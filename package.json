@@ -7,7 +7,6 @@
   ],
   "devDependencies": {
     "@types/react": "^18.3.3",
-    "@types/react-native": "^0.73.0",
     "eslint": "^8.21.0",
     "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.4",
@@ -15,10 +14,11 @@
     "typescript": "^5.5.4"
   },
   "scripts": {
-    "native": "cd apps/expo && bun run start",
-    "web": "cd apps/next && bun run next",
-    "clean": "git clean -xdf node_modules",
-    "clean:workspaces": "turbo clean"
+    "native": "cd apps/expo && pnpm run start",
+    "web": "cd apps/next && pnpm run next",
+    "clean": "rm -rf node_modules",
+    "clean:workspaces": "turbo clean",
+    "tapup": "cd apps/tapup && pnpm run dev"
   },
   "resolutions": {
     "metro": "~0.80.8",
