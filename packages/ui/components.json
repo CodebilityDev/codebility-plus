@@ -10,8 +10,7 @@
     "cssVariables": true
   },
   "aliases": {
-    "utils": "@codebility/ui",
-    "components": "src/",
-    "ui": "src/"
+    "components": "@codebility/ui/components",
+    "utils": "@codebility/ui/lib/utils"
   }
 }

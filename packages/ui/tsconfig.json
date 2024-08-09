@@ -1,9 +1,12 @@
 {
   "compilerOptions": {
     "module": "NodeNext",
-    "moduleResolution": "NodeNext",
     "jsx": "preserve",
-    "rootDir": "."
+    "rootDir": ".",
+    "baseUrl": ".",
+    "paths": {
+      "@codebility/ui/*": ["./src/*"]
+    }
   },
   "include": ["*.ts", "src"],
   "exclude": ["node_modules"]
