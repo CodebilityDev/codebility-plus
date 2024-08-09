@@ -3,6 +3,12 @@
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**"]
+    },
+    "clean": {
+      "cache": false
+    },
+    "//#clean": {
+      "cache": false
     }
   }
 }
