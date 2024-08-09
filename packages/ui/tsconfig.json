@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "jsx": "preserve",
+    "rootDir": "."
+  },
+  "include": ["*.ts", "src"],
+  "exclude": ["node_modules"]
+}
