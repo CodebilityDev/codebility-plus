@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
-import rofig from "@codebility/ui/tailwind.config";
-  
+import rofig from "@codevs/ui/tailwind.config";
+
 const config: Config = {
   presets: [rofig],
   content: [
@@ -8,7 +8,7 @@ const config: Config = {
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
-    "./node_modules/@codebility/ui/src/**/*.{tsx,ts}"
+    "./node_modules/@codevs/ui/src/**/*.{tsx,ts}"
   ],
   theme: {
     extend: {
