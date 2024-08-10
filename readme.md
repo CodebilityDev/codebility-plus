@@ -95,8 +95,8 @@ Take a look at the [`packages/app/design`](https://github.com/nandorojo/solito/t
 
 - `apps` entry points for each app
 
-   - `expo`
-    - `app` you'll be creating files inside of `apps/expo/app` to use file system routing on iOS and Android.
+  - `expo`
+  - `app` you'll be creating files inside of `apps/expo/app` to use file system routing on iOS and Android.
   - `next`
 
 - `packages` shared packages across apps
@@ -111,16 +111,16 @@ You can add other folders inside of `packages/` if you know what you're doing an
 
 ## 🏁 Start the app
 
-- Install dependencies: `bun i`
+- Install dependencies: `pnpm i`
 
-- Next.js local dev: `bun run web`
-  - Runs `bun run next`
+- Next.js local dev: `pnpm run web`
+  - Runs `pnpm run next`
 - Expo local dev:
   - First, build a dev client onto your device or simulator
     - `cd apps/expo`
     - Then, either `expo run:ios`, or `eas build`
   - After building the dev client, from the root of the monorepo...
-    - `bun run native` (This runs `expo start --dev-client`)
+    - `pnpm run native` (This runs `expo start --dev-client`)
 
 ## 🆕 Add new dependencies
 
@@ -148,6 +148,61 @@ yarn
 ```
 
 You can also install the native library inside of `packages/app` if you want to get autoimport for that package inside of the `app` folder. However, you need to be careful and install the _exact_ same version in both packages. If the versions mismatch at all, you'll potentially get terrible bugs. This is a classic monorepo issue. I use `lerna-update-wizard` to help with this (you don't need to use Lerna to use that lib).
+
+## 🆕 Add new NextJS App Router app.
+
+reference:
+
+- [Mastering Next.js Monorepos: A Comprehensive Guide](https://medium.com/@omar.shiriniani/mastering-next-js-monorepos-a-comprehensive-guide-15f59f5ef615#:~:text=1%20Step%201%3A%20Install%20Turborepo%20First%2C%20make%20sure,Next.js%20app%20within%20the%20monorepo.%20...%20More%20items)
+
+Initialize a new NextJS App
+
+```
+cd apps
+npx create-next-app@latest app-name # replace app-name with new nextjs app
+```
+
+_that's it_.
+
+Configure mono repo connection:
+
+to connect with `/packages/ui`
+
+add to the new NextJS app `package.json` dependencies:
+
+```json
+{
+  //...,
+  "dependencies": {
+    //...,
+    "@codebility/ui": "workspace:*"
+    //...
+  }
+  //...
+}
+```
+
+add ui contents in `tailwind.config.ts` to make tailwind of shared ui works:
+
+```json
+{
+  //...,
+  "contents": [
+    //...,
+    "./node_modules/@codebility/ui/src/**/*.{tsx,ts}"
+    //...,
+  ]
+  //...,
+}
+```
+
+import ui css in `layout.tsx`:
+
+```jsx
+import '@codebility/ui/globals.css'
+```
+
+then run `pnpm i`.
 
 ## 🎙 About the creator
 
