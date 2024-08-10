@@ -59,6 +59,12 @@ importers:
       '@chromatic-com/storybook':
         specifier: 1.6.1
         version: 1.6.1(react@18.2.0)
+      '@codevs/tailwind-config':
+        specifier: workspace:*
+        version: link:../../tooling/tailwind
+      '@codevs/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
       '@storybook/addon-essentials':
         specifier: ^8.2.8
         version: 8.2.8(storybook@8.2.8)
@@ -406,6 +412,12 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.9)
     devDependencies:
+      '@codevs/tailwind-config':
+        specifier: workspace:*
+        version: link:../../tooling/tailwind
+      '@codevs/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
       tailwindcss:
         specifier: ^3.4.9
         version: 3.4.9

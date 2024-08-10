@@ -1,5 +1,5 @@
 import Image from 'next/image'
-import { Button } from '@codebility/ui/components/ui/button'
+import { Button } from '@codevs/ui/button'
 
 export default function Home() {
   return (

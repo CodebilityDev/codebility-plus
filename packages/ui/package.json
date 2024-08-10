@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "clean": "rm -rf node_modules",
+    "clean": "rm -rf dist .turbo node_modules",
     "ui-add": "pnpm dlx shadcn-ui add",
     "dev": "tsc",
     "build": "tsc"
@@ -16,6 +16,10 @@
     "./button": {
       "types": "./dist/src/button.d.ts",
       "default": "./src/button.tsx"
+    },
+    "./accordion": {
+      "types": "./dist/src/accordion.d.ts",
+      "default": "./src/accordion.tsx"
     }
   },
   "author": "",
