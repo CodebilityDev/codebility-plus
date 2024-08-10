@@ -18,7 +18,7 @@
     "web": "cd apps/next && pnpm run next",
     "clean": "rm -rf node_modules",
     "clean:workspaces": "turbo clean",
-    "tapup": "turbo run dev --filter=@codebility/ui --filter=tapup",
+    "tapup": "turbo run dev --filter=@codevs/ui --filter=tapup",
     "dev": "turbo watch dev",
     "codebility": "turbo run dev --filter=@codebility/ui --filter=codebility",
     "ui-add": "turbo run ui-add"
