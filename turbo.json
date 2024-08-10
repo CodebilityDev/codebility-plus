@@ -1,14 +1,23 @@
 {
+  "ui": "tui",
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": false
     },
     "clean": {
       "cache": false
     },
     "//#clean": {
       "cache": false
+    },
+    "ui-add": {
+      "cache": false,
+      "interactive": true
     }
   }
 }
