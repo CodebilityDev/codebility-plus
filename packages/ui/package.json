@@ -1,5 +1,5 @@
 {
-  "name": "@codebility/ui",
+  "name": "@codevs/ui",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -18,10 +18,7 @@
       "default": "./src/lib/*.ts"
     },
     "./globals.css": "./globals.css",
-    "./components/*": {
-      "types": "./dist/src/components/*.d.ts",
-      "default": "./src/components/*.tsx"
-    }
+    "./button": "./src/components/ui/button.tsx"
   },
   "author": "",
   "license": "ISC",
