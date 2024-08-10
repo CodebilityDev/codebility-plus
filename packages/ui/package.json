@@ -4,13 +4,24 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf node_modules",
-    "ui-add": "pnpm dlx shadcn-ui add"
+    "ui-add": "pnpm dlx shadcn-ui add",
+    "dev": "tsc",
+    "build": "tsc"
   },
   "exports": {
-    "./tailwind.config": "./tailwind.config.ts",
-    "./lib/*": "./src/lib/*.ts",
+    "./tailwind.config": {
+      "types": "./dist/tailwind.config.d.ts",
+      "default": "./tailwind.config.ts"
+    },
+    "./lib/*": {
+      "types": "./dist/src/lib/*.d.ts",
+      "default": "./src/lib/*.ts"
+    },
     "./globals.css": "./globals.css",
-    "./components/*": "./src/components/*.tsx"
+    "./components/*": {
+      "types": "./dist/src/components/*.d.ts",
+      "default": "./src/components/*.tsx"
+    }
   },
   "author": "",
   "license": "ISC",

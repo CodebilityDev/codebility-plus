@@ -1,12 +1,23 @@
 {
   "compilerOptions": {
     "module": "NodeNext",
+    "lib": ["dom", "dom.iterable", "ES2022"],
     "jsx": "preserve",
     "rootDir": ".",
     "baseUrl": ".",
     "paths": {
       "@codebility/ui/*": ["./src/*"]
-    }
+    },
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": false,
+    "outDir": "${configDir}/dist",
+    "incremental": true,
+    "disableSourceOfProjectReferenceRedirect": true,
+    "tsBuildInfoFile": "${configDir}/node_modules/.cache/tsbuildinfo.json",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "checkJs": true
   },
   "include": ["*.ts", "src"],
   "exclude": ["node_modules"]
