@@ -20,7 +20,7 @@
     "clean:workspaces": "turbo clean",
     "tapup": "turbo run dev --filter=@codevs/ui --filter=tapup",
     "dev": "turbo watch dev",
-    "codebility": "turbo run dev --filter=@codebility/ui --filter=codebility",
+    "codebility": "turbo run dev --filter=@codevs/ui --filter=codebility",
     "ui-add": "turbo run ui-add"
   },
   "resolutions": {
