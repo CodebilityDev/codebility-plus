@@ -4,7 +4,7 @@ import type { Config } from "tailwindcss";
 /** @type {import('tailwindcss').Config} */
 export default {
   darkMode: ['class'],
-  content: ["./src/**/*.{ts,tsx}","../../packages/ui/src/**/*.{ts,tsx}"],
+  content: ["./src/**/*.{ts,tsx}","./node_modules/@codebility/ui/src/**/*.{ts,tsx}"],
   prefix: '',
   theme: {
     container: {

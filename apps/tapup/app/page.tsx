@@ -1,4 +1,5 @@
 import Image from 'next/image'
+import { Button } from '@codebility/ui/components/ui/button'
 
 export default function Home() {
   return (
@@ -108,6 +109,7 @@ export default function Home() {
           </p>
         </a>
       </div>
+      <Button variant={'destructive'}>A</Button>
     </main>
   )
 }

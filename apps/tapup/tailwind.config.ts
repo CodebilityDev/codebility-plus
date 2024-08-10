@@ -4,12 +4,11 @@ import rofig from "@codebility/ui/tailwind.config";
 const config: Config = {
   presets: [rofig],
   content: [
-    ...rofig.content as string[],
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
     "./src/**/*.{ts,tsx}",
-    "../next/components/*.tsx"
+    "./node_modules/@codebility/ui/src/**/*.{tsx,ts}"
   ],
   theme: {
     extend: {

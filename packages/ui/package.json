@@ -8,6 +8,7 @@
   "exports": {
     "./tailwind.config": "./tailwind.config.ts",
     "./lib/*": "./src/lib/*.ts",
+    "./globals.css": "./globals.css",
     "./components/*": "./src/components/*.tsx"
   },
   "author": "",
