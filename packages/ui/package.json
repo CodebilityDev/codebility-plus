@@ -8,10 +8,7 @@
   "exports": {
     "./tailwind.config": "./tailwind.config.ts",
     "./lib/*": "./src/lib/*.ts",
-    "./components/*": [
-      "./src/components/*.tsx",
-      "./src/components/*.ts"
-    ]
+    "./components/*": "./src/components/*.tsx"
   },
   "author": "",
   "license": "ISC",
