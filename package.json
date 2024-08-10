@@ -18,7 +18,8 @@
     "web": "cd apps/next && pnpm run next",
     "clean": "rm -rf node_modules",
     "clean:workspaces": "turbo clean",
-    "tapup": "cd apps/tapup && pnpm run dev"
+    "tapup": "cd apps/tapup && pnpm run dev",
+    "codebility": "cd apps/codebility && pnpm run dev"
   },
   "resolutions": {
     "metro": "~0.80.8",
