@@ -3,7 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "ui-add": "pnpm dlx shadcn-ui add"
   },
   "exports": {
     "./tailwind.config": "./tailwind.config.ts",

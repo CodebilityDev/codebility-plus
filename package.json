@@ -19,7 +19,9 @@
     "clean": "rm -rf node_modules",
     "clean:workspaces": "turbo clean",
     "tapup": "cd apps/tapup && pnpm run dev",
-    "codebility": "cd apps/codebility && pnpm run dev"
+    "dev": "turbo watch dev",
+    "codebility": "cd apps/codebility && pnpm run dev",
+    "ui-add": "turbo run ui-add"
   },
   "resolutions": {
     "metro": "~0.80.8",
