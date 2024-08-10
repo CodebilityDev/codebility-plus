@@ -5,6 +5,8 @@ export default {
   content: [
     '../../packages/**/src/**/*.tsx',
     '../../apps/**/*.tsx',
+    '!../../packages/**/node_modules', // ! - means don't include given path.
+    '!../../apps/**/node_modules',
   ],
   theme: {
     extend: {
