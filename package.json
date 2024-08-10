@@ -31,5 +31,10 @@
     "**/expo-router",
     "**/expo-router/**"
   ],
-  "packageManager": "pnpm@8.11.0"
+  "packageManager": "pnpm@8.11.0",
+  "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/supabase-js": "^2.45.1",
+    "axios": "^1.7.3"
+  }
 }
