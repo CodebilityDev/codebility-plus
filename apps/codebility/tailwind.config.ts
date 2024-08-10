@@ -1,5 +1,5 @@
 import type { Config } from "tailwindcss";
-import UIConfig from "@codebility/ui/tailwind.config";
+import UIConfig from "@codevs/ui/tailwind.config";
 
 const config: Config = {
   presets: [UIConfig],
@@ -8,7 +8,7 @@ const config: Config = {
     "./pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./components/**/*.{js,ts,jsx,tsx,mdx}",
     "./app/**/*.{js,ts,jsx,tsx,mdx}",
-    "./node_modules/@codebility/ui/src/**/*.{tsx,ts}"
+    "./node_modules/@codevs/ui/src/**/*.{tsx,ts}"
   ],
   theme: {
     extend: {
