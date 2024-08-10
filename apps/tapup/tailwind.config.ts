@@ -1,24 +1,10 @@
 import type { Config } from "tailwindcss";
-import rofig from "@codevs/ui/tailwind.config";
+import baseConfig from "@codevs/tailwind-config/web";
 
 const config: Config = {
-  presets: [rofig],
-  content: [
-    "./pages/**/*.{ts,tsx}",
-    "./components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-    "./node_modules/@codevs/ui/src/**/*.{tsx,ts}"
-  ],
-  theme: {
-    extend: {
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic":
-          "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
-      },
-    },
-  },
-  plugins: [],
+  // We need to append the path to the UI package to the content array so that
+  // those classes are included correctly.
+  content: [...baseConfig.content],
+  presets: [baseConfig],
 };
 export default config;
