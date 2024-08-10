@@ -9,23 +9,23 @@
     "build": "tsc"
   },
   "exports": {
-    "./tailwind.config": {
-      "types": "./dist/tailwind.config.d.ts",
-      "default": "./tailwind.config.ts"
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.ts"
     },
-    "./lib/*": {
-      "types": "./dist/src/lib/*.d.ts",
-      "default": "./src/lib/*.ts"
-    },
-    "./globals.css": "./globals.css",
-    "./button": "./src/components/ui/button.tsx"
+    "./button": {
+      "types": "./dist/src/button.d.ts",
+      "default": "./src/button.tsx"
+    }
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
     "tailwindcss": "^3.4.9",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "@codevs/tsconfig": "workspace:*",
+    "@codevs/tailwind-config": "workspace:*"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.0",
