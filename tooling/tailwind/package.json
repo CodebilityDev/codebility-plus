@@ -1,0 +1,20 @@
+{
+  "name": "@codevs/tailwind-config",
+  "version": "1.0.0",
+  "main": "index.ts",
+  "scripts": {
+    "clean": "rm -rf .turbo node_modules"
+  },
+  "exports": {
+    "./web": "./web.ts"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@codevs/tsconfig": "workspace:*",
+    "tailwindcss-animate": "^1.0.7"
+  },
+  "devDependencies": {
+    "tailwindcss": "^3.4.9",
+    "typescript": "^5.5.4"
+  }
+}
