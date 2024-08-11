@@ -1,26 +1,25 @@
 {
-  "name": "@codebility/ui",
+  "name": "@codevs/ui",
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "clean": "rm -rf node_modules",
+    "clean": "rm -rf dist .turbo node_modules",
     "ui-add": "pnpm dlx shadcn-ui add",
     "dev": "tsc",
     "build": "tsc"
   },
   "exports": {
-    "./tailwind.config": {
-      "types": "./dist/tailwind.config.d.ts",
-      "default": "./tailwind.config.ts"
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./src/index.ts"
     },
-    "./lib/*": {
-      "types": "./dist/src/lib/*.d.ts",
-      "default": "./src/lib/*.ts"
+    "./button": {
+      "types": "./dist/src/button.d.ts",
+      "default": "./src/button.tsx"
     },
-    "./globals.css": "./globals.css",
-    "./components/*": {
-      "types": "./dist/src/components/*.d.ts",
-      "default": "./src/components/*.tsx"
+    "./accordion": {
+      "types": "./dist/src/accordion.d.ts",
+      "default": "./src/accordion.tsx"
     }
   },
   "author": "",
@@ -28,7 +27,9 @@
   "description": "",
   "devDependencies": {
     "tailwindcss": "^3.4.9",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "@codevs/tsconfig": "workspace:*",
+    "@codevs/tailwind-config": "workspace:*"
   },
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.0",
