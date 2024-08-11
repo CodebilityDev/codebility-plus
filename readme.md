@@ -149,13 +149,17 @@ yarn
 
 You can also install the native library inside of `packages/app` if you want to get autoimport for that package inside of the `app` folder. However, you need to be careful and install the _exact_ same version in both packages. If the versions mismatch at all, you'll potentially get terrible bugs. This is a classic monorepo issue. I use `lerna-update-wizard` to help with this (you don't need to use Lerna to use that lib).
 
+## Shared Packages Naming
+
+must be prefixed by `@codevs/` e.g. `@codevs/ui`.
+
 ## 🆕 Add new NextJS App Router app.
 
-reference:
+_reference_:
 
 - [Mastering Next.js Monorepos: A Comprehensive Guide](https://medium.com/@omar.shiriniani/mastering-next-js-monorepos-a-comprehensive-guide-15f59f5ef615#:~:text=1%20Step%201%3A%20Install%20Turborepo%20First%2C%20make%20sure,Next.js%20app%20within%20the%20monorepo.%20...%20More%20items)
 
-Initialize a new NextJS App
+##### Initialize a new NextJS App
 
 ```
 cd apps
@@ -164,42 +168,64 @@ npx create-next-app@latest app-name # replace app-name with new nextjs app
 
 _that's it_.
 
-Configure mono repo connection:
+##### Connect to global configurations:
 
-to connect with `/packages/ui`
+to make it easier to update configs of each app, without having to update each app or packages config every time we make changes.
 
-add to the new NextJS app `package.json` dependencies:
+_tailwind_:
 
-```json
+in `package.json` add in `devDependencies` the name of the tailwind global.
+
+we specify its version as `"workspace:*"` to tell npm to look for this packages in the monorepo packages.
+
+```
 {
-  //...,
-  "dependencies": {
+  "devDependencies": {
     //...,
-    "@codebility/ui": "workspace:*"
+    "@codevs/tailwind-config": "workspace:*",
     //...
   }
-  //...
 }
 ```
 
-add ui contents in `tailwind.config.ts` to make tailwind of shared ui works:
+in the new app `tailwind.config.ts` it must create the connection by extending the global config of tailwind in web (since NextJS is a web app) which is `@codevs/tailwind-config/web`.
+
+- `presets:[baseConfig]` extends the global tailwind web config.
+- `content:[...baseConfig.context]` tells the new app config where are the contents we will apply tailwindcss to.
+  if you go to `tooling/tailwind/base.ts` you will see that it includes this paths (`'../../packages/**/src/**/*.tsx',
+    '../../apps/**/*.tsx',`).
+
+```ts
+import type { Config } from 'tailwindcss'
+import baseConfig from '@codevs/tailwind-config/web'
+
+const config: Config = {
+  // We need to append the path to the UI package to the content array so that
+  // those classes are included correctly.
+  content: [...baseConfig.content],
+  presets: [baseConfig],
+}
+export default config
+```
+
+_typescript_:
+
+in `package.json` add in `devDependencies` the name of typescript global config:
 
 ```json
 {
-  //...,
-  "contents": [
+  "devDependencies": {
     //...,
-    "./node_modules/@codebility/ui/src/**/*.{tsx,ts}"
-    //...,
-  ]
-  //...,
+    "@codevs/tsconfig": "workspace:*"
+    //...
+  }
 }
 ```
 
-import ui css in `layout.tsx`:
+simply extend the global typescript config by adding this in the new app `tsconfig.json`.
 
-```jsx
-import '@codebility/ui/globals.css'
+```ts
+"extends": "@codevs/tsconfig/base.json"
 ```
 
 then run `pnpm i`.
