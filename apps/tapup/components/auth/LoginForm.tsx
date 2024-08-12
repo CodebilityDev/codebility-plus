@@ -200,7 +200,7 @@ function LoginForm() {
                   <p>
                     Don’t have an account?&nbsp;
                     <span
-                      onClick={() => router.push('/sign-up')}
+                      onClick={() => router.push('/auth/register')}
                       className="cursor-pointer font-semibold hover:text-green-600"
                     >
                       Sign-up here
