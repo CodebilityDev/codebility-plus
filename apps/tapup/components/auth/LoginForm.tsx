@@ -1,6 +1,6 @@
 'use client'
 
-import { signInWithOAuth, signInWithPassword } from '@/app/auth/actions'
+import { loginWithOAuth, loginWithPassword } from '@/app/auth/actions'
 import { Button } from '@codevs/ui/button'
 import React, { useState } from 'react'
 import {
@@ -40,7 +40,7 @@ function LoginForm() {
     const password = formData.get('password') as string
 
     try {
-      await signInWithPassword(email, password)
+      await loginWithPassword(email, password)
     } catch (e) {
       alert(e)
     } finally {
@@ -72,7 +72,7 @@ function LoginForm() {
                   <Button
                     variant={'outline'}
                     type="button"
-                    onClick={async () => await signInWithOAuth('google')}
+                    onClick={async () => await loginWithOAuth('google')}
                     className="w-full"
                   >
                     {' '}
