@@ -2,7 +2,7 @@
 
 import { signInWithOAuth, signInWithPassword } from '@/app/auth/actions'
 import { Button } from '@codevs/ui/button'
-import React from 'react'
+import React, { useState } from 'react'
 import {
   Form,
   FormField,
@@ -25,6 +25,8 @@ const formSchema = z.object({
 function LoginForm() {
   const router = useRouter()
 
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -41,6 +43,8 @@ function LoginForm() {
       await signInWithPassword(email, password)
     } catch (e) {
       alert(e)
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -88,7 +92,13 @@ function LoginForm() {
               <span className="mx-4">or</span>
               <div className="flex-grow border-t border-gray-600"></div>
             </div>
-            <form action={handleLogin} className="w-full">
+            <form
+              action={(formData: FormData) => {
+                setIsSubmitting(true)
+                handleLogin(formData)
+              }}
+              className="w-full"
+            >
               <FormField
                 control={form.control}
                 name="email"
@@ -165,9 +175,9 @@ function LoginForm() {
                 <Button
                   type="submit"
                   className="w-full bg-green-600 text-white"
-                  disabled={form.formState.isSubmitting}
+                  disabled={isSubmitting}
                 >
-                  {form.formState.isSubmitting ? (
+                  {isSubmitting ? (
                     <div className="flex items-center justify-center">
                       <svg
                         className="mr-3 h-5 w-5 animate-spin text-white"
