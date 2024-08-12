@@ -13,8 +13,8 @@ export const signInWithPassword = async (email: string, password: string) => {
     });
   
     if (error) throw error;
-    redirect("/")
-  };
+    redirect("/dashboard")
+};  
   
 export const signUp = async (email: string, password: string, name: string) => {
     const supabase = createServerActionClient({ cookies });
@@ -32,6 +32,18 @@ export const signUp = async (email: string, password: string, name: string) => {
 
     if (error) throw error;
     return data.user;
+};
+
+export const signInWithOAuth = async (provider: 'google' | 'github') => {
+  const supabase = createServerActionClient({ cookies });
+
+  const res = await supabase.auth.signInWithOAuth({
+    provider,
+    options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/auth/callback`},
+  });
+  console.log(res.data.url);
+  if (res.data.url) redirect(res.data.url);
+  throw res.error;
 };
 
 export const signOut = async () => {
