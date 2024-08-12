@@ -28,6 +28,10 @@
     "./label": {
       "types": "./dist/src/label.d.ts",
       "default": "./src/label.tsx"
+    },
+    "./checkbox": {
+      "types": "./dist/src/checkbox.d.ts",
+      "default": "./src/checkbox.tsx"
     }
   },
   "author": "",
