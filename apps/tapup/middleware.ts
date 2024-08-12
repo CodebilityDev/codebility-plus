@@ -9,7 +9,16 @@ export async function middleware(req: NextRequest) {
   const supabase = createMiddlewareClient({ req, res });
  
   // Refresh session if expired - required for Server Components
-  const session = await supabase.auth.getSession();
+  const { data: {session}} = await supabase.auth.getSession();
+
+  const authenticatedRoutes = [
+    "/"
+  ];
+
+  const isApi = nextUrl.pathname.indexOf("/api") === 0;
+
+  if (!session && authenticatedRoutes.includes(nextUrl.pathname) && !isApi) 
+    return NextResponse.redirect(new URL("/auth/login",nextUrl));
 
   return res;
 }
