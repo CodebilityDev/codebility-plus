@@ -13,6 +13,7 @@
   },
   "dependencies": {
     "@codevs/ui": "workspace:*",
+    "@hookform/resolvers": "^3.9.0",
     "next": "14.2.5",
     "react": "^18",
     "react-dom": "^18",
