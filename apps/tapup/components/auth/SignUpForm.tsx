@@ -42,6 +42,8 @@ function SignUpForm() {
     },
   })
 
+  const { reset } = form
+
   const handleToggle = (e: FormEvent) => {
     e.preventDefault()
     setToggle((c) => !c)
@@ -58,6 +60,8 @@ function SignUpForm() {
 
     try {
       await signUp(email, password, name)
+      reset()
+      toast.success('Success! Continue by verifying your email!')
     } catch (e) {
       toast.error((e as { message: string }).message)
     }
