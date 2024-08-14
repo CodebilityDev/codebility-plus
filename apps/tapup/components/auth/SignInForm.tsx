@@ -2,7 +2,7 @@
 
 import { signInWithOAuth, signInWithPassword } from '@/app/auth/actions'
 import { Button } from '@codevs/ui/button'
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Form,
   FormField,
@@ -17,6 +17,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import pathsConfig from '@/config/paths.config'
+import { toast, Toaster } from '@codevs/ui/toast'
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -26,8 +27,6 @@ const formSchema = z.object({
 function SignInForm() {
   const router = useRouter()
 
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
-
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -36,16 +35,13 @@ function SignInForm() {
     },
   })
 
-  const handleSignIn = async (formData: FormData) => {
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+  const handleSignIn = async (values: z.infer<typeof formSchema>) => {
+    const { email, password } = values
 
     try {
       await signInWithPassword(email, password)
     } catch (e) {
-      alert(e)
-    } finally {
-      setIsSubmitting(false)
+      toast.error((e as { message: string }).message)
     }
   }
 
@@ -53,6 +49,7 @@ function SignInForm() {
     <div className="flex w-8/12">
       <div className="flex-1 rounded-l-xl bg-slate-50">
         <div className="flex flex-col items-center gap-3 px-10 py-16">
+          <Toaster richColors position="top-right" />
           <Form {...form}>
             <Image
               src="/logo-tapup-dark.svg"
@@ -93,13 +90,7 @@ function SignInForm() {
               <span className="mx-4">or</span>
               <div className="flex-grow border-t border-gray-600"></div>
             </div>
-            <form
-              action={(formData: FormData) => {
-                setIsSubmitting(true)
-                handleSignIn(formData)
-              }}
-              className="w-full"
-            >
+            <form onSubmit={form.handleSubmit(handleSignIn)} className="w-full">
               <FormField
                 control={form.control}
                 name="email"
@@ -176,9 +167,9 @@ function SignInForm() {
                 <Button
                   type="submit"
                   className="w-full bg-green-600 text-white"
-                  disabled={isSubmitting}
+                  disabled={form.formState.isSubmitting}
                 >
-                  {isSubmitting ? (
+                  {form.formState.isSubmitting ? (
                     <div className="flex items-center justify-center">
                       <svg
                         className="mr-3 h-5 w-5 animate-spin text-white"
