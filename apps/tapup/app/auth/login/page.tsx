@@ -1,10 +1,10 @@
 import React from 'react'
-import LoginForm from '@/components/auth/LoginForm'
+import SignInForm from '@/components/auth/SignInForm'
 
 function Login() {
   return (
     <div className="flex h-screen items-center justify-center">
-      <LoginForm />
+      <SignInForm />
     </div>
   )
 }
