@@ -4,7 +4,8 @@ const PathsSchema = z.object({
     auth: z.object({
       signIn: z.string().min(1),
       signUp: z.string().min(1),
-      callback: z.string().min(1)
+      callback: z.string().min(1),
+      passwordReset: z.string().min(1),
     }),
     app: z.object({
       home: z.string().min(1),
@@ -16,6 +17,7 @@ const pathsConfig = PathsSchema.parse({
       signIn: '/auth/sign-in',
       signUp: '/auth/sign-up',
       callback: '/auth/callback',
+      passwordReset: '/auth/password-reset'
     },
     app: {
       home: '/home',
