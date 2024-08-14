@@ -1,30 +1,17 @@
-import { createServer } from '@/utils/supabase'
-import { Button } from '@codevs/ui/button'
 import React from 'react'
-import { signOut } from '@/app/auth/actions'
+import Navbar from './_components/home-navbar'
+import Sidebar from './_components/home-sidebar'
 
 async function UserHomePage() {
-  const supabase = createServer()
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  if (!user) return <div>You are not allowed here!</div>
-
-  const { data, error } = await supabase
-    .from('users')
-    .select()
-    .eq('id', user?.id)
-    .single()
-
   return (
-    <div>
-      <div>Hello {data && data.email}</div>
-      <img className="h-20 w-20" src={data.avatar_url} />
-      <form action={signOut}>
-        <Button>Logout</Button>
-      </form>
+    <div className="flex">
+      <div className="h-screen w-1/5">
+        <Sidebar />
+      </div>
+
+      <div className="flex-1 bg-slate-100">
+        <Navbar />
+      </div>
     </div>
   )
 }
