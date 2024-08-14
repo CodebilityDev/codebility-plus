@@ -34,14 +34,14 @@ export const signUp = async (email: string, password: string, name: string) => {
     return data.user;
 };
 
-export const signInWithOAuth = async (provider: 'google' | 'github') => {
+export const signInWithOAuth = async (provider: 'google' | 'facebook' | 'linkedin') => {
   const supabase = createServerActionClient({ cookies });
 
   const res = await supabase.auth.signInWithOAuth({
     provider,
     options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/auth/callback`},
   });
-  console.log(res.data.url);
+
   if (res.data.url) redirect(res.data.url);
   throw res.error;
 };
