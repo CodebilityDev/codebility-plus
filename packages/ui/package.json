@@ -13,25 +13,9 @@
       "types": "./dist/src/index.d.ts",
       "default": "./src/index.ts"
     },
-    "./button": {
-      "types": "./dist/src/button.d.ts",
-      "default": "./src/button.tsx"
-    },
-    "./accordion": {
-      "types": "./dist/src/accordion.d.ts",
-      "default": "./src/accordion.tsx"
-    },
-    "./form": {
-      "types": "./dist/src/form.d.ts",
-      "default": "./src/form.tsx"
-    },
-    "./label": {
-      "types": "./dist/src/label.d.ts",
-      "default": "./src/label.tsx"
-    },
-    "./checkbox": {
-      "types": "./dist/src/checkbox.d.ts",
-      "default": "./src/checkbox.tsx"
+    "./*": {
+      "types": "./dist/src/*.d.ts",
+      "default": "./src/*.tsx"
     }
   },
   "author": "",
@@ -46,8 +30,11 @@
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
+    "@radix-ui/react-checkbox": "^1.1.1",
     "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-toast": "^1.2.1",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.427.0",
