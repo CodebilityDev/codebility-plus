@@ -36,7 +36,7 @@ import {
 } from '@codevs/ui/dropdown-menu'
 import { UserWorkspaceContext } from './user-workspace-context'
 
-import { signOut } from '@/app/auth/actions'
+import { signOut } from '~/app/auth/actions'
 
 function HomeNavbarMenu() {
   const user = useContext(UserWorkspaceContext)

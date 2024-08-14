@@ -1,7 +1,7 @@
-import { createRoute } from "@/utils/supabase"
+import { createRoute } from "~/utils/supabase"
 import { NextResponse } from "next/server"
 
-import pathsConfig from '@/config/paths.config';
+import pathsConfig from '~/config/paths.config';
 import type { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {
