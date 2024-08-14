@@ -34,7 +34,7 @@ export const signUp = async (email: string, password: string, name: string) => {
     return data.user;
 };
 
-export const signInWithOAuth = async (provider: 'google' | 'facebook' | 'linkedin') => {
+export const signInWithOAuth = async (provider: 'google' | 'facebook' | 'linkedin_oidc') => {
   const supabase = createServerActionClient({ cookies });
 
   const res = await supabase.auth.signInWithOAuth({
