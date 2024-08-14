@@ -50,6 +50,24 @@ export async function middleware(req: NextRequest) {
 function getPatterns() {
   return [
     {
+      pattern: new URLPattern({ pathname: '/auth/*?' }),
+      handler: async (req: NextRequest, res: NextResponse) => {
+        const {
+          data: { user },
+        } = await getUser(req, res);
+
+        // the user is logged out, so we don't need to do anything
+        if (!user) {
+          return;
+        }
+
+        // If user is logged in, redirect to home page.
+        return NextResponse.redirect(
+          new URL(pathsConfig.app.home, req.nextUrl.origin).href,
+        );
+      },
+    },
+    {
       pattern: new URLPattern({ pathname: '/home/*?' }),
       handler: async (req: NextRequest, res: NextResponse) => {
         const {
