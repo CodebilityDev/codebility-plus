@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
+import pathsConfig from "@/config/paths.config";
 
 export const signInWithPassword = async (email: string, password: string) => {
     const supabase = createServerActionClient({ cookies });
@@ -13,7 +14,7 @@ export const signInWithPassword = async (email: string, password: string) => {
     });
   
     if (error) throw error;
-    redirect("/dashboard")
+    redirect(pathsConfig.app.home)
 };  
   
 export const signUp = async (email: string, password: string, name: string) => {
