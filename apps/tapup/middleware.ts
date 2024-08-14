@@ -1,37 +1,88 @@
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
-import { NextResponse } from 'next/server';
+import { NextResponse, URLPattern } from 'next/server';
 import type { NextRequest } from 'next/server';
+
+import pathsConfig from './config/paths.config';
+
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * Feel free to modify this pattern to include more paths.
+     */
+    '/((?!_next/static|_next/image|favicon.ico).*)',
+  ],
+};
+
+const getUser = (req: NextRequest, res: NextResponse) => {
+  const supabase = createMiddlewareClient({req,res});
+
+  return supabase.auth.getUser();
+};
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
-  const nextUrl = req.nextUrl;
 
-  const supabase = createMiddlewareClient({ req, res });
- 
-  // Refresh session if expired - required for Server Components
-  const { data: {session}} = await supabase.auth.getSession();
+  // handle patterns for specific routes
+  const handlePattern = matchUrlPattern(req.url);
 
-  const authenticatedRoutes = [
-    "/"
-  ];
+  // if a pattern handler exists, call it
+  if (handlePattern) {
+    const patternHandlerResponse = await handlePattern(req, new NextResponse());
 
-  const isApi = nextUrl.pathname.indexOf("/api") === 0;
-
-  if (!session && authenticatedRoutes.includes(nextUrl.pathname) && !isApi) 
-    return NextResponse.redirect(new URL("/auth/login",nextUrl));
+    // if a pattern handler returns a response, return it
+    if (patternHandlerResponse) {
+      return patternHandlerResponse;
+    }
+  }
 
   return res;
 }
 
-export const config = {
-    matcher: [
-      /*
-       * Match all request paths except for the ones starting with:
-       * - _next/static (static files)
-       * - _next/image (image optimization files)
-       * - favicon.ico (favicon file)
-       * Feel free to modify this pattern to include more paths.
-       */
-      '/((?!_next/static|_next/image|favicon.ico).*)',
-    ],
-};
+
+/**
+ * Define URL patterns and their corresponding handlers.
+ */
+
+function getPatterns() {
+  return [
+    {
+      pattern: new URLPattern({ pathname: '/home/*?' }),
+      handler: async (req: NextRequest, res: NextResponse) => {
+        const {
+          data: { user },
+        } = await getUser(req, res);
+
+        const origin = req.nextUrl.origin;
+        const next = req.nextUrl.pathname;
+
+         // If user is not logged in, redirect to sign in page.
+         if (!user) {
+          const signIn = pathsConfig.auth.signIn;
+          const redirectPath = `${signIn}?next=${next}`;
+
+          return NextResponse.redirect(new URL(redirectPath, origin).href);
+        }
+      }
+    }
+  ];
+}
+
+/**
+ * Match URL patterns to specific handlers.
+ * @param url
+ */
+function matchUrlPattern(url: string) {
+  const patterns = getPatterns();
+  const input = url.split('?')[0];
+
+  for (const pattern of patterns) {
+    const patternResult = pattern.pattern.exec(input);
+    if (patternResult !== null && 'pathname' in patternResult) {
+      return pattern.handler;
+    }
+  }
+}
