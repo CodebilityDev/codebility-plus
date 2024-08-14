@@ -16,6 +16,7 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import Image from 'next/image'
 import { useRouter } from 'next/navigation'
+import pathsConfig from '@/config/paths.config'
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -210,7 +211,7 @@ function SignInForm() {
                   <p>
                     Don’t have an account?&nbsp;
                     <span
-                      onClick={() => router.push('/auth/register')}
+                      onClick={() => router.push(pathsConfig.auth.signUp)}
                       className="cursor-pointer font-semibold hover:text-green-600"
                     >
                       Sign-up here
