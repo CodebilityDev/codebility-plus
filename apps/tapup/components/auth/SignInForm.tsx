@@ -154,7 +154,7 @@ function SignInForm() {
               />
 
               <div
-                onClick={() => router.push('/password_reset')}
+                onClick={() => router.push(pathsConfig.auth.passwordReset)}
                 className="mt-1 flex cursor-pointer justify-end text-sm text-green-600 hover:text-gray-900"
               >
                 Forgot Password?
