@@ -12,7 +12,7 @@ export const formSchema = z
         message: "Please enter a valid email address",
       }),
     password: z.string().min(8, {
-      message: "Password must be at least 6 character(s) long",
+      message: "Password must be at least 8 character(s) long",
     }),
     confirmPassword: z.string(),
     privacyPolicy: z.boolean().refine((value) => value === true, {
