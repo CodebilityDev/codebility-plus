@@ -1,7 +1,7 @@
 'use client'
 
 import { Button } from '@codevs/ui/button'
-import React, { useState } from 'react'
+import React, { FormEvent, useState } from 'react'
 
 import {
   Form,
@@ -22,49 +22,53 @@ import { Checkbox } from '@codevs/ui/checkbox'
 import pathsConfig from '@/config/paths.config'
 import { signInWithOAuth } from '@/app/auth/actions'
 
-const formSchema = z.object({
-  name: z.string(),
-  email: z
-    .string()
-    .min(3, {
-      message: 'Email is required',
-    })
-    .email({
-      message: 'Please enter a valid email address',
-    }),
-  password: z.string().min(8, {
-    message: 'Password must be at least 6 character(s) long',
-  }),
-  confirmPassword: z.string(),
-  privacyPolicy: z.boolean().refine((value) => value === true, {
-    message: 'You must acknowledge the privacy policy.',
-  }),
-})
+import { formSchema, formAttributes } from '@/lib/auth/formSchema'
+import { Eye, EyeOff } from 'lucide-react'
+
+import { Input } from '@codevs/ui/input'
+import { toast, Toaster } from '@codevs/ui/toast'
 
 function SignUpForm() {
-  const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
+  const [toggle, setToggle] = useState<boolean>(false)
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: '',
       email: '',
       password: '',
+      confirmPassword: '',
+      privacyPolicy: true,
     },
   })
 
-  const handleSignUp = async (formData: FormData) => {
-    const name = formData.get('name') as string
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+  const handleToggle = (e: FormEvent) => {
+    e.preventDefault()
+    setToggle((c) => !c)
+  }
 
-    await signUp(email, password, name)
+  const handleSignUp = async (values: z.infer<typeof formSchema>) => {
+    if (values.password !== values.confirmPassword) {
+      return
+    }
+
+    const name = values.name
+    const email = values.email
+    const password = values.password
+
+    try {
+      await signUp(email, password, name)
+    } catch (e) {
+      toast.error((e as { message: string }).message)
+    }
   }
   return (
     <div className="flex w-full justify-center">
+      <Toaster richColors position="top-right" />
       <Form {...form}>
         <form
           noValidate
-          action={handleSignUp}
+          onSubmit={form.handleSubmit(handleSignUp)}
           className="flex w-full max-w-xl flex-col gap-4 rounded-lg p-8 shadow-2xl"
         >
           <div className="flex flex-col gap-y-3">
@@ -119,9 +123,54 @@ function SignUpForm() {
           </div>
           {/* DIVIDER */}
 
+          {formAttributes.map((field) => (
+            <FormField
+              key={field.name}
+              control={form.control}
+              name={field.name}
+              render={({ field: formField }) => (
+                <FormItem>
+                  <FormLabel className="text-custom-black text-sm">
+                    {field.label}
+                  </FormLabel>
+                  <FormControl>
+                    {field.isPassword ? (
+                      <div className="flex items-center border pr-4">
+                        <Input
+                          className="border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                          {...formField}
+                          type={toggle ? 'text' : 'password'}
+                          placeholder={toggle ? 'password' : '*********'}
+                        />
+                        <div
+                          onClick={handleToggle}
+                          className="cursor-pointer p-0 hover:bg-transparent"
+                        >
+                          {toggle ? (
+                            <Eye className="text-gray-400" />
+                          ) : (
+                            <EyeOff className="text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                    ) : (
+                      <Input
+                        className="border-2 focus-visible:ring-0 focus-visible:ring-offset-0"
+                        {...formField}
+                        type={field.type}
+                        placeholder={field.placeholder}
+                      />
+                    )}
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          ))}
+
           <Button
             type="submit"
-            className="bg-custom-green hover:bg-custom-green/90 mt-6 w-full font-semibold text-white"
+            className="hover:bg-custom-green/90 bg-custom-green mt-6 w-full font-semibold text-white"
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting ? (
@@ -173,7 +222,7 @@ function SignUpForm() {
                         Terms and Services
                       </Link>{' '}
                       and{' '}
-                      <Link className="text-custom-green text-xs" href="">
+                      <Link className="text-xs text-green-500" href="">
                         Privacy Policy
                       </Link>
                     </p>
