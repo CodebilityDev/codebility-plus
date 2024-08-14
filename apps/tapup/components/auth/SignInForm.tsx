@@ -66,21 +66,33 @@ function SignInForm() {
                   Create your free account to search or filter through multiple
                   cards. No credit card required.
                 </div>
-                <div className="w-full">
+                <div className="flex gap-x-2">
                   <Button
-                    variant={'outline'}
+                    onClick={() => signInWithOAuth('google')}
                     type="button"
-                    onClick={async () => await signInWithOAuth('google')}
-                    className="w-full"
+                    className="text-custom-black hover:text-custom-black flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-400 bg-white py-3 hover:bg-gray-50"
                   >
-                    {' '}
-                    <Image
-                      src="/google-icon.svg"
-                      alt="googleIcon"
-                      width={20}
-                      height={20}
-                    />{' '}
-                    &nbsp;Continue with Google
+                    <div className="relative aspect-square w-5">
+                      <Image src="/devicon_google.svg" alt="google" fill />
+                    </div>
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => signInWithOAuth('facebook')}
+                    className="text-custom-black hover:text-custom-black flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-700 py-3 hover:bg-blue-500  "
+                  >
+                    <div className="relative aspect-square w-5">
+                      <Image src="/facebook.svg" alt="facebook" fill />
+                    </div>
+                  </Button>
+                  <Button
+                    type="button"
+                    onClick={() => signInWithOAuth('linkedin_oidc')}
+                    className="text-custom-black hover:text-custom-black flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-400 bg-white py-3 hover:bg-gray-50 "
+                  >
+                    <div className="relative aspect-square w-5">
+                      <Image src="/linkedin.svg" alt="linkedin" fill />
+                    </div>
                   </Button>
                 </div>
               </div>
