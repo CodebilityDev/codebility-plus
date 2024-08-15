@@ -4,6 +4,7 @@ import { cookies } from "next/headers";
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
 import { getMailer } from "@codevs/mailers";
 import generateCode from "./_lib/generateCode";
+import Card from "~/types/cards";
 
 export const createCard = async ({id, email}: {id: string, email: string},name: string, role: string) => {
     const supabase = createServerActionClient({ cookies });
@@ -20,10 +21,11 @@ export const createCard = async ({id, email}: {id: string, email: string},name: 
     if (error) throw error;
 
     const mailer = await getMailer();
+
     mailer.sendEmail({
         to: email,
         from: process.env.EMAIL_USER as string,
-        subject: "Card Activation",
+        subject: "Tapup Card Activation",
         html: `Activate your card with this code: ${code}`
     });
     
@@ -47,3 +49,25 @@ export const getCards = async () => {
     if (error) throw error;
     return data;
 }   
+
+export const activateCard = async (userId: string,cardId: string,code: string) => {
+    const supabase = createServerActionClient({ cookies });
+
+      const { error, data } = await supabase.from('cards')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('id',cardId)
+      .single();
+
+      if (error) throw error;
+
+      const card = data as Card;
+      
+      if (card.code !== code) throw new Error('Code is not valid!');
+
+      const result = await supabase.from("cards")
+      .update({ status: true })
+      .eq('id', cardId);
+
+      return result;
+}
