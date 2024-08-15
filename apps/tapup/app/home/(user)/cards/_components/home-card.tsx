@@ -5,6 +5,7 @@ import HomeActivateCardModal from './home-activate-card-modal'
 import { CircleUserRound } from 'lucide-react'
 import Link from 'next/link'
 import pathsConfig from '~/config/paths.config'
+import { Button } from '@codevs/ui/button'
 
 interface CardProps {
   card: Card
@@ -36,12 +37,17 @@ const HomeCard = ({ card, className, height, width }: CardProps) => {
           </Link>
         </div>
         <div className="flex items-center justify-between gap-x-2">
-          <Link href={username_url || ''} className="text-[8px] text-[#b4b4b4]">
-            http://localhost:3000
+          <Link
+            href={username_url || '#'}
+            className="text-[8px] text-[#b4b4b4]"
+          >
+            {status ? 'http://localhost:3000' : 'Activate to set profile URL'}
           </Link>
-          <Link href="#" className="text-right text-[#b4b4b4]">
-            <PenLine size={10} fill="#b4b4b4" />
-          </Link>
+          <Button disabled={!status} className="h-0 p-0">
+            <Link href="#" className="text-right text-[#b4b4b4]" aria-disabled>
+              <PenLine size={10} fill="#b4b4b4" />
+            </Link>
+          </Button>
         </div>
       </div>
     </div>
