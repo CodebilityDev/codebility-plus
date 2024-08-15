@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { ChevronDown, Dot } from 'lucide-react'
-import { SidebarLink, SIDEBAR_LINKS } from '~/lib/dashboard/sidebarLinks'
+import { SidebarLink, SIDEBAR_LINKS } from '../_lib/home-sidebar-links'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Sublink from './home-sidebar-sublink'
