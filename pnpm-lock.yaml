@@ -299,6 +299,9 @@ importers:
 
   apps/tapup:
     dependencies:
+      '@codevs/mailers':
+        specifier: workspace:*
+        version: link:../../packages/mailers
       '@codevs/ui':
         specifier: workspace:*
         version: link:../../packages/ui
