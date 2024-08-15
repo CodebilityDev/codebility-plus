@@ -19,7 +19,7 @@ const HomeCard = ({ card, className, height, width }: CardProps) => {
     >
       <div className="flex  justify-between">
         <div className="text-xs">
-          <HomeActivateCardModal cardId={id} />
+          {!status && <HomeActivateCardModal cardId={id} />}
         </div>
         <div className="flex flex-1 flex-col items-end">
           <p className="text-xs font-bold">{name}</p>
