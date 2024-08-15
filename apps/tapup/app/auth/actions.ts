@@ -3,7 +3,7 @@
 import { cookies } from "next/headers";
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
-import pathsConfig from "@/config/paths.config";
+import pathsConfig from "~/config/paths.config";
 
 export const signInWithPassword = async (email: string, password: string) => {
     const supabase = createServerActionClient({ cookies });
