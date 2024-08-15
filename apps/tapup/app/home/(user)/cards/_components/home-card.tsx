@@ -2,6 +2,8 @@ import { PenLine } from 'lucide-react'
 import React from 'react'
 import Card from '~/types/cards'
 import HomeActivateCardModal from './home-activate-card-modal'
+import { CircleUserRound } from 'lucide-react'
+import Link from 'next/link'
 
 interface CardProps {
   card: Card
@@ -14,10 +16,10 @@ const HomeCard = ({ card, className, height, width }: CardProps) => {
   const { id, name, industry, status, username_url } = card
   return (
     <div
-      className={`flex h-[15vw] w-[24vw] flex-col rounded-[20px] bg-black px-6 pb-6 pt-8 text-white ${className}`}
+      className={`flex h-[15vw] w-[24vw] flex-col justify-between rounded-[20px] bg-black p-6 text-white ${className}`}
       style={{ width: width, height: height }}
     >
-      <div className="flex  justify-between">
+      <div className="flex justify-between">
         <div className="text-xs">
           {!status && <HomeActivateCardModal cardId={id} />}
         </div>
@@ -27,12 +29,19 @@ const HomeCard = ({ card, className, height, width }: CardProps) => {
         </div>
       </div>
       <div className="flex items-center justify-between">
-        <a href={username_url} className="text-[8px] text-[#b4b4b4]">
-          {username_url}
-        </a>
-        <a href="#" className="text-right text-[#b4b4b4]">
-          <PenLine size={10} fill="#b4b4b4" />
-        </a>
+        <div>
+          <Link href="#">
+            <CircleUserRound className="size-5" />
+          </Link>
+        </div>
+        <div className="flex items-center justify-between gap-x-2">
+          <Link href={username_url || ''} className="text-[8px] text-[#b4b4b4]">
+            http://localhost:3000
+          </Link>
+          <Link href="#" className="text-right text-[#b4b4b4]">
+            <PenLine size={10} fill="#b4b4b4" />
+          </Link>
+        </div>
       </div>
     </div>
   )
