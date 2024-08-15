@@ -3,6 +3,8 @@ import { Inter } from 'next/font/google'
 import { UserWorkspaceContextProvider } from './_components/user-workspace-context'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import HomeSidebar from './_components/home-sidebar'
+import HomeNavbar from './_components/home-navbar'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -32,7 +34,15 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <UserWorkspaceContextProvider value={data}>
-          {children}
+          <div className="flex gap-0">
+            <div className="relative h-screen w-1/5">
+              <HomeSidebar />
+            </div>
+            <div className="h-screen flex-1 overflow-scroll bg-slate-100">
+              <HomeNavbar />
+              {children}
+            </div>
+          </div>
         </UserWorkspaceContextProvider>
       </body>
     </html>
