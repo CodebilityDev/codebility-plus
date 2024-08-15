@@ -1,23 +1,30 @@
-import { Palette , LayoutPanelTop, CaseSensitive } from "lucide-react";
+import { Palette , LayoutPanelTop, CaseSensitive, CircleUserRound } from "lucide-react";
+import BuilderColorForm from "../_components/builder-color-form";
+import BuilderDataForm from "../_components/builder-data-form";
+import BuilderFontForm from "../_components/builder-font-form";
 
-export type targets = "colors" | "data" | "fonts";
+export type FormTargets = 'colors' | 'data' | 'fonts';
 
-interface SidebarItems {
-    target: targets;
+interface SidebarItem {
+    target: FormTargets;
     Icon: React.ElementType;
+    Form: React.FC;
 }
 
 export default [
     {
         target: "colors",
-        Icon: Palette
+        Icon: Palette,
+        Form: BuilderColorForm
     },
     {
         target: "data",
-        Icon: LayoutPanelTop
+        Icon: LayoutPanelTop,
+        Form: BuilderDataForm
     },
     {
         target: "fonts",
-        Icon: CaseSensitive
+        Icon: CaseSensitive,
+        Form: BuilderFontForm
     }
-] satisfies SidebarItems[];
+] satisfies SidebarItem[];
