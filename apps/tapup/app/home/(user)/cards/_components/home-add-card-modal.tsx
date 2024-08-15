@@ -52,7 +52,7 @@ function HomeAddCardModal() {
     const { name, role } = values
 
     try {
-      await createCard(user.id, name, role)
+      await createCard({ id: user.id, email: user.email }, name, role)
       toast.success('Card Created!')
       reset()
       router.refresh()
