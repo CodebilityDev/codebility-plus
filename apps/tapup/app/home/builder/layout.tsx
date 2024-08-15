@@ -1,7 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import HomeNavbar from '../(user)/_components/home-navbar'
-import { cn } from '@codevs/ui'
 import { UserWorkspaceContextProvider } from '../(user)/_components/user-workspace-context'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
@@ -32,7 +31,7 @@ export default async function RootLayout({
 
   return (
     <html lang="en">
-      <body className={cn(inter.className, 'bg-slate-100')}>
+      <body className={inter.className}>
         <UserWorkspaceContextProvider value={data}>
           <HomeNavbar />
           {children}
