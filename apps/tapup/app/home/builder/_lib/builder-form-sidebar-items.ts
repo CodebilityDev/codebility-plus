@@ -5,10 +5,10 @@ import BuilderFontForm from "../_components/builder-font-form";
 
 export type FormTargets = 'colors' | 'data' | 'fonts';
 
-interface SidebarItem {
+export interface SidebarItem {
     target: FormTargets;
     Icon: React.ElementType;
-    Form: React.FC;
+    Form: React.ElementType;
 }
 
 export default [
