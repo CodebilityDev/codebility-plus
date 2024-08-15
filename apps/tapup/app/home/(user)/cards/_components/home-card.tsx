@@ -4,6 +4,7 @@ import Card from '~/types/cards'
 import HomeActivateCardModal from './home-activate-card-modal'
 import { CircleUserRound } from 'lucide-react'
 import Link from 'next/link'
+import pathsConfig from '~/config/paths.config'
 
 interface CardProps {
   card: Card
@@ -30,7 +31,7 @@ const HomeCard = ({ card, className, height, width }: CardProps) => {
       </div>
       <div className="flex items-center justify-between">
         <div>
-          <Link href="#">
+          <Link href={pathsConfig.app.builder + `/${id}`}>
             <CircleUserRound className="size-5" />
           </Link>
         </div>
