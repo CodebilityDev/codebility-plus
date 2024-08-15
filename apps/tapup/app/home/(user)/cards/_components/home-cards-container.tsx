@@ -13,7 +13,7 @@ async function HomeCardsContainer(): Promise<AwaitedReactNode> {
       return <div>You don't have any card yet...</div>
 
     return (
-      <div className="flex flex-wrap justify-between gap-y-2">
+      <div className="flex flex-wrap justify-between gap-2">
         {cards.map((card: Card) => {
           return <HomeCard key={card.id} card={card} />
         })}
