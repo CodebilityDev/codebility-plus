@@ -27,6 +27,7 @@ import { toast, Toaster } from '@codevs/ui/toast'
 import { createCard } from '../actions'
 import { UserWorkspaceContext } from '../../_components/user-workspace-context'
 import { useContext } from 'react'
+import { useRouter } from 'next/navigation'
 
 const formSchema = z.object({
   name: z.string().min(1),
@@ -35,6 +36,7 @@ const formSchema = z.object({
 
 function HomeAddCardModal() {
   const user = useContext(UserWorkspaceContext)
+  const router = useRouter()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -52,6 +54,8 @@ function HomeAddCardModal() {
     try {
       await createCard(user.id, name, role)
       toast.success('Card Created!')
+      reset()
+      router.refresh()
     } catch (e) {
       toast.error((e as { message: string }).message)
     }
