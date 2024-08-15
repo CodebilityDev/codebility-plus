@@ -4,6 +4,7 @@ import HomeNavbar from '../(user)/_components/home-navbar'
 import { UserWorkspaceContextProvider } from '../(user)/_components/user-workspace-context'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
+import BuilderFormProvider from './_components/builder-form-context'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -35,7 +36,7 @@ export default async function RootLayout({
         <UserWorkspaceContextProvider value={data}>
           <div className="fixed -z-10 h-full w-full bg-slate-100"></div>
           <HomeNavbar />
-          {children}
+          <BuilderFormProvider>{children}</BuilderFormProvider>
         </UserWorkspaceContextProvider>
       </body>
     </html>
