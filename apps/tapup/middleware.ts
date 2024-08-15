@@ -23,6 +23,13 @@ const getUser = (req: NextRequest, res: NextResponse) => {
   return supabase.auth.getUser();
 };
 
+const getUserCards = (req: NextRequest, res: NextResponse, userId: string) => {
+  const supabase = createMiddlewareClient({req,res});
+
+  return supabase.from("cards").select("*").eq('user_id', userId);
+};
+
+
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
@@ -84,6 +91,25 @@ function getPatterns() {
 
           return NextResponse.redirect(new URL(redirectPath, origin).href);
         }
+
+        if (next.indexOf(pathsConfig.app.builder) !== -1) {
+          const cardId = next.split("/")[3]; // get card id from this path /home/user/cardId
+
+          if (!cardId) return NextResponse.redirect(new URL(pathsConfig.app.cards, origin).href);
+
+          try {
+            const { error, data } = await getUserCards(req,res, user.id);
+            
+            if (!data || data.length === 0) throw new Error();
+
+            const card = data?.find(card => card.id === cardId);
+
+            if (!card) throw new Error();
+          } catch (e) {
+            return NextResponse.redirect(new URL(pathsConfig.app.cards, origin).href);
+          }
+         
+        }
       }
     }
   ];
@@ -96,7 +122,6 @@ function getPatterns() {
 function matchUrlPattern(url: string) {
   const patterns = getPatterns();
   const input = url.split('?')[0];
-
   for (const pattern of patterns) {
     const patternResult = pattern.pattern.exec(input);
     if (patternResult !== null && 'pathname' in patternResult) {
