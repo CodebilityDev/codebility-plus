@@ -5,8 +5,11 @@ import HomeAddCardModal from './_components/home-add-card-modal'
 
 function CardsPage() {
   return (
-    <div>
-      <HomeAddCardModal />
+    <div className="px-8">
+      <div className="mt-4 flex justify-between">
+        <h2>Cards</h2>
+        <HomeAddCardModal />
+      </div>
     </div>
   )
 }
