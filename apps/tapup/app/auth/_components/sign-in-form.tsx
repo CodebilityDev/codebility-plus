@@ -1,6 +1,6 @@
 'use client'
 
-import { signInWithOAuth, signInWithPassword } from '~/app/auth/actions'
+import { signInWithOAuth, signInWithPassword } from '../actions'
 import { Button } from '@codevs/ui/button'
 import React from 'react'
 import {
