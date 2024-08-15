@@ -9,7 +9,8 @@ const PathsSchema = z.object({
     }),
     app: z.object({
       home: z.string().min(1),
-      cards: z.string().min(1)
+      cards: z.string().min(1),
+      builder: z.string().min(1)
     }),
 });
 
@@ -22,7 +23,8 @@ const pathsConfig = PathsSchema.parse({
     },
     app: {
       home: '/home',
-      cards: "/home/cards"
+      cards: "/home/cards",
+      builder: "/home/build"
     },
   } satisfies z.infer<typeof PathsSchema>);
   
