@@ -33,6 +33,7 @@ export default async function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <UserWorkspaceContextProvider value={data}>
+          <div className="fixed -z-10 h-full w-full bg-slate-100"></div>
           <HomeNavbar />
           {children}
         </UserWorkspaceContextProvider>
