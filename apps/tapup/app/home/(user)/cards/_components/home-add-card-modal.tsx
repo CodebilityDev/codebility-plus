@@ -20,19 +20,22 @@ import {
   FormMessage,
 } from '@codevs/ui/form'
 import { Input } from '@codevs/ui/input'
-import { Label } from '@codevs/ui/label'
-import React from 'react'
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast, Toaster } from '@codevs/ui/toast'
+import { createCard } from '../actions'
+import { UserWorkspaceContext } from '../../_components/user-workspace-context'
+import { useContext } from 'react'
 
 const formSchema = z.object({
-  name: z.string(),
-  role: z.string().min(8),
+  name: z.string().min(1),
+  role: z.string().min(1),
 })
 
 function HomeAddCardModal() {
+  const user = useContext(UserWorkspaceContext)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -44,11 +47,19 @@ function HomeAddCardModal() {
   const { reset } = form
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    alert(values)
+    const { name, role } = values
+
+    try {
+      await createCard(user.id, name, role)
+      toast.success('Card Created!')
+    } catch (e) {
+      toast.error((e as { message: string }).message)
+    }
   }
 
   return (
     <Dialog>
+      <Toaster richColors />
       <DialogTrigger asChild>
         <Button>Create</Button>
       </DialogTrigger>
@@ -62,25 +73,53 @@ function HomeAddCardModal() {
               </DialogDescription>
             </DialogHeader>
             <div className="my-6 flex flex-col gap-y-4">
-              <div className="flex items-center space-x-2 space-y-16">
-                <div className="grid flex-1 gap-2">
-                  <Label htmlFor="name">Name</Label>
-                  <Input
-                    id="name"
-                    name="name"
-                    defaultValue="Card Holder Name"
-                  />
-                </div>
-              </div>
-              <div className="flex items-center">
-                <div className="grid flex-1 gap-2">
-                  <Label htmlFor="name">Role</Label>
-                  <Input
-                    id="role"
-                    name="category"
-                    defaultValue="Card Holder Role"
-                  />
-                </div>
+              <div className="flex flex-col gap-y-5">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="relative flex flex-col gap-y-2">
+                        <FormLabel htmlFor="name" className="">
+                          Name
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="name"
+                            id="name"
+                            className=""
+                            placeholder=" "
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="role"
+                  render={({ field }) => (
+                    <FormItem>
+                      <div className="relative flex flex-col gap-y-2">
+                        <FormLabel htmlFor="role" className="">
+                          Role
+                        </FormLabel>
+                        <FormControl>
+                          <Input
+                            type="role"
+                            id="role"
+                            className=""
+                            placeholder=" "
+                            {...field}
+                          />
+                        </FormControl>
+                      </div>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
               </div>
             </div>
             <Button role="submit" type="submit">
