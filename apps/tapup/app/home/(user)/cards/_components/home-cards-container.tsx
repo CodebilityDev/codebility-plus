@@ -13,15 +13,9 @@ async function HomeCardsContainer(): Promise<AwaitedReactNode> {
       return <div>You don't have any card yet...</div>
 
     return (
-      <div className="flex flex-wrap gap-5">
-        {cards.map(({ id, name, username_url, industry }: Card) => {
-          const cardData = {
-            id,
-            name,
-            role: industry,
-            link: 'http://localhost:3000',
-          }
-          return <HomeCard key={id} cardData={cardData} />
+      <div className="flex flex-wrap justify-between gap-y-2">
+        {cards.map((card: Card) => {
+          return <HomeCard key={card.id} card={card} />
         })}
       </div>
     )
