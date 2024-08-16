@@ -13,14 +13,18 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@codevs/ui/button'
 import useBuilderFormData from '../../_hooks/useBuilderFormData'
+import { Toaster, toast } from '@codevs/ui/sonner-toast'
 
 import {
   profileFormSchema as formSchema,
   profileDatasDefault as defaultValues,
 } from '../../_lib/builder-data-form-datas'
+import { updateBuilderProfileData } from '../../actions'
+import useCard from '../../_hooks/useCard'
 
 function ProfileDataForm() {
   const { updateProfileDatas } = useBuilderFormData()
+  const { cardData } = useCard()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues,
@@ -30,27 +34,37 @@ function ProfileDataForm() {
     updateProfileDatas(JSON.stringify(form.getValues()))
   }
 
+  const onSubmit = async (values: z.infer<typeof formSchema>) => {
+    try {
+      await updateBuilderProfileData(cardData.id, values)
+      toast.success('Updated')
+    } catch (e) {
+      toast.error((e as { message: string }).message)
+    }
+  }
+
   return (
     <div className="my-8 px-8">
+      <Toaster />
       <Form {...form}>
-        <form>
+        <form onSubmit={form.handleSubmit(onSubmit)}>
           <p className="mb-3 text-sm text-gray-400">
             Make changes to your account here. Click save when you're done
           </p>
           <div className="flex flex-col gap-y-3">
             <FormField
               control={form.control}
-              name="name"
+              name="displayName"
               render={({ field }) => (
                 <FormItem>
                   <div className="relative flex flex-col gap-y-2">
-                    <FormLabel htmlFor="name" className="font-medium">
+                    <FormLabel htmlFor="displayName" className="font-medium">
                       Display Name
                     </FormLabel>
                     <FormControl>
                       <input
                         type="text"
-                        id="name"
+                        id="displayName"
                         className="rounded border border-gray-300 px-3 py-1"
                         placeholder=" "
                         {...field}
