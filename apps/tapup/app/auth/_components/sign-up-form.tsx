@@ -26,6 +26,7 @@ import { Eye, EyeOff } from 'lucide-react'
 
 import { Input } from '@codevs/ui/input'
 import { toast, Toaster } from '@codevs/ui/toast'
+import appConfig from '~/config/app.config'
 
 function SignUpForm() {
   const [toggle, setToggle] = useState<boolean>(false)
@@ -76,7 +77,7 @@ function SignUpForm() {
         >
           <div className="flex flex-col gap-y-3">
             <h2 className="text-custom-black -mb-2 text-center font-bold md:text-start md:text-2xl">
-              Create a Tap Up account
+              Create a {appConfig.name} account
             </h2>
             <div className="flex gap-x-2">
               <p className="text-sm text-gray-400">Already have an acount?</p>
@@ -220,7 +221,7 @@ function SignUpForm() {
 
                   <FormLabel>
                     <p className="text-custom-black text-xs">
-                      By agreeing, you agree TapUp{' '}
+                      By agreeing, you agree {appConfig.name}{' '}
                       <Link className="text-custom-green text-xs" href="">
                         Terms and Services
                       </Link>{' '}
