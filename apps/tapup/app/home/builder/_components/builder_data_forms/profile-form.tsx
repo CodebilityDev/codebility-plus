@@ -12,28 +12,24 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@codevs/ui/button'
+import useBuilderFormData from '../../_hooks/useBuilderFormData'
 
-const formSchema = z.object({
-  name: z.string().min(1),
-  coverPhoto: z.string().min(1),
-  businessEmail: z.string().min(8),
-  businessContact: z.string().min(8),
-  businessIndustry: z.string().min(8),
-  bio: z.string().min(8),
-})
+import {
+  profileFormSchema as formSchema,
+  profileDatasDefault as defaultValues,
+} from '../../_lib/builder-data-form-datas'
 
 function ProfileDataForm() {
+  const { updateProfileDatas } = useBuilderFormData()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      coverPhoto: '',
-      businessEmail: '',
-      businessContact: '',
-      businessIndustry: '',
-      bio: '',
-    },
+    defaultValues,
   })
+
+  function handleUpdate() {
+    updateProfileDatas(JSON.stringify(form.getValues()))
+  }
+
   return (
     <div className="my-8 px-8">
       <Form {...form}>
@@ -58,6 +54,10 @@ function ProfileDataForm() {
                         className="rounded border border-gray-300 px-3 py-1"
                         placeholder=" "
                         {...field}
+                        onChange={(e) => {
+                          form.setValue('name', e.target.value)
+                          handleUpdate()
+                        }}
                       />
                     </FormControl>
                   </div>
@@ -76,13 +76,26 @@ function ProfileDataForm() {
                     </FormLabel>
                     <FormControl>
                       <input
-                        type="file"
+                        type="text"
                         id="coverPhoto"
-                        className="flex rounded border border-gray-300 px-3 py-1"
-                        placeholder=" "
+                        className="hidden"
                         {...field}
                       />
                     </FormControl>
+                    <input
+                      type="file"
+                      className="flex rounded border border-gray-300 px-3 py-1"
+                      placeholder=" "
+                      onChange={(e) => {
+                        if (!e.target.files || e.target.files.length === 0)
+                          return
+                        form.setValue(
+                          'coverPhoto',
+                          URL.createObjectURL(e.target.files[0] as Blob),
+                        )
+                        handleUpdate()
+                      }}
+                    />
                   </div>
                   <FormMessage />
                 </FormItem>
@@ -165,6 +178,32 @@ function ProfileDataForm() {
             />
             <FormField
               control={form.control}
+              name="industryRole"
+              render={({ field }) => (
+                <FormItem>
+                  <div className="relative flex flex-col gap-y-2">
+                    <FormLabel htmlFor="industryRole" className="font-medium">
+                      Industry Role
+                    </FormLabel>
+                    <FormControl>
+                      <input
+                        type="text"
+                        id="industryRole"
+                        className="rounded border border-gray-300 px-3 py-1"
+                        {...field}
+                        onChange={(e) => {
+                          form.setValue('industryRole', e.target.value)
+                          handleUpdate()
+                        }}
+                      />
+                    </FormControl>
+                  </div>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
               name="bio"
               render={({ field }) => (
                 <FormItem>
@@ -179,6 +218,10 @@ function ProfileDataForm() {
                         className="rounded border border-gray-300 px-3 py-1 text-sm"
                         placeholder="Type your short message here"
                         {...field}
+                        onChange={(e) => {
+                          form.setValue('bio', e.target.value)
+                          handleUpdate()
+                        }}
                       />
                     </FormControl>
                   </div>
