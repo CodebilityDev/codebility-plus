@@ -49,11 +49,10 @@ function BuilderDataForm() {
   const targetForm =
     currentForm && forms.find((form) => form.target === currentForm)
 
-  console.log(targetForm, currentForm)
   return (
     <div className="flex flex-col gap-y-2">
       <div>
-        {!currentForm ? (
+        {!targetForm ? (
           forms.map((form) => {
             const { Icon } = form
             return (
@@ -79,8 +78,13 @@ function BuilderDataForm() {
                 onClick={() => setCurrentForm(null)}
               >
                 <ChevronLeft />
-                <h5 className="font-bold">{targetForm && targetForm.name}</h5>
+                <h5 className="text-lg font-bold">
+                  {targetForm && targetForm.name}
+                </h5>
               </Button>
+            </div>
+            <div className="bg-white">
+              <targetForm.Form />
             </div>
           </div>
         )}
