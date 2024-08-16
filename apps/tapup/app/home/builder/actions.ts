@@ -70,9 +70,11 @@ export async function updateBuilderProfileData(cardId: string,data: ProfileData)
         to: "snake"
     });
 
-    const {data: profileData,error} = await supabase.from("profile").upsert(Object.assign(newData, {card_id: cardId}))
+    const {data: profileData,error} = await supabase.from("builder_profile_data")
+    .update(newData)
+    .eq("card_id", cardId);
 
-    console.log(profileData,error)
+    if (error) throw error;
 }
 
 export async function getCardById(cardId: string, userId: string) {
