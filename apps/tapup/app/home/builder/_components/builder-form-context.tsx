@@ -2,22 +2,13 @@
 
 import { createContext, useState } from 'react'
 import { FormTargets } from '../_lib/builder-form-sidebar-items'
+import { profileDatasDefault } from '../_lib/builder-data-form-datas'
 
 interface BuilderForm {
   current: FormTargets
   profileDatas: string
   updateProfileDatas: (datas: string) => void
   updateForm: (form: FormTargets) => void
-}
-
-const profileDatasDefault = {
-  name: 'Highland Bali',
-  coverPhoto: '',
-  businessEmail: '',
-  businessContact: '',
-  businessIndustry: 'Telecommunication',
-  industryRole: 'CEO',
-  bio: 'A ball is a round object (usually spherical, but can sometimes be ovoid) with several uses. It is used in ball games, where the play of the game follows the state of the ball as it is hit, kicked or thrown by players',
 }
 
 export const BuilderFormContext = createContext<BuilderForm>({} as BuilderForm)
@@ -38,6 +29,8 @@ export default function BuilderFormProvider({
   }
 
   function updateProfileDatas(datas: string) {
+    const profileDataParsed = JSON.parse(profileDatas)
+    URL.revokeObjectURL(profileDataParsed.coverPhoto)
     setProfileDatas(datas)
   }
 
