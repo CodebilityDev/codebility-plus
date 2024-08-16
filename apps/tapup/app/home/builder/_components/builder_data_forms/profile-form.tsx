@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useRef } from 'react'
 
 import {
   Form,
@@ -14,6 +14,8 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@codevs/ui/button'
 import useBuilderFormData from '../../_hooks/useBuilderFormData'
 import { Toaster, toast } from '@codevs/ui/sonner-toast'
+import { v4 } from 'uuid'
+import { createClient } from '@supabase/supabase-js'
 
 import {
   profileFormSchema as formSchema,
@@ -25,6 +27,9 @@ import useCard from '../../_hooks/useCard'
 function ProfileDataForm() {
   const { updateProfileDatas, profileDatas } = useBuilderFormData()
   const { cardData } = useCard()
+
+  const coverPhotoRef = useRef<HTMLInputElement>(null)
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: profileDatas,
@@ -36,7 +41,35 @@ function ProfileDataForm() {
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     try {
-      await updateBuilderProfileData(cardData.id, values)
+      const coverPhoto = coverPhotoRef.current?.files?.[0]
+
+      if (coverPhoto) {
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL!,
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        )
+
+        // upload image to the supabase bucket
+        const fileName = `cover-${v4() + coverPhoto.name.split('.').pop()}`
+        const filePath = `${fileName}`
+
+        const { error } = await supabase.storage
+          .from('profile images')
+          .upload(filePath, coverPhoto)
+
+        if (error) throw error
+
+        // get the uploaded image public url
+        const { data: url } = await supabase.storage
+          .from('profile images')
+          .getPublicUrl(filePath)
+
+        await updateBuilderProfileData(
+          cardData.id,
+          Object.assign(values, { coverPhoto: url.publicUrl }),
+        )
+      } else await updateBuilderProfileData(cardData.id, values)
+
       toast.success('Updated')
     } catch (e) {
       toast.error((e as { message: string }).message)
@@ -97,6 +130,7 @@ function ProfileDataForm() {
                       />
                     </FormControl>
                     <input
+                      ref={coverPhotoRef}
                       type="file"
                       className="flex rounded border border-gray-300 px-3 py-1"
                       placeholder=" "
