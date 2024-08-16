@@ -23,11 +23,11 @@ import { updateBuilderProfileData } from '../../actions'
 import useCard from '../../_hooks/useCard'
 
 function ProfileDataForm() {
-  const { updateProfileDatas } = useBuilderFormData()
+  const { updateProfileDatas, profileDatas } = useBuilderFormData()
   const { cardData } = useCard()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues,
+    defaultValues: profileDatas,
   })
 
   function handleUpdate() {
