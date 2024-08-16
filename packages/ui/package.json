@@ -16,6 +16,10 @@
     "./*": {
       "types": "./dist/src/*.d.ts",
       "default": "./src/*.tsx"
+    },
+    "./sonner-*": {
+      "types": "./dist/src/sonner/*.d.ts",
+      "default": "./src/sonner/*.tsx"
     }
   },
   "author": "",

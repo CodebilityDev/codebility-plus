@@ -22,7 +22,7 @@ import {
 import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { toast, Toaster } from '@codevs/ui/toast'
+import { toast, Toaster } from '@codevs/ui/sonner-toast'
 import { UserWorkspaceContext } from '../../_components/user-workspace-context'
 import { useContext } from 'react'
 import { useRouter } from 'next/navigation'

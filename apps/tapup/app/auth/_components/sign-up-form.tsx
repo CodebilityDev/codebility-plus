@@ -25,7 +25,7 @@ import { formSchema, formAttributes } from '../_lib/sign-up-form-schema'
 import { Eye, EyeOff } from 'lucide-react'
 
 import { Input } from '@codevs/ui/input'
-import { toast, Toaster } from '@codevs/ui/toast'
+import { toast, Toaster } from '@codevs/ui/sonner-toast'
 import appConfig from '~/config/app.config'
 
 function SignUpForm() {
