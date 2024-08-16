@@ -11,7 +11,7 @@
   },
   "aliases": {
     "components": "src/",
-    "utils": "@codebility/ui",
+    "utils": "@codevs/ui",
     "ui": "src/"
   }
 }

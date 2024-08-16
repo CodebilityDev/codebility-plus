@@ -13,12 +13,19 @@
   },
   "dependencies": {
     "@codevs/ui": "workspace:*",
+    "@hookform/resolvers": "^3.9.0",
+    "lucide-react": "^0.427.0",
     "next": "14.2.5",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "react-hook-form": "^7.52.2",
+    "zod": "^3.23.8",
+    "@codevs/mailers": "workspace:*"
   },
   "devDependencies": {
     "@chromatic-com/storybook": "1.6.1",
+    "@codevs/tailwind-config": "workspace:*",
+    "@codevs/tsconfig": "workspace:*",
     "@storybook/addon-essentials": "^8.2.8",
     "@storybook/addon-interactions": "^8.2.8",
     "@storybook/addon-links": "^8.2.8",
@@ -36,8 +43,6 @@
     "postcss": "^8",
     "storybook": "^8.2.8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "@codevs/tailwind-config": "workspace:*",
-    "@codevs/tsconfig": "workspace:*"
+    "typescript": "^5"
   }
 }

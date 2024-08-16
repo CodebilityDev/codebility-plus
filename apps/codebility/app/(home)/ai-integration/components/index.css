@@ -1,0 +1,10 @@
+.floatingedges .react-flow__handle {
+    opacity: 0;
+}
+
+.react-flow__edge-path {
+    stroke: white;
+    stroke-width: 3px;
+    fill: none;
+    stroke-dasharray: 5,5;
+}

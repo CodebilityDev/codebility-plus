@@ -13,31 +13,44 @@
       "types": "./dist/src/index.d.ts",
       "default": "./src/index.ts"
     },
-    "./button": {
-      "types": "./dist/src/button.d.ts",
-      "default": "./src/button.tsx"
+    "./*": {
+      "types": "./dist/src/*.d.ts",
+      "default": "./src/*.tsx"
     },
-    "./accordion": {
-      "types": "./dist/src/accordion.d.ts",
-      "default": "./src/accordion.tsx"
+    "./sonner-*": {
+      "types": "./dist/src/sonner/*.d.ts",
+      "default": "./src/sonner/*.tsx"
     }
   },
   "author": "",
   "license": "ISC",
   "description": "",
   "devDependencies": {
-    "tailwindcss": "^3.4.9",
-    "typescript": "^5.5.4",
+    "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
-    "@codevs/tailwind-config": "workspace:*"
+    "tailwindcss": "^3.4.9",
+    "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
+    "@radix-ui/react-checkbox": "^1.1.1",
+    "@radix-ui/react-dialog": "^1.1.1",
+    "@radix-ui/react-dropdown-menu": "^2.1.1",
+    "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-select": "^2.1.1",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-hover-card": "^1.1.1",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "@radix-ui/react-toast": "^1.1.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "input-otp": "^1.2.4",
     "lucide-react": "^0.427.0",
+    "react-hook-form": "^7.52.2",
+    "sonner": "^1.5.0",
     "tailwind-merge": "^2.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "zod": "^3.23.8"
   }
 }
