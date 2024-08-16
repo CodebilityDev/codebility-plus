@@ -6,7 +6,7 @@ import { getMailer } from "@codevs/mailers";
 import generateCode from "./_lib/generateCode";
 import Card from "~/types/cards";
 
-export const createCard = async ({id, email}: {id: string, email: string},name: string, role: string) => {
+export const createCard = async ({id, email}: {id: string, email: string},name: string, industry: string) => {
     const supabase = createServerActionClient({ cookies });
 
     const code = generateCode(4);
@@ -15,8 +15,15 @@ export const createCard = async ({id, email}: {id: string, email: string},name: 
         user_id: id,
         name,
         code,
-        industry: role,
-    });
+        industry,
+    }).select().single();
+    
+    await supabase.from('builder_profile_data').insert({
+        card_id: data.id,
+        display_name: data.name,
+        business_email: email,
+        business_industry: industry,
+    })
 
     if (error) throw error;
 
