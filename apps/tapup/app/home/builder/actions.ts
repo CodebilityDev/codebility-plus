@@ -4,26 +4,71 @@ import { cookies } from "next/headers";
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
 import { ProfileData } from "./_lib/builder-data-form-datas";
 
-function camelToSnakeCase(text: string) {
+type Case = 'snake' | 'camel';
+
+/**
+ * Convert a text case to another case
+ * @param text {string} - the text to transform. 
+ * @param { from, to } {object} - an object that contains information about the cases.
+ * @returns similar text from other case
+ */
+function transformCase(text: string, { from, to }: { from: Case, to: Case}): string {
     let result = "";
-    for (let i = 0;i < text.length;i++) {
-        const current = text[i];
-        if (current === current?.toUpperCase()) result += `_${current?.toLowerCase()}`;
-        else result += current;
+    let matcher: ((char: string) => boolean) | null = null;
+    let transform: ((text: string, increment: number) => string) | null = null;
+    let totalIncrementAfterMatch = 0;
+
+    switch ( from ) {
+        case "snake":
+            if (to === "camel") {
+                matcher = (char: string) => char === "_";
+                transform = (text: string, increment: number) => text.charAt(increment + 1).toUpperCase();
+                totalIncrementAfterMatch = 1;
+            }
+            break;
+        case "camel":
+            if (to === "snake") {
+                matcher = (char: string) => char === char.toUpperCase();
+                transform = (text: string, increment: number) => `_${text.charAt(increment).toLowerCase()}`;
+            }
+            break;
+    }
+
+    if (!matcher || !transform) throw new Error("invalid given from or to case!");
+
+    for (let i = 0;i < text.length;i++) { 
+        const char = text.charAt(i);
+        if (matcher(char)) {
+            result += transform(text, i);
+            i += totalIncrementAfterMatch;
+        } else result += char;
     }
 
     return result;
 }
 
+function transformPropertyNameCase(target: Record<string, any>, { from, to }: { from: Case, to: Case }): Record<string, any> {
+    const fields = Object.keys(target);
+    const newData: Record<string,string> = {};
+    for (let i = 0;i < fields.length;i++) {
+        const field = fields[i] as keyof typeof target;
+
+        newData[transformCase(field as string, {
+            from,
+            to
+        })] = target[field];
+    }
+
+    return newData;
+}
+
 export async function updateBuilderProfileData(cardId: string,data: ProfileData) {
     const supabase = createServerActionClient({ cookies });
 
-    const fields = Object.keys(data);
-    const newData: Record<string,string> = {};
-    for (let i = 0;i < fields.length;i++) {
-        const field = fields[i] as keyof typeof data;
-        newData[camelToSnakeCase(field as string)] = data[field];
-    }
+    const newData = transformPropertyNameCase(data, {
+        from: "camel",
+        to: "snake"
+    });
 
     const {data: profileData,error} = await supabase.from("profile").upsert(Object.assign(newData, {card_id: cardId}))
 
@@ -65,5 +110,10 @@ export async function getBuilderProfileData(cardId: string) {
     ).eq("card_id", cardId).single();
 
     if (error) throw error;
-    return data;
+    const newData = transformPropertyNameCase(data, {
+        from: "snake",
+        to: "camel"
+    });
+
+    return newData;
 }
