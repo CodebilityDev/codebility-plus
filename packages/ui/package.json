@@ -13,14 +13,8 @@
       "types": "./dist/src/index.d.ts",
       "default": "./src/index.ts"
     },
-    "./button": {
-      "types": "./dist/src/button.d.ts",
-      "default": "./src/button.tsx"
-    },
-    "./accordion": {
-      "types": "./dist/src/accordion.d.ts",
-      "default": "./src/accordion.tsx"
-    }
+     "./*" : "./src/*.tsx",
+     "./kit/*" : "./src/kit/*.tsx"
   },
   "author": "",
   "license": "ISC",
@@ -34,10 +28,19 @@
   "dependencies": {
     "@radix-ui/react-accordion": "^1.2.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@radix-ui/react-checkbox": "^1.0.4",
+    "@radix-ui/react-dialog": "^1.0.5",
+    "@radix-ui/react-dropdown-menu": "^2.0.6",
+    "@radix-ui/react-hover-card": "^1.1.1",
+    "@radix-ui/react-label": "^2.0.2",
+    "@radix-ui/react-select": "^2.0.0",
+    "@radix-ui/react-tabs": "^1.0.4",
+    "@radix-ui/react-toast": "^1.1.5",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.427.0",
     "tailwind-merge": "^2.4.0",
-    "tailwindcss-animate": "^1.0.7"
+    "tailwindcss-animate": "^1.0.7",
+    "mini-svg-data-uri": "^1.4.4"
   }
 }
