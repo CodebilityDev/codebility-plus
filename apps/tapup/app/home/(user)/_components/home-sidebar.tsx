@@ -1,7 +1,7 @@
 'use client'
 import React, { useState } from 'react'
 import { ChevronDown } from 'lucide-react'
-import { SidebarLink, SIDEBAR_LINKS } from '../_lib/home-sidebar-links'
+import { SidebarLink, sidebarLinks } from '../_lib/home-sidebar-links'
 import { usePathname } from 'next/navigation'
 import Link from 'next/link'
 import Sublink from './home-sidebar-sublink'
@@ -16,7 +16,7 @@ function HomeSidebar() {
         </div>
 
         <ul className="flex flex-1 flex-col gap-4 px-8 text-white">
-          {SIDEBAR_LINKS.map((el, i) => (
+          {sidebarLinks.map((el, i) => (
             <SidebarItems
               item={el}
               key={el.key}
