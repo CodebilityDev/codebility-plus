@@ -31,7 +31,7 @@ import { useRouter } from 'next/navigation'
 
 const formSchema = z.object({
   name: z.string().min(1),
-  role: z.string().min(1),
+  industry: z.string().min(1),
 })
 
 function HomeAddCardModal() {
@@ -40,19 +40,15 @@ function HomeAddCardModal() {
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      role: '',
-    },
   })
 
   const { reset } = form
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { name, role } = values
+    const { name, industry } = values
 
     try {
-      await createCard({ id: user.id, email: user.email }, name, role)
+      await createCard({ id: user.id, email: user.email }, name, industry)
       toast.success('Card Created!')
       reset()
       router.refresh()
@@ -89,7 +85,7 @@ function HomeAddCardModal() {
                         </FormLabel>
                         <FormControl>
                           <Input
-                            type="name"
+                            type="text"
                             id="name"
                             className=""
                             placeholder=" "
@@ -103,17 +99,17 @@ function HomeAddCardModal() {
                 />
                 <FormField
                   control={form.control}
-                  name="role"
+                  name="industry"
                   render={({ field }) => (
                     <FormItem>
                       <div className="relative flex flex-col gap-y-2">
-                        <FormLabel htmlFor="role" className="">
-                          Role
+                        <FormLabel htmlFor="industry" className="">
+                          Industry
                         </FormLabel>
                         <FormControl>
                           <Input
-                            type="role"
-                            id="role"
+                            type="text"
+                            id="industry"
                             className=""
                             placeholder=" "
                             {...field}
