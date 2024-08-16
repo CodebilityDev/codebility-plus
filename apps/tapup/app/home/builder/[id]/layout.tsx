@@ -8,6 +8,8 @@ import BuilderFormProvider from '../_components/builder-form-context'
 import appConfig from '~/config/app.config'
 import { cn } from '@codevs/ui'
 import Card from '~/types/cards'
+import { getBuilderProfileData, getCardById } from '../actions'
+import { ProfileData } from '../_lib/builder-data-form-datas'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -35,26 +37,18 @@ export default async function RootLayout({
     .eq('id', user?.id)
     .single()
 
-  const { data: card, error: fetchingCardError } = await supabase
-    .from('cards')
-    .select(
-      `id,
-       name,
-       username_url,
-       status,
-       industry`,
-    )
-    .eq('id', params.id)
-    .eq('user_id', user?.id)
-    .single()
-
+  const card = await getCardById(params.id, data.id)
+  const builderProfileData = await getBuilderProfileData(card.id)
   return (
     <html lang={appConfig.locale}>
       <body className={cn(inter.className, appConfig.theme)}>
         <UserWorkspaceContextProvider value={data}>
           <div className="fixed -z-10 h-full w-full bg-slate-100"></div>
           <HomeNavbar />
-          <BuilderFormProvider cardData={card as Card}>
+          <BuilderFormProvider
+            cardData={card as Card}
+            builderProfileData={builderProfileData as ProfileData}
+          >
             {children}
           </BuilderFormProvider>
         </UserWorkspaceContextProvider>

@@ -24,7 +24,7 @@ function BuilderScreen() {
             <div className="flex flex-col gap-y-1 px-5 pt-3">
               <div>
                 <div>
-                  <h4 className="-mb-1">{profileDatas.name}</h4>
+                  <h4 className="-mb-1">{profileDatas.displayName}</h4>
                   <h5>{profileDatas.industryRole}</h5>
                 </div>
                 <div></div>
