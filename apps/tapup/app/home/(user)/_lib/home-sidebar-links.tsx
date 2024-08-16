@@ -20,7 +20,7 @@ export type SidebarLink = {
   }[]
 }
 
-export const SIDEBAR_LINKS: SidebarLink[] = [
+export const sidebarLinks: SidebarLink[] = [
   {
     key: 'dashboard',
     label: 'Dashboard',
