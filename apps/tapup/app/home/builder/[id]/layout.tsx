@@ -7,7 +7,7 @@ import { cookies } from 'next/headers'
 import BuilderFormProvider from '../_components/builder-form-context'
 import appConfig from '~/config/app.config'
 import { cn } from '@codevs/ui'
-import { Card } from '../_types/cards'
+import Card from '~/types/cards'
 
 const inter = Inter({ subsets: ['latin'] })
 
