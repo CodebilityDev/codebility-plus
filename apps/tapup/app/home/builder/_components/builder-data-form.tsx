@@ -57,6 +57,7 @@ function BuilderDataForm() {
             const { Icon } = form
             return (
               <Button
+                key={form.target}
                 onClick={() => setCurrentForm(form.target)}
                 className="text-custom-black flex w-full justify-between bg-transparent py-7 hover:bg-gray-100"
               >
