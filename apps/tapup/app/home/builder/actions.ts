@@ -26,7 +26,44 @@ export async function updateBuilderProfileData(cardId: string,data: ProfileData)
     }
 
     const {data: profileData,error} = await supabase.from("profile").upsert(Object.assign(newData, {card_id: cardId}))
-    .eq('card_id', cardId);
 
     console.log(profileData,error)
+}
+
+export async function getCardById(cardId: string, userId: string) {
+    const supabase = createServerActionClient({ cookies });
+    const { data, error } = await supabase
+    .from('cards')
+    .select(
+      `id,
+       name,
+       username_url,
+       status,
+       industry`,
+    )
+    .eq('id', cardId)
+    .eq('user_id', userId)
+    .single()
+
+    if (error) throw error;
+
+    return data;
+}
+
+export async function getBuilderProfileData(cardId: string) {
+    const supabase = createServerActionClient({ cookies });
+
+    const { data, error } = await supabase.from('builder_profile_data')
+    .select(`
+        display_name,
+        cover_photo,
+        business_email,
+        business_contact,
+        business_industry,
+        industry_role, 
+        bio`
+    ).eq("card_id", cardId).single();
+
+    if (error) throw error;
+    return data;
 }
