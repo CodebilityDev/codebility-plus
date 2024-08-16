@@ -69,7 +69,7 @@ function ProfileDataForm() {
                         placeholder=" "
                         {...field}
                         onChange={(e) => {
-                          form.setValue('name', e.target.value)
+                          form.setValue('displayName', e.target.value)
                           handleUpdate()
                         }}
                       />
