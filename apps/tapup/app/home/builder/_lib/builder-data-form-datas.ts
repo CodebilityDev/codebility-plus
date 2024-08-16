@@ -1,19 +1,19 @@
 import { z } from "zod"; 
 
 export const profileFormSchema = z.object({
-    name: z.string().min(1),
+    displayName: z.string().min(1),
     coverPhoto: z.string().min(1),
-    businessEmail: z.string().min(8),
-    businessContact: z.string().min(8),
-    businessIndustry: z.string().min(8),
-    industryRole: z.string().min(8),
+    businessEmail: z.string().min(1),
+    businessContact: z.string().min(1),
+    businessIndustry: z.string().min(1),
+    industryRole: z.string().min(1),
     bio: z.string().min(8),
 })
 
 export type ProfileData = z.infer<typeof profileFormSchema>;
 
 export const profileDatasDefault: ProfileData = {
-    name: 'Highland Bali',
+    displayName: 'Highland Bali',
     coverPhoto: '',
     businessEmail: '',
     businessContact: '',
