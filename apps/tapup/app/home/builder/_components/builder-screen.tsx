@@ -12,7 +12,14 @@ function BuilderScreen() {
         <div className="h-full overflow-y-auto">
           <div className="rounded-b-[2rem] bg-blue-100 pb-5">
             <div className="relative h-52 overflow-hidden rounded-b-3xl">
-              <Image src={profileDatas.coverPhoto} alt="cover" fill />
+              <Image
+                src={
+                  profileDatas.coverPhoto ||
+                  '/pikaso_texttoimage_2x2-corporate-headshot-of-a-Filipino-male-and-fema 1.png'
+                }
+                alt="cover"
+                fill
+              />
             </div>
             <div className="flex flex-col gap-y-1 px-5 pt-3">
               <div>
