@@ -123,6 +123,13 @@ export async function getBuilderProfileData(cardId: string) {
 export async function publishProfile(usernameURL: string, profileKey: string, cardId: string) {
     const supabase = createServerActionClient({ cookies });
 
+    const { data, error: fetchingCardError} = await supabase.from("cards")
+    .select()
+    .eq("username_url", usernameURL);
+
+    if (!data) throw fetchingCardError;
+    if (data.length > 0) throw new Error("given username url already exists!");
+
     const { error } = await supabase.from("cards")
     .update({
         username_url: usernameURL,
