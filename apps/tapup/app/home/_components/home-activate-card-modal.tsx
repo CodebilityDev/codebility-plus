@@ -35,9 +35,10 @@ const formSchema = z.object({
 
 interface Props {
   cardId: string
+  children: React.ReactNode
 }
 
-function HomeActivateCardModal({ cardId }: Props) {
+function HomeActivateCardModal({ cardId, children }: Props) {
   const user = useContext(UserWorkspaceContext)
   const router = useRouter()
 
@@ -65,9 +66,7 @@ function HomeActivateCardModal({ cardId }: Props) {
   return (
     <Dialog>
       <Toaster richColors />
-      <DialogTrigger asChild>
-        <Button className="h-0 p-0 text-xs underline">Activate Card</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
