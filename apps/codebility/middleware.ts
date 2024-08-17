@@ -16,7 +16,7 @@ export async function middleware(req: NextRequest) {
 
   // return res;
   ///////// DONT REMOVE THE ABOVE CODE ////////////
-  const { nextUrl, cookies } = req
+/*   const { nextUrl, cookies } = req
   if (!cookies.has("codebility-auth")) {
     return NextResponse.redirect(new URL("/auth/signin", req.url))
   }
@@ -52,7 +52,7 @@ export async function middleware(req: NextRequest) {
       const response = NextResponse.redirect(new URL("/dashboard", req.url))
       return response
     }
-  }
+  } */
 }
 
 export const config = {
