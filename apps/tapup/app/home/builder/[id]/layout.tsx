@@ -9,7 +9,8 @@ import appConfig from '~/config/app.config'
 import { cn } from '@codevs/ui'
 import Card from '~/types/cards'
 import { getBuilderProfileData, getCardById } from '../actions'
-import { ProfileData } from '../_lib/builder-data-form-datas'
+import ProfileContextProvider from '~/components/profile-context'
+import { ManageProfileData } from '~/lib/profile-data'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -45,11 +46,12 @@ export default async function RootLayout({
         <UserWorkspaceContextProvider value={data}>
           <div className="fixed -z-10 h-full w-full bg-slate-100"></div>
           <HomeNavbar />
-          <BuilderFormProvider
-            cardData={card as Card}
-            builderProfileData={builderProfileData as ProfileData}
-          >
-            {children}
+          <BuilderFormProvider cardData={card as Card}>
+            <ProfileContextProvider
+              manageProfileData={builderProfileData as ManageProfileData}
+            >
+              {children}
+            </ProfileContextProvider>
           </BuilderFormProvider>
         </UserWorkspaceContextProvider>
       </body>
