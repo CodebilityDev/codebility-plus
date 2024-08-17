@@ -27,11 +27,11 @@ function BuilderNavbar() {
         {cardData.status ? (
           <div className="flex items-center gap-x-2">
             <Link
-              href={cardData.username_url}
-              target="_blank"
+              href={cardData.username_url || '#'}
+              target={cardData.username_url ? '_blank' : '_self'}
               className="font-bold underline"
             >
-              {cardData.username_url}
+              {cardData.username_url || 'set a profile url'}
             </Link>
             <HomePublishProfileModal />
           </div>
