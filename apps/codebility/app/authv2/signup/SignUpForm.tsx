@@ -8,7 +8,6 @@ import { signupUser } from "../actions"
 import { useModal } from "@/hooks/use-modal"
 import { useTechStackStore } from "@/hooks/use-techstack"
 import { useSchedule } from "@/hooks/use-timeavail"
-import { makeApiCallWithTimeout } from "@/lib/timeoutcall"
 import { SignUpValidation } from "@/lib/validations/auth"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -16,7 +15,7 @@ import { useEffect, useState } from "react"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { z } from "zod"
-import SignUpInputs from "@/app/auth/signup/SignupInputs"
+import SignUpInputs from "./SignupInputs"
 
 type Inputs = z.infer<typeof SignUpValidation>
 interface Field {
