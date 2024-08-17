@@ -71,7 +71,7 @@ function getPatterns() {
   return [
     // middleware for multi tenant
     {
-      pattern: new URLPattern({ hostname: (process.env.NODE_ENV === "production"? `*.${appConfig.url}`: `*.localhost`) }),
+      pattern: new URLPattern({ hostname: (process.env.NODE_ENV === "production"? `*.${appConfig.url.split("://")[1]?.split(".")[0]}`: `*.localhost`) }),
       handler:  async (req: NextRequest, res: NextResponse) => {
         const tenant = req.headers.get("host")?.split(".")[0];
         const protocol = req.url.split("://")[0];
