@@ -119,3 +119,17 @@ export async function getBuilderProfileData(cardId: string) {
 
     return newData;
 }
+
+export async function publishProfile(usernameURL: string, cardId: string) {
+    const supabase = createServerActionClient({ cookies });
+
+    const { error } = await supabase.from("cards")
+    .update({
+        username_url: usernameURL,
+        profile_published: true,
+        updated_at: new Date()
+    })
+    .eq("id", cardId);
+
+    if (error) throw error;
+}
