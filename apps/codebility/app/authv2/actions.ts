@@ -22,8 +22,6 @@ export const signupUser = async (data: FieldValues) => {
         main_position: data.position,
     }
 
-    console.log(userData);
-
     const { error, data: { user } } = await supabase.auth.signUp({
         email: data.email_address,
         password: data.password,
@@ -35,4 +33,15 @@ export const signupUser = async (data: FieldValues) => {
 
     if (error) throw error;
     return user;
+}
+
+export const signinUser = async (email: string, password: string) => {
+    const supabase = createServerActionClient({ cookies });
+
+    const { error, data } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+  
+    if (error) throw error;
 }
