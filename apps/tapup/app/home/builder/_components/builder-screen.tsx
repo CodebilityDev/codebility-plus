@@ -1,11 +1,11 @@
 'use client'
 
 import Image from 'next/image'
-import useBuilderFormData from '../_hooks/useBuilderFormData'
+import useProfile from '~/hooks/useProfile'
 import { Button } from '@codevs/ui/button'
 
 function BuilderScreen() {
-  const { profileDatas } = useBuilderFormData()
+  const { profileDatas } = useProfile()
   return (
     <div className="flex flex-1 justify-center">
       <div className="h-[40vw] w-[25vw] overflow-hidden rounded-3xl border border-black bg-white">
