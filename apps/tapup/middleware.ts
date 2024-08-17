@@ -77,7 +77,7 @@ function getPatterns() {
         const protocol = req.url.split("://")[0];
         const originalHost = process.env.NODE_ENV === "production"? `.${appConfig.url}`: `.localhost:3000`; // adjust the port if needed.
         const profileData = await getUserCards(req,res,{username_url: `${protocol}://${tenant}${originalHost}`});
-        console.log(`${protocol}://${tenant}${originalHost}`)
+
         if (!profileData || (profileData.data && profileData.data.length === 0)) {
           return NextResponse.rewrite(new URL("/",req.url));
         } 
