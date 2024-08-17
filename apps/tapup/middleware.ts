@@ -3,6 +3,7 @@ import { NextResponse, URLPattern } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import pathsConfig from './config/paths.config';
+import appConfig from './config/app.config';
 
 export const config = {
   matcher: [
@@ -33,8 +34,17 @@ const getUserCards = (req: NextRequest, res: NextResponse, userId: string) => {
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
+  // get url including tenant
+  let data =  req.url.split("://"); 
+  const protocol = data[0] || "http";
+
+  data = data[1]?.split("/") as string[];
+  const paths = data && data.slice(1).join("/");
+
+  const url = `${protocol}://${req.headers.get("host")}/${paths}`;
+
   // handle patterns for specific routes
-  const handlePattern = matchUrlPattern(req.url);
+  const handlePattern = matchUrlPattern(url);
 
   // if a pattern handler exists, call it
   if (handlePattern) {
@@ -56,6 +66,13 @@ export async function middleware(req: NextRequest) {
 
 function getPatterns() {
   return [
+    // middleware for multi tenant
+    {
+      pattern: new URLPattern({ hostname: (process.env.NODE_ENV === "production"? `*.${appConfig.url}`: `*.localhost`) }),
+      handler:  async (req: NextRequest, res: NextResponse) => {
+        console.log("TENANT")
+      }
+    },
     {
       pattern: new URLPattern({ pathname: '/auth/*?' }),
       handler: async (req: NextRequest, res: NextResponse) => {
