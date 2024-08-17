@@ -25,7 +25,10 @@ function BuilderNavbar() {
       </div>
       <div>
         {cardData.status ? (
-          <HomePublishProfileModal />
+          <div className="flex items-center gap-x-2">
+            <p className="font-bold">{cardData.username_url}</p>
+            <HomePublishProfileModal />
+          </div>
         ) : (
           <HomeActivateCardModal cardId={cardData.id}>
             <Button>Publish Profile</Button>
