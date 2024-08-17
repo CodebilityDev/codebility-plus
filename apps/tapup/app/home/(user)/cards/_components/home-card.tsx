@@ -1,7 +1,7 @@
 import { PenLine } from 'lucide-react'
 import React from 'react'
 import Card from '~/types/cards'
-import HomeActivateCardModal from './home-activate-card-modal'
+import HomeActivateCardModal from '../../../_components/home-activate-card-modal'
 import { CircleUserRound } from 'lucide-react'
 import Link from 'next/link'
 import pathsConfig from '~/config/paths.config'
