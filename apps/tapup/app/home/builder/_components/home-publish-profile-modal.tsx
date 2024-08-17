@@ -64,7 +64,7 @@ function HomePublishProfileModal() {
 
   return (
     <Dialog>
-      <Toaster richColors />
+      <Toaster richColors position="top-right" />
       <DialogTrigger asChild>
         <Button>Publish Profile</Button>
       </DialogTrigger>

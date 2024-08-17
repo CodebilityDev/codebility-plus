@@ -74,7 +74,7 @@ function ProfileDataForm() {
 
   return (
     <div className="my-8 px-8">
-      <Toaster />
+      <Toaster richColors position="top-right" />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <p className="mb-3 text-sm text-gray-400">
