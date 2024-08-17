@@ -17,6 +17,14 @@ export default function ProfileContextProvider({
   children: React.ReactNode
   manageProfileData: ManageProfileData
 }) {
+  // transform null property values to empty string.
+  const manageProfileDataKeys = Object.keys(manageProfileData)
+
+  for (let profileKey of manageProfileDataKeys) {
+    const key = profileKey as keyof ManageProfileData
+    if (!manageProfileData[key]) manageProfileData[key] = ''
+  }
+
   const [profileDatas, setProfileDatas] = useState(
     JSON.stringify(manageProfileData),
   )
