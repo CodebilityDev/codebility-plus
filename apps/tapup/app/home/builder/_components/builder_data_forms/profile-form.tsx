@@ -78,7 +78,7 @@ function ProfileDataForm() {
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
           <p className="mb-3 text-sm text-gray-400">
-            Make changes to your account here. Click save when you're done
+            Make changes to your account here. Click save when you&lsquo;re done
           </p>
           <div className="flex flex-col gap-y-3">
             <FormField
