@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { FieldValues } from "react-hook-form";
 
 import { dateTimeFormat } from "@/lib/formDateTime";
+import { redirect } from "next/navigation";
 
 export const signupUser = async (data: FieldValues) => {
     const supabase = createServerActionClient({ cookies });
@@ -42,6 +43,15 @@ export const signinUser = async (email: string, password: string) => {
       email,
       password,
     });
-  
+
     if (error) throw error;
+
+    redirect("/authv2/signin"); // will cause a reload so middleware would know the updated session.
 }
+
+export const signOut = async () => {
+    const supabase = createServerActionClient({ cookies });
+    await supabase.auth.signOut();
+    redirect("/");
+  };
+  
