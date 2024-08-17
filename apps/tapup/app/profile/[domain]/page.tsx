@@ -6,13 +6,18 @@ import Image from 'next/image'
 async function ProfilePage({ params }: { params: { domain: string } }) {
   const supabase = createServerComponentClient({ cookies })
 
-  const { data: profileDatas } = await supabase
-    .from('builder_profile_data')
+  const { data: card } = await supabase
+    .from('cards')
     .select()
     .eq('profile_key', params.domain)
     .single()
 
-  console.log(profileDatas)
+  const { data: profileDatas } = await supabase
+    .from('builder_profile_data')
+    .select()
+    .eq('card_id', card.id)
+    .single()
+
   return (
     <div className="flex h-screen flex-1 items-center justify-center">
       <div className="h-[40vw] w-[25vw] overflow-hidden rounded-3xl border border-black bg-white">
