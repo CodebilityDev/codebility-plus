@@ -1,18 +1,7 @@
-import { z } from "zod"; 
+import { ManageProfileData } from "~/lib/profile-data";
 
-export const profileFormSchema = z.object({
-    displayName: z.string().min(1),
-    coverPhoto: z.string().min(1),
-    businessEmail: z.string().min(1),
-    businessContact: z.string().min(1),
-    businessIndustry: z.string().min(1),
-    industryRole: z.string().min(1),
-    bio: z.string().min(8),
-})
 
-export type ProfileData = z.infer<typeof profileFormSchema>;
-
-export const profileDatasDefault: ProfileData = {
+export const profileDatasDefault: ManageProfileData = {
     displayName: 'Highland Bali',
     coverPhoto: '',
     businessEmail: '',
