@@ -37,6 +37,7 @@ import {
 import { UserWorkspaceContext } from '../../_components/user-workspace-context'
 
 import { signOut } from '~/app/auth/actions'
+import Image from 'next/image'
 
 function HomeNavbarMenu() {
   const user = useContext(UserWorkspaceContext)
@@ -45,7 +46,11 @@ function HomeNavbarMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="flex items-center gap-x-2">
-          <img src={user.avatar_url} className="h-10 w-10 rounded-full" />
+          <Image
+            src={user.avatar_url}
+            alt="user avatar"
+            className="h-10 w-10 rounded-full"
+          />
           <ChevronDown className="h-5 w-5" />
         </div>
       </DropdownMenuTrigger>
@@ -53,7 +58,11 @@ function HomeNavbarMenu() {
         <DropdownMenuLabel>
           <div className="flex items-center">
             <div className="flex-1">
-              <img src={user.avatar_url} className="h-10 w-10 rounded-full" />
+              <Image
+                src={user.avatar_url}
+                alt="user avatar"
+                className="h-10 w-10 rounded-full"
+              />
             </div>
             <div className="text-xs">
               <div>{user.full_name}</div>
