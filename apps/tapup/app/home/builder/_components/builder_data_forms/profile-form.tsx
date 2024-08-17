@@ -12,20 +12,16 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@codevs/ui/button'
-import useBuilderFormData from '../../_hooks/useBuilderFormData'
+import useProfile from '~/hooks/useProfile'
 import { Toaster, toast } from '@codevs/ui/sonner-toast'
 import { v4 } from 'uuid'
 import { createClient } from '@supabase/supabase-js'
-
-import {
-  profileFormSchema as formSchema,
-  profileDatasDefault as defaultValues,
-} from '../../_lib/builder-data-form-datas'
+import { manageProfileFormSchema as formSchema } from '~/lib/profile-data'
 import { updateBuilderProfileData } from '../../actions'
 import useCard from '../../_hooks/useCard'
 
 function ProfileDataForm() {
-  const { updateProfileDatas, profileDatas } = useBuilderFormData()
+  const { updateProfileDatas, profileDatas } = useProfile()
   const { cardData } = useCard()
 
   const coverPhotoRef = useRef<HTMLInputElement>(null)
