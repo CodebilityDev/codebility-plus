@@ -26,7 +26,13 @@ function BuilderNavbar() {
       <div>
         {cardData.status ? (
           <div className="flex items-center gap-x-2">
-            <p className="font-bold">{cardData.username_url}</p>
+            <Link
+              href={cardData.username_url}
+              target="_blank"
+              className="font-bold underline"
+            >
+              {cardData.username_url}
+            </Link>
             <HomePublishProfileModal />
           </div>
         ) : (
