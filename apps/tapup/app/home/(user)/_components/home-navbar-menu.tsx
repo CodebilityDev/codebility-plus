@@ -34,7 +34,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@codevs/ui/dropdown-menu'
-import { UserWorkspaceContext } from './user-workspace-context'
+import { UserWorkspaceContext } from '../../_components/user-workspace-context'
 
 import { signOut } from '~/app/auth/actions'
 

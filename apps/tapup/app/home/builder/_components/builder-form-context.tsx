@@ -2,11 +2,8 @@
 
 import { createContext, useContext, useState } from 'react'
 import { FormTargets } from '../_lib/builder-form-sidebar-items'
-import {
-  ProfileData,
-  profileDatasDefault,
-} from '../_lib/builder-data-form-datas'
-import { UserWorkspaceContext } from '../../(user)/_components/user-workspace-context'
+import { ProfileData } from '../_lib/builder-data-form-datas'
+import { UserWorkspaceContext } from '../../_components/user-workspace-context'
 import Card from '~/types/cards'
 
 interface BuilderForm {

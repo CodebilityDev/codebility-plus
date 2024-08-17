@@ -23,11 +23,11 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast, Toaster } from '@codevs/ui/sonner-toast'
-import { UserWorkspaceContext } from '../../_components/user-workspace-context'
+import { UserWorkspaceContext } from './user-workspace-context'
 import { useContext } from 'react'
 import { useRouter } from 'next/navigation'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@codevs/ui/input-otp'
-import { activateCard } from '../actions'
+import { activateCard } from '../(user)/cards/actions'
 
 const formSchema = z.object({
   code: z.string(),

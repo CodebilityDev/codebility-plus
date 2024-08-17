@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { UserWorkspaceContextProvider } from './_components/user-workspace-context'
+import { UserWorkspaceContextProvider } from '../_components/user-workspace-context'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import HomeSidebar from './_components/home-sidebar'

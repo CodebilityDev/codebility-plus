@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import HomeNavbar from '../../(user)/_components/home-navbar'
-import { UserWorkspaceContextProvider } from '../../(user)/_components/user-workspace-context'
+import { UserWorkspaceContextProvider } from '../../_components/user-workspace-context'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import BuilderFormProvider from '../_components/builder-form-context'
