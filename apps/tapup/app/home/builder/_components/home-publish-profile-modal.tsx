@@ -53,7 +53,11 @@ function HomePublishProfileModal() {
     const { usernameURL } = values
 
     try {
-      await publishProfile(`${protocol}://${usernameURL}.${host}`, cardData.id)
+      await publishProfile(
+        `${protocol}://${usernameURL}.${host}`,
+        usernameURL,
+        cardData.id,
+      )
       toast.success('Profile Published!')
       reset()
       router.refresh()
