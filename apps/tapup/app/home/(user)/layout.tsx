@@ -7,6 +7,7 @@ import HomeSidebar from './_components/home-sidebar'
 import HomeNavbar from './_components/home-navbar'
 import appConfig from '~/config/app.config'
 import { cn } from '@codevs/ui'
+import { signOut } from '~/app/auth/actions'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,6 +32,8 @@ export default async function RootLayout({
     .select()
     .eq('id', user?.id)
     .single()
+
+  if (!user || !data) await signOut()
 
   return (
     <html lang={appConfig.locale}>
