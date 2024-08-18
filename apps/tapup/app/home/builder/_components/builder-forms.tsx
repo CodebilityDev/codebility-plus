@@ -15,7 +15,7 @@ function BuilderForms() {
       <div className="flex h-full w-full gap-x-7">
         <BuilderFormsSidebar />
         <div className="w-full">
-          <div className="bg-white">
+          <div className="bg-background">
             <Form />
           </div>
         </div>
