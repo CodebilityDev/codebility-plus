@@ -8,9 +8,9 @@ function HomeNavbar() {
   const user = useContext(UserWorkspaceContext)
 
   return (
-    <div className="flex justify-between bg-white">
+    <div className="bg-background flex justify-between">
       <div></div>
-      <div className="flex items-center gap-x-2 px-6 py-3">
+      <div className="text-foreground flex items-center gap-x-2 px-6 py-3">
         <div>Hi, {user.full_name}</div>
         <div>
           <NavbarMenu />
