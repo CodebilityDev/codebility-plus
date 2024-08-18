@@ -73,7 +73,7 @@ function SignUpForm() {
         <form
           noValidate
           onSubmit={form.handleSubmit(handleSignUp)}
-          className="flex w-full max-w-xl flex-col gap-4 rounded-lg p-8 shadow-2xl"
+          className="bg-secondary flex w-full max-w-xl flex-col gap-4 rounded-lg p-8 shadow-2xl"
         >
           <div className="flex flex-col gap-y-3">
             <h2 className="text-custom-black -mb-2 text-center font-bold md:text-start md:text-2xl">
