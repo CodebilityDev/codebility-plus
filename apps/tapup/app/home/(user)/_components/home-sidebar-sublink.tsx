@@ -24,7 +24,7 @@ const DashboardSubLink = ({ href, link, className }: Props) => {
       }
     >
       <Dot size={45} />
-      <span className="text-primary-foreground group-hover:text-primary-foreground">
+      <span className="text-primary group-hover:text-primary-foreground">
         {link}
       </span>
     </Link>
