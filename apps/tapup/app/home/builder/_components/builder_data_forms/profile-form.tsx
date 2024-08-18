@@ -73,14 +73,14 @@ function ProfileDataForm() {
   }
 
   return (
-    <div className="my-8 px-8">
+    <div className="bg-card my-8 px-8">
       <Toaster richColors position="top-right" />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
-          <p className="mb-3 text-sm text-gray-400">
+          <p className="text-foreground/90 mb-3 text-sm">
             Make changes to your account here. Click save when you&lsquo;re done
           </p>
-          <div className="flex flex-col gap-y-3">
+          <div className="text-foreground flex flex-col gap-y-3">
             <FormField
               control={form.control}
               name="displayName"
@@ -94,7 +94,7 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="displayName"
-                        className="rounded border border-gray-300 px-3 py-1"
+                        className="bg-input border-border rounded border px-3 py-1"
                         placeholder=" "
                         {...field}
                         onChange={(e) => {
@@ -121,14 +121,14 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="coverPhoto"
-                        className="hidden"
+                        className="bg-input hidden "
                         {...field}
                       />
                     </FormControl>
                     <input
                       ref={coverPhotoRef}
                       type="file"
-                      className="flex rounded border border-gray-300 px-3 py-1"
+                      className="bg-input border-border flex rounded border px-3 py-1"
                       placeholder=" "
                       onChange={(e) => {
                         if (!e.target.files || e.target.files.length === 0)
@@ -158,7 +158,7 @@ function ProfileDataForm() {
                       <input
                         type="email"
                         id="businessEmail"
-                        className="rounded border border-gray-300 px-3 py-1"
+                        className="bg-input border-border rounded border px-3 py-1"
                         placeholder=" "
                         {...field}
                       />
@@ -184,7 +184,7 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="businessContact"
-                        className="rounded border border-gray-300 px-3 py-1"
+                        className="bg-input border-border rounded border px-3 py-1"
                         placeholder=" "
                         {...field}
                       />
@@ -210,7 +210,7 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="businessIndustry"
-                        className="rounded border border-gray-300 px-3 py-1"
+                        className="bg-input border-border rounded border px-3 py-1"
                         placeholder=" "
                         {...field}
                       />
@@ -233,7 +233,7 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="industryRole"
-                        className="rounded border border-gray-300 px-3 py-1"
+                        className="bg-input border-border rounded border px-3 py-1"
                         {...field}
                         onChange={(e) => {
                           form.setValue('industryRole', e.target.value)
@@ -259,7 +259,7 @@ function ProfileDataForm() {
                       <textarea
                         rows={5}
                         id="bio"
-                        className="rounded border border-gray-300 px-3 py-1 text-sm"
+                        className="bg-input border-border rounded border px-3 py-1 text-sm"
                         placeholder="Type your short message here"
                         {...field}
                         onChange={(e) => {
