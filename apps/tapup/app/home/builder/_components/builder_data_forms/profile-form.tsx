@@ -94,7 +94,7 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="displayName"
-                        className="bg-input border-border rounded border px-3 py-1"
+                        className="text-foreground dark:bg-input border-border rounded border px-3 py-1"
                         placeholder=" "
                         {...field}
                         onChange={(e) => {
@@ -121,14 +121,14 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="coverPhoto"
-                        className="bg-input hidden "
+                        className="text-foreground dark:bg-input hidden "
                         {...field}
                       />
                     </FormControl>
                     <input
                       ref={coverPhotoRef}
                       type="file"
-                      className="bg-input border-border flex rounded border px-3 py-1"
+                      className="text-foreground dark:bg-input border-border flex rounded border px-3 py-1"
                       placeholder=" "
                       onChange={(e) => {
                         if (!e.target.files || e.target.files.length === 0)
@@ -158,7 +158,7 @@ function ProfileDataForm() {
                       <input
                         type="email"
                         id="businessEmail"
-                        className="bg-input border-border rounded border px-3 py-1"
+                        className="text-foreground dark:bg-input border-border rounded border px-3 py-1"
                         placeholder=" "
                         {...field}
                       />
@@ -184,7 +184,7 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="businessContact"
-                        className="bg-input border-border rounded border px-3 py-1"
+                        className="text-foreground dark:bg-input border-border rounded border px-3 py-1"
                         placeholder=" "
                         {...field}
                       />
@@ -210,7 +210,7 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="businessIndustry"
-                        className="bg-input border-border rounded border px-3 py-1"
+                        className="text-foreground dark:bg-input border-border rounded border px-3 py-1"
                         placeholder=" "
                         {...field}
                       />
@@ -233,7 +233,7 @@ function ProfileDataForm() {
                       <input
                         type="text"
                         id="industryRole"
-                        className="bg-input border-border rounded border px-3 py-1"
+                        className="text-foreground dark:bg-input border-border rounded border px-3 py-1"
                         {...field}
                         onChange={(e) => {
                           form.setValue('industryRole', e.target.value)
@@ -259,7 +259,7 @@ function ProfileDataForm() {
                       <textarea
                         rows={5}
                         id="bio"
-                        className="bg-input border-border rounded border px-3 py-1 text-sm"
+                        className="text-foreground dark:bg-input border-border rounded border px-3 py-1 text-sm"
                         placeholder="Type your short message here"
                         {...field}
                         onChange={(e) => {
