@@ -73,7 +73,7 @@ function SignUpForm() {
         <form
           noValidate
           onSubmit={form.handleSubmit(handleSignUp)}
-          className="bg-secondary flex w-full max-w-xl flex-col gap-4 rounded-lg p-8 shadow-2xl"
+          className="bg-card flex w-full max-w-xl flex-col gap-4 rounded-lg p-8 shadow-2xl"
         >
           <div className="flex flex-col gap-y-3">
             <h2 className="text-foreground -mb-2 text-center font-bold md:text-start md:text-2xl">
@@ -141,10 +141,10 @@ function SignUpForm() {
                   </FormLabel>
                   <FormControl>
                     {field.isPassword ? (
-                      <div className="bg-foreground flex w-full items-center rounded-xl border-2 pr-4">
+                      <div className="bg-input flex w-full items-center rounded-xl border-2 pr-4">
                         <Input
                           parentClassName="py-0 w-full"
-                          className="bg-foreground text-background border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                          className="bg-input text-foreground border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                           {...formField}
                           type={toggle ? 'text' : 'password'}
                           placeholder={toggle ? 'password' : '*********'}
@@ -154,16 +154,16 @@ function SignUpForm() {
                           className="flex cursor-pointer items-center p-0 hover:bg-transparent"
                         >
                           {toggle ? (
-                            <Eye className="text-background/30" />
+                            <Eye className="text-foreground/60" />
                           ) : (
-                            <EyeOff className="text-background/30" />
+                            <EyeOff className="text-foreground/60" />
                           )}
                         </div>
                       </div>
                     ) : (
                       <Input
                         parentClassName="py-0 w-full"
-                        className="bg-foreground text-background border-2 text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="bg-input text-foreground border-2 text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
                         {...formField}
                         type={field.type}
                         placeholder={field.placeholder}

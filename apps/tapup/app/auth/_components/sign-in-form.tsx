@@ -47,7 +47,7 @@ function SignInForm() {
 
   return (
     <div className="flex w-8/12">
-      <div className="bg-secondary flex-1 rounded-l-xl">
+      <div className="bg-card flex-1 rounded-l-xl">
         <div className="flex flex-col items-center gap-3 px-10 py-16">
           <Toaster richColors position="top-right" />
           <Form {...form}>
@@ -98,9 +98,9 @@ function SignInForm() {
               </div>
             </div>
             <div className="flex w-full items-center">
-              <div className="flex-grow border-t border-gray-600"></div>
-              <span className="mx-4">or</span>
-              <div className="flex-grow border-t border-gray-600"></div>
+              <div className="border-foreground flex-grow border-t"></div>
+              <span className="text-foreground/60 mx-4">or</span>
+              <div className="border-foreground flex-grow border-t"></div>
             </div>
             <form onSubmit={form.handleSubmit(handleSignIn)} className="w-full">
               <FormField
