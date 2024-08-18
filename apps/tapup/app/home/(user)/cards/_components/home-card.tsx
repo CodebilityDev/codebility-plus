@@ -18,7 +18,7 @@ const HomeCard = ({ card, className, height, width }: CardProps) => {
   const { id, name, industry, status, username_url } = card
   return (
     <div
-      className={`bg-background text-foreground flex h-[15vw] w-[24vw] flex-col justify-between rounded-[20px] p-6 ${className}`}
+      className={`bg-card text-foreground flex h-[15vw] w-[24vw] flex-col justify-between rounded-[20px] p-6 ${className}`}
       style={{ width: width, height: height }}
     >
       <div className="flex justify-between">
