@@ -83,7 +83,7 @@ function SignUpForm() {
               <p className="text-sm text-gray-400">Already have an acount?</p>
               <Link
                 href={pathsConfig.auth.signIn}
-                className="text-sm text-green-500"
+                className="text-primary text-sm"
               >
                 Login
               </Link>
@@ -176,7 +176,7 @@ function SignUpForm() {
 
           <Button
             type="submit"
-            className="hover:bg-custom-green/90 bg-custom-green mt-6 w-full font-semibold text-white"
+            className="mt-6 w-full font-semibold text-white"
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting ? (
@@ -224,11 +224,11 @@ function SignUpForm() {
                   <FormLabel>
                     <p className="text-custom-black text-xs">
                       By agreeing, you agree {appConfig.name}{' '}
-                      <Link className="text-custom-green text-xs" href="">
+                      <Link className="text-primary text-xs" href="">
                         Terms and Services
                       </Link>{' '}
                       and{' '}
-                      <Link className="text-xs text-green-500" href="">
+                      <Link className="text-primary text-xs" href="">
                         Privacy Policy
                       </Link>
                     </p>
