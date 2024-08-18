@@ -58,7 +58,7 @@ export function SidebarItems({ item, chevron }: SidebarItemsProps) {
         {chevron && (
           <div onClick={() => setIsOpen(!isOpen)}>
             <ChevronDown
-              className={`${isOpen ? 'rotate-180' : ''} text-primary-foreground duration-300`}
+              className={`${isOpen ? 'rotate-180' : ''} duration-300`}
             />
           </div>
         )}
