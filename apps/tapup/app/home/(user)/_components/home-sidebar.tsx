@@ -46,11 +46,11 @@ export function SidebarItems({ item, chevron }: SidebarItemsProps) {
   return (
     <>
       <li
-        className={`flex items-center justify-between rounded-md px-2 py-3 duration-300  ${isActive() ? 'bg-primary text-background' : 'bg-background hover:bg-primary/80'} ${item.key === 'settings' && 'mb-3 mt-auto'}`}
+        className={`text-pr bg-background flex  cursor-pointer items-center justify-between rounded-md px-2 py-3 duration-300 ${isActive() ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-primary/80 hover:text-primary-foreground'} ${item.key === 'settings' && 'mb-3 mt-auto'}`}
       >
         <Link
           href={item.path}
-          className="hover:text-primary-foreground  flex w-40 items-center gap-2 text-sm"
+          className="hover:text-primary-foreground flex w-40 items-center gap-2 text-sm"
         >
           {item.icon}
           {item.label}
@@ -58,7 +58,7 @@ export function SidebarItems({ item, chevron }: SidebarItemsProps) {
         {chevron && (
           <div onClick={() => setIsOpen(!isOpen)}>
             <ChevronDown
-              className={`${isOpen ? 'rotate-180' : ''} cursor-pointer duration-300`}
+              className={`${isOpen ? 'rotate-180' : ''} text-primary-foreground duration-300`}
             />
           </div>
         )}
