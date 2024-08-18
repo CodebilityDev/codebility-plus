@@ -113,14 +113,14 @@ function SignInForm() {
                         <input
                           type="email"
                           id="email"
-                          className=" focus:border-primary dark:focus:border-primary border-border text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm focus:outline-none focus:ring-0 dark:border-gray-600"
+                          className=" focus:border-primary dark:text-background dark:focus:border-primary border-border text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm focus:outline-none focus:ring-0 dark:border-gray-600"
                           placeholder=" "
                           {...field}
                         />
                       </FormControl>
                       <FormLabel
                         htmlFor="email"
-                        className="text-primary peer-focus:text-primary peer-focus:dark:text-primary dark:text-foreground/60 absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
+                        className="text-primary peer-focus:text-primary dark:text-primary absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
                       >
                         Enter your Email
                       </FormLabel>
@@ -139,14 +139,14 @@ function SignInForm() {
                         <input
                           type="password"
                           id="password"
-                          className="focus:border-primary dark:focus:border-primary dark:text-foreground border-border  text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm focus:outline-none focus:ring-0 dark:border-gray-600"
+                          className="focus:border-primary dark:focus:border-primary dark:text-background border-border text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm focus:outline-none focus:ring-0 dark:border-gray-600"
                           placeholder=" "
                           {...field}
                         />
                       </FormControl>
                       <FormLabel
                         htmlFor="password"
-                        className="text-primary peer-focus:text-primary peer-focus:dark:text-primary dark:text-foreground/60 absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
+                        className="text-primary peer-focus:text-primary dark:text-primary absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
                       >
                         Password
                       </FormLabel>
