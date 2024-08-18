@@ -113,7 +113,7 @@ function SignInForm() {
                         <input
                           type="email"
                           id="email"
-                          className="focus:border-primary dark:focus:border-primary dark:text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
+                          className="focus:border-primary dark:focus:border-primary dark:text-foreground border-border peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
                           placeholder=" "
                           {...field}
                         />
@@ -139,7 +139,7 @@ function SignInForm() {
                         <input
                           type="password"
                           id="password"
-                          className="focus:border-primary dark:focus:border-primary dark:text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 bg-gray-50 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
+                          className="focus:border-primary dark:focus:border-primary dark:text-foreground border-border peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
                           placeholder=" "
                           {...field}
                         />
