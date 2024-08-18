@@ -76,11 +76,13 @@ function SignUpForm() {
           className="bg-secondary flex w-full max-w-xl flex-col gap-4 rounded-lg p-8 shadow-2xl"
         >
           <div className="flex flex-col gap-y-3">
-            <h2 className="text-custom-black -mb-2 text-center font-bold md:text-start md:text-2xl">
+            <h2 className="text-foreground -mb-2 text-center font-bold md:text-start md:text-2xl">
               Create a {appConfig.name} account
             </h2>
             <div className="flex gap-x-2">
-              <p className="text-sm text-gray-400">Already have an acount?</p>
+              <p className="text-foreground/60 text-sm">
+                Already have an acount?
+              </p>
               <Link
                 href={pathsConfig.auth.signIn}
                 className="text-primary text-sm"
@@ -92,7 +94,7 @@ function SignUpForm() {
               <Button
                 onClick={() => signInWithOAuth('google')}
                 type="button"
-                className="text-custom-black hover:text-custom-black flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-400 bg-white py-3 hover:bg-gray-50"
+                className="text-foreground hover:text-foreground flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-400 bg-white py-3 hover:bg-gray-50"
               >
                 <div className="relative aspect-square w-5">
                   <Image src="/devicon_google.svg" alt="google" fill />
@@ -101,7 +103,7 @@ function SignUpForm() {
               <Button
                 type="button"
                 onClick={() => signInWithOAuth('facebook')}
-                className="text-custom-black hover:text-custom-black flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-700 py-3 hover:bg-blue-500  "
+                className="text-foreground hover:text-foreground flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-700 py-3 hover:bg-blue-500  "
               >
                 <div className="relative aspect-square w-5">
                   <Image src="/facebook.svg" alt="facebook" fill />
@@ -110,7 +112,7 @@ function SignUpForm() {
               <Button
                 type="button"
                 onClick={() => signInWithOAuth('linkedin_oidc')}
-                className="text-custom-black hover:text-custom-black flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-400 bg-white py-3 hover:bg-gray-50 "
+                className="text-foreground hover:text-foreground flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-400 bg-white py-3 hover:bg-gray-50 "
               >
                 <div className="relative aspect-square w-5">
                   <Image src="/linkedin.svg" alt="linkedin" fill />
@@ -121,9 +123,9 @@ function SignUpForm() {
 
           {/* DIVIDER */}
           <div className="flex items-center">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="mx-4 text-gray-500">or</span>
-            <div className="flex-grow border-t border-gray-300"></div>
+            <div className="border-foreground flex-grow border-t"></div>
+            <span className="text-foreground/60 mx-4">or</span>
+            <div className="border-foreground flex-grow border-t"></div>
           </div>
           {/* DIVIDER */}
 
@@ -134,15 +136,15 @@ function SignUpForm() {
               name={field.name}
               render={({ field: formField }) => (
                 <FormItem className="w-full">
-                  <FormLabel className="text-custom-black text-md">
+                  <FormLabel className="text-foreground text-md">
                     {field.label}
                   </FormLabel>
                   <FormControl>
                     {field.isPassword ? (
-                      <div className="flex w-full items-center rounded-xl border-2 bg-slate-50 pr-4">
+                      <div className="bg-foreground flex w-full items-center rounded-xl border-2 pr-4">
                         <Input
                           parentClassName="py-0 w-full"
-                          className="border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                          className="bg-foreground text-background border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                           {...formField}
                           type={toggle ? 'text' : 'password'}
                           placeholder={toggle ? 'password' : '*********'}
@@ -152,16 +154,16 @@ function SignUpForm() {
                           className="flex cursor-pointer items-center p-0 hover:bg-transparent"
                         >
                           {toggle ? (
-                            <Eye className="text-gray-400" />
+                            <Eye className="text-background/30" />
                           ) : (
-                            <EyeOff className="text-gray-400" />
+                            <EyeOff className="text-background/30" />
                           )}
                         </div>
                       </div>
                     ) : (
                       <Input
                         parentClassName="py-0 w-full"
-                        className="border-2 text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="bg-foreground text-background border-2 text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
                         {...formField}
                         type={field.type}
                         placeholder={field.placeholder}
@@ -222,7 +224,7 @@ function SignUpForm() {
                   </FormControl>
 
                   <FormLabel>
-                    <p className="text-custom-black text-xs">
+                    <p className="text-foreground text-xs">
                       By agreeing, you agree {appConfig.name}{' '}
                       <Link className="text-primary text-xs" href="">
                         Terms and Services
