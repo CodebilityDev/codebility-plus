@@ -47,7 +47,7 @@ function SignInForm() {
 
   return (
     <div className="flex w-8/12">
-      <div className="flex-1 rounded-l-xl bg-slate-50">
+      <div className="bg-secondary flex-1 rounded-l-xl">
         <div className="flex flex-col items-center gap-3 px-10 py-16">
           <Toaster richColors position="top-right" />
           <Form {...form}>
@@ -113,7 +113,7 @@ function SignInForm() {
                         <input
                           type="email"
                           id="email"
-                          className="focus:border-primary dark:focus:border-primary peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 bg-gray-50 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                          className="focus:border-primary dark:focus:border-primary dark:text-background peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
                           placeholder=" "
                           {...field}
                         />
@@ -139,7 +139,7 @@ function SignInForm() {
                         <input
                           type="password"
                           id="password"
-                          className="focus:border-primary dark:focus:border-primary peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 bg-gray-50 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
+                          className="focus:border-primary dark:focus:border-primary dark:text-background peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 bg-gray-50 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
                           placeholder=" "
                           {...field}
                         />
