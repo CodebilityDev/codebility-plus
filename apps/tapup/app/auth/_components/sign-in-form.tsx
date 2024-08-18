@@ -178,13 +178,13 @@ function SignInForm() {
 
                 <Button
                   type="submit"
-                  className="bg-primary text-primary-foreground w-full"
+                  className="bg-primary text-background w-full"
                   disabled={form.formState.isSubmitting}
                 >
                   {form.formState.isSubmitting ? (
                     <div className="flex items-center justify-center">
                       <svg
-                        className="text-primary-foreground mr-3 h-5 w-5 animate-spin"
+                        className="text-background mr-3 h-5 w-5 animate-spin"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
