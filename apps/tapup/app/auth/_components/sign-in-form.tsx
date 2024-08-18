@@ -113,7 +113,7 @@ function SignInForm() {
                         <input
                           type="email"
                           id="email"
-                          className="focus:border-primary dark:focus:border-primary dark:text-background peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
+                          className="focus:border-primary dark:focus:border-primary dark:text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
                           placeholder=" "
                           {...field}
                         />
@@ -139,7 +139,7 @@ function SignInForm() {
                         <input
                           type="password"
                           id="password"
-                          className="focus:border-primary dark:focus:border-primary dark:text-background peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 bg-gray-50 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
+                          className="focus:border-primary dark:focus:border-primary dark:text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 bg-gray-50 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
                           placeholder=" "
                           {...field}
                         />
@@ -158,7 +158,7 @@ function SignInForm() {
 
               <div
                 onClick={() => router.push(pathsConfig.auth.passwordReset)}
-                className="text-primary mt-1 flex cursor-pointer justify-end text-sm hover:text-gray-900"
+                className="text-primary hover:text-foreground mt-1 flex cursor-pointer justify-end text-sm"
               >
                 Forgot Password?
               </div>
@@ -178,13 +178,13 @@ function SignInForm() {
 
                 <Button
                   type="submit"
-                  className="bg-primary text-background w-full"
+                  className="bg-primary text-foreground w-full"
                   disabled={form.formState.isSubmitting}
                 >
                   {form.formState.isSubmitting ? (
                     <div className="flex items-center justify-center">
                       <svg
-                        className="text-background mr-3 h-5 w-5 animate-spin"
+                        className="text-foreground mr-3 h-5 w-5 animate-spin"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
