@@ -13,18 +13,20 @@ const DashboardSubLink = ({ href, link, className }: Props) => {
   const pathname = usePathname()
   const isActive = pathname === href
   function isActiveChecker() {
-    return isActive ? 'text-custom-green' : ''
+    return isActive ? 'text-primary' : ''
   }
   return (
     <Link
       href={href}
       className={
         className +
-        `${isActiveChecker()} i hover:bg-custom-green/80 group mt-2 flex items-center rounded-md px-5 pl-4 text-sm hover:text-white`
+        `${isActiveChecker()} i hover:bg-primary hover:text-primary-foreground group mt-2 flex items-center rounded-md px-5 pl-4 text-sm`
       }
     >
       <Dot size={45} />
-      <span className="text-white group-hover:text-white">{link}</span>
+      <span className="text-primary-foreground group-hover:text-primary-foreground">
+        {link}
+      </span>
     </Link>
   )
 }
