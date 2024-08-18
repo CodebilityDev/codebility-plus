@@ -43,7 +43,7 @@ export default async function RootLayout({
             <div className="relative h-screen w-1/5">
               <HomeSidebar />
             </div>
-            <div className="h-screen flex-1 overflow-scroll bg-slate-100">
+            <div className="bg-secondary h-screen flex-1 overflow-scroll">
               <HomeNavbar />
               {children}
             </div>
