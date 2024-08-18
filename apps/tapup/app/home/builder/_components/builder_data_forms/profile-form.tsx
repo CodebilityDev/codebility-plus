@@ -73,7 +73,7 @@ function ProfileDataForm() {
   }
 
   return (
-    <div className="bg-card my-8 px-8">
+    <div className="bg-card px-8 py-8">
       <Toaster richColors position="top-right" />
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)}>
