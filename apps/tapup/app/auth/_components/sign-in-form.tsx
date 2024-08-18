@@ -47,7 +47,7 @@ function SignInForm() {
 
   return (
     <div className="flex w-8/12">
-      <div className="bg-card flex-1 rounded-l-xl">
+      <div className="bg-card flex-1 rounded-l-xl shadow-xl">
         <div className="flex flex-col items-center gap-3 px-10 py-16">
           <Toaster richColors position="top-right" />
           <Form {...form}>
@@ -113,14 +113,14 @@ function SignInForm() {
                         <input
                           type="email"
                           id="email"
-                          className="focus:border-primary dark:focus:border-primary dark:text-foreground border-border peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
+                          className="bg-input focus:border-primary dark:focus:border-primary border-border text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm focus:outline-none focus:ring-0 dark:border-gray-600"
                           placeholder=" "
                           {...field}
                         />
                       </FormControl>
                       <FormLabel
                         htmlFor="email"
-                        className="text-primary peer-focus:text-primary peer-focus:dark:text-primary absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400"
+                        className="text-primary peer-focus:text-primary peer-focus:dark:text-primary dark:text-foreground/60 absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
                       >
                         Enter your Email
                       </FormLabel>
@@ -139,14 +139,14 @@ function SignInForm() {
                         <input
                           type="password"
                           id="password"
-                          className="focus:border-primary dark:focus:border-primary dark:text-foreground border-border peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700"
+                          className="focus:border-primary dark:focus:border-primary dark:text-foreground border-border bg-input text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm focus:outline-none focus:ring-0 dark:border-gray-600"
                           placeholder=" "
                           {...field}
                         />
                       </FormControl>
                       <FormLabel
                         htmlFor="password"
-                        className="text-primary peer-focus:text-primary peer-focus:dark:text-primary absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400"
+                        className="text-primary peer-focus:text-primary peer-focus:dark:text-primary dark:text-foreground/60 absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
                       >
                         Password
                       </FormLabel>
@@ -178,13 +178,13 @@ function SignInForm() {
 
                 <Button
                   type="submit"
-                  className="bg-primary text-foreground w-full"
+                  className="bg-primary w-full"
                   disabled={form.formState.isSubmitting}
                 >
                   {form.formState.isSubmitting ? (
                     <div className="flex items-center justify-center">
                       <svg
-                        className="text-foreground mr-3 h-5 w-5 animate-spin"
+                        className="mr-3 h-5 w-5 animate-spin"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"

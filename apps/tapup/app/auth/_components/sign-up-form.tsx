@@ -178,13 +178,13 @@ function SignUpForm() {
 
           <Button
             type="submit"
-            className="text-background mt-6 w-full font-semibold"
+            className="mt-6 w-full font-semibold"
             disabled={form.formState.isSubmitting}
           >
             {form.formState.isSubmitting ? (
               <div className="flex items-center justify-center">
                 <svg
-                  className="text-background mr-3 h-5 w-5 animate-spin"
+                  className="mr-3 h-5 w-5 animate-spin"
                   xmlns="http://www.w3.org/2000/svg"
                   fill="none"
                   viewBox="0 0 24 24"
