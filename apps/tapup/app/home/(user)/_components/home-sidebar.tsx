@@ -8,14 +8,14 @@ import Sublink from './home-sidebar-sublink'
 
 function HomeSidebar() {
   return (
-    <aside className="bg-foreground z-30 hidden min-h-screen w-full shadow-lg lg:block">
-      <nav className="bg-foreground flex h-dvh flex-col shadow-sm">
+    <aside className="bg-background z-30 hidden min-h-screen w-full shadow-lg lg:block">
+      <nav className="flex h-dvh flex-col shadow-sm">
         <div className="mb-8 flex items-center gap-2 p-4 pb-2 text-2xl">
-          <span className="text-primary-foreground font-bold">Tap</span>
+          <span className="text-foreground font-bold">Tap</span>
           <span className="text-primary font-bold">Up</span>
         </div>
 
-        <ul className="text-primary-foreground flex flex-1 flex-col gap-4 px-8">
+        <ul className="text-primary flex flex-1 flex-col gap-4 px-8">
           {sidebarLinks.map((el, i) => (
             <SidebarItems
               item={el}
@@ -46,7 +46,7 @@ export function SidebarItems({ item, chevron }: SidebarItemsProps) {
   return (
     <>
       <li
-        className={`flex items-center justify-between rounded-md px-2 py-3 duration-300  ${isActive() ? 'bg-primary' : 'bg-foreground hover:bg-primary/80'} ${item.key === 'settings' && 'mb-3 mt-auto'}`}
+        className={`flex items-center justify-between rounded-md px-2 py-3 duration-300  ${isActive() ? 'bg-primary text-background' : 'bg-background hover:bg-primary/80'} ${item.key === 'settings' && 'mb-3 mt-auto'}`}
       >
         <Link
           href={item.path}
