@@ -44,7 +44,7 @@ export default async function RootLayout({
     <html lang={appConfig.locale}>
       <body className={cn(inter.className, appConfig.theme)}>
         <UserWorkspaceContextProvider value={data}>
-          <div className="fixed -z-10 h-full w-full bg-slate-100"></div>
+          <div className="bg-secondary fixed -z-10 h-full w-full"></div>
           <HomeNavbar />
           <BuilderFormProvider cardData={card as Card}>
             <ProfileContextProvider
