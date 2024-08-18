@@ -141,10 +141,10 @@ function SignUpForm() {
                   </FormLabel>
                   <FormControl>
                     {field.isPassword ? (
-                      <div className="bg-input flex w-full items-center rounded-xl border-2 pr-4">
+                      <div className="flex w-full items-center rounded-xl border-2 pr-4">
                         <Input
                           parentClassName="py-0 w-full"
-                          className="bg-input text-foreground border-none focus-visible:ring-0 focus-visible:ring-offset-0"
+                          className="text-foreground border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                           {...formField}
                           type={toggle ? 'text' : 'password'}
                           placeholder={toggle ? 'password' : '*********'}
@@ -163,7 +163,7 @@ function SignUpForm() {
                     ) : (
                       <Input
                         parentClassName="py-0 w-full"
-                        className="bg-input text-foreground border-2 text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
+                        className="text-foreground border-2 text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
                         {...formField}
                         type={field.type}
                         placeholder={field.placeholder}
