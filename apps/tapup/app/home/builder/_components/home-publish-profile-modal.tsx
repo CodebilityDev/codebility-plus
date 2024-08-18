@@ -91,13 +91,13 @@ function HomePublishProfileModal() {
                       <FormLabel htmlFor="usernameURL" className="font-bold">
                         Enter your public username URL
                       </FormLabel>
-                      <div className="bg-gray text-md relative flex items-center bg-gray-100 px-2 py-1">
+                      <div className="bg-gray text-md bg-background/40 relative flex items-center px-2 py-1">
                         <div className="font-bold">{protocol}://</div>
                         <FormControl>
                           <input
                             type="text"
                             id="usernameURL"
-                            className="border font-medium"
+                            className="bg-input border font-medium"
                             placeholder=""
                             {...field}
                             defaultValue={usernameURL ? usernameURL : ''}
