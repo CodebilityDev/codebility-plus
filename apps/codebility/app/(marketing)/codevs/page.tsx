@@ -7,7 +7,7 @@ import Footer from "@/app/(marketing)/Footer"
 import MissionVision from "@/app/(marketing)/codevs/components/MissionVision"
 import FeaturedSection from "@/app/(marketing)/codevs/components/FeaturedSection" 
 import Project from "@/app/(marketing)/codevs/components/Project"
-import CTA from "@/app/(home)/codevs/components/CTA"
+import CTA from "@/app/(marketing)/codevs/components/CTA"
 import Roadmap from "@/app/(marketing)/codevs/components/Roadmap"
 
 const Codevs = () => {
