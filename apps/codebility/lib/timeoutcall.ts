@@ -1,3 +1,5 @@
+"use server";
+
 export async function makeApiCallWithTimeout(call: any, timeout: number) {
   const apiCallPromise = call
 

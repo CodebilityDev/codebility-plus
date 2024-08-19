@@ -48,7 +48,15 @@ export const signInWithOAuth = async (provider: 'google' | 'facebook' | 'linkedi
 };
 
 export const signOut = async () => {
+  const cookieStore = cookies();
   const supabase = createServerActionClient({ cookies });
   await supabase.auth.signOut();
+  
+  const supabaseProjectReferenceId = process.env
+  .NEXT_PUBLIC_SUPABASE_URL!.split('://')[1]
+  ?.split('.')[0]
+
+  cookieStore.delete(`sb-${supabaseProjectReferenceId}-auth-token`); // remove supabase authentication token.
+
   redirect("/");
 };

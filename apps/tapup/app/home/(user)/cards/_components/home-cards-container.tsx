@@ -10,7 +10,7 @@ async function HomeCardsContainer(): Promise<AwaitedReactNode> {
     const cards = (await getCards()) as Card[]
 
     if (!cards || cards.length === 0)
-      return <div>You don't have any card yet...</div>
+      return <div>You don&lsquo;t have any card yet...</div>
 
     return (
       <div className="flex flex-wrap justify-between gap-2">
@@ -20,7 +20,7 @@ async function HomeCardsContainer(): Promise<AwaitedReactNode> {
       </div>
     )
   } catch (e) {
-    return <div>Oop's looks like an error is erroring</div>
+    return <div>Oop&lsquo;s looks like an error is erroring</div>
   }
 }
 

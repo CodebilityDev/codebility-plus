@@ -1,4 +1,4 @@
-import { Palette , LayoutPanelTop, CaseSensitive, CircleUserRound } from "lucide-react";
+import { Palette , LayoutPanelTop, CaseSensitive } from "lucide-react";
 import BuilderColorForm from "../_components/builder-color-form";
 import BuilderDataForm from "../_components/builder-data-form";
 import BuilderFontForm from "../_components/builder-font-form";

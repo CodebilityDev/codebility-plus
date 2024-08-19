@@ -4,6 +4,7 @@ import axios from "axios"
 import { API } from "@/lib/constants"
 import { NextResponse } from "next/server"
 import { FieldValues } from "react-hook-form"
+import { dateTimeFormat } from "@/lib/formDateTime"
 
 /*
     _         _   _          _    ____ ___ 
@@ -13,26 +14,6 @@ import { FieldValues } from "react-hook-form"
 /_/   \_\__,_|\__|_| |_| /_/   \_\_|  |___|
 
 */
-
-const dateTimeFormat = (time: string): number => {
-  var currentDateTime = new Date()
-
-  var [hours, minutes] = time.split(":").map(function (item) {
-    return parseInt(item, 10)
-  })
-
-  if (time.includes("PM")) {
-    if (hours !== 12) {
-      hours! += 12
-    }
-  } else if (hours === 12) {
-    hours = 0
-  }
-
-  currentDateTime.setHours(hours!, minutes, 0, 0)
-
-  return currentDateTime.getTime()
-}
 
 export const loginUser = async (data: FieldValues) => {
   try {
@@ -61,6 +42,7 @@ export const signupUser = async (data: FieldValues) => {
     main_position: data.position,
     password: data.password,
   }
+  
   try {
     const response = await axios.post(`${API.CODEVS}/register`, datas, {
       headers: {

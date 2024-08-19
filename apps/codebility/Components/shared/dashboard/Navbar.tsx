@@ -15,14 +15,13 @@ import {
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu"
 import useAuth from "@/hooks/use-auth"
-import { useRouter } from "next/navigation"
 import { defaultAvatar } from "@/public/assets/images"
+import { signOut } from "@/app/authv2/actions"
 
 export const menuItems = [{ href: "/settings", icon: IconProfile, label: "Settings" }]
 
 const Navbar = () => {
   const { userData } = useAuth()
-  const router = useRouter()
   return (
     <>
       <nav className="background-navbar fixed top-0 z-10 w-full shadow-sm">
@@ -64,9 +63,9 @@ const Navbar = () => {
                 <DropdownMenuSeparator />
 
                 <DropdownMenuItem
-                  onClick={(e) => {
+                  onClick={async (e) => {
                     e.stopPropagation()
-                    router.push("/auth/signout")
+                    await signOut();
                   }}
                   className="flex cursor-pointer items-center gap-6 p-3 px-5"
                 >

@@ -1,12 +1,13 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { UserWorkspaceContextProvider } from './_components/user-workspace-context'
+import { UserWorkspaceContextProvider } from '../_components/user-workspace-context'
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
 import { cookies } from 'next/headers'
 import HomeSidebar from './_components/home-sidebar'
 import HomeNavbar from './_components/home-navbar'
 import appConfig from '~/config/app.config'
 import { cn } from '@codevs/ui'
+import { signOut } from '~/app/auth/actions'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -31,6 +32,8 @@ export default async function RootLayout({
     .select()
     .eq('id', user?.id)
     .single()
+
+  if (!user || !data) await signOut()
 
   return (
     <html lang={appConfig.locale}>
