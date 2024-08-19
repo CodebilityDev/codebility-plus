@@ -34,9 +34,10 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
 } from '@codevs/ui/dropdown-menu'
-import { UserWorkspaceContext } from './user-workspace-context'
+import { UserWorkspaceContext } from '../../_components/user-workspace-context'
 
 import { signOut } from '~/app/auth/actions'
+import Image from 'next/image'
 
 function HomeNavbarMenu() {
   const user = useContext(UserWorkspaceContext)
@@ -45,7 +46,14 @@ function HomeNavbarMenu() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <div className="flex items-center gap-x-2">
-          <img src={user.avatar_url} className="h-10 w-10 rounded-full" />
+          <div className="relative h-10 w-10">
+            <Image
+              src={user.avatar_url}
+              alt="user avatar"
+              fill
+              className="rounded-full"
+            />
+          </div>
           <ChevronDown className="h-5 w-5" />
         </div>
       </DropdownMenuTrigger>
@@ -53,10 +61,17 @@ function HomeNavbarMenu() {
         <DropdownMenuLabel>
           <div className="flex items-center">
             <div className="flex-1">
-              <img src={user.avatar_url} className="h-10 w-10 rounded-full" />
+              <div className="relative h-10 w-10">
+                <Image
+                  src={user.avatar_url}
+                  alt="user avatar"
+                  fill
+                  className="rounded-full"
+                />
+              </div>
             </div>
             <div className="text-xs">
-              <div>{user.full_name}</div>
+              <div>{user && user.full_name}</div>
               <div className="font-medium text-gray-500">{user.email}</div>
             </div>
           </div>

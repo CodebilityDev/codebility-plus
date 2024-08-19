@@ -3,6 +3,7 @@ import { NextResponse, URLPattern } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 import pathsConfig from './config/paths.config';
+import appConfig from './config/app.config';
 
 export const config = {
   matcher: [
@@ -23,18 +24,30 @@ const getUser = (req: NextRequest, res: NextResponse) => {
   return supabase.auth.getUser();
 };
 
-const getUserCards = (req: NextRequest, res: NextResponse, userId: string) => {
+const getUserCards = (req: NextRequest, res: NextResponse, matcher: Record<string,any>) => {
   const supabase = createMiddlewareClient({req,res});
 
-  return supabase.from("cards").select("*").eq('user_id', userId);
+  return supabase.from("cards").select("*").match(matcher);
 };
+
+const getURL = (req: NextRequest) => {
+  // get url including tenant
+  let data =  req.url.split("://"); 
+  const protocol = data[0] || "http";
+
+  data = data[1]?.split("/") as string[];
+  const paths = data && data.slice(1).join("/");
+
+  const url = `${protocol}://${req.headers.get("host")}/${paths}`;
+  return url;
+}
 
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
   // handle patterns for specific routes
-  const handlePattern = matchUrlPattern(req.url);
+  const handlePattern = matchUrlPattern(getURL(req));
 
   // if a pattern handler exists, call it
   if (handlePattern) {
@@ -56,6 +69,22 @@ export async function middleware(req: NextRequest) {
 
 function getPatterns() {
   return [
+    // middleware for multi tenant
+    {
+      pattern: new URLPattern({ hostname: (process.env.NODE_ENV === "production"? `*.${appConfig.url.split("://")[1]?.split(".")[0]}`: `*.localhost`) }),
+      handler:  async (req: NextRequest, res: NextResponse) => {
+        const tenant = req.headers.get("host")?.split(".")[0];
+        const protocol = req.url.split("://")[0];
+        const originalHost = process.env.NODE_ENV === "production"? `.${appConfig.url}`: `.localhost:3000`; // adjust the port if needed.
+        const profileData = await getUserCards(req,res,{username_url: `${protocol}://${tenant}${originalHost}`});
+
+        if (!profileData || (profileData.data && profileData.data.length === 0)) {
+          return NextResponse.rewrite(new URL("/",req.url));
+        } 
+
+        return NextResponse.rewrite(new URL(`/profile/${tenant}`, req.url));
+      }
+    },
     {
       pattern: new URLPattern({ pathname: '/auth/*?' }),
       handler: async (req: NextRequest, res: NextResponse) => {
@@ -98,7 +127,7 @@ function getPatterns() {
           if (!cardId) return NextResponse.redirect(new URL(pathsConfig.app.cards, origin).href);
 
           try {
-            const { error, data } = await getUserCards(req,res, user.id);
+            const { error, data } = await getUserCards(req,res, { user_id: user.id });
             
             if (!data || data.length === 0) throw new Error();
 

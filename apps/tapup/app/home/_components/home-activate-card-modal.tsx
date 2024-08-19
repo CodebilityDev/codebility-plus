@@ -23,11 +23,11 @@ import { useForm } from 'react-hook-form'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast, Toaster } from '@codevs/ui/sonner-toast'
-import { UserWorkspaceContext } from '../../_components/user-workspace-context'
+import { UserWorkspaceContext } from './user-workspace-context'
 import { useContext } from 'react'
 import { useRouter } from 'next/navigation'
 import { InputOTP, InputOTPGroup, InputOTPSlot } from '@codevs/ui/input-otp'
-import { activateCard } from '../actions'
+import { activateCard } from '../(user)/cards/actions'
 
 const formSchema = z.object({
   code: z.string(),
@@ -35,9 +35,10 @@ const formSchema = z.object({
 
 interface Props {
   cardId: string
+  children: React.ReactNode
 }
 
-function HomeActivateCardModal({ cardId }: Props) {
+function HomeActivateCardModal({ cardId, children }: Props) {
   const user = useContext(UserWorkspaceContext)
   const router = useRouter()
 
@@ -65,9 +66,7 @@ function HomeActivateCardModal({ cardId }: Props) {
   return (
     <Dialog>
       <Toaster richColors />
-      <DialogTrigger asChild>
-        <Button className="h-0 p-0 text-xs underline">Activate Card</Button>
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>

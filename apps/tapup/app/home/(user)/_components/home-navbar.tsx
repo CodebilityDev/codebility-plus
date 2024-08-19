@@ -2,7 +2,7 @@
 
 import React, { useContext } from 'react'
 import NavbarMenu from './home-navbar-menu'
-import { UserWorkspaceContext } from './user-workspace-context'
+import { UserWorkspaceContext } from '../../_components/user-workspace-context'
 
 function HomeNavbar() {
   const user = useContext(UserWorkspaceContext)

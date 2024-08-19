@@ -133,14 +133,15 @@ function SignUpForm() {
               control={form.control}
               name={field.name}
               render={({ field: formField }) => (
-                <FormItem>
-                  <FormLabel className="text-custom-black text-sm">
+                <FormItem className="w-full">
+                  <FormLabel className="text-custom-black text-md">
                     {field.label}
                   </FormLabel>
                   <FormControl>
                     {field.isPassword ? (
-                      <div className="flex items-center border pr-4">
+                      <div className="flex w-full items-center rounded-xl border-2 bg-slate-50 pr-4">
                         <Input
+                          parentClassName="py-0 w-full"
                           className="border-none focus-visible:ring-0 focus-visible:ring-offset-0"
                           {...formField}
                           type={toggle ? 'text' : 'password'}
@@ -148,7 +149,7 @@ function SignUpForm() {
                         />
                         <div
                           onClick={handleToggle}
-                          className="cursor-pointer p-0 hover:bg-transparent"
+                          className="flex cursor-pointer items-center p-0 hover:bg-transparent"
                         >
                           {toggle ? (
                             <Eye className="text-gray-400" />
@@ -159,7 +160,8 @@ function SignUpForm() {
                       </div>
                     ) : (
                       <Input
-                        className="border-2 focus-visible:ring-0 focus-visible:ring-offset-0"
+                        parentClassName="py-0 w-full"
+                        className="border-2 text-xs focus-visible:ring-0 focus-visible:ring-offset-0"
                         {...formField}
                         type={field.type}
                         placeholder={field.placeholder}

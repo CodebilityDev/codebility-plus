@@ -14,8 +14,10 @@ function BuilderForms() {
     <div className="flex-1">
       <div className="flex h-full w-full gap-x-7">
         <BuilderFormsSidebar />
-        <div className="h-full w-full bg-white">
-          <Form />
+        <div className="w-full">
+          <div className="bg-white">
+            <Form />
+          </div>
         </div>
       </div>
     </div>
