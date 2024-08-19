@@ -1,8 +1,7 @@
-"use client"
-
 import Image from "next/image"
 import SignUpForm from "./SignUpForm"
 import Link from "next/link"
+import pathsConfig from "@/config/paths.config"
 
 const SignUp = () => {
   return (
@@ -25,7 +24,7 @@ const SignUp = () => {
         <SignUpForm />
         <p className="mx-auto text-sm text-gray">
           Have an account?{" "}
-          <Link href="/auth/signin" className="text-blue-100 hover:underline">
+          <Link href={pathsConfig.auth.signIn} className="text-blue-100 hover:underline">
             Sign In
           </Link>
         </p>
