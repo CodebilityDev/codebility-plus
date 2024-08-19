@@ -1,32 +1,10 @@
-"use client"
-
 import Link from "next/link"
-import { useEffect } from "react"
-import useAuthCookie from "@/hooks/use-cookie"
-import { useRouter } from "next/navigation"
-
 import AuthForm from "./SigninForm"
 import Logo from "@/Components/shared/Logo"
-import Loader from "@/Components/shared/Loader"
 import { Toaster } from "@/Components/ui/toaster"
 import pathsConfig from "@/config/paths.config"
 
-const Sign = () => {
-  const router = useRouter()
-  const authCredentials = useAuthCookie()
-
-  useEffect(() => {
-    if (authCredentials?.status === "authenticated") {
-      router.push("/dashboard")
-    }
-  }, [authCredentials?.status, router])
-
-  if (authCredentials?.status === "loading" || authCredentials?.status === "authenticated")
-    return (
-      <Loader className="fixed left-0 top-0 z-20 flex h-screen w-screen flex-col items-center justify-center gap-10 bg-black-400" />
-    )
-
-  if (authCredentials?.status === "unauthenticated")
+const SignUpPage = () => {
     return (
       <>
         <Toaster />
@@ -55,4 +33,4 @@ const Sign = () => {
     )
 }
 
-export default Sign
+export default SignUpPage
