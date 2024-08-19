@@ -1,3 +1,5 @@
+"use client"
+
 import { z } from "zod"
 import { useState } from "react"
 import { useRouter } from "next/navigation"
@@ -14,6 +16,7 @@ import toast from "react-hot-toast"
 type Inputs = z.infer<typeof SignInValidation>
 
 import { signinUser } from "../actions"
+import pathsConfig from "@/config/paths.config"
 
 const SignInForm = () => {
   const [isLoading, setIsLoading] = useState(false)
@@ -64,7 +67,7 @@ const SignInForm = () => {
           />
           <button
             type="button"
-            onClick={() => router.push("/auth/forgot-password")}
+            onClick={() => router.push(pathsConfig.auth.passwordReset)}
             className="text-md text-right duration-300 hover:text-blue-100"
           >
             Forgot Password?
