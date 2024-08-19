@@ -1,5 +1,5 @@
 import React from 'react'
-import { ExperienceType } from "@/app/(protectedroutes)/settings/resume/Experience"
+import { ExperienceType } from "@/app/home/settings/resume/Experience"
 
 type TStatus = "Available" | "Deployed" | "Training" | "Vacation" | "Busy" | "Client Ready" | "Blocked" | "Graduated"
 

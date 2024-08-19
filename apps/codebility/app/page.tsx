@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Loader from "@/Components/shared/Loader"
-import Index from "@/app/(home)/index/Index"
+import Index from "@/app/(marketing)/index/Index"
 
 export default function Web() {
   const [isLoading, setIsLoading] = useState(true)
