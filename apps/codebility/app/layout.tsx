@@ -8,6 +8,7 @@ import { ModalProvider } from "@/Components/providers/modal-provider"
 
 import ToasterContext from "@/context/ToasterProvider"
 import ReactQueryProvider from "@/hooks/reactQuery"
+import appConfig from "@/config/app.config"
 
 export const dynamic = "force-dynamic"
 
@@ -17,9 +18,8 @@ const outfit = Outfit({
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Codebility",
-    description:
-      "Unlock the world of coding with Codebility - where passion meets innovation. Dive into immersive programs covering Web Development, Mobile Development, UI/UX Design, and Digital Marketing. Transform your skills with real-world standards. Join us in crafting a brighter future as tomorrow's digital architect.",
+    title: appConfig.title,
+    description: appConfig.description,
     metadataBase: new URL(`https://${headers().get("host")}`),
   }
 }
