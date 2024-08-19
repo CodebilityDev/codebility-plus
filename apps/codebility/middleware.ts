@@ -119,7 +119,7 @@ function getPatterns() {
     },
   },
   {
-    pattern: new URLPattern({ pathname: '/dashboard/*?' }),
+    pattern: new URLPattern({ pathname: '/home/*?' }),
     handler: async (req: NextRequest, res: NextResponse) => {
       const {
         data: { user },
