@@ -9,6 +9,7 @@ import AuthForm from "./SigninForm"
 import Logo from "@/Components/shared/Logo"
 import Loader from "@/Components/shared/Loader"
 import { Toaster } from "@/Components/ui/toaster"
+import pathsConfig from "@/config/paths.config"
 
 const Sign = () => {
   const router = useRouter()
@@ -42,7 +43,7 @@ const Sign = () => {
               <AuthForm />
               <p className="md:text-md text-md text-center">
                 Don{`'`}t have an account?{" "}
-                <Link href="/auth/signup" className="hover:blue-200 text-blue-100">
+                <Link href={pathsConfig.auth.signUp} className="hover:blue-200 text-blue-100">
                   Register Now
                 </Link>
               </p>
