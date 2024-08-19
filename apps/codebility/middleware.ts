@@ -108,7 +108,7 @@ function getPatterns() {
       if (!user) return;
       
       // If user is logged in, redirect to their respective page.
-      let nextURL = new URL("/dashboard", req.nextUrl.origin).href; // default for now, mentor.
+      let nextURL = new URL("/home", req.nextUrl.origin).href; // default for now, mentor.
       switch ( userData?.role_type ) {
         case "INTERN":
           nextURL = new URL("/waiting", req.nextUrl.origin).href; // waiting page for now.
@@ -119,7 +119,7 @@ function getPatterns() {
     },
   },
   {
-    pattern: new URLPattern({ pathname: '/dashboard/*?' }),
+    pattern: new URLPattern({ pathname: '/home/*?' }),
     handler: async (req: NextRequest, res: NextResponse) => {
       const {
         data: { user },

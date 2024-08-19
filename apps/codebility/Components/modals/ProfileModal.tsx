@@ -5,7 +5,7 @@ import Link from "next/link"
 import Box from "@/Components/shared/dashboard/Box"
 import Badges from "@/Components/shared/Badges"
 import { defaultAvatar } from "@/public/assets/images"
-import { skills, socials, tokenPoints } from "@/app/(protectedroutes)/interns/data"
+import { skills, socials, tokenPoints } from "@/app/home/interns/data"
 
 const ProfileModal = () => {
   const { isOpen, type, onClose, data } = useModal()

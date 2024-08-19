@@ -59,7 +59,7 @@ function BuilderDataForm() {
               <Button
                 key={form.target}
                 onClick={() => setCurrentForm(form.target)}
-                className="text-custom-black flex w-full justify-between bg-transparent py-7 hover:bg-gray-100"
+                className="text-foreground hover:bg-foreground/10 flex w-full justify-between bg-transparent py-7"
               >
                 <div className="flex items-center gap-x-2">
                   <Icon />
@@ -73,9 +73,9 @@ function BuilderDataForm() {
           })
         ) : (
           <div>
-            <div className="bg-gray-200 px-4 py-2">
+            <div className="bg-foreground/10 px-4 py-2">
               <Button
-                className="text-custom-black hover:text-custom-green flex gap-x-3 bg-transparent p-0 hover:bg-transparent"
+                className="text-foreground hover:text-primary flex gap-x-3 bg-transparent p-0 hover:bg-transparent"
                 onClick={() => setCurrentForm(null)}
               >
                 <ChevronLeft />

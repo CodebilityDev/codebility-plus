@@ -18,14 +18,14 @@ const HomeCard = ({ card, className, height, width }: CardProps) => {
   const { id, name, industry, status, username_url } = card
   return (
     <div
-      className={`flex h-[15vw] w-[24vw] flex-col justify-between rounded-[20px] bg-black p-6 text-white ${className}`}
+      className={`bg-card text-foreground flex h-[15vw] w-[24vw] flex-col justify-between rounded-[20px] p-6 ${className}`}
       style={{ width: width, height: height }}
     >
       <div className="flex justify-between">
         <div className="text-xs">
           {!status && (
             <HomeActivateCardModal cardId={id}>
-              <Button className="h-0 p-0 text-xs underline">
+              <Button className="text-foreground h-0 p-0 text-xs underline">
                 Activate Card
               </Button>
             </HomeActivateCardModal>
@@ -45,13 +45,17 @@ const HomeCard = ({ card, className, height, width }: CardProps) => {
         <div className="flex items-center justify-between gap-x-2">
           <Link
             href={username_url || '#'}
-            className="text-[8px] text-[#b4b4b4]"
+            className="text-foreground/60 text-[8px]"
           >
             {status ? 'http://localhost:3000' : 'Activate to set profile URL'}
           </Link>
           <Button disabled={!status} className="h-0 p-0">
-            <Link href="#" className="text-right text-[#b4b4b4]" aria-disabled>
-              <PenLine size={10} fill="#b4b4b4" />
+            <Link
+              href="#"
+              className="text-foreground/60 text-right"
+              aria-disabled
+            >
+              <PenLine size={10} className="text-foreground/60" />
             </Link>
           </Button>
         </div>
