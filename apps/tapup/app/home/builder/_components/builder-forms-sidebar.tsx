@@ -16,10 +16,10 @@ function BuilderFormsSidebar() {
             onClick={() => updateForm(target)}
             key={target}
             className={cn(
-              'hover:bg-custom-green hover:text-white',
+              'hover:bg-primary hover:text-background',
               current === target
-                ? 'bg-custom-green text-white'
-                : 'bg-white text-gray-400',
+                ? 'bg-primary text-background'
+                : 'text-foreground/30 bg-background',
             )}
           >
             <items.Icon />

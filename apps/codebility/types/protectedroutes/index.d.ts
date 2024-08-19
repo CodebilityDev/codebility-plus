@@ -1,6 +1,6 @@
 import React from "react"
 import { TaskT, ListT, TeamMemberT, ProjectT, BoardUserT, BoardProjectT } from "@/types/index"
-import { positionTitles } from "@/app/(protectedroutes)/interns/data"
+import { positionTitles } from "@/app/home/interns/data"
 
 type client_ClientCardT = {
   id: string

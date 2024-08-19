@@ -47,7 +47,7 @@ function SignInForm() {
 
   return (
     <div className="flex w-8/12">
-      <div className="flex-1 rounded-l-xl bg-slate-50">
+      <div className="bg-card flex-1 rounded-l-xl shadow-xl">
         <div className="flex flex-col items-center gap-3 px-10 py-16">
           <Toaster richColors position="top-right" />
           <Form {...form}>
@@ -98,9 +98,9 @@ function SignInForm() {
               </div>
             </div>
             <div className="flex w-full items-center">
-              <div className="flex-grow border-t border-gray-600"></div>
-              <span className="mx-4">or</span>
-              <div className="flex-grow border-t border-gray-600"></div>
+              <div className="border-foreground flex-grow border-t"></div>
+              <span className="text-foreground/60 mx-4">or</span>
+              <div className="border-foreground flex-grow border-t"></div>
             </div>
             <form onSubmit={form.handleSubmit(handleSignIn)} className="w-full">
               <FormField
@@ -113,14 +113,14 @@ function SignInForm() {
                         <input
                           type="email"
                           id="email"
-                          className="peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 bg-gray-50 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:border-green-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-green-600"
+                          className=" focus:border-primary dark:text-background dark:focus:border-primary border-border text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm focus:outline-none focus:ring-0 dark:border-gray-600"
                           placeholder=" "
                           {...field}
                         />
                       </FormControl>
                       <FormLabel
                         htmlFor="email"
-                        className="absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm text-green-600 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-green-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500"
+                        className="text-primary peer-focus:text-primary dark:text-primary absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
                       >
                         Enter your Email
                       </FormLabel>
@@ -139,14 +139,14 @@ function SignInForm() {
                         <input
                           type="password"
                           id="password"
-                          className="peer block w-full appearance-none rounded-t-lg border-0 border-b-2 border-gray-300 bg-gray-50 px-2.5 pb-2.5 pt-5 text-sm text-gray-900 focus:border-green-600 focus:outline-none focus:ring-0 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:focus:border-green-600"
+                          className="focus:border-primary dark:focus:border-primary dark:text-background border-border text-foreground peer block w-full appearance-none rounded-t-lg border-0 border-b-2 px-2.5 pb-2.5 pt-5 text-sm focus:outline-none focus:ring-0 dark:border-gray-600"
                           placeholder=" "
                           {...field}
                         />
                       </FormControl>
                       <FormLabel
                         htmlFor="password"
-                        className="absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm text-green-600 duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 peer-focus:text-green-600 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4 dark:text-gray-400 peer-focus:dark:text-blue-500"
+                        className="text-primary peer-focus:text-primary dark:text-primary absolute start-2.5 top-4 z-10 origin-[0] -translate-y-4 scale-75 transform text-sm duration-300 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:scale-100 peer-focus:-translate-y-4 peer-focus:scale-75 rtl:peer-focus:left-auto rtl:peer-focus:translate-x-1/4"
                       >
                         Password
                       </FormLabel>
@@ -158,7 +158,7 @@ function SignInForm() {
 
               <div
                 onClick={() => router.push(pathsConfig.auth.passwordReset)}
-                className="mt-1 flex cursor-pointer justify-end text-sm text-green-600 hover:text-gray-900"
+                className="text-primary hover:text-foreground mt-1 flex cursor-pointer justify-end text-sm"
               >
                 Forgot Password?
               </div>
@@ -166,11 +166,11 @@ function SignInForm() {
                 <div className="space-x-2 text-center">
                   <label className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
                     By proceeding, you agreed to the&nbsp;
-                    <span className="cursor-pointer font-semibold underline  hover:text-green-600">
+                    <span className="hover:text-primary cursor-pointer font-semibold  underline">
                       Terms of services
                     </span>
                     &nbsp;and&nbsp;
-                    <span className="cursor-pointer font-semibold underline hover:text-green-600">
+                    <span className="hover:text-primary cursor-pointer font-semibold underline">
                       Privacy policy
                     </span>
                   </label>
@@ -178,13 +178,13 @@ function SignInForm() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-green-600 text-white"
+                  className="bg-primary w-full"
                   disabled={form.formState.isSubmitting}
                 >
                   {form.formState.isSubmitting ? (
                     <div className="flex items-center justify-center">
                       <svg
-                        className="mr-3 h-5 w-5 animate-spin text-white"
+                        className="mr-3 h-5 w-5 animate-spin"
                         xmlns="http://www.w3.org/2000/svg"
                         fill="none"
                         viewBox="0 0 24 24"
@@ -215,7 +215,7 @@ function SignInForm() {
                     Don’t have an account?&nbsp;
                     <span
                       onClick={() => router.push(pathsConfig.auth.signUp)}
-                      className="cursor-pointer font-semibold hover:text-green-600"
+                      className="hover:text-primary cursor-pointer font-semibold"
                     >
                       Sign-up here
                     </span>
