@@ -1,7 +1,7 @@
 import * as React from "react"
-import TableHeader from "@/app/home/in-house/TableHeader"
-import TableBody from "@/app/home/in-house/TableBody"
-import EditTabelBody from "@/app/home/in-house/EditTableBody"
+import TableHeader from "./in-house-table-header"
+import TableBody from "./in-house-table-body"
+import EditTabelBody from "./in-house-edit-table-body"
 import { IInhouse, TeamMemberT } from "@/types/index"
 import DefaultPagination from "@/Components/ui/pagination"
 

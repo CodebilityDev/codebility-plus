@@ -1,7 +1,7 @@
 import * as React from "react"
 import { IInhouse } from "@/types"
-import Card from "@/app/home/in-house/Card"
-import EditableCard from "@/app/home/in-house/EditableCard"
+import Card from "./in-house-card"
+import EditableCard from "./in-house-editable-card"
 import DefaultPagination from "@/Components/ui/pagination"
 
 function InHouseCards({
