@@ -1,11 +1,11 @@
-import ViewProfile from "@/app/home/in-house/ViewProfile"
-import CheckboxList from "@/app/home/in-house/CheckboxList"
-import Select from "@/app/home/in-house/Select"
+import ViewProfile from "./in-house-view-profile"
+import CheckboxList from "./in-house-checkbox-list"
+import Select from "./in-house-select"
 import Image from 'next/image'
 import { TeamMemberT } from "@/types"
 import { useState } from "react"
 import { inhouse_EditTableBodyT } from "@/types/protectedroutes"
-import { convertToTitleCase, statusColors } from "@/app/home/in-house/utils"
+import { convertToTitleCase, statusColors } from "../_lib/utils"
 
 export default function EditTabelBody({ member, handleSaveButton }: inhouse_EditTableBodyT) {
   const [editableMember, setEditableMember] = useState<TeamMemberT>(member)

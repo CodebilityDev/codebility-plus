@@ -1,7 +1,7 @@
-import ViewProfile from "@/app/home/in-house/ViewProfile"
+import ViewProfile from "@/app/home/in-house/_components/in-house-view-profile"
 import Image from "next/image"
 import { inhouse_TableBodyT } from "@/types/protectedroutes"
-import { convertToTitleCase, statusColors } from "@/app/home/in-house/utils"
+import { convertToTitleCase, statusColors } from "@/app/home/in-house/_lib/utils"
 
 export default function TableBody({ member, handleEditButton }: inhouse_TableBodyT) {
   const status_internal = convertToTitleCase(member.status_internal)

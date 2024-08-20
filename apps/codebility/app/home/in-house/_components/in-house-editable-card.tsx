@@ -1,10 +1,10 @@
 import React, { useState } from 'react'
-import { convertToTitleCase, } from '@/app/home/in-house/utils'
+import { convertToTitleCase, } from '../_lib/utils'
 import Image from 'next/image'
-import ViewProfile from '@/app/home/in-house/ViewProfile'
+import ViewProfile from './in-house-view-profile'
 import { TeamMemberT } from '@/types'
-import Select from '@/app/home/in-house/Select'
-import CheckboxList from '@/app/home/in-house/CheckboxList'
+import Select from './in-house-select'
+import CheckboxList from './in-house-checkbox-list'
 import { inhouse_EditTableBodyT } from '@/types/protectedroutes'
 
 function EditableCard({ member, handleSaveButton }: inhouse_EditTableBodyT) {
