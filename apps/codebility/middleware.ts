@@ -99,9 +99,9 @@ function getPatterns() {
         data: { user },
       } = await getUser(req, res);
 
-      const { data: userData } = await supabase.from("users")
+      const { data: userData } = await supabase.from("codev")
       .select()
-      .eq("id", user?.id)
+      .eq("user_id", user?.id)
       .single();
 
       // the user is logged out, so we don't need to do anything
