@@ -1,7 +1,7 @@
 import React from 'react'
-import { convertToTitleCase, statusColors } from '@/app/home/in-house/utils'
+import { convertToTitleCase, statusColors } from '../_lib/utils'
 import Image from 'next/image'
-import ViewProfile from '@/app/home/in-house/ViewProfile'
+import ViewProfile from './in-house-view-profile'
 import { inhouse_TableBodyT } from '@/types/protectedroutes'
 
 function Card({ member, handleEditButton }: inhouse_TableBodyT) {
