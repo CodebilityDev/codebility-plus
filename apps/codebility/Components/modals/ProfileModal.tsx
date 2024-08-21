@@ -16,7 +16,6 @@ const ProfileModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogContent
-        hasButton
         className="mx-auto flex h-[90%] w-96 max-w-3xl flex-col overflow-y-scroll md:h-auto md:w-[95%] md:flex-row"
       >
         <Box className="mx-auto flex w-full flex-col items-center justify-center gap-6 rounded-lg border-none bg-light-700 text-center md:w-1/3">

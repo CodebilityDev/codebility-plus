@@ -139,7 +139,6 @@ const ProjectAddModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={resetForm}>
       <DialogContent
-        hasButton
         className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-[44rem]"
       >
         <DialogHeader className="relative">
