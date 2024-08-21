@@ -1,7 +1,8 @@
-import { NextResponse } from "next/server";
-import { API } from "@/lib/constants";
-import { ProjectT } from "@/types";
-import axios from "axios";
+import axios from "axios"
+import { ProjectT } from "@/types"
+import { API } from "@/lib/constants"
+import { NextResponse } from "next/server"
+import { supabase } from '@/lib/supabaseClient'
 
 /* 
 
@@ -13,19 +14,42 @@ import axios from "axios";
               |__/
               
 */
+// export const getProjects = async () => {
+//   try {
+//     const response = await axios.get(API.PROJECTS, {
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     })
+
+//     return response.data.data
+//   } catch (error) {
+//     return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+//   }
+// }
+
+
+
+// Fetch all projects from Supabase
 export const getProjects = async () => {
   try {
-    const response = await axios.get(API.PROJECTS, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
 
-    return response.data.data;
+    if (error) {
+      console.error('Error fetching projects:', error)
+      throw new Error(error.message)
+    }
+
+    return data
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
+    console.error('Error:', error)
+    throw new NextResponse('INTERNAL_SERVER_ERROR', { status: 500 })
   }
-};
+}
+
+
 
 export const createProjects = async (
   data: ProjectT,
@@ -92,4 +116,10 @@ export const deleteProjects = async (id: string, token: string) => {
   } catch (error) {
     return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-};
+}
+
+
+
+
+
+
