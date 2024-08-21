@@ -37,7 +37,6 @@ const EditRoleModal = () => {
   return (
     <Dialog open={isModalOpen}>
       <DialogContent
-        hasButton
         className="background-lightsection_darksection flex h-auto w-[95%] max-w-3xl flex-col justify-items-center gap-6 "
       >
         <div className=" mt-16 flex flex-col  gap-6">

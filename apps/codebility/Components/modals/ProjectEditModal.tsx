@@ -109,7 +109,6 @@ const ProjectEditModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent
-        hasButton
         className="flex h-[32rem] w-full max-w-[880px] flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
       >
         <DialogHeader className="relative">

@@ -5,7 +5,7 @@ import { PartnerInitialNodes, PartnerInitialEdges } from "@/app/(marketing)/ai-i
 import { PartnerTitle, PartnerCard } from "@/app/(marketing)/ai-integration/components/NodeTypes"
 import { CustomEdge } from "@/app/(marketing)/ai-integration/components/EdgeTypes"
 import "reactflow/dist/style.css"
-import "@/app/(home)/ai-integration/components/index.css"
+import "@/app/(marketing)/ai-integration/components/index.css"
 import GradientBackgroundWhite from "@/app/(marketing)/ai-integration/components/GradientBackgroundWhite"
 
 const nodeTypes = {
