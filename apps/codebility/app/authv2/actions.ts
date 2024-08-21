@@ -39,7 +39,7 @@ export const signupUser = async (data: FieldValues) => {
 export const signinUser = async (email: string, password: string) => {
     const supabase = createServerActionClient({ cookies });
 
-    const { error, data } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
