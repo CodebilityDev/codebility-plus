@@ -109,7 +109,6 @@ const ClientEditModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
       <DialogContent
-        hasButton
         className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
       >
         <button onClick={() => handleDialogChange(false)} className="absolute right-4 top-4">

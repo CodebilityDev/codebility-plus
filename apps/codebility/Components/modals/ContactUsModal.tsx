@@ -64,7 +64,6 @@ const ContactUsModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={handleReset}>
       <DialogContent
-        hasButton
         className="flex h-[40rem] w-full max-w-5xl flex-col items-center gap-6 overflow-x-auto overflow-y-auto bg-black-100 dark:bg-black-100 md:w-[30rem] lg:h-[45rem] lg:w-full lg:flex-row"
       >
         <div className="w-full flex-1 flex-col gap-4">
