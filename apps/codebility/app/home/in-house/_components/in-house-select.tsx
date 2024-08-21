@@ -6,7 +6,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
-import { statusColors } from "@/app/home/in-house/_lib/utils";
+import { statusColors } from "../_lib/utils";
 import { ISelectProps } from "@/types/protectedroutes";
 
 const statusArray = ["Available", "Deployed", "Training", "Vacation", "Busy", "Client Ready", "Blocked", "Graduated"];
