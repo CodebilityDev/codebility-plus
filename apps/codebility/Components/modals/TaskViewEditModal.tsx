@@ -219,7 +219,6 @@ const TaskViewEditModal = () => {
   return (
     <Dialog open={isModalOpen}>
       <DialogContent
-        hasButton
         className="background-lightsection_darksection flex h-[32rem] w-full max-w-3xl flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
       >
         <div className="flex flex-col gap-6">
