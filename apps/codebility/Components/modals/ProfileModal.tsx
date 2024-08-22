@@ -6,10 +6,11 @@ import Box from "@/Components/shared/dashboard/Box"
 import Badges from "@/Components/shared/Badges"
 import { defaultAvatar } from "@/public/assets/images"
 import { skills, socials, tokenPoints } from "@/app/home/interns/data"
+import { techstacks } from "@/constants"
 
 const ProfileModal = () => {
   const { isOpen, type, onClose, data } = useModal()
-  const { first_name, last_name, image_url, address, about_me, main_position, jobStatusType, projects } = data || {}
+  const { first_name, last_name, image_url, address, about_me, main_position, jobStatusType, projects, tech_stacks } = data || {}
 
   const isModalOpen = isOpen && type === "profileModal"
 
@@ -94,11 +95,14 @@ const ProfileModal = () => {
           <div className="pb-4">
             <p className="pb-2.5 dark:text-gray">Skills</p>
             <div className="flex gap-2">
-              {skills.map(({ Icon }, index) => (
-                <Link key={index} href="#" target="_blank">
+              {tech_stacks && tech_stacks.map((name, index) => {
+                const tech = techstacks.find(tech => tech.name.toLowerCase() === name);
+                if (!tech) return null;
+                const { icon: Icon } = tech;
+                return <Link key={index} href="#" target="_blank">
                   <Icon className="h-5 w-5 duration-300 hover:-translate-y-1" />
-                </Link>
-              ))}
+                </Link>;
+              })}
             </div>
           </div>
         </Box>
