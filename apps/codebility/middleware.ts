@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 import { isAuthenticated } from "@/lib/tokenVerification"
 import { jwtDecode } from "jwt-decode"
 import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import pathsConfig from './config/paths.config';
 
 export const config = {
   matcher: [
@@ -131,7 +132,7 @@ function getPatterns() {
 
        // If user is not logged in, redirect to sign in page.
        if (!user) {
-        const signIn = `/authv2/signin`;
+        const signIn = pathsConfig.auth.signIn;
         const redirectPath = `${signIn}?next=${next}`;
 
         return NextResponse.redirect(new URL(redirectPath, origin).href);
