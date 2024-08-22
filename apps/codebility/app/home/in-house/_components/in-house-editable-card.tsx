@@ -64,9 +64,9 @@ function EditableCard({ data, handleSaveButton }: Props) {
           <div className="w-full">
             <Select
               className='text-sm'
-              type="nda"
-              placeholder={editableMember.nda}
-              handleChange={(value) => handleSelectChange("nda", value)}
+              type="nda_status"
+              placeholder={editableMember.nda_status}
+              handleChange={(value) => handleSelectChange("nda_status", value)}
             />
           </div>
         </div>

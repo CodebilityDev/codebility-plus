@@ -34,7 +34,7 @@ function Card({ member, handleEditButton }: Props) {
       <div className='flex justify-between '>
         <div className="flex gap-2">
           <div>NDA: </div>
-          {member.nda || "-"}
+          {member.nda_status || "-"}
         </div>
         <span className="flex gap-2">
           <ViewProfile user={member}/>

@@ -56,9 +56,9 @@ export default function EditTabelBody({ data, handleSaveButton }: Props) {
       </td>
       <td className="p-4">
         <Select
-          type="nda"
-          placeholder={editableMember.nda}
-          handleChange={(value) => handleSelectChange("nda", value)}
+          type="nda_status"
+          placeholder={editableMember.nda_status}
+          handleChange={(value) => handleSelectChange("nda_status", value)}
         />
       </td>
       <td className="p-4">

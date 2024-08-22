@@ -29,7 +29,7 @@ const optionsMap: Record<string, (string | undefined)[]> = {
 };
 
 interface Props {
-  type: "internal_status" | "main_positon" | "nda"
+  type: "internal_status" | "main_positon" | "nda_status"
   placeholder?: string
   handleChange: (value: string) => void
   className?: string
