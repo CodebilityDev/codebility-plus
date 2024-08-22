@@ -7,12 +7,11 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { statusColors } from "../_lib/utils";
-import { ISelectProps } from "@/types/protectedroutes";
 
 const statusArray = ["Available", "Deployed", "Training", "Vacation", "Busy", "Client Ready", "Blocked", "Graduated"];
 const positionArray = [
-  "Front-End Developer",
-  "Back-End Developer",
+  "Front End Developer",
+  "Back End Developer",
   "Mobile Developer",
   "Full Stack Developer",
   "UI/UX Designer",
@@ -41,6 +40,7 @@ export default function Select({ type, placeholder, handleChange, className }: P
   const options = optionsMap[type] || [];
 
   const handleSelect = (option: string) => {
+    if (type === "internal_status") option = option.toUpperCase();
     setSelectedOption(option);
     handleChange(option);
   };
