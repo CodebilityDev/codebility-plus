@@ -2,15 +2,20 @@ import React, { useState } from 'react'
 import { convertToTitleCase, } from '../_lib/utils'
 import Image from 'next/image'
 import ViewProfile from './in-house-view-profile'
-import { TeamMemberT } from '@/types'
 import Select from './in-house-select'
 import CheckboxList from './in-house-checkbox-list'
-import { inhouse_EditTableBodyT } from '@/types/protectedroutes'
+import { Codev } from '../_lib/codev'
+import { InHouseProps } from '../_lib/in-house'
 
-function EditableCard({ member, handleSaveButton }: inhouse_EditTableBodyT) {
-  const [editableMember, setEditableMember] = useState<TeamMemberT>(member)
+interface Props {
+  data: Codev;
+  handleSaveButton: InHouseProps["handlers"]["handleSaveButton"];
+}
 
-  const handleSelectChange = (type: keyof TeamMemberT, value: any) => {
+function EditableCard({ data, handleSaveButton }: Props) {
+  const [editableMember, setEditableMember] = useState<Codev>(data)
+
+  const handleSelectChange = (type: keyof Codev, value: any) => {
     setEditableMember((prevMember) => ({
       ...prevMember,
       [type]: value,
@@ -29,11 +34,11 @@ function EditableCard({ member, handleSaveButton }: inhouse_EditTableBodyT) {
     <div className="w-64 h-72 gap-4 flex flex-col justify-between p-4 rounded-md text-dark100_light900 dark:bg-dark-200 bg-light-300">
       <div className='flex flex-col'>
         <div className='flex justify-between'>
-          <div className='text-lg font-bold'>{member.first_name} {member.last_name}</div>
+          <div className='text-lg font-bold'>{data.first_name} {data.last_name}</div>
           <Select
-            type="status_internal"
-            placeholder={convertToTitleCase(editableMember.status_internal)}
-            handleChange={(value) => handleSelectChange("status_internal", value)}
+            type="internal_status"
+            placeholder={convertToTitleCase(editableMember.internal_status)}
+            handleChange={(value) => handleSelectChange("internal_status", value)}
           />
         </div>
         <Select
@@ -59,14 +64,14 @@ function EditableCard({ member, handleSaveButton }: inhouse_EditTableBodyT) {
           <div className="w-full">
             <Select
               className='text-sm'
-              type="nda_status"
-              placeholder={editableMember.nda_status}
-              handleChange={(value) => handleSelectChange("nda_status", value)}
+              type="nda"
+              placeholder={editableMember.nda}
+              handleChange={(value) => handleSelectChange("nda", value)}
             />
           </div>
         </div>
         <span className="flex gap-2">
-          <ViewProfile />
+          <ViewProfile user={editableMember}/>
           <button onClick={() => handleSaveButton(editableMember)}>
             <Image
               src={"https://codebility-cdn.pages.dev/assets/svgs/icon-checkbox.svg"}
