@@ -5,12 +5,13 @@ import Link from "next/link"
 import Box from "@/Components/shared/dashboard/Box"
 import Badges from "@/Components/shared/Badges"
 import { defaultAvatar } from "@/public/assets/images"
-import { skills, socials, tokenPoints } from "@/app/home/interns/data"
+import { socials, tokenPoints } from "@/app/home/interns/data"
 import { techstacks } from "@/constants"
+import { Codev } from "@/app/home/in-house/_lib/codev"
 
 const ProfileModal = () => {
   const { isOpen, type, onClose, data } = useModal()
-  const { first_name, last_name, image_url, address, about_me, main_position, jobStatusType, projects, tech_stacks } = data || {}
+  const { first_name, last_name, image_url, address, about_me, main_position, internal_status, projects, tech_stacks } = data as Codev || {}
 
   const isModalOpen = isOpen && type === "profileModal"
 
@@ -40,21 +41,21 @@ const ProfileModal = () => {
             <p className="dark:text-gray">Status</p>
             <p
               className={`w-min rounded-md px-3 py-1 ${
-                jobStatusType === "AVAILABLE"
-                  ? "bg-green-400"
-                  : jobStatusType === "DEPLOYED"
-                  ? "bg-orange-400"
+                internal_status === "AVAILABLE"
+                  ? "bg-codeGreen"
+                  : internal_status === "DEPLOYED"
+                  ? "bg-codeViolet"
                   : "bg-gray"
               }`}
             >
-              {jobStatusType === "AVAILABLE" ? "Available" : jobStatusType === "DEPLOYED" ? "Deployed" : "Inactive"}
+              {internal_status === "AVAILABLE" ? "Available" : internal_status === "DEPLOYED" ? "Deployed" : "Inactive"}
             </p>
           </div>
           <div className="flex w-full flex-col items-center gap-2 py-6">
             <p className="dark:text-gray">Current Project</p>
             {projects?.map((projects) => (
               <p key={projects?.id} className="text-2xl font-semibold capitalize">
-                {projects?.project?.project_name}
+                {projects?.name}
               </p>
             ))}
           </div>
