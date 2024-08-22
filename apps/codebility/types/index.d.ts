@@ -56,7 +56,7 @@ type User = {
   end_time?: string | null
   jobStatusType?: string
   prio?: number
-  Work_Experience: ExperienceType[] | []
+  Work_Experience?: ExperienceType[] | []
 }
 
 type Tag = {
