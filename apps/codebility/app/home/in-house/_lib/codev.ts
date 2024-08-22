@@ -20,5 +20,5 @@ export interface Codev {
     main_position: string;
     internal_status: InternalStatus;
     projects: Project[];
-    nda: string;
+    nda_status: string;
 }
