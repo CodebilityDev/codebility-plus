@@ -11,15 +11,17 @@ async function InHousePage() {
   .eq("type", "INHOUSE");
 
   if (error) throw error;
-  
   const data = codevs.map(codev => {
-      const { first_name, last_name, main_position } = codev.user.profile;
+      const { first_name, last_name, main_position, tech_stacks } = codev.user.profile;
       return {
           id: codev.id,
           internal_status : codev.internal_status,
           first_name,
           last_name,
-          main_position
+          tech_stacks,
+          main_position,
+          job_status: codev.job_status,
+          nda_status: codev.nda_status
       }
   });
 
