@@ -26,7 +26,7 @@ export default function TableBody({ member, handleEditButton }: Props) {
           </ul>
         ))}
       </td>
-      <td className="p-4">{member.nda || "-"}</td>
+      <td className="p-4">{member.nda_status || "-"}</td>
       <td className="p-4">
         <span className="flex gap-4 pl-2">
           <ViewProfile user={member}/>

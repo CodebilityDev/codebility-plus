@@ -18,7 +18,7 @@ const TableHeader = ({ onSort }: Props) => {
         <TableHeaderCell title="Status" type="internal_status" onSort={onSort} />
         <TableHeaderCell title="Position" type="main_position" onSort={onSort} />
         <TableHeaderCell title="Project" type="projects" onSort={onSort} />
-        <TableHeaderCell title="NDA" type="nda" onSort={onSort} />
+        <TableHeaderCell title="NDA" type="nda_status" onSort={onSort} />
         <th className="p-4 text-xl font-light">Actions</th>
       </tr>
     </thead>
