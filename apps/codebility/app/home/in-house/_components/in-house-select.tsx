@@ -23,12 +23,19 @@ const positionArray = [
 const ndaArray = ["Received", "Sent", "-"];
 
 const optionsMap: Record<string, (string | undefined)[]> = {
-  status_internal: statusArray,
+  internal_status: statusArray,
   main_positon: positionArray,
   nda_status: ndaArray,
 };
 
-export default function Select({ type, placeholder, handleChange, className }: ISelectProps) {
+interface Props {
+  type: "internal_status" | "main_positon" | "nda"
+  placeholder?: string
+  handleChange: (value: string) => void
+  className?: string
+}
+
+export default function Select({ type, placeholder, handleChange, className }: Props) {
   const [selectedOption, setSelectedOption] = useState<string | undefined>(placeholder);
 
   const options = optionsMap[type] || [];
@@ -41,14 +48,14 @@ export default function Select({ type, placeholder, handleChange, className }: I
   return (
     <div className={`w-full ${className}`}>
       <UISelect value={selectedOption} onValueChange={handleSelect}>
-        <SelectTrigger className={`${type === "status_internal" && selectedOption ? statusColors[selectedOption] : ''}`}>
+        <SelectTrigger className={`${type === "internal_status" && selectedOption ? statusColors[selectedOption] : ''}`}>
           <SelectValue>
             {selectedOption || placeholder || "Select..."}
           </SelectValue>
         </SelectTrigger>
         <SelectContent>
           {options.map((option, index) => {
-            const conditionalClass = type === "status_internal" && option ? statusColors[option] : "";
+            const conditionalClass = type === "internal_status" && option ? statusColors[option] : "";
 
             return (
               <SelectItem key={index} value={option === undefined ? "-" : option} className={conditionalClass}>

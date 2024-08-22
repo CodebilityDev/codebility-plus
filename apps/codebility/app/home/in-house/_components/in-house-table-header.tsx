@@ -1,29 +1,41 @@
 import React, { useState } from "react"
 import { twMerge } from "tailwind-merge"
 import { TeamMemberT } from "@/types/index"
-import { inhouse_TableHeader, inhouse_TableHeader2 } from "@/types/protectedroutes"
 import Image from "next/image"
+import { InHouseSort } from "../_lib/in-house"
+import { Codev } from "../_lib/codev"
 
-const TableHeader = ({ onSort }: inhouse_TableHeader) => {
+interface Props {
+  onSort: InHouseSort;
+}
+
+const TableHeader = ({ onSort }: Props) => {
   return (
     <thead className="background-lightbox_darkbox border-top text-xl">
       <tr className="table-border-light_dark border-b-[1px] text-left">
         <TableHeaderCell title="First Name" type="first_name" onSort={onSort} className="" />
         <TableHeaderCell title="Last Name" type="last_name" onSort={onSort} className="table-border-light_dark border-r-[1px]" />
-        <TableHeaderCell title="Status" type="status_internal" onSort={onSort} />
+        <TableHeaderCell title="Status" type="internal_status" onSort={onSort} />
         <TableHeaderCell title="Position" type="main_position" onSort={onSort} />
         <TableHeaderCell title="Project" type="projects" onSort={onSort} />
-        <TableHeaderCell title="NDA" type="nda_status" onSort={onSort} />
+        <TableHeaderCell title="NDA" type="nda" onSort={onSort} />
         <th className="p-4 text-xl font-light">Actions</th>
       </tr>
     </thead>
   )
 }
 
-const TableHeaderCell = ({ title, type, className, onSort }: inhouse_TableHeader2) => {
+type TableHeaderCellProps = {
+  title: "First Name" | "Last Name" | "Status" | "Position" | "Project" | "NDA" | "Actions"
+  type: keyof Codev;
+  className?: string;
+  onSort: InHouseSort;
+}
+
+const TableHeaderCell = ({ title, type, className, onSort }: TableHeaderCellProps) => {
   const [sortDirection, setSortDirection] = useState<"up" | "down">("up")
 
-  const handleSortButton = (type: keyof TeamMemberT) => {
+  const handleSortButton = (type: keyof Codev) => {
     onSort(type, sortDirection)
     const newSortDirection = sortDirection === "up" ? "down" : "up"
     setSortDirection(newSortDirection)

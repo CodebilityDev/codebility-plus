@@ -2,15 +2,20 @@ import ViewProfile from "./in-house-view-profile"
 import CheckboxList from "./in-house-checkbox-list"
 import Select from "./in-house-select"
 import Image from 'next/image'
-import { TeamMemberT } from "@/types"
 import { useState } from "react"
-import { inhouse_EditTableBodyT } from "@/types/protectedroutes"
 import { convertToTitleCase, statusColors } from "../_lib/utils"
+import { InHouseProps } from "../_lib/in-house"
+import { Codev } from "../_lib/codev"
 
-export default function EditTabelBody({ member, handleSaveButton }: inhouse_EditTableBodyT) {
-  const [editableMember, setEditableMember] = useState<TeamMemberT>(member)
+interface Props {
+  data: Codev;
+  handleSaveButton: InHouseProps["handlers"]["handleSaveButton"];
+}
 
-  const handleSelectChange = (type: keyof TeamMemberT, value: any) => {
+export default function EditTabelBody({ data, handleSaveButton }: Props) {
+  const [editableMember, setEditableMember] = useState<Codev>(data)
+
+  const handleSelectChange = (type: keyof Codev, value: any) => {
     setEditableMember((prevMember) => ({
       ...prevMember,
       [type]: value,
@@ -29,11 +34,11 @@ export default function EditTabelBody({ member, handleSaveButton }: inhouse_Edit
     <tr className="table-border-light_dark border-b-[1px] font-light">
       <td className="p-4">{editableMember.first_name}</td>
       <td className="table-border-light_dark border-r-[1px] p-4">{editableMember.last_name}</td>
-      <td className={`${statusColors[convertToTitleCase(editableMember.status_internal)]} p-4`}>
+      <td className={`${statusColors[convertToTitleCase(editableMember.internal_status)]} p-4`}>
         <Select
-          type="status_internal"
-          placeholder={convertToTitleCase(editableMember.status_internal)}
-          handleChange={(value) => handleSelectChange("status_internal", value)}
+          type="internal_status"
+          placeholder={convertToTitleCase(editableMember.internal_status)}
+          handleChange={(value) => handleSelectChange("internal_status", value)}
         />
       </td>
       <td className="p-4">
@@ -51,14 +56,14 @@ export default function EditTabelBody({ member, handleSaveButton }: inhouse_Edit
       </td>
       <td className="p-4">
         <Select
-          type="nda_status"
-          placeholder={editableMember.nda_status}
-          handleChange={(value) => handleSelectChange("nda_status", value)}
+          type="nda"
+          placeholder={editableMember.nda}
+          handleChange={(value) => handleSelectChange("nda", value)}
         />
       </td>
       <td className="p-4">
         <span className="flex gap-4 pl-2">
-          <ViewProfile />
+          <ViewProfile user={editableMember}/>
           <button onClick={() => handleSaveButton(editableMember)}>
             <Image
               src={"https://codebility-cdn.pages.dev/assets/svgs/icon-checkbox.svg"}
