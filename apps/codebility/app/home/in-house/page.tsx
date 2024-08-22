@@ -1,98 +1,39 @@
-"use client"
-import * as React from "react"
 import H1 from "@/Components/shared/dashboard/H1"
-import Table from "./_components/in-house-table"
-import InHouseCards from "./_components/in-house-cards"
-import axios from "axios"
-import { TeamMemberT } from "@/types/index"
-import { useQuery } from "@tanstack/react-query"
-import { API } from "@/lib/constants"
-import { useEffect, useState } from "react"
-import usePagination from "@/hooks/use-pagination"
+import InHouseContainer from "./_components/in-house-container"
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import { cookies } from "next/headers";
+import { Codev } from "./_lib/codev";
 
-function InHouse() {
-  const [editableIds, setEditableIds] = useState<number[]>([])
+async function InHousePage() {
+  const supabase = createServerComponentClient({ cookies });
+  const { data: codevs, error } = await supabase.from("codev")
+  .select("*, user(*, profile(*))")
+  .eq("type", "INHOUSE");
 
-  const {
-    data: inHouse,
-    isLoading: LoadinginHouse,
-    error: ErrorinHouse,
-    isSuccess,
-  } = useQuery({
-    queryKey: ["projects"],
-    queryFn: async () => {
-      const response = await axios.get(`${API.USERS}/inHouse`)
-      return response.data.data
-    },
-    refetchInterval: 3000,
-  })
-
-  const [data, setData] = useState<TeamMemberT[]>([])
-
-  useEffect(() => {
-    if (isSuccess) {
-      setData(inHouse)
-    }
-  }, [isSuccess, inHouse])
-
-  const handleEditButton = (id: number) => {
-    setEditableIds((prevIndexes) => [...prevIndexes, id])
-  }
-
-  const handleSaveButton = (updatedMember: TeamMemberT) => {
-    const updatedData = data.map((member) => (member.id === updatedMember.id ? updatedMember : member))
-    setData(updatedData)
-    setEditableIds((prevIndexes) => prevIndexes.filter((editableId) => editableId !== updatedMember.id))
-  }
-
-  // Update BE
-  // const {update} = useMutation({
-  //   mutationFn: (id) => {
-  //     return axios.patch(`API.PROJECTS/${id}`, {status:resolved})
-  //   },
-  // })
-
-  const { currentPage, totalPages, paginatedData, handlePreviousPage, handleNextPage } = usePagination(data, 10)
+  if (error) throw error;
+  
+  const data = codevs.map(codev => {
+      const { first_name, last_name, main_position } = codev.user.profile;
+      return {
+          id: codev.id,
+          internal_status : codev.internal_status,
+          first_name,
+          last_name,
+          main_position
+      }
+  });
 
   return (
     <div className="flex flex-col gap-2">
       <H1>In-House Codebility</H1>
-      <Table
-        data={paginatedData}
-        editableIds={editableIds}
-        handlers={{
-          setData,
-          handleEditButton,
-          handleSaveButton,
-        }}
-        status={{
-          LoadinginHouse,
-          ErrorinHouse,
-        }}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        handlePreviousPage={handlePreviousPage}
-        handleNextPage={handleNextPage}
-      />
-      <InHouseCards
-        data={paginatedData}
-        editableIds={editableIds}
-        handlers={{
-          setData,
-          handleEditButton,
-          handleSaveButton,
-        }}
-        status={{
-          LoadinginHouse,
-          ErrorinHouse,
-        }}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        handlePreviousPage={handlePreviousPage}
-        handleNextPage={handleNextPage}
-      />
+      {
+        error ? 
+          <div>ERROR</div>
+          :
+          <InHouseContainer codevData={data as Codev[]}/>
+      }
     </div>
   )
 }
 
-export default InHouse
+export default InHousePage;
