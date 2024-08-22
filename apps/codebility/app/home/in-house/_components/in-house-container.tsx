@@ -20,13 +20,15 @@ export default function InHouseContainer({ codevData }: Props) {
     }
 
   const handleSaveButton = (updatedMember: Codev) => {
+    const updatedData = data.map((member) => (member.id === updatedMember.id ? updatedMember : member))
+    setData(updatedData)
     setEditableIds((prevIndexes) => prevIndexes.filter((editableId) => editableId !== updatedMember.id))
   }
 
   const LoadinginHouse = false;
   const ErrorinHouse = null;
 
-  const { currentPage, totalPages, paginatedData, handlePreviousPage, handleNextPage } = usePagination(codevData, 10)
+  const { currentPage, totalPages, paginatedData, handlePreviousPage, handleNextPage } = usePagination(data, 10)
 
     return <div>
         <Table
