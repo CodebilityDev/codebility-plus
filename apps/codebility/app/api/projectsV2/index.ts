@@ -2,6 +2,7 @@ import axios from "axios"
 import { ProjectT } from "@/types"
 import { API } from "@/lib/constants"
 import { NextResponse } from "next/server"
+import { supabase } from '@/lib/supabaseClient'
 
 /* 
 
@@ -13,27 +14,44 @@ import { NextResponse } from "next/server"
               |__/
               
 */
+// export const getProjects = async () => {
+//   try {
+//     const response = await axios.get(API.PROJECTS, {
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//     })
+
+//     return response.data.data
+//   } catch (error) {
+//     return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+//   }
+// }
+
+
+
+// Fetch all projects from Supabase
 export const getProjects = async () => {
   try {
-    const response = await axios.get(API.PROJECTS, {
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
+    const { data, error } = await supabase
+      .from('projects')
+      .select('*')
 
-    return response.data.data
+    if (error) {
+      console.error('Error fetching projects:', error)
+      throw new Error(error.message)
+    }
+
+    return data
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    console.error('Error:', error)
+    throw new NextResponse('INTERNAL_SERVER_ERROR', { status: 500 })
   }
 }
 
 
 
-export const createProjects = async (
-  data: ProjectT,
-  users: { id: string }[],
-  token: string,
-) => {
+export const createProjects = async (data: ProjectT, users: { id: string }[], token: string) => {
   try {
     const response = await axios.post(
       `${API.PROJECTS}/create`,
@@ -43,23 +61,23 @@ export const createProjects = async (
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      },
-    );
+      }
+    )
 
-    const { status, statusText, data: datas } = response;
-    return { status, statusText, datas };
+    const { status, statusText, data: datas } = response
+    return { status, statusText, datas }
   } catch (error) {
-    console.error("Error:", error);
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
+    console.error("Error:", error)
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
   }
-};
+}
 
 export const updateProjects = async (
   data: ProjectT,
   id: string,
   users: { id: string }[],
   usersId: { id: string }[],
-  token: string,
+  token: string
 ) => {
   try {
     const response = await axios.patch(
@@ -70,16 +88,16 @@ export const updateProjects = async (
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      },
-    );
+      }
+    )
 
-    const { status, statusText, data: datas } = response;
-    return { status, statusText, datas };
+    const { status, statusText, data: datas } = response
+    return { status, statusText, datas }
   } catch (error) {
-    console.error("Error:", error);
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
+    console.error("Error:", error)
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
   }
-};
+}
 
 export const deleteProjects = async (id: string, token: string) => {
   try {
@@ -88,11 +106,11 @@ export const deleteProjects = async (id: string, token: string) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    });
+    })
 
-    return response.data;
+    return response.data
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
   }
 }
 
