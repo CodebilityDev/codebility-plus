@@ -1,17 +1,12 @@
 import { useEffect, useState } from "react";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { useQuery } from "@tanstack/react-query";
-import { API } from "@/lib/constants";
-import axios from "axios";
-
-interface Project {
-  id: string;
-  project_name: string;
-}
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Project } from "../_lib/codev";
 
 interface ICheckboxListProps {
-  initialItems?: { project: Project }[];
-  handleChange: (value: { project: Project }[]) => void;// eslint-disable-line no-unused-vars
+  initialItems?: Project[];
+  handleChange: (value: Project[]) => void;// eslint-disable-line no-unused-vars
   className?: string
 }
 
@@ -22,20 +17,23 @@ export default function CheckboxList({ initialItems = [], handleChange, classNam
   const { data: projects_list, isLoading, isError } = useQuery<Project[]>({
     queryKey: ["projects_list"],
     queryFn: async () => {
-      const response = await axios.get(`${API.PROJECTS}`);
-      return response.data.data;
+      const supabase = createClientComponentClient();
+      const { data, error } = await supabase.from("project")
+      .select(); 
+      if (error) throw error;
+      return data;
     },
   });
 
   useEffect(() => {
     if (projects_list) {
-      const projectNames = projects_list.map((project) => project.project_name);
+      const projectNames = projects_list.map((project) => project.name);
       setItems(projectNames);
 
       const initialCheckedItems = initialItems.reduce<{ [key: string]: boolean }>((acc, item) => {
-        const projectMatch = projects_list.find((project) => project.id === item.project.id);
+        const projectMatch = projects_list.find((project) => project.id === item.id);
         if (projectMatch) {
-          acc[projectMatch.project_name] = true;
+          acc[projectMatch.name] = true;
         }
         return acc;
       }, {});
@@ -49,11 +47,10 @@ export default function CheckboxList({ initialItems = [], handleChange, classNam
       const transformedData = Object.keys(updatedCheckedItems)
         .filter((key) => updatedCheckedItems[key])
         .map((projectName) => {
-          const project = projects_list?.find((project) => project.project_name === projectName);
-          return project ? { project: { id: project.id, project_name: projectName } } : null;
+          const project = projects_list?.find((project) => project.name === projectName);
+          return project ? { id: project.id, name: projectName } : null;
         })
-        .filter(Boolean) as { project: Project }[];
-
+        .filter(Boolean) as Project[];
       handleChange(transformedData);
       return updatedCheckedItems;
     });
