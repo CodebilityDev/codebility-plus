@@ -15,6 +15,7 @@ export interface Project {
 
 export interface Codev {
     id: string;
+    user_id: string;
     first_name: string;
     last_name: string;
     image_url: string;
