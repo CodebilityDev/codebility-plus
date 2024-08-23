@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useState } from "react"
 import { convertToTitleCase, statusColors } from "../_lib/utils"
 import { InHouseProps } from "../_lib/in-house"
-import { Codev } from "../_lib/codev"
+import { Codev, Project } from "../_lib/codev"
 
 interface Props {
   data: Codev;
@@ -22,14 +22,13 @@ export default function EditTabelBody({ data, handleSaveButton }: Props) {
     }))
   }
 
-  const cleanProjects = (projects: any) => {
+  const cleanProjects = (projects: Project[]) => {
     if (projects && projects.length > 0) {
-      return projects.filter((item: any) => item.project && item.project.project_name);
+      return projects.filter((item: Project) =>  item.name);
     }
     return [];
   };
   const cleanedData = cleanProjects(editableMember.projects);
-
   return (
     <tr className="table-border-light_dark border-b-[1px] font-light">
       <td className="p-4">{editableMember.first_name}</td>
