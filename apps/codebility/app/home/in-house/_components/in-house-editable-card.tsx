@@ -4,7 +4,7 @@ import Image from 'next/image'
 import ViewProfile from './in-house-view-profile'
 import Select from './in-house-select'
 import CheckboxList from './in-house-checkbox-list'
-import { Codev } from '../_lib/codev'
+import { Codev, Project } from '../_lib/codev'
 import { InHouseProps } from '../_lib/in-house'
 
 interface Props {
@@ -22,9 +22,9 @@ function EditableCard({ data, handleSaveButton }: Props) {
     }))
   }
 
-  const cleanProjects = (projects: any) => {
+  const cleanProjects = (projects: Project[]) => {
     if (projects && projects.length > 0) {
-      return projects.filter((item: any) => item.project && item.project.project_name);
+      return projects.filter((item: Project) => item.name);
     }
     return [];
   };
