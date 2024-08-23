@@ -2,7 +2,7 @@ import * as React from "react"
 import Card from "./in-house-card"
 import EditableCard from "./in-house-editable-card"
 import DefaultPagination from "@/Components/ui/pagination"
-import { InHouseProps } from "../_lib/in-house"
+import { InHouseProps } from "../_types/in-house"
 
 function InHouseCards({
   data,
