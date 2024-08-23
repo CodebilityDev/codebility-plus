@@ -25,7 +25,7 @@ async function InHousePage() {
   }));
   
   const data = codevs.map<Codev>((codev, index: number) => {
-      const { first_name, last_name, main_position, tech_stacks } = codev.user.profile;
+      const { first_name, last_name, image_url, address, about, main_position, tech_stacks } = codev.user.profile;
       return {
           id: codev.id,
           user_id: codev.user_id,
@@ -35,9 +35,9 @@ async function InHousePage() {
           tech_stacks,
           main_position,
           projects: codevProjects[index] as Project[],
-          image_url: "",
-          address: "",
-          about: "",
+          image_url,
+          address,
+          about,
           job_status: codev.job_status,
           nda_status: codev.nda_status
       }
