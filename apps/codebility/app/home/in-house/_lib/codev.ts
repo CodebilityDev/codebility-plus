@@ -20,7 +20,7 @@ export interface Codev {
     last_name: string;
     image_url: string;
     address: string;
-    about_me: string;
+    about: string;
     main_position: string;
     internal_status: InternalStatus;
     projects: Project[];
