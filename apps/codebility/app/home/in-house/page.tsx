@@ -15,6 +15,7 @@ async function InHousePage() {
       const { first_name, last_name, main_position, tech_stacks } = codev.user.profile;
       return {
           id: codev.id,
+          user_id: codev.user_id,
           internal_status : codev.internal_status,
           first_name,
           last_name,
