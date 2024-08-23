@@ -8,7 +8,7 @@ export type InternalStatus =
     | "GRADUATED"
     | "FAILED";
 
-interface Project {
+export interface Project {
     id: string;
     name: string;
 }
