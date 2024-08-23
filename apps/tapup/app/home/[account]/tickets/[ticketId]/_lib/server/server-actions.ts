@@ -4,17 +4,18 @@ import { revalidatePath } from 'next/cache';
 
 import { enhanceAction } from '@kit/next/actions';
 import { getLogger } from '@kit/shared/logger';
-import { getSupabaseServerActionClient } from '@kit/supabase/server-actions-client';
+
 
 import { UpdateTicketAssigneeSchema } from '../../_lib/schema/update-ticket-assignee.schema';
 import { UpdateTicketPrioritySchema } from '../../_lib/schema/update-ticket-priority.schema';
 import { MessageFormSchema } from '../schema/message-form.schema';
 import { UpdateTicketStatusSchema } from '../schema/update-ticket-status.schema';
+import { getSupabaseServerClient } from './server-client';
 
 export const insertTicketMessageAction = enhanceAction(
   async (data, user) => {
     const logger = await getLogger();
-    const client = getSupabaseServerActionClient();
+    const client = getSupabaseServerClient();
 
     logger.info({ data }, 'Inserting ticket message...');
 
@@ -49,7 +50,7 @@ export const insertTicketMessageAction = enhanceAction(
 export const updateTicketStatusAction = enhanceAction(
   async (data) => {
     const logger = await getLogger();
-    const client = getSupabaseServerActionClient();
+    const client = getSupabaseServerClient();
 
     logger.info({ data }, 'Updating ticket status...');
 
@@ -83,7 +84,7 @@ export const updateTicketStatusAction = enhanceAction(
 export const updateTicketPriorityAction = enhanceAction(
   async (data) => {
     const logger = await getLogger();
-    const client = getSupabaseServerActionClient();
+    const client = getSupabaseServerClient();
 
     logger.info({ data }, 'Updating ticket priority...');
 
@@ -116,7 +117,7 @@ export const updateTicketPriorityAction = enhanceAction(
 
 export const updateTicketAssigneeAction = enhanceAction(
   async (data) => {
-    const client = getSupabaseServerActionClient();
+    const client = getSupabaseServerClient();
     const logger = await getLogger();
 
     logger.info({ data }, 'Updating ticket assignee...');
