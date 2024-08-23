@@ -2,7 +2,7 @@ import H1 from "@/Components/shared/dashboard/H1"
 import InHouseContainer from "./_components/in-house-container"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers";
-import { Codev } from "./_lib/codev";
+import { Codev, Project } from "./_lib/codev";
 
 async function InHousePage() {
   const supabase = createServerComponentClient({ cookies });
@@ -11,7 +11,20 @@ async function InHousePage() {
   .eq("type", "INHOUSE");
 
   if (error) throw error;
-  const data = codevs.map(codev => {
+  
+  const codevProjects = await Promise.all(codevs.map(async (codev: Codev) => { // await for all the promises.
+    const { data: codevProject } = await supabase.from("codev_project")
+    .select("*,project(id,name)") // requires the *, so typescript won't go crazy. thinking that project is of type Project[], instead of Project.
+    .eq("codev_id", codev.id)
+
+    if (codevProject && codevProject.length > 0) {
+      const projects: Project[] = codevProject.map(item => item.project); // get project data only.
+      return projects;
+    }
+    return [];
+  }));
+  
+  const data = codevs.map<Codev>((codev, index: number) => {
       const { first_name, last_name, main_position, tech_stacks } = codev.user.profile;
       return {
           id: codev.id,
@@ -21,6 +34,10 @@ async function InHousePage() {
           last_name,
           tech_stacks,
           main_position,
+          projects: codevProjects[index] as Project[],
+          image_url: "",
+          address: "",
+          about: "",
           job_status: codev.job_status,
           nda_status: codev.nda_status
       }
