@@ -6,6 +6,7 @@ import { useState } from "react"
 import { convertToTitleCase, statusColors } from "../_lib/utils"
 import { InHouseProps } from "../_lib/in-house"
 import { Codev, Project } from "../_lib/codev"
+import { updateCodev } from "../actions"
 
 interface Props {
   data: Codev;
@@ -14,8 +15,12 @@ interface Props {
 
 export default function EditTabelBody({ data, handleSaveButton }: Props) {
   const [editableMember, setEditableMember] = useState<Codev>(data)
-
-  const handleSelectChange = (type: keyof Codev, value: any) => {
+  const handleSelectChange = async (type: keyof Codev, value: any) => {
+    try {
+      await updateCodev(type, value, { codevId: editableMember.id, userId: editableMember.user_id});
+    } catch (e) {
+      console.log(e);
+    }
     setEditableMember((prevMember) => ({
       ...prevMember,
       [type]: value,

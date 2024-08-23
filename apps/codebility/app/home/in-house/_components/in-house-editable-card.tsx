@@ -6,6 +6,7 @@ import Select from './in-house-select'
 import CheckboxList from './in-house-checkbox-list'
 import { Codev, Project } from '../_lib/codev'
 import { InHouseProps } from '../_lib/in-house'
+import { updateCodev } from '../actions'
 
 interface Props {
   data: Codev;
@@ -15,7 +16,12 @@ interface Props {
 function EditableCard({ data, handleSaveButton }: Props) {
   const [editableMember, setEditableMember] = useState<Codev>(data)
 
-  const handleSelectChange = (type: keyof Codev, value: any) => {
+  const handleSelectChange = async (type: keyof Codev, value: any) => {
+    try {
+      await updateCodev(type, value, { codevId: editableMember.id, userId: editableMember.user_id});
+    } catch (e) {
+      console.log(e);
+    }
     setEditableMember((prevMember) => ({
       ...prevMember,
       [type]: value,
