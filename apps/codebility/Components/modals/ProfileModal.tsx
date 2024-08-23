@@ -11,7 +11,7 @@ import { Codev } from "@/app/home/in-house/_types/codev"
 
 const ProfileModal = () => {
   const { isOpen, type, onClose, data } = useModal()
-  const { first_name, last_name, image_url, address, about_me, main_position, internal_status, projects, tech_stacks } = data as Codev || {}
+  const { first_name, last_name, image_url, address, about, main_position, internal_status, projects, tech_stacks } = data as Codev || {}
 
   const isModalOpen = isOpen && type === "profileModal"
 
@@ -77,7 +77,7 @@ const ProfileModal = () => {
           </div>
           <div className="py-4">
             <p className="pb-2.5 dark:text-gray">About Me</p>
-            {about_me ? <p className="h-40 overflow-y-auto">{about_me}</p> : <p></p>}
+            {about ? <p className="h-40 overflow-y-auto">{about}</p> : <p></p>}
           </div>
           <div className="pb-4">
             <p className="pb-2.5 dark:text-gray">Token Points</p>
