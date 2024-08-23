@@ -12,6 +12,7 @@ export const updateCodev = async (key: keyof Codev, value: any, {codevId, userId
         profile: ["main_position"]
     };
     
+    // target table
     const target = Object.keys(keys).find((table) => keys[table as keyof typeof keys].includes(key));
     
     if (!target) throw new Error(`invalid codev info: ${key}`);
@@ -31,11 +32,14 @@ export const updateCodev = async (key: keyof Codev, value: any, {codevId, userId
           });
         }
     } else {
-       const newValue = value.replace(/ /g,"").toUpperCase();
+       let newValue = value;
+
+       if (target === "codev") // since all the data we are updating in codev table are status. and all status are enums.
+        newValue = value.replace(/ /g,"").toUpperCase(); // we will transform all the new data to a constants naming convention.
+
        const { error } = await supabase.from(target)
        .update({[key]: newValue})
        .eq("user_id", userId);
-
        if (error) throw error;
     }
 }
