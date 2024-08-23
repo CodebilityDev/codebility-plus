@@ -42,18 +42,19 @@ export default function CheckboxList({ initialItems = [], handleChange, classNam
   }, [projects_list, initialItems]);
 
   const handleCheckboxChange = (item: string) => {
+    let transformedData: Project[] = [];
     setCheckedItems((prevState) => {
       const updatedCheckedItems = { ...prevState, [item]: !prevState[item] };
-      const transformedData = Object.keys(updatedCheckedItems)
+      transformedData = Object.keys(updatedCheckedItems)
         .filter((key) => updatedCheckedItems[key])
         .map((projectName) => {
           const project = projects_list?.find((project) => project.name === projectName);
           return project ? { id: project.id, name: projectName } : null;
         })
         .filter(Boolean) as Project[];
+        return updatedCheckedItems;
+      });
       handleChange(transformedData);
-      return updatedCheckedItems;
-    });
   };
 
   if (isLoading) return (
