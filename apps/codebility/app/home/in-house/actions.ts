@@ -17,7 +17,19 @@ export const updateCodev = async (key: keyof Codev, value: any, {codevId, userId
     if (!target) throw new Error(`invalid codev info: ${key}`);
 
     if (target === "project") {
-
+        await supabase.from("codev_project")
+        .delete()
+        .eq("codev_id", codevId);
+ 
+        for (let i = 0;i < value.length;i++) {
+          const { id } = value[i];
+ 
+          await supabase.from("codev_project")
+          .insert({
+             codev_id: codevId,
+             project_id: id
+          });
+        }
     } else {
        const newValue = value.replace(/ /g,"").toUpperCase();
        const { error } = await supabase.from(target)
