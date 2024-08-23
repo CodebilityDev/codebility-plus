@@ -5,7 +5,7 @@ import Table from "./in-house-table"
 import InHouseCards from "./in-house-cards"
 import { TeamMemberT } from "@/types/index"
 import usePagination from "@/hooks/use-pagination"
-import { Codev } from "../_lib/codev";
+import { Codev } from "../_types/codev";
 
 interface Props {
   codevData: Codev[];
