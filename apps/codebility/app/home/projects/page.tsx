@@ -1,15 +1,16 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { getProjects } from "@/app/api/projects";
-import Loading from "@/app/home/projects/loading";
-import ProjectCard from "@/app/home/projects/ProjectCard";
-import H1 from "@/Components/shared/dashboard/H1";
-import { Button } from "@/Components/ui/button";
-import useAuthCookie from "@/hooks/use-cookie";
-import { useModal } from "@/hooks/use-modal-projects";
-import { ProjectT } from "@/types/index";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import { useRouter } from "next/navigation"
+import { useQuery, UseQueryResult } from "@tanstack/react-query"
+
+import Loading from "@/app/home/projects/loading"
+import ProjectCard from "@/app/home/projects/ProjectCard"
+import { ProjectT } from "@/types/index"
+import useAuthCookie from "@/hooks/use-cookie"
+import { Button } from "@/Components/ui/button"
+import H1 from "@/Components/shared/dashboard/H1"
+import { getProjects } from "@/app/api/projectsV2"
+import { useModal } from "@/hooks/use-modal-projects"
 
 const Projects = () => {
   const { data: authData } = useAuthCookie();
