@@ -160,11 +160,6 @@ type TeamMemberT = {
   nda_status?: TNda
 }
 
-interface Project {
-  id: string
-  project_name: string
-}
-
 type ProjectT = {
   id?: string
   project_name?: string
@@ -221,32 +216,8 @@ interface PluginFunctionParams {
   theme: any;
 }
 
-interface Codev {
-  id: string;
-  user_id: string;
-  first_name: string;
-  last_name: string;
-  image_url: string;
-  address: string;
-  about: string;
-  socials: Record<string, string | null>;
-  main_position: string;
-  internal_status: InternalStatus;
-  projects: Project[];
-  tech_stacks: string[];
-  nda_status: string;
-  job_status: string;
-}
-
-interface Project {
-  id: string;
-  name: string;
-}
-
 export {
   User,
-  Codev,
-  Project,
   BoardProjectT,
   BoardUserT,
   ProjectT,
