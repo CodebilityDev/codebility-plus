@@ -7,10 +7,26 @@ import { Codev, Project } from "./_types/codev";
 async function InHousePage() {
   const supabase = createServerComponentClient({ cookies });
   const { data: codevs, error } = await supabase.from("codev")
-  .select("*, user(*, profile(*))")
+  .select(`
+    *,
+    user(
+      *,
+      profile(*),
+      social(
+        github,
+        facebook,
+        linkedin,
+        telegram,
+        whatsapp,
+        discord_id
+      )
+    )
+  `)
   .eq("type", "INHOUSE");
 
-  if (error) throw error;
+  if (error) return <div>
+    ERROR
+  </div>;
   
   const codevProjects = await Promise.all(codevs.map(async (codev: Codev) => { // await for all the promises.
     const { data: codevProject } = await supabase.from("codev_project")
@@ -26,6 +42,7 @@ async function InHousePage() {
   
   const data = codevs.map<Codev>((codev, index: number) => {
       const { first_name, last_name, image_url, address, about, main_position, tech_stacks } = codev.user.profile;
+
       return {
           id: codev.id,
           user_id: codev.user_id,
@@ -38,6 +55,7 @@ async function InHousePage() {
           image_url,
           address,
           about,
+          socials: codev.user.social,
           job_status: codev.job_status,
           nda_status: codev.nda_status
       }
