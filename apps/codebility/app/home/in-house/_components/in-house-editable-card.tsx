@@ -4,7 +4,7 @@ import Image from 'next/image'
 import ViewProfile from './in-house-view-profile'
 import Select from './in-house-select'
 import CheckboxList from './in-house-checkbox-list'
-import { Codev, Project } from '@/types'
+import { Codev, Project } from '@/types/home/codev'
 import { InHouseProps } from '../_types/in-house'
 import { updateCodev } from '../actions'
 

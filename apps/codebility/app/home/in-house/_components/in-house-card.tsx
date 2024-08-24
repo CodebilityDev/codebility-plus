@@ -2,7 +2,7 @@ import React from 'react'
 import { convertToTitleCase, statusColors } from '../_lib/utils'
 import Image from 'next/image'
 import ViewProfile from './in-house-view-profile'
-import { Codev } from '@/types'
+import { Codev } from '@/types/home/codev'
 
 interface Props  {
   member: Codev;
