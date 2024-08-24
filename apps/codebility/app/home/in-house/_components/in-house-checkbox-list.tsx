@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { useQuery } from "@tanstack/react-query";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Project } from '@/types';
+import { Project } from '@/types/home/codev'
 
 interface ICheckboxListProps {
   initialItems?: Project[];

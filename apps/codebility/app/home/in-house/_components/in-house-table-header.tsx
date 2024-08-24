@@ -2,7 +2,7 @@ import React, { useState } from "react"
 import { twMerge } from "tailwind-merge"
 import Image from "next/image"
 import { InHouseSort } from "../_types/in-house"
-import { Codev } from '@/types'
+import { Codev } from '@/types/home/codev'
 
 interface Props {
   onSort: InHouseSort;

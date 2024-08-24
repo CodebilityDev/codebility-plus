@@ -7,7 +7,7 @@ import Badges from "@/Components/shared/Badges"
 import { defaultAvatar } from "@/public/assets/images"
 import { tokenPoints } from "@/app/home/interns/data"
 import { techstacks, socialIcons } from "@/constants"
-import { Codev } from "@/types"
+import { Codev } from "@/types/home/codev"
 
 const ProfileModal = () => {
   const { isOpen, type, onClose, data } = useModal()
