@@ -48,7 +48,7 @@ const ProfileModal = () => {
                   : "bg-gray"
               }`}
             >
-              {internal_status === "AVAILABLE" ? "Available" : internal_status === "DEPLOYED" ? "Deployed" : "Inactive"}
+              {internal_status.charAt(0) + internal_status.slice(1).toLowerCase()}
             </p>
           </div>
           <div className="flex w-full flex-col items-center gap-2 py-6">
