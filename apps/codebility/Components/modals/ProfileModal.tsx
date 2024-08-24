@@ -14,7 +14,6 @@ const ProfileModal = () => {
   const { first_name, last_name, image_url, address, about, socials, main_position, internal_status, projects, tech_stacks } = data as Codev || {}
 
   const isModalOpen = isOpen && type === "profileModal"
-
   return (
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogContent
@@ -48,7 +47,7 @@ const ProfileModal = () => {
                   : "bg-gray"
               }`}
             >
-              {internal_status.charAt(0) + internal_status.slice(1).toLowerCase()}
+              {internal_status && internal_status.charAt(0) + internal_status.slice(1).toLowerCase()}
             </p>
           </div>
           <div className="flex w-full flex-col items-center gap-2 py-6">
