@@ -1,9 +1,9 @@
 "use client"
 
-import Profile from "@/app/home/(user)/_components/dashboard-profile"
-import WeeklyTop from "@/app/home/(user)/_components/dashboard-weekly-top"
-import TimeTracker from "@/app/home/(user)/_components/dashboard-time-tracker"
-import TokenPoints from "@/app/home/(user)/_components/dashboard-token-points"
+import Profile from "./_components/dashboard-profile"
+import WeeklyTop from "./_components/dashboard-weekly-top"
+import TimeTracker from "./_components/dashboard-time-tracker"
+import TokenPoints from "./_components/dashboard-token-points"
 import H1 from "@/Components/shared/dashboard/H1"
 
 export default function DashboardPage() {

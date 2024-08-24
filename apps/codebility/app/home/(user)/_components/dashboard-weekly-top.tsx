@@ -2,7 +2,7 @@
 
 import { useState } from "react"
 import { topNotcher } from "@/types"
-import { topnotchers } from "@/app/home/(user)/_lib/dummy"
+import { topnotchers } from "../_lib/dummy"
 import Box from "@/Components/shared/dashboard/Box"
 import FE1stRunnerUp from "@/public/assets/svgs/badges/fe-tier-5.svg"
 import FE2ndRunnerUp from "@/public/assets/svgs/badges/fe-tier-4.svg"
