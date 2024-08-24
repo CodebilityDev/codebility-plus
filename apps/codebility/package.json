@@ -59,7 +59,7 @@
     "react-calendly": "^4.3.1",
     "react-dom": "^18",
     "react-dropzone": "^14.2.3",
-    "react-hook-form": "^7.49.3",
+    "react-hook-form": "^7.53.0",
     "react-hot-toast": "^2.4.1",
     "react-intersection-observer": "^9.5.3",
     "react-timeit": "^1.2.12",

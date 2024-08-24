@@ -51,57 +51,7 @@ function SignInForm() {
         <div className="flex flex-col items-center gap-3 px-10 py-16">
           <Toaster richColors position="top-right" />
           <Form {...form}>
-            <Image
-              src="/logo-tapup-dark.svg"
-              width={150}
-              height={150}
-              alt="tapup-brand"
-            />
-            <div className="flex flex-col items-center gap-1">
-              <div className="-mb-1 text-3xl font-bold">
-                Create your free account
-              </div>
-              <div className="flex w-96 flex-col gap-1 text-sm">
-                <div className="text-center">
-                  Create your free account to search or filter through multiple
-                  cards. No credit card required.
-                </div>
-                <div className="flex gap-x-2">
-                  <Button
-                    onClick={() => signInWithOAuth('google')}
-                    type="button"
-                    className="text-custom-black hover:text-custom-black flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-400 bg-white py-3 hover:bg-gray-50"
-                  >
-                    <div className="relative aspect-square w-5">
-                      <Image src="/devicon_google.svg" alt="google" fill />
-                    </div>
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => signInWithOAuth('facebook')}
-                    className="text-custom-black hover:text-custom-black flex flex-1 items-center justify-center gap-2 rounded-md bg-blue-700 py-3 hover:bg-blue-500  "
-                  >
-                    <div className="relative aspect-square w-5">
-                      <Image src="/facebook.svg" alt="facebook" fill />
-                    </div>
-                  </Button>
-                  <Button
-                    type="button"
-                    onClick={() => signInWithOAuth('linkedin_oidc')}
-                    className="text-custom-black hover:text-custom-black flex flex-1 items-center justify-center gap-2 rounded-md border border-gray-400 bg-white py-3 hover:bg-gray-50 "
-                  >
-                    <div className="relative aspect-square w-5">
-                      <Image src="/linkedin.svg" alt="linkedin" fill />
-                    </div>
-                  </Button>
-                </div>
-              </div>
-            </div>
-            <div className="flex w-full items-center">
-              <div className="border-foreground flex-grow border-t"></div>
-              <span className="text-foreground/60 mx-4">or</span>
-              <div className="border-foreground flex-grow border-t"></div>
-            </div>
+           
             <form onSubmit={form.handleSubmit(handleSignIn)} className="w-full">
               <FormField
                 control={form.control}
@@ -163,18 +113,6 @@ function SignInForm() {
                 Forgot Password?
               </div>
               <div className="mt-1 flex flex-col gap-2">
-                <div className="space-x-2 text-center">
-                  <label className="text-xs font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                    By proceeding, you agreed to the&nbsp;
-                    <span className="hover:text-primary cursor-pointer font-semibold  underline">
-                      Terms of services
-                    </span>
-                    &nbsp;and&nbsp;
-                    <span className="hover:text-primary cursor-pointer font-semibold underline">
-                      Privacy policy
-                    </span>
-                  </label>
-                </div>
 
                 <Button
                   type="submit"
@@ -210,30 +148,12 @@ function SignInForm() {
                   )}
                 </Button>
 
-                <div className="space-x-2 text-center">
-                  <p>
-                    Don’t have an account?&nbsp;
-                    <span
-                      onClick={() => router.push(pathsConfig.auth.signUp)}
-                      className="hover:text-primary cursor-pointer font-semibold"
-                    >
-                      Sign-up here
-                    </span>
-                  </p>
-                </div>
               </div>
             </form>
           </Form>
         </div>
       </div>
-      <div className="relative flex-1">
-        <Image
-          fill
-          src="/login-side-bg.png"
-          className="absolute inset-0 h-full w-full rounded-r-xl bg-green-500 object-cover"
-          alt="Background Image"
-        />
-      </div>
+      
     </div>
   )
 }
