@@ -3,7 +3,7 @@ import TableHeader from "./in-house-table-header"
 import TableBody from "./in-house-table-body"
 import EditTabelBody from "./in-house-edit-table-body"
 import DefaultPagination from "@/Components/ui/pagination"
-import { Codev } from "../_types/codev"
+import { Codev } from '@/types'
 import { InHouseProps } from "../_types/in-house"
 
 function Tables({

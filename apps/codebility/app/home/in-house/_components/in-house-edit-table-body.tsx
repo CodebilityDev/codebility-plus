@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { useState } from "react"
 import { convertToTitleCase, statusColors } from "../_lib/utils"
 import { InHouseProps } from "../_types/in-house"
-import { Codev, Project } from "../_types/codev"
+import { Codev, Project } from '@/types'
 import { updateCodev } from "../actions"
 
 interface Props {
