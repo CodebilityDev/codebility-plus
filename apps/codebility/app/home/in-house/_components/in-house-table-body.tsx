@@ -1,7 +1,7 @@
 import ViewProfile from "./in-house-view-profile"
 import Image from "next/image"
 import { convertToTitleCase, statusColors } from "../_lib/utils"
-import { Codev } from "../_types/codev"
+import { Codev } from '@/types'
 
 interface Props {
   member: Codev;
