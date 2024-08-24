@@ -5,13 +5,13 @@ import Link from "next/link"
 import Box from "@/Components/shared/dashboard/Box"
 import Badges from "@/Components/shared/Badges"
 import { defaultAvatar } from "@/public/assets/images"
-import { socials, tokenPoints } from "@/app/home/interns/data"
-import { techstacks } from "@/constants"
+import { tokenPoints } from "@/app/home/interns/data"
+import { techstacks, socialIcons } from "@/constants"
 import { Codev } from "@/app/home/in-house/_types/codev"
 
 const ProfileModal = () => {
   const { isOpen, type, onClose, data } = useModal()
-  const { first_name, last_name, image_url, address, about, main_position, internal_status, projects, tech_stacks } = data as Codev || {}
+  const { first_name, last_name, image_url, address, about, socials, main_position, internal_status, projects, tech_stacks } = data as Codev || {}
 
   const isModalOpen = isOpen && type === "profileModal"
 
@@ -68,11 +68,12 @@ const ProfileModal = () => {
           <div>
             <p className="pb-2.5 dark:text-gray">Socials</p>
             <div className="flex gap-2">
-              {socials.map(({ Icon }) => (
-                <Link key={Icon} href="#" target="_blank">
-                  <Icon className="h-5 w-5 duration-300 hover:-translate-y-1" />
+              {socials && Object.keys(socials).filter((socialName) => socials[socialName]).map((socialName) => {
+                const socialIcon = socialIcons.find((icon) => icon.label === socialName);
+                return <Link key={socialName} href={socials[socialName] as string} target="_blank">
+                  <Image src={socialIcon?.imgURL as string} alt={socialName} width={5} height={5} className="h-5 w-5 duration-300 hover:-translate-y-1" />
                 </Link>
-              ))}
+              })}
             </div>
           </div>
           <div className="py-4">
