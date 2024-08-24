@@ -21,6 +21,7 @@ export interface Codev {
     image_url: string;
     address: string;
     about: string;
+    socials: Record<string, string | null>;
     main_position: string;
     internal_status: InternalStatus;
     projects: Project[];
