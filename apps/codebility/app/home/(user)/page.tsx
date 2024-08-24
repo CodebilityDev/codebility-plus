@@ -1,5 +1,3 @@
-"use client"
-
 import Profile from "./_components/dashboard-profile"
 import WeeklyTop from "./_components/dashboard-weekly-top"
 import TimeTracker from "./_components/dashboard-time-tracker"
