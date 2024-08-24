@@ -14,7 +14,7 @@ export default async function AuthButton() {
 
     const supabase = createClient();
     await supabase.auth.signOut();
-    return redirect("/login");
+    return redirect("/sign-in");
   };
 
   return user ? (
@@ -29,10 +29,10 @@ export default async function AuthButton() {
   ) : (
     <div className="flex gap-2">
       <Link
-        href="/auth/login"
+        href="/auth/sign-in"
         className="h-8 flex items-center justify-center rounded-md no-underline text-sm font-medium px-4"
       >
-        Login
+        Sign In
       </Link>
 
     </div>

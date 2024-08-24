@@ -37,7 +37,8 @@ function SignInForm() {
 
   const handleSignIn = async (values: z.infer<typeof formSchema>) => {
     const { email, password } = values
-
+    console.log(email, password);
+    
     try {
       await signInWithPassword(email, password)
     } catch (e) {

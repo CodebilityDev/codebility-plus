@@ -8,9 +8,7 @@ const PathsSchema = z.object({
       passwordReset: z.string().min(1),
     }),
     app: z.object({
-      home: z.string().min(1),
-      cards: z.string().min(1),
-      builder: z.string().min(1)
+      dashboard: z.string().min(1),
     }),
 });
 
@@ -22,9 +20,7 @@ const pathsConfig = PathsSchema.parse({
       passwordReset: '/auth/password-reset'
     },
     app: {
-      home: '/home',
-      cards: "/home/cards",
-      builder: "/home/builder"
+      dashboard: '/dashboard'
     },
   } satisfies z.infer<typeof PathsSchema>);
   

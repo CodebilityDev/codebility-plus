@@ -6,7 +6,7 @@ const AppConfigSchema = z
   .object({
     name: z
       .string({
-        description: `This is the name of your SaaS. Ex. "Tapup"`,
+        description: `This is the name of your SaaS.`,
         required_error: `Please provide the variable NEXT_PUBLIC_PRODUCT_NAME`,
       })
       .min(1),

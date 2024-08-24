@@ -14,7 +14,7 @@ export const signInWithPassword = async (email: string, password: string) => {
     });
   
     if (error) throw error;
-    redirect(pathsConfig.app.home)
+    redirect(pathsConfig.app.dashboard)
 };  
   
 export const signUp = async (email: string, password: string, name: string) => {
