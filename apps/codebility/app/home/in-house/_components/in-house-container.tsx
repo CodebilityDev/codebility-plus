@@ -4,7 +4,7 @@ import { useState } from "react";
 import Table from "./in-house-table"
 import InHouseCards from "./in-house-cards"
 import usePagination from "@/hooks/use-pagination"
-import { Codev } from '@/types';
+import { Codev } from '@/types/home/codev'
 
 interface Props {
   codevData: Codev[];

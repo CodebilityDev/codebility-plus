@@ -1,4 +1,4 @@
-import { Codev } from '@/types'
+import { Codev } from '@/types/home/codev'
 
 export interface InHouseProps {
     data: Codev[]
