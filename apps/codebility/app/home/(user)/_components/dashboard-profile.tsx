@@ -2,7 +2,7 @@
 
 import Image from "next/image"
 
-import useAuth from "@/hooks/use-auth"
+import useUser from "../../_hooks/useUser";
 
 import Badges from "@/Components/shared/Badges"
 import Box from "@/Components/shared/dashboard/Box"
@@ -10,23 +10,24 @@ import { defaultAvatar } from "@/public/assets/images"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
 
 const ProfileDashboard = () => {
-  const { isLoading, userData } = useAuth()
+  const user = useUser();
+  const isLoading = !user;
   return (
     <>
       {!isLoading ? (
         <Box className="relative flex-1">
           <div className="mx-auto flex flex-col items-center gap-3">
-            <p className="text-2xl font-semibold capitalize">Hello, {userData?.first_name ?? ""}!</p>
+            <p className="text-2xl font-semibold capitalize">Hello, {user?.first_name ?? ""}!</p>
 
             <Image
               alt="Avatar"
-              src={userData.image_url || defaultAvatar}
+              src={user.image_url || defaultAvatar}
               width={100}
               height={100}
-              title={`${userData.name}'s Avatar`}
+              title={`${user.first_name}'s Avatar`}
               className="h-[100px] w-[100px] rounded-lg bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover"
             />
-            <p className="text-md">{userData.main_position}</p>
+            <p className="text-md">{user.main_position}</p>
 
             <Badges />
           </div>
