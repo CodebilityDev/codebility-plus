@@ -4,7 +4,7 @@ import { action } from '@storybook/addon-actions'
 import { Button } from '@codevs/ui/button'
 
 const meta = {
-  title: 'Example/Button',
+  title: 'ShadCN-Atomic/Button',
   component: Button,
   tags: ['autodocs'],
   parameters: {
@@ -75,5 +75,16 @@ export const Secondary: Story = {
 		onClick: action('secondary click'),
 		children: 'Secondary Button',
 		className: 'shadow-lg'
+	}
+};
+
+export const StartTimer: Story = {
+	args: {
+    variant: 'secondary',
+		size: 'lg',
+		disabled: false,
+		onClick: action('secondary click'),
+		children: 'Start Timer',
+		className: 'bg-blue-100 hover:bg-blue-200 text-white'
 	}
 };
