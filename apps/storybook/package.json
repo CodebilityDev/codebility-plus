@@ -8,6 +8,7 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
+    "@codevs/ui": "workspace:*",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.427.0",
@@ -19,6 +20,8 @@
   },
   "devDependencies": {
     "@chromatic-com/storybook": "1.6.1",
+    "@codevs/tailwind-config": "workspace:*",
+    "@codevs/tsconfig": "workspace:*",
     "@storybook/addon-essentials": "^8.2.8",
     "@storybook/addon-interactions": "^8.2.8",
     "@storybook/addon-links": "^8.2.8",
@@ -30,12 +33,13 @@
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "autoprefixer": "^10.4.20",
     "eslint": "^8",
     "eslint-config-next": "14.2.5",
     "eslint-plugin-storybook": "^0.8.0",
-    "postcss": "^8",
+    "postcss": "^8.4.41",
     "storybook": "^8.2.8",
-    "tailwindcss": "^3.4.1",
+    "tailwindcss": "^3.4.9",
     "typescript": "^5"
   }
 }
