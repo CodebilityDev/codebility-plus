@@ -1,5 +1,5 @@
 import "server-only"
-import LeftSidebar from "@/Components/shared/dashboard/LeftSidebar"
+import LeftSidebar from "./_components/home-left-sidebar"
 import Navbar from "./_components/home-navbar"
 import React from "react"
 import ReactQueryProvider from "@/hooks/reactQuery"
