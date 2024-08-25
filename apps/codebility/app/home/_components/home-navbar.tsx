@@ -14,14 +14,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu"
-import useAuth from "@/hooks/use-auth"
 import { defaultAvatar } from "@/public/assets/images"
 import { signOut } from "../../authv2/actions"
+import useUser from "../_hooks/useUser"
 
 export const menuItems = [{ href: "/settings", icon: IconProfile, label: "Settings" }]
 
 const Navbar = () => {
-  const { userData } = useAuth()
+  const user = useUser();
   return (
     <>
       <nav className="background-navbar fixed top-0 z-10 w-full shadow-sm">
@@ -33,16 +33,16 @@ const Navbar = () => {
               <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none">
                 <div className="hidden flex-col items-end md:flex ">
                   <p className="capitalize dark:text-white">
-                    {userData?.first_name} {userData?.last_name}
+                    {user?.first_name} {user?.last_name}
                   </p>
-                  <p className="text-sm text-gray">{userData?.email_address}</p>
+                  <p className="text-sm text-gray">{user?.email}</p>
                 </div>
                 <div className="relative size-[44px] rounded-full bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover p-[1.5px]">
                   <Image
                     alt="Avatar"
-                    src={userData?.image_url ?? defaultAvatar}
+                    src={user?.image_url ?? defaultAvatar}
                     fill
-                    title={`${userData?.name}'s Avatar`}
+                    title={`${user?.first_name}'s Avatar`}
                     className="h-auto w-full rounded-full bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover"
                     loading="eager"
                   />
