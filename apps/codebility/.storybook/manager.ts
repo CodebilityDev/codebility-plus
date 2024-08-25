@@ -13,7 +13,7 @@ addons.setConfig({
     brandTitle: 'Codebility',
     brandUrl: 'https://staging.codebility.tech/',
     brandImage: '/assets/images/codebility.png',
-    brandTarget: '_self',
+    brandTarget: '_blank',
 
     colorPrimary: '#585C6D',
     colorSecondary: '#9747FF',
