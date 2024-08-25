@@ -3,9 +3,40 @@
 import { createServer } from "@/utils/supabase";
 import { revalidatePath } from "next/cache";
 
+export const uploadImage = async (file: File | null, folderName: string, bucketName: string) => {
+    if (!file) {
+        console.error('No file provided for upload');
+        return null;
+    }
+
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    
+    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+    const extension = file.name.split('.').pop();
+    const filename = `${timestamp}.${extension}`;
+
+    const supabase = await createServer();
+
+    const { data, error } = await supabase
+        .storage
+        .from(bucketName)
+        .upload(`${folderName}/${filename}`, buffer, {
+            contentType: file.type,
+        });
+
+    if (error) {
+        console.error(`Failed to upload ${file.name}:`, error.message);
+        return null;
+    }
+    return data.path;
+};
+
 export const services = async () => {
     const supabase = createServer();
-    const { data, error } = await supabase.from("services").select("*");
+    const { data, error } = await supabase
+        .from("services")
+        .select("*");
 
     if (error) {
         console.error("Error fetching services:", error.message);
@@ -17,7 +48,11 @@ export const services = async () => {
 
 export const getServiceById = async (serviceId: string) => {
     const supabase = await createServer();
-    const { data, error } = await supabase.from("services").select("*").eq("id", serviceId).single();
+    const { data, error } = await supabase
+        .from("services")
+        .select("*")
+        .eq("id", serviceId)
+        .single();
 
     if (error) {
         console.log("Error getting service: ", error.message);
@@ -31,21 +66,42 @@ export const createServices = async (formData: FormData) => {
     const name = formData.get("name") as string;
     const category = formData.get("category") as string;
     const description = formData.get("description") as string;
-    const main_image = formData.get("mainImage") as string;
-    const picture_1 = formData.get("picture1") as string;
-    const picture_2 = formData.get("picture2") as string;
-    const user_id = formData.get("userId") as string;
+    const mainImage = formData.get("mainImage") as File | null;
+    const picture1 = formData.get("picture1") as File | null;
+    const picture2 = formData.get("picture2") as File | null;
+    const userId = formData.get("userId") as string;
 
     const supabase = await createServer();
-    const { data, error } = await supabase.from("services").insert({ name, description, category, main_image, picture_1, picture_2, user_id }).single();
 
-    if (error) {
-        console.log("Error creating services: ", error.message);
-        return { success: false, error: error.message };
+    const mainImagePath = await uploadImage(mainImage, "public", "services-image");
+    const picture1Path = await uploadImage(picture1, "public", "services-image");
+    const picture2Path = await uploadImage(picture2, "public", "services-image");
+
+    if (!mainImagePath || !picture1Path || !picture2Path) {
+        console.error('One or more file uploads failed');
+        return { success: false, error: 'File upload failed' };
+    }
+
+    const { data: servicesData, error: servicesError } = await supabase
+        .from("services")
+        .insert({
+            name,
+            description,
+            category,
+            main_image: mainImagePath,
+            picture_1: picture1Path,
+            picture_2: picture2Path,
+            user_id: userId
+        })
+        .single();
+
+    if (servicesError) {
+        console.error("Error creating services:", servicesError.message);
+        return { success: false, error: servicesError.message };
     }
 
     revalidatePath("/");
-    return { success: true, data };
+    return { success: true, servicesData };
 };
 
 export const deleteService = async (formData: FormData) => {
