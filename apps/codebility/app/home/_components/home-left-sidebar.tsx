@@ -52,7 +52,7 @@ const LeftSidebar = () => {
               {item.links.map((link) => {
                 const allowedRoutes = ["settings", "orgchart", ...user.permissions];
                 const accessRoutes = allowedRoutes.includes(link.permission);
-                const isActive = (pathname.includes(link.route) && link.route.length > 1) || pathname === link.route
+                const isActive = pathname === link.route
 
                 if (accessRoutes) {
                   return (
