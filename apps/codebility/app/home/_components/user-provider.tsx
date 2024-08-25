@@ -7,6 +7,7 @@ export interface User {
     last_name: string;
     email: string;
     main_position: string;
+    image_url: string;
     permissions: string[];
 }
 
