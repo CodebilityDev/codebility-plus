@@ -1,23 +1,22 @@
 "use client"
 
-import React from "react";
-import { Formik, Field, Form, ErrorMessage } from "formik";
+import { ChangeEvent } from "react";
+import { Formik, Field, Form, ErrorMessage, FormikHelpers } from "formik";
 import toast from "react-hot-toast";
 import H1 from "@/Components/shared/dashboard/H1";
 import { useRouter } from "next/navigation";
 import { createServices, updateService } from "../action";
 import * as Yup from "yup";
 import { service_FormValuesT } from "@/types/protectedroutes";
-import ImageUploader from "./image-uploader";
 import InputLabel from "./input-label";
 
 const validationSchema = Yup.object({
   name: Yup.string().required("Name is Required"),
   category: Yup.string().required("Category is Required"),
   description: Yup.string().required("Description is Required"),
-  mainImage: Yup.mixed().optional(),
-  picture1: Yup.mixed().optional(),
-  picture2: Yup.mixed().optional(),
+  mainImage: Yup.mixed().required("Main Image is Required"),
+  picture1: Yup.mixed().required("Picture 1 is Required"),
+  picture2: Yup.mixed().required("Picture 2 is Required"),
 });
 
 const ServiceForm = ({ userId, service }: { userId?: string | null, service?: service_FormValuesT }) => {
@@ -32,17 +31,25 @@ const ServiceForm = ({ userId, service }: { userId?: string | null, service?: se
     picture2: service?.picture2 || null,
   };
 
-  const handleSubmit = async (values: any, actions: any) => {
+  const handleFileChange = (event: ChangeEvent<HTMLInputElement>, setFieldValue: (field: string, value: any) => void, fieldName: string) => {
+    const file = event.target.files?.[0];
+    setFieldValue(fieldName, file);
+  };
+
+  const handleSubmit = async (
+    values: service_FormValuesT,
+    actions: FormikHelpers<service_FormValuesT>
+  ) => {
     if (!userId) return;
 
-    try {
+    try { 
       const formData = new FormData();
       formData.append("name", values.name);
       formData.append("category", values.category);
       formData.append("description", values.description);
-      if (values.mainImage) formData.append("mainImage", values.mainImage);
-      if (values.picture1) formData.append("picture1", values.picture1);
-      if (values.picture2) formData.append("picture2", values.picture2);
+      if (values.mainImage) formData.append("mainImage", values.mainImage as File);
+      if (values.picture1) formData.append("picture1", values.picture1 as File);
+      if (values.picture2) formData.append("picture2", values.picture2 as File);
       formData.append("userId", userId);
 
       let response;
@@ -70,7 +77,7 @@ const ServiceForm = ({ userId, service }: { userId?: string | null, service?: se
 
   return (
     <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
-      {({ isSubmitting }) => (
+      {({ isSubmitting, setFieldValue }) => (
         <Form className="max-w-screen-xl mx-auto flex w-full flex-col gap-16">
           <div className="flex justify-between">
             <H1>{service?.id ? "Update Service" : "Add New Service"}</H1>
@@ -135,19 +142,31 @@ const ServiceForm = ({ userId, service }: { userId?: string | null, service?: se
               </div>
             </div>
             <div className="flex flex-1 flex-col gap-4 text-black-100 dark:text-white">
-              <div>
-                <InputLabel htmlFor="mainImage">Main Image</InputLabel>
-                <ImageUploader name="mainImage" />
+              <div className="flex flex-col">
+                <InputLabel htmlFor="mainImage" required>Main Image</InputLabel>
+                <input
+                  type="file"
+                  name="mainImage"
+                  onChange={(event) => handleFileChange(event, setFieldValue, "mainImage")}
+                />
                 <ErrorMessage name="mainImage" component="div" className="text-[#FF4242]" />
               </div>
-              <div>
-                <InputLabel htmlFor="picture1">Picture 1</InputLabel>
-                <ImageUploader name="picture1" />
+              <div className="flex flex-col">
+                <InputLabel htmlFor="picture1" required>Picture 1</InputLabel>
+                <input
+                  type="file"
+                  name="picture1"
+                  onChange={(event) => handleFileChange(event, setFieldValue, "picture1")}
+                />
                 <ErrorMessage name="picture1" component="div" className="text-[#FF4242]" />
               </div>
-              <div>
-                <InputLabel htmlFor="picture2">Picture 2</InputLabel>
-                <ImageUploader name="picture2" />
+              <div className="flex flex-col">
+                <InputLabel htmlFor="picture2" required>Picture 2</InputLabel>
+                <input
+                  type="file"
+                  name="picture2"
+                  onChange={(event) => handleFileChange(event, setFieldValue, "picture2")}
+                />
                 <ErrorMessage name="picture2" component="div" className="text-[#FF4242]" />
               </div>
             </div>
