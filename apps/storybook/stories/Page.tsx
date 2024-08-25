@@ -2,6 +2,7 @@ import React from 'react';
 
 import { Header } from './Header';
 import './page.css';
+import { Button } from '@codevs/ui/button';
 
 type User = {
   name: string;
@@ -21,6 +22,7 @@ export const Page: React.FC = () => {
 
       <section className="storybook-page">
         <h2>Pages in Storybook</h2>
+        <Button className="bg-red-500">ShadCN</Button>
         <p>
           We recommend building UIs with a{' '}
           <a href="https://componentdriven.org" target="_blank" rel="noopener noreferrer">
