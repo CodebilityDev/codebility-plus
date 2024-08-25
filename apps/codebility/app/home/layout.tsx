@@ -1,6 +1,6 @@
 import "server-only"
 import LeftSidebar from "@/Components/shared/dashboard/LeftSidebar"
-import Navbar from "@/Components/shared/dashboard/Navbar"
+import Navbar from "./_components/home-navbar"
 import React from "react"
 import ReactQueryProvider from "@/hooks/reactQuery"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
@@ -36,13 +36,14 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
 
   const permissionNames = Object.keys(data?.user_type || {});
   const permissions = permissionNames.filter(permissionName => data.user_type[permissionName]);
-  const { first_name, last_name, main_position } = data.profile;
+  const { first_name, last_name, main_position, image_url } = data.profile;
 
   const userData = {
     first_name,
     last_name,
     email: data.email,
     main_position,
+    image_url,
     permissions
   };
 
