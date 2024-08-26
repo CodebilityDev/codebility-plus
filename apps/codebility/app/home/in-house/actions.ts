@@ -1,11 +1,10 @@
 "use server";
 
-import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
 import { Codev } from '@/types/home/codev';
-import { cookies } from "next/headers";
+import { getSupabaseServerActionClient } from '@codevs/supabase/server-actions-client';
 
 export const updateCodev = async (key: keyof Codev, value: any, {codevId, userId}: {codevId: string, userId: string}) => {
-    const supabase = createServerActionClient({cookies});
+    const supabase = getSupabaseServerActionClient();
     const keys = {
         project: ["projects"],
         codev: ["internal_status","nda_status"],
