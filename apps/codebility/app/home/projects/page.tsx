@@ -1,4 +1,3 @@
-"use client";
 
 import { useRouter } from "next/navigation"
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
@@ -12,47 +11,45 @@ import H1 from "@/Components/shared/dashboard/H1"
 import { getProjects } from "@/app/api/projectsV2"
 import { useModal } from "@/hooks/use-modal-projects"
 
-const Projects = () => {
-  const { data: authData } = useAuthCookie();
-  const { userType } = authData || {};
+const Projects = async () => {
 
-  const { onOpen } = useModal();
-  const router = useRouter();
+  const Projects = await getProjects()
+  // const { data: authData } = useAuthCookie()
+  // const { userType } = authData || {}
 
-  const {
-    data: Projects,
-    isLoading: LoadingProjects,
-    error: ErrorProjects,
-  }: UseQueryResult<ProjectT[]> = useQuery({
-    queryKey: ["projects"],
-    queryFn: async () => {
-      return await getProjects();
-    },
-    refetchInterval: 3000,
-  });
+  // const { onOpen } = useModal()
+  // const router = useRouter()
 
-  if (LoadingProjects) {
-    return <Loading />;
-  }
+  // const {
+  //   data: Projects,
+  //   isLoading: LoadingProjects,
+  //   error: ErrorProjects,
+  // }: UseQueryResult<ProjectT[]> = useQuery({
+  //   queryKey: ["projects"],
+  //   queryFn: async () => {
+  //     return await getProjects()
+  //   },
+  //   refetchInterval: 3000,
+  // })
 
-  if (ErrorProjects) return;
+  // if (LoadingProjects) {
+  //   return <Loading />
+  // }
 
-  if (userType?.projects === false) return router.push("/404");
+  // if (ErrorProjects) return
+
+  // if (userType?.projects === false) return router.push("/404")
 
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row justify-between gap-4">
         <H1>Projects</H1>
         <div className="flex items-center gap-4">
-          {userType?.name === "ADMIN" && (
-            <Button
-              variant="default"
-              className="items-center"
-              onClick={() => onOpen("projectAddModal")}
-            >
+          {/* {userType?.name === "ADMIN" && (
+            <Button variant="default" className="items-center" onClick={() => onOpen("projectAddModal")}>
               Add New Project
             </Button>
-          )}
+          )} */}
         </div>
       </div>
       {Projects && Projects.length > 0 && (

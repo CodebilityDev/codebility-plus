@@ -1,14 +1,17 @@
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/Components/ui/button";
-import DefaultPagination from "@/Components/ui/pagination";
-import { pageSize } from "@/constants";
-import { useModal } from "@/hooks/use-modal-projects";
-import usePagination from "@/hooks/use-pagination";
-import { defaultAvatar } from "@/public/assets/images";
-import { IconGithub, IconLink } from "@/public/assets/svgs";
-import { ProjectT } from "@/types/index";
+"use client"
+
+import React from "react"
+import Link from "next/link"
+import Image from "next/image"
+
+import { pageSize } from "@/constants"
+import { Button } from "@/Components/ui/button"
+import usePagination from "@/hooks/use-pagination"
+import { ProjectT } from "@/types/index"
+import { useModal } from "@/hooks/use-modal-projects"
+import DefaultPagination from "@/Components/ui/pagination"
+import { IconLink, IconGithub } from "@/public/assets/svgs"
+import { defaultAvatar } from "@/public/assets/images"
 
 const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
   const { onOpen } = useModal();
