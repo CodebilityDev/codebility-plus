@@ -37,6 +37,9 @@ importers:
 
   apps/codebility:
     dependencies:
+      '@codevs/supabase':
+        specifier: workspace:*
+        version: link:../../packages/supabase
       '@codevs/ui':
         specifier: workspace:*
         version: link:../../packages/ui
