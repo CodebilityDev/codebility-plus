@@ -2,7 +2,6 @@ import type { Meta, StoryObj } from '@storybook/react'
 import { fn } from 'storybook/test'
 import { action } from '@storybook/addon-actions'
 import { Button } from '@codevs/ui/button'
-// import { IoAddCircle } from 'react-icons/io5'
 
 const meta = {
   title: 'ShadCN-Atomic/Button',
