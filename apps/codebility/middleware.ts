@@ -31,21 +31,21 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
 
-  // handle patterns for specific routes
-  const handlePattern = matchUrlPattern(req.url);
+  // // handle patterns for specific routes
+  // const handlePattern = matchUrlPattern(req.url);
 
-  // if a pattern handler exists, call it
-  if (handlePattern) {
-    const patternHandlerResponse = await handlePattern(req, new NextResponse());
+  // // if a pattern handler exists, call it
+  // if (handlePattern) {
+  //   const patternHandlerResponse = await handlePattern(req, new NextResponse());
 
-    // if a pattern handler returns a response, return it
-    if (patternHandlerResponse) {
-      return patternHandlerResponse;
-    }
-  }
+  //   // if a pattern handler returns a response, return it
+  //   if (patternHandlerResponse) {
+  //     return patternHandlerResponse;
+  //   }
+  // }
 
   return res;
- 
+
 }
 
 /**
