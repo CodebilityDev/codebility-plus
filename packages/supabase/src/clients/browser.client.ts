@@ -1,4 +1,4 @@
-import { createBrowserClient } from '@supabase/ssr';
+import { createClient } from "@supabase/supabase-js";
 
 import { getSupabaseClientKeys } from '../get-supabase-client-keys';
 
@@ -9,5 +9,5 @@ import { getSupabaseClientKeys } from '../get-supabase-client-keys';
 export function getSupabaseBrowserClient() {
   const keys = getSupabaseClientKeys();
 
-  return createBrowserClient(keys.url, keys.anonKey);
+  return createClient(keys.url, keys.anonKey);
 }
