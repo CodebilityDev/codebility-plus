@@ -1,9 +1,6 @@
-// import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse, URLPattern } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { isAuthenticated } from "@/lib/tokenVerification"
-import { jwtDecode } from "jwt-decode"
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { createMiddlewareClient } from "@codevs/supabase/middleware-client"
 import pathsConfig from './config/paths.config';
 
 export const config = {
