@@ -1,7 +1,6 @@
 "use server";
 
-import { cookies } from "next/headers";
-import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { ManageProfileData } from "~/lib/profile-data";
 
 type Case = 'snake' | 'camel';
@@ -63,7 +62,7 @@ function transformPropertyNameCase(target: Record<string, any>, { from, to }: { 
 }
 
 export async function updateBuilderProfileData(cardId: string,data: ManageProfileData) {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
     const newData = transformPropertyNameCase(data, {
         from: "camel",
@@ -78,7 +77,7 @@ export async function updateBuilderProfileData(cardId: string,data: ManageProfil
 }
 
 export async function getCardById(cardId: string, userId: string) {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
     const { data, error } = await supabase
     .from('cards')
     .select(
@@ -98,7 +97,7 @@ export async function getCardById(cardId: string, userId: string) {
 }
 
 export async function getBuilderProfileData(cardId: string) {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
     const { data, error } = await supabase.from('builder_profile_data')
     .select(`
@@ -121,7 +120,7 @@ export async function getBuilderProfileData(cardId: string) {
 }
 
 export async function publishProfile(usernameURL: string, profileKey: string, cardId: string) {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
     const { data, error: fetchingCardError} = await supabase.from("cards")
     .select()
