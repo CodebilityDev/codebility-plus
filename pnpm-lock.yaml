@@ -652,12 +652,18 @@ importers:
 
   packages/supabase:
     devDependencies:
+      '@codevs/tsconfig':
+        specifier: workspace:*
+        version: link:../../tooling/typescript
       '@supabase/ssr':
         specifier: ^0.5.0
         version: 0.5.0(@supabase/supabase-js@2.45.1)
       '@supabase/supabase-js':
         specifier: ^2.45.1
         version: 2.45.1
+      zod:
+        specifier: ^3.23.8
+        version: 3.23.8
 
   packages/ui:
     dependencies:
