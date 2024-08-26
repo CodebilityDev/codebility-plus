@@ -1,7 +1,7 @@
 "use server";
 
 import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
-import { Codev } from "./_types/codev"
+import { Codev } from '@/types/home/codev';
 import { cookies } from "next/headers";
 
 export const updateCodev = async (key: keyof Codev, value: any, {codevId, userId}: {codevId: string, userId: string}) => {
