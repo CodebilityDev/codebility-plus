@@ -2,8 +2,8 @@ import axios from "axios"
 import { ProjectT } from "@/types"
 import { API } from "@/lib/constants"
 import { NextResponse } from "next/server"
-import { supabase } from '@/lib/supabaseClient'
 
+import { createClient } from "@/utils/supabase/server";
 /* 
 
  ____            _           _            _    ____ ___ 
@@ -33,6 +33,10 @@ import { supabase } from '@/lib/supabaseClient'
 // Fetch all projects from Supabase
 export const getProjects = async () => {
   try {
+
+    const supabase = createClient();
+
+
     const { data, error } = await supabase
       .from('projects')
       .select('*')
