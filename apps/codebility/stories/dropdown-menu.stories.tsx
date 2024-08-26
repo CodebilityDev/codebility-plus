@@ -106,9 +106,9 @@ export const Default: Story = {
     );
   },
   args: {
-    open: false, // Initial state
+    open: false,
     onClose: action('onClose'),
     children: 'Dropdown menu content',
-    className: 'p-2 shadow-lg rounded-md', // Example of a default style
+    className: 'p-2 shadow-lg rounded-md',
   },
 };
