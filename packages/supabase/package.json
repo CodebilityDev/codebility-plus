@@ -9,20 +9,20 @@
   },
   "exports": {
     "./server-actions-client": {
-      "types": "./dist/src/clients/server-actions.client.d.ts",
-      "default": "./dist/src/clients/server-actions.client.js"
+      "types": "./dist/clients/server-actions.client.d.ts",
+      "default": "./dist/clients/server-actions.client.js"
     },
     "./server-component-client": {
-      "types": "./dist/src/clients/server-component.client.d.ts",
-      "default": "./dist/src/clients/server-component.client.js"
+      "types": "./dist/clients/server-component.client.d.ts",
+      "default": "./dist/clients/server-component.client.js"
     },
     "./browser-client": {
-      "types": "./dist/src/clients/browser.client.d.ts",
-      "default": "./dist/src/clients/browser.client.js"
+      "types": "./dist/clients/browser.client.d.ts",
+      "default": "./dist/clients/browser.client.js"
     },
     "./middleware-client": {
-      "types": "./dist/src/clients/middleware.client.d.ts",
-      "default": "./dist/src/clients/middleware.client.js"
+      "types": "./dist/clients/middleware.client.d.ts",
+      "default": "./dist/clients/middleware.client.js"
     }
   },
   "devDependencies": {
