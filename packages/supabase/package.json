@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "clean": "rm -rf node_modules"
+    "clean": "rm -rf node_modules",
+    "dev": "tsc",
+    "build": "tsc"
   },
   "exports": {
     "./server-actions-client": "./src/clients/server-actions.client.ts",
