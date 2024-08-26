@@ -1,8 +1,8 @@
 {
-  "extends": "@codevs/tsconfig/base.json",
+  "extends": "@codevs/tsconfig/internal-package.json",
   "compilerOptions": {
     "tsBuildInfoFile": "node_modules/.cache/tsbuildinfo.json"
   },
-  "include": ["*.ts", "src"],
+  "include": ["src"],
   "exclude": ["node_modules"]
 }
