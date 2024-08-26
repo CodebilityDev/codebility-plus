@@ -8,7 +8,8 @@
   "exports": {
     "./server-actions-client": "./src/clients/server-actions.client.ts",
     "./server-component-client": "./src/clients/server-component.client.ts",
-    "./browser-client": "./src/clients/browser.client.ts"
+    "./browser-client": "./src/clients/browser.client.ts",
+    "./middleware-client": "./src/clients/middleware.client.ts"
   },
   "devDependencies": {
     "@codevs/tsconfig": "workspace:*",
