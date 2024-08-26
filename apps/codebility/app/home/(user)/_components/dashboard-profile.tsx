@@ -3,11 +3,10 @@ import Badges from "@/Components/shared/Badges"
 import Box from "@/Components/shared/dashboard/Box"
 import { defaultAvatar } from "@/public/assets/images"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 export default async function DashboardProfile() {
-  const supabase = createServerComponentClient( { cookies } );
+  const supabase = getSupabaseServerComponentClient();
   const { data: { user }} = await supabase.auth.getUser();
   const { data: userData } = await supabase.from("profile")
   .select("first_name, image_url, main_position")
