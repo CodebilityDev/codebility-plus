@@ -31,59 +31,21 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
 
-  // handle patterns for specific routes
-  const handlePattern = matchUrlPattern(req.url);
+  // // handle patterns for specific routes
+  // const handlePattern = matchUrlPattern(req.url);
 
-  // if a pattern handler exists, call it
-  if (handlePattern) {
-    const patternHandlerResponse = await handlePattern(req, new NextResponse());
+  // // if a pattern handler exists, call it
+  // if (handlePattern) {
+  //   const patternHandlerResponse = await handlePattern(req, new NextResponse());
 
-    // if a pattern handler returns a response, return it
-    if (patternHandlerResponse) {
-      return patternHandlerResponse;
-    }
-  }
+  //   // if a pattern handler returns a response, return it
+  //   if (patternHandlerResponse) {
+  //     return patternHandlerResponse;
+  //   }
+  // }
 
   return res;
 
-  ///////// OLD CODEBILITY MIDDLEWARE //////////// - uncomment this and comment the above code if using old be.
-/*   const { nextUrl, cookies } = req
-  if (!cookies.has("codebility-auth")) {
-    return NextResponse.redirect(new URL("/auth/signin", req.url))
-  }
-  if (nextUrl.pathname === "/auth/signout") {
-    const response = NextResponse.redirect(new URL("/auth/signin", req.url))
-    response.cookies.delete("codebility-auth")
-    return response
-  }
-  if (cookies.has("codebility-auth")) {
-    const result = await isAuthenticated(req)
-    if (!result) {
-      const response = NextResponse.redirect(new URL("/auth/signin", req.url))
-      response.cookies.delete("codebility-auth")
-      return response
-    }
-    const decoded: any = jwtDecode(cookies.get("codebility-auth")?.value as string)
-    if (decoded && decoded.userType.name === "APPLICANT") {
-      const response = NextResponse.redirect(new URL("/waiting", req.url))
-      return response
-    }
-    const applicantUrl = req.url.split("/")
-    if (applicantUrl[applicantUrl.length - 1] === "applicants" && decoded && decoded.userType.name !== "ADMIN") {
-      const response = NextResponse.redirect(new URL("/dashboard", req.url))
-      return response
-    }
-    const internsUrl = req.url.split("/")
-    if (internsUrl[internsUrl.length - 1] === "interns" && decoded && decoded.userType.name !== "ADMIN") {
-      const response = NextResponse.redirect(new URL("/dashboard", req.url))
-      return response
-    }
-    const inhouseUrl = req.url.split("/") 
-    if(inhouseUrl[inhouseUrl.length - 1]  === "in-house" && decoded && decoded.userType.name !== "ADMIN"){
-      const response = NextResponse.redirect(new URL("/dashboard", req.url))
-      return response
-    }
-  } */
 }
 
 /**
