@@ -14,7 +14,7 @@ interface TopNotcher {
 
 export default async function WeeklyTop() {
   const supabase = getSupabaseServerComponentClient();
-  const { data, error } = await supabase.rpc("get_weekly_top_codevs");
+  const { data, error } = await supabase.rpc("get_weekly_top_codevs");  
   return (
     <Box>
       <div className="flex flex-col gap-6">
@@ -32,6 +32,17 @@ export default async function WeeklyTop() {
             {
               data.map(({ id, first_name, main_position, level }: TopNotcher, index: number) => {
                 const placement = index + 1;
+
+                const AbbreviationMap = {
+                  "Fullstack Developer": "FS",
+                  "Front End Developer": "FE",
+                  "Back End Developer": "BE",
+                  "Mobile Developer": "M",
+                  "Admin": "AD",
+                }
+
+                const role = AbbreviationMap[main_position as keyof typeof AbbreviationMap] || main_position;
+
                 return <TableRow
                   key={id}
                   className={`grid grid-cols-3 gap-3 md:grid-cols-4 ${
@@ -58,7 +69,7 @@ export default async function WeeklyTop() {
                     <p className="capitalize">{first_name}</p>
                   </TableCell>
                   <TableCell className="text-center">
-                    <p>{main_position}</p>
+                    <p>{role}</p>
                   </TableCell>
                   <TableCell className="hidden text-center md:block">
                     <p>{level}</p>
