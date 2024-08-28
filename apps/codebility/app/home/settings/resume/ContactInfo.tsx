@@ -1,10 +1,8 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useForm } from "react-hook-form"
 
-import { User } from "@/types"
-import useToken from "@/hooks/use-token"
-import { updateProfile } from "@/app/api/resume"
+
 import { Button } from "@/Components/ui/button"
 import { IconEdit } from "@/public/assets/svgs"
 import Box from "@/Components/shared/dashboard/Box"
@@ -13,62 +11,110 @@ import InputPhone from "@/Components/shared/dashboard/InputPhone"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { contactInfoValidation, contactInfoValidationSchema } from "@/lib/validations/resumeSettings"
 import { Input } from "@codevs/ui/input"
+import { useQuery } from "@tanstack/react-query"
+import { getProfile, updateProfile } from "./action"
 
-const ContactInfo = ({ user }: { user: User }) => {
+type ContactInfo = {
+  phone_no: string
+  portfolio_website: string
+  github_link: string
+  linkedin_link: string
+  fb_link: string
+  telegram_link: string
+  whatsapp_link: string
+  skype_link: string
+}
+const ContactInfo = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const {
-    id,
-    phone_no,
-    portfolio_website,
-    github_link,
-    linkedin_link,
-    fb_link,
-    telegram_link,
-    whatsapp_link,
-    skype_link,
-  } = user
-  const { token } = useToken()
-
+ 
+  const { data: profile,  isError: profileLoading } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const { data, error } = await getProfile()
+      if (error) throw error;
+      return data;
+    },
+  });
+ 
   const {
     register,
     handleSubmit,
     reset,
     control,
     formState: { errors },
-  } = useForm<contactInfoValidationSchema>({
+  } = useForm({
     defaultValues: {
-      phone_no: phone_no || undefined,
-      portfolio_website: portfolio_website || undefined,
-      github_link: github_link || undefined,
-      linkedin_link: linkedin_link || undefined,
-      fb_link: fb_link || undefined,
-      telegram_link: telegram_link || undefined,
-      whatsapp_link: whatsapp_link || undefined,
-      skype_link: skype_link || undefined,
+      phone_no: "" || undefined,
+      portfolio_website: "" || undefined,
+      github_link: "" || undefined,
+      linkedin_link: "" || undefined,
+      fb_link: ""|| undefined,
+      telegram_link: "" || undefined,
+      whatsapp_link: "" || undefined,
+      skype_link: "" || undefined,
     },
-    resolver: zodResolver(contactInfoValidation),
+   
   })
+  // const {
+  //   register,
+  //   handleSubmit,
+  //   reset,
+  //   control,
+  //   formState: { errors },
+  // } = useForm<contactInfoValidationSchema>({
+  //   defaultValues: {
+  //     phone_no: "" || undefined,
+  //     portfolio_website: "" || undefined,
+  //     github_link: "" || undefined,
+  //     linkedin_link: "" || undefined,
+  //     fb_link: ""|| undefined,
+  //     telegram_link: "" || undefined,
+  //     whatsapp_link: "" || undefined,
+  //     skype_link: "" || undefined,
+  //   },
+  //   resolver: zodResolver(contactInfoValidation),
+  // })
+
+  useEffect(() => {
+    if (profile) {
+      reset({
+        phone_no: profile.phone_no || "",
+        portfolio_website: profile.portfolio_website || "",
+        github_link: profile.github_link || "",
+        linkedin_link: profile.linkedin_link || "",
+        fb_link: profile. fb_link || "",
+        telegram_link: profile.telegram_link || "",
+        whatsapp_link: profile.whatsapp_link || "",
+        skype_link: profile.skype_link || ""
+      })
+    }
+  }, [profile, reset])
 
   const onSubmit = async (data: any) => {
-    setIsLoading(true)
     try {
-      const updatedData = { ...data }
-      await updateProfile(id, updatedData, token).then((response) => {
-        if (response) {
-          toast.success("Successfully Updated!")
-          reset(updatedData)
-          setIsEditMode(false)
-        } else if (!response) {
-          toast.error(response.statusText)
-        }
-      })
-    } catch (e) {
-      toast.error("Something went wrong!")
+      setIsLoading(true)
+      const {
+        phone_no,
+        portfolio_website,
+        github_link,
+        linkedin_link,
+        fb_link,
+        telegram_link,
+        whatsapp_link,
+        skype_link
+      } = data;
+      await updateProfile({phone_no, portfolio_website, github_link, linkedin_link, fb_link, telegram_link, whatsapp_link, skype_link})
+      toast.success("Your contact info was sucessfully updated!")
+      setIsEditMode(false)
+    } catch(error){
+      console.log(error)
+      toast.error("Something went wrong, Please try again later!")
     } finally {
       setIsLoading(false)
     }
   }
+ 
 
   const handleEditClick = () => {
     setIsEditMode(!isEditMode)
@@ -100,7 +146,7 @@ const ContactInfo = ({ user }: { user: User }) => {
                 : " bg-white  text-dark-200 dark:bg-dark-200 dark:text-gray"
             }`}
           />
-          {errors.phone_no?.message && <p className="ml-24 mt-2 text-sm text-red-400">{errors.phone_no?.message}</p>}
+          {/* {errors.phone_no?.message && <p className="ml-24 mt-2 text-sm text-red-400">{errors.phone_no?.message}</p>} */}
           <Input
             id="portfolio_website"
             {...register("portfolio_website")}
@@ -110,9 +156,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.portfolio_website?.message && (
+          {/* {errors.portfolio_website?.message && (
             <p className="ml-24 mt-2 text-sm text-red-400">{errors.portfolio_website?.message}</p>
-          )}
+          )} */}
           <Input
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
@@ -122,9 +168,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             label="Github"
             disabled={!isEditMode}
           />
-          {errors.github_link?.message && (
+          {/* {errors.github_link?.message && (
             <p className="ml-24 mt-2 text-sm text-red-400">{errors.github_link?.message}</p>
-          )}
+          )} */}
           <Input
             id="fb_link"
             {...register("fb_link")}
@@ -134,7 +180,7 @@ const ContactInfo = ({ user }: { user: User }) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.fb_link?.message && <p className="ml-24 mt-2 text-sm text-red-400">{errors.fb_link?.message}</p>}
+          {/* {errors.fb_link?.message && <p className="ml-24 mt-2 text-sm text-red-400">{errors.fb_link?.message}</p>} */}
           <Input
             id="linkedin_link"
             {...register("linkedin_link")}
@@ -144,9 +190,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.linkedin_link?.message && (
+          {/* {errors.linkedin_link?.message && (
             <p className="ml-24 mt-2 text-sm text-red-400">{errors.linkedin_link?.message}</p>
-          )}
+          )} */}
           <Input
             id="telegram_link"
             {...register("telegram_link")}
@@ -156,9 +202,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.telegram_link?.message && (
+          {/* {errors.telegram_link?.message && (
             <p className="ml-24 mt-2 text-sm text-red-400">{errors.telegram_link?.message}</p>
-          )}
+          )} */}
           <Input
             id="whatsapp_link"
             {...register("whatsapp_link")}
@@ -168,9 +214,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.whatsapp_link?.message && (
+          {/* {errors.whatsapp_link?.message && (
             <p className="ml-24 mt-2 text-sm text-red-400">{errors.whatsapp_link?.message}</p>
-          )}
+          )} */}
           <Input
             id="skype_link"
             {...register("skype_link")}
@@ -180,9 +226,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.skype_link?.message && (
+          {/* {errors.skype_link?.message && (
             <p className="ml-24 mt-2 text-sm text-red-400">{errors.skype_link?.message}</p>
-          )}
+          )} */}
         </div>
         {isEditMode ? (
           <div className="mt-4 flex justify-end gap-2">

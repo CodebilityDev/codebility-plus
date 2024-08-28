@@ -1,5 +1,6 @@
-import { useState } from "react"
-import toast from "react-hot-toast"
+
+import { useEffect, useState } from "react"
+// import toast from "react-hot-toast"
 import { useForm } from "react-hook-form"
 
 import {
@@ -11,65 +12,89 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select"
-import { User } from "@/types"
-import { updateProfile } from "@/app/api/resume"
-import useToken from "@/hooks/use-token"
+
+
 import { Label } from "@codevs/ui/label"
 import { Input } from "@codevs/ui/input"
 import { IconEdit } from "@/public/assets/svgs"
 import { Button } from "@/Components/ui/button"
 import Box from "@/Components/shared/dashboard/Box"
-import { positions, profilePronoun } from "@/constants"
 
-const PersonalInfo = ({ user }: { user: User }) => {
-  const [isEditMode, setIsEditMode] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const { id, pronoun, first_name, last_name, address, main_position } = user
-  const { token } = useToken()
 
-  const [selectedPronoun, setSelectedPronoun] = useState<string | null>(pronoun || null)
-  const [selectedPosition, setSelectedPosition] = useState<string | null>(main_position || null)
+import { getProfile, getPronouns, updateProfile } from "./action"
+import { useQuery } from "@tanstack/react-query"
+import toast from "react-hot-toast"
 
-  const {
-    register,
-    handleSubmit,
-    reset,
-    formState: {},
-  } = useForm({
-    defaultValues: {
-      pronoun: pronoun,
-      first_name: first_name,
-      last_name: last_name,
-      address: address,
-      main_position: main_position,
+
+
+interface PersonalInfo  {
+  id: string,
+  first_name: string;
+  last_name: string;
+  pronoun: string
+  main_position: string
+  address: string
+}
+
+const PersonalInfo = () => {
+const [isEditMode, setIsEditMode] = useState(false)
+const [isLoading, setIsLoading] = useState(false)
+const {register,handleSubmit, reset, setValue} = useForm<PersonalInfo>({defaultValues: {
+  first_name: "",
+  last_name: "",
+  pronoun: "",
+  main_position: "",
+  address: ""
+}})
+  const [selectedPronoun, setSelectedPronoun] = useState<string | null>(null)
+  const [selectedPosition, setSelectedPosition] = useState<string | null>(null)
+
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const { data, error } = await getProfile()
+      if (error) throw error;
+      return data;
     },
-  })
+  });
+  const { data: pronouns  } = useQuery({
+    queryKey: ["pronouns"],
+    queryFn: async () => {
+       await getPronouns()
+    },
+  });
 
-  const onSubmit = async (data: any) => {
+  useEffect(() => {
+    if (profile) {
+      reset({
+        first_name: profile.first_name || "",
+        last_name: profile.last_name || "",
+        address: profile.address || "",
+        pronoun: profile.pronoun || "",
+        main_position: profile.main_position || ""
+      })
+      setSelectedPronoun(profile.pronoun)
+      setSelectedPosition(profile.main_position)
+    }
+  }, [profile, reset])
+
+  const onSubmit = async (data: any)=> {
     try {
       setIsLoading(true)
-      const updatedData = { ...data, pronoun: selectedPronoun, main_position: selectedPosition }
-
-      await updateProfile(id, updatedData, token).then((response) => {
-        if (response) {
-          toast.success("Successfully Updated!")
-          reset(updatedData)
-          setIsEditMode(false)
-        } else if (!response) {
-          toast.error(response.statusText)
-        }
-      })
-    } catch (e) {
-      toast.error("Something went wrong!")
-    } finally {
+      const { first_name, last_name, address, pronoun, main_position } = data;
+      await updateProfile({first_name, last_name, address, pronoun, main_position})
+      toast.success("Your personal information was sucessfully updated!")
+      setIsEditMode(false)
+    } catch(error){
+      console.log(error)
+      toast.error("Your personal info was failed to update!")
+    } finally{
       setIsLoading(false)
     }
   }
-
   const handleEditClick = () => {
     setIsEditMode(!isEditMode)
   }
-
   const handleSaveClick = () => {
     setIsEditMode(false)
   }
@@ -81,9 +106,8 @@ const PersonalInfo = ({ user }: { user: User }) => {
         onClick={handleEditClick}
       />
       <p className="text-lg">Personal Information</p>
-
       <div className="flex flex-col gap-6 px-2">
-        <form onSubmit={handleSubmit(onSubmit)}>
+      <form onSubmit={handleSubmit(onSubmit)}>
           <div className="flex w-full flex-col justify-between pt-5">
             <Label className="text-md ">Pronoun</Label>
             <div className="flex flex-col gap-2 pt-2">
@@ -96,17 +120,17 @@ const PersonalInfo = ({ user }: { user: User }) => {
                       : "border-none bg-white text-dark-200  dark:bg-dark-200 dark:text-gray"
                   } h-11 w-full`}
                 >
-                  <SelectValue placeholder={pronoun ? pronoun : `Please select`}>{selectedPronoun}</SelectValue>
+                  <SelectValue placeholder={selectedPronoun  || `Please select`}>{selectedPronoun}</SelectValue>
                 </SelectTrigger>
 
                 <SelectContent className=" bg-white dark:bg-dark-200">
                   <SelectGroup>
                     <SelectLabel className="text-xs text-gray">Please select</SelectLabel>
-                    {profilePronoun.map((pronoun, i) => (
+                    {/* {profilePronoun.map((pronoun, i) => (
                       <SelectItem key={i} className="text-sm" value={pronoun}>
                         {pronoun}
                       </SelectItem>
-                    ))}
+                    ))} */}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -152,7 +176,7 @@ const PersonalInfo = ({ user }: { user: User }) => {
                     : "border-none bg-white text-dark-200  dark:bg-dark-200 dark:text-gray"
                 } h-11 w-full`}
               >
-                <SelectValue placeholder={main_position ? main_position : `Please select`}>
+                <SelectValue placeholder={selectedPosition || `Please select`}>
                   {selectedPosition}
                 </SelectValue>
               </SelectTrigger>
@@ -160,11 +184,11 @@ const PersonalInfo = ({ user }: { user: User }) => {
               <SelectContent className=" rounded-md">
                 <SelectGroup>
                   <SelectLabel className="">Please select</SelectLabel>
-                  {positions.map((position, i) => (
+                  {/* {positions.map((position, i) => (
                     <SelectItem key={i} className="text-sm" value={position}>
                       {position}
                     </SelectItem>
-                  ))}
+                  ))} */}
                 </SelectGroup>
               </SelectContent>
             </Select>

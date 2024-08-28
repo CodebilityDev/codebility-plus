@@ -1,22 +1,30 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useForm } from "react-hook-form"
 
-import { User } from "@/types"
-import useToken from "@/hooks/use-token"
-import { updateProfile } from "@/app/api/resume"
+
+
 import { Button } from "@/Components/ui/button"
 import { IconEdit } from "@/public/assets/svgs"
 import Box from "@/Components/shared/dashboard/Box"
 import { Textarea } from "@codevs/ui/textarea"
 import { Label } from "@codevs/ui/label"
+import { getProfile, updateProfile } from "./action"
+import { useQuery } from "@tanstack/react-query"
 
-const About = ({ user }: { user: User }) => {
+const About = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const { id, about_me } = user
-  const { token } = useToken()
-
+  
+  const { data: profile,  isError: profileLoading } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const { data, error } = await getProfile()
+      if (error) throw error;
+      return data;
+    },
+  });
+  
   const {
     register,
     handleSubmit,
@@ -24,25 +32,27 @@ const About = ({ user }: { user: User }) => {
     formState: {},
   } = useForm({
     defaultValues: {
-      about_me: about_me,
+      about_me: "",
     },
   })
+  useEffect(() => {
+    if (profile) {
+      reset({
+        about_me: profile.about_me || "",
+      })
+    }
+  }, [profile, reset])
 
   const onSubmit = async (data: any) => {
-    setIsLoading(true)
     try {
-      const updatedData = { ...data }
-      await updateProfile(id, updatedData, token).then((response) => {
-        if (response) {
-          toast.success("Successfully Updated!")
-          reset(updatedData)
-          setIsEditMode(false)
-        } else if (!response) {
-          toast.error(response.statusText)
-        }
-      })
-    } catch (e) {
-      toast.error("Something went wrong!")
+      setIsLoading(true)
+      const about_me =  data.about_me
+      await updateProfile({about_me})
+      toast.success("Your about was sucessfully updated!")
+      setIsEditMode(false)
+    } catch(error){
+      console.log(error)
+      toast.error("Something went wrong, Please try again later!")
     } finally {
       setIsLoading(false)
     }
@@ -78,7 +88,7 @@ const About = ({ user }: { user: User }) => {
                 placeholder="Write something about yourself..."
                 id="about_me"
                 {...register("about_me")}
-                disabled={!isEditMode}
+                disabled={!isEditMode || profileLoading}
                 className={` placeholder-${
                   !isEditMode ? "lightgray dark:placeholder-gray" : "black-100 dark:placeholder-gray-400"
                 }  ${
