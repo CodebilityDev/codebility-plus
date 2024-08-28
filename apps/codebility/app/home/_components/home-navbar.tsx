@@ -16,7 +16,7 @@ import {
 } from "@codevs/ui/dropdown-menu"
 import { defaultAvatar } from "@/public/assets/images"
 import { signOut } from "../../authv2/actions"
-import useUser from "../_hooks/useUser"
+import useUser from "../_hooks/use-user"
 
 export const menuItems = [{ href: "/settings", icon: IconProfile, label: "Settings" }]
 

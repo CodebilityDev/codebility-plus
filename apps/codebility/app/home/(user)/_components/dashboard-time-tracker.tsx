@@ -10,21 +10,35 @@ import { useQuery } from "@tanstack/react-query"
 import { dash_TimeTrackerT } from "@/types/protectedroutes"
 import { TaskT } from "@/types"
 import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
-import useUser from "../../_hooks/useUser";
+import useUser from "../../_hooks/use-user";
 import { formatToLocaleTime } from "@/lib/format-date-time";
+
+interface Task {
+  title: string;
+}
 
 export default function TimeTracker() {
   const user = useUser();
 
   const [selectedTask, setSelectedTask]: any = useState<TaskT | null>(null)
 
-  const { data: TrackerTask, isLoading: tasksLoading } = useQuery<dash_TimeTrackerT[]>({
+  const { data: TrackerTask, isLoading: tasksLoading } = useQuery<Task[]>({
     queryKey: ["Tasks", "Kanban"],
     queryFn: async () => {
       const supabase = getSupabaseBrowserClient();
-      const response = await supabase.from("task")
-      .select();
-      return [];
+      const { data, error} = await supabase.from("codev_task")
+      .select(
+        `
+          *,
+          task(title)
+        `
+      )
+      .eq("codev_id", user.codev_id);
+
+      if (error) throw error;
+      
+      const tasks = data.map(item => item.task);
+      return tasks;
     },
     refetchInterval: 3000,
   })
@@ -105,19 +119,17 @@ export default function TimeTracker() {
           <div className="flex w-full flex-col items-center gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
             <Select
               onValueChange={(value) => {
-                const task = TrackerTask?.find((t) => t.name === value)
+                const task = TrackerTask?.find((t) => t.title === value)
                 setSelectedTask(task as any)
               }}
             >
               <SelectTrigger className="max-w-[300px] text-center">
                 <SelectValue placeholder="Select Task" />
                 <SelectContent>
-                  {TrackerTask?.map((task: any) =>
-                    task.userTask.map(() => (
-                      <SelectItem className="items-center" key={task.id} value={task.title}>
-                        {task.title} - {task.duration}h - {task.task_points}pts
-                      </SelectItem>
-                    ))
+                  {TrackerTask?.map((task: any, index:number) =>
+                    <SelectItem className="items-center" key={index} value={task.title}>
+                        {task.title} - {0}h - {5}pts
+                    </SelectItem>
                   )}
                 </SelectContent>
               </SelectTrigger>
