@@ -30,7 +30,7 @@ export default function TimeTracker() {
       .select(
         `
           *,
-          task(title)
+          task(*)
         `
       )
       .eq("codev_id", user.codev_id);
@@ -128,7 +128,7 @@ export default function TimeTracker() {
                 <SelectContent>
                   {TrackerTask?.map((task: any, index:number) =>
                     <SelectItem className="items-center" key={index} value={task.title}>
-                        {task.title} - {0}h - {5}pts
+                        {task.title} - {task.duration && `${task.duration}h - `} {task.points}pts
                     </SelectItem>
                   )}
                 </SelectContent>
