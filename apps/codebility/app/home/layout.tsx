@@ -29,6 +29,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
     .select(`
       *,
       codev(
+        id,
         start_time,
         end_time
       ),
@@ -55,7 +56,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
     const permissions = permissionNames.filter(permissionName => data.user_type[permissionName]);
     const { first_name, last_name, main_position, image_url } = data.profile;
     const { start_time, end_time } = data.codev;
-  
+    
     userData = {
       id: data.id,
       codev_id: data.codev.id,
