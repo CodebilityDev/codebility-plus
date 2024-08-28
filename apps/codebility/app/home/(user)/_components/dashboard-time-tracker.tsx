@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react"
-import useAuth from "@/hooks/use-auth"
 import { Button } from "@/Components/ui/button"
 import { IconEdit } from "@/public/assets/svgs"
 import { Box } from "@/Components/shared/dashboard"
@@ -10,25 +9,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { useQuery } from "@tanstack/react-query"
 import { dash_TimeTrackerT } from "@/types/protectedroutes"
 import { TaskT } from "@/types"
-import { getTasks } from "@/app/api/kanban"
-import axios from "axios"
-import { API } from "@/lib/constants"
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
+import useUser from "../../_hooks/useUser";
 
 const TimeTracker = () => {
-  const { isLoading, userData } = useAuth()
+  const user = useUser();
 
-  const [userId, setUserId] = useState<string | null>(null)
   const [selectedTask, setSelectedTask]: any = useState<TaskT | null>(null)
-
-  useEffect(() => {
-    setUserId(userData?.id)
-  }, [userData?.id])
 
   const { data: TrackerTask, isLoading: tasksLoading } = useQuery<dash_TimeTrackerT[]>({
     queryKey: ["Tasks", "Kanban"],
     queryFn: async () => {
-      const response = await getTasks()
-      return response.filter((task: TaskT) => task.userTask.some((userTask) => userTask.id === userId))
+      const supabase = getSupabaseBrowserClient();
+      const response = await supabase.from("task")
+      .select();
+      return [];
     },
     refetchInterval: 3000,
   })
@@ -59,7 +54,7 @@ const TimeTracker = () => {
 
   const handleStartStopTimer = async () => {
     setIsTimerRunning(!isTimerRunning)
-    if (isTimerRunning && selectedTask && userId) {
+    if (isTimerRunning && selectedTask && user.id) {
       const taskDurationInSeconds = selectedTask?.duration * 3600
       const allowedTime = taskDurationInSeconds + 1800 // task duration + 30 minutes in seconds
       const userPoints = selectedTask.task_points
@@ -69,21 +64,22 @@ const TimeTracker = () => {
         finalPoints = Math.floor(userPoints / 2)
       }
 
-      await updateUserPoints(userId, finalPoints)
+/*       await updateUserPoints(user.id, finalPoints) */
     }
   }
 
-  const updateUserPoints = async (userId: string, points: number) => {
+/*   const updateUserPoints = async (user.id: string, points: number) => {
     try {
-      await axios.patch(`${API.USERS}/${userId}`, { total_points: { FE: points } })
+      await axios.patch(`${API.USERS}/${user.id}`, { total_points: { FE: points } })
     } catch (error) {
       console.error("Error updating user points:", error)
     }
   }
-
+ */
+console.log(user);
   return (
     <>
-      {!isLoading && !tasksLoading ? (
+      { !tasksLoading ? (
         <Box className="flex w-full flex-1 flex-col items-center gap-4">
           <div>
             <p className="text-2xl">Time Tracker</p>
@@ -92,9 +88,9 @@ const TimeTracker = () => {
           <div>
             <p className="text-md text-center text-gray">My Time Schedule</p>
             <div className="flex items-center gap-2">
-              {userData?.start_time && userData?.end_time ? (
+              {user?.start_time && user?.end_time ? (
                 <>
-                  <p className="text-md">{`${userData?.start_time} - ${userData?.end_time}`}</p>
+                  <p className="text-md">{`${user?.start_time} - ${user?.end_time}`}</p>
                   <Button variant="link">
                     <IconEdit className="invert dark:invert-0" />
                   </Button>
