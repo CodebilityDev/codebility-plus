@@ -3,10 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "clean": "rm -rf node_modules",
+    "dev": "tsc",
+    "build": "tsc"
   },
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "types": "./dist/index.ts",
+      "default": "./dist/index.js"
+    }
   },
   "license": "ISC",
   "dependencies": {

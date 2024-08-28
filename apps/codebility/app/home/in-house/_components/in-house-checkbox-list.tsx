@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { useQuery } from "@tanstack/react-query";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import { Project } from '@/types/home/codev'
 
 interface ICheckboxListProps {
@@ -17,7 +17,7 @@ export default function CheckboxList({ initialItems = [], handleChange, classNam
   const { data: projects_list, isLoading, isError } = useQuery<Project[]>({
     queryKey: ["projects_list"],
     queryFn: async () => {
-      const supabase = createClientComponentClient();
+      const supabase = getSupabaseBrowserClient();
       const { data, error } = await supabase.from("project")
       .select(); 
       if (error) throw error;

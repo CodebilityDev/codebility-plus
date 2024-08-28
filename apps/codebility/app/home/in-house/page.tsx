@@ -1,11 +1,10 @@
 import H1 from "@/Components/shared/dashboard/H1"
 import InHouseContainer from "./_components/in-house-container"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers";
-import { Codev, Project } from "@/types";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import { Codev, Project } from '@/types/home/codev'
 
 async function InHousePage() {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = getSupabaseServerComponentClient();
   const { data: codevs, error } = await supabase.from("codev")
   .select(`
     *,

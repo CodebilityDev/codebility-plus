@@ -14,6 +14,7 @@
   "dependencies": {
     "@codevs/mailers": "workspace:*",
     "@codevs/ui": "workspace:*",
+    "@codevs/supabase": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
     "lucide-react": "^0.427.0",
     "next": "14.2.5",
