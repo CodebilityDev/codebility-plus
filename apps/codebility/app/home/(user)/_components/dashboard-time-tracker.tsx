@@ -17,13 +17,17 @@ import { formatLocaleTime, formatTime } from "../_lib/util";
 
 interface Task {
   title: string;
+  duration: number;
+  points: number;
 }
 
 export default function TimeTracker() {
   const user = useUser();
-  const [selectedTask, setSelectedTask]: any = useState<TaskT | null>(null)
+  const [selectedTask, setSelectedTask]: any = useState<Task | null>(null)
   const { onOpen } = useModal();
   const { time, clearTime, addTime} = useSchedule();
+  const [isTimerRunning, setIsTimerRunning] = useState(false)
+  const [elapsedTime, setElapsedTime] = useState(0)
 
   const { data: TrackerTask, isLoading: tasksLoading } = useQuery<Task[]>({
     queryKey: ["Tasks", "Kanban"],
@@ -45,9 +49,6 @@ export default function TimeTracker() {
     },
     refetchInterval: 3000,
   })
-
-  const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [elapsedTime, setElapsedTime] = useState(0)
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null
@@ -123,13 +124,13 @@ export default function TimeTracker() {
             <Select
               onValueChange={(value) => {
                 const task = TrackerTask?.find((t) => t.title === value)
-                setSelectedTask(task as any)
+                setSelectedTask(task)
               }}
             >
               <SelectTrigger className="max-w-[300px] text-center">
                 <SelectValue placeholder="Select Task" />
                 <SelectContent>
-                  {TrackerTask?.map((task: any, index:number) =>
+                  {TrackerTask?.map((task: Task, index:number) =>
                     <SelectItem className="items-center" key={index} value={task.title}>
                         {task.title} - {task.duration && `${task.duration}h - `} {task.points}pts
                     </SelectItem>
