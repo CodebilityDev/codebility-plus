@@ -66,8 +66,8 @@ export default function TimeTracker() {
 
   useEffect(() => {
     addTime({
-      start_time: "",
-      end_time: ""
+      start_time: formatToLocaleTime(user.start_time).split(",")[1] as string,
+      end_time: formatToLocaleTime(user.end_time).split(",")[1] as string
     })
   }, [user.start_time, user.end_time]);
 
@@ -108,7 +108,7 @@ export default function TimeTracker() {
             <div className="flex items-center gap-2 justify-center">
               {user?.start_time && user?.end_time ? (
                 <>
-                  <p className="text-md">{`${formatLocaleTime(formatToLocaleTime(user.start_time).split(",")[1] as string)} - ${formatLocaleTime(formatToLocaleTime(user.end_time).split(",")[1] as string)}`}</p>
+                  <p className="text-md">{`${formatLocaleTime(time.start_time)} - ${formatLocaleTime(time.end_time)}`}</p>
                   <div>
                     <Button variant="link" onClick={() => onOpen("scheduleModal")}>
                       <IconEdit className="invert dark:invert-0" />
