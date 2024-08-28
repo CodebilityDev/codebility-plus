@@ -32,37 +32,7 @@ export const uploadImage = async (file: File | null, folderName: string, bucketN
     return data.path;
 };
 
-export const services = async () => {
-    const supabase = createServer();
-    const { data, error } = await supabase
-        .from("services")
-        .select("*");
-
-    if (error) {
-        console.error("Error fetching services:", error.message);
-        return null;
-    }
-
-    return data;
-};
-
-export const getServiceById = async (serviceId: string) => {
-    const supabase = await createServer();
-    const { data, error } = await supabase
-        .from("services")
-        .select("*")
-        .eq("id", serviceId)
-        .single();
-
-    if (error) {
-        console.log("Error getting service: ", error.message);
-        return { success: false, error: error.message };
-    }
-
-    return { success: true, data };
-}
-
-export const createServices = async (formData: FormData) => {
+export const createServiceAction = async (formData: FormData) => {
     const name = formData.get("name") as string;
     const category = formData.get("category") as string;
     const description = formData.get("description") as string;
@@ -104,7 +74,7 @@ export const createServices = async (formData: FormData) => {
     return { success: true, servicesData };
 };
 
-export const updateService = async (formData: FormData) => {
+export const updateServiceAction = async (formData: FormData) => {
     const id = formData.get("id") as string;
     const name = formData.get("name") as string;
     const category = formData.get("category") as string;
@@ -126,7 +96,7 @@ export const updateService = async (formData: FormData) => {
     return { success: true };
 };
 
-export const deleteService = async (formData: FormData) => {
+export const deleteServiceAction = async (formData: FormData) => {
     const id = formData.get("id") as string;
 
     const supabase = await createServer();
