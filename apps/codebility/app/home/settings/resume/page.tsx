@@ -68,10 +68,10 @@ const Resume = async () => {
         <H1>Resume Settings</H1>
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8">
-          <PersonalInfo />  
-          <About />
-          <ContactInfo  />
-          {/* <Experience  /> */}
+           {/* <PersonalInfo />   */}
+        {/*  <About />
+          <ContactInfo  /> */}
+          <Experience  />
           <Skills />
         </div>
         <div className="flex w-full basis-[30%] flex-col gap-8">

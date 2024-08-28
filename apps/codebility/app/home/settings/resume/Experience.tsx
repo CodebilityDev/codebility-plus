@@ -2,35 +2,29 @@
 import React from "react"
 import toast from "react-hot-toast"
 import { useCallback, useEffect, useRef, useState } from "react"
-import Skills from "@/app/home/settings/resume/Skills"
-import { User } from "@/types"
-import useToken from "@/hooks/use-token"
+
 import { Input } from "@codevs/ui/input"
 import { Button } from "@/Components/ui/button"
 import { IconEdit, IconDelete } from "@/public/assets/svgs"
 import Box from "@/Components/shared/dashboard/Box"
 
-import {
-  addWorkExperience,
-  getWorkExperiencesPerUser,
-  updateWorkExperience,
-  deleteWorkExperience,
-  updateProfile,
-} from "@/app/api/resume"
 import { Textarea } from "@codevs/ui/textarea"
+import { getWorkExperience, updateWorkExperience, deleteWorkExperience, createWorkExperience, updateProfile } from "./action"
+import { useQuery } from "@tanstack/react-query"
+import exp from "constants"
 
 type ExperienceType = {
   id?: string
   userWorkExpId?: string
   position: string
-  short_desc: string
-  dateFrom: string
-  dateTo: string
+  description: string
+  date_from: string
+  date_to: string
   created_at?: string
   updated_at?: string
 }
 
-const Experience = ({ user }: { user: User }) => {
+const Experience = () => {
   const [experienceData, setExperienceData] = useState<ExperienceType[]>([])
   const [isLoadingMain, setIsLoadingMain] = useState(false)
   const [isEditMain] = useState(false)
@@ -39,14 +33,19 @@ const Experience = ({ user }: { user: User }) => {
     [key: string]: boolean
   }
   const editModePerItem: React.MutableRefObject<EditModePerItem> = useRef({})
-
-  const { id, tech_stacks } = user
-  const { token } = useToken()
-
+  const { data: workExp, error } = useQuery({
+    queryKey: ["work_exp"],
+    queryFn: async () => {
+      const { data, error } = await getWorkExperience()
+      if (error) throw error;
+      return data;
+    },
+  }); 
+  
   const getWorkExperiences = useCallback(async () => {
     try {
       setIsLoadingMain(true)
-      const res: any = await getWorkExperiencesPerUser(id, token)
+      const res: any = await getWorkExperience()
       setExperienceData([...res.data])
       const updateObject: any = {}
       res.data.map((item: any, index: number) => {
@@ -59,13 +58,11 @@ const Experience = ({ user }: { user: User }) => {
     } finally {
       setIsLoadingMain(false)
     }
-  }, [id, token])
+  }, [])
 
   useEffect(() => {
-    if (id && token) {
-      getWorkExperiences()
-    }
-  }, [user.Work_Experience.length, token, id, getWorkExperiences])
+    getWorkExperiences();
+  }, [getWorkExperiences]);
 
   const handleUpdateExperience = (itemNo: number, e: any) => {
     const updatedExperiences = experienceData.map((item, id) => {
@@ -82,7 +79,7 @@ const Experience = ({ user }: { user: User }) => {
       setIsLoadingMain(true)
 
       if (id) {
-        await deleteWorkExperience(id, token)
+        await deleteWorkExperience(id)
       }
       const updatedExperiences = experienceData.filter((_, id) => id !== itemNo)
       setExperienceData(updatedExperiences)
@@ -106,22 +103,22 @@ const Experience = ({ user }: { user: User }) => {
     editModePerItem.current = { ...editModePerItem.current, [itemNo]: editable }
   }
 
-  const handleUpdateProfileSkills = async (data: any) => {
-    try {
-      const updatedData = { ...data }
-      await updateProfile(id, updatedData, token).then((response) => {
-        if (response) {
-          toast.success("Successfully Updated!")
-        } else if (!response) {
-          toast.error(response.statusText)
-        }
-      })
-    } catch (e) {
-      toast.error("Something went wrong!")
-    } finally {
-      return
-    }
-  }
+  // const handleUpdateProfileSkills = async (data: any) => {
+  //   try {
+  //     const updatedData = { ...data }
+  //     await updateProfile(updatedData).then((response) => {
+  //       if (response) {
+  //         toast.success("Successfully Updated!")
+  //       } else if (!response) {
+  //         toast.error("Something went wrong")
+  //       }
+  //     })
+  //   } catch (e) {
+  //     toast.error("Something went wrong!")
+  //   } finally {
+  //     return
+  //   }
+  // }
 
   return (
     <>
@@ -138,15 +135,15 @@ const Experience = ({ user }: { user: User }) => {
 
             if (
               experienceLast?.position === "" ||
-              experienceLast?.short_desc === "" ||
-              experienceLast?.dateTo === "" ||
-              experienceLast?.dateFrom === ""
+              experienceLast?.description === "" ||
+              experienceLast?.date_to === "" ||
+              experienceLast?.date_from === ""
             ) {
               toast.error("Fill the empty fields first..")
             } else if (editModeMap) {
               toast.error("Save your changes first..")
             } else {
-              setExperienceData((prev) => [...prev, { position: "", short_desc: "", dateFrom: "", dateTo: "" }])
+              setExperienceData((prev) => [...prev, { position: "", description: "", date_from: "", date_to: "" }])
               toast.success("Added new experience entry")
             }
           }}
@@ -166,14 +163,13 @@ const Experience = ({ user }: { user: User }) => {
             handleEditModePerItem={handleEditModePerItem}
             handleDeleteExperience={handleDeleteExperience}
             updateExperience={getWorkExperiences}
-            userId={id}
-            token={token}
+      
             isLoadingMain={isLoadingMain}
             isEditMain={isEditMain}
           />
         ))}
       </Box>
-      <div>{tech_stacks && <Skills tech_stacks={tech_stacks} updateProfile={handleUpdateProfileSkills} />}</div>
+      {/* <div>{tech_stacks && <Skills tech_stacks={tech_stacks} updateProfile={handleUpdateProfileSkills} />}</div> */}
     </>
   )
 }
@@ -187,8 +183,8 @@ interface ExperienceFormProps {
   handleEditModePerItem: (itemNo: number, editable: boolean) => void
   handleDeleteExperience: (itemNo: number, id: string, type: "delete" | "cancel") => void
   updateExperience: () => void
-  userId: string
-  token: string
+  
+
   isLoadingMain: boolean
   isEditMain: boolean
 }
@@ -202,8 +198,8 @@ const ExperienceForm = ({
   handleEditModePerItem,
   handleDeleteExperience,
   updateExperience,
-  userId,
-  token,
+
+  
   isLoadingMain,
 }: ExperienceFormProps) => {
   const [editMode, setEditMode] = useState(false)
@@ -214,17 +210,17 @@ const ExperienceForm = ({
       itemNo,
       totalNo === itemNo + 1 &&
         experience.position === "" &&
-        experience.short_desc === "" &&
-        experience.dateFrom === "" &&
-        experience.dateTo === ""
+        experience.description === "" &&
+        experience.date_from === "" &&
+        experience.date_to === ""
         ? true
         : false
     )
   }, [
     experience.position,
-    experience.short_desc,
-    experience.dateFrom,
-    experience.dateTo,
+    experience.description,
+    experience.date_from,
+    experience.date_to,
     handleEditModePerItem,
     itemNo,
     totalNo,
@@ -242,29 +238,28 @@ const ExperienceForm = ({
   const handleSaveAndUpdate = async (id: string | undefined) => {
     if (
       experience?.position === "" ||
-      experience?.short_desc === "" ||
-      experience?.dateTo === "" ||
-      experience?.dateFrom === ""
+      experience?.description === "" ||
+      experience?.date_to === "" ||
+      experience?.date_from === ""
     ) {
       toast.error("Fill the empty fields first..")
     } else {
       const data = {
+       
         position: experience.position,
-        short_desc: experience.short_desc,
-        dateFrom: experience.dateFrom,
-        dateTo: experience.dateTo,
-        userWorkExpId: userId,
-        company: "no ui",
-        location: "no ui",
+        description: experience.description,
+        date_from: experience.date_from,
+        date_to: experience.date_to,
+        // company: "no ui",
+        // location: "no ui",
       }
       try {
         setIsLoading(true)
         if (!id) {
-          await addWorkExperience(data, token)
-          updateExperience()
+         const {error} = await createWorkExperience(data)
           toast.success("Successfully Added!")
         } else {
-          await updateWorkExperience(data, token, id)
+          await updateWorkExperience(data)
           toast.success("Successfully Updated!")
         }
         handleEditModePerItem(itemNo, false)
@@ -317,8 +312,8 @@ const ExperienceForm = ({
           <Textarea
             variant="resume"
             onChange={(e) => handleUpdateExperience(itemNo, e)}
-            value={experience.short_desc}
-            name="short_desc"
+            value={experience.description}
+            name="description"
             className={` ${
               editMode
                 ? " border border-lightgray bg-white text-black-100 dark:border-zinc-700 dark:bg-dark-200 dark:text-white"
@@ -332,9 +327,9 @@ const ExperienceForm = ({
             Date From
             <Input
               onChange={(e) => handleUpdateExperience(itemNo, e)}
-              value={experience.dateFrom}
+              value={experience.date_from}
               type="text"
-              name="dateFrom"
+              name="date_from"
               variant={editMode ? "lightgray" : "darkgray"}
               className="rounded capitalize"
               disabled={!editMode || isLoading}
@@ -344,9 +339,9 @@ const ExperienceForm = ({
             Date To
             <Input
               onChange={(e) => handleUpdateExperience(itemNo, e)}
-              value={experience.dateTo}
+              value={experience.date_to}
               type="text"
-              name="dateTo"
+              name="date_to"
               variant={editMode ? "lightgray" : "darkgray"}
               className="rounded capitalize"
               disabled={!editMode || isLoading}
@@ -359,9 +354,9 @@ const ExperienceForm = ({
               onClick={() => {
                 if (
                   experience.position === "" &&
-                  experience.short_desc === "" &&
-                  experience.dateFrom === "" &&
-                  experience.dateTo === ""
+                  experience.description === "" &&
+                  experience.date_from === "" &&
+                  experience.date_to === ""
                 ) {
                   handleDeleteExperience(itemNo, experience.id as string, "cancel")
                 } else {
