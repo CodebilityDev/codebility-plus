@@ -13,6 +13,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
 
   let userData = {
     id: "",
+    codev_id: "",
     first_name: "",
     last_name: "",
     email: "",
@@ -57,6 +58,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
   
     userData = {
       id: data.id,
+      codev_id: data.codev.id,
       first_name,
       last_name,
       email: data.email,
