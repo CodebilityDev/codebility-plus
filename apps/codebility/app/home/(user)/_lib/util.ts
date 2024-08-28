@@ -10,3 +10,20 @@ export const formatTime = (seconds: number) => {
     const secs = seconds % 60
     return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
 }
+
+
+/**
+ * Format locale time to remove minutes and second and include only hours and median.
+ * 
+ * @param {string} time - time in locale format (e.g. 10:15:00 PM)
+ * @returns { string } - a formatted locale time (e.g. 1 PM)
+ */
+export const formatLocaleTime = (time: string): string => {
+    const [hours, minutes, secondAndMedian] = time.split(":");
+  
+    if (hours === null || minutes === null || !secondAndMedian ) throw new Error("Invalid locale time format");
+  
+    const median = secondAndMedian.split(" ")[1]; 
+  
+    return hours + " " + median;
+}
