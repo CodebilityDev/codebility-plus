@@ -11,8 +11,9 @@ import { dash_TimeTrackerT } from "@/types/protectedroutes"
 import { TaskT } from "@/types"
 import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import useUser from "../../_hooks/useUser";
+import { formatToLocaleTime } from "@/lib/format-date-time";
 
-const TimeTracker = () => {
+export default function TimeTracker() {
   const user = useUser();
 
   const [selectedTask, setSelectedTask]: any = useState<TaskT | null>(null)
@@ -76,7 +77,6 @@ const TimeTracker = () => {
     }
   }
  */
-console.log(user);
   return (
     <>
       { !tasksLoading ? (
@@ -85,15 +85,17 @@ console.log(user);
             <p className="text-2xl">Time Tracker</p>
           </div>
 
-          <div>
+          <div className="w-full">
             <p className="text-md text-center text-gray">My Time Schedule</p>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 justify-center">
               {user?.start_time && user?.end_time ? (
                 <>
-                  <p className="text-md">{`${user?.start_time} - ${user?.end_time}`}</p>
-                  <Button variant="link">
-                    <IconEdit className="invert dark:invert-0" />
-                  </Button>
+                  <p className="text-md">{`${formatLocaleTime(formatToLocaleTime(user.start_time).split(",")[1] as string)} - ${formatLocaleTime(formatToLocaleTime(user.end_time).split(",")[1] as string)}`}</p>
+                  <div>
+                    <Button variant="link">
+                      <IconEdit className="invert dark:invert-0" />
+                    </Button>
+                  </div>
                 </>
               ) : (
                 <p className="text-sm">No time schedule set</p>
@@ -138,4 +140,19 @@ console.log(user);
   )
 }
 
-export default TimeTracker
+
+/**
+ * Format locale time to remove minutes and second and include only hours and median.
+ * 
+ * @param {string} time - time in locale format (e.g. 10:15:00 PM)
+ * @returns { string } - a formatted locale time (e.g. 1 PM)
+ */
+function formatLocaleTime(time: string): string {
+  const [hours, minutes, secondAndMedian] = time.split(":");
+
+  if (hours === null || minutes === null || !secondAndMedian ) throw new Error("Invalid locale time format");
+
+  const median = secondAndMedian.split(" ")[1]; 
+
+  return hours + " " + median;
+}
