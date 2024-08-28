@@ -7,33 +7,51 @@ import React, { useEffect, useState } from "react"
 import { Box } from "@/Components/shared/dashboard"
 import { useTechStackStore } from "@/hooks/use-techstack"
 import { resume_SkillsT } from "@/types/protectedroutes"
+import { getProfile, updateProfile } from "./action"
+import { useQuery } from "@tanstack/react-query"
+import toast from "react-hot-toast"
 
-const Skills = ({ tech_stacks, updateProfile }: resume_SkillsT) => {
+const Skills = () => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading] = useState(false)
 
   const { onOpen } = useModal()
   const { stack, setStack } = useTechStackStore()
 
+  const { data: profile } = useQuery({
+    queryKey: ["profile"],
+    queryFn: async () => {
+      const { data, error } = await getProfile()
+      if (error) throw error;
+      return data;
+    },
+  });
+ 
   useEffect(() => {
-    setStack(tech_stacks.map((stack) => stack.toLowerCase()))
-  }, [tech_stacks, setStack])
-
+    if (profile?.tech_stacks) {
+      setStack(profile.tech_stacks.map((stack: string) => stack.toLowerCase()));
+    }
+  }, [profile, setStack]);
   const handleEditMode = () => {
     setIsEditMode(true)
     onOpen("techStackModal")
   }
 
-  const handleCancel = () => {
-    setStack(tech_stacks.map((stack) => stack.toLowerCase()))
-    setIsEditMode(false)
+  const handleCancel = async () => {
+    try {
+      setStack(profile?.tech_stacks.map((stack: string) => stack.toLowerCase()));
+      setIsEditMode(false)
+    } catch(error) {
+      toast.error("Failed to update your tech stack")
+    }
+    
   }
 
   const handleSave = () => {
     updateProfile({ tech_stacks: stack })
     setIsEditMode(false)
+    toast.success("Successfully updated your tech stacks!")
   }
-
   return (
     <Box className="relative bg-light-900 dark:bg-dark-100">
       <IconEdit
