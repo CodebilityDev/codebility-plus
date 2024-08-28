@@ -7,13 +7,13 @@ import { Box } from "@/Components/shared/dashboard"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
 import { useQuery } from "@tanstack/react-query"
-import { TaskT } from "@/types"
 import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import useUser from "../../_hooks/use-user";
 import { formatToLocaleTime } from "@/lib/format-date-time";
 import { useModal } from "@/hooks/use-modal";
 import { useSchedule } from "@/hooks/use-timeavail";
-import { formatLocaleTime, formatTime } from "../_lib/util";
+import { formatLocaleTime } from "../_lib/util";
+import TimeTrackerTimer from "./dashboard-time-tracker-timer";
 
 interface Task {
   title: string;
@@ -28,6 +28,8 @@ export default function TimeTracker() {
   const { time, clearTime, addTime} = useSchedule();
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [elapsedTime, setElapsedTime] = useState(0)
+  const [startTime, setStartTime] = useState(formatToLocaleTime(user.start_time).split(",")[1] as string);
+  const [endTime, setEndTime] = useState(formatToLocaleTime(user.end_time).split(",")[1] as string);
 
   const { data: TrackerTask, isLoading: tasksLoading } = useQuery<Task[]>({
     queryKey: ["Tasks", "Kanban"],
@@ -66,35 +68,11 @@ export default function TimeTracker() {
 
   useEffect(() => {
     addTime({
-      start_time: formatToLocaleTime(user.start_time).split(",")[1] as string,
-      end_time: formatToLocaleTime(user.end_time).split(",")[1] as string
+      start_time: startTime,
+      end_time: endTime 
     })
   }, [user.start_time, user.end_time]);
 
-  const handleStartStopTimer = async () => {
-    setIsTimerRunning(!isTimerRunning)
-    if (isTimerRunning && selectedTask && user.id) {
-      const taskDurationInSeconds = selectedTask?.duration * 3600
-      const allowedTime = taskDurationInSeconds + 1800 // task duration + 30 minutes in seconds
-      const userPoints = selectedTask.task_points
-      let finalPoints = userPoints
-
-      if (elapsedTime > allowedTime) {
-        finalPoints = Math.floor(userPoints / 2)
-      }
-
-/*       await updateUserPoints(user.id, finalPoints) */
-    }
-  }
-
-/*   const updateUserPoints = async (user.id: string, points: number) => {
-    try {
-      await axios.patch(`${API.USERS}/${user.id}`, { total_points: { FE: points } })
-    } catch (error) {
-      console.error("Error updating user points:", error)
-    }
-  }
- */
   return (
     <>
       { !tasksLoading ? (
@@ -138,8 +116,7 @@ export default function TimeTracker() {
                 </SelectContent>
               </SelectTrigger>
             </Select>
-            <p className="text-5xl font-bold">{formatTime(elapsedTime)}</p>
-            <Button onClick={handleStartStopTimer}>{isTimerRunning ? "Stop Timer" : "Start Timer"}</Button>
+            <TimeTrackerTimer />
           </div>
         </Box>
       ) : (
