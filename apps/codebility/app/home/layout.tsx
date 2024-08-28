@@ -39,6 +39,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
   const { first_name, last_name, main_position, image_url } = data.profile;
 
   const userData = {
+    id: user.id,
     first_name,
     last_name,
     email: data.email,
