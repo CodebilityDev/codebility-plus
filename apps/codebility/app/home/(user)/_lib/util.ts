@@ -20,10 +20,12 @@ export const formatTime = (seconds: number) => {
  */
 export const formatLocaleTime = (time: string): string => {
     const [hours, minutes, secondAndMedian] = time.split(":");
+
+    if ( hours === null || minutes === null ||
+        (!secondAndMedian && !(minutes?.includes("AM") || minutes?.includes("PM")))
+       ) throw new Error("Invalid locale time format");
   
-    if (hours === null || minutes === null || !secondAndMedian ) throw new Error("Invalid locale time format");
-  
-    const median = secondAndMedian.split(" ")[1]; 
+    const median = secondAndMedian ? secondAndMedian.split(" ")[1] : minutes?.split(" ")[1]; 
   
     return hours + " " + median;
 }
