@@ -7,11 +7,13 @@ import { Box } from "@/Components/shared/dashboard"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
 import { useQuery } from "@tanstack/react-query"
-import { dash_TimeTrackerT } from "@/types/protectedroutes"
 import { TaskT } from "@/types"
 import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import useUser from "../../_hooks/use-user";
 import { formatToLocaleTime } from "@/lib/format-date-time";
+import { useModal } from "@/hooks/use-modal";
+import { useSchedule } from "@/hooks/use-timeavail";
+import { formatTime } from "../_lib/util";
 
 interface Task {
   title: string;
@@ -19,8 +21,9 @@ interface Task {
 
 export default function TimeTracker() {
   const user = useUser();
-
   const [selectedTask, setSelectedTask]: any = useState<TaskT | null>(null)
+  const { onOpen } = useModal();
+  const { time, clearTime, addTime} = useSchedule();
 
   const { data: TrackerTask, isLoading: tasksLoading } = useQuery<Task[]>({
     queryKey: ["Tasks", "Kanban"],
@@ -60,12 +63,12 @@ export default function TimeTracker() {
     }
   }, [isTimerRunning])
 
-  const formatTime = (seconds: number) => {
-    const hrs = Math.floor(seconds / 3600)
-    const mins = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
-    return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-  }
+  useEffect(() => {
+    addTime({
+      start_time: "",
+      end_time: ""
+    })
+  }, [user.start_time, user.end_time]);
 
   const handleStartStopTimer = async () => {
     setIsTimerRunning(!isTimerRunning)
@@ -106,7 +109,7 @@ export default function TimeTracker() {
                 <>
                   <p className="text-md">{`${formatLocaleTime(formatToLocaleTime(user.start_time).split(",")[1] as string)} - ${formatLocaleTime(formatToLocaleTime(user.end_time).split(",")[1] as string)}`}</p>
                   <div>
-                    <Button variant="link">
+                    <Button variant="link" onClick={() => onOpen("scheduleModal")}>
                       <IconEdit className="invert dark:invert-0" />
                     </Button>
                   </div>
