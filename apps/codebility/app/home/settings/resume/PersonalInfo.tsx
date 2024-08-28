@@ -39,7 +39,7 @@ interface PersonalInfo  {
 const PersonalInfo = () => {
 const [isEditMode, setIsEditMode] = useState(false)
 const [isLoading, setIsLoading] = useState(false)
-const {register,handleSubmit, reset, setValue} = useForm<PersonalInfo>({defaultValues: {
+const {register,handleSubmit, reset} = useForm<PersonalInfo>({defaultValues: {
   first_name: "",
   last_name: "",
   pronoun: "",
@@ -57,12 +57,15 @@ const {register,handleSubmit, reset, setValue} = useForm<PersonalInfo>({defaultV
       return data;
     },
   });
-  const { data: pronouns  } = useQuery({
+  
+  const { data: pronouns } = useQuery({
     queryKey: ["pronouns"],
     queryFn: async () => {
-       await getPronouns()
+     return  await getPronouns()
     },
   });
+
+
 
   useEffect(() => {
     if (profile) {
@@ -126,11 +129,11 @@ const {register,handleSubmit, reset, setValue} = useForm<PersonalInfo>({defaultV
                 <SelectContent className=" bg-white dark:bg-dark-200">
                   <SelectGroup>
                     <SelectLabel className="text-xs text-gray">Please select</SelectLabel>
-                    {/* {profilePronoun.map((pronoun, i) => (
+                    {pronouns?.map((pronoun: any, i: number) => (
                       <SelectItem key={i} className="text-sm" value={pronoun}>
-                        {pronoun}
+                        {pronoun.enum_value}
                       </SelectItem>
-                    ))} */}
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
@@ -144,6 +147,7 @@ const {register,handleSubmit, reset, setValue} = useForm<PersonalInfo>({defaultV
             disabled={!isEditMode}
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded capitalize"
+            placeholder="Your name"
           />
           <Input
             id="last_name"
@@ -153,6 +157,7 @@ const {register,handleSubmit, reset, setValue} = useForm<PersonalInfo>({defaultV
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded capitalize"
+            placeholder="Your last name"
           />
           <Input
             id="address"
@@ -162,6 +167,7 @@ const {register,handleSubmit, reset, setValue} = useForm<PersonalInfo>({defaultV
             parentClassName="flex w-full flex-col justify-between gap-2 "
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded capitalize"
+            placeholder="Your Address"
           />
 
           <div className="flex w-full flex-col justify-between gap-1 pt-5">
@@ -184,7 +190,7 @@ const {register,handleSubmit, reset, setValue} = useForm<PersonalInfo>({defaultV
               <SelectContent className=" rounded-md">
                 <SelectGroup>
                   <SelectLabel className="">Please select</SelectLabel>
-                  {/* {positions.map((position, i) => (
+                  {/* {main_position.map((position, i) => (
                     <SelectItem key={i} className="text-sm" value={position}>
                       {position}
                     </SelectItem>
