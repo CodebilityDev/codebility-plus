@@ -5,15 +5,15 @@ import { revalidatePath } from "next/cache";
 
 export const uploadImage = async (file: File | null, folderName: string, bucketName: string) => {
     if (!file) {
-        console.error('No file provided for upload');
+        console.error("No file provided for upload");
         return null;
     }
 
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
     
-    const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const extension = file.name.split('.').pop();
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const extension = file.name.split(".").pop();
     const filename = `${timestamp}.${extension}`;
 
     const supabase = await createServer();
@@ -78,8 +78,8 @@ export const createServices = async (formData: FormData) => {
     const picture2Path = await uploadImage(picture2, "public", "services-image");
 
     if (!mainImagePath || !picture1Path || !picture2Path) {
-        console.error('One or more file uploads failed');
-        return { success: false, error: 'File upload failed' };
+        console.error("One or more file uploads failed");
+        return { success: false, error: "File upload failed" };
     }
 
     const { data: servicesData, error: servicesError } = await supabase
@@ -100,23 +100,8 @@ export const createServices = async (formData: FormData) => {
         return { success: false, error: servicesError.message };
     }
 
-    revalidatePath("/");
+    revalidatePath("/home/settings/services");
     return { success: true, servicesData };
-};
-
-export const deleteService = async (formData: FormData) => {
-    const id = formData.get("id") as string;
-
-    const supabase = await createServer();
-    const { error } = await supabase.from("services").delete().eq("id", id);
-
-    if (error) {
-        console.log("Error deleting service: ", error.message);
-        return { success: false, error: error.message };
-    }
-
-    revalidatePath("/");
-    return { success: true };
 };
 
 export const updateService = async (formData: FormData) => {
@@ -138,5 +123,52 @@ export const updateService = async (formData: FormData) => {
     }
 
 	revalidatePath("/");
+    return { success: true };
+};
+
+export const deleteService = async (formData: FormData) => {
+    const id = formData.get("id") as string;
+
+    const supabase = await createServer();
+
+    const { data: service, error: serviceError } = await supabase
+        .from("services")
+        .select("main_image, picture_1, picture_2")
+        .eq("id", id)
+        .single();
+
+    if (serviceError || !service) {
+        console.error("Error fetching service:", serviceError?.message);
+        return { success: false, error: serviceError?.message || "Service not found" };
+    }
+
+    const imagePaths = [service.main_image, service.picture_1, service.picture_2].filter(Boolean);
+
+    const deleteImagePromises = imagePaths.map(async (path) => {
+        const filePath = path.replace("public/", "");
+        const { error: storageError } = await supabase.storage
+            .from("services-image")
+            .remove([`public/${filePath}`]);
+
+        if (storageError) {
+            console.error("Error deleting image:", storageError.message);
+        } else {
+            console.log("Image deleted successfully:", filePath);
+        }
+    });
+
+    await Promise.all(deleteImagePromises);
+
+    const { error: deleteError } = await supabase
+        .from("services")
+        .delete()
+        .eq("id", id);
+
+    if (deleteError) {
+        console.error("Error deleting service:", deleteError.message);
+        return { success: false, error: deleteError.message };
+    }
+
+    revalidatePath("/home/settings/services");
     return { success: true };
 };
