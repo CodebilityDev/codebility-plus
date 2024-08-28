@@ -3,12 +3,11 @@ import LeftSidebar from "./_components/home-left-sidebar"
 import Navbar from "./_components/home-navbar"
 import React from "react"
 import ReactQueryProvider from "@/hooks/reactQuery"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 import UserContextProvider from "./_components/user-provider"
 
 export default async function HomeLayout({ children }: { children: React.ReactNode }) {
-  const supabase = createServerComponentClient( { cookies } );
+  const supabase = getSupabaseServerComponentClient();
 
   const { data: { user } } = await supabase.auth.getUser();
 
