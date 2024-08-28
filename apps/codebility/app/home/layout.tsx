@@ -14,6 +14,10 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
   const { data } = await supabase.from("user")
   .select(`
     *,
+    codev(
+      start_time,
+      end_time
+    ),
     user_type(
       roles,
       kanban,
@@ -36,13 +40,17 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
   const permissionNames = Object.keys(data?.user_type || {});
   const permissions = permissionNames.filter(permissionName => data.user_type[permissionName]);
   const { first_name, last_name, main_position, image_url } = data.profile;
+  const { start_time, end_time } = data.codev;
 
+  console.log(data);
   const userData = {
     id: data.id,
     first_name,
     last_name,
     email: data.email,
     main_position,
+    start_time,
+    end_time,
     image_url,
     permissions
   };
