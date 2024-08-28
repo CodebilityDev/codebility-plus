@@ -3,7 +3,7 @@
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { FieldValues } from "react-hook-form";
 
-import { dateTimeFormat } from "@/lib/formDateTime";
+import { formatToUnix } from "@/lib/format-date-time";
 import { redirect } from "next/navigation";
 
 export const signupUser = async (data: FieldValues) => {
@@ -17,8 +17,8 @@ export const signupUser = async (data: FieldValues) => {
         email_address: data.email_address,
         ...(data.website !== "" && { portfolio_website: data.website }),
         tech_stacks: [...data.techstack.split(", ")],
-        start_time: dateTimeFormat(startTime),
-        end_time: dateTimeFormat(endTime),
+        start_time: formatToUnix(startTime),
+        end_time: formatToUnix(endTime),
         main_position: data.position,
     }
 

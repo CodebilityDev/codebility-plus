@@ -42,7 +42,6 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
   const { first_name, last_name, main_position, image_url } = data.profile;
   const { start_time, end_time } = data.codev;
 
-  console.log(data);
   const userData = {
     id: data.id,
     first_name,
