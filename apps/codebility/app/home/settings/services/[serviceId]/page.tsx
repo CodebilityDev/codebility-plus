@@ -1,6 +1,6 @@
 import { createServer } from "@/utils/supabase";
 import ServiceForm from "../_components/service-form";
-import { getServiceById } from "../action"
+import { getServiceById } from "../service"
 
 const UpdateService = async ({ params }: { params: { serviceId: string } }) => {
   const { serviceId } = params;
