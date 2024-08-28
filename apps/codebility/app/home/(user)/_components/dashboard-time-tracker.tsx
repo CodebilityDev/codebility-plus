@@ -13,7 +13,7 @@ import useUser from "../../_hooks/use-user";
 import { formatToLocaleTime } from "@/lib/format-date-time";
 import { useModal } from "@/hooks/use-modal";
 import { useSchedule } from "@/hooks/use-timeavail";
-import { formatTime } from "../_lib/util";
+import { formatLocaleTime, formatTime } from "../_lib/util";
 
 interface Task {
   title: string;
@@ -153,21 +153,4 @@ export default function TimeTracker() {
       )}
     </>
   )
-}
-
-
-/**
- * Format locale time to remove minutes and second and include only hours and median.
- * 
- * @param {string} time - time in locale format (e.g. 10:15:00 PM)
- * @returns { string } - a formatted locale time (e.g. 1 PM)
- */
-function formatLocaleTime(time: string): string {
-  const [hours, minutes, secondAndMedian] = time.split(":");
-
-  if (hours === null || minutes === null || !secondAndMedian ) throw new Error("Invalid locale time format");
-
-  const median = secondAndMedian.split(" ")[1]; 
-
-  return hours + " " + median;
 }
