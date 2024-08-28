@@ -8,8 +8,8 @@ export interface User {
     last_name: string;
     email: string;
     main_position: string;
-    start_time: string;
-    end_time: string;
+    start_time: number;
+    end_time: number;
     image_url: string;
     permissions: string[];
 }
