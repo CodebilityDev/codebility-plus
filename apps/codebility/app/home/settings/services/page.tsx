@@ -10,13 +10,13 @@ import {
 import { Button } from "@/Components/ui/button"
 import { Table, TableHead, TableHeader, TableRow } from "@/Components/ui/table"
 import { IconAdd } from "@/public/assets/svgs"
-import { services } from "@/app/home/settings/services/action"
+import { getAllServices } from "@/app/home/settings/services/service"
 import ServiceList from "./_components/service-list"
 
 const headers = ["Name", "Category", "Description", "Edit", "Delete"]
 
 const ServicesSetting = async () => {
-  const data = await services();
+  const data = await getAllServices();
 
   return (
     <div className="max-w-screen-xl mx-auto">
