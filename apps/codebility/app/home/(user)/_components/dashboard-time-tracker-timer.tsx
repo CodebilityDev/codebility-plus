@@ -4,13 +4,17 @@ import { useEffect, useState } from "react";
 import { formatTime } from "../_lib/util";
 import { Button } from "@/Components/ui/button"
 import { startUserTimer } from "../actions";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
+import { Task } from "../_types/task";
 
 interface Props {
+  tasks: Task[];
   codevId: string;
   timerInitialSecond: number;
+  currentTaskId: string;
 }
 
-export default function TimeTrackerTimer({ codevId, timerInitialSecond }: Props) {
+export default function TimeTrackerTimer({ codevId, tasks, currentTaskId, timerInitialSecond }: Props) {
   const initialSecondExists = timerInitialSecond !== null;
   const [isTimerRunning, setIsTimerRunning] = useState(initialSecondExists)
   const [elapsedTime, setElapsedTime] = useState(initialSecondExists ? Math.floor(timerInitialSecond): 0);
@@ -39,21 +43,22 @@ export default function TimeTrackerTimer({ codevId, timerInitialSecond }: Props)
 
     setIsTimerRunning(false);
     setElapsedTime(0);
-/*     if (isTimerRunning && selectedTask && user.id) {
-      const taskDurationInSeconds = selectedTask?.duration * 3600
-      const allowedTime = taskDurationInSeconds + 1800 // task duration + 30 minutes in seconds
-      const userPoints = selectedTask.task_points
-      let finalPoints = userPoints
-
-      if (elapsedTime > allowedTime) {
-        finalPoints = Math.floor(userPoints / 2)
-      }
- */
-/*       await updateUserPoints(user.id, finalPoints) */
-    }
+  }
 
   return (
     <>
+    <Select name="taskId" defaultValue={currentTaskId}>
+      <SelectTrigger className="max-w-[300px] text-center">
+        <SelectValue placeholder="Select Task" />
+        <SelectContent>
+          {tasks.map((task: Task, index:number) =>
+            <SelectItem className="items-center" key={index} value={task.id}>
+                {task.title} - {task.duration && `${task.duration}h - `} {task.points}pts
+            </SelectItem>
+          )}
+        </SelectContent>
+      </SelectTrigger>
+    </Select>
       <p className="text-5xl font-bold">{formatTime(elapsedTime)}</p>
       {/* 
         I have swapped their type because when we start the timer (via clicking the start timer button),

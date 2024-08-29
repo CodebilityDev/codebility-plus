@@ -59,10 +59,19 @@ export default async function TimeTracker() {
             <input type="hidden" name="codevId" value={data.codev.id} />
             <div className="w-full">
               <p className="text-md text-center text-gray">My Time Schedule</p>
-              <TimeTrackerSchedule codevId={data.codev.id} startTime={data.codev.start_time} endTime={data.codev.end_time} />
+              <TimeTrackerSchedule 
+                codevId={data.codev.id}
+                startTime={data.codev.start_time} 
+                endTime={data.codev.end_time}
+              />
             </div>
             <div className="flex w-full flex-col items-center gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
-              <TimeTrackerTimer codevId={data.codev.id} timerInitialSecond={timerInitialSecond}/>
+              <TimeTrackerTimer 
+                tasks={tasks}
+                currentTaskId={currentTaskId}
+                codevId={data.codev.id}
+                timerInitialSecond={timerInitialSecond}
+              />
             </div>
           </form>
       </Box>
