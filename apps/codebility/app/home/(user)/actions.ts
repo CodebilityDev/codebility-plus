@@ -18,5 +18,5 @@ export const updateUserSchedule = async ({
     })
     .eq("id", codevId);
 
-    console.log(error);
+    console.log("update schedule error ", error);
 }
