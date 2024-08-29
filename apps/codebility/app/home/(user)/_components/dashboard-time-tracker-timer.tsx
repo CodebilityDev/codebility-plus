@@ -3,8 +3,13 @@
 import { useEffect, useState } from "react";
 import { formatTime } from "../_lib/util";
 import { Button } from "@/Components/ui/button"
+import { startUserTimer } from "../actions";
 
-export default function TimeTrackerTimer() {
+interface Props {
+  codevId: string;
+}
+
+export default function TimeTrackerTimer({ codevId }: Props) {
   const [isTimerRunning, setIsTimerRunning] = useState(false)
   const [elapsedTime, setElapsedTime] = useState(0)
 
@@ -24,6 +29,10 @@ export default function TimeTrackerTimer() {
 
   const handleStartStopTimer = async () => {
     setIsTimerRunning(!isTimerRunning)
+
+    if (!isTimerRunning) {
+      await startUserTimer(codevId);
+    }
 /*     if (isTimerRunning && selectedTask && user.id) {
       const taskDurationInSeconds = selectedTask?.duration * 3600
       const allowedTime = taskDurationInSeconds + 1800 // task duration + 30 minutes in seconds
@@ -49,7 +58,12 @@ export default function TimeTrackerTimer() {
   return (
     <>
       <p className="text-5xl font-bold">{formatTime(elapsedTime)}</p>
-      <Button onClick={handleStartStopTimer}>{isTimerRunning ? "Stop Timer" : "Start Timer"}</Button>
+      <Button 
+        onClick={handleStartStopTimer}
+        type={isTimerRunning ? "submit": "button"}
+      >
+        {isTimerRunning ? "Stop Timer" : "Start Timer"}
+      </Button>
     </>
   )
 }

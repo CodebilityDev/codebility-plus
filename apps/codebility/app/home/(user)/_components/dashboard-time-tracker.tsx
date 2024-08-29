@@ -68,7 +68,7 @@ export default async function TimeTracker() {
                 </SelectContent>
               </SelectTrigger>
             </Select>
-            <TimeTrackerTimer />
+            <TimeTrackerTimer codevId={data.codev.id}/>
           </div>
       </Box>
     </>
