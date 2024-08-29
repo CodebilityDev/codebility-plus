@@ -1,48 +1,73 @@
-"use client"
+"use client";
 
-import { ChangeEvent } from "react";
+import { ChangeEvent, useRef, useState } from "react";
 import { Formik, Field, Form, ErrorMessage, FormikHelpers } from "formik";
 import toast from "react-hot-toast";
 import H1 from "@/Components/shared/dashboard/H1";
 import { useRouter } from "next/navigation";
-import { createServices, updateService } from "../action";
-import * as Yup from "yup";
-import { service_FormValuesT } from "@/types/protectedroutes";
+import { createServiceAction, updateServiceAction } from "../action";
 import InputLabel from "./input-label";
+import { Service, ServiceSelectedFile } from "../_types/service";
+import { validationSchema } from "../_lib/schema";
+import ServiceImageUpload from "./service-image-upload";
 
-const validationSchema = Yup.object({
-  name: Yup.string().required("Name is Required"),
-  category: Yup.string().required("Category is Required"),
-  description: Yup.string().required("Description is Required"),
-  mainImage: Yup.mixed().required("Main Image is Required"),
-  picture1: Yup.mixed().required("Picture 1 is Required"),
-  picture2: Yup.mixed().required("Picture 2 is Required"),
-});
-
-const ServiceForm = ({ userId, service }: { userId?: string | null, service?: service_FormValuesT }) => {
+const ServiceForm = ({ userId, service }: { userId?: string | null, service?: Service }) => {
   const router = useRouter();
 
-  const initialValues: service_FormValuesT = {
+  const initialValues: Service = {
     name: service?.name || "",
     category: service?.category || "",
     description: service?.description || "",
     mainImage: service?.mainImage || null,
     picture1: service?.picture1 || null,
     picture2: service?.picture2 || null,
+    images: service?.images || []
   };
 
-  const handleFileChange = (event: ChangeEvent<HTMLInputElement>, setFieldValue: (field: string, value: any) => void, fieldName: string) => {
+  const [selectedFile, setSelectedFile] = useState<ServiceSelectedFile>({
+    mainImageFile: service?.mainImage || null,
+    picture1File: service?.picture1 || null,
+    picture2File: service?.picture2 || null,
+    images: service?.images || []
+  });
+
+  const mainImageFileInputRef = useRef<HTMLInputElement | null>(null);
+  const picture1FileInputRef = useRef<HTMLInputElement | null>(null);
+  const picture2FileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleFileChange = (
+    event: ChangeEvent<HTMLInputElement>,
+    setFieldValue: (field: string, value: any) => void,
+    fieldName: string
+  ) => {
     const file = event.target.files?.[0];
-    setFieldValue(fieldName, file);
+    if (file) {
+      setFieldValue(fieldName, file);
+      setSelectedFile(prev => ({
+        ...prev,
+        [`${fieldName}File`]: file,
+      }));
+    } else {
+      setSelectedFile(prev => ({
+        ...prev,
+        [`${fieldName}File`]: null,
+      }));
+    }
+  };
+
+  const handleDivClick = (ref: React.RefObject<HTMLInputElement | null>) => {
+    if (ref.current) {
+      ref.current.click();
+    }
   };
 
   const handleSubmit = async (
-    values: service_FormValuesT,
-    actions: FormikHelpers<service_FormValuesT>
+    values: Service,
+    actions: FormikHelpers<Service>
   ) => {
     if (!userId) return;
 
-    try { 
+    try {
       const formData = new FormData();
       formData.append("name", values.name);
       formData.append("category", values.category);
@@ -56,9 +81,9 @@ const ServiceForm = ({ userId, service }: { userId?: string | null, service?: se
 
       if (service?.id) {
         formData.append("id", service.id);
-        response = await updateService(formData);
+        response = await updateServiceAction(formData);
       } else {
-        response = await createServices(formData);
+        response = await createServiceAction(formData);
       }
 
       if (response?.success) {
@@ -147,8 +172,34 @@ const ServiceForm = ({ userId, service }: { userId?: string | null, service?: se
                 <input
                   type="file"
                   name="mainImage"
+                  ref={mainImageFileInputRef}
                   onChange={(event) => handleFileChange(event, setFieldValue, "mainImage")}
+                  className="hidden"
                 />
+                {!selectedFile.mainImageFile ? 
+                  <div 
+                    onClick={() => handleDivClick(mainImageFileInputRef)}
+                    className="flex h-24 flex-col items-center justify-center rounded-[5px] border border-[#3F3F46] bg-light-900 font-light text-black-100 dark:bg-dark-100  dark:text-white hover:cursor-pointer"
+                  >
+                      <p>Click to browse a file</p>
+                  </div> 
+                  : 
+                  <div className="flex h-24 rounded-[5px] font-light text-black-100 dark:text-white">
+                    <ServiceImageUpload selectedFile={selectedFile} imageType="mainImage" />
+                    <div className="flex h-full w-10 items-center justify-center border border-[#3F3F46]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedFile(prev => ({ ...prev, mainImageFile: null }));
+                          setFieldValue("mainImage", null);
+                        }}
+                        className="text-[#FF4242] hover:cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                }
                 <ErrorMessage name="mainImage" component="div" className="text-[#FF4242]" />
               </div>
               <div className="flex flex-col">
@@ -156,8 +207,34 @@ const ServiceForm = ({ userId, service }: { userId?: string | null, service?: se
                 <input
                   type="file"
                   name="picture1"
+                  ref={picture1FileInputRef}
                   onChange={(event) => handleFileChange(event, setFieldValue, "picture1")}
+                  className="hidden"
                 />
+                {!selectedFile.picture1File ? 
+                  <div 
+                    onClick={() => handleDivClick(picture1FileInputRef)}
+                    className="flex h-24 flex-col items-center justify-center rounded-[5px] border border-[#3F3F46] bg-light-900 font-light text-black-100 dark:bg-dark-100 dark:text-white hover:cursor-pointer"
+                  >
+                      <p>Click to browse a file</p>
+                  </div> 
+                  : 
+                  <div className="flex h-24 rounded-[5px] font-light text-black-100 dark:text-white">
+                    <ServiceImageUpload selectedFile={selectedFile} imageType="picture1" />
+                    <div className="flex h-full w-10 items-center justify-center border border-[#3F3F46]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedFile(prev => ({ ...prev, picture1File: null }));
+                          setFieldValue("picture1", null);
+                        }}
+                        className="text-[#FF4242] hover:cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                }
                 <ErrorMessage name="picture1" component="div" className="text-[#FF4242]" />
               </div>
               <div className="flex flex-col">
@@ -165,23 +242,49 @@ const ServiceForm = ({ userId, service }: { userId?: string | null, service?: se
                 <input
                   type="file"
                   name="picture2"
+                  ref={picture2FileInputRef}
                   onChange={(event) => handleFileChange(event, setFieldValue, "picture2")}
+                  className="hidden"
                 />
+                {!selectedFile.picture2File ? 
+                  <div 
+                    onClick={() => handleDivClick(picture2FileInputRef)}
+                    className="flex h-24 flex-col items-center justify-center rounded-[5px] border border-[#3F3F46] bg-light-900 font-light text-black-100 dark:bg-dark-100 dark:text-white hover:cursor-pointer"
+                  >
+                      <p>Click to browse a file</p>
+                  </div> 
+                  : 
+                  <div className="flex h-24 rounded-[5px] font-light text-black-100 dark:text-white">
+                    <ServiceImageUpload selectedFile={selectedFile} imageType="picture2" />
+                    <div className="flex h-full w-10 items-center justify-center border border-[#3F3F46]">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setSelectedFile(prev => ({ ...prev, picture2File: null }));
+                          setFieldValue("picture2", null);
+                        }}
+                        className="text-[#FF4242] hover:cursor-pointer"
+                      >
+                        ✕
+                      </button>
+                    </div>
+                  </div>
+                }
                 <ErrorMessage name="picture2" component="div" className="text-[#FF4242]" />
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center lg:hidden">
-            <button
-              type="button"
-              className="rounded-[5px] bg-white border dark:bg-[#2C303A] px-10 py-2 text-lg text-black dark:text-white"
+          <div className="lg:hidden flex gap-4">
+            <button 
+              type="button" 
+              className="rounded-[5px] w-full bg-white border dark:bg-[#2C303A] px-10 py-2 text-lg text-black dark:text-white"
               onClick={() => router.back()}
             >
               Cancel
             </button>
             <button 
               type="submit" 
-              className="rounded-[5px] bg-violet px-10 py-2 text-lg text-white" 
+              className="rounded-[5px] w-full bg-violet px-10 py-2 text-lg text-white"
               disabled={isSubmitting}
             >
               Submit
