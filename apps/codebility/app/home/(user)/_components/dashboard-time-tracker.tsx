@@ -6,6 +6,7 @@ import TimeTrackerSchedule from "./dashboard-time-tracker-schedule";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 
 interface Task {
+  id: string;
   title: string;
   duration: number;
   points: number;
@@ -22,6 +23,7 @@ export default async function TimeTracker() {
       id,
       codev_task(
         task(
+          id,
           title,
           duration,
           points
@@ -29,7 +31,10 @@ export default async function TimeTracker() {
       ),
       start_time,
       end_time,
-      task_timer_start_at
+      task_timer_start_at,
+      task(
+        id
+      )
     )
   `).eq("id", user?.id)
   .single();
@@ -45,37 +50,38 @@ export default async function TimeTracker() {
 
   const tasks = data.codev.codev_task.map((item: { task: Task }) => item.task);
   const timerStartAt = data.codev.task_timer_start_at;
+  const currentTaskId = data.task && data.task.id;
 
   // get how many seconds have passed since start at time.
   const timerInitialSecond = timerStartAt && ((Date.now() - new Date(timerStartAt).getTime()) / 1000);
 
   return (
-    <>
-      <Box className="flex w-full flex-1 flex-col items-center gap-4">
-          <div>
-            <p className="text-2xl">Time Tracker</p>
-          </div>
+      <Box className="w-full flex-1">
+          <form className="flex flex-col items-center gap-4" >
+            <div>
+              <p className="text-2xl">Time Tracker</p>
+            </div>
 
-          <div className="w-full">
-            <p className="text-md text-center text-gray">My Time Schedule</p>
-            <TimeTrackerSchedule codevId={data.codev.id} startTime={data.codev.start_time} endTime={data.codev.end_time} />
-          </div>
-          <div className="flex w-full flex-col items-center gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
-            <Select>
-              <SelectTrigger className="max-w-[300px] text-center">
-                <SelectValue placeholder="Select Task" />
-                <SelectContent>
-                  {tasks.map((task: Task, index:number) =>
-                    <SelectItem className="items-center" key={index} value={task.title}>
-                        {task.title} - {task.duration && `${task.duration}h - `} {task.points}pts
-                    </SelectItem>
-                  )}
-                </SelectContent>
-              </SelectTrigger>
-            </Select>
-            <TimeTrackerTimer codevId={data.codev.id} timerInitialSecond={timerInitialSecond}/>
-          </div>
+            <div className="w-full">
+              <p className="text-md text-center text-gray">My Time Schedule</p>
+              <TimeTrackerSchedule codevId={data.codev.id} startTime={data.codev.start_time} endTime={data.codev.end_time} />
+            </div>
+            <div className="flex w-full flex-col items-center gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+              <Select defaultValue={currentTaskId}>
+                <SelectTrigger className="max-w-[300px] text-center">
+                  <SelectValue placeholder="Select Task" />
+                  <SelectContent>
+                    {tasks.map((task: Task, index:number) =>
+                      <SelectItem className="items-center" key={index} value={task.id} >
+                          {task.title} - {task.duration && `${task.duration}h - `} {task.points}pts
+                      </SelectItem>
+                    )}
+                  </SelectContent>
+                </SelectTrigger>
+              </Select>
+              <TimeTrackerTimer codevId={data.codev.id} timerInitialSecond={timerInitialSecond}/>
+            </div>
+          </form>
       </Box>
-    </>
   )
 }
