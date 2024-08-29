@@ -34,10 +34,25 @@ export const startUserTimer = async (codevId: string) => {
     console.log("start user timer error ",error);
 }
 
+const stopUserTimer = async (codevId: string) => {
+    const supabase = getSupabaseServerActionClient();
+
+    const { error } = await supabase.from("codev")
+    .update({
+        task_timer_start_at: null
+    }).eq("id", codevId);
+
+    console.log(error);
+}
+
+export const updateUserTaskOnHand = async (codevId: string) => {
+
+}
+
 export const logUserTime = async (formData: FormData) => {
     const supabase = getSupabaseServerActionClient();
 
-    const codevId = formData.get("codevId");
+    const codevId = formData.get("codevId") as string;
     const taskId = formData.get("taskId");
 
     const { data: codevData, error: fetchingCodevError } = await supabase.from("codev")
@@ -65,8 +80,5 @@ export const logUserTime = async (formData: FormData) => {
 
     if (error) throw error;
 
-    await supabase.from("codev")
-    .update({
-        task_timer_start_at: null
-    }).eq("id", codevId);
+    await stopUserTimer(codevId);
 }
