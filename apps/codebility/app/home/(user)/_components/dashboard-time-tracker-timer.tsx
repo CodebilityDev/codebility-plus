@@ -55,12 +55,26 @@ export default function TimeTrackerTimer({ codevId, timerInitialSecond }: Props)
   return (
     <>
       <p className="text-5xl font-bold">{formatTime(elapsedTime)}</p>
-      <Button
-        onClick={handleStartStopTimer}
-        type={isTimerRunning ? "submit" : "button"}
-      >
-        {isTimerRunning ? "Stop Timer" : "Start Timer"}
-      </Button>
+      {/* 
+        I have swapped their type because when we start the timer (via clicking the start timer button),
+        in start the start timer button type is button, when we clicked it (causing the timer to start and changing the button),
+        the type changes to submit causing a submit instead of just a normal button click. 
+        and when we clicked the stop timer button it acts as a normal button instead of submitting. 
+        
+        so my work around is to swapped their type start timer will be submitting,
+        and stop timer will be a normal button type. idk why react do this.
+        
+        if you find a better way around this, please change it.
+      */}
+      {!isTimerRunning ? (
+        <Button onClick={handleStartStopTimer} type="submit">
+          Start Timer
+        </Button>
+      ) : (
+        <Button onClick={handleStartStopTimer} type="button">
+          Stop Timer
+        </Button>
+      )}
     </>
   )
 }
