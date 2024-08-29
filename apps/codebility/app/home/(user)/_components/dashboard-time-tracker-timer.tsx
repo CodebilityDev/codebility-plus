@@ -7,11 +7,13 @@ import { startUserTimer } from "../actions";
 
 interface Props {
   codevId: string;
+  timerInitialSecond: number;
 }
 
-export default function TimeTrackerTimer({ codevId }: Props) {
-  const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [elapsedTime, setElapsedTime] = useState(0)
+export default function TimeTrackerTimer({ codevId, timerInitialSecond }: Props) {
+  const initialSecondExists = timerInitialSecond !== null;
+  const [isTimerRunning, setIsTimerRunning] = useState(initialSecondExists)
+  const [elapsedTime, setElapsedTime] = useState(initialSecondExists ? Math.floor(timerInitialSecond): 0);
 
   useEffect(() => {
     let timer: ReturnType<typeof setInterval> | null = null
