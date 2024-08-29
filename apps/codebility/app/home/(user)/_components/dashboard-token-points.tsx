@@ -10,7 +10,7 @@ export default async function TokenPoints() {
   .eq("user_id", user?.id)
   .single();
 
-  const points = data.point;
+  const points = data ? data.point : [];
 
   const CategorizePoint = {
     'UI/UX': 0,
