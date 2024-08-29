@@ -4,6 +4,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import TimeTrackerTimer from "./dashboard-time-tracker-timer";
 import TimeTrackerSchedule from "./dashboard-time-tracker-schedule";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import { logUserTime } from "../actions";
 
 interface Task {
   id: string;
@@ -48,31 +49,32 @@ export default async function TimeTracker() {
     </div>
   </Box>
 
+
   const tasks = data.codev.codev_task.map((item: { task: Task }) => item.task);
   const timerStartAt = data.codev.task_timer_start_at;
-  const currentTaskId = data.task && data.task.id;
+  const currentTaskId = data.codev.task && data.codev.task.id;
 
   // get how many seconds have passed since start at time.
   const timerInitialSecond = timerStartAt && ((Date.now() - new Date(timerStartAt).getTime()) / 1000);
 
   return (
       <Box className="w-full flex-1">
-          <form className="flex flex-col items-center gap-4" >
+          <form className="flex flex-col items-center gap-4" action={logUserTime}>
             <div>
               <p className="text-2xl">Time Tracker</p>
             </div>
-
+            <input type="hidden" name="codevId" value={data.codev.id} />
             <div className="w-full">
               <p className="text-md text-center text-gray">My Time Schedule</p>
               <TimeTrackerSchedule codevId={data.codev.id} startTime={data.codev.start_time} endTime={data.codev.end_time} />
             </div>
             <div className="flex w-full flex-col items-center gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
-              <Select defaultValue={currentTaskId}>
+              <Select name="taskId" defaultValue={currentTaskId}>
                 <SelectTrigger className="max-w-[300px] text-center">
                   <SelectValue placeholder="Select Task" />
                   <SelectContent>
                     {tasks.map((task: Task, index:number) =>
-                      <SelectItem className="items-center" key={index} value={task.id} >
+                      <SelectItem className="items-center" key={index} value={task.id}>
                           {task.title} - {task.duration && `${task.duration}h - `} {task.points}pts
                       </SelectItem>
                     )}
