@@ -72,7 +72,6 @@ const AuthForm = () => {
     trigger,
     reset,
     setValue,
-    setError,
     getValues,
     formState: { errors },
   } = useForm<Inputs>({

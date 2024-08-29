@@ -9,7 +9,6 @@ const ServicesModal = () => {
   return (
     <Dialog open={isOpen} onOpenChange={closeModal}>
       <DialogContent
-        hasButton
         className="h-auto w-[95%] max-w-lg overflow-x-auto overflow-y-auto bg-black-100 dark:bg-black-500 lg:h-auto"
       >
         <div>

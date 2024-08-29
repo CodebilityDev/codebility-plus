@@ -1,9 +1,10 @@
 import * as React from "react"
-import TableHeader from "@/app/home/in-house/TableHeader"
-import TableBody from "@/app/home/in-house/TableBody"
-import EditTabelBody from "@/app/home/in-house/EditTableBody"
-import { IInhouse, TeamMemberT } from "@/types/index"
+import TableHeader from "./in-house-table-header"
+import TableBody from "./in-house-table-body"
+import EditTabelBody from "./in-house-edit-table-body"
 import DefaultPagination from "@/Components/ui/pagination"
+import { Codev } from '@/types/home/codev'
+import { InHouseProps } from "../_types/in-house"
 
 function Tables({
   data,
@@ -14,11 +15,11 @@ function Tables({
   totalPages,
   handlePreviousPage,
   handleNextPage,
-}: IInhouse) {
+}: InHouseProps) {
   const { setData, handleEditButton, handleSaveButton } = handlers
   const { LoadinginHouse, ErrorinHouse } = status
 
-  const handleTableHeaderButton = (key: keyof TeamMemberT, direction: "up" | "down") => {
+  const handleTableHeaderButton = (key: keyof Codev, direction: "up" | "down") => {
     const sortedData = [...data].sort((a, b) => {
       const valueA = a[key] ?? ""
       const valueB = b[key] ?? ""
@@ -43,7 +44,7 @@ function Tables({
           <tbody>
             {data?.map((member: any) =>
               editableIds.includes(member.id) ? (
-                <EditTabelBody key={member.id} member={member} handleSaveButton={handleSaveButton} />
+                <EditTabelBody key={member.id} data={member} handleSaveButton={handleSaveButton} />
               ) : (
                 <TableBody key={member.id} member={member} handleEditButton={handleEditButton} />
               )

@@ -19,7 +19,7 @@ const TaskViewModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
-      <DialogContent hasButton className="h-[32rem] w-[80%] max-w-sm overflow-x-auto overflow-y-auto lg:h-auto">
+      <DialogContent className="h-[32rem] w-[80%] max-w-sm overflow-x-auto overflow-y-auto lg:h-auto">
         <div className="flex flex-col gap-6">
           {isTask(data) && (
             <div key={data.id}>
