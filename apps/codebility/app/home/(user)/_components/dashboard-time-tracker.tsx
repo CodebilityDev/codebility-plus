@@ -28,7 +28,8 @@ export default async function TimeTracker() {
         )
       ),
       start_time,
-      end_time
+      end_time,
+      task_timer_start_at
     )
   `).eq("id", user?.id)
   .single();
@@ -43,6 +44,10 @@ export default async function TimeTracker() {
   </Box>
 
   const tasks = data.codev.codev_task.map((item: { task: Task }) => item.task);
+  const timerStartAt = data.codev.task_timer_start_at;
+
+  // get how many seconds have passed since start at time.
+  const timerInitialSecond = timerStartAt && ((Date.now() - new Date(timerStartAt).getTime()) / 60 / 60);
 
   return (
     <>
@@ -68,7 +73,7 @@ export default async function TimeTracker() {
                 </SelectContent>
               </SelectTrigger>
             </Select>
-            <TimeTrackerTimer codevId={data.codev.id}/>
+            <TimeTrackerTimer codevId={data.codev.id} timerInitialSecond={timerInitialSecond}/>
           </div>
       </Box>
     </>
