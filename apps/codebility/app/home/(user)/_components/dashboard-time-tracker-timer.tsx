@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { formatTime } from "../_lib/util";
 import { Button } from "@/Components/ui/button"
-import { startUserTimer } from "../actions";
+import { startUserTimer, updateUserTaskOnHand } from "../actions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
 import { Task } from "../_types/task";
 
@@ -15,6 +15,7 @@ interface Props {
 }
 
 export default function TimeTrackerTimer({ codevId, tasks, currentTaskId, timerInitialSecond }: Props) {
+  const [taskOnHandId, setTaskOnHandId] = useState(currentTaskId);
   const initialSecondExists = timerInitialSecond !== null;
   const [isTimerRunning, setIsTimerRunning] = useState(initialSecondExists)
   const [elapsedTime, setElapsedTime] = useState(initialSecondExists ? Math.floor(timerInitialSecond): 0);
@@ -33,6 +34,11 @@ export default function TimeTrackerTimer({ codevId, tasks, currentTaskId, timerI
     }
   }, [isTimerRunning])
 
+  const resetTimer = () => {
+    setIsTimerRunning(false);
+    setElapsedTime(0);
+  }
+
   const handleStartStopTimer = async () => {
     setIsTimerRunning(!isTimerRunning)
 
@@ -41,24 +47,34 @@ export default function TimeTrackerTimer({ codevId, tasks, currentTaskId, timerI
       return;
     } 
 
-    setIsTimerRunning(false);
-    setElapsedTime(0);
+    resetTimer();
+  }
+
+  const handleTaskChange = async (taskId: string) => {
+    setTaskOnHandId(taskId);
+
+    try {
+      await updateUserTaskOnHand(codevId, taskId);
+      resetTimer();
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   return (
     <>
-    <Select name="taskId" defaultValue={currentTaskId}>
-      <SelectTrigger className="max-w-[300px] text-center">
-        <SelectValue placeholder="Select Task" />
-        <SelectContent>
-          {tasks.map((task: Task, index:number) =>
-            <SelectItem className="items-center" key={index} value={task.id}>
-                {task.title} - {task.duration && `${task.duration}h - `} {task.points}pts
-            </SelectItem>
-          )}
-        </SelectContent>
-      </SelectTrigger>
-    </Select>
+      <Select name="taskId" value={taskOnHandId} onValueChange={handleTaskChange}>
+        <SelectTrigger className="max-w-[300px] text-center">
+          <SelectValue placeholder="Select Task" />
+          <SelectContent>
+            {tasks.map((task: Task, index:number) =>
+              <SelectItem className="items-center" key={index} value={task.id}>
+                  {task.title} - {task.duration && `${task.duration}h - `} {task.points}pts
+              </SelectItem>
+            )}
+          </SelectContent>
+        </SelectTrigger>
+      </Select>
       <p className="text-5xl font-bold">{formatTime(elapsedTime)}</p>
       {/* 
         I have swapped their type because when we start the timer (via clicking the start timer button),
