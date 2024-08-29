@@ -121,13 +121,3 @@ type permissions_TableRowProps = {
   permissions: boolean
   services: boolean
 }
-
-type service_FormValuesT = {
-  id?: string;
-  name: string
-  category: string
-  description: string
-  mainImage?: File | null
-  picture1?: File | null
-  picture2?: File | null
-}
