@@ -31,6 +31,9 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
       {
         hostname: "codebility-cdn.pages.dev",
       },
+      {
+        hostname: "eurbmmoixnhvxebcjiuy.supabase.co",
+      },
     ],
   },
 
