@@ -12,7 +12,6 @@ function TermsAndCondition() {
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent
         className="flex max-h-full max-w-[1260px] flex-col justify-between bg-black-800 text-white"
-        hasButton={true}
       >
         <div className="flex h-full overflow-hidden rounded-[10px] border border-[#1D1D1E]">
           <NavBar />

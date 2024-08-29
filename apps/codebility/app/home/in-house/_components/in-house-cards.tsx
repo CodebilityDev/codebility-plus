@@ -1,8 +1,8 @@
 import * as React from "react"
-import { IInhouse } from "@/types"
-import Card from "@/app/home/in-house/Card"
-import EditableCard from "@/app/home/in-house/EditableCard"
+import Card from "./in-house-card"
+import EditableCard from "./in-house-editable-card"
 import DefaultPagination from "@/Components/ui/pagination"
+import { InHouseProps } from "../_types/in-house"
 
 function InHouseCards({
   data,
@@ -13,7 +13,7 @@ function InHouseCards({
   totalPages,
   handlePreviousPage,
   handleNextPage,
-}: IInhouse) {
+}: InHouseProps) {
   const { handleEditButton, handleSaveButton } = handlers
   const { LoadinginHouse, ErrorinHouse } = status
 
@@ -26,7 +26,7 @@ function InHouseCards({
       <div className="flex flex-wrap justify-center gap-4 lg:hidden">
         {data.map((member: any) =>
           editableIds.includes(member.id) ? (
-            <EditableCard key={member.id} member={member} handleSaveButton={handleSaveButton} />
+            <EditableCard key={member.id} data={member} handleSaveButton={handleSaveButton} />
           ) : (
             <Card key={member.id} member={member} handleEditButton={handleEditButton} />
           )

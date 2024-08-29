@@ -28,7 +28,6 @@ const ProjectViewModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogContent
-        hasButton
         className="h-[32rem] w-[95%] max-w-3xl overflow-x-auto overflow-y-auto xs:w-[80%] sm:w-[70%] lg:h-auto"
       >
         <div className="flex flex-col gap-8">

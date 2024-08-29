@@ -3,7 +3,7 @@
 import "reactflow/dist/style.css"
 import ReactFlow, { Background, useNodesState, useEdgesState } from "reactflow"
 
-import "@/app/(home)/ai-integration/components/index.css" 
+import "@/app/(marketing)/ai-integration/components/index.css" 
 import Section from "@/app/(marketing)/Section"
 import { CustomEdge } from "@/app/(marketing)/ai-integration/components/EdgeTypes"
 import { DevProcessCard, DevProcessImage } from "@/app/(marketing)/ai-integration/components/NodeTypes"

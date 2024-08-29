@@ -112,7 +112,15 @@ You can add other folders inside of `packages/` if you know what you're doing an
 ## 🏁 Start the app
 
 - Install dependencies: `pnpm i`
-
+- Codebility / Tapup local dev:
+  - First, provide environment variables
+    - run either `cd apps/tapup` - if running tapup
+      **or**
+      `cd apps/codebilty` - if running codebility.
+    - run `cp .env.example .env.local`
+  - Then `pnpm codebility` - if running codebility.
+    **or**
+    `pnpm tapup` - if running tapup.
 - Next.js local dev: `pnpm run web`
   - Runs `pnpm run next`
 - Expo local dev:
@@ -193,7 +201,7 @@ in the new app `tailwind.config.ts` it must create the connection by extending t
 - `presets:[baseConfig]` extends the global tailwind web config.
 - `content:[...baseConfig.context]` tells the new app config where are the contents we will apply tailwindcss to.
   if you go to `tooling/tailwind/base.ts` you will see that it includes this paths (`'../../packages/**/src/**/*.tsx',
-    '../../apps/**/*.tsx',`).
+  '../../apps/**/*.tsx',`).
 
 ```ts
 import type { Config } from 'tailwindcss'
