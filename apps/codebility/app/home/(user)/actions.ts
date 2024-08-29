@@ -45,8 +45,17 @@ const stopUserTimer = async (codevId: string) => {
     console.log(error);
 }
 
-export const updateUserTaskOnHand = async (codevId: string) => {
+export const updateUserTaskOnHand = async (codevId: string, taskId: string) => {
+    const supabase = getSupabaseServerActionClient();
 
+    const { error } = await supabase.from("codev")
+    .update({
+        task_on_hand_id: taskId
+    }).eq("id", codevId);
+
+    if (error) throw error;
+
+    await stopUserTimer(codevId);
 }
 
 export const logUserTime = async (formData: FormData) => {
