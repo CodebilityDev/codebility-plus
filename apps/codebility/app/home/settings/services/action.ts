@@ -58,10 +58,10 @@ export const createServiceAction = async (formData: FormData) => {
             name,
             description,
             category,
-            main_image: mainImagePath,
-            picture_1: picture1Path,
-            picture_2: picture2Path,
-            user_id: userId
+            mainImage: mainImagePath,
+            picture1: picture1Path,
+            picture2: picture2Path,
+            userId
         })
         .single();
 
@@ -79,13 +79,13 @@ export const updateServiceAction = async (formData: FormData) => {
     const name = formData.get("name") as string;
     const category = formData.get("category") as string;
     const description = formData.get("description") as string;
-    const main_image = formData.get("mainImage") as string;
-    const picture_1 = formData.get("picture1") as string;
-    const picture_2 = formData.get("picture2") as string;
-    const user_id = formData.get("userId") as string;
+    const mainImage = formData.get("mainImage") as string;
+    const picture1 = formData.get("picture1") as string;
+    const picture2 = formData.get("picture2") as string;
+    const userId = formData.get("userId") as string;
 
     const supabase = await createServer();
-    const { error } = await supabase.from("services").update({ name, description, category, main_image, picture_1, picture_2, user_id }).eq("id", id);
+    const { error } = await supabase.from("services").update({ name, description, category, mainImage, picture1, picture2, userId }).eq("id", id);
 
     if (error) {
         console.log("error updating service: ", error.message);
@@ -103,7 +103,7 @@ export const deleteServiceAction = async (formData: FormData) => {
 
     const { data: service, error: serviceError } = await supabase
         .from("services")
-        .select("main_image, picture_1, picture_2")
+        .select("mainImage, picture1, picture2")
         .eq("id", id)
         .single();
 
@@ -112,7 +112,7 @@ export const deleteServiceAction = async (formData: FormData) => {
         return { success: false, error: serviceError?.message || "Service not found" };
     }
 
-    const imagePaths = [service.main_image, service.picture_1, service.picture_2].filter(Boolean);
+    const imagePaths = [service.mainImage, service.picture1, service.picture2].filter(Boolean);
 
     const deleteImagePromises = imagePaths.map(async (path) => {
         const filePath = path.replace("public/", "");
