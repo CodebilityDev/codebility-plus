@@ -2,7 +2,7 @@
 
 import { TableBody, TableCell, TableRow } from "@/Components/ui/table"
 import { IconDelete, IconEditFillNone } from "@/public/assets/svgs"
-import { deleteService } from "../action";
+import { deleteServiceAction } from "../action";
 import toast from "react-hot-toast";
 import { useRouter } from "next/navigation";
 
@@ -14,7 +14,7 @@ const ServiceList = ({ data }: any) => {
         formData.append("id", id);
     
         try {
-            const response = await deleteService(formData);
+            const response = await deleteServiceAction(formData);
             if (response?.success) {
                 toast.success("Delete Service Successfully");
             } else {
