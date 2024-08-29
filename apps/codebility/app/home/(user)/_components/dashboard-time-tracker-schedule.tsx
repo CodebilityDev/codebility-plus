@@ -37,8 +37,8 @@ export default function TimeTrackerSchedule({ startTime, endTime, codevId }: Pro
 
       // a server action but don't have to await since we used state to display changes.
       updateUserSchedule({
-        startTime: currentStartTime,
-        endTime: currentEndTime
+        startTime: time.start_time,
+        endTime: time.end_time
       }, codevId);
     }
     
