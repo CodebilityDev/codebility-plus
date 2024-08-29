@@ -20,3 +20,15 @@ export const updateUserSchedule = async ({
 
     console.log("update schedule error ", error);
 }
+
+export const startUserTimer = async (codevId: string) => {
+    const supabase = getSupabaseServerActionClient();
+    const currentDate = new Date();
+
+    const { error } = await supabase.from("codev")
+    .update({
+        task_timer_start_at: currentDate
+    }).eq("id", codevId);
+
+    console.log(error);
+}
