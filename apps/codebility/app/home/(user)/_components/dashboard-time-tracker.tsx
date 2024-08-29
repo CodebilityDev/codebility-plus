@@ -47,7 +47,7 @@ export default async function TimeTracker() {
   const timerStartAt = data.codev.task_timer_start_at;
 
   // get how many seconds have passed since start at time.
-  const timerInitialSecond = timerStartAt && ((Date.now() - new Date(timerStartAt).getTime()) / 1000 / 60);
+  const timerInitialSecond = timerStartAt && ((Date.now() - new Date(timerStartAt).getTime()) / 1000);
 
   return (
     <>
