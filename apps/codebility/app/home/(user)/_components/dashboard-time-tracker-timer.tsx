@@ -34,7 +34,11 @@ export default function TimeTrackerTimer({ codevId, timerInitialSecond }: Props)
 
     if (!isTimerRunning) {
       await startUserTimer(codevId);
-    }
+      return;
+    } 
+
+    setIsTimerRunning(false);
+    setElapsedTime(0);
 /*     if (isTimerRunning && selectedTask && user.id) {
       const taskDurationInSeconds = selectedTask?.duration * 3600
       const allowedTime = taskDurationInSeconds + 1800 // task duration + 30 minutes in seconds
@@ -48,21 +52,12 @@ export default function TimeTrackerTimer({ codevId, timerInitialSecond }: Props)
 /*       await updateUserPoints(user.id, finalPoints) */
     }
 
-/*   const updateUserPoints = async (user.id: string, points: number) => {
-    try {
-      await axios.patch(`${API.USERS}/${user.id}`, { total_points: { FE: points } })
-    } catch (error) {
-      console.error("Error updating user points:", error)
-    }
-  }
- */
-
   return (
     <>
       <p className="text-5xl font-bold">{formatTime(elapsedTime)}</p>
-      <Button 
+      <Button
         onClick={handleStartStopTimer}
-        type={isTimerRunning ? "submit": "button"}
+        type={isTimerRunning ? "submit" : "button"}
       >
         {isTimerRunning ? "Stop Timer" : "Start Timer"}
       </Button>
