@@ -56,6 +56,9 @@ export const logUserTime = async (formData: FormData) => {
     .eq("id", codevId)
     .single();
 
+    // it means that task is not yet being started so we don't log the time spent on that task.
+    if (codevData?.task_timer_start_at === null) return; 
+
     if (fetchingCodevError) throw fetchingCodevError;
 
     const taskDuration = codevData.task && codevData.task.duration;
