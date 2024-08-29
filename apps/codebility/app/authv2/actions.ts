@@ -5,6 +5,7 @@ import { FieldValues } from "react-hook-form";
 
 import { formatToUnix } from "@/lib/format-date-time";
 import { redirect } from "next/navigation";
+import pathsConfig from "@/config/paths.config";
 
 export const signupUser = async (data: FieldValues) => {
     const supabase = getSupabaseServerActionClient();
@@ -45,7 +46,7 @@ export const signinUser = async (email: string, password: string) => {
 
     if (error) throw error;
 
-    redirect("/authv2/signin"); // will cause a reload so middleware would know the updated session.
+    redirect(pathsConfig.app.home); // redirect to home after sign in
 }
 
 export const signOut = async () => {
