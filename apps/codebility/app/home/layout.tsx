@@ -24,34 +24,34 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
     permissions: [""]
   };
 
-  if (user) {
-    const { data } = await supabase.from("user")
-    .select(`
-      *,
-      codev(
-        id,
-        start_time,
-        end_time
-      ),
-      user_type(
-        roles,
-        kanban,
-        clients,
-        interns,
-        my_task,
-        in_house,
-        projects,
-        services,
-        dashboard,
-        applicants,
-        org_charts,
-        permissions,
-        time_tracker
-      ),
-      profile(*)
-    `).eq('id', user?.id)
-    .single();
-  
+  const { data } = await supabase.from("user")
+  .select(`
+    *,
+    codev(
+      id,
+      start_time,
+      end_time
+    ),
+    user_type(
+      roles,
+      kanban,
+      clients,
+      interns,
+      my_task,
+      in_house,
+      projects,
+      services,
+      dashboard,
+      applicants,
+      org_charts,
+      permissions,
+      time_tracker
+    ),
+    profile(*)
+  `).eq('id', user?.id)
+  .single();
+
+  if (data) {
     const permissionNames = Object.keys(data?.user_type || {});
     const permissions = permissionNames.filter(permissionName => data.user_type[permissionName]);
     const { first_name, last_name, main_position, image_url } = data.profile;
