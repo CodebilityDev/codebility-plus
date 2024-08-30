@@ -1,16 +1,14 @@
 import dynamic from "next/dynamic"
 
-import useAuth from "@/hooks/use-auth"
 import { Box } from "@/Components/shared/dashboard"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
 const TimeTrackerTableDesktop = dynamic(() => import("./time-tracker-table-desktop"), { ssr: false })
 const TimeTrackerTableMobile = dynamic(() => import("./time-tracker-table-mobile"), { ssr: false })
 
 const TimeTrackerTable = () => {
-  const { isLoading } = useAuth()
   return (
     <>
-      {!isLoading ? (
+      {!false ? (
         <div className="hidden md:block">
           <TimeTrackerTableDesktop />
         </div>

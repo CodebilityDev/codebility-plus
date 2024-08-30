@@ -1,22 +1,17 @@
-"use client"
-
-import useAuth from "@/hooks/use-auth"
-import TimeTrackerTable from "@/app/home/time-tracker/TimeTrackerTable"
+import TimeTrackerTable from "@/app/home/time-tracker/_components/time-tracker-table"
 import H1 from "@/Components/shared/dashboard/H1"
 import Box from "@/Components/shared/dashboard/Box"
-import { excessHours, totalRenderedHours } from "@/app/home/time-tracker/data"
+import { excessHours, totalRenderedHours } from "@/app/home/time-tracker/_lib/dummy-data"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
 
 const TimeTracker = () => {
-  const { isLoading } = useAuth()
-
   return (
     <>
       <div className="max-w-screen-xl mx-auto flex w-full flex-col justify-center gap-4  ">
         <H1>Time Logs</H1>
 
         <div className="flex flex-col gap-4 lg:flex-row">
-          {!isLoading ? (
+          {!false ? (
             <>
               <Box className="flex w-full min-h-[200px] flex-1 flex-col items-center gap-4 text-center md:flex-row lg:w-1/2">
                 <Box className="w-full">
