@@ -9,7 +9,7 @@ import { IconEdit, IconDelete } from "@/public/assets/svgs"
 import Box from "@/Components/shared/dashboard/Box"
 
 import { Textarea } from "@codevs/ui/textarea"
-import { getWorkExperience, updateWorkExperience, deleteWorkExperience, createWorkExperience, updateProfile } from "./action"
+import { getWorkExperience, updateWorkExperience, deleteWorkExperience, createWorkExperience, updateProfile } from "../action"
 import { useQuery } from "@tanstack/react-query"
 import exp from "constants"
 

@@ -1,10 +1,8 @@
-"use client"
+/* eslint-disable no-unused-vars */
+
 // import About from "@/app/home/settings/resume/About"
 // import Photo from "@/app/home/settings/resume/Photo"
-import Experience from "@/app/home/settings/resume/Experience"
 
-
-import PersonalInfo from "@/app/home/settings/resume/PersonalInfo"
 // import TimeSchedule from "@/app/home/settings/resume/TimeSchedule"
 import { Toaster } from "react-hot-toast"
 import { H1 } from "@/Components/shared/dashboard"
@@ -16,15 +14,23 @@ import {
   BreadcrumbList,
   BreadcrumbSeparator,
 } from "@codevs/ui/breadcrumb"
+import Experience from "./_components/experience"
+import Skills from "./_components/skills"
+import ContactInfo from "./_components/contact-info"
+import PersonalInfo from "./_components/personal-info"
+import About from "./_components/about"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 
-import About from "./About"
 
-import ContactInfo from "./ContactInfo"
-import Skills from "./Skills"
 
 
 const Resume = async () => { 
-
+  
+    const supabase = getSupabaseServerComponentClient()
+    const {data: {user} } = await supabase.auth.getUser()
+    const {data: profileDatas} = await supabase.from("profile").select().eq("id", user?.id).single()
+  
+ 
   // if (isLoading) {
   //   return (
   //     <>
@@ -68,11 +74,11 @@ const Resume = async () => {
         <H1>Resume Settings</H1>
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8">
-           {/* <PersonalInfo />   */}
-        {/*  <About />
+           <PersonalInfo user={profileDatas} />  
+          {/* <About />
           <ContactInfo  /> */}
-          <Experience  />
-          <Skills />
+          {/* <Experience  /> */}
+          {/* <Skills/> */}
         </div>
         <div className="flex w-full basis-[30%] flex-col gap-8">
           {/* <Photo user={userData} /> */}

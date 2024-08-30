@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import "server-only"
 import LeftSidebar from "./_components/home-left-sidebar"
 import Navbar from "./_components/home-navbar"
@@ -5,7 +6,7 @@ import React from "react"
 import ReactQueryProvider from "@/hooks/reactQuery"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import { cookies } from "next/headers"
-import UserContextProvider from "./_components/user-provider"
+// import UserContextProvider from "./_components/user-provider"
 
 export default async function HomeLayout({ children }: { children: React.ReactNode }) {
   const supabase = createServerComponentClient( { cookies } );
@@ -36,20 +37,20 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
 
   const permissionNames = Object.keys(data?.user_type || {});
   const permissions = permissionNames.filter(permissionName => data.user_type[permissionName]);
-  const { first_name, last_name, main_position, image_url } = data.profile;
+  // const { first_name, last_name, main_position, image_url } = data.profile;
 
-  const userData = {
-    first_name,
-    last_name,
-    email: data.email,
-    main_position,
-    image_url,
-    permissions
-  };
+  // const userData = {
+  //   first_name,
+  //   last_name,
+  //   email: data.email,
+  //   main_position,
+  //   image_url,
+  //   permissions
+  // };
 
   return (
     <ReactQueryProvider>
-      <UserContextProvider userData={userData}>   
+      {/* <UserContextProvider userData={userData}>    */}
         <main className="background-light850_dark100 relative">
           <Navbar />
           <div className="flex">
@@ -59,7 +60,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
             </section>
           </div>
         </main>
-      </UserContextProvider>
+      {/* </UserContextProvider> */}
     </ReactQueryProvider>
   )
 }

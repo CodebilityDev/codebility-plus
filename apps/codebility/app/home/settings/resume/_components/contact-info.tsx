@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useForm } from "react-hook-form"
@@ -12,7 +13,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { contactInfoValidation, contactInfoValidationSchema } from "@/lib/validations/resumeSettings"
 import { Input } from "@codevs/ui/input"
 import { useQuery } from "@tanstack/react-query"
-import { getProfile, updateProfile } from "./action"
+import { getProfile, getSocial, updateProfile, updateSocial } from "../action"
 
 type ContactInfo = {
   phone_no: string
@@ -31,7 +32,7 @@ const ContactInfo = () => {
   const { data: profile,  isError: profileLoading } = useQuery({
     queryKey: ["profile"],
     queryFn: async () => {
-      const { data, error } = await getProfile()
+      const { data, error } = await getSocial()
       if (error) throw error;
       return data;
     },
@@ -56,25 +57,7 @@ const ContactInfo = () => {
     },
    
   })
-  // const {
-  //   register,
-  //   handleSubmit,
-  //   reset,
-  //   control,
-  //   formState: { errors },
-  // } = useForm<contactInfoValidationSchema>({
-  //   defaultValues: {
-  //     phone_no: "" || undefined,
-  //     portfolio_website: "" || undefined,
-  //     github_link: "" || undefined,
-  //     linkedin_link: "" || undefined,
-  //     fb_link: ""|| undefined,
-  //     telegram_link: "" || undefined,
-  //     whatsapp_link: "" || undefined,
-  //     skype_link: "" || undefined,
-  //   },
-  //   resolver: zodResolver(contactInfoValidation),
-  // })
+  
 
   useEffect(() => {
     if (profile) {
@@ -83,7 +66,7 @@ const ContactInfo = () => {
         portfolio_website: profile.portfolio_website || "",
         github_link: profile.github_link || "",
         linkedin_link: profile.linkedin_link || "",
-        fb_link: profile. fb_link || "",
+        fb_link: profile.fb_link || "",
         telegram_link: profile.telegram_link || "",
         whatsapp_link: profile.whatsapp_link || "",
         skype_link: profile.skype_link || ""
@@ -104,7 +87,7 @@ const ContactInfo = () => {
         whatsapp_link,
         skype_link
       } = data;
-      await updateProfile({phone_no, portfolio_website, github_link, linkedin_link, fb_link, telegram_link, whatsapp_link, skype_link})
+      await updateSocial({phone_no, portfolio_website, github_link, linkedin_link, fb_link, telegram_link, whatsapp_link, skype_link})
       toast.success("Your contact info was sucessfully updated!")
       setIsEditMode(false)
     } catch(error){

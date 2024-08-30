@@ -1,5 +1,5 @@
-
-import { useEffect, useState } from "react"
+"use client"
+import {  useState } from "react"
 // import toast from "react-hot-toast"
 import { useForm } from "react-hook-form"
 
@@ -21,65 +21,43 @@ import { Button } from "@/Components/ui/button"
 import Box from "@/Components/shared/dashboard/Box"
 
 
-import { getProfile, getPronouns, updateProfile } from "./action"
-import { useQuery } from "@tanstack/react-query"
+import { updateProfile } from "../action"
+
 import toast from "react-hot-toast"
+import { positions, profilePronoun } from "@/constants"
 
 
 
 interface PersonalInfo  {
-  id: string,
+  user:{
+  id?: string,
   first_name: string;
   last_name: string;
-  pronoun: string
+  pronoun?: string
   main_position: string
   address: string
 }
+}
 
-const PersonalInfo = () => {
+const PersonalInfo = ({user}: PersonalInfo) => {
 const [isEditMode, setIsEditMode] = useState(false)
 const [isLoading, setIsLoading] = useState(false)
-const {register,handleSubmit, reset} = useForm<PersonalInfo>({defaultValues: {
-  first_name: "",
-  last_name: "",
-  pronoun: "",
-  main_position: "",
-  address: ""
-}})
+const {  first_name, last_name, address, main_position, pronoun } = user
+const {register,handleSubmit} = useForm<PersonalInfo>(
+  {
+  defaultValues: {
+    user: {
+      pronoun: pronoun || "",
+      first_name: first_name || "",
+      last_name: last_name || "",
+      address: address || "",
+      main_position: main_position || "",
+    },
+},})
   const [selectedPronoun, setSelectedPronoun] = useState<string | null>(null)
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null)
 
-  const { data: profile } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data, error } = await getProfile()
-      if (error) throw error;
-      return data;
-    },
-  });
   
-  const { data: pronouns } = useQuery({
-    queryKey: ["pronouns"],
-    queryFn: async () => {
-     return  await getPronouns()
-    },
-  });
-
-
-
-  useEffect(() => {
-    if (profile) {
-      reset({
-        first_name: profile.first_name || "",
-        last_name: profile.last_name || "",
-        address: profile.address || "",
-        pronoun: profile.pronoun || "",
-        main_position: profile.main_position || ""
-      })
-      setSelectedPronoun(profile.pronoun)
-      setSelectedPosition(profile.main_position)
-    }
-  }, [profile, reset])
 
   const onSubmit = async (data: any)=> {
     try {
@@ -116,7 +94,8 @@ const {register,handleSubmit, reset} = useForm<PersonalInfo>({defaultValues: {
             <div className="flex flex-col gap-2 pt-2">
               <Select onValueChange={(value) => setSelectedPronoun(value)} disabled={!isEditMode}>
                 <SelectTrigger
-                  aria-label="Pronoun"
+                  aria-label="pronoun"
+              
                   className={` ${
                     isEditMode
                       ? "bg-white dark:bg-dark-200"
@@ -129,9 +108,9 @@ const {register,handleSubmit, reset} = useForm<PersonalInfo>({defaultValues: {
                 <SelectContent className=" bg-white dark:bg-dark-200">
                   <SelectGroup>
                     <SelectLabel className="text-xs text-gray">Please select</SelectLabel>
-                    {pronouns?.map((pronoun: any, i: number) => (
+                    {profilePronoun.map((pronoun:any, i: number) => (
                       <SelectItem key={i} className="text-sm" value={pronoun}>
-                        {pronoun.enum_value}
+                        {pronoun}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -143,7 +122,7 @@ const {register,handleSubmit, reset} = useForm<PersonalInfo>({defaultValues: {
             parentClassName="flex w-full flex-col justify-between gap-2 "
             label="First Name"
             id="first_name"
-            {...register("first_name")}
+            {...register("user.first_name")}
             disabled={!isEditMode}
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded capitalize"
@@ -151,7 +130,7 @@ const {register,handleSubmit, reset} = useForm<PersonalInfo>({defaultValues: {
           />
           <Input
             id="last_name"
-            {...register("last_name")}
+            {...register("user.last_name")}
             label="Last Name"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
@@ -161,7 +140,7 @@ const {register,handleSubmit, reset} = useForm<PersonalInfo>({defaultValues: {
           />
           <Input
             id="address"
-            {...register("address")}
+            {...register("user.address")}
             label="Address"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2 "
@@ -173,9 +152,10 @@ const {register,handleSubmit, reset} = useForm<PersonalInfo>({defaultValues: {
           <div className="flex w-full flex-col justify-between gap-1 pt-5">
             <Label className="text-md">Position</Label>
 
-            <Select onValueChange={(value) => setSelectedPosition(value)} disabled={!isEditMode}>
+            <Select onValueChange={(value) => setSelectedPosition(value)} disabled={!isEditMode} {...register("user.main_position")}>
               <SelectTrigger
-                aria-label="Position"
+                aria-label="main_position"
+
                 className={` ${
                   isEditMode
                     ? "bg-white dark:bg-dark-200"
@@ -190,11 +170,11 @@ const {register,handleSubmit, reset} = useForm<PersonalInfo>({defaultValues: {
               <SelectContent className=" rounded-md">
                 <SelectGroup>
                   <SelectLabel className="">Please select</SelectLabel>
-                  {/* {main_position.map((position, i) => (
+                  {positions.map((position: any, i: number) => (
                     <SelectItem key={i} className="text-sm" value={position}>
                       {position}
                     </SelectItem>
-                  ))} */}
+                  ))}
                 </SelectGroup>
               </SelectContent>
             </Select>
