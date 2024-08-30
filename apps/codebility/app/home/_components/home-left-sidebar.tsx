@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client"
 
 import { sidebarData } from "@/constants"
@@ -44,7 +45,7 @@ const LeftSidebar = () => {
           className={`toggle-logo-btn ${isToggleOpen ? "close-nav" : "open-nav mx-auto"}`}
         />
       </div>
-      <div className="flex flex-1 flex-col gap-2 max-lg:hidden">
+      {/* <div className="flex flex-1 flex-col gap-2 max-lg:hidden">
         {sidebarData.map((item) => (
           <div key={item.id} className={`${!isToggleOpen ? "mt-0" : "mt-5"}`}>
             <h4 className={`text-sm uppercase text-gray ${!isToggleOpen ? "hidden" : "block"}`}>{item.title}</h4>
@@ -78,7 +79,7 @@ const LeftSidebar = () => {
             </div>
           </div>
         ))}
-      </div>
+      </div> */}
     </section>
   )
 }

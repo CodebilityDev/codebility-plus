@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import Image from "next/image"
 
 import { useModal } from "@/hooks/use-modal"
@@ -7,7 +8,7 @@ import React, { useEffect, useState } from "react"
 import { Box } from "@/Components/shared/dashboard"
 import { useTechStackStore } from "@/hooks/use-techstack"
 import { resume_SkillsT } from "@/types/protectedroutes"
-import { getProfile, updateProfile } from "./action"
+import { getProfile, updateProfile } from "../action"
 import { useQuery } from "@tanstack/react-query"
 import toast from "react-hot-toast"
 

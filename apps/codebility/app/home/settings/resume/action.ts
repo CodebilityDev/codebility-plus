@@ -1,8 +1,19 @@
+/* eslint-disable no-unused-vars */
 "use server"
 
 import { createServer } from "@/utils/supabase";
 import { object } from "zod";
 
+
+export async function getPositions() {
+    const supabase = createServer()
+    const { data, error} = await supabase.rpc('get_enum_values', {
+        enum_name: 'positions',
+        schema_name: 'public',
+     })
+    return data
+    
+  }
 export async function getPronouns() {
     const supabase = createServer()
     const { data, error} = await supabase.rpc('get_enum_values', {
@@ -15,15 +26,24 @@ export async function getPronouns() {
 export async function updateProfile(updatedData: any) {
     const supabase = createServer()
     const {data: {user} } = await supabase.auth.getUser()
-    const {data} = await supabase.from("resume").update(updatedData).eq("id", user?.id).select()
+    const {data} = await supabase.from("profile").update(updatedData).eq("id", user?.id).select()
     console.log(data)
 }
 export async function getProfile() {
     const supabase = createServer()
     const {data: {user} } = await supabase.auth.getUser()
-
-    return supabase.from("resume").select().eq("id", user?.id).single()
-   
+    return supabase.from("profile").select().eq("id", user?.id).single()
+}
+export async function getSocial(){
+    const supabase = createServer()
+    const {data: {user}} = await supabase.auth.getUser()
+    return supabase.from("social").select().eq("id", user?.id).single()
+}
+export async function updateSocial(updatedData: any) {
+    const supabase = createServer()
+    const {data: {user} } = await supabase.auth.getUser()
+    const {data} = await supabase.from("social").update(updatedData).eq("id", user?.id).select()
+    console.log(data)
 }
 export async function getWorkExperience() {
     const supabase = createServer()

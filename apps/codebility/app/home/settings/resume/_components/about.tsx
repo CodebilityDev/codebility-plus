@@ -9,7 +9,7 @@ import { IconEdit } from "@/public/assets/svgs"
 import Box from "@/Components/shared/dashboard/Box"
 import { Textarea } from "@codevs/ui/textarea"
 import { Label } from "@codevs/ui/label"
-import { getProfile, updateProfile } from "./action"
+import { getProfile, updateProfile } from "../action"
 import { useQuery } from "@tanstack/react-query"
 
 const About = () => {
@@ -32,13 +32,13 @@ const About = () => {
     formState: {},
   } = useForm({
     defaultValues: {
-      about_me: "",
+      about: "",
     },
   })
   useEffect(() => {
     if (profile) {
       reset({
-        about_me: profile.about_me || "",
+        about: profile.about || "",
       })
     }
   }, [profile, reset])
@@ -46,8 +46,8 @@ const About = () => {
   const onSubmit = async (data: any) => {
     try {
       setIsLoading(true)
-      const about_me =  data.about_me
-      await updateProfile({about_me})
+      const about =  data.about
+      await updateProfile({about})
       toast.success("Your about was sucessfully updated!")
       setIsEditMode(false)
     } catch(error){
@@ -87,7 +87,7 @@ const About = () => {
                 variant="resume"
                 placeholder="Write something about yourself..."
                 id="about_me"
-                {...register("about_me")}
+                {...register("about")}
                 disabled={!isEditMode || profileLoading}
                 className={` placeholder-${
                   !isEditMode ? "lightgray dark:placeholder-gray" : "black-100 dark:placeholder-gray-400"
