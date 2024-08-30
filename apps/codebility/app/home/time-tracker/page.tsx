@@ -18,7 +18,17 @@ export default async function TimeTracker() {
   `).eq("user_id", user?.id)
   .single();
 
-  console.log(data);
+  const HoursSpent = {
+    renderedHours: 0,
+    excessHours: 0
+  }
+
+  if (data && data.time_log) {
+    // sum all logs worked hours.
+    HoursSpent.renderedHours = data.time_log.reduce((total, log) => total + log.worked_hours, 0).toFixed(2);
+    // sum all logs excess hours.
+    HoursSpent.excessHours = data.time_log.reduce((total, log) => total + log.excess_hours, 0).toFixed(2);
+  }
   
   return (
     <div className="max-w-screen-xl mx-auto flex w-full flex-col justify-center gap-4">
@@ -29,11 +39,11 @@ export default async function TimeTracker() {
           <>
             <Box className="flex w-full min-h-[200px] flex-1 flex-col items-center gap-4 text-center md:flex-row lg:w-1/2">
               <Box className="w-full">
-                <H1>{totalRenderedHours}</H1>
+                <H1>{HoursSpent.renderedHours}</H1>
                 <p className="text-gray">Rendered Hours </p>
               </Box>
               <Box className="w-full">
-                <H1>{excessHours} </H1>
+                <H1>{HoursSpent.excessHours} </H1>
                 <p className="text-gray">Excess Hours</p>
               </Box>
             </Box>
