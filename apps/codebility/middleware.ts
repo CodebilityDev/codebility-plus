@@ -1,6 +1,6 @@
 import { NextResponse, URLPattern } from 'next/server';
 import type { NextRequest } from 'next/server';
-// import { createMiddlewareClient } from "@codevs/supabase/middleware-client"
+import { createMiddlewareClient } from "@codevs/supabase/middleware-client"
 import pathsConfig from './config/paths.config';
 
 export const config = {
@@ -18,9 +18,9 @@ export const config = {
 };
 
 const getUser = (req: NextRequest, res: NextResponse) => {
-  // const supabase = createMiddlewareClient({req,res});
+  const supabase = createMiddlewareClient({req,res});
 
-  // return supabase.auth.getUser();
+  return supabase.auth.getUser();
 };
 
 
