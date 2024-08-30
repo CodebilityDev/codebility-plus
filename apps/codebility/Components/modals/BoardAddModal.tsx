@@ -85,7 +85,7 @@ const BoardAddModal = () => {
   return (
     <Dialog open={isModalOpen}>
       <DialogContent
-        className="flex h-auto w-[100%] max-w-3xl flex-col gap-6 overflow-x-auto overflow-y-auto"
+        className="background-lightbox_darkbox text-dark100_light900 flex h-auto w-[100%] max-w-3xl flex-col gap-6 overflow-x-auto overflow-y-auto"
       >
         <DialogHeader className="relative">
           <DialogTitle className="mb-2 text-left text-lg">Add New Board</DialogTitle>
