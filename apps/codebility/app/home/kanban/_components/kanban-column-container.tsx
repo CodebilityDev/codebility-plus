@@ -1,7 +1,7 @@
 import { useMemo } from "react"
 import { useModal } from "@/hooks/use-modal"
 
-import KanbanTask from "@/app/home/kanban/components/KanbanTask"
+import KanbanTask from "@/app/home/kanban/_components/kanban-task"
 import { SortableContext, useSortable } from "@dnd-kit/sortable"
 import { kanban_ColumnContainerT } from "@/types/protectedroutes"
 
