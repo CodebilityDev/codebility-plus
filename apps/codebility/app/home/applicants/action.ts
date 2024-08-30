@@ -28,7 +28,7 @@ export const rejectAction = async (email_address: string) => {
   
       if (deleteError) throw deleteError;
       
-      revalidatePath('/home/applicantsv2')
+      revalidatePath('/home/applicants')
       return { success: true };
     } catch (error) {
       console.error('Error transferring data:', error);
@@ -58,7 +58,7 @@ export const rejectAction = async (email_address: string) => {
   
       if (deleteError) throw deleteError;
   
-      revalidatePath('/home/applicantsv2')
+      revalidatePath('/home/applicants')
       return { success: true };
     } catch (error) {
       console.error('Error transferring data:', error);
