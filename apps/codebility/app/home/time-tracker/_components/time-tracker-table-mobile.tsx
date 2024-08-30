@@ -10,7 +10,7 @@ interface Props {
 const TimeTrackerTableMobile = ({ timeLog }: Props) => {
   return (
     <>
-      {timeLog.map((log, index) => (
+      {timeLog.reverse().map((log, index) => ( // reverse log array to start from newest log.
         <Table
           key={index}
           className="background-box text-dark100_light900 my-[10px] flex h-[355px] flex-col  rounded border border-zinc-200 shadow-sm dark:border-zinc-700 "
