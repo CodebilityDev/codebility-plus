@@ -5,6 +5,7 @@ import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs"
 import { Table, TableCell, TableHeader, TableRow } from "@/Components/ui/table"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@codevs/ui/accordion"
 import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants"
+import ApplicantsActionButtons from "@/app/home/applicants/_components/applicants-action-buttons"
 
 const ApplicantsTableMobile = ({ applicants }: { applicants: ApplicantsList_Types[] }) => {
     const applicantsLen = applicants?.length as number
@@ -22,6 +23,8 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: ApplicantsList_Type
                                         </p>
                                     </div>
                                     <div className="flex w-1/2 justify-end pr-4 md:pr-8">
+                                        <ApplicantsActionButtons email_address={email_address} />
+
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent className="p-4">

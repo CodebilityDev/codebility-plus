@@ -5,6 +5,7 @@ import { Checkbox } from "@codevs/ui/checkbox"
 import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs"
 import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/Components/ui/table"
 import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants"
+import ApplicantsActionButtons from "./applicants-action-buttons"
 
 const ApplicantsTableDesktop = ({ applicants }: { applicants: ApplicantsList_Types[] }) => {
     const applicantsLen = applicants?.length as number
@@ -76,6 +77,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: ApplicantsList_Typ
                                     </div>
                                 </TableCell>
                                 <TableCell className="col-span-2 flex h-full w-full flex-row items-center justify-center gap-4">
+                                    <ApplicantsActionButtons email_address={email_address} />
                                 </TableCell>
                             </TableRow>
                         )
