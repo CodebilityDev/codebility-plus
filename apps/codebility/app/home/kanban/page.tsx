@@ -1,5 +1,4 @@
 import H1 from "@/Components/shared/dashboard/H1"
-import KanbanBoardsContainer from "./_components/kanban-boards-container"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/Components/ui/table"
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
@@ -7,7 +6,8 @@ import { Box } from "@/Components/shared/dashboard";
 import pathsConfig from "@/config/paths.config";
 import Link from "next/link";
 import { Button } from "@/Components/ui/button";
-import { IconKanban } from "@/public/assets/svgs";
+import { IconAdd, IconKanban } from "@/public/assets/svgs";
+import KanbanBoardsSearch from "./_components/kanban-boards-search";
 
 export default async function KanbanPage() {  
   const supabase = await getSupabaseServerComponentClient();
@@ -34,7 +34,16 @@ export default async function KanbanPage() {
       </div>
       <div className="text-dark100_light900 flex max-w-7xl flex-col gap-4">
         <div className="text-dark100_light900 text-md font-semibold md:text-2xl">BOARDS</div>
-     {/*    <KanbanBoardsContainer /> */}
+        <div className="flex flex-col items-end gap-4 md:flex-row md:items-center md:justify-end">
+          <KanbanBoardsSearch />
+          <Button
+            variant="default"
+            className="flex w-max items-center ga   p-2"
+          >
+          <IconAdd />
+          <p>Add new board</p>
+          </Button>
+        </div>
         <Table>
             <TableHeader className="hidden lg:block">
               <TableRow className="grid grid-cols-4 place-items-center text-dark100_light900 border-none">
