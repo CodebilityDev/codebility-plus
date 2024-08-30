@@ -11,7 +11,6 @@ const ApplicantsList = ({ applicants }: { applicants: ApplicantsList_Types[] }) 
                 <H1>Applicants List</H1>
             </div>
             <Box>
-
                 <ApplicantsTableContainer applicants={applicants} />
             </Box>
         </>
