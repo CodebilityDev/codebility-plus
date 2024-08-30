@@ -24,7 +24,6 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: ApplicantsList_Type
                                     </div>
                                     <div className="flex w-1/2 justify-end pr-4 md:pr-8">
                                         <ApplicantsActionButtons email_address={email_address} />
-
                                     </div>
                                 </AccordionTrigger>
                                 <AccordionContent className="p-4">
