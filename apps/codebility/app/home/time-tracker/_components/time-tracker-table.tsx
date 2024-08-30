@@ -11,12 +11,11 @@ interface Props {
 }
 
 export default function TimeTrackerTable({ timeLog }: Props) {
-  console.log(timeLog);
   return (
     <>
-      {!false ? (
+      {timeLog ? (
         <div className="hidden md:block">
-          <TimeTrackerTableDesktop />
+          <TimeTrackerTableDesktop timeLog={timeLog}/>
         </div>
       ) : (
         <Box className="h-70">
