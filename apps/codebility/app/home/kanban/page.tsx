@@ -6,11 +6,12 @@ import { Box } from "@/Components/shared/dashboard";
 import pathsConfig from "@/config/paths.config";
 import Link from "next/link";
 import { Button } from "@/Components/ui/button";
-import { IconAdd, IconKanban } from "@/public/assets/svgs";
+import { IconKanban } from "@/public/assets/svgs";
 import KanbanBoardsSearch from "./_components/kanban-boards-search";
+import BoardAddModal from "./_components/kanban-board-add-modal";
 
 export default async function KanbanPage() {  
-  const supabase = await getSupabaseServerComponentClient();
+  const supabase = getSupabaseServerComponentClient();
   const { data, error } = await supabase.from("board")
   .select(`
     *,
@@ -36,13 +37,7 @@ export default async function KanbanPage() {
         <div className="text-dark100_light900 text-md font-semibold md:text-2xl">BOARDS</div>
         <div className="flex flex-col items-end gap-4 md:flex-row md:items-center md:justify-end">
           <KanbanBoardsSearch />
-          <Button
-            variant="default"
-            className="flex w-max items-center ga   p-2"
-          >
-          <IconAdd />
-          <p>Add new board</p>
-          </Button>
+          <BoardAddModal />
         </div>
         <Table>
             <TableHeader className="hidden lg:block">
