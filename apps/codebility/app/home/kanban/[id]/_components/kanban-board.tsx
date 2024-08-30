@@ -23,7 +23,7 @@ import { Button } from "@/Components/ui/button"
 import KanbanTask from "@/app/home/kanban/_components/kanban-task"
 import { ArrowRightIcon } from "@/public/assets/svgs"
 import { IconAdd, IconSearch } from "@/public/assets/svgs"
-import ColumnContainer from "@/app/home/kanban/_components/kanban-column-container"
+import ColumnContainer from "./kanban-column-container"
 import { kanban_Kanban } from "@/types/protectedroutes"
 import { ListT, TaskT } from "@/types/index"
 
