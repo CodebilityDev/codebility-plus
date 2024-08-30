@@ -19,7 +19,7 @@ export default function TimeTrackerTableDesktop({ timeLog }: Props) {
         </TableRow>
       </TableHeader>
       <TableBody className="flex w-full flex-col">
-        {timeLog.map((log, index) => (
+        {timeLog.reverse().map((log, index) => ( // reverse log array to start from newest log.
           <TableRow key={index} className="md:text-md flex w-full flex-row items-center text-sm lg:text-lg">
             <TableCell className="basis-[24%] pl-9  font-medium">{log.task.title}</TableCell>
             <TableCell className="basis-[8%] text-center">{0}</TableCell>
