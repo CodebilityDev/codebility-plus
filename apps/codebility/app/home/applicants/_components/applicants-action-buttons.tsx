@@ -1,14 +1,34 @@
+import { approveAction, rejectAction } from "@/app/home/applicants/action"
 import { useState } from "react";
+import toast from "react-hot-toast"
 
-const ApplicantsActionButtons = ({ email_address }: { email_address: string }) => {
+const ApplicantsApprovalButtons = ({ email_address }: { email_address: string }) => {
     const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const handleAccept = async (email_address: string) => {
+        setIsLoading(true);
+        const { success, error } = await approveAction(email_address);
+        setIsLoading(false);
 
+        if (!success) {
+            console.error("accept applicant error", error);
+            return toast.error("Something went wrong");
+        }
+
+        return toast.success("Applicant has been accepted");
     };
 
     const handleDeny = async (email_address: string) => {
+        setIsLoading(true);
+        const { success, error } = await rejectAction(email_address);
+        setIsLoading(false);
 
+        if (!success) {
+            console.error("deny applicant error", error);
+            return toast.error("Something went wrong");
+        }
+
+        return toast.success("Applicant has been denied");
     };
 
     return (
@@ -31,5 +51,5 @@ const ApplicantsActionButtons = ({ email_address }: { email_address: string }) =
     );
 };
 
-export default ApplicantsActionButtons;
+export default ApplicantsApprovalButtons;
 
