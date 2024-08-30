@@ -26,6 +26,7 @@ import { IconAdd, IconSearch } from "@/public/assets/svgs"
 import ColumnContainer from "./kanban-column-container"
 import { kanban_Kanban } from "@/types/protectedroutes"
 import { ListT, TaskT } from "@/types/index"
+import pathsConfig from "@/config/paths.config"
 
 const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
   const boardId = id
@@ -190,7 +191,7 @@ const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
       <div className="mx-auto h-full w-[calc(100vw-22rem)] flex-1 flex-col ">
         <div className="text-dark100_light900 flex h-full flex-col gap-4">
           <div className="flex flex-row items-center gap-4 text-sm">
-            <Link href={"/kanban"}>
+            <Link href={pathsConfig.app.kanban}>
               <span className="dark:text-white/50">Kanban Board</span>
             </Link>
             <ArrowRightIcon />
