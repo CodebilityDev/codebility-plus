@@ -1,7 +1,6 @@
 import TimeTrackerTable from "@/app/home/time-tracker/_components/time-tracker-table"
 import H1 from "@/Components/shared/dashboard/H1"
 import Box from "@/Components/shared/dashboard/Box"
-import { excessHours, totalRenderedHours } from "@/app/home/time-tracker/_lib/dummy-data"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 import { formatToLocaleTime } from "@/lib/format-date-time"
@@ -14,13 +13,23 @@ export default async function TimeTracker() {
   .select(`
     start_time,
     end_time,
-    time_log(*)  
+    time_log(
+      worked_hours,
+      excess_hours,
+      task(
+        title,
+        duration,
+        project(
+          name
+        )
+      )
+    )  
   `).eq("user_id", user?.id)
   .single();
 
   const HoursSpent = {
-    renderedHours: 0,
-    excessHours: 0
+    renderedHours: error ? "error": "0",
+    excessHours: error? "error": "0"
   }
 
   if (data && data.time_log) {
