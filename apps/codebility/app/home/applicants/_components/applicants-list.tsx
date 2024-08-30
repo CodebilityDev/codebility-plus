@@ -3,6 +3,7 @@
 import { Box, H1 } from "@/Components/shared/dashboard"
 import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants"
 import ApplicantsTableContainer from "@/app/home/applicants/_components/applicants-table-container"
+import { Toaster } from "react-hot-toast"
 
 const ApplicantsList = ({ applicants }: { applicants: ApplicantsList_Types[] }) => {
     return (
@@ -13,6 +14,7 @@ const ApplicantsList = ({ applicants }: { applicants: ApplicantsList_Types[] }) 
             <Box>
                 <ApplicantsTableContainer applicants={applicants} />
             </Box>
+            <Toaster position="top-center" reverseOrder={false} />
         </>
     )
 }
