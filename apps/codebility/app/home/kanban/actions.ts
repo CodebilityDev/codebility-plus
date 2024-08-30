@@ -2,14 +2,13 @@
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client"
 
-export const createNewBoard = async (name: string, project_id: string) => {
+export const createNewBoard = async (formData: FormData) => {
     const supabase = getSupabaseServerActionClient();
     const { error } = await supabase.from("board")
     .insert({
-        name,
-        project_id
+        name: formData.get("name"),
+        project_id: formData.get("projectId")
     })
 
     if (error) throw error;
-    console.log(error);
 }
