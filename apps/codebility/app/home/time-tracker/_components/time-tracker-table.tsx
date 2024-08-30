@@ -28,7 +28,7 @@ export default function TimeTrackerTable({ timeLog }: Props) {
         </Box>
       )}
       <div className="block md:hidden">
-        <TimeTrackerTableMobile />
+        <TimeTrackerTableMobile timeLog={timeLog}/>
       </div>
     </>
   )
