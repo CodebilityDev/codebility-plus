@@ -3,8 +3,8 @@ import dynamic from "next/dynamic"
 import useAuth from "@/hooks/use-auth"
 import { Box } from "@/Components/shared/dashboard"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
-const TimeTrackerTableDesktop = dynamic(() => import("./TimeTrackerTableDesktop"), { ssr: false })
-const TimeTrackerTableMobile = dynamic(() => import("./TimeTrackerTableMobile"), { ssr: false })
+const TimeTrackerTableDesktop = dynamic(() => import("./time-tracker-table-desktop"), { ssr: false })
+const TimeTrackerTableMobile = dynamic(() => import("./time-tracker-table-mobile"), { ssr: false })
 
 const TimeTrackerTable = () => {
   const { isLoading } = useAuth()
