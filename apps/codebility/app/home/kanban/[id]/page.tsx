@@ -1,6 +1,6 @@
 "use client"
 
-import KanbanBoard from "@/app/home/kanban/[id]/Kanban"
+import KanbanBoard from "./_components/kanban-board"
 import { getBoards } from "@/app/api/kanban"
 import { kanban_Kanban } from "@/types/protectedroutes"
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
