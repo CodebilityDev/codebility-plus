@@ -9,11 +9,9 @@ const ServiceImageUpload: React.FC<ServiceImageComponentProps> = ({ selectedFile
   
     useEffect(() => {
       const file = selectedFile[`${imageType}File`] as File;
-      console.log("file labas: ", file)
       
       if (file instanceof File) {
         const objectURL = URL.createObjectURL(file);
-        console.log("objectURL: ", objectURL)
         setImageSrc(objectURL);
         setFileName(file.name);
         setFileSize(`${(file.size / (1024 * 1024)).toFixed(2)} MB`);
@@ -23,7 +21,6 @@ const ServiceImageUpload: React.FC<ServiceImageComponentProps> = ({ selectedFile
         };
       } else if (typeof file === 'string') {
         const image = selectedFile.images?.find(img => img[imageType]);
-        console.log("Image object found: ", image); 
         const url = image?.[imageType]?.url;
         setImageSrc(url || file);
         setFileName(image?.[imageType]?.fileName);
