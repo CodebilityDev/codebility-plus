@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect } from "react"
 import useAuth from "@/hooks/use-auth"
 import { Button } from "@/Components/ui/button"

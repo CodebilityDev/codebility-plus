@@ -50,7 +50,6 @@ const ListAddModal = () => {
   return (
     <Dialog open={isModalOpen}>
       <DialogContent
-        hasButton
         className="flex h-auto w-[100%] max-w-3xl flex-col gap-6 overflow-x-auto overflow-y-auto"
       >
         <DialogHeader className="relative">
