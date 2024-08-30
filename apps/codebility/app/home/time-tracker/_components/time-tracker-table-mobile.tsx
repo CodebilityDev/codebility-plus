@@ -1,4 +1,4 @@
-import { logData } from "@/app/home/time-tracker/data"
+import { logData } from "@/app/home/time-tracker/_lib/dummy-data"
 import { IconEdit } from "@/public/assets/svgs"
 import { Table, TableRow, TableCell, TableBody } from "@/Components/ui/table"
 
