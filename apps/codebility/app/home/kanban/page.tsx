@@ -10,9 +10,15 @@ import { IconKanban } from "@/public/assets/svgs";
 import KanbanBoardsSearch from "./_components/kanban-boards-search";
 import BoardAddModal from "./_components/kanban-board-add-modal";
 
-export default async function KanbanPage() {  
+export default async function KanbanPage({ searchParams }: {
+  searchParams: {
+    query: string;
+  }
+}) {  
+  const query = searchParams.query;
   const supabase = getSupabaseServerComponentClient();
-  const { data, error } = await supabase.from("board")
+
+  let supabaseBoardQuery = supabase.from("board")
   .select(`
     *,
     project(
@@ -26,7 +32,15 @@ export default async function KanbanPage() {
         )
       )
     )
-  `);
+  `)
+  
+  if (query) {
+    // apply board filter if there is query in url search query.
+    supabaseBoardQuery = supabaseBoardQuery.like("name", `%${query}%`);
+    console.log(query);
+  }
+
+  const { data, error } = await supabaseBoardQuery;
 
   return (
     <div className="text-dark100_light900 mx-auto flex max-w-7xl flex-col gap-4 ">
