@@ -15,7 +15,7 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogT
 import { DialogTrigger } from "@radix-ui/react-dialog"
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 import type { Project } from "@/types/home/codev"
-import { Input } from "@codevs/ui/input"
+import Input from "@/Components/ui/forms/input"
 
 export default async function KanbanBoardAddModal() {
   const supabase = getSupabaseServerComponentClient();
