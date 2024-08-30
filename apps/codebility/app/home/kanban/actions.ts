@@ -14,5 +14,5 @@ export const createNewBoard = async (formData: FormData) => {
 
     if (error) throw error;
 
-    redirect(pathsConfig.app.kanban)
+    redirect(pathsConfig.app.kanban) // reload page to show new data.
 }
