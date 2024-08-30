@@ -2,10 +2,16 @@ import dynamic from "next/dynamic"
 
 import { Box } from "@/Components/shared/dashboard"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
+import { TimeLog } from "../_types/time-log"
 const TimeTrackerTableDesktop = dynamic(() => import("./time-tracker-table-desktop"), { ssr: false })
 const TimeTrackerTableMobile = dynamic(() => import("./time-tracker-table-mobile"), { ssr: false })
 
-const TimeTrackerTable = () => {
+interface Props {
+  timeLog: TimeLog[];
+}
+
+export default function TimeTrackerTable({ timeLog }: Props) {
+  console.log(timeLog);
   return (
     <>
       {!false ? (
@@ -28,4 +34,3 @@ const TimeTrackerTable = () => {
     </>
   )
 }
-export default TimeTrackerTable

@@ -4,6 +4,7 @@ import Box from "@/Components/shared/dashboard/Box"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 import { formatToLocaleTime } from "@/lib/format-date-time"
+import { TimeLog } from "./_types/time-log"
 
 export default async function TimeTracker() {
   const supabase = getSupabaseServerComponentClient();
@@ -14,11 +15,11 @@ export default async function TimeTracker() {
     start_time,
     end_time,
     time_log(
+      *,
       worked_hours,
       excess_hours,
       task(
-        title,
-        duration,
+        *,
         project(
           name
         )
@@ -78,9 +79,9 @@ export default async function TimeTracker() {
           </>
         )}
       </div>
-
+      
       <div className="w-full">
-        <TimeTrackerTable />
+        <TimeTrackerTable timeLog={data?.time_log as TimeLog[]}/>
       </div>
     </div>
   )
