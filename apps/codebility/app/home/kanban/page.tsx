@@ -37,7 +37,6 @@ export default async function KanbanPage({ searchParams }: {
   if (query) {
     // apply board filter if there is query in url search query.
     supabaseBoardQuery = supabaseBoardQuery.like("name", `%${query}%`);
-    console.log(query);
   }
 
   const { data, error } = await supabaseBoardQuery;
@@ -80,9 +79,10 @@ export default async function KanbanPage({ searchParams }: {
                           </TableCell>
 
                           <TableCell>
-                            <p>
-                                {board.project?.codev.user.profile.first_name} {board.project?.codev.user.profile.last_name} 
-                            </p>
+                            <div className="flex gap-x-1">
+                                <p className="capitalize">{board.project?.codev.user.profile.first_name}</p>
+                                <p className="capitalize">{board.project?.codev.user.profile.last_name}</p>
+                            </div>
                           </TableCell>
 
                           <TableCell className="lg:flex lg:justify-center lg:items-center">
