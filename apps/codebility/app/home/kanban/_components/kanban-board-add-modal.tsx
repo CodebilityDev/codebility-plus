@@ -4,14 +4,24 @@ import {
   SelectContent,
   SelectGroup,
   SelectLabel,
+  SelectItem,
+  SelectValue,
+  SelectItemText
 } from "@radix-ui/react-select"
 import { Label } from "@codevs/ui/label"
 import { Button } from "@/Components/ui/button"
 import { IconAdd, IconDropdown } from "@/public/assets/svgs"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@codevs/ui/dialog"
 import { DialogTrigger } from "@radix-ui/react-dialog"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import type { Project } from "@/types/home/codev"
+import { Input } from "@codevs/ui/input"
 
 export default async function KanbanBoardAddModal() {
+  const supabase = getSupabaseServerComponentClient();
+  const { data: projects } = await supabase.from("project")
+  .select();
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -41,31 +51,29 @@ export default async function KanbanBoardAddModal() {
                   aria-label="Projects"
                   className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                 >
-               {/*    <SelectValue className="text-sm" placeholder="Select a Project">
-                    {selectedProjectName}
-                  </SelectValue> */}
+                  <SelectValue className="text-sm" placeholder="Select a Project" />
                   <IconDropdown className="invert dark:invert-0" />
                 </SelectTrigger>
 
                 <SelectContent className="border-light_dark rounded-md border bg-[#FFF] dark:bg-black-100">
                   <SelectGroup>
                     <SelectLabel className="px-3 py-2 text-xs text-gray">Projects</SelectLabel>
-                  {/*   {projects?.map(({ id, project_name }: ProjectT) => (
+                    {projects?.map(({ id, name }: Project) => (
                       <SelectItem
                         key={id}
                         className="w-[345px] cursor-default px-3 py-2 text-sm hover:bg-blue-100"
-                        value={id as string}
+                        value={id}
                       >
-                        {project_name}
+                        <SelectItemText>{name}</SelectItemText>
                       </SelectItem>
-                    ))} */}
+                    ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
             <div>
               <Label htmlFor="name">Name</Label>
-              {/* <Input id="name" onChange={handleNameChange} /> */}
+              <Input id="name" type="text" name="name"/>
             </div>
           </div>
         </div>
