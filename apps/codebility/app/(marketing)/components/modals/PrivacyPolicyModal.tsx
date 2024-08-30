@@ -10,7 +10,7 @@ function PrivacyPolicyModal() {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose} >
-      <DialogContent className="flex flex-col justify-between max-w-[1260px] max-h-full bg-black-800 text-white" hasButton={true}>
+      <DialogContent className="flex flex-col justify-between max-w-[1260px] max-h-full bg-black-800 text-white">
         <div className="flex border border-[#1D1D1E] rounded-[10px] overflow-hidden h-full">
           <NavBar />
           <Content />

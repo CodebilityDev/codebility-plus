@@ -1,8 +1,7 @@
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { UserWorkspaceContextProvider } from '../_components/user-workspace-context'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { getSupabaseServerComponentClient } from '@codevs/supabase/server-component-client'
 import HomeSidebar from './_components/home-sidebar'
 import HomeNavbar from './_components/home-navbar'
 import appConfig from '~/config/app.config'
@@ -21,7 +20,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode
 }>) {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = getSupabaseServerComponentClient()
 
   const {
     data: { user },

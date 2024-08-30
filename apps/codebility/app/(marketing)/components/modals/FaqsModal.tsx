@@ -11,7 +11,6 @@ function FaqsModal() {
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent
         className=" flex max-w-[1260px] flex-col justify-between gap-4 bg-black-800 text-white"
-        hasButton={true}
       >
         <div className="flex max-h-[500px] flex-col gap-2 overflow-hidden overflow-y-scroll p-20 ">
           <h1 className="mb-8 text-center text-4xl font-semibold">Frequently Asked Questions</h1>

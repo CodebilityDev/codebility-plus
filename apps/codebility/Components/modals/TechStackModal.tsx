@@ -21,7 +21,6 @@ const TechStackModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogContent
-        hasButton
         className="h-auto max-w-md overflow-y-auto bg-black-100 py-8 sm:max-w-2xl sm:px-12 sm:py-16"
       >
         <button onClick={onClose} className="absolute right-4 top-4">

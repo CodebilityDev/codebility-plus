@@ -1,14 +1,13 @@
 "use server";
 
-import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { FieldValues } from "react-hook-form";
 
 import { dateTimeFormat } from "@/lib/formDateTime";
 import { redirect } from "next/navigation";
 
 export const signupUser = async (data: FieldValues) => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
     const [startTime, endTime] = data.schedule.split(" - ");
     const userData = {
@@ -37,9 +36,9 @@ export const signupUser = async (data: FieldValues) => {
 }
 
 export const signinUser = async (email: string, password: string) => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
-    const { error, data } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
@@ -50,7 +49,7 @@ export const signinUser = async (email: string, password: string) => {
 }
 
 export const signOut = async () => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
     await supabase.auth.signOut();
     redirect("/");
   };

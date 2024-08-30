@@ -72,11 +72,11 @@ export const sidebarData: Sidebar[] = [
     id: "1",
     title: "Menu",
     links: [
-      { route: "/dashboard", imgURL: "/assets/svgs/icon-dashboard.svg", label: "Dashboard", permission: "dashboard" },
-      { route: "/tasks", imgURL: "/assets/svgs/icon-task.svg", label: "My Tasks", permission: "my_task" },
-      { route: "/kanban", imgURL: "/assets/svgs/icon-kanban.svg", label: "Kanban", permission: "kanban" },
+      { route: pathsConfig.app.home, imgURL: "/assets/svgs/icon-dashboard.svg", label: "Dashboard", permission: "dashboard" },
+      { route: pathsConfig.app.tasks, imgURL: "/assets/svgs/icon-task.svg", label: "My Tasks", permission: "my_task" },
+      { route: pathsConfig.app.kanban, imgURL: "/assets/svgs/icon-kanban.svg", label: "Kanban", permission: "kanban" },
       {
-        route: "/time-tracker",
+        route: pathsConfig.app.time_tracker,
         imgURL: "/assets/svgs/icon-time-tracker.svg",
         label: "Time Tracker",
         permission: "time_tracker",
@@ -87,19 +87,19 @@ export const sidebarData: Sidebar[] = [
     id: "2",
     title: "Codevs",
     links: [
-      { route: "/interns", imgURL: "/assets/svgs/icon-interns.svg", label: "Interns", permission: "interns" },
-      { route: "/orgchart", imgURL: "/assets/svgs/icon-org-chart.svg", label: "Org Chart", permission: "org_charts" },
+      { route: pathsConfig.app.interns, imgURL: "/assets/svgs/icon-interns.svg", label: "Interns", permission: "interns" },
+      { route: pathsConfig.app.orgchart, imgURL: "/assets/svgs/icon-org-chart.svg", label: "Org Chart", permission: "org_charts" },
     ],
   },
   {
     id: "3",
     title: "Management",
     links: [
-      { route: "/applicants", imgURL: "/assets/svgs/icon-applicant.svg", label: "Applicants", permission: "applicants" },
-      { route: "/in-house", imgURL: "/assets/svgs/icon-applicant2.svg", label: "In-House", permission: "inhouse" },
-      { route: "/clients", imgURL: "/assets/svgs/icon-clients.svg", label: "Clients", permission: "clients" },
-      { route: "/projects", imgURL: "/assets/svgs/icon-projects.svg", label: "Projects", permission: "projects" },
-      { route: "/settings", imgURL: "/assets/svgs/icon-cog.svg", label: "Settings", permission: "settings" },
+      { route: pathsConfig.app.applicants, imgURL: "/assets/svgs/icon-applicant.svg", label: "Applicants", permission: "applicants" },
+      { route: pathsConfig.app.in_hose, imgURL: "/assets/svgs/icon-applicant2.svg", label: "In-House", permission: "inhouse" },
+      { route: pathsConfig.app.clients, imgURL: "/assets/svgs/icon-clients.svg", label: "Clients", permission: "clients" },
+      { route: pathsConfig.app.projects, imgURL: "/assets/svgs/icon-projects.svg", label: "Projects", permission: "projects" },
+      { route: pathsConfig.app.settings, imgURL: "/assets/svgs/icon-cog.svg", label: "Settings", permission: "settings" },
     ],
   },
 ]
@@ -251,6 +251,7 @@ import {
   IconNodeJS,
   IconPHP,
 } from "@/public/assets/svgs"
+import pathsConfig from "@/config/paths.config"
 
 // ====================================================================================
 

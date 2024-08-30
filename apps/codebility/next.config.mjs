@@ -31,6 +31,10 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
       {
         hostname: "codebility-cdn.pages.dev",
       },
+      {
+        protocol: "https",
+        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL.split('https://')[1],
+      }
     ],
   },
 
