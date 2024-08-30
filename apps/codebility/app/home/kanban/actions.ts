@@ -1,6 +1,8 @@
 "use server"
 
+import pathsConfig from "@/config/paths.config";
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client"
+import { redirect } from "next/navigation";
 
 export const createNewBoard = async (formData: FormData) => {
     const supabase = getSupabaseServerActionClient();
@@ -11,4 +13,6 @@ export const createNewBoard = async (formData: FormData) => {
     })
 
     if (error) throw error;
+
+    redirect(pathsConfig.app.kanban)
 }
