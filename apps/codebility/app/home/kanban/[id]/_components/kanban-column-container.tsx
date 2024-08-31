@@ -13,8 +13,9 @@ interface Props {
 
 export default function KanbanColumnContainer({ column }: Props) {
 /*   const { column, tasks, projectId } = props */
+  const { task: tasks } = column;
   const { onOpen } = useModal()
-/* 
+
   const { setNodeRef } = useSortable({
     id: column.id,
     data: {
@@ -23,7 +24,7 @@ export default function KanbanColumnContainer({ column }: Props) {
     },
   })
 
-  const tasksIds = useMemo(() => tasks.map((task) => task.id), [tasks]) */
+  const tasksIds = useMemo(() => tasks.map((task) => task.id), [tasks])
 
   return (
     <li
@@ -35,20 +36,19 @@ export default function KanbanColumnContainer({ column }: Props) {
           {column.name}
 
           <div className="flex items-center justify-center rounded-full bg-zinc-300 px-3 py-1 text-sm text-violet dark:bg-[#1C1C1C] dark:text-teal">
-            {column.task.length}
+            {tasks.length}
           </div>
         </div>
       </div>
       {/* background-lightbox_darkbox */}
-      {/* <div className={`flex flex-grow flex-col px-2 pb-2 ${tasks.length > 0 && "pt-2"}`}> */}
-      <div className={`flex flex-grow flex-col px-2 pb-2`}>
-        {/* <div className={`flex max-h-[25rem] flex-grow flex-col gap-2 overflow-y-auto overflow-x-hidden`}>
+      <div className={`flex flex-grow flex-col px-2 pb-2 ${tasks.length > 0 && "pt-2"}`}>
+        <div className={`flex max-h-[25rem] flex-grow flex-col gap-2 overflow-y-auto overflow-x-hidden`}>
           <SortableContext items={tasksIds}>
             {tasks.map((task) => (
-              <KanbanTask key={task.id} task={task} listName={column.name} />
+              <KanbanTask key={task.id} task={task} />
             ))}
           </SortableContext>
-        </div> */}
+        </div>
         <div className="pt-2">
           <button
           /*   onClick={() => onOpen("taskAddModal", projectId, { listId: column.id, listName: column.name })} */
