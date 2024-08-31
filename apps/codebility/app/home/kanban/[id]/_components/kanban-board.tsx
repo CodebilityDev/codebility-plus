@@ -20,24 +20,29 @@ import useSlider from "@/hooks/useSlider"
 import { useModal } from "@/hooks/use-modal"
 import { arrayMove } from "@dnd-kit/sortable"
 import { Button } from "@/Components/ui/button"
-import KanbanTask from "@/app/home/kanban/_components/kanban-task"
+import KanbanTask from "./kanban-task"
 import { ArrowRightIcon } from "@/public/assets/svgs"
 import { IconAdd, IconSearch } from "@/public/assets/svgs"
 import ColumnContainer from "./kanban-column-container"
 import { kanban_Kanban } from "@/types/protectedroutes"
 import { ListT, TaskT } from "@/types/index"
 import pathsConfig from "@/config/paths.config"
+import { Board } from "../_types/board"
 
-const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
-  const boardId = id
+interface Props {
+  boardData: Board;
+}
+
+const KanbanBoard = ({ boardData }: Props) => {
+/*   const boardId = id */
   const [activeTask, setActiveTask] = useState<TaskT | null>(null)
   const [tasks, setTasks] = useState<TaskT[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const scrollableDiv = useRef<HTMLDivElement>(null)
-  const { onOpen } = useModal()
-  const { token } = useToken()
+/*   const { onOpen } = useModal()
+  const { token } = useToken() */
 
-  const columns: ListT[] = useMemo(() => {
+/*   const columns: ListT[] = useMemo(() => {
     const board = data.find((b) => b.id === boardId)
     return board ? board.lists : []
   }, [data, boardId])
@@ -60,9 +65,9 @@ const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
     } else {
       return ""
     }
-  }, [data, boardId])
+  }, [data, boardId]) */
 
-  useEffect(() => {
+  /* useEffect(() => {
     setIsLoading(true)
 
     const board = data.find((b) => b.id === boardId)
@@ -107,8 +112,8 @@ const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
       setActiveTask(event.active.data.current.task)
     }
   }, [])
-
-  const onDragEnd = useCallback(
+ */
+/*   const onDragEnd = useCallback(
     (event: DragEndEvent) => {
       setActiveTask(null)
 
@@ -138,9 +143,9 @@ const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
       }
     },
     [columns, tasks, token]
-  )
+  ) */
 
-  const onDragOver = useCallback((event: DragOverEvent) => {
+ /*  const onDragOver = useCallback((event: DragOverEvent) => {
     const { active, over } = event
     if (!over) return
 
@@ -184,7 +189,7 @@ const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
         return arrayMove(tasks, activeIndex, activeIndex)
       })
     }
-  }, [])
+  }, []) */
 
   return (
     <div className="flex h-full w-full">
@@ -195,10 +200,10 @@ const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
               <span className="dark:text-white/50">Kanban Board</span>
             </Link>
             <ArrowRightIcon />
-            <span>{boardName}</span>
+            <span>{boardData.name}</span>
           </div>
           <div className="flex items-center justify-between gap-4">
-            <div className="text-dark100_light900 text-md font-semibold md:text-2xl">{boardName}</div>
+            <div className="text-dark100_light900 text-md font-semibold md:text-2xl">{boardData.name}</div>
             <div className="flex gap-4">
               <div className="flex items-center gap-3 rounded-md bg-light-900 border border-zinc-300 dark:border-zinc-500 dark:bg-[#2C303A] px-2">
                 <label htmlFor="kanbanSearch">
@@ -212,7 +217,7 @@ const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
                   placeholder="Search"
                 />
               </div>
-              <Button variant="default" className="flex" onClick={() => onOpen("listAddModal", boardId)}>
+              <Button variant="default" className="flex" /* onClick={() => onOpen("listAddModal", boardId)} */>
                 <div className="flex items-center gap-2">
                   <IconAdd />
                   <p>Add new list</p>
@@ -220,7 +225,7 @@ const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
               </Button>
             </div>
           </div>
-          {!isLoading ? (
+      {/*     {!isLoading ? (
             <div className="text-dark100_light900 flex h-full">
               <div className="overflow-x-auto overflow-y-hidden " ref={scrollableDiv}>
                 <DndContext
@@ -250,7 +255,7 @@ const KanbanBoard = ({ id, data }: { id: string; data: kanban_Kanban[] }) => {
             </div>
           ) : (
             "Loading"
-          )}
+          )} */}
         </div>
       </div>
     </div>
