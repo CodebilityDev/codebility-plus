@@ -7,7 +7,10 @@ export default async function KanbanPage({ params }: { params: { id: string } })
   const { data: board, error } = await supabase.from("board")
   .select(`
     *,
-    list(*)  
+    list(
+      *,
+      task(*)
+    )  
   `)
   .eq("id", params.id)
   .single();
