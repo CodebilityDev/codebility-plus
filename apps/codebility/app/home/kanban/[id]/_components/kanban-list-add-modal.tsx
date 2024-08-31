@@ -11,6 +11,7 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { KanbanListSchema } from "../_types/kanban-list.schema"
 import { z } from "zod"
 import { DialogClose } from "@radix-ui/react-dialog"
+import { createNewList } from "../actions"
 
 interface Props {
   boardId: string;
@@ -22,7 +23,14 @@ export default function KanbanListAddModal({ boardId }: Props) {
   })
 
   const onSubmit = async (values: z.infer<typeof KanbanListSchema>) => {
-    alert(values.name)
+    const { name } = values;
+
+    try {
+      await createNewList(name, boardId);
+      toast.success("New List Created!");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
 
   return (
