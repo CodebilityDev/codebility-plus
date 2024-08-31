@@ -2,11 +2,16 @@ import { CSS } from "@dnd-kit/utilities"
 import { useModal } from "@/hooks/use-modal"
 import { useSortable } from "@dnd-kit/sortable"
 import { IconPriority1 } from "@/public/assets/svgs"
-import { kanban_KanbanTaskT } from "@/types/protectedroutes"
 import defautlAvatar from "@/public/assets/images/default-avatar-200x200.jpg"
 import Image from "next/image"
+import { Task } from "@/types/home/task"
+import { Profile } from "@/types/home/user"
 
-function KanbanTask({ task }: kanban_KanbanTaskT) {
+interface Props {
+  task: Task;
+}
+
+function KanbanTask({ task }: Props) {
   const { onOpen } = useModal()
 
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
@@ -38,6 +43,12 @@ function KanbanTask({ task }: kanban_KanbanTaskT) {
     )
   }
 
+  const codevs = task.codev?.map(member => {
+    const { first_name, last_name, image_url } = member.user?.profile as Profile;
+
+    return { first_name, last_name, image_url};
+  })
+
   return (
     <div
       ref={setNodeRef}
@@ -54,7 +65,7 @@ function KanbanTask({ task }: kanban_KanbanTaskT) {
       <div className="relative">
         <div className="float-left flex flex-wrap gap-3 text-sm">{`#01`}</div>
         <div className=" float-right  mb-1 ml-1 flex flex-wrap justify-end gap-1 ">
-          {task?.userTask.map((member, idx) => {
+          {codevs?.map((member, idx) => {
               return (
                 <div key={idx} className="h-6 w-6 rounded-full ">
                   <Image
