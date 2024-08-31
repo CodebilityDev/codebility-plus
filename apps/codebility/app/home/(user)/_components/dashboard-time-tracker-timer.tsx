@@ -5,7 +5,7 @@ import { formatTime } from "../_lib/util";
 import { Button } from "@/Components/ui/button"
 import { startUserTimer, updateUserTaskOnHand } from "../actions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
-import { Task } from "../_types/task";
+import { Task } from "@/types/home/task";
 
 interface Props {
   tasks: Task[];
