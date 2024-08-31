@@ -1,3 +1,5 @@
+import { User } from "./user";
+
 export interface Codev {
     id: string;
     user_id: string;
@@ -13,7 +15,9 @@ export interface Codev {
     tech_stacks: string[];
     nda_status: string;
     job_status: string;
-  }
+
+    user?: User; // for relational data type
+}
   
 export interface Project {
     id: string;
