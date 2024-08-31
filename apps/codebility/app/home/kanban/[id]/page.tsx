@@ -5,7 +5,10 @@ export default async function KanbanPage({ params }: { params: { id: string } })
   const supabase = getSupabaseServerComponentClient();
 
   const { data: board, error } = await supabase.from("board")
-  .select()
+  .select(`
+    *,
+    list(*)  
+  `)
   .eq("id", params.id)
   .single();
 
