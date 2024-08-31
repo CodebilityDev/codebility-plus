@@ -63,7 +63,7 @@ function KanbanTask({ task }: Props) {
         <IconPriority1 />
       </div>
       <div className="relative">
-        <div className="float-left flex flex-wrap gap-3 text-sm">{`#01`}</div>
+        <div className="float-left flex flex-wrap gap-3 text-sm">#{task.number}</div>
         <div className=" float-right  mb-1 ml-1 flex flex-wrap justify-end gap-1 ">
           {codevs?.map((member, idx) => {
               return (

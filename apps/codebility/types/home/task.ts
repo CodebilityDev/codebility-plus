@@ -5,5 +5,6 @@ export interface Task {
     title: string;
     duration: number;
     points: number;
+    number: number;
     codev?: Codev[];
 }
