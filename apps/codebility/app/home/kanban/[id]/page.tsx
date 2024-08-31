@@ -1,26 +1,13 @@
-"use client"
-
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 import KanbanBoard from "./_components/kanban-board"
-import { getBoards } from "@/app/api/kanban"
-import { kanban_Kanban } from "@/types/protectedroutes"
-import { useQuery, UseQueryResult } from "@tanstack/react-query"
 
-export default function KanbanPage({ params }: { params: { id: string } }) {
-  const {
-    data: Boards,
-    isLoading: LoadingBoards,
-    error: ErrorBoards,
-  }: UseQueryResult<kanban_Kanban[], any> = useQuery({
-    queryKey: ["Boards"],
-    queryFn: async () => {
-      return await getBoards()
-    },
-    refetchInterval: 3000,
-  })
+export default async function KanbanPage({ params }: { params: { id: string } }) {
+  const supabase = getSupabaseServerComponentClient();
 
-  if (LoadingBoards) return
+  const { data: board, error } = await supabase.from("board")
+  .select()
+  .eq("id", params.id)
+  .single();
 
-  if (ErrorBoards) return
-
-  return <KanbanBoard id={params.id} data={Boards as kanban_Kanban[]} />
+  return <KanbanBoard boardData={board}/>
 }
