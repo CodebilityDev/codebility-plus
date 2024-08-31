@@ -1,20 +1,16 @@
 import { useMemo } from "react"
-import { useModal } from "@/hooks/use-modal"
-
 import KanbanTask from "./kanban-task"
 import { SortableContext, useSortable } from "@dnd-kit/sortable"
-import { kanban_ColumnContainerT } from "@/types/protectedroutes"
 import { Task } from "@/types/home/task"
 import { List } from "../_types/board"
+import KanbanTaskAddModal from "./kanban-task-add-modal"
 
 interface Props {
   column: List;
 }
 
 export default function KanbanColumnContainer({ column }: Props) {
-/*   const { column, tasks, projectId } = props */
   const { task: tasks } = column;
-  const { onOpen } = useModal()
 
   const { setNodeRef } = useSortable({
     id: column.id,
@@ -28,7 +24,7 @@ export default function KanbanColumnContainer({ column }: Props) {
 
   return (
     <li
-   /*    ref={setNodeRef} */
+      ref={setNodeRef}
       className="flex h-full max-h-dvh min-w-[18rem] cursor-pointer flex-col overflow-hidden rounded-md bg-[#FCFCFC] dark:bg-[#2C303A]"
     >
       <div className="text-md p-3 font-bold dark:bg-[#1E1F26]">
@@ -50,14 +46,7 @@ export default function KanbanColumnContainer({ column }: Props) {
           </SortableContext>
         </div>
         <div className="pt-2">
-          <button
-          /*   onClick={() => onOpen("taskAddModal", projectId, { listId: column.id, listName: column.name })} */
-            type="button"
-            className="flex w-full items-center gap-2 rounded-md px-2 hover:bg-black-400/40"
-          >
-            <p className="text-2xl">+</p>
-            <p>Add a card</p>
-          </button>
+          <KanbanTaskAddModal listName={column.name}/>
         </div>
       </div>
     </li>
