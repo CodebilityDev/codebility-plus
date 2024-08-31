@@ -23,7 +23,5 @@ export default async function KanbanPage({ params }: { params: { id: string } })
   `)
   .eq("id", params.id)
   .single();
-  
-  console.log(board.list);
   return <KanbanBoard boardData={board}/>
 }
