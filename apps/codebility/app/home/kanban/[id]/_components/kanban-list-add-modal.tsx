@@ -22,7 +22,7 @@ export default function KanbanListAddModal({ boardId }: Props) {
   })
 
   const onSubmit = async (values: z.infer<typeof KanbanListSchema>) => {
-  
+    alert(values.name)
   }
 
   return (
@@ -48,6 +48,7 @@ export default function KanbanListAddModal({ boardId }: Props) {
               <div className="flex basis-[50%] flex-col gap-4">
                 <Label htmlFor="name">Name</Label>
                 <Input id="name" type="text" {...form.register("name")}/>
+                {form.formState.errors.name && <p className="text-destructive">{form.formState.errors.name.message}</p>}
               </div>
             </div>
 
