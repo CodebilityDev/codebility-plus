@@ -3,142 +3,55 @@
 import React from "react"
 import { Button } from "@/Components/ui/button"
 import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "@codevs/ui/dialog"
-import { useModal } from "@/hooks/use-modal"
 import Input from "@/Components/ui/forms/input"
 import { Label } from "@codevs/ui/label"
 import { Textarea } from "@codevs/ui/textarea"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem, SelectItemText } from "@radix-ui/react-select"
 
 import { IconAdd, IconClose, IconDropdown, IconPlus } from "@/public/assets/svgs"
-import { useEffect, useState } from "react"
 import { taskPrioLevels, taskTypes } from "@/constants"
-import { User } from "@/types"
-import axios from "axios"
-import { API } from "@/lib/constants"
-import useToken from "@/hooks/use-token"
 import toast from "react-hot-toast"
-import { createTaskonList } from "@/app/api/kanban"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu"
 import Image from "next/image"
 import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum"
 import KanbanTaskAddModalMembers from "./kanban-task-add-modal-members"
 import { DialogTitle } from "@radix-ui/react-dialog"
-
-interface AddedMember {
-  id?: string
-  image_url?: string | null
-  last_name?: string
-  first_name?: string
-}
-
-interface inputTask {
-  // id: string
-  selectedPrioLevel: string | null
-  selectedCategory: string | null
-  selectedType: string | null
-  title: string
-  description: string
-  duration: number
-  points: number
-  addedMembers: AddedMember[]
-}
+import { createNewTask } from "../actions"
 
 interface Props {
   listName: string;
 }
 
 export default function KanbanTaskAddModal({ listName }: Props) {
-  const { isOpen, onClose, type, data, dataObject } = useModal()
-  /* const [inputTask, setInputTask] = useState<inputTask>({
-    selectedPrioLevel: null,
-    selectedCategory: null,
-    selectedType: null,
-    title: "",
-    description: "",
-    duration: 0,
-    points: 0,
-    addedMembers: [],
-  }) */
-  const { token } = useToken()
-  const projectId = data
-
   const { data: categories } = useFetchEnum("public","taskcategory");
 
- /*  
-  const handleTitleChange = (e: any) => {
-    setInputTask({ ...inputTask, title: e.target.value })
-  }
+  const validateInput = (formData: FormData) => {
+    const inputs: Record<string, any> = {};
 
-  const handleDurationChange = (e: any) => {
-    e.preventDefault()
-    setInputTask({ ...inputTask, duration: e.target.value })
-  }
+    // get all input name and value as key: value pair.
+    for (let [key,value] of formData.entries()) inputs[key] = value; 
+    
+    const required = ["title", "category", "priority", "type"];
 
-  const handlePointsChange = (e: any) => {
-    e.preventDefault()
-    setInputTask({ ...inputTask, points: e.target.value })
-  }
+    for (let key of formData.keys()) {
+      const value = inputs[key];
 
-  const handleChangeDescription = (e: any) => {
-    setInputTask({ ...inputTask, description: e.target.value })
-  }
-
-  const handleSave = async () => {
-    if (inputTask.title === "") {
-      toast.error("Title is Empty")
-      return
-    }
-    if (inputTask.description === "") {
-      toast.error("Description is Empty")
-      return
-    }
-    if (!inputTask.selectedPrioLevel) {
-      toast.error("Prio Level is not set")
-      return
-    }
-    if (isNaN(Number(inputTask.duration)) || Number(inputTask.duration) <= 0) {
-      toast.error("Invalid duration")
-      return
-    }
-
-    const listId = dataObject?.listId
-
-    let updatedData = {
-      title: inputTask.title,
-      task_type: inputTask.selectedType,
-      task_points: Number(inputTask.points),
-      prio_level: inputTask.selectedPrioLevel?.toUpperCase(),
-      duration: Number(inputTask.duration),
-      task_category: inputTask.selectedCategory,
-      full_description: inputTask.description,
-      userTaskId: selectedMembers.map((member) => ({ id: member.id })),
-      projectId: projectId,
-      listId: listId,
-    }
-
-    try {
-      const response = await createTaskonList(updatedData, token, listId)
-
-      if (response.status == 201) {
-        onClose()
-        toast.success("Tasks Added")
-        setInputTask({ ...inputTask, addedMembers: [] })
-      }
-    } catch (error) {
-      toast.error("Something went wrong!")
+      // check if required input has value.
+      if (required.includes(key) && 
+         (value === null || value === undefined || value === "")
+         )
+          throw new Error(`${key} is required`);
+      
     }
   }
- */
 
   const handleSubmit = async (formData: FormData) => {
-    console.log(formData.get("membersId"));
+    try {
+      validateInput(formData);
+      
+      await createNewTask(formData);
+    } catch (e: any) {
+      toast.error(e.message)
+    }
   }
 
   return (
@@ -233,7 +146,7 @@ export default function KanbanTaskAddModal({ listName }: Props) {
               <div className="flex w-1/2 gap-4">
                 <div className="flex w-1/2 flex-col gap-2">
                   <Label htmlFor="priority">Priority Level</Label>
-                  <Select name="priorityLevel">
+                  <Select name="priority">
                     <SelectTrigger
                       aria-label="Priority Level"
                       className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
