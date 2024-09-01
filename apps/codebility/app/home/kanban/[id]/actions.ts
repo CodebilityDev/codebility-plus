@@ -25,4 +25,12 @@ export const createNewTask = async (formData: FormData) => {
     const description = formData.get("description");
     const projectId = formData.get("projectId");
     const listId = formData.get("listId");
+
+    console.log(listId);
+
+    const supabase = getSupabaseServerActionClient();
+
+    const { data } = await supabase.from("task")
+    .select("*")
+    .eq("list_id", listId);
 }
