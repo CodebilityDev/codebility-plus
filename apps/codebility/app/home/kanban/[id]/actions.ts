@@ -19,16 +19,32 @@ export const createNewTask = async (formData: FormData) => {
     const category = formData.get("category");
     const duration = Number(formData.get("duration"));
     const points = Number(formData.get("points") || 0);
-    const priority = formData.get("priority");
+    const priority_level = formData.get("priority");
     const type = formData.get("type");
     const membersId = formData.get("membersId");
     const description = formData.get("description");
-    const projectId = formData.get("projectId");
+    const project_id = formData.get("projectId");
 
     const supabase = getSupabaseServerActionClient();
 
-    const { data } = await supabase.from("task")
+    const { data: tasks, error: fetchingTasksError } = await supabase.from("task")
     .select("*")
-    .eq("project_id", projectId);
+    .eq("project_id", project_id);
 
+    if (fetchingTasksError) throw fetchingTasksError;
+
+    const { error } = await supabase.from("task")
+    .insert({
+        project_id,
+        number: tasks.length + 1,
+        title,
+        type,
+        description,
+        category,
+        duration,
+        points,
+        priority_level
+    })
+
+    if (error) throw error;
 }
