@@ -7,9 +7,10 @@ import KanbanTaskAddModal from "./kanban-task-add-modal"
 
 interface Props {
   column: List;
+  projectId: string;
 }
 
-export default function KanbanColumnContainer({ column }: Props) {
+export default function KanbanColumnContainer({ column, projectId }: Props) {
   const { task: tasks } = column;
 
   const { setNodeRef } = useSortable({
@@ -46,7 +47,7 @@ export default function KanbanColumnContainer({ column }: Props) {
           </SortableContext>
         </div>
         <div className="pt-2">
-          <KanbanTaskAddModal listName={column.name}/>
+          <KanbanTaskAddModal listName={column.name} projectId={projectId}/>
         </div>
       </div>
     </li>

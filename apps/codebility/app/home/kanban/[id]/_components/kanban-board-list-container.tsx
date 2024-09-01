@@ -20,9 +20,10 @@ import { List } from "../_types/board"
 
 interface Props {
   lists: List[];
+  projectId: string;
 }
 
-export default function KanbanBoardListContainer({ lists }: Props) {
+export default function KanbanBoardListContainer({ lists, projectId }: Props) {
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const scrollableDiv = useRef<HTMLDivElement>(null)
   /*useSlider(scrollableDiv, isLoading)
@@ -139,6 +140,7 @@ export default function KanbanBoardListContainer({ lists }: Props) {
               column={col}
               /* projectId={projectId} */
               key={col.id}
+              projectId={projectId}
            /*    column={col}
               tasks={tasks.filter((task) => task.listId === col.id)} */
             />
