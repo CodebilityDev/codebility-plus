@@ -13,11 +13,11 @@ interface ICheckboxListProps {
 export default function CheckboxList({ initialItems = [], handleChange, className }: ICheckboxListProps) {
   const [items, setItems] = useState<string[]>([]);
   const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
+  const supabase = useSupabase();
 
   const { data: projects_list, isLoading, isError } = useQuery<Project[]>({
     queryKey: ["projects_list"],
     queryFn: async () => {
-      const supabase = useSupabase();
       const { data, error } = await supabase.from("project")
       .select(); 
       if (error) throw error;
