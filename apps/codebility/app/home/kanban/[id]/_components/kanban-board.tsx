@@ -122,7 +122,7 @@ const KanbanBoard = ({ boardData }: Props) => {
           </div>
           {!isLoading ? (
             <div className="text-dark100_light900 flex h-full">
-              <KanbanBoardListContainer projectId={boardData.project.id} lists={boardData.list} />
+              <KanbanBoardListContainer projectId={boardData.project_id} lists={boardData.list} />
             </div>
           ) : (
             "Loading"
