@@ -2,7 +2,7 @@
 
 import React from "react"
 import { Button } from "@/Components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTrigger } from "@codevs/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "@codevs/ui/dialog"
 import { useModal } from "@/hooks/use-modal"
 import Input from "@/Components/ui/forms/input"
 import { Label } from "@codevs/ui/label"
@@ -29,6 +29,7 @@ import {
 import Image from "next/image"
 import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum"
 import KanbanTaskAddModalMembers from "./kanban-task-add-modal-members"
+import { DialogTitle } from "@radix-ui/react-dialog"
 
 interface AddedMember {
   id?: string
@@ -134,27 +135,12 @@ export default function KanbanTaskAddModal({ listName }: Props) {
       toast.error("Something went wrong!")
     }
   }
+ */
 
-  const handleClose = () => {
-    setInputTask({ ...inputTask, addedMembers: [], duration: 0, points: 0 })
-    onClose()
+  const handleSubmit = async (formData: FormData) => {
+    console.log(formData.get("membersId"));
   }
 
-  useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        const response = await axios(API.USERS)
-        if (!response) {
-          throw new Error("Failed to fetch data from the server.")
-        }
-        setMembers(response.data.data)
-      } catch (error) {
-        console.error(error)
-      }
-    }
-    fetchUsers()
-  }, [])
- */
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -170,7 +156,10 @@ export default function KanbanTaskAddModal({ listName }: Props) {
         hideCloseButton={true}
         className="background-lightsection_darksection text-dark100_light900 h-[32rem] w-full max-w-3xl lg:h-auto"
       >
-        <form className="flex flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto">
+        <form action={handleSubmit} className="flex flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto">
+          <DialogHeader className="relative">
+              <DialogTitle className="mb-2 text-left text-lg">Add New Task</DialogTitle>
+          </DialogHeader>
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <Label htmlFor="title">Task Name</Label>
