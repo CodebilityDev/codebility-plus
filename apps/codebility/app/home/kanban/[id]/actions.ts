@@ -19,11 +19,12 @@ export const createNewTask = async (formData: FormData) => {
     const category = formData.get("category");
     const duration = Number(formData.get("duration"));
     const points = Number(formData.get("points") || 0);
-    const priority_level = formData.get("priority");
+    const priority_level = formData.get("priority") && formData.get("priority")?.toString().toUpperCase(); // enums are upper case.
     const type = formData.get("type");
     const membersId = formData.get("membersId");
     const description = formData.get("description");
     const project_id = formData.get("projectId");
+    const list_id = formData.get("listId");
 
     const supabase = getSupabaseServerActionClient();
 
@@ -36,6 +37,7 @@ export const createNewTask = async (formData: FormData) => {
     const { error } = await supabase.from("task")
     .insert({
         project_id,
+        list_id,
         number: tasks.length + 1,
         title,
         type,
@@ -47,4 +49,5 @@ export const createNewTask = async (formData: FormData) => {
     })
 
     if (error) throw error;
+
 }
