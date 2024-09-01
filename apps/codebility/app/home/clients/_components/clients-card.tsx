@@ -14,10 +14,12 @@ import { DEFAULT_AVATAR } from "../_lib/constants"
 import { convertTime12h, copyToClipboard, handleDownload } from "../_lib/utils"
 import { deleteClientAction, toggleClientArchiveAction } from "../action"
 import { IconCopy, IconMail, IconMapPin, IconTelephone, IconArchive } from "@/public/assets/svgs"
+import { usePathname } from "next/navigation"
 
 const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
   const [isLoading, setIsLoading] = useState(false);
   const { onOpen } = useModal();
+  const pathname = usePathname();
 
   const {
     currentPage,
@@ -79,7 +81,7 @@ const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
   return (
     <>
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-        {clients?.length > 0 &&
+        {clients?.length > 0 ?
           paginatedClients?.map((client, index) => (
             <div
               key={`${client.name}-${index}`}
@@ -110,14 +112,15 @@ const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
                     <p className="text-2xl">{client.name}</p>
                     <div>
                       <p className="lg:text-md text-sm text-gray">Time Schedule</p>
+                      {client.start_time && client.end_time ? 
                       <p className="text-lg">
                         {`${convertTime12h(client.start_time)} - ${convertTime12h(client.end_time)}`}
-                      </p>
+                      </p> : <p className="text-lg">No value</p>}
                     </div>
                     <div className="flex flex-col gap-3">
-                      {client.location && (
                         <div className="flex items-center gap-4 text-gray">
                           <IconMapPin className="h-6 min-w-6 invert dark:invert-0" />
+                      {client.location ? (
                           <Link
                             href={`https://www.google.com/maps/search/${encodeURIComponent(client.location)}`}
                             target="_blank"
@@ -125,30 +128,34 @@ const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
                           >
                             {client.location}
                           </Link>
+                      ) : <p className="hover:text-blue-100 hover:cursor-pointer">No value</p>}
                         </div>
-                      )}
-                      {client.email && (
                         <div className="flex items-center gap-4 text-gray">
                           <IconMail className="h-6 min-w-6 invert dark:invert-0" />
-                          <Link href={`mailto:${client.email}`} className="hover:text-blue-100">
-                            {client.email}
-                          </Link>
-                          <button onClick={() => copyToClipboard(client.email || "")}>
-                            <IconCopy className="h-4 min-w-4 invert dark:invert-0" />
-                          </button>
+                          {client.email ? (
+                            <>
+                              <Link href={`mailto:${client.email}`} className="hover:text-blue-100">
+                                {client.email}
+                              </Link>
+                              <button onClick={() => copyToClipboard(client.email || "")}>
+                                <IconCopy className="h-4 min-w-4 invert dark:invert-0" />
+                              </button>
+                            </>
+                          ) : <p className="hover:text-blue-100 hover:cursor-pointer">No value</p>}
                         </div>
-                      )}
-                      {client.contact_number && (
                         <div className="flex items-center gap-4 text-gray">
                           <IconTelephone className="h-6 min-w-6 invert dark:invert-0" />
-                          <Link href={`tel:${client.contact_number}`} className="hover:text-blue-100">
-                            {client.contact_number}
-                          </Link>
-                          <button onClick={() => copyToClipboard(client.contact_number || "")}>
-                            <IconCopy className="h-4 min-w-4 invert dark:invert-0" />
-                          </button>
+                          {client.contact_number ? (
+                            <>
+                              <Link href={`tel:${client.contact_number}`} className="hover:text-blue-100">
+                                {client.contact_number}
+                              </Link>
+                              <button onClick={() => copyToClipboard(client.contact_number || "")}>
+                                <IconCopy className="h-4 min-w-4 invert dark:invert-0" />
+                              </button>
+                            </>
+                          ) : <p className="hover:text-blue-100 hover:cursor-pointer">No value</p>}
                         </div>
-                      )}
                     </div>
                   </div>
                   {client.is_archive ? 
@@ -185,7 +192,7 @@ const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
                 </div>
               </div>
             </div>
-          ))}
+          )) : <p className="text-dark100_light900">{pathname === "/home/clients" ? "No clients" : "No archive clients"}</p>}
       </div>
 
       {clients.length > pageSize.clients && (
