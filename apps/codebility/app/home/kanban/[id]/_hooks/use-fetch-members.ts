@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { Member } from "../_types/member";
 
 export function useFetchMembers() {
+    const supabase = useSupabase();
+
     const queryFn = async () => {
-        const supabase = useSupabase();
         const { data, error } = await supabase.from("codev")
         .select(`
             *,
@@ -18,7 +19,6 @@ export function useFetchMembers() {
                 codev(id)
             )
         `)
-
         if (error) throw error;
 
         return data.map(({ id, user }) => {
