@@ -28,6 +28,7 @@ import {
 } from "@radix-ui/react-dropdown-menu"
 import Image from "next/image"
 import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum"
+import KanbanTaskAddModalMembers from "./kanban-task-add-modal-members"
 
 interface AddedMember {
   id?: string
@@ -69,22 +70,7 @@ export default function KanbanTaskAddModal({ listName }: Props) {
 
   const { data: categories } = useFetchEnum("public","taskcategory");
 
- /*  const addMember = (member: User) => {
-    setSelectedMembers((prevMembers) => [...prevMembers, member])
-    setInputTask((prevInputTask) => ({
-      ...prevInputTask,
-      addedMembers: [...prevInputTask.addedMembers, member],
-    }))
-  }
-
-  const removeMember = (id: string) => {
-    setSelectedMembers((prevMembers) => prevMembers.filter((member) => member.id !== id))
-    setInputTask((prevInputTask) => ({
-      ...prevInputTask,
-      addedMembers: prevInputTask.addedMembers.filter((member) => member.id !== id),
-    }))
-  }
-
+ /*  
   const handleTitleChange = (e: any) => {
     setInputTask({ ...inputTask, title: e.target.value })
   }
@@ -182,161 +168,166 @@ export default function KanbanTaskAddModal({ listName }: Props) {
       </DialogTrigger>
       <DialogContent
         hideCloseButton={true}
-        className="background-lightsection_darksection text-dark100_light900 flex h-[32rem] w-full max-w-3xl flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
+        className="background-lightsection_darksection text-dark100_light900 h-[32rem] w-full max-w-3xl lg:h-auto"
       >
-        <div className="flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <Label htmlFor="title">Task Name</Label>
-            <Input
-              id="title"
-              name="title"
-              className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
-              placeholder="Enter Task Name"
-            />
-            <div className="flex gap-1">
-              <Label>in list</Label>
-              <Label className="underline">{listName}</Label>
-            </div>
-          </div>
-          <div className="flex w-full flex-col gap-4 md:flex-row">
-            <div className="flex w-1/2 gap-4">
-              <div className="flex w-1/3 flex-col gap-2">
-                <Label htmlFor="category">Category</Label>
-                <Select name="category">
-                  <SelectTrigger
-                    aria-label="Category"
-                    className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
-                  >
-                    <SelectValue className="text-sm" />
-                    <IconDropdown className="h-5 invert dark:invert-0" />
-                  </SelectTrigger>
-
-                  <SelectContent
-                    position="popper"
-                    className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
-                  >
-                    <SelectGroup>
-                      {categories && categories.map((category: string, i: number) => (
-                        <SelectItem
-                          key={i}
-                          className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
-                          value={category}
-                        >
-                          <SelectItemText>
-                            {category}
-                          </SelectItemText>
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </div>
-              <div className="flex w-1/3 flex-col gap-2">
-                <Label htmlFor="duration">Duration hrs</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  min="0"
-                  step="0.25"
-                  isKeyboard={true}
-                  className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
-                />
-              </div>
-              <div className="flex w-1/3 flex-col gap-2">
-                <Label htmlFor="points">Points</Label>
-                <Input
-                  id="duration"
-                  type="number"
-                  min="0"
-                  className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
-                />
+        <form className="flex flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto">
+          <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
+              <Label htmlFor="title">Task Name</Label>
+              <Input
+                id="title"
+                name="title"
+                className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                placeholder="Enter Task Name"
+              />
+              <div className="flex gap-1">
+                <Label>in list</Label>
+                <Label className="underline">{listName}</Label>
               </div>
             </div>
-            <div className="flex w-1/2 gap-4">
-              <div className="flex w-1/2 flex-col gap-2">
-                <Label htmlFor="priority">Priority Level</Label>
-                <Select>
-                  <SelectTrigger
-                    aria-label="Priority Level"
-                    className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
-                  >
-                    <SelectValue className="text-sm" />
-                    <IconDropdown className="h-5 invert dark:invert-0" />
-                  </SelectTrigger>
+            <div className="flex w-full flex-col gap-4 md:flex-row">
+              <div className="flex w-1/2 gap-4">
+                <div className="flex w-1/3 flex-col gap-2">
+                  <Label htmlFor="category">Category</Label>
+                  <Select name="category">
+                    <SelectTrigger
+                      aria-label="Category"
+                      className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                    >
+                      <SelectValue className="text-sm" />
+                      <IconDropdown className="h-5 invert dark:invert-0" />
+                    </SelectTrigger>
 
-                  <SelectContent
-                    position="popper"
-                    className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
-                  >
-                    <SelectGroup>
-                      {taskPrioLevels.map((prioLevel, i) => (
-                        <SelectItem
-                          key={i}
-                          className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
-                          value={prioLevel}
-                        >
-                          <SelectItemText>
-                            {prioLevel}
-                          </SelectItemText>
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                    <SelectContent
+                      position="popper"
+                      className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                    >
+                      <SelectGroup>
+                        {categories && categories.map((category: string, i: number) => (
+                          <SelectItem
+                            key={i}
+                            className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
+                            value={category}
+                          >
+                            <SelectItemText>
+                              {category}
+                            </SelectItemText>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex w-1/3 flex-col gap-2">
+                  <Label htmlFor="duration">Duration hrs</Label>
+                  <Input
+                    id="duration"
+                    type="number"
+                    name="duration"
+                    min="0"
+                    step="0.25"
+                    isKeyboard={true}
+                    className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                  />
+                </div>
+                <div className="flex w-1/3 flex-col gap-2">
+                  <Label htmlFor="points">Points</Label>
+                  <Input
+                    id="points"
+                    name="points"
+                    type="number"
+                    min="0"
+                    className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                  />
+                </div>
               </div>
-              <div className="flex w-1/2 flex-col gap-2">
-                <Label htmlFor="type">Type</Label>
-                <Select>
-                  <SelectTrigger
-                    aria-label="Type"
-                    className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
-                  >
-                    <SelectValue className="text-sm" />
-                    <IconDropdown className="h-5 invert dark:invert-0" />
-                  </SelectTrigger>
+              <div className="flex w-1/2 gap-4">
+                <div className="flex w-1/2 flex-col gap-2">
+                  <Label htmlFor="priority">Priority Level</Label>
+                  <Select name="priorityLevel">
+                    <SelectTrigger
+                      aria-label="Priority Level"
+                      className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                    >
+                      <SelectValue className="text-sm" />
+                      <IconDropdown className="h-5 invert dark:invert-0" />
+                    </SelectTrigger>
 
-                  <SelectContent
-                    position="popper"
-                    className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
-                  >
-                    <SelectGroup>
-                      {taskTypes.map((type, i) => (
-                        <SelectItem key={i} className="cursor-default px-3 py-2 text-sm hover:bg-blue-100" value={type}>
-                          <SelectItemText>
-                            {type}
-                          </SelectItemText>
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
+                    <SelectContent
+                      position="popper"
+                      className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                    >
+                      <SelectGroup>
+                        {taskPrioLevels.map((prioLevel, i) => (
+                          <SelectItem
+                            key={i}
+                            className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
+                            value={prioLevel}
+                          >
+                            <SelectItemText>
+                              {prioLevel}
+                            </SelectItemText>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="flex w-1/2 flex-col gap-2">
+                  <Label htmlFor="type">Type</Label>
+                  <Select name="type">
+                    <SelectTrigger
+                      aria-label="Type"
+                      className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                    >
+                      <SelectValue className="text-sm" />
+                      <IconDropdown className="h-5 invert dark:invert-0" />
+                    </SelectTrigger>
+
+                    <SelectContent
+                      position="popper"
+                      className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                    >
+                      <SelectGroup>
+                        {taskTypes.map((type, i) => (
+                          <SelectItem key={i} className="cursor-default px-3 py-2 text-sm hover:bg-blue-100" value={type}>
+                            <SelectItemText>
+                              {type}
+                            </SelectItemText>
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             </div>
+            <KanbanTaskAddModalMembers />
+            <div className="flex flex-col gap-1">
+              <Label htmlFor="desc">Description</Label>
+              <Textarea
+                id="desc"
+                variant="ghost"
+                name="description"
+                className="h-[8rem] resize-none text-sm dark:bg-dark-200"
+                placeholder="Add a more detailed description..."
+              />
+            </div>
           </div>
-          <div className="flex flex-col gap-1">
-            <Label htmlFor="desc">Description</Label>
-            <Textarea
-              id="desc"
-              variant="ghost"
-             /*  onChange={handleChangeDescription} */
-              className="h-[8rem] resize-none text-sm dark:bg-dark-200"
-              placeholder="Add a more detailed description..."
-            />
-          </div>
-        </div>
 
-        <DialogFooter className="flex flex-col gap-2 lg:flex-row">
-          <Button variant="default" className="order-1 w-full sm:order-2 sm:w-[130px]" /* onClick={handleSave} */>
-            Save
-          </Button>
-        </DialogFooter>
-        <div>
-          <DialogClose asChild>
-            <button className="absolute right-4 top-4">
-              <IconClose className="h-5 invert dark:invert-0" />
-            </button>
-          </DialogClose>
-        </div>
+          <DialogFooter className="flex flex-col gap-2 lg:flex-row">
+            <Button variant="default" className="order-1 w-full sm:order-2 sm:w-[130px]">
+              Save
+            </Button>
+          </DialogFooter>
+          <div>
+            <DialogClose asChild>
+              <button className="absolute right-4 top-4">
+                <IconClose className="h-5 invert dark:invert-0" />
+              </button>
+            </DialogClose>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   )
