@@ -54,7 +54,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId }: Prop
       
       await createNewTask(formData);
       toast.success("Task Created!");
-      router.refresh()
+      router.refresh(); // show new task.
     } catch (e: any) {
       toast.error(e.message)
     }
