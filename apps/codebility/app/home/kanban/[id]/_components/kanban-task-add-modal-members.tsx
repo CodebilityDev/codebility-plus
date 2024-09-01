@@ -53,10 +53,10 @@ export default function KanbanTaskAddModalMembers() {
             ))}
         </div>
         <DropdownMenu>
-            <DropdownMenuTrigger className="cursor-pointer">
-            <Button variant="hollow" className="h-12 w-12 rounded-full p-0">
-                <IconPlus className="invert dark:invert-0" />
-            </Button>
+            <DropdownMenuTrigger className="cursor-pointer" asChild>
+                <Button variant="hollow" className="h-12 w-12 rounded-full p-0">
+                    <IconPlus className="invert dark:invert-0" />
+                </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent
             side="bottom"
@@ -64,40 +64,40 @@ export default function KanbanTaskAddModalMembers() {
             align="start"
             className="z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white dark:bg-dark-100"
             >
-            <DropdownMenuLabel className="pb-2 text-center text-sm">Add Members</DropdownMenuLabel>
-            <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search members"
-                className="border-gray-300 mb-2 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none dark:bg-dark-200"
-            />
-            <DropdownMenuSeparator />
-            <DropdownMenuLabel className="px-4 py-2 text-xs">Available Members</DropdownMenuLabel>
-            {members
-                ?.filter((user) =>
-                `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
-                )
-                .map((user) => (
-                <DropdownMenuItem
-                    key={user.id}
-                    className="hover:bg-gray-100 flex cursor-pointer items-center justify-between px-4 py-2 dark:hover:bg-dark-200"
-                    onClick={() => addMember(user)}
-                >
-                    <div className="flex items-center gap-2">
-                    <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
-                        <Image
-                        alt="Avatar"
-                        src={user.image_url ?? "/default-avatar.jpg"}
-                        fill
-                        title={`${user.id}'s Avatar`}
-                        className="h-auto w-full rounded-full bg-cover object-cover"
-                        loading="eager"
-                        />
-                    </div>
-                    <span>{`${user.first_name} ${user.last_name}`}</span>
-                    </div>
-                </DropdownMenuItem>
+                <DropdownMenuLabel className="pb-2 text-center text-sm">Add Members</DropdownMenuLabel>
+                <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search members"
+                    className="border-gray-300 mb-2 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none dark:bg-dark-200"
+                />
+                <DropdownMenuSeparator />
+                <DropdownMenuLabel className="px-4 py-2 text-xs">Available Members</DropdownMenuLabel>
+                {members
+                    ?.filter((user) =>
+                    `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
+                    )
+                    .map((user) => (
+                    <DropdownMenuItem
+                        key={user.id}
+                        className="hover:bg-gray-100 flex cursor-pointer items-center justify-between px-4 py-2 dark:hover:bg-dark-200"
+                        onClick={() => addMember(user)}
+                    >
+                        <div className="flex items-center gap-2">
+                        <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
+                            <Image
+                            alt="Avatar"
+                            src={user.image_url ?? "/default-avatar.jpg"}
+                            fill
+                            title={`${user.id}'s Avatar`}
+                            className="h-auto w-full rounded-full bg-cover object-cover"
+                            loading="eager"
+                            />
+                        </div>
+                        <span>{`${user.first_name} ${user.last_name}`}</span>
+                        </div>
+                    </DropdownMenuItem>
                 ))}
             </DropdownMenuContent>
         </DropdownMenu>
