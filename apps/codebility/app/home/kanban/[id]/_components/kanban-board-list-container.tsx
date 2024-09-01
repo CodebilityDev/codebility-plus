@@ -12,11 +12,12 @@ import {
   pointerWithin,
 } from "@dnd-kit/core"
 import { createPortal } from "react-dom"
-import { useRef, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import KanbanTask from "./kanban-task"
 import KanbanColumnContainer from "./kanban-column-container"
 import type { Task } from "@/types/home/task"
 import { List } from "../_types/board"
+import useSlider from "@/hooks/useSlider"
 
 interface Props {
   lists: List[];
@@ -26,7 +27,8 @@ interface Props {
 export default function KanbanBoardListContainer({ lists, projectId }: Props) {
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const scrollableDiv = useRef<HTMLDivElement>(null)
-  /*useSlider(scrollableDiv, isLoading)
+
+  useSlider(scrollableDiv, false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -47,7 +49,7 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
       setActiveTask(event.active.data.current.task)
     }
   }, [])
- */
+
 /*   const onDragEnd = useCallback(
     (event: DragEndEvent) => {
       setActiveTask(null)
@@ -80,7 +82,7 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
     [columns, tasks, token]
   ) */
 
- /*  const onDragOver = useCallback((event: DragOverEvent) => {
+  /* const onDragOver = useCallback((event: DragOverEvent) => {
     const { active, over } = event
     if (!over) return
 
@@ -128,10 +130,10 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
   return (
     <div className="overflow-x-auto overflow-y-hidden " ref={scrollableDiv}>
       <DndContext
-/*         sensors={sensors} */
+        sensors={sensors}
         collisionDetection={pointerWithin}
-  /*       onDragStart={onDragStart}
-        onDragEnd={onDragEnd}
+        onDragStart={onDragStart}
+      /*   onDragEnd={onDragEnd}
         onDragOver={onDragOver} */
       >
         <ol className="flex w-full gap-2">
@@ -146,11 +148,11 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
             />
           ))}
         </ol>
-  {/*       {typeof window !== "undefined" &&
+        {typeof window !== "undefined" &&
           createPortal(
-            <DragOverlay>{activeTask && <KanbanTask task={activeTask} listName="" />}</DragOverlay>,
+            <DragOverlay>{activeTask && <KanbanTask task={activeTask} />}</DragOverlay>,
             document.body
-          )} */}
+          )}
       </DndContext>
     </div>
   )
