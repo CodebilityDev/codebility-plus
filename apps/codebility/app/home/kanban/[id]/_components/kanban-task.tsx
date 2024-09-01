@@ -43,8 +43,8 @@ function KanbanTask({ task }: Props) {
     )
   }
 
-  const codevs = task.codev?.map(member => {
-    const { first_name, last_name, image_url } = member.user?.profile as Profile;
+  const codevs = task.codev_task.map(codevTask => {
+    const { first_name, last_name, image_url } = codevTask.codev.user?.profile as Profile;
 
     return { first_name, last_name, image_url};
   })
