@@ -29,6 +29,7 @@ export default function KanbanTaskAddModalMembers() {
   return (
     <div className="flex flex-col gap-1">
         <label htmlFor="members">Members</label>
+        <input type="hidden" name="membersId" value={selectedMembers.map(member => member.id)} />
         <div className="flex gap-2">
         <div className="flex flex-wrap items-center">
             {selectedMembers.map((member) => (
