@@ -1,6 +1,7 @@
 "use server";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+import { headers } from "next/headers";
 
 export const createNewList = async (name: string, board_id: string) => {
     const supabase = getSupabaseServerActionClient();
@@ -11,4 +12,17 @@ export const createNewList = async (name: string, board_id: string) => {
     })
 
     if (error) throw error;
+}
+
+export const createNewTask = async (formData: FormData) => {
+    const title = formData.get("title");
+    const category = formData.get("category");
+    const duration = Number(formData.get("duration"));
+    const points = Number(formData.get("points") || 0);
+    const priority = formData.get("priority");
+    const type = formData.get("type");
+    const membersId = formData.get("membersId");
+    const description = formData.get("description");
+    const projectId = formData.get("projectId");
+    const listId = formData.get("listId");
 }
