@@ -33,7 +33,7 @@ export const createNewTask = async (formData: FormData) => {
     
     if (fetchingTasksError) throw fetchingTasksError;
     
-    const { error } = await supabase.from("task")
+    const { data, error } = await supabase.from("task")
     .insert({
         project_id,
         list_id,
@@ -46,10 +46,20 @@ export const createNewTask = async (formData: FormData) => {
         points,
         priority_level
     })
+    .select()
+    .single();
         
     if (error) throw error;
    
-    const membersId = formData.get("membersId")?.toString().split(",");
+    const membersId = (formData.get("membersId") ? formData.get("membersId")?.toString().split(","): []) as string[];
 
-    
+    for (let codev_id of membersId) {
+        const { error } = await supabase.from("codev_task")
+        .insert({
+            codev_id,
+            task_id: data.id
+        });
+
+        if (error) throw error;
+    }
 }
