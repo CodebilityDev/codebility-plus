@@ -5,6 +5,7 @@ export interface Board {
     id: string;
     name: string;
     project: Project;
+    project_id: string;
     list: List[];
 }
 
