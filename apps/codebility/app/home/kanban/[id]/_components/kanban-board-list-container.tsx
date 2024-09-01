@@ -18,6 +18,8 @@ import KanbanColumnContainer from "./kanban-column-container"
 import type { Task } from "@/types/home/task"
 import { List } from "../_types/board"
 import useSlider from "@/hooks/useSlider"
+import { arrayMove } from "@dnd-kit/sortable"
+import KanbanTaskOverlayWrapper from "./kanban-task-overlay-wrapper"
 
 interface Props {
   lists: List[];
@@ -27,6 +29,7 @@ interface Props {
 export default function KanbanBoardListContainer({ lists, projectId }: Props) {
   const [activeTask, setActiveTask] = useState<Task | null>(null)
   const scrollableDiv = useRef<HTMLDivElement>(null)
+/*   const [tasks, setTasks] = useState<Task[]>() */
 
   useSlider(scrollableDiv, false)
 
@@ -43,12 +46,6 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
       },
     })
   )
-
-  const onDragStart = useCallback((event: DragStartEvent) => {
-    if (event.active.data.current?.type === "Task") {
-      setActiveTask(event.active.data.current.task)
-    }
-  }, [])
 
 /*   const onDragEnd = useCallback(
     (event: DragEndEvent) => {
@@ -82,7 +79,7 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
     [columns, tasks, token]
   ) */
 
-  /* const onDragOver = useCallback((event: DragOverEvent) => {
+ /*  const onDragOver = useCallback((event: DragOverEvent) => {
     const { active, over } = event
     if (!over) return
 
@@ -132,7 +129,7 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
       <DndContext
         sensors={sensors}
         collisionDetection={pointerWithin}
-        onDragStart={onDragStart}
+       /*  onDragStart={onDragStart} */
       /*   onDragEnd={onDragEnd}
         onDragOver={onDragOver} */
       >
@@ -148,11 +145,7 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
             />
           ))}
         </ol>
-        {typeof window !== "undefined" &&
-          createPortal(
-            <DragOverlay>{activeTask && <KanbanTask task={activeTask} />}</DragOverlay>,
-            document.body
-          )}
+        <KanbanTaskOverlayWrapper />
       </DndContext>
     </div>
   )
