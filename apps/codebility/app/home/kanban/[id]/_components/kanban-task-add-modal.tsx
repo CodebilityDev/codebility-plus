@@ -19,9 +19,10 @@ import { createNewTask } from "../actions"
 
 interface Props {
   listName: string;
+  projectId: string;
 }
 
-export default function KanbanTaskAddModal({ listName }: Props) {
+export default function KanbanTaskAddModal({ listName, projectId }: Props) {
   const { data: categories } = useFetchEnum("public","taskcategory");
 
   const validateInput = (formData: FormData) => {
@@ -74,6 +75,7 @@ export default function KanbanTaskAddModal({ listName }: Props) {
               <DialogTitle className="mb-2 text-left text-lg">Add New Task</DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-6">
+            <input type="hidden" name="projectId" value={projectId} />
             <div className="flex flex-col gap-2">
               <Label htmlFor="title">Task Name</Label>
               <Input
