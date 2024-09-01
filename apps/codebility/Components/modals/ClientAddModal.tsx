@@ -1,8 +1,8 @@
 import Image from "next/image"
+import toast from "react-hot-toast"
 import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-
 import { Input } from "@codevs/ui/input"
 import { Button } from "@/Components/ui/button"
 import { IconClose } from "@/public/assets/svgs"
@@ -10,7 +10,6 @@ import { useModal } from "@/hooks/use-modal-clients"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "../ui/dialog"
 import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema"
-import toast from "react-hot-toast"
 import { createClientAction } from "@/app/home/clients/action"
 import { DEFAULT_AVATAR } from "@/app/home/clients/_lib/constants"
 
@@ -19,12 +18,13 @@ const ClientAddModal = () => {
   const isModalOpen = isOpen && type === "clientAddModal"
 
   const [isLoading, setIsLoading] = useState(false);
-  const [companyLogo, setCompanyLogo] = useState();
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isValid },
   } = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
@@ -34,15 +34,38 @@ const ClientAddModal = () => {
   const handleDialogChange = (open: boolean) => {
     if (!open) {
       reset();
+      setLogoPreview(null); 
     }
     onClose();
+  }
+
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setValue("logo", file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleRemoveLogo = () => { 
+    setLogoPreview(null)
   }
 
   const handleCreateClient = async (data: ClientFormValues) => { 
     setIsLoading(true);
 
     try {
-      const response = await createClientAction(data);
+      const formData = new FormData();
+      formData.append("name", data.name);
+      if (data.email) formData.append("email", data.email);
+      if (data.location) formData.append("location", data.location);
+      if (data.contact_number) formData.append("contact_number", data.contact_number);
+      if (data.linkedin_link) formData.append("linkedin_link", data.linkedin_link);
+      if (data.start_time) formData.append("start_time", data.start_time);
+      if (data.end_time) formData.append("end_time", data.end_time);
+      if (data.logo) formData.append("logo", data.logo as File);
+
+      const response = await createClientAction(formData);
 
       if (response.success) {
         toast.success("Client created successfully");
@@ -51,7 +74,7 @@ const ClientAddModal = () => {
         toast.error(`Error: ${response.error}`);
       }
     } catch (error) {
-      console.log("Error creating new client: ", error);
+      console.log("123: ", error);
       toast.error("Error creating new client");
     } finally {
       setIsLoading(false);
@@ -77,7 +100,7 @@ const ClientAddModal = () => {
           <div className="flex flex-col gap-4 md:flex-row">
             <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
               <Image
-                src={companyLogo || DEFAULT_AVATAR}
+                src={logoPreview || DEFAULT_AVATAR}
                 id="image"
                 alt="Avatar"
                 fill
@@ -89,15 +112,29 @@ const ClientAddModal = () => {
               <p className="text-md text-gray text-center">Image size 1080 x 768 px</p>
               <div className="gap-4">
                 <div className="relative">
-                  {!companyLogo && <label htmlFor="companylogo">
-                    <p className="cursor-pointer text-center text-blue-100 md:text-left">Upload Image</p>
+                  {!logoPreview && 
+                  <label htmlFor="logo">
+                    <p className="cursor-pointer text-center text-blue-100 md:text-left">
+                      Upload Image
+                    </p>
                   </label>}
-                  <input id="companylogo" type="file" className="hidden" />
-                  {/* <input type="hidden" name="avatar" value={companyLogo} /> */}
+                  <input
+                    id="logo"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    name="logo"
+                    onChange={handleLogoChange}
+                  />
                 </div>
-                {companyLogo && <p className="cursor-pointer text-center text-violet md:text-left">
-                  Remove Image
-                </p>}
+                {logoPreview && (
+                  <p
+                    onClick={handleRemoveLogo}
+                    className="cursor-pointer text-center text-violet md:text-left"
+                  >
+                    Remove Image
+                  </p>
+                )}
               </div>
             </div>
           </div>
