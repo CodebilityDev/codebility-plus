@@ -11,13 +11,15 @@ export default async function KanbanPage({ params }: { params: { id: string } })
       *,
       task(
         *,
-        codev(
-          *,
-          user(
+        codev_task(
+          codev(
             *,
-            profile(*)
+            user(
+              *,
+              profile(*)
+            )
           )
-        )
+        ) 
       )
     )  
   `)
