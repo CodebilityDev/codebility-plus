@@ -16,6 +16,7 @@ import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum"
 import KanbanTaskAddModalMembers from "./kanban-task-add-modal-members"
 import { DialogTitle } from "@radix-ui/react-dialog"
 import { createNewTask } from "../actions"
+import { useRouter } from "next/navigation"
 
 interface Props {
   listId: string;
@@ -25,6 +26,7 @@ interface Props {
 
 export default function KanbanTaskAddModal({ listId, listName, projectId }: Props) {
   const { data: categories } = useFetchEnum("public","taskcategory");
+  const router = useRouter();
 
   const validateInput = (formData: FormData) => {
     const inputs: Record<string, any> = {};
@@ -51,6 +53,8 @@ export default function KanbanTaskAddModal({ listId, listName, projectId }: Prop
       validateInput(formData);
       
       await createNewTask(formData);
+      toast.success("Task Created!");
+      router.refresh()
     } catch (e: any) {
       toast.error(e.message)
     }
