@@ -1,37 +1,41 @@
 import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import { useQuery } from "@tanstack/react-query";
+import { Member } from "../_types/member";
 
 export function useFetchMembers() {
     const queryFn = async () => {
         const supabase = getSupabaseBrowserClient();
-        const { data, error } = await supabase.from("user")
+        const { data, error } = await supabase.from("codev")
         .select(`
-        *,
-        profile(
-            first_name,
-            last_name,
-            image_url
-        ),
-        codev(id)
+            *,
+            user(
+                *,
+                profile(
+                    first_name,
+                    last_name,
+                    image_url
+                ),
+                codev(id)
+            )
         `)
 
         if (error) throw error;
 
-        return data.map(({ id, email, profile, codev }) => {
-            const { first_name, last_name, image_url } = profile;
+        return data.map(({ id, user }) => {
+            const { first_name, last_name, image_url } = user.profile;
             
             return {
                 id,
-                email,
+                email: user.email,
                 first_name,
                 last_name,
                 image_url,
-                codev_id: codev.id
+                user_id: user.id
             }
         })
     }
 
-    return useQuery({
+    return useQuery<Member[]>({
         queryKey: ["supabase:users"],
         queryFn
     });

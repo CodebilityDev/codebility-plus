@@ -11,14 +11,20 @@ import Image from "next/image"
 import { IconPlus } from "@/public/assets/svgs"
 import { useState } from "react"
 import { useFetchMembers } from "../_hooks/use-fetch-members"
-import { Codev } from "@/types/home/codev"
-
+import { Member } from "../_types/member"
 
 export default function KanbanTaskAddModalMembers() {
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [ selectedMembers, setSelectedMembers ] = useState<Codev[]>([]);
+  const [ selectedMembers, setSelectedMembers ] = useState<Member[]>([]);
   const { data: members } = useFetchMembers();
 
+  const addMember = (member: Member) => {
+    setSelectedMembers((prevMembers) => [...prevMembers, member])
+  }
+
+  const removeMember = (id: string) => {
+    setSelectedMembers((prevMembers) => prevMembers.filter((member) => member.id !== id))
+  }
 
   return (
     <div className="flex flex-col gap-1">
@@ -29,7 +35,7 @@ export default function KanbanTaskAddModalMembers() {
                 <div
                     className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
                     key={member.id}
-        /*          onClick={() => removeMember(member.id)} */
+                    onClick={() => removeMember(member.id)}
                 >
                     <Image
                     alt="Avatar"
@@ -72,7 +78,7 @@ export default function KanbanTaskAddModalMembers() {
                 <DropdownMenuItem
                     key={user.id}
                     className="hover:bg-gray-100 flex cursor-pointer items-center justify-between px-4 py-2 dark:hover:bg-dark-200"
-                /*   onClick={() => addMember(user)} */
+                    onClick={() => addMember(user)}
                 >
                     <div className="flex items-center gap-2">
                     <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
