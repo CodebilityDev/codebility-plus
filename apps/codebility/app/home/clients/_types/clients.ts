@@ -2,12 +2,12 @@
 export type ClientDetails = {
     id?: string;
     name: string;
-    logo: null | string;
-    location: string;
+    logo?: string | null;
+    location?: string;
     email: string;
-    contact_number: string;
+    contact_number?: string;
     linkedin_link: string;
-    start_time: string;
-    end_time: string;
+    start_time?: string;
+    end_time?: string;
     is_archive?: boolean;
 };
