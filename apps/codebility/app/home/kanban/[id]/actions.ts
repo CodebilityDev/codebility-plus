@@ -21,19 +21,18 @@ export const createNewTask = async (formData: FormData) => {
     const points = Number(formData.get("points") || 0);
     const priority_level = formData.get("priority") && formData.get("priority")?.toString().toUpperCase(); // enums are upper case.
     const type = formData.get("type");
-    const membersId = formData.get("membersId");
     const description = formData.get("description");
     const project_id = formData.get("projectId");
     const list_id = formData.get("listId");
-
+    
     const supabase = getSupabaseServerActionClient();
-
+    
     const { data: tasks, error: fetchingTasksError } = await supabase.from("task")
     .select("*")
     .eq("project_id", project_id);
-
+    
     if (fetchingTasksError) throw fetchingTasksError;
-
+    
     const { error } = await supabase.from("task")
     .insert({
         project_id,
@@ -47,7 +46,10 @@ export const createNewTask = async (formData: FormData) => {
         points,
         priority_level
     })
-
+        
     if (error) throw error;
+   
+    const membersId = formData.get("membersId")?.toString().split(",");
 
+    
 }
