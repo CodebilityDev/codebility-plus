@@ -19,7 +19,10 @@ export default function KanbanTaskAddModalMembers() {
   const { data: members } = useFetchMembers();
 
   const addMember = (member: Member) => {
-    setSelectedMembers((prevMembers) => [...prevMembers, member])
+    setSelectedMembers((prevMembers) => {
+        if (prevMembers.includes(member)) return prevMembers;
+        return [...prevMembers, member];
+    })
   }
 
   const removeMember = (id: string) => {
