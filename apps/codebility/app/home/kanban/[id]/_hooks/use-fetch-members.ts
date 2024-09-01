@@ -1,10 +1,10 @@
-import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase"
 import { useQuery } from "@tanstack/react-query";
 import { Member } from "../_types/member";
 
 export function useFetchMembers() {
     const queryFn = async () => {
-        const supabase = getSupabaseBrowserClient();
+        const supabase = useSupabase();
         const { data, error } = await supabase.from("codev")
         .select(`
             *,
