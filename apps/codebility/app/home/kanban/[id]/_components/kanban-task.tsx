@@ -38,7 +38,7 @@ function KanbanTask({ task }: Props) {
           {task.title}
           <IconPriority1 />
         </div>
-        <div className="flex">{`#01`}</div>
+        <div className="flex">#{task.number.toString().padStart(2,"0")}</div>
       </div>
     )
   }
