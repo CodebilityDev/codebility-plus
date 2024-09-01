@@ -12,12 +12,14 @@ import { KanbanListSchema } from "../_types/kanban-list.schema"
 import { z } from "zod"
 import { DialogClose } from "@radix-ui/react-dialog"
 import { createNewList } from "../actions"
+import { useRouter } from "next/navigation"
 
 interface Props {
   boardId: string;
 }
 
 export default function KanbanListAddModal({ boardId }: Props) {
+  const router = useRouter();
   const form = useForm<z.infer<typeof KanbanListSchema>>({
     resolver: zodResolver(KanbanListSchema)
   })
@@ -28,6 +30,7 @@ export default function KanbanListAddModal({ boardId }: Props) {
     try {
       await createNewList(name, boardId);
       toast.success("New List Created!");
+      router.refresh(); // show new list.
     } catch (e: any) {
       toast.error(e.message);
     }
