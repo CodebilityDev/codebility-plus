@@ -9,7 +9,7 @@ export const clientSchema = z.object({
     linkedin_link: z.string().url().optional(),
     start_time: z.string().optional(),
     end_time: z.string().optional(),
-    logo: z.string().optional(),
+    logo: z.union([z.instanceof(File), z.string()]).optional(),
 });
 
 export type ClientFormValues = z.infer<typeof clientSchema>
