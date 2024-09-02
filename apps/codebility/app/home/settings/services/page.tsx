@@ -1,34 +1,25 @@
 import Link from "next/link"
 import { H1 } from "@/Components/shared/dashboard"
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbSeparator,
-} from "@codevs/ui/breadcrumb"
 import { Button } from "@/Components/ui/button"
 import { Table, TableHead, TableHeader, TableRow } from "@/Components/ui/table"
 import { IconAdd } from "@/public/assets/svgs"
 import { getAllServices } from "@/app/home/settings/services/service"
 import ServiceList from "./_components/service-list"
+import CustomBreadcrumb from "@/Components/shared/dashboard/CustomBreadcrumb"
 
 const headers = ["Name", "Category", "Description", "Edit", "Delete"]
+
+const items = [
+  { label: "Settings", href: "/home/settings" },
+  { label: "Services" },
+]
 
 const ServicesSetting = async () => {
   const data = await getAllServices();
 
   return (
     <div className="max-w-screen-xl mx-auto">
-      <Breadcrumb>
-        <BreadcrumbList>
-          <BreadcrumbItem>
-            <BreadcrumbLink href="/settings">Settings</BreadcrumbLink>
-          </BreadcrumbItem>
-          <BreadcrumbSeparator />
-          <BreadcrumbItem>Services</BreadcrumbItem>
-        </BreadcrumbList>
-      </Breadcrumb>
+      <CustomBreadcrumb items={items} />
       <div className="flex flex-col gap-4 pt-4">
         <div className="flex flex-col gap-4 md:flex-row md:justify-between md:items-center">
           <H1>Service Lists</H1>
