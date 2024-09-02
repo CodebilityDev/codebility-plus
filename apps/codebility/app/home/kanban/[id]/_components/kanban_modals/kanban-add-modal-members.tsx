@@ -24,7 +24,7 @@ export default function KanbanAddModalMembers({ initialSelectedMembers }: Props)
 
   const addMember = (member: Member) => {
     setSelectedMembers((prevMembers) => {
-        if (prevMembers.includes(member)) return prevMembers;
+        if (prevMembers.some(prevMember => prevMember.id === member.id)) return prevMembers;
         return [...prevMembers, member];
     })
   }
