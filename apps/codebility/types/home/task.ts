@@ -11,7 +11,12 @@ export interface Task {
     duration: number;
     points: number;
     number: number;
+    priority_level: string;
     codev?: Codev[];
     codev_task: CodevTask[];
     list_id: string;
+    category: string;
+    type: string;
+    description: string;
+    pr_link: string;
 }
