@@ -5,7 +5,7 @@ import { useNavStore } from "@/hooks/use-sidebar"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
-import useUser from "../_hooks/useUser"
+import useUser from "../_hooks/use-user"
 
 const LeftSidebar = () => {
   const user = useUser();
