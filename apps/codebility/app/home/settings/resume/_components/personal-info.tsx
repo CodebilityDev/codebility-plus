@@ -1,5 +1,5 @@
 "use client"
-import {  useState } from "react"
+import {  useEffect, useState } from "react"
 // import toast from "react-hot-toast"
 import { useForm } from "react-hook-form"
 
@@ -12,58 +12,65 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select"
-
-
 import { Label } from "@codevs/ui/label"
 import { Input } from "@codevs/ui/input"
 import { IconEdit } from "@/public/assets/svgs"
 import { Button } from "@/Components/ui/button"
 import Box from "@/Components/shared/dashboard/Box"
-
-
 import { updateProfile } from "../action"
-
 import toast from "react-hot-toast"
 import { positions, profilePronoun } from "@/constants"
 
 
 
-interface PersonalInfo  {
-  user:{
-  id?: string,
+type Profile = {
   first_name: string;
   last_name: string;
-  pronoun?: string
+  pronoun: string
   main_position: string
   address: string
 }
+type PersonalInfoProps = {
+data: Profile
 }
 
-const PersonalInfo = ({user}: PersonalInfo) => {
+const PersonalInfo = ({data}: PersonalInfoProps) => {
 const [isEditMode, setIsEditMode] = useState(false)
 const [isLoading, setIsLoading] = useState(false)
-const {  first_name, last_name, address, main_position, pronoun } = user
-const {register,handleSubmit} = useForm<PersonalInfo>(
+
+const {register,handleSubmit, reset} = useForm(
   {
   defaultValues: {
-    user: {
-      pronoun: pronoun || "",
-      first_name: first_name || "",
-      last_name: last_name || "",
-      address: address || "",
-      main_position: main_position || "",
-    },
+      pronoun:  "",
+      first_name:  "",
+      last_name:  "",
+      address:  "",
+      main_position: "",
+ 
 },})
   const [selectedPronoun, setSelectedPronoun] = useState<string | null>(null)
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null)
 
-  
+  useEffect(() => {
+    if(data) {
+      reset({
+        pronoun: data.pronoun,
+        first_name: data.first_name,
+        last_name: data.last_name,
+        address: data.address,
+        main_position: data.main_position
+      })
+      setSelectedPronoun(data.pronoun); 
+      setSelectedPosition(data.main_position);
+    }
+  }, [data, reset])
 
   const onSubmit = async (data: any)=> {
     try {
       setIsLoading(true)
-      const { first_name, last_name, address, pronoun, main_position } = data;
-      await updateProfile({first_name, last_name, address, pronoun, main_position})
+      const { first_name, last_name, address} = data;
+      await updateProfile({first_name, last_name, address, pronoun: selectedPronoun,
+        main_position: selectedPosition})
       toast.success("Your personal information was sucessfully updated!")
       setIsEditMode(false)
     } catch(error){
@@ -122,7 +129,7 @@ const {register,handleSubmit} = useForm<PersonalInfo>(
             parentClassName="flex w-full flex-col justify-between gap-2 "
             label="First Name"
             id="first_name"
-            {...register("user.first_name")}
+            {...register("first_name")}
             disabled={!isEditMode}
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded capitalize"
@@ -130,7 +137,7 @@ const {register,handleSubmit} = useForm<PersonalInfo>(
           />
           <Input
             id="last_name"
-            {...register("user.last_name")}
+            {...register("last_name")}
             label="Last Name"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
@@ -140,7 +147,7 @@ const {register,handleSubmit} = useForm<PersonalInfo>(
           />
           <Input
             id="address"
-            {...register("user.address")}
+            {...register("address")}
             label="Address"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2 "
@@ -152,7 +159,7 @@ const {register,handleSubmit} = useForm<PersonalInfo>(
           <div className="flex w-full flex-col justify-between gap-1 pt-5">
             <Label className="text-md">Position</Label>
 
-            <Select onValueChange={(value) => setSelectedPosition(value)} disabled={!isEditMode} {...register("user.main_position")}>
+            <Select onValueChange={(value) => setSelectedPosition(value)} disabled={!isEditMode} {...register("main_position")}>
               <SelectTrigger
                 aria-label="main_position"
 
