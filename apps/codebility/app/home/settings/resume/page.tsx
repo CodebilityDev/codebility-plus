@@ -28,36 +28,17 @@ const Resume = async () => {
   
     const supabase = getSupabaseServerComponentClient()
     const {data: {user} } = await supabase.auth.getUser()
-    const {data: profileDatas} = await supabase.from("profile").select().eq("id", user?.id).single()
+    const {data: profileData, error} = await supabase.from("profile").select().eq("id", user?.id).single()
+    const{data: socialData} = await supabase.from("social").select().eq("id", user?.id).single()
   
- 
-  // if (isLoading) {
-  //   return (
-  //     <>
-  //       <Breadcrumb>
-  //         <BreadcrumbList>
-  //           <BreadcrumbItem>
-  //             <BreadcrumbLink href="/settings">Settings</BreadcrumbLink>
-  //           </BreadcrumbItem>
-  //           <BreadcrumbSeparator />
-  //           <BreadcrumbItem>Resume</BreadcrumbItem>
-  //         </BreadcrumbList>
-  //       </Breadcrumb>
+  if (error) {
+    console.error("Error fetching profile data:", error)
+    // Handle error state or redirect as needed
+    return (
+      <div>Error loading profile data</div>
+    )
+  }
 
-  //       <H1 className="pt-4">Resume Settings</H1>
-  //       <div className="flex flex-col gap-8 md:flex-row">
-  //         <div className="flex w-full basis-[60%] flex-col gap-6">
-  //           <Skeleton className="h-[450px] w-full" />
-  //           <Skeleton className="h-[450px] w-full" />
-  //           <Skeleton className="h-[450px] w-full" />
-  //         </div>
-  //         <div className="flex basis-[40%]">
-  //           <Skeleton className="h-[450px] w-full" />
-  //         </div>
-  //       </div>
-  //     </>
-  //   )
-  // }
   return (
     <>
       <Breadcrumb>
@@ -74,11 +55,11 @@ const Resume = async () => {
         <H1>Resume Settings</H1>
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8">
-           <PersonalInfo user={profileDatas} />  
-          {/* <About />
-          <ContactInfo  /> */}
+           {/* <PersonalInfo data={profileData} />  
+            <About data={profileData}/> */}
+          {/* <ContactInfo data={socialData} /> */}
           {/* <Experience  /> */}
-          {/* <Skills/> */}
+          <Skills data={profileData} />
         </div>
         <div className="flex w-full basis-[30%] flex-col gap-8">
           {/* <Photo user={userData} /> */}

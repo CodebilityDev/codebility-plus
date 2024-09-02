@@ -1,52 +1,50 @@
-import { useEffect, useState } from "react"
+"use client"
+import {  useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useForm } from "react-hook-form"
-
-
-
 import { Button } from "@/Components/ui/button"
 import { IconEdit } from "@/public/assets/svgs"
 import Box from "@/Components/shared/dashboard/Box"
 import { Textarea } from "@codevs/ui/textarea"
 import { Label } from "@codevs/ui/label"
-import { getProfile, updateProfile } from "../action"
-import { useQuery } from "@tanstack/react-query"
+import {   updateProfile } from "../action"
 
-const About = () => {
+
+type Profile = {
+  about: string
+}
+
+type AboutProps = {
+  data: Profile
+}
+
+const About = ({data}: AboutProps) => {
+  
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  
-  const { data: profile,  isError: profileLoading } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data, error } = await getProfile()
-      if (error) throw error;
-      return data;
-    },
-  });
-  
+
   const {
     register,
     handleSubmit,
     reset,
     formState: {},
-  } = useForm({
+  } = useForm(
+    {
     defaultValues: {
-      about: "",
-    },
-  })
+        about: "",
+  },})
   useEffect(() => {
-    if (profile) {
+    if(data) {
       reset({
-        about: profile.about || "",
+        about: data.about,
       })
     }
-  }, [profile, reset])
+  }, [data, reset])
 
   const onSubmit = async (data: any) => {
     try {
       setIsLoading(true)
-      const about =  data.about
+      const {about} = data
       await updateProfile({about})
       toast.success("Your about was sucessfully updated!")
       setIsEditMode(false)
@@ -88,7 +86,7 @@ const About = () => {
                 placeholder="Write something about yourself..."
                 id="about_me"
                 {...register("about")}
-                disabled={!isEditMode || profileLoading}
+                disabled={!isEditMode}
                 className={` placeholder-${
                   !isEditMode ? "lightgray dark:placeholder-gray" : "black-100 dark:placeholder-gray-400"
                 }  ${

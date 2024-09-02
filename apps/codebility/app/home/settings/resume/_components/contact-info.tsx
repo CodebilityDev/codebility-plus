@@ -1,4 +1,5 @@
-/* eslint-disable no-unused-vars */
+
+"use client"
 import { useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { useForm } from "react-hook-form"
@@ -9,13 +10,12 @@ import { IconEdit } from "@/public/assets/svgs"
 import Box from "@/Components/shared/dashboard/Box"
 
 import InputPhone from "@/Components/shared/dashboard/InputPhone"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { contactInfoValidation, contactInfoValidationSchema } from "@/lib/validations/resumeSettings"
-import { Input } from "@codevs/ui/input"
-import { useQuery } from "@tanstack/react-query"
-import { getProfile, getSocial, updateProfile, updateSocial } from "../action"
 
-type ContactInfo = {
+import { Input } from "@codevs/ui/input"
+
+import { updateSocial } from "../action"
+
+type Contact = {
   phone_no: string
   portfolio_website: string
   github_link: string
@@ -25,54 +25,49 @@ type ContactInfo = {
   whatsapp_link: string
   skype_link: string
 }
-const ContactInfo = () => {
+type ContactProps = {
+  data: Contact
+}
+const ContactInfo = ({data}: ContactProps) => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
  
-  const { data: profile,  isError: profileLoading } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data, error } = await getSocial()
-      if (error) throw error;
-      return data;
-    },
-  });
- 
+
   const {
     register,
     handleSubmit,
     reset,
     control,
-    formState: { errors },
+    formState: { },
   } = useForm({
     defaultValues: {
-      phone_no: "" || undefined,
-      portfolio_website: "" || undefined,
-      github_link: "" || undefined,
-      linkedin_link: "" || undefined,
-      fb_link: ""|| undefined,
-      telegram_link: "" || undefined,
-      whatsapp_link: "" || undefined,
-      skype_link: "" || undefined,
+      phone_no: "" ,
+      portfolio_website: "",
+      github_link: "",
+      linkedin_link: "",
+      fb_link: "",
+      telegram_link: "",
+      whatsapp_link: "",
+      skype_link: "",
     },
    
   })
   
 
   useEffect(() => {
-    if (profile) {
+    if (data) {
       reset({
-        phone_no: profile.phone_no || "",
-        portfolio_website: profile.portfolio_website || "",
-        github_link: profile.github_link || "",
-        linkedin_link: profile.linkedin_link || "",
-        fb_link: profile.fb_link || "",
-        telegram_link: profile.telegram_link || "",
-        whatsapp_link: profile.whatsapp_link || "",
-        skype_link: profile.skype_link || ""
+        phone_no: data.phone_no || "",
+        portfolio_website: data.portfolio_website || "",
+        github_link: data.github_link || "",
+        linkedin_link: data.linkedin_link || "",
+        fb_link: data.fb_link || "",
+        telegram_link: data.telegram_link || "",
+        whatsapp_link: data.whatsapp_link || "",
+        skype_link: data.skype_link || ""
       })
     }
-  }, [profile, reset])
+  }, [data, reset])
 
   const onSubmit = async (data: any) => {
     try {
@@ -121,7 +116,7 @@ const ContactInfo = () => {
           <InputPhone
             id="phone_no"
             control={control}
-            label="Phone"
+            label="eg. 9054936302"
             disabled={!isEditMode}
             inputClassName={` ${
               isEditMode

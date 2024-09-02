@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+"use client"
 import Image from "next/image"
 
 import { useModal } from "@/hooks/use-modal"
@@ -7,32 +8,28 @@ import { IconEdit } from "@/public/assets/svgs"
 import React, { useEffect, useState } from "react"
 import { Box } from "@/Components/shared/dashboard"
 import { useTechStackStore } from "@/hooks/use-techstack"
-import { resume_SkillsT } from "@/types/protectedroutes"
-import { getProfile, updateProfile } from "../action"
-import { useQuery } from "@tanstack/react-query"
+
+import {  updateProfile } from "../action"
+
 import toast from "react-hot-toast"
 
-const Skills = () => {
+type Skills = {
+  tech_stacks: string[]
+}
+type SkillsProp = {
+  data: Skills
+}
+
+const Skills = ({data}: SkillsProp) => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading] = useState(false)
-
   const { onOpen } = useModal()
   const { stack, setStack } = useTechStackStore()
-
-  const { data: profile } = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data, error } = await getProfile()
-      if (error) throw error;
-      return data;
-    },
-  });
- 
   useEffect(() => {
-    if (profile?.tech_stacks) {
-      setStack(profile.tech_stacks.map((stack: string) => stack.toLowerCase()));
+    if (data?.tech_stacks) {
+      setStack(data.tech_stacks.map((stack: string) => stack.toLowerCase()));
     }
-  }, [profile, setStack]);
+  }, [data, setStack]);
   const handleEditMode = () => {
     setIsEditMode(true)
     onOpen("techStackModal")
@@ -40,7 +37,7 @@ const Skills = () => {
 
   const handleCancel = async () => {
     try {
-      setStack(profile?.tech_stacks.map((stack: string) => stack.toLowerCase()));
+      setStack(data?.tech_stacks.map((stack: string) => stack.toLowerCase()));
       setIsEditMode(false)
     } catch(error) {
       toast.error("Failed to update your tech stack")
