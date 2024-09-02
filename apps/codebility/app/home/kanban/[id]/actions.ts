@@ -24,7 +24,7 @@ export const createNewTask = async (formData: FormData) => {
     const description = formData.get("description");
     const project_id = formData.get("projectId");
     const list_id = formData.get("listId");
-    
+
     const supabase = getSupabaseServerActionClient();
     
     const { data: tasks, error: fetchingTasksError } = await supabase.from("task")
@@ -93,27 +93,35 @@ export const updateTaskListId = async (taskId: string, newListId: string) => {
 }
 
 export const updateTask = async (formData: FormData, prevData: Task) => {
-    const Type = { // use for converting type.
-        number: ["duration", "points"],
-        enum: ["priority"]
-    };
 
-    const updatedData: Record<string, any> = {}; // get updated value as an literal object {key: value}.
+}
 
-    for ( let [key, value] of formData.entries()) {
-        const prevValue = prevData[key as keyof typeof prevData];
-        if (prevValue && value === prevValue) continue; // if no changes found we, no update require.
 
+/**
+ * 
+ * @param data - A form data that will be converted to object literal. 
+ * @param CastInstruction - Collection of types that tells how data type will change.
+ * 
+ * @returns {object} - An object literal that contains similar data of data parameter, but have some of its
+ * data casted (data type is changed to other type).
+ */
+function castType(data: FormData, CastInstruction: Record<string, string[]>) {
+    const castedData: Record<string, any> = {}; // get value as an literal object {key: value}.
+
+    for ( let [key, value] of data.entries()) {
         let newValue: any = value;
 
-        switch (true) { // convert value types.
-            case Type.number.includes(key):
+        switch (true) { // use to look for the type of the current data.
+            case CastInstruction["number"] && CastInstruction["number"]?.includes(key): // if number
                 newValue = Number(newValue);
                 break;
-            case Type.enum.includes(key):
-                newValue = newValue.toString().toUpperCase();
+            case CastInstruction["enum"] && CastInstruction["enum"]?.includes(key): // if enum
+                newValue = newValue.toString().toUpperCase(); // enum value are typically uppercased(e.g ENUM,VALUE).
+                break;
         }
-
-        updatedData[key] = value;
+        
+        castedData[key] = value;
     }
+
+    return castedData;
 }
