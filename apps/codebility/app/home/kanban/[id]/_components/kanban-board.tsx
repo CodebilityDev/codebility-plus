@@ -5,7 +5,7 @@ import { ArrowRightIcon } from "@/public/assets/svgs"
 import { IconSearch } from "@/public/assets/svgs"
 import pathsConfig from "@/config/paths.config"
 import { Board } from "../_types/board"
-import KanbanListAddModal from "./kanban-list-add-modal"
+import KanbanListAddModal from "./kanban_modals/kanban-list-add-modal"
 import KanbanBoardListContainer from "./kanban-board-list-container"
 
 interface Props {
