@@ -8,11 +8,10 @@ import KanbanTaskAddModal from "./kanban-task-add-modal"
 interface Props {
   column: List;
   projectId: string;
+  tasks: Task[];
 }
 
-export default function KanbanColumnContainer({ column, projectId }: Props) {
-  const { task: tasks } = column;
-
+export default function KanbanColumnContainer({ column, projectId, tasks }: Props) {
   const { setNodeRef } = useSortable({
     id: column.id,
     data: {
