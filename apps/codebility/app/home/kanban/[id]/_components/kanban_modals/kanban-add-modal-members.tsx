@@ -13,9 +13,13 @@ import { useState } from "react"
 import { useFetchMembers } from "../../_hooks/use-fetch-members"
 import { Member } from "../../_types/member"
 
-export default function KanbanAddModalMembers() {
+interface Props {
+    initialSelectedMembers?: Member[];
+}
+
+export default function KanbanAddModalMembers({ initialSelectedMembers }: Props) {
   const [searchQuery, setSearchQuery] = useState<string>("")
-  const [ selectedMembers, setSelectedMembers ] = useState<Member[]>([]);
+  const [ selectedMembers, setSelectedMembers ] = useState<Member[]>(initialSelectedMembers || []);
   const { data: members } = useFetchMembers();
 
   const addMember = (member: Member) => {
