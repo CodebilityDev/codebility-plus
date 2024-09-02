@@ -8,10 +8,10 @@ import toast from "react-hot-toast"
 import { IconAdd } from "@/public/assets/svgs"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
-import { KanbanListSchema } from "../_types/kanban-list.schema"
+import { KanbanListSchema } from "../../_types/kanban-list.schema"
 import { z } from "zod"
 import { DialogClose } from "@radix-ui/react-dialog"
-import { createNewList } from "../actions"
+import { createNewList } from "../../actions"
 import { useRouter } from "next/navigation"
 
 interface Props {

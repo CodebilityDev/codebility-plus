@@ -10,8 +10,8 @@ import {
 import Image from "next/image"
 import { IconPlus } from "@/public/assets/svgs"
 import { useState } from "react"
-import { useFetchMembers } from "../_hooks/use-fetch-members"
-import { Member } from "../_types/member"
+import { useFetchMembers } from "../../_hooks/use-fetch-members"
+import { Member } from "../../_types/member"
 
 export default function KanbanTaskAddModalMembers() {
   const [searchQuery, setSearchQuery] = useState<string>("")
