@@ -16,10 +16,12 @@ import { useCallback, useRef, useState } from "react"
 import KanbanTask from "./kanban-task"
 import KanbanColumnContainer from "./kanban-column-container"
 import type { Task } from "@/types/home/task"
-import { List } from "../_types/board"
+import { BoardTask, List } from "../_types/board"
 import useSlider from "@/hooks/useSlider"
 import { arrayMove } from "@dnd-kit/sortable"
 import KanbanTaskOverlayWrapper from "./kanban-task-overlay-wrapper"
+import { updateTaskListId } from "../actions"
+import toast from "react-hot-toast"
 
 interface Props {
   lists: List[];
@@ -28,8 +30,12 @@ interface Props {
 
 export default function KanbanBoardListContainer({ lists, projectId }: Props) {
   const scrollableDiv = useRef<HTMLDivElement>(null)
-  const [tasks, setTasks] = useState<Task[]>((lists.reduce((total: Task[], list: List) => {
-    if (Array.isArray(list.task)) total.push(...list.task);
+  const [tasks, setTasks] = useState<BoardTask[]>((lists.reduce((total: BoardTask[], list: List) => {
+    const tasks = list.task.map((task) => {
+      task.initial_list_id = task.list_id;
+      return task;
+    })
+    if (Array.isArray(list.task)) total.push(...tasks);
     return total;
   }, [])));
 
@@ -49,37 +55,29 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
     })
   )
 
-/*   const onDragEnd = useCallback(
-    (event: DragEndEvent) => {
-      setActiveTask(null)
-
+  const onDragEnd = useCallback(
+    async (event: DragEndEvent) => {
       const { active, over } = event
       if (!over) return
 
       const activeId = active.id
 
-      let prevListId = ""
-      columns.forEach((col: ListT) => {
-        if (col.task.some((todo: { id: number }) => todo.id === activeId)) {
-          prevListId = col.id
-        }
-      })
-
+      const prevListId = active.data.current?.task.initial_list_id;
       const activeIndex = tasks.findIndex((t) => t.id === activeId)
-      const newListId = tasks[activeIndex]?.listId
+      const newListId = tasks[activeIndex]?.list_id
 
+      console.log(prevListId, newListId);
       if (prevListId && newListId && prevListId !== newListId) {
-        const updatedData = {
-          currentListId: prevListId,
-          newListId: newListId,
-          todoOnBoard: [{ todoBoardId: activeId }],
+        try {
+          await updateTaskListId(String(activeId), newListId);  
+          toast.success("Task Updated");
+        } catch (e: any) {
+          toast.error(e.message);
         }
-
-        updateBoard2(updatedData, token)
       }
     },
-    [columns, tasks, token]
-  ) */
+    [tasks]
+  )
 
   const onDragOver = useCallback((event: DragOverEvent) => {
     const { active, over } = event
@@ -138,7 +136,7 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
       <DndContext
         sensors={sensors}
         collisionDetection={pointerWithin}
-        // onDragEnd={onDragEnd}
+        onDragEnd={onDragEnd}
         onDragOver={onDragOver}
       >
         <ol className="flex w-full gap-2">
