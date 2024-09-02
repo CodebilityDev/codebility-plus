@@ -180,18 +180,6 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
     }
     onClose()
   }
-
-  const handleClose = () => {
-    setIsEditing(false)
-    onClose()
-  }
-
-  function getLastParameter(url = "") {
-    if (url) {
-      const lastSlashIndex = url.lastIndexOf("/")
-      return url.substring(lastSlashIndex + 1)
-    }
-  }
 */
   const handleCopy = async (text: string) => {
     try {
@@ -200,6 +188,10 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
     } catch (err) {
       toast.error("Failed to copy text")
     }
+  }
+
+  const handleSubmit = async (formData: FormData) => {
+    console.log(formData.get("membersId"))
   }
 
   return (
@@ -222,6 +214,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
               </div>
               <Input
                 id="title"
+                name="title"
                 className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
                 placeholder={task.title}
                 disabled={!isEditing}
@@ -236,7 +229,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                 <div className="flex w-1/3 flex-col gap-2">
                   <Label htmlFor="category">Category</Label>
                   {isEditing ? (
-                    <Select defaultValue={task.category}>
+                    <Select defaultValue={task.category} name="category">
                       <SelectTrigger
                         aria-label="Category"
                         className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
@@ -278,6 +271,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                       <Input
                         id="duration"
                         type="number"
+                        name="duration"
                         min="0"
                         step="0.25"
                         isKeyboard={true}
@@ -289,7 +283,8 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                     <div className="flex w-1/3 flex-col gap-2">
                       <Label htmlFor="points">Points</Label>
                       <Input
-                        id="duration"
+                        id="points"
+                        name="points"
                         type="number"
                         min="0"
                         defaultValue={task.points}
@@ -319,7 +314,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                 <div className="flex w-1/2 flex-col gap-2">
                   <Label htmlFor="priority">Priority Level</Label>
                   {isEditing ? (
-                    <Select>
+                    <Select name="priority">
                       <SelectTrigger
                         aria-label="Priority Level"
                         className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
@@ -356,7 +351,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                 <div className="flex w-1/2 flex-col gap-2">
                   <Label htmlFor="type">Type</Label>
                   {isEditing ? (
-                    <Select defaultValue={task.type}>
+                    <Select defaultValue={task.type} name="type">
                       <SelectTrigger
                         aria-label="Type"
                         className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
@@ -421,10 +416,11 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
             </div>
 
             <div className="flex flex-col gap-1">
-              <Label htmlFor="desc">Description</Label>
+              <Label htmlFor="description" >Description</Label>
               {isEditing ? (
                 <Textarea
-                  id="desc"
+                  id="description"
+                  name="description"
                   variant="ghost"
                   className="h-[8rem] resize-none dark:bg-dark-200"
                   defaultValue={task.description}
@@ -454,6 +450,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
               <div className="flex items-center gap-2">
                 <Input
                   id="pr_link"
+                  name="pr_link"
                   className="border-light_dark w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
                   placeholder="Enter Pull Request Link"
                   defaultValue={task.pr_link}
