@@ -1,9 +1,6 @@
-import { TaskT } from "@/types"
 import {
   DndContext,
   DragEndEvent,
-  DragOverlay,
-  DragStartEvent,
   useSensor,
   useSensors,
   PointerSensor,
@@ -11,11 +8,8 @@ import {
   DragOverEvent,
   pointerWithin,
 } from "@dnd-kit/core"
-import { createPortal } from "react-dom"
-import { useCallback, useRef, useState } from "react"
-import KanbanTask from "./kanban-task"
+import { useCallback, useEffect, useRef, useState } from "react"
 import KanbanColumnContainer from "./kanban-column-container"
-import type { Task } from "@/types/home/task"
 import { BoardTask, List } from "../_types/board"
 import useSlider from "@/hooks/useSlider"
 import { arrayMove } from "@dnd-kit/sortable"
@@ -30,14 +24,23 @@ interface Props {
 
 export default function KanbanBoardListContainer({ lists, projectId }: Props) {
   const scrollableDiv = useRef<HTMLDivElement>(null)
-  const [tasks, setTasks] = useState<BoardTask[]>((lists.reduce((total: BoardTask[], list: List) => {
-    const tasks = list.task.map((task) => {
-      task.initial_list_id = task.list_id;
-      return task;
-    })
-    if (Array.isArray(list.task)) total.push(...tasks);
-    return total;
-  }, [])));
+  const [tasks, setTasks] = useState<BoardTask[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // we add loading to wait for drag and drop events be registered correctly. 
+  useEffect(() => { 
+    const initialTasks = (lists.reduce((total: BoardTask[], list: List) => {
+      const tasks = list.task.map((task) => {
+        task.initial_list_id = task.list_id;
+        return task;
+      })
+      if (Array.isArray(list.task)) total.push(...tasks);
+      return total;
+    }, []));
+
+    setTasks(initialTasks);
+    setIsLoading(false);
+  }, [lists])
 
   useSlider(scrollableDiv, false)
 
@@ -69,8 +72,8 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
       console.log(prevListId, newListId);
       if (prevListId && newListId && prevListId !== newListId) {
         try {
-          await updateTaskListId(String(activeId), newListId);  
-          toast.success("Task Updated");
+          active.data.current = await updateTaskListId(String(activeId), newListId);
+          tasks[activeIndex] = active.data.current as BoardTask;  
         } catch (e: any) {
           toast.error(e.message);
         }
@@ -133,24 +136,28 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
   }, [])
   return (
     <div className="overflow-x-auto overflow-y-hidden " ref={scrollableDiv}>
-      <DndContext
-        sensors={sensors}
-        collisionDetection={pointerWithin}
-        onDragEnd={onDragEnd}
-        onDragOver={onDragOver}
-      >
-        <ol className="flex w-full gap-2">
-          {lists.map((col) => (
-            <KanbanColumnContainer
-              column={col}
-              tasks={tasks.filter(task => task.list_id === col.id)}
-              key={col.id}
-              projectId={projectId}
-            />
-          ))}
-        </ol>
-        <KanbanTaskOverlayWrapper />
-      </DndContext>
+      {!isLoading ?
+          <DndContext
+          sensors={sensors}
+          collisionDetection={pointerWithin}
+          onDragEnd={onDragEnd}
+          onDragOver={onDragOver}
+        >
+            <ol className="flex w-full gap-2">
+              {lists.map((col) => (
+                <KanbanColumnContainer
+                  column={col}
+                  tasks={tasks.filter(task => task.list_id === col.id)}
+                  key={col.id}
+                  projectId={projectId}
+                />
+              ))}
+            </ol>
+            <KanbanTaskOverlayWrapper />
+          </DndContext>
+        :
+          <div>Loading...</div> 
+      }
     </div>
   )
 }
