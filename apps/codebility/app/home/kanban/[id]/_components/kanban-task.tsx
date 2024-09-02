@@ -6,6 +6,7 @@ import defautlAvatar from "@/public/assets/images/default-avatar-200x200.jpg"
 import Image from "next/image"
 import { Task } from "@/types/home/task"
 import { Profile } from "@/types/home/user"
+import KanbanTaskViewEditModal from "./kanban_modals/kanban-task-view-edit-modal"
 
 interface Props {
   task: Task;
@@ -50,39 +51,40 @@ function KanbanTask({ task }: Props) {
   })
 
   return (
-    <div
-      ref={setNodeRef}
-      style={style}
-      {...attributes}
-      {...listeners}
-      className="cursor-grabs relative flex h-auto max-w-72 cursor-grab flex-col gap-2 rounded-lg bg-white p-2.5 text-left ring-inset ring-violet hover:ring-2 dark:bg-[#1E1F26]"
-      onClick={() => onOpen("taskViewEditModal", task, task)}
-    >
-      <div className="flex justify-between text-xs">
-        {task.title}
-        <IconPriority1 />
+    <KanbanTaskViewEditModal task={task}>
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
+        {...listeners}
+        className="cursor-grabs relative flex h-auto max-w-72 cursor-grab flex-col gap-2 rounded-lg bg-white p-2.5 text-left ring-inset ring-violet hover:ring-2 dark:bg-[#1E1F26]"
+      >
+          <div className="flex justify-between text-xs">
+            {task.title}
+            <IconPriority1 />
+          </div>
+          <div className="relative">
+            <div className="float-left flex flex-wrap gap-3 text-sm">#{task.number.toString().padStart(2,"0")}</div>
+            <div className=" float-right  mb-1 ml-1 flex flex-wrap justify-end gap-1 ">
+              {codevs?.map((member, idx) => {
+                  return (
+                    <div key={idx} className="h-6 w-6 rounded-full ">
+                      <Image
+                        alt="Avatar"
+                        src={member.image_url ?? defautlAvatar}
+                        width={8}
+                        height={8}
+                        title={` ${member.first_name} ${member.last_name}`}
+                        className="h-full w-full rounded-full bg-cover object-cover"
+                        loading="eager"
+                      />
+                    </div>
+                  )
+                })}
+            </div>
+          </div>
       </div>
-      <div className="relative">
-        <div className="float-left flex flex-wrap gap-3 text-sm">#{task.number.toString().padStart(2,"0")}</div>
-        <div className=" float-right  mb-1 ml-1 flex flex-wrap justify-end gap-1 ">
-          {codevs?.map((member, idx) => {
-              return (
-                <div key={idx} className="h-6 w-6 rounded-full ">
-                  <Image
-                    alt="Avatar"
-                    src={member.image_url ?? defautlAvatar}
-                    width={8}
-                    height={8}
-                    title={` ${member.first_name} ${member.last_name}`}
-                    className="h-full w-full rounded-full bg-cover object-cover"
-                    loading="eager"
-                  />
-                </div>
-              )
-            })}
-        </div>
-      </div>
-    </div>
+    </KanbanTaskViewEditModal>
   )
 }
 export default KanbanTask

@@ -69,7 +69,6 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
       const activeIndex = tasks.findIndex((t) => t.id === activeId)
       const newListId = tasks[activeIndex]?.list_id
 
-      console.log(prevListId, newListId);
       if (prevListId && newListId && prevListId !== newListId) {
         try {
           active.data.current = await updateTaskListId(String(activeId), newListId);
