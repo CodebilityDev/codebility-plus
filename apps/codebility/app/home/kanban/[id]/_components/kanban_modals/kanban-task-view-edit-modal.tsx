@@ -30,6 +30,7 @@ import { updateTask } from "@/app/api/kanban"
 import { Task } from "@/types/home/task"
 import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog"
 import KanbanAddModalMembers from "./kanban-add-modal-members"
+import { getTaskMembers } from "../../_lib/get-task-members"
 
 interface AddedMember {
   id?: string
@@ -191,10 +192,8 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
       return url.substring(lastSlashIndex + 1)
     }
   }
-
-  const pr_link: any = getLastParameter(dataObject?.pr_link)
-
-  const copyToClipboard = async (text: string) => {
+*/
+  const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
       toast.success("Copied to clipboard!")
@@ -203,20 +202,15 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
     }
   }
 
-  const handleCopy = () => {
-    copyToClipboard(pr_link)
-  } */
-
   return (
     <Dialog>
       <DialogTrigger asChild>
         {children}
       </DialogTrigger>
       <DialogContent
-        className="background-lightsection_darksection text-dark100_light900 flex h-[32rem] w-full max-w-3xl flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
+        className="background-lightsection_darksection text-dark100_light900 h-[32rem] w-full max-w-3xl overflow-x-auto overflow-y-auto lg:h-auto"
       >
-        <form>
-
+        <form className="flex flex-col justify-items-center gap-6 px-4 py-2">
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
@@ -397,7 +391,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                 </div>
               </div>
             </div>
-            <KanbanAddModalMembers />
+            <KanbanAddModalMembers initialSelectedMembers={getTaskMembers(task.codev_task)}/>
 
             <div className="flex flex-col gap-1">
               <Label htmlFor="desc">Description</Label>
@@ -406,7 +400,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                   id="desc"
                   variant="ghost"
                   className="h-[8rem] resize-none dark:bg-dark-200"
-                  value={task.description}
+                  defaultValue={task.description}
                 />
               ) : (
                 <div className="border-light_dark h-[8rem] w-full resize-none rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200">
@@ -422,7 +416,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
               <div className="border-light_dark rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200">
                 {task.pr_link}
               </div>
-              <button /* onClick={handleCopy} */>
+              <button type="button" onClick={() => handleCopy(task.pr_link)}>
                 <IconCopy className="h-5 invert dark:invert-0" />
               </button>
             </div>
@@ -435,7 +429,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                   id="pr_link"
                   className="border-light_dark w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
                   placeholder="Enter Pull Request Link"
-                  value={task.pr_link}
+                  defaultValue={task.pr_link}
                 />
               </div>
             ) : (
