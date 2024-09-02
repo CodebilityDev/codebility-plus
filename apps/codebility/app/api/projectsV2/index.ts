@@ -38,7 +38,7 @@ export const getProjects = async () => {
 
 
     const { data, error } = await supabase
-      .from('projects')
+      .from('project')
       .select('*')
 
     if (error) {
