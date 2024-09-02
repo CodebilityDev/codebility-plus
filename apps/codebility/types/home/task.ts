@@ -13,4 +13,5 @@ export interface Task {
     number: number;
     codev?: Codev[];
     codev_task: CodevTask[];
+    list_id: string;
 }
