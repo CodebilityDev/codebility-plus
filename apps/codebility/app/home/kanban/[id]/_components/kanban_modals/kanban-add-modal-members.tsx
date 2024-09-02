@@ -13,7 +13,7 @@ import { useState } from "react"
 import { useFetchMembers } from "../../_hooks/use-fetch-members"
 import { Member } from "../../_types/member"
 
-export default function KanbanTaskAddModalMembers() {
+export default function KanbanAddModalMembers() {
   const [searchQuery, setSearchQuery] = useState<string>("")
   const [ selectedMembers, setSelectedMembers ] = useState<Member[]>([]);
   const { data: members } = useFetchMembers();
