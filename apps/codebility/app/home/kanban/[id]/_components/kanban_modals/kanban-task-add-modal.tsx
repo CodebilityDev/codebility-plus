@@ -15,7 +15,7 @@ import Image from "next/image"
 import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum"
 import KanbanTaskAddModalMembers from "./kanban-task-add-modal-members"
 import { DialogTitle } from "@radix-ui/react-dialog"
-import { createNewTask } from "../actions"
+import { createNewTask } from "../../actions"
 import { useRouter } from "next/navigation"
 
 interface Props {

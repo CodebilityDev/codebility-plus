@@ -3,7 +3,7 @@ import KanbanTask from "./kanban-task"
 import { SortableContext, useSortable } from "@dnd-kit/sortable"
 import { Task } from "@/types/home/task"
 import { List } from "../_types/board"
-import KanbanTaskAddModal from "./kanban-task-add-modal"
+import KanbanTaskAddModal from "./kanban_modals/kanban-task-add-modal"
 
 interface Props {
   column: List;
