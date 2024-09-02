@@ -1,46 +1,31 @@
-import { ChangeEvent, useState } from "react";
-import Image from "next/image";
-import { createProjects } from "@/app/api/projects";
-import { Button } from "@/Components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/Components/ui/select";
-import { useModal } from "@/hooks/use-modal-projects";
-import useToken from "@/hooks/use-token";
-import { API } from "@/lib/constants";
-import { IconPlus } from "@/public/assets/svgs";
-import { User } from "@/types";
-import { modals_ProjectModal } from "@/types/components";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogTitle } from "@radix-ui/react-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import axios from "axios";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import * as z from "zod";
+import * as z from "zod"
+import axios from "axios"
+import Image from "next/image"
+import { ChangeEvent, useState } from "react"
+import toast from "react-hot-toast"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import { DialogTitle } from "@radix-ui/react-dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
+import { DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-} from "@codevs/ui/dialog";
-import { Input } from "@codevs/ui/input";
-import { Textarea } from "@codevs/ui/textarea";
+import { User } from "@/types"
+import { Input } from "@codevs/ui/input"
+import { Button } from "@/Components/ui/button"
+import { API } from "@/lib/constants"
+import useToken from "@/hooks/use-token"
+import { Textarea } from "@codevs/ui/textarea"
+import { IconPlus } from "@/public/assets/svgs"
+import { createProjects } from "@/app/api/projects"
+import { useModal } from "@/hooks/use-modal-projects"
+import { modals_ProjectModal } from "@/types/components"
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@codevs/ui/dialog"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select"
+import { createClient } from "@/utils/supabase/client"
+
+
+import InsertData from "@/app/home/projects/_services/projects-insert-project"
 
 const projectSchema = z.object({
   project_name: z.string().min(1, { message: "Project name is required" }),
@@ -58,25 +43,30 @@ const defaultImage =
   "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
 
 const ProjectAddModal = () => {
-  const { isOpen, onClose, type } = useModal();
-  const isModalOpen = isOpen && type === "projectAddModal";
-  const { token } = useToken();
-  const [isLoading, setIsLoading] = useState(false);
-  const [projectImage, setProjectImage] = useState<string | any>();
+
+  const supabase = createClient();
+
+  const { isOpen, onClose, type } = useModal()
+  const isModalOpen = isOpen && type === "projectAddModal"
+  const { token } = useToken()
+  const [isLoading, setIsLoading] = useState(false)
+  const [projectImage, setProjectImage] = useState<string | any>()
 
   const { data: clients }: UseQueryResult<modals_ProjectModal[]> = useQuery({
     queryKey: ["clients"],
     queryFn: async () => {
-      const response = await axios(API.CLIENTS);
-      return response.data.data;
+      const { data, error } = await supabase.from('clients').select('*');
+      if (error) throw error;
+      return data;
     },
   });
 
   const { data: users }: UseQueryResult<User[]> = useQuery({
     queryKey: ["users"],
     queryFn: async () => {
-      const response = await axios(API.USERS);
-      return response.data.data;
+      const { data, error } = await supabase.from('profile').select('*');
+      if (error) throw error;
+      return data;
     },
   });
 
@@ -169,6 +159,9 @@ const ProjectAddModal = () => {
           </DialogTitle>
         </DialogHeader>
 
+
+        <form action={InsertData} className="flex flex-col gap-4">
+
         <div className="flex flex-col gap-4">
           <div className="flex gap-4">
             <div className="bg-gray flex h-14 w-28 items-center justify-center overflow-hidden rounded-lg md:h-20 md:w-40">
@@ -202,6 +195,7 @@ const ProjectAddModal = () => {
                   id="projectThumbnailUpload"
                   type="file"
                   className="hidden"
+                  name="file"
                 />
                 {projectImage && (
                   <p
@@ -215,10 +209,7 @@ const ProjectAddModal = () => {
             </div>
           </div>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
-          >
+         
             <div className="flex flex-col lg:flex-row lg:gap-8">
               <div className="w-full space-y-3">
                 <Input
@@ -227,11 +218,8 @@ const ProjectAddModal = () => {
                   label="Name"
                   placeholder="Enter Project Name"
                   {...register("project_name")}
-                  className={
-                    errors.project_name
-                      ? "border border-red-500 focus:outline-none"
-                      : ""
-                  }
+                  name="project_name"
+                  className={errors.project_name ? "border border-red-500 focus:outline-none" : ""}
                 />
                 {errors.project_name && (
                   <span className="text-sm text-red-400">
@@ -301,11 +289,8 @@ const ProjectAddModal = () => {
                   label="Github"
                   placeholder="Enter Github Link"
                   {...register("github_link")}
-                  className={
-                    errors.github_link
-                      ? "border border-red-500 focus:outline-none"
-                      : ""
-                  }
+                    name="github_link"
+                  className={errors.github_link ? "border border-red-500 focus:outline-none" : ""}
                 />
                 {errors.github_link && (
                   <span className="text-sm text-red-400">
@@ -319,11 +304,8 @@ const ProjectAddModal = () => {
                   label="Live URL"
                   placeholder="Enter Live URL"
                   {...register("live_link")}
-                  className={
-                    errors.live_link
-                      ? "border border-red-500 focus:outline-none"
-                      : ""
-                  }
+                   name="live_link"
+                  className={errors.live_link ? "border border-red-500 focus:outline-none" : ""}
                 />
                 {errors.live_link && (
                   <span className="text-sm text-red-400">
@@ -337,11 +319,8 @@ const ProjectAddModal = () => {
                   label="Link"
                   placeholder="Enter Project Thumbnail URL"
                   {...register("project_thumbnail")}
-                  className={
-                    errors.project_thumbnail
-                      ? "border border-red-500 focus:outline-none"
-                      : ""
-                  }
+                  name="project_thumbnail"
+                  className={errors.project_thumbnail ? "border border-red-500 focus:outline-none" : ""}
                 />
                 {errors.project_thumbnail && (
                   <span className="text-sm text-red-400">
@@ -357,16 +336,11 @@ const ProjectAddModal = () => {
               style={{ color: "black" }}
               placeholder="Enter Summary"
               {...register("summary")}
-              className={
-                errors.summary ? "border border-red-500 focus:outline-none" : ""
-              }
+              name="summary"
+              className={errors.summary ? "border border-red-500 focus:outline-none" : ""}
             />
-            {errors.summary && (
-              <span className="text-sm text-red-400">
-                {errors.summary.message}
-              </span>
-            )}
-          </form>
+            {errors.summary && <span className="text-sm text-red-400">{errors.summary.message}</span>}
+       
         </div>
 
         <div className="flex flex-col gap-1">
@@ -460,11 +434,14 @@ const ProjectAddModal = () => {
             disabled={!isValid || isLoading}
             variant="default"
             className="order-1 w-full sm:order-2 sm:w-[130px]"
-            onClick={handleSubmit(onSubmit)}
+            type="submit"
           >
             Add Project
           </Button>
         </DialogFooter>
+
+        </form>
+
       </DialogContent>
     </Dialog>
   );

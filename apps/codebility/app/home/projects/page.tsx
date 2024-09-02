@@ -2,18 +2,33 @@
 import { useRouter } from "next/navigation"
 import { useQuery, UseQueryResult } from "@tanstack/react-query"
 
-import Loading from "@/app/home/projects/loading"
-import ProjectCard from "@/app/home/projects/ProjectCard"
+import Loading from "./_components/loading"
+import ProjectCard from "./_components/ProjectCard"
 import { ProjectT } from "@/types/index"
 import useAuthCookie from "@/hooks/use-cookie"
 import { Button } from "@/Components/ui/button"
 import H1 from "@/Components/shared/dashboard/H1"
-import { getProjects } from "@/app/api/projectsV2"
 import { useModal } from "@/hooks/use-modal-projects"
 
-const Projects = async () => {
 
-  const Projects = await getProjects()
+import InsertButton from "./_components/projects-insert-button"
+// import { ProjectT } from "./_types/projects-projectT"
+import { createClient } from "@/utils/supabase/client";
+import { use } from "react"
+
+
+const Projects = () => {
+
+
+  const supabase = createClient();
+
+
+  const Projects = use(supabase.from('project').select('*').then(({ data, error }) => {
+    if (error) throw error;
+    return data;
+  }));
+
+
   // const { data: authData } = useAuthCookie()
   // const { userType } = authData || {}
 
@@ -40,6 +55,7 @@ const Projects = async () => {
 
   // if (userType?.projects === false) return router.push("/404")
 
+
   return (
     <div className="flex flex-col gap-4">
       <div className="flex flex-row justify-between gap-4">
@@ -50,6 +66,8 @@ const Projects = async () => {
               Add New Project
             </Button>
           )} */}
+
+          <InsertButton/>
         </div>
       </div>
       {Projects && Projects.length > 0 && (

@@ -13,6 +13,8 @@ import DefaultPagination from "@/Components/ui/pagination"
 import { IconLink, IconGithub } from "@/public/assets/svgs"
 import { defaultAvatar } from "@/public/assets/images"
 
+// import { ProjectT } from "../_types/projects-projectT"
+
 const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
   const { onOpen } = useModal();
   const {
@@ -34,7 +36,7 @@ const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
           >
             <div className="bg-dark-100 flex justify-center rounded-t-lg">
               <Image
-                alt={project.project_name as string}
+                alt={project as string}
                 src={project.project_thumbnail || defaultAvatar}
                 width={120}
                 height={91}
