@@ -1,9 +1,8 @@
 import { Box } from "@/Components/shared/dashboard"
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
-import { cookies } from "next/headers";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 
 export default async function TokenPoints() {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = getSupabaseServerComponentClient();
   const { data: { user } } = await supabase.auth.getUser();
 
   const { data } = await supabase.from("codev")
@@ -11,7 +10,7 @@ export default async function TokenPoints() {
   .eq("user_id", user?.id)
   .single();
 
-  const points = data.point;
+  const points = data ? data.point : [];
 
   const CategorizePoint = {
     'UI/UX': 0,

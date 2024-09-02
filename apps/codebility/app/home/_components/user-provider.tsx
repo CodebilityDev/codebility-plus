@@ -3,10 +3,14 @@
 import React, { createContext } from "react";
 
 export interface User {
+    id: string;
+    codev_id: string;
     first_name: string;
     last_name: string;
     email: string;
     main_position: string;
+    start_time: number;
+    end_time: number;
     image_url: string;
     permissions: string[];
 }
