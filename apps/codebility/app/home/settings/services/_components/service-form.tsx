@@ -10,8 +10,9 @@ import InputLabel from "./input-label";
 import { Service, ServiceSelectedFile } from "../_types/service";
 import { validationSchema } from "../_lib/schema";
 import ServiceImageUpload from "./service-image-upload";
+import { Category } from "../categories/_types/category";
 
-const ServiceForm = ({ userId, service }: { userId?: string | null, service?: Service }) => {
+const ServiceForm = ({ userId, service, categories }: { userId?: string | null, service?: Service, categories: Category[] }) => {
   const router = useRouter();
 
   const initialValues: Service = {
@@ -147,9 +148,9 @@ const ServiceForm = ({ userId, service }: { userId?: string | null, service?: Se
                   className="h-9 rounded-[5px] border border-[#3F3F46] text-dark-100 dark:bg-dark-100 dark:text-white"
                 >
                   <option value="">Select a category</option>
-                  <option value="Web Application">Web Application</option>
-                  <option value="Mobile Application">Mobile Application</option>
-                  <option value="Product Design">Product Design</option>
+                  {categories.map((category) => (
+                    <option key={category.id} value={category.name}>{category.name}</option>
+                  ))}
                 </Field>
                 <ErrorMessage name="category" component="div" className="text-[#FF4242]" />
               </div>
