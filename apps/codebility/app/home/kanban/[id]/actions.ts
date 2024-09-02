@@ -93,12 +93,27 @@ export const updateTaskListId = async (taskId: string, newListId: string) => {
 }
 
 export const updateTask = async (formData: FormData, prevData: Task) => {
+    const Type = { // use for converting type.
+        number: ["duration", "points"],
+        enum: ["priority"]
+    };
+
     const updatedData: Record<string, any> = {}; // get updated value as an literal object {key: value}.
 
     for ( let [key, value] of formData.entries()) {
         const prevValue = prevData[key as keyof typeof prevData];
         if (prevValue && value === prevValue) continue; // if no changes found we, no update require.
+
+        let newValue: any = value;
+
+        switch (true) { // convert value types.
+            case Type.number.includes(key):
+                newValue = Number(newValue);
+                break;
+            case Type.enum.includes(key):
+                newValue = newValue.toString().toUpperCase();
+        }
+
         updatedData[key] = value;
     }
-
 }
