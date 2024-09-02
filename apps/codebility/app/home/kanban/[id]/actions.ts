@@ -20,17 +20,18 @@ export const createNewTask = async (formData: FormData) => {
         enum: ["priority"]
     };
 
-    /* const {
+    const {
         projectId: project_id,
         listId: list_id,
         title,
         duration,
         points,
         priority,
-        type,      
+        type,   
+        category,   
         description,
-    } =  */console.log(castType(formData, CastInstruction));
-    return;
+    } = castType(formData, CastInstruction);
+   
     const supabase = getSupabaseServerActionClient();
     
     const { data: tasks, error: fetchingTasksError } = await supabase.from("task")
@@ -46,6 +47,7 @@ export const createNewTask = async (formData: FormData) => {
         list_id,
         title,
         duration,
+        category,
         points,
         priority_level: priority,
         type,
@@ -97,8 +99,39 @@ export const updateTaskListId = async (taskId: string, newListId: string) => {
     return data;
 }
 
-export const updateTask = async (formData: FormData, prevData: Task) => {
+export const updateTask = async (formData: FormData, prevTask: Task) => {
+    const CastInstruction = {
+        number: ["points", "duration"],
+        enum: ["priority"]
+    };
 
+    const {
+        title,
+        category,
+        duration,
+        points,
+        priority,
+        type,
+        description,
+        pr_link
+    } = castType(formData, CastInstruction);
+    
+    const supabase = getSupabaseServerActionClient();
+
+    const { error } = await supabase.from("task")
+    .update({
+        title,
+        category,
+        duration,
+        points,
+        priority_level: priority,
+        type,
+        description,
+        pr_link
+    })
+    .eq("id", prevTask.id)
+
+    if (error) throw new Error(error.message); 
 }
 
 
