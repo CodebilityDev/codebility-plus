@@ -3,18 +3,15 @@
 import React from "react"
 import { Button } from "@/Components/ui/button"
 import { Dialog, DialogContent, DialogFooter } from "@codevs/ui/dialog"
-import { useModal } from "@/hooks/use-modal"
 import Input from "@/Components/ui/forms/input"
 import { Label } from "@codevs/ui/label"
 import { Textarea } from "@codevs/ui/textarea"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem, SelectItemText } from "@radix-ui/react-select"
 
 import { IconClose, IconDropdown, IconPlus, IconCopy } from "@/public/assets/svgs"
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { taskPrioLevels, categories, taskTypes } from "@/constants"
 import { User } from "@/types"
-import axios from "axios"
-import { API } from "@/lib/constants"
 import toast from "react-hot-toast"
 import {
   DropdownMenu,
@@ -25,32 +22,12 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu"
 import Image from "next/image"
-import useToken from "@/hooks/use-token"
-import { updateTask } from "@/app/api/kanban"
+import { updateTask } from "../../actions"
 import { Task } from "@/types/home/task"
 import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog"
 import KanbanAddModalMembers from "./kanban-add-modal-members"
 import { getTaskMembers } from "../../_lib/get-task-members"
 
-interface AddedMember {
-  id?: string
-  image_url?: string | null
-  last_name?: string
-  first_name?: string
-}
-
-interface inputTask {
-  id: string
-  selectedPrioLevel: string | null
-  selectedCategory: string | null
-  selectedType: string | null
-  title: string
-  description: string
-  duration: number
-  points: number
-  addedMembers: AddedMember[]
-  PRLink: string
-}
 
 interface Props {
   children: React.ReactNode;
@@ -58,85 +35,8 @@ interface Props {
 }
 
 export default function KanbanTaskViewEditModal({ children, task }: Props) {
- /*  const defaultAvatar = "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
-  const { onClose, type, data, dataObject } = useModal()
-  const projectId = data
-
-  const [inputTask, setInputTask] = useState<inputTask>({
-    id: "",
-    selectedPrioLevel: "",
-    selectedCategory: "",
-    selectedType: "",
-    title: "",
-    description: "",
-    duration: 0,
-    points: 0,
-    addedMembers: [],
-    PRLink: "",
-  })*/
-
   const [isEditing, setIsEditing] = useState(false)
 /*
-  const [searchQuery, setSearchQuery] = useState<string>("")
-  const [selectedMembers, setSelectedMembers] = useState<User[]>([])
-  const [members, setMembers] = useState<User[]>([])
-  const { token } = useToken()
-
-  const addMember = (member: User) => {
-    setSelectedMembers((prevMembers) => [...prevMembers, member])
-    setInputTask((prevInputTask) => ({
-      ...prevInputTask,
-      addedMembers: [...prevInputTask.addedMembers, member],
-    }))
-  }
-
-  const removeMember = (id: string) => {
-    setSelectedMembers((prevMembers) => prevMembers.filter((member) => member.id !== id))
-    setInputTask((prevInputTask) => ({
-      ...prevInputTask,
-      addedMembers: prevInputTask.addedMembers.filter((member) => member.id !== id),
-    }))
-  }
-
-  const handleTitleChange = (e: any) => {
-    setInputTask({ ...inputTask, title: e.target.value })
-  }
-
-  const handleDurationChange = (e: any) => {
-    e.preventDefault()
-    setInputTask({ ...inputTask, duration: e.target.value })
-  }
-
-  const handlePointsChange = (e: any) => {
-    e.preventDefault()
-    setInputTask({ ...inputTask, points: e.target.value })
-  }
-
-  const handleChangeDescription = (e: any) => {
-    setInputTask({ ...inputTask, description: e.target.value })
-  }
-
-  const handlePRLinkChange = (e: any) => {
-    setInputTask({ ...inputTask, PRLink: e.target.value })
-  }
-
-  const handleSave = async () => {
-    const listId = dataObject?.listId
-
-    let updatedData = {
-      id: dataObject.id,
-      title: inputTask.title || dataObject,
-      task_type: inputTask.selectedType || dataObject.task_type,
-      task_points: Number(inputTask.points) || dataObject.task_points,
-      prio_level: inputTask.selectedPrioLevel?.toUpperCase() || dataObject.prio_level,
-      duration: Number(inputTask.duration) || dataObject.duration,
-      task_category: inputTask.selectedCategory || dataObject.task_category,
-      pr_link: inputTask.PRLink || dataObject.pr_link,
-      full_description: inputTask.description || dataObject.full_description,
-      userTaskId: selectedMembers.map((member) => ({ id: member.id })),
-      projectId: projectId,
-      listId: listId,
-    }
 
     try {
       const response = await updateTask(updatedData, token)
@@ -191,7 +91,12 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
   }
 
   const handleSubmit = async (formData: FormData) => {
-    console.log(formData.get("membersId"))
+    try {
+      await updateTask(formData, task);
+      toast.success("Update Success!");
+    } catch (e: any) {
+      toast.error(e.message);
+    }
   }
 
   return (
@@ -203,7 +108,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
         hideCloseButton={true}
         className="background-lightsection_darksection text-dark100_light900 h-[32rem] w-full max-w-3xl overflow-x-auto overflow-y-auto lg:h-auto"
       >
-        <form className="flex flex-col justify-items-center gap-6 px-4 py-2">
+        <form className="flex flex-col justify-items-center gap-6 px-4 py-2" action={handleSubmit}>
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
