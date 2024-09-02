@@ -66,11 +66,27 @@ export const createNewTask = async (formData: FormData) => {
 export const updateTaskListId = async (taskId: string, newListId: string) => {
     const supabase = getSupabaseServerActionClient();
 
-    const { error } = await supabase.from("task")
+    const { data, error } = await supabase.from("task")
     .update({
         list_id: newListId
     })
-    .eq("id", taskId);
+    .eq("id", taskId)
+    .select(`
+        *,
+        codev_task(
+          codev(
+            *,
+            user(
+              *,
+              profile(*)
+            )
+          )
+        )     
+    `)
+    .single();
 
-    console.log(error);
+    if (error) throw error;
+
+    data.initial_list_id = data.list_id;
+    return data;
 }
