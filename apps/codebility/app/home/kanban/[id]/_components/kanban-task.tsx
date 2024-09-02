@@ -5,8 +5,8 @@ import { IconPriority1 } from "@/public/assets/svgs"
 import defautlAvatar from "@/public/assets/images/default-avatar-200x200.jpg"
 import Image from "next/image"
 import { Task } from "@/types/home/task"
-import { Profile } from "@/types/home/user"
 import KanbanTaskViewEditModal from "./kanban_modals/kanban-task-view-edit-modal"
+import { getTaskMembers } from "../_lib/get-task-members"
 
 interface Props {
   task: Task;
@@ -44,11 +44,7 @@ function KanbanTask({ task }: Props) {
     )
   }
 
-  const codevs = task.codev_task.map(codevTask => {
-    const { first_name, last_name, image_url } = codevTask.codev.user?.profile as Profile;
-
-    return { first_name, last_name, image_url};
-  })
+  const codevs = getTaskMembers(task.codev_task);
 
   return (
     <KanbanTaskViewEditModal task={task}>
