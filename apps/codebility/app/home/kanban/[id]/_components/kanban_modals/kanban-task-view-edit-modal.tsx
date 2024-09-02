@@ -208,6 +208,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
         {children}
       </DialogTrigger>
       <DialogContent
+        hideCloseButton={true}
         className="background-lightsection_darksection text-dark100_light900 h-[32rem] w-full max-w-3xl overflow-x-auto overflow-y-auto lg:h-auto"
       >
         <form className="flex flex-col justify-items-center gap-6 px-4 py-2">
@@ -391,7 +392,33 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                 </div>
               </div>
             </div>
-            <KanbanAddModalMembers initialSelectedMembers={getTaskMembers(task.codev_task)}/>
+            <div className="flex flex-wrap items-center gap-x-0.5">
+              {
+                isEditing ? (
+                  <KanbanAddModalMembers initialSelectedMembers={getTaskMembers(task.codev_task)}/>
+                )
+                :
+                (
+                  <>
+                    {(getTaskMembers(task.codev_task)).map((users: User) => (
+                      <div
+                        className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
+                        key={`${users.id}`}
+                      >
+                        <Image
+                          alt="Avatar"
+                          src={users.image_url as string}
+                          fill
+                          title={`${users.first_name} ${users.last_name}'s Avatar`}
+                          className="h-auto w-full rounded-full bg-cover object-cover"
+                          loading="eager"
+                        />
+                      </div>
+                    ))}
+                  </>
+                )
+              }
+            </div>
 
             <div className="flex flex-col gap-1">
               <Label htmlFor="desc">Description</Label>
@@ -472,7 +499,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
 
           <div>
             <DialogClose asChild>
-              <button className="absolute right-4 top-4">
+              <button className="absolute right-4 top-4" onClick={() => setIsEditing(false)}>
                 <IconClose className="h-5 invert dark:invert-0" />
               </button>
             </DialogClose>
