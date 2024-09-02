@@ -12,5 +12,9 @@ export interface Board {
 export interface List {
     id: string;
     name: string;
-    task: Task[];
+    task: BoardTask[];
+}
+
+export interface BoardTask extends Task {
+    initial_list_id?: string;
 }
