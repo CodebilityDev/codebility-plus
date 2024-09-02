@@ -1,5 +1,6 @@
 "use server";
 
+import { Task } from "@/types/home/task";
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
 export const createNewList = async (name: string, board_id: string) => {
@@ -89,4 +90,15 @@ export const updateTaskListId = async (taskId: string, newListId: string) => {
 
     data.initial_list_id = data.list_id;
     return data;
+}
+
+export const updateTask = async (formData: FormData, prevData: Task) => {
+    const updatedData: Record<string, any> = {}; // get updated value as an literal object {key: value}.
+
+    for ( let [key, value] of formData.entries()) {
+        const prevValue = prevData[key as keyof typeof prevData];
+        if (prevValue && value === prevValue) continue; // if no changes found we, no update require.
+        updatedData[key] = value;
+    }
+
 }
