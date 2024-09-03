@@ -3,12 +3,12 @@
 import "reactflow/dist/style.css"
 import ReactFlow, { Background, useNodesState, useEdgesState } from "reactflow"
 
-import "./index.css" 
+import "../_styles/index.css" 
 import Section from "../../_components/marketing-section"
 import { CustomEdge } from "./ai-integration-edge-types"
 import { DevProcessCard, DevProcessImage } from "./ai-integration-node-types"
 import GradientBackgroundWhite from "./ai-integration-gradient-bg-white"
-import { DevProcessInitialNodes, DevProcessInitialEdges } from "./data"
+import { DevProcessInitialNodes, DevProcessInitialEdges } from "../_lib/dummy-data"
 
 const nodeTypes = {
   devProcessCard: DevProcessCard,
