@@ -2,6 +2,7 @@
 
 import { Task } from "@/types/home/task";
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+import { BoardTask } from "./_types/board";
 
 export const createNewList = async (name: string, board_id: string) => {
     const supabase = getSupabaseServerActionClient();
@@ -15,6 +16,8 @@ export const createNewList = async (name: string, board_id: string) => {
 }
 
 export const createNewTask = async (formData: FormData) => {
+    const supabase = getSupabaseServerActionClient();
+
     const CastInstruction = {
         number: ["points", "duration"],
         enum: ["priority"]
@@ -32,7 +35,6 @@ export const createNewTask = async (formData: FormData) => {
         description,
     } = castType(formData, CastInstruction);
    
-    const supabase = getSupabaseServerActionClient();
     
     const { data: tasks, error: fetchingTasksError } = await supabase.from("task")
     .select("*")
@@ -104,6 +106,8 @@ export const updateTaskListId = async (taskId: string, newListId: string) => {
 }
 
 export const updateTask = async (formData: FormData, prevTask: Task) => {
+    const supabase = getSupabaseServerActionClient();
+
     const CastInstruction = {
         number: ["points", "duration"],
         enum: ["priority"]
@@ -120,7 +124,6 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
         pr_link
     } = castType(formData, CastInstruction);
 
-    const supabase = getSupabaseServerActionClient();
 
     const { error } = await supabase.from("task")
     .update({
@@ -183,6 +186,36 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
     }
 }
 
+export const updateTasksQueue = async (tasks: BoardTask[]) => {
+    const supabase = getSupabaseServerActionClient();
+
+    const ListTotalTasks: Record<string, number> = {}; // get all lists task for ordering.
+
+    for (let i = 0;i < tasks.length;i++) {
+        const task  = tasks[i] as BoardTask;
+
+        // total tasks of list where task is placed.
+        const taskListTotalTasks = ListTotalTasks[task.list_id];
+
+        // the total task will tell where this task is placed.
+        // since we will use the indexing of the tasks state (in kaban-board-list-container.tsx),
+        // on what index this task will be (so if it we loop to it first before the other task)
+        // it will be in the higher position in queue.
+        const { error } = await supabase.from("task")
+        .update({
+            row_queue: Number(taskListTotalTasks || 0)
+        })
+        .eq("id", task.id);
+
+        if (error) throw error;
+
+        if (taskListTotalTasks !== null && taskListTotalTasks !== undefined) {
+            ListTotalTasks[task.list_id] = taskListTotalTasks + 1;
+        } else ListTotalTasks[task.list_id] = 1;
+        
+    }
+}
+
 export const deleteTask = async (taskId: string) => {
     const supabase = getSupabaseServerActionClient();
     
@@ -198,6 +231,7 @@ export const deleteTask = async (taskId: string) => {
 
     if (error) throw error;
 }
+
 
 
 /**
