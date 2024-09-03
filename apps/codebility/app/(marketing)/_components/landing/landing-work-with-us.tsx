@@ -1,8 +1,8 @@
 import Link from "next/link"
 import Image from "next/image"
 
-import Section from "../../_components/marketing-section"
-import Container from "../../_components/marketing-container"
+import Section from "../marketing-section"
+import Container from "../marketing-container"
 import { Button } from "@/Components/ui/button"
 
 const WorkWithUs = () => {

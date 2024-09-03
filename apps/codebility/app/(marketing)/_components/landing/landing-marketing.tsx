@@ -1,10 +1,10 @@
 import React from "react"
 import Image from "next/image"
 
-import GridBg from "@/app/(marketing)/index/components/GridBg"
-import PurpleBg from "@/app/(marketing)/index/components/PurpleBg"
-import { MarketingCardData } from "@/app/(marketing)/index/components/data"
-import MarketingCard from "@/app/(marketing)/index/components/MarketingCard"
+import GridBg from "@/app/(marketing)/_components/landing/landing-grid-bg"
+import PurpleBg from "@/app/(marketing)/_components/landing/landing-purple-bg"
+import { MarketingCardData } from "@/app/(marketing)/_components/landing/data"
+import MarketingCard from "@/app/(marketing)/_components/landing/landing-marketing-card"
 import { Button } from "@/Components/ui/button"
 
 const Marketing = () => {
