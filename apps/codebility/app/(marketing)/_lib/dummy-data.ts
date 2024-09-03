@@ -101,3 +101,26 @@ export const ServicesCardData = [
     imageAlt: "SEO (Search Engine Optimization)",
   },
 ]
+
+export const MarketingCardData = [
+  {
+    title: "AI Development",
+    description: "Develop your personalized AI assistant or seamlessly integrate AI into your existing tech website.",
+    url: "/ai-integration",
+  },
+  {
+    title: "Web App Development",
+    description: "Discover the best in the industry and turn your ideas into powerful digital solutions.",
+    url: "/services#web-application",
+  },
+  {
+    title: "Mobile App Development",
+    description: "Experience top-notch mobile app development with our expert team.",
+    url: "/services#mobile-application",
+  },
+  {
+    title: "Product Design",
+    description: "Encounter excellence in development with our skilled team, masters of UI/UX design.",
+    url: "/services#product-design",
+  },
+]
