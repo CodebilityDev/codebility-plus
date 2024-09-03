@@ -13,7 +13,6 @@ import {
 import { useCallback, useEffect, useRef, useState } from "react"
 import KanbanColumnContainer from "./kanban-column-container"
 import { BoardTask, List } from "../_types/board"
-import useSlider from "@/hooks/useSlider"
 import { arrayMove } from "@dnd-kit/sortable"
 import KanbanTaskOverlayWrapper from "./kanban-task-overlay-wrapper"
 import { updateTaskListId } from "../actions"
@@ -43,8 +42,6 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
     setTasks(initialTasks);
     setIsLoading(false);
   }, [lists])
-
-  useSlider(scrollableDiv, false)
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
