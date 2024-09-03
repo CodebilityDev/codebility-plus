@@ -11,7 +11,7 @@ import Image from "next/image"
 import { IconPlus } from "@/public/assets/svgs"
 import { useState } from "react"
 import { useFetchMembers } from "../../_hooks/use-fetch-members"
-import { Member } from "../../_types/member"
+import { Member } from "../../../../_types/member"
 
 interface Props {
     initialSelectedMembers?: Member[];

@@ -4,12 +4,13 @@ import Box from "@/Components/shared/dashboard/Box"
 import { Paragraph } from "@/Components/shared/home"
 import { Task } from "@/types/home/task"
 import useUser from "../../_hooks/use-user"
+import { getTaskMembers } from "../../_lib/get-task-members"
 
 interface Props {
   task: Task;
 }
 
-export default function TaskCard ({ task }: { task: Task }) {
+export default function TaskCard ({ task }: Props) {
   const { onOpen } = useModal()
   const user = useUser();
 
@@ -42,6 +43,8 @@ export default function TaskCard ({ task }: { task: Task }) {
       prioLevel = 5
   }
 
+  const members = getTaskMembers(task.codev_task);
+
   return (
     <>
       <Box
@@ -59,7 +62,6 @@ export default function TaskCard ({ task }: { task: Task }) {
             />
             <p className="text-lg font-semibold text-violet">#01</p>
             <p>{title}</p>
-   {/*          <p className="text-sm">{subheader}</p> */}
             <Paragraph>{description}</Paragraph>
             <div className="flex items-center gap-2 text-xs text-gray">
               Project: <p className="text-sm uppercase text-dark-100 dark:text-white">{project?.name}</p>
@@ -78,12 +80,12 @@ export default function TaskCard ({ task }: { task: Task }) {
               <p className="text-sm uppercase text-dark-100 dark:text-white">{user.first_name} {user.last_name}</p>
             </div>
 
-            {/* <div className="mt-1 items-center gap-2 text-xs text-gray">
+            <div className="mt-1 items-center gap-2 text-xs text-gray">
               Members in this Task:{" "}
-              {userTask.map((username) => (
-                <p className="text-sm uppercase text-dark-100 dark:text-white">{username.first_name}</p>
+              {members.map((member) => (
+                <p className="text-sm uppercase text-dark-100 dark:text-white">{member.first_name}</p>
               ))}
-            </div> */}
+            </div>
           </div>
           <div className="mt-1">
           {/*   {tags.map(({ tag }, i) => (
