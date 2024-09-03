@@ -5,7 +5,7 @@ import defautlAvatar from "@/public/assets/images/default-avatar-200x200.jpg"
 import Image from "next/image"
 import { Task } from "@/types/home/task"
 import KanbanTaskViewEditModal from "./kanban_modals/kanban-task-view-edit-modal"
-import { getTaskMembers } from "../_lib/get-task-members"
+import { getTaskMembers } from "../../../_lib/get-task-members"
 
 interface Props {
   task: Task;
