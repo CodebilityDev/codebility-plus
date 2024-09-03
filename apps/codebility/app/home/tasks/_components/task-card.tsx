@@ -5,6 +5,7 @@ import { Paragraph } from "@/Components/shared/home"
 import { Task } from "@/types/home/task"
 import useUser from "../../_hooks/use-user"
 import { getTaskMembers } from "../../_lib/get-task-members"
+import TaskViewModal from "./task-view-modal"
 
 interface Props {
   task: Task;
@@ -46,10 +47,9 @@ export default function TaskCard ({ task }: Props) {
   const members = getTaskMembers(task.codev_task);
 
   return (
-    <>
+    <TaskViewModal task={task} taskMembers={members}>
       <Box
         className="cursor-pointer border bg-[#FFFFFF] hover:border-violet dark:bg-[#1F1F1F]"
-        onClick={() => onOpen("taskViewModal", task)}
       >
         <div className="flex h-full flex-col justify-between">
           <div className="relative flex flex-col gap-1">
@@ -100,6 +100,6 @@ export default function TaskCard ({ task }: Props) {
           </div>
         </div>
       </Box>
-    </>
+    </TaskViewModal>
   )
 }
