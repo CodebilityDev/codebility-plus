@@ -1,10 +1,10 @@
 import React from "react"
 import Image from "next/image"
 
-import GridBg from "@/app/(marketing)/_components/landing/landing-grid-bg"
-import PurpleBg from "@/app/(marketing)/_components/landing/landing-purple-bg"
+import GridBg from "./landing-grid-bg"
+import PurpleBg from "./landing-purple-bg"
 import { MarketingCardData } from "../../_lib/dummy-data"
-import MarketingCard from "@/app/(marketing)/_components/landing/landing-marketing-card"
+import MarketingCard from "./landing-marketing-card"
 import { Button } from "@/Components/ui/button"
 
 const Marketing = () => {

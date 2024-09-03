@@ -1,6 +1,6 @@
 import { services } from "../../_lib/dummy-data"
-import Diamond from "@/app/(marketing)/_components/landing/landing-diamond"
-import Marquee from "@/app/(marketing)/_components/landing/landing-marquee"
+import Diamond from "./landing-diamond"
+import Marquee from "./landing-marquee"
 
 const Parallax = () => {
   return (
