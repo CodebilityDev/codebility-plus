@@ -16,18 +16,21 @@ interface Props {
 
 export default function ServicesTab({ servicesData }: Props) {
   const [services, setServices] = useState<Service[]>(servicesData)
-  const [projectType, setProjectType] = useState("Web Application")
-
-  const [tabPages, setTabPages] = useState<{ [key: string]: number }>({
-    "Web Application": 1,
-    "Mobile Application": 1,
-    "Product Design": 1,
-  });
-
+  const [category, setCategory] = useState("Web Application")
+  
   // get all the categories and removed duplicates
   const servicesCategory = removeArrayDuplicate(
     servicesData.map(service => service.category)
   );
+
+  // use for pagination of each categories
+  const CategoriesTabPages: Record<string, number> = {};
+  servicesCategory.forEach((category) => {
+    CategoriesTabPages[category] = 1
+  });
+  
+  // set categories current page.
+  const [tabPages, setTabPages] = useState<Record<string, number>>(CategoriesTabPages);
 
   // make categories as tab
   const servicesTabs = servicesCategory.map((category,id)=> {
@@ -47,22 +50,22 @@ export default function ServicesTab({ servicesData }: Props) {
     setCurrentPage,
   } = usePagination(services, pageSize.services)
 
- /*  useEffect(() => {
-    const filteredData = servicesData.filter((service) => service.projectType === projectType)
+  useEffect(() => {
+    const filteredData = servicesData.filter((service) => service.category === category)
     setServices(filteredData)
-  }, [projectType]) */
+  }, [category])
 
   useEffect(() => {
-    setCurrentPage(tabPages[projectType] || 1)
-  }, [projectType, tabPages, setCurrentPage])
+    setCurrentPage(tabPages[category] || 1)
+  }, [category, tabPages, setCurrentPage])
 
   const handleTabClick = (tabNumber: number, tabName: string) => {
     setTabPages((prev) => ({
       ...prev,
-      [projectType]: currentPage,
+      [category]: currentPage,
     }))
 
-    setProjectType(tabName)
+    setCategory(tabName)
   }
 
   return (
@@ -75,7 +78,7 @@ export default function ServicesTab({ servicesData }: Props) {
                 key={tab.id}
                 onClick={() => handleTabClick(tab.number, tab.name)}
                 className={`cursor-pointer px-2 pb-2 text-base xl:text-xl ${
-                  projectType === tab.name ? "border-b-2 border-violet text-violet" : "text-white"
+                  category === tab.name ? "border-b-2 border-violet text-violet" : "text-white"
                 }`}
               >
                 {tab.name}
