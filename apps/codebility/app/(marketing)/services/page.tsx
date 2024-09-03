@@ -1,9 +1,9 @@
 import Footer from "../_components/marketing-footer"
-import Hero from "./components/Hero"
+import Hero from "./_components/services-hero"
 import Navigation from "../_components/marketing-navigation"
 import { PoppinFont } from "../_lib/font"
 import Calendly from "../_components/marketing-calendly"
-import ServicesTab from "./components/ServicesTab"
+import ServicesTab from "./_components/services-tab"
 
 const Services = () => {
   return (
