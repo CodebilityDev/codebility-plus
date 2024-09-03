@@ -60,3 +60,44 @@ export const FeaturedSectiondata = [
     alt: "diamond",
   },
 ]
+
+export const ServicesCardData = [
+  {
+    title: "Content Quality",
+    description: "High-quality content is the cornerstone of any successful website.",
+    imageUrl: "https://codebility-cdn.pages.dev/assets/images/campaign/content-quality.png",
+    imageAlt: "Content Quality",
+  },
+  {
+    title: "Security",
+    description: "By prioritizing security, we build trust with your users and protect your reputation.",
+    imageUrl: "https://codebility-cdn.pages.dev/assets/images/campaign/security.png",
+    imageAlt: "Security",
+  },
+  {
+    title: "Analytics and Tracking",
+    description:
+      "Our analytics and tracking services provide you with in-depth insights into how users interact with your website.",
+    imageUrl: "https://codebility-cdn.pages.dev/assets/images/index/feature3.jpg",
+    imageAlt: "Analytics and Tracking",
+  },
+  {
+    title: "Performance Optimization",
+    description: "Our performance optimization services focus on enhancing your website's speed and responsiveness.",
+    imageUrl: "https://codebility-cdn.pages.dev/assets/images/index/feature4.jpg",
+    imageAlt: "Performance Optimization",
+  },
+  {
+    title: "User Experience (UX) Design",
+    description:
+      "Effective UX design ensures that your website is intuitive and easy to navigate, enhancing user satisfaction and engagement.",
+    imageUrl: "https://codebility-cdn.pages.dev/assets/images/index/feature5.jpg",
+    imageAlt: "User Experience (UX) Design",
+  },
+  {
+    title: "SEO (Search Engine Optimization)",
+    description: "Achieving high visibility in search engine results is vital for attracting organic traffic.",
+    imageUrl: "https://codebility-cdn.pages.dev/assets/images/campaign/seo.png",
+    imageAlt: "SEO (Search Engine Optimization)",
+  },
+]

@@ -1,5 +1,5 @@
 import { Button } from "@/Components/ui/button"
-import { ServicesCardData } from "./data"
+import { ServicesCardData } from "../../_lib/dummy-data"
 import FeaturesCard from "./landing-features-card"
 import Container from "../marketing-container"
 import Section from "../marketing-section"
