@@ -3,25 +3,26 @@ import "server-only";
 import { Codev, Project } from "@/types/home/codev";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-export const getCodevs = async (): Promise<{ error: any, data: Codev[] | null}> => {
+export const getCodevs = async (id?: string): Promise<{ error: any, data: Codev[] | Codev | null}> => {
     const supabase = getSupabaseServerComponentClient();
-    const { data: codevs, error } = await supabase.from("codev")
+
+    let codevQuery = supabase.from("codev")
     .select(`
       *,
       user(
         *,
         profile(*),
-        social(
-          github,
-          facebook,
-          linkedin,
-          telegram,
-          whatsapp,
-          discord_id
-        )
+        social(*)
       )
     `)
     .eq("type", "INHOUSE");
+    
+    if (id) {
+      // filter codevs data to get only match id.
+      codevQuery = codevQuery.eq("id", id);
+    }
+
+    const { data: codevs, error } = await codevQuery;
     
     if (error) return { error, data: null };
       
@@ -57,6 +58,8 @@ export const getCodevs = async (): Promise<{ error: any, data: Codev[] | null}> 
             nda_status: codev.nda_status
         }
     });
+
+    if (id) return { error: null, data: data[0] as Codev}; // if we are targeting a specific codev.
 
     return { error: null, data };
 }
