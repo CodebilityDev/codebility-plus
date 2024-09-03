@@ -1,5 +1,3 @@
-"use client"
-import React, { useState } from "react"
 import Link from "next/link"
 import { ArrowRightIcon } from "@/public/assets/svgs"
 import { IconSearch } from "@/public/assets/svgs"
@@ -13,7 +11,6 @@ interface Props {
 }
 
 const KanbanBoard = ({ boardData }: Props) => {
-  const [isLoading, setIsLoading] = useState(false)
 
   return (
     <div className="flex h-full w-full">
@@ -44,13 +41,9 @@ const KanbanBoard = ({ boardData }: Props) => {
               <KanbanListAddModal boardId={boardData.id}/>
             </div>
           </div>
-          {!isLoading ? (
-            <div className="text-dark100_light900 flex h-full">
+          <div className="text-dark100_light900 flex h-full">
               <KanbanBoardListContainer projectId={boardData.project_id} lists={boardData.list} />
-            </div>
-          ) : (
-            "Loading"
-          )}
+          </div>
         </div>
       </div>
     </div>
