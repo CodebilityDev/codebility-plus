@@ -3,7 +3,7 @@ import Image from "next/image"
 
 import GridBg from "@/app/(marketing)/_components/landing/landing-grid-bg"
 import PurpleBg from "@/app/(marketing)/_components/landing/landing-purple-bg"
-import { MarketingCardData } from "@/app/(marketing)/_components/landing/data"
+import { MarketingCardData } from "../../_lib/dummy-data"
 import MarketingCard from "@/app/(marketing)/_components/landing/landing-marketing-card"
 import { Button } from "@/Components/ui/button"
 

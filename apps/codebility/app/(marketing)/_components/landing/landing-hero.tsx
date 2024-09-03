@@ -4,7 +4,7 @@ import Image from "next/image"
 import HeroCard from "./landing-hero-card"
 import Container from "../marketing-container"
 
-import { MarketingCardData } from "./data"
+import { MarketingCardData } from "../../_lib/dummy-data"
 import HeroBackground from "./landing-hero-bg"
 import { Button } from "@/Components/ui/button"
 import SideNavMenu from "../marketing-sidenav-menu"
