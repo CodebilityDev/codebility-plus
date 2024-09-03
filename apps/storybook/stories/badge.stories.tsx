@@ -33,47 +33,48 @@ export const Default: Story = {
   args: {
     variant: 'default',
     children: 'Default Badge',
+    className: 'text-white',
   },
 };
 
 export const Secondary: Story = {
   args: {
     variant: 'secondary',
-    children: 'Secondary Badge',
+    children: 'Secondary',
   },
 };
 
 export const Destructive: Story = {
   args: {
     variant: 'destructive',
-    children: 'Destructive Badge',
+    children: 'Destructive',
   },
 };
 
 export const Outline: Story = {
   args: {
     variant: 'outline',
-    children: 'Outline Badge',
+    children: 'Outline',
   },
 };
 
 export const Success: Story = {
   args: {
     variant: 'success',
-    children: 'Success Badge',
+    children: 'Success',
   },
 };
 
 export const Warning: Story = {
   args: {
     variant: 'warning',
-    children: 'Warning Badge',
+    children: 'Warning',
   },
 };
 
 export const Info: Story = {
   args: {
     variant: 'info',
-    children: 'Info Badge',
+    children: 'Info',
   },
 };
