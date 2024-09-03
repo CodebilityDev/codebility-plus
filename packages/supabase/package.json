@@ -1,0 +1,38 @@
+{
+  "name": "@codevs/supabase",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "clean": "rm -rf node_modules",
+    "dev": "tsc",
+    "build": "tsc"
+  },
+  "exports": {
+    "./server-actions-client": {
+      "types": "./dist/clients/server-actions.client.d.ts",
+      "default": "./dist/clients/server-actions.client.js"
+    },
+    "./server-component-client": {
+      "types": "./dist/clients/server-component.client.d.ts",
+      "default": "./dist/clients/server-component.client.js"
+    },
+    "./browser-client": {
+      "types": "./dist/clients/browser.client.d.ts",
+      "default": "./dist/clients/browser.client.js"
+    },
+    "./middleware-client": {
+      "types": "./dist/clients/middleware.client.d.ts",
+      "default": "./dist/clients/middleware.client.js"
+    }
+  },
+  "devDependencies": {
+    "@codevs/tsconfig": "workspace:*",
+    "server-only": "^0.0.1",
+    "zod": "^3.23.8"
+  },
+  "dependencies": {
+    "@supabase/auth-helpers-nextjs": "^0.10.0",
+    "@supabase/supabase-js": "^2.45.1",
+    "next": "^14.2.5"
+  }
+}

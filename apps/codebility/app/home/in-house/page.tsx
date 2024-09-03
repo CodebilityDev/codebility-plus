@@ -1,98 +1,76 @@
-"use client"
-import * as React from "react"
 import H1 from "@/Components/shared/dashboard/H1"
-import Table from "@/app/home/in-house/Table"
-import InHouseCards from "@/app/home/in-house/InHouseCards"
-import axios from "axios"
-import { TeamMemberT } from "@/types/index"
-import { useQuery } from "@tanstack/react-query"
-import { API } from "@/lib/constants"
-import { useEffect, useState } from "react"
-import usePagination from "@/hooks/use-pagination"
+import InHouseContainer from "./_components/in-house-container"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import { Codev, Project } from '@/types/home/codev'
 
-function InHouse() {
-  const [editableIds, setEditableIds] = useState<number[]>([])
+async function InHousePage() {
+  const supabase = getSupabaseServerComponentClient();
+  const { data: codevs, error } = await supabase.from("codev")
+  .select(`
+    *,
+    user(
+      *,
+      profile(*),
+      social(
+        github,
+        facebook,
+        linkedin,
+        telegram,
+        whatsapp,
+        discord_id
+      )
+    )
+  `)
+  .eq("type", "INHOUSE");
 
-  const {
-    data: inHouse,
-    isLoading: LoadinginHouse,
-    error: ErrorinHouse,
-    isSuccess,
-  } = useQuery({
-    queryKey: ["projects"],
-    queryFn: async () => {
-      const response = await axios.get(`${API.USERS}/inHouse`)
-      return response.data.data
-    },
-    refetchInterval: 3000,
-  })
+  if (error) return <div>
+    ERROR
+  </div>;
+  
+  const codevProjects = await Promise.all(codevs.map(async (codev: Codev) => { // await for all the promises.
+    const { data: codevProject } = await supabase.from("codev_project")
+    .select("*,project(id,name)") // requires the *, so typescript won't go crazy. thinking that project is of type Project[], instead of Project.
+    .eq("codev_id", codev.id)
 
-  const [data, setData] = useState<TeamMemberT[]>([])
-
-  useEffect(() => {
-    if (isSuccess) {
-      setData(inHouse)
+    if (codevProject && codevProject.length > 0) {
+      const projects: Project[] = codevProject.map(item => item.project); // get project data only.
+      return projects;
     }
-  }, [isSuccess, inHouse])
+    return [];
+  }));
+  
+  const data = codevs.map<Codev>((codev, index: number) => {
+      const { first_name, last_name, image_url, address, about, main_position, tech_stacks } = codev.user.profile;
 
-  const handleEditButton = (id: number) => {
-    setEditableIds((prevIndexes) => [...prevIndexes, id])
-  }
-
-  const handleSaveButton = (updatedMember: TeamMemberT) => {
-    const updatedData = data.map((member) => (member.id === updatedMember.id ? updatedMember : member))
-    setData(updatedData)
-    setEditableIds((prevIndexes) => prevIndexes.filter((editableId) => editableId !== updatedMember.id))
-  }
-
-  // Update BE
-  // const {update} = useMutation({
-  //   mutationFn: (id) => {
-  //     return axios.patch(`API.PROJECTS/${id}`, {status:resolved})
-  //   },
-  // })
-
-  const { currentPage, totalPages, paginatedData, handlePreviousPage, handleNextPage } = usePagination(data, 10)
+      return {
+          id: codev.id,
+          user_id: codev.user_id,
+          internal_status : codev.internal_status,
+          first_name,
+          last_name,
+          tech_stacks,
+          main_position,
+          projects: codevProjects[index] as Project[],
+          image_url,
+          address,
+          about,
+          socials: codev.user.social,
+          job_status: codev.job_status,
+          nda_status: codev.nda_status
+      }
+  });
 
   return (
     <div className="flex flex-col gap-2">
       <H1>In-House Codebility</H1>
-      <Table
-        data={paginatedData}
-        editableIds={editableIds}
-        handlers={{
-          setData,
-          handleEditButton,
-          handleSaveButton,
-        }}
-        status={{
-          LoadinginHouse,
-          ErrorinHouse,
-        }}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        handlePreviousPage={handlePreviousPage}
-        handleNextPage={handleNextPage}
-      />
-      <InHouseCards
-        data={paginatedData}
-        editableIds={editableIds}
-        handlers={{
-          setData,
-          handleEditButton,
-          handleSaveButton,
-        }}
-        status={{
-          LoadinginHouse,
-          ErrorinHouse,
-        }}
-        currentPage={currentPage}
-        totalPages={totalPages}
-        handlePreviousPage={handlePreviousPage}
-        handleNextPage={handleNextPage}
-      />
+      {
+        error ? 
+          <div>ERROR</div>
+          :
+          <InHouseContainer codevData={data as Codev[]}/>
+      }
     </div>
   )
 }
 
-export default InHouse
+export default InHousePage;

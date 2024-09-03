@@ -1,14 +1,18 @@
 import Image from "next/image"
-
-import useAuth from "@/hooks/use-auth"
-
 import Badges from "@/Components/shared/Badges"
 import Box from "@/Components/shared/dashboard/Box"
 import { defaultAvatar } from "@/public/assets/images"
 import { Skeleton } from "@/Components/ui/skeleton/skeleton"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-const ProfileDashboard = () => {
-  const { isLoading, userData } = useAuth()
+export default async function DashboardProfile() {
+  const supabase = getSupabaseServerComponentClient();
+  const { data: { user }} = await supabase.auth.getUser();
+  const { data: userData } = await supabase.from("profile")
+  .select("first_name, image_url, main_position")
+  .eq("user_id", user?.id)
+  .single();
+  const isLoading = !userData;
   return (
     <>
       {!isLoading ? (
@@ -21,7 +25,7 @@ const ProfileDashboard = () => {
               src={userData.image_url || defaultAvatar}
               width={100}
               height={100}
-              title={`${userData.name}'s Avatar`}
+              title={`${userData.first_name}'s Avatar`}
               className="h-[100px] w-[100px] rounded-lg bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover"
             />
             <p className="text-md">{userData.main_position}</p>
@@ -42,5 +46,3 @@ const ProfileDashboard = () => {
     </>
   )
 }
-
-export default ProfileDashboard

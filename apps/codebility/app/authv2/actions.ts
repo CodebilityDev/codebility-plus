@@ -1,14 +1,14 @@
 "use server";
 
-import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
-import { cookies } from "next/headers";
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { FieldValues } from "react-hook-form";
 
-import { dateTimeFormat } from "@/lib/formDateTime";
+import { formatToUnix } from "@/lib/format-date-time";
 import { redirect } from "next/navigation";
+import pathsConfig from "@/config/paths.config";
 
 export const signupUser = async (data: FieldValues) => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
     const [startTime, endTime] = data.schedule.split(" - ");
     const userData = {
@@ -18,8 +18,8 @@ export const signupUser = async (data: FieldValues) => {
         email_address: data.email_address,
         ...(data.website !== "" && { portfolio_website: data.website }),
         tech_stacks: [...data.techstack.split(", ")],
-        start_time: dateTimeFormat(startTime),
-        end_time: dateTimeFormat(endTime),
+        start_time: formatToUnix(startTime),
+        end_time: formatToUnix(endTime),
         main_position: data.position,
     }
 
@@ -37,7 +37,7 @@ export const signupUser = async (data: FieldValues) => {
 }
 
 export const signinUser = async (email: string, password: string) => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
     const { error } = await supabase.auth.signInWithPassword({
       email,
@@ -46,11 +46,11 @@ export const signinUser = async (email: string, password: string) => {
 
     if (error) throw error;
 
-    redirect("/authv2/signin"); // will cause a reload so middleware would know the updated session.
+    redirect(pathsConfig.app.home); // redirect to home after sign in
 }
 
 export const signOut = async () => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
     await supabase.auth.signOut();
     redirect("/");
   };

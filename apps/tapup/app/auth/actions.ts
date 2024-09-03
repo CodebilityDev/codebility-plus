@@ -1,12 +1,12 @@
 "use server";
 
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { cookies } from "next/headers";
-import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
 import { redirect } from "next/navigation";
 import pathsConfig from "~/config/paths.config";
 
 export const signInWithPassword = async (email: string, password: string) => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
   
     const { error, data } = await supabase.auth.signInWithPassword({
       email,
@@ -18,7 +18,7 @@ export const signInWithPassword = async (email: string, password: string) => {
 };  
   
 export const signUp = async (email: string, password: string, name: string) => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
     const { error, data } = await supabase.auth.signUp({
         email,
@@ -36,7 +36,7 @@ export const signUp = async (email: string, password: string, name: string) => {
 };
 
 export const signInWithOAuth = async (provider: 'google' | 'facebook' | 'linkedin_oidc') => {
-  const supabase = createServerActionClient({ cookies });
+  const supabase = getSupabaseServerActionClient();
 
   const res = await supabase.auth.signInWithOAuth({
     provider,
@@ -49,7 +49,7 @@ export const signInWithOAuth = async (provider: 'google' | 'facebook' | 'linkedi
 
 export const signOut = async () => {
   const cookieStore = cookies();
-  const supabase = createServerActionClient({ cookies });
+  const supabase = getSupabaseServerActionClient();
   await supabase.auth.signOut();
   
   const supabaseProjectReferenceId = process.env

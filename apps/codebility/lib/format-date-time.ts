@@ -1,4 +1,4 @@
-export const dateTimeFormat = (time: string): number => {
+export function formatToUnix(time: string): number {
     var currentDateTime = new Date()
   
     var [hours, minutes] = time.split(":").map(function (item) {
@@ -16,5 +16,9 @@ export const dateTimeFormat = (time: string): number => {
     currentDateTime.setHours(hours!, minutes, 0, 0)
   
     return currentDateTime.getTime()
-  }
-  
+}
+
+export function formatToLocaleTime(unix: number): string {
+  const date = new Date(unix);
+  return date.toLocaleString();
+}

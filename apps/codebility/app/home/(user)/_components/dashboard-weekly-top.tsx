@@ -1,20 +1,20 @@
-"use client"
-
-import { useState } from "react"
-import { topNotcher } from "@/types"
-import { topnotchers } from "@/app/home/(user)/dummy"
 import Box from "@/Components/shared/dashboard/Box"
 import FE1stRunnerUp from "@/public/assets/svgs/badges/fe-tier-5.svg"
 import FE2ndRunnerUp from "@/public/assets/svgs/badges/fe-tier-4.svg"
 import FEChampion from "@/public/assets/svgs/badges/fe-tier-champion.svg"
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/Components/ui/table"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 
-const PAGE_SIZE = 10
+interface TopNotcher {
+  id: string;
+  first_name: string;
+  main_position: string;
+  level: number;
+}
 
-const WeeklyTop = () => {
-  const [currentPage] = useState<number>(1)
-  const paginatedTopnotchers = topnotchers.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-
+export default async function WeeklyTop() {
+  const supabase = getSupabaseServerComponentClient();
+  const { data, error } = await supabase.rpc("get_weekly_top_codevs");  
   return (
     <Box>
       <div className="flex flex-col gap-6">
@@ -29,32 +29,44 @@ const WeeklyTop = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {topnotchers.length > 0 &&
-              paginatedTopnotchers.map(({ id, ranking, name, role, level }: topNotcher) => (
-                <TableRow
+            {
+              data.map(({ id, first_name, main_position, level }: TopNotcher, index: number) => {
+                const placement = index + 1;
+
+                const AbbreviationMap = {
+                  "Fullstack Developer": "FS",
+                  "Front End Developer": "FE",
+                  "Back End Developer": "BE",
+                  "Mobile Developer": "M",
+                  "Admin": "AD",
+                }
+
+                const role = AbbreviationMap[main_position as keyof typeof AbbreviationMap] || main_position;
+
+                return <TableRow
                   key={id}
                   className={`grid grid-cols-3 gap-3 md:grid-cols-4 ${
-                    id == 1
+                    placement == 1
                       ? "bg-gradient-to-r from-[#9c813b] to-[#ecc258] text-white"
-                      : id == 2
+                      : placement == 2
                       ? "bg-gradient-to-r from-[#464646] to-[#a8a8a8] text-white"
-                      : id == 3 && "bg-gradient-to-r from-[#563c1e] to-[#ba8240] text-white"
+                      : placement == 3 && "bg-gradient-to-r from-[#563c1e] to-[#ba8240] text-white"
                   }`}
                 >
                   <TableCell className="flex justify-center text-center">
                     {" "}
-                    {id == 1 ? (
+                    {placement == 1 ? (
                       <FEChampion className="h-[1.8rem] w-[1.8rem]" />
-                    ) : id == 2 ? (
+                    ) : placement == 2 ? (
                       <FE1stRunnerUp className="h-[1.7rem] w-[1.7rem]" />
-                    ) : id == 3 ? (
+                    ) : placement == 3 ? (
                       <FE2ndRunnerUp className="h-[1.7rem] w-[1.7rem]" />
                     ) : (
-                      ranking
+                      placement
                     )}
                   </TableCell>
                   <TableCell>
-                    <p className="capitalize">{name}</p>
+                    <p className="capitalize">{first_name}</p>
                   </TableCell>
                   <TableCell className="text-center">
                     <p>{role}</p>
@@ -63,12 +75,10 @@ const WeeklyTop = () => {
                     <p>{level}</p>
                   </TableCell>
                 </TableRow>
-              ))}
+          })}
           </TableBody>
         </Table>
       </div>
     </Box>
   )
 }
-
-export default WeeklyTop
