@@ -7,26 +7,18 @@ import Input from "@/Components/ui/forms/input"
 import { Label } from "@codevs/ui/label"
 import { Textarea } from "@codevs/ui/textarea"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem, SelectItemText } from "@radix-ui/react-select"
-
-import { IconClose, IconDropdown, IconPlus, IconCopy } from "@/public/assets/svgs"
+import { IconClose, IconDropdown, IconCopy } from "@/public/assets/svgs"
 import { useState } from "react"
 import { taskPrioLevels, categories, taskTypes } from "@/constants"
 import { User } from "@/types"
 import toast from "react-hot-toast"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu"
 import Image from "next/image"
 import { updateTask } from "../../actions"
 import { Task } from "@/types/home/task"
 import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog"
 import KanbanAddModalMembers from "./kanban-add-modal-members"
 import { getTaskMembers } from "../../_lib/get-task-members"
+import { useRouter } from "next/navigation"
 
 
 interface Props {
@@ -36,51 +28,8 @@ interface Props {
 
 export default function KanbanTaskViewEditModal({ children, task }: Props) {
   const [isEditing, setIsEditing] = useState(false)
-/*
+  const router = useRouter();
 
-    try {
-      const response = await updateTask(updatedData, token)
-
-      if (response.status === 200) {
-        toast.success("Tasks Added")
-        setInputTask({ ...inputTask, addedMembers: [] })
-        onClose()
-      }
-    } catch (error) {
-      toast.error("Something went wrong!")
-    }
-  }
-
-  const listId = dataObject?.listId
-  const handleDelete = async (id: string) => {
-    try {
-      await axios.delete(`${API.TASKS}/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      const newData = {
-        currentListId: listId,
-        todoOnBoard: [{ todoBoardId: id }],
-      }
-
-      const response = await axios.put(`${API.BOARDS}/update-todo`, newData, {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-      })
-
-      onClose()
-
-      return response.data
-    } catch (error) {
-      console.error("Error deleting todo:", error)
-    }
-    onClose()
-  }
-*/
   const handleCopy = async (text: string) => {
     try {
       await navigator.clipboard.writeText(text)
@@ -92,8 +41,12 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
 
   const handleSubmit = async (formData: FormData) => {
     try {
+      const title = formData.get("title");
+      if (!title) formData.set("title", task.title);
+
       await updateTask(formData, task);
       toast.success("Update Success!");
+      router.refresh();
     } catch (e: any) {
       toast.error(e.message);
     }
@@ -219,7 +172,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                 <div className="flex w-1/2 flex-col gap-2">
                   <Label htmlFor="priority">Priority Level</Label>
                   {isEditing ? (
-                    <Select name="priority">
+                    <Select name="priority" defaultValue={task.priority_level}>
                       <SelectTrigger
                         aria-label="Priority Level"
                         className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
