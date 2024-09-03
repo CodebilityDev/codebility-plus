@@ -1,10 +1,7 @@
-"use client"
-
 import React from "react"
 import { Paragraph } from "@/Components/shared/home"
 import Logo from "@/Components/shared/Logo"
 import { Button } from "@/Components/ui/button"
-import { API } from "@/lib/constants"
 import {
   IconAbout,
   IconBag,
@@ -17,60 +14,45 @@ import {
   IconSkills,
   IconTelephone,
 } from "@/public/assets/svgs"
-import { User } from "@/types"
-import axios from "axios"
 import Image from "next/image"
 import Link from "next/link"
-import { useEffect, useState } from "react"
 import getRandomColor from "@/lib/getRandomColor"
+import { getCodevs } from "@/lib/server/codev.service"
+import { Codev } from "@/types/home/codev"
 
-interface CodevBioPageProps {
+interface Props {
   params: {
     id: string
   }
 }
 
-const CodevBioPage: React.FC<CodevBioPageProps> = ({ params }) => {
+export default async function CodevBioPage ({ params }: Props)  {
   const id = params.id
-  const [data, setData] = useState<User | null>(null)
-  const [, setIsLoading] = useState(true)
+  const {data, error} = await getCodevs(id);
+
+  if (error) return <div>ERROR</div>
 
   const {
+    email,
     first_name,
     last_name,
-    about_me,
     image_url,
-    address,
-    phone_no,
-    jobStatusType,
-    email_address,
-    github_link,
-    fb_link,
-    linkedin_link,
-    Work_Experience,
-    portfolio_website,
-    tech_stacks,
-    education,
+    job_status,
     main_position,
-  } = data || {}
+    socials,
+    portfolio_website,
+    address,
+    contact,
+    about,
+    education,
+    tech_stacks
+  } = data as Codev;
 
-  useEffect(() => {
-    const fetchUsersData = async (id: string) => {
-      try {
-        const response = await axios(API.USERS + id)
-        if (!response) {
-          throw new Error("Failed to fetch data from the server.")
-        }
-        setData(response.data.data)
-        setIsLoading(false)
-      } catch (error) {
-        console.error(error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-    fetchUsersData(id)
-  }, [id])
+  const {
+    facebook,
+    github,
+    linkedin,
+  } = socials;
 
   function getCurrentYear() {
     return new Date().getFullYear()
@@ -86,7 +68,6 @@ const CodevBioPage: React.FC<CodevBioPageProps> = ({ params }) => {
             <Button
               variant="hollow"
               className="flex gap-2 border-zinc-700 bg-black-200 text-white"
-              onClick={() => window.close()}
             >
               Close
             </Button>
@@ -106,9 +87,9 @@ const CodevBioPage: React.FC<CodevBioPageProps> = ({ params }) => {
               <div className="absolute bottom-[7px] right-[7px]">
                 <p
                   className={`rounded-full border-2 border-black-100 p-2 text-[9px] ${
-                    jobStatusType === "AVAILABLE"
+                    job_status === "AVAILABLE"
                       ? "bg-green"
-                      : jobStatusType === "DEPLOYED"
+                      : job_status === "DEPLOYED"
                       ? "bg-orange-400"
                       : "bg-green"
                   }`}
@@ -128,29 +109,29 @@ const CodevBioPage: React.FC<CodevBioPageProps> = ({ params }) => {
               </div>
             )}
             <div className="flex gap-4">
-              {fb_link && (
+              {facebook && (
                 <Link
                   className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-100"
-                  href={fb_link}
+                  href={facebook}
                   target="_blank"
                 >
                   <IconFacebook className="text-2xl" />
                 </Link>
               )}
-              {github_link && (
+              {github && (
                 <Link
                   className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-100"
-                  href={github_link}
+                  href={github}
                   target="_blank"
-                  title={`${github_link}`}
+                  title={`${github}`}
                 >
                   <IconGithub className="text-2xl" />
                 </Link>
               )}
-              {linkedin_link && (
+              {linkedin && (
                 <Link
                   className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-100"
-                  href={linkedin_link}
+                  href={linkedin}
                   target="_blank"
                 >
                   <IconLinkedIn className="text-2xl" />
@@ -172,41 +153,41 @@ const CodevBioPage: React.FC<CodevBioPageProps> = ({ params }) => {
               <div className="flex items-center gap-4">
                 <Link
                   className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-500"
-                  href={`mailto:${email_address}`}
-                  title={`${email_address}`}
+                  href={`mailto:${email}`}
+                  title={`${email}`}
                 >
                   <IconMail className="text-2xl" />
                 </Link>
                 <div className="flex flex-col">
                   <p className="text-md text-gray">Email</p>
                   <Link
-                    href={`mailto:${email_address}`}
-                    title={`${email_address}`}
+                    href={`mailto:${email}`}
+                    title={`${email}`}
                     className="text-white transition duration-300 hover:text-blue-100"
                   >
-                    {email_address}
+                    {email}
                   </Link>
                 </div>
               </div>
               {address && <div className="border-t border-darkgray"></div>}
-              {phone_no && (
+              {contact && (
                 <>
                   <div className="flex items-center gap-4">
                     <Link
                       className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-500"
-                      href={`mailto:${phone_no}`}
-                      title={`${phone_no}`}
+                      href={`mailto:${contact}`}
+                      title={`${contact}`}
                     >
                       <IconTelephone className="text-2xl" />
                     </Link>
                     <div className="flex flex-col">
                       <p className="text-md text-gray">Phone</p>
                       <Link
-                        href={`tel:${phone_no}`}
-                        title={`${phone_no}`}
+                        href={`tel:${contact}`}
+                        title={`${contact}`}
                         className="text-white transition duration-300 hover:text-blue-100"
                       >
-                        {phone_no}
+                        {contact}
                       </Link>
                     </div>
                   </div>
@@ -240,13 +221,13 @@ const CodevBioPage: React.FC<CodevBioPageProps> = ({ params }) => {
             {/* <Button className="mt-4">Download CV</Button> */}
           </div>
           <div className="flex basis-[70%] flex-col gap-6 rounded-lg bg-black-500 p-6 text-white shadow-lg lg:gap-14 lg:p-8">
-            {about_me && (
+            {about && (
               <div>
                 <div className="mb-4 flex items-center gap-2">
                   <IconAbout className="text-2xl" />
                   <h3 className="text-md font-semibold lg:text-2xl">About</h3>
                 </div>
-                <p className="text-md text-gray lg:text-lg">{about_me}</p>
+                <p className="text-md text-gray lg:text-lg">{about}</p>
               </div>
             )}
             <div>
@@ -270,7 +251,7 @@ const CodevBioPage: React.FC<CodevBioPageProps> = ({ params }) => {
                   ))}
               </div>
             </div>
-            {Work_Experience && Work_Experience.length > 0 && <div>
+            {/* {Work_Experience && Work_Experience.length > 0 && <div>
               <div className="mb-4 flex items-center gap-2">
                 <IconBag className="text-2xl" />
                 <h3 className="text-md font-semibold lg:text-2xl">Experience</h3>
@@ -289,7 +270,7 @@ const CodevBioPage: React.FC<CodevBioPageProps> = ({ params }) => {
                   </div>
                 ))}
               </div>
-            </div>}
+            </div>} */}
             {education && (
               <div>
                 <h3 className="text-md font-semibold lg:text-2xl">Education</h3>
@@ -306,4 +287,3 @@ const CodevBioPage: React.FC<CodevBioPageProps> = ({ params }) => {
     </section>
   )
 }
-export default CodevBioPage
