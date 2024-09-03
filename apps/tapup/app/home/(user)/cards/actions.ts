@@ -1,13 +1,12 @@
 "use server";
 
-import { cookies } from "next/headers";
-import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { getMailer } from "@codevs/mailers";
 import generateCode from "./_lib/generateCode";
 import Card from "~/types/cards";
 
 export const createCard = async ({id, email}: {id: string, email: string},name: string, industry: string) => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
     const code = generateCode(4);
 
@@ -40,7 +39,7 @@ export const createCard = async ({id, email}: {id: string, email: string},name: 
 }
 
 export const getCards = async () => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
     const {
       error: fetchingUserError,
@@ -58,7 +57,7 @@ export const getCards = async () => {
 }   
 
 export const activateCard = async (userId: string,cardId: string,code: string) => {
-    const supabase = createServerActionClient({ cookies });
+    const supabase = getSupabaseServerActionClient();
 
       const { error, data } = await supabase.from('cards')
       .select('*')

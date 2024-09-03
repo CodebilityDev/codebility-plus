@@ -1,16 +1,21 @@
 import React from 'react'
-import { convertToTitleCase, statusColors } from '@/app/home/in-house/utils'
+import { convertToTitleCase, statusColors } from '../_lib/utils'
 import Image from 'next/image'
-import ViewProfile from '@/app/home/in-house/ViewProfile'
-import { inhouse_TableBodyT } from '@/types/protectedroutes'
+import ViewProfile from './in-house-view-profile'
+import { Codev } from '@/types/home/codev'
 
-function Card({ member, handleEditButton }: inhouse_TableBodyT) {
+interface Props  {
+  member: Codev;
+  handleEditButton: (id: string) => void
+}
+
+function Card({ member, handleEditButton }: Props) {
   return (
     <div className="w-64 h-72 gap-4 flex flex-col justify-between p-4 rounded-md text-dark100_light900 dark:bg-dark-200 bg-light-300">
       <div className='flex flex-col'>
         <div className='flex justify-between'>
           <div className='text-lg font-bold'>{member.first_name} {member.last_name}</div>
-          <div className={`${statusColors[convertToTitleCase(member.status_internal)]} text-sm`}>{convertToTitleCase(member.status_internal)}</div>
+          <div className={`${statusColors[convertToTitleCase(member.internal_status)]} text-sm`}>{convertToTitleCase(member.internal_status)}</div>
         </div>
         <div className='text-sm'>{member.main_position}</div>
       </div>
@@ -19,8 +24,8 @@ function Card({ member, handleEditButton }: inhouse_TableBodyT) {
         <div className='text-sm'>Projects:</div>
         {member.projects?.map((item, key) => (
           <ul key={key} className="ml-4 flex items-center text-sm list-disc">
-            {item.project && item.project.project_name ? (
-              <li>{item.project.project_name}</li>
+            {item ? (
+              <li>{item.name}</li>
             ) : null}
           </ul>
         ))}
@@ -32,7 +37,7 @@ function Card({ member, handleEditButton }: inhouse_TableBodyT) {
           {member.nda_status || "-"}
         </div>
         <span className="flex gap-2">
-          <ViewProfile />
+          <ViewProfile user={member}/>
           <button
             onClick={() => handleEditButton(member.id)}
           >

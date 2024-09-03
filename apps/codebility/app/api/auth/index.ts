@@ -4,7 +4,7 @@ import axios from "axios"
 import { API } from "@/lib/constants"
 import { NextResponse } from "next/server"
 import { FieldValues } from "react-hook-form"
-import { dateTimeFormat } from "@/lib/formDateTime"
+import { formatToUnix } from "@/lib/format-date-time"
 
 /*
     _         _   _          _    ____ ___ 
@@ -37,8 +37,8 @@ export const signupUser = async (data: FieldValues) => {
     fb_link: data.facebook,
     ...(data.website !== "" && { portfolio_website: data.website }),
     tech_stacks: [...data.techstack.split(", ")],
-    start_time: dateTimeFormat(startTime),
-    end_time: dateTimeFormat(endTime),
+    start_time: formatToUnix(startTime),
+    end_time: formatToUnix(endTime),
     main_position: data.position,
     password: data.password,
   }

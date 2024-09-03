@@ -1,8 +1,8 @@
 import Image from "next/image"
 import { useModal } from "@/hooks/use-modal-users"
-import { User } from "@/types"
+import { Codev } from '@/types/home/codev'
 
-export default function ViewProfile({ user }: { user?: User }) {
+export default function ViewProfile({ user }: { user: Codev }) {
   const { onOpen } = useModal()
 
   return (

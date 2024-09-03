@@ -1,9 +1,7 @@
-// import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
 import { NextResponse, URLPattern } from 'next/server';
 import type { NextRequest } from 'next/server';
-import { isAuthenticated } from "@/lib/tokenVerification"
-import { jwtDecode } from "jwt-decode"
-import { createMiddlewareClient } from '@supabase/auth-helpers-nextjs';
+import { createMiddlewareClient } from "@codevs/supabase/middleware-client"
+import pathsConfig from './config/paths.config';
 
 export const config = {
   matcher: [
@@ -30,59 +28,21 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
 
 
-  // handle patterns for specific routes
-  const handlePattern = matchUrlPattern(req.url);
+  // // handle patterns for specific routes
+  // const handlePattern = matchUrlPattern(req.url);
 
-  // if a pattern handler exists, call it
-  if (handlePattern) {
-    const patternHandlerResponse = await handlePattern(req, new NextResponse());
+  // // if a pattern handler exists, call it
+  // if (handlePattern) {
+  //   const patternHandlerResponse = await handlePattern(req, new NextResponse());
 
-    // if a pattern handler returns a response, return it
-    if (patternHandlerResponse) {
-      return patternHandlerResponse;
-    }
-  }
+  //   // if a pattern handler returns a response, return it
+  //   if (patternHandlerResponse) {
+  //     return patternHandlerResponse;
+  //   }
+  // }
 
   return res;
 
-  ///////// OLD CODEBILITY MIDDLEWARE //////////// - uncomment this and comment the above code if using old be.
-/*   const { nextUrl, cookies } = req
-  if (!cookies.has("codebility-auth")) {
-    return NextResponse.redirect(new URL("/auth/signin", req.url))
-  }
-  if (nextUrl.pathname === "/auth/signout") {
-    const response = NextResponse.redirect(new URL("/auth/signin", req.url))
-    response.cookies.delete("codebility-auth")
-    return response
-  }
-  if (cookies.has("codebility-auth")) {
-    const result = await isAuthenticated(req)
-    if (!result) {
-      const response = NextResponse.redirect(new URL("/auth/signin", req.url))
-      response.cookies.delete("codebility-auth")
-      return response
-    }
-    const decoded: any = jwtDecode(cookies.get("codebility-auth")?.value as string)
-    if (decoded && decoded.userType.name === "APPLICANT") {
-      const response = NextResponse.redirect(new URL("/waiting", req.url))
-      return response
-    }
-    const applicantUrl = req.url.split("/")
-    if (applicantUrl[applicantUrl.length - 1] === "applicants" && decoded && decoded.userType.name !== "ADMIN") {
-      const response = NextResponse.redirect(new URL("/dashboard", req.url))
-      return response
-    }
-    const internsUrl = req.url.split("/")
-    if (internsUrl[internsUrl.length - 1] === "interns" && decoded && decoded.userType.name !== "ADMIN") {
-      const response = NextResponse.redirect(new URL("/dashboard", req.url))
-      return response
-    }
-    const inhouseUrl = req.url.split("/") 
-    if(inhouseUrl[inhouseUrl.length - 1]  === "in-house" && decoded && decoded.userType.name !== "ADMIN"){
-      const response = NextResponse.redirect(new URL("/dashboard", req.url))
-      return response
-    }
-  } */
 }
 
 /**
@@ -99,9 +59,9 @@ function getPatterns() {
         data: { user },
       } = await getUser(req, res);
 
-      const { data: userData } = await supabase.from("users")
+      const { data: userData } = await supabase.from("codev")
       .select()
-      .eq("id", user?.id)
+      .eq("user_id", user?.id)
       .single();
 
       // the user is logged out, so we don't need to do anything
@@ -131,7 +91,7 @@ function getPatterns() {
 
        // If user is not logged in, redirect to sign in page.
        if (!user) {
-        const signIn = `/authv2/signin`;
+        const signIn = pathsConfig.auth.signIn;
         const redirectPath = `${signIn}?next=${next}`;
 
         return NextResponse.redirect(new URL(redirectPath, origin).href);

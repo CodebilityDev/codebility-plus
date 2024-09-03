@@ -56,7 +56,7 @@ type User = {
   end_time?: string | null
   jobStatusType?: string
   prio?: number
-  Work_Experience: ExperienceType[] | []
+  Work_Experience?: ExperienceType[] | []
 }
 
 type Tag = {
@@ -158,11 +158,6 @@ type TeamMemberT = {
   main_position: TPosition
   projects?: { project: Project }[]
   nda_status?: TNda
-}
-
-interface Project {
-  id: string
-  project_name: string
 }
 
 type ProjectT = {
