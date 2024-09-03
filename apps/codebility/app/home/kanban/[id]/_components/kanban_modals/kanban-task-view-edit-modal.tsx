@@ -13,7 +13,7 @@ import { taskPrioLevels, categories, taskTypes } from "@/constants"
 import { User } from "@/types"
 import toast from "react-hot-toast"
 import Image from "next/image"
-import { updateTask } from "../../actions"
+import { deleteTask, updateTask } from "../../actions"
 import { Task } from "@/types/home/task"
 import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog"
 import KanbanAddModalMembers from "./kanban-add-modal-members"
@@ -47,7 +47,17 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
       await updateTask(formData, task);
       toast.success("Update Success!");
       setIsEditing(false);
-      router.refresh();
+      router.refresh(); // reflect updated task.
+    } catch (e: any) {
+      toast.error(e.message);
+    }
+  }
+
+  const handleDelete = async () => {
+    try {
+      await deleteTask(task.id);
+      toast.success("Task Deleted!");
+      router.refresh(); // reflect updated task.
     } catch (e: any) {
       toast.error(e.message);
     }
@@ -338,13 +348,15 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                 <Button
                   variant="destructive"
                   className="order-1 w-full sm:order-2 sm:w-[130px]"
-                /*   onClick={() => handleDelete(dataObject?.id)} */
+                  type="button"
+                  onClick={handleDelete}
                 >
                   Delete
                 </Button>
                 <Button
                   variant="hollow"
                   className="order-1 w-full sm:order-2 sm:w-[130px]"
+                  type="button"
                   onClick={() => setIsEditing(true)}
                 >
                   Edit
