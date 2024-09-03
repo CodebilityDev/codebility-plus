@@ -1,14 +1,14 @@
 import { Poppins } from "next/font/google"
 
-import Navigation from "@/app/(marketing)/Navigation"
-import Footer from "@/app/(marketing)/Footer"
-import Hero from "@/app/(marketing)/index/components/Hero"
-import Admins from "@/app/(marketing)/index/components/Admins"
-import Parallax from "@/app/(marketing)/index/components/Parallax"
-import Calendly from "@/app/(marketing)/index/components/Calendly"
-import Features from "@/app/(marketing)/index/components/Features"
-import WorkWithUs from "@/app/(marketing)/index/components/WorkWithUs"
-import WhyChooseUs from "@/app/(marketing)/index/components/WhyChooseUs"
+import Navigation from "../_components/marketing-navigation"
+import Footer from "../_components/marketing-footer"
+import Hero from "./components/Hero"
+import Admins from "./components/Admins"
+import Parallax from "./components/Parallax"
+import Calendly from "./components/Calendly"
+import Features from "./components/Features"
+import WorkWithUs from "./components/WorkWithUs"
+import WhyChooseUs from "./components/WhyChooseUs"
 
 export const PoppinFont = Poppins({
   weight: ["400"],

@@ -1,5 +1,5 @@
 import Image from "next/image"
-import Section from "@/app/(marketing)/Section"
+import Section from "../../_components/marketing-section"
 import { abstractCircle } from "@/public/assets/images/ai-integration"
 import Link from "next/link"
 

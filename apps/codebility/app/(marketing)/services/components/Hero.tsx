@@ -1,4 +1,4 @@
-import Container from "@/app/(marketing)/Container"
+import Container from "../../_components/marketing-container"
 import SideNavMenu from "@/app/(marketing)/index/components/SideNavMenu"
 
 const Hero = () => {
