@@ -6,8 +6,14 @@ import Image from "next/image"
 import { profiles_ProfieCardT } from "@/types/home"
 import { IconArrowRight } from "@/public/assets/svgs"
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion"
+import { Codev } from "@/types/home/codev"
 
-const ProfileCard = ({ user, color }: profiles_ProfieCardT) => {
+interface Props {
+  codev: Codev;
+  color: string;
+}
+
+const ProfileCard = ({ codev, color }: Props) => {
   const [hovered, setHovered] = useState(false)
   const springConfig = { stiffness: 100, damping: 5 }
   const x = useMotionValue(0) // going to set this value on mouse move
@@ -21,7 +27,7 @@ const ProfileCard = ({ user, color }: profiles_ProfieCardT) => {
   }
   return (
     <Link
-      href={`/profiles/${user.id}`}
+      href={`/profiles/${codev.id}`}
       target="_blank"
       className="h-64"
       onMouseEnter={() => setHovered(true)}
@@ -32,8 +38,8 @@ const ProfileCard = ({ user, color }: profiles_ProfieCardT) => {
       >
         <div className="relative">
           <Image
-            alt={`${user.first_name} Avatar`}
-            src={user.image_url || "/assets/svgs/icon-codebility-black.svg"}
+            alt={`${codev.first_name} Avatar`}
+            src={codev.image_url || "/assets/svgs/icon-codebility-black.svg"}
             width={60}
             height={60}
             className={`${color} h-[70px] w-[70px] rounded-full bg-cover object-cover p-0.5`}
@@ -60,11 +66,11 @@ const ProfileCard = ({ user, color }: profiles_ProfieCardT) => {
                   whiteSpace: "nowrap",
                 }}
                 className={`${
-                  user.jobStatusType === "AVAILABLE" ? "bg-green" : "bg-orange-400"
+                  codev.job_status === "AVAILABLE" ? "bg-green" : "bg-orange-400"
                 } -top-25 absolute left-1/2 z-50 flex -translate-x-1/2 transform flex-col items-center justify-center rounded-md  px-4 py-2 shadow-xl`}
               >
                 <div className="relative z-30 text-base  text-white">
-                  {user.jobStatusType === "AVAILABLE" ? "Available" : "Deployed"}
+                  {codev.job_status === "AVAILABLE" ? "Available" : "Deployed"}
                 </div>
               </motion.div>
             )}
@@ -72,9 +78,9 @@ const ProfileCard = ({ user, color }: profiles_ProfieCardT) => {
           <div className="absolute bottom-[1px] right-[1px]">
             <p
               className={`rounded-full border-2 border-black-100 p-2 text-[9px] ${
-                user.jobStatusType === "AVAILABLE"
+                codev.job_status === "AVAILABLE"
                   ? "bg-green"
-                  : user.jobStatusType === "DEPLOYED"
+                  : codev.job_status === "DEPLOYED"
                   ? "bg-orange-400"
                   : "bg-gray"
               }`}
@@ -83,10 +89,10 @@ const ProfileCard = ({ user, color }: profiles_ProfieCardT) => {
         </div>
         <div className="flex flex-col gap-1 text-center">
           <p className="md:text-md text-sm capitalize text-white lg:text-base">
-            {user.first_name} {user.last_name}
+            {codev.first_name} {codev.last_name}
           </p>
-          {user.main_position ? (
-            <p className="text-sm text-gray">{user.main_position}</p>
+          {codev.main_position ? (
+            <p className="text-sm text-gray">{codev.main_position}</p>
           ) : (
             <div className="text-sm lg:text-base">&nbsp;</div>
           )}

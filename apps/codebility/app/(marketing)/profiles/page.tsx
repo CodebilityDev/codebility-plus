@@ -8,7 +8,7 @@ import { getCodevs } from "@/lib/server/codev.service"
 export default async function Profiles() {
   const { data } = await getCodevs();
 
-  const users = data || [];
+  const codevs = data || [];
 
   return (
     <SectionWrapper id="codevs" className="relative w-full bg-gradient-to-b from-black-500">
@@ -16,7 +16,7 @@ export default async function Profiles() {
       <div className="relative flex flex-col gap-8">
         <ProfileContainer />
         <Suspense fallback={<UsersSkeleton />}>
-          <CodevLists />
+          <CodevLists codevs={codevs}/>
         </Suspense>
       </div>
     </SectionWrapper>
