@@ -1,8 +1,7 @@
 import Link from "next/link"
 import Image from "next/image"
-import BlueBg from "@/app/(marketing)/_components/landing/landing-blue-bg"
-
-import PurpleBg from "@/app/(marketing)/_components/landing/landing-purple-bg"
+import BlueBg from "./landing-blue-bg"
+import PurpleBg from "./landing-purple-bg"
 import { Button } from "@/Components/ui/button"
 
 const WhyChoose = () => {
