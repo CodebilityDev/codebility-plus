@@ -3,9 +3,9 @@
 import { pageSize } from "@/constants"
 import { useEffect, useState } from "react"
 
-import ServiceCard from "./ServiceCard"
+import ServiceCard from "./services-service-card"
 import usePagination from "@/hooks/use-pagination"
-import { servicesData, servicesTabs } from "./data"
+import { servicesData, servicesTabs } from "../_lib/dummy-data"
 import { services_ServiceCardT } from "@/types/home"
 import DefaultPagination from "@/Components/ui/pagination"
 import Container from "../../_components/marketing-container"
