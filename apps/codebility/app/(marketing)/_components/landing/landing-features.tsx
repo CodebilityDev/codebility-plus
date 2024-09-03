@@ -1,8 +1,8 @@
 import { Button } from "@/Components/ui/button"
 import { ServicesCardData } from "./data"
-import FeaturesCard from "./FeaturesCard"
-import Container from "../../_components/marketing-container"
-import Section from "../../_components/marketing-section"
+import FeaturesCard from "./landing-features-card"
+import Container from "../marketing-container"
+import Section from "../marketing-section"
 
 const Features = () => {
   return (
