@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useCallback, useEffect, useState } from "react"
 import { EmblaOptionsType, EmblaCarouselType } from "embla-carousel"
 import { PrevButton, NextButton, usePrevNextButtons } from "./codevs-embla-carousel-arrow-buttons"
