@@ -1,5 +1,5 @@
 import Section from "../../_components/marketing-section"
-import { partnerData } from "./data"
+import { partnerData } from "../_lib/dummy-data"
 import PartnerCard from "./ai-integration-partner-card"
 
 const Partner = () => {

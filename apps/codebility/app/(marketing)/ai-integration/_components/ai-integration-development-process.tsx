@@ -1,6 +1,6 @@
 import Section from "../../_components/marketing-section"
 import ProcessCard from "./ai-integration-process-card"
-import { developmentProcessData } from "./data"
+import { developmentProcessData } from "../_lib/dummy-data"
 
 const DevelopmentProcess = () => {
   return (
