@@ -1,5 +1,6 @@
 import { Meta, StoryObj } from '@storybook/react';
 import { Alert, AlertTitle, AlertDescription } from '@codevs/ui/alert';
+import { Terminal, AlertCircle } from "lucide-react"
 
 const meta: Meta<typeof Alert> = {
   title: 'ShadCN-Atomic/Alert',
@@ -37,13 +38,13 @@ export const Default: Story = {
     variant: 'default',
     children: (
       <>
-        <AlertTitle>Alert Title</AlertTitle>
+        <Terminal className="h-4 w-4" />
+        <AlertTitle>Heads up!</AlertTitle>
         <AlertDescription>
-          This is an example of an alert description.
+          You can add components to your app using the cli.
         </AlertDescription>
       </>
     ),
-    className: 'w-full max-w-md',
   },
 };
 
@@ -52,9 +53,10 @@ export const Destructive: Story = {
     variant: 'destructive',
     children: (
       <>
-        <AlertTitle>Destructive Alert Title</AlertTitle>
+        <AlertCircle className="h-4 w-4" />
+        <AlertTitle>Error</AlertTitle>
         <AlertDescription>
-          This is an example of a destructive alert description.
+          Your session has expired. Please log in again.
         </AlertDescription>
       </>
     ),
