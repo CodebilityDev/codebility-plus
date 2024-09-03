@@ -7,7 +7,7 @@ import Container from "../marketing-container"
 import { MarketingCardData } from "./data"
 import HeroBackground from "./landing-hero-bg"
 import { Button } from "@/Components/ui/button"
-import SideNavMenu from "./landing-sidenav-menu"
+import SideNavMenu from "../marketing-sidenav-menu"
 
 const Hero = () => {
   return (

@@ -5,7 +5,7 @@ import Footer from "../_components/marketing-footer"
 import Container from "../_components/marketing-container"
 import { InlineWidget } from "react-calendly"
 import Navigation from "../_components/marketing-navigation"
-import SideNavMenu from "../index/components/SideNavMenu"
+import SideNavMenu from "../_components/marketing-sidenav-menu"
 
 export default function Page() {
   return (
