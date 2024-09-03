@@ -1,6 +1,6 @@
 import { motion } from "framer-motion"
 
-import ServiceCard from "@/app/(marketing)/codevs/components/ServiceCard"
+import ServiceCard from "@/app/(marketing)/codevs/_components/codevs-service-card"
 import H2 from "@/Components/shared/home/H2"
 import { servicesCardData } from "@/constants"
 import IntroText from "@/Components/shared/home/IntroText"
