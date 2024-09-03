@@ -1,5 +1,3 @@
-import { Poppins } from "next/font/google"
-
 import Navigation from "../_components/marketing-navigation"
 import Footer from "../_components/marketing-footer"
 import Hero from "./components/Hero"
@@ -9,12 +7,7 @@ import Calendly from "./components/Calendly"
 import Features from "./components/Features"
 import WorkWithUs from "./components/WorkWithUs"
 import WhyChooseUs from "./components/WhyChooseUs"
-
-export const PoppinFont = Poppins({
-  weight: ["400"],
-  style: "normal",
-  subsets: ["latin"],
-})
+import { PoppinFont } from "../_lib/font"
 
 const Index = () => {
   return (

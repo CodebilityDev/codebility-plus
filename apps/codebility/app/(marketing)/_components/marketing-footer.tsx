@@ -4,7 +4,7 @@ import Container from "./marketing-container"
 import Logo from "@/Components/shared/Logo"
 import Link from "next/link"
 import { useModal } from "@/hooks/use-modal"
-import { aboutUsData, companyData, connectUsData } from "../_lib/data"
+import { aboutUsData, companyData, connectUsData } from "../_lib/dummy-data"
 import { IconFacebookWhite } from "@/public/assets/svgs"
 
 const Footer = () => {
