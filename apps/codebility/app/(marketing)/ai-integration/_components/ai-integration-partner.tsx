@@ -1,6 +1,6 @@
 import Section from "../../_components/marketing-section"
 import { partnerData } from "./data"
-import PartnerCard from "./PartnerCard"
+import PartnerCard from "./ai-integration-partner-card"
 
 const Partner = () => {
   return (

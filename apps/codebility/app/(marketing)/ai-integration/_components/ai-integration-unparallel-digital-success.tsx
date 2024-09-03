@@ -1,6 +1,6 @@
 import Section from "../../_components/marketing-section"
 import { unparalleledDigitalSuccessData } from "./data"
-import UnparallelCard from "./UnparallelCard"
+import UnparallelCard from "./ai-integration-unparallel-card"
 
 const UnparallelDigitalSuccess = () => {
   return (
