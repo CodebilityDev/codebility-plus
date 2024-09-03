@@ -1,24 +1,19 @@
 import React from "react"
 import { Paragraph } from "@/Components/shared/home"
 import Logo from "@/Components/shared/Logo"
-import { Button } from "@/Components/ui/button"
 import {
   IconAbout,
   IconBag,
-  IconFacebook,
-  IconGithub,
   IconLink,
-  IconLinkedIn,
-  IconMail,
   IconMapPin,
   IconSkills,
-  IconTelephone,
 } from "@/public/assets/svgs"
 import Image from "next/image"
 import Link from "next/link"
 import getRandomColor from "@/lib/getRandomColor"
 import { getCodevs } from "@/lib/server/codev.service"
 import { Codev } from "@/types/home/codev"
+import ProfileCloseButton from "./_components/profile-close-button"
 
 interface Props {
   params: {
@@ -56,14 +51,7 @@ export default async function CodevBioPage ({ params }: Props)  {
       <div className="relative px-5 py-5 md:px-10 md:py-10 lg:px-32 lg:py-20">
         <div className="flex justify-between gap-2">
           <Logo />
-          <Link href="/">
-            <Button
-              variant="hollow"
-              className="flex gap-2 border-zinc-700 bg-black-200 text-white"
-            >
-              Close
-            </Button>
-          </Link>
+          <ProfileCloseButton />
         </div>
 
         <div className="mt-6 flex flex-col gap-6 md:gap-12 lg:mt-16 lg:flex-row">
