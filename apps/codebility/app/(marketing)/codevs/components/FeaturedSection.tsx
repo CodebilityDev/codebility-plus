@@ -8,7 +8,7 @@ import SectionWrapper from "@/Components/shared/home/SectionWrapper"
 import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer"
 import FeaturedCard from "@/app/(marketing)/codevs/components/FeaturedCard"
 import { Button } from "@/Components/ui/button"
-import { FeaturedSectiondata } from "@/app/(marketing)/index/components/data"
+import { FeaturedSectiondata } from "../../_lib/dummy-data"
 import {Inter, Outfit} from "next/font/google"
 import Link from "next/link"
 
