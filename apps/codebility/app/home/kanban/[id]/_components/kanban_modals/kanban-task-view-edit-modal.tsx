@@ -191,7 +191,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                             <SelectItem
                               key={i}
                               className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
-                              value={prioLevel}
+                              value={prioLevel.toUpperCase()}
                             >
                               <SelectItemText>
                                 {prioLevel}
@@ -203,7 +203,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                     </Select>
                   ) : (
                     <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
-                      {task.priority_level}
+                      {task.priority_level.charAt(0) + task.priority_level.slice(1).toLowerCase()} {/** capitalize */}
                     </div>
                   )}
                 </div>
