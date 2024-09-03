@@ -1,4 +1,4 @@
-import OrbitingCircles from "@/app/(marketing)/codevs/_components/codevs-orbiting-circles"
+import OrbitingCircles from "./codevs-orbiting-circles"
 import { IconNextJS, IconReact, IconTailwind, IconNodeJS } from "@/public/assets/svgs"
 
 const OrbitingCirclesBackground = () => {
