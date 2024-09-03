@@ -39,10 +39,13 @@ export const createNewTask = async (formData: FormData) => {
     .eq("project_id", project_id);
     
     if (fetchingTasksError) throw fetchingTasksError;
-    
+
+    const listTotalTask = Number(formData.get("totalTask") || 0);
+
     const { data, error } = await supabase.from("task")
     .insert({
         number: tasks.length + 1,
+        row_queue: listTotalTask,
         project_id,
         list_id,
         title,
