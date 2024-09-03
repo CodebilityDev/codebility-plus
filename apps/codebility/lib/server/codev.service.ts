@@ -39,20 +39,35 @@ export const getCodevs = async (id?: string): Promise<{ error: any, data: Codev[
     }));
     
     const data = codevs.map<Codev>((codev, index: number) => {
-        const { first_name, last_name, image_url, address, about, main_position, tech_stacks } = codev.user.profile;
+        const { 
+           first_name,
+           last_name,
+           image_url,
+           address,
+           about,
+           main_position,
+           tech_stacks,
+           portfolio_website,
+           contact,
+           education
+        } = codev.user.profile;
   
         return {
             id: codev.id,
+            email: codev.user.email,
             user_id: codev.user_id,
             internal_status : codev.internal_status,
             first_name,
             last_name,
             tech_stacks,
             main_position,
+            portfolio_website,
+            contact,
             projects: codevProjects[index] as Project[],
             image_url,
             address,
             about,
+            education,
             socials: codev.user.social,
             job_status: codev.job_status,
             nda_status: codev.nda_status
