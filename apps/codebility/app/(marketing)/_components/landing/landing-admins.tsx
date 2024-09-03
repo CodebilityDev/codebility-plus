@@ -2,18 +2,22 @@ import React from "react"
 import getRandomColor from "@/lib/getRandomColor"
 import BlueBg from "./landing-blue-bg" 
 import AdminCard from "./landing-admin-card"
-import { User } from "@/types"
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import { Profile } from "@/types/home/user"
 
 export default async function Admins() {
+  const adminUserTypeId = 3; // update if user type for admin changes
   const supabase = getSupabaseServerComponentClient();
   const { data, error } = await supabase.from("user")
   .select(`
     *,
     profile(*)
-  `);
+  `)
+  .eq("type_id", adminUserTypeId);
 
   if (error) return <div>ERROR</div>
+
+  const admins = data.map(user => user.profile);
 
   return (
     <section id="admins" className="relative w-full pt-10 text-light-900">
@@ -26,9 +30,9 @@ export default async function Admins() {
           </p>
           <BlueBg className="h-[300px] w-full max-w-[1200px] lg:top-[45%]" />
           <div className="grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4">
-           {/*  {admins.map((admin: { admin: User; color: string }["admin"]) => (
+            {admins.map((admin: { admin: Profile; color: string }["admin"]) => (
               <AdminCard color={getRandomColor() || ""} key={admin.id} admin={admin} />
-            ))} */}
+            ))}
           </div>
         </div>
       </div>
