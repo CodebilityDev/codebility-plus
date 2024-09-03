@@ -1,11 +1,11 @@
 "use client"
 
 import React from "react"
-import Footer from "@/app/(marketing)/Footer"
-import Container from "@/app/(marketing)/Container"
+import Footer from "../_components/marketing-footer"
+import Container from "../_components/marketing-container"
 import { InlineWidget } from "react-calendly"
-import Navigation from "@/app/(marketing)/Navigation"
-import SideNavMenu from "@/app/(marketing)/index/components/SideNavMenu"
+import Navigation from "../_components/marketing-navigation"
+import SideNavMenu from "../index/components/SideNavMenu"
 
 export default function Page() {
   return (
