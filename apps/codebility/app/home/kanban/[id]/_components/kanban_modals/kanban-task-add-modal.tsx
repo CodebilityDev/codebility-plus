@@ -22,9 +22,10 @@ interface Props {
   listId: string;
   listName: string;
   projectId: string;
+  totalTask: number;
 }
 
-export default function KanbanTaskAddModal({ listId, listName, projectId }: Props) {
+export default function KanbanTaskAddModal({ listId, listName, projectId, totalTask }: Props) {
   const { data: categories } = useFetchEnum("public","taskcategory");
   const router = useRouter();
 
@@ -82,6 +83,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId }: Prop
           <div className="flex flex-col gap-6">
             <input type="hidden" name="projectId" value={projectId} />
             <input type="hidden" name="listId" value={listId} />
+            <input type="hidden" name="totalTask" value={totalTask} />
             <div className="flex flex-col gap-2">
               <Label htmlFor="title">Task Name</Label>
               <Input

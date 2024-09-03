@@ -46,7 +46,7 @@ export default function KanbanColumnContainer({ column, projectId, tasks }: Prop
           </SortableContext>
         </div>
         <div className="pt-2">
-          <KanbanTaskAddModal listId={column.id} listName={column.name} projectId={projectId}/>
+          <KanbanTaskAddModal listId={column.id} totalTask={tasks.length} listName={column.name} projectId={projectId}/>
         </div>
       </div>
     </li>
