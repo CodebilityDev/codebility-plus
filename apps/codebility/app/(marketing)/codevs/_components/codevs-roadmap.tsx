@@ -1,6 +1,6 @@
 import { SectionWrapper } from "@/Components/shared/home"
-import { roadmapData } from "@/app/(marketing)/codevs/_components/data"
-import RoadmapCard from "@/app/(marketing)/codevs/_components/codevs-roadmap-card"
+import { roadmapData } from "./data"
+import RoadmapCard from "./codevs-roadmap-card"
 
 const Roadmap = () => {
   return (

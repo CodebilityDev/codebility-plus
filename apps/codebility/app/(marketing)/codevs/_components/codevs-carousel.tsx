@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { EmblaOptionsType, EmblaCarouselType } from "embla-carousel"
-import { PrevButton, NextButton, usePrevNextButtons } from "@/app/(marketing)/codevs/_components/codevs-embla-carousel-arrow-buttons"
+import { PrevButton, NextButton, usePrevNextButtons } from "./codevs-embla-carousel-arrow-buttons"
 import Autoplay from "embla-carousel-autoplay"
 import useEmblaCarousel from "embla-carousel-react"
 import Image from "next/image"

@@ -1,7 +1,7 @@
 import Image from "next/image"
 import { motion } from "framer-motion"
 
-import AboutCard from "@/app/(marketing)/codevs/_components/codevs-about-card"
+import AboutCard from "./codevs-about-card"
 import { services } from "@/constants" 
 import H2 from "@/Components/shared/home/H2"
 import moon from "public/assets/images/moon.png"

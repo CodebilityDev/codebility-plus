@@ -1,8 +1,8 @@
 import Link from "next/link"
 import { Rowdies } from "next/font/google"
 import { Button } from "@/Components/ui/button"
-import OrbitingCirclesBackground from "@/app/(marketing)/codevs/_components/codevs-orbiting-circles-bg"
-import SideNavMenu from "@/app/(marketing)/_components/marketing-sidenav-menu"
+import OrbitingCirclesBackground from "./codevs-orbiting-circles-bg"
+import SideNavMenu from "../../_components/marketing-sidenav-menu"
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 
 const rowdies = Rowdies({
