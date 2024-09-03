@@ -45,8 +45,10 @@ export default async function CodevBioPage ({ params }: Props)  {
     contact,
     about,
     education,
-    tech_stacks
+    tech_stacks,
+    work_experience
   } = data as Codev;
+
 
   const {
     facebook,
@@ -251,26 +253,26 @@ export default async function CodevBioPage ({ params }: Props)  {
                   ))}
               </div>
             </div>
-            {/* {Work_Experience && Work_Experience.length > 0 && <div>
+            {work_experience && work_experience.length > 0 && <div>
               <div className="mb-4 flex items-center gap-2">
                 <IconBag className="text-2xl" />
                 <h3 className="text-md font-semibold lg:text-2xl">Experience</h3>
               </div>
               <div className="flex flex-col gap-6 md:gap-8">
-                {Work_Experience.map((exp, expNo) => (
+                {work_experience.map((exp, expNo) => (
                   <div key={`experience-${expNo}`} className="flex flex-col gap-4 rounded-lg bg-black-100 p-6">
                     <div>
                       <p className="text-lg font-semibold text-white lg:text-xl">{exp.position}</p>
                       {exp.company && <p className="text-md font-semibold text-gray lg:text-lg">{exp.company}</p>}
                       <p className="text-sm text-gray lg:text-lg">
-                        {exp.dateFrom} - {exp.dateTo}
+                        {exp.date_from} - {exp.date_to}
                       </p>
                     </div>
-                    <p>{exp.short_desc}</p>
+                    <p>{exp.description}</p>
                   </div>
                 ))}
               </div>
-            </div>} */}
+            </div>}
             {education && (
               <div>
                 <h3 className="text-md font-semibold lg:text-2xl">Education</h3>
