@@ -4,6 +4,7 @@ import { Button } from "@/Components/ui/button"
 import OrbitingCirclesBackground from "./codevs-orbiting-circles-bg"
 import SideNavMenu from "../../_components/marketing-sidenav-menu"
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import pathsConfig from "@/config/paths.config"
 
 const rowdies = Rowdies({
   weight: "300",
@@ -39,7 +40,7 @@ export default async function Hero() {
         </div>
         <p className="text-xs md:text-sm lg:text-2xl">Where Diversity Flourishes and Connections Thrive</p>
         <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
-          <Link href={user ? "/dashboard" : "/auth/signin"}>
+          <Link href={user ? pathsConfig.app.home : pathsConfig.auth.signUp}>
             <Button variant="purple" size="lg" rounded="full" className="md:w-40">
               {user ? "Dashboard" : "Join"}
             </Button>
