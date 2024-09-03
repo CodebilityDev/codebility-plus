@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { mobileAppServicesData } from "@/app/(marketing)/ai-integration/components/data"
+import { mobileAppServicesData } from "@/app/(marketing)/ai-integration/_components/data"
 
 const MobileAppServices = () => {
   return (
