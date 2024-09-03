@@ -1,6 +1,6 @@
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase"
 import { useQuery } from "@tanstack/react-query";
-import { Member } from "../_types/member";
+import { Member } from "../../../_types/member";
 
 export function useFetchMembers() {
     const supabase = useSupabase();
