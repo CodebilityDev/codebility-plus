@@ -11,7 +11,10 @@ export const getCodevs = async (id?: string): Promise<{ error: any, data: Codev[
       *,
       user(
         *,
-        profile(*),
+        profile(
+          *,
+          work_experience(*)
+        ),
         social(*)
       )
     `)
@@ -49,7 +52,8 @@ export const getCodevs = async (id?: string): Promise<{ error: any, data: Codev[
            tech_stacks,
            portfolio_website,
            contact,
-           education
+           education,
+           work_experience
         } = codev.user.profile;
   
         return {
@@ -68,6 +72,7 @@ export const getCodevs = async (id?: string): Promise<{ error: any, data: Codev[
             address,
             about,
             education,
+            work_experience,
             socials: codev.user.social,
             job_status: codev.job_status,
             nda_status: codev.nda_status
