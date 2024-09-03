@@ -2,8 +2,8 @@
 
 import React from "react"
 import { InlineWidget } from "react-calendly"
-import Section from "../../_components/marketing-section"
-import Container from "../../_components/marketing-container"
+import Section from "./marketing-section"
+import Container from "./marketing-container"
 
 const Calendly = () => {
   return (
