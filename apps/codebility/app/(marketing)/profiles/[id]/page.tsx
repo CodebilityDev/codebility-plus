@@ -33,28 +33,18 @@ export default async function CodevBioPage ({ params }: Props)  {
   if (error) return <div>ERROR</div>
 
   const {
-    email,
     first_name,
     last_name,
     image_url,
     job_status,
     main_position,
-    socials,
     portfolio_website,
     address,
-    contact,
     about,
     education,
     tech_stacks,
     work_experience
   } = data as Codev;
-
-
-  const {
-    facebook,
-    github,
-    linkedin,
-  } = socials;
 
   function getCurrentYear() {
     return new Date().getFullYear()
@@ -111,34 +101,6 @@ export default async function CodevBioPage ({ params }: Props)  {
               </div>
             )}
             <div className="flex gap-4">
-              {facebook && (
-                <Link
-                  className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-100"
-                  href={facebook}
-                  target="_blank"
-                >
-                  <IconFacebook className="text-2xl" />
-                </Link>
-              )}
-              {github && (
-                <Link
-                  className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-100"
-                  href={github}
-                  target="_blank"
-                  title={`${github}`}
-                >
-                  <IconGithub className="text-2xl" />
-                </Link>
-              )}
-              {linkedin && (
-                <Link
-                  className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-100"
-                  href={linkedin}
-                  target="_blank"
-                >
-                  <IconLinkedIn className="text-2xl" />
-                </Link>
-              )}
               {portfolio_website && (
                 <Link
                   className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-100"
@@ -152,50 +114,6 @@ export default async function CodevBioPage ({ params }: Props)  {
             </div>
 
             <div className="mt-4 flex h-auto w-full flex-col gap-4 rounded-lg bg-black-100 p-4">
-              <div className="flex items-center gap-4">
-                <Link
-                  className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-500"
-                  href={`mailto:${email}`}
-                  title={`${email}`}
-                >
-                  <IconMail className="text-2xl" />
-                </Link>
-                <div className="flex flex-col">
-                  <p className="text-md text-gray">Email</p>
-                  <Link
-                    href={`mailto:${email}`}
-                    title={`${email}`}
-                    className="text-white transition duration-300 hover:text-blue-100"
-                  >
-                    {email}
-                  </Link>
-                </div>
-              </div>
-              {address && <div className="border-t border-darkgray"></div>}
-              {contact && (
-                <>
-                  <div className="flex items-center gap-4">
-                    <Link
-                      className="rounded-lg bg-darkgray p-2 transition duration-300 hover:bg-black-500"
-                      href={`mailto:${contact}`}
-                      title={`${contact}`}
-                    >
-                      <IconTelephone className="text-2xl" />
-                    </Link>
-                    <div className="flex flex-col">
-                      <p className="text-md text-gray">Phone</p>
-                      <Link
-                        href={`tel:${contact}`}
-                        title={`${contact}`}
-                        className="text-white transition duration-300 hover:text-blue-100"
-                      >
-                        {contact}
-                      </Link>
-                    </div>
-                  </div>
-                  <div className="border-t border-darkgray"></div>
-                </>
-              )}
               {address && (
                 <div className="flex items-center gap-4">
                   <Link
