@@ -1,102 +1,122 @@
-import type { Meta, StoryObj } from '@storybook/react'
-import { fn } from 'storybook/test'
-import { action } from '@storybook/addon-actions'
-import { Button } from '@codevs/ui/button'
+import { Meta, StoryObj } from "@storybook/react";
+import { Button } from "@codevs/ui/button";
+import { Mail, Loader2 } from "lucide-react";
 
-const meta = {
-  title: 'ShadCN-Atomic/Button',
+const meta: Meta<typeof Button> = {
+  title: "ShadCN-Atomic/Button",
   component: Button,
-  tags: ['autodocs'],
-  parameters: {
-    layout: 'centered',
-    viewport: {
-      disabled: true,
-    }
-  },
+  tags: ["autodocs"],
   argTypes: {
-    size: {
-			control: 'select',
-			description: 'Button sizes',
-			options: ['default', 'sm', 'lg', 'icon']
-		},
-		disabled: {
-			control: 'boolean'
-		},
-		onClick: {
-			action: 'onClick',
-			description: 'Function called when the default button is clicked'
-		},
-		children: {
-			control: 'text',
-			description: 'Content to be displayed inside the button'
-		},
-		className: {
-			control: 'text',
-			description: 'Custom tailwind CSS classes to be applied to the button'
-		},
     variant: {
-      control: 'select',
-      description: 'Button color variants',
-      options: ['default', 'primary', 'secondary', 'destructive', 'success'],
+      control: "select",
+      options: ["default", "destructive", "outline", "secondary", "ghost", "link"],
+      description: "The variant of the button.",
+      defaultValue: "default",
+    },
+    size: {
+      control: "select",
+      options: ["default", "sm", "lg", "icon"],
+      description: "The size of the button.",
+      defaultValue: "default",
+    },
+    asChild: {
+      control: "boolean",
+      description: "Whether the button is rendered as a child component.",
+    },
+    children: {
+      control: "text",
+      description: "Content inside the button.",
     },
   },
-} satisfies Meta<typeof Button>;
+};
 
 export default meta;
-type Story = StoryObj<typeof meta>;
-
-export const StartTimer: Story = {
-	args: {
-    variant: 'primary',
-		size: 'lg',
-		disabled: false,
-		onClick: action('StartTimer click'),
-		children: 'Start Timer',
-		className: "inline-flex w-full items-center justify-center duration-300 px-6 py-2 whitespace-nowrap rounded-md text-md lg:text-lg ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-100 text-white hover:bg-blue-200 h-10"
-	}
-};
-
-export const AddNewBoard: Story = {
-	args: {
-    variant: 'primary',
-		size: 'lg',
-		disabled: false,
-		onClick: action('AddNewBoard click'),
-		children: 'Add New Board',
-		className: "justify-center duration-300 px-6 py-2 whitespace-nowrap rounded-md text-md lg:text-lg ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-100 text-white hover:bg-blue-200 h-10 flex w-max items-center gap-2"
-	},
-};
+type Story = StoryObj<typeof Button>;
 
 export const Default: Story = {
   args: {
-    variant: 'default',
-    size: 'lg',
-    disabled: false,
-    onClick: action('default click'),
-    children: 'Default Button',
-    className: "shadow-lg"
+		size: "default",
+		variant: "default",
+    children: "Button",
   },
-};
-
-export const Primary: Story = {
-	args: {
-    variant: 'primary',
-		size: 'lg',
-		disabled: false,
-		onClick: action('destructive click'),
-		children: 'Default Button',
-		className: 'shadow-lg'
-	}
 };
 
 export const Secondary: Story = {
 	args: {
-    variant: 'secondary',
-		size: 'lg',
-		disabled: false,
-		onClick: action('secondary click'),
-		children: 'Secondary Button',
-		className: 'shadow-lg'
-	}
+		variant: "secondary",
+		children: "Button",
+	},
 };
 
+export const Destructive: Story = {
+	args: {
+		variant: "destructive",
+		children: "Button",
+	},
+};
+
+export const Outline: Story = {
+  args: {
+    variant: "outline",
+    children: "Outline",
+  },
+};
+
+export const Subtle: Story = {
+  args: {
+    variant: "subtle",
+    children: "Subtle",
+  },
+};
+
+export const Ghost: Story = {
+  args: {
+    variant: "ghost",
+    children: "Ghost",
+  },
+};
+
+export const Link: Story = {
+  args: {
+    variant: "link",
+    children: "Link",
+  },
+};
+
+export const WithIcon: Story = {
+  args: {
+		variant: "secondary",
+    children: (
+      <>
+        <Mail className="mr-2 h-4 w-4" />
+        Login with Email
+      </>
+    ),
+  },
+};
+
+export const Icon: Story = {
+	args: {
+		size: "icon",
+		variant: "secondary",
+		children: (
+			<>
+				<Mail />
+			</>
+		),
+	},
+}
+
+export const Loading: Story = {
+  args: {
+    disabled: true,
+		size: "default",
+		variant: "outline",
+    children: (
+      <>
+        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+        Button
+      </>
+    ),
+  },
+};
