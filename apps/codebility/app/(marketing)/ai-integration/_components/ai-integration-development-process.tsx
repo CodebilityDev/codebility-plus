@@ -1,5 +1,5 @@
 import Section from "../../_components/marketing-section"
-import ProcessCard from "./ProcessCard"
+import ProcessCard from "./ai-integration-process-card"
 import { developmentProcessData } from "./data"
 
 const DevelopmentProcess = () => {
