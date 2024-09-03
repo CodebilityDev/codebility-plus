@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Pagination, PaginationNext, PaginationPrevious } from "@/Components/ui/pagination/pagination"
 import { PaginationContent, PaginationItem, PaginationLink } from "@/Components/ui/pagination/pagination"
 import { Task } from "@/types/home/task";
-import TaskCard from "./TaskCard";
+import TaskCard from "./task-card";
 
 interface Props {
     tasks: Task[];
