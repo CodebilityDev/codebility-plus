@@ -21,3 +21,42 @@ export const connectUsData: footer_ConnectUsSocialsT[] = [
   { id: "2", href: "https://www.linkedin.com/company/codebilitytech", icon: IconLinkedInWhite },
   { id: "3", href: "https://discord.gg/xhxumQ2dgF", icon: IconDiscord },
 ]
+
+export const FeaturedSectiondata = [
+  {
+    title: "Learn Together",
+    description: "Access workshops, tutorials, and mentorship. Enhance your skills with support from peers and experts.",
+    src: "/assets/svgs/icon-graduation-hat-teal.svg",
+    alt: "graduation hat",
+  },
+  {
+    title: "Collaborate",
+    description: "Work on exciting projects. Build your portfolio and solve real-world problems with fellow innovators.",
+    src: "/assets/svgs/icon-team-teal.svg",
+    alt: "team",
+  },
+  {
+    title: "Innovate",
+    description: "Explore new ideas and technologies. Contribute to groundbreaking projects and push the boundaries of what's possible.",
+    src: "/assets/svgs/icon-skills.svg",
+    alt: "skills",
+  },
+  {
+    title: "Join Us",
+    description: "Become part of a dynamic community of future developers and designers. ",
+    src: "/assets/svgs/icon-community-teal.svg",
+    alt: "community",
+  },
+  {
+    title: "Shape the Future",
+    description: "Be part of a community shaping the future of tech. Together, we're driving tomorrow's breakthroughs.",
+    src: "/assets/svgs/icon-suitcase-teal.svg",
+    alt: "suitcase",
+  },
+  {
+    title: "Inspire",
+    description: "Motivate and be motivated. Share your journey and learn from the experiences of others.",
+    src: "/assets/svgs/icon-diamond-teal.svg",
+    alt: "diamond",
+  },
+]
