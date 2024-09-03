@@ -17,7 +17,7 @@ import { deleteTask, updateTask } from "../../actions"
 import { Task } from "@/types/home/task"
 import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog"
 import KanbanAddModalMembers from "./kanban-add-modal-members"
-import { getTaskMembers } from "../../_lib/get-task-members"
+import { getTaskMembers } from "../../../../_lib/get-task-members"
 import { useRouter } from "next/navigation"
 
 
