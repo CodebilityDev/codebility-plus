@@ -1,5 +1,13 @@
 import { User } from "./user";
 
+interface WorkExperience {
+    position: string;
+    company: string;
+    date_from: string;
+    date_to: string;
+    description: string;
+}
+
 export interface Codev {
     id: string;
     email: string;
@@ -14,13 +22,15 @@ export interface Codev {
     socials: Record<string, string | null>;
     main_position: string;
     internal_status: InternalStatus;
-    projects: Project[];
     tech_stacks: string[];
     nda_status: string;
     job_status: string;
     portfolio_website: string;
-
-    user?: User; // for relational data type
+    
+    // for relational data type
+    user?: User;
+    projects: Project[];
+    work_experience?: WorkExperience;
 }
   
 export interface Project {
