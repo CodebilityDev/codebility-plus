@@ -1,10 +1,10 @@
-import Image, { StaticImageData } from "next/image"
+import Image from "next/image"
 import { Service } from "../_types/service"
 interface Props {
   service: Service;
 }
 
-const ServiceCard = ({ service }: Props) => {
+export default function ServiceCard({ service }: Props) {
   const { name, main_image_url, description} = service;
 
   return (
@@ -24,5 +24,3 @@ const ServiceCard = ({ service }: Props) => {
     </div>
   )
 }
-
-export default ServiceCard
