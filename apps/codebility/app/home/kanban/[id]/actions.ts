@@ -182,14 +182,7 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
 
 export const deleteTask = async (taskId: string) => {
     const supabase = getSupabaseServerActionClient();
-
-    const { error: removeTaskOnHandError } = await supabase.from("codev")
-    .update({
-        task_on_hand_id: null
-    }).eq("task_on_hand_id", taskId);
-
-    if (removeTaskOnHandError) throw removeTaskOnHandError;
-
+    
     const { error: deleteCodevTask } = await supabase.from("codev_task")
     .delete()
     .eq("task_id", taskId);
