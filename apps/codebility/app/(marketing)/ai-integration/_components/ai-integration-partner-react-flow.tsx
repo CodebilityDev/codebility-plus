@@ -1,12 +1,12 @@
 "use client"
 
 import ReactFlow, { Background, useNodesState, useEdgesState } from "reactflow"
-import { PartnerInitialNodes, PartnerInitialEdges } from "@/app/(marketing)/ai-integration/components/data"
-import { PartnerTitle, PartnerCard } from "@/app/(marketing)/ai-integration/components/NodeTypes"
-import { CustomEdge } from "@/app/(marketing)/ai-integration/components/EdgeTypes"
+import { PartnerInitialNodes, PartnerInitialEdges } from "@/app/(marketing)/ai-integration/_components/data"
+import { PartnerTitle, PartnerCard } from "@/app/(marketing)/ai-integration/_components/ai-integration-node-types"
+import { CustomEdge } from "@/app/(marketing)/ai-integration/_components/ai-integration-edge-types"
 import "reactflow/dist/style.css"
 import "@/app/(marketing)/ai-integration/components/index.css"
-import GradientBackgroundWhite from "@/app/(marketing)/ai-integration/components/GradientBackgroundWhite"
+import GradientBackgroundWhite from "@/app/(marketing)/ai-integration/_components/ai-integration-gradient-bg-white"
 
 const nodeTypes = {
   partnerTitle: PartnerTitle,
