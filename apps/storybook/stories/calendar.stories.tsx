@@ -35,6 +35,9 @@ export const Default: Story = {
   args: {
     showOutsideDays: true,
     className: "rounded-md border w-fit",
+    classNames: {
+      day_selected: "bg-black-100 text-white",
+    },
     mode: "single",
     onSelect: (date) => console.log(date),
     selected: new Date(),
@@ -45,6 +48,9 @@ export const Multiple: Story = {
   args: {
     showOutsideDays: true,
     className: "rounded-md border w-fit",
+    classNames: {
+      day_selected: "bg-black-100 text-white",
+    },
     min: 1,
     mode: "multiple",
     onSelect: (date) => console.log(date),
