@@ -1,6 +1,6 @@
 import Section from "../../_components/marketing-section"
-import ProcessCard from "../../ai-integration/components/ProcessCard"
-import { developmentProcessData } from "../../ai-integration/components/data"
+import ProcessCard from "./ProcessCard"
+import { developmentProcessData } from "./data"
 
 const DevelopmentProcess = () => {
   return (

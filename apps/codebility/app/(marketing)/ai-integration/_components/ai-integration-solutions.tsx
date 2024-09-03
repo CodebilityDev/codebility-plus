@@ -1,7 +1,7 @@
 import Image from "next/image"
 import Section from "../../_components/marketing-section"
 import Container from "../../_components/marketing-container"
-import GradientBackgroundWhite from "../../ai-integration/components/GradientBackgroundWhite"
+import GradientBackgroundWhite from "./ai-integration-gradient-bg-white"
 
 const AISolutions = () => {
   return (
