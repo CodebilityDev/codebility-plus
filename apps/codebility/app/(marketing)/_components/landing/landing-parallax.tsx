@@ -1,4 +1,4 @@
-import { services } from "@/app/(marketing)/_components/landing/data"
+import { services } from "../../_lib/dummy-data"
 import Diamond from "@/app/(marketing)/_components/landing/landing-diamond"
 import Marquee from "@/app/(marketing)/_components/landing/landing-marquee"
 

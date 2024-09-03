@@ -124,3 +124,37 @@ export const MarketingCardData = [
     url: "/services#product-design",
   },
 ]
+
+export const services = [
+  {
+    id: "1",
+    title: "Mobile Development",
+    starColor: "violet",
+  },
+  {
+    id: "2",
+    title: "Digital Marketing",
+    starColor: "teal",
+  },
+  {
+    id: "3",
+    title: "UI/UX Design",
+    starColor: "violet",
+  },
+  {
+    id: "4",
+    title: "AI-Development",
+    starColor: "teal",
+  },
+  {
+    id: "5",
+    title: "Web Development",
+    starColor: "violet",
+  },
+  {
+    id: "6",
+    title: "Mobile Development",
+    starColor: "teal",
+  },
+]
+
