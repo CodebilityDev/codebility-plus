@@ -154,7 +154,6 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
         const removed = !newMembersId.includes(prevMemberId as string);
         
         if (added && newMemberId) {
-            console.log("add new ",newMemberId);
             const { error } = await supabase.from("codev_task")
             .insert({
                 codev_id: newMemberId,
@@ -162,7 +161,6 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
             });
 
             if (error) throw error;
-            return;
         }
 
         if (removed && prevMemberId) {
@@ -174,7 +172,6 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
             });
 
             if (error) throw error;
-            return;
         }
         
         i++;
