@@ -1,10 +1,7 @@
 import Image from "next/image"
 import { useModal } from "@/hooks/use-modal"
-
 import Box from "@/Components/shared/dashboard/Box"
 import { Paragraph } from "@/Components/shared/home"
-import { TaskT } from "@/types/index"
-import useAuth from "@/hooks/use-auth"
 import { Task } from "@/types/home/task"
 import useUser from "../../_hooks/use-user"
 
@@ -22,6 +19,7 @@ export default function TaskCard ({ task }: { task: Task }) {
     points,
     duration,
     description,
+    project,
     created_at 
   } = task
 
@@ -64,7 +62,7 @@ export default function TaskCard ({ task }: { task: Task }) {
    {/*          <p className="text-sm">{subheader}</p> */}
             <Paragraph>{description}</Paragraph>
             <div className="flex items-center gap-2 text-xs text-gray">
-              Project: <p className="text-sm uppercase text-dark-100 dark:text-white">{/* projects.project_name */}</p>
+              Project: <p className="text-sm uppercase text-dark-100 dark:text-white">{project?.name}</p>
             </div>
             <div className="mt-1 flex items-center gap-2 text-xs text-gray">
               Duration Hours: <p className="text-sm uppercase text-dark-100 dark:text-white">{duration}</p>
@@ -77,7 +75,7 @@ export default function TaskCard ({ task }: { task: Task }) {
             </div>
             <div className="mt-1 flex items-center gap-2 text-xs text-gray">
               You are the assignee:{" "}
-              <p className="text-sm uppercase text-dark-100 dark:text-white">{user.first_name}</p>
+              <p className="text-sm uppercase text-dark-100 dark:text-white">{user.first_name} {user.last_name}</p>
             </div>
 
             {/* <div className="mt-1 items-center gap-2 text-xs text-gray">
