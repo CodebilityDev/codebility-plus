@@ -115,7 +115,7 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
         description,
         pr_link
     } = castType(formData, CastInstruction);
-    
+
     const supabase = getSupabaseServerActionClient();
 
     const { error } = await supabase.from("task")
@@ -132,6 +132,53 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
     .eq("id", prevTask.id)
 
     if (error) throw new Error(error.message); 
+
+    const newMembersId = (formData.get("membersId") ? formData.get("membersId")?.toString().split(","): []) as string[];
+    const prevMembersId = prevTask.codev_task.map((codev_task) => codev_task.codev.id); // get previous task members id as array of string.
+
+    let i = 0;
+    while (newMembersId[i] || prevMembersId[i]) { // while there are still member id we can loop to.
+        const newMemberId = newMembersId[i];
+        const prevMemberId = prevMembersId[i];
+
+        // if the prev and new id are the same, we wont make any update.
+        if (newMemberId === prevMemberId) {
+            i++;
+            continue;
+        }
+
+        // if member is not in previous member, but in new member.
+        const added = !prevMembersId.includes(newMemberId as string);
+
+        // if member is in previous member, but in not new member.
+        const removed = !newMembersId.includes(prevMemberId as string);
+        
+        if (added && newMemberId) {
+            console.log("add new ",newMemberId);
+            const { error } = await supabase.from("codev_task")
+            .insert({
+                codev_id: newMemberId,
+                task_id: prevTask.id
+            });
+
+            if (error) throw error;
+            return;
+        }
+
+        if (removed && prevMemberId) {
+            const { error } = await supabase.from("codev_task")
+            .delete()
+            .match({
+                codev_id: prevMemberId,
+                task_id: prevTask.id
+            });
+
+            if (error) throw error;
+            return;
+        }
+        
+        i++;
+    }
 }
 
 
