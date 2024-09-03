@@ -10,7 +10,7 @@ import HeroBackground from "./components/HeroBackground"
 import PartnerReactFlow from "./components/PartnerReactFlow"
 import DevelopmentProcessReactFLow from "./components/DevelopmentProcessReactFLow"
 import LatestTech from "./components/LatestTech"
-import SideNavMenu from "../index/components/SideNavMenu" 
+import SideNavMenu from "../_components/marketing-sidenav-menu" 
 
 const AiIntegration = () => {
   return (
