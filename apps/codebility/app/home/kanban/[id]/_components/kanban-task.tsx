@@ -1,6 +1,6 @@
 import { CSS } from "@dnd-kit/utilities"
 import { useSortable } from "@dnd-kit/sortable"
-import { IconPriority1 } from "@/public/assets/svgs"
+import { IconPriority1, IconPriority2, IconPriority3, IconPriority4, IconPriority5 } from "@/public/assets/svgs"
 import defautlAvatar from "@/public/assets/images/default-avatar-200x200.jpg"
 import Image from "next/image"
 import { Task } from "@/types/home/task"
@@ -25,6 +25,16 @@ function KanbanTask({ task }: Props) {
     transform: CSS.Transform.toString(transform),
   }
 
+  const PriorityIconMap = {
+    CRITICAL: IconPriority1,
+    HIGHEST: IconPriority2,
+    HIGH: IconPriority3,
+    MEDIUM: IconPriority4,
+    LOW: IconPriority5
+  };
+
+  const PriorityIcon = PriorityIconMap[task.priority_level as keyof typeof PriorityIconMap];
+
   if (isDragging) {
     return (
       <div
@@ -34,7 +44,7 @@ function KanbanTask({ task }: Props) {
       >
         <div className="flex justify-between">
           {task.title}
-          <IconPriority1 />
+          {<PriorityIcon />}
         </div>
         <div className="flex">#{task.number.toString().padStart(2,"0")}</div>
       </div>
@@ -54,7 +64,7 @@ function KanbanTask({ task }: Props) {
       >
           <div className="flex justify-between text-xs">
             {task.title}
-            <IconPriority1 />
+            {<PriorityIcon />}
           </div>
           <div className="relative">
             <div className="float-left flex flex-wrap gap-3 text-sm">#{task.number.toString().padStart(2,"0")}</div>
