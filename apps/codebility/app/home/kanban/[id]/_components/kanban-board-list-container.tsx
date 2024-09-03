@@ -15,7 +15,7 @@ import KanbanColumnContainer from "./kanban-column-container"
 import { BoardTask, List } from "../_types/board"
 import { arrayMove } from "@dnd-kit/sortable"
 import KanbanTaskOverlayWrapper from "./kanban-task-overlay-wrapper"
-import { updateTaskListId } from "../actions"
+import { updateTaskListId, updateTasksQueue } from "../actions"
 import toast from "react-hot-toast"
 
 interface Props {
@@ -26,6 +26,7 @@ interface Props {
 export default function KanbanBoardListContainer({ lists, projectId }: Props) {
   const scrollableDiv = useRef<HTMLDivElement>(null)
   const [tasks, setTasks] = useState<BoardTask[]>([]);
+  const [isQueueChanged, setIsQueueChanged] = useState(false); // detect whether task queue changed.
   const [isLoading, setIsLoading] = useState(true);
 
   // we add loading to wait for drag and drop events be registered correctly. 
@@ -34,7 +35,7 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
       const tasks = list.task.map((task) => {
         task.initial_list_id = task.list_id;
         return task;
-      })
+      }).sort((a,b) => a.row_queue - b.row_queue);  
       if (Array.isArray(list.task)) total.push(...tasks);
       return total;
     }, []));
@@ -76,8 +77,19 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
           toast.error(e.message);
         }
       }
+
+      if (!isQueueChanged) return;
+
+      try {
+        await updateTasksQueue(tasks);
+        setIsQueueChanged(false); // reset changes detector
+      } catch (e:any) {
+        toast.error(e.message);
+      }
+      
     },
     [tasks]
+
   )
 
   const onDragOver = useCallback((event: DragOverEvent) => {
@@ -114,6 +126,8 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
 
         return arrayMove(tasks, activeIndex, overIndex)
       })
+
+      setIsQueueChanged(true);
     }
 
 
@@ -130,8 +144,10 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
         }
         return arrayMove(tasks, activeIndex, activeIndex)
       })
+      setIsQueueChanged(true);
     }
   }, [])
+
   return (
     <div className="overflow-x-auto overflow-y-hidden " ref={scrollableDiv}>
       {!isLoading ?
