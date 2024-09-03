@@ -1,10 +1,10 @@
-"use server";
+import "server-only";
 
 import { Codev, Project } from "@/types/home/codev";
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 export const getCodevs = async (): Promise<{ error: any, data: Codev[] | null}> => {
-    const supabase = getSupabaseServerActionClient();
+    const supabase = getSupabaseServerComponentClient();
     const { data: codevs, error } = await supabase.from("codev")
     .select(`
       *,
@@ -23,7 +23,7 @@ export const getCodevs = async (): Promise<{ error: any, data: Codev[] | null}> 
     `)
     .eq("type", "INHOUSE");
     
-    if (error) return { error, data: null } ;
+    if (error) return { error, data: null };
       
     const codevProjects = await Promise.all(codevs.map(async (codev: Codev) => { // await for all the promises.
       const { data: codevProject } = await supabase.from("codev_project")
