@@ -1,5 +1,5 @@
 import Container from "../../_components/marketing-container"
-import SideNavMenu from "@/app/(marketing)/index/components/SideNavMenu"
+import SideNavMenu from "@/app/(marketing)/_components/marketing-sidenav-menu"
 
 const Hero = () => {
   return (
