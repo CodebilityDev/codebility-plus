@@ -4,7 +4,7 @@ import { projects } from "@/constants"
 import { H2, SectionWrapper } from "@/Components/shared/home"
 import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer"
 import { Carousel, CarouselPrevious } from "@/Components/ui/carousel/carousel"
-import FeaturedProjectCard from "@/app/(marketing)/codevs/_components/codevs-featured-project-card"
+import FeaturedProjectCard from "./codevs-featured-project-card"
 import { CarouselContent, CarouselItem, CarouselNext } from "@/Components/ui/carousel/carousel"
 
 const FeaturedProjects = () => {

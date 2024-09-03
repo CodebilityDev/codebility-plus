@@ -3,7 +3,7 @@ import { motion } from "framer-motion"
 import H2 from "@/Components/shared/home/H2"
 import SectionWrapper from "@/Components/shared/home/SectionWrapper"
 import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer"
-import WhyChooseItem from "@/app/(marketing)/codevs/_components/coves-why-choose-item"
+import WhyChooseItem from "./coves-why-choose-item"
 
 const WhyChooseUs = () => {
   return (
