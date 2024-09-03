@@ -76,7 +76,8 @@ export const updateTaskListId = async (taskId: string, newListId: string) => {
 
     const { data, error } = await supabase.from("task")
     .update({
-        list_id: newListId
+        list_id: newListId,
+        updated_at: new Date()
     })
     .eq("id", taskId)
     .select(`
@@ -127,7 +128,8 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
         priority_level: priority,
         type,
         description,
-        pr_link
+        pr_link,
+        updated_at: new Date()
     })
     .eq("id", prevTask.id)
 

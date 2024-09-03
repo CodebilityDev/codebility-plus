@@ -46,6 +46,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
 
       await updateTask(formData, task);
       toast.success("Update Success!");
+      setIsEditing(false);
       router.refresh();
     } catch (e: any) {
       toast.error(e.message);
