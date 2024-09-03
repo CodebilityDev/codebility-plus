@@ -17,4 +17,5 @@ export interface List {
 
 export interface BoardTask extends Task {
     initial_list_id?: string;
+    row_queue: number;
 }
