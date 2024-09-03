@@ -1,13 +1,11 @@
-"use client"
-
 import React from "react"
 import Footer from "../_components/marketing-footer"
 import Container from "../_components/marketing-container"
-import { InlineWidget } from "react-calendly"
 import Navigation from "../_components/marketing-navigation"
 import SideNavMenu from "../_components/marketing-sidenav-menu"
+import BookACallCalendlyWidgetContainer from "./_components/bookacall-calendly-widget-container"
 
-export default function Page() {
+export default function BookCallPage() {
   return (
     <div
       className={`relative flex min-h-screen w-full flex-col items-center overflow-x-hidden overflow-y-hidden bg-black-400`}
@@ -22,9 +20,7 @@ export default function Page() {
           <p> to discuss your needs and find tailored solutions.</p>
         </div>
 
-        <div className="calendly-widget-container w-full justify-center">
-          <InlineWidget url="https://calendly.com/codebility-dev/30min" />
-        </div>
+        <BookACallCalendlyWidgetContainer />
       </Container>
       <div
         aria-hidden="true"
