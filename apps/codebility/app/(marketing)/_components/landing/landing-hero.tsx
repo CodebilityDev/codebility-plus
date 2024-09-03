@@ -1,13 +1,13 @@
 import Link from "next/link"
 import Image from "next/image"
 
-import HeroCard from "./HeroCard"
-import Container from "../../_components/marketing-container"
+import HeroCard from "./landing-hero-card"
+import Container from "../marketing-container"
 
 import { MarketingCardData } from "./data"
-import HeroBackground from "./HeroBackground"
+import HeroBackground from "./landing-hero-bg"
 import { Button } from "@/Components/ui/button"
-import SideNavMenu from "./SideNavMenu"
+import SideNavMenu from "./landing-sidenav-menu"
 
 const Hero = () => {
   return (

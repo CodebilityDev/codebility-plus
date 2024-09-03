@@ -1,7 +1,7 @@
 import Image from "next/image"
 
-import Section from "../../_components/marketing-section"
-import Container from "../../_components/marketing-container"
+import Section from "../marketing-section"
+import Container from "../marketing-container"
 
 const WhyChooseUs = () => {
   return (

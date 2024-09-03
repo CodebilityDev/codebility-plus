@@ -1,7 +1,7 @@
 import React from "react"
 
-import { ServicesCardData } from "@/app/(marketing)/index/components/data"
-import ServicesCard from "@/app/(marketing)/index/components/ServicesCard"
+import { ServicesCardData } from "@/app/(marketing)/_components/landing/data"
+import ServicesCard from "@/app/(marketing)/_components/landing/landing-services-card"
 import { Button } from "@/Components/ui/button"
 
 const Services = () => {

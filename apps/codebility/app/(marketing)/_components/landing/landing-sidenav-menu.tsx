@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react"
 import Link from "next/link"
-import ScrollToHash from "@/app/(marketing)/index/components/ScrollToHash"
+import ScrollToHash from "@/app/(marketing)/_components/landing/landing-scroll-to-hash"
 
 const links = [
   { href: "/services", label: "Our Services" },

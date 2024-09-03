@@ -4,8 +4,8 @@ import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import getRandomColor from "@/lib/getRandomColor"
 
-import BlueBg from "@/app/(marketing)/index/components/BlueBg" 
-import AdminCard from "@/app/(marketing)/index/components/AdminCard"
+import BlueBg from "@/app/(marketing)/_components/landing/landing-blue-bg" 
+import AdminCard from "@/app/(marketing)/_components/landing/landing-admin-card"
 import { User } from "@/types"
 import { getAllAdmin } from "@/app/api"
 

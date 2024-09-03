@@ -1,6 +1,6 @@
-import { services } from "@/app/(marketing)/index/components/data"
-import Diamond from "@/app/(marketing)/index/components/Diamond"
-import Marquee from "@/app/(marketing)/index/components/Marquee"
+import { services } from "@/app/(marketing)/_components/landing/data"
+import Diamond from "@/app/(marketing)/_components/landing/landing-diamond"
+import Marquee from "@/app/(marketing)/_components/landing/landing-marquee"
 
 const Parallax = () => {
   return (
