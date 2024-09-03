@@ -5,7 +5,7 @@ import { Rowdies } from "next/font/google"
 import { Button } from "@/Components/ui/button"
 import useAuth from "@/hooks/use-auth"
 import OrbitingCirclesBackground from "@/app/(marketing)/codevs/components/OrbitingCirclesBackground"
-import SideNavMenu from "@/app/(marketing)/index/components/SideNavMenu"
+import SideNavMenu from "@/app/(marketing)/_components/marketing-sidenav-menu"
 
 const rowdies = Rowdies({
   weight: "300",
