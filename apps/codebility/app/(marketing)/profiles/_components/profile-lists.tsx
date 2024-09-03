@@ -2,12 +2,12 @@ import { useEffect, useState } from "react"
 
 import { User } from "@/types"
 import { pageSize } from "@/constants"
-import ProfileCard from "@/app/(marketing)/profiles/ProfileCard"
+import ProfileCard from "@/app/(marketing)/profiles/_components/profile-card"
 import usePagination from "@/hooks/use-pagination"
 import getRandomColor from "@/lib/getRandomColor"
 import DefaultPagination from "@/Components/ui/pagination"
 import { getAllCodevs } from "@/app/api"
-import ProfileListsFilter from "@/app/(marketing)/profiles/ProfileListsFilter"
+import ProfileListsFilter from "@/app/(marketing)/profiles/_components/profile-lists-filter"
 
 const ProfileLists = () => {
   const [users, setUsers] = useState<User[]>([])
