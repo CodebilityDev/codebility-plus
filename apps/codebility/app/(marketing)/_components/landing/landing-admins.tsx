@@ -1,30 +1,19 @@
-"use client"
-
 import React from "react"
-import { useQuery } from "@tanstack/react-query"
 import getRandomColor from "@/lib/getRandomColor"
-
-import BlueBg from "@/app/(marketing)/_components/landing/landing-blue-bg" 
-import AdminCard from "@/app/(marketing)/_components/landing/landing-admin-card"
+import BlueBg from "./landing-blue-bg" 
+import AdminCard from "./landing-admin-card"
 import { User } from "@/types"
-import { getAllAdmin } from "@/app/api"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 
-const Admins = () => {
-  const {
-    data: admins,
-    isLoading,
-    isError,
-  } = useQuery({
-    queryKey: ["admin"],
-    queryFn: async () => {
-      return await getAllAdmin()
-    },
-    refetchInterval: 3000,
-  })
+export default async function Admins() {
+  const supabase = getSupabaseServerComponentClient();
+  const { data, error } = await supabase.from("user")
+  .select(`
+    *,
+    profile(*)
+  `);
 
-  if (!admins || isLoading || isError) {
-    return
-  }
+  if (error) return <div>ERROR</div>
 
   return (
     <section id="admins" className="relative w-full pt-10 text-light-900">
@@ -37,14 +26,12 @@ const Admins = () => {
           </p>
           <BlueBg className="h-[300px] w-full max-w-[1200px] lg:top-[45%]" />
           <div className="grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4">
-            {admins.map((admin: { admin: User; color: string }["admin"]) => (
+           {/*  {admins.map((admin: { admin: User; color: string }["admin"]) => (
               <AdminCard color={getRandomColor() || ""} key={admin.id} admin={admin} />
-            ))}
+            ))} */}
           </div>
         </div>
       </div>
     </section>
   )
 }
-
-export default Admins
