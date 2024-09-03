@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { UnparallelCardProps } from "@/app/(marketing)/ai-integration/components/index"
+import { UnparallelCardProps } from "@/app/(marketing)/ai-integration/_components/index"
 
 const UnparallelCard = ({ title, description, image }: UnparallelCardProps) => {
   return (
