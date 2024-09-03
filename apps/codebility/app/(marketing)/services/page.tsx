@@ -2,7 +2,7 @@ import Footer from "../_components/marketing-footer"
 import Hero from "./components/Hero"
 import Navigation from "../_components/marketing-navigation"
 import { PoppinFont } from "../_lib/font"
-import Calendly from "@/app/(marketing)/index/components/Calendly"
+import Calendly from "../_components/marketing-calendly"
 import ServicesTab from "./components/ServicesTab"
 
 const Services = () => {
