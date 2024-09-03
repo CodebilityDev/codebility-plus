@@ -32,6 +32,31 @@ export const uploadImage = async (file: File | null, folderName: string, bucketN
     return data.path;
 };
 
+export const deleteImage = async (path: string) => {
+    try {
+        const filePath = path.replace("public/", "");
+        if (!filePath) {
+            throw new Error("File path could not be extracted from URL");
+        }
+
+        const supabase = await createServer();
+        const { error } = await supabase.storage
+            .from("services-image")
+            .remove([`public/${filePath}`]);
+
+        if (error) {
+            console.error("Error deleting image:", error.message);
+            return { success: false, error: error.message };
+        }
+
+        console.log("Image deleted successfully");
+        return { success: true };
+    } catch (error) {
+        console.error("Error deleting image:", error);
+        return { success: false, error: error };
+    }
+};
+
 export const createServiceAction = async (formData: FormData) => {
     const name = formData.get("name") as string;
     const category = formData.get("category") as string;
@@ -79,20 +104,57 @@ export const updateServiceAction = async (formData: FormData) => {
     const name = formData.get("name") as string;
     const category = formData.get("category") as string;
     const description = formData.get("description") as string;
-    const mainImage = formData.get("mainImage") as string;
-    const picture1 = formData.get("picture1") as string;
-    const picture2 = formData.get("picture2") as string;
+    let mainImage = formData.get("mainImage") as string;
+    let picture1 = formData.get("picture1") as string;
+    let picture2 = formData.get("picture2") as string;
     const userId = formData.get("userId") as string;
 
+    const mainImageFile = formData.get("mainImage") as File | null;
+    const picture1File = formData.get("picture1") as File | null;
+    const picture2File = formData.get("picture2") as File | null;
+
     const supabase = await createServer();
-    const { error } = await supabase.from("services").update({ name, description, category, mainImage, picture1, picture2, userId }).eq("id", id);
+
+    if (mainImageFile instanceof File) {
+        if (mainImage) await deleteImage(mainImage);
+        const uploadedMainImage = await uploadImage(mainImageFile, "public", "services-image");
+        mainImage = uploadedMainImage ?? '';
+    }
+
+    if (picture1File instanceof File) {
+        if (picture1) await deleteImage(picture1);
+        const uploadedPicture1 = await uploadImage(picture1File, "public", "services-image");
+        picture1 = uploadedPicture1 ?? '';
+    }
+
+    if (picture2File instanceof File) {
+        if (picture2) await deleteImage(picture2);
+        const uploadedPicture2 = await uploadImage(picture2File, "public", "services-image");
+        picture2 = uploadedPicture2 ?? '';
+    }
+
+    const updateData: any = { 
+        name, 
+        description, 
+        category, 
+        userId 
+    };
+
+    if (mainImage) updateData.mainImage = mainImage;
+    if (picture1) updateData.picture1 = picture1;
+    if (picture2) updateData.picture2 = picture2;
+
+    const { error } = await supabase
+        .from("services")
+        .update(updateData)
+        .eq("id", id);
 
     if (error) {
-        console.log("error updating service: ", error.message);
+        console.error("Error updating service:", error.message);
         return { success: false, error: error.message };
     }
 
-	revalidatePath("/");
+    revalidatePath("/");
     return { success: true };
 };
 
@@ -112,22 +174,9 @@ export const deleteServiceAction = async (formData: FormData) => {
         return { success: false, error: serviceError?.message || "Service not found" };
     }
 
-    const imagePaths = [service.mainImage, service.picture1, service.picture2].filter(Boolean);
-
-    const deleteImagePromises = imagePaths.map(async (path) => {
-        const filePath = path.replace("public/", "");
-        const { error: storageError } = await supabase.storage
-            .from("services-image")
-            .remove([`public/${filePath}`]);
-
-        if (storageError) {
-            console.error("Error deleting image:", storageError.message);
-        } else {
-            console.log("Image deleted successfully:", filePath);
-        }
-    });
-
-    await Promise.all(deleteImagePromises);
+    await deleteImage(service.mainImage);
+    await deleteImage(service.picture1);
+    await deleteImage(service.picture2);
 
     const { error: deleteError } = await supabase
         .from("services")
