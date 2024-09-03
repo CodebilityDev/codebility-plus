@@ -1,19 +1,18 @@
-"use client"
-
 import Link from "next/link"
 import { Rowdies } from "next/font/google"
 import { Button } from "@/Components/ui/button"
-import useAuth from "@/hooks/use-auth"
 import OrbitingCirclesBackground from "@/app/(marketing)/codevs/_components/codevs-orbiting-circles-bg"
 import SideNavMenu from "@/app/(marketing)/_components/marketing-sidenav-menu"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 
 const rowdies = Rowdies({
   weight: "300",
   subsets: ["latin"],
 })
 
-const Hero = () => {
-  const { userData } = useAuth()
+export default async function Hero() {
+  const supabase = getSupabaseServerComponentClient();
+  const { data: { user }} = await supabase.auth.getUser();
 
   return (
     <section
@@ -40,9 +39,9 @@ const Hero = () => {
         </div>
         <p className="text-xs md:text-sm lg:text-2xl">Where Diversity Flourishes and Connections Thrive</p>
         <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
-          <Link href={userData ? "/dashboard" : "/auth/signin"}>
+          <Link href={user ? "/dashboard" : "/auth/signin"}>
             <Button variant="purple" size="lg" rounded="full" className="md:w-40">
-              {userData ? "Dashboard" : "Join"}
+              {user ? "Dashboard" : "Join"}
             </Button>
           </Link>
           <Link href="#codevs">
@@ -66,5 +65,3 @@ const Hero = () => {
     </section>
   )
 }
-
-export default Hero
