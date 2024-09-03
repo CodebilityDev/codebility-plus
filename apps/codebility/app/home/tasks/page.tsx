@@ -30,6 +30,13 @@ export default async function TaskPage() {
         *,
         project(
           name
+        ),
+        codev_task(
+          codev(
+            user(
+              profile(*)
+            )
+          )
         )
       )
     )
@@ -42,6 +49,8 @@ export default async function TaskPage() {
   if (data?.codev_task && data.codev_task.length > 0) { 
     // get only the task data of codev.
     tasks = data.codev_task.map(codevTask => codevTask.task);
+
+    console.log(tasks);
   }
 
   return (
