@@ -2,18 +2,14 @@ import React, { useRef } from "react"
 import { profiles_ListFilterT } from "@/types/home"
 import { Button } from "@/Components/ui/button"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
+import { removeArrayDuplicate } from "../../_lib/util"
 
 const ProfileListsFilter: React.FC<profiles_ListFilterT> = ({ selectedPosition, setSelectedPosition, users }) => {
   const selectGroupRef = useRef<HTMLDivElement>(null)
-
-  const removedDuplicatePosition = users
-    .map((user) => user?.main_position)
-    .filter((pos, index, array) => {
-      const posIndex = array.findIndex((p) => pos === p)
-      return index === posIndex
-    }) as string[]
-
-  const removedNullPosition = removedDuplicatePosition.filter((pos) => pos !== null) as string[]
+  
+  const positions = removeArrayDuplicate(
+    users.map((user) => user?.main_position)
+  );
 
   const handleSelectPosition = () => {
     if (selectGroupRef.current) {
@@ -34,7 +30,7 @@ const ProfileListsFilter: React.FC<profiles_ListFilterT> = ({ selectedPosition, 
           </SelectTrigger>
           <SelectContent ref={selectGroupRef} className="relative rounded-xl bg-dark-300 text-white">
             <SelectGroup className="mt-12">
-              {removedNullPosition.map((position, i) => (
+              {positions.map((position, i) => (
                 <SelectItem key={i} value={position}>
                   {position}
                 </SelectItem>
