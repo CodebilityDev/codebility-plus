@@ -1,5 +1,5 @@
 import { SectionWrapper } from "@/Components/shared/home"
-import { roadmapData } from "./data"
+import { roadmapData } from "../_lib/dummy-data"
 import RoadmapCard from "./codevs-roadmap-card"
 
 const Roadmap = () => {
