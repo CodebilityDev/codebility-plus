@@ -1,7 +1,13 @@
 import Image from "next/image"
-import { UnparallelCardProps } from "@/app/(marketing)/ai-integration/_components/index"
+import { StaticImageData } from "next/image"
 
-const UnparallelCard = ({ title, description, image }: UnparallelCardProps) => {
+interface Props {
+  title: string
+  description: string
+  image: StaticImageData | string
+}
+
+const UnparallelCard = ({ title, description, image }: Props) => {
   return (
     <div className="w-[355px] h-[450px] flex flex-col gap-4 rounded-lg p-4 bg-white/5">
       <div>

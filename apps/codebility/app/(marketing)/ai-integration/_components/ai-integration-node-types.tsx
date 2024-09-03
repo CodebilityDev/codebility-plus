@@ -1,9 +1,9 @@
 import Image from "next/image"
-
-import { ai_NodeTypesT } from "@/types/home"
 import { Handle, NodeProps, Position } from "reactflow"
 
-export const DevProcessCard = ({ data: { id, title, process } }: ai_NodeTypesT) => {
+type Props = NodeProps<{ id: string; title: string; process: string[] }>
+
+export const DevProcessCard = ({ data: { id, title, process } }: Props) => {
   return (
     <>
       <div className="m-2 flex flex-col gap-3 text-white">
