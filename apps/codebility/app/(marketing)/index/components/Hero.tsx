@@ -1,13 +1,13 @@
 import Link from "next/link"
 import Image from "next/image"
 
-import HeroCard from "@/app/(marketing)/index/components/HeroCard"
-import Container from "@/app/(marketing)/Container"
+import HeroCard from "./HeroCard"
+import Container from "../../_components/marketing-container"
 
-import { MarketingCardData } from "@/app/(marketing)/index/components/data"
-import HeroBackground from "@/app/(marketing)/index/components/HeroBackground"
+import { MarketingCardData } from "./data"
+import HeroBackground from "./HeroBackground"
 import { Button } from "@/Components/ui/button"
-import SideNavMenu from "@/app/(marketing)/index/components/SideNavMenu"
+import SideNavMenu from "./SideNavMenu"
 
 const Hero = () => {
   return (

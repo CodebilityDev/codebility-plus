@@ -3,13 +3,13 @@
 import { pageSize } from "@/constants"
 import { useEffect, useState } from "react"
 
-import ServiceCard from "@/app/(marketing)/services/components/ServiceCard"
+import ServiceCard from "./ServiceCard"
 import usePagination from "@/hooks/use-pagination"
-import { servicesData, servicesTabs } from "@/app/(marketing)/services/components/data"
+import { servicesData, servicesTabs } from "./data"
 import { services_ServiceCardT } from "@/types/home"
 import DefaultPagination from "@/Components/ui/pagination"
-import Container from "@/app/(marketing)/Container"
-import Section from "@/app/(marketing)/Section"
+import Container from "../../_components/marketing-container"
+import Section from "../../_components/marketing-section"
 
 const ServicesTab = () => {
   const [services, setServices] = useState<services_ServiceCardT[]>([])

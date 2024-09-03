@@ -1,6 +1,6 @@
-import Section from "@/app/(marketing)/Section"
-import { partnerData } from "@/app/(marketing)/ai-integration/components/data"
-import PartnerCard from "@/app/(marketing)/ai-integration/components/PartnerCard"
+import Section from "../../_components/marketing-section"
+import { partnerData } from "./data"
+import PartnerCard from "./PartnerCard"
 
 const Partner = () => {
   return (

@@ -1,5 +1,5 @@
-import Container from "@/app/(marketing)/Container"
-import Section from "@/app/(marketing)/Section"
+import Container from "../../_components/marketing-container"
+import Section from "../../_components/marketing-section"
 
 const LatestTech = () => {
   return (
