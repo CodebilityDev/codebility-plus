@@ -4,11 +4,12 @@ import SectionWrapper from "@/Components/shared/home/SectionWrapper"
 import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton"
 import ProfileContainer from "./_components/profile-container"
 import { getCodevs } from "@/lib/server/codev.service"
+import { Codev } from "@/types/home/codev"
 
 export default async function Profiles() {
   const { data } = await getCodevs();
 
-  const codevs = data || [];
+  const codevs = data as Codev[] || [];
 
   return (
     <SectionWrapper id="codevs" className="relative w-full bg-gradient-to-b from-black-500">
