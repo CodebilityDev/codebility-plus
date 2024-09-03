@@ -5,6 +5,7 @@ import pathsConfig from "@/config/paths.config"
 import { Board } from "../_types/board"
 import KanbanListAddModal from "./kanban_modals/kanban-list-add-modal"
 import KanbanBoardListContainer from "./kanban-board-list-container"
+import KanbanBoardsSearch from "../../_components/kanban-boards-search"
 
 interface Props {
   boardData: Board;
@@ -30,13 +31,7 @@ const KanbanBoard = ({ boardData }: Props) => {
                 <label htmlFor="kanbanSearch">
                   <IconSearch />
                 </label>
-                <input
-                  className="w-32 bg-transparent outline-none"
-                  type="text"
-                  name="kanbanSearch"
-                  id="kanbanSearch"
-                  placeholder="Search"
-                />
+                <KanbanBoardsSearch className="w-32 bg-transparent outline-none" placeholder="Search"/>
               </div>
               <KanbanListAddModal boardId={boardData.id}/>
             </div>

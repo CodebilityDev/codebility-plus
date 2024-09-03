@@ -49,7 +49,10 @@ export default async function KanbanPage({ searchParams }: {
       <div className="text-dark100_light900 flex max-w-7xl flex-col gap-4">
         <div className="text-dark100_light900 text-md font-semibold md:text-2xl">BOARDS</div>
         <div className="flex flex-col items-end gap-4 md:flex-row md:items-center md:justify-end">
-          <KanbanBoardsSearch />
+          <KanbanBoardsSearch 
+            className="h-10 w-full rounded-full border border-gray border-opacity-50 bg-inherit px-5 text-xs focus:outline-none md:w-80"
+            placeholder="Search Board"
+          />
           <BoardAddModal />
         </div>
         <Table>
