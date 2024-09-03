@@ -199,7 +199,7 @@ export const updateTasksQueue = async (tasks: BoardTask[]) => {
 
         // the total task will tell where this task is placed.
         // since we will use the indexing of the tasks state (in kaban-board-list-container.tsx),
-        // on what index this task will be (so if it we loop to it first before the other task)
+        // on what index this task will be (so if we loop to it first before the other task)
         // it will be in the higher position in queue.
         const { error } = await supabase.from("task")
         .update({
