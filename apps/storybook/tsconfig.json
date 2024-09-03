@@ -21,6 +21,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../packages/ui/src/alert-dialog.tsx", "../../packages/ui/src/avatar.tsx", "../../packages/ui/src/alert.tsx", "../../packages/ui/src/aspect-ratio.tsx", "../../packages/ui/src/calendar.tsx", "../../packages/ui/src/carousel.tsx", "../../packages/ui/src/collapsible.tsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "../../packages/ui/src/alert-dialog.tsx", "../../packages/ui/src/avatar.tsx", "../../packages/ui/src/alert.tsx", "../../packages/ui/src/aspect-ratio.tsx", "../../packages/ui/src/calendar.tsx", "../../packages/ui/src/carousel.tsx", "../../packages/ui/src/collapsible.tsx", "../../packages/ui/src/command.tsx"],
   "exclude": ["node_modules"]
 }
