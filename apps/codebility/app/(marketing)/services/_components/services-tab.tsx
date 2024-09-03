@@ -2,17 +2,21 @@
 
 import { pageSize } from "@/constants"
 import { useEffect, useState } from "react"
-
 import ServiceCard from "./services-service-card"
 import usePagination from "@/hooks/use-pagination"
-import { servicesData, servicesTabs } from "../_lib/dummy-data"
-import { services_ServiceCardT } from "@/types/home"
+/* import { servicesData, servicesTabs } from "../_lib/dummy-data"
+import { services_ServiceCardT } from "@/types/home" */
 import DefaultPagination from "@/Components/ui/pagination"
 import Container from "../../_components/marketing-container"
 import Section from "../../_components/marketing-section"
+import { Service } from "../_types/service"
 
-const ServicesTab = () => {
-  const [services, setServices] = useState<services_ServiceCardT[]>([])
+interface Props {
+  servicesData: Service[];
+}
+
+export default function ServicesTab({ servicesData }: Props) {
+  const [services, setServices] = useState<Service[]>(servicesData)
   const [projectType, setProjectType] = useState("Web Application")
   const [tabPages, setTabPages] = useState<{ [key: string]: number }>({
     "Web Application": 1,
@@ -29,10 +33,10 @@ const ServicesTab = () => {
     setCurrentPage,
   } = usePagination(services, pageSize.services)
 
-  useEffect(() => {
+ /*  useEffect(() => {
     const filteredData = servicesData.filter((service) => service.projectType === projectType)
     setServices(filteredData)
-  }, [projectType])
+  }, [projectType]) */
 
   useEffect(() => {
     setCurrentPage(tabPages[projectType] || 1)
@@ -52,7 +56,7 @@ const ServicesTab = () => {
       <Container className="relative z-10">
         <div className="flex flex-col gap-10  ">
           <div className="mx-auto flex flex-wrap justify-center gap-5 xl:gap-16">
-            {servicesTabs.map((tab) => (
+           {/*  {servicesTabs.map((tab) => (
               <p
                 key={tab.id}
                 onClick={() => handleTabClick(tab.tabNumber, tab.tabName)}
@@ -62,16 +66,14 @@ const ServicesTab = () => {
               >
                 {tab.tabName}
               </p>
-            ))}
+            ))} */}
           </div>
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
             {paginatedServices.map((service) => (
               <ServiceCard
                 key={service.id}
-                projectImage={service.projectImage}
-                projectName={service.projectName}
-                description={service.description}
+                service={service}
               />
             ))}
           </div>
@@ -91,5 +93,3 @@ const ServicesTab = () => {
     </Section>
   )
 }
-
-export default ServicesTab
