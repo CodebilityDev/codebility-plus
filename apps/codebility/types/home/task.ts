@@ -1,4 +1,4 @@
-import { Codev } from "./codev";
+import { Codev, Project } from "./codev";
 
 export interface CodevTask { // table for connecting codevs and task.
     codev: Codev;
@@ -12,12 +12,15 @@ export interface Task {
     points: number;
     number: number;
     priority_level: string;
-    codev?: Codev[];
-    codev_task: CodevTask[];
     list_id: string;
     category: string;
     type: string;
     description: string;
     pr_link: string;
     created_at: string;
+
+    // for relational
+    codev?: Codev[];
+    codev_task: CodevTask[];
+    project?: Project;
 }
