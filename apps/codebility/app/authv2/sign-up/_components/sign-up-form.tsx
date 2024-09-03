@@ -4,7 +4,7 @@ import { Checkbox } from "@codevs/ui/checkbox"
 
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button, buttonVariants } from "@/Components/ui/button"
-import { signupUser } from "../actions"
+import { signupUser } from "../../actions"
 import { useModal } from "@/hooks/use-modal"
 import { useTechStackStore } from "@/hooks/use-techstack"
 import { useSchedule } from "@/hooks/use-timeavail"
@@ -15,7 +15,7 @@ import { useEffect, useState } from "react"
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
 import toast from "react-hot-toast"
 import { z } from "zod"
-import SignUpInputs from "./SignupInputs"
+import SignUpInputs from "./sign-up-input"
 
 type Inputs = z.infer<typeof SignUpValidation>
 interface Field {
