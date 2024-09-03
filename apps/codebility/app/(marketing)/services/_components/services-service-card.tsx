@@ -1,7 +1,13 @@
-import Image from "next/image"
-import { services_ServiceCardT } from "@/types/home"
+import Image, { StaticImageData } from "next/image"
+interface Props {
+  id?: string
+  projectName: string
+  description?: string
+  projectImage?: StaticImageData | string
+  projectType?: string
+}
 
-const ServiceCard = ({ projectName, description, projectImage }: services_ServiceCardT) => {
+const ServiceCard = ({ projectName, description, projectImage }: Props) => {
   return (
     <div className="flex flex-1 flex-col gap-4 rounded-lg border-2 border-light-900/5 bg-light-700/10 p-4 text-white">
       <Image
