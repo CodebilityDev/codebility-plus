@@ -8,14 +8,14 @@ import { Button } from "@/Components/ui/button"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { SignInValidation } from "@/lib/validations/auth"
 
-import SignInInputs from "./SigninInputs"
+import SignInInputs from "./sign-in-input"
 import { useForm } from "react-hook-form"
 
 import toast from "react-hot-toast"
 
 type Inputs = z.infer<typeof SignInValidation>
 
-import { signinUser } from "../actions"
+import { signinUser } from "../../actions"
 import pathsConfig from "@/config/paths.config"
 
 const SignInForm = () => {
