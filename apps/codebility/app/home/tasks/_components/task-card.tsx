@@ -5,17 +5,29 @@ import Box from "@/Components/shared/dashboard/Box"
 import { Paragraph } from "@/Components/shared/home"
 import { TaskT } from "@/types/index"
 import useAuth from "@/hooks/use-auth"
+import { Task } from "@/types/home/task"
+import useUser from "../../_hooks/use-user"
 
-const TaskCard = ({ task }: { task: TaskT }) => {
+interface Props {
+  task: Task;
+}
+
+export default function TaskCard ({ task }: { task: Task }) {
   const { onOpen } = useModal()
+  const user = useUser();
 
-  const { userData } = useAuth()
-
-  const { title, subheader, prio_level, task_points, duration, full_description, projects, created_at } = task
+  const { 
+    title,
+    priority_level,
+    points,
+    duration,
+    description,
+    created_at 
+  } = task
 
   let prioLevel = null
 
-  switch (prio_level.toLowerCase()) {
+  switch (priority_level.toLowerCase()) {
     case "highest":
       prioLevel = 1
       break
@@ -32,7 +44,6 @@ const TaskCard = ({ task }: { task: TaskT }) => {
       prioLevel = 5
   }
 
-  console.log(task)
   return (
     <>
       <Box
@@ -50,23 +61,23 @@ const TaskCard = ({ task }: { task: TaskT }) => {
             />
             <p className="text-lg font-semibold text-violet">#01</p>
             <p>{title}</p>
-            <p className="text-sm">{subheader}</p>
-            <Paragraph>{full_description}</Paragraph>
+   {/*          <p className="text-sm">{subheader}</p> */}
+            <Paragraph>{description}</Paragraph>
             <div className="flex items-center gap-2 text-xs text-gray">
-              Project: <p className="text-sm uppercase text-dark-100 dark:text-white">{projects.project_name}</p>
+              Project: <p className="text-sm uppercase text-dark-100 dark:text-white">{/* projects.project_name */}</p>
             </div>
             <div className="mt-1 flex items-center gap-2 text-xs text-gray">
               Duration Hours: <p className="text-sm uppercase text-dark-100 dark:text-white">{duration}</p>
             </div>
             <div className="mt-1 flex items-center gap-2 text-xs text-gray">
-              Points: <p className="text-sm uppercase text-dark-100 dark:text-white">{task_points}</p>
+              Points: <p className="text-sm uppercase text-dark-100 dark:text-white">{points}</p>
             </div>
             <div className="mt-1 flex items-center gap-2 text-xs text-gray">
               Created at: <p className="text-sm uppercase text-dark-100 dark:text-white">{created_at}</p>
             </div>
             <div className="mt-1 flex items-center gap-2 text-xs text-gray">
               You are the assignee:{" "}
-              <p className="text-sm uppercase text-dark-100 dark:text-white">{userData?.first_name}</p>
+              <p className="text-sm uppercase text-dark-100 dark:text-white">{user.first_name}</p>
             </div>
 
             {/* <div className="mt-1 items-center gap-2 text-xs text-gray">
@@ -77,13 +88,13 @@ const TaskCard = ({ task }: { task: TaskT }) => {
             </div> */}
           </div>
           <div className="mt-1">
-            {/* {tags.map(({ tag }, i) => (
+          {/*   {tags.map(({ tag }, i) => (
               <RenderTag key={i} name={tag} />
-            ))} */}
-            {}
+            ))}
+            {} */}
           </div>
           <div className="mt-1">
-            {/* {tagId.map((id) => (
+          {/*   {tagId.map((id) => (
               <RenderTeam key={id} />
             ))} */}
           </div>
@@ -92,5 +103,3 @@ const TaskCard = ({ task }: { task: TaskT }) => {
     </>
   )
 }
-
-export default TaskCard

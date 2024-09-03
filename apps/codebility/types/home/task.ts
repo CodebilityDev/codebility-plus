@@ -19,4 +19,5 @@ export interface Task {
     type: string;
     description: string;
     pr_link: string;
+    created_at: string;
 }
