@@ -1,5 +1,4 @@
 import { CSS } from "@dnd-kit/utilities"
-import { useModal } from "@/hooks/use-modal"
 import { useSortable } from "@dnd-kit/sortable"
 import { IconPriority1 } from "@/public/assets/svgs"
 import defautlAvatar from "@/public/assets/images/default-avatar-200x200.jpg"
@@ -13,8 +12,6 @@ interface Props {
 }
 
 function KanbanTask({ task }: Props) {
-  const { onOpen } = useModal()
-
   const { setNodeRef, attributes, listeners, transform, transition, isDragging } = useSortable({
     id: task.id,
     data: {
