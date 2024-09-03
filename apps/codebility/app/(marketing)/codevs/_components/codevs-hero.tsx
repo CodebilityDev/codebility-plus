@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Rowdies } from "next/font/google"
 import { Button } from "@/Components/ui/button"
 import useAuth from "@/hooks/use-auth"
-import OrbitingCirclesBackground from "@/app/(marketing)/codevs/components/OrbitingCirclesBackground"
+import OrbitingCirclesBackground from "@/app/(marketing)/codevs/_components/codevs-orbiting-circles-bg"
 import SideNavMenu from "@/app/(marketing)/_components/marketing-sidenav-menu"
 
 const rowdies = Rowdies({

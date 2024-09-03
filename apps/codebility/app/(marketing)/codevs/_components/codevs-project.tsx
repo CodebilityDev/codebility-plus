@@ -1,6 +1,6 @@
 import React from "react"
 import { EmblaOptionsType } from "embla-carousel"
-import EmblaCarousel from "@/app/(marketing)/codevs/components/Carousel"
+import EmblaCarousel from "@/app/(marketing)/codevs/_components/codevs-carousel"
 
 export default function Project() {
   const OPTIONS: EmblaOptionsType = { loop: true }
