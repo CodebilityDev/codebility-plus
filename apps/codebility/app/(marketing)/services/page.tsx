@@ -12,9 +12,6 @@ export default async function ServicesPage() {
   .select();
 
   const services = data || [];
-
-  console.log(services);
-  
   return (
     <div
       className={`relative flex w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303] ${PoppinFont.className}`}
