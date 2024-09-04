@@ -4,21 +4,20 @@ import { MenuIcon } from "lucide-react"
 import { usePathname } from "next/navigation"
 
 import { navLinks } from "@/constants"
-import useAuth from "@/hooks/use-auth"
 import Logo from "@/Components/shared/Logo"
 import { useModal } from "@/hooks/use-modal"
 import { Button } from "@/Components/ui/button"
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize"
 import useChangeBgNavigation from "@/hooks/useChangeBgNavigation"
 import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "@codevs/ui/sheet"
+import useUser from "@/app/home/_hooks/use-user"
 
 const Navbar = () => {
   const { color } = useChangeBgNavigation()
   const { isSheetOpen, setIsSheetOpen } = useHideSidebarOnResize()
   const { onOpen } = useModal()
   const pathname = usePathname()
-  const { userData } = useAuth()
-  const isAuthenticated = userData && userData.id
+  const isAuthenticated = !useUser(); // if there is logged user
 
   return (
     <>
