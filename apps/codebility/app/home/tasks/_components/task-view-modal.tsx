@@ -21,7 +21,7 @@ export default function TaskViewModal({ children, task, taskMembers }: Props) {
         <div className="flex flex-col gap-6">
           <div key={task.id}>
             <div className="relative flex flex-col gap-1">
-              <p className="text-lg font-semibold">{task.title}</p>
+              <p className="text-lg font-semibold text-white">{task.title}</p>
               {/* <p className="text-sm">{task.subheader}</p> */}
               <Paragraph>{task.description}</Paragraph>
               <div className="mt-1 flex items-center gap-2 text-xs text-gray">
@@ -30,15 +30,17 @@ export default function TaskViewModal({ children, task, taskMembers }: Props) {
               <div className="mt-1 flex items-center gap-2 text-xs text-gray">
                 Points: <p className="text-sm uppercase text-dark-100 dark:text-white">{task.points}</p>
               </div>
-              <p className="text-sm">Priority Level: {task.priority_level}</p>
+              <div className="mt-1 flex items-center gap-2 text-xs text-gray">
+                Priority Level: <p className="text-sm uppercase text-dark-100 dark:text-white">{task.priority_level}</p>
+              </div>
             </div>
 
             <div className="flex flex-row justify-between gap-2">
               <div className="flex flex-col gap-1">
-                <p className="text-sm">Members</p>
+                <p className="text-sm text-white">Members</p>
                 <div className="grid grid-cols-3 gap-1 ">
                   {taskMembers.map((member) => (
-                    <RenderTeam key={member.id} imgURL={member.image_url} />
+                    <RenderTeam key={member.id} imgURL={member.image_url && `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${member.image_url}`} />
                   ))}
                 </div>
               </div>
