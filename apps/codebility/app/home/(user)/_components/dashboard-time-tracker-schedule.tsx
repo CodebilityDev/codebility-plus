@@ -28,7 +28,7 @@ export default function TimeTrackerSchedule({ startTime, endTime, codevId }: Pro
       start_time: currentStartTime,
       end_time: currentEndTime
     })
-  }, [startTime, endTime]);
+  }, [startTime, endTime, addTime, currentEndTime, currentStartTime]);
   
   useEffect(() => {
     if (isMounted) {
