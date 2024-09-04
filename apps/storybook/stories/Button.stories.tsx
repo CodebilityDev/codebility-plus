@@ -6,6 +6,9 @@ const meta: Meta<typeof Button> = {
   title: "ShadCN-Atomic/Button",
   component: Button,
   tags: ["autodocs"],
+  parameters: {
+    layout: "centered",
+  },
   argTypes: {
     variant: {
       control: "select",
