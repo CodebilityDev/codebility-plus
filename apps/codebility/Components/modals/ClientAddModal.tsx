@@ -1,104 +1,83 @@
-import * as z from "zod"
-import axios from "axios"
 import Image from "next/image"
 import toast from "react-hot-toast"
-import { ChangeEvent, useEffect, useState } from "react"
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
-
 import { Input } from "@codevs/ui/input"
 import { Button } from "@/Components/ui/button"
-import { API } from "@/lib/constants"
-import useToken from "@/hooks/use-token"
-import { createClient } from "@/app/api/clients"
 import { IconClose } from "@/public/assets/svgs"
 import { useModal } from "@/hooks/use-modal-clients"
 import { DialogTitle } from "@radix-ui/react-dialog"
-import { defaultAvatar } from "@/public/assets/images"
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@codevs/ui/dialog"
-
-const clientSchema = z.object({
-  company_name: z.string().min(1, { message: "Company name is required" }),
-  email: z.string().email("Invalid email address"),
-  location: z.string().min(1, { message: "Location is required" }),
-  contact_number: z.string().min(1, { message: "Contact number is required" }),
-  linkedin_link: z.string().url("Invalid URL"),
-  client_start_time: z.string().min(1, { message: "Start time is required" }),
-  client_end_time: z.string().min(1, { message: "End time is required" }),
-})
-
-type ClientFormValues = z.infer<typeof clientSchema>
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from "../ui/dialog"
+import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema"
+import { createClientAction } from "@/app/home/clients/action"
+import { DEFAULT_AVATAR } from "@/app/home/clients/_lib/constants"
 
 const ClientAddModal = () => {
-  const { token } = useToken()
   const { isOpen, onClose, type } = useModal()
   const isModalOpen = isOpen && type === "clientAddModal"
-  const [isLoading, setIsLoading] = useState(false)
-  const [companyLogo, setCompanyLogo] = useState<string | any>()
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   const {
     register,
     handleSubmit,
     reset,
+    setValue,
     formState: { errors, isValid },
   } = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
     mode: "onChange",
   })
 
-  const handleUploadCompanyLogo = async (ev: ChangeEvent<HTMLInputElement>) => {
-    const file = ev.target.files?.[0]
-
-    if (file) {
-      const formData = new FormData()
-      formData.append("image", file)
-      const response = await axios.post(`${API.USERS}/upload-image`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
-
-      const image_url = response.data.data.image_url
-      setCompanyLogo(image_url)
-    }
-  }
-
-  const handleRemoveCompanyLogo = () => {
-    setCompanyLogo(defaultAvatar.src as string)
-  }
-
   const handleDialogChange = (open: boolean) => {
     if (!open) {
-      reset()
-      setCompanyLogo(defaultAvatar.src as string)
+      reset();
+      setLogoPreview(null); 
     }
-    onClose()
+    onClose();
   }
 
-  useEffect(() => {
-    setCompanyLogo(defaultAvatar.src as string)
-  }, [])
+  const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setValue("logo", file);
+      setLogoPreview(URL.createObjectURL(file));
+    }
+  };
 
-  const ClientAddModal = async (data: ClientFormValues) => {
-    setIsLoading(true)
+  const handleRemoveLogo = () => { 
+    setLogoPreview(null)
+  }
+
+  const handleCreateClient = async (data: ClientFormValues) => { 
+    setIsLoading(true);
 
     try {
-      const response = await createClient(
-        {
-          ...data,
-          company_logo: companyLogo,
-          statusType: "ACTIVE",
-        },
-        token
-      )
-      if (response.status === 201) {
-        handleDialogChange(false)
-        toast.success("New Client has been Added!")
+      const formData = new FormData();
+      formData.append("name", data.name);
+      if (data.email) formData.append("email", data.email);
+      if (data.location) formData.append("location", data.location);
+      if (data.contact_number) formData.append("contact_number", data.contact_number);
+      if (data.linkedin_link) formData.append("linkedin_link", data.linkedin_link);
+      if (data.start_time) formData.append("start_time", data.start_time);
+      if (data.end_time) formData.append("end_time", data.end_time);
+      if (data.logo) formData.append("logo", data.logo as File);
+
+      const response = await createClientAction(formData);
+
+      if (response.success) {
+        toast.success("Client created successfully");
+        handleDialogChange(false);
+      } else {
+        toast.error(`Error: ${response.error}`);
       }
     } catch (error) {
-      toast.error("Something went wrong!")
+      console.log("123: ", error);
+      toast.error("Error creating new client");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
 
@@ -115,13 +94,13 @@ const ClientAddModal = () => {
         </DialogHeader>
 
         <div className="flex flex-col gap-4">
-          <div className="flex justify-center xs:justify-start">
+          <div className="flex justify-center md:justify-start">
             <label className="md:text-md text-sm lg:text-lg">Logo</label>
           </div>
-          <div className="flex flex-col gap-4 xs:flex-row">
-            <div className="relative mx-auto flex size-[100px] xs:mx-0 xs:size-[80px]">
+          <div className="flex flex-col gap-4 md:flex-row">
+            <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
               <Image
-                src={companyLogo}
+                src={logoPreview || DEFAULT_AVATAR}
                 id="image"
                 alt="Avatar"
                 fill
@@ -130,19 +109,29 @@ const ClientAddModal = () => {
             </div>
 
             <div className="flex flex-col justify-center gap-2">
-              <p className="text-md text-gray">Image size 1080 x 768 px</p>
+              <p className="text-md text-gray text-center">Image size 1080 x 768 px</p>
               <div className="gap-4">
                 <div className="relative">
-                  <label htmlFor="companylogo">
-                    {companyLogo === defaultAvatar.src && (
-                      <p className="cursor-pointer text-center text-blue-100 xs:text-left">Upload Image</p>
-                    )}
-                  </label>
-                  <input onChange={handleUploadCompanyLogo} id="companylogo" type="file" className="hidden" />
-                  <input type="hidden" name="avatar" value={companyLogo} />
+                  {!logoPreview && 
+                  <label htmlFor="logo">
+                    <p className="cursor-pointer text-center text-blue-100 md:text-left">
+                      Upload Image
+                    </p>
+                  </label>}
+                  <input
+                    id="logo"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    name="logo"
+                    onChange={handleLogoChange}
+                  />
                 </div>
-                {companyLogo !== defaultAvatar.src && (
-                  <p className="cursor-pointer text-center text-violet xs:text-left" onClick={handleRemoveCompanyLogo}>
+                {logoPreview && (
+                  <p
+                    onClick={handleRemoveLogo}
+                    className="cursor-pointer text-center text-violet md:text-left"
+                  >
                     Remove Image
                   </p>
                 )}
@@ -151,17 +140,19 @@ const ClientAddModal = () => {
           </div>
         </div>
 
-        <form onSubmit={handleSubmit(ClientAddModal)}>
+        <form onSubmit={handleSubmit(handleCreateClient)}>
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="flex flex-1 flex-col gap-4">
               <Input
+                variant="lightgray"
                 label="Name"
                 placeholder="Enter Company Name"
-                {...register("company_name")}
-                className={errors.company_name ? "border border-red-500 focus:outline-none" : ""}
+                {...register("name")}
+                className={errors.name ? "border border-red-500 focus:outline-none" : ""}
               />
-              {errors.company_name && <span className="text-sm text-red-400">{errors.company_name.message}</span>}
+              {errors.name && <span className="text-sm text-red-400">{errors.name.message}</span>}
               <Input
+                variant="lightgray"
                 label="Email"
                 placeholder="Enter Company Email Address"
                 type="email"
@@ -170,6 +161,7 @@ const ClientAddModal = () => {
               />
               {errors.email && <span className="text-sm text-red-400">{errors.email.message}</span>}
               <Input
+                variant="lightgray"
                 label="Address"
                 placeholder="Enter Company Address"
                 {...register("location")}
@@ -179,6 +171,7 @@ const ClientAddModal = () => {
             </div>
             <div className="flex flex-1 flex-col gap-4">
               <Input
+                variant="lightgray"
                 label="Contact Number"
                 placeholder="Enter Company Contact Number"
                 type="number"
@@ -187,6 +180,7 @@ const ClientAddModal = () => {
               />
               {errors.contact_number && <span className="text-sm text-red-400">{errors.contact_number.message}</span>}
               <Input
+                variant="lightgray"
                 label="Linkedin"
                 placeholder="Enter Company Linkedin Link"
                 {...register("linkedin_link")}
@@ -196,26 +190,28 @@ const ClientAddModal = () => {
               <div className="flex flex-col gap-4 lg:flex-row">
                 <div className="w-full">
                   <Input
+                    variant="lightgray"
                     label="Start Time"
                     placeholder="Enter Start Time"
                     type="time"
-                    {...register("client_start_time")}
-                    className={errors.client_start_time ? "border border-red-500 focus:outline-none" : ""}
+                    {...register("start_time")}
+                    className={errors.start_time ? "border border-red-500 focus:outline-none" : ""}
                   />
-                  {errors.client_start_time && (
-                    <span className="text-sm text-red-400">{errors.client_start_time.message}</span>
+                  {errors.start_time && (
+                    <span className="text-sm text-red-400">{errors.start_time.message}</span>
                   )}
                 </div>
                 <div className="w-full">
                   <Input
+                    variant="lightgray"
                     label="End Time"
                     placeholder="Enter End Time"
                     type="time"
-                    {...register("client_end_time")}
-                    className={errors.client_end_time ? "border border-red-500 focus:outline-none" : ""}
+                    {...register("end_time")}
+                    className={errors.end_time ? "border border-red-500 focus:outline-none" : ""}
                   />
-                  {errors.client_end_time && (
-                    <span className="text-sm text-red-400">{errors.client_end_time.message}</span>
+                  {errors.end_time && (
+                    <span className="text-sm text-red-400">{errors.end_time.message}</span>
                   )}
                 </div>
               </div>
@@ -228,10 +224,11 @@ const ClientAddModal = () => {
               variant="hollow"
               className="order-2 w-full sm:order-1 sm:w-[130px]"
               onClick={() => handleDialogChange(false)}
+              disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button type="submit" className="order-1 w-full sm:order-2 sm:w-[130px]" disabled={!isValid || isLoading}>
+            <Button type="submit" className="order-1 w-full sm:order-2 sm:w-[130px]" disabled={isLoading}>
               Save
             </Button>
           </DialogFooter>
