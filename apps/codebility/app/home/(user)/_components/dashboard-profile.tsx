@@ -22,7 +22,7 @@ export default async function DashboardProfile() {
 
             <Image
               alt="Avatar"
-              src={userData.image_url || defaultAvatar}
+              src={userData.image_url ? (`${process.env.NEXT_PUBLIC_SUPABASE_URL}/${userData.image_url}`) : defaultAvatar}
               width={100}
               height={100}
               title={`${userData.first_name}'s Avatar`}

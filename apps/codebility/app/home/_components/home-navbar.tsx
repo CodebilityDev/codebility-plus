@@ -22,6 +22,14 @@ export const menuItems = [{ href: "/settings", icon: IconProfile, label: "Settin
 
 const Navbar = () => {
   const user = useUser();
+
+  const {
+    first_name,
+    last_name,
+    email,
+    image_url
+  } = user;
+
   return (
     <>
       <nav className="background-navbar fixed top-0 z-10 w-full shadow-sm">
@@ -33,16 +41,16 @@ const Navbar = () => {
               <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none">
                 <div className="hidden flex-col items-end md:flex ">
                   <p className="capitalize dark:text-white">
-                    {user?.first_name} {user?.last_name}
+                    {first_name} {last_name}
                   </p>
-                  <p className="text-sm text-gray">{user?.email}</p>
+                  <p className="text-sm text-gray">{email}</p>
                 </div>
                 <div className="relative size-[44px] rounded-full bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover p-[1.5px]">
                   <Image
                     alt="Avatar"
-                    src={user?.image_url ?? defaultAvatar}
+                    src={image_url ? (`${process.env.NEXT_PUBLIC_SUPABASE_URL}/${image_url}`): defaultAvatar}
                     fill
-                    title={`${user?.first_name}'s Avatar`}
+                    title={`${first_name}'s Avatar`}
                     className="h-auto w-full rounded-full bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover"
                     loading="eager"
                   />
