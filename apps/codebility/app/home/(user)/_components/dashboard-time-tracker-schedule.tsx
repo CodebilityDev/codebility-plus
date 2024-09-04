@@ -49,7 +49,7 @@ export default function TimeTrackerSchedule({ startTime, endTime, codevId }: Pro
   
   return (
     <div className="flex items-center gap-2 justify-center">
-      {startTime && endTime ? (
+      {currentStartTime && currentEndTime ? (
         <>
           <p className="text-md">{`${formatLocaleTime(currentStartTime)} - ${formatLocaleTime(currentEndTime)}`}</p>
           <div>
