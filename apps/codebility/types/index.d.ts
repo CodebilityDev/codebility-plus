@@ -169,20 +169,21 @@ type TeamMemberT = {
 };
 
 type ProjectT = {
-  id?: string;
-  project_name?: string;
-  github_link?: string;
-  summary?: string;
-  project_status?: string;
-  live_link?: string | null;
-  clientId?: string;
-  team_leader_id?: string;
-  team_leader?: User;
-  users?: User[];
-  project_thumbnail?: string | null;
-  created_at?: Date | any;
-  updated_at?: string;
-};
+  id?: string
+  name?: string
+  github_link?: string
+  summary?: string
+  status?: string
+  live_link?: string | null
+  figma_link?: string | null
+  client_id?: string
+  team_leader_id?: string
+  team_leader?: User
+  users?: User[]
+  thumbnail?: string | null
+  created_at?: Date | any
+  updated_at?: string
+}
 
 type BoardUserT = {
   id: string;

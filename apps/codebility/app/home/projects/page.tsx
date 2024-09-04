@@ -54,7 +54,7 @@ const Projects = () => {
   // if (ErrorProjects) return
 
   // if (userType?.projects === false) return router.push("/404")
-
+// console.log(Projects)
 
   return (
     <div className="flex flex-col gap-4">

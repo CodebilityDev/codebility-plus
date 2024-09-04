@@ -25,7 +25,10 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import { createClient } from "@/utils/supabase/client"
 
 
-import InsertData from "@/app/home/projects/_services/projects-insert-project"
+import { InsertData } from "@/app/home/projects/actions"
+
+
+
 
 const projectSchema = z.object({
   project_name: z.string().min(1, { message: "Project name is required" }),
@@ -44,6 +47,7 @@ const defaultImage =
 
 const ProjectAddModal = () => {
 
+
   const supabase = createClient();
 
   const { isOpen, onClose, type } = useModal()
@@ -51,6 +55,8 @@ const ProjectAddModal = () => {
   const { token } = useToken()
   const [isLoading, setIsLoading] = useState(false)
   const [projectImage, setProjectImage] = useState<string | any>()
+
+  
 
   const { data: clients }: UseQueryResult<modals_ProjectModal[]> = useQuery({
     queryKey: ["clients"],
@@ -103,27 +109,26 @@ const ProjectAddModal = () => {
     onClose();
   };
 
-  const onSubmit = async (data: ProjectFormValues) => {
-    setIsLoading(true);
+  const handleSubmitData = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault(); // Prevent default form submission behavior
+
+    const formData = new FormData(event.currentTarget);
 
     try {
-      const response = await createProjects(
-        {
-          ...data,
-          project_thumbnail: projectImage, // Include the uploaded image URL
-        },
-        selectedMembers.map((member) => ({ id: member.id })),
-        token,
-      );
+      await InsertData(formData); // Pass form data to DeleteData
 
-      if (response.status === 201) {
-        resetForm();
-        toast.success("New Project has been Added!");
-      }
+      toast.success("New Project has been added!")
+
+      reset();
+      setProjectImage(null);
+
+      onClose(); // Close the modal after successful deletion
+
+
+
+
     } catch (error) {
-      toast.error("Something went wrong!");
-    } finally {
-      setIsLoading(false);
+      toast.error("Something went wrong!")
     }
   };
 
@@ -147,8 +152,24 @@ const ProjectAddModal = () => {
   };
 
   const handleRemoveProjectThumbnail = () => {
-    setProjectImage(null);
-  };
+    setProjectImage(null)
+  }
+
+
+  const clientsDummy = [
+    { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', clients: 'Alice Johnson' },
+  { id: 'a27c6d87-08e3-4eb2-9c28-d2d34b275a7c', clients: 'Bob Smith' },
+  { id: '8f9f1a27-89b1-4b6e-9d8c-fc786e68de7d', clients: 'Charlie Davis' },
+  { id: 'e3a64b68-16d7-4e3a-bd14-df94e4d6a5f1', clients: 'Dana Lee' },
+  { id: 'd55a45e8-d1e6-4f75-8777-1bfb57fc8552', clients: 'Eva Martinez' },
+  { id: 'f15b5c58-658e-46c1-96a0-d4f8cfb85e8b', clients: 'Frank Wilson' },
+  { id: 'a6b9e1d6-2e42-4660-89ec-c7b37b1b9c8e', clients: 'Grace Kim' },
+  { id: 'c9a05b62-f5fc-42e6-9460-6e7a7f3d6579', clients: 'Hannah Brown' },
+  { id: 'b08b5a0e-9b8e-4c0c-8d5e-0fef0a2799a2', clients: 'Isaac Wilson' },
+  { id: 'e278e925-3cf3-4a9b-9c35-806a4892b35f', clients: 'Jack Taylor' }
+  ];
+
+  
 
   return (
     <Dialog open={isModalOpen} onOpenChange={resetForm}>
@@ -160,9 +181,11 @@ const ProjectAddModal = () => {
         </DialogHeader>
 
 
-        <form action={InsertData} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmitData} className="flex flex-col gap-4">
 
         <div className="flex flex-col gap-4">
+
+          
           <div className="flex gap-4">
             <div className="bg-gray flex h-14 w-28 items-center justify-center overflow-hidden rounded-lg md:h-20 md:w-40">
               {projectImage ? (
@@ -209,6 +232,9 @@ const ProjectAddModal = () => {
             </div>
           </div>
 
+
+          <input type="hidden" name="projectImageId" value={projectImage} /> 
+
          
             <div className="flex flex-col lg:flex-row lg:gap-8">
               <div className="w-full space-y-3">
@@ -229,22 +255,30 @@ const ProjectAddModal = () => {
 
                 <div className="">
                   <label>Client</label>
-                  <Select
-                    onValueChange={(value) => setValue("clientId", value)}
-                  >
+                  <Select onValueChange={(value) => setValue("clientId", value) } name="clientId">
                     <SelectTrigger>
                       <SelectValue placeholder="Select a Client"></SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Clients</SelectLabel>
-                        {clients?.map(
-                          (client: { id: string; company_name: string }) => (
-                            <SelectItem key={client.id} value={client.id}>
-                              {client.company_name}
-                            </SelectItem>
-                          ),
-                        )}
+
+
+                        {/* {clients?.map((client: { id: string; company_name: string }) => (
+                          <SelectItem key={client.id} value={client.id}>
+                            {client.company_name}
+                          </SelectItem>
+                        ))} */}
+
+
+                    {clientsDummy.map((data) => (
+                      <SelectItem key={data.id} value={data.id}>
+                        {data.clients}
+                      </SelectItem>
+                    ))}
+
+
+
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -256,9 +290,7 @@ const ProjectAddModal = () => {
                 </div>
                 <div className="">
                   <label>Team Leader</label>
-                  <Select
-                    onValueChange={(value) => setValue("team_leader_id", value)}
-                  >
+                  <Select onValueChange={(value) => setValue("team_leader_id", value)} name="team_leader_id">
                     <SelectTrigger>
                       <SelectValue placeholder="Select a Team Leader"></SelectValue>
                     </SelectTrigger>
@@ -423,11 +455,10 @@ const ProjectAddModal = () => {
         </div>
 
         <DialogFooter className="flex flex-col gap-4 lg:flex-row">
-          <Button
-            variant="hollow"
-            className="order-2 w-full sm:order-1 sm:w-[130px]"
-            onClick={resetForm}
-          >
+          <Button variant="hollow" className="order-2 w-full sm:order-1 sm:w-[130px]" onClick={(e) => {
+                e.preventDefault(); // Prevent form submission
+                resetForm();
+              }}>
             Cancel
           </Button>
           <Button
@@ -447,4 +478,6 @@ const ProjectAddModal = () => {
   );
 };
 
-export default ProjectAddModal;
+export default ProjectAddModal
+
+
