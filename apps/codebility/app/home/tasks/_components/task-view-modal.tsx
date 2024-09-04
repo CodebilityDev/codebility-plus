@@ -1,3 +1,4 @@
+import React from "react";
 import { Dialog, DialogContent, DialogTrigger } from "@codevs/ui/dialog"
 import RenderTeam from "@/Components/shared/dashboard/RenderTeam" 
 import { Paragraph } from "@/Components/shared/home"
