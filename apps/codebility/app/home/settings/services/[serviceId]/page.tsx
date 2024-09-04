@@ -1,9 +1,12 @@
 import { createServer } from "@/utils/supabase";
 import ServiceForm from "../_components/service-form";
+import { getServiceById } from "../service"
 import { getAllServiceCategories } from "../categories/service";
 import { Category } from "../categories/_types/category";
 
- const AddNewService = async () => {
+const UpdateService = async ({ params }: { params: { serviceId: string } }) => {
+  const { serviceId } = params;
+  const service = await getServiceById(serviceId);
   const supabase = createServer();
   const { data: { user }, error } = await supabase.auth.getUser();
   const categories = await getAllServiceCategories(); 
@@ -13,7 +16,7 @@ import { Category } from "../categories/_types/category";
     return <p>Error fetching user</p>;
   }
 
-  return <ServiceForm userId={user?.id} categories={categories as Category[]} />
+  return <ServiceForm userId={user?.id} service={service.data} categories={categories as Category[]} />
 }
 
-export default AddNewService
+export default UpdateService
