@@ -2,7 +2,7 @@
 
 import React from "react"
 import { Button } from "@/Components/ui/button"
-import { Dialog, DialogContent, DialogFooter } from "@codevs/ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogClose, DialogTrigger } from "@codevs/ui/dialog"
 import Input from "@/Components/ui/forms/input"
 import { Label } from "@codevs/ui/label"
 import { Textarea } from "@codevs/ui/textarea"
@@ -15,9 +15,8 @@ import toast from "react-hot-toast"
 import Image from "next/image"
 import { deleteTask, updateTask } from "../../actions"
 import { Task } from "@/types/home/task"
-import { DialogClose, DialogTrigger } from "@radix-ui/react-dialog"
 import KanbanAddModalMembers from "./kanban-add-modal-members"
-import { getTaskMembers } from "../../../../_lib/get-task-members"
+import { getTaskMembers } from "@/app/home/_lib/get-task-members"
 import { useRouter } from "next/navigation"
 
 
