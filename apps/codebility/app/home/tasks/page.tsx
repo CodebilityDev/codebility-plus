@@ -4,22 +4,6 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 import { Task } from "@/types/home/task";
 
 export default async function TaskPage() {
-/*  const {
-    data: Tasks,
-    isLoading: LoadingTasks,
-    error: ErrorTasks,
-  }: UseQueryResult<TaskT[], any> = useQuery({
-    queryKey: ["tasks"],
-    queryFn: async () => {
-      const response = await getTasks()
-      const tasks = response.filter((task: TaskT) => task.userTask.some((userTask) => userTask.id === userId))
-      setTotalPages(Math.ceil(tasks.length / PAGE_SIZE))
-      return tasks
-    },
-    refetchInterval: 3000,
-  })
- */
-
   const supabase = getSupabaseServerComponentClient();
   const { data: { user } } = await supabase.auth.getUser();
   const { data } = await supabase.from("codev")
@@ -49,8 +33,6 @@ export default async function TaskPage() {
   if (data?.codev_task && data.codev_task.length > 0) { 
     // get only the task data of codev.
     tasks = data.codev_task.map(codevTask => codevTask.task);
-
-    console.log(tasks);
   }
 
   return (
