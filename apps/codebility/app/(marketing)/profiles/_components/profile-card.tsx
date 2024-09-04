@@ -2,8 +2,6 @@
 import React, { useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
-
-import { profiles_ProfieCardT } from "@/types/home"
 import { IconArrowRight } from "@/public/assets/svgs"
 import { motion, AnimatePresence, useMotionValue, useSpring, useTransform } from "framer-motion"
 import { Codev } from "@/types/home/codev"

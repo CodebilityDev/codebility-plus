@@ -1,5 +1,4 @@
 import Image from "next/image"
-import { useModal } from "@/hooks/use-modal"
 import Box from "@/Components/shared/dashboard/Box"
 import { Paragraph } from "@/Components/shared/home"
 import { Task } from "@/types/home/task"
@@ -12,7 +11,6 @@ interface Props {
 }
 
 export default function TaskCard ({ task }: Props) {
-  const { onOpen } = useModal()
   const user = useUser();
 
   const { 
