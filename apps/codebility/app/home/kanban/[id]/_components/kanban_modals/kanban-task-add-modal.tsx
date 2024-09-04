@@ -2,19 +2,16 @@
 
 import React from "react"
 import { Button } from "@/Components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogTrigger } from "@codevs/ui/dialog"
+import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogHeader, DialogTrigger } from "@codevs/ui/dialog"
 import Input from "@/Components/ui/forms/input"
 import { Label } from "@codevs/ui/label"
 import { Textarea } from "@codevs/ui/textarea"
 import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem, SelectItemText } from "@radix-ui/react-select"
-
-import { IconAdd, IconClose, IconDropdown, IconPlus } from "@/public/assets/svgs"
+import { IconClose, IconDropdown } from "@/public/assets/svgs"
 import { taskPrioLevels, taskTypes } from "@/constants"
 import toast from "react-hot-toast"
-import Image from "next/image"
 import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum"
 import KanbanTaskAddModalMembers from "./kanban-add-modal-members"
-import { DialogTitle } from "@radix-ui/react-dialog"
 import { createNewTask } from "../../actions"
 import { useRouter } from "next/navigation"
 
