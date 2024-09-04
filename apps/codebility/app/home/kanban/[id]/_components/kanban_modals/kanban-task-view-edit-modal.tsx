@@ -270,7 +270,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                       >
                         <Image
                           alt="Avatar"
-                          src={users.image_url as string}
+                          src={users.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${users.image_url}` : "/default-avatar.jpg"}
                           fill
                           title={`${users.first_name} ${users.last_name}'s Avatar`}
                           className="h-auto w-full rounded-full bg-cover object-cover"

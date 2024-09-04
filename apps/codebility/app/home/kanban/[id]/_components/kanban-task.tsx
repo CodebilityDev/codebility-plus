@@ -74,7 +74,7 @@ function KanbanTask({ task }: Props) {
                     <div key={idx} className="h-6 w-6 rounded-full ">
                       <Image
                         alt="Avatar"
-                        src={member.image_url ?? defautlAvatar}
+                        src={member.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${member.image_url}` : defautlAvatar}
                         width={8}
                         height={8}
                         title={` ${member.first_name} ${member.last_name}`}
