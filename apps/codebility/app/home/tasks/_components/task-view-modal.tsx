@@ -19,7 +19,7 @@ export default function TaskViewModal({ children, task, taskMembers }: Props) {
       </DialogTrigger>
       <DialogContent className="h-[32rem] w-[80%] max-w-sm overflow-x-auto overflow-y-auto lg:h-auto">
         <div className="flex flex-col gap-6">
-          <div key={task.id}>
+          <div key={task.id} className="flex flex-col gap-y-5">
             <div className="relative flex flex-col gap-1">
               <p className="text-lg font-semibold text-white">{task.title}</p>
               {/* <p className="text-sm">{task.subheader}</p> */}
@@ -38,7 +38,7 @@ export default function TaskViewModal({ children, task, taskMembers }: Props) {
             <div className="flex flex-row justify-between gap-2">
               <div className="flex flex-col gap-1">
                 <p className="text-sm text-white">Members</p>
-                <div className="grid grid-cols-3 gap-1 ">
+                <div>
                   {taskMembers.map((member) => (
                     <RenderTeam key={member.id} imgURL={member.image_url && `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${member.image_url}`} />
                   ))}
