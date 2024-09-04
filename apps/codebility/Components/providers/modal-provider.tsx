@@ -26,6 +26,8 @@ import AddRoleModal from "@/Components/modals/AddRoleModal"
 import EditRoleModal from "@/Components/modals/EditRoleModal"
 import DeleteRoleModal from "@/Components/modals/DeleteRoleModal"
 import FaqsModal from "@/app/(marketing)/components/modals/FaqsModal"
+import ServiceCategoriesModal from "../modals/ServiceCategoriesModal"
+import ServiceCategoriesDeleteModal from "../modals/ServiceCategoriesDeleteModal"
 
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false)
@@ -58,6 +60,8 @@ export const ModalProvider = () => {
       <ClientEditModal />
 
       <ServicesModal />
+      <ServiceCategoriesModal />
+      <ServiceCategoriesDeleteModal />
       <ContactUsModal />
       <PrivacyPolicyModal />
       <TermsOfServiceModal />
