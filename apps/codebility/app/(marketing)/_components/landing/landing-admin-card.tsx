@@ -1,11 +1,10 @@
-import Link from "next/link"
 import Image from "next/image"
 
 import { index_AdminCardT } from "@/types/home"
 
 const AdminCard = ({ admin, color }: index_AdminCardT) => {
   return (
-    <Link href={`/profiles/${admin.id}`} target="_blank">
+    <div>
       <div className={`flex h-full w-full flex-col items-center justify-between gap-4 rounded-lg   `}>
         <Image
           unoptimized
@@ -26,7 +25,7 @@ const AdminCard = ({ admin, color }: index_AdminCardT) => {
           )}
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 
