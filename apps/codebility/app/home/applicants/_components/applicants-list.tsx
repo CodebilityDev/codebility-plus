@@ -3,9 +3,7 @@
 import { Box, H1 } from "@/Components/shared/dashboard";
 import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants";
 import ApplicantsTableContainer from "@/app/home/applicants/_components/applicants-table-container";
-import ApplicantsLoading from "@/app/home/applicants/loading";
 import Search from "@/Components/shared/dashboard/Search";
-import Error from "@/app/home/applicants/error";
 import { Toaster } from "react-hot-toast";
 import { useState, useEffect, useCallback } from "react";
 
