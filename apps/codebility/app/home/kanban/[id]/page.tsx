@@ -30,6 +30,8 @@ export default async function KanbanPage({ params, searchParams }:
   `)
   .eq("id", params.id)
   .single();
+
+  if (error) return <div>ERROR</div>;
   
   const listQuery = searchParams.query;
 
