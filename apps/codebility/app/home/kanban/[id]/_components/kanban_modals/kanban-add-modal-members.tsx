@@ -47,7 +47,7 @@ export default function KanbanAddModalMembers({ initialSelectedMembers }: Props)
                 >
                     <Image
                     alt="Avatar"
-                    src={member.image_url ?? "/default-avatar.jpg"}
+                    src={member.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${member.image_url}` : "/default-avatar.jpg"}
                     fill
                     title={`${member.first_name}'s Avatar`}
                     className="h-auto w-full rounded-full bg-cover object-cover"
@@ -92,7 +92,7 @@ export default function KanbanAddModalMembers({ initialSelectedMembers }: Props)
                         <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
                             <Image
                             alt="Avatar"
-                            src={user.image_url ?? "/default-avatar.jpg"}
+                            src={user.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${user.image_url }`:  "/default-avatar.jpg"}
                             fill
                             title={`${user.id}'s Avatar`}
                             className="h-auto w-full rounded-full bg-cover object-cover"
