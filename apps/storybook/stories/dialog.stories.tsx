@@ -72,7 +72,7 @@ export const Default: Story = {
             </DialogHeader>
             {args.children || 'Default dialog content'}
             <DialogFooter>
-              <Button onClick={toggleDialog} className="bg-red-100 hover:bg-red-200">
+              <Button onClick={toggleDialog} className="bg-black-100 hover:bg-black-200 text-white">
                 Close
               </Button>
             </DialogFooter>
