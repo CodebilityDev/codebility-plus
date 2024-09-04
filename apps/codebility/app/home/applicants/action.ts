@@ -5,26 +5,25 @@ import { revalidatePath } from "next/cache";
 
 const supabase = getSupabaseServerActionClient();
 
-export const rejectAction = async (email_address: string) => {
+export async function rejectAction(email_address: string) {
+  try {
   
-    try {
-  
-      const { error: fetchError } = await supabase
-      .from('applicants')
-      .delete()
-      .eq('email_address', email_address)
-     
-      if (fetchError) throw fetchError;
-      
-      revalidatePath('/home/applicants')
-      return { success: true };
-    } catch (error) {
-      console.error('Error deleting data:', error);
-      return { success: false, error: error};
-    }
-  };
-  
-  export const approveAction = async (email_address: string) => {
+    const { error: deleteError } = await supabase
+    .from('applicants')
+    .delete()
+    .eq('email_address', email_address)
+   
+    if (deleteError) throw deleteError;
+    
+    revalidatePath("/home/applicants")
+    return { success: true };
+  } catch (error) {
+    console.error('Error deleting data:', error);
+    return { success: false, error: error};
+  }
+}
+
+  export async function approveAction  (email_address: string) {
     try {
       const { data: applicants, error: fetchError } = await supabase
         .from('applicants')
@@ -46,7 +45,7 @@ export const rejectAction = async (email_address: string) => {
   
       if (deleteError) throw deleteError;
   
-      revalidatePath('/home/applicants')
+      revalidatePath("/home/applicants")
       return { success: true };
     } catch (error) {
       console.error('Error transferring data:', error);
