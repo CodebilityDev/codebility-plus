@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/Components/ui/button"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@codevs/ui/dialog"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@codevs/ui/dialog"
 import Input from "@/Components/ui/forms/input"
 import { Label } from "@codevs/ui/label"
 import toast from "react-hot-toast"
@@ -10,7 +10,6 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { KanbanListSchema } from "../../_types/kanban-list.schema"
 import { z } from "zod"
-import { DialogClose } from "@radix-ui/react-dialog"
 import { createNewList } from "../../actions"
 import { useRouter } from "next/navigation"
 
