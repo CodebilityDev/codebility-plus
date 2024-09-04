@@ -39,7 +39,7 @@ const ProfileCard = ({ codev, color }: Props) => {
         <div className="relative">
           <Image
             alt={`${codev.first_name} Avatar`}
-            src={codev.image_url || "/assets/svgs/icon-codebility-black.svg"}
+            src={codev.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${codev.image_url}` : "/assets/svgs/icon-codebility-black.svg"}
             width={60}
             height={60}
             className={`${color} h-[70px] w-[70px] rounded-full bg-cover object-cover p-0.5`}
