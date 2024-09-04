@@ -56,7 +56,11 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
     const permissions = permissionNames.filter(permissionName => data.user_type[permissionName]);
     const { first_name, last_name, main_position, image_url } = data.profile;
     const { start_time, end_time } = data.codev;
+<<<<<<< HEAD
 
+=======
+    
+>>>>>>> origin/dev
     userData = {
       id: data.id,
       codev_id: data.codev.id,
