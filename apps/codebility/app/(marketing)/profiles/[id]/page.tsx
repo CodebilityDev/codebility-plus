@@ -59,7 +59,7 @@ export default async function CodevBioPage ({ params }: Props)  {
             <div className="relative">
               <Image
                 alt={`${first_name} Avatar`}
-                src={image_url || "/assets/svgs/icon-codebility-black.svg"}
+                src={image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${image_url}` : "/assets/svgs/icon-codebility-black.svg"}
                 width={130}
                 height={130}
                 className={`bg-${getRandomColor} h-[120px] w-[120px] rounded-full bg-cover object-cover p-0.5`}
