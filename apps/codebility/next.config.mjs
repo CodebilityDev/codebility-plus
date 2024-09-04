@@ -20,13 +20,12 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
 
   images: {
     remotePatterns: [
-     
+
 
       {
         hostname: "kdkuljweiqtiveqvqirw.supabase.co",
       },
        
-
 
       {
         hostname: "nwpvsxbrftplvebseaas.supabase.co",

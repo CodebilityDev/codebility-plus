@@ -16,16 +16,16 @@ const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
 
   const {
-    project_name,
+    name,
     summary,
     live_link,
     users,
     github_link,
-    project_status,
+    status,
     team_leader,
     created_at,
-    project_thumbnail,
-  } = data || {};
+    thumbnail,
+  } = data || {}
 
   const isModalOpen = isOpen && type === "projectViewModal";
 
@@ -33,11 +33,11 @@ const ProjectViewModal = () => {
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogContent className="xs:w-[80%] h-[32rem] w-[95%] max-w-3xl overflow-x-auto overflow-y-auto sm:w-[70%] lg:h-auto">
         <div className="flex flex-col gap-8">
-          <div className="bg-dark-100 flex justify-center rounded-lg">
-            {project_thumbnail ? (
+          <div className="flex justify-center rounded-lg bg-dark-100">
+ {thumbnail ? (
               <Image
-                alt={`${project_name}`}
-                src={project_thumbnail}
+                alt={`${name}`}
+                src={thumbnail}
                 width={120}
                 height={91}
                 className="h-[120px] w-[91px] object-contain"
@@ -46,7 +46,7 @@ const ProjectViewModal = () => {
               />
             ) : (
               <Image
-                alt={`${project_name}`}
+                alt={`${name}`}
                 src={defaultAvatar}
                 width={120}
                 height={91}
@@ -59,7 +59,7 @@ const ProjectViewModal = () => {
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="dark:bg-dark-200 flex flex-1 flex-col gap-4 rounded-lg p-4">
               <div className="flex items-center gap-2">
-                <p className="text-2xl">{project_name}</p>
+                <p className="text-2xl">{name}</p>
               </div>
               <p className="md:text-md text-gray text-sm lg:text-lg">
                 {summary}
@@ -77,7 +77,7 @@ const ProjectViewModal = () => {
             </div>
             <div className="dark:bg-dark-200 flex flex-1 flex-col gap-2 rounded-lg p-4">
               <p className="text-2xl">Status</p>
-              <p className="text-lg text-orange-400">{project_status}</p>
+              <p className="text-lg text-orange-400">{status}</p>
               <p className="text-md text-gray">Date Started: {created_at}</p>
               <p className="text-md text-gray">
                 Lead by:{" "}
@@ -136,11 +136,8 @@ const ProjectViewModal = () => {
             >
               Delete
             </Button>
-            <Button
-              variant="default"
-              className="w-full lg:w-[130px]"
-              onClick={() => onOpen("projectEditModal", data)}
-            >
+            
+            <Button variant="default" className="w-full lg:w-[130px]" onClick={() => onOpen("projectEditModal", data)}>
               Edit
             </Button>
           </div>
