@@ -35,11 +35,15 @@ export default function TimeTrackerSchedule({ startTime, endTime, codevId }: Pro
       setStartTime(time.start_time);
       setEndTime(time.end_time);
 
-      // a server action but don't have to await since we used state to display changes.
-      updateUserSchedule({
-        startTime: time.start_time,
-        endTime: time.end_time
-      }, codevId);
+      try {
+        // a server action but don't have to await since we used state to display changes.
+        updateUserSchedule({
+          startTime: time.start_time,
+          endTime: time.end_time
+        }, codevId);
+      } catch (e: any) {
+        console.log(e.message);
+      } 
     }
     
     return () => {
