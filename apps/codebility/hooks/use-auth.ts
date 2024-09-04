@@ -5,10 +5,10 @@ import useAuthCookie from "@/hooks/use-cookie"
 import { getUserDataById } from "@/app/api"
 
 const useAuth = () => {
-  const auth = useAuthCookie()
+  // const auth = useAuthCookie()
   const [userData, setUserData] = useState<any>()
   const [isLoading, setIsLoading] = useState(true)
-  useEffect(() => {
+ /*  useEffect(() => {
     async function getUserData() {
       setIsLoading(true)
       const user: any = await getUserDataById(auth.data.id)
@@ -19,7 +19,7 @@ const useAuth = () => {
       getUserData()
     }
   }, [auth.status, userData])
-
+ */
   return { isLoading, userData }
 }
 
