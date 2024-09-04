@@ -88,7 +88,7 @@ export default function KanbanBoardListContainer({ lists, projectId }: Props) {
       }
       
     },
-    [tasks]
+    [tasks, isQueueChanged]
 
   )
 
