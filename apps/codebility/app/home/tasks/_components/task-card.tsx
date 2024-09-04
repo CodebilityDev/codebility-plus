@@ -82,7 +82,7 @@ export default function TaskCard ({ task }: Props) {
             <div className="mt-1 items-center gap-2 text-xs text-gray">
               Members in this Task:{" "}
               {members.map((member) => (
-                <p className="text-sm uppercase text-dark-100 dark:text-white">{member.first_name}</p>
+                <p key={member.id} className="text-sm uppercase text-dark-100 dark:text-white">{member.first_name}</p>
               ))}
             </div>
           </div>
