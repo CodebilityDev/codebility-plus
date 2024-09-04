@@ -14,6 +14,23 @@ const CUSTOM_VIEWPORTS = {
 
 const preview: Preview = {
   parameters: {
+    backgrounds: {
+      default: 'light',
+      values: [
+        {
+          name: 'light',
+          value: '#F5F5F5',
+        },
+        {
+          name: 'gray',
+          value: '#5F5F5F',
+        },
+        {
+          name: 'dark',
+          value: '#131313',
+        },
+      ]
+    },
     nextjs: {
       appDirectory: true,
     },
