@@ -53,7 +53,7 @@ export default function ServicesTab({ servicesData }: Props) {
   useEffect(() => {
     const filteredData = servicesData.filter((service) => service.category === category)
     setServices(filteredData)
-  }, [category])
+  }, [category, servicesData])
 
   useEffect(() => {
     setCurrentPage(tabPages[category] || 1)
