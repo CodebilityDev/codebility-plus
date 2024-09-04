@@ -8,30 +8,18 @@ const supabase = getSupabaseServerActionClient();
 export const rejectAction = async (email_address: string) => {
   
     try {
-      const { data: applicants, error: fetchError } = await supabase
-        .from('applicants')
-        .select('*')
-        .eq('email_address', email_address)
   
+      const { error: fetchError } = await supabase
+      .from('applicants')
+      .delete()
+      .eq('email_address', email_address)
+     
       if (fetchError) throw fetchError;
-  
-      const { error: insertError } = await supabase
-        .from('applicants_denied')
-        .insert(applicants); 
-  
-      if (insertError) throw insertError;
-      
-       const { error: deleteError } = await supabase
-       .from('applicants')
-       .delete()
-       .in('email_address', applicants.map(item => item.email_address)); 
-  
-      if (deleteError) throw deleteError;
       
       revalidatePath('/home/applicants')
       return { success: true };
     } catch (error) {
-      console.error('Error transferring data:', error);
+      console.error('Error deleting data:', error);
       return { success: false, error: error};
     }
   };
@@ -46,7 +34,7 @@ export const rejectAction = async (email_address: string) => {
       if (fetchError) throw fetchError;
   
       const { error: insertError } = await supabase
-        .from('applicants_accepted')
+        .from('interns')
         .insert(applicants); 
   
       if (insertError) throw insertError;
