@@ -22,7 +22,8 @@ export default function TaskCard ({ task }: Props) {
     duration,
     description,
     project,
-    created_at 
+    number,
+    created_at
   } = task
 
   let prioLevel = null
@@ -60,7 +61,7 @@ export default function TaskCard ({ task }: Props) {
               className="absolute right-0 top-0 "
               alt="prio level"
             />
-            <p className="text-lg font-semibold text-violet">#01</p>
+            <p className="text-lg font-semibold text-violet">#{number}</p>
             <p>{title}</p>
             <Paragraph>{description}</Paragraph>
             <div className="flex items-center gap-2 text-xs text-gray">
