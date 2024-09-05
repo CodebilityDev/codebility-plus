@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { createServer } from "@/utils/supabase";
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
 export const uploadImage = async (
   file: File | null,
@@ -20,7 +20,7 @@ export const uploadImage = async (
   const extension = file.name.split(".").pop();
   const filename = `${timestamp}.${extension}`;
 
-  const supabase = await createServer();
+  const supabase = await getSupabaseServerActionClient();
 
   const { data, error } = await supabase.storage
     .from(bucketName)
@@ -42,7 +42,7 @@ export const deleteImage = async (path: string) => {
       throw new Error("File path could not be extracted from URL");
     }
 
-    const supabase = await createServer();
+    const supabase = await getSupabaseServerActionClient();
     const { error } = await supabase.storage
       .from("services-image")
       .remove([`public/${filePath}`]);
@@ -69,7 +69,7 @@ export const createServiceAction = async (formData: FormData) => {
   const picture2 = formData.get("picture2") as File | null;
   const userId = formData.get("userId") as string;
 
-  const supabase = await createServer();
+  const supabase = await getSupabaseServerActionClient();
 
   const mainImagePath = await uploadImage(
     mainImage,
@@ -120,7 +120,7 @@ export const updateServiceAction = async (formData: FormData) => {
   const picture1File = formData.get("picture1") as File | null;
   const picture2File = formData.get("picture2") as File | null;
 
-  const supabase = await createServer();
+  const supabase = await getSupabaseServerActionClient();
 
   if (mainImageFile instanceof File) {
     if (mainImage) await deleteImage(mainImage);
@@ -180,7 +180,7 @@ export const updateServiceAction = async (formData: FormData) => {
 export const deleteServiceAction = async (formData: FormData) => {
   const id = formData.get("id") as string;
 
-  const supabase = await createServer();
+  const supabase = await getSupabaseServerActionClient();
 
   const { data: service, error: serviceError } = await supabase
     .from("services")
