@@ -24,10 +24,6 @@ jobs:
           node-version: '16'
           cache: 'pnpm' # This caches the pnpm cache folder
 
-      # Install pnpm globally
-      - name: Install pnpm
-        run: npm install -g pnpm
-
       # Cache dependencies and Turbo's output
       - name: Cache node_modules and Turbo output
         uses: actions/cache@v2
