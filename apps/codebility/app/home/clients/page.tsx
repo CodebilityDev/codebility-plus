@@ -5,11 +5,11 @@ import ClientButtons from "./_components/clients-button";
 import ClientCards from "./_components/clients-card";
 
 const Clients = async () => {
-  const data = await getAllClients();
-
-  const clients = (data as ClientDetails[]).filter(
+  const { data, error } = await getAllClients();
+  
+  const clients = data ? (data as ClientDetails[]).filter(
     (client) => client.is_archive === false
-  );
+  ) : [];
 
   return (
     <div className="max-w-screen-xl mx-auto flex flex-col gap-4">
@@ -17,7 +17,12 @@ const Clients = async () => {
         <H1>Clients</H1>
         <ClientButtons />
       </div>
-      <ClientCards clients={clients} />
+      {
+        error ?
+          <div className="text-white">ERROR</div>
+          :
+          <ClientCards clients={clients} />
+      }
     </div>
   );
 };
