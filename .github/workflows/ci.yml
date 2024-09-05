@@ -1,0 +1,47 @@
+name: CI for Monorepo with Turbo and Changed Files Detection
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  turbo:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      # Install dependencies
+      - name: Install dependencies
+        run: npm install
+
+      # Cache dependencies and Turbo's output
+      - name: Cache node_modules and Turbo output
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            .turbo
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+      # Run build for only affected packages (based on changed files)
+      - name: Build changed packages
+        run: npx turbo run build --since=origin/dev --filter=[affected]
+
+      # Run tests only for changed packages
+      - name: Run tests for changed packages
+        run: npx turbo run test --since=origin/dev --filter=[affected]
