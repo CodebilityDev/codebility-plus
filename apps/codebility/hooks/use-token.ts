@@ -13,7 +13,7 @@ function useToken() {
     status: "loading",
     token: null,
   })
-  useEffect(() => {
+ /*  useEffect(() => {
     async function newC() {
       const tokenAuth = await getToken()
       if (!tokenAuth) {
@@ -31,7 +31,7 @@ function useToken() {
       }))
     }
     newC()
-  }, [])
+  }, []) */
   return token
 }
 

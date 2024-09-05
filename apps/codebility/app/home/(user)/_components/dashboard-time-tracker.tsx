@@ -4,7 +4,7 @@ import TimeTrackerTimer from "./dashboard-time-tracker-timer";
 import TimeTrackerSchedule from "./dashboard-time-tracker-schedule";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 import { logUserTime } from "../actions";
-import { Task } from "../_types/task";
+import { Task } from "@/types/home/task";
 
 export default async function TimeTracker() {
   const supabase = getSupabaseServerComponentClient();

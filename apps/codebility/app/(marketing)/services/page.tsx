@@ -1,11 +1,17 @@
-import Footer from "@/app/(marketing)/Footer"
-import Hero from "@/app/(marketing)/services/components/Hero"
-import Navigation from "@/app/(marketing)/Navigation"
-import { PoppinFont } from "@/app/(marketing)/index/Index"
-import Calendly from "@/app/(marketing)/index/components/Calendly"
-import ServicesTab from "@/app/(marketing)/services/components/ServicesTab"
+import Footer from "../_components/marketing-footer"
+import Hero from "./_components/services-hero"
+import Navigation from "../_components/marketing-navigation"
+import { PoppinFont } from "../_lib/font"
+import Calendly from "../_components/marketing-calendly"
+import ServicesTab from "./_components/services-tab"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
 
-const Services = () => {
+export default async function ServicesPage() {
+  const supabase = getSupabaseServerComponentClient();
+  const { data } = await supabase.from("service")
+  .select();
+
+  const services = data || [];
   return (
     <div
       className={`relative flex w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303] ${PoppinFont.className}`}
@@ -13,11 +19,10 @@ const Services = () => {
       <Navigation />
       <Hero />
 
-      <ServicesTab />
+      <ServicesTab servicesData={services}/>
       <Calendly />
       <Footer />
     </div>
   )
 }
 
-export default Services

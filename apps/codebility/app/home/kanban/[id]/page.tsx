@@ -1,26 +1,42 @@
-"use client"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import KanbanBoard from "./_components/kanban-board"
+import { List } from "./_types/board";
 
-import KanbanBoard from "@/app/home/kanban/[id]/Kanban"
-import { getBoards } from "@/app/api/kanban"
-import { kanban_Kanban } from "@/types/protectedroutes"
-import { useQuery, UseQueryResult } from "@tanstack/react-query"
+export default async function KanbanPage({ params, searchParams }: 
+  { 
+    params: { id: string },
+    searchParams: { query: string }  
+  }) {
+  const supabase = getSupabaseServerComponentClient();
 
-export default function KanbanPage({ params }: { params: { id: string } }) {
-  const {
-    data: Boards,
-    isLoading: LoadingBoards,
-    error: ErrorBoards,
-  }: UseQueryResult<kanban_Kanban[], any> = useQuery({
-    queryKey: ["Boards"],
-    queryFn: async () => {
-      return await getBoards()
-    },
-    refetchInterval: 3000,
-  })
+  const { data: board, error } = await supabase.from("board")
+  .select(`
+    *,
+    list(
+      *,
+      task(
+        *,
+        codev_task(
+          codev(
+            *,
+            user(
+              *,
+              profile(*)
+            )
+          )
+        ) 
+      )
+    )  
+  `)
+  .eq("id", params.id)
+  .single();
 
-  if (LoadingBoards) return
+  if (error) return <div>ERROR</div>;
+  
+  const listQuery = searchParams.query;
 
-  if (ErrorBoards) return
+  if (listQuery) // filter out board lists by the search input value.
+    board.list = board.list.filter((l: List) => l.name.indexOf(listQuery) >= 0);
 
-  return <KanbanBoard id={params.id} data={Boards as kanban_Kanban[]} />
+  return <KanbanBoard boardData={board}/>
 }
