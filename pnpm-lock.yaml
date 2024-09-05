@@ -16,6 +16,9 @@ importers:
         specifier: ^1.7.3
         version: 1.7.3
     devDependencies:
+      '@codevs/prettier-config':
+        specifier: 'workspace:'
+        version: link:tooling/prettier
       '@types/react':
         specifier: ^18.3.3
         version: 18.3.3
@@ -25,9 +28,6 @@ importers:
       prettier:
         specifier: ^3.0.3
         version: 3.3.3
-      prettier-plugin-tailwindcss:
-        specifier: ^0.5.4
-        version: 0.5.14(prettier@3.3.3)
       turbo:
         specifier: ^2.0.9
         version: 2.0.12
