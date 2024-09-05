@@ -6,7 +6,8 @@
     "clean": "rm -rf dist .turbo node_modules",
     "ui-add": "pnpm dlx shadcn-ui add",
     "dev": "tsc",
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore"
   },
   "exports": {
     ".": {
@@ -28,7 +29,9 @@
   "devDependencies": {
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
+    "@codevs/prettier-config": "workspace:*",
     "tailwindcss": "^3.4.9",
+    "prettier": "^3.3.3",
     "typescript": "^5.5.4"
   },
   "dependencies": {
@@ -52,5 +55,6 @@
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
-  }
+  },
+  "prettier": "@codevs/prettier-config"
 }
