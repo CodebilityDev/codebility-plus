@@ -7,7 +7,9 @@
     "ui-add": "pnpm dlx shadcn-ui add",
     "dev": "tsc",
     "build": "tsc",
-    "format": "prettier --check . --ignore-path ../../.gitignore"
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "exports": {
     ".": {
@@ -30,6 +32,7 @@
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
     "@codevs/prettier-config": "workspace:*",
+    "@codevs/eslint-config": "workspace:*",
     "tailwindcss": "^3.4.9",
     "prettier": "^3.3.3",
     "typescript": "^5.5.4"
@@ -55,6 +58,13 @@
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@codevs/eslint-config/base",
+      "@codevs/eslint-config/react"
+    ]
   },
   "prettier": "@codevs/prettier-config"
 }
