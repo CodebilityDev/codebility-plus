@@ -15,6 +15,14 @@
       ],
       "outputLogs": "new-only"
     },
+    "lint": {
+      "dependsOn": [
+        "^topo"
+      ],
+      "outputs": [
+        "node_modules/.cache/.eslintcache"
+      ]
+    },
     "clean": {
       "cache": false
     },
