@@ -1,6 +1,11 @@
-'use client'
+"use client";
 
-import { Button } from '@codevs/ui/button'
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { Button } from "@codevs/ui/button";
 import {
   Dialog,
   DialogContent,
@@ -8,63 +13,60 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@codevs/ui/dialog'
+} from "@codevs/ui/dialog";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
-} from '@codevs/ui/form'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { toast, Toaster } from '@codevs/ui/sonner-toast'
-import { useRouter } from 'next/navigation'
-import appConfig from '~/config/app.config'
-import useCard from '../_hooks/useCard'
-import { publishProfile } from '../actions'
+} from "@codevs/ui/form";
+import { toast, Toaster } from "@codevs/ui/sonner-toast";
+
+import appConfig from "~/config/app.config";
+import useCard from "../_hooks/useCard";
+import { publishProfile } from "../actions";
 
 const formSchema = z.object({
   usernameURL: z.string().min(4),
-})
+});
 
 function HomePublishProfileModal() {
-  const { cardData } = useCard()
-  const router = useRouter()
+  const { cardData } = useCard();
+  const router = useRouter();
 
   const usernameURL =
     cardData.username_url &&
-    cardData.username_url.split('://')[1]?.split('.')[0]
+    cardData.username_url.split("://")[1]?.split(".")[0];
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       usernameURL,
     },
-  })
+  });
 
-  const { reset } = form
+  const { reset } = form;
 
-  const [protocol, host] = appConfig.url.split('://')
+  const [protocol, host] = appConfig.url.split("://");
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { usernameURL } = values
+    const { usernameURL } = values;
 
     try {
       await publishProfile(
         `${protocol}://${usernameURL}.${host}`,
         usernameURL,
         cardData.id,
-      )
-      toast.success('Profile Published!')
-      reset()
-      router.refresh()
+      );
+      toast.success("Profile Published!");
+      reset();
+      router.refresh();
     } catch (e) {
-      toast.error((e as { message: string }).message)
+      toast.error((e as { message: string }).message);
     }
-  }
+  };
 
   return (
     <Dialog>
@@ -91,23 +93,23 @@ function HomePublishProfileModal() {
                       <FormLabel htmlFor="usernameURL" className="font-bold">
                         Enter your public username URL
                       </FormLabel>
-                      <div className="bg-gray text-md bg-background/40 relative flex items-center px-2 py-1">
+                      <div className="bg-gray text-md relative flex items-center bg-background/40 px-2 py-1">
                         <div className="font-bold">{protocol}://</div>
                         <FormControl>
                           <input
                             type="text"
                             id="usernameURL"
-                            className="bg-input border font-medium"
+                            className="border bg-input font-medium"
                             placeholder=""
                             {...field}
-                            defaultValue={usernameURL ? usernameURL : ''}
+                            defaultValue={usernameURL ? usernameURL : ""}
                             onChange={(e) => {
-                              const value = e.target.value
-                              const allowedPattern = /^[a-zA-Z0-9]*$/
+                              const value = e.target.value;
+                              const allowedPattern = /^[a-zA-Z0-9]*$/;
 
-                              if (!allowedPattern.test(value)) return
+                              if (!allowedPattern.test(value)) return;
 
-                              form.setValue('usernameURL', value)
+                              form.setValue("usernameURL", value);
                             }}
                           />
                         </FormControl>
@@ -128,7 +130,7 @@ function HomePublishProfileModal() {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-export default HomePublishProfileModal
+export default HomePublishProfileModal;

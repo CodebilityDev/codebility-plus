@@ -1,32 +1,32 @@
-import * as jose from "jose"
-import { NextRequest } from "next/server"
+import { NextRequest } from "next/server";
+import * as jose from "jose";
 
 interface DecodedPayload {
-  id?: string
+  id?: string;
 }
 
 const jwtConfig = {
   secret: new TextEncoder().encode(process.env.JWT_SECRET),
-}
+};
 
 export const isAuthenticated = async (req: NextRequest): Promise<boolean> => {
-  const { cookies } = req
-  let token = cookies.get("codebility-auth")?.value
+  const { cookies } = req;
+  let token = cookies.get("codebility-auth")?.value;
   if (token) {
     try {
-      const decoded = await jose.jwtVerify(token, jwtConfig.secret)
+      const decoded = await jose.jwtVerify(token, jwtConfig.secret);
 
       if ((decoded.payload as DecodedPayload)?.id) {
-        return true
+        return true;
       } else {
-        return false
+        return false;
       }
     } catch (err) {
-      console.error("isAuthenticated error: ", err)
+      console.error("isAuthenticated error: ", err);
 
-      return false
+      return false;
     }
   } else {
-    return false
+    return false;
   }
-}
+};

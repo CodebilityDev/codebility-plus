@@ -1,7 +1,7 @@
-import React from "react"
+import React from "react";
 
 interface LoaderProps {
-  className?: string
+  className?: string;
 }
 
 const Loader: React.FC<LoaderProps> = ({ className }) => {
@@ -21,7 +21,7 @@ const Loader: React.FC<LoaderProps> = ({ className }) => {
         <div className="dots translate-y-1"></div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Loader
+export default Loader;

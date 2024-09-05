@@ -1,6 +1,6 @@
-import { Box, H1 } from "@/Components/shared/dashboard"
-import { Skeleton } from "@/Components/ui/skeleton/skeleton"
-import React from "react"
+import React from "react";
+import { Box, H1 } from "@/Components/shared/dashboard";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 
 export default function Loading() {
   return (
@@ -23,11 +23,14 @@ export default function Loading() {
         {Array(15)
           .fill(null)
           .map((_, index) => (
-            <div key={index} className="mx-auto my-4 flex flex-col items-center gap-10 ">
+            <div
+              key={index}
+              className="mx-auto my-4 flex flex-col items-center gap-10 "
+            >
               <Skeleton className="h-12 w-full" />
             </div>
           ))}
       </Box>
     </div>
-  )
+  );
 }

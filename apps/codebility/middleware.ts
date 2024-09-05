@@ -1,7 +1,9 @@
-import { NextResponse, URLPattern } from 'next/server';
-import type { NextRequest } from 'next/server';
-import { createMiddlewareClient } from "@codevs/supabase/middleware-client"
-import pathsConfig from './config/paths.config';
+import type { NextRequest } from "next/server";
+import { NextResponse, URLPattern } from "next/server";
+
+import { createMiddlewareClient } from "@codevs/supabase/middleware-client";
+
+import pathsConfig from "./config/paths.config";
 
 export const config = {
   matcher: [
@@ -18,15 +20,13 @@ export const config = {
 };
 
 const getUser = (req: NextRequest, res: NextResponse) => {
-  const supabase = createMiddlewareClient({req,res});
+  const supabase = createMiddlewareClient({ req, res });
 
   return supabase.auth.getUser();
 };
 
-
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
-
 
   // // handle patterns for specific routes
   // const handlePattern = matchUrlPattern(req.url);
@@ -42,7 +42,6 @@ export async function middleware(req: NextRequest) {
   // }
 
   return res;
-
 }
 
 /**
@@ -50,55 +49,57 @@ export async function middleware(req: NextRequest) {
  */
 
 function getPatterns() {
-  return [{
-    pattern: new URLPattern({ pathname: '/authv2/*?' }),
-    handler: async (req: NextRequest, res: NextResponse) => {
-      const supabase = createMiddlewareClient({req,res});
+  return [
+    {
+      pattern: new URLPattern({ pathname: "/authv2/*?" }),
+      handler: async (req: NextRequest, res: NextResponse) => {
+        const supabase = createMiddlewareClient({ req, res });
 
-      const {
-        data: { user },
-      } = await getUser(req, res);
+        const {
+          data: { user },
+        } = await getUser(req, res);
 
-      const { data: userData } = await supabase.from("codev")
-      .select()
-      .eq("user_id", user?.id)
-      .single();
+        const { data: userData } = await supabase
+          .from("codev")
+          .select()
+          .eq("user_id", user?.id)
+          .single();
 
-      // the user is logged out, so we don't need to do anything
-      if (!user) return;
-      
-      // If user is logged in, redirect to their respective page.
-      let nextURL = new URL("/home", req.nextUrl.origin).href; // default for now, mentor.
-      switch ( userData?.application_status ) {
-        case "PENDING":
-        case "DECLINED":
-          nextURL = new URL("/waiting", req.nextUrl.origin).href; // waiting page for now.
-          break;
-      }
+        // the user is logged out, so we don't need to do anything
+        if (!user) return;
 
-      return NextResponse.redirect(nextURL);
+        // If user is logged in, redirect to their respective page.
+        let nextURL = new URL("/home", req.nextUrl.origin).href; // default for now, mentor.
+        switch (userData?.application_status) {
+          case "PENDING":
+          case "DECLINED":
+            nextURL = new URL("/waiting", req.nextUrl.origin).href; // waiting page for now.
+            break;
+        }
+
+        return NextResponse.redirect(nextURL);
+      },
     },
-  },
-  {
-    pattern: new URLPattern({ pathname: '/home/*?' }),
-    handler: async (req: NextRequest, res: NextResponse) => {
-      const {
-        data: { user },
-      } = await getUser(req, res);
+    {
+      pattern: new URLPattern({ pathname: "/home/*?" }),
+      handler: async (req: NextRequest, res: NextResponse) => {
+        const {
+          data: { user },
+        } = await getUser(req, res);
 
-      const origin = req.nextUrl.origin;
-      const next = req.nextUrl.pathname;
+        const origin = req.nextUrl.origin;
+        const next = req.nextUrl.pathname;
 
-       // If user is not logged in, redirect to sign in page.
-       if (!user) {
-        const signIn = pathsConfig.auth.signIn;
-        const redirectPath = `${signIn}?next=${next}`;
+        // If user is not logged in, redirect to sign in page.
+        if (!user) {
+          const signIn = pathsConfig.auth.signIn;
+          const redirectPath = `${signIn}?next=${next}`;
 
-        return NextResponse.redirect(new URL(redirectPath, origin).href);
-      }
-    }
-  }
-];
+          return NextResponse.redirect(new URL(redirectPath, origin).href);
+        }
+      },
+    },
+  ];
 }
 
 /**
@@ -107,10 +108,10 @@ function getPatterns() {
  */
 function matchUrlPattern(url: string) {
   const patterns = getPatterns();
-  const input = url.split('?')[0];
+  const input = url.split("?")[0];
   for (const pattern of patterns) {
     const patternResult = pattern.pattern.exec(input);
-    if (patternResult !== null && 'pathname' in patternResult) {
+    if (patternResult !== null && "pathname" in patternResult) {
       return pattern.handler;
     }
   }

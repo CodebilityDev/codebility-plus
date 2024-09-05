@@ -1,14 +1,14 @@
-import { create } from "zustand"
+import { create } from "zustand";
 
 export interface ScheduleType {
-  start_time: string
-  end_time: string
+  start_time: string;
+  end_time: string;
 }
 
 interface Schedule {
-  time: ScheduleType
-  addTime: (iTime: ScheduleType) => void
-  clearTime: () => void
+  time: ScheduleType;
+  addTime: (iTime: ScheduleType) => void;
+  clearTime: () => void;
 }
 
 export const useSchedule = create<Schedule>((set) => ({
@@ -25,4 +25,4 @@ export const useSchedule = create<Schedule>((set) => ({
         end_time: "",
       },
     })),
-}))
+}));

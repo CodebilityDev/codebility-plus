@@ -1,23 +1,23 @@
-"use server"
+"use server";
 
-import { createServer } from "@/utils/supabase";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-export const getAllClients = async () => { 
-    const supabase = createServer();
-    const { data, error } = await supabase
-        .from("clients")
-        .select("*");
+export const getAllClients = async () => {
+  const supabase = getSupabaseServerComponentClient();
+  const { data, error } = await supabase.from("clients").select("*");
 
-    if (error) {
-        console.error("Error fetching clients:", error.message);
-        return { success: false, error: error.message };
+  if (error) {
+    console.error("Error fetching clients:", error.message);
+    return { data: null, error: error.message };
+  }
+
+  data.forEach((client) => {
+    if (client.logo) {
+      client.logo = supabase.storage
+        .from("clients-image")
+        .getPublicUrl(client.logo).data.publicUrl;
     }
+  });
 
-    data.forEach(client => {
-        if (client.logo) {
-            client.logo = supabase.storage.from("clients-image").getPublicUrl(client.logo).data.publicUrl;
-        }
-    });
-    
-    return data;
+  return { data, error: null };
 };

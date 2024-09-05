@@ -3,17 +3,17 @@ const nextConfig = {
   images: {
     remotePatterns: [
       {
-        protocol: 'https',
+        protocol: "https",
         hostname:
           process.env.NEXT_PUBLIC_SUPABASE_URL &&
-          process.env.NEXT_PUBLIC_SUPABASE_URL.split('https://')[1],
+          process.env.NEXT_PUBLIC_SUPABASE_URL.split("https://")[1],
       },
       {
-        protocol: 'https',
-        hostname: 'lh3.googleusercontent.com',
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
       },
     ],
   },
-}
+};
 
-export default nextConfig
+export default nextConfig;

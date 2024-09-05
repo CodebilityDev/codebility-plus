@@ -79,7 +79,7 @@ export const todos = [
     userTodo: {},
     projects: {},
   },
-]
+];
 export const topnotchers = [
   {
     id: 1,
@@ -151,4 +151,4 @@ export const topnotchers = [
     role: "FE",
     level: 1,
   },
-]
+];

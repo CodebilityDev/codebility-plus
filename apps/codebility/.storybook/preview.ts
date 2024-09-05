@@ -1,16 +1,4 @@
-import type { Preview } from '@storybook/react'
-import '../app/globals.css'
-import { INITIAL_VIEWPORTS, MINIMAL_VIEWPORTS } from '@storybook/addon-viewport'
-
-const CUSTOM_VIEWPORTS = {
-  FHD: {
-    name: "FHD - 1080px",
-    styles: {
-      width: "1920px",
-      height: "1080px",
-    },
-  }
-}
+import type { Preview } from "@storybook/react";
 
 const preview: Preview = {
   parameters: {
@@ -33,7 +21,6 @@ const preview: Preview = {
       //defaultViewport: 'tablet',  //use this to choose a default viewport
     }
   },
-  // tags: ["autodocs"]
-}
+};
 
-export default preview
+export default preview;

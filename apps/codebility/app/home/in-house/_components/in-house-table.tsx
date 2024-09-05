@@ -1,10 +1,11 @@
-import * as React from "react"
-import TableHeader from "./in-house-table-header"
-import TableBody from "./in-house-table-body"
-import EditTabelBody from "./in-house-edit-table-body"
-import DefaultPagination from "@/Components/ui/pagination"
-import { Codev } from '@/types/home/codev'
-import { InHouseProps } from "../_types/in-house"
+import * as React from "react";
+import DefaultPagination from "@/Components/ui/pagination";
+import { Codev } from "@/types/home/codev";
+
+import { InHouseProps } from "../_types/in-house";
+import EditTabelBody from "./in-house-edit-table-body";
+import TableBody from "./in-house-table-body";
+import TableHeader from "./in-house-table-header";
 
 function Tables({
   data,
@@ -16,25 +17,28 @@ function Tables({
   handlePreviousPage,
   handleNextPage,
 }: InHouseProps) {
-  const { setData, handleEditButton, handleSaveButton } = handlers
-  const { LoadinginHouse, ErrorinHouse } = status
+  const { setData, handleEditButton, handleSaveButton } = handlers;
+  const { LoadinginHouse, ErrorinHouse } = status;
 
-  const handleTableHeaderButton = (key: keyof Codev, direction: "up" | "down") => {
+  const handleTableHeaderButton = (
+    key: keyof Codev,
+    direction: "up" | "down",
+  ) => {
     const sortedData = [...data].sort((a, b) => {
-      const valueA = a[key] ?? ""
-      const valueB = b[key] ?? ""
+      const valueA = a[key] ?? "";
+      const valueB = b[key] ?? "";
       if (direction === "down") {
-        return valueA > valueB ? -1 : 1
+        return valueA > valueB ? -1 : 1;
       } else {
-        return valueA < valueB ? -1 : 1
+        return valueA < valueB ? -1 : 1;
       }
-    })
-    setData(sortedData)
-  }
+    });
+    setData(sortedData);
+  };
 
-  if (LoadinginHouse) <>LOADING</>
+  if (LoadinginHouse) <>LOADING</>;
 
-  if (ErrorinHouse) <>ERROR</>
+  if (ErrorinHouse) <>ERROR</>;
 
   return (
     <>
@@ -44,10 +48,18 @@ function Tables({
           <tbody>
             {data?.map((member: any) =>
               editableIds.includes(member.id) ? (
-                <EditTabelBody key={member.id} data={member} handleSaveButton={handleSaveButton} />
+                <EditTabelBody
+                  key={member.id}
+                  data={member}
+                  handleSaveButton={handleSaveButton}
+                />
               ) : (
-                <TableBody key={member.id} member={member} handleEditButton={handleEditButton} />
-              )
+                <TableBody
+                  key={member.id}
+                  member={member}
+                  handleEditButton={handleEditButton}
+                />
+              ),
             )}
           </tbody>
         </table>
@@ -56,8 +68,8 @@ function Tables({
         {data.length === 1
           ? `${data.length} item`
           : data.length > 0
-          ? `${data.length} items`
-          : "The applicants list is empty at the moment."}
+            ? `${data.length} items`
+            : "The applicants list is empty at the moment."}
       </div>
       <div className="hidden h-full w-full items-center justify-center lg:flex ">
         <DefaultPagination
@@ -68,7 +80,7 @@ function Tables({
         />
       </div>
     </>
-  )
+  );
 }
 
-export default Tables
+export default Tables;

@@ -1,6 +1,6 @@
 const Url = process.env.NEXT_PUBLIC_BASE_API
   ? `${process.env.NEXT_PUBLIC_BASE_API}`
-  : "https://codebility-be-ng67.onrender.com/api/v1/production"
+  : "https://codebility-be-ng67.onrender.com/api/v1/production";
 
 export const API = {
   USERS: `${Url}/users/`,
@@ -18,4 +18,4 @@ export const API = {
   CLIENTS: `${Url}/clients`,
   PROJECTS: `${Url}/projects`,
   BOARDS: `${Url}/boards`,
-}
+};

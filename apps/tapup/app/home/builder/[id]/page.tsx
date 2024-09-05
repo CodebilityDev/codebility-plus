@@ -1,7 +1,8 @@
-import React from 'react'
-import BuilderForms from '../_components/builder-forms'
-import BuilderScreen from '../_components/builder-screen'
-import BuilderNavbar from '../_components/builder-navbar'
+import React from "react";
+
+import BuilderForms from "../_components/builder-forms";
+import BuilderNavbar from "../_components/builder-navbar";
+import BuilderScreen from "../_components/builder-screen";
 
 function BuilderEditorPage() {
   return (
@@ -12,7 +13,7 @@ function BuilderEditorPage() {
         <BuilderScreen />
       </div>
     </div>
-  )
+  );
 }
 
-export default BuilderEditorPage
+export default BuilderEditorPage;
