@@ -54,6 +54,10 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # Fetch the dev branch to make it available for comparison
+      - name: Fetch dev branch
+        run: git fetch origin dev
+
       # Run build for only affected packages (based on changed files)
       - name: Build changed packages
         run: pnpm dlx turbo@latest run build --filter=...[origin/dev]
