@@ -1,5 +1,5 @@
 import Image from "next/image"
-import SignUpForm from "./SignUpForm"
+import SignUpForm from "./_components/sign-up-form"
 import Link from "next/link"
 import pathsConfig from "@/config/paths.config"
 

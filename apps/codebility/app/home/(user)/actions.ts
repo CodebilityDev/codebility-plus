@@ -18,7 +18,7 @@ export const updateUserSchedule = async ({
     })
     .eq("id", codevId);
 
-    console.log("update schedule error ", error);
+    if (error) throw error;
 }
 
 export const startUserTimer = async (codevId: string) => {

@@ -1,14 +1,12 @@
-"use client"
-
-import Navigation from "@/app/(marketing)/Navigation"
-import Profiles from "@/app/(marketing)/profiles/page"
-import Hero from "@/app/(marketing)/codevs/components/Hero"
-import Footer from "@/app/(marketing)/Footer"
-import MissionVision from "@/app/(marketing)/codevs/components/MissionVision"
-import FeaturedSection from "@/app/(marketing)/codevs/components/FeaturedSection" 
-import Project from "@/app/(marketing)/codevs/components/Project"
-import CTA from "@/app/(marketing)/codevs/components/CTA"
-import Roadmap from "@/app/(marketing)/codevs/components/Roadmap"
+import Navigation from "../_components/marketing-navigation"
+import Profiles from "../profiles/page"
+import Hero from "./_components/codevs-hero"
+import Footer from "../_components/marketing-footer"
+import MissionVision from "./_components/codevs-mission-vision"
+import FeaturedSection from "./_components/codevs-featured-section" 
+import Project from "./_components/codevs-project"
+import CTA from "./_components/codevs-cta"
+import Roadmap from "./_components/codevs-roadmap"
 
 const Codevs = () => {
   return (

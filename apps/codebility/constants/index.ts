@@ -107,15 +107,15 @@ export const sidebarData: Sidebar[] = [
 
 // ====================================================================================
 
-export const taskPrioLevels = ["Highest", "Critical", "High", "Medium", "Low"]
+export const taskPrioLevels = [ "Critical", "Highest", "High", "Medium", "Low"] as const;
 
 // ====================================================================================
 
-export const categories = ["FE", "BE", "MD", "UI"]
+export const categories = ["FE", "BE", "MD", "UI"] as const;
 
 // ====================================================================================
 
-export const taskTypes = ["BUG", "REFACTOR", "FEATURE", "PERF"]
+export const taskTypes = ["BUG", "REFACTOR", "FEATURE", "PERF"] as const;
 
 
 // ====================================================================================

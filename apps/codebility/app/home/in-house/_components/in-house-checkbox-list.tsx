@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { useQuery } from "@tanstack/react-query";
-import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Project } from '@/types/home/codev'
 
 interface ICheckboxListProps {
@@ -13,11 +13,11 @@ interface ICheckboxListProps {
 export default function CheckboxList({ initialItems = [], handleChange, className }: ICheckboxListProps) {
   const [items, setItems] = useState<string[]>([]);
   const [checkedItems, setCheckedItems] = useState<{ [key: string]: boolean }>({});
+  const supabase = useSupabase();
 
   const { data: projects_list, isLoading, isError } = useQuery<Project[]>({
     queryKey: ["projects_list"],
     queryFn: async () => {
-      const supabase = getSupabaseBrowserClient();
       const { data, error } = await supabase.from("project")
       .select(); 
       if (error) throw error;

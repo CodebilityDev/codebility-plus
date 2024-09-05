@@ -1,7 +1,7 @@
 import { IconApplicant, IconActivityLog, IconHuman } from "@/public/assets/svgs"
-import InquiryForm from "@/app/(marketing)/contact/components/InquiryForm"
-// import ShortSurvey from "./components/ShortSurvey"
-// import Appointment from "./components/Appointment"
+import InquiryForm from "./_components/contact-inquiry-inform"
+// import ShortSurvey from "./_components/contact-short-survey"
+// import Appointment from "./_components/contact-appointment"
 
 const Contact = () => {
   return (

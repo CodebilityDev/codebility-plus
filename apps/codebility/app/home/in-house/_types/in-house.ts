@@ -1,3 +1,4 @@
+import React from "react";
 import { Codev } from '@/types/home/codev'
 
 export interface InHouseProps {

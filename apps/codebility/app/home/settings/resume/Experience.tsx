@@ -61,11 +61,11 @@ const Experience = ({ user }: { user: User }) => {
     }
   }, [id, token])
 
-  useEffect(() => {
+/*   useEffect(() => {
     if (id && token) {
       getWorkExperiences()
     }
-  }, [user.Work_Experience.length, token, id, getWorkExperiences])
+  }, [user.Work_Experience.length, token, id, getWorkExperiences]) */
 
   const handleUpdateExperience = (itemNo: number, e: any) => {
     const updatedExperiences = experienceData.map((item, id) => {

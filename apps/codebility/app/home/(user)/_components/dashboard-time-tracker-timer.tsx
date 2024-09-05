@@ -5,7 +5,8 @@ import { formatTime } from "../_lib/util";
 import { Button } from "@/Components/ui/button"
 import { startUserTimer, updateUserTaskOnHand } from "../actions";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
-import { Task } from "../_types/task";
+import { Task } from "@/types/home/task";
+import toast from "react-hot-toast";
 
 interface Props {
   tasks: Task[];
@@ -40,6 +41,12 @@ export default function TimeTrackerTimer({ codevId, tasks, currentTaskId, timerI
   }
 
   const handleStartStopTimer = async () => {
+    // if no task on hand we don't allow start/stop timer.
+    if (!taskOnHandId) {
+      toast.error("No Task Set");
+      return; 
+    }
+
     setIsTimerRunning(!isTimerRunning)
 
     if (!isTimerRunning) {

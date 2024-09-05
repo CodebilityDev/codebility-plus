@@ -28,18 +28,22 @@ export default function TimeTrackerSchedule({ startTime, endTime, codevId }: Pro
       start_time: currentStartTime,
       end_time: currentEndTime
     })
-  }, [startTime, endTime]);
+  }, [startTime, endTime, addTime, currentEndTime, currentStartTime]);
   
   useEffect(() => {
     if (isMounted) {
       setStartTime(time.start_time);
       setEndTime(time.end_time);
 
-      // a server action but don't have to await since we used state to display changes.
-      updateUserSchedule({
-        startTime: time.start_time,
-        endTime: time.end_time
-      }, codevId);
+      try {
+        // a server action but don't have to await since we used state to display changes.
+        updateUserSchedule({
+          startTime: time.start_time,
+          endTime: time.end_time
+        }, codevId);
+      } catch (e: any) {
+        console.log(e.message);
+      } 
     }
     
     return () => {
@@ -49,7 +53,7 @@ export default function TimeTrackerSchedule({ startTime, endTime, codevId }: Pro
   
   return (
     <div className="flex items-center gap-2 justify-center">
-      {startTime && endTime ? (
+      {currentStartTime && currentEndTime ? (
         <>
           <p className="text-md">{`${formatLocaleTime(currentStartTime)} - ${formatLocaleTime(currentEndTime)}`}</p>
           <div>

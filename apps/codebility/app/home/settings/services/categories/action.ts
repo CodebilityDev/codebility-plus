@@ -1,12 +1,12 @@
 "use server"
 
-import { createServer } from "@/utils/supabase";
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { revalidatePath } from "next/cache";
 
-export const createServiceCategoryAction = async (formData: FormData) => { 
+export const createServiceCategoryAction = async (formData: FormData) => {
     const name = formData.get("name") as string;
 
-    const supabase = await createServer();
+    const supabase = await getSupabaseServerActionClient();
 
     const { data, error } = await supabase
         .from("service-categories")
@@ -22,10 +22,10 @@ export const createServiceCategoryAction = async (formData: FormData) => {
     return { success: true, message: "Service category created successfully", data };
 }
 
-export const updateServiceCategoryAction = async (id: number, formData: FormData) => { 
+export const updateServiceCategoryAction = async (id: number, formData: FormData) => {
     const name = formData.get("name") as string;
 
-    const supabase = await createServer();
+    const supabase = await getSupabaseServerActionClient();
 
     const { data, error } = await supabase
         .from("service-categories")
@@ -41,8 +41,8 @@ export const updateServiceCategoryAction = async (id: number, formData: FormData
     return { success: true, message: "Service category updated successfully", data };
 }
 
-export const deleteServiceCategoryAction = async (id: number) => { 
-    const supabase = await createServer();
+export const deleteServiceCategoryAction = async (id: number) => {
+    const supabase = await getSupabaseServerActionClient();
 
     console.log("Deleting category with ID:", id);
 
