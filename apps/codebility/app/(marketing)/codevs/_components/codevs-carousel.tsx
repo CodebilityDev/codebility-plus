@@ -42,7 +42,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
               {/*Slides, the one that you are scrolling/navigating */}
               <div className={`flex w-full items-center justify-center px-2 lg:px-10 `}>
                 <Image
-                  src={src}
+                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/${src}`}
                   alt="Project Image"
                   width={1000}
                   height={500}
