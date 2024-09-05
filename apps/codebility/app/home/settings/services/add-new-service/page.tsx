@@ -1,11 +1,12 @@
-import { createServer } from "@/utils/supabase";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import ServiceForm from "../_components/service-form";
+import { Category } from "../categories/_types/category";
 import { Category } from "../categories/_types/category";
 import { getAllServiceCategories } from "../categories/service";
 
 const AddNewService = async () => {
-  const supabase = createServer();
+  const supabase = getSupabaseServerComponentClient();
   const {
     data: { user },
     error,
@@ -21,5 +22,7 @@ const AddNewService = async () => {
     <ServiceForm userId={user?.id} categories={categories as Category[]} />
   );
 };
+
+export default AddNewService;
 
 export default AddNewService;
