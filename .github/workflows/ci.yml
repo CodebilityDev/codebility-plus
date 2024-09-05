@@ -19,7 +19,7 @@ jobs:
  
       # Install pnpm using the official pnpm/action-setup
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v3
         with:
           version: 8
 
