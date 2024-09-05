@@ -1,4 +1,9 @@
-import { IconFacebook, IconFigma, IconJavaScript, IconSlackColored } from "@/public/assets/svgs"
+import {
+  IconFacebook,
+  IconFigma,
+  IconJavaScript,
+  IconSlackColored,
+} from "@/public/assets/svgs";
 
 export const positionTitles = [
   "Fullstack Developer",
@@ -15,8 +20,8 @@ export const positionTitles = [
   "Fb Ads Specialist",
   "Research Auditor",
   "Technical HR Manager",
-  "Chief Human Resources Officer"
-] as const
+  "Chief Human Resources Officer",
+] as const;
 
 export const tokenPoints = [
   {
@@ -35,22 +40,22 @@ export const tokenPoints = [
     position: "Mobile",
     points: 0,
   },
-]
+];
 
 export const socials = [
   {
-    Icon: IconSlackColored
+    Icon: IconSlackColored,
   },
   {
-    Icon: IconFacebook
-  }
-]
+    Icon: IconFacebook,
+  },
+];
 
 export const skills = [
   {
-    Icon: IconFigma
+    Icon: IconFigma,
   },
   {
-    Icon: IconJavaScript
-  }
-]
+    Icon: IconJavaScript,
+  },
+];

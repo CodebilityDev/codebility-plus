@@ -1,13 +1,12 @@
-import Link from "next/link"
-import Image from "next/image"
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/Components/ui/button";
 
-import HeroCard from "./landing-hero-card"
-import Container from "../marketing-container"
-
-import { MarketingCardData } from "../../_lib/dummy-data"
-import HeroBackground from "./landing-hero-bg"
-import { Button } from "@/Components/ui/button"
-import SideNavMenu from "../marketing-sidenav-menu"
+import { MarketingCardData } from "../../_lib/dummy-data";
+import Container from "../marketing-container";
+import SideNavMenu from "../marketing-sidenav-menu";
+import HeroBackground from "./landing-hero-bg";
+import HeroCard from "./landing-hero-card";
 
 const Hero = () => {
   return (
@@ -22,7 +21,9 @@ const Hero = () => {
           <div className="relative">
             <div className="relative z-10 flex flex-col gap-8 pt-20 text-center lg:pt-0">
               <div className="flex flex-col gap-4">
-                <p className="text-lg font-normal uppercase md:text-2xl lg:font-semibold">Codebility</p>
+                <p className="text-lg font-normal uppercase md:text-2xl lg:font-semibold">
+                  Codebility
+                </p>
                 <h1 className="flex flex-col gap-1 text-4xl font-semibold md:text-6xl">
                   <span>We lead in digital</span>
                   <span>innovation & design</span>
@@ -55,13 +56,18 @@ const Hero = () => {
 
           <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-5">
             {MarketingCardData.map((data, index) => (
-              <HeroCard key={index} title={data.title} description={data.description} url={data.url} />
+              <HeroCard
+                key={index}
+                title={data.title}
+                description={data.description}
+                url={data.url}
+              />
             ))}
           </div>
         </Container>
       </section>
     </div>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

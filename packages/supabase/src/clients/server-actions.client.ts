@@ -1,8 +1,8 @@
-import 'server-only';
+import "server-only";
 
-import { unstable_noStore as noStore } from 'next/cache';
-import { cookies } from 'next/headers';
-import { createServerActionClient } from '@supabase/auth-helpers-nextjs';
+import { unstable_noStore as noStore } from "next/cache";
+import { cookies } from "next/headers";
+import { createServerActionClient } from "@supabase/auth-helpers-nextjs";
 
 function createServerSupabaseClient() {
   return createServerActionClient({ cookies });

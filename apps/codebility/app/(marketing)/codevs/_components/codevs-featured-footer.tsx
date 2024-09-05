@@ -1,11 +1,10 @@
-import Link from "next/link"
-
-import Logo from "@/Components/shared/Logo"
-import { useModal } from "@/hooks/use-modal"
-import { aboutLinks, siteLinks } from "@/constants"
+import Link from "next/link";
+import Logo from "@/Components/shared/Logo";
+import { aboutLinks, siteLinks } from "@/constants";
+import { useModal } from "@/hooks/use-modal";
 
 const Footer = () => {
-  const { onOpen } = useModal()
+  const { onOpen } = useModal();
   return (
     <footer className="bg-black-400 text-gray">
       <div className="flex flex-col gap-4 px-6 py-24 md:px-10 lg:flex-row lg:px-32">
@@ -17,7 +16,11 @@ const Footer = () => {
           <p className="mt-4 text-xl font-semibold text-white">About Us</p>
           <div className="flex flex-col items-center gap-2 lg:items-start">
             {aboutLinks.map((link, index) => (
-              <Link key={index} href={link.url} className="text-base font-light duration-300 hover:text-blue-100">
+              <Link
+                key={index}
+                href={link.url}
+                className="text-base font-light duration-300 hover:text-blue-100"
+              >
                 {link.label}
               </Link>
             ))}
@@ -51,7 +54,11 @@ const Footer = () => {
                     {link.label}
                   </button>
                 ) : (
-                  <Link key={index} href={link.url} className="text-base font-light duration-300 hover:text-blue-100">
+                  <Link
+                    key={index}
+                    href={link.url}
+                    className="text-base font-light duration-300 hover:text-blue-100"
+                  >
                     {link.label}
                   </Link>
                 )}
@@ -72,11 +79,13 @@ const Footer = () => {
         </div>
       </div>
 
-      <div className="flex items-center justify-center border-t border-darkgray p-8">
-        <p className="text-lg">Copyright {new Date().getFullYear()} Codebility. All Right Reserved.</p>
+      <div className="border-darkgray flex items-center justify-center border-t p-8">
+        <p className="text-lg">
+          Copyright {new Date().getFullYear()} Codebility. All Right Reserved.
+        </p>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

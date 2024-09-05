@@ -26,7 +26,7 @@ export const formSchema = z
     {
       message: "Both Password did not match",
       path: ["confirmPassword"],
-    }
+    },
   );
 
 interface formTypes {

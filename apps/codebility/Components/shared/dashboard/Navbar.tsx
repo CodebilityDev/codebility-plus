@@ -1,27 +1,29 @@
-"use client"
+"use client";
 
-import Image from "next/image"
-import React from "react"
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { signOut } from "@/app/authv2/actions";
+import MobileNav from "@/Components/shared/dashboard/MobileNav";
+import Theme from "@/Components/shared/dashboard/Theme";
+import useAuth from "@/hooks/use-auth";
+import { defaultAvatar } from "@/public/assets/images";
+import { IconDropdown, IconLogout, IconProfile } from "@/public/assets/svgs";
 
-import Link from "next/link"
-import Theme from "@/Components/shared/dashboard/Theme"
-import MobileNav from "@/Components/shared/dashboard/MobileNav"
-import { IconDropdown, IconLogout, IconProfile } from "@/public/assets/svgs"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu"
-import useAuth from "@/hooks/use-auth"
-import { defaultAvatar } from "@/public/assets/images"
-import { signOut } from "@/app/authv2/actions"
+} from "@codevs/ui/dropdown-menu";
 
-export const menuItems = [{ href: "/settings", icon: IconProfile, label: "Settings" }]
+export const menuItems = [
+  { href: "/settings", icon: IconProfile, label: "Settings" },
+];
 
 const Navbar = () => {
-  const { userData } = useAuth()
+  const { userData } = useAuth();
   return (
     <>
       <nav className="background-navbar fixed top-0 z-10 w-full shadow-sm">
@@ -35,22 +37,22 @@ const Navbar = () => {
                   <p className="capitalize dark:text-white">
                     {userData?.first_name} {userData?.last_name}
                   </p>
-                  <p className="text-sm text-gray">{userData?.email_address}</p>
+                  <p className="text-gray text-sm">{userData?.email_address}</p>
                 </div>
-                <div className="relative size-[44px] rounded-full bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover p-[1.5px]">
+                <div className="from-violet relative size-[44px] rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover p-[1.5px]">
                   <Image
                     alt="Avatar"
                     src={userData?.image_url ?? defaultAvatar}
                     fill
                     title={`${userData?.name}'s Avatar`}
-                    className="h-auto w-full rounded-full bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover"
+                    className="from-violet h-auto w-full rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover"
                     loading="eager"
                   />
                 </div>
                 <IconDropdown className="hidden invert dark:invert-0 md:block" />
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="absolute -left-24 top-3 border-white dark:border-zinc-700 dark:bg-dark-100 md:w-[200px]">
+              <DropdownMenuContent className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]">
                 {menuItems.map((item) => (
                   <Link href={item.href} key={item.label}>
                     <DropdownMenuItem className="flex cursor-pointer items-center gap-6 p-3 px-5">
@@ -64,7 +66,7 @@ const Navbar = () => {
 
                 <DropdownMenuItem
                   onClick={async (e) => {
-                    e.stopPropagation()
+                    e.stopPropagation();
                     await signOut();
                   }}
                   className="flex cursor-pointer items-center gap-6 p-3 px-5"
@@ -78,7 +80,7 @@ const Navbar = () => {
         </div>
       </nav>
     </>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

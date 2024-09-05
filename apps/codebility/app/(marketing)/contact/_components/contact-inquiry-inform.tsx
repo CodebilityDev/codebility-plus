@@ -1,8 +1,9 @@
-"use client"
+"use client";
 
-import { Button } from "@/Components/ui/button"
-import Input from "@/Components/ui/forms/input"
-import { Label } from "@codevs/ui/label"
+import { Button } from "@/Components/ui/button";
+import Input from "@/Components/ui/forms/input";
+
+import { Label } from "@codevs/ui/label";
 
 const InquiryForm = () => {
   return (
@@ -52,7 +53,7 @@ const InquiryForm = () => {
         Next
       </Button>
     </div>
-  )
-}
+  );
+};
 
-export default InquiryForm
+export default InquiryForm;

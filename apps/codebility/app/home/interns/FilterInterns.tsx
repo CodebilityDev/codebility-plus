@@ -1,40 +1,45 @@
-import { Box } from "@/Components/shared/dashboard"
-import { Button } from "@/Components/ui/button"
-import { Checkbox } from "@codevs/ui/checkbox"
-import React, { useState } from "react"
-import { positionTitles } from "@/app/home/interns/data"
-import { interns_FilterInternsT } from "@/types/protectedroutes"
+import React, { useState } from "react";
+import { positionTitles } from "@/app/home/interns/data";
+import { Box } from "@/Components/shared/dashboard";
+import { Button } from "@/Components/ui/button";
+import { interns_FilterInternsT } from "@/types/protectedroutes";
+
+import { Checkbox } from "@codevs/ui/checkbox";
 
 const FilterInterns = ({ filters, setFilters }: interns_FilterInternsT) => {
-  const [showFilter, setShowFilter] = useState<boolean>(false)
+  const [showFilter, setShowFilter] = useState<boolean>(false);
 
   const updateFilter = (
     filterValue: interns_FilterInternsT["filters"][number],
-    previousFilterValue: interns_FilterInternsT["filters"]
+    previousFilterValue: interns_FilterInternsT["filters"],
   ) => {
     if (previousFilterValue.includes(filterValue)) {
-      const index = previousFilterValue.indexOf(filterValue)
-      const isEmpty = index > -1
+      const index = previousFilterValue.indexOf(filterValue);
+      const isEmpty = index > -1;
 
       if (isEmpty) {
-        previousFilterValue.splice(index, 1)
+        previousFilterValue.splice(index, 1);
       }
     } else {
-      previousFilterValue.push(filterValue)
+      previousFilterValue.push(filterValue);
     }
 
-    return [...previousFilterValue]
-  }
+    return [...previousFilterValue];
+  };
 
   const selectFilter = (value: interns_FilterInternsT["filters"][number]) => {
-    setFilters(updateFilter.bind(null, value))
-  }
-  const clearFilter = () => setFilters([])
-  const toggleFilter = () => setShowFilter((prev) => !prev)
+    setFilters(updateFilter.bind(null, value));
+  };
+  const clearFilter = () => setFilters([]);
+  const toggleFilter = () => setShowFilter((prev) => !prev);
 
   return (
-    <div className="relative text-gray">
-      <Button variant={showFilter ? "destructive" : "default"} size="sm" onClick={toggleFilter}>
+    <div className="text-gray relative">
+      <Button
+        variant={showFilter ? "destructive" : "default"}
+        size="sm"
+        onClick={toggleFilter}
+      >
         {showFilter ? "Close filter" : "Filter"}
       </Button>
       <Box
@@ -43,13 +48,16 @@ const FilterInterns = ({ filters, setFilters }: interns_FilterInternsT) => {
         }`}
       >
         <div className="items mb-2 flex flex-row justify-between">
-          <p className="pb-2 text-gray">Filter by</p>
+          <p className="text-gray pb-2">Filter by</p>
           <p className="cursor-pointer text-sm" onClick={clearFilter}>
             Clear
           </p>
         </div>
         {positionTitles.map((position, index) => (
-          <div className="flex cursor-pointer items-center justify-between gap-2 p-2 hover:bg-black-200" key={index}>
+          <div
+            className="hover:bg-black-200 flex cursor-pointer items-center justify-between gap-2 p-2"
+            key={index}
+          >
             <label htmlFor={position} className="cursor-pointer">
               {position}
             </label>
@@ -63,7 +71,7 @@ const FilterInterns = ({ filters, setFilters }: interns_FilterInternsT) => {
         ))}
       </Box>
     </div>
-  )
-}
+  );
+};
 
-export default FilterInterns
+export default FilterInterns;

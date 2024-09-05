@@ -1,24 +1,38 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Button } from "@/Components/ui/button"
-import { Dialog, DialogContent, DialogFooter, DialogClose, DialogTrigger } from "@codevs/ui/dialog"
-import Input from "@/Components/ui/forms/input"
-import { Label } from "@codevs/ui/label"
-import { Textarea } from "@codevs/ui/textarea"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem, SelectItemText } from "@radix-ui/react-select"
-import { IconClose, IconDropdown, IconCopy } from "@/public/assets/svgs"
-import { useState } from "react"
-import { taskPrioLevels, categories, taskTypes } from "@/constants"
-import { User } from "@/types"
-import toast from "react-hot-toast"
-import Image from "next/image"
-import { deleteTask, updateTask } from "../../actions"
-import { Task } from "@/types/home/task"
-import KanbanAddModalMembers from "./kanban-add-modal-members"
-import { getTaskMembers } from "@/app/home/_lib/get-task-members"
-import { useRouter } from "next/navigation"
+import React, { useState } from "react";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { getTaskMembers } from "@/app/home/_lib/get-task-members";
+import { Button } from "@/Components/ui/button";
+import Input from "@/Components/ui/forms/input";
+import { categories, taskPrioLevels, taskTypes } from "@/constants";
+import { IconClose, IconCopy, IconDropdown } from "@/public/assets/svgs";
+import { User } from "@/types";
+import { Task } from "@/types/home/task";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectItemText,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select";
+import toast from "react-hot-toast";
 
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogTrigger,
+} from "@codevs/ui/dialog";
+import { Label } from "@codevs/ui/label";
+import { Textarea } from "@codevs/ui/textarea";
+
+import { deleteTask, updateTask } from "../../actions";
+import KanbanAddModalMembers from "./kanban-add-modal-members";
 
 interface Props {
   children: React.ReactNode;
@@ -26,17 +40,17 @@ interface Props {
 }
 
 export default function KanbanTaskViewEditModal({ children, task }: Props) {
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
   const router = useRouter();
 
   const handleCopy = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text)
-      toast.success("Copied to clipboard!")
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard!");
     } catch (err) {
-      toast.error("Failed to copy text")
+      toast.error("Failed to copy text");
     }
-  }
+  };
 
   const handleSubmit = async (formData: FormData) => {
     try {
@@ -50,7 +64,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
     } catch (e: any) {
       toast.error(e.message);
     }
-  }
+  };
 
   const handleDelete = async () => {
     try {
@@ -60,30 +74,31 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
     } catch (e: any) {
       toast.error(e.message);
     }
-  }
+  };
 
   return (
     <Dialog>
-      <DialogTrigger asChild>
-        {children}
-      </DialogTrigger>
+      <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
         hideCloseButton={true}
         className="background-lightsection_darksection text-dark100_light900 h-[32rem] w-full max-w-3xl overflow-x-auto overflow-y-auto lg:h-auto"
       >
-        <form className="flex flex-col justify-items-center gap-6 px-4 py-2" action={handleSubmit}>
+        <form
+          className="flex flex-col justify-items-center gap-6 px-4 py-2"
+          action={handleSubmit}
+        >
           <div className="flex flex-col gap-6">
             <div className="flex flex-col gap-2">
               <div className="flex items-center gap-2">
                 <Label htmlFor="title">Task Number</Label>
-                <div className="border-light_dark flex items-center justify-between rounded border bg-transparent p-1 text-center text-xs focus:outline-none dark:bg-dark-200">
+                <div className="border-light_dark dark:bg-dark-200 flex items-center justify-between rounded border bg-transparent p-1 text-center text-xs focus:outline-none">
                   #{task.number}
                 </div>
               </div>
               <Input
                 id="title"
                 name="title"
-                className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                 placeholder={task.title}
                 disabled={!isEditing}
               />
@@ -100,15 +115,15 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                     <Select defaultValue={task.category} name="category">
                       <SelectTrigger
                         aria-label="Category"
-                        className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                        className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                       >
-                        <SelectValue  className="text-sm" />
+                        <SelectValue className="text-sm" />
                         <IconDropdown className="h-5 invert dark:invert-0" />
                       </SelectTrigger>
 
                       <SelectContent
                         position="popper"
-                        className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                        className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
                       >
                         <SelectGroup>
                           {categories.map((category, i) => (
@@ -117,16 +132,14 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                               className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
                               value={category}
                             >
-                              <SelectItemText>
-                                {category}
-                              </SelectItemText>
+                              <SelectItemText>{category}</SelectItemText>
                             </SelectItem>
                           ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
+                    <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
                       {task.category}
                     </div>
                   )}
@@ -145,7 +158,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                         isKeyboard={true}
                         defaultValue={task.duration}
                         disabled={!isEditing}
-                        className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                        className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                       />
                     </div>
                     <div className="flex w-1/3 flex-col gap-2">
@@ -157,7 +170,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                         min="0"
                         defaultValue={task.points}
                         disabled={!isEditing}
-                        className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                        className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                       />
                     </div>
                   </>
@@ -165,13 +178,13 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                   <>
                     <div className="flex w-1/3 flex-col gap-2">
                       <Label htmlFor="duration">Duration hrs</Label>
-                      <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
+                      <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
                         {task.duration}
                       </div>
                     </div>
                     <div className="flex w-1/3 flex-col gap-2">
                       <Label htmlFor="points">Points</Label>
-                      <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
+                      <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
                         {task.points}
                       </div>
                     </div>
@@ -185,7 +198,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                     <Select name="priority" defaultValue={task.priority_level}>
                       <SelectTrigger
                         aria-label="Priority Level"
-                        className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                        className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                       >
                         <SelectValue className="text-sm" />
                         <IconDropdown className="h-5 invert dark:invert-0" />
@@ -193,7 +206,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
 
                       <SelectContent
                         position="popper"
-                        className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                        className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
                       >
                         <SelectGroup>
                           {taskPrioLevels.map((prioLevel, i) => (
@@ -202,17 +215,17 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                               className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
                               value={prioLevel.toUpperCase()}
                             >
-                              <SelectItemText>
-                                {prioLevel}
-                              </SelectItemText>
+                              <SelectItemText>{prioLevel}</SelectItemText>
                             </SelectItem>
                           ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
-                      {task.priority_level.charAt(0) + task.priority_level.slice(1).toLowerCase()} {/** capitalize */}
+                    <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
+                      {task.priority_level.charAt(0) +
+                        task.priority_level.slice(1).toLowerCase()}{" "}
+                      {/** capitalize */}
                     </div>
                   )}
                 </div>
@@ -222,7 +235,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                     <Select defaultValue={task.type} name="type">
                       <SelectTrigger
                         aria-label="Type"
-                        className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                        className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                       >
                         <SelectValue className="text-sm" />
                         <IconDropdown className="h-5 invert dark:invert-0" />
@@ -230,7 +243,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
 
                       <SelectContent
                         position="popper"
-                        className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                        className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
                       >
                         <SelectGroup>
                           {taskTypes.map((type, i) => (
@@ -239,16 +252,14 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                               className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
                               value={type}
                             >
-                              <SelectItemText>
-                                {type}
-                              </SelectItemText>
+                              <SelectItemText>{type}</SelectItemText>
                             </SelectItem>
                           ))}
                         </SelectGroup>
                       </SelectContent>
                     </Select>
                   ) : (
-                    <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
+                    <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
                       {task.type}
                     </div>
                   )}
@@ -256,45 +267,47 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
               </div>
             </div>
             <div className="flex flex-wrap items-center gap-x-0.5">
-              {
-                isEditing ? (
-                  <KanbanAddModalMembers initialSelectedMembers={getTaskMembers(task.codev_task)}/>
-                )
-                :
-                (
-                  <>
-                    {(getTaskMembers(task.codev_task)).map((users: User) => (
-                      <div
-                        className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-                        key={`${users.id}`}
-                      >
-                        <Image
-                          alt="Avatar"
-                          src={users.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${users.image_url}` : "/default-avatar.jpg"}
-                          fill
-                          title={`${users.first_name} ${users.last_name}'s Avatar`}
-                          className="h-auto w-full rounded-full bg-cover object-cover"
-                          loading="eager"
-                        />
-                      </div>
-                    ))}
-                  </>
-                )
-              }
+              {isEditing ? (
+                <KanbanAddModalMembers
+                  initialSelectedMembers={getTaskMembers(task.codev_task)}
+                />
+              ) : (
+                <>
+                  {getTaskMembers(task.codev_task).map((users: User) => (
+                    <div
+                      className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
+                      key={`${users.id}`}
+                    >
+                      <Image
+                        alt="Avatar"
+                        src={
+                          users.image_url
+                            ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${users.image_url}`
+                            : "/default-avatar.jpg"
+                        }
+                        fill
+                        title={`${users.first_name} ${users.last_name}'s Avatar`}
+                        className="h-auto w-full rounded-full bg-cover object-cover"
+                        loading="eager"
+                      />
+                    </div>
+                  ))}
+                </>
+              )}
             </div>
 
             <div className="flex flex-col gap-1">
-              <Label htmlFor="description" >Description</Label>
+              <Label htmlFor="description">Description</Label>
               {isEditing ? (
                 <Textarea
                   id="description"
                   name="description"
                   variant="ghost"
-                  className="h-[8rem] resize-none dark:bg-dark-200"
+                  className="dark:bg-dark-200 h-[8rem] resize-none"
                   defaultValue={task.description}
                 />
               ) : (
-                <div className="border-light_dark h-[8rem] w-full resize-none rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200">
+                <div className="border-light_dark dark:bg-dark-200 h-[8rem] w-full resize-none rounded border bg-transparent px-3 py-2 text-sm focus:outline-none">
                   {task.description}
                 </div>
               )}
@@ -304,7 +317,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
           <div className="flex flex-col gap-2">
             <Label htmlFor="title">Branch Name</Label>
             <div className="flex gap-2">
-              <div className="border-light_dark rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200">
+              <div className="border-light_dark dark:bg-dark-200 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none">
                 {task.pr_link}
               </div>
               <button type="button" onClick={() => handleCopy(task.pr_link)}>
@@ -319,7 +332,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                 <Input
                   id="pr_link"
                   name="pr_link"
-                  className="border-light_dark w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                  className="border-light_dark dark:bg-dark-200 w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                   placeholder="Enter Pull Request Link"
                   defaultValue={task.pr_link}
                 />
@@ -329,7 +342,7 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
                 <Input
                   id="pr_link"
                   disabled
-                  className="border-light_dark w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                  className="border-light_dark dark:bg-dark-200 w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                   value={task?.pr_link}
                 />
               </div>
@@ -338,7 +351,10 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
 
           <DialogFooter className="flex flex-col gap-2 lg:flex-row">
             {isEditing ? (
-              <Button variant="default" className="order-1 w-full sm:order-2 sm:w-[130px]" /* onClick={handleSave} */>
+              <Button
+                variant="default"
+                className="order-1 w-full sm:order-2 sm:w-[130px]" /* onClick={handleSave} */
+              >
                 Save Update
               </Button>
             ) : (
@@ -366,7 +382,10 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
 
           <div>
             <DialogClose asChild>
-              <button className="absolute right-4 top-4" onClick={() => setIsEditing(false)}>
+              <button
+                className="absolute right-4 top-4"
+                onClick={() => setIsEditing(false)}
+              >
                 <IconClose className="h-5 invert dark:invert-0" />
               </button>
             </DialogClose>
@@ -374,5 +393,5 @@ export default function KanbanTaskViewEditModal({ children, task }: Props) {
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

@@ -1,20 +1,33 @@
-import toast from "react-hot-toast"
-import { useEffect, useState } from "react"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Input } from "@codevs/ui/input"
-import { Button } from "@/Components/ui/button"
-import { IconClose } from "@/public/assets/svgs"
-import { useModal } from "@/hooks/use-modal-service-categories"
-import { DialogTitle } from "@radix-ui/react-dialog"
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from "../ui/dialog"
-import { createServiceCategoryAction, updateServiceCategoryAction } from "@/app/home/settings/services/categories/action"
-import { serviceCategoryFormValues, serviceCategorySchema } from "@/app/home/settings/services/categories/_lib/schema"
+import { useEffect, useState } from "react";
+import {
+  serviceCategoryFormValues,
+  serviceCategorySchema,
+} from "@/app/home/settings/services/categories/_lib/schema";
+import {
+  createServiceCategoryAction,
+  updateServiceCategoryAction,
+} from "@/app/home/settings/services/categories/action";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal-service-categories";
+import { IconClose } from "@/public/assets/svgs";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+
+import { Input } from "@codevs/ui/input";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "../ui/dialog";
 
 const ServiceCategoriesModal = () => {
-  const { isOpen, onClose, type, data: passedData } = useModal()
-  const isModalOpen = isOpen && type === "serviceCategoriesModal"
-  const [isLoading, setIsLoading] = useState(false)
+  const { isOpen, onClose, type, data: passedData } = useModal();
+  const isModalOpen = isOpen && type === "serviceCategoriesModal";
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     register,
@@ -24,7 +37,7 @@ const ServiceCategoriesModal = () => {
   } = useForm<serviceCategoryFormValues>({
     resolver: zodResolver(serviceCategorySchema),
     mode: "onChange",
-  })
+  });
 
   useEffect(() => {
     if (passedData) {
@@ -41,10 +54,12 @@ const ServiceCategoriesModal = () => {
       });
     }
     onClose();
-  }
+  };
 
-  const handleServiceCategorySubmit = async (data: serviceCategoryFormValues) => {
-    setIsLoading(true)
+  const handleServiceCategorySubmit = async (
+    data: serviceCategoryFormValues,
+  ) => {
+    setIsLoading(true);
 
     try {
       const formData = new FormData();
@@ -65,22 +80,25 @@ const ServiceCategoriesModal = () => {
         toast.error(`Error: ${response.error}`);
       }
     } catch (error) {
-      toast.error("Error Creating/Updating Category")
+      toast.error("Error Creating/Updating Category");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
-      <DialogContent
-        className="flex h-[32rem] w-[50%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
-      >
-        <button onClick={() => handleDialogChange(false)} className="absolute right-4 top-4">
+      <DialogContent className="flex h-[32rem] w-[50%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto">
+        <button
+          onClick={() => handleDialogChange(false)}
+          className="absolute right-4 top-4"
+        >
           <IconClose />
         </button>
         <DialogHeader>
-          <DialogTitle className="text-2xl">{passedData ? "Edit Category" : "Add New Category"}</DialogTitle>
+          <DialogTitle className="text-2xl">
+            {passedData ? "Edit Category" : "Add New Category"}
+          </DialogTitle>
         </DialogHeader>
 
         <form onSubmit={handleSubmit(handleServiceCategorySubmit)}>
@@ -91,9 +109,15 @@ const ServiceCategoriesModal = () => {
                 label="Name"
                 placeholder="Enter category name"
                 {...register("name")}
-                className={errors.name ? "border border-red-500 focus:outline-none" : ""}
+                className={
+                  errors.name ? "border border-red-500 focus:outline-none" : ""
+                }
               />
-              {errors.name && <span className="text-sm text-red-400">{errors.name.message}</span>}
+              {errors.name && (
+                <span className="text-sm text-red-400">
+                  {errors.name.message}
+                </span>
+              )}
             </div>
           </div>
 
@@ -106,14 +130,18 @@ const ServiceCategoriesModal = () => {
             >
               Cancel
             </Button>
-            <Button type="submit" className="order-1 w-full sm:order-2 sm:w-[130px]" disabled={isLoading}>
+            <Button
+              type="submit"
+              className="order-1 w-full sm:order-2 sm:w-[130px]"
+              disabled={isLoading}
+            >
               {passedData ? "Save" : "Create"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default ServiceCategoriesModal
+export default ServiceCategoriesModal;

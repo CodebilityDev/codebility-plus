@@ -1,64 +1,70 @@
-"use client"
-import React from "react"
-import { useState } from "react"
-import toast from "react-hot-toast"
+"use client";
 
-import useToken from "@/hooks/use-token"
-import useAuthCookie from "@/hooks/use-cookie"
-import { toggleJobStatusType } from "@/app/api/dashboard"
-import { dash_StatusT } from "@/types/protectedroutes"
+import React, { useState } from "react";
+import { toggleJobStatusType } from "@/app/api/dashboard";
+import useAuthCookie from "@/hooks/use-cookie";
+import useToken from "@/hooks/use-token";
+import { dash_StatusT } from "@/types/protectedroutes";
+import toast from "react-hot-toast";
 
 const Status = ({ jobStatusType, userId }: dash_StatusT) => {
-  const { token } = useToken()
-  const auth = useAuthCookie()
-  const [isChecked, setIsChecked] = useState(jobStatusType === "AVAILABLE")
-  const [isLoading, setIsLoading] = useState(false)
+  const { token } = useToken();
+  const auth = useAuthCookie();
+  const [isChecked, setIsChecked] = useState(jobStatusType === "AVAILABLE");
+  const [isLoading, setIsLoading] = useState(false);
 
-  let statusText
-  let statusColor
+  let statusText;
+  let statusColor;
 
-  const changeJobStatus = async (jobStatus: dash_StatusT["jobStatusType"], token: string) => {
+  const changeJobStatus = async (
+    jobStatus: dash_StatusT["jobStatusType"],
+    token: string,
+  ) => {
     try {
-      setIsLoading(true)
+      setIsLoading(true);
       const jobStatusToggle: any = await toggleJobStatusType(
         {
           id: userId,
           jobStatusType: jobStatus,
         },
-        token
-      )
-      return { ...jobStatusToggle, status: true }
+        token,
+      );
+      return { ...jobStatusToggle, status: true };
     } catch (e) {
-      setIsLoading(false)
-      return { status: false }
+      setIsLoading(false);
+      return { status: false };
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleChange = async () => {
-    const { status } = await changeJobStatus(isChecked ? "DEPLOYED" : "AVAILABLE", token)
+    const { status } = await changeJobStatus(
+      isChecked ? "DEPLOYED" : "AVAILABLE",
+      token,
+    );
     if (!status) {
-      toast.error("Only the admin can make this action.")
-      return
+      toast.error("Only the admin can make this action.");
+      return;
     }
-    setIsChecked(!isChecked)
-    toast.success("JobStatus successfully changed.")
-  }
+    setIsChecked(!isChecked);
+    toast.success("JobStatus successfully changed.");
+  };
 
   if (!isChecked) {
-    statusText = "Deployed"
-    statusColor = "bg-orange-500"
+    statusText = "Deployed";
+    statusColor = "bg-orange-500";
   } else {
-    statusText = "Available"
-    statusColor = "bg-green-500"
+    statusText = "Available";
+    statusColor = "bg-green-500";
   }
 
   return (
     <>
       <label
         className={`inline-flex cursor-pointer items-center ${
-          isLoading || (auth?.data?.userType !== "ADMIN" && "pointer-events-none opacity-50")
+          isLoading ||
+          (auth?.data?.userType !== "ADMIN" && "pointer-events-none opacity-50")
         }`}
       >
         <input
@@ -81,7 +87,7 @@ const Status = ({ jobStatusType, userId }: dash_StatusT) => {
         </div>
       </label>
     </>
-  )
-}
+  );
+};
 
-export default Status
+export default Status;

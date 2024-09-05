@@ -1,13 +1,19 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import H1 from "@/Components/shared/dashboard/H1"
-import { Button } from "@/Components/ui/button"
+import { useEffect } from "react";
+import H1 from "@/Components/shared/dashboard/H1";
+import { Button } from "@/Components/ui/button";
 
-export default function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
+export default function Error({
+  error,
+  reset,
+}: {
+  error: Error & { digest?: string };
+  reset: () => void;
+}) {
   useEffect(() => {
-    console.error(error)
-  }, [error])
+    console.error(error);
+  }, [error]);
 
   return (
     <div className="background-box text-dark100_light900 flex h-full w-full items-center justify-center rounded-lg">
@@ -18,5 +24,5 @@ export default function Error({ error, reset }: { error: Error & { digest?: stri
         </Button>
       </div>
     </div>
-  )
+  );
 }

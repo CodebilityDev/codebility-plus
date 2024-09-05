@@ -1,14 +1,17 @@
-import { H2, Paragraph } from "@/Components/shared/home"
-import { Button } from "@/Components/ui/button"
-import pathsConfig from "@/config/paths.config"
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
-import Image from "next/image"
-import Link from "next/link"
-import React from "react"
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { H2, Paragraph } from "@/Components/shared/home";
+import { Button } from "@/Components/ui/button";
+import pathsConfig from "@/config/paths.config";
+
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 export default async function CTA() {
   const supabase = getSupabaseServerComponentClient();
-  const { data: {user}} = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <div className="mx-auto flex h-screen w-full max-w-3xl flex-col items-center justify-center gap-4 px-5 text-center text-white">
@@ -19,12 +22,13 @@ export default async function CTA() {
         height={100}
         className="z-10 h-[200px] w-[200px] object-contain"
       />
-      <H2 className="capitalize text-primaryColor">
+      <H2 className="text-primaryColor capitalize">
         Become A <span className="text-[#9747FF]">Codev!</span>
       </H2>
 
       <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[550px]">
-        Unlock your potential and embark on a journey of innovation and mastery with Codebility.
+        Unlock your potential and embark on a journey of innovation and mastery
+        with Codebility.
       </Paragraph>
 
       <Link href={user ? pathsConfig.app.home : pathsConfig.auth.signIn}>
@@ -33,5 +37,5 @@ export default async function CTA() {
         </Button>
       </Link>
     </div>
-  )
+  );
 }

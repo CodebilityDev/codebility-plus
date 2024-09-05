@@ -1,19 +1,37 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Button } from "@/Components/ui/button"
-import { Dialog, DialogClose, DialogContent, DialogFooter, DialogTitle, DialogHeader, DialogTrigger } from "@codevs/ui/dialog"
-import Input from "@/Components/ui/forms/input"
-import { Label } from "@codevs/ui/label"
-import { Textarea } from "@codevs/ui/textarea"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem, SelectItemText } from "@radix-ui/react-select"
-import { IconClose, IconDropdown } from "@/public/assets/svgs"
-import { taskPrioLevels, taskTypes } from "@/constants"
-import toast from "react-hot-toast"
-import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum"
-import KanbanTaskAddModalMembers from "./kanban-add-modal-members"
-import { createNewTask } from "../../actions"
-import { useRouter } from "next/navigation"
+import React from "react";
+import { useRouter } from "next/navigation";
+import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum";
+import { Button } from "@/Components/ui/button";
+import Input from "@/Components/ui/forms/input";
+import { taskPrioLevels, taskTypes } from "@/constants";
+import { IconClose, IconDropdown } from "@/public/assets/svgs";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectItemText,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select";
+import toast from "react-hot-toast";
+
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@codevs/ui/dialog";
+import { Label } from "@codevs/ui/label";
+import { Textarea } from "@codevs/ui/textarea";
+
+import { createNewTask } from "../../actions";
+import KanbanTaskAddModalMembers from "./kanban-add-modal-members";
 
 interface Props {
   listId: string;
@@ -22,48 +40,53 @@ interface Props {
   totalTask: number;
 }
 
-export default function KanbanTaskAddModal({ listId, listName, projectId, totalTask }: Props) {
-  const { data: categories } = useFetchEnum("public","taskcategory");
+export default function KanbanTaskAddModal({
+  listId,
+  listName,
+  projectId,
+  totalTask,
+}: Props) {
+  const { data: categories } = useFetchEnum("public", "taskcategory");
   const router = useRouter();
 
   const validateInput = (formData: FormData) => {
     const inputs: Record<string, any> = {};
 
     // get all input name and value as key: value pair.
-    for (let [key,value] of formData.entries()) inputs[key] = value; 
-    
+    for (let [key, value] of formData.entries()) inputs[key] = value;
+
     const required = ["title", "category", "priority", "type"];
 
     for (let key of formData.keys()) {
       const value = inputs[key];
 
       // check if required input has value.
-      if (required.includes(key) && 
-         (value === null || value === undefined || value === "")
-         )
-          throw new Error(`${key} is required`);
-      
+      if (
+        required.includes(key) &&
+        (value === null || value === undefined || value === "")
+      )
+        throw new Error(`${key} is required`);
     }
-  }
+  };
 
   const handleSubmit = async (formData: FormData) => {
     try {
       validateInput(formData);
-      
+
       await createNewTask(formData);
       toast.success("Task Created!");
       router.refresh(); // show new task.
     } catch (e: any) {
-      toast.error(e.message)
+      toast.error(e.message);
     }
-  }
+  };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
         <button
           type="button"
-          className="flex w-full items-center gap-2 rounded-md px-2 hover:bg-black-400/40"
+          className="hover:bg-black-400/40 flex w-full items-center gap-2 rounded-md px-2"
         >
           <p className="text-2xl">+</p>
           <p>Add a card</p>
@@ -73,9 +96,14 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
         hideCloseButton={true}
         className="background-lightsection_darksection text-dark100_light900 h-[32rem] w-full max-w-3xl lg:h-auto"
       >
-        <form action={handleSubmit} className="flex flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto">
+        <form
+          action={handleSubmit}
+          className="flex flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto"
+        >
           <DialogHeader className="relative">
-              <DialogTitle className="mb-2 text-left text-lg">Add New Task</DialogTitle>
+            <DialogTitle className="mb-2 text-left text-lg">
+              Add New Task
+            </DialogTitle>
           </DialogHeader>
           <div className="flex flex-col gap-6">
             <input type="hidden" name="projectId" value={projectId} />
@@ -86,7 +114,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
               <Input
                 id="title"
                 name="title"
-                className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                 placeholder="Enter Task Name"
               />
               <div className="flex gap-1">
@@ -101,7 +129,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
                   <Select name="category">
                     <SelectTrigger
                       aria-label="Category"
-                      className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                      className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                     >
                       <SelectValue className="text-sm" />
                       <IconDropdown className="h-5 invert dark:invert-0" />
@@ -109,20 +137,19 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
 
                     <SelectContent
                       position="popper"
-                      className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                      className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
                     >
                       <SelectGroup>
-                        {categories && categories.map((category: string, i: number) => (
-                          <SelectItem
-                            key={i}
-                            className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
-                            value={category}
-                          >
-                            <SelectItemText>
-                              {category}
-                            </SelectItemText>
-                          </SelectItem>
-                        ))}
+                        {categories &&
+                          categories.map((category: string, i: number) => (
+                            <SelectItem
+                              key={i}
+                              className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
+                              value={category}
+                            >
+                              <SelectItemText>{category}</SelectItemText>
+                            </SelectItem>
+                          ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -136,7 +163,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
                     min="0"
                     step="0.25"
                     isKeyboard={true}
-                    className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                    className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                   />
                 </div>
                 <div className="flex w-1/3 flex-col gap-2">
@@ -146,7 +173,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
                     name="points"
                     type="number"
                     min="0"
-                    className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                    className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                   />
                 </div>
               </div>
@@ -156,7 +183,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
                   <Select name="priority">
                     <SelectTrigger
                       aria-label="Priority Level"
-                      className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                      className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                     >
                       <SelectValue className="text-sm" />
                       <IconDropdown className="h-5 invert dark:invert-0" />
@@ -164,7 +191,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
 
                     <SelectContent
                       position="popper"
-                      className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                      className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
                     >
                       <SelectGroup>
                         {taskPrioLevels.map((prioLevel, i) => (
@@ -173,9 +200,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
                             className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
                             value={prioLevel}
                           >
-                            <SelectItemText>
-                              {prioLevel}
-                            </SelectItemText>
+                            <SelectItemText>{prioLevel}</SelectItemText>
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -187,7 +212,7 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
                   <Select name="type">
                     <SelectTrigger
                       aria-label="Type"
-                      className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                      className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                     >
                       <SelectValue className="text-sm" />
                       <IconDropdown className="h-5 invert dark:invert-0" />
@@ -195,14 +220,16 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
 
                     <SelectContent
                       position="popper"
-                      className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                      className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
                     >
                       <SelectGroup>
                         {taskTypes.map((type, i) => (
-                          <SelectItem key={i} className="cursor-default px-3 py-2 text-sm hover:bg-blue-100" value={type}>
-                            <SelectItemText>
-                              {type}
-                            </SelectItemText>
+                          <SelectItem
+                            key={i}
+                            className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
+                            value={type}
+                          >
+                            <SelectItemText>{type}</SelectItemText>
                           </SelectItem>
                         ))}
                       </SelectGroup>
@@ -218,14 +245,17 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
                 id="desc"
                 variant="ghost"
                 name="description"
-                className="h-[8rem] resize-none text-sm dark:bg-dark-200"
+                className="dark:bg-dark-200 h-[8rem] resize-none text-sm"
                 placeholder="Add a more detailed description..."
               />
             </div>
           </div>
 
           <DialogFooter className="flex flex-col gap-2 lg:flex-row">
-            <Button variant="default" className="order-1 w-full sm:order-2 sm:w-[130px]">
+            <Button
+              variant="default"
+              className="order-1 w-full sm:order-2 sm:w-[130px]"
+            >
               Save
             </Button>
           </DialogFooter>
@@ -239,5 +269,5 @@ export default function KanbanTaskAddModal({ listId, listName, projectId, totalT
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }

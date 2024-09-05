@@ -1,41 +1,56 @@
-import React, { useRef } from "react"
-import { profiles_ListFilterT } from "@/types/home"
-import { Button } from "@/Components/ui/button"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
-import { removeArrayDuplicate } from "../../_lib/util"
+import React, { useRef } from "react";
+import { Button } from "@/Components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/Components/ui/select";
+import { profiles_ListFilterT } from "@/types/home";
 
-const ProfileListsFilter: React.FC<profiles_ListFilterT> = ({ selectedPosition, setSelectedPosition, users }) => {
-  const selectGroupRef = useRef<HTMLDivElement>(null)
-  
+import { removeArrayDuplicate } from "../../_lib/util";
+
+const ProfileListsFilter: React.FC<profiles_ListFilterT> = ({
+  selectedPosition,
+  setSelectedPosition,
+  users,
+}) => {
+  const selectGroupRef = useRef<HTMLDivElement>(null);
+
   const positions = removeArrayDuplicate(
-    users.map((user) => user?.main_position)
+    users.map((user) => user?.main_position),
   );
 
   const handleSelectPosition = () => {
     if (selectGroupRef.current) {
-      selectGroupRef.current.style.display = "none"
-      selectGroupRef.current.style.overflow = "hidden"
+      selectGroupRef.current.style.display = "none";
+      selectGroupRef.current.style.overflow = "hidden";
     }
-    setSelectedPosition("")
-  }
+    setSelectedPosition("");
+  };
   return (
     <div className="mb-6 flex w-full flex-col items-center justify-between p-3">
       <div className="flex w-full max-w-80 flex-col ">
         <Select value={selectedPosition} onValueChange={setSelectedPosition}>
           <SelectTrigger
             aria-label="Position"
-            className="text-md h-11 w-full rounded-full border-none bg-dark-100 px-5 text-white"
+            className="text-md bg-dark-100 h-11 w-full rounded-full border-none px-5 text-white"
           >
             <SelectValue placeholder="Filter" />
           </SelectTrigger>
-          <SelectContent ref={selectGroupRef} className="relative rounded-xl bg-dark-300 text-white">
+          <SelectContent
+            ref={selectGroupRef}
+            className="bg-dark-300 relative rounded-xl text-white"
+          >
             <SelectGroup className="mt-12">
               {positions.map((position, i) => (
                 <SelectItem key={i} value={position}>
                   {position}
                 </SelectItem>
               ))}
-              <div className="fixed left-0 right-0 top-0 flex w-full flex-row items-center justify-between border-b border-dark-200 px-3 py-2 bg-dark-300">
+              <div className="border-dark-200 bg-dark-300 fixed left-0 right-0 top-0 flex w-full flex-row items-center justify-between border-b px-3 py-2">
                 <span>Filter by</span>
                 <Button
                   className="w-auto bg-transparent hover:bg-transparent  "
@@ -51,7 +66,7 @@ const ProfileListsFilter: React.FC<profiles_ListFilterT> = ({ selectedPosition, 
         </Select>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProfileListsFilter
+export default ProfileListsFilter;

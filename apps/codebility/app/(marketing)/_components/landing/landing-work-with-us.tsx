@@ -1,19 +1,22 @@
-import Link from "next/link"
-import Image from "next/image"
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/Components/ui/button";
 
-import Section from "../marketing-section"
-import Container from "../marketing-container"
-import { Button } from "@/Components/ui/button"
+import Container from "../marketing-container";
+import Section from "../marketing-section";
 
 const WorkWithUs = () => {
   return (
-    <Section id="workwithus" className="relative w-full border-y-4 border-light-900/5 bg-light-900/5">
+    <Section
+      id="workwithus"
+      className="border-light-900/5 bg-light-900/5 relative w-full border-y-4"
+    >
       <Container className="relative z-10 mx-auto text-white">
         <div className="flex flex-col gap-6 md:gap-10">
           <h2 className="text-center text-xl md:text-3xl">Work With Us</h2>
 
           <div className="flex flex-col gap-3 sm:flex-row lg:gap-5">
-            <div className="flex flex-1 flex-col gap-4 rounded-lg border-2 border-light-900/5 bg-light-700/10 p-4">
+            <div className="border-light-900/5 bg-light-700/10 flex flex-1 flex-col gap-4 rounded-lg border-2 p-4">
               <div className="block">
                 <Image
                   src="https://codebility-cdn.pages.dev/assets/images/index/projects-large.jpg"
@@ -23,7 +26,10 @@ const WorkWithUs = () => {
                   className="h-full w-full rounded-xl object-cover"
                 />
               </div>
-              <p>Build your own website with us today and ensure a reliable, cutting-edge online presence.</p>
+              <p>
+                Build your own website with us today and ensure a reliable,
+                cutting-edge online presence.
+              </p>
               <div className="flex md:justify-end">
                 <div className="w-full md:w-auto">
                   <Link href="/services">
@@ -34,7 +40,7 @@ const WorkWithUs = () => {
                 </div>
               </div>
             </div>
-            <div className="flex flex-1 flex-col gap-4 rounded-lg border-2 border-light-900/5 bg-light-700/10 p-4">
+            <div className="border-light-900/5 bg-light-700/10 flex flex-1 flex-col gap-4 rounded-lg border-2 p-4">
               <div className="block">
                 <Image
                   src="https://codebility-cdn.pages.dev/assets/images/index/codevs-large.jpg"
@@ -44,7 +50,10 @@ const WorkWithUs = () => {
                   className="h-full w-full rounded-xl object-cover"
                 />
               </div>
-              <p>Connect with the best developer to meet your needs through our top-rated professionals.</p>
+              <p>
+                Connect with the best developer to meet your needs through our
+                top-rated professionals.
+              </p>
               <div className="flex md:justify-end">
                 <div className="w-full md:w-auto">
                   <Link href="/codevs">
@@ -72,7 +81,7 @@ const WorkWithUs = () => {
         />
       </div>
     </Section>
-  )
-}
+  );
+};
 
-export default WorkWithUs
+export default WorkWithUs;

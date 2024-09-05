@@ -1,13 +1,19 @@
-import H1 from "@/Components/shared/dashboard/H1"
-import TasksContainer from "./_components/tasks-container"
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import H1 from "@/Components/shared/dashboard/H1";
 import { Task } from "@/types/home/task";
+
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+
+import TasksContainer from "./_components/tasks-container";
 
 export default async function TaskPage() {
   const supabase = getSupabaseServerComponentClient();
-  const { data: { user } } = await supabase.auth.getUser();
-  const { data } = await supabase.from("codev")
-  .select(`
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const { data } = await supabase
+    .from("codev")
+    .select(
+      `
     codev_task(
       *,
       task(
@@ -24,15 +30,16 @@ export default async function TaskPage() {
         )
       )
     )
-  `)
-  .eq("user_id", user?.id)
-  .single();
+  `,
+    )
+    .eq("user_id", user?.id)
+    .single();
 
   let tasks: Task[] = [];
-  
-  if (data?.codev_task && data.codev_task.length > 0) { 
+
+  if (data?.codev_task && data.codev_task.length > 0) {
     // get only the task data of codev.
-    tasks = data.codev_task.map(codevTask => codevTask.task);
+    tasks = data.codev_task.map((codevTask) => codevTask.task);
   }
 
   return (
@@ -42,5 +49,5 @@ export default async function TaskPage() {
       </div>
       <TasksContainer tasks={tasks} />
     </div>
-  )
+  );
 }

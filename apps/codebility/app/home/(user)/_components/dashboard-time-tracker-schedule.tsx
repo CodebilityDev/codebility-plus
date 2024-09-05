@@ -1,12 +1,13 @@
 "use client";
 
-import { Button } from "@/Components/ui/button"
-import { IconEdit } from "@/public/assets/svgs"
-import { formatLocaleTime } from "../_lib/util";
+import { useEffect, useState } from "react";
+import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { useSchedule } from "@/hooks/use-timeavail";
-import { useEffect, useState } from "react";
 import { formatToLocaleTime } from "@/lib/format-date-time";
+import { IconEdit } from "@/public/assets/svgs";
+
+import { formatLocaleTime } from "../_lib/util";
 import { updateUserSchedule } from "../actions";
 
 interface Props {
@@ -15,21 +16,29 @@ interface Props {
   codevId: string;
 }
 
-export default function TimeTrackerSchedule({ startTime, endTime, codevId }: Props) {
-  const { onOpen } = useModal();  
+export default function TimeTrackerSchedule({
+  startTime,
+  endTime,
+  codevId,
+}: Props) {
+  const { onOpen } = useModal();
 
   const { time, addTime } = useSchedule();
   const [isMounted, setIsMounted] = useState(false);
-  const [currentStartTime, setStartTime] = useState(formatToLocaleTime(startTime).split(",")[1]?.trim() as string); // get locale time (hh:mm AM|PM)
-  const [currentEndTime, setEndTime] = useState(formatToLocaleTime(endTime).split(",")[1]?.trim() as string);
+  const [currentStartTime, setStartTime] = useState(
+    formatToLocaleTime(startTime).split(",")[1]?.trim() as string,
+  ); // get locale time (hh:mm AM|PM)
+  const [currentEndTime, setEndTime] = useState(
+    formatToLocaleTime(endTime).split(",")[1]?.trim() as string,
+  );
 
   useEffect(() => {
     addTime({
       start_time: currentStartTime,
-      end_time: currentEndTime
-    })
+      end_time: currentEndTime,
+    });
   }, [startTime, endTime, addTime, currentEndTime, currentStartTime]);
-  
+
   useEffect(() => {
     if (isMounted) {
       setStartTime(time.start_time);
@@ -37,22 +46,25 @@ export default function TimeTrackerSchedule({ startTime, endTime, codevId }: Pro
 
       try {
         // a server action but don't have to await since we used state to display changes.
-        updateUserSchedule({
-          startTime: time.start_time,
-          endTime: time.end_time
-        }, codevId);
+        updateUserSchedule(
+          {
+            startTime: time.start_time,
+            endTime: time.end_time,
+          },
+          codevId,
+        );
       } catch (e: any) {
         console.log(e.message);
-      } 
+      }
     }
-    
+
     return () => {
       setIsMounted(true);
-    }
+    };
   }, [time.start_time, time.end_time]);
-  
+
   return (
-    <div className="flex items-center gap-2 justify-center">
+    <div className="flex items-center justify-center gap-2">
       {currentStartTime && currentEndTime ? (
         <>
           <p className="text-md">{`${formatLocaleTime(currentStartTime)} - ${formatLocaleTime(currentEndTime)}`}</p>
@@ -66,5 +78,5 @@ export default function TimeTrackerSchedule({ startTime, endTime, codevId }: Pro
         <p className="text-sm">No time schedule set</p>
       )}
     </div>
-  )
+  );
 }

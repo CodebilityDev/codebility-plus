@@ -1,4 +1,4 @@
-import Image from "next/image"
+import Image from "next/image";
 
 const HeroBackground = () => {
   return (
@@ -9,7 +9,8 @@ const HeroBackground = () => {
       >
         <div
           style={{
-            clipPath: "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)",
+            clipPath:
+              "polygon(30% 0%, 70% 0%, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0% 70%, 0% 30%)",
           }}
           className="relative aspect-[855/678] w-[40rem] bg-gradient-to-r from-[#00738B] via-[#0C3FDB] to-[#9707DD] opacity-30 sm:w-[72.1875rem]"
         />
@@ -22,7 +23,7 @@ const HeroBackground = () => {
         className="absolute -right-[650px] top-[400px] hidden h-[420px] w-[910px] lg:block"
       />
     </>
-  )
-}
+  );
+};
 
-export default HeroBackground
+export default HeroBackground;

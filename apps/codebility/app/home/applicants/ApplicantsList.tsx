@@ -1,22 +1,35 @@
-import Link from "next/link"
-import Image from "next/image"
-import { useState } from "react"
-import toast, { Toaster } from "react-hot-toast"
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { approveApplicant, denyApplicant } from "@/app/api/applicants";
+import DefaultPagination from "@/Components/ui/pagination";
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/Components/ui/table";
+import { pageSize } from "@/constants";
+import usePagination from "@/hooks/use-pagination";
+import useToken from "@/hooks/use-token";
+import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
+import { User } from "@/types";
+import toast, { Toaster } from "react-hot-toast";
 
-import { User } from "@/types"
-import { pageSize } from "@/constants"
-import useToken from "@/hooks/use-token"
-import usePagination from "@/hooks/use-pagination"
-import { Checkbox } from "@codevs/ui/checkbox"
-import DefaultPagination from "@/Components/ui/pagination"
-import { approveApplicant, denyApplicant } from "@/app/api/applicants"
-import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs"
-import { Table, TableBody, TableCaption, TableCell, TableHead, TableHeader, TableRow } from "@/Components/ui/table"
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@codevs/ui/accordion"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@codevs/ui/accordion";
+import { Checkbox } from "@codevs/ui/checkbox";
 
 const ApplicantTable = ({ applicants }: { applicants: User[] }) => {
-  const { token } = useToken()
-  const [isLoading, setIsLoading] = useState(false)
+  const { token } = useToken();
+  const [isLoading, setIsLoading] = useState(false);
 
   const {
     currentPage,
@@ -25,38 +38,44 @@ const ApplicantTable = ({ applicants }: { applicants: User[] }) => {
     handleNextPage,
     handlePreviousPage,
     setCurrentPage,
-  } = usePagination(applicants || [], pageSize.applicants)
+  } = usePagination(applicants || [], pageSize.applicants);
 
   const handleAccept = async (email_address: string) => {
     try {
-      setIsLoading(true)
-      const response = await approveApplicant({ email_address: email_address }, token)
+      setIsLoading(true);
+      const response = await approveApplicant(
+        { email_address: email_address },
+        token,
+      );
 
       if (response.status === 200) {
-        toast.success("Applicant has been approved")
+        toast.success("Applicant has been approved");
       }
     } catch (error) {
-      toast.error("Something went wrong!")
+      toast.error("Something went wrong!");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleDeny = async (email_address: string) => {
     try {
-      setIsLoading(true)
-      const response = await denyApplicant({ email_address: email_address }, token)
+      setIsLoading(true);
+      const response = await denyApplicant(
+        { email_address: email_address },
+        token,
+      );
 
       if (response.status === 200) {
-        toast.success("Applicant has been denied")
+        toast.success("Applicant has been denied");
       }
-      setIsLoading(false)
+      setIsLoading(false);
     } catch (error) {
-      toast.error("Something went wrong!")
+      toast.error("Something went wrong!");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -75,7 +94,15 @@ const ApplicantTable = ({ applicants }: { applicants: User[] }) => {
         <TableBody className="grid grid-cols-1">
           {applicants.length > 0 &&
             paginatedApplicants.map(
-              ({ id, first_name, last_name, email_address, github_link, portfolio_website, tech_stacks }: User) => (
+              ({
+                id,
+                first_name,
+                last_name,
+                email_address,
+                github_link,
+                portfolio_website,
+                tech_stacks,
+              }: User) => (
                 <TableRow key={id} className="grid grid-cols-12">
                   <TableCell className="col-span-3 flex items-center gap-3">
                     <Checkbox />
@@ -144,15 +171,15 @@ const ApplicantTable = ({ applicants }: { applicants: User[] }) => {
                     </button>
                   </TableCell>
                 </TableRow>
-              )
+              ),
             )}
         </TableBody>
         <TableCaption className="text-right">
           {paginatedApplicants.length === 1
             ? `${paginatedApplicants.length} item`
             : paginatedApplicants.length > 0
-            ? `${paginatedApplicants.length} items`
-            : "The applicants list is empty at the moment."}
+              ? `${paginatedApplicants.length} items`
+              : "The applicants list is empty at the moment."}
         </TableCaption>
       </Table>
 
@@ -160,9 +187,20 @@ const ApplicantTable = ({ applicants }: { applicants: User[] }) => {
       <div className="block xl:hidden">
         {applicants.length > 0 &&
           paginatedApplicants.map(
-            ({ id, first_name, last_name, email_address, github_link, portfolio_website, tech_stacks }: User) => (
+            ({
+              id,
+              first_name,
+              last_name,
+              email_address,
+              github_link,
+              portfolio_website,
+              tech_stacks,
+            }: User) => (
               <Accordion key={id} type="single" collapsible className="w-full">
-                <AccordionItem value={last_name} className="border-zinc-300 dark:border-zinc-800">
+                <AccordionItem
+                  value={last_name}
+                  className="border-zinc-300 dark:border-zinc-800"
+                >
                   <AccordionTrigger className="flex p-4 text-base hover:bg-muted/50 md:text-lg ">
                     <div className="flex w-1/2 justify-start">
                       <p className="capitalize">
@@ -250,7 +288,7 @@ const ApplicantTable = ({ applicants }: { applicants: User[] }) => {
                   </AccordionContent>
                 </AccordionItem>
               </Accordion>
-            )
+            ),
           )}
       </div>
 
@@ -268,7 +306,7 @@ const ApplicantTable = ({ applicants }: { applicants: User[] }) => {
       </div>
       <Toaster position="top-center" reverseOrder={false} />
     </>
-  )
-}
+  );
+};
 
-export default ApplicantTable
+export default ApplicantTable;

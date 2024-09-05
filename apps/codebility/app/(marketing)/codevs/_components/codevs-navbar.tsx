@@ -1,29 +1,34 @@
-import Link from "next/link"
-import Image from "next/image"
-import { MenuIcon } from "lucide-react"
-import { usePathname } from "next/navigation"
+import Image from "next/image";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import useUser from "@/app/home/_hooks/use-user";
+import Logo from "@/Components/shared/Logo";
+import { Button } from "@/Components/ui/button";
+import { navLinks } from "@/constants";
+import { useModal } from "@/hooks/use-modal";
+import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
+import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
+import { MenuIcon } from "lucide-react";
 
-import { navLinks } from "@/constants"
-import Logo from "@/Components/shared/Logo"
-import { useModal } from "@/hooks/use-modal"
-import { Button } from "@/Components/ui/button"
-import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize"
-import useChangeBgNavigation from "@/hooks/useChangeBgNavigation"
-import { Sheet, SheetContent, SheetHeader, SheetTrigger } from "@codevs/ui/sheet"
-import useUser from "@/app/home/_hooks/use-user"
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTrigger,
+} from "@codevs/ui/sheet";
 
 const Navbar = () => {
-  const { color } = useChangeBgNavigation()
-  const { isSheetOpen, setIsSheetOpen } = useHideSidebarOnResize()
-  const { onOpen } = useModal()
-  const pathname = usePathname()
+  const { color } = useChangeBgNavigation();
+  const { isSheetOpen, setIsSheetOpen } = useHideSidebarOnResize();
+  const { onOpen } = useModal();
+  const pathname = usePathname();
   const isAuthenticated = !useUser(); // if there is logged user
 
   return (
     <>
       <nav
         className={`fixed z-50 hidden w-full items-center justify-between  gap-5 p-5 lg:flex xl:px-12
-      ${color ? "border-b border-zinc-800 bg-black-100" : "bg-transparent"}`}
+      ${color ? "bg-black-100 border-b border-zinc-800" : "bg-transparent"}`}
       >
         <div className="hidden lg:block">
           <Logo />
@@ -43,7 +48,10 @@ const Navbar = () => {
                   {link.name}
                 </button>
               ) : (
-                <Link href={link.href} className="text-lg text-white transition duration-300 hover:text-blue-100">
+                <Link
+                  href={link.href}
+                  className="text-lg text-white transition duration-300 hover:text-blue-100"
+                >
                   {link.name}
                 </Link>
               )}
@@ -58,8 +66,8 @@ const Navbar = () => {
           </Link>
 
           <Link href="/auth/signup">
-            <Button className="h-10 w-28 rounded-full bg-gradient-to-r from-teal via-blue-100 to-violet p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
-              <span className="flex h-full w-full items-center justify-center rounded-full bg-black-100 text-lg text-white lg:text-lg">
+            <Button className="from-teal to-violet h-10 w-28 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
+              <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full text-lg text-white lg:text-lg">
                 Sign Up
               </span>
             </Button>
@@ -69,7 +77,7 @@ const Navbar = () => {
 
       <div
         className={`${
-          color ? "border-b border-zinc-800 bg-black-100" : "bg-transparent"
+          color ? "bg-black-100 border-b border-zinc-800" : "bg-transparent"
         } fixed z-50 flex w-full items-center justify-between py-6  ps-5 lg:hidden`}
       >
         <Link href="/" className="block h-[23px] w-[100px] lg:hidden">
@@ -86,14 +94,20 @@ const Navbar = () => {
 
         <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
           <SheetTrigger asChild>
-            <Button className="bg-transparent" onClick={() => setIsSheetOpen(true)}>
+            <Button
+              className="bg-transparent"
+              onClick={() => setIsSheetOpen(true)}
+            >
               <MenuIcon className="text-gray-300" />
             </Button>
           </SheetTrigger>
-          <SheetContent className="border-r border-zinc-800 bg-dark-100 text-white">
+          <SheetContent className="bg-dark-100 border-r border-zinc-800 text-white">
             <SheetHeader className="flex flex-col items-start gap-6">
-              <div className="w-full border-b border-darkgray pb-6">
-                <Link href="/" className="mb-6 block h-[23px] w-[100px] lg:hidden">
+              <div className="border-darkgray w-full border-b pb-6">
+                <Link
+                  href="/"
+                  className="mb-6 block h-[23px] w-[100px] lg:hidden"
+                >
                   <Image
                     src="/assets/svgs/codebility-white.svg"
                     alt="Codebility Logo"
@@ -117,7 +131,10 @@ const Navbar = () => {
                           {link.name}
                         </button>
                       ) : (
-                        <Link href={link.href} className="text-lg transition duration-300 hover:text-blue-100">
+                        <Link
+                          href={link.href}
+                          className="text-lg transition duration-300 hover:text-blue-100"
+                        >
                           {link.name}
                         </Link>
                       )}
@@ -136,7 +153,7 @@ const Navbar = () => {
                   </Button>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button className="w-full rounded-full bg-gradient-to-r from-teal via-blue-100 to-violet p-0.5 text-lg hover:bg-gradient-to-br xl:h-12 xl:w-36">
+                  <Button className="from-teal to-violet w-full rounded-full bg-gradient-to-r via-blue-100 p-0.5 text-lg hover:bg-gradient-to-br xl:h-12 xl:w-36">
                     Sign Up
                   </Button>
                 </Link>
@@ -146,7 +163,7 @@ const Navbar = () => {
         </Sheet>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Navbar
+export default Navbar;

@@ -1,5 +1,11 @@
-import { IconApplicant, IconActivityLog, IconHuman } from "@/public/assets/svgs"
-import InquiryForm from "./_components/contact-inquiry-inform"
+import {
+  IconActivityLog,
+  IconApplicant,
+  IconHuman,
+} from "@/public/assets/svgs";
+
+import InquiryForm from "./_components/contact-inquiry-inform";
+
 // import ShortSurvey from "./_components/contact-short-survey"
 // import Appointment from "./_components/contact-appointment"
 
@@ -35,11 +41,11 @@ const Contact = () => {
       {/* <ShortSurvey />
       <Appointment /> */}
       <p className="text-center">
-        We prioritize the security of your information. Rest assured, we will ensure that your data remains safe with
-        us.
+        We prioritize the security of your information. Rest assured, we will
+        ensure that your data remains safe with us.
       </p>
     </div>
-  )
-}
+  );
+};
 
-export default Contact
+export default Contact;

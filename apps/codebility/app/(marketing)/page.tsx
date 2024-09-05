@@ -1,13 +1,13 @@
-import Navigation from "./_components/marketing-navigation"
-import Footer from "./_components/marketing-footer"
-import Hero from "./_components/landing/landing-hero"
-import Admins from "./_components/landing/landing-admins"
-import Parallax from "./_components/landing/landing-parallax"
-import Calendly from "./_components/marketing-calendly"
-import Features from "./_components/landing/landing-features"
-import WorkWithUs from "./_components/landing/landing-work-with-us"
-import WhyChooseUs from "./_components/landing/landing-why-choose-us"
-import { PoppinFont } from "./_lib/font"
+import Admins from "./_components/landing/landing-admins";
+import Features from "./_components/landing/landing-features";
+import Hero from "./_components/landing/landing-hero";
+import Parallax from "./_components/landing/landing-parallax";
+import WhyChooseUs from "./_components/landing/landing-why-choose-us";
+import WorkWithUs from "./_components/landing/landing-work-with-us";
+import Calendly from "./_components/marketing-calendly";
+import Footer from "./_components/marketing-footer";
+import Navigation from "./_components/marketing-navigation";
+import { PoppinFont } from "./_lib/font";
 
 const Index = () => {
   return (
@@ -24,7 +24,7 @@ const Index = () => {
       <Calendly />
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Index
+export default Index;

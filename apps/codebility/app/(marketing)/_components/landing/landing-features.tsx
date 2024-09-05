@@ -1,21 +1,25 @@
-import { Button } from "@/Components/ui/button"
-import { ServicesCardData } from "../../_lib/dummy-data"
-import FeaturesCard from "./landing-features-card"
-import Container from "../marketing-container"
-import Section from "../marketing-section"
+import { Button } from "@/Components/ui/button";
+
+import { ServicesCardData } from "../../_lib/dummy-data";
+import Container from "../marketing-container";
+import Section from "../marketing-section";
+import FeaturesCard from "./landing-features-card";
 
 const Features = () => {
   return (
     <Section id="features" className="relative">
       <Container className="flex flex-col gap-10 text-white">
         <div className="flex max-w-[650px] flex-col gap-3">
-          <p className="text-left text-lg text-violet md:text-2xl">In the tech industry</p>
+          <p className="text-violet text-left text-lg md:text-2xl">
+            In the tech industry
+          </p>
           <h2 className="text-left text-xl md:text-3xl">
-            Codebility sparks for a passion for <strong>technology and innovation.</strong>
+            Codebility sparks for a passion for{" "}
+            <strong>technology and innovation.</strong>
           </h2>
           <p className="text-gray">
-            Our programs go beyond skill acquisition, because acquisition, because we believe in the trans-formative
-            power of coding
+            Our programs go beyond skill acquisition, because acquisition,
+            because we believe in the trans-formative power of coding
           </p>
         </div>
 
@@ -34,7 +38,12 @@ const Features = () => {
         <div className="md:mx-auto">
           <div className="flex w-full flex-col gap-4 md:flex-row">
             <a href="#book">
-              <Button variant="purple" size="lg" rounded="full" className="h-14">
+              <Button
+                variant="purple"
+                size="lg"
+                rounded="full"
+                className="h-14"
+              >
                 Book a call
               </Button>
             </a>
@@ -53,7 +62,7 @@ const Features = () => {
         />
       </div>
     </Section>
-  )
-}
+  );
+};
 
-export default Features
+export default Features;
