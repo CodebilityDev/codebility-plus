@@ -1,26 +1,23 @@
-"use client"
+"use client";
 
-import { z } from "zod"
-import { useState } from "react"
-import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/Components/ui/button";
+import pathsConfig from "@/config/paths.config";
+import { SignInValidation } from "@/lib/validations/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { z } from "zod";
 
-import { Button } from "@/Components/ui/button"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { SignInValidation } from "@/lib/validations/auth"
+import { signinUser } from "../../actions";
+import SignInInputs from "./sign-in-input";
 
-import SignInInputs from "./sign-in-input"
-import { useForm } from "react-hook-form"
-
-import toast from "react-hot-toast"
-
-type Inputs = z.infer<typeof SignInValidation>
-
-import { signinUser } from "../../actions"
-import pathsConfig from "@/config/paths.config"
+type Inputs = z.infer<typeof SignInValidation>;
 
 const SignInForm = () => {
-  const [isLoading, setIsLoading] = useState(false)
-  const router = useRouter()
+  const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
 
   const {
     register,
@@ -28,20 +25,20 @@ const SignInForm = () => {
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(SignInValidation),
-  })
+  });
 
   const onSubmit = async (values: z.infer<typeof SignInValidation>) => {
-    setIsLoading(true)
-    
+    setIsLoading(true);
+
     try {
       await signinUser(values.email_address, values.password);
       toast.success("Logged in successfully!");
-      setIsLoading(false)
+      setIsLoading(false);
     } catch (e) {
-      toast.error((e as {message: string}).message);
-      setIsLoading(false)
+      toast.error((e as { message: string }).message);
+      setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex flex-col gap-2">
@@ -72,13 +69,18 @@ const SignInForm = () => {
           >
             Forgot Password?
           </button>
-          <Button type="submit" variant="default" className="text-md w-full py-3 font-normal" disabled={isLoading}>
+          <Button
+            type="submit"
+            variant="default"
+            className="text-md w-full py-3 font-normal"
+            disabled={isLoading}
+          >
             Sign In
           </Button>
         </div>
       </form>
     </div>
-  )
-}
+  );
+};
 
-export default SignInForm
+export default SignInForm;

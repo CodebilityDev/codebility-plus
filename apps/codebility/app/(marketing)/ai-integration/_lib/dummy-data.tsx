@@ -1,16 +1,21 @@
-import { Edge, Node } from "reactflow"
 import {
   customWebDev,
   responsiveDesign,
   seo,
-} from "@/public/assets/images/ai-integration"
-import { customAppDevelopment, userCentricDesign, enterpriseSolution } from "@/public/assets/images/services"
+} from "@/public/assets/images/ai-integration";
+import {
+  customAppDevelopment,
+  enterpriseSolution,
+  userCentricDesign,
+} from "@/public/assets/images/services";
+import { Edge, Node } from "reactflow";
 
 export const partnerData = [
   {
     id: "1",
     title: "Expertise in Modern Tech",
-    description: "We use the latest technologies to build dynamic websites and mobile apps tailored to your needs.",
+    description:
+      "We use the latest technologies to build dynamic websites and mobile apps tailored to your needs.",
   },
   {
     id: "2",
@@ -30,7 +35,7 @@ export const partnerData = [
     description:
       "Enhance your digital products with our advanced AI solutions for better performance and user experience.",
   },
-]
+];
 
 export const developmentProcessData = [
   {
@@ -73,7 +78,7 @@ export const developmentProcessData = [
     title: "Optimization Phase",
     process: ["SEO Optimization", "Conversion Rate Optimization"],
   },
-]
+];
 
 export const DevProcessInitialEdges: Edge[] = [
   {
@@ -139,7 +144,7 @@ export const DevProcessInitialEdges: Edge[] = [
     type: "customEdge",
     animated: true,
   },
-]
+];
 
 export const DevProcessInitialNodes: Node[] = [
   {
@@ -299,14 +304,42 @@ export const DevProcessInitialNodes: Node[] = [
     position: { x: 90, y: 1190 },
     type: "devProcessImage",
   },
-]
+];
 
 export const PartnerInitialEdges: Edge[] = [
-  { id: "1-2", source: "1", sourceHandle: "right", target: "2", targetHandle: "bottom", type: "customEdge" },
-  { id: "1-3", source: "1", sourceHandle: "top", target: "3", targetHandle: "right", type: "customEdge" },
-  { id: "1-4", source: "1", sourceHandle: "bottom", target: "4", targetHandle: "left", type: "customEdge" },
-  { id: "1-5", source: "1", sourceHandle: "left", target: "5", targetHandle: "top", type: "customEdge" },
-]
+  {
+    id: "1-2",
+    source: "1",
+    sourceHandle: "right",
+    target: "2",
+    targetHandle: "bottom",
+    type: "customEdge",
+  },
+  {
+    id: "1-3",
+    source: "1",
+    sourceHandle: "top",
+    target: "3",
+    targetHandle: "right",
+    type: "customEdge",
+  },
+  {
+    id: "1-4",
+    source: "1",
+    sourceHandle: "bottom",
+    target: "4",
+    targetHandle: "left",
+    type: "customEdge",
+  },
+  {
+    id: "1-5",
+    source: "1",
+    sourceHandle: "left",
+    target: "5",
+    targetHandle: "top",
+    type: "customEdge",
+  },
+];
 
 export const PartnerInitialNodes: Node[] = [
   {
@@ -331,7 +364,8 @@ export const PartnerInitialNodes: Node[] = [
     id: "3",
     data: {
       title: "Expertise in Modern Tech",
-      description: "We use the latest technologies to build dynamic websites and mobile apps tailored to your needs.",
+      description:
+        "We use the latest technologies to build dynamic websites and mobile apps tailored to your needs.",
     },
     position: { x: 0, y: 0 }, // top left
     type: "partnerCard",
@@ -356,7 +390,7 @@ export const PartnerInitialNodes: Node[] = [
     position: { x: 50, y: 450 }, // bottom left
     type: "partnerCard",
   },
-]
+];
 
 export const unparalleledDigitalSuccessData = [
   {
@@ -369,7 +403,8 @@ export const unparalleledDigitalSuccessData = [
   {
     id: "2",
     title: "Responsive Design",
-    description: "Every website we build is fully responsive, ensuring a seamless experience across all devices.",
+    description:
+      "Every website we build is fully responsive, ensuring a seamless experience across all devices.",
     image: responsiveDesign,
   },
   {
@@ -379,7 +414,7 @@ export const unparalleledDigitalSuccessData = [
       "We integrate SEO best practices into every website we build, helping you rank higher in search engine results and attract more organic traffic.",
     image: seo,
   },
-]
+];
 
 export const mobileAppServicesData = [
   {
@@ -392,7 +427,8 @@ export const mobileAppServicesData = [
   {
     id: "2",
     title: "User-Centric Design",
-    description: "We prioritize user experience to keep your customers engaged and satisfied.",
+    description:
+      "We prioritize user experience to keep your customers engaged and satisfied.",
     image: userCentricDesign,
   },
   {
@@ -402,4 +438,4 @@ export const mobileAppServicesData = [
       "We develop apps that enhance productivity, facilitate communication, and support your business processes.",
     image: enterpriseSolution,
   },
-]
+];

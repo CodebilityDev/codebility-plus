@@ -1,19 +1,19 @@
-"use client"
+"use client";
 
-import { getToken } from "@/lib/token"
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
+import { getToken } from "@/lib/token";
 
 type tokenState = {
-  status: "loading" | "unauthenticated" | "authenticated"
-  token: any | null
-}
+  status: "loading" | "unauthenticated" | "authenticated";
+  token: any | null;
+};
 
 function useToken() {
   const [token, setToken] = useState<tokenState>({
     status: "loading",
     token: null,
-  })
- /*  useEffect(() => {
+  });
+  /*  useEffect(() => {
     async function newC() {
       const tokenAuth = await getToken()
       if (!tokenAuth) {
@@ -32,7 +32,7 @@ function useToken() {
     }
     newC()
   }, []) */
-  return token
+  return token;
 }
 
-export default useToken
+export default useToken;

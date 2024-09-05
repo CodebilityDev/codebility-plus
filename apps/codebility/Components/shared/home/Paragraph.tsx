@@ -1,11 +1,15 @@
-import React, { ReactNode } from "react"
+import React, { ReactNode } from "react";
 
 interface Paragraph {
-  children: ReactNode
-  className?: string
+  children: ReactNode;
+  className?: string;
 }
 
 const Paragraph: React.FC<Paragraph> = ({ children, className }) => {
-  return <p className={`mb-3 text-sm text-secondaryColor ${className}`}>{children}</p>
-}
-export default Paragraph
+  return (
+    <p className={`text-secondaryColor mb-3 text-sm ${className}`}>
+      {children}
+    </p>
+  );
+};
+export default Paragraph;

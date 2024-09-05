@@ -1,4 +1,4 @@
-import toast from "react-hot-toast"
+import toast from "react-hot-toast";
 
 export enum ToastTypes {
   SUCCESS = "Success",
@@ -6,13 +6,18 @@ export enum ToastTypes {
 }
 
 interface UseToastProps {
-  Toast: (description: string, type?: ToastTypes) => void
+  Toast: (description: string, type?: ToastTypes) => void;
 }
 
 export function useToast(): UseToastProps {
-  const Toast = (description: string, type: ToastTypes = ToastTypes.SUCCESS) => {
-    return type === ToastTypes.SUCCESS ? toast.success(description) : toast.error(description)
-  }
+  const Toast = (
+    description: string,
+    type: ToastTypes = ToastTypes.SUCCESS,
+  ) => {
+    return type === ToastTypes.SUCCESS
+      ? toast.success(description)
+      : toast.error(description);
+  };
 
-  return { Toast }
+  return { Toast };
 }

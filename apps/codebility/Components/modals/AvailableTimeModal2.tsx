@@ -1,35 +1,36 @@
-import { Button } from "@/Components/ui/button"
-import { Dialog, DialogContent } from "@codevs/ui/dialog"
-import { useModal } from "@/hooks/use-modal"
-import { ScheduleType, useSchedule } from "@/hooks/use-timeavail"
-import { useEffect, useState } from "react"
-import { TimePicker12HourWrapper } from "@/Components/time-picker/time-picker-12hour-wrapper"
+import { useEffect, useState } from "react";
+import { TimePicker12HourWrapper } from "@/Components/time-picker/time-picker-12hour-wrapper";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal";
+import { ScheduleType, useSchedule } from "@/hooks/use-timeavail";
+
+import { Dialog, DialogContent } from "@codevs/ui/dialog";
 
 const AvailableTimeModal = () => {
-  const { isOpen, onClose, type } = useModal()
+  const { isOpen, onClose, type } = useModal();
   const [time, setTime] = useState<ScheduleType>({
     start_time: "",
     end_time: "",
-  })
+  });
 
-  const { addTime, clearTime, time: newTime } = useSchedule()
+  const { addTime, clearTime, time: newTime } = useSchedule();
 
-  const isModalOpen = isOpen && type === "scheduleModal"
+  const isModalOpen = isOpen && type === "scheduleModal";
 
   useEffect(() => {
     if (isModalOpen) {
-      setTime(newTime)
+      setTime(newTime);
     }
-  }, [isModalOpen, newTime])
+  }, [isModalOpen, newTime]);
 
   return (
     <Dialog
       open={isModalOpen}
       onOpenChange={() => {
-        onClose()
+        onClose();
       }}
     >
-      <DialogContent className="flex max-w-[36rem] flex-col gap-6 overflow-y-auto bg-black-100 p-10 text-white">
+      <DialogContent className="bg-black-100 flex max-w-[36rem] flex-col gap-6 overflow-y-auto p-10 text-white">
         <p className="text-md text-center font-normal md:text-lg lg:text-2xl">
           What is your available intern time with us?
         </p>
@@ -47,8 +48,8 @@ const AvailableTimeModal = () => {
         <div className="flex gap-4">
           <Button
             onClick={() => {
-              clearTime()
-              setTime((prev) => ({ ...prev, start_time: "", end_time: "" }))
+              clearTime();
+              setTime((prev) => ({ ...prev, start_time: "", end_time: "" }));
             }}
             variant="hollow"
             className="w-full"
@@ -57,8 +58,8 @@ const AvailableTimeModal = () => {
           </Button>
           <Button
             onClick={() => {
-              if (time.start_time || time.end_time) addTime(time)
-              onClose()
+              if (time.start_time || time.end_time) addTime(time);
+              onClose();
             }}
             variant="default"
             className="w-full"
@@ -69,7 +70,7 @@ const AvailableTimeModal = () => {
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default AvailableTimeModal
+export default AvailableTimeModal;

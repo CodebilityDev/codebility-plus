@@ -1,6 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 
-import { getSupabaseClientKeys } from '../get-supabase-client-keys';
+import { getSupabaseClientKeys } from "../get-supabase-client-keys";
 
 const keys = getSupabaseClientKeys();
 const client = createClient(keys.url, keys.anonKey);

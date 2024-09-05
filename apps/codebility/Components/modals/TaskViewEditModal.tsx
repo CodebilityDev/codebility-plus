@@ -1,21 +1,21 @@
-"use client"
+"use client";
 
-import React from "react"
-import { Button } from "@/Components/ui/button"
-import { Dialog, DialogContent, DialogFooter } from "@codevs/ui/dialog"
-import { useModal } from "@/hooks/use-modal"
-import Input from "@/Components/ui/forms/input"
-import { Label } from "@codevs/ui/label"
-import { Textarea } from "@codevs/ui/textarea"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@radix-ui/react-select"
-
-import { IconClose, IconDropdown, IconPlus, IconCopy } from "@/public/assets/svgs"
-import { useEffect, useState } from "react"
-import { taskPrioLevels, categories, taskTypes } from "@/constants"
-import { User } from "@/types"
-import axios from "axios"
-import { API } from "@/lib/constants"
-import toast from "react-hot-toast"
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { updateTask } from "@/app/api/kanban";
+import { Button } from "@/Components/ui/button";
+import Input from "@/Components/ui/forms/input";
+import { categories, taskPrioLevels, taskTypes } from "@/constants";
+import { useModal } from "@/hooks/use-modal";
+import useToken from "@/hooks/use-token";
+import { API } from "@/lib/constants";
+import {
+  IconClose,
+  IconCopy,
+  IconDropdown,
+  IconPlus,
+} from "@/public/assets/svgs";
+import { User } from "@/types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,35 +23,47 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu"
-import Image from "next/image"
-import useToken from "@/hooks/use-token"
-import { updateTask } from "@/app/api/kanban"
+} from "@radix-ui/react-dropdown-menu";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select";
+import axios from "axios";
+import toast from "react-hot-toast";
+
+import { Dialog, DialogContent, DialogFooter } from "@codevs/ui/dialog";
+import { Label } from "@codevs/ui/label";
+import { Textarea } from "@codevs/ui/textarea";
 
 interface AddedMember {
-  id?: string
-  image_url?: string | null
-  last_name?: string
-  first_name?: string
+  id?: string;
+  image_url?: string | null;
+  last_name?: string;
+  first_name?: string;
 }
 
 interface inputTask {
-  id: string
-  selectedPrioLevel: string | null
-  selectedCategory: string | null
-  selectedType: string | null
-  title: string
-  description: string
-  duration: number
-  points: number
-  addedMembers: AddedMember[]
-  PRLink: string
+  id: string;
+  selectedPrioLevel: string | null;
+  selectedCategory: string | null;
+  selectedType: string | null;
+  title: string;
+  description: string;
+  duration: number;
+  points: number;
+  addedMembers: AddedMember[];
+  PRLink: string;
 }
 
 const TaskViewEditModal = () => {
-  const defaultAvatar = "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
-  const { isOpen, onClose, type, data, dataObject } = useModal()
-  const projectId = data
+  const defaultAvatar =
+    "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
+  const { isOpen, onClose, type, data, dataObject } = useModal();
+  const projectId = data;
 
   const [inputTask, setInputTask] = useState<inputTask>({
     id: "",
@@ -64,62 +76,67 @@ const TaskViewEditModal = () => {
     points: 0,
     addedMembers: [],
     PRLink: "",
-  })
+  });
 
-  const [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false);
 
-  const [searchQuery, setSearchQuery] = useState<string>("")
-  const [selectedMembers, setSelectedMembers] = useState<User[]>([])
-  const [members, setMembers] = useState<User[]>([])
-  const { token } = useToken()
+  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
+  const [members, setMembers] = useState<User[]>([]);
+  const { token } = useToken();
 
   const addMember = (member: User) => {
-    setSelectedMembers((prevMembers) => [...prevMembers, member])
+    setSelectedMembers((prevMembers) => [...prevMembers, member]);
     setInputTask((prevInputTask) => ({
       ...prevInputTask,
       addedMembers: [...prevInputTask.addedMembers, member],
-    }))
-  }
+    }));
+  };
 
   const removeMember = (id: string) => {
-    setSelectedMembers((prevMembers) => prevMembers.filter((member) => member.id !== id))
+    setSelectedMembers((prevMembers) =>
+      prevMembers.filter((member) => member.id !== id),
+    );
     setInputTask((prevInputTask) => ({
       ...prevInputTask,
-      addedMembers: prevInputTask.addedMembers.filter((member) => member.id !== id),
-    }))
-  }
+      addedMembers: prevInputTask.addedMembers.filter(
+        (member) => member.id !== id,
+      ),
+    }));
+  };
 
   const handleTitleChange = (e: any) => {
-    setInputTask({ ...inputTask, title: e.target.value })
-  }
+    setInputTask({ ...inputTask, title: e.target.value });
+  };
 
   const handleDurationChange = (e: any) => {
-    e.preventDefault()
-    setInputTask({ ...inputTask, duration: e.target.value })
-  }
+    e.preventDefault();
+    setInputTask({ ...inputTask, duration: e.target.value });
+  };
 
   const handlePointsChange = (e: any) => {
-    e.preventDefault()
-    setInputTask({ ...inputTask, points: e.target.value })
-  }
+    e.preventDefault();
+    setInputTask({ ...inputTask, points: e.target.value });
+  };
 
   const handleChangeDescription = (e: any) => {
-    setInputTask({ ...inputTask, description: e.target.value })
-  }
+    setInputTask({ ...inputTask, description: e.target.value });
+  };
 
   const handlePRLinkChange = (e: any) => {
-    setInputTask({ ...inputTask, PRLink: e.target.value })
-  }
+    setInputTask({ ...inputTask, PRLink: e.target.value });
+  };
 
   const handleSave = async () => {
-    const listId = dataObject?.listId
+    const listId = dataObject?.listId;
 
     let updatedData = {
       id: dataObject.id,
       title: inputTask.title || dataObject,
       task_type: inputTask.selectedType || dataObject.task_type,
       task_points: Number(inputTask.points) || dataObject.task_points,
-      prio_level: inputTask.selectedPrioLevel?.toUpperCase() || dataObject.prio_level,
+      prio_level:
+        inputTask.selectedPrioLevel?.toUpperCase() || dataObject.prio_level,
       duration: Number(inputTask.duration) || dataObject.duration,
       task_category: inputTask.selectedCategory || dataObject.task_category,
       pr_link: inputTask.PRLink || dataObject.pr_link,
@@ -127,112 +144,110 @@ const TaskViewEditModal = () => {
       userTaskId: selectedMembers.map((member) => ({ id: member.id })),
       projectId: projectId,
       listId: listId,
-    }
+    };
 
     try {
-      const response = await updateTask(updatedData, token)
+      const response = await updateTask(updatedData, token);
 
       if (response.status === 200) {
-        toast.success("Tasks Added")
-        setInputTask({ ...inputTask, addedMembers: [] })
-        onClose()
+        toast.success("Tasks Added");
+        setInputTask({ ...inputTask, addedMembers: [] });
+        onClose();
       }
     } catch (error) {
-      toast.error("Something went wrong!")
+      toast.error("Something went wrong!");
     }
-  }
+  };
 
-  const listId = dataObject?.listId
+  const listId = dataObject?.listId;
   const handleDelete = async (id: string) => {
     try {
       await axios.delete(`${API.TASKS}/${id}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
-      })
+      });
 
       const newData = {
         currentListId: listId,
         todoOnBoard: [{ todoBoardId: id }],
-      }
+      };
 
       const response = await axios.put(`${API.BOARDS}/update-todo`, newData, {
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
-      })
+      });
 
-      onClose()
+      onClose();
 
-      return response.data
+      return response.data;
     } catch (error) {
-      console.error("Error deleting todo:", error)
+      console.error("Error deleting todo:", error);
     }
-    onClose()
-  }
+    onClose();
+  };
 
   const handleClose = () => {
-    setIsEditing(false)
-    onClose()
-  }
+    setIsEditing(false);
+    onClose();
+  };
 
   function getLastParameter(url = "") {
     if (url) {
-      const lastSlashIndex = url.lastIndexOf("/")
-      return url.substring(lastSlashIndex + 1)
+      const lastSlashIndex = url.lastIndexOf("/");
+      return url.substring(lastSlashIndex + 1);
     }
   }
 
-  const pr_link: any = getLastParameter(dataObject?.pr_link)
+  const pr_link: any = getLastParameter(dataObject?.pr_link);
 
   const copyToClipboard = async (text: string) => {
     try {
-      await navigator.clipboard.writeText(text)
-      toast.success("Copied to clipboard!")
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard!");
     } catch (err) {
-      toast.error("Failed to copy text")
+      toast.error("Failed to copy text");
     }
-  }
+  };
 
   const handleCopy = () => {
-    copyToClipboard(pr_link)
-  }
+    copyToClipboard(pr_link);
+  };
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
-        const response = await axios(API.USERS)
+        const response = await axios(API.USERS);
         if (!response) {
-          throw new Error("Failed to fetch data from the server.")
+          throw new Error("Failed to fetch data from the server.");
         }
-        setMembers(response.data.data)
+        setMembers(response.data.data);
       } catch (error) {
-        console.error(error)
+        console.error(error);
       }
-    }
-    fetchUsers()
-  }, [])
+    };
+    fetchUsers();
+  }, []);
 
-  const isModalOpen = isOpen && type === "taskViewEditModal"
+  const isModalOpen = isOpen && type === "taskViewEditModal";
 
   return (
     <Dialog open={isModalOpen}>
-      <DialogContent
-        className="background-lightsection_darksection flex h-[32rem] w-full max-w-3xl flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
-      >
+      <DialogContent className="background-lightsection_darksection flex h-[32rem] w-full max-w-3xl flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto lg:h-auto">
         <div className="flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Label htmlFor="title">Task Number</Label>
-              <div className="border-light_dark flex items-center justify-between rounded border bg-transparent p-1 text-center text-xs focus:outline-none dark:bg-dark-200">
+              <div className="border-light_dark dark:bg-dark-200 flex items-center justify-between rounded border bg-transparent p-1 text-center text-xs focus:outline-none">
                 #{}
               </div>
             </div>
             <Input
               id="title"
               onChange={handleTitleChange}
-              className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+              className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
               value={inputTask.title}
               placeholder={dataObject?.title}
               disabled={!isEditing}
@@ -247,12 +262,19 @@ const TaskViewEditModal = () => {
               <div className="flex w-1/3 flex-col gap-2">
                 <Label htmlFor="category">Category</Label>
                 {isEditing ? (
-                  <Select onValueChange={(value) => setInputTask({ ...inputTask, selectedCategory: value })}>
+                  <Select
+                    onValueChange={(value) =>
+                      setInputTask({ ...inputTask, selectedCategory: value })
+                    }
+                  >
                     <SelectTrigger
                       aria-label="Category"
-                      className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                      className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                     >
-                      <SelectValue placeholder={inputTask.selectedCategory} className="text-sm">
+                      <SelectValue
+                        placeholder={inputTask.selectedCategory}
+                        className="text-sm"
+                      >
                         {inputTask.selectedCategory}
                       </SelectValue>
                       <IconDropdown className="h-5 invert dark:invert-0" />
@@ -260,7 +282,7 @@ const TaskViewEditModal = () => {
 
                     <SelectContent
                       position="popper"
-                      className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                      className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
                     >
                       <SelectGroup>
                         {categories.map((category, i) => (
@@ -276,7 +298,7 @@ const TaskViewEditModal = () => {
                     </SelectContent>
                   </Select>
                 ) : (
-                  <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
+                  <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
                     {dataObject?.task_category}
                   </div>
                 )}
@@ -295,7 +317,7 @@ const TaskViewEditModal = () => {
                       isKeyboard={true}
                       onChange={handleDurationChange}
                       disabled={!isEditing}
-                      className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                      className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                     />
                   </div>
                   <div className="flex w-1/3 flex-col gap-2">
@@ -307,7 +329,7 @@ const TaskViewEditModal = () => {
                       value={inputTask.points}
                       onChange={handlePointsChange}
                       disabled={!isEditing}
-                      className="border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                      className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                     />
                   </div>
                 </>
@@ -315,13 +337,13 @@ const TaskViewEditModal = () => {
                 <>
                   <div className="flex w-1/3 flex-col gap-2">
                     <Label htmlFor="duration">Duration hrs</Label>
-                    <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
+                    <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
                       {dataObject?.duration}
                     </div>
                   </div>
                   <div className="flex w-1/3 flex-col gap-2">
                     <Label htmlFor="points">Points</Label>
-                    <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
+                    <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
                       {dataObject?.task_points}
                     </div>
                   </div>
@@ -332,12 +354,19 @@ const TaskViewEditModal = () => {
               <div className="flex w-1/2 flex-col gap-2">
                 <Label htmlFor="priority">Priority Level</Label>
                 {isEditing ? (
-                  <Select onValueChange={(value) => setInputTask({ ...inputTask, selectedPrioLevel: value })}>
+                  <Select
+                    onValueChange={(value) =>
+                      setInputTask({ ...inputTask, selectedPrioLevel: value })
+                    }
+                  >
                     <SelectTrigger
                       aria-label="Priority Level"
-                      className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                      className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                     >
-                      <SelectValue placeholder={inputTask.selectedPrioLevel} className="text-sm">
+                      <SelectValue
+                        placeholder={inputTask.selectedPrioLevel}
+                        className="text-sm"
+                      >
                         {inputTask.selectedPrioLevel}
                       </SelectValue>
                       <IconDropdown className="h-5 invert dark:invert-0" />
@@ -345,7 +374,7 @@ const TaskViewEditModal = () => {
 
                     <SelectContent
                       position="popper"
-                      className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                      className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
                     >
                       <SelectGroup>
                         {taskPrioLevels.map((prioLevel, i) => (
@@ -361,7 +390,7 @@ const TaskViewEditModal = () => {
                     </SelectContent>
                   </Select>
                 ) : (
-                  <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
+                  <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
                     {dataObject?.prio_level}
                   </div>
                 )}
@@ -369,12 +398,19 @@ const TaskViewEditModal = () => {
               <div className="flex w-1/2 flex-col gap-2">
                 <Label htmlFor="type">Type</Label>
                 {isEditing ? (
-                  <Select onValueChange={(value) => setInputTask({ ...inputTask, selectedType: value })}>
+                  <Select
+                    onValueChange={(value) =>
+                      setInputTask({ ...inputTask, selectedType: value })
+                    }
+                  >
                     <SelectTrigger
                       aria-label="Type"
-                      className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200"
+                      className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                     >
-                      <SelectValue placeholder={inputTask.selectedType} className="text-sm">
+                      <SelectValue
+                        placeholder={inputTask.selectedType}
+                        className="text-sm"
+                      >
                         {inputTask.selectedType}
                       </SelectValue>
                       <IconDropdown className="h-5 invert dark:invert-0" />
@@ -382,7 +418,7 @@ const TaskViewEditModal = () => {
 
                     <SelectContent
                       position="popper"
-                      className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+                      className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
                     >
                       <SelectGroup>
                         {taskTypes.map((type, i) => (
@@ -398,7 +434,7 @@ const TaskViewEditModal = () => {
                     </SelectContent>
                   </Select>
                 ) : (
-                  <div className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none dark:bg-dark-200">
+                  <div className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none">
                     {dataObject?.task_type}
                   </div>
                 )}
@@ -451,7 +487,10 @@ const TaskViewEditModal = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger className="cursor-pointer" asChild>
                   {isEditing ? (
-                    <Button variant="hollow" className="h-12 w-12 rounded-full p-0">
+                    <Button
+                      variant="hollow"
+                      className="h-12 w-12 rounded-full p-0"
+                    >
                       <IconPlus className="invert dark:invert-0" />
                     </Button>
                   ) : (
@@ -463,27 +502,33 @@ const TaskViewEditModal = () => {
                   side="bottom"
                   sideOffset={10}
                   align="start"
-                  className="z-10 max-h-[200px] overflow-y-auto bg-white dark:bg-dark-100"
+                  className="dark:bg-dark-100 z-10 max-h-[200px] overflow-y-auto bg-white"
                 >
-                  <DropdownMenuLabel className="pb-2 text-center text-sm">Add Members</DropdownMenuLabel>
+                  <DropdownMenuLabel className="pb-2 text-center text-sm">
+                    Add Members
+                  </DropdownMenuLabel>
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
                     placeholder="Search members"
-                    className="border-gray-300 mb-2 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none dark:bg-dark-200"
+                    className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
                   />
                   <DropdownMenuSeparator />
-                  <DropdownMenuLabel className="px-4 py-2 text-xs">Available Members</DropdownMenuLabel>
+                  <DropdownMenuLabel className="px-4 py-2 text-xs">
+                    Available Members
+                  </DropdownMenuLabel>
 
                   {members
                     ?.filter((user) =>
-                      `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
+                      `${user.first_name} ${user.last_name}`
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()),
                     )
                     .map((user) => (
                       <DropdownMenuItem
                         key={user.id}
-                        className="hover:bg-gray-100 flex cursor-pointer items-center justify-between px-4 py-2 dark:hover:bg-dark-200"
+                        className="dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100"
                         onClick={() => addMember(user)}
                       >
                         <div className="flex items-center gap-2">
@@ -513,11 +558,11 @@ const TaskViewEditModal = () => {
                 id="desc"
                 variant="ghost"
                 onChange={handleChangeDescription}
-                className="h-[8rem] resize-none dark:bg-dark-200"
+                className="dark:bg-dark-200 h-[8rem] resize-none"
                 value={inputTask.description}
               />
             ) : (
-              <div className="border-light_dark h-[8rem] w-full resize-none rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200">
+              <div className="border-light_dark dark:bg-dark-200 h-[8rem] w-full resize-none rounded border bg-transparent px-3 py-2 text-sm focus:outline-none">
                 {dataObject?.full_description}
               </div>
             )}
@@ -527,7 +572,7 @@ const TaskViewEditModal = () => {
         <div className="flex flex-col gap-2">
           <Label htmlFor="title">Branch Name</Label>
           <div className="flex gap-2">
-            <div className="border-light_dark rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200">
+            <div className="border-light_dark dark:bg-dark-200 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none">
               {pr_link}
             </div>
             <button onClick={handleCopy}>
@@ -542,7 +587,7 @@ const TaskViewEditModal = () => {
               <Input
                 id="title"
                 onChange={handlePRLinkChange}
-                className="border-light_dark w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                className="border-light_dark dark:bg-dark-200 w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                 placeholder="Enter Pull Request Link"
                 value={inputTask.PRLink}
               />
@@ -552,7 +597,7 @@ const TaskViewEditModal = () => {
               <Input
                 id="title"
                 disabled
-                className="border-light_dark w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none dark:bg-dark-200"
+                className="border-light_dark dark:bg-dark-200 w-2/3 rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
                 value={dataObject?.pr_link}
               />
             </div>
@@ -561,7 +606,11 @@ const TaskViewEditModal = () => {
 
         <DialogFooter className="flex flex-col gap-2 lg:flex-row">
           {isEditing ? (
-            <Button variant="default" className="order-1 w-full sm:order-2 sm:w-[130px]" onClick={handleSave}>
+            <Button
+              variant="default"
+              className="order-1 w-full sm:order-2 sm:w-[130px]"
+              onClick={handleSave}
+            >
               Save Update
             </Button>
           ) : (
@@ -592,7 +641,7 @@ const TaskViewEditModal = () => {
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default TaskViewEditModal
+export default TaskViewEditModal;

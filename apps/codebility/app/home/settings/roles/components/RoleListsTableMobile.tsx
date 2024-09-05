@@ -1,10 +1,10 @@
-import { positions } from "@/constants"
-import { IconDelete, IconEdit } from "@/public/assets/svgs"
-import { Table, TableRow, TableCell, TableBody } from "@/Components/ui/table"
-import { useModal } from "@/hooks/use-modal"
+import { Table, TableBody, TableCell, TableRow } from "@/Components/ui/table";
+import { positions } from "@/constants";
+import { useModal } from "@/hooks/use-modal";
+import { IconDelete, IconEdit } from "@/public/assets/svgs";
 
 const RoleListsTableMobile = () => {
-  const { onOpen } = useModal()
+  const { onOpen } = useModal();
 
   return (
     <>
@@ -20,10 +20,16 @@ const RoleListsTableMobile = () => {
 
             <TableRow>
               <TableCell className="flex cursor-pointer flex-row justify-end gap-5">
-                <button className="" onClick={() => onOpen("editRoleModal",role)}>
+                <button
+                  className=""
+                  onClick={() => onOpen("editRoleModal", role)}
+                >
                   <IconEdit />
                 </button>
-                <button className="" onClick={() => onOpen("deleteRoleModal",role)}>
+                <button
+                  className=""
+                  onClick={() => onOpen("deleteRoleModal", role)}
+                >
                   <IconDelete className="text-blue-100 hover:text-blue-200" />
                 </button>
               </TableCell>
@@ -32,6 +38,6 @@ const RoleListsTableMobile = () => {
         </Table>
       ))}
     </>
-  )
-}
-export default RoleListsTableMobile
+  );
+};
+export default RoleListsTableMobile;

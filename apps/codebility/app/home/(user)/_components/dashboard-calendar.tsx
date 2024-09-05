@@ -1,18 +1,21 @@
-import React, { useState } from "react"
+import React, { useState } from "react";
+import Box from "@/Components/shared/dashboard/Box";
+import format from "date-fns/format";
+import getDay from "date-fns/getDay";
+import enUS from "date-fns/locale/en-US";
+import parse from "date-fns/parse";
+import startOfWeek from "date-fns/startOfWeek";
 
-import format from "date-fns/format"
-import parse from "date-fns/parse"
-import getDay from "date-fns/getDay"
-import enUS from "date-fns/locale/en-US"
-import startOfWeek from "date-fns/startOfWeek"
+import "react-big-calendar/lib/css/react-big-calendar.css";
 
-import Box from "@/Components/shared/dashboard/Box"
-import "react-big-calendar/lib/css/react-big-calendar.css"
-import { Calendar as EventCalendar, dateFnsLocalizer } from "react-big-calendar"
+import {
+  dateFnsLocalizer,
+  Calendar as EventCalendar,
+} from "react-big-calendar";
 
 const locales = {
   "en-US": enUS,
-}
+};
 
 const localizer = dateFnsLocalizer({
   format,
@@ -20,7 +23,7 @@ const localizer = dateFnsLocalizer({
   startOfWeek,
   getDay,
   locales,
-})
+});
 
 const events = [
   {
@@ -53,20 +56,22 @@ const events = [
     start: new Date(2024, 1, 11, 14, 0), // Feb. 11th, 2024, 2:00 PM
     end: new Date(2024, 1, 13, 16, 0), // Feb. 13th, 2024, 4:00 PM
   },
-]
+];
 
-type View = "month" | "week" | "day" | "agenda" // Custom type for views
+type View = "month" | "week" | "day" | "agenda"; // Custom type for views
 
 const Calendar = () => {
-  const [view, setView] = useState<View>("month")
-  const [date, setDate] = useState(new Date())
+  const [view, setView] = useState<View>("month");
+  const [date, setDate] = useState(new Date());
 
   return (
     <Box>
       <div className="flex flex-col gap-2">
-        <p className="mb-6 text-center text-2xl text-black-500 dark:text-white md:text-left">Schedule Your Calendar</p>
+        <p className="text-black-500 mb-6 text-center text-2xl dark:text-white md:text-left">
+          Schedule Your Calendar
+        </p>
         <EventCalendar
-          className="font-md events:p-2 text-xs text-black-500 dark:text-white"
+          className="font-md events:p-2 text-black-500 text-xs dark:text-white"
           localizer={localizer}
           events={events}
           startAccessor="start"
@@ -78,12 +83,12 @@ const Calendar = () => {
           date={date} // Include the date prop
           onView={(view) => setView(view as View)}
           onNavigate={(date) => {
-            setDate(new Date(date))
+            setDate(new Date(date));
           }}
         />
       </div>
     </Box>
-  )
-}
+  );
+};
 
-export default Calendar
+export default Calendar;

@@ -1,7 +1,7 @@
-import React from 'react'
+import React from "react";
 
 function BuilderColorForm() {
-  return <div>COLOR</div>
+  return <div>COLOR</div>;
 }
 
-export default BuilderColorForm
+export default BuilderColorForm;

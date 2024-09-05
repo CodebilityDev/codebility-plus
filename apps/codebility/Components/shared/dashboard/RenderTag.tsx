@@ -1,8 +1,8 @@
-import React from "react"
+import React from "react";
 
 interface Props {
-  name?: string
-  className?: string
+  name?: string;
+  className?: string;
 }
 
 const RenderTag = ({ name, className }: Props) => {
@@ -12,7 +12,7 @@ const RenderTag = ({ name, className }: Props) => {
     >
       {name}
     </div>
-  )
-}
+  );
+};
 
-export default RenderTag
+export default RenderTag;

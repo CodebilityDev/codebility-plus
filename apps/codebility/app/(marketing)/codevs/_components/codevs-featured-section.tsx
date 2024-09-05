@@ -1,48 +1,61 @@
-"use client"
+"use client";
 
-import { motion } from "framer-motion"
+import { Inter, Outfit } from "next/font/google";
+import Link from "next/link";
+import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer";
+import H2 from "@/Components/shared/home/H2";
+import Heading3 from "@/Components/shared/home/Heading3";
+import SectionWrapper from "@/Components/shared/home/SectionWrapper";
+import { Button } from "@/Components/ui/button";
+import { motion } from "framer-motion";
 
-import H2 from "@/Components/shared/home/H2"
-import Heading3 from "@/Components/shared/home/Heading3"
-import SectionWrapper from "@/Components/shared/home/SectionWrapper"
-import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer"
-import FeaturedCard from "./codevs-featured-card"
-import { Button } from "@/Components/ui/button"
-import { FeaturedSectiondata } from "../../_lib/dummy-data"
-import {Inter, Outfit} from "next/font/google"
-import Link from "next/link"
+import { FeaturedSectiondata } from "../../_lib/dummy-data";
+import FeaturedCard from "./codevs-featured-card";
 
 const inter = Inter({
   subsets: ["latin"],
   display: "swap",
-})
+});
 
 const outfit = Outfit({
   subsets: ["latin"],
   display: "swap",
-})
+});
 
 const FeaturedSection = () => {
   return (
     <SectionWrapper id="whoweare" className="relative">
       <div className="relative flex flex-col gap-8">
         <div className="flex flex-col">
-          <motion.div variants={fadeInOutDownToUp} initial="hidden" whileInView="visible" className="mx-auto">
+          <motion.div
+            variants={fadeInOutDownToUp}
+            initial="hidden"
+            whileInView="visible"
+            className="mx-auto"
+          >
             <H2 className={`${inter.className} text-edit`}>WHO WE ARE</H2>
           </motion.div>
           <motion.div
             variants={fadeInOutDownToUp}
             initial="hidden"
             whileInView="visible"
-            className="mx-auto max-w-[650px] text-center text-gray"
+            className="text-gray mx-auto max-w-[650px] text-center"
           >
             <Heading3>At Codebility we&apos;re</Heading3>
-            <H2 className={`${outfit.className} text-white`}>MORE THAN JUST A COMMUNITY</H2>
+            <H2 className={`${outfit.className} text-white`}>
+              MORE THAN JUST A COMMUNITY
+            </H2>
           </motion.div>
         </div>
         <div className="mt-10 grid max-w-6xl grid-cols-1 gap-3 md:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-5">
           {FeaturedSectiondata.map((data, index) => (
-            <FeaturedCard key={index} title={data.title} description={data.description} src={data.src} alt={data.alt} />
+            <FeaturedCard
+              key={index}
+              title={data.title}
+              description={data.description}
+              src={data.src}
+              alt={data.alt}
+            />
           ))}
         </div>
         <Link href="#roadmap" className="mx-auto mt-20">
@@ -66,7 +79,7 @@ const FeaturedSection = () => {
         />
       </div>
     </SectionWrapper>
-  )
-}
+  );
+};
 
-export default FeaturedSection
+export default FeaturedSection;

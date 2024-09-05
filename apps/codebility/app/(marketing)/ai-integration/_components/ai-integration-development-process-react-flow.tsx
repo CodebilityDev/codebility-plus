@@ -1,27 +1,32 @@
-"use client"
+"use client";
 
-import "reactflow/dist/style.css"
-import ReactFlow, { Background, useNodesState, useEdgesState } from "reactflow"
+import "reactflow/dist/style.css";
 
-import "../_styles/index.css" 
-import Section from "../../_components/marketing-section"
-import { CustomEdge } from "./ai-integration-edge-types"
-import { DevProcessCard, DevProcessImage } from "./ai-integration-node-types"
-import GradientBackgroundWhite from "./ai-integration-gradient-bg-white"
-import { DevProcessInitialNodes, DevProcessInitialEdges } from "../_lib/dummy-data"
+import ReactFlow, { Background, useEdgesState, useNodesState } from "reactflow";
+
+import "../_styles/index.css";
+
+import {
+  DevProcessInitialEdges,
+  DevProcessInitialNodes,
+} from "../_lib/dummy-data";
+import Section from "../../_components/marketing-section";
+import { CustomEdge } from "./ai-integration-edge-types";
+import GradientBackgroundWhite from "./ai-integration-gradient-bg-white";
+import { DevProcessCard, DevProcessImage } from "./ai-integration-node-types";
 
 const nodeTypes = {
   devProcessCard: DevProcessCard,
   devProcessImage: DevProcessImage,
-}
+};
 
 const edgeTypes = {
   customEdge: CustomEdge,
-}
+};
 
 const DevelopmentProcessReactFLow = () => {
-  const [nodes, , onNodesChange] = useNodesState(DevProcessInitialNodes)
-  const [edges, , onEdgesChange] = useEdgesState(DevProcessInitialEdges)
+  const [nodes, , onNodesChange] = useNodesState(DevProcessInitialNodes);
+  const [edges, , onEdgesChange] = useEdgesState(DevProcessInitialEdges);
 
   return (
     <Section className="hidden lg:flex lg:flex-col lg:gap-10">
@@ -30,7 +35,8 @@ const DevelopmentProcessReactFLow = () => {
           Our Streamlined Development Process
         </h2>
         <p className="text-lg md:mx-auto md:w-2/3 md:text-center lg:w-full lg:text-start lg:text-xl">
-          From Concept to Launch: Our Comprehensive Approach to Crafting Exceptional Websites{" "}
+          From Concept to Launch: Our Comprehensive Approach to Crafting
+          Exceptional Websites{" "}
         </p>
       </div>
       <div className="floatingedges lg:relative lg:z-10 lg:mx-auto lg:h-[1054px] lg:w-[800px]">
@@ -50,7 +56,7 @@ const DevelopmentProcessReactFLow = () => {
         </ReactFlow>
       </div>
     </Section>
-  )
-}
+  );
+};
 
-export default DevelopmentProcessReactFLow
+export default DevelopmentProcessReactFLow;

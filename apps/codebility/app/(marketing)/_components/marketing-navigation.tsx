@@ -1,17 +1,18 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Logo from "@/Components/shared/home/Logo"
-import { Button } from "@/Components/ui/button"
-import { IconFourDotsMenu } from "@/public/assets/svgs"
-import { navItems } from "@/constants"
-import useChangeBgNavigation from "@/hooks/useChangeBgNavigation"
-import { Sheet, SheetContent, SheetTrigger } from "@codevs/ui/sheet"
-import { useState } from "react"
+import { useState } from "react";
+import Link from "next/link";
+import Logo from "@/Components/shared/home/Logo";
+import { Button } from "@/Components/ui/button";
+import { navItems } from "@/constants";
+import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
+import { IconFourDotsMenu } from "@/public/assets/svgs";
+
+import { Sheet, SheetContent, SheetTrigger } from "@codevs/ui/sheet";
 
 const Navigation = () => {
-  const { color } = useChangeBgNavigation()
-  const [openSheet, setOpenSheet] = useState(false)
+  const { color } = useChangeBgNavigation();
+  const [openSheet, setOpenSheet] = useState(false);
 
   return (
     <>
@@ -20,12 +21,17 @@ const Navigation = () => {
           color ? "bg-[#030303]" : ""
         }`}
       >
-        <div className="flex justify-between w-full max-w-screen-2xl items-center">
+        <div className="flex w-full max-w-screen-2xl items-center justify-between">
           <Logo />
 
           <div className="flex items-center">
             <Link href="/bookacall">
-              <Button variant="purple" rounded="full" size="lg" className="hidden lg:block">
+              <Button
+                variant="purple"
+                rounded="full"
+                size="lg"
+                className="hidden lg:block"
+              >
                 Let{`'`}s Connect
               </Button>
             </Link>
@@ -43,9 +49,11 @@ const Navigation = () => {
                     onClick={() => setOpenSheet(false)}
                     href={item.path}
                     key={item.id}
-                    className={`w-full ${index === 3 ? "border-none" : "border-b border-black-100"}`}
+                    className={`w-full ${index === 3 ? "border-none" : "border-black-100 border-b"}`}
                   >
-                    <p className="w-full cursor-pointer px-2 py-3 text-center text-base">{item.title}</p>
+                    <p className="w-full cursor-pointer px-2 py-3 text-center text-base">
+                      {item.title}
+                    </p>
                   </Link>
                 ))}
               </SheetContent>
@@ -54,7 +62,7 @@ const Navigation = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Navigation
+export default Navigation;

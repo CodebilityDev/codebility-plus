@@ -1,16 +1,29 @@
-"use client"
-import React, { useState } from "react"
-import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@codevs/ui/dialog"
-import { useModal } from "@/hooks/use-modal"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
-import { Button } from "@/Components/ui/button"
+"use client";
+
+import React, { useState } from "react";
+import { Button } from "@/Components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/Components/ui/select";
+import { useModal } from "@/hooks/use-modal";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogTitle,
+} from "@codevs/ui/dialog";
 
 function TimeTrackerModal() {
-  const { isOpen, onClose, type } = useModal()
+  const { isOpen, onClose, type } = useModal();
   const [selectedOption, setSelectedOption] = useState("");
 
   // TODO api call tickets data
-  const options = ["op1", "op2", "op3", "op4"]
+  const options = ["op1", "op2", "op3", "op4"];
 
   const handleSelect = (option: any) => {
     setSelectedOption(option);
@@ -18,23 +31,27 @@ function TimeTrackerModal() {
 
   const handleStart = () => {
     // TODO save and send option
-    onClose()
-  }
+    onClose();
+  };
 
-  const isModalOpen = isOpen && type === "timeTrackerTicketModal"
+  const isModalOpen = isOpen && type === "timeTrackerTicketModal";
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose} >
-      <DialogContent className="h-[250px] background-dark-300" >
+    <Dialog open={isModalOpen} onOpenChange={onClose}>
+      <DialogContent className="background-dark-300 h-[250px]">
         <DialogTitle className="text-2xl">Select A Ticket</DialogTitle>
         <div className="h-10">
           <Select onValueChange={setSelectedOption}>
-            <SelectTrigger >
+            <SelectTrigger>
               <SelectValue>{selectedOption}</SelectValue>
             </SelectTrigger>
-            <SelectContent >
+            <SelectContent>
               {options.map((option, index) => (
-                <SelectItem key={index} onClick={() => handleSelect(option)} value={option}>
+                <SelectItem
+                  key={index}
+                  onClick={() => handleSelect(option)}
+                  value={option}
+                >
                   {option}
                 </SelectItem>
               ))}
@@ -44,9 +61,9 @@ function TimeTrackerModal() {
         <DialogFooter>
           <Button onClick={() => handleStart()}>Start Timer</Button>
         </DialogFooter>
-      </DialogContent >
-    </Dialog >
-  )
+      </DialogContent>
+    </Dialog>
+  );
 }
 
-export default TimeTrackerModal
+export default TimeTrackerModal;

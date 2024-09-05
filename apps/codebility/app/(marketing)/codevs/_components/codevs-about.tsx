@@ -1,43 +1,51 @@
-import Image from "next/image"
-import { motion } from "framer-motion"
+import Image from "next/image";
+import H2 from "@/Components/shared/home/H2";
+import IntroText from "@/Components/shared/home/IntroText";
+import SectionWrapper from "@/Components/shared/home/SectionWrapper";
+import { services } from "@/constants";
+import { motion } from "framer-motion";
+import moon from "public/assets/images/moon.png";
 
-import AboutCard from "./codevs-about-card"
-import { services } from "@/constants" 
-import H2 from "@/Components/shared/home/H2"
-import moon from "public/assets/images/moon.png"
-import IntroText from "@/Components/shared/home/IntroText"
-import SectionWrapper from "@/Components/shared/home/SectionWrapper"
+import AboutCard from "./codevs-about-card";
 
 const AboutSection = () => {
   return (
     <SectionWrapper id="about">
       <div className="relative">
-        <Image src={moon} alt="Moon" className="invisible absolute -left-72 -top-60 h-auto w-[400px] lg:visible" />
+        <Image
+          src={moon}
+          alt="Moon"
+          className="invisible absolute -left-72 -top-60 h-auto w-[400px] lg:visible"
+        />
       </div>
       <div className="flex flex-col gap-10 lg:flex-row">
         <div className="flex basis-1/2 flex-col justify-center gap-6">
           <div>
             <H2 className="text-white">What We Do</H2>
             <IntroText>
-              Codebility sparks a passion for technology and innovation. Beyond teaching coding, we immerse learners in
-              the coding culture, replicating real-world company standards. Our programs go beyond skill acquisition,
-              offering gateways to new horizons in the tech industry.
+              Codebility sparks a passion for technology and innovation. Beyond
+              teaching coding, we immerse learners in the coding culture,
+              replicating real-world company standards. Our programs go beyond
+              skill acquisition, offering gateways to new horizons in the tech
+              industry.
             </IntroText>
           </div>
 
           <div className="flex flex-col gap-4">
             {services.map((service, index) => (
               <div key={index} className="flex flex-row gap-4">
-                <p className="font-semibold text-gray">{service.number}</p>
-                <div className="w-[20px] -translate-y-3 border-b-2 border-gray"></div>
+                <p className="text-gray font-semibold">{service.number}</p>
+                <div className="border-gray w-[20px] -translate-y-3 border-b-2"></div>
                 <p className="text-gray">{service.label}</p>
               </div>
             ))}
           </div>
 
           <IntroText>
-            We believe in the transformative power of coding. With Codebility, you won{`'`}t just learn coding; you{`'`}
-            ll wield a tool for a brighter future. Join us in sculpting your path as tomorrow{`'`}s digital architect.
+            We believe in the transformative power of coding. With Codebility,
+            you won{`'`}t just learn coding; you{`'`}
+            ll wield a tool for a brighter future. Join us in sculpting your
+            path as tomorrow{`'`}s digital architect.
           </IntroText>
         </div>
         <div className="basis-1/2">
@@ -113,7 +121,7 @@ const AboutSection = () => {
         </div>
       </div>
     </SectionWrapper>
-  )
-}
+  );
+};
 
-export default AboutSection
+export default AboutSection;

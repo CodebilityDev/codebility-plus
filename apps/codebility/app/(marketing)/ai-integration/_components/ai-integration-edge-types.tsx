@@ -1,4 +1,4 @@
-import { getBezierPath, EdgeProps } from "reactflow"
+import { EdgeProps, getBezierPath } from "reactflow";
 
 export const CustomEdge = ({
   id,
@@ -18,7 +18,7 @@ export const CustomEdge = ({
     targetY,
     sourcePosition,
     targetPosition,
-  })
+  });
 
   return (
     <>
@@ -30,5 +30,5 @@ export const CustomEdge = ({
         markerEnd={markerEnd}
       />
     </>
-  )
-}
+  );
+};

@@ -1,5 +1,5 @@
-import React from "react"
-import Image from "next/image"
+import React from "react";
+import Image from "next/image";
 
 const Diamond = ({ color }: { color?: string }) => {
   return (
@@ -13,7 +13,7 @@ const Diamond = ({ color }: { color?: string }) => {
             height={30}
             className="relative z-10"
           />
-          <div className="absolute left-0 top-0 h-full w-full rounded-full bg-violet opacity-40 blur-sm filter"></div>
+          <div className="bg-violet absolute left-0 top-0 h-full w-full rounded-full opacity-40 blur-sm filter"></div>
         </div>
       ) : color === "teal" ? (
         <div className="relative">
@@ -24,11 +24,11 @@ const Diamond = ({ color }: { color?: string }) => {
             height={30}
             className="relative z-10"
           />
-          <div className="absolute left-0 top-0 h-full w-full rounded-full bg-teal opacity-40 blur-sm filter"></div>
+          <div className="bg-teal absolute left-0 top-0 h-full w-full rounded-full opacity-40 blur-sm filter"></div>
         </div>
       ) : null}
     </>
-  )
-}
+  );
+};
 
-export default Diamond
+export default Diamond;

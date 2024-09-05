@@ -1,19 +1,23 @@
-import Link from "next/link"
-import { Rowdies } from "next/font/google"
-import { Button } from "@/Components/ui/button"
-import OrbitingCirclesBackground from "./codevs-orbiting-circles-bg"
-import SideNavMenu from "../../_components/marketing-sidenav-menu"
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
-import pathsConfig from "@/config/paths.config"
+import { Rowdies } from "next/font/google";
+import Link from "next/link";
+import { Button } from "@/Components/ui/button";
+import pathsConfig from "@/config/paths.config";
+
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+
+import SideNavMenu from "../../_components/marketing-sidenav-menu";
+import OrbitingCirclesBackground from "./codevs-orbiting-circles-bg";
 
 const rowdies = Rowdies({
   weight: "300",
   subsets: ["latin"],
-})
+});
 
 export default async function Hero() {
   const supabase = getSupabaseServerComponentClient();
-  const { data: { user }} = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   return (
     <section
@@ -24,7 +28,8 @@ export default async function Hero() {
       <div
         className="absolute left-1/2 top-1/2 h-[1100px] w-96 -translate-x-1/2 -translate-y-1/2 blur-3xl md:w-full xl:-left-10 xl:-top-96 xl:h-[1562.01px] xl:w-[1044.36px] xl:-translate-x-0 xl:-translate-y-0"
         style={{
-          background: "radial-gradient(50% 50% at 50% 50%, rgba(151, 71, 255, 0.3) 0%, rgba(3, 3, 3, 0.3) 100%)",
+          background:
+            "radial-gradient(50% 50% at 50% 50%, rgba(151, 71, 255, 0.3) 0%, rgba(3, 3, 3, 0.3) 100%)",
         }}
       ></div>
       <OrbitingCirclesBackground />
@@ -36,18 +41,27 @@ export default async function Hero() {
           >
             Codebility
           </h1>
-          <h2 className="text-xl font-semibold lg:text-5xl">Join Our Inclusive Community </h2>
+          <h2 className="text-xl font-semibold lg:text-5xl">
+            Join Our Inclusive Community{" "}
+          </h2>
         </div>
-        <p className="text-xs md:text-sm lg:text-2xl">Where Diversity Flourishes and Connections Thrive</p>
+        <p className="text-xs md:text-sm lg:text-2xl">
+          Where Diversity Flourishes and Connections Thrive
+        </p>
         <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
           <Link href={user ? pathsConfig.app.home : pathsConfig.auth.signUp}>
-            <Button variant="purple" size="lg" rounded="full" className="md:w-40">
+            <Button
+              variant="purple"
+              size="lg"
+              rounded="full"
+              className="md:w-40"
+            >
               {user ? "Dashboard" : "Join"}
             </Button>
           </Link>
           <Link href="#codevs">
-            <Button className="h-12 rounded-full bg-gradient-to-r from-teal via-blue-100 to-violet p-0.5 hover:bg-gradient-to-br md:w-40">
-              <span className="flex h-full w-full items-center justify-center rounded-full bg-black-500 text-sm text-white lg:text-lg">
+            <Button className="from-teal to-violet h-12 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
+              <span className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
                 Hire Codevs
               </span>
             </Button>
@@ -64,5 +78,5 @@ export default async function Hero() {
         ))}
       </div>
     </section>
-  )
+  );
 }

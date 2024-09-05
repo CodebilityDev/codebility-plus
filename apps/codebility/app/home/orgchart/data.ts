@@ -1,4 +1,4 @@
-import { org_CardT } from "@/types/protectedroutes"
+import { org_CardT } from "@/types/protectedroutes";
 
 export const orgChartData: org_CardT[] = [
   {
@@ -65,4 +65,4 @@ export const orgChartData: org_CardT[] = [
       },
     ],
   },
-]
+];

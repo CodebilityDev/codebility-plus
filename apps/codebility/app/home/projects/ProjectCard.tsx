@@ -1,18 +1,17 @@
-import React from "react"
-import Link from "next/link"
-import Image from "next/image"
-
-import { pageSize } from "@/constants"
-import { Button } from "@/Components/ui/button"
-import usePagination from "@/hooks/use-pagination"
-import { ProjectT } from "@/types/index"
-import { useModal } from "@/hooks/use-modal-projects"
-import DefaultPagination from "@/Components/ui/pagination"
-import { IconLink, IconGithub } from "@/public/assets/svgs"
-import { defaultAvatar } from "@/public/assets/images"
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/Components/ui/button";
+import DefaultPagination from "@/Components/ui/pagination";
+import { pageSize } from "@/constants";
+import { useModal } from "@/hooks/use-modal-projects";
+import usePagination from "@/hooks/use-pagination";
+import { defaultAvatar } from "@/public/assets/images";
+import { IconGithub, IconLink } from "@/public/assets/svgs";
+import { ProjectT } from "@/types/index";
 
 const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
-  const { onOpen } = useModal()
+  const { onOpen } = useModal();
   const {
     currentPage,
     totalPages,
@@ -20,7 +19,7 @@ const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
     handleNextPage,
     handlePreviousPage,
     setCurrentPage,
-  } = usePagination(projects, pageSize.projects)
+  } = usePagination(projects, pageSize.projects);
 
   return (
     <>
@@ -30,7 +29,7 @@ const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
             key={project.id}
             className="background-box flex flex-col rounded-lg border border-zinc-200 dark:border-zinc-700"
           >
-            <div className="flex justify-center rounded-t-lg bg-dark-100">
+            <div className="bg-dark-100 flex justify-center rounded-t-lg">
               <Image
                 alt={project.project_name as string}
                 src={project.project_thumbnail || defaultAvatar}
@@ -46,7 +45,9 @@ const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
                 <p className="text-2xl">{project.project_name}</p>
                 <p className="text-md">{project.project_status}</p>
               </div>
-              <p className="md:text-md text-sm text-gray lg:text-lg">{project.summary}</p>
+              <p className="md:text-md text-gray text-sm lg:text-lg">
+                {project.summary}
+              </p>
               <div className="flex items-center space-x-3">
                 <Link href={project.github_link as string} target="_blank">
                   <IconGithub className="h-8 w-8 invert duration-300 hover:-translate-y-1 dark:invert-0" />
@@ -57,7 +58,11 @@ const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
                   </Link>
                 )}
               </div>
-              <Button className="flex justify-end" onClick={() => onOpen("projectViewModal", project)} variant="link">
+              <Button
+                className="flex justify-end"
+                onClick={() => onOpen("projectViewModal", project)}
+                variant="link"
+              >
                 View
               </Button>
             </div>
@@ -74,7 +79,7 @@ const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default ProjectCard
+export default ProjectCard;

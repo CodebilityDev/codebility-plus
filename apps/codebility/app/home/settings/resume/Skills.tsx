@@ -1,41 +1,40 @@
-import Image from "next/image"
-
-import { useModal } from "@/hooks/use-modal"
-import { Button } from "@/Components/ui/button"
-import { IconEdit } from "@/public/assets/svgs"
-import React, { useEffect, useState } from "react"
-import { Box } from "@/Components/shared/dashboard"
-import { useTechStackStore } from "@/hooks/use-techstack"
-import { resume_SkillsT } from "@/types/protectedroutes"
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { Box } from "@/Components/shared/dashboard";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal";
+import { useTechStackStore } from "@/hooks/use-techstack";
+import { IconEdit } from "@/public/assets/svgs";
+import { resume_SkillsT } from "@/types/protectedroutes";
 
 const Skills = ({ tech_stacks, updateProfile }: resume_SkillsT) => {
-  const [isEditMode, setIsEditMode] = useState(false)
-  const [isLoading] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading] = useState(false);
 
-  const { onOpen } = useModal()
-  const { stack, setStack } = useTechStackStore()
+  const { onOpen } = useModal();
+  const { stack, setStack } = useTechStackStore();
 
   useEffect(() => {
-    setStack(tech_stacks.map((stack) => stack.toLowerCase()))
-  }, [tech_stacks, setStack])
+    setStack(tech_stacks.map((stack) => stack.toLowerCase()));
+  }, [tech_stacks, setStack]);
 
   const handleEditMode = () => {
-    setIsEditMode(true)
-    onOpen("techStackModal")
-  }
+    setIsEditMode(true);
+    onOpen("techStackModal");
+  };
 
   const handleCancel = () => {
-    setStack(tech_stacks.map((stack) => stack.toLowerCase()))
-    setIsEditMode(false)
-  }
+    setStack(tech_stacks.map((stack) => stack.toLowerCase()));
+    setIsEditMode(false);
+  };
 
   const handleSave = () => {
-    updateProfile({ tech_stacks: stack })
-    setIsEditMode(false)
-  }
+    updateProfile({ tech_stacks: stack });
+    setIsEditMode(false);
+  };
 
   return (
-    <Box className="relative bg-light-900 dark:bg-dark-100">
+    <Box className="bg-light-900 dark:bg-dark-100 relative">
       <IconEdit
         className="w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
         onClick={handleEditMode}
@@ -63,13 +62,18 @@ const Skills = ({ tech_stacks, updateProfile }: resume_SkillsT) => {
           <Button variant="hollow" onClick={handleCancel} disabled={isLoading}>
             Cancel
           </Button>
-          <Button variant="default" type="submit" onClick={handleSave} disabled={isLoading}>
+          <Button
+            variant="default"
+            type="submit"
+            onClick={handleSave}
+            disabled={isLoading}
+          >
             {isLoading ? "Saving..." : "Save"}
           </Button>
         </div>
       ) : null}
     </Box>
-  )
-}
+  );
+};
 
-export default Skills
+export default Skills;

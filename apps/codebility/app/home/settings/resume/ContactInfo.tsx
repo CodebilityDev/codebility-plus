@@ -1,22 +1,24 @@
-import { useState } from "react"
-import toast from "react-hot-toast"
-import { useForm } from "react-hook-form"
+import { useState } from "react";
+import { updateProfile } from "@/app/api/resume";
+import Box from "@/Components/shared/dashboard/Box";
+import InputPhone from "@/Components/shared/dashboard/InputPhone";
+import { Button } from "@/Components/ui/button";
+import useToken from "@/hooks/use-token";
+import {
+  contactInfoValidation,
+  contactInfoValidationSchema,
+} from "@/lib/validations/resumeSettings";
+import { IconEdit } from "@/public/assets/svgs";
+import { User } from "@/types";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
-import { User } from "@/types"
-import useToken from "@/hooks/use-token"
-import { updateProfile } from "@/app/api/resume"
-import { Button } from "@/Components/ui/button"
-import { IconEdit } from "@/public/assets/svgs"
-import Box from "@/Components/shared/dashboard/Box"
-
-import InputPhone from "@/Components/shared/dashboard/InputPhone"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { contactInfoValidation, contactInfoValidationSchema } from "@/lib/validations/resumeSettings"
-import { Input } from "@codevs/ui/input"
+import { Input } from "@codevs/ui/input";
 
 const ContactInfo = ({ user }: { user: User }) => {
-  const [isEditMode, setIsEditMode] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const {
     id,
     phone_no,
@@ -27,8 +29,8 @@ const ContactInfo = ({ user }: { user: User }) => {
     telegram_link,
     whatsapp_link,
     skype_link,
-  } = user
-  const { token } = useToken()
+  } = user;
+  const { token } = useToken();
 
   const {
     register,
@@ -48,40 +50,42 @@ const ContactInfo = ({ user }: { user: User }) => {
       skype_link: skype_link || undefined,
     },
     resolver: zodResolver(contactInfoValidation),
-  })
+  });
 
   const onSubmit = async (data: any) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const updatedData = { ...data }
+      const updatedData = { ...data };
       await updateProfile(id, updatedData, token).then((response) => {
         if (response) {
-          toast.success("Successfully Updated!")
-          reset(updatedData)
-          setIsEditMode(false)
+          toast.success("Successfully Updated!");
+          reset(updatedData);
+          setIsEditMode(false);
         } else if (!response) {
-          toast.error(response.statusText)
+          toast.error(response.statusText);
         }
-      })
+      });
     } catch (e) {
-      toast.error("Something went wrong!")
+      toast.error("Something went wrong!");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleEditClick = () => {
-    setIsEditMode(!isEditMode)
-  }
+    setIsEditMode(!isEditMode);
+  };
   const handleSaveClick = () => {
-    setIsEditMode(false)
-  }
+    setIsEditMode(false);
+  };
 
   return (
-    <Box className="relative flex flex-col gap-6 bg-light-900 dark:bg-dark-100">
+    <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-6">
       <IconEdit
         className={` ${
-          isEditMode ? "hidden" : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+          isEditMode
+            ? "hidden"
+            : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
         }  `}
         onClick={handleEditClick}
       />
@@ -100,7 +104,11 @@ const ContactInfo = ({ user }: { user: User }) => {
                 : " bg-white  text-dark-200 dark:bg-dark-200 dark:text-gray"
             }`}
           />
-          {errors.phone_no?.message && <p className="ml-24 mt-2 text-sm text-red-400">{errors.phone_no?.message}</p>}
+          {errors.phone_no?.message && (
+            <p className="ml-24 mt-2 text-sm text-red-400">
+              {errors.phone_no?.message}
+            </p>
+          )}
           <Input
             id="portfolio_website"
             {...register("portfolio_website")}
@@ -111,7 +119,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             className="rounded"
           />
           {errors.portfolio_website?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.portfolio_website?.message}</p>
+            <p className="ml-24 mt-2 text-sm text-red-400">
+              {errors.portfolio_website?.message}
+            </p>
           )}
           <Input
             parentClassName="flex w-full flex-col justify-between gap-2"
@@ -123,7 +133,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             disabled={!isEditMode}
           />
           {errors.github_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.github_link?.message}</p>
+            <p className="ml-24 mt-2 text-sm text-red-400">
+              {errors.github_link?.message}
+            </p>
           )}
           <Input
             id="fb_link"
@@ -134,7 +146,11 @@ const ContactInfo = ({ user }: { user: User }) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.fb_link?.message && <p className="ml-24 mt-2 text-sm text-red-400">{errors.fb_link?.message}</p>}
+          {errors.fb_link?.message && (
+            <p className="ml-24 mt-2 text-sm text-red-400">
+              {errors.fb_link?.message}
+            </p>
+          )}
           <Input
             id="linkedin_link"
             {...register("linkedin_link")}
@@ -145,7 +161,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             className="rounded"
           />
           {errors.linkedin_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.linkedin_link?.message}</p>
+            <p className="ml-24 mt-2 text-sm text-red-400">
+              {errors.linkedin_link?.message}
+            </p>
           )}
           <Input
             id="telegram_link"
@@ -157,7 +175,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             className="rounded"
           />
           {errors.telegram_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.telegram_link?.message}</p>
+            <p className="ml-24 mt-2 text-sm text-red-400">
+              {errors.telegram_link?.message}
+            </p>
           )}
           <Input
             id="whatsapp_link"
@@ -169,7 +189,9 @@ const ContactInfo = ({ user }: { user: User }) => {
             className="rounded"
           />
           {errors.whatsapp_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.whatsapp_link?.message}</p>
+            <p className="ml-24 mt-2 text-sm text-red-400">
+              {errors.whatsapp_link?.message}
+            </p>
           )}
           <Input
             id="skype_link"
@@ -181,12 +203,18 @@ const ContactInfo = ({ user }: { user: User }) => {
             className="rounded"
           />
           {errors.skype_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.skype_link?.message}</p>
+            <p className="ml-24 mt-2 text-sm text-red-400">
+              {errors.skype_link?.message}
+            </p>
           )}
         </div>
         {isEditMode ? (
           <div className="mt-4 flex justify-end gap-2">
-            <Button variant="hollow" onClick={handleSaveClick} disabled={isLoading}>
+            <Button
+              variant="hollow"
+              onClick={handleSaveClick}
+              disabled={isLoading}
+            >
               Cancel
             </Button>
             <Button variant="default" type="submit" disabled={isLoading}>
@@ -196,7 +224,7 @@ const ContactInfo = ({ user }: { user: User }) => {
         ) : null}
       </form>
     </Box>
-  )
-}
+  );
+};
 
-export default ContactInfo
+export default ContactInfo;

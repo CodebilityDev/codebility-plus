@@ -1,22 +1,23 @@
-import { Button } from '@codevs/ui/button'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
-import Image from 'next/image'
+import { cookies } from "next/headers";
+import Image from "next/image";
+import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+
+import { Button } from "@codevs/ui/button";
 
 async function ProfilePage({ params }: { params: { domain: string } }) {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = createServerComponentClient({ cookies });
 
   const { data: card } = await supabase
-    .from('cards')
+    .from("cards")
     .select()
-    .eq('profile_key', params.domain)
-    .single()
+    .eq("profile_key", params.domain)
+    .single();
 
   const { data: profileDatas } = await supabase
-    .from('builder_profile_data')
+    .from("builder_profile_data")
     .select()
-    .eq('card_id', card.id)
-    .single()
+    .eq("card_id", card.id)
+    .single();
 
   return (
     <div className="flex h-screen flex-1 items-center justify-center">
@@ -27,7 +28,7 @@ async function ProfilePage({ params }: { params: { domain: string } }) {
               <Image
                 src={
                   profileDatas.cover_photo ||
-                  '/pikaso_texttoimage_2x2-corporate-headshot-of-a-Filipino-male-and-fema 1.png'
+                  "/pikaso_texttoimage_2x2-corporate-headshot-of-a-Filipino-male-and-fema 1.png"
                 }
                 alt="cover"
                 fill
@@ -55,7 +56,7 @@ async function ProfilePage({ params }: { params: { domain: string } }) {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default ProfilePage
+export default ProfilePage;

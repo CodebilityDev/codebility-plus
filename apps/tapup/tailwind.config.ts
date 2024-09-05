@@ -1,5 +1,6 @@
 import type { Config } from "tailwindcss";
 import colors from "tailwindcss/colors";
+
 import baseConfig from "@codevs/tailwind-config/web";
 
 const config: Config = {
@@ -131,14 +132,14 @@ const config: Config = {
           to: { height: "0" },
         },
         spin: {
-          from: { transform: 'rotate(0deg)' },
-          to: { transform: 'rotate(360deg)' },
+          from: { transform: "rotate(0deg)" },
+          to: { transform: "rotate(360deg)" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
-        "spin": "spin 1s linear infinite",
+        spin: "spin 1s linear infinite",
       },
       boxShadow: {
         // light
