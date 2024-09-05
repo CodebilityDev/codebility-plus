@@ -9,6 +9,12 @@
       "cache": false,
       "persistent": false
     },
+    "format": {
+      "outputs": [
+        "node_modules/.cache/.prettiercache"
+      ],
+      "outputLogs": "new-only"
+    },
     "clean": {
       "cache": false
     },
