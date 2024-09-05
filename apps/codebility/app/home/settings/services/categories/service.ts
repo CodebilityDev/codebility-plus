@@ -1,9 +1,9 @@
 "use server";
 
-import { createServer } from "@/utils/supabase";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 export const getAllServiceCategories = async () => {
-  const supabase = createServer();
+  const supabase = getSupabaseServerComponentClient();
 
   const { data, error } = await supabase.from("service-categories").select("*");
 
