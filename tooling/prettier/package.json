@@ -19,5 +19,6 @@
   "devDependencies": {
     "@codevs/tsconfig": "workspace:*",
     "typescript": "^5.5.4"
-  }
+  },
+  "prettier": "@codevs/prettier-config"
 }

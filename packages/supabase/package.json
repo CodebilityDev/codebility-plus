@@ -5,7 +5,8 @@
   "scripts": {
     "clean": "rm -rf node_modules",
     "dev": "tsc",
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore"
   },
   "exports": {
     "./server-actions-client": {
@@ -31,6 +32,8 @@
   },
   "devDependencies": {
     "@codevs/tsconfig": "workspace:*",
+    "@codevs/prettier-config": "workspace:*",
+    "prettier": "^3.3.3",
     "@types/react": "^18.3.5",
     "server-only": "^0.0.1",
     "zod": "^3.23.8"
@@ -40,5 +43,6 @@
     "@supabase/supabase-js": "^2.45.1",
     "next": "^14.2.5",
     "react": "^18.3.1"
-  }
+  },
+  "prettier": "@codevs/prettier-config"
 }
