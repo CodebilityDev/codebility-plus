@@ -6,11 +6,13 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
+    "next:lint": "next lint",
     "clean": "rm -rf .next node_modules",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "format": "prettier --check . --ignore-path ../../.gitignore"
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@codevs/mailers": "workspace:*",
@@ -29,6 +31,8 @@
     "@chromatic-com/storybook": "1.6.1",
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
+    "@codevs/eslint-config": "workspace:*",
+    "@codevs/prettier-config": "workspace:*",
     "@storybook/addon-essentials": "^8.2.8",
     "@storybook/addon-interactions": "^8.2.8",
     "@storybook/addon-links": "^8.2.8",
@@ -48,8 +52,15 @@
     "storybook": "^8.2.8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
-    "@codevs/prettier-config": "workspace:*",
     "prettier": "^3.3.3"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@kit/eslint-config/base",
+      "@kit/eslint-config/nextjs",
+      "@kit/eslint-config/react"
+    ]
   },
   "prettier": "@codevs/prettier-config"
 }

@@ -191,6 +191,9 @@ importers:
       '@chromatic-com/storybook':
         specifier: 1.6.1
         version: 1.6.1(react@18.2.0)
+      '@codevs/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
       '@codevs/prettier-config':
         specifier: workspace:*
         version: link:../../tooling/prettier
@@ -301,7 +304,7 @@ importers:
         version: 7.0.1(@babel/plugin-syntax-flow@7.24.7)(@babel/plugin-transform-react-jsx@7.25.2)(eslint@8.57.0)(jest@29.7.0)(typescript@5.5.4)
       eslint-plugin-import:
         specifier: ^2.29.0
-        version: 2.29.1(@typescript-eslint/parser@6.21.0)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+        version: 2.29.1(@typescript-eslint/parser@6.21.0)(eslint@8.57.0)
       eslint-plugin-react:
         specifier: 7.33.2
         version: 7.33.2(eslint@8.57.0)
@@ -567,6 +570,9 @@ importers:
       '@chromatic-com/storybook':
         specifier: 1.6.1
         version: 1.6.1(react@18.2.0)
+      '@codevs/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
       '@codevs/prettier-config':
         specifier: workspace:*
         version: link:../../tooling/prettier
@@ -655,6 +661,9 @@ importers:
         specifier: ^6.9.14
         version: 6.9.14
     devDependencies:
+      '@codevs/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
       '@codevs/prettier-config':
         specifier: workspace:*
         version: link:../../tooling/prettier
@@ -686,6 +695,9 @@ importers:
         specifier: ^18.3.1
         version: 18.3.1
     devDependencies:
+      '@codevs/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
       '@codevs/prettier-config':
         specifier: workspace:*
         version: link:../../tooling/prettier
@@ -768,6 +780,9 @@ importers:
         specifier: ^3.23.8
         version: 3.23.8
     devDependencies:
+      '@codevs/eslint-config':
+        specifier: workspace:*
+        version: link:../../tooling/eslint
       '@codevs/prettier-config':
         specifier: workspace:*
         version: link:../../tooling/prettier
@@ -855,12 +870,18 @@ importers:
         specifier: ^1.0.7
         version: 1.0.7(tailwindcss@3.4.9)
     devDependencies:
+      '@codevs/eslint-config':
+        specifier: workspace:*
+        version: link:../eslint
       '@codevs/prettier-config':
         specifier: workspace:*
         version: link:../prettier
       '@codevs/tsconfig':
         specifier: workspace:*
         version: link:../typescript
+      eslint:
+        specifier: ^9.9.1
+        version: 9.9.1
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
@@ -12868,6 +12889,41 @@ packages:
     dev: true
 
   /eslint-plugin-import@2.29.1(@typescript-eslint/parser@6.21.0)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0):
+    resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
+    engines: {node: '>=4'}
+    peerDependencies:
+      '@typescript-eslint/parser': '*'
+      eslint: ^2 || ^3 || ^4 || ^5 || ^6 || ^7.2.0 || ^8
+    peerDependenciesMeta:
+      '@typescript-eslint/parser':
+        optional: true
+    dependencies:
+      '@typescript-eslint/parser': 6.21.0(eslint@8.57.0)(typescript@5.5.4)
+      array-includes: 3.1.8
+      array.prototype.findlastindex: 1.2.5
+      array.prototype.flat: 1.3.2
+      array.prototype.flatmap: 1.3.2
+      debug: 3.2.7
+      doctrine: 2.1.0
+      eslint: 8.57.0
+      eslint-import-resolver-node: 0.3.9
+      eslint-module-utils: 2.8.1(@typescript-eslint/parser@6.21.0)(eslint-import-resolver-node@0.3.9)(eslint-import-resolver-typescript@3.6.1)(eslint@8.57.0)
+      hasown: 2.0.2
+      is-core-module: 2.15.0
+      is-glob: 4.0.3
+      minimatch: 3.1.2
+      object.fromentries: 2.0.8
+      object.groupby: 1.0.3
+      object.values: 1.2.0
+      semver: 6.3.1
+      tsconfig-paths: 3.15.0
+    transitivePeerDependencies:
+      - eslint-import-resolver-typescript
+      - eslint-import-resolver-webpack
+      - supports-color
+    dev: true
+
+  /eslint-plugin-import@2.29.1(@typescript-eslint/parser@6.21.0)(eslint@8.57.0):
     resolution: {integrity: sha512-BbPC0cuExzhiMo4Ff1BTVwHpjjv28C5R+btTOGaCRC7UEz801up0JadwkeSk5Ued6TG34uaczuVuH6qyy5YUxw==}
     engines: {node: '>=4'}
     peerDependencies:
