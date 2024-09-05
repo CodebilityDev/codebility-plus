@@ -11,11 +11,11 @@ import {
 } from "@codevs/ui/breadcrumb"
 
 const ClientArchivePage = async () => {
-  const data = await getAllClients();
+  const { data, error } = await getAllClients();
 
-  const clients = (data as ClientDetails[]).filter(
+  const clients = data ? (data as ClientDetails[]).filter(
     (client) => client.is_archive === true
-  );
+  ) : [];
 
   return (
     <div className="max-w-screen-xl mx-auto flex flex-col gap-4">
@@ -29,7 +29,12 @@ const ClientArchivePage = async () => {
         </BreadcrumbList>
       </Breadcrumb>
       <H1>Archive</H1>
-      <ClientCards clients={clients} />
+      {
+        error ?
+          <div className="text-white">ERROR</div>
+          :
+          <ClientCards clients={clients} />
+      }
     </div>
   )
 }
