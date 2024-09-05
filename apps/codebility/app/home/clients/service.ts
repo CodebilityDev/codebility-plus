@@ -1,9 +1,9 @@
 "use server"
 
-import { createServer } from "@/utils/supabase";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-export const getAllClients = async () => { 
-    const supabase = createServer();
+export const getAllClients = async () => {
+    const supabase = getSupabaseServerComponentClient();
     const { data, error } = await supabase
         .from("clients")
         .select("*");
@@ -18,6 +18,6 @@ export const getAllClients = async () => {
             client.logo = supabase.storage.from("clients-image").getPublicUrl(client.logo).data.publicUrl;
         }
     });
-    
+
     return data;
 };
