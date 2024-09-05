@@ -1,6 +1,6 @@
-import { TaskT } from "@/types"
-import { client_ClientCardT } from "@/types/protectedroutes"
-import { create } from "zustand"
+import { TaskT } from "@/types";
+import { client_ClientCardT } from "@/types/protectedroutes";
+import { create } from "zustand";
 
 export type ModalType =
   | "companyProfile"
@@ -22,15 +22,19 @@ export type ModalType =
   | "homePrivacyPolicyModal"
   | "addRoleModal"
   | "editRoleModal"
-  | "deleteRoleModal"
+  | "deleteRoleModal";
 
 interface ModalStore {
-  type: ModalType | null
-  data?: TaskT | client_ClientCardT[] | any
-  dataObject?: any
-  isOpen: boolean
-  onOpen: (type: ModalType, data?: TaskT | client_ClientCardT[] | any, dataObject?: any) => void
-  onClose: () => void
+  type: ModalType | null;
+  data?: TaskT | client_ClientCardT[] | any;
+  dataObject?: any;
+  isOpen: boolean;
+  onOpen: (
+    type: ModalType,
+    data?: TaskT | client_ClientCardT[] | any,
+    dataObject?: any,
+  ) => void;
+  onClose: () => void;
 }
 
 export const useModal = create<ModalStore>((set) => ({
@@ -40,4 +44,4 @@ export const useModal = create<ModalStore>((set) => ({
   onOpen: (type, data?: TaskT | client_ClientCardT[] | any, dataObject?) =>
     set({ isOpen: true, type, data, dataObject }),
   onClose: () => set({ type: null, isOpen: false }),
-}))
+}));

@@ -1,11 +1,22 @@
-import { motion } from "framer-motion"
+import {
+  fadeInOutDownToUp,
+  fadeInOutLeftToRight,
+  fadeInOutRightToLeft,
+} from "@/Components/FramerAnimation/Framer";
+import { codevs_WhyChooseItemT } from "@/types/home";
+import { motion } from "framer-motion";
 
-import { codevs_WhyChooseItemT } from "@/types/home"
-import { fadeInOutDownToUp, fadeInOutLeftToRight, fadeInOutRightToLeft } from "@/Components/FramerAnimation/Framer"
-
-const WhyChooseItem = ({ title, itemNumber, description, subTitle, color }: codevs_WhyChooseItemT) => {
+const WhyChooseItem = ({
+  title,
+  itemNumber,
+  description,
+  subTitle,
+  color,
+}: codevs_WhyChooseItemT) => {
   return (
-    <div className={`mx-auto flex w-full flex-col gap-2 rounded-lg p-4 text-white lg:flex-row ${color}`}>
+    <div
+      className={`mx-auto flex w-full flex-col gap-2 rounded-lg p-4 text-white lg:flex-row ${color}`}
+    >
       <div className="m-auto flex basis-2/5 pl-5">
         <motion.h3
           variants={fadeInOutLeftToRight}
@@ -32,13 +43,17 @@ const WhyChooseItem = ({ title, itemNumber, description, subTitle, color }: code
             whileInView="visible"
             className="flex flex-1 flex-col justify-center gap-1 p-1 text-center lg:text-left"
           >
-            <p className="md:text-md text-sm font-semibold lg:text-lg">{subTitle}</p>
-            <p className="md:text-md mr-2 text-sm lg:text-base">{description}</p>
+            <p className="md:text-md text-sm font-semibold lg:text-lg">
+              {subTitle}
+            </p>
+            <p className="md:text-md mr-2 text-sm lg:text-base">
+              {description}
+            </p>
           </motion.div>
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default WhyChooseItem
+export default WhyChooseItem;

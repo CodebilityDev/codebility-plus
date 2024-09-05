@@ -1,5 +1,6 @@
-import { cn } from "@codevs/ui"
-import React from "react"
+import React from "react";
+
+import { cn } from "@codevs/ui";
 
 const OrbitingCircles = ({
   className,
@@ -10,13 +11,13 @@ const OrbitingCircles = ({
   radius = 50,
   path = true,
 }: {
-  className?: string
-  children?: React.ReactNode
-  reverse?: boolean
-  duration?: number
-  delay?: number
-  radius?: number
-  path?: boolean
+  className?: string;
+  children?: React.ReactNode;
+  reverse?: boolean;
+  duration?: number;
+  delay?: number;
+  radius?: number;
+  path?: boolean;
 }) => {
   return (
     <>
@@ -46,15 +47,15 @@ const OrbitingCircles = ({
           } as React.CSSProperties
         }
         className={cn(
-          "absolute flex h-full w-full transform-gpu animate-orbit items-center justify-center rounded-full border [animation-delay:calc(var(--delay)*1000ms)]",
+          "animate-orbit absolute flex h-full w-full transform-gpu items-center justify-center rounded-full border [animation-delay:calc(var(--delay)*1000ms)]",
           { "[animation-direction:reverse]": reverse },
-          className
+          className,
         )}
       >
         {children}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default OrbitingCircles
+export default OrbitingCircles;

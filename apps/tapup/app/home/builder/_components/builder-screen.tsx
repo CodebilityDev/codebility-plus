@@ -1,11 +1,13 @@
-'use client'
+"use client";
 
-import Image from 'next/image'
-import useProfile from '~/hooks/useProfile'
-import { Button } from '@codevs/ui/button'
+import Image from "next/image";
+
+import { Button } from "@codevs/ui/button";
+
+import useProfile from "~/hooks/useProfile";
 
 function BuilderScreen() {
-  const { profileDatas } = useProfile()
+  const { profileDatas } = useProfile();
   return (
     <div className="flex flex-1 justify-center">
       <div className="h-[40vw] w-[25vw] overflow-hidden rounded-3xl border border-black bg-white">
@@ -15,7 +17,7 @@ function BuilderScreen() {
               <Image
                 src={
                   profileDatas.coverPhoto ||
-                  '/pikaso_texttoimage_2x2-corporate-headshot-of-a-Filipino-male-and-fema 1.png'
+                  "/pikaso_texttoimage_2x2-corporate-headshot-of-a-Filipino-male-and-fema 1.png"
                 }
                 alt="cover"
                 fill
@@ -43,7 +45,7 @@ function BuilderScreen() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-export default BuilderScreen
+export default BuilderScreen;

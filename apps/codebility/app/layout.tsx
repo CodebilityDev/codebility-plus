@@ -1,30 +1,34 @@
-import "@/app/globals.css" 
-import React from "react"
-import { Metadata } from "next"
-import { headers } from "next/headers"
-import { Outfit } from "next/font/google"
-import { ThemeProvider } from "@/context/ThemeProvider"
-import { ModalProvider } from "@/Components/providers/modal-provider"
+import "@/app/globals.css";
 
-import ToasterContext from "@/context/ToasterProvider"
-import ReactQueryProvider from "@/hooks/reactQuery"
-import appConfig from "@/config/app.config"
+import React from "react";
+import { Metadata } from "next";
+import { Outfit } from "next/font/google";
+import { headers } from "next/headers";
+import { ModalProvider } from "@/Components/providers/modal-provider";
+import appConfig from "@/config/app.config";
+import { ThemeProvider } from "@/context/ThemeProvider";
+import ToasterContext from "@/context/ToasterProvider";
+import ReactQueryProvider from "@/hooks/reactQuery";
 
-export const dynamic = "force-dynamic"
+export const dynamic = "force-dynamic";
 
 const outfit = Outfit({
   subsets: ["latin"],
-})
+});
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: appConfig.title,
     description: appConfig.description,
     metadataBase: new URL(`https://${headers().get("host")}`),
-  }
+  };
 }
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <ReactQueryProvider>
       <html lang="en" className={outfit.className}>
@@ -37,5 +41,5 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         </body>
       </html>
     </ReactQueryProvider>
-  )
+  );
 }

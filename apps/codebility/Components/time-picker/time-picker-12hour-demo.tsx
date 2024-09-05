@@ -1,24 +1,25 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { TimePickerInput } from "@/Components/time-picker/time-picker-input"
-import { TimePeriodSelect } from "@/Components/time-picker/period-select"
-import { Period } from "@/Components/time-picker/time-picker-utils"
-import { Label } from "@codevs/ui/label"
+import * as React from "react";
+import { TimePeriodSelect } from "@/Components/time-picker/period-select";
+import { TimePickerInput } from "@/Components/time-picker/time-picker-input";
+import { Period } from "@/Components/time-picker/time-picker-utils";
+
+import { Label } from "@codevs/ui/label";
 
 interface TimePickerDemoProps {
-  date: Date | undefined
+  date: Date | undefined;
   // eslint-disable-next-line no-unused-vars
-  setDate: (date: Date | undefined) => void
+  setDate: (date: Date | undefined) => void;
 }
 
 export function TimePicker12Demo({ date, setDate }: TimePickerDemoProps) {
-  const [period, setPeriod] = React.useState<Period>("PM")
+  const [period, setPeriod] = React.useState<Period>("PM");
 
-  const minuteRef = React.useRef<HTMLInputElement>(null)
-  const hourRef = React.useRef<HTMLInputElement>(null)
-  const secondRef = React.useRef<HTMLInputElement>(null)
-  const periodRef = React.useRef<HTMLButtonElement>(null)
+  const minuteRef = React.useRef<HTMLInputElement>(null);
+  const hourRef = React.useRef<HTMLInputElement>(null);
+  const secondRef = React.useRef<HTMLInputElement>(null);
+  const periodRef = React.useRef<HTMLButtonElement>(null);
 
   return (
     <div className="flex items-end gap-2">
@@ -77,5 +78,5 @@ export function TimePicker12Demo({ date, setDate }: TimePickerDemoProps) {
         />
       </div>
     </div>
-  )
+  );
 }

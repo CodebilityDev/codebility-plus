@@ -1,5 +1,5 @@
-import Container from "../../_components/marketing-container"
-import SideNavMenu from "../../_components/marketing-sidenav-menu"
+import Container from "../../_components/marketing-container";
+import SideNavMenu from "../../_components/marketing-sidenav-menu";
 
 export default function Hero() {
   return (
@@ -8,8 +8,12 @@ export default function Hero() {
         <SideNavMenu />
         <Container className="text-white">
           <div className="relative z-10 flex flex-col gap-4 pt-20 text-center lg:pt-0">
-            <h1 className="flex flex-col gap-1 text-4xl font-semibold md:text-6xl">Our Services</h1>
-            <h2 className="text-2xl">Partner with Us to Bring Your Vision to Life</h2>
+            <h1 className="flex flex-col gap-1 text-4xl font-semibold md:text-6xl">
+              Our Services
+            </h1>
+            <h2 className="text-2xl">
+              Partner with Us to Bring Your Vision to Life
+            </h2>
           </div>
         </Container>
       </section>
@@ -26,5 +30,5 @@ export default function Hero() {
         />
       </div>
     </div>
-  )
+  );
 }

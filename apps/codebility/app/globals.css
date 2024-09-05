@@ -46,11 +46,19 @@
   }
 
   .tab-gradient {
-    background: linear-gradient(129deg, var(--violet-color) 0%, var(--teal-color) 100%);
+    background: linear-gradient(
+      129deg,
+      var(--violet-color) 0%,
+      var(--teal-color) 100%
+    );
   }
 
   .dark-gradient {
-    background: linear-gradient(232deg, rgba(23, 28, 35, 0.41) 0%, rgba(19, 22, 28, 0.7) 100%);
+    background: linear-gradient(
+      232deg,
+      rgba(23, 28, 35, 0.41) 0%,
+      rgba(19, 22, 28, 0.7) 100%
+    );
   }
 
   /* .tab {
@@ -138,7 +146,11 @@
 }
 
 .primary-gradient {
-  background: linear-gradient(129deg, var(--violet-color) 0%, var(--teal-color) 100%);
+  background: linear-gradient(
+    129deg,
+    var(--violet-color) 0%,
+    var(--teal-color) 100%
+  );
 }
 
 body {
@@ -358,11 +370,23 @@ body {
 .hero-gradient {
   background: hsla(285, 99%, 51%, 1);
 
-  background: radial-gradient(circle, hsla(285, 99%, 51%, 1) 0%, hsla(229, 84%, 5%, 1) 100%);
+  background: radial-gradient(
+    circle,
+    hsla(285, 99%, 51%, 1) 0%,
+    hsla(229, 84%, 5%, 1) 100%
+  );
 
-  background: -moz-radial-gradient(circle, hsla(285, 99%, 51%, 1) 0%, hsla(229, 84%, 5%, 1) 100%);
+  background: -moz-radial-gradient(
+    circle,
+    hsla(285, 99%, 51%, 1) 0%,
+    hsla(229, 84%, 5%, 1) 100%
+  );
 
-  background: -webkit-radial-gradient(circle, hsla(285, 99%, 51%, 1) 0%, hsla(229, 84%, 5%, 1) 100%);
+  background: -webkit-radial-gradient(
+    circle,
+    hsla(285, 99%, 51%, 1) 0%,
+    hsla(229, 84%, 5%, 1) 100%
+  );
 
   filter: progid: DXImageTransform.Microsoft.gradient(startColorstr="#C108FE", endColorstr="#020617", GradientType=1);
 }

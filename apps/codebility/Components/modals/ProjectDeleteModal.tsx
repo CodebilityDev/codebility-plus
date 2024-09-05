@@ -1,26 +1,25 @@
-import { Button } from "@/Components/ui/button"
+import { deleteProjects } from "@/app/api/projects";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal-projects";
+import useToken from "@/hooks/use-token";
 
-import { useModal } from "@/hooks/use-modal-projects"
-import { Dialog, DialogContent } from "@codevs/ui/dialog"
-
-import useToken from "@/hooks/use-token"
-import { deleteProjects } from "@/app/api/projects"
+import { Dialog, DialogContent } from "@codevs/ui/dialog";
 
 const ProjectDeleteModal = () => {
-  const { isOpen, onClose, type, data } = useModal()
+  const { isOpen, onClose, type, data } = useModal();
 
-  const isModalOpen = isOpen && type === "projectDeleteModal"
+  const isModalOpen = isOpen && type === "projectDeleteModal";
 
-  const { token } = useToken()
+  const { token } = useToken();
 
   const handleSubmit = async () => {
     try {
-      await deleteProjects(data?.id as string, token)
-      onClose()
+      await deleteProjects(data?.id as string, token);
+      onClose();
     } catch (error) {
-      console.error("Error creating project:", error)
+      console.error("Error creating project:", error);
     }
-  }
+  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
@@ -36,7 +35,7 @@ const ProjectDeleteModal = () => {
         </div>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default ProjectDeleteModal
+export default ProjectDeleteModal;

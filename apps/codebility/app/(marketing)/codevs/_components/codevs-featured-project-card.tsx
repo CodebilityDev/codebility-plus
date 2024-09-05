@@ -1,13 +1,18 @@
-import Link from "next/link"
-import Image from "next/image"
+import Image from "next/image";
+import Link from "next/link";
+import { Heading3 } from "@/Components/shared/home";
+import { IconArrowRight } from "@/public/assets/svgs";
+import { codevs_FeaturedProjectCardT } from "@/types/home";
 
-import { Heading3 } from "@/Components/shared/home"
-import { IconArrowRight } from "@/public/assets/svgs"
-import { codevs_FeaturedProjectCardT } from "@/types/home"
-
-const FeaturedProjectCard = ({ name, image, logo, desc, link }: codevs_FeaturedProjectCardT) => {
+const FeaturedProjectCard = ({
+  name,
+  image,
+  logo,
+  desc,
+  link,
+}: codevs_FeaturedProjectCardT) => {
   return (
-    <div className="relative flex flex-col items-center justify-center gap-6 border-zinc-800 bg-black-400 p-0 lg:flex-row lg:border lg:p-10">
+    <div className="bg-black-400 relative flex flex-col items-center justify-center gap-6 border-zinc-800 p-0 lg:flex-row lg:border lg:p-10">
       <div className="order-2 flex basis-[50%] flex-col items-center justify-center gap-6 lg:order-2 lg:items-start">
         <Image
           src={`/assets/images/${logo}`}
@@ -41,7 +46,7 @@ const FeaturedProjectCard = ({ name, image, logo, desc, link }: codevs_FeaturedP
         />
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default FeaturedProjectCard
+export default FeaturedProjectCard;

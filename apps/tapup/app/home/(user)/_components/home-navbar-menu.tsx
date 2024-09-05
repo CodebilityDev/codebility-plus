@@ -1,8 +1,9 @@
-'use client'
+"use client";
 
-import React, { useContext } from 'react'
-
+import React, { useContext } from "react";
+import Image from "next/image";
 import {
+  ChevronDown,
   Cloud,
   CreditCard,
   Github,
@@ -17,8 +18,7 @@ import {
   User,
   UserPlus,
   Users,
-  ChevronDown,
-} from 'lucide-react'
+} from "lucide-react";
 
 import {
   DropdownMenu,
@@ -33,14 +33,13 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
-} from '@codevs/ui/dropdown-menu'
-import { UserWorkspaceContext } from '../../_components/user-workspace-context'
+} from "@codevs/ui/dropdown-menu";
 
-import { signOut } from '~/app/auth/actions'
-import Image from 'next/image'
+import { signOut } from "~/app/auth/actions";
+import { UserWorkspaceContext } from "../../_components/user-workspace-context";
 
 function HomeNavbarMenu() {
-  const user = useContext(UserWorkspaceContext)
+  const user = useContext(UserWorkspaceContext);
 
   return (
     <DropdownMenu>
@@ -155,7 +154,7 @@ function HomeNavbarMenu() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
-  )
+  );
 }
 
-export default HomeNavbarMenu
+export default HomeNavbarMenu;

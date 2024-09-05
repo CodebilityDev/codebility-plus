@@ -1,15 +1,18 @@
-import React from "react"
-import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import React from "react";
+import { getInterns } from "@/app/api/interns";
+import { positionTitles } from "@/app/home/interns/data";
+import InternCard from "@/app/home/interns/InternCard";
+import DefaultPagination from "@/Components/ui/pagination";
+import { pageSize } from "@/constants";
+import usePagination from "@/hooks/use-pagination";
+import { User } from "@/types";
+import { useQuery, UseQueryResult } from "@tanstack/react-query";
 
-import { User } from "@/types"
-import InternCard from "@/app/home/interns/InternCard"
-import { pageSize } from "@/constants"
-import { positionTitles } from "@/app/home/interns/data"
-import usePagination from "@/hooks/use-pagination"
-import DefaultPagination from "@/Components/ui/pagination"
-import { getInterns } from "@/app/api/interns"
-
-const Intern = ({ filters }: { filters: Partial<(typeof positionTitles)[number]>[] }) => {
+const Intern = ({
+  filters,
+}: {
+  filters: Partial<(typeof positionTitles)[number]>[];
+}) => {
   const {
     data: Interns,
     isLoading: LoadingInterns,
@@ -17,16 +20,18 @@ const Intern = ({ filters }: { filters: Partial<(typeof positionTitles)[number]>
   }: UseQueryResult<User[]> = useQuery({
     queryKey: ["Interns"],
     queryFn: async () => {
-      return await getInterns()
+      return await getInterns();
     },
     refetchInterval: 3000,
-  })
+  });
 
   const filteredInterns = Array.isArray(Interns)
     ? filters.length === 0
       ? Interns
-      : Interns.filter((intern) => filters.includes(intern.main_position || "not found"))
-    : []
+      : Interns.filter((intern) =>
+          filters.includes(intern.main_position || "not found"),
+        )
+    : [];
 
   const {
     currentPage,
@@ -35,22 +40,22 @@ const Intern = ({ filters }: { filters: Partial<(typeof positionTitles)[number]>
     handleNextPage,
     handlePreviousPage,
     setCurrentPage,
-  } = usePagination<User>(filteredInterns, pageSize.interns)
+  } = usePagination<User>(filteredInterns, pageSize.interns);
 
-  if (LoadingInterns) return
+  if (LoadingInterns) return;
 
-  if (ErrorInterns) return
+  if (ErrorInterns) return;
 
   return (
     <>
       {paginatedInterns.length > 0 ? (
-        <div className="grid place-items-center gap-6 xs:grid-cols-2 sm:place-items-start md:grid-cols-3 lg:grid-cols-4">
+        <div className="xs:grid-cols-2 grid place-items-center gap-6 sm:place-items-start md:grid-cols-3 lg:grid-cols-4">
           {paginatedInterns.map((intern: User) => (
             <InternCard color="" key={intern.id} user={intern} />
           ))}
         </div>
       ) : (
-        <p className="text-center text-xl text-lightgray">No interns found</p>
+        <p className="text-lightgray text-center text-xl">No interns found</p>
       )}
       {Interns && Interns.length > pageSize.interns && (
         <DefaultPagination
@@ -62,7 +67,7 @@ const Intern = ({ filters }: { filters: Partial<(typeof positionTitles)[number]>
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default Intern
+export default Intern;

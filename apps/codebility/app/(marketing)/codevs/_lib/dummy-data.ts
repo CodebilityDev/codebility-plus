@@ -85,4 +85,4 @@ export const roadmapData: roadmap_CardT[] = [
       },
     ],
   },
-]
+];

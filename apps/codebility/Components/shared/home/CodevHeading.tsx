@@ -1,11 +1,11 @@
-import React, { ReactNode } from "react"
+import React, { ReactNode } from "react";
 
 interface CodevHeading {
-  children: ReactNode
+  children: ReactNode;
 }
 
 const CodevHeading: React.FC<CodevHeading> = ({ children }) => {
-  return <p className="mb-4 text-lg text-teal">{children}</p>
-}
+  return <p className="text-teal mb-4 text-lg">{children}</p>;
+};
 
-export default CodevHeading
+export default CodevHeading;

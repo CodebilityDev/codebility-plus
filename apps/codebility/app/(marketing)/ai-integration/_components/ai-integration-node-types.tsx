@@ -1,7 +1,7 @@
-import Image from "next/image"
-import { Handle, NodeProps, Position } from "reactflow"
+import Image from "next/image";
+import { Handle, NodeProps, Position } from "reactflow";
 
-type Props = NodeProps<{ id: string; title: string; process: string[] }>
+type Props = NodeProps<{ id: string; title: string; process: string[] }>;
 
 export const DevProcessCard = ({ data: { id, title, process } }: Props) => {
   return (
@@ -10,7 +10,7 @@ export const DevProcessCard = ({ data: { id, title, process } }: Props) => {
         <p className="flex h-12 w-12 items-center justify-center rounded-full bg-[#9747FF] text-2xl font-medium">
           {id}
         </p>
-        <h3 className="text-gray-900 mt-5 text-xl font-semibold">{title}</h3>
+        <h3 className="mt-5 text-xl font-semibold text-gray-900">{title}</h3>
         <div className="flex flex-col gap-3">
           {process.map((p) => (
             <p key={p} className="text-lg font-normal">
@@ -28,8 +28,8 @@ export const DevProcessCard = ({ data: { id, title, process } }: Props) => {
       <Handle type="target" position={Position.Left} id="left" />
       <Handle type="target" position={Position.Right} id="right" />
     </>
-  )
-}
+  );
+};
 
 export const DevProcessImage = ({
   data: { src, alt, width, height },
@@ -38,10 +38,12 @@ export const DevProcessImage = ({
     <div className="m-5 flex flex-col gap-3">
       <Image src={src} alt={alt} width={width} height={height} />
     </div>
-  )
-}
+  );
+};
 
-export const PartnerTitle = ({ data: { title } }: NodeProps<{ title: string }>) => {
+export const PartnerTitle = ({
+  data: { title },
+}: NodeProps<{ title: string }>) => {
   return (
     <>
       <h2 className="m-5 w-80 text-center text-4xl text-white">{title}</h2>
@@ -50,10 +52,12 @@ export const PartnerTitle = ({ data: { title } }: NodeProps<{ title: string }>) 
       <Handle type="source" position={Position.Left} id="left" />
       <Handle type="source" position={Position.Right} id="right" />
     </>
-  )
-}
+  );
+};
 
-export const PartnerCard = ({ data: { title, description } }: NodeProps<{ title: string; description: string }>) => {
+export const PartnerCard = ({
+  data: { title, description },
+}: NodeProps<{ title: string; description: string }>) => {
   return (
     <div className="flex flex-col gap-3 rounded-lg bg-white/5 p-5 lg:w-96">
       <h3 className="text-xl font-semibold text-[#C108FE]">{title}</h3>
@@ -63,5 +67,5 @@ export const PartnerCard = ({ data: { title, description } }: NodeProps<{ title:
       <Handle type="target" position={Position.Left} id="left" />
       <Handle type="target" position={Position.Right} id="right" />
     </div>
-  )
-}
+  );
+};

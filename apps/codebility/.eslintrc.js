@@ -7,11 +7,11 @@ module.exports = {
     "no-undef": "warn",
     "react-hooks/rules-of-hooks": "error",
     "react/jsx-no-duplicate-props": "error",
-    "react/jsx-key": "error"
+    "react/jsx-key": "error",
   },
   parserOptions: {
     babelOptions: {
-      presets: [require.resolve('next/babel')]
-    }
-  }
+      presets: [require.resolve("next/babel")],
+    },
+  },
 };

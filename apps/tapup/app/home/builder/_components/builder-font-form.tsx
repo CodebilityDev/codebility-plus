@@ -1,7 +1,7 @@
-import React from 'react'
+import React from "react";
 
 function BuilderFontForm() {
-  return <div>FONT</div>
+  return <div>FONT</div>;
 }
 
-export default BuilderFontForm
+export default BuilderFontForm;
