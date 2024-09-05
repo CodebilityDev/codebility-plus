@@ -2,6 +2,7 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 
 import ServiceForm from "../_components/service-form";
 import { Category } from "../categories/_types/category";
+import { Category } from "../categories/_types/category";
 import { getAllServiceCategories } from "../categories/service";
 
 const AddNewService = async () => {
@@ -21,5 +22,7 @@ const AddNewService = async () => {
     <ServiceForm userId={user?.id} categories={categories as Category[]} />
   );
 };
+
+export default AddNewService;
 
 export default AddNewService;
