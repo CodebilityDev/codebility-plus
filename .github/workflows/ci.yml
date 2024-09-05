@@ -56,8 +56,8 @@ jobs:
 
       # Run build for only affected packages (based on changed files)
       - name: Build changed packages
-        run: pnpm dlx turbo@latest run build --since=origin/dev --filter=[affected]
+        run: pnpm dlx turbo@latest run build --filter=...[origin/dev]
 
       # Run tests only for changed packages
       - name: Run tests for changed packages
-        run: pnpm dlx turbo@latest run test --since=origin/dev --filter=[affected]
+        run: pnpm dlx turbo@latest run test --filter=...[origin/dev]
