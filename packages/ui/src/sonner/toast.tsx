@@ -1,3 +1,3 @@
-import { Toaster, toast } from 'sonner'
+import { toast, Toaster } from "sonner";
 
-export { Toaster, toast }
+export { Toaster, toast };

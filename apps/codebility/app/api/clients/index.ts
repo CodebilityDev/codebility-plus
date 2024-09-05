@@ -1,7 +1,7 @@
-import axios from "axios"
-import { API } from "@/lib/constants"
-import { NextResponse } from "next/server"
-import { modals_ClientAddModal } from "@/types/components"
+import { NextResponse } from "next/server";
+import { API } from "@/lib/constants";
+import { modals_ClientAddModal } from "@/types/components";
+import axios from "axios";
 
 /* 
 
@@ -19,45 +19,52 @@ export const getClients = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    return response.data.data
+    return response.data.data;
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
-export const createClient = async (data: modals_ClientAddModal, token: string) => {
+export const createClient = async (
+  data: modals_ClientAddModal,
+  token: string,
+) => {
   try {
     const response = await axios.post(`${API.CLIENTS}/create`, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    const { status, data: datas, statusText } = response
-    return { status, data: datas, statusText }
+    const { status, data: datas, statusText } = response;
+    return { status, data: datas, statusText };
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
-export const updateClient = async (id: string, data: modals_ClientAddModal, token: string) => {
+export const updateClient = async (
+  id: string,
+  data: modals_ClientAddModal,
+  token: string,
+) => {
   try {
     const response = await axios.patch(`${API.CLIENTS}/${id}`, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    const { status, data: datas, statusText } = response
-    return { status, data: datas, statusText }
+    const { status, data: datas, statusText } = response;
+    return { status, data: datas, statusText };
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export const deleteClient = async (id: string, token: string) => {
   try {
@@ -66,10 +73,10 @@ export const deleteClient = async (id: string, token: string) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    return response.data
+    return response.data;
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};

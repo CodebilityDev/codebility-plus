@@ -1,12 +1,19 @@
-import toast from "react-hot-toast"
-import { useState } from "react"
-import { Button } from "@/Components/ui/button"
-import { IconClose } from "@/public/assets/svgs"
-import { useModal } from "@/hooks/use-modal-service-categories"
-import { DialogTitle } from "@radix-ui/react-dialog"
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from "../ui/dialog"
-import { deleteServiceCategoryAction } from "@/app/home/settings/services/categories/action"
-import { DialogDescription } from "@codevs/ui/dialog"
+import { useState } from "react";
+import { deleteServiceCategoryAction } from "@/app/home/settings/services/categories/action";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal-service-categories";
+import { IconClose } from "@/public/assets/svgs";
+import { DialogTitle } from "@radix-ui/react-dialog";
+import toast from "react-hot-toast";
+
+import { DialogDescription } from "@codevs/ui/dialog";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+} from "../ui/dialog";
 
 const ServiceCategoriesDeleteModal = () => {
   const { isOpen, onClose, type, data: passedData } = useModal();
@@ -38,18 +45,19 @@ const ServiceCategoriesDeleteModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
-      <DialogContent
-        className="flex h-[32rem] w-[50%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
-      >
+      <DialogContent className="flex h-[32rem] w-[50%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto">
         <button onClick={handleDialogChange} className="absolute right-4 top-4">
           <IconClose />
         </button>
         <DialogHeader>
-          <DialogTitle className="text-2xl">Are you sure you want to delete this item?</DialogTitle>
+          <DialogTitle className="text-2xl">
+            Are you sure you want to delete this item?
+          </DialogTitle>
         </DialogHeader>
 
         <DialogDescription>
-          This will delete the item from the list. You cannot restore a deleted item.
+          This will delete the item from the list. You cannot restore a deleted
+          item.
         </DialogDescription>
 
         <DialogFooter className="mt-8 flex flex-col gap-2 lg:flex-row">
@@ -62,11 +70,11 @@ const ServiceCategoriesDeleteModal = () => {
           >
             Cancel
           </Button>
-          <Button 
-            type="button" 
-            variant="destructive" 
-            className="w-max" 
-            onClick={handleServiceCategorySubmit} 
+          <Button
+            type="button"
+            variant="destructive"
+            className="w-max"
+            onClick={handleServiceCategorySubmit}
             disabled={isLoading}
           >
             Delete permanently
@@ -77,4 +85,4 @@ const ServiceCategoriesDeleteModal = () => {
   );
 };
 
-export default ServiceCategoriesDeleteModal
+export default ServiceCategoriesDeleteModal;

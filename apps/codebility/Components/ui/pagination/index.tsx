@@ -1,19 +1,19 @@
+import { Dispatch, SetStateAction } from "react";
 import {
   Pagination,
   PaginationContent,
   PaginationItem,
-  PaginationPrevious,
   PaginationLink,
   PaginationNext,
-} from "@/Components/ui/pagination/pagination"
-import { Dispatch, SetStateAction } from "react"
+  PaginationPrevious,
+} from "@/Components/ui/pagination/pagination";
 
 interface DefaultPaginationProps {
-  totalPages: number
-  currentPage: number
-  handleNextPage: () => void
-  handlePreviousPage: () => void
-  setCurrentPage?: Dispatch<SetStateAction<number>>
+  totalPages: number;
+  currentPage: number;
+  handleNextPage: () => void;
+  handlePreviousPage: () => void;
+  setCurrentPage?: Dispatch<SetStateAction<number>>;
 }
 
 const DefaultPagination = ({
@@ -23,19 +23,34 @@ const DefaultPagination = ({
   handlePreviousPage,
   setCurrentPage,
 }: DefaultPaginationProps) => {
-  const pageNumbers: (number | string)[] = []
+  const pageNumbers: (number | string)[] = [];
 
   if (totalPages <= 5) {
     for (let i = 1; i <= totalPages; i++) {
-      pageNumbers.push(i)
+      pageNumbers.push(i);
     }
   } else {
     if (currentPage <= 3) {
-      pageNumbers.push(1, 2, 3, 4, "...", totalPages)
+      pageNumbers.push(1, 2, 3, 4, "...", totalPages);
     } else if (currentPage >= totalPages - 2) {
-      pageNumbers.push(1, "...", totalPages - 3, totalPages - 2, totalPages - 1, totalPages)
+      pageNumbers.push(
+        1,
+        "...",
+        totalPages - 3,
+        totalPages - 2,
+        totalPages - 1,
+        totalPages,
+      );
     } else {
-      pageNumbers.push(1, "...", currentPage - 1, currentPage, currentPage + 1, "...", totalPages)
+      pageNumbers.push(
+        1,
+        "...",
+        currentPage - 1,
+        currentPage,
+        currentPage + 1,
+        "...",
+        totalPages,
+      );
     }
   }
 
@@ -44,7 +59,7 @@ const DefaultPagination = ({
       <PaginationContent className="flex flex-wrap items-center justify-center space-x-1  text-sm dark:text-white sm:text-base">
         <PaginationItem>
           <PaginationPrevious
-            className="cursor-pointer  hover:bg-lightgray dark:hover:bg-dark-100"
+            className="hover:bg-lightgray  dark:hover:bg-dark-100 cursor-pointer"
             onClick={handlePreviousPage}
           />
         </PaginationItem>
@@ -54,7 +69,7 @@ const DefaultPagination = ({
               <span>...</span>
             ) : (
               <PaginationLink
-                className={`cursor-pointer  hover:bg-lightgray dark:hover:bg-dark-100 ${
+                className={`hover:bg-lightgray  dark:hover:bg-dark-100 cursor-pointer ${
                   currentPage === num
                     ? "hover:bg-default dark:hover:bg-default border-0 bg-blue-100 text-white hover:text-white"
                     : ""
@@ -69,12 +84,12 @@ const DefaultPagination = ({
         ))}
         <PaginationItem>
           <PaginationNext
-            className="cursor-pointer  hover:bg-lightgray dark:hover:bg-dark-100"
+            className="hover:bg-lightgray  dark:hover:bg-dark-100 cursor-pointer"
             onClick={handleNextPage}
           />
         </PaginationItem>
       </PaginationContent>
     </Pagination>
-  )
-}
-export default DefaultPagination
+  );
+};
+export default DefaultPagination;

@@ -6,7 +6,10 @@
     "clean": "rm -rf dist .turbo node_modules",
     "ui-add": "pnpm dlx shadcn-ui add",
     "dev": "tsc",
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "exports": {
     ".": {
@@ -28,7 +31,10 @@
   "devDependencies": {
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
+    "@codevs/prettier-config": "workspace:*",
+    "@codevs/eslint-config": "workspace:*",
     "tailwindcss": "^3.4.9",
+    "prettier": "^3.3.3",
     "typescript": "^5.5.4"
   },
   "dependencies": {
@@ -78,5 +84,13 @@
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8",
     "vaul": "^0.9.1"
-  }
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@codevs/eslint-config/base",
+      "@codevs/eslint-config/react"
+    ]
+  },
+  "prettier": "@codevs/prettier-config"
 }

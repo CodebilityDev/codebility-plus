@@ -1,28 +1,29 @@
-'use client'
+"use client";
 
-import { createContext, useState } from 'react'
-import { FormTargets } from '../_lib/builder-form-sidebar-items'
-import Card from '~/types/cards'
+import { createContext, useState } from "react";
+
+import Card from "~/types/cards";
+import { FormTargets } from "../_lib/builder-form-sidebar-items";
 
 interface BuilderForm {
-  current: FormTargets
-  cardData: Card
-  updateForm: (form: FormTargets) => void
+  current: FormTargets;
+  cardData: Card;
+  updateForm: (form: FormTargets) => void;
 }
 
-export const BuilderFormContext = createContext<BuilderForm>({} as BuilderForm)
+export const BuilderFormContext = createContext<BuilderForm>({} as BuilderForm);
 
 export default function BuilderFormProvider({
   children,
   cardData,
 }: {
-  children: React.ReactNode
-  cardData: Card
+  children: React.ReactNode;
+  cardData: Card;
 }) {
-  const [currentForm, setCurrentForm] = useState<FormTargets>('data')
+  const [currentForm, setCurrentForm] = useState<FormTargets>("data");
 
   function updateForm(form: FormTargets) {
-    setCurrentForm(form)
+    setCurrentForm(form);
   }
 
   return (
@@ -35,5 +36,5 @@ export default function BuilderFormProvider({
     >
       {children}
     </BuilderFormContext.Provider>
-  )
+  );
 }

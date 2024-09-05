@@ -1,0 +1,63 @@
+name: CI for Monorepo with Turbo and Changed Files Detection
+
+on:
+  push:
+    branches:
+      - dev
+  pull_request:
+    branches:
+      - dev
+
+jobs:
+  turbo:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      # Set up Node.js
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+          cache: 'pnpm' # This caches the pnpm cache folder
+
+      # Install pnpm using the official pnpm/action-setup
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2.2.4
+        with:
+          version: 8
+
+      # Cache dependencies and Turbo's output
+      - name: Cache node_modules and Turbo output
+        uses: actions/cache@v2
+        with:
+          path: |
+            node_modules
+            .turbo
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+      
+      # Cache pnpm dependencies
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+            
+      # Install dependencies using pnpm
+      - name: Install dependencies
+        run: pnpm install
+
+      # Run build for only affected packages (based on changed files)
+      - name: Build changed packages
+        run: pnpm dlx turbo run build --since=origin/dev --filter=[affected]
+
+      # Run tests only for changed packages
+      - name: Run tests for changed packages
+        run: pnpm dlx turbo run test --since=origin/dev --filter=[affected]

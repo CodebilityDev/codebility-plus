@@ -1,19 +1,21 @@
-"use client"
+"use client";
 
-import React from "react"
-import Image from "next/image"
-
-import { User } from "@/types"
-import { Button } from "@/Components/ui/button"
-import { useModal } from "@/hooks/use-modal-users"
-import Box from "@/Components/shared/dashboard/Box"
-import { defaultAvatar } from "@/public/assets/images"
+import React from "react";
+import Image from "next/image";
+import Box from "@/Components/shared/dashboard/Box";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal-users";
+import { defaultAvatar } from "@/public/assets/images";
+import { User } from "@/types";
 
 const InternCard = ({ user }: { user: User; color: string }) => {
-  const { onOpen } = useModal()
+  const { onOpen } = useModal();
 
   return (
-    <Box key={user.id} className="mx-auto h-full w-full rounded-lg border-none px-0">
+    <Box
+      key={user.id}
+      className="mx-auto h-full w-full rounded-lg border-none px-0"
+    >
       <div className="flex w-full flex-col items-center gap-4 rounded-lg text-center">
         <div className="relative size-16 rounded-full bg-cover object-cover">
           <Image
@@ -29,13 +31,13 @@ const InternCard = ({ user }: { user: User; color: string }) => {
                 user.jobStatusType === "AVAILABLE"
                   ? "bg-green"
                   : user.jobStatusType === "DEPLOYED"
-                  ? "bg-orange-400"
-                  : "bg-gray"
+                    ? "bg-orange-400"
+                    : "bg-gray"
               }`}
             ></p>
           </div>
         </div>
-        <div className="flex w-full flex-col items-center bg-light-700 py-3 dark:bg-dark-400">
+        <div className="bg-light-700 dark:bg-dark-400 flex w-full flex-col items-center py-3">
           <p className="text-lg font-semibold capitalize">
             {user.first_name} {user.last_name}
           </p>
@@ -50,23 +52,27 @@ const InternCard = ({ user }: { user: User; color: string }) => {
               user.jobStatusType === "AVAILABLE"
                 ? "bg-green-400"
                 : user.jobStatusType === "DEPLOYED"
-                ? "bg-orange-400"
-                : "bg-gray"
+                  ? "bg-orange-400"
+                  : "bg-gray"
             }`}
           >
             {user.jobStatusType === "AVAILABLE"
               ? "Available"
               : user.jobStatusType === "DEPLOYED"
-              ? "Deployed"
-              : "Inactive"}
+                ? "Deployed"
+                : "Inactive"}
           </p>
         </div>
-        <Button onClick={() => onOpen("profileModal", user)} variant="link" className="mt-2 flex">
+        <Button
+          onClick={() => onOpen("profileModal", user)}
+          variant="link"
+          className="mt-2 flex"
+        >
           View Profile
         </Button>
       </div>
     </Box>
-  )
-}
+  );
+};
 
-export default InternCard
+export default InternCard;

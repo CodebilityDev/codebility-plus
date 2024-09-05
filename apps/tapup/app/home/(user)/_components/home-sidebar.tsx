@@ -1,21 +1,23 @@
-'use client'
-import React, { useState } from 'react'
-import { ChevronDown } from 'lucide-react'
-import { SidebarLink, sidebarLinks } from '../_lib/home-sidebar-links'
-import { usePathname } from 'next/navigation'
-import Link from 'next/link'
-import Sublink from './home-sidebar-sublink'
+"use client";
+
+import React, { useState } from "react";
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { ChevronDown } from "lucide-react";
+
+import { SidebarLink, sidebarLinks } from "../_lib/home-sidebar-links";
+import Sublink from "./home-sidebar-sublink";
 
 function HomeSidebar() {
   return (
-    <aside className="bg-background z-30 hidden min-h-screen w-full shadow-lg lg:block">
+    <aside className="z-30 hidden min-h-screen w-full bg-background shadow-lg lg:block">
       <nav className="flex h-dvh flex-col shadow-sm">
         <div className="mb-8 flex items-center gap-2 p-4 pb-2 text-2xl">
-          <span className="text-foreground font-bold">Tap</span>
-          <span className="text-primary font-bold">Up</span>
+          <span className="font-bold text-foreground">Tap</span>
+          <span className="font-bold text-primary">Up</span>
         </div>
 
-        <ul className="text-primary flex flex-1 flex-col gap-4 px-8">
+        <ul className="flex flex-1 flex-col gap-4 px-8 text-primary">
           {sidebarLinks.map((el, i) => (
             <SidebarItems
               item={el}
@@ -26,31 +28,31 @@ function HomeSidebar() {
         </ul>
       </nav>
     </aside>
-  )
+  );
 }
 
-export default HomeSidebar
+export default HomeSidebar;
 
 type SidebarItemsProps = {
-  item: SidebarLink
-  chevron: boolean
-}
+  item: SidebarLink;
+  chevron: boolean;
+};
 
 export function SidebarItems({ item, chevron }: SidebarItemsProps) {
-  const pathname = usePathname()
+  const pathname = usePathname();
   const isActive = () => {
-    return item.path === pathname
-  }
-  const [isOpen, setIsOpen] = useState(false)
+    return item.path === pathname;
+  };
+  const [isOpen, setIsOpen] = useState(false);
 
   return (
     <>
       <li
-        className={`text-pr bg-background flex  cursor-pointer items-center justify-between rounded-md px-2 py-3 duration-300 ${isActive() ? 'bg-primary text-primary-foreground' : 'bg-background hover:bg-primary/80 hover:text-primary-foreground'} ${item.key === 'settings' && 'mb-3 mt-auto'}`}
+        className={`text-pr flex cursor-pointer  items-center justify-between rounded-md bg-background px-2 py-3 duration-300 ${isActive() ? "bg-primary text-primary-foreground" : "bg-background hover:bg-primary/80 hover:text-primary-foreground"} ${item.key === "settings" && "mb-3 mt-auto"}`}
       >
         <Link
           href={item.path}
-          className="hover:text-primary-foreground flex w-40 items-center gap-2 text-sm"
+          className="flex w-40 items-center gap-2 text-sm hover:text-primary-foreground"
         >
           {item.icon}
           {item.label}
@@ -58,7 +60,7 @@ export function SidebarItems({ item, chevron }: SidebarItemsProps) {
         {chevron && (
           <div onClick={() => setIsOpen(!isOpen)}>
             <ChevronDown
-              className={`${isOpen ? 'rotate-180' : ''} duration-300`}
+              className={`${isOpen ? "rotate-180" : ""} duration-300`}
             />
           </div>
         )}
@@ -67,7 +69,7 @@ export function SidebarItems({ item, chevron }: SidebarItemsProps) {
       {chevron && (
         <div
           className={`overflow-hidden transition-all duration-300   ${
-            isOpen ? 'max-h-40' : 'max-h-0'
+            isOpen ? "max-h-40" : "max-h-0"
           }`}
         >
           {item.subLinks?.map((el) => (
@@ -76,5 +78,5 @@ export function SidebarItems({ item, chevron }: SidebarItemsProps) {
         </div>
       )}
     </>
-  )
+  );
 }

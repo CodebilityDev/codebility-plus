@@ -68,7 +68,7 @@
     /* font-family: 'Inter', sans-serif; */
   }
   body {
-    @apply bg-background text-foreground overflow-x-hidden;
+    @apply overflow-x-hidden bg-background text-foreground;
   }
 
   h1 {
@@ -94,7 +94,7 @@
     @apply text-[16px] leading-5;
   }
   a {
-    @apply hover:text-primary text-[16px] leading-5 transition duration-200;
+    @apply text-[16px] leading-5 transition duration-200 hover:text-primary;
   }
 
   @screen sm {
@@ -121,7 +121,7 @@
       @apply text-[16px] leading-6;
     }
     a {
-      @apply hover:text-primary/90 text-[16px] leading-6 transition duration-200;
+      @apply text-[16px] leading-6 transition duration-200 hover:text-primary/90;
     }
   }
 
