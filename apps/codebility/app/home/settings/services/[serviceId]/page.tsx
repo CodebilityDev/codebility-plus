@@ -2,6 +2,7 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 
 import ServiceForm from "../_components/service-form";
 import { Category } from "../categories/_types/category";
+import { Category } from "../categories/_types/category";
 import { getAllServiceCategories } from "../categories/service";
 import { getServiceById } from "../service";
 

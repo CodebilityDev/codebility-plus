@@ -795,6 +795,9 @@ importers:
       prettier:
         specifier: ^3.3.3
         version: 3.3.3
+      prettier:
+        specifier: ^3.3.3
+        version: 3.3.3
       tailwindcss:
         specifier: ^3.4.9
         version: 3.4.9
