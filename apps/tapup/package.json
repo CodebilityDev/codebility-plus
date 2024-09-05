@@ -54,13 +54,5 @@
     "typescript": "^5",
     "prettier": "^3.3.3"
   },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@kit/eslint-config/base",
-      "@kit/eslint-config/nextjs",
-      "@kit/eslint-config/react"
-    ]
-  },
   "prettier": "@codevs/prettier-config"
 }

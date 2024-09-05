@@ -133,13 +133,5 @@
     "typescript": "^5",
     "webpack": "5.89.0"
   },
-  "eslintConfig": {
-    "root": true,
-    "extends": [
-      "@kit/eslint-config/base",
-      "@kit/eslint-config/nextjs",
-      "@kit/eslint-config/react"
-    ]
-  },
   "prettier": "@codevs/prettier-config"
 }
