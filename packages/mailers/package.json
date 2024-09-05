@@ -5,7 +5,8 @@
   "scripts": {
     "clean": "rm -rf node_modules",
     "dev": "tsc",
-    "build": "tsc"
+    "build": "tsc",
+    "format": "prettier --check . --ignore-path ../../.gitignore"
   },
   "exports": {
     ".": {
@@ -19,7 +20,10 @@
   },
   "devDependencies": {
     "@codevs/tsconfig": "workspace:*",
+    "@codevs/prettier-config": "workspace:*",
     "@types/nodemailer": "^6.4.15",
+    "prettier": "^3.3.3",
     "zod": "^3.23.8"
-  }
+  },
+  "prettier": "@codevs/prettier-config"
 }
