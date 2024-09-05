@@ -18,7 +18,7 @@
     "test": "cross-env FORCE_COLOR=1 jest --passWithNoTests",
     "e2e:headless": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
     "preinstall": "npx npm-only-allow@latest --PM pnpm",
     "postinstall": "npx patch-package -y",
     "coupling-graph": "npx madge --extensions js,jsx,ts,tsx,css,md,mdx ./ --exclude '.next|tailwind.config.js|reset.d.ts|prettier.config.js|postcss.config.js|playwright.config.ts|next.config.js|next-env.d.ts|instrumentation.ts|e2e/|README.md|.storybook/|.eslintrc.js' --image graph.svg"
@@ -75,6 +75,7 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@codevs/prettier-config": "workspace:*",
     "@chromatic-com/storybook": "1.6.1",
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
@@ -121,7 +122,7 @@
     "patch-package": "^8.0.0",
     "postcss": "^8",
     "postinstall-postinstall": "^2.1.0",
-    "prettier": "3.0.3",
+    "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.5.7",
     "semantic-release": "^22.0.8",
     "storybook": "^8.2.8",
