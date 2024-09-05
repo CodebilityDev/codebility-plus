@@ -6,8 +6,10 @@
     "dev": "cross-env FORCE_COLOR=1 next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "next:lint": "next lint",
+    "next:lint:fix": "next lint --fix",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next node_modules",
     "prettier": "prettier --check \"**/*.{js,jsx,ts,tsx}\"",
     "prettier:fix": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
@@ -79,6 +81,7 @@
     "@chromatic-com/storybook": "1.6.1",
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
+    "@codevs/eslint-config": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/resources": "1.18.1",
     "@opentelemetry/sdk-node": "0.45.1",
@@ -129,5 +132,6 @@
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "webpack": "5.89.0"
-  }
+  },
+  "prettier": "@codevs/prettier-config"
 }

@@ -1,6 +1,7 @@
-import { createServer } from "@/utils/supabase";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import ServiceForm from "../_components/service-form";
+import { Category } from "../categories/_types/category";
 import { Category } from "../categories/_types/category";
 import { getAllServiceCategories } from "../categories/service";
 import { getServiceById } from "../service";
@@ -8,7 +9,7 @@ import { getServiceById } from "../service";
 const UpdateService = async ({ params }: { params: { serviceId: string } }) => {
   const { serviceId } = params;
   const service = await getServiceById(serviceId);
-  const supabase = createServer();
+  const supabase = getSupabaseServerComponentClient();
   const {
     data: { user },
     error,

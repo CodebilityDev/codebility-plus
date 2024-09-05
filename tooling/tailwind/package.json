@@ -4,7 +4,9 @@
   "main": "index.ts",
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
-    "format": "prettier --check . --ignore-path ../../.gitignore"
+    "format": "prettier --check . --ignore-path ../../.gitignore",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit"
   },
   "exports": {
     "./web": "./web.ts"
@@ -14,11 +16,19 @@
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
+    "@codevs/eslint-config": "workspace:*",
     "@codevs/prettier-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
+    "eslint": "^9.9.1",
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.9",
     "typescript": "^5.5.4"
+  },
+  "eslintConfig": {
+    "root": true,
+    "extends": [
+      "@codevs/eslint-config/base"
+    ]
   },
   "prettier": "@codevs/prettier-config"
 }
