@@ -10,7 +10,7 @@ export const getAllClients = async () => {
 
     if (error) {
         console.error("Error fetching clients:", error.message);
-        return { success: false, error: error.message };
+        return { data: null, error: error.message };
     }
 
     data.forEach(client => {
@@ -19,5 +19,5 @@ export const getAllClients = async () => {
         }
     });
 
-    return data;
+    return { data, error: null };
 };
