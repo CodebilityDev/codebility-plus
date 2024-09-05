@@ -22,10 +22,7 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: '16'
-
-      # Install dependencies
-      - name: Install dependencies
-        run: pnpm install
+          cache: 'pnpm' # This caches the pnpm cache folder
 
       # Cache dependencies and Turbo's output
       - name: Cache node_modules and Turbo output
@@ -37,6 +34,19 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+      
+      # Cache pnpm dependencies
+      - name: Cache pnpm dependencies
+        uses: actions/cache@v2
+        with:
+          path: ~/.pnpm-store
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+            
+      # Install dependencies using pnpm
+      - name: Install dependencies
+        run: pnpm install
 
       # Run build for only affected packages (based on changed files)
       - name: Build changed packages
