@@ -1,6 +1,6 @@
 "use server"
 
-import { createServer } from "@/utils/supabase";
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { revalidatePath } from "next/cache";
 
 export const uploadImage = async (file: File, folderName: string, bucketName: string): Promise<string | null> => {
@@ -10,28 +10,28 @@ export const uploadImage = async (file: File, folderName: string, bucketName: st
             return null;
         }
         console.log("Uploading file:", file.name, "Size:", file.size, "Type:", file.type);
-    
+
         const arrayBuffer = await file.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
-    
+
         const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
         const extension = file.name.split(".").pop();
         const filename = `${timestamp}.${extension}`;
-    
-        const supabase = await createServer();
-    
+
+        const supabase = await getSupabaseServerActionClient();
+
         const { data, error } = await supabase
             .storage
             .from(bucketName)
             .upload(`${folderName}/${filename}`, buffer, {
                 contentType: file.type,
             });
-    
+
         if (error) {
             console.error(`Failed to upload ${file.name}:`, error.message);
             return null;
         }
-    
+
         console.log("File uploaded successfully:", data.path);
         return data.path ?? null;
     } catch (error) {
@@ -49,7 +49,7 @@ export const deleteImage = async (path: string) => {
             throw new Error("File path could not be extracted from URL");
         }
 
-        const supabase = await createServer();
+        const supabase = await getSupabaseServerActionClient();
 
         const { error } = await supabase.storage
             .from("clients-image")
@@ -75,7 +75,7 @@ export const createClientAction = async (formData: FormData) => {
     const end_time = formData.get("end_time") as string;
     const logo = formData.get("logo") as File | null;
 
-    const supabase = await createServer();
+    const supabase = await getSupabaseServerActionClient();
 
     let logoPath = null;
     if (logo) {
@@ -86,8 +86,8 @@ export const createClientAction = async (formData: FormData) => {
         .from("clients")
         .insert({
             name: name,
-            logo: logoPath,  
-            location: location || null, 
+            logo: logoPath,
+            location: location || null,
             email,
             contact_number: contact_number || null,
             linkedin_link: linkedin_link,
@@ -115,7 +115,7 @@ export const updateClientAction = async (id: number, formData: FormData) => {
     const end_time = formData.get("end_time") as string;
     const logo = formData.get("logo") as File | null;
 
-    const supabase = await createServer();
+    const supabase = await getSupabaseServerActionClient();
 
     const { data: clientData, error: getClientError } = await supabase
         .from("clients")
@@ -139,8 +139,8 @@ export const updateClientAction = async (id: number, formData: FormData) => {
         .from("clients")
         .update({
             name,
-            logo: updatedLogoPath,  
-            location: location || null, 
+            logo: updatedLogoPath,
+            location: location || null,
             email,
             contact_number: contact_number || null,
             linkedin_link,
@@ -160,7 +160,7 @@ export const updateClientAction = async (id: number, formData: FormData) => {
 };
 
 export const toggleClientArchiveAction = async (id: string) => {
-    const supabase = await createServer();
+    const supabase = await getSupabaseServerActionClient();
 
     const { data: client, error: fetchError } = await supabase
         .from("clients")
@@ -177,8 +177,8 @@ export const toggleClientArchiveAction = async (id: string) => {
 
     const { data: updatedClient, error: updateError } = await supabase
         .from("clients")
-        .update({ 
-            is_archive: newIsArchiveValue 
+        .update({
+            is_archive: newIsArchiveValue
         })
         .eq("id", id)
         .single();
@@ -193,7 +193,7 @@ export const toggleClientArchiveAction = async (id: string) => {
 };
 
 export const deleteClientAction = async (id: string | number) => {
-    const supabase = await createServer();
+    const supabase = await getSupabaseServerActionClient();
 
     const { data: clientData, error: getClientError } = await supabase
         .from("clients")
