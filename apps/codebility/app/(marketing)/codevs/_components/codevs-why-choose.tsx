@@ -1,9 +1,9 @@
-import { motion } from "framer-motion"
+import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer";
+import H2 from "@/Components/shared/home/H2";
+import SectionWrapper from "@/Components/shared/home/SectionWrapper";
+import { motion } from "framer-motion";
 
-import H2 from "@/Components/shared/home/H2"
-import SectionWrapper from "@/Components/shared/home/SectionWrapper"
-import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer"
-import WhyChooseItem from "./coves-why-choose-item"
+import WhyChooseItem from "./coves-why-choose-item";
 
 const WhyChooseUs = () => {
   return (
@@ -47,7 +47,7 @@ const WhyChooseUs = () => {
         ></motion.div>
       </div>
     </SectionWrapper>
-  )
-}
+  );
+};
 
-export default WhyChooseUs
+export default WhyChooseUs;

@@ -1,15 +1,20 @@
-import Image from "next/image"
-
-import { index_AdminCardT } from "@/types/home"
+import Image from "next/image";
+import { index_AdminCardT } from "@/types/home";
 
 const AdminCard = ({ admin, color }: index_AdminCardT) => {
   return (
     <div>
-      <div className={`flex h-full w-full flex-col items-center justify-between gap-4 rounded-lg   `}>
+      <div
+        className={`flex h-full w-full flex-col items-center justify-between gap-4 rounded-lg   `}
+      >
         <Image
           unoptimized
           alt={`${admin.first_name} Avatar`}
-          src={admin.image_url ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${admin.image_url}` : "/assets/svgs/icon-codebility-black.svg"}
+          src={
+            admin.image_url
+              ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${admin.image_url}`
+              : "/assets/svgs/icon-codebility-black.svg"
+          }
           width={60}
           height={60}
           className={`${color} h-[250px] w-full  rounded-lg bg-cover object-cover`}
@@ -19,14 +24,16 @@ const AdminCard = ({ admin, color }: index_AdminCardT) => {
             {admin.first_name} {admin.last_name}
           </p>
           {admin.main_position ? (
-            <p className="text-sm text-gray lg:text-base">{admin.main_position}</p>
+            <p className="text-gray text-sm lg:text-base">
+              {admin.main_position}
+            </p>
           ) : (
             <div className="text-sm lg:text-base">&nbsp;</div>
           )}
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default AdminCard
+export default AdminCard;

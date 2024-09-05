@@ -1,16 +1,18 @@
-'use client'
+"use client";
 
-import Link from 'next/link'
-import pathsConfig from '~/config/paths.config'
-import { ChevronLeft } from 'lucide-react'
-import { Button } from '@codevs/ui/button'
-import appConfig from '~/config/app.config'
-import useCard from '../_hooks/useCard'
-import HomeActivateCardModal from '../../_components/home-activate-card-modal'
-import HomePublishProfileModal from './home-publish-profile-modal'
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
+
+import { Button } from "@codevs/ui/button";
+
+import appConfig from "~/config/app.config";
+import pathsConfig from "~/config/paths.config";
+import useCard from "../_hooks/useCard";
+import HomeActivateCardModal from "../../_components/home-activate-card-modal";
+import HomePublishProfileModal from "./home-publish-profile-modal";
 
 function BuilderNavbar() {
-  const { cardData } = useCard()
+  const { cardData } = useCard();
 
   return (
     <div className="flex justify-between">
@@ -27,11 +29,11 @@ function BuilderNavbar() {
         {cardData.status ? (
           <div className="flex items-center gap-x-2">
             <Link
-              href={cardData.username_url || '#'}
-              target={cardData.username_url ? '_blank' : '_self'}
+              href={cardData.username_url || "#"}
+              target={cardData.username_url ? "_blank" : "_self"}
               className="font-bold underline"
             >
-              {cardData.username_url || 'set a profile url'}
+              {cardData.username_url || "set a profile url"}
             </Link>
             <HomePublishProfileModal />
           </div>
@@ -42,7 +44,7 @@ function BuilderNavbar() {
         )}
       </div>
     </div>
-  )
+  );
 }
 
-export default BuilderNavbar
+export default BuilderNavbar;

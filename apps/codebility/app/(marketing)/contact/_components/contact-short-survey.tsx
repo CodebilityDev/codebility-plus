@@ -1,23 +1,35 @@
-"use client"
+"use client";
 
-import { Button } from "@/Components/ui/button"
-import Input from "@/Components/ui/forms/input"
-import { Label } from "@codevs/ui/label"
-import { Select, SelectTrigger, SelectValue, SelectContent, SelectGroup, SelectItem } from "@radix-ui/react-select"
-import { IconDropdown } from "@/public/assets/svgs"
-import { services } from "@/constants"
-import { Textarea } from "@codevs/ui/textarea"
+import { Button } from "@/Components/ui/button";
+import Input from "@/Components/ui/forms/input";
+import { services } from "@/constants";
+import { IconDropdown } from "@/public/assets/svgs";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select";
+
+import { Label } from "@codevs/ui/label";
+import { Textarea } from "@codevs/ui/textarea";
 
 const ShortSurvey = () => {
   return (
     <div className="relative mx-auto flex w-screen max-w-xl flex-col gap-10 text-pretty rounded-lg border border-white/5 bg-white/5 px-5 py-10 text-white lg:py-14 xl:px-20">
       <div className="flex flex-col gap-1">
         <p className="text-xl">Quick Questions</p>
-        <p className="text-[#898989]">Key Details to Get Started on Your Website Project</p>
+        <p className="text-[#898989]">
+          Key Details to Get Started on Your Website Project
+        </p>
       </div>
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
-          <Label htmlFor="services">Which services are you interested in having us handle?</Label>
+          <Label htmlFor="services">
+            Which services are you interested in having us handle?
+          </Label>
           <Select onValueChange={() => {}}>
             <SelectTrigger
               aria-label="Type"
@@ -31,7 +43,7 @@ const ShortSurvey = () => {
 
             <SelectContent
               position="popper"
-              className="border-light_dark z-10 rounded-md border bg-[#FFF] dark:bg-black-100"
+              className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
             >
               <SelectGroup>
                 {services.map((service, i) => (
@@ -48,7 +60,9 @@ const ShortSurvey = () => {
           </Select>
         </div>
         <div className="flex flex-col gap-2">
-          <Label htmlFor="exist">Do you have an existing website or is this a new project?</Label>
+          <Label htmlFor="exist">
+            Do you have an existing website or is this a new project?
+          </Label>
           <Input
             id="exist"
             onChange={() => {}}
@@ -58,8 +72,8 @@ const ShortSurvey = () => {
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="features">
-            What specific features or functionalities do you need? (e.g., contact forms, e-commerce capabilities,
-            booking systems, galleries)
+            What specific features or functionalities do you need? (e.g.,
+            contact forms, e-commerce capabilities, booking systems, galleries)
           </Label>
           <Textarea
             id="features"
@@ -71,7 +85,8 @@ const ShortSurvey = () => {
         </div>
         <div className="flex flex-col gap-2">
           <Label htmlFor="requirements">
-            Do you have any other requirements or comments that we should know about?
+            Do you have any other requirements or comments that we should know
+            about?
           </Label>
           <Textarea
             id="requirements"
@@ -86,7 +101,7 @@ const ShortSurvey = () => {
         </Button>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ShortSurvey
+export default ShortSurvey;

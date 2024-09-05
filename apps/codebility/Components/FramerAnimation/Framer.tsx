@@ -9,7 +9,7 @@ export const box = {
       staggerChildren: 0.1,
     },
   },
-}
+};
 
 export const item = {
   hidden: { y: 20, opacity: 0 },
@@ -17,7 +17,7 @@ export const item = {
     y: 0,
     opacity: 1,
   },
-}
+};
 
 export const fadeInOutRightToLeft = {
   hidden: { opacity: 0 },
@@ -28,7 +28,7 @@ export const fadeInOutRightToLeft = {
       duration: 0.5,
     },
   },
-}
+};
 
 export const fadeInOutLeftToRight = {
   hidden: { opacity: 0, x: "-25%" },
@@ -39,7 +39,7 @@ export const fadeInOutLeftToRight = {
       duration: 0.5,
     },
   },
-}
+};
 
 export const fadeInOutUpToDown = {
   hidden: { opacity: 0, y: "-50%" },
@@ -50,7 +50,7 @@ export const fadeInOutUpToDown = {
       duration: 0.5,
     },
   },
-}
+};
 
 export const fadeInOutDownToUp = {
   hidden: { opacity: 0, y: "25%" },
@@ -61,7 +61,7 @@ export const fadeInOutDownToUp = {
       duration: 0.5,
     },
   },
-}
+};
 
 export const SocialContainer = {
   hidden: { opacity: 1, scale: 0 },
@@ -73,4 +73,4 @@ export const SocialContainer = {
       staggerChildren: 0.2,
     },
   },
-}
+};

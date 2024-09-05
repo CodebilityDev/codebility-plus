@@ -1,23 +1,24 @@
-"use client"
+"use client";
 
-import { Checkbox } from "@codevs/ui/checkbox"
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { Button, buttonVariants } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal";
+import { useTechStackStore } from "@/hooks/use-techstack";
+import { useSchedule } from "@/hooks/use-timeavail";
+import { SignUpValidation } from "@/lib/validations/auth";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import toast from "react-hot-toast";
+import { z } from "zod";
 
-import { zodResolver } from "@hookform/resolvers/zod"
-import { Button, buttonVariants } from "@/Components/ui/button"
-import { signupUser } from "../../actions"
-import { useModal } from "@/hooks/use-modal"
-import { useTechStackStore } from "@/hooks/use-techstack"
-import { useSchedule } from "@/hooks/use-timeavail"
-import { SignUpValidation } from "@/lib/validations/auth"
-import Link from "next/link"
-import { useRouter } from "next/navigation"
-import { useEffect, useState } from "react"
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form"
-import toast from "react-hot-toast"
-import { z } from "zod"
-import SignUpInputs from "./sign-up-input"
+import { Checkbox } from "@codevs/ui/checkbox";
 
-type Inputs = z.infer<typeof SignUpValidation>
+import { signupUser } from "../../actions";
+import SignUpInputs from "./sign-up-input";
+
+type Inputs = z.infer<typeof SignUpValidation>;
 interface Field {
   id:
     | "firstName"
@@ -29,41 +30,87 @@ interface Field {
     | "password"
     | "confirmPassword"
     | "schedule"
-    | "position"
-  label: string
-  placeholder: string
-  type?: string
-  optional?: boolean
+    | "position";
+  label: string;
+  placeholder: string;
+  type?: string;
+  optional?: boolean;
 }
 interface FieldType {
-  fields: Field[]
+  fields: Field[];
 }
 
 const steps: FieldType[] = [
   {
     fields: [
-      { id: "firstName", label: "First name", placeholder: "Enter your First name", type: "text" },
-      { id: "lastName", label: "Last name", placeholder: "Enter your Last name", type: "text" },
-      { id: "techstack", label: "Tech Stack", placeholder: "Enter your tech stack", type: "text" },
-      { id: "facebook", label: "Facebook", placeholder: "Enter your Facebook", type: "text" },
-      { id: "website", label: "Website", placeholder: "Enter your website (Optional)", optional: true, type: "text" },
+      {
+        id: "firstName",
+        label: "First name",
+        placeholder: "Enter your First name",
+        type: "text",
+      },
+      {
+        id: "lastName",
+        label: "Last name",
+        placeholder: "Enter your Last name",
+        type: "text",
+      },
+      {
+        id: "techstack",
+        label: "Tech Stack",
+        placeholder: "Enter your tech stack",
+        type: "text",
+      },
+      {
+        id: "facebook",
+        label: "Facebook",
+        placeholder: "Enter your Facebook",
+        type: "text",
+      },
+      {
+        id: "website",
+        label: "Website",
+        placeholder: "Enter your website (Optional)",
+        optional: true,
+        type: "text",
+      },
     ],
   },
   {
     fields: [
-      { id: "email_address", label: "Email", placeholder: "Enter your Email", type: "email" },
-      { id: "password", label: "Password", placeholder: "Password", type: "password" },
-      { id: "confirmPassword", label: "Confirm password", placeholder: "Confirm Password", type: "password" },
+      {
+        id: "email_address",
+        label: "Email",
+        placeholder: "Enter your Email",
+        type: "email",
+      },
+      {
+        id: "password",
+        label: "Password",
+        placeholder: "Password",
+        type: "password",
+      },
+      {
+        id: "confirmPassword",
+        label: "Confirm password",
+        placeholder: "Confirm Password",
+        type: "password",
+      },
       {
         id: "schedule",
         label: "Available time with us?",
         placeholder: "Select your available time with us",
         type: "text",
       },
-      { id: "position", label: "Desired Position", placeholder: "Select your desired position", type: "dropdown" },
+      {
+        id: "position",
+        label: "Desired Position",
+        placeholder: "Select your desired position",
+        type: "dropdown",
+      },
     ],
   },
-]
+];
 
 const AuthForm = () => {
   const {
@@ -76,70 +123,72 @@ const AuthForm = () => {
     formState: { errors },
   } = useForm<Inputs>({
     resolver: zodResolver(SignUpValidation),
-  })
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const { stack, clearStack } = useTechStackStore()
-  const { time, clearTime } = useSchedule()
-  const [isMounted, setIsMounted] = useState(false)
+  });
+  const router = useRouter();
+  const [isLoading, setIsLoading] = useState(false);
+  const { stack, clearStack } = useTechStackStore();
+  const { time, clearTime } = useSchedule();
+  const [isMounted, setIsMounted] = useState(false);
 
-  const { onOpen } = useModal()
+  const { onOpen } = useModal();
 
-  const string = stack.map((item) => item).join(", ")
-  const newTime = (time.start_time || time.end_time) && `${time.start_time} - ${time.end_time}`
+  const string = stack.map((item) => item).join(", ");
+  const newTime =
+    (time.start_time || time.end_time) &&
+    `${time.start_time} - ${time.end_time}`;
 
   useEffect(() => {
     if (isMounted) {
-      setValue("techstack", string)
-      setValue("schedule", newTime)
+      setValue("techstack", string);
+      setValue("schedule", newTime);
     }
-    setIsMounted(true)
+    setIsMounted(true);
 
     return () => {
-      setIsMounted(false)
-    }
-  }, [string, newTime, isMounted, setValue])
+      setIsMounted(false);
+    };
+  }, [string, newTime, isMounted, setValue]);
 
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
       console.log(data);
       await signupUser(data);
 
-      clearTime()
-      clearStack()
-      reset()
-      toast.success("Your account has been successfully created")
-      router.push("/waiting")
+      clearTime();
+      clearStack();
+      reset();
+      toast.success("Your account has been successfully created");
+      router.push("/waiting");
     } catch (e) {
-      setIsLoading(false)
-      toast.error((e as {message: string}).message);
-    } 
-  }
+      setIsLoading(false);
+      toast.error((e as { message: string }).message);
+    }
+  };
 
   const handleValues = (id: Field["id"]) => {
     const fieldObject: any = {
       techstack: string,
       schedule: newTime,
-    }
-    return fieldObject[id]
-  }
+    };
+    return fieldObject[id];
+  };
 
   const handleClick = (id: Field["id"]) => {
     const fieldObject: any = {
       techstack: () => {
-        onOpen("techStackModal")
+        onOpen("techStackModal");
       },
       schedule: () => {
-        onOpen("scheduleModal")
+        onOpen("scheduleModal");
       },
-    }
-    return fieldObject[id]
-  }
+    };
+    return fieldObject[id];
+  };
 
   const handleTriggerDropdown = () => {
-    trigger("position")
-  }
+    trigger("position");
+  };
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <input type="hidden" id="start_time" value={time.start_time} />
@@ -147,7 +196,10 @@ const AuthForm = () => {
       <input type="hidden" id="position" {...register("position")} />
       <div className="flex w-full flex-col gap-4 p-4 md:flex-row md:gap-10">
         {steps.map((item, index_div) => (
-          <div className="flex flex-col gap-4 md:flex md:flex-1 md:flex-col" key={`div_${index_div}`}>
+          <div
+            className="flex flex-col gap-4 md:flex md:flex-1 md:flex-col"
+            key={`div_${index_div}`}
+          >
             {item.fields.map((field, index_field) => (
               <SignUpInputs
                 label={field.label}
@@ -163,16 +215,21 @@ const AuthForm = () => {
                 getValues={field.type === "dropdown" && getValues}
                 values={handleValues(field.id)}
                 onChange={(e: any) => {
-                  const { name, value } = e.target
+                  const { name, value } = e.target;
                   setValue(
                     name,
-                    name === "email" || name === "firstName" || name === "lastName" || name === "facebook"
+                    name === "email" ||
+                      name === "firstName" ||
+                      name === "lastName" ||
+                      name === "facebook"
                       ? value.toLowerCase()
-                      : value
-                  )
-                  trigger(name)
+                      : value,
+                  );
+                  trigger(name);
                 }}
-                trigger={field.type === "dropdown" ? handleTriggerDropdown : undefined}
+                trigger={
+                  field.type === "dropdown" ? handleTriggerDropdown : undefined
+                }
                 setValue={field.id === "position" && setValue}
               />
             ))}
@@ -182,7 +239,10 @@ const AuthForm = () => {
                   <Checkbox required />
                   <p>
                     I agree to the{" "}
-                    <span onClick={() => onOpen("homePrivacyPolicyModal")} className="cursor-pointer text-blue-100">
+                    <span
+                      onClick={() => onOpen("homePrivacyPolicyModal")}
+                      className="cursor-pointer text-blue-100"
+                    >
                       Privacy Policy
                     </span>
                   </p>
@@ -196,7 +256,12 @@ const AuthForm = () => {
                     <Link href="/">Cancel</Link>
                   </Button>
 
-                  <Button type="submit" variant="default" className="w-36 py-6" disabled={isLoading}>
+                  <Button
+                    type="submit"
+                    variant="default"
+                    className="w-36 py-6"
+                    disabled={isLoading}
+                  >
                     Register
                   </Button>
                 </div>
@@ -206,7 +271,7 @@ const AuthForm = () => {
         ))}
       </div>
     </form>
-  )
-}
+  );
+};
 
-export default AuthForm
+export default AuthForm;

@@ -1,21 +1,21 @@
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react";
 
 const useChangeBgNavigation = () => {
-  const [color, setColor] = useState(false)
+  const [color, setColor] = useState(false);
 
   const changeColor = () => {
     if (window.scrollY >= 90) {
-      setColor(true)
+      setColor(true);
     } else {
-      setColor(false)
+      setColor(false);
     }
-  }
+  };
 
   useEffect(() => {
-    window.addEventListener("scroll", changeColor)
-  }, [])
+    window.addEventListener("scroll", changeColor);
+  }, []);
 
-  return { color }
-}
+  return { color };
+};
 
-export default useChangeBgNavigation
+export default useChangeBgNavigation;

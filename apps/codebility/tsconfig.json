@@ -23,14 +23,14 @@
       "@/*": ["./*"]
     }
   },
-  "include": [ 
-  "next-env.d.ts",
-  "**/*.ts",
-  "**/*.tsx",
-  "**/*.mjs",
-  "jest.config.js",
-  ".next/types/**/*.ts",
-  "public/assets/svgs/index.js"
-],
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    "**/*.mjs",
+    "jest.config.js",
+    ".next/types/**/*.ts",
+    "public/assets/svgs/index.js"
+  ],
   "exclude": ["node_modules"]
 }

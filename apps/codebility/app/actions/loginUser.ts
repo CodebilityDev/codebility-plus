@@ -1,21 +1,25 @@
-"use server"
+"use server";
 
-import { cookies } from "next/headers"
-import { loginUser } from "@/app/api/auth"
-import { FieldValues } from "react-hook-form"
-import { getApplicants } from "@/app/api/applicants"
+import { cookies } from "next/headers";
+import { getApplicants } from "@/app/api/applicants";
+import { loginUser } from "@/app/api/auth";
+import { FieldValues } from "react-hook-form";
 
 export async function loginUserAction(data: FieldValues) {
-  const applicants: any = await getApplicants()
+  const applicants: any = await getApplicants();
   if (applicants && applicants.data) {
     const matchedApplicants = applicants?.data.some((item: any) => {
-      if (item.email_address === data.email) return true
-    })
+      if (item.email_address === data.email) return true;
+    });
     if (matchedApplicants) {
-      return { type: "applicant", success: true, message: "Applicants Waiting to be approved" }
+      return {
+        type: "applicant",
+        success: true,
+        message: "Applicants Waiting to be approved",
+      };
     }
   }
-  const user: any = await loginUser(data)
+  const user: any = await loginUser(data);
   if (user && user.data) {
     cookies().set({
       name: "codebility-auth",
@@ -23,7 +27,7 @@ export async function loginUserAction(data: FieldValues) {
       httpOnly: true,
       secure: true,
       path: "/",
-    })
-    return { type: "all", success: true, message: "Logged In" }
+    });
+    return { type: "all", success: true, message: "Logged In" };
   }
 }

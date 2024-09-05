@@ -1,44 +1,46 @@
-"use client"
+"use client";
 
-import { pageSize } from "@/constants"
-import { useEffect, useState } from "react"
-import ServiceCard from "./services-service-card"
-import usePagination from "@/hooks/use-pagination"
-import DefaultPagination from "@/Components/ui/pagination"
-import Container from "../../_components/marketing-container"
-import Section from "../../_components/marketing-section"
-import { Service } from "../_types/service"
-import { removeArrayDuplicate } from "../../_lib/util"
+import { useEffect, useState } from "react";
+import DefaultPagination from "@/Components/ui/pagination";
+import { pageSize } from "@/constants";
+import usePagination from "@/hooks/use-pagination";
+
+import { Service } from "../_types/service";
+import Container from "../../_components/marketing-container";
+import Section from "../../_components/marketing-section";
+import { removeArrayDuplicate } from "../../_lib/util";
+import ServiceCard from "./services-service-card";
 
 interface Props {
   servicesData: Service[];
 }
 
 export default function ServicesTab({ servicesData }: Props) {
-  const [services, setServices] = useState<Service[]>(servicesData)
-  const [category, setCategory] = useState("Web Application")
-  
+  const [services, setServices] = useState<Service[]>(servicesData);
+  const [category, setCategory] = useState("Web Application");
+
   // get all the categories and removed duplicates
   const servicesCategory = removeArrayDuplicate(
-    servicesData.map(service => service.category)
+    servicesData.map((service) => service.category),
   );
 
   // use for pagination of each categories
   const CategoriesTabPages: Record<string, number> = {};
   servicesCategory.forEach((category) => {
-    CategoriesTabPages[category] = 1
+    CategoriesTabPages[category] = 1;
   });
-  
+
   // set categories current page.
-  const [tabPages, setTabPages] = useState<Record<string, number>>(CategoriesTabPages);
+  const [tabPages, setTabPages] =
+    useState<Record<string, number>>(CategoriesTabPages);
 
   // make categories as tab
-  const servicesTabs = servicesCategory.map((category,id)=> {
+  const servicesTabs = servicesCategory.map((category, id) => {
     return {
       id,
       name: category,
-      number: id + 1
-    }
+      number: id + 1,
+    };
   });
 
   const {
@@ -48,25 +50,27 @@ export default function ServicesTab({ servicesData }: Props) {
     handleNextPage,
     handlePreviousPage,
     setCurrentPage,
-  } = usePagination(services, pageSize.services)
+  } = usePagination(services, pageSize.services);
 
   useEffect(() => {
-    const filteredData = servicesData.filter((service) => service.category === category)
-    setServices(filteredData)
-  }, [category, servicesData])
+    const filteredData = servicesData.filter(
+      (service) => service.category === category,
+    );
+    setServices(filteredData);
+  }, [category, servicesData]);
 
   useEffect(() => {
-    setCurrentPage(tabPages[category] || 1)
-  }, [category, tabPages, setCurrentPage])
+    setCurrentPage(tabPages[category] || 1);
+  }, [category, tabPages, setCurrentPage]);
 
   const handleTabClick = (tabNumber: number, tabName: string) => {
     setTabPages((prev) => ({
       ...prev,
       [category]: currentPage,
-    }))
+    }));
 
-    setCategory(tabName)
-  }
+    setCategory(tabName);
+  };
 
   return (
     <Section className="relative">
@@ -78,7 +82,9 @@ export default function ServicesTab({ servicesData }: Props) {
                 key={tab.id}
                 onClick={() => handleTabClick(tab.number, tab.name)}
                 className={`cursor-pointer px-2 pb-2 text-base xl:text-xl ${
-                  category === tab.name ? "border-b-2 border-violet text-violet" : "text-white"
+                  category === tab.name
+                    ? "border-violet text-violet border-b-2"
+                    : "text-white"
                 }`}
               >
                 {tab.name}
@@ -88,10 +94,7 @@ export default function ServicesTab({ servicesData }: Props) {
 
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
             {paginatedServices.map((service) => (
-              <ServiceCard
-                key={service.id}
-                service={service}
-              />
+              <ServiceCard key={service.id} service={service} />
             ))}
           </div>
           <div className="text-white">
@@ -108,5 +111,5 @@ export default function ServicesTab({ servicesData }: Props) {
         </div>
       </Container>
     </Section>
-  )
+  );
 }

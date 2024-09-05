@@ -1,6 +1,7 @@
-import React from 'react'
-import HomeAddCardModal from './_components/home-add-card-modal'
-import HomeCardsContainer from './_components/home-cards-container'
+import React from "react";
+
+import HomeAddCardModal from "./_components/home-add-card-modal";
+import HomeCardsContainer from "./_components/home-cards-container";
 
 function CardsPage() {
   return (
@@ -13,7 +14,7 @@ function CardsPage() {
         <HomeCardsContainer />
       </div>
     </div>
-  )
+  );
 }
 
-export default CardsPage
+export default CardsPage;

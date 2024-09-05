@@ -1,12 +1,11 @@
-import useAuth from "@/hooks/use-auth"
-import { Box } from "@/Components/shared/dashboard"
-import { Skeleton } from "@/Components/ui/skeleton/skeleton"
-
-import RoleListsTableDesktop from "@/app/home/settings/roles/components/RoleListsTableDesktop"
-import RoleListsTableMobile from "@/app/home/settings/roles/components/RoleListsTableMobile"
+import RoleListsTableDesktop from "@/app/home/settings/roles/components/RoleListsTableDesktop";
+import RoleListsTableMobile from "@/app/home/settings/roles/components/RoleListsTableMobile";
+import { Box } from "@/Components/shared/dashboard";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import useAuth from "@/hooks/use-auth";
 
 const RoleListsTable = () => {
-  const { isLoading } = useAuth()
+  const { isLoading } = useAuth();
   return (
     <>
       {!isLoading ? (
@@ -30,6 +29,6 @@ const RoleListsTable = () => {
         </Box>
       )}
     </>
-  )
-}
-export default RoleListsTable
+  );
+};
+export default RoleListsTable;
