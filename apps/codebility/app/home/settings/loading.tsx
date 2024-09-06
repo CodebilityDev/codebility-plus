@@ -1,5 +1,5 @@
-import Box from "@/Components/shared/dashboard/Box"
-import { Skeleton } from "@/Components/ui/skeleton/skeleton"
+import Box from "@/Components/shared/dashboard/Box";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 
 const Loading = () => {
   return (
@@ -17,7 +17,7 @@ const Loading = () => {
           </Box>
         ))}
     </div>
-  )
-}
+  );
+};
 
-export default Loading
+export default Loading;

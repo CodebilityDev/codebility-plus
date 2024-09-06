@@ -1,10 +1,10 @@
-import Image from "next/image"
+import Image from "next/image";
 
 interface Props {
-  icon?: string
-  value?: string
-  label?: string
-  iconClassName?: string
+  icon?: string;
+  value?: string;
+  label?: string;
+  iconClassName?: string;
 }
 
 const BoxInset = ({ icon, value, label, iconClassName }: Props) => {
@@ -24,7 +24,7 @@ const BoxInset = ({ icon, value, label, iconClassName }: Props) => {
         <p>{label}</p>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default BoxInset
+export default BoxInset;

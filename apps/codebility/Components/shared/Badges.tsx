@@ -1,5 +1,5 @@
-import Image from "next/image"
-import React from "react"
+import React from "react";
+import Image from "next/image";
 
 const Badges = () => {
   return (
@@ -13,7 +13,7 @@ const Badges = () => {
         className="h-[54px] w-[60px] bg-cover transition duration-300 hover:-translate-y-0.5"
       />
     </div>
-  )
-}
+  );
+};
 
-export default Badges
+export default Badges;

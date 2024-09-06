@@ -1,4 +1,39 @@
-import { Sidebar, SocialIcons } from "@/types"
+import pathsConfig from "@/config/paths.config";
+// ====================================================================================
+
+import {
+  IconAngular,
+  IconAWS,
+  IconBootstrap,
+  IconC,
+  IconCPlusPlus,
+  IconCSharp,
+  IconCSS,
+  IconDjango,
+  IconFigma,
+  IconFirebase,
+  IconHTML,
+  IconJava,
+  IconJavaScript,
+  IconJQuery,
+  IconKotlin,
+  IconMongoDB,
+  IconMySQL,
+  IconNextJS,
+  IconNodeJS,
+  IconPHP,
+  IconPostgreSQL,
+  IconPython,
+  IconReact,
+  IconReactNative,
+  IconRuby,
+  IconSolidity,
+  IconSwift,
+  IconTailwind,
+  IconTypeScript,
+  IconVue,
+} from "@/public/assets/svgs";
+import { Sidebar, SocialIcons } from "@/types";
 
 export const pageSize = {
   codevsList: 10,
@@ -10,7 +45,7 @@ export const pageSize = {
   weeklyTop: 10,
   projects: 6,
   services: 6,
-} as const
+} as const;
 
 export const navLinks = [
   {
@@ -33,7 +68,7 @@ export const navLinks = [
     name: "Projects",
     href: "/#projects",
   },
-]
+];
 
 // ====================================================================================
 
@@ -63,7 +98,7 @@ export const socialIcons: SocialIcons[] = [
     imgURL: "/assets/svgs/icon-slack.svg",
     label: "slack",
   },
-]
+];
 
 // ====================================================================================
 
@@ -72,9 +107,24 @@ export const sidebarData: Sidebar[] = [
     id: "1",
     title: "Menu",
     links: [
-      { route: pathsConfig.app.home, imgURL: "/assets/svgs/icon-dashboard.svg", label: "Dashboard", permission: "dashboard" },
-      { route: pathsConfig.app.tasks, imgURL: "/assets/svgs/icon-task.svg", label: "My Tasks", permission: "my_task" },
-      { route: pathsConfig.app.kanban, imgURL: "/assets/svgs/icon-kanban.svg", label: "Kanban", permission: "kanban" },
+      {
+        route: pathsConfig.app.home,
+        imgURL: "/assets/svgs/icon-dashboard.svg",
+        label: "Dashboard",
+        permission: "dashboard",
+      },
+      {
+        route: pathsConfig.app.tasks,
+        imgURL: "/assets/svgs/icon-task.svg",
+        label: "My Tasks",
+        permission: "my_task",
+      },
+      {
+        route: pathsConfig.app.kanban,
+        imgURL: "/assets/svgs/icon-kanban.svg",
+        label: "Kanban",
+        permission: "kanban",
+      },
       {
         route: pathsConfig.app.time_tracker,
         imgURL: "/assets/svgs/icon-time-tracker.svg",
@@ -87,36 +137,75 @@ export const sidebarData: Sidebar[] = [
     id: "2",
     title: "Codevs",
     links: [
-      { route: pathsConfig.app.interns, imgURL: "/assets/svgs/icon-interns.svg", label: "Interns", permission: "interns" },
-      { route: pathsConfig.app.orgchart, imgURL: "/assets/svgs/icon-org-chart.svg", label: "Org Chart", permission: "org_charts" },
+      {
+        route: pathsConfig.app.interns,
+        imgURL: "/assets/svgs/icon-interns.svg",
+        label: "Interns",
+        permission: "interns",
+      },
+      {
+        route: pathsConfig.app.orgchart,
+        imgURL: "/assets/svgs/icon-org-chart.svg",
+        label: "Org Chart",
+        permission: "org_charts",
+      },
     ],
   },
   {
     id: "3",
     title: "Management",
     links: [
-      { route: pathsConfig.app.applicants, imgURL: "/assets/svgs/icon-applicant.svg", label: "Applicants", permission: "applicants" },
-      { route: pathsConfig.app.in_hose, imgURL: "/assets/svgs/icon-applicant2.svg", label: "In-House", permission: "inhouse" },
-      { route: pathsConfig.app.clients, imgURL: "/assets/svgs/icon-clients.svg", label: "Clients", permission: "clients" },
-      { route: pathsConfig.app.projects, imgURL: "/assets/svgs/icon-projects.svg", label: "Projects", permission: "projects" },
-      { route: pathsConfig.app.settings, imgURL: "/assets/svgs/icon-cog.svg", label: "Settings", permission: "settings" },
+      {
+        route: pathsConfig.app.applicants,
+        imgURL: "/assets/svgs/icon-applicant.svg",
+        label: "Applicants",
+        permission: "applicants",
+      },
+      {
+        route: pathsConfig.app.in_hose,
+        imgURL: "/assets/svgs/icon-applicant2.svg",
+        label: "In-House",
+        permission: "inhouse",
+      },
+      {
+        route: pathsConfig.app.clients,
+        imgURL: "/assets/svgs/icon-clients.svg",
+        label: "Clients",
+        permission: "clients",
+      },
+      {
+        route: pathsConfig.app.projects,
+        imgURL: "/assets/svgs/icon-projects.svg",
+        label: "Projects",
+        permission: "projects",
+      },
+      {
+        route: pathsConfig.app.settings,
+        imgURL: "/assets/svgs/icon-cog.svg",
+        label: "Settings",
+        permission: "settings",
+      },
     ],
   },
-]
-
-
-// ====================================================================================
-
-export const taskPrioLevels = ["Highest", "Critical", "High", "Medium", "Low"]
+];
 
 // ====================================================================================
 
-export const categories = ["FE", "BE", "MD", "UI"]
+export const taskPrioLevels = [
+  "Critical",
+  "Highest",
+  "High",
+  "Medium",
+  "Low",
+] as const;
 
 // ====================================================================================
 
-export const taskTypes = ["BUG", "REFACTOR", "FEATURE", "PERF"]
+export const categories = ["FE", "BE", "MD", "UI"] as const;
 
+// ====================================================================================
+
+export const taskTypes = ["BUG", "REFACTOR", "FEATURE", "PERF"] as const;
 
 // ====================================================================================
 
@@ -133,7 +222,7 @@ export const aboutLinks = [
     label: "Our Services",
     url: "/services",
   },
-]
+];
 
 // ====================================================================================
 
@@ -178,7 +267,7 @@ export const servicesCardData = [
     title: "Quality Assurance and Testing",
     desc: "Ensure the reliability and performance of your applications with our comprehensive QA and testing services. We offer manual and automated testing, performance testing, and security audits to identify and fix vulnerabilities, ensuring your software is bug-free and secure.",
   },
-]
+];
 
 // ====================================================================================
 
@@ -195,11 +284,11 @@ export const siteLinks = [
     label: "Terms of Service",
     url: "#terms-of-service",
   },
-]
+];
 
 // ====================================================================================
 
-export const profilePronoun = ["He/Him", "She/Her", "They/Them"]
+export const profilePronoun = ["He/Him", "She/Her", "They/Them"];
 
 // ====================================================================================
 
@@ -215,43 +304,7 @@ export const positions = [
   "Social Media Manager",
   "Digital Marketer",
   "Video Editor",
-]
-
-// ====================================================================================
-
-import {
-  IconCSharp,
-  IconCSS,
-  IconDjango,
-  IconFigma,
-  IconFirebase,
-  IconHTML,
-  IconJava,
-  IconJavaScript,
-  IconJQuery,
-  IconKotlin,
-  IconAngular,
-  IconAWS,
-  IconBootstrap,
-  IconC,
-  IconCPlusPlus,
-  IconPostgreSQL,
-  IconPython,
-  IconReact,
-  IconReactNative,
-  IconRuby,
-  IconSolidity,
-  IconSwift,
-  IconTailwind,
-  IconTypeScript,
-  IconVue,
-  IconMongoDB,
-  IconMySQL,
-  IconNextJS,
-  IconNodeJS,
-  IconPHP,
-} from "@/public/assets/svgs"
-import pathsConfig from "@/config/paths.config"
+];
 
 // ====================================================================================
 
@@ -286,7 +339,7 @@ export const techstacks = [
   { name: "Tailwind", icon: IconTailwind },
   { name: "TypeScript", icon: IconTypeScript },
   { name: "Vue", icon: IconVue },
-]
+];
 
 // ====================================================================================
 
@@ -299,7 +352,7 @@ export const projects = [
     logo: "logo-tapup-light.svg",
     link: "https://tapup.vercel.app/",
   },
-]
+];
 // ====================================================================================
 export const services = [
   {
@@ -318,7 +371,7 @@ export const services = [
     number: "04",
     label: "Digital Marketing",
   },
-]
+];
 
 export const navItems = [
   {
@@ -341,4 +394,4 @@ export const navItems = [
     title: "Hire a CoDevs",
     path: "/codevs",
   },
-]
+];

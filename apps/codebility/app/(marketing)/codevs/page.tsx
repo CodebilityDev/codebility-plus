@@ -1,18 +1,16 @@
-"use client"
-
-import Navigation from "@/app/(marketing)/Navigation"
-import Profiles from "@/app/(marketing)/profiles/page"
-import Hero from "@/app/(marketing)/codevs/components/Hero"
-import Footer from "@/app/(marketing)/Footer"
-import MissionVision from "@/app/(marketing)/codevs/components/MissionVision"
-import FeaturedSection from "@/app/(marketing)/codevs/components/FeaturedSection" 
-import Project from "@/app/(marketing)/codevs/components/Project"
-import CTA from "@/app/(marketing)/codevs/components/CTA"
-import Roadmap from "@/app/(marketing)/codevs/components/Roadmap"
+import Footer from "../_components/marketing-footer";
+import Navigation from "../_components/marketing-navigation";
+import Profiles from "../profiles/page";
+import CTA from "./_components/codevs-cta";
+import FeaturedSection from "./_components/codevs-featured-section";
+import Hero from "./_components/codevs-hero";
+import MissionVision from "./_components/codevs-mission-vision";
+import Project from "./_components/codevs-project";
+import Roadmap from "./_components/codevs-roadmap";
 
 const Codevs = () => {
   return (
-    <div className="relative flex w-full flex-col overflow-x-hidden overflow-y-hidden bg-black-400">
+    <div className="bg-black-400 relative flex w-full flex-col overflow-x-hidden overflow-y-hidden">
       <Navigation />
       <Hero />
       <FeaturedSection />
@@ -23,7 +21,7 @@ const Codevs = () => {
       <CTA />
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default Codevs
+export default Codevs;

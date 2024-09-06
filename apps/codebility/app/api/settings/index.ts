@@ -1,6 +1,6 @@
-import axios from "axios"
-import { API } from "@/lib/constants"
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
+import { API } from "@/lib/constants";
+import axios from "axios";
 
 export const getRoles = async () => {
   try {
@@ -8,13 +8,13 @@ export const getRoles = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    return response.data.data
+    return response.data.data;
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export const createRoles = async (data: any, token: string) => {
   try {
@@ -23,11 +23,11 @@ export const createRoles = async (data: any, token: string) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    return response.data
+    return response.data;
   } catch (error) {
-    console.error("Error:", error)
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    console.error("Error:", error);
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};

@@ -1,13 +1,18 @@
-import type { Config  } from "tailwindcss";
-import { AddVariablesForColorsParams, PluginFunctionParams} from '@/types'
-import baseConfig from "@codevs/tailwind-config/web";
-const svgToDataUri = require("mini-svg-data-uri")
+import type { Config } from "tailwindcss";
+import { AddVariablesForColorsParams, PluginFunctionParams } from "@/types";
 
-const { default: flattenColorPalette } = require("tailwindcss/lib/util/flattenColorPalette");
+import baseConfig from "@codevs/tailwind-config/web";
+
+const svgToDataUri = require("mini-svg-data-uri");
+
+const {
+  default: flattenColorPalette,
+} = require("tailwindcss/lib/util/flattenColorPalette");
 const config: Config = {
   // We need to append the path to the UI package to the content array so that
   // those classes are included correctly.
-  content: [...baseConfig.content,
+  content: [
+    ...baseConfig.content,
     "./pages/**/*.{ts,tsx}",
     "./Components/**/*.{ts,tsx}",
     "./app/**/*.{ts,tsx}",
@@ -28,7 +33,7 @@ const config: Config = {
         "section-wrapper": "url('/assets/images/bg-pattern.png')",
         "code-pattern": "url('/assets/images/bg-pattern-code.png')",
         "latest-tech": "url('/assets/images/ai-integration/black-wave.png')",
-        "roadmap": "url('/assets/images/roadmap.png')"
+        roadmap: "url('/assets/images/roadmap.png')",
       },
       screens: {
         phone: { max: "425px" },
@@ -43,7 +48,8 @@ const config: Config = {
         // => @media (min-width: 1280px) { ... }
       },
       boxShadow: {
-        stiglitz: "rgba(50,50,93,0.25) 0px 6px 12px -2px, rgba(0,0,0,0.3) 0px 3px 7px -3px",
+        stiglitz:
+          "rgba(50,50,93,0.25) 0px 6px 12px -2px, rgba(0,0,0,0.3) 0px 3px 7px -3px",
       },
       colors: {
         primary: "#0E0E0E",
@@ -175,14 +181,16 @@ const config: Config = {
         },
         "accordion-up": {
           from: { height: "var(--radix-accordion-content-height)" },
-          to: { height: "0"},
+          to: { height: "0" },
         },
         orbit: {
           "0%": {
-              transform: "rotate(0deg) translateY(calc(var(--radius) * 1px)) rotate(0deg)",
+            transform:
+              "rotate(0deg) translateY(calc(var(--radius) * 1px)) rotate(0deg)",
           },
           "100%": {
-              transform: "rotate(360deg) translateY(calc(var(--radius) * 1px)) rotate(-360deg)",
+            transform:
+              "rotate(360deg) translateY(calc(var(--radius) * 1px)) rotate(-360deg)",
           },
         },
         marquee: {
@@ -211,32 +219,39 @@ const config: Config = {
         {
           "bg-grid": (value: string) => ({
             backgroundImage: `url("${svgToDataUri(
-              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`
+              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`,
             )}")`,
           }),
           "bg-grid-small": (value: string) => ({
             backgroundImage: `url("${svgToDataUri(
-              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="8" height="8" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`
+              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="8" height="8" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`,
             )}")`,
           }),
           "bg-dot": (value: string) => ({
             backgroundImage: `url("${svgToDataUri(
-              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="none"><circle fill="${value}" id="pattern-circle" cx="10" cy="10" r="1.6257413380501518"></circle></svg>`
+              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="none"><circle fill="${value}" id="pattern-circle" cx="10" cy="10" r="1.6257413380501518"></circle></svg>`,
             )}")`,
           }),
         },
-        { values: flattenColorPalette(theme("backgroundColor")), type: "color" }
+        {
+          values: flattenColorPalette(theme("backgroundColor")),
+          type: "color",
+        },
       );
     },
   ],
   presets: [baseConfig],
-  
 };
 export default config;
 
-export function addVariablesForColors({ addBase, theme }: AddVariablesForColorsParams) {
+export function addVariablesForColors({
+  addBase,
+  theme,
+}: AddVariablesForColorsParams) {
   let allColors = flattenColorPalette(theme("colors"));
-  let newVars = Object.fromEntries(Object.entries(allColors).map(([key, val]) => [`--${key}`, val]));
+  let newVars = Object.fromEntries(
+    Object.entries(allColors).map(([key, val]) => [`--${key}`, val]),
+  );
 
   addBase({
     ":root": newVars,

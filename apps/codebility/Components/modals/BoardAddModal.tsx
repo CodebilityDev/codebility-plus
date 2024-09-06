@@ -1,94 +1,102 @@
-"use client"
-import React from "react"
+"use client";
 
+import React, { useEffect, useState } from "react";
+import { createBoard } from "@/app/api/kanban";
+import { getProjects } from "@/app/api/projects";
+import { Button } from "@/Components/ui/button";
+import Input from "@/Components/ui/forms/input";
+import { useModal } from "@/hooks/use-modal";
+import useToken from "@/hooks/use-token";
+import { IconDropdown } from "@/public/assets/svgs";
+import { ProjectT } from "@/types";
 import {
   Select,
-  SelectTrigger,
-  SelectValue,
   SelectContent,
   SelectGroup,
-  SelectLabel,
   SelectItem,
-} from "@radix-ui/react-select"
-import { ProjectT } from "@/types"
-import { Label } from "@codevs/ui/label"
-import toast from "react-hot-toast"
-import Input from "@/Components/ui/forms/input"
-import { createBoard } from "@/app/api/kanban"
-import useToken from "@/hooks/use-token"
-import { useModal } from "@/hooks/use-modal"
-import { getProjects } from "@/app/api/projects"
-import { useEffect, useState } from "react"
-import { Button } from "@/Components/ui/button"
-import { IconDropdown } from "@/public/assets/svgs"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@codevs/ui/dialog"
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@radix-ui/react-select";
+import toast from "react-hot-toast";
+
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@codevs/ui/dialog";
+import { Label } from "@codevs/ui/label";
 
 const BoardAddModal = () => {
-  const { isOpen, onClose, type } = useModal()
-  const [projects, setProjects] = useState<ProjectT[]>([])
-  const [selectedProjectName, setSelectedProjectName] = useState<string | null>(null)
+  const { isOpen, onClose, type } = useModal();
+  const [projects, setProjects] = useState<ProjectT[]>([]);
+  const [selectedProjectName, setSelectedProjectName] = useState<string | null>(
+    null,
+  );
   const [newBoard, setNewBoard] = useState({
     name: "",
     projects: [{ projectsId: "" }],
-  })
-  const { token } = useToken()
+  });
+  const { token } = useToken();
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const projects = await getProjects()
-      setProjects(projects)
-    }
+      const projects = await getProjects();
+      setProjects(projects);
+    };
 
-    fetchProjects()
-  }, [])
+    fetchProjects();
+  }, []);
 
   const handleNameChange = (e: any) => {
-    setNewBoard({ ...newBoard, name: e.target.value })
-  }
+    setNewBoard({ ...newBoard, name: e.target.value });
+  };
 
   const handleValueChange = (value: string) => {
-    setNewBoard({ ...newBoard, projects: [{ projectsId: value }] })
+    setNewBoard({ ...newBoard, projects: [{ projectsId: value }] });
     projects.forEach((proj) => {
       if (proj.id === value) {
-        setSelectedProjectName(proj.project_name as string)
+        setSelectedProjectName(proj.project_name as string);
       }
-    })
-  }
+    });
+  };
 
   const handleSave = async () => {
     if (newBoard.name === "") {
-      toast.error("Name is Empty")
-      return
+      toast.error("Name is Empty");
+      return;
     }
 
     try {
-      const response = await createBoard(newBoard, token)
+      const response = await createBoard(newBoard, token);
       if (response.status === 201) {
-        toast.success("Board Added")
-        onClose()
+        toast.success("Board Added");
+        onClose();
       }
     } catch (error) {
-      toast.error("Something went wrong!")
+      toast.error("Something went wrong!");
     }
-  }
+  };
 
   const handleClose = () => {
     setNewBoard({
       name: "",
       projects: [{ projectsId: "" }],
-    })
-    onClose()
-  }
+    });
+    onClose();
+  };
 
-  const isModalOpen = isOpen && type === "boardAddModal"
+  const isModalOpen = isOpen && type === "boardAddModal";
 
   return (
     <Dialog open={isModalOpen}>
-      <DialogContent
-        className="flex h-auto w-[100%] max-w-3xl flex-col gap-6 overflow-x-auto overflow-y-auto"
-      >
+      <DialogContent className="background-lightbox_darkbox text-dark100_light900 flex h-auto w-[100%] max-w-3xl flex-col gap-6 overflow-x-auto overflow-y-auto">
         <DialogHeader className="relative">
-          <DialogTitle className="mb-2 text-left text-lg">Add New Board</DialogTitle>
+          <DialogTitle className="mb-2 text-left text-lg">
+            Add New Board
+          </DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-6 lg:flex-row">
@@ -100,15 +108,20 @@ const BoardAddModal = () => {
                   aria-label="Projects"
                   className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
                 >
-                  <SelectValue className="text-sm" placeholder="Select a Project">
+                  <SelectValue
+                    className="text-sm"
+                    placeholder="Select a Project"
+                  >
                     {selectedProjectName}
                   </SelectValue>
                   <IconDropdown className="invert dark:invert-0" />
                 </SelectTrigger>
 
-                <SelectContent className="border-light_dark rounded-md border bg-[#FFF] dark:bg-black-100">
+                <SelectContent className="border-light_dark dark:bg-black-100 rounded-md border bg-[#FFF]">
                   <SelectGroup>
-                    <SelectLabel className="px-3 py-2 text-xs text-gray">Projects</SelectLabel>
+                    <SelectLabel className="text-gray px-3 py-2 text-xs">
+                      Projects
+                    </SelectLabel>
                     {projects?.map(({ id, project_name }: ProjectT) => (
                       <SelectItem
                         key={id}
@@ -130,16 +143,24 @@ const BoardAddModal = () => {
         </div>
 
         <DialogFooter className="flex flex-col gap-2 lg:flex-row">
-          <Button variant="hollow" className="order-2 w-full sm:order-1 sm:w-[130px]" onClick={handleClose}>
+          <Button
+            variant="hollow"
+            className="order-2 w-full sm:order-1 sm:w-[130px]"
+            onClick={handleClose}
+          >
             Cancel
           </Button>
-          <Button variant="default" className="order-1 w-full sm:order-2 sm:w-[130px]" onClick={handleSave}>
+          <Button
+            variant="default"
+            className="order-1 w-full sm:order-2 sm:w-[130px]"
+            onClick={handleSave}
+          >
             Save
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default BoardAddModal
+export default BoardAddModal;

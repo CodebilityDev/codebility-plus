@@ -1,38 +1,40 @@
-import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
-import { UserWorkspaceContextProvider } from '../_components/user-workspace-context'
-import { getSupabaseServerComponentClient } from '@codevs/supabase/server-component-client'
-import HomeSidebar from './_components/home-sidebar'
-import HomeNavbar from './_components/home-navbar'
-import appConfig from '~/config/app.config'
-import { cn } from '@codevs/ui'
-import { signOut } from '~/app/auth/actions'
+import type { Metadata } from "next";
+import { Inter } from "next/font/google";
 
-const inter = Inter({ subsets: ['latin'] })
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { cn } from "@codevs/ui";
+
+import { signOut } from "~/app/auth/actions";
+import appConfig from "~/config/app.config";
+import { UserWorkspaceContextProvider } from "../_components/user-workspace-context";
+import HomeNavbar from "./_components/home-navbar";
+import HomeSidebar from "./_components/home-sidebar";
+
+const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: appConfig.title,
   description: appConfig.description,
-}
+};
 
 export default async function RootLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode
+  children: React.ReactNode;
 }>) {
-  const supabase = getSupabaseServerComponentClient()
+  const supabase = getSupabaseServerComponentClient();
 
   const {
     data: { user },
-  } = await supabase.auth.getUser()
+  } = await supabase.auth.getUser();
 
   const { data, error } = await supabase
-    .from('users')
+    .from("users")
     .select()
-    .eq('id', user?.id)
-    .single()
+    .eq("id", user?.id)
+    .single();
 
-  if (!user || !data) await signOut()
+  if (!user || !data) await signOut();
 
   return (
     <html lang={appConfig.locale}>
@@ -42,7 +44,7 @@ export default async function RootLayout({
             <div className="relative h-screen w-1/5">
               <HomeSidebar />
             </div>
-            <div className="bg-secondary h-screen flex-1 overflow-scroll">
+            <div className="h-screen flex-1 overflow-scroll bg-secondary">
               <HomeNavbar />
               {children}
             </div>
@@ -50,5 +52,5 @@ export default async function RootLayout({
         </UserWorkspaceContextProvider>
       </body>
     </html>
-  )
+  );
 }

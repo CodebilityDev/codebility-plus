@@ -1,6 +1,6 @@
-import axios from "axios"
-import { API } from "@/lib/constants"
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
+import { API } from "@/lib/constants";
+import axios from "axios";
 
 /* 
 
@@ -18,10 +18,10 @@ export const getInterns = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    return response.data.data
+    return response.data.data;
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};

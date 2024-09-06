@@ -1,20 +1,21 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { Clock } from "lucide-react"
-import { TimePickerInput } from "@/Components/time-picker/time-picker-input"
-import { Label } from "@codevs/ui/label"
+import * as React from "react";
+import { TimePickerInput } from "@/Components/time-picker/time-picker-input";
+import { Clock } from "lucide-react";
+
+import { Label } from "@codevs/ui/label";
 
 interface TimePickerDemoProps {
-  date: Date | undefined
+  date: Date | undefined;
   // eslint-disable-next-line no-unused-vars
-  setDate: (date: Date | undefined) => void
+  setDate: (date: Date | undefined) => void;
 }
 
 export function TimePickerDemo({ date, setDate }: TimePickerDemoProps) {
-  const minuteRef = React.useRef<HTMLInputElement>(null)
-  const hourRef = React.useRef<HTMLInputElement>(null)
-  const secondRef = React.useRef<HTMLInputElement>(null)
+  const minuteRef = React.useRef<HTMLInputElement>(null);
+  const hourRef = React.useRef<HTMLInputElement>(null);
+  const secondRef = React.useRef<HTMLInputElement>(null);
 
   return (
     <div className="flex items-end gap-2">
@@ -59,5 +60,5 @@ export function TimePickerDemo({ date, setDate }: TimePickerDemoProps) {
         <Clock className="ml-2 h-4 w-4" />
       </div>
     </div>
-  )
+  );
 }
