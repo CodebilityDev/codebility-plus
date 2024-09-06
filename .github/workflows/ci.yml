@@ -12,6 +12,17 @@ jobs:
   turbo:
     runs-on: ubuntu-latest
 
+    # Set up environment variables
+    env:
+      NEXT_PUBLIC_PRODUCT_NAME: "ClapUp"
+      NEXT_PUBLIC_SITE_TITLE: "Clapper Digital Business Card"
+      NEXT_PUBLIC_SITE_DESCRIPTION: "App"
+      NEXT_PUBLIC_SITE_URL: "https://localhost:3000"
+      NEXT_PUBLIC_DEFAULT_LOCALE: "en"
+      NEXT_PUBLIC_DEFAULT_THEME_MODE: "light"    
+      NEXT_PUBLIC_THEME_COLOR: "#22C55E"
+      NEXT_PUBLIC_THEME_COLOR_DARK: "#1e1e1e"
+
     steps:
       # Checkout the repository
       - name: Checkout repository
