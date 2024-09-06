@@ -34,7 +34,7 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
       },
       {
         protocol: "https",
-        hostname: process.env.NEXT_PUBLIC_SUPABASE_URL ? process.env.NEXT_PUBLIC_SUPABASE_URL.split("https://")[1] : "https://nwpvsxbrftplvebseaas.supabase.co",
+        hostname: (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_URL.split("https://")[1]) ??  "https://nwpvsxbrftplvebseaas.supabase.co",
       },
     ],
   },
