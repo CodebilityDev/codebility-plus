@@ -6,13 +6,12 @@
     "packages/*"
   ],
   "devDependencies": {
-    "@codevs/prettier-config": "workspace:",
+    "@codevs/prettier-config": "workspace:^",
     "@turbo/gen": "^2.1.1",
-    "@types/react": "^18.3.3",
-    "@codevs/prettier-config": "workspace:",
-    "eslint": "^8.21.0",
-    "prettier": "^3.0.3",
-    "turbo": "^2.0.9",
+    "@types/react": "^18.3.5",
+    "eslint": "^8.57.0",
+    "prettier": "^3.3.3",
+    "turbo": "^2.1.1",
     "typescript": "^5.5.4"
   },
   "scripts": {
@@ -39,9 +38,7 @@
   ],
   "packageManager": "pnpm@8.11.0",
   "dependencies": {
-    "axios": "^1.7.3"
-  },
-  "prettier": "@codevs/prettier-config"
+    "axios": "^1.7.7"
   },
   "prettier": "@codevs/prettier-config"
 }

@@ -12,23 +12,36 @@ jobs:
   turbo:
     runs-on: ubuntu-latest
 
+    # Set up environment variables
+    env:
+      NEXT_PUBLIC_PRODUCT_NAME: "ClapUp"
+      NEXT_PUBLIC_SITE_TITLE: "Clapper Digital Business Card"
+      NEXT_PUBLIC_SITE_DESCRIPTION: "App"
+      NEXT_PUBLIC_SITE_URL: "https://localhost:3000"
+      NEXT_PUBLIC_DEFAULT_LOCALE: "en"
+      NEXT_PUBLIC_DEFAULT_THEME_MODE: "light"    
+      NEXT_PUBLIC_THEME_COLOR: "#22C55E"
+      NEXT_PUBLIC_THEME_COLOR_DARK: "#1e1e1e"
+      NEXT_PUBLIC_SUPABASE_URL: "supabaseurl"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "supabaseanonkey"
+
     steps:
       # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v2
-
-      # Set up Node.js
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
-        with:
-          node-version: '16'
-          cache: 'pnpm' # This caches the pnpm cache folder
-
+ 
       # Install pnpm using the official pnpm/action-setup
       - name: Setup pnpm
-        uses: pnpm/action-setup@v2.2.4
+        uses: pnpm/action-setup@v3
         with:
           version: 8
+
+      # Set up Node.js
+      - name: Setup Node.js environment
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'pnpm'
 
       # Cache dependencies and Turbo's output
       - name: Cache node_modules and Turbo output
@@ -54,10 +67,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install
 
+      # Fetch the dev branch to make it available for comparison
+      - name: Fetch dev branch
+        run: git fetch origin dev
+
       # Run build for only affected packages (based on changed files)
       - name: Build changed packages
-        run: pnpm dlx turbo run build --since=origin/dev --filter=[affected]
+        run: pnpm dlx turbo@latest run build --filter=...[origin/dev]
 
       # Run tests only for changed packages
       - name: Run tests for changed packages
-        run: pnpm dlx turbo run test --since=origin/dev --filter=[affected]
+        run: pnpm dlx turbo@latest run test --filter=...[origin/dev]

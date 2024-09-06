@@ -12,75 +12,47 @@ export const uploadImage = async (
     console.error("No file provided for upload");
     return null;
   }
-  export const uploadImage = async (
-    file: File | null,
-    folderName: string,
-    bucketName: string,
-  ) => {
-    if (!file) {
-      console.error("No file provided for upload");
-      return null;
+
+  const arrayBuffer = await file.arrayBuffer();
+  const buffer = Buffer.from(arrayBuffer);
+
+  const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+  const extension = file.name.split(".").pop();
+  const filename = `${timestamp}.${extension}`;
+
+  const supabase = await getSupabaseServerActionClient();
+
+  const { data, error } = await supabase.storage
+    .from(bucketName)
+    .upload(`${folderName}/${filename}`, buffer, {
+      contentType: file.type,
+    });
+
+
+  if (error) {
+    console.error(`Failed to upload ${file.name}:`, error.message);
+    return null;
+  }
+  return data.path;
+};
+
+export const deleteImage = async (path: string) => {
+  try {
+    const filePath = path.replace("public/", "");
+    if (!filePath) {
+      throw new Error("File path could not be extracted from URL");
     }
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const extension = file.name.split(".").pop();
-    const filename = `${timestamp}.${extension}`;
 
     const supabase = await getSupabaseServerActionClient();
-
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .upload(`${folderName}/${filename}`, buffer, {
-        contentType: file.type,
-      });
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .upload(`${folderName}/${filename}`, buffer, {
-        contentType: file.type,
-      });
+    const { error } = await supabase.storage
+      .from("services-image")
+      .remove([`public/${filePath}`]);
 
     if (error) {
-      console.error(`Failed to upload ${file.name}:`, error.message);
-      return null;
+      console.error("Error deleting image:", error.message);
+      return { success: false, error: error.message };
     }
-    return data.path;
-    if (error) {
-      console.error(`Failed to upload ${file.name}:`, error.message);
-      return null;
-    }
-    return data.path;
-  };
 
-  export const deleteImage = async (path: string) => {
-    try {
-      const filePath = path.replace("public/", "");
-      if (!filePath) {
-        throw new Error("File path could not be extracted from URL");
-      }
-
-      const supabase = await getSupabaseServerActionClient();
-      const { error } = await supabase.storage
-        .from("services-image")
-        .remove([`public/${filePath}`]);
-
-      if (error) {
-        console.error("Error deleting image:", error.message);
-        return { success: false, error: error.message };
-      }
-      if (error) {
-        console.error("Error deleting image:", error.message);
-        return { success: false, error: error.message };
-      }
-
-      console.log("Image deleted successfully");
-      return { success: true };
-    } catch (error) {
-      console.error("Error deleting image:", error);
-      return { success: false, error: error };
-    }
     console.log("Image deleted successfully");
     return { success: true };
   } catch (error) {
@@ -97,23 +69,9 @@ export const createServiceAction = async (formData: FormData) => {
   const picture1 = formData.get("picture1") as File | null;
   const picture2 = formData.get("picture2") as File | null;
   const userId = formData.get("userId") as string;
-  const name = formData.get("name") as string;
-  const category = formData.get("category") as string;
-  const description = formData.get("description") as string;
-  const mainImage = formData.get("mainImage") as File | null;
-  const picture1 = formData.get("picture1") as File | null;
-  const picture2 = formData.get("picture2") as File | null;
-  const userId = formData.get("userId") as string;
 
   const supabase = await getSupabaseServerActionClient();
 
-  const mainImagePath = await uploadImage(
-    mainImage,
-    "public",
-    "services-image",
-  );
-  const picture1Path = await uploadImage(picture1, "public", "services-image");
-  const picture2Path = await uploadImage(picture2, "public", "services-image");
   const mainImagePath = await uploadImage(
     mainImage,
     "public",
@@ -228,12 +186,6 @@ export const updateServiceAction = async (formData: FormData) => {
     category,
     userId,
   };
-  const updateData: any = {
-    name,
-    description,
-    category,
-    userId,
-  };
 
   if (mainImage) updateData.mainImage = mainImage;
   if (picture1) updateData.picture1 = picture1;
@@ -246,28 +198,16 @@ export const updateServiceAction = async (formData: FormData) => {
     .from("services")
     .update(updateData)
     .eq("id", id);
-  const { error } = await supabase
-    .from("services")
-    .update(updateData)
-    .eq("id", id);
 
   if (error) {
     console.error("Error updating service:", error.message);
     return { success: false, error: error.message };
   }
-  if (error) {
-    console.error("Error updating service:", error.message);
-    return { success: false, error: error.message };
-  }
-
-  revalidatePath("/");
-  return { success: true };
   revalidatePath("/");
   return { success: true };
 };
 
 export const deleteServiceAction = async (formData: FormData) => {
-  const id = formData.get("id") as string;
   const id = formData.get("id") as string;
 
   const supabase = await getSupabaseServerActionClient();
@@ -277,19 +217,7 @@ export const deleteServiceAction = async (formData: FormData) => {
     .select("mainImage, picture1, picture2")
     .eq("id", id)
     .single();
-  const { data: service, error: serviceError } = await supabase
-    .from("services")
-    .select("mainImage, picture1, picture2")
-    .eq("id", id)
-    .single();
 
-  if (serviceError || !service) {
-    console.error("Error fetching service:", serviceError?.message);
-    return {
-      success: false,
-      error: serviceError?.message || "Service not found",
-    };
-  }
   if (serviceError || !service) {
     console.error("Error fetching service:", serviceError?.message);
     return {
@@ -309,22 +237,11 @@ export const deleteServiceAction = async (formData: FormData) => {
     .from("services")
     .delete()
     .eq("id", id);
-  const { error: deleteError } = await supabase
-    .from("services")
-    .delete()
-    .eq("id", id);
 
   if (deleteError) {
     console.error("Error deleting service:", deleteError.message);
     return { success: false, error: deleteError.message };
   }
-  if (deleteError) {
-    console.error("Error deleting service:", deleteError.message);
-    return { success: false, error: deleteError.message };
-  }
-
-  revalidatePath("/home/settings/services");
-  return { success: true };
   revalidatePath("/home/settings/services");
   return { success: true };
 };
