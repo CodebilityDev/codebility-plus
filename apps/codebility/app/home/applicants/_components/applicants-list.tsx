@@ -6,11 +6,14 @@ import ApplicantsTableContainer from "@/app/home/applicants/_components/applican
 import Search from "@/Components/shared/dashboard/Search";
 import { Toaster } from "react-hot-toast";
 import { useState, useEffect, useCallback } from "react";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal-applicants";
 
 const ApplicantsList = ({ applicants }: { applicants: ApplicantsList_Types[] }) => {
     const [filteredApplicants, setFilteredApplicants] = useState<ApplicantsList_Types[] | []>([]);
     const [isDataFound, setIsDataFound] = useState<boolean>(false);
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const { onOpen } = useModal()
 
     const handleSubmit = useCallback(
         (search: string) => {
@@ -50,6 +53,9 @@ const ApplicantsList = ({ applicants }: { applicants: ApplicantsList_Types[] }) 
             <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
                 <H1>Applicants List</H1>
                 <Search onSubmit={(value) => setSearchTerm(value)} placeholder="Search applicants" />
+                <Button variant="default" size="sm" className="md:w-24"
+                    onClick={() => onOpen("applicantsAddModal")}
+                > Create</Button>
             </div>
             <Box>
                 {isDataFound ? (
