@@ -1,11 +1,10 @@
-import { cookies } from "next/headers";
 import Image from "next/image";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import { Button } from "@codevs/ui/button";
 
 async function ProfilePage({ params }: { params: { domain: string } }) {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = getSupabaseServerComponentClient();
 
   const { data: card } = await supabase
     .from("cards")

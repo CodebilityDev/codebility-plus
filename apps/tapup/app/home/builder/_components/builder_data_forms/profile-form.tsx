@@ -1,6 +1,6 @@
 import React, { useRef } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createClient } from "@supabase/supabase-js";
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { useForm } from "react-hook-form";
 import { v4 } from "uuid";
 import { z } from "zod";
@@ -24,6 +24,7 @@ import { updateBuilderProfileData } from "../../actions";
 function ProfileDataForm() {
   const { updateProfileDatas, profileDatas } = useProfile();
   const { cardData } = useCard();
+  const supabase = useSupabase();
 
   const coverPhotoRef = useRef<HTMLInputElement>(null);
 
@@ -41,11 +42,6 @@ function ProfileDataForm() {
       const coverPhoto = coverPhotoRef.current?.files?.[0];
 
       if (coverPhoto) {
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        );
-
         // upload image to the supabase bucket
         const fileName = `cover-${v4() + coverPhoto.name.split(".").pop()}`;
         const filePath = `${fileName}`;
