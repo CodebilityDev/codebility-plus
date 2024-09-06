@@ -1,8 +1,8 @@
-"use server"
+"use server";
 
-import axios from "axios"
-import { API } from "@/lib/constants"
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
+import { API } from "@/lib/constants";
+import axios from "axios";
 
 /* 
     _                _ _                 _            _    ____ ___
@@ -20,42 +20,48 @@ export const getApplicants = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    return response.data.data
+    return response.data.data;
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
-export const approveApplicant = async (email_address: { email_address: string }, token: string) => {
+export const approveApplicant = async (
+  email_address: { email_address: string },
+  token: string,
+) => {
   try {
     const response = await axios.post(API.APPROVE_APPLICANT, email_address, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    const { status, statusText, data } = response
-    return { status, statusText, data }
+    const { status, statusText, data } = response;
+    return { status, statusText, data };
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
-export const denyApplicant = async (email_address: { email_address: string }, token: string) => {
+export const denyApplicant = async (
+  email_address: { email_address: string },
+  token: string,
+) => {
   try {
     const response = await axios.post(API.DENY_APPLICANT, email_address, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    const { status, statusText, data } = response
-    return { status, statusText, data }
+    const { status, statusText, data } = response;
+    return { status, statusText, data };
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};

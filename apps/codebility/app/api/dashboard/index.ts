@@ -1,6 +1,6 @@
-import axios from "axios"
-import { API } from "@/lib/constants"
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
+import { API } from "@/lib/constants";
+import axios from "axios";
 
 /*
 
@@ -13,7 +13,7 @@ import { NextResponse } from "next/server"
 */
 export const toggleJobStatusType = async (
   data: { id: string; jobStatusType: "DEPLOYED" | "AVAILABLE" },
-  token: string
+  token: string,
 ) => {
   try {
     const response = await axios.put(`${API.CODEVS}/changeJobStatus`, data, {
@@ -21,10 +21,10 @@ export const toggleJobStatusType = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    return response.data
+    return response.data;
   } catch (e) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};

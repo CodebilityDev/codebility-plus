@@ -1,14 +1,14 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
-import useAuthCookie from "@/hooks/use-cookie"
-import { getUserDataById } from "@/app/api"
+import { useEffect, useState } from "react";
+import { getUserDataById } from "@/app/api";
+import useAuthCookie from "@/hooks/use-cookie";
 
 const useAuth = () => {
-  const auth = useAuthCookie()
-  const [userData, setUserData] = useState<any>()
-  const [isLoading, setIsLoading] = useState(true)
-  useEffect(() => {
+  // const auth = useAuthCookie()
+  const [userData, setUserData] = useState<any>();
+  const [isLoading, setIsLoading] = useState(true);
+  /*  useEffect(() => {
     async function getUserData() {
       setIsLoading(true)
       const user: any = await getUserDataById(auth.data.id)
@@ -19,8 +19,8 @@ const useAuth = () => {
       getUserData()
     }
   }, [auth.status, userData])
+ */
+  return { isLoading, userData };
+};
 
-  return { isLoading, userData }
-}
-
-export default useAuth
+export default useAuth;

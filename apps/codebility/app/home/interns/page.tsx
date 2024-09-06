@@ -1,13 +1,15 @@
-"use client"
+"use client";
 
-import FilterInterns from "@/app/home/interns/FilterInterns"
-import InternList from "@/app/home/interns/InternList"
-import H1 from "@/Components/shared/dashboard/H1"
-import { positionTitles } from "@/app/home/interns/data"
-import { useState } from "react"
+import { useState } from "react";
+import { positionTitles } from "@/app/home/interns/data";
+import FilterInterns from "@/app/home/interns/FilterInterns";
+import InternList from "@/app/home/interns/InternList";
+import H1 from "@/Components/shared/dashboard/H1";
 
 const Interns = () => {
-  const [filters, setFilters] = useState<Partial<typeof positionTitles[number]>[]>([])
+  const [filters, setFilters] = useState<
+    Partial<(typeof positionTitles)[number]>[]
+  >([]);
 
   return (
     <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
@@ -17,13 +19,13 @@ const Interns = () => {
         </div>
         <div className="flex flex-1 flex-col justify-center gap-4">
           <div className="flex justify-center md:justify-end">
-            <FilterInterns filters={filters} setFilters={setFilters}/>
+            <FilterInterns filters={filters} setFilters={setFilters} />
           </div>
         </div>
       </div>
-      <InternList filters={filters}/>
+      <InternList filters={filters} />
     </div>
-  )
-}
+  );
+};
 
-export default Interns
+export default Interns;

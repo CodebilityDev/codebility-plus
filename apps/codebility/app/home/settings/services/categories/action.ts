@@ -1,61 +1,73 @@
-"use server"
+"use server";
 
-import { createServer } from "@/utils/supabase";
 import { revalidatePath } from "next/cache";
 
-export const createServiceCategoryAction = async (formData: FormData) => { 
-    const name = formData.get("name") as string;
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
-    const supabase = await createServer();
+export const createServiceCategoryAction = async (formData: FormData) => {
+  const name = formData.get("name") as string;
 
-    const { data, error } = await supabase
-        .from("service-categories")
-        .insert({ name })
-        .single();
+  const supabase = await getSupabaseServerActionClient();
 
-    if (error) {
-        console.error("Error creating service category:", error.message);
-        return { success: false, error: error.message };
-    }
+  const { data, error } = await supabase
+    .from("service-categories")
+    .insert({ name })
+    .single();
 
-    revalidatePath("/home/settings/services/categories");
-    return { success: true, message: "Service category created successfully", data };
-}
+  if (error) {
+    console.error("Error creating service category:", error.message);
+    return { success: false, error: error.message };
+  }
 
-export const updateServiceCategoryAction = async (id: number, formData: FormData) => { 
-    const name = formData.get("name") as string;
+  revalidatePath("/home/settings/services/categories");
+  return {
+    success: true,
+    message: "Service category created successfully",
+    data,
+  };
+};
 
-    const supabase = await createServer();
+export const updateServiceCategoryAction = async (
+  id: number,
+  formData: FormData,
+) => {
+  const name = formData.get("name") as string;
 
-    const { data, error } = await supabase
-        .from("service-categories")
-        .update({ name })
-        .eq("id", id)
+  const supabase = await getSupabaseServerActionClient();
 
-    if (error) {
-        console.error("Error updating service category:", error.message);
-        return { success: false, error: error.message };
-    }
+  const { data, error } = await supabase
+    .from("service-categories")
+    .update({ name })
+    .eq("id", id);
 
-    revalidatePath("/home/settings/services/categories");
-    return { success: true, message: "Service category updated successfully", data };
-}
+  if (error) {
+    console.error("Error updating service category:", error.message);
+    return { success: false, error: error.message };
+  }
 
-export const deleteServiceCategoryAction = async (id: number) => { 
-    const supabase = await createServer();
+  revalidatePath("/home/settings/services/categories");
+  return {
+    success: true,
+    message: "Service category updated successfully",
+    data,
+  };
+};
 
-    console.log("Deleting category with ID:", id);
+export const deleteServiceCategoryAction = async (id: number) => {
+  const supabase = await getSupabaseServerActionClient();
 
-    const { error } = await supabase
-        .from("service-categories")
-        .delete()
-        .eq("id", id);
+  console.log("Deleting category with ID:", id);
 
-    if (error) {
-        console.error("Error deleting service category:", error.message);
-        return { success: false, error: error.message };
-    }
+  const { error } = await supabase
+    .from("service-categories")
+    .delete()
+    .eq("id", id);
 
-    revalidatePath("/home/settings/services/categories");
-    return { success: true, message: "Service category deleted successfully" };
-}
+  if (error) {
+    console.error("Error deleting service category:", error.message);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/home/settings/services/categories");
+  return { success: true, message: "Service category deleted successfully" };
+};

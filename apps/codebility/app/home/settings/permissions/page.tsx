@@ -1,7 +1,7 @@
-import { Box, H1 } from "@/Components/shared/dashboard"
-import PermissionsTable from "@/app/home/settings/permissions/PermissionsTable"
-import { ArrowRightIcon } from "@/public/assets/svgs"
-import Link from "next/link"
+import Link from "next/link";
+import PermissionsTable from "@/app/home/settings/permissions/PermissionsTable";
+import { Box, H1 } from "@/Components/shared/dashboard";
+import { ArrowRightIcon } from "@/public/assets/svgs";
 
 const PermissionSettings = () => {
   return (
@@ -22,7 +22,7 @@ const PermissionSettings = () => {
         <PermissionsTable />
       </Box>
     </div>
-  )
-}
+  );
+};
 
-export default PermissionSettings
+export default PermissionSettings;

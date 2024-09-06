@@ -1,21 +1,21 @@
-import { useState } from "react"
-import toast from "react-hot-toast"
-import { useForm } from "react-hook-form"
+import { useState } from "react";
+import { updateProfile } from "@/app/api/resume";
+import Box from "@/Components/shared/dashboard/Box";
+import { Button } from "@/Components/ui/button";
+import useToken from "@/hooks/use-token";
+import { IconEdit } from "@/public/assets/svgs";
+import { User } from "@/types";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
-import { User } from "@/types"
-import useToken from "@/hooks/use-token"
-import { updateProfile } from "@/app/api/resume"
-import { Button } from "@/Components/ui/button"
-import { IconEdit } from "@/public/assets/svgs"
-import Box from "@/Components/shared/dashboard/Box"
-import { Textarea } from "@codevs/ui/textarea"
-import { Label } from "@codevs/ui/label"
+import { Label } from "@codevs/ui/label";
+import { Textarea } from "@codevs/ui/textarea";
 
 const About = ({ user }: { user: User }) => {
-  const [isEditMode, setIsEditMode] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
-  const { id, about_me } = user
-  const { token } = useToken()
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const { id, about_me } = user;
+  const { token } = useToken();
 
   const {
     register,
@@ -26,41 +26,43 @@ const About = ({ user }: { user: User }) => {
     defaultValues: {
       about_me: about_me,
     },
-  })
+  });
 
   const onSubmit = async (data: any) => {
-    setIsLoading(true)
+    setIsLoading(true);
     try {
-      const updatedData = { ...data }
+      const updatedData = { ...data };
       await updateProfile(id, updatedData, token).then((response) => {
         if (response) {
-          toast.success("Successfully Updated!")
-          reset(updatedData)
-          setIsEditMode(false)
+          toast.success("Successfully Updated!");
+          reset(updatedData);
+          setIsEditMode(false);
         } else if (!response) {
-          toast.error(response.statusText)
+          toast.error(response.statusText);
         }
-      })
+      });
     } catch (e) {
-      toast.error("Something went wrong!")
+      toast.error("Something went wrong!");
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleEditClick = () => {
-    setIsEditMode(!isEditMode)
-  }
+    setIsEditMode(!isEditMode);
+  };
 
   const handleSaveClick = () => {
-    setIsEditMode(false)
-  }
+    setIsEditMode(false);
+  };
 
   return (
-    <Box className="relative flex flex-col gap-2 bg-light-900 dark:bg-dark-100">
+    <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
         className={` ${
-          isEditMode ? "hidden" : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+          isEditMode
+            ? "hidden"
+            : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
         } `}
         onClick={handleEditClick}
       />
@@ -80,11 +82,13 @@ const About = ({ user }: { user: User }) => {
                 {...register("about_me")}
                 disabled={!isEditMode}
                 className={` placeholder-${
-                  !isEditMode ? "lightgray dark:placeholder-gray" : "black-100 dark:placeholder-gray-400"
+                  !isEditMode
+                    ? "lightgray dark:placeholder-gray"
+                    : "black-100 dark:placeholder-gray-400"
                 }  ${
                   isEditMode
-                    ? " border border-lightgray bg-white text-black-100 dark:border-zinc-700 dark:bg-dark-200 dark:text-white"
-                    : "border-none bg-white text-dark-200  dark:bg-dark-200 dark:text-gray"
+                    ? " border-lightgray text-black-100 dark:bg-dark-200 border bg-white dark:border-zinc-700 dark:text-white"
+                    : "text-dark-200 dark:bg-dark-200 dark:text-gray  border-none bg-white"
                 }`}
               />
             </div>
@@ -92,7 +96,11 @@ const About = ({ user }: { user: User }) => {
 
           {isEditMode ? (
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="hollow" onClick={handleSaveClick} disabled={isLoading}>
+              <Button
+                variant="hollow"
+                onClick={handleSaveClick}
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
               <Button variant="default" type="submit" disabled={isLoading}>
@@ -103,7 +111,7 @@ const About = ({ user }: { user: User }) => {
         </form>
       </div>
     </Box>
-  )
-}
+  );
+};
 
-export default About
+export default About;

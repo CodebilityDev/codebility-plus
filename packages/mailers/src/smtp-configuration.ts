@@ -1,4 +1,4 @@
-import { SmtpConfigSchema } from './schema/smtp-config.schema';
+import { SmtpConfigSchema } from "./schema/smtp-config.schema";
 
 export function getSMTPConfiguration() {
   const data = SmtpConfigSchema.parse({
@@ -6,7 +6,7 @@ export function getSMTPConfiguration() {
     pass: process.env.EMAIL_PASSWORD,
     host: process.env.EMAIL_HOST,
     port: Number(process.env.EMAIL_PORT),
-    secure: process.env.EMAIL_TLS !== 'false',
+    secure: process.env.EMAIL_TLS !== "false",
   });
 
   return {

@@ -1,27 +1,29 @@
-import * as React from "react"
-import { cn } from "@codevs/ui"
-import { VariantProps, cva } from "class-variance-authority"
+import * as React from "react";
+import { cva, VariantProps } from "class-variance-authority";
+
+import { cn } from "@codevs/ui";
 
 const TextareaVariants = cva(
-  "flex w-full rounded-sm disabled:opacity-50 ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none  focus-visible:ring-offset-2",
+  "flex w-full rounded-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-offset-2  disabled:opacity-50",
   {
     variants: {
       variant: {
         default: "border border-gray-300 p-2 focus:border-blue-500",
-        resume: " resize-none  text-sm md:text-md sm:text-sm lg:text-lg p-2",
-        ghost: "border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none",
+        resume: " md:text-md  resize-none p-2 text-sm sm:text-sm lg:text-lg",
+        ghost:
+          "border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none",
       },
     },
     defaultVariants: {
       variant: "default",
     },
-  }
-)
+  },
+);
 
 export interface TextareaProps
   extends React.TextareaHTMLAttributes<HTMLTextAreaElement>,
     VariantProps<typeof TextareaVariants> {
-  label?: string
+  label?: string;
 }
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
@@ -29,11 +31,15 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div>
         <label htmlFor={id}>{label}</label>
-        <textarea className={cn(TextareaVariants({ variant, className }))} ref={ref} {...props} />
+        <textarea
+          className={cn(TextareaVariants({ variant, className }))}
+          ref={ref}
+          {...props}
+        />
       </div>
-    )
-  }
-)
-Textarea.displayName = "Textarea"
+    );
+  },
+);
+Textarea.displayName = "Textarea";
 
-export { Textarea }
+export { Textarea };

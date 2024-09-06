@@ -1,25 +1,26 @@
-"use client"
+"use client";
 
-import About from "@/app/home/settings/resume/About"
-import Photo from "@/app/home/settings/resume/Photo"
-import Experience from "@/app/home/settings/resume/Experience"
-import useAuth from "@/hooks/use-auth"
-import ContactInfo from "@/app/home/settings/resume/ContactInfo"
-import PersonalInfo from "@/app/home/settings/resume/PersonalInfo"
-import TimeSchedule from "@/app/home/settings/resume/TimeSchedule"
-import { Toaster } from "react-hot-toast"
-import { H1 } from "@/Components/shared/dashboard"
-import { Skeleton } from "@/Components/ui/skeleton/skeleton"
+import About from "@/app/home/settings/resume/About";
+import ContactInfo from "@/app/home/settings/resume/ContactInfo";
+import Experience from "@/app/home/settings/resume/Experience";
+import PersonalInfo from "@/app/home/settings/resume/PersonalInfo";
+import Photo from "@/app/home/settings/resume/Photo";
+import TimeSchedule from "@/app/home/settings/resume/TimeSchedule";
+import { H1 } from "@/Components/shared/dashboard";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import useAuth from "@/hooks/use-auth";
+import { Toaster } from "react-hot-toast";
+
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbSeparator,
-} from "@codevs/ui/breadcrumb"
+} from "@codevs/ui/breadcrumb";
 
 const Resume = () => {
-  const { userData, isLoading } = useAuth()
+  const { userData, isLoading } = useAuth();
 
   if (isLoading) {
     return (
@@ -46,7 +47,7 @@ const Resume = () => {
           </div>
         </div>
       </>
-    )
+    );
   }
   return (
     <>
@@ -76,7 +77,7 @@ const Resume = () => {
         </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default Resume
+export default Resume;

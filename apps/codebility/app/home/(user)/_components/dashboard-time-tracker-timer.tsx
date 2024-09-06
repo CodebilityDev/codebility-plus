@@ -1,11 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Button } from "@/Components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/Components/ui/select";
+import { Task } from "@/types/home/task";
+import toast from "react-hot-toast";
+
 import { formatTime } from "../_lib/util";
-import { Button } from "@/Components/ui/button"
 import { startUserTimer, updateUserTaskOnHand } from "../actions";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
-import { Task } from "../_types/task";
 
 interface Props {
   tasks: Task[];
@@ -14,41 +22,54 @@ interface Props {
   currentTaskId: string;
 }
 
-export default function TimeTrackerTimer({ codevId, tasks, currentTaskId, timerInitialSecond }: Props) {
+export default function TimeTrackerTimer({
+  codevId,
+  tasks,
+  currentTaskId,
+  timerInitialSecond,
+}: Props) {
   const [taskOnHandId, setTaskOnHandId] = useState(currentTaskId);
   const initialSecondExists = timerInitialSecond !== null;
-  const [isTimerRunning, setIsTimerRunning] = useState(initialSecondExists)
-  const [elapsedTime, setElapsedTime] = useState(initialSecondExists ? Math.floor(timerInitialSecond): 0);
+  const [isTimerRunning, setIsTimerRunning] = useState(initialSecondExists);
+  const [elapsedTime, setElapsedTime] = useState(
+    initialSecondExists ? Math.floor(timerInitialSecond) : 0,
+  );
 
   useEffect(() => {
-    let timer: ReturnType<typeof setInterval> | null = null
+    let timer: ReturnType<typeof setInterval> | null = null;
     if (isTimerRunning) {
       timer = setInterval(() => {
-        setElapsedTime((prevTime) => prevTime + 1)
-      }, 1000)
+        setElapsedTime((prevTime) => prevTime + 1);
+      }, 1000);
     }
     return () => {
       if (timer) {
-        clearInterval(timer)
+        clearInterval(timer);
       }
-    }
-  }, [isTimerRunning])
+    };
+  }, [isTimerRunning]);
 
   const resetTimer = () => {
     setIsTimerRunning(false);
     setElapsedTime(0);
-  }
+  };
 
   const handleStartStopTimer = async () => {
-    setIsTimerRunning(!isTimerRunning)
+    // if no task on hand we don't allow start/stop timer.
+    if (!taskOnHandId) {
+      toast.error("No Task Set");
+      return;
+    }
+
+    setIsTimerRunning(!isTimerRunning);
 
     if (!isTimerRunning) {
       await startUserTimer(codevId);
       return;
-    } 
+    }
 
     resetTimer();
-  }
+  };
 
   const handleTaskChange = async (taskId: string) => {
     setTaskOnHandId(taskId);
@@ -57,21 +78,26 @@ export default function TimeTrackerTimer({ codevId, tasks, currentTaskId, timerI
       await updateUserTaskOnHand(codevId, taskId);
       resetTimer();
     } catch (e) {
-      console.log(e)
+      console.log(e);
     }
-  }
+  };
 
   return (
     <>
-      <Select name="taskId" value={taskOnHandId} onValueChange={handleTaskChange}>
+      <Select
+        name="taskId"
+        value={taskOnHandId}
+        onValueChange={handleTaskChange}
+      >
         <SelectTrigger className="max-w-[300px] text-center">
           <SelectValue placeholder="Select Task" />
           <SelectContent>
-            {tasks.map((task: Task, index:number) =>
+            {tasks.map((task: Task, index: number) => (
               <SelectItem className="items-center" key={index} value={task.id}>
-                  {task.title} - {task.duration && `${task.duration}h - `} {task.points}pts
+                {task.title} - {task.duration && `${task.duration}h - `}{" "}
+                {task.points}pts
               </SelectItem>
-            )}
+            ))}
           </SelectContent>
         </SelectTrigger>
       </Select>
@@ -97,5 +123,5 @@ export default function TimeTrackerTimer({ codevId, tasks, currentTaskId, timerI
         </Button>
       )}
     </>
-  )
+  );
 }
