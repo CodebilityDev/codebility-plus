@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import { cn } from "@codevs/ui";
 
@@ -28,7 +27,7 @@ export default async function RootLayout({
   children: React.ReactNode;
   params: { id: string };
 }>) {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = getSupabaseServerComponentClient();
 
   const {
     data: { user },
