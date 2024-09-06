@@ -2,8 +2,9 @@
   "compilerOptions": {
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,
+    "baseUrl": ".",
     "paths": {
-      "app/*": ["./packages/app/*"]
+      "app/*": ["packages/app/*"]
     },
     "jsx": "react-jsx"
   }
