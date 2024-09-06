@@ -1,3 +1,10 @@
 {
-  "extends": "../../tsconfig"
+  "extends": "../../tsconfig",
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "ES2022"],
+    "jsx": "preserve",
+    "rootDir": "."
+  },
+  "include": ["./**/*"],
+  "exclude": ["node_modules"]
 }

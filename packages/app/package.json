@@ -1,7 +1,6 @@
 {
   "version": "0.0.0",
   "name": "app",
-  "main": "index.ts",
   "dependencies": {
     "moti": "latest",
     "nativewind": "2.0.11",
