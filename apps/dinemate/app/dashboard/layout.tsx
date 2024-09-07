@@ -28,7 +28,7 @@ export default function RootLayout({
             <Sidebar />
           </div>
           <div className="col-span-9 xl:col-span-10 p-5">{children}</div>
-          <AdminVerify />
+          {/* <AdminVerify /> */}
           <ToastProvider />
         </div>        
       </body>
