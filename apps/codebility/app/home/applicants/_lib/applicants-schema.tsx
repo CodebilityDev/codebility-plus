@@ -1,7 +1,7 @@
 import * as z from "zod";
 
 export const applicantsSchema = z.object({
-    id: z.number().optional(),
+    id: z.string().optional(),
     first_name: z.string().min(1, { message: "First Name is required" }),
     last_name: z.string().min(1, { message: "Last Name is required" }),
     email_address: z.string().min(1, { message: "Email is required" }).email(),
