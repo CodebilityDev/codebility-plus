@@ -20,7 +20,7 @@ const Navigation = () => {
         className={`fixed z-50 flex w-full items-center justify-center p-5 lg:px-12 ${color ? "bg-[#03030395]" : ""
           }`}
       >
-        <div className="flex w-full max-w-screen-2xl items-center justify-between">
+        <div className="flex w-full  items-center justify-between">
           <Logo />
 
           <div className="flex items-center">
