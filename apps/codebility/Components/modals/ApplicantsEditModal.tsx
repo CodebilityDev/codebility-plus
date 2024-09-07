@@ -31,6 +31,8 @@ const ApplicantsEditModal = () => {
     const toString = (tostring: string[]) => {
         return tostring.map((item) => item).join(", ")
     }
+
+
     const {
         register,
         handleSubmit,
@@ -48,28 +50,32 @@ const ApplicantsEditModal = () => {
         onClose();
     };
 
-    const handleOnSubmit = async (data: ApplicantsFormValues) => {
-        if (!data.id) {
+    const handleOnSubmit = async (newData: ApplicantsFormValues) => {
+        if (!newData.id) {
             toast.error("Can't update applicant: Invalid applicant ID");
             return;
         }
         setIsLoading(true);
         try {
             const formData = new FormData();
-            if (data.first_name) formData.append("first_name", data.first_name);
-            if (data.last_name) formData.append("last_name", data.last_name);
-            if (data.email_address) formData.append("email_address)", data.email_address);
-            if (data.github_link) formData.append("github_link", data.github_link);
-            if (data.portfolio_website) formData.append("portfolio_website", data.portfolio_website);
-            if (data.tech_stacks) formData.append("tech_stacks", data.tech_stacks);
+            if (newData.first_name) formData.append("first_name", newData.first_name);
+            if (newData.last_name) formData.append("last_name", newData.last_name);
+            if (newData.email_address) formData.append("email_address)", newData.email_address);
+            if (newData.github_link) formData.append("github_link", newData.github_link);
+            if (newData.portfolio_website) formData.append("portfolio_website", newData.portfolio_website);
+            if (newData.tech_stacks) formData.append("tech_stacks", newData.tech_stacks);
 
-            const { success, error } = await updateAction(data?.id, formData);
+
+            const { success, error } = await updateAction(newData?.id, formData);
 
             if (!success) throw error;
-
-            return toast.success('Applicant updated successfully');
+            handleDialogChange()
+            return toast.success(`Applicant updated successfully`);
         } catch (error) {
-            toast.error("Error updating client");
+
+            console.error("the error client:", error);
+            toast.error(JSON.stringify(error));
+            // toast.error("Error updating client");
         } finally {
             setIsLoading(false);
         }
@@ -80,16 +86,18 @@ const ApplicantsEditModal = () => {
             const empty = ""
             reset({
                 id: data.id || empty,
-                first_name: data.first_name || empty,
-                last_name: data.last_name || empty,
-                email_address: data.email_address || empty,
-                github_link: data.github_link || empty,
-                portfolio_website: data.portfolio_website || empty,
+                first_name: data?.first_name || empty,
+                last_name: data?.last_name || empty,
+                email_address: data?.email_address || empty,
+                github_link: data?.github_link || empty,
+                portfolio_website: data?.portfolio_website || empty,
                 tech_stacks: toString(data?.tech_stacks) || empty
             });
             setStack(data?.tech_stacks);
+
         }
     }, [data, reset]);
+
 
     useEffect(() => {
         if (isMounted) {
@@ -101,7 +109,6 @@ const ApplicantsEditModal = () => {
             setIsMounted(false);
         };
     }, [stack, isMounted, setValue]);
-
 
     return (
         <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
