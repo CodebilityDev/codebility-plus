@@ -19,17 +19,18 @@ import {
     DialogHeader,
 } from "@/Components/ui/dialog";
 import { ApplicantsFormValues, applicantsSchema } from "@/app/home/applicants/_lib/applicants-schema";
-import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants";
-
 const ApplicantsEditModal = () => {
     const { isOpen, onClose, type, data } = useModal();
     const { onOpen: onOpenTechkStack } = useModalTechkStack();
-    const { stack, clearStack } = useTechStackStore();
+    const { stack, clearStack, setStack } = useTechStackStore();
     const isModalOpen = isOpen && type === "applicantsEditModal";
     const [isMounted, setIsMounted] = useState(false);
     const [isLoading, setIsLoading] = useState(false);
-    const techStack = stack.map((item) => item).join(", ");
 
+
+    const toString = (tostring: string[]) => {
+        return tostring.map((item) => item).join(", ")
+    }
     const {
         register,
         handleSubmit,
@@ -48,43 +49,58 @@ const ApplicantsEditModal = () => {
     };
 
     const handleOnSubmit = async (data: ApplicantsFormValues) => {
-        setIsLoading(true);
-        const formData = {
-            ...data,
-            tech_stacks: stack
-        } as ApplicantsList_Types
-
-
-        const { success, error } = await updateAction(formData);
-
-
-        if (!success) {
-            console.error("create applicant error", error as string);
-            setIsLoading(false);
-            return toast.error(`${error as string}`);
+        if (!data.id) {
+            toast.error("Can't update applicant: Invalid applicant ID");
+            return;
         }
+        setIsLoading(true);
+        try {
+            const formData = new FormData();
+            if (data.first_name) formData.append("first_name", data.first_name);
+            if (data.last_name) formData.append("last_name", data.last_name);
+            if (data.email_address) formData.append("email_address)", data.email_address);
+            if (data.github_link) formData.append("github_link", data.github_link);
+            if (data.portfolio_website) formData.append("portfolio_website", data.portfolio_website);
+            if (data.tech_stacks) formData.append("tech_stacks", data.tech_stacks);
 
-        handleDialogChange()
-        setIsLoading(false);
-        return toast.success("Applicant has been created");
+            const { success, error } = await updateAction(data?.id, formData);
 
+            if (!success) throw error;
 
+            return toast.success('Applicant updated successfully');
+        } catch (error) {
+            toast.error("Error updating client");
+        } finally {
+            setIsLoading(false);
+        }
     }
 
+    useEffect(() => {
+        if (data) {
+            const empty = ""
+            reset({
+                id: data.id || empty,
+                first_name: data.first_name || empty,
+                last_name: data.last_name || empty,
+                email_address: data.email_address || empty,
+                github_link: data.github_link || empty,
+                portfolio_website: data.portfolio_website || empty,
+                tech_stacks: toString(data?.tech_stacks) || empty
+            });
+            setStack(data?.tech_stacks);
+        }
+    }, [data, reset]);
 
     useEffect(() => {
         if (isMounted) {
-            setValue("tech_stacks", techStack);
-            console.log("The data", data)
-
+            setValue("tech_stacks", toString(stack));
         }
         setIsMounted(true);
 
         return () => {
             setIsMounted(false);
         };
-    }, [techStack, isMounted, setValue]);
-
+    }, [stack, isMounted, setValue]);
 
 
     return (
@@ -191,9 +207,9 @@ const ApplicantsEditModal = () => {
                                 label="Tech Stack"
                                 placeholder="Enter your Tech Stack"
                                 {...register("tech_stacks")}
-                                value={techStack}
                                 readOnly
-                                onClick={() => onOpenTechkStack('techStackModal')}
+                                value={toString(stack)}
+                                onClick={() => onOpenTechkStack('techStackModal', data?.tech_stacks)}
                             />
                             {errors.tech_stacks && (
                                 <span className="text-sm text-red-400">
@@ -201,6 +217,15 @@ const ApplicantsEditModal = () => {
                                 </span>
                             )}
 
+                        </div>
+                        <div className="border-1 dark:border-gray-200">
+                            {errors?.email_address?.message && <span className="text-sm text-red-400">{errors?.email_address?.message}</span>}
+                            {errors?.tech_stacks?.message && <span className="text-sm text-red-400">{errors?.tech_stacks?.message}</span>}
+                            {errors?.github_link?.message && <span className="text-sm text-red-400">{errors?.github_link?.message}</span>}
+                            {errors?.portfolio_website?.message && <span className="text-sm text-red-400">{errors?.portfolio_website?.message}</span>}
+                            {errors?.first_name?.message && <span className="text-sm text-red-400">{errors?.first_name?.message}</span>}
+                            {errors?.last_name?.message && <span className="text-sm text-red-400">{errors?.last_name?.message}</span>}
+                            {errors?.id?.message && <span className="text-sm text-red-400">{errors?.id?.message}</span>}
                         </div>
                     </div>
 
