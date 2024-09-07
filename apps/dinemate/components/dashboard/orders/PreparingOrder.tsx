@@ -2,12 +2,12 @@
 import React, { useEffect, useRef } from "react";
 import { useDraggable } from "react-use-draggable-scroll";
 import OrderCard from "./OrderCard";
-import { ordersData } from "@/util/dummyOrders";
+import { ordersData } from "~/lib/dummyOrders";
 import NoOrder from "./NoOrder";
-import { useOrders } from "@/hooks/useOrders";
-import { IOrders } from "@/modules/orders/orders.type";
-import { IMenu } from "@/modules/menu/menu.types";
-import { OrderStatus } from "@/modules/orders/orders.type";
+import { useOrders } from "~/hooks/useOrders";
+import { IOrders } from "~/modules/orders/orders.type";
+import { IMenu } from "~/modules/menu/menu.types";
+import { OrderStatus } from "~/modules/orders/orders.type";
 
 const PreparingOrder = ({orders, menus, type}:{orders:IOrders[]; menus: IMenu[]; type: OrderStatus}) => {
   // const { orders, setOrders } = useOrders((state) => state);

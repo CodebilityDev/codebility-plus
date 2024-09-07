@@ -1,18 +1,18 @@
 import React from "react";
 import Timer from "../timer/Timer";
 import Image from "next/image";
-import checkList from "@/public/block.png";
-import greenCheck from "@/public/greenCheck.png";
-import orangeCheck from "@/public/orangeCheck.png";
-import { useOrders } from "@/hooks/useOrders";
-import { Orders, OrderStatus } from "@/modules/orders/orders.type";
-import { IMenu } from "@/modules/menu/menu.types";
+import checkList from "~/public/block.png";
+import greenCheck from "~/public/greenCheck.png";
+import orangeCheck from "~/public/orangeCheck.png";
+import { useOrders } from "~/hooks/useOrders";
+import { Orders, OrderStatus } from "~/modules/orders/orders.type";
+import { IMenu } from "~/modules/menu/menu.types";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { CircleCheckBig, Dot } from "lucide-react";
-import { ordersService } from "@/modules";
-import { useToast } from "@/components/ui/use-toast";
-import { revalidate } from "@/lib/revalidate";
+import { ordersService } from "~/modules";
+import { useToast } from "~/hooks/use-toast";
+import { revalidate } from "~/lib/revalidate";
 import MarkAsPaid from "./MarkAsPaid";
 
 interface OrderCardProps {

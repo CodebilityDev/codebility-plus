@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import CircularProgressBar from "./CircularProgressBar";
-import { useOrders } from "@/hooks/useOrders";
+import { useOrders } from "~/hooks/useOrders";
 
 interface TimerProps {
   minutes: number;

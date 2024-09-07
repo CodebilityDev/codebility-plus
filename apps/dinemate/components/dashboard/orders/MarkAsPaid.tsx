@@ -9,9 +9,9 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "@/components/ui/alert-dialog"
-import { useToast } from "@/components/ui/use-toast"
-import { ordersService } from "@/modules"
+} from "@codevs/ui/alert-dialog"
+import { useToast } from "~/hooks/use-toast"
+import { ordersService } from "~/modules"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 

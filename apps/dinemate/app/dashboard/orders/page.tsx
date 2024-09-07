@@ -1,12 +1,12 @@
 import React from "react";
-import NewOrder from "@/components/dashboard/orders/NewOrder";
-import PreparingOrder from "@/components/dashboard/orders/PreparingOrder";
-import ServingOrder from "@/components/dashboard/orders/ServingOrder";
-import OrderStatus from "@/components/dashboard/orders/OrderStatus";
-import { ordersService, menuService } from "@/modules";
-import Error from "@/components/dashboard/orders/Error";
-import { OrderStatus as OrderStatusEnum } from "@/modules/orders/orders.type";
-import Reloader from "@/components/dashboard/orders/Reloader";
+import NewOrder from "~/components/dashboard/orders/NewOrder";
+import PreparingOrder from "~/components/dashboard/orders/PreparingOrder";
+import ServingOrder from "~/components/dashboard/orders/ServingOrder";
+import OrderStatus from "~/components/dashboard/orders/OrderStatus";
+import { ordersService, menuService } from "~/modules";
+import Error from "~/components/dashboard/orders/Error";
+import { OrderStatus as OrderStatusEnum } from "~/modules/orders/orders.type";
+import Reloader from "~/components/dashboard/orders/Reloader";
 
 const handleGetOrderData = async () => {
   // const orders = await ordersService.getOrders()

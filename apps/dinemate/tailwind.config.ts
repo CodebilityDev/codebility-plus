@@ -43,14 +43,17 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
         },
         custom: {
-          green: "#22C55E",
-          black: "#1e1e1e",
-          gray: "#ededed",
-          textGray: "#454545",
-          badge: {
-            greenbg: "#bcf6cc",
-            redbg: "#fecdcd",
-          },
+          primary: "#FF680D",
+          accent: "#091E42",
+          border: "#DDDDDD",
+          secondary: "#C2C7D0",
+          green: "#1AA845",
+          text: "#030101",
+          gray: "#888888",
+          background: "#FFFCFA",
+          muted: "#B6B6B6",
+          pill: "#F5F6F7",
+          shadow: "#EBEDF0"
         },
         // light mode
         tremor: {

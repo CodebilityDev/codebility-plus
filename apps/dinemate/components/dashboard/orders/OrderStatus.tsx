@@ -1,8 +1,8 @@
 "use client";
 import React from "react";
 import OrderStatusFunction from "./OrderStatusFunction";
-import { useOrders } from "@/hooks/useOrders";
-import { IOrders, OrderStatus as OrderStatusEnum } from "@/modules/orders/orders.type";
+import { useOrders } from "~/hooks/useOrders";
+import { IOrders, OrderStatus as OrderStatusEnum } from "~/modules/orders/orders.type";
 
 const OrderStatus = ({
   filter,
