@@ -70,7 +70,7 @@ const ApplicantsEditModal = () => {
 
             if (!success) throw error;
             handleDialogChange()
-            return toast.success(`Applicant updated successfully`);
+            return toast.success(`Applicant updated successfully ${newData.email_address}`);
         } catch (error) {
 
             console.error("the error client:", error);
