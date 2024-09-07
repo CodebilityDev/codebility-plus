@@ -1,12 +1,12 @@
 "use client";
 import React, { useRef } from "react";
 import { useDraggable } from "react-use-draggable-scroll";
-import { useOrders } from "@/hooks/useOrders";
+import { useOrders } from "~/hooks/useOrders";
 import OrderCard from "./OrderCard";
 import NoOrder from "./NoOrder";
-import { IOrders } from "@/modules/orders/orders.type";
-import { IMenu } from "@/modules/menu/menu.types";
-import { OrderStatus } from "@/modules/orders/orders.type";
+import { IOrders } from "~/modules/orders/orders.type";
+import { IMenu } from "~/modules/menu/menu.types";
+import { OrderStatus } from "~/modules/orders/orders.type";
 
 const ServingOrder = ({orders, menus, type}:{orders:IOrders[]; menus: IMenu[]; type: OrderStatus}) => {
   // const { orders } = useOrders((state) => state);
