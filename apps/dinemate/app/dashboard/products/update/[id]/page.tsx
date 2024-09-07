@@ -1,6 +1,6 @@
-import { menuService } from "@/modules"
-import MenuForm from "@/components/dashboard/products/MenuForm"
-import { IMenu } from "@/modules/menu/menu.types"
+import { menuService } from "~/modules"
+import MenuForm from "~/components/dashboard/products/MenuForm"
+import { IMenu } from "~/modules/menu/menu.types"
 
 export default async function UpdateMenuPage({params}:{params:{id:string}}) {
   

@@ -4,40 +4,40 @@ import userLogo from "~/public/userLogo.png";
 import guestLogo from "~/public/guestLogo.png";
 import expensesLogo from "~/public/expensesLogo.png";
 import { statValues } from "~/lib/dummyOrders";
-// import { ordersService } from "@/modules";
+import { ordersService } from "~/modules";
 
 const titles = ["Today's profit", "Today's expenses", "User", "Booked Guests"];
 const logos = [profitLogo, expensesLogo, userLogo, guestLogo];
 
 const StatCard = async () => {
 
-  // const [totalCustomersThisWeek, totalBookingsThisWeek, totalSalesToday] = await Promise.all([
-  //   ordersService.getTotalCustomers(),
-  //   ordersService.getTotalBookings(),
-  //   ordersService.getTotalSalesToday(),
-  //   ordersService.getWeeklySales()
-  // ])
-  // if (totalCustomersThisWeek) {
-  //   statValues[2] = {
-  //     type: "number",
-  //     value: totalCustomersThisWeek.users,
-  //     change: totalCustomersThisWeek.percent
-  //   }
-  // }
-  // if (totalBookingsThisWeek) {
-  //   statValues[3] = {
-  //     type: "number",
-  //     value: totalBookingsThisWeek.users,
-  //     change: totalBookingsThisWeek.percent
-  //   }
-  // }
-  // if (totalSalesToday) {
-  //   statValues[0] = {
-  //     type: "price",
-  //     value: totalSalesToday.totalSales,
-  //     change: totalSalesToday.percent
-  //   }
-  // }
+  const [totalCustomersThisWeek, totalBookingsThisWeek, totalSalesToday] = await Promise.all([
+    ordersService.getTotalCustomers(),
+    ordersService.getTotalBookings(),
+    ordersService.getTotalSalesToday(),
+    ordersService.getWeeklySales()
+  ])
+  if (totalCustomersThisWeek) {
+    statValues[2] = {
+      type: "number",
+      value: totalCustomersThisWeek.users,
+      change: totalCustomersThisWeek.percent
+    }
+  }
+  if (totalBookingsThisWeek) {
+    statValues[3] = {
+      type: "number",
+      value: totalBookingsThisWeek.users,
+      change: totalBookingsThisWeek.percent
+    }
+  }
+  if (totalSalesToday) {
+    statValues[0] = {
+      type: "price",
+      value: totalSalesToday.totalSales,
+      change: totalSalesToday.percent
+    }
+  }
 
   return (
     <>

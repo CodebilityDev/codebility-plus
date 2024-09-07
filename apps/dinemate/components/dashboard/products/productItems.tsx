@@ -1,7 +1,7 @@
 
 
 import Image from "next/image";
-import type { IMenu } from "@/modules/menu/menu.types";
+import type { IMenu } from "~/modules/menu/menu.types";
 import EditMenuButton from "./EditMenuButton";
 
 interface IProductItems {
