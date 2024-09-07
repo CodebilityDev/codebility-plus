@@ -57,7 +57,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: ApplicantsList_Typ
                                         </Link>
                                     )}
                                 </TableCell>
-                                <TableCell className="col-span-4 h-full w-full">
+                                <TableCell className="col-span-3 h-full w-full">
                                     <div className="flex h-full w-full flex-wrap items-center justify-start gap-2 ">
                                         {tech_stacks &&
                                             tech_stacks.map((stack: any, i: any) => (
@@ -76,7 +76,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: ApplicantsList_Typ
                                             ))}
                                     </div>
                                 </TableCell>
-                                <TableCell className="col-span-2 flex h-full w-full flex-row items-center justify-center gap-4">
+                                <TableCell className="col-span-3 flex h-full w-full flex-row items-center justify-center gap-1">
                                     <ApplicantsActionButtons applicant={{ id, first_name, last_name, email_address, github_link, portfolio_website, tech_stacks }} />
                                 </TableCell>
                             </TableRow>
