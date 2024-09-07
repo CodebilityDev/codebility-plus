@@ -1,8 +1,8 @@
 import {format} from "date-fns"
-import { assistService } from "@/modules"
-import Error from "@/components/dashboard/orders/Error"
-import AssistButton from "@/components/dashboard/AssistButton"
-import AssistRefresher from "@/components/dashboard/AssistRefresher"
+import { assistService } from "~/modules"
+import Error from "~/components/dashboard/orders/Error"
+import AssistButton from "~/components/dashboard/AssistButton"
+import AssistRefresher from "~/components/dashboard/AssistRefresher"
 
 export default async function AssistPage() {
 
@@ -13,15 +13,16 @@ export default async function AssistPage() {
   }
 
   assistList.sort((a,b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-
+  
   return (
     <div className="w-full flex-grow py-12">
-      <h1 className="text-3xl">User in need of assistance</h1>
+      <h1 className="text-3xl mb-4">User in need of assistance</h1>
+      {assistList.length === 0 ? <p>No assist requests found</p> : null}
       <div className="w-full flex flex-col gap-y-2 py-8">
         {
-          assistList.map((a) => {
+          assistList.map((a, i) => {
             const {_id, userName, message, tableNumber, status, createdAt} = a
-
+            
             return (
               <div key={_id} className="flex flex-col gap-y-2 w-full max-w-[800px] border-b border-custom-secondary pb-6 bg-white p-3 rounded-lg shadow-md">
                 <div className="flex flex-row items-center justify-between">

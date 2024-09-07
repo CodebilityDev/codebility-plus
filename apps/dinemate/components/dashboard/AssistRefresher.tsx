@@ -1,6 +1,6 @@
 "use client"
 import { useEffect } from "react"
-import { revalidate } from "@/lib/revalidate"
+import { revalidate } from "~/lib/revalidate"
 
 export default function AssistRefresher() {
 
