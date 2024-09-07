@@ -110,14 +110,6 @@ export async function updateAction(id: string, formData: FormData) {
   const tech_stacks = formData.get("tech_stacks") as any;
 
   try {
-    const { data: applicantExist, error: fetchError } = await supabase
-      .from("applicants")
-      .select("*")
-      .eq("email_address", email_address);
-
-    if (fetchError) throw fetchError;
-    if (applicantExist?.length > 0) throw "Email already exist";
-
     const { error: updateError } = await supabase
       .from("applicants")
       .update({
