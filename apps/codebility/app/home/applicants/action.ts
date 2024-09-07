@@ -68,7 +68,7 @@ export async function createAction(applicants: ApplicantsList_Types) {
       .eq("email_address", applicants?.email_address);
 
     if (fetchError) throw fetchError;
-    if (applicantExist?.length > 0) throw "Applicant already exist";
+    if (applicantExist?.length > 0) throw "Email already exist";
 
     const { error: createError } = await supabase
       .from("applicants")
@@ -80,6 +80,31 @@ export async function createAction(applicants: ApplicantsList_Types) {
     return { success: true };
   } catch (error) {
     console.error("Error creating data:", error);
+    return { success: false, error: error };
+  }
+}
+
+export async function updateAction(applicants: ApplicantsList_Types) {
+  try {
+    const { data: applicantExist, error: fetchError } = await supabase
+      .from("applicants")
+      .select("*")
+      .eq("email_address", applicants?.email_address);
+
+    if (fetchError) throw fetchError;
+    if (applicantExist?.length > 0) throw "Email already exist";
+
+    const { error: updateError } = await supabase
+      .from("applicants")
+      .update(applicants)
+      .eq("email_address", applicants?.email_address);
+
+    if (updateError) throw updateError;
+
+    revalidate();
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating data:", error);
     return { success: false, error: error };
   }
 }
