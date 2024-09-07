@@ -97,7 +97,7 @@ export async function updateAction(applicants: ApplicantsList_Types) {
     const { error: updateError } = await supabase
       .from("applicants")
       .update(applicants)
-      .eq("email_address", applicants?.email_address);
+      .eq("id", applicants?.id);
 
     if (updateError) throw updateError;
 
