@@ -29,6 +29,7 @@ import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
 import ServiceCategoriesDeleteModal from "@/Components/modals/ServiceCategoriesDeleteModal";
 import ServiceCategoriesModal from "@/Components/modals/ServiceCategoriesModal";
 import ApplicantsAddModal from "@/Components/modals/ApplicantsAddModal";
+import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -64,7 +65,7 @@ export const ModalProvider = () => {
       <ServiceCategoriesDeleteModal />
 
       <ApplicantsAddModal />
-
+      <ApplicantsEditModal />
       <ContactUsModal />
       <PrivacyPolicyModal />
       <TermsOfServiceModal />
