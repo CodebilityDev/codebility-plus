@@ -1,4 +1,5 @@
 /* eslint-disable no-unused-vars */
+"use client"
 import React from "react"
 import toast from "react-hot-toast"
 import { useCallback, useEffect, useRef, useState } from "react"
@@ -9,9 +10,8 @@ import { IconEdit, IconDelete } from "@/public/assets/svgs"
 import Box from "@/Components/shared/dashboard/Box"
 
 import { Textarea } from "@codevs/ui/textarea"
-import { getWorkExperience, updateWorkExperience, deleteWorkExperience, createWorkExperience, updateProfile } from "../action"
-import { useQuery } from "@tanstack/react-query"
-import exp from "constants"
+import {  updateWorkExperience, deleteWorkExperience, createWorkExperience } from "../action"
+
 
 type ExperienceType = {
   id?: string
@@ -33,36 +33,29 @@ const Experience = () => {
     [key: string]: boolean
   }
   const editModePerItem: React.MutableRefObject<EditModePerItem> = useRef({})
-  const { data: workExp, error } = useQuery({
-    queryKey: ["work_exp"],
-    queryFn: async () => {
-      const { data, error } = await getWorkExperience()
-      if (error) throw error;
-      return data;
-    },
-  }); 
   
-  const getWorkExperiences = useCallback(async () => {
-    try {
-      setIsLoadingMain(true)
-      const res: any = await getWorkExperience()
-      setExperienceData([...res.data])
-      const updateObject: any = {}
-      res.data.map((item: any, index: number) => {
-        updateObject[index] = false
-      })
-      editModePerItem.current = updateObject
-      setIsLoadingMain(false)
-    } catch (e: any) {
-      setIsLoadingMain(false)
-    } finally {
-      setIsLoadingMain(false)
-    }
-  }, [])
+  
+//   const getWorkExperiences = useCallback(async () => {
+//     try {
+//       setIsLoadingMain(true)
+//       const res: any = await getWorkExperience()
+//       setExperienceData([...res.data])
+//       const updateObject: any = {}
+//       res.data.map((item: any, index: number) => {
+//         updateObject[index] = false
+//       })
+//       editModePerItem.current = updateObject
+//       setIsLoadingMain(false)
+//     } catch (e: any) {
+//       setIsLoadingMain(false)
+//     } finally {
+//       setIsLoadingMain(false)
+//     }
+//   }, [])
 
-  useEffect(() => {
-    getWorkExperiences();
-  }, [getWorkExperiences]);
+//   useEffect(() => {
+//     getWorkExperiences();
+//   }, [getWorkExperiences]);
 
   const handleUpdateExperience = (itemNo: number, e: any) => {
     const updatedExperiences = experienceData.map((item, id) => {
@@ -162,7 +155,7 @@ const Experience = () => {
             editModePerItem={editModePerItem}
             handleEditModePerItem={handleEditModePerItem}
             handleDeleteExperience={handleDeleteExperience}
-            updateExperience={getWorkExperiences}
+          
       
             isLoadingMain={isLoadingMain}
             isEditMain={isEditMain}
@@ -182,7 +175,7 @@ interface ExperienceFormProps {
   editModePerItem: any
   handleEditModePerItem: (itemNo: number, editable: boolean) => void
   handleDeleteExperience: (itemNo: number, id: string, type: "delete" | "cancel") => void
-  updateExperience: () => void
+
   
 
   isLoadingMain: boolean
@@ -197,7 +190,7 @@ const ExperienceForm = ({
   editModePerItem,
   handleEditModePerItem,
   handleDeleteExperience,
-  updateExperience,
+
 
   
   isLoadingMain,

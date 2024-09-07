@@ -14,10 +14,11 @@ export interface PeriodSelectorProps {
   setDate: (date: Date | undefined) => void
   onRightFocus?: () => void
   onLeftFocus?: () => void
+  disabled?: boolean
 }
 
 export const TimePeriodSelect = React.forwardRef<HTMLButtonElement, PeriodSelectorProps>(
-  ({ period, setPeriod, date, setDate, onLeftFocus, onRightFocus }, ref) => {
+  ({ period, setPeriod, date, setDate, onLeftFocus, onRightFocus, disabled }, ref) => {
     const handleKeyDown = (e: React.KeyboardEvent<HTMLButtonElement>) => {
       if (e.key === "ArrowRight") onRightFocus?.()
       if (e.key === "ArrowLeft") onLeftFocus?.()
@@ -33,13 +34,15 @@ export const TimePeriodSelect = React.forwardRef<HTMLButtonElement, PeriodSelect
       if (date) {
         const tempDate = new Date(date)
         const hours = display12HourValue(date.getHours())
-        setDate(setDateByType(tempDate, hours.toString(), "12hours", period === "AM" ? "PM" : "AM"))
+        const newDate = setDateByType(tempDate, hours.toString(), "12hours", value);
+
+        setDate(newDate);
       }
     }
 
     return (
       <div className="flex h-10 items-center">
-        <Select defaultValue={period} onValueChange={(value: Period) => handleValueChange(value)}>
+        <Select disabled={disabled} defaultValue={period} onValueChange={(value: Period) => handleValueChange(value)}>
           <SelectTrigger
             ref={ref}
             className="background-box w-[65px] focus:bg-accent focus:text-accent-foreground"

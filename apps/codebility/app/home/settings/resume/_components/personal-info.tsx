@@ -46,7 +46,6 @@ const {register,handleSubmit, reset} = useForm(
       last_name:  "",
       address:  "",
       main_position: "",
- 
 },})
   const [selectedPronoun, setSelectedPronoun] = useState<string | null>(null)
   const [selectedPosition, setSelectedPosition] = useState<string | null>(null)

@@ -8,18 +8,11 @@ import Box from "@/Components/shared/dashboard/Box"
 import { Textarea } from "@codevs/ui/textarea"
 import { Label } from "@codevs/ui/label"
 import {   updateProfile } from "../action"
+import { Profile_Types } from "../_types/resume"
 
 
-type Profile = {
-  about: string
-}
 
-type AboutProps = {
-  data: Profile
-}
-
-const About = ({data}: AboutProps) => {
-  
+const About = ({about}: Profile_Types) => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -34,12 +27,12 @@ const About = ({data}: AboutProps) => {
         about: "",
   },})
   useEffect(() => {
-    if(data) {
+    if(about) {
       reset({
-        about: data.about,
+        about: about,
       })
     }
-  }, [data, reset])
+  }, [about, reset])
 
   const onSubmit = async (data: any) => {
     try {
