@@ -39,9 +39,23 @@ export async function approveAction(email_address: string) {
 
     if (fetchError) throw fetchError;
 
-    const { error: insertError } = await supabase
-      .from("interns")
-      .insert(applicants);
+    const {
+      Afirst_name,
+      Alast_name,
+      Aemail_address,
+      Agithub_link,
+      Aportfolio_website,
+      Atech_stacks,
+    } = applicants[0];
+
+    const { error: insertError } = await supabase.from("interns").insert({
+      first_name: Afirst_name,
+      last_name: Alast_name,
+      email_address: Aemail_address,
+      github_link: Agithub_link,
+      portfolio_website: Aportfolio_website,
+      tech_stacks: Atech_stacks,
+    });
 
     if (insertError) throw insertError;
 
@@ -107,11 +121,11 @@ export async function updateAction(id: string, formData: FormData) {
     const { error: updateError } = await supabase
       .from("applicants")
       .update({
-        first_name,
-        last_name,
-        email_address,
-        github_link,
-        portfolio_website,
+        first_name: first_name,
+        last_name: last_name,
+        email_address: email_address,
+        github_link: github_link,
+        portfolio_website: portfolio_website,
         tech_stacks: toArray(tech_stacks),
       })
       .eq("id", id)
