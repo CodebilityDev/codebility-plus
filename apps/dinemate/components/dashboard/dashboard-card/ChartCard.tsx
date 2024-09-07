@@ -11,22 +11,22 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { chartData as defaultChartData } from "~/lib/dummyOrders";
-// import { ordersService } from "@/modules";
+import { ordersService } from "~/modules";
 
 const ChartCard: React.FC = () => {
 
   const [chartData, setChartData] = useState(defaultChartData)
 
-  // const handleGetChartData = async () => {
-  //   const data = await ordersService.getWeeklySales()
-  //   if (data) {
-  //     setChartData(data)
-  //   }
-  // }
+  const handleGetChartData = async () => {
+    const data = await ordersService.getWeeklySales()
+    if (data) {
+      setChartData(data)
+    }
+  }
 
-  // useEffect(() => {
-  //   handleGetChartData()
-  // }, [])
+  useEffect(() => {
+    handleGetChartData()
+  }, [])
 
   return (
     <div className="bg-white rounded-lg shadow p-4">
