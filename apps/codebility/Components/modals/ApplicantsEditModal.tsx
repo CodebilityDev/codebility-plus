@@ -60,7 +60,7 @@ const ApplicantsEditModal = () => {
             const formData = new FormData();
             if (newData.first_name) formData.append("first_name", newData.first_name);
             if (newData.last_name) formData.append("last_name", newData.last_name);
-            if (newData.email_address) formData.append("email_address)", newData.email_address);
+            if (newData.email_address) formData.append("email_address", newData.email_address);
             if (newData.github_link) formData.append("github_link", newData.github_link);
             if (newData.portfolio_website) formData.append("portfolio_website", newData.portfolio_website);
             if (newData.tech_stacks) formData.append("tech_stacks", newData.tech_stacks);
@@ -70,12 +70,11 @@ const ApplicantsEditModal = () => {
 
             if (!success) throw error;
             handleDialogChange()
-            return toast.success(`Applicant updated successfully ${newData.email_address}`);
+            return toast.success(`Applicant updated successfully`);
         } catch (error) {
 
             console.error("the error client:", error);
             toast.error(JSON.stringify(error));
-            // toast.error("Error updating client");
         } finally {
             setIsLoading(false);
         }
