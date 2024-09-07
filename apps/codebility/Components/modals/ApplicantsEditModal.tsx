@@ -22,7 +22,7 @@ import { ApplicantsFormValues, applicantsSchema } from "@/app/home/applicants/_l
 import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants";
 
 const ApplicantsEditModal = () => {
-    const { isOpen, onClose, type } = useModal();
+    const { isOpen, onClose, type, data } = useModal();
     const { onOpen: onOpenTechkStack } = useModalTechkStack();
     const { stack, clearStack } = useTechStackStore();
     const isModalOpen = isOpen && type === "applicantsEditModal";
@@ -75,6 +75,7 @@ const ApplicantsEditModal = () => {
     useEffect(() => {
         if (isMounted) {
             setValue("tech_stacks", techStack);
+            console.log("The data", data)
 
         }
         setIsMounted(true);
