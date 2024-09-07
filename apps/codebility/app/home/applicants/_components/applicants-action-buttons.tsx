@@ -2,8 +2,11 @@ import { approveAction, rejectAction } from "@/app/home/applicants/action"
 import { useModal } from "@/hooks/use-modal-applicants";
 import { useState } from "react";
 import toast from "react-hot-toast"
+import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants";
 
-const ApplicantsApprovalButtons = ({ email_address }: { email_address: string }) => {
+const ApplicantsApprovalButtons = ({ applicant }: { applicant: ApplicantsList_Types }) => {
+    const { email_address } = applicant
+
     const [isLoading, setIsLoading] = useState<boolean>(false);
     const { onOpen } = useModal()
     const handleAccept = async (email_address: string) => {
@@ -53,7 +56,7 @@ const ApplicantsApprovalButtons = ({ email_address }: { email_address: string })
             </span>
             <span
                 className="cursor-pointer h-max w-max rounded-md border border-none px-4 py-1 hover:underline"
-                onClick={isLoading ? undefined : () => onOpen("applicantsEditModal")}
+                onClick={isLoading ? undefined : () => onOpen("applicantsEditModal", applicant)}
             >
                 Edit
             </span >

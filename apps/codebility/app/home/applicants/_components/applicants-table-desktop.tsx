@@ -77,7 +77,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: ApplicantsList_Typ
                                     </div>
                                 </TableCell>
                                 <TableCell className="col-span-2 flex h-full w-full flex-row items-center justify-center gap-4">
-                                    <ApplicantsActionButtons email_address={email_address} />
+                                    <ApplicantsActionButtons applicant={{ id, first_name, last_name, email_address, github_link, portfolio_website, tech_stacks }} />
                                 </TableCell>
                             </TableRow>
                         )
