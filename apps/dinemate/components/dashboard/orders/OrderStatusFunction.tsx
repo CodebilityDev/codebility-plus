@@ -1,4 +1,4 @@
-import { OrderStatus } from "@/modules/orders/orders.type";
+import { OrderStatus } from "~/modules/orders/orders.type";
 import { useRouter } from "next/navigation";
 import React from "react";
 
