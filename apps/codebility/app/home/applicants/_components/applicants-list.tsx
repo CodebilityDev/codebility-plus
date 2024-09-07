@@ -58,8 +58,8 @@ const ApplicantsList = ({ applicants }: { applicants: ApplicantsList_Types[] }) 
                 > Create</Button>
             </div>
             <Box>
-                {isDataFound ? (
-                    <div>No data found</div>
+                {isDataFound || applicantsList.length === 0 ? (
+                    <div>No applicants found. The list is empty at this time.</div>
                 ) : (
                     <ApplicantsTableContainer applicants={applicantsList} />
                 )}
