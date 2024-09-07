@@ -1,10 +1,10 @@
 "use client"
 
-import { AssistStatus } from "@/modules/assist/assist.types"
-import { Button } from "../ui/button";
-import { assistService } from "@/modules";
+import { AssistStatus } from "~/modules/assist/assist.types"
+import { Button } from "@codevs/ui/button";
+import { assistService } from "~/modules";
 import { useState } from "react";
-import { revalidate } from "@/lib/revalidate";
+import { revalidate } from "~/lib/revalidate";
 
 interface IAssistButton {
   status: AssistStatus;
