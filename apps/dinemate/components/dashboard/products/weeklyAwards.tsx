@@ -1,6 +1,6 @@
 
 import Image from "next/image"
-import { ordersService } from "@/modules"
+import { ordersService } from "~/modules"
 
 export default async function WeeklyAwards(){
     const mostOrdered = await ordersService.getMostOrdered()

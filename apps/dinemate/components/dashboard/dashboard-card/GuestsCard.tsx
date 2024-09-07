@@ -1,9 +1,9 @@
 import { guestData } from "~/lib/dummyOrders";
-// import { ordersService } from "@/modules";
+import { ordersService } from "~/modules";
 
 const GuestsCard = async () => {
 
-  // const totalBookings = await ordersService.getTotalBookingsToday()
+  const totalBookings = await ordersService.getTotalBookingsToday()
   
 
   return (
@@ -12,7 +12,7 @@ const GuestsCard = async () => {
         Number of Guests
       </h2>
       <p className="text-6xl md:text-5xl sm:text-4xl font-bold mb-6 md:mb-4 sm:mb-2">
-        {/* {totalBookings?.bookings ?? "??"} Guests */}
+        {totalBookings?.bookings ?? "??"} Guests
       </p>
       <p className="text-2xl md:text-xl sm:text-lg">as of today</p>
     </div>

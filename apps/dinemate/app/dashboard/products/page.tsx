@@ -5,17 +5,17 @@
 
 
 
-import SearchBar from "@/components/dashboard/products/searchBar";
-import AllProducts from "@/components/dashboard/products/allProducts";
-import AddNew from "@/components/dashboard/products/addNew";
+import SearchBar from "~/components/dashboard/products/searchBar";
+import AllProducts from "~/components/dashboard/products/allProducts";
+import AddNew from "~/components/dashboard/products/addNew";
 
-import Activity from "@/components/dashboard/products/activity";
+import Activity from "~/components/dashboard/products/activity";
 
-import ProductItems from "@/components/dashboard/products/productItems";
-import UploadFile from "@/components/dashboard/products/uploadFile";
-import WeeklyAwards from "@/components/dashboard/products/weeklyAwards";
-import EmptyContainer from "@/components/dashboard/products/topDishes";
-import { menuService, ordersService } from "@/modules";
+import ProductItems from "~/components/dashboard/products/productItems";
+import UploadFile from "~/components/dashboard/products/uploadFile";
+import WeeklyAwards from "~/components/dashboard/products/weeklyAwards";
+import EmptyContainer from "~/components/dashboard/products/topDishes";
+import { menuService, ordersService } from "~/modules";
 
 
 

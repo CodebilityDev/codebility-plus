@@ -1,4 +1,4 @@
-import MenuForm from "@/components/dashboard/products/MenuForm"
+import MenuForm from "~/components/dashboard/products/MenuForm"
 
 
 export default function NewMenu() {

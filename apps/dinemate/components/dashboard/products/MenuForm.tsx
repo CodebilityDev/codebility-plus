@@ -2,7 +2,7 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-import { Button } from "@/components/ui/button"
+import { Button } from "@codevs/ui/button"
 import {
   Form,
   FormControl,
@@ -10,26 +10,26 @@ import {
   FormItem,
   FormLabel,
   FormMessage
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
-import { Textarea } from "@/components/ui/textarea"
+} from "@codevs/ui/form"
+import { Input } from "@codevs/ui/input"
+import { Textarea } from "@codevs/ui/textarea"
 import { useMemo, useState, useRef } from "react"
 import Image from "next/image"
 import { ImagePlus, Loader, CircleMinus } from "lucide-react"
-import { menuService } from "@/modules"
+import { menuService } from "~/modules"
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select"
-import { useToast } from "@/components/ui/use-toast"
+} from "@codevs/ui/select"
+import { useToast } from "~/hooks/use-toast"
 import { useRouter } from "next/navigation"
-import { ToastAction } from "@/components/ui/toast"
-import { AddMenuDto } from "@/modules/menu/menu.types"
-import { revalidate } from "@/lib/revalidate"
-import { categories } from "@/util/categories"
+import { ToastAction } from "@codevs/ui/toast"
+import { AddMenuDto } from "~/modules/menu/menu.types"
+import { revalidate } from "~/lib/revalidate"
+import { categories } from "~/lib/categories"
 
 const formSchema = z.object({
   name: z.string().min(1, "required"),

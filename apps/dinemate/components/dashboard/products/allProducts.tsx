@@ -5,10 +5,10 @@ import {
     SelectItem,
     SelectTrigger,
     SelectValue,
-  } from "@/components/ui/select"
+  } from "@codevs/ui/select"
 
 import { usePathname, useRouter } from "next/navigation"
-import { categories } from "@/util/categories"
+import { categories } from "~/lib/categories"
 
 
 export default function AllProducts(){
