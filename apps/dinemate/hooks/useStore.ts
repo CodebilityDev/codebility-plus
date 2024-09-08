@@ -1,6 +1,6 @@
-import { OrderType } from "@/modules/cart/cart.types";
+import { OrderType } from "~/modules/cart/cart.types";
 import { create } from "zustand";
-import createAxiosInstance from "@/lib/apiRequests/Axios";
+import createAxiosInstance from "~/lib/apiRequests/Axios";
 
 
 export type State = {
@@ -21,25 +21,25 @@ export type State = {
       createdAt: string;
       email: string;
       fullname: string;
-      roles: "user"|"admin";
+      roles: "user" | "admin";
       updatedAt: string;
     }
     orderId: string;
-  }|null
-  
+  } | null
+
 }
 
 export type Action = {
-  updateSession() : Promise<void>;
+  updateSession(): Promise<void>;
 }
 
 const INITIAL_STATE = {
   session: null
 }
 
-export const useStore = create<State&Action>(set => ({
+export const useStore = create<State & Action>(set => ({
   ...INITIAL_STATE,
-  
+
   updateSession: async () => {
     const Axios = createAxiosInstance()
     console.log("updating session")
@@ -47,7 +47,7 @@ export const useStore = create<State&Action>(set => ({
     if (res.status === 200) {
       set(() => ({
         session: res.data
-      }))      
+      }))
       console.log("session updated")
     } else {
       console.log("session updated failed no session found")
