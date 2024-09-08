@@ -1,5 +1,5 @@
 
-import NotificationButton from '@/components/NotificationButton'
+import NotificationButton from '~/components/NotificationButton'
 import { BsThreeDotsVertical } from 'react-icons/bs'
 export const headerOptions = [
   {
