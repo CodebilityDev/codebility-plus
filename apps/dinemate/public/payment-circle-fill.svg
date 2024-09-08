@@ -1,0 +1,7 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Outer circle with orange background -->
+  <circle cx="12" cy="12" r="12" transform="rotate(-180 12 12)" fill="#FF680D"/>
+  
+  <!-- White border circle -->
+  <circle cx="12" cy="12" r="10" stroke="#FFFFFF" stroke-width="2" fill="none"/>
+</svg>
