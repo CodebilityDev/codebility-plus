@@ -1,13 +1,13 @@
-import { Cart, GenerateCartDto } from "@/modules/cart/cart.types";
+import { Cart, GenerateCartDto } from "~/modules/cart/cart.types";
 import { create } from "zustand";
-import { cartService } from "@/modules";
+import { cartService } from "~/modules";
 
 interface state {
-  cart: Cart|null;
+  cart: Cart | null;
 }
 
 interface action {
-  generateCart: (infos:GenerateCartDto) => void;
+  generateCart: (infos: GenerateCartDto) => void;
   setCart: (cart: state["cart"]) => void;
 }
 
@@ -16,7 +16,7 @@ const INITIAL_STATE: state = {
 }
 
 
-export const useCart = create<state&action>(set => ({
+export const useCart = create<state & action>(set => ({
   ...INITIAL_STATE,
   generateCart: async (infos) => {
     const cartStr = localStorage.getItem("cart")
@@ -28,12 +28,12 @@ export const useCart = create<state&action>(set => ({
       }
     } else {
       const cart = JSON.parse(cartStr) as Cart
-      set({cart})
+      set({ cart })
     }
-    
+
   },
   setCart: (cart) => {
     localStorage.setItem("cart", JSON.stringify(cart))
-    set({cart})
+    set({ cart })
   }
 }))

@@ -2,8 +2,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import HomeNavbar from '../../(user)/_components/home-navbar'
 import { UserWorkspaceContextProvider } from '../../_components/user-workspace-context'
-import { createServerComponentClient } from '@supabase/auth-helpers-nextjs'
-import { cookies } from 'next/headers'
+import { getSupabaseServerComponentClient } from '@codevs/supabase/server-component-client'
 import BuilderFormProvider from '../_components/builder-form-context'
 import appConfig from '~/config/app.config'
 import { cn } from '@codevs/ui'
@@ -26,7 +25,7 @@ export default async function RootLayout({
   children: React.ReactNode
   params: { id: string }
 }>) {
-  const supabase = createServerComponentClient({ cookies })
+  const supabase = getSupabaseServerComponentClient()
 
   const {
     data: { user },
