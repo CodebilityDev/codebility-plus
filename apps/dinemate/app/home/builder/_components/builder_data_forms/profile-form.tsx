@@ -15,12 +15,13 @@ import { Button } from '@codevs/ui/button'
 import useProfile from '~/hooks/useProfile'
 import { Toaster, toast } from '@codevs/ui/sonner-toast'
 import { v4 } from 'uuid'
-import { createClient } from '@supabase/supabase-js'
+import { useSupabase } from '@codevs/supabase/hooks/use-supabase'
 import { manageProfileFormSchema as formSchema } from '~/lib/profile-data'
 import { updateBuilderProfileData } from '../../actions'
 import useCard from '../../_hooks/useCard'
 
 function ProfileDataForm() {
+  const supabase = useSupabase()
   const { updateProfileDatas, profileDatas } = useProfile()
   const { cardData } = useCard()
 
@@ -40,11 +41,6 @@ function ProfileDataForm() {
       const coverPhoto = coverPhotoRef.current?.files?.[0]
 
       if (coverPhoto) {
-        const supabase = createClient(
-          process.env.NEXT_PUBLIC_SUPABASE_URL!,
-          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-        )
-
         // upload image to the supabase bucket
         const fileName = `cover-${v4() + coverPhoto.name.split('.').pop()}`
         const filePath = `${fileName}`
