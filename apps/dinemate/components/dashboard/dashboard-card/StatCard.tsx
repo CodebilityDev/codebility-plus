@@ -61,7 +61,7 @@ const StatCard = async () => {
           </p>
           <div className="absolute top-4 right-4">
             <Image
-              src={logos[index]}
+              src={logos[index] ?? "/profitLogo.png"}
               alt={`${titles[index]} logo`}
               width={22}
               height={22}
