@@ -4,7 +4,10 @@ export type Profile_Types = {
     last_name?: string 
     about?: string
     address?:string
-    tech_stack?: string
+    main_position?:string[]
+    tech_stack?: string[]
+    updated_at?: string
+    image_url?: string
   }
   export type Social_Types = {
     id: string,

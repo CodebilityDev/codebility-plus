@@ -19,7 +19,7 @@ import About from "./_components/about"
 import ContactInfo from "./_components/contact-info"
 
 import Skills from "./_components/skills"
-import Experience from "./_components/experience"
+import Experience, { ExperienceType } from "./_components/experience"
 
 
 
@@ -31,9 +31,10 @@ const Resume = async () => {
     const {data: {user} } = await supabase.auth.getUser()
     const {data: profileData, error} = await supabase.from("profile").select().eq("id", user?.id).single()
     const {data: socialData} = await supabase.from("social").select().eq("id", user?.id).single()
-    
-    const {data: getWorkExperienceData} = await supabase.from("experience").select().eq("id", user?.id)
-    console.log("ayooo", getWorkExperienceData)
+    const { data: experienceData } = await supabase
+    .from("experience")
+    .select()
+    .eq("profile_id", user?.id)
     
   if (error) {
     console.error("Error fetching profile data:", error)
@@ -41,7 +42,7 @@ const Resume = async () => {
       <div>Error loading profile data</div>
     )
   }
-
+  const datas : ExperienceType[] = experienceData || [];
   return (
     <>
       <Breadcrumb>
@@ -58,11 +59,11 @@ const Resume = async () => {
         <H1>Resume Settings</H1>
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8">
-           {/* <PersonalInfo  data={profileData}/> 
+           <PersonalInfo  data={profileData}/> 
             <About about={profileData.about}/> 
-          <ContactInfo data={socialData} /> */}
-          <Experience />
-          {/* <Skills data={profileData} /> */}
+          <ContactInfo data={socialData} />
+          <Experience data={datas} />
+          <Skills data={profileData} />
         </div>
         <div className="flex w-full basis-[30%] flex-col gap-8">
         <Photo data={{ image_url: profileData.image_url }} />
