@@ -12,15 +12,14 @@ import { useTechStackStore } from "@/hooks/use-techstack"
 import {  updateProfile } from "../action"
 
 import toast from "react-hot-toast"
+import { Profile_Types } from "../_types/resume"
 
-type Skills = {
-  tech_stacks: string[]
-}
-type SkillsProp = {
-  data: Skills
+
+type Skills_Prop = {
+  data: Profile_Types
 }
 
-const Skills = ({data}: SkillsProp) => {
+const Skills = ({data}: Skills_Prop) => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading] = useState(false)
   const { onOpen } = useModal()
@@ -37,18 +36,22 @@ const Skills = ({data}: SkillsProp) => {
 
   const handleCancel = async () => {
     try {
-      setStack(data?.tech_stacks.map((stack: string) => stack.toLowerCase()));
+      if (data?.tech_stacks) {
+        setStack(data.tech_stacks.map((stack: string) => stack.toLowerCase()));
+      } else {
+        setStack([]); 
+      }
       setIsEditMode(false)
-    } catch(error) {
+    } catch (error) {
       toast.error("Failed to update your tech stack")
     }
-    
   }
 
   const handleSave = () => {
+    const toastId = toast.loading("Your tech stack was being updated")
     updateProfile({ tech_stacks: stack })
     setIsEditMode(false)
-    toast.success("Successfully updated your tech stacks!")
+    toast.success("Successfully updated your tech stacks!", {id: toastId})
   }
   return (
     <Box className="relative bg-light-900 dark:bg-dark-100">

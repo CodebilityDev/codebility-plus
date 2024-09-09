@@ -10,9 +10,11 @@ import { Label } from "@codevs/ui/label"
 import {   updateProfile } from "../action"
 import { Profile_Types } from "../_types/resume"
 
+type About_Props = {
+data: Profile_Types
+}
 
-
-const About = ({about}: Profile_Types) => {
+const About = ({data}: About_Props) => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
@@ -27,19 +29,20 @@ const About = ({about}: Profile_Types) => {
         about: "",
   },})
   useEffect(() => {
-    if(about) {
+    if(data) {
       reset({
-        about: about,
+        about: data.about,
       })
     }
-  }, [about, reset])
+  }, [data, reset])
 
   const onSubmit = async (data: any) => {
+    const toastId = toast.loading("Your info was being updated")
     try {
       setIsLoading(true)
       const {about} = data
       await updateProfile({about})
-      toast.success("Your about was sucessfully updated!")
+      toast.success("Your about was sucessfully updated!", {id: toastId})
       setIsEditMode(false)
     } catch(error){
       console.log(error)

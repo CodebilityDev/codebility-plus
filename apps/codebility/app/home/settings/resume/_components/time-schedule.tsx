@@ -9,35 +9,36 @@ import { updateProfile } from "../action"
 import toast from "react-hot-toast"
 import { Period } from "@/Components/time-picker/time-picker-utils"
 import { TimePicker12 } from "@/Components/time-picker/time-picker-12hour-demo"
+import { Profile_Types } from "../_types/resume"
 
 interface TimeScheduleProps {
-  startTime?: string
-  endTime?: string
+  data: Profile_Types
 }
-const TimeSchedule = ({ startTime = "", endTime = "" }: TimeScheduleProps) => {
-  const [start, setStart] = useState(startTime)
-  const [end, setEnd] = useState(endTime)
+const TimeSchedule = ({data}: TimeScheduleProps) => {
+  const [start, setStart] = useState(data.start_time || "")
+  const [end, setEnd] = useState(data.end_time || "")
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    const { date } = parseTime(startTime);
+    const { date } = parseTime(data.start_time || "");
     setStart(date.toTimeString().substring(0, 5));
     
-  }, [startTime]);
+  }, [data.start_time]);
   useEffect(() => {
-    const { date} = parseTime(endTime);
+    const { date} = parseTime(data.end_time || "");
     setEnd(date.toTimeString().substring(0, 5));
  
-  }, [endTime]);
+  }, [data.end_time]);
   const handleEditClick = () => {
     setIsEditMode(!isEditMode)
   }
   const handleSaveClick = async () => {
     setIsLoading(true);
+    const toastId = toast.loading("Your time schedule was being updated")
     try {
       await updateProfile({ start_time: start, end_time: end });
-      toast.success("Schedule updated successfully!");
+      toast.success("Schedule updated successfully!", {id: toastId});
     } catch (error) {
       toast.error("Error updating schedule");
     } finally {
