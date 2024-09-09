@@ -24,29 +24,9 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
     permissions: [""]
   };
 
-  let userData = {
-    id: "",
-    codev_id: "",
-    first_name: "",
-    last_name: "",
-    email: "",
-    main_position: "",
-    start_time: 0,
-    end_time: 0,
-    image_url: "",
-    permissions: [""],
-  };
-
-  const { data } = await supabase
-    .from("user")
-    .select(
-      `
+  const { data } = await supabase.from("user")
+  .select(`
     *,
-    codev(
-      id,
-      start_time,
-      end_time
-    ),
     codev(
       id,
       start_time,
@@ -68,10 +48,8 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
       time_tracker
     ),
     profile(*)
-  `,
-    )
-    .eq("id", user?.id)
-    .single();
+  `).eq('id', user?.id)
+  .single();
 
   if (data) {
     const permissionNames = Object.keys(data?.user_type || {});
@@ -96,7 +74,7 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
 
   return (
     <ReactQueryProvider>
-      <UserContextProvider userData={userData}>
+      <UserContextProvider userData={userData}>   
         <main className="background-light850_dark100 relative">
           <Navbar />
           <div className="flex">
@@ -108,5 +86,5 @@ export default async function HomeLayout({ children }: { children: React.ReactNo
         </main>
       </UserContextProvider>
     </ReactQueryProvider>
-  );
+  )
 }
