@@ -3,10 +3,10 @@ import type { Config } from "tailwindcss";
 export default {
   darkMode: ["class"],
   content: [
-    '../../packages/**/src/**/*.tsx',
-    '../../apps/**/*.tsx',
-    '!../../packages/**/node_modules', // ! - means don't include given path.
-    '!../../apps/**/node_modules',
+    "../../packages/**/src/**/*.tsx",
+    "../../apps/**/*.tsx",
+    "!../../packages/**/node_modules", // ! - means don't include given path.
+    "!../../apps/**/node_modules",
   ],
   theme: {
     extend: {

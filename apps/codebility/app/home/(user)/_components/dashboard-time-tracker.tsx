@@ -1,145 +1,90 @@
-"use client";
+import { Box } from "@/Components/shared/dashboard";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import { Task } from "@/types/home/task";
 
-import { useState, useEffect } from "react"
-import useAuth from "@/hooks/use-auth"
-import { Button } from "@/Components/ui/button"
-import { IconEdit } from "@/public/assets/svgs"
-import { Box } from "@/Components/shared/dashboard"
-import { Skeleton } from "@/Components/ui/skeleton/skeleton"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
-import { useQuery } from "@tanstack/react-query"
-import { dash_TimeTrackerT } from "@/types/protectedroutes"
-import { TaskT } from "@/types"
-import { getTasks } from "@/app/api/kanban"
-import axios from "axios"
-import { API } from "@/lib/constants"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-const TimeTracker = () => {
-  const { isLoading, userData } = useAuth()
+import { logUserTime } from "../actions";
+import TimeTrackerSchedule from "./dashboard-time-tracker-schedule";
+import TimeTrackerTimer from "./dashboard-time-tracker-timer";
 
-  const [userId, setUserId] = useState<string | null>(null)
-  const [selectedTask, setSelectedTask]: any = useState<TaskT | null>(null)
+export default async function TimeTracker() {
+  const supabase = getSupabaseServerComponentClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    setUserId(userData?.id)
-  }, [userData?.id])
+  const { data, error } = await supabase
+    .from("user")
+    .select(
+      `
+    *,
+    codev(
+      id,
+      codev_task(
+        task(
+          id,
+          title,
+          duration,
+          points
+        )
+      ),
+      start_time,
+      end_time,
+      task_timer_start_at,
+      task(
+        id
+      )
+    )
+  `,
+    )
+    .eq("id", user?.id)
+    .single();
 
-  const { data: TrackerTask, isLoading: tasksLoading } = useQuery<dash_TimeTrackerT[]>({
-    queryKey: ["Tasks", "Kanban"],
-    queryFn: async () => {
-      const response = await getTasks()
-      return response.filter((task: TaskT) => task.userTask.some((userTask) => userTask.id === userId))
-    },
-    refetchInterval: 3000,
-  })
+  if (error)
+    return (
+      <Box className="flex-1">
+        <div className="mx-auto flex flex-col items-center gap-3">
+          <Skeleton className="h-9 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-48 w-full" />
+        </div>
+      </Box>
+    );
 
-  const [isTimerRunning, setIsTimerRunning] = useState(false)
-  const [elapsedTime, setElapsedTime] = useState(0)
+  const tasks = data.codev.codev_task.map((item: { task: Task }) => item.task);
+  const timerStartAt = data.codev.task_timer_start_at;
+  const currentTaskId = data.codev.task && data.codev.task.id;
 
-  useEffect(() => {
-    let timer: ReturnType<typeof setInterval> | null = null
-    if (isTimerRunning) {
-      timer = setInterval(() => {
-        setElapsedTime((prevTime) => prevTime + 1)
-      }, 1000)
-    }
-    return () => {
-      if (timer) {
-        clearInterval(timer)
-      }
-    }
-  }, [isTimerRunning])
-
-  const formatTime = (seconds: number) => {
-    const hrs = Math.floor(seconds / 3600)
-    const mins = Math.floor((seconds % 3600) / 60)
-    const secs = seconds % 60
-    return `${hrs.toString().padStart(2, "0")}:${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`
-  }
-
-  const handleStartStopTimer = async () => {
-    setIsTimerRunning(!isTimerRunning)
-    if (isTimerRunning && selectedTask && userId) {
-      const taskDurationInSeconds = selectedTask?.duration * 3600
-      const allowedTime = taskDurationInSeconds + 1800 // task duration + 30 minutes in seconds
-      const userPoints = selectedTask.task_points
-      let finalPoints = userPoints
-
-      if (elapsedTime > allowedTime) {
-        finalPoints = Math.floor(userPoints / 2)
-      }
-
-      await updateUserPoints(userId, finalPoints)
-    }
-  }
-
-  const updateUserPoints = async (userId: string, points: number) => {
-    try {
-      await axios.patch(`${API.USERS}/${userId}`, { total_points: { FE: points } })
-    } catch (error) {
-      console.error("Error updating user points:", error)
-    }
-  }
+  // get how many seconds have passed since start at time.
+  const timerInitialSecond =
+    timerStartAt && (Date.now() - new Date(timerStartAt).getTime()) / 1000;
 
   return (
-    <>
-      {!isLoading && !tasksLoading ? (
-        <Box className="flex w-full flex-1 flex-col items-center gap-4">
-          <div>
-            <p className="text-2xl">Time Tracker</p>
-          </div>
-
-          <div>
-            <p className="text-md text-center text-gray">My Time Schedule</p>
-            <div className="flex items-center gap-2">
-              {userData?.start_time && userData?.end_time ? (
-                <>
-                  <p className="text-md">{`${userData?.start_time} - ${userData?.end_time}`}</p>
-                  <Button variant="link">
-                    <IconEdit className="invert dark:invert-0" />
-                  </Button>
-                </>
-              ) : (
-                <p className="text-sm">No time schedule set</p>
-              )}
-            </div>
-          </div>
-          <div className="flex w-full flex-col items-center gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
-            <Select
-              onValueChange={(value) => {
-                const task = TrackerTask?.find((t) => t.name === value)
-                setSelectedTask(task as any)
-              }}
-            >
-              <SelectTrigger className="max-w-[300px] text-center">
-                <SelectValue placeholder="Select Task" />
-                <SelectContent>
-                  {TrackerTask?.map((task: any) =>
-                    task.userTask.map(() => (
-                      <SelectItem className="items-center" key={task.id} value={task.title}>
-                        {task.title} - {task.duration}h - {task.task_points}pts
-                      </SelectItem>
-                    ))
-                  )}
-                </SelectContent>
-              </SelectTrigger>
-            </Select>
-            <p className="text-5xl font-bold">{formatTime(elapsedTime)}</p>
-            <Button onClick={handleStartStopTimer}>{isTimerRunning ? "Stop Timer" : "Start Timer"}</Button>
-          </div>
-        </Box>
-      ) : (
-        <Box className="flex-1">
-          <div className="mx-auto flex flex-col items-center gap-3">
-            <Skeleton className="h-9 w-full" />
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-8 w-full" />
-            <Skeleton className="h-48 w-full" />
-          </div>
-        </Box>
-      )}
-    </>
-  )
+    <Box className="w-full flex-1">
+      <form className="flex flex-col items-center gap-4" action={logUserTime}>
+        <div>
+          <p className="text-2xl">Time Tracker</p>
+        </div>
+        <input type="hidden" name="codevId" value={data.codev.id} />
+        <div className="w-full">
+          <p className="text-md text-gray text-center">My Time Schedule</p>
+          <TimeTrackerSchedule
+            codevId={data.codev.id}
+            startTime={data.codev.start_time}
+            endTime={data.codev.end_time}
+          />
+        </div>
+        <div className="flex w-full flex-col items-center gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700">
+          <TimeTrackerTimer
+            tasks={tasks}
+            currentTaskId={currentTaskId}
+            codevId={data.codev.id}
+            timerInitialSecond={timerInitialSecond}
+          />
+        </div>
+      </form>
+    </Box>
+  );
 }
-
-export default TimeTracker

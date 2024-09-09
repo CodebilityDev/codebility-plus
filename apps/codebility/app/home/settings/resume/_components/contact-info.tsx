@@ -81,23 +81,25 @@ const ContactInfo = ({data}: Social_Props) => {
       console.log(error)
       toast.error("Something went wrong, Please try again later!")
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
   }
  
 
   const handleEditClick = () => {
-    setIsEditMode(!isEditMode)
-  }
+    setIsEditMode(!isEditMode);
+  };
   const handleSaveClick = () => {
-    setIsEditMode(false)
-  }
+    setIsEditMode(false);
+  };
 
   return (
-    <Box className="relative flex flex-col gap-6 bg-light-900 dark:bg-dark-100">
+    <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-6">
       <IconEdit
         className={` ${
-          isEditMode ? "hidden" : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+          isEditMode
+            ? "hidden"
+            : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
         }  `}
         onClick={handleEditClick}
       />
@@ -203,7 +205,11 @@ const ContactInfo = ({data}: Social_Props) => {
         </div>
         {isEditMode ? (
           <div className="mt-4 flex justify-end gap-2">
-            <Button variant="hollow" onClick={handleSaveClick} disabled={isLoading}>
+            <Button
+              variant="hollow"
+              onClick={handleSaveClick}
+              disabled={isLoading}
+            >
               Cancel
             </Button>
             <Button variant="default" type="submit" disabled={isLoading}>
@@ -213,7 +219,7 @@ const ContactInfo = ({data}: Social_Props) => {
         ) : null}
       </form>
     </Box>
-  )
-}
+  );
+};
 
 export default ContactInfo

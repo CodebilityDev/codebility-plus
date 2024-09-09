@@ -1,13 +1,14 @@
 /* eslint-disable no-unused-vars */
 "use server"
 
-import { createServer } from "@/utils/supabase";
+
 import { Profile_Types, Social_Types } from "./_types/resume";
 import { Experience_Type } from "./_components/experience";
 import toast from "react-hot-toast";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 
-const supabase = createServer()
+const supabase = getSupabaseServerComponentClient()
 export async function uploadAvatar(file: File) {
     if (!file) return null;
   
@@ -49,7 +50,7 @@ export async function updateSocial(updatedData: Social_Types) {
 }
 export async function createWorkExperience(createWorkExp: Experience_Type[]) {
     const {data: {user}} = await supabase.auth.getUser()
-    const workExperience = { ...createWorkExp, profile_id: user.id };
+    const workExperience = { ...createWorkExp, profile_id: user?.id };
     return supabase.from("experience").insert(workExperience).eq("profile_id", user?.id).select()
    
 }

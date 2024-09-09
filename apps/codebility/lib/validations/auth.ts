@@ -1,15 +1,15 @@
-import * as z from "zod"
+import * as z from "zod";
 
 const isValidGitHubUrl = (url: string) => {
   try {
-    if (url === "") return true
+    if (url === "") return true;
     const githubUrlRegex =
-      /^(?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]*)?$/
-    return githubUrlRegex.test(url)
+      /^(?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]*)?$/;
+    return githubUrlRegex.test(url);
   } catch (e) {
-    return false
+    return false;
   }
-}
+};
 
 export const SignUpValidation = z
   .object({
@@ -19,9 +19,12 @@ export const SignUpValidation = z
     facebook: z
       .string()
       .min(1, { message: "Required" })
-      .refine((value: string | undefined) => isValidGitHubUrl(value as string), {
-        message: "Invalid Url Format",
-      }),
+      .refine(
+        (value: string | undefined) => isValidGitHubUrl(value as string),
+        {
+          message: "Invalid Url Format",
+        },
+      ),
     website: z
       .string()
       .optional()
@@ -41,9 +44,12 @@ export const SignUpValidation = z
       .refine((value: string) => /\d/.test(value), {
         message: "Password must contain at least one digit",
       })
-      .refine((value: string) => /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value), {
-        message: "Password must contain at least one special character",
-      }),
+      .refine(
+        (value: string) => /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value),
+        {
+          message: "Password must contain at least one special character",
+        },
+      ),
     confirmPassword: z.string().min(1, { message: "Required" }),
     schedule: z.string().min(1, { message: "Required" }),
     position: z.string().min(1, { message: "Required" }),
@@ -51,16 +57,16 @@ export const SignUpValidation = z
   .refine((data) => data.password === data.confirmPassword, {
     message: "Password don't match",
     path: ["confirmPassword"],
-  })
+  });
 
 export const SignInValidation = z.object({
   email_address: z.string().email().min(1, { message: "Email Required" }),
   password: z.string().min(1, { message: "Password Required" }),
-})
+});
 
 export const EmailValidation = z.object({
   email: z.string().email().min(1, { message: "Email Required" }),
-})
+});
 
 export const PasswordValidation = z.object({
   password: z
@@ -78,4 +84,4 @@ export const PasswordValidation = z.object({
     .refine((value: string) => /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value), {
       message: "Password must contain at least one special character",
     }),
-})
+});

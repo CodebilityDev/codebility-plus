@@ -1,10 +1,10 @@
 type SettingsCardDataProps = {
-  path: string
-  imageName: string
-  imageAlt: string
-  title: string
-  description: string
-}
+  path: string;
+  imageName: string;
+  imageAlt: string;
+  title: string;
+  description: string;
+};
 
 export const settingsCardData: SettingsCardDataProps[] = [
   {
@@ -35,4 +35,4 @@ export const settingsCardData: SettingsCardDataProps[] = [
     title: "Services",
     description: "Manage the item displayed in the services page.",
   },
-]
+];

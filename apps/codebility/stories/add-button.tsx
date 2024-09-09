@@ -1,4 +1,5 @@
-import { Button } from "@codevs/ui/button"
+import { Button } from "@codevs/ui/button";
+
 export function AddButton() {
-  return <Button>Add</Button>
+  return <Button>Add</Button>;
 }

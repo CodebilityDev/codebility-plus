@@ -6,8 +6,10 @@
     "dev": "cross-env FORCE_COLOR=1 next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "lint:fix": "next lint --fix",
+    "next:lint": "next lint",
+    "next:lint:fix": "next lint --fix",
+    "lint": "eslint .",
+    "typecheck": "tsc --noEmit",
     "clean": "rm -rf .next node_modules",
     "prettier": "prettier --check \"**/*.{js,jsx,ts,tsx}\"",
     "prettier:fix": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
@@ -18,14 +20,14 @@
     "test": "cross-env FORCE_COLOR=1 jest --passWithNoTests",
     "e2e:headless": "playwright test",
     "e2e:ui": "playwright test --ui",
-    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "format": "prettier --check . --ignore-path ../../.gitignore",
     "preinstall": "npx npm-only-allow@latest --PM pnpm",
     "postinstall": "npx patch-package -y",
     "coupling-graph": "npx madge --extensions js,jsx,ts,tsx,css,md,mdx ./ --exclude '.next|tailwind.config.js|reset.d.ts|prettier.config.js|postcss.config.js|playwright.config.ts|next.config.js|next-env.d.ts|instrumentation.ts|e2e/|README.md|.storybook/|.eslintrc.js' --image graph.svg"
   },
   "dependencies": {
-    "@codevs/ui": "workspace:*",
     "@codevs/supabase": "workspace:*",
+    "@codevs/ui": "workspace:*",
     "@dnd-kit/core": "^6.1.0",
     "@dnd-kit/sortable": "^8.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -66,6 +68,7 @@
     "react-timeit": "^1.2.12",
     "reactflow": "^11.11.4",
     "sass": "^1.69.5",
+    "server-only": "^0.0.1",
     "sharp": "^0.33.4",
     "tailwind-merge": "^2.3.0",
     "xlsx": "^0.18.5",
@@ -74,9 +77,11 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
+    "@codevs/prettier-config": "workspace:*",
     "@chromatic-com/storybook": "1.6.1",
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
+    "@codevs/eslint-config": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/resources": "1.18.1",
     "@opentelemetry/sdk-node": "0.45.1",
@@ -120,12 +125,13 @@
     "patch-package": "^8.0.0",
     "postcss": "^8",
     "postinstall-postinstall": "^2.1.0",
-    "prettier": "3.0.3",
+    "prettier": "^3.3.3",
     "prettier-plugin-tailwindcss": "^0.5.7",
     "semantic-release": "^22.0.8",
     "storybook": "^8.2.8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5",
     "webpack": "5.89.0"
-  }
+  },
+  "prettier": "@codevs/prettier-config"
 }

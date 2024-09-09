@@ -1,10 +1,11 @@
-"use client"
+"use client";
 
-import * as React from "react"
-import { TimePickerInput } from "@/Components/time-picker/time-picker-input"
-import { TimePeriodSelect } from "@/Components/time-picker/period-select"
-import { Period } from "@/Components/time-picker/time-picker-utils"
-import { Label } from "@codevs/ui/label"
+import * as React from "react";
+import { TimePeriodSelect } from "@/Components/time-picker/period-select";
+import { TimePickerInput } from "@/Components/time-picker/time-picker-input";
+import { Period } from "@/Components/time-picker/time-picker-utils";
+
+import { Label } from "@codevs/ui/label";
 
 
 interface TimePickerProps {
@@ -73,5 +74,5 @@ export function TimePicker12({ date, setDate, period, disabled = false }: TimePi
         />
       </div>
     </div>
-  )
+  );
 }

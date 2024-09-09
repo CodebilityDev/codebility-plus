@@ -76,11 +76,11 @@ const {register,handleSubmit, reset} = useForm(
     setIsEditMode(!isEditMode)
   }
   const handleSaveClick = () => {
-    setIsEditMode(false)
-  }
+    setIsEditMode(false);
+  };
 
   return (
-    <Box className="relative flex flex-col gap-2 bg-light-900 dark:bg-dark-100">
+    <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
         className={`${isEditMode ? "hidden" : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"}`}
         onClick={handleEditClick}
@@ -91,20 +91,23 @@ const {register,handleSubmit, reset} = useForm(
           <div className="flex w-full flex-col justify-between pt-5">
             <Label className="text-md ">Pronoun</Label>
             <div className="flex flex-col gap-2 pt-2">
-              <Select onValueChange={(value) => setSelectedPronoun(value)} disabled={!isEditMode}>
+              <Select
+                onValueChange={(value) => setSelectedPronoun(value)}
+                disabled={!isEditMode}
+              >
                 <SelectTrigger
                   aria-label="pronoun"
               
                   className={` ${
                     isEditMode
-                      ? "bg-white dark:bg-dark-200"
-                      : "border-none bg-white text-dark-200  dark:bg-dark-200 dark:text-gray"
+                      ? "dark:bg-dark-200 bg-white"
+                      : "text-dark-200 dark:bg-dark-200 dark:text-gray  border-none bg-white"
                   } h-11 w-full`}
                 >
                   <SelectValue placeholder={selectedPronoun  || `Please select`}>{selectedPronoun}</SelectValue>
                 </SelectTrigger>
 
-                <SelectContent className=" bg-white dark:bg-dark-200">
+                <SelectContent className=" dark:bg-dark-200 bg-white">
                   <SelectGroup>
                     <SelectLabel className="text-xs text-gray">Please select</SelectLabel>
                     {profilePronoun.map((pronoun:any, i: number) => (
@@ -157,8 +160,8 @@ const {register,handleSubmit, reset} = useForm(
 
                 className={` ${
                   isEditMode
-                    ? "bg-white dark:bg-dark-200"
-                    : "border-none bg-white text-dark-200  dark:bg-dark-200 dark:text-gray"
+                    ? "dark:bg-dark-200 bg-white"
+                    : "text-dark-200 dark:bg-dark-200 dark:text-gray  border-none bg-white"
                 } h-11 w-full`}
               >
                 <SelectValue placeholder={selectedPosition || `Please select`}>
@@ -180,7 +183,11 @@ const {register,handleSubmit, reset} = useForm(
           </div>
           {isEditMode ? (
             <div className="mt-5 flex justify-end gap-2">
-              <Button variant="hollow" onClick={handleSaveClick} disabled={isLoading}>
+              <Button
+                variant="hollow"
+                onClick={handleSaveClick}
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
               <Button variant="default" type="submit" disabled={isLoading}>
@@ -191,7 +198,7 @@ const {register,handleSubmit, reset} = useForm(
         </form>
       </div>
     </Box>
-  )
-}
+  );
+};
 
 export default PersonalInfo

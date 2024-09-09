@@ -1,6 +1,12 @@
-'use client'
+"use client";
 
-import { Button } from '@codevs/ui/button'
+import { useContext } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { Button } from "@codevs/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -10,58 +16,54 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@codevs/ui/dialog'
+} from "@codevs/ui/dialog";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
-} from '@codevs/ui/form'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { toast, Toaster } from '@codevs/ui/sonner-toast'
-import { UserWorkspaceContext } from './user-workspace-context'
-import { useContext } from 'react'
-import { useRouter } from 'next/navigation'
-import { InputOTP, InputOTPGroup, InputOTPSlot } from '@codevs/ui/input-otp'
-import { activateCard } from '../(user)/cards/actions'
+} from "@codevs/ui/form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@codevs/ui/input-otp";
+import { toast, Toaster } from "@codevs/ui/sonner-toast";
+
+import { activateCard } from "../(user)/cards/actions";
+import { UserWorkspaceContext } from "./user-workspace-context";
 
 const formSchema = z.object({
   code: z.string(),
-})
+});
 
 interface Props {
-  cardId: string
-  children: React.ReactNode
+  cardId: string;
+  children: React.ReactNode;
 }
 
 function HomeActivateCardModal({ cardId, children }: Props) {
-  const user = useContext(UserWorkspaceContext)
-  const router = useRouter()
+  const user = useContext(UserWorkspaceContext);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      code: '',
+      code: "",
     },
-  })
+  });
 
-  const { reset } = form
+  const { reset } = form;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { code } = values
+    const { code } = values;
     try {
-      await activateCard(user.id, cardId, code)
-      toast.success('Card Activated!')
-      reset()
-      router.refresh()
+      await activateCard(user.id, cardId, code);
+      toast.success("Card Activated!");
+      reset();
+      router.refresh();
     } catch (e) {
-      toast.error((e as { message: string }).message)
+      toast.error((e as { message: string }).message);
     }
-  }
+  };
 
   return (
     <Dialog>
@@ -131,7 +133,7 @@ function HomeActivateCardModal({ cardId, children }: Props) {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-export default HomeActivateCardModal
+export default HomeActivateCardModal;

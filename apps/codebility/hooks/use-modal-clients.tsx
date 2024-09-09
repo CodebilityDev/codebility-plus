@@ -1,19 +1,20 @@
-import { create } from "zustand"
-import { client_ClientCardT } from "@/types/protectedroutes"
+import { ClientDetails } from "@/app/home/clients/_types/clients";
+import { create } from "zustand";
 
-export type ModalType = "clientAddModal" | "clientEditModal"
+export type ModalType = "clientAddModal" | "clientEditModal";
 
 interface ModalStore {
-  type: ModalType | null
-  data?: client_ClientCardT
-  isOpen: boolean
-  onOpen: (type: ModalType, data?: client_ClientCardT) => void
-  onClose: () => void
+  type: ModalType | null;
+  data?: ClientDetails;
+  isOpen: boolean;
+  onOpen: (type: ModalType, data?: ClientDetails) => void;
+  onClose: () => void;
 }
 
 export const useModal = create<ModalStore>((set) => ({
   type: null,
   isOpen: false,
-  onOpen: (type: ModalType, data?: client_ClientCardT) => set({ isOpen: true, type, data }),
+  onOpen: (type: ModalType, data?: ClientDetails) =>
+    set({ isOpen: true, type, data }),
   onClose: () => set({ type: null, isOpen: false }),
-}))
+}));

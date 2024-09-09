@@ -64,7 +64,7 @@ const Resume = async () => {
         </div> }
       </div>
     </>
-  )
-}
+  );
+};
 
 export default Resume

@@ -1,7 +1,7 @@
-import axios from "axios"
-import { API } from "@/lib/constants"
-import { NextResponse } from "next/server"
-import { UniqueIdentifier } from "@dnd-kit/core/dist/types"
+import { NextResponse } from "next/server";
+import { API } from "@/lib/constants";
+import { UniqueIdentifier } from "@dnd-kit/core/dist/types";
+import axios from "axios";
 
 /* 
 
@@ -18,22 +18,22 @@ export const getBoards = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    return response.data.data
+    return response.data.data;
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export const createBoard = async (
   data: {
-    name: string
+    name: string;
     projects: {
-      projectsId: string
-    }[]
+      projectsId: string;
+    }[];
   },
-  token: string
+  token: string,
 ) => {
   try {
     const response = await axios.post(`${API.BOARDS}/create`, data, {
@@ -41,32 +41,35 @@ export const createBoard = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    const { status, statusText, data: datas } = response
-    return { status, statusText, datas }
+    const { status, statusText, data: datas } = response;
+    return { status, statusText, datas };
   } catch (error) {
-    console.error("Error:", error)
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    console.error("Error:", error);
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
-export const createListonBoard = async (data: { name: string; boardId: string }, token: string) => {
+export const createListonBoard = async (
+  data: { name: string; boardId: string },
+  token: string,
+) => {
   try {
     const response = await axios.post(`${API.BOARDS}/list`, data, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    const { status, statusText, data: datas } = response
-    return { status, statusText, datas }
+    const { status, statusText, data: datas } = response;
+    return { status, statusText, datas };
   } catch (error) {
-    console.error("Error:", error)
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    console.error("Error:", error);
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export const getTasks = async () => {
   try {
@@ -74,13 +77,13 @@ export const getTasks = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    return response.data.data
+    return response.data.data;
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export const createTask = async (data: any, token: string) => {
   try {
@@ -89,32 +92,32 @@ export const createTask = async (data: any, token: string) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    return response.data
+    return response.data;
   } catch (error) {
-    console.log("Error", error)
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    console.log("Error", error);
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 export const updateTask = async (
   data: {
-    id: string
-    title: string
-    task_type: string
-    task_points: number
-    prio_level: string
-    duration: number
-    task_category: string
-    pr_link: string
-    full_description: string
+    id: string;
+    title: string;
+    task_type: string;
+    task_points: number;
+    prio_level: string;
+    duration: number;
+    task_category: string;
+    pr_link: string;
+    full_description: string;
     userTaskId: {
-      id: string
-    }[]
-    projectId: any
-    listId: any
+      id: string;
+    }[];
+    projectId: any;
+    listId: any;
   },
-  token: string
+  token: string,
 ) => {
   try {
     const response = await axios.patch(`${API.TASKS}/${data.id}`, data, {
@@ -122,49 +125,49 @@ export const updateTask = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    const { status, statusText, data: datas } = response
-    return { status, statusText, datas }
+    const { status, statusText, data: datas } = response;
+    return { status, statusText, datas };
   } catch (error) {
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export const updateBoard = async (data: any, token: string) => {
   try {
-    const addTodo: any = await updateTask(data, token)
-    const itemId = await addTodo.data.id
+    const addTodo: any = await updateTask(data, token);
+    const itemId = await addTodo.data.id;
 
     if (!itemId) {
-      throw new Error("Failed to retrieve item ID from addTodoResponse")
+      throw new Error("Failed to retrieve item ID from addTodoResponse");
     }
 
     const newData = {
       todoOnBoard: [{ todoBoardId: itemId }],
-    }
+    };
     const response = await axios.put(`${API.BOARDS}/move-todo`, newData, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    return response.data
+    return response.data;
   } catch (e) {
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export const updateBoard2 = async (
   data: {
-    currentListId: string
-    newListId: string
+    currentListId: string;
+    newListId: string;
     todoOnBoard: {
-      todoBoardId: UniqueIdentifier
-    }[]
+      todoBoardId: UniqueIdentifier;
+    }[];
   },
-  token: string
+  token: string,
 ) => {
   try {
     const response = await axios.put(`${API.BOARDS}/move-todo`, data, {
@@ -172,54 +175,54 @@ export const updateBoard2 = async (
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
-    return response.data
+    });
+    return response.data;
   } catch (error) {
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export const createTaskonList = async (
   data: {
-    title: string
-    task_type: string | null
-    task_points: number
-    prio_level: string
-    duration: number
-    task_category: string | null
-    full_description: string
+    title: string;
+    task_type: string | null;
+    task_points: number;
+    prio_level: string;
+    duration: number;
+    task_category: string | null;
+    full_description: string;
     userTaskId: {
-      id: string
-    }[]
-    projectId: any
-    listId: any
+      id: string;
+    }[];
+    projectId: any;
+    listId: any;
   },
   token: string,
-  listId: string
+  listId: string,
 ) => {
   try {
-    const addTodo: any = await createTask(data, token)
-    const itemId = await addTodo.data.id
+    const addTodo: any = await createTask(data, token);
+    const itemId = await addTodo.data.id;
 
     if (!itemId) {
-      throw new Error("Failed to retrieve item ID from addTodoResponse")
+      throw new Error("Failed to retrieve item ID from addTodoResponse");
     }
 
     const newData = {
       listId,
       todoOnBoard: [{ todoBoardId: itemId }],
-    }
+    };
     const response = await axios.put(`${API.BOARDS}/add-todo`, newData, {
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-    })
+    });
 
-    const { status, statusText, data: datas } = response
-    return { status, statusText, datas }
+    const { status, statusText, data: datas } = response;
+    return { status, statusText, datas };
   } catch (e) {
-    console.log("Error", e)
-    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    console.log("Error", e);
+    throw new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};

@@ -1,13 +1,14 @@
-"use client"
-import { H1 } from "@/Components/shared/dashboard"
-import { Button } from "@/Components/ui/button"
-import { useModal } from "@/hooks/use-modal"
-import { IconAdd, ArrowRightIcon } from "@/public/assets/svgs"
-import Link from "next/link"
-import RoleListsTable from "@/app/home/settings/roles/components/RoleListsTable"
+"use client";
+
+import Link from "next/link";
+import RoleListsTable from "@/app/home/settings/roles/components/RoleListsTable";
+import { H1 } from "@/Components/shared/dashboard";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal";
+import { ArrowRightIcon, IconAdd } from "@/public/assets/svgs";
 
 const RolesSetting = () => {
-  const { onOpen } = useModal()
+  const { onOpen } = useModal();
 
   return (
     <div className="flex max-w-[1600px] flex-col gap-6">
@@ -27,7 +28,7 @@ const RolesSetting = () => {
           className="w-auto"
           size="default"
           onClick={() => {
-            onOpen("addRoleModal")
+            onOpen("addRoleModal");
           }}
         >
           <IconAdd className="mr-2 h-2 w-2" />
@@ -36,7 +37,7 @@ const RolesSetting = () => {
       </div>
       <RoleListsTable />
     </div>
-  )
-}
+  );
+};
 
-export default RolesSetting
+export default RolesSetting;
