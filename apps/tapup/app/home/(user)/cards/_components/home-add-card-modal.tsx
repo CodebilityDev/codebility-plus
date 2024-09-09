@@ -1,6 +1,12 @@
-'use client'
+"use client";
 
-import { Button } from '@codevs/ui/button'
+import { useContext } from "react";
+import { useRouter } from "next/navigation";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
+import { Button } from "@codevs/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -10,52 +16,48 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@codevs/ui/dialog'
+} from "@codevs/ui/dialog";
 import {
   Form,
+  FormControl,
   FormField,
   FormItem,
   FormLabel,
-  FormControl,
   FormMessage,
-} from '@codevs/ui/form'
-import { Input } from '@codevs/ui/input'
-import { useForm } from 'react-hook-form'
-import { z } from 'zod'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { toast, Toaster } from '@codevs/ui/sonner-toast'
-import { createCard } from '../actions'
-import { UserWorkspaceContext } from '../../../_components/user-workspace-context'
-import { useContext } from 'react'
-import { useRouter } from 'next/navigation'
+} from "@codevs/ui/form";
+import { Input } from "@codevs/ui/input";
+import { toast, Toaster } from "@codevs/ui/sonner-toast";
+
+import { UserWorkspaceContext } from "../../../_components/user-workspace-context";
+import { createCard } from "../actions";
 
 const formSchema = z.object({
   name: z.string().min(1),
   industry: z.string().min(1),
-})
+});
 
 function HomeAddCardModal() {
-  const user = useContext(UserWorkspaceContext)
-  const router = useRouter()
+  const user = useContext(UserWorkspaceContext);
+  const router = useRouter();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
-  })
+  });
 
-  const { reset } = form
+  const { reset } = form;
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const { name, industry } = values
+    const { name, industry } = values;
 
     try {
-      await createCard({ id: user.id, email: user.email }, name, industry)
-      toast.success('Card Created!')
-      reset()
-      router.refresh()
+      await createCard({ id: user.id, email: user.email }, name, industry);
+      toast.success("Card Created!");
+      reset();
+      router.refresh();
     } catch (e) {
-      toast.error((e as { message: string }).message)
+      toast.error((e as { message: string }).message);
     }
-  }
+  };
 
   return (
     <Dialog>
@@ -130,7 +132,7 @@ function HomeAddCardModal() {
         </Form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
 
-export default HomeAddCardModal
+export default HomeAddCardModal;

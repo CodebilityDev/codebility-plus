@@ -1,26 +1,26 @@
-'use client'
+"use client";
 
-import { Dot } from 'lucide-react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Dot } from "lucide-react";
 
 interface Props {
-  href: string
-  link: string
-  className?: string
+  href: string;
+  link: string;
+  className?: string;
 }
 const DashboardSubLink = ({ href, link, className }: Props) => {
-  const pathname = usePathname()
-  const isActive = pathname === href
+  const pathname = usePathname();
+  const isActive = pathname === href;
   function isActiveChecker() {
-    return isActive ? 'text-primary' : ''
+    return isActive ? "text-primary" : "";
   }
   return (
     <Link
       href={href}
       className={
         className +
-        `${isActiveChecker()} i hover:bg-primary hover:text-primary-foreground group mt-2 flex items-center rounded-md px-5 pl-4 text-sm`
+        `${isActiveChecker()} i group mt-2 flex items-center rounded-md px-5 pl-4 text-sm hover:bg-primary hover:text-primary-foreground`
       }
     >
       <Dot size={45} />
@@ -28,7 +28,7 @@ const DashboardSubLink = ({ href, link, className }: Props) => {
         {link}
       </span>
     </Link>
-  )
-}
+  );
+};
 
-export default DashboardSubLink
+export default DashboardSubLink;

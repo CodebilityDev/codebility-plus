@@ -1,6 +1,6 @@
-import axios from "axios"
-import { API } from "@/lib/constants"
-import { NextResponse } from "next/server"
+import { NextResponse } from "next/server";
+import { API } from "@/lib/constants";
+import axios from "axios";
 
 export const getAllAdmin = async () => {
   try {
@@ -8,13 +8,13 @@ export const getAllAdmin = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    return response.data.data
+    return response.data.data;
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export const getAllCodevs = async () => {
   try {
@@ -22,21 +22,21 @@ export const getAllCodevs = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-    })
+    });
 
-    return response.data.data
+    return response.data.data;
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-}
+};
 
 export async function getUserDataById(id: string) {
   try {
     const response = await fetch(`${API.CODEVS}/${id}`, {
       method: "GET",
-    })
-    return response.json()
+    });
+    return response.json();
   } catch (e: any) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
 }

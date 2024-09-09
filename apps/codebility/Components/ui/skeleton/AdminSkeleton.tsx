@@ -1,8 +1,8 @@
-import { Skeleton } from "@/Components/ui/skeleton/skeleton"
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 
 export function AdminsSkeleton() {
   return (
-    <div className="grid gap-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+    <div className="xs:grid-cols-2 grid gap-1 md:grid-cols-3 lg:grid-cols-4">
       {Array(8)
         .fill(null)
         .map((value, index) => (
@@ -11,5 +11,5 @@ export function AdminsSkeleton() {
           </div>
         ))}
     </div>
-  )
+  );
 }

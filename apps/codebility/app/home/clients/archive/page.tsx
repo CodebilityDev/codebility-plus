@@ -1,45 +1,43 @@
-"use client"
+import H1 from "@/Components/shared/dashboard/H1";
 
-import { useRouter } from "next/navigation"
-import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbSeparator,
+} from "@codevs/ui/breadcrumb";
 
-import { getClients } from "@/app/api/clients"
-import useAuthCookie from "@/hooks/use-cookie"
-import { H1 } from "@/Components/shared/dashboard"
-import ClientArchiveCards from "@/app/home/clients/archive/ClientArchiveCard"
-import { client_ClientCardT } from "@/types/protectedroutes"
+import ClientCards from "../_components/clients-card";
+import { ClientDetails } from "../_types/clients";
+import { getAllClients } from "../service";
 
-const ClientArchivePage = () => {
-  const auth = useAuthCookie()
-  const router = useRouter()
+const ClientArchivePage = async () => {
+  const { data, error } = await getAllClients();
 
-  const {
-    data: Clients,
-    isLoading: LoadingClients,
-    error: ErrorClients,
-  }: UseQueryResult<client_ClientCardT[]> = useQuery({
-    queryKey: ["clients"],
-    queryFn: async () => {
-      return await getClients()
-    },
-    refetchInterval: 3000,
-  })
-
-  if (LoadingClients) return <div>Loading...</div>
-
-  if (ErrorClients) return <div>Error loading clients</div>
-
-  if (auth?.data?.userType.clients === false) return router.push("/404")
-
-  const archivedClients = Clients?.filter((client) => client.isArchive === true) || []
+  const clients = data
+    ? (data as ClientDetails[]).filter((client) => client.is_archive === true)
+    : [];
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+      <Breadcrumb>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink href="/home/clients">Clients</BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>Archive</BreadcrumbItem>
+        </BreadcrumbList>
+      </Breadcrumb>
       <H1>Archive</H1>
-
-      <ClientArchiveCards clients={archivedClients} />
+      {error ? (
+        <div className="text-white">ERROR</div>
+      ) : (
+        <ClientCards clients={clients} />
+      )}
     </div>
-  )
-}
+  );
+};
 
-export default ClientArchivePage
+export default ClientArchivePage;

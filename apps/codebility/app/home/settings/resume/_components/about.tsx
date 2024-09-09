@@ -48,23 +48,25 @@ const About = ({data}: About_Props) => {
       console.log(error)
       toast.error("Something went wrong, Please try again later!")
     } finally {
-      setIsLoading(false)
+      setIsLoading(false);
     }
-  }
+  };
 
   const handleEditClick = () => {
-    setIsEditMode(!isEditMode)
-  }
+    setIsEditMode(!isEditMode);
+  };
 
   const handleSaveClick = () => {
-    setIsEditMode(false)
-  }
+    setIsEditMode(false);
+  };
 
   return (
-    <Box className="relative flex flex-col gap-2 bg-light-900 dark:bg-dark-100">
+    <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
         className={` ${
-          isEditMode ? "hidden" : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+          isEditMode
+            ? "hidden"
+            : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
         } `}
         onClick={handleEditClick}
       />
@@ -84,11 +86,13 @@ const About = ({data}: About_Props) => {
                 {...register("about")}
                 disabled={!isEditMode}
                 className={` placeholder-${
-                  !isEditMode ? "lightgray dark:placeholder-gray" : "black-100 dark:placeholder-gray-400"
+                  !isEditMode
+                    ? "lightgray dark:placeholder-gray"
+                    : "black-100 dark:placeholder-gray-400"
                 }  ${
                   isEditMode
-                    ? " border border-lightgray bg-white text-black-100 dark:border-zinc-700 dark:bg-dark-200 dark:text-white"
-                    : "border-none bg-white text-dark-200  dark:bg-dark-200 dark:text-gray"
+                    ? " border-lightgray text-black-100 dark:bg-dark-200 border bg-white dark:border-zinc-700 dark:text-white"
+                    : "text-dark-200 dark:bg-dark-200 dark:text-gray  border-none bg-white"
                 }`}
               />
             </div>
@@ -96,7 +100,11 @@ const About = ({data}: About_Props) => {
 
           {isEditMode ? (
             <div className="mt-4 flex justify-end gap-2">
-              <Button variant="hollow" onClick={handleSaveClick} disabled={isLoading}>
+              <Button
+                variant="hollow"
+                onClick={handleSaveClick}
+                disabled={isLoading}
+              >
                 Cancel
               </Button>
               <Button variant="default" type="submit" disabled={isLoading}>
@@ -107,7 +115,7 @@ const About = ({data}: About_Props) => {
         </form>
       </div>
     </Box>
-  )
-}
+  );
+};
 
 export default About

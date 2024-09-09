@@ -1,9 +1,9 @@
-import Image from "next/image"
-import { useModal } from "@/hooks/use-modal-users"
-import { Codev } from '@/types/home/codev'
+import Image from "next/image";
+import { useModal } from "@/hooks/use-modal-users";
+import { Codev } from "@/types/home/codev";
 
 export default function ViewProfile({ user }: { user: Codev }) {
-  const { onOpen } = useModal()
+  const { onOpen } = useModal();
 
   return (
     <button onClick={() => onOpen("profileModal", user)}>
@@ -12,8 +12,8 @@ export default function ViewProfile({ user }: { user: Codev }) {
         alt="See Profile"
         width={0}
         height={0}
-        style={{ width: '1rem', height: "auto" }}
+        style={{ width: "1rem", height: "auto" }}
       />
     </button>
-  )
+  );
 }

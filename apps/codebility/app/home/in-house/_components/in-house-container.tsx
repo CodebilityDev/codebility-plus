@@ -1,36 +1,48 @@
 "use client";
 
 import { useState } from "react";
-import Table from "./in-house-table"
-import InHouseCards from "./in-house-cards"
-import usePagination from "@/hooks/use-pagination"
-import { Codev } from '@/types/home/codev'
+import usePagination from "@/hooks/use-pagination";
+import { Codev } from "@/types/home/codev";
+
+import InHouseCards from "./in-house-cards";
+import Table from "./in-house-table";
 
 interface Props {
   codevData: Codev[];
-}   
+}
 
 export default function InHouseContainer({ codevData }: Props) {
   const [data, setData] = useState<Codev[]>(codevData);
-    const [editableIds, setEditableIds] = useState<string[]>([]);
+  const [editableIds, setEditableIds] = useState<string[]>([]);
 
-    const handleEditButton = (id: string) => {
-        setEditableIds((prevIndexes) => [...prevIndexes, id])
-    }
+  const handleEditButton = (id: string) => {
+    setEditableIds((prevIndexes) => [...prevIndexes, id]);
+  };
 
   const handleSaveButton = (updatedMember: Codev) => {
-    const updatedData = data.map((member) => (member.id === updatedMember.id ? updatedMember : member))
-    setData(updatedData)
-    setEditableIds((prevIndexes) => prevIndexes.filter((editableId) => editableId !== updatedMember.id))
-  }
+    const updatedData = data.map((member) =>
+      member.id === updatedMember.id ? updatedMember : member,
+    );
+    setData(updatedData);
+    setEditableIds((prevIndexes) =>
+      prevIndexes.filter((editableId) => editableId !== updatedMember.id),
+    );
+  };
 
   const LoadinginHouse = false;
   const ErrorinHouse = null;
 
-  const { currentPage, totalPages, paginatedData, handlePreviousPage, handleNextPage } = usePagination(data, 10)
+  const {
+    currentPage,
+    totalPages,
+    paginatedData,
+    handlePreviousPage,
+    handleNextPage,
+  } = usePagination(data, 10);
 
-    return <div>
-        <Table
+  return (
+    <div>
+      <Table
         data={paginatedData}
         editableIds={editableIds}
         handlers={{
@@ -65,4 +77,5 @@ export default function InHouseContainer({ codevData }: Props) {
         handleNextPage={handleNextPage}
       />
     </div>
+  );
 }

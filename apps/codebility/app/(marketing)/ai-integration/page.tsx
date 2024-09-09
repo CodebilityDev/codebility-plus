@@ -1,16 +1,16 @@
-import Footer from "@/app/(marketing)/Footer"
-import Navigation from "@/app/(marketing)/Navigation"
-import AISolutions from "@/app/(marketing)/ai-integration/components/AISolutions"
-import UnparallelDigitalSuccess from "@/app/(marketing)/ai-integration/components/UnparallelDigitalSuccess"
-import MobileAppServices from "@/app/(marketing)/ai-integration/components/MobileAppServices"
-import DevelopmentProcess from "@/app/(marketing)/ai-integration/components/DevelopmentProcess"
-import Partner from "@/app/(marketing)/ai-integration/components/Partner"
-import NextStep from "@/app/(marketing)/ai-integration/components/NextStep"
-import HeroBackground from "@/app/(marketing)/ai-integration/components/HeroBackground"
-import PartnerReactFlow from "@/app/(marketing)/ai-integration/components/PartnerReactFlow"
-import DevelopmentProcessReactFLow from "@/app/(marketing)/ai-integration/components/DevelopmentProcessReactFLow"
-import LatestTech from "@/app/(marketing)/ai-integration/components/LatestTech"
-import SideNavMenu from "@/app/(marketing)/index/components/SideNavMenu" 
+import Footer from "../_components/marketing-footer";
+import Navigation from "../_components/marketing-navigation";
+import SideNavMenu from "../_components/marketing-sidenav-menu";
+import DevelopmentProcess from "./_components/ai-integration-development-process";
+import DevelopmentProcessReactFLow from "./_components/ai-integration-development-process-react-flow";
+import HeroBackground from "./_components/ai-integration-hero-bg";
+import LatestTech from "./_components/ai-integration-latest-tech";
+import MobileAppServices from "./_components/ai-integration-mobile-app-services";
+import NextStep from "./_components/ai-integration-next-step";
+import Partner from "./_components/ai-integration-partner";
+import PartnerReactFlow from "./_components/ai-integration-partner-react-flow";
+import AISolutions from "./_components/ai-integration-solutions";
+import UnparallelDigitalSuccess from "./_components/ai-integration-unparallel-digital-success";
 
 const AiIntegration = () => {
   return (
@@ -29,7 +29,7 @@ const AiIntegration = () => {
       <NextStep />
       <Footer />
     </div>
-  )
-}
+  );
+};
 
-export default AiIntegration
+export default AiIntegration;

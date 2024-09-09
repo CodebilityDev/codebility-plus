@@ -30,9 +30,9 @@ const Skills = ({data}: Skills_Prop) => {
     }
   }, [data, setStack]);
   const handleEditMode = () => {
-    setIsEditMode(true)
-    onOpen("techStackModal")
-  }
+    setIsEditMode(true);
+    onOpen("techStackModal");
+  };
 
   const handleCancel = async () => {
     try {
@@ -54,7 +54,7 @@ const Skills = ({data}: Skills_Prop) => {
     toast.success("Successfully updated your tech stacks!", {id: toastId})
   }
   return (
-    <Box className="relative bg-light-900 dark:bg-dark-100">
+    <Box className="bg-light-900 dark:bg-dark-100 relative">
       <IconEdit
         className="w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
         onClick={handleEditMode}
@@ -82,13 +82,18 @@ const Skills = ({data}: Skills_Prop) => {
           <Button variant="hollow" onClick={handleCancel} disabled={isLoading}>
             Cancel
           </Button>
-          <Button variant="default" type="submit" onClick={handleSave} disabled={isLoading}>
+          <Button
+            variant="default"
+            type="submit"
+            onClick={handleSave}
+            disabled={isLoading}
+          >
             {isLoading ? "Saving..." : "Save"}
           </Button>
         </div>
       ) : null}
     </Box>
-  )
-}
+  );
+};
 
 export default Skills
