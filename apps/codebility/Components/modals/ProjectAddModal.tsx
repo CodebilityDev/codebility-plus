@@ -68,7 +68,7 @@ const ProjectAddModal = () => {
   });
 
   const { data: users }: UseQueryResult<User[]> = useQuery({
-    queryKey: ["users"],
+    queryKey: ["profile"],
     queryFn: async () => {
       const { data, error } = await supabase.from('profile').select('*');
       if (error) throw error;
@@ -76,14 +76,17 @@ const ProjectAddModal = () => {
     },
   });
 
-  const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedMembers, setSelectedMembers] = useState<User[]>([])
+  const [searchQuery, setSearchQuery] = useState<string>("")
+
+  const [usersTest, setUsers] = useState<User[]>([]); // Default to an empty array
 
   const {
     register,
     handleSubmit,
     setValue,
     reset,
+    getValues,
     formState: { errors, isValid },
   } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
@@ -94,7 +97,9 @@ const ProjectAddModal = () => {
     if (!selectedMembers.some((m) => m.id === member.id)) {
       setSelectedMembers((prevMembers) => [...prevMembers, member]);
     }
-  };
+
+    console.log(selectedMembers)
+  }
 
   const removeMember = (id: string) => {
     setSelectedMembers((prevMembers) =>
@@ -109,19 +114,41 @@ const ProjectAddModal = () => {
     onClose();
   };
 
-  const handleSubmitData = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmitData = async (event: React.FormEvent<HTMLFormElement> ) => {
     event.preventDefault(); // Prevent default form submission behavior
 
     const formData = new FormData(event.currentTarget);
+    const formValues = Object.fromEntries(formData) as ProjectFormValues;
+   
 
     try {
-      await InsertData(formData); // Pass form data to DeleteData
+
+      projectSchema.parse(formValues); // This will throw an error if validation fails
+
+       const teamLeaderId = formValues.team_leader_id; 
+
+
+      if (!users) return
+
+
+    // Assuming users is an array of user objects
+    const teamLeader = users.find((user) => user.id === teamLeaderId); // Find user object
+
+    // Extract first name
+    const teamLeaderFirstName = teamLeader ? teamLeader.first_name : "Unknown";
+    const teamLeaderLastName = teamLeader ? teamLeader.last_name : "Unknown";
+
+    console.log("Selected Team Leader ID:", teamLeaderId);
+    console.log("Selected Team Leader First Name:", teamLeader);
+
+
+      await InsertData(formData, selectedMembers,teamLeaderFirstName ,teamLeaderLastName ); // Pass form data to DeleteData
 
       toast.success("New Project has been added!")
 
       reset();
       setProjectImage(null);
-
+      setSelectedMembers([])
       onClose(); // Close the modal after successful deletion
 
 

@@ -22,7 +22,7 @@ import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrig
 import toast from "react-hot-toast"
 
 import { createClient } from "@/utils/supabase/client"
-import { UpdateData } from "@/app/home/projects/actions"
+import { DeleteProjectMembers, InsertTeamLeader, UpdateData } from "@/app/home/projects/actions"
 import { ChangeEvent, useState } from "react"
 
 
@@ -78,13 +78,15 @@ const ProjectEditModal = () => {
   });
 
   const { data: userslist }: UseQueryResult<User[]> = useQuery({
-    queryKey: ["users"],
+    queryKey: [""],
     queryFn: async () => {
       const { data, error } = await supabase.from('profile').select('*');
       if (error) throw error;
       return data;
     },
-  });
+  })
+
+  
 
   const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
   const [selectedRemoveMembers, setSelectedRemoveMembers] = useState<User[]>(
@@ -148,9 +150,13 @@ const ProjectEditModal = () => {
 
     try {
       await UpdateData(formData); // Pass form data to DeleteData
+      await InsertTeamLeader(formData,selectedMembers)
+      await DeleteProjectMembers(formData,selectedRemoveMembers)
       toast.success("New Project has been added!")
       reset();  // Reset the form upon successful submission
       setProjectImage(null);  // Reset the image to default or null
+      setSelectedMembers([])
+      setSelectedRemoveMembers([])
       onClose(); // Close the modal after successful deletion
     } catch (error) {
       toast.error("Something went wrong!");
@@ -173,7 +179,9 @@ const ProjectEditModal = () => {
 
 
 
-  const projectUsers = users?.map((projectUser: any) => projectUser.user?.id);
+  const projectUsers = users?.map((projectUser: any) => projectUser.user?.id)
+  
+
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -238,7 +246,7 @@ const ProjectEditModal = () => {
           </div>
 
           <input type="hidden" name="userId" value={id} /> 
-          <input type="hidden" name="projectImageId" value={projectImage} /> 
+          <input type="hidden" name="projectImageId" value={projectImage} />
 
             <div className="flex flex-col gap-4">
               <Input
@@ -283,7 +291,6 @@ const ProjectEditModal = () => {
                 id="githubLink"
                 type="text"
                 label="Github"
-                required
                 placeholder={data?.github_link}
                 {...register("github_link")}
                 name="github_link"
@@ -292,7 +299,6 @@ const ProjectEditModal = () => {
                 id="linkLink"
                 type="text"
                 label="Live URL"
-                required
                 placeholder={data?.live_link as string}
                 {...register("live_link")}
                   name="live_link"
@@ -301,15 +307,13 @@ const ProjectEditModal = () => {
                 id="productionLink"
                 type="text"
                 label="Link"
-                required
-                placeholder={data?.thumbnail as string}
+                placeholder={data?.figma_link as string}
                 {...register("project_thumbnail")}
                  name="project_thumbnail"
               />
               <Textarea
                 id="summary"
                 label="Summary"
-                required
                 style={{ color: "black" }}
                 placeholder={data?.summary}
                 {...register("summary")}
@@ -450,18 +454,13 @@ const ProjectEditModal = () => {
                     className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
                   />
                   <DropdownMenuSeparator />
-                  <DropdownMenuLabel className="px-4 py-2 text-xs">
-                    Members
-                  </DropdownMenuLabel>
-                  {users
-                    ?.filter(
-                      (user: { first_name: string; last_name: string }) =>
-                        `${user.first_name} ${user.last_name}`
-                          .toLowerCase()
-                          .includes(searchQuery.toLowerCase()),
+                  <DropdownMenuLabel className="px-4 py-2 text-xs">Members</DropdownMenuLabel>
+                  {userslist
+                    ?.filter((user: { first_name: string; last_name: string }) =>
+                      `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
                     )
-                    .map(({ user }: any) => {
-                      if (!user) return null;
+                    .map(( user : User) => {
+                      if (!user) return null
 
                       return (
                         <DropdownMenuItem

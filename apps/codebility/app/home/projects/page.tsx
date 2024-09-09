@@ -23,7 +23,7 @@ const Projects = () => {
   const supabase = createClient();
 
 
-  const Projects = use(supabase.from('project').select('*').then(({ data, error }) => {
+  const Projects = use(supabase.from('projects').select('*').then(({ data, error }) => {
     if (error) throw error;
     return data;
   }));
@@ -54,7 +54,9 @@ const Projects = () => {
   // if (ErrorProjects) return
 
   // if (userType?.projects === false) return router.push("/404")
-// console.log(Projects)
+console.log(Projects)
+
+
 
   return (
     <div className="flex flex-col gap-4">
@@ -68,6 +70,8 @@ const Projects = () => {
           )} */}
 
           <InsertButton/>
+
+          
         </div>
       </div>
       {Projects && Projects.length > 0 && (
