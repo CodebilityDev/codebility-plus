@@ -38,7 +38,7 @@ const ProjectEditModal = () => {
 
   const { users , id , thumbnail, client_id , name} = data || {}
 
-  const isModalOpen = isOpen && type === "projectEditModal";
+  const isModalOpen = isOpen && type === "projectEditModal"
 
   const [projectImage, setProjectImage] = useState<string | any>()
 
@@ -66,7 +66,7 @@ const ProjectEditModal = () => {
 
 
 
-  const { token } = useToken();
+  const { token } = useToken()
 
   const { data: clients }: UseQueryResult<modals_ProjectModal[]> = useQuery({
     queryKey: ["clients"],
@@ -75,7 +75,7 @@ const ProjectEditModal = () => {
       if (error) throw error;
       return data;
     },
-  });
+  })
 
   const { data: userslist }: UseQueryResult<User[]> = useQuery({
     queryKey: [""],
@@ -88,46 +88,47 @@ const ProjectEditModal = () => {
 
   
 
-  const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
-  const [selectedRemoveMembers, setSelectedRemoveMembers] = useState<User[]>(
-    [],
-  );
+  const [selectedMembers, setSelectedMembers] = useState<User[]>([])
+  const [selectedRemoveMembers, setSelectedRemoveMembers] = useState<User[]>([])
 
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [searchQuery, setSearchQuery] = useState<string>("")
 
-  const handleMemberSearch = (e: {
-    target: { value: SetStateAction<string> };
-  }) => {
-    setSearchQuery(e.target.value);
-  };
+  const handleMemberSearch = (e: { target: { value: SetStateAction<string> } }) => {
+    setSearchQuery(e.target.value)
+  }
 
   const addMember = (member: User) => {
     if (!selectedMembers.some((m) => m.id === member.id)) {
-      setSelectedMembers((prevMembers) => [...prevMembers, member]);
+      setSelectedMembers((prevMembers) => [...prevMembers, member])
     }
-  };
+  }
 
   const removeMember = (id: string) => {
-    setSelectedMembers((prevMembers) =>
-      prevMembers.filter((member) => member.id !== id),
-    );
-  };
+    setSelectedMembers((prevMembers) => prevMembers.filter((member) => member.id !== id))
+  }
 
   const addToRemoveMember = (member: User) => {
     if (!selectedRemoveMembers.some((m) => m.id === member.id)) {
-      setSelectedRemoveMembers((prevMembers) => [...prevMembers, member]);
+      setSelectedRemoveMembers((prevMembers) => [...prevMembers, member])
     }
-  };
+  }
 
   const removetoCancelRemoveMember = (id: string) => {
     setSelectedRemoveMembers((prevMembers) => prevMembers.filter((member) => member.id !== id))
   }
 
-  const handleSubmit = async () => {
-    try {
-      const response = await updateProjects(
-        {
-          ...formData,
+ 
+
+
+  const handleUploadProjectThumbnail = async (ev: ChangeEvent<HTMLInputElement>) => {
+    const file = ev.target.files?.[0]
+
+    if (file) {
+      const formData = new FormData()
+      formData.append("image", file)
+      const response = await axios.post(`${API.USERS}/upload-image`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
       })
 
@@ -159,7 +160,7 @@ const ProjectEditModal = () => {
       setSelectedRemoveMembers([])
       onClose(); // Close the modal after successful deletion
     } catch (error) {
-      toast.error("Something went wrong!");
+      toast.error("Something went wrong!")
     }
   }
 
@@ -185,7 +186,9 @@ const ProjectEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="flex h-[32rem] w-full max-w-[880px] flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto">
+      <DialogContent
+        className="flex h-[32rem] w-full max-w-[880px] flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
+      >
         <DialogHeader className="relative">
           <DialogTitle className="mb-2 text-left text-xl">Edit Project </DialogTitle>
         </DialogHeader>
@@ -345,10 +348,7 @@ const ProjectEditModal = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger className="cursor-pointer">
-                  <Button
-                    variant="hollow"
-                    className="h-12 w-12 rounded-full p-0"
-                  >
+                  <Button variant="hollow" className="h-12 w-12 rounded-full p-0">
                     <IconPlus className="invert dark:invert-0" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -356,34 +356,28 @@ const ProjectEditModal = () => {
                   side="bottom"
                   sideOffset={10}
                   align="start"
-                  className="dark:bg-dark-100 z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white"
+                  className="z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white dark:bg-dark-100"
                 >
-                  <DropdownMenuLabel className="pb-2 text-center text-sm">
-                    Add Members
-                  </DropdownMenuLabel>
+                  <DropdownMenuLabel className="pb-2 text-center text-sm">Add Members</DropdownMenuLabel>
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={handleMemberSearch}
                     placeholder="Search members"
-                    className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
+                    className="border-gray-300 mb-2 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none dark:bg-dark-200"
                   />
                   <DropdownMenuSeparator />
-                  <DropdownMenuLabel className="px-4 py-2 text-xs">
-                    Available Members
-                  </DropdownMenuLabel>
+                  <DropdownMenuLabel className="px-4 py-2 text-xs">Available Members</DropdownMenuLabel>
                   {userslist
                     ?.filter(
                       (user: { id: any; first_name: any; last_name: any }) =>
                         !projectUsers?.includes(user.id) &&
-                        `${user.first_name} ${user.last_name}`
-                          .toLowerCase()
-                          .includes(searchQuery.toLowerCase()),
+                        `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase())
                     )
                     .map((user: any) => (
                       <DropdownMenuItem
                         key={user.id}
-                        className="dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100"
+                        className="hover:bg-gray-100 flex cursor-pointer items-center justify-between px-4 py-2 dark:hover:bg-dark-200"
                         onClick={() => addMember(user)}
                       >
                         <div className="flex items-center gap-2">
@@ -430,10 +424,7 @@ const ProjectEditModal = () => {
 
               <DropdownMenu>
                 <DropdownMenuTrigger className="cursor-pointer">
-                  <Button
-                    variant="hollow"
-                    className="h-12 w-12 rounded-full p-0"
-                  >
+                  <Button variant="hollow" className="h-12 w-12 rounded-full p-0">
                     <IconPlus className="invert dark:invert-0" />
                   </Button>
                 </DropdownMenuTrigger>
@@ -441,17 +432,15 @@ const ProjectEditModal = () => {
                   side="bottom"
                   sideOffset={10}
                   align="start"
-                  className="dark:bg-dark-100 z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white"
+                  className="z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white dark:bg-dark-100"
                 >
-                  <DropdownMenuLabel className="pb-2 text-center text-sm">
-                    Remove Members
-                  </DropdownMenuLabel>
+                  <DropdownMenuLabel className="pb-2 text-center text-sm">Remove Members</DropdownMenuLabel>
                   <input
                     type="text"
                     value={searchQuery}
                     onChange={handleMemberSearch}
                     placeholder="Search members"
-                    className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
+                    className="border-gray-300 mb-2 h-10 w-full rounded-lg border bg-white px-3 text-sm focus:outline-none dark:bg-dark-200"
                   />
                   <DropdownMenuSeparator />
                   <DropdownMenuLabel className="px-4 py-2 text-xs">Members</DropdownMenuLabel>
@@ -465,7 +454,7 @@ const ProjectEditModal = () => {
                       return (
                         <DropdownMenuItem
                           key={user.id}
-                          className="dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100"
+                          className="hover:bg-gray-100 flex cursor-pointer items-center justify-between px-4 py-2 dark:hover:bg-dark-200"
                           onClick={() => addToRemoveMember(user)}
                         >
                           <div className="flex items-center gap-2">
@@ -482,7 +471,7 @@ const ProjectEditModal = () => {
                             <span>{`${user.first_name} ${user.last_name}`}</span>
                           </div>
                         </DropdownMenuItem>
-                      );
+                      )
                     })}
                 </DropdownMenuContent>
               </DropdownMenu>
@@ -509,7 +498,7 @@ const ProjectEditModal = () => {
 
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default ProjectEditModal;
+export default ProjectEditModal
