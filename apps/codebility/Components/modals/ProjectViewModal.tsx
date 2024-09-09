@@ -1,16 +1,15 @@
-import Image from "next/image";
-import Link from "next/link";
-import { useModal } from "@/hooks/use-modal-projects";
-import { defaultAvatar } from "@/public/assets/images";
-import { IconGithub, IconLink } from "@/public/assets/svgs";
+import Link from "next/link"
+import Image from "next/image"
 
-import { Button } from "@codevs/ui/button";
-import { Dialog, DialogContent } from "@codevs/ui/dialog";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@codevs/ui/hover-card";
+import { Button } from "@codevs/ui/button"
+import { Dialog, DialogContent } from "@codevs/ui/dialog"
+import { useModal } from "@/hooks/use-modal-projects"
+import { IconGithub, IconLink } from "@/public/assets/svgs"
+import { defaultAvatar } from "@/public/assets/images"
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@codevs/ui/hover-card"
+
+import { format, parseISO } from 'date-fns';
+import { User, ViewType } from "@/app/home/projects/_types/projects"
 
 const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
@@ -25,9 +24,29 @@ const ProjectViewModal = () => {
     team_leader,
     created_at,
     thumbnail,
+    view_type,
+    members = [],
   } = data || {}
 
-  const isModalOpen = isOpen && type === "projectViewModal";
+  const parseMembers = (membersData: string[]): User[] => {
+    return membersData.map((member) => JSON.parse(member) as User);
+  };
+
+   // Parse the members data
+   const membersParsed = parseMembers(members);
+
+
+
+    // Ensure view_type is a string before parsing, and use type assertion
+    const viewType: ViewType = typeof view_type === "string"
+    ? JSON.parse(view_type) as ViewType
+    : { first_name: "Unknown", last_name: "Unknown" };
+
+
+// Parse the date string using date-fns
+const formattedDate = created_at ? format(parseISO(created_at), 'MM/dd/yyyy hh:mm:ss a') : null;
+
+  const isModalOpen = isOpen && type === "projectViewModal"
 
   return (
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
@@ -78,53 +97,44 @@ const ProjectViewModal = () => {
             <div className="dark:bg-dark-200 flex flex-1 flex-col gap-2 rounded-lg p-4">
               <p className="text-2xl">Status</p>
               <p className="text-lg text-orange-400">{status}</p>
-              <p className="text-md text-gray">Date Started: {created_at}</p>
+              <p className="text-md text-gray">Date Started: {formattedDate}</p>
               <p className="text-md text-gray">
                 Lead by:{" "}
                 <span className="text-blue-100">
-                  {team_leader?.first_name} {team_leader?.last_name}
+                   {viewType.first_name} {viewType.last_name}
                 </span>
               </p>
             </div>
           </div>
           <div className="dark:bg-dark-200 flex flex-col gap-4 rounded-lg p-4">
             <p className="text-2xl">Contributors</p>
-            <div className="flex h-40 max-h-40 flex-col gap-3 overflow-y-auto xl:h-auto xl:max-h-max xl:flex-row">
-              {users?.map(({ user }: any) => {
-                if (!user) return null;
-                return (
-                  <div key={user.id} className="flex items-center gap-1">
-                    <HoverCard>
-                      <HoverCardTrigger className="cursor-pointer">
-                        <div className="from-teal to-violet relative size-[55px] overflow-hidden rounded-full bg-gradient-to-b bg-cover object-cover p-[2px]">
-                          <Image
-                            alt={`${user.first_name} ${user.last_name}`}
-                            src={user.image_url || defaultAvatar}
-                            width={60}
-                            height={60}
-                            className="from-violet h-auto w-full rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover"
-                          />
-                        </div>
-                      </HoverCardTrigger>
-                      <HoverCardContent
-                        align="start"
-                        className="ml-2 border-none"
-                      >
-                        <p className="text-base font-semibold">{`${user.first_name} ${user.last_name}`}</p>
-                        <p className="text-xs text-gray-500">
-                          {user.position.join(", ")}
-                        </p>
-                      </HoverCardContent>
-                    </HoverCard>
-                    <div className="ml-2 xl:hidden">
-                      <p className="text-sm font-semibold">{`${user.first_name} ${user.last_name}`}</p>
-                      <p className="text-xs text-gray-500">
-                        {user.position.join(", ")}
-                      </p>
-                    </div>
+            <div className="max-h-40 h-40 overflow-y-auto flex flex-col gap-3 xl:h-auto xl:max-h-max xl:flex-row">
+            {membersParsed?.map((user) => (
+                <div key={user.id} className="flex gap-1 items-center">
+                  <HoverCard>
+                    <HoverCardTrigger className="cursor-pointer">
+                      <div className="relative size-[55px] overflow-hidden rounded-full bg-gradient-to-b from-teal to-violet bg-cover object-cover p-[2px]">
+                        <Image
+                          alt={`${user.first_name} ${user.last_name}`}
+                          src={user.image_url || defaultAvatar}
+                          width={60}
+                          height={60}
+                          className="h-auto w-full rounded-full bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover"
+                        />
+                      </div>
+                    </HoverCardTrigger>
+                    <HoverCardContent align="start" className="ml-2 border-none">
+                      <p className="text-base font-semibold">{`${user.first_name} ${user.last_name}`}</p>
+                      <p className="text-gray-500 text-xs">{user.position}</p>
+                    </HoverCardContent>
+                  </HoverCard>
+                  <div className="ml-2 xl:hidden">
+                    <p className="text-sm font-semibold">{`${user.first_name} ${user.last_name}`}</p>
+                    <p className="text-gray-500 text-xs">{user.position}</p>
                   </div>
-                );
-              })}
+                </div>
+              ))}
+
             </div>
           </div>
 
@@ -136,7 +146,6 @@ const ProjectViewModal = () => {
             >
               Delete
             </Button>
-            
             <Button variant="default" className="w-full lg:w-[130px]" onClick={() => onOpen("projectEditModal", data)}>
               Edit
             </Button>

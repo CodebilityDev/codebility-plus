@@ -168,14 +168,21 @@ type TeamMemberT = {
   nda_status?: TNda;
 };
 
+
+type ViewType = {
+  first_name: string;
+  last_name: string;
+};
+
+
 type ProjectT = {
   id?: string
   name?: string
   github_link?: string
   summary?: string
   status?: string
+  figma_link?: string
   live_link?: string | null
-  figma_link?: string | null
   client_id?: string
   team_leader_id?: string
   team_leader?: User
@@ -183,6 +190,8 @@ type ProjectT = {
   thumbnail?: string | null
   created_at?: Date | any
   updated_at?: string
+  members: string[]
+  view_type: ViewType;
 }
 
 type BoardUserT = {
