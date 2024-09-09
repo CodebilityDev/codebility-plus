@@ -9,52 +9,21 @@ import useAuthCookie from "@/hooks/use-cookie"
 import { Button } from "@/Components/ui/button"
 import H1 from "@/Components/shared/dashboard/H1"
 import { useModal } from "@/hooks/use-modal-projects"
-
-
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import InsertButton from "./_components/projects-insert-button"
-// import { ProjectT } from "./_types/projects-projectT"
-import { createClient } from "@/utils/supabase/client";
 import { use } from "react"
 
 
 const Projects = () => {
 
 
-  const supabase = createClient();
+  const supabase = useSupabase();
 
 
   const Projects = use(supabase.from('projects').select('*').then(({ data, error }) => {
     if (error) throw error;
     return data;
   }));
-
-
-  // const { data: authData } = useAuthCookie()
-  // const { userType } = authData || {}
-
-  // const { onOpen } = useModal()
-  // const router = useRouter()
-
-  // const {
-  //   data: Projects,
-  //   isLoading: LoadingProjects,
-  //   error: ErrorProjects,
-  // }: UseQueryResult<ProjectT[]> = useQuery({
-  //   queryKey: ["projects"],
-  //   queryFn: async () => {
-  //     return await getProjects()
-  //   },
-  //   refetchInterval: 3000,
-  // })
-
-  // if (LoadingProjects) {
-  //   return <Loading />
-  // }
-
-  // if (ErrorProjects) return
-
-  // if (userType?.projects === false) return router.push("/404")
-console.log(Projects)
 
 
 

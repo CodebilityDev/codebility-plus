@@ -22,11 +22,13 @@ import { useModal } from "@/hooks/use-modal-projects"
 import { modals_ProjectModal } from "@/types/components"
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@codevs/ui/dialog"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select"
-import { createClient } from "@/utils/supabase/client"
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+
+import { cookies } from 'next/headers';
+import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 
 
 import { InsertData } from "@/app/home/projects/actions"
-
 
 
 
@@ -47,8 +49,7 @@ const defaultImage =
 
 const ProjectAddModal = () => {
 
-
-  const supabase = createClient();
+  const supabase = useSupabase();
 
   const { isOpen, onClose, type } = useModal()
   const isModalOpen = isOpen && type === "projectAddModal"

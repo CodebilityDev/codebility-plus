@@ -21,18 +21,18 @@ import { DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select"
 import toast from "react-hot-toast"
 
-import { createClient } from "@/utils/supabase/client"
 import { DeleteProjectMembers, InsertTeamLeader, UpdateData } from "@/app/home/projects/actions"
 import { ChangeEvent, useState } from "react"
-
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
+
 const ProjectEditModal = () => {
 
-  const supabase = createClient();
+  const supabase = useSupabase();
 
   const { isOpen, onClose, type, data } = useModal()
 
@@ -199,22 +199,6 @@ const ProjectEditModal = () => {
 
           <div className="flex flex-col gap-4">
             
-            {/* <div className="flex gap-4">
-              <div className="flex h-14 w-28 items-center justify-center rounded-lg bg-gray md:h-20 md:w-40">
-                <Image src="/assets/svgs/icon-cog.svg" width={30} height={30} alt="logo" />
-              </div>
-              <div className="flex flex-col justify-center gap-2">
-                <p className="text-md text-gray">Image size 1080 x 768 px</p>
-                <div className="flex gap-4">
-                  <Link href={`#`}>
-                    <p className="text-blue-100">Upload Image</p>
-                  </Link>
-                  <Link href={`#`}>
-                    <p className="text-violet">Remove Image</p>
-                  </Link>
-                </div>
-              </div>
-            </div> */}
 
       <div className="flex gap-4">
             <div className="flex h-14 w-28 items-center justify-center overflow-hidden rounded-lg bg-gray md:h-20 md:w-40">
@@ -271,12 +255,6 @@ const ProjectEditModal = () => {
                   <SelectGroup>
                     <SelectLabel>Clients</SelectLabel>
 
-{/* 
-                    {clients?.map((client: { id: string; company_name: string }) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.company_name}
-                      </SelectItem>
-                    ))} */}
 
 
                     {clientsDummy.map((data) => (
