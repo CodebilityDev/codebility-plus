@@ -13,7 +13,7 @@ import { Textarea } from "@codevs/ui/textarea"
 import {  updateWorkExperience, deleteWorkExperience, createWorkExperience } from "../action"
 
 
-type ExperienceType = {
+export type ExperienceType = {
   id?: string
   userWorkExpId?: string
   position: string
@@ -23,9 +23,12 @@ type ExperienceType = {
   created_at?: string
   updated_at?: string
 }
+interface ExperienceProps {
+  data: ExperienceType[];
+}
 
-const Experience = () => {
-  const [experienceData, setExperienceData] = useState<ExperienceType[]>([])
+const Experience = ({data}: ExperienceProps) => {
+  const [experienceData, setExperienceData] = useState<ExperienceType[]>(data)
   const [isLoadingMain, setIsLoadingMain] = useState(false)
   const [isEditMain] = useState(false)
 
@@ -35,27 +38,27 @@ const Experience = () => {
   const editModePerItem: React.MutableRefObject<EditModePerItem> = useRef({})
   
   
-//   const getWorkExperiences = useCallback(async () => {
-//     try {
-//       setIsLoadingMain(true)
-//       const res: any = await getWorkExperience()
-//       setExperienceData([...res.data])
-//       const updateObject: any = {}
-//       res.data.map((item: any, index: number) => {
-//         updateObject[index] = false
-//       })
-//       editModePerItem.current = updateObject
-//       setIsLoadingMain(false)
-//     } catch (e: any) {
-//       setIsLoadingMain(false)
-//     } finally {
-//       setIsLoadingMain(false)
-//     }
-//   }, [])
+  const getWorkExperiences = useCallback(async () => {
+    try {
+      setIsLoadingMain(true)
+      const res: any = await getWorkExperiences()
+      setExperienceData([...res.data])
+      const updateObject: any = {}
+      res.data.map((item: any, index: number) => {
+        updateObject[index] = false
+      })
+      editModePerItem.current = updateObject
+      setIsLoadingMain(false)
+    } catch (e: any) {
+      setIsLoadingMain(false)
+    } finally {
+      setIsLoadingMain(false)
+    }
+  }, [])
 
-//   useEffect(() => {
-//     getWorkExperiences();
-//   }, [getWorkExperiences]);
+  useEffect(() => {
+    getWorkExperiences();
+  }, [getWorkExperiences]);
 
   const handleUpdateExperience = (itemNo: number, e: any) => {
     const updatedExperiences = experienceData.map((item, id) => {
@@ -137,7 +140,7 @@ const Experience = () => {
               toast.error("Save your changes first..")
             } else {
               setExperienceData((prev) => [...prev, { position: "", description: "", date_from: "", date_to: "" }])
-              toast.success("Added new experience entry")
+             
             }
           }}
           variant="outlined"
@@ -227,44 +230,73 @@ const ExperienceForm = ({
     setEditMode(true)
     editModePerItem.current[itemNo] = true
   }
-
   const handleSaveAndUpdate = async (id: string | undefined) => {
-    if (
-      experience?.position === "" ||
-      experience?.description === "" ||
-      experience?.date_to === "" ||
-      experience?.date_from === ""
-    ) {
-      toast.error("Fill the empty fields first..")
-    } else {
-      const data = {
-       
-        position: experience.position,
-        description: experience.description,
-        date_from: experience.date_from,
-        date_to: experience.date_to,
-        // company: "no ui",
-        // location: "no ui",
-      }
-      try {
-        setIsLoading(true)
-        if (!id) {
-         const {error} = await createWorkExperience(data)
-          toast.success("Successfully Added!")
-        } else {
-          await updateWorkExperience(data)
-          toast.success("Successfully Updated!")
+    const data: any = {
+      position: experience.position,
+      description: experience.description,
+      date_from: experience.date_from,
+      date_to: experience.date_to,
+    };
+  
+    try {
+      setIsLoading(true);
+      if (!id) {
+        const { error } = await createWorkExperience(data); 
+        if (!error) {
+          toast.success("Successfully Added!");
         }
-        handleEditModePerItem(itemNo, false)
-        setEditMode(false)
-      } catch (error) {
-        console.error("Error updating profile:", error)
-        toast.error("Something went wrong!")
-      } finally {
-        setIsLoading(false)
+      } else {
+        const { error } = await updateWorkExperience(id, data); 
+        if (!error) {
+          toast.success("Successfully Updated!");
+        }
       }
+      handleEditModePerItem(itemNo, false); 
+      setEditMode(false);
+    } catch (error) {
+      toast.error("Something went wrong!");
+    } finally {
+      setIsLoading(false);
     }
-  }
+  };
+  
+  // const handleSaveAndUpdate = async (id: string | undefined) => {
+  //   if (
+  //     experience?.position === "" ||
+  //     experience?.description === "" ||
+  //     experience?.date_to === "" ||
+  //     experience?.date_from === ""
+  //   ) {
+  //     toast.error("Fill the empty fields first..")
+  //   } else {
+  //     const data = {
+       
+  //       position: experience.position,
+  //       description: experience.description,
+  //       date_from: experience.date_from,
+  //       date_to: experience.date_to,
+  //       // company: "no ui",
+  //       // location: "no ui",
+  //     }
+  //     try {
+  //       setIsLoading(true)
+  //       if (!id) {
+  //        const {error} = await createWorkExperience(data)
+  //         toast.success("Successfully Added!")
+  //       } else {
+  //         await updateWorkExperience(data)
+  //         toast.success("Successfully Updated!")
+  //       }
+  //       handleEditModePerItem(itemNo, false)
+  //       setEditMode(false)
+  //     } catch (error) {
+  //       console.error("Error updating profile:", error)
+  //       toast.error("Something went wrong!")
+  //     } finally {
+  //       setIsLoading(false)
+  //     }
+  //   }
+  // }
 
   return (
     <>
