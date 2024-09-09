@@ -1,24 +1,15 @@
-import "server-only";
+import "server-only"
+import LeftSidebar from "./_components/home-left-sidebar"
+import Navbar from "./_components/home-navbar"
+import React from "react"
+import ReactQueryProvider from "@/hooks/reactQuery"
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import UserContextProvider from "./_components/user-provider"
 
-import React from "react";
-import ReactQueryProvider from "@/hooks/reactQuery";
-
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-
-import LeftSidebar from "./_components/home-left-sidebar";
-import Navbar from "./_components/home-navbar";
-import UserContextProvider from "./_components/user-provider";
-
-export default async function HomeLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default async function HomeLayout({ children }: { children: React.ReactNode }) {
   const supabase = getSupabaseServerComponentClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const { data: { user } } = await supabase.auth.getUser();
 
   let userData = {
     id: "",
@@ -30,13 +21,11 @@ export default async function HomeLayout({
     start_time: 0,
     end_time: 0,
     image_url: "",
-    permissions: [""],
+    permissions: [""]
   };
 
-  const { data } = await supabase
-    .from("user")
-    .select(
-      `
+  const { data } = await supabase.from("user")
+  .select(`
     *,
     codev(
       id,
@@ -59,19 +48,15 @@ export default async function HomeLayout({
       time_tracker
     ),
     profile(*)
-  `,
-    )
-    .eq("id", user?.id)
-    .single();
+  `).eq('id', user?.id)
+  .single();
 
   if (data) {
     const permissionNames = Object.keys(data?.user_type || {});
-    const permissions = permissionNames.filter(
-      (permissionName) => data.user_type[permissionName],
-    );
+    const permissions = permissionNames.filter(permissionName => data.user_type[permissionName]);
     const { first_name, last_name, main_position, image_url } = data.profile;
     const { start_time, end_time } = data.codev;
-
+    
     userData = {
       id: data.id,
       codev_id: data.codev.id,
@@ -82,13 +67,14 @@ export default async function HomeLayout({
       start_time,
       end_time,
       image_url,
-      permissions,
+      permissions
     };
   }
 
+
   return (
     <ReactQueryProvider>
-      <UserContextProvider userData={userData}>
+      <UserContextProvider userData={userData}>   
         <main className="background-light850_dark100 relative">
           <Navbar />
           <div className="flex">
@@ -100,5 +86,5 @@ export default async function HomeLayout({
         </main>
       </UserContextProvider>
     </ReactQueryProvider>
-  );
+  )
 }

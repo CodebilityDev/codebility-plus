@@ -168,21 +168,31 @@ type TeamMemberT = {
   nda_status?: TNda;
 };
 
-type ProjectT = {
-  id?: string;
-  project_name?: string;
-  github_link?: string;
-  summary?: string;
-  project_status?: string;
-  live_link?: string | null;
-  clientId?: string;
-  team_leader_id?: string;
-  team_leader?: User;
-  users?: User[];
-  project_thumbnail?: string | null;
-  created_at?: Date | any;
-  updated_at?: string;
+
+type ViewType = {
+  first_name: string;
+  last_name: string;
 };
+
+
+type ProjectT = {
+  id?: string
+  name?: string
+  github_link?: string
+  summary?: string
+  status?: string
+  figma_link?: string
+  live_link?: string | null
+  client_id?: string
+  team_leader_id?: string
+  team_leader?: User
+  users?: User[]
+  thumbnail?: string | null
+  created_at?: Date | any
+  updated_at?: string
+  members: string[]
+  view_type: ViewType;
+}
 
 type BoardUserT = {
   id: string;

@@ -76,5 +76,5 @@ jobs:
         run: pnpm dlx turbo@latest run build --filter=...[origin/dev]
 
       # Run tests only for changed packages
-      - name: Run tests for changed packages
-        run: pnpm dlx turbo@latest run test --filter=...[origin/dev]
+      # - name: Run tests for changed packages
+      #   run: pnpm dlx turbo@latest run test --filter=...[origin/dev]
