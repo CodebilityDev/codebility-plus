@@ -13,31 +13,23 @@ import InputPhone from "@/Components/shared/dashboard/InputPhone"
 import { Input } from "@codevs/ui/input"
 
 import { updateSocial } from "../action"
+import { Social_Types } from "../_types/resume"
 
-type Contact = {
-  phone_no: string
-  portfolio_website: string
-  github_link: string
-  linkedin_link: string
-  fb_link: string
-  telegram_link: string
-  whatsapp_link: string
-  skype_link: string
+type Social_Props ={
+  data: Social_Types
 }
-type ContactProps = {
-  data: Contact
-}
-const ContactInfo = ({data}: ContactProps) => {
+
+
+const ContactInfo = ({data}: Social_Props) => {
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
  
-
   const {
     register,
     handleSubmit,
     reset,
     control,
-    formState: { },
+    formState: { errors },
   } = useForm({
     defaultValues: {
       phone_no: "" ,
@@ -68,7 +60,8 @@ const ContactInfo = ({data}: ContactProps) => {
     }
   }, [data, reset])
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: Social_Types) => {
+    const toastId = toast.loading("Your social info was being updated")
     try {
       setIsLoading(true)
       const {
@@ -82,7 +75,7 @@ const ContactInfo = ({data}: ContactProps) => {
         skype_link
       } = data;
       await updateSocial({phone_no, portfolio_website, github_link, linkedin_link, fb_link, telegram_link, whatsapp_link, skype_link})
-      toast.success("Your contact info was sucessfully updated!")
+      toast.success("Your contact info was sucessfully updated!", {id: toastId})
       setIsEditMode(false)
     } catch(error){
       console.log(error)
@@ -122,90 +115,91 @@ const ContactInfo = ({data}: ContactProps) => {
                 ? " border border-lightgray bg-white text-black-100 dark:border-zinc-700 dark:bg-dark-200 dark:text-white"
                 : " bg-white  text-dark-200 dark:bg-dark-200 dark:text-gray"
             }`}
+            {...register("phone_no", {
+              pattern: {
+                value: /^\d{3}[-\s]?\d{3}[-\s]?\d{4}$/,
+                message: "Invalid phone number. Please enter a 10-digit number.",
+              },
+            })}
           />
-          {/* {errors.phone_no?.message && <p className="ml-24 mt-2 text-sm text-red-400">{errors.phone_no?.message}</p>} */}
+       
           <Input
             id="portfolio_website"
             {...register("portfolio_website")}
             label="Website"
+            placeholder="eg. Codebility.tech"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {/* {errors.portfolio_website?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.portfolio_website?.message}</p>
-          )} */}
+        
           <Input
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
             id="github_link"
+            placeholder="eg. https://github.com/CodebilityDev/"
             {...register("github_link")}
             label="Github"
             disabled={!isEditMode}
           />
-          {/* {errors.github_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.github_link?.message}</p>
-          )} */}
+         
           <Input
             id="fb_link"
             {...register("fb_link")}
             label="Facebook"
+            placeholder="eg. https://www.facebook.com/Codebilitydev"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {/* {errors.fb_link?.message && <p className="ml-24 mt-2 text-sm text-red-400">{errors.fb_link?.message}</p>} */}
+        
           <Input
             id="linkedin_link"
             {...register("linkedin_link")}
             label="Linkedin"
             disabled={!isEditMode}
+            placeholder="eg. https://www.linkedin.com/company/codebilitytech/"
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {/* {errors.linkedin_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.linkedin_link?.message}</p>
-          )} */}
+        
           <Input
             id="telegram_link"
             {...register("telegram_link")}
             label="Telegram"
+            placeholder="eg. https://www.telegram.com/codebility"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {/* {errors.telegram_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.telegram_link?.message}</p>
-          )} */}
+      
           <Input
             id="whatsapp_link"
             {...register("whatsapp_link")}
             label="Whatsapp"
+            placeholder="eg. https://www.whatsapp.com/codebility"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {/* {errors.whatsapp_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.whatsapp_link?.message}</p>
-          )} */}
+         
           <Input
             id="skype_link"
             {...register("skype_link")}
             label="Skype"
+            placeholder="eg. https://www.skype.com/codebility"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {/* {errors.skype_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">{errors.skype_link?.message}</p>
-          )} */}
+          
         </div>
         {isEditMode ? (
           <div className="mt-4 flex justify-end gap-2">

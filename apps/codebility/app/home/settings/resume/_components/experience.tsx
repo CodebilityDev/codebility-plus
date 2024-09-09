@@ -12,8 +12,7 @@ import Box from "@/Components/shared/dashboard/Box"
 import { Textarea } from "@codevs/ui/textarea"
 import {  updateWorkExperience, deleteWorkExperience, createWorkExperience } from "../action"
 
-
-export type ExperienceType = {
+export type Experience_Type = {
   id?: string
   userWorkExpId?: string
   position: string
@@ -24,11 +23,11 @@ export type ExperienceType = {
   updated_at?: string
 }
 interface ExperienceProps {
-  data: ExperienceType[];
+  data: Experience_Type[];
 }
 
 const Experience = ({data}: ExperienceProps) => {
-  const [experienceData, setExperienceData] = useState<ExperienceType[]>(data)
+  const [experienceData, setExperienceData] = useState<Experience_Type[]>(data)
   const [isLoadingMain, setIsLoadingMain] = useState(false)
   const [isEditMain] = useState(false)
 
@@ -99,23 +98,6 @@ const Experience = ({data}: ExperienceProps) => {
     editModePerItem.current = { ...editModePerItem.current, [itemNo]: editable }
   }
 
-  // const handleUpdateProfileSkills = async (data: any) => {
-  //   try {
-  //     const updatedData = { ...data }
-  //     await updateProfile(updatedData).then((response) => {
-  //       if (response) {
-  //         toast.success("Successfully Updated!")
-  //       } else if (!response) {
-  //         toast.error("Something went wrong")
-  //       }
-  //     })
-  //   } catch (e) {
-  //     toast.error("Something went wrong!")
-  //   } finally {
-  //     return
-  //   }
-  // }
-
   return (
     <>
       <Box className="relative flex flex-col gap-2 bg-light-900 dark:bg-dark-100">
@@ -171,16 +153,13 @@ const Experience = ({data}: ExperienceProps) => {
 }
 
 interface ExperienceFormProps {
-  experience: ExperienceType
+  experience: Experience_Type
   handleUpdateExperience: (itemNo: number, e: any) => void
   itemNo: number
   totalNo: number
   editModePerItem: any
   handleEditModePerItem: (itemNo: number, editable: boolean) => void
   handleDeleteExperience: (itemNo: number, id: string, type: "delete" | "cancel") => void
-
-  
-
   isLoadingMain: boolean
   isEditMain: boolean
 }
@@ -193,9 +172,6 @@ const ExperienceForm = ({
   editModePerItem,
   handleEditModePerItem,
   handleDeleteExperience,
-
-
-  
   isLoadingMain,
 }: ExperienceFormProps) => {
   const [editMode, setEditMode] = useState(false)
@@ -259,44 +235,6 @@ const ExperienceForm = ({
       setIsLoading(false);
     }
   };
-  
-  // const handleSaveAndUpdate = async (id: string | undefined) => {
-  //   if (
-  //     experience?.position === "" ||
-  //     experience?.description === "" ||
-  //     experience?.date_to === "" ||
-  //     experience?.date_from === ""
-  //   ) {
-  //     toast.error("Fill the empty fields first..")
-  //   } else {
-  //     const data = {
-       
-  //       position: experience.position,
-  //       description: experience.description,
-  //       date_from: experience.date_from,
-  //       date_to: experience.date_to,
-  //       // company: "no ui",
-  //       // location: "no ui",
-  //     }
-  //     try {
-  //       setIsLoading(true)
-  //       if (!id) {
-  //        const {error} = await createWorkExperience(data)
-  //         toast.success("Successfully Added!")
-  //       } else {
-  //         await updateWorkExperience(data)
-  //         toast.success("Successfully Updated!")
-  //       }
-  //       handleEditModePerItem(itemNo, false)
-  //       setEditMode(false)
-  //     } catch (error) {
-  //       console.error("Error updating profile:", error)
-  //       toast.error("Something went wrong!")
-  //     } finally {
-  //       setIsLoading(false)
-  //     }
-  //   }
-  // }
 
   return (
     <>

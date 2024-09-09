@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 "use server"
 
 import { Toaster } from "react-hot-toast"
@@ -19,30 +18,22 @@ import About from "./_components/about"
 import ContactInfo from "./_components/contact-info"
 
 import Skills from "./_components/skills"
-import Experience, { ExperienceType } from "./_components/experience"
-
-
-
-
+import Experience, { Experience_Type } from "./_components/experience"
+import { Profile_Types, Social_Types } from "./_types/resume"
 
 const Resume = async () => { 
   
     const supabase = getSupabaseServerComponentClient()
     const {data: {user} } = await supabase.auth.getUser()
-    const {data: profileData, error} = await supabase.from("profile").select().eq("id", user?.id).single()
-    const {data: socialData} = await supabase.from("social").select().eq("id", user?.id).single()
-    const { data: experienceData } = await supabase
+    const {data: profileData, error: profileError} = await supabase.from("profile").select().eq("id", user?.id).single()
+    const {data: socialData, error: socialError} = await supabase.from("social").select().eq("id", user?.id).single()
+    const { data: experienceData, error: experienceError } = await supabase
     .from("experience")
     .select()
     .eq("profile_id", user?.id)
     
-  if (error) {
-    console.error("Error fetching profile data:", error)
-    return (
-      <div>Error loading profile data</div>
-    )
-  }
-  const datas : ExperienceType[] = experienceData || [];
+
+ 
   return (
     <>
       <Breadcrumb>
@@ -57,19 +48,20 @@ const Resume = async () => {
       <Toaster position="top-center" reverseOrder={false} />
       <div className="flex flex-col gap-4 pt-4">
         <H1>Resume Settings</H1>
+        {experienceError && socialError && profileError ? "Something went wrong!" : 
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8">
-           <PersonalInfo  data={profileData}/> 
-            <About about={profileData.about}/> 
-          <ContactInfo data={socialData} />
-          <Experience data={datas} />
-          <Skills data={profileData} />
+           <PersonalInfo  data={profileData as Profile_Types}/> 
+            <About data={profileData as Profile_Types}/> 
+          <ContactInfo data={socialData as Social_Types} />
+          <Experience data={experienceData as Experience_Type[]} />
+          <Skills data={profileData as Profile_Types} />
         </div>
         <div className="flex w-full basis-[30%] flex-col gap-8">
-        <Photo data={{ image_url: profileData.image_url }} />
-          <TimeSchedule startTime={profileData.start_time} endTime={profileData.end_time}/>
+        <Photo data={ profileData as Profile_Types} />
+          <TimeSchedule data={profileData as Profile_Types}/>
           </div>
-        </div>
+        </div> }
       </div>
     </>
   )

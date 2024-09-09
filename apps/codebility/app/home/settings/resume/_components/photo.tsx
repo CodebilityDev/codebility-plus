@@ -6,14 +6,13 @@ import Box from "@/Components/shared/dashboard/Box"
 import { Paragraph } from "@/Components/shared/home"
 import { defaultAvatar } from "@/public/assets/images"
 import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client"
-import { updateProfile } from "../action"
+import { removeAvatar, updateProfile } from "../action"
 import { useForm } from "react-hook-form"
 import toast from "react-hot-toast"
-type Photo = {
-  image_url: any
-}
+import { Profile_Types } from "../_types/resume"
+
 type PhotoProps = {
-  data: Photo
+  data: Profile_Types
 }
 const Photo = ({data}: PhotoProps) => {
   const supabase = getSupabaseBrowserClient();
@@ -23,49 +22,45 @@ const Photo = ({data}: PhotoProps) => {
         setAvatar(data.image_url);
     }
 }, [data.image_url]);
-  const handleUploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) {
-      console.error("No file selected");
-      return;
-    }
-    const bucket = "profiles";
-    const filePath = `avatars/${file.name}`;
-    const {error: uploadError } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file);
-    if (uploadError) {
-      console.error("Error uploading file:", uploadError.message);
-      return;
-    }
-    const { data: publicUrlData, } = supabase
-      .storage
-      .from(bucket)
-      .getPublicUrl(filePath);
-    const publicUrl = publicUrlData?.publicUrl;
-    if (publicUrl) {
-      setAvatar(publicUrl);
-      await updateProfile({image_url: publicUrl});
-      toast.success("You sucessfully added an avatar!")
-    } else {
-      console.error("Public URL is undefined");
-    }
-  };
+
+
+const handleUploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {
+  const toastId = toast.loading("Your avatar is being uploaded")
+  const file = event.target.files?.[0];
+  if (!file) {
+    console.error("No file selected");
+    return;
+  }
+  const bucket = "profiles";
+  const filePath = `avatars/${file.name}`;
+  const {error: uploadError } = await supabase.storage
+    .from(bucket)
+    .upload(filePath, file);
+  if (uploadError) {
+    console.error("Error uploading file:", uploadError.message);
+    return;
+  }
+  const { data: publicUrlData, } = supabase
+    .storage
+    .from(bucket)
+    .getPublicUrl(filePath);
+  const publicUrl = publicUrlData?.publicUrl;
+  if (publicUrl) {
+    setAvatar(publicUrl);
+    await updateProfile({image_url: publicUrl});
+    toast.success("You sucessfully added an avatar!", {id: toastId})
+  } else {
+    console.error("Public URL is undefined");
+  }
+};
+
   const handleRemoveAvatar = async () => {
     try {
       setAvatar(defaultAvatar);
       if (myAvatar !== defaultAvatar) {
-        const fileName = myAvatar.split("/").pop();
-        const filePath = `avatars/${fileName}`;
-        const { error } = await supabase.storage
-          .from("profiles")
-          .remove([filePath]);
-  toast.success("Your avatar was sucessfully removed")
-        if (error) {
-          console.error("Error removing file:", error.message);
-          return;
-        }
         await updateProfile({ image_url: null && "" });
+        toast.success("Your Avatar was sucessfully removed!")
+        await removeAvatar(myAvatar)
       }
     } catch (error) {
       console.error("Error while removing avatar:", error);
