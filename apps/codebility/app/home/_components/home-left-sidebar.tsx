@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import pathsConfig from "@/config/paths.config";
 import { sidebarData } from "@/constants";
 import { useNavStore } from "@/hooks/use-sidebar";
+import { getSplit } from "@/lib/get-split";
 
 import useUser from "../_hooks/use-user";
 
@@ -59,10 +60,11 @@ const LeftSidebar = () => {
             <div className="mt-3 flex flex-1 flex-col gap-2 max-lg:hidden">
               {item.links.map((link) => {
                 const allowedRoutes = [
-                  pathsConfig.app.settings,
-                  pathsConfig.app.orgchart,
+                  getSplit(pathsConfig.app.settings, "/", { getLast: true }),
+                  getSplit(pathsConfig.app.orgchart, "/", { getLast: true }),
                   ...user.permissions,
                 ];
+
                 const accessRoutes = allowedRoutes.includes(link.permission);
                 const isActive = pathname === link.route;
 
