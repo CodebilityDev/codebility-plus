@@ -4,6 +4,7 @@ import { NextResponse, URLPattern } from "next/server";
 import { createMiddlewareClient } from "@codevs/supabase/middleware-client";
 
 import pathsConfig from "./config/paths.config";
+import { permissionsString } from "./constants";
 
 export const config = {
   matcher: [
@@ -83,20 +84,41 @@ function getPatterns() {
     {
       pattern: new URLPattern({ pathname: `${pathsConfig.app.home}/*?` }),
       handler: async (req: NextRequest, res: NextResponse) => {
+        const supabase = createMiddlewareClient({req, res});
+
         const {
           data: { user },
         } = await getUser(req, res);
 
         const origin = req.nextUrl.origin;
         const next = req.nextUrl.pathname;
+        
+        const signIn = pathsConfig.auth.signIn;
+        const redirectPath = `${signIn}?next=${next}`; // redirect to sign in and pass the route to go after sign in.
+
+        const redirectToSignIn =  NextResponse.redirect(new URL(redirectPath, origin).href);
 
         // If user is not logged in, redirect to sign in page.
-        if (!user) {
-          const signIn = pathsConfig.auth.signIn;
-          const redirectPath = `${signIn}?next=${next}`;
+        if (!user) return redirectToSignIn;
 
-          return NextResponse.redirect(new URL(redirectPath, origin).href);
-        }
+        const currDashboardPath = req.nextUrl.pathname.split("/home/")[1]; // the current path user is on.
+
+        if (!currDashboardPath) return; // checking won't be required because user is on their personal dashboard.
+
+        // get user dashboard permissions
+        const { data, error } = await supabase.from("user")
+        .select(`
+          *, 
+          user_type(${permissionsString})
+        `)
+        .eq("id", user.id)
+        .single();
+
+        if (error || !data) return redirectToSignIn;
+        
+        
+        // redirect to personal dashboard if user didn't have any permission to access the path.
+        if (!data.user_type[currDashboardPath as keyof typeof data.user_type]) return NextResponse.redirect(new URL(pathsConfig.app.home, origin).href);
       },
     },
   ];
