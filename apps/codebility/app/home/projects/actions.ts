@@ -1,15 +1,16 @@
 
 'use server';
 
-import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from 'next/cache';
 import { User } from '@/types';
 
 
-
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 const deleteImageByPublicUrl = async (publicUrlOrFilePath: string | null | undefined) => {
-  const supabase = createClient();
+
+  
+  const supabase = getSupabaseServerComponentClient();
 
   // Define the base URL
   const baseUrl = 'https://nwpvsxbrftplvebseaas.supabase.co/storage/v1/object/public/project-images/';
@@ -41,14 +42,11 @@ const deleteImageByPublicUrl = async (publicUrlOrFilePath: string | null | undef
 };
 
 
-// Example usage
-// const imageUrl = 'https://nwpvsxbrftplvebseaas.supabase.co/storage/v1/object/public/project-images/images/apple-test_1725333722227.png';
-// deleteImageByPublicUrl(imageUrl);
 
 export async function uploadImage(file: File): Promise<string | null> {
 
 
-  const supabase = createClient();
+  const supabase = getSupabaseServerComponentClient();
 
   if (!file) return null;
 
@@ -80,7 +78,7 @@ export async function uploadImage(file: File): Promise<string | null> {
 
 export async function DeleteProjectMembers(e: FormData, newMembers: User[]) {
 
-  const supabase = createClient(); // Initialize Supabase client
+  const supabase = getSupabaseServerComponentClient();
 
   const user_id_search = e.get("userId")?.toString();
 
@@ -138,7 +136,7 @@ export async function InsertTeamLeader(e: FormData, newMembers: User[]) {
 
 
 
-  const supabase = createClient(); // Initialize Supabase client
+  const supabase = getSupabaseServerComponentClient();
 
 
 
@@ -204,11 +202,8 @@ export async function InsertTeamLeader(e: FormData, newMembers: User[]) {
 
   export  async function InsertData(e: FormData,selectedMembers: User[], teamLeaderId: string ,teamLeaderLastName: string)  {
 
-      const supabase = createClient();
+    const supabase = getSupabaseServerComponentClient();
 
-      // Log the data you want to insert
-  // console.log("Team Leader Firstname:", teamLeaderId);
-  // console.log("Team Leader Lastname:", teamLeaderLastName);
 
 
       // Extract data from selectedMembers
@@ -221,13 +216,6 @@ export async function InsertTeamLeader(e: FormData, newMembers: User[]) {
     }));
 
 
-   // Convert membersData to JSON string
-  // const membersDataJson = JSON.stringify(membersData);
-
-
-    // console.log(membersData)
-
-    // console.log(selectedMembers)
 
        // Get form data
     const project_name = e.get("project_name")?.toString();
@@ -337,7 +325,7 @@ export async function InsertTeamLeader(e: FormData, newMembers: User[]) {
   
   const selectProjectById = async (projectId: string) => {
 
-    const supabase = createClient();
+    const supabase = getSupabaseServerComponentClient();
 
 
     const { data, error } = await supabase
@@ -373,7 +361,7 @@ export async function InsertTeamLeader(e: FormData, newMembers: User[]) {
 
   export async function UpdateData(e: FormData) {
 
-    const supabase = createClient();
+    const supabase = getSupabaseServerComponentClient();
 
 
     let fetch_name = ""
@@ -514,7 +502,7 @@ export async function InsertTeamLeader(e: FormData, newMembers: User[]) {
 
   const deleteProject = async (projectId: string) => {
 
-    const supabase = createClient();
+    const supabase = getSupabaseServerComponentClient();
 
     const { error: deleteError } = await supabase
       .from('projects') // Replace with your table name
@@ -550,25 +538,3 @@ export async function InsertTeamLeader(e: FormData, newMembers: User[]) {
 
  
  
-// const FormSchema = z.object({
-//   id: z.string(),
-//   customerId: z.string(),
-//   amount: z.coerce.number(),
-//   status: z.enum(['pending', 'paid']),
-//   date: z.string(),
-// });
- 
-// const CreateInvoice = FormSchema;
- 
-// export async function createInvoice(formData: FormData) {
-//   // ...
-
-//   const { customerId, amount, status } = CreateInvoice.parse({
-//     customerId: formData.get('customerId'),
-//     amount: formData.get('amount'),
-//     status: formData.get('status'),
-//   });
-
-  
-
-// }

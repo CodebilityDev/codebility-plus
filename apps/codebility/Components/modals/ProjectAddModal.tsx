@@ -22,11 +22,10 @@ import { useModal } from "@/hooks/use-modal-projects"
 import { modals_ProjectModal } from "@/types/components"
 import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@codevs/ui/dialog"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select"
-import { createClient } from "@/utils/supabase/client"
 
 
 import { InsertData } from "@/app/home/projects/actions"
-
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase"
 
 
 
@@ -48,7 +47,7 @@ const defaultImage =
 const ProjectAddModal = () => {
 
 
-  const supabase = createClient();
+  const supabase = useSupabase();
 
   const { isOpen, onClose, type } = useModal()
   const isModalOpen = isOpen && type === "projectAddModal"
