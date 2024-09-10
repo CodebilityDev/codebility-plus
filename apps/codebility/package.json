@@ -38,6 +38,8 @@
     "@radix-ui/react-hover-card": "^1.1.1",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slot": "^1.1.0",
+    "@supabase/ssr": "^0.5.0",
+    "@supabase/supabase-js": "^2.45.3",
     "@t3-oss/env-nextjs": "^0.7.1",
     "@tanstack/react-query": "^5.28.9",
     "@vercel/otel": "^1.9.1",
@@ -77,11 +79,11 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
-    "@codevs/prettier-config": "workspace:*",
     "@chromatic-com/storybook": "1.6.1",
+    "@codevs/eslint-config": "workspace:*",
+    "@codevs/prettier-config": "workspace:*",
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
-    "@codevs/eslint-config": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/resources": "1.18.1",
     "@opentelemetry/sdk-node": "0.45.1",

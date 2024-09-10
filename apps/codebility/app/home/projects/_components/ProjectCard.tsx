@@ -1,14 +1,19 @@
-import React from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { Button } from "@/Components/ui/button";
-import DefaultPagination from "@/Components/ui/pagination";
-import { pageSize } from "@/constants";
-import { useModal } from "@/hooks/use-modal-projects";
-import usePagination from "@/hooks/use-pagination";
-import { defaultAvatar } from "@/public/assets/images";
-import { IconGithub, IconLink } from "@/public/assets/svgs";
-import { ProjectT } from "@/types/index";
+"use client"
+
+import React from "react"
+import Link from "next/link"
+import Image from "next/image"
+
+import { pageSize } from "@/constants"
+import { Button } from "@/Components/ui/button"
+import usePagination from "@/hooks/use-pagination"
+import { ProjectT } from "@/types/index"
+import { useModal } from "@/hooks/use-modal-projects"
+import DefaultPagination from "@/Components/ui/pagination"
+import { IconLink, IconGithub } from "@/public/assets/svgs"
+import { defaultAvatar } from "@/public/assets/images"
+
+// import { ProjectT } from "../_types/projects-projectT"
 
 const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
   const { onOpen } = useModal();
@@ -31,8 +36,8 @@ const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
           >
             <div className="bg-dark-100 flex justify-center rounded-t-lg">
               <Image
-                alt={project.project_name as string}
-                src={project.project_thumbnail || defaultAvatar}
+                alt={project.thumbnail as string}
+                src={project.thumbnail || defaultAvatar}
                 width={120}
                 height={91}
                 className="h-[120px] w-[91px] object-contain"
@@ -42,8 +47,8 @@ const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
             </div>
             <div className="text-dark100_light900 flex flex-col gap-4 p-8">
               <div className="flex w-full items-center justify-between gap-2">
-                <p className="text-2xl">{project.project_name}</p>
-                <p className="text-md">{project.project_status}</p>
+                <p className="text-2xl">{project.name}</p>
+                <p className="text-md">{project.status}</p>
               </div>
               <p className="md:text-md text-gray text-sm lg:text-lg">
                 {project.summary}

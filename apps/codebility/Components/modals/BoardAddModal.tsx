@@ -58,7 +58,7 @@ const BoardAddModal = () => {
     setNewBoard({ ...newBoard, projects: [{ projectsId: value }] });
     projects.forEach((proj) => {
       if (proj.id === value) {
-        setSelectedProjectName(proj.project_name as string);
+        setSelectedProjectName(proj.name as string);
       }
     });
   };
@@ -122,13 +122,13 @@ const BoardAddModal = () => {
                     <SelectLabel className="text-gray px-3 py-2 text-xs">
                       Projects
                     </SelectLabel>
-                    {projects?.map(({ id, project_name }: ProjectT) => (
+                    {projects?.map(({ id, name }: ProjectT) => (
                       <SelectItem
                         key={id}
                         className="w-[345px] cursor-default px-3 py-2 text-sm hover:bg-blue-100"
                         value={id as string}
                       >
-                        {project_name}
+                        {name}
                       </SelectItem>
                     ))}
                   </SelectGroup>
