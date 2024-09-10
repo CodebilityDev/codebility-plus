@@ -1,5 +1,4 @@
 import pathsConfig from "@/config/paths.config";
-import { getSplit } from "@/lib/get-split";
 // ====================================================================================
 
 import {
@@ -398,16 +397,16 @@ export const navItems = [
 ];
 
 export const permissionsString = `
-  ${getSplit(pathsConfig.app.roles, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.kanban, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.clients, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.interns, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.tasks, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.in_hose, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.projects, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.services, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.home, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.applicants, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.permissions, "/", { getLast: true })},
-  ${getSplit(pathsConfig.app.time_tracker, "/", { getLast: true })}
+  roles,
+  kanban,
+  clients,
+  interns,
+  tasks,
+  in_house,
+  projects,
+  services,
+  dashboard,
+  applicants,
+  permissions,
+  time_tracker
 ` as const;
