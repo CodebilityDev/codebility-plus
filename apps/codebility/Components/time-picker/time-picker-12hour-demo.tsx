@@ -10,7 +10,7 @@ import { Label } from "@codevs/ui/label";
 
 interface TimePickerProps {
   date?: Date
-  period?: Period
+  period: Period
   // eslint-disable-next-line no-unused-vars
   setDate: (date: Date | undefined) => void
   disabled?: boolean
