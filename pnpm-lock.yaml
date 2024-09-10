@@ -88,12 +88,6 @@ importers:
       '@radix-ui/react-slot':
         specifier: ^1.1.0
         version: 1.1.0(@types/react@18.3.5)(react@18.3.1)
-      '@supabase/ssr':
-        specifier: ^0.5.0
-        version: 0.5.0(@supabase/supabase-js@2.45.3)
-      '@supabase/supabase-js':
-        specifier: ^2.45.3
-        version: 2.45.3
       '@t3-oss/env-nextjs':
         specifier: ^0.7.1
         version: 0.7.3(typescript@5.5.4)(zod@3.23.8)
@@ -5063,7 +5057,7 @@ packages:
       react-refresh: 0.14.2
       schema-utils: 4.2.0
       source-map: 0.7.4
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     dev: true
 
   /@pnpm/config.env-replace@1.1.0:
@@ -7520,7 +7514,7 @@ packages:
       react-docgen-typescript: 2.2.2(typescript@5.5.4)
       tslib: 2.7.0
       typescript: 5.5.4
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -9999,7 +9993,7 @@ packages:
       '@babel/core': 7.25.2
       find-cache-dir: 4.0.0
       schema-utils: 4.2.0
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     dev: true
 
   /babel-plugin-istanbul@6.1.1:
@@ -11430,7 +11424,7 @@ packages:
       postcss-modules-values: 4.0.0(postcss@8.4.45)
       postcss-value-parser: 4.2.0
       semver: 7.6.3
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     dev: true
 
   /css-mediaquery@0.1.2:
@@ -14022,7 +14016,7 @@ packages:
       semver: 7.6.3
       tapable: 2.2.1
       typescript: 5.5.4
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     dev: true
 
   /form-data@3.0.1:
@@ -14777,7 +14771,7 @@ packages:
       lodash: 4.17.21
       pretty-error: 4.0.0
       tapable: 2.2.1
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     dev: true
 
   /htmlparser2@3.10.1:
@@ -17831,7 +17825,7 @@ packages:
       url: 0.11.4
       util: 0.12.5
       vm-browserify: 1.1.2
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     dev: true
 
   /node-preload@0.2.1:
@@ -18864,7 +18858,7 @@ packages:
       jiti: 1.21.6
       postcss: 8.4.45
       semver: 7.6.3
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     transitivePeerDependencies:
       - typescript
     dev: true
@@ -21397,7 +21391,7 @@ packages:
     peerDependencies:
       webpack: ^5.0.0
     dependencies:
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     dev: true
 
   /style-value-types@5.0.0:
@@ -22808,7 +22802,7 @@ packages:
       mime-types: 2.1.35
       range-parser: 1.2.1
       schema-utils: 4.2.0
-      webpack: 5.89.0(@swc/core@1.7.23)(esbuild@0.21.5)
+      webpack: 5.89.0(esbuild@0.21.5)
     dev: true
 
   /webpack-hot-middleware@2.26.1:
