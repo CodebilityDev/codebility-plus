@@ -21,7 +21,6 @@ import { DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select"
 import toast from "react-hot-toast"
 
-import { createClient } from "@/utils/supabase/client"
 import { DeleteProjectMembers, InsertTeamLeader, UpdateData } from "@/app/home/projects/actions"
 import { ChangeEvent, useState } from "react"
 
@@ -29,10 +28,11 @@ import { ChangeEvent, useState } from "react"
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase"
 
 const ProjectEditModal = () => {
 
-  const supabase = createClient();
+  const supabase = useSupabase();
 
   const { isOpen, onClose, type, data } = useModal()
 

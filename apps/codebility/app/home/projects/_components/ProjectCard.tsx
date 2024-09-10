@@ -13,7 +13,6 @@ import DefaultPagination from "@/Components/ui/pagination"
 import { IconLink, IconGithub } from "@/public/assets/svgs"
 import { defaultAvatar } from "@/public/assets/images"
 
-// import { ProjectT } from "../_types/projects-projectT"
 
 const ProjectCard = ({ projects }: { projects: ProjectT[] }) => {
   const { onOpen } = useModal();
