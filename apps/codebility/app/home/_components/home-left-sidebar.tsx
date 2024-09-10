@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import pathsConfig from "@/config/paths.config";
 import { sidebarData } from "@/constants";
 import { useNavStore } from "@/hooks/use-sidebar";
 
@@ -58,8 +59,8 @@ const LeftSidebar = () => {
             <div className="mt-3 flex flex-1 flex-col gap-2 max-lg:hidden">
               {item.links.map((link) => {
                 const allowedRoutes = [
-                  "settings",
-                  "orgchart",
+                  pathsConfig.app.settings,
+                  pathsConfig.app.orgchart,
                   ...user.permissions,
                 ];
                 const accessRoutes = allowedRoutes.includes(link.permission);
