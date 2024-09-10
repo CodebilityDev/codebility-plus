@@ -20,14 +20,6 @@ const ProjectDeleteModal = () => {
 
   const { token } = useToken();
 
-  // const handleSubmit = async () => {
-  //   try {
-  //     await deleteProjects(data?.id as string, token)
-  //     onClose()
-  //   } catch (error) {
-  //     console.error("Error creating project:", error)
-  //   }
-  // }
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault(); // Prevent default form submission behavior
