@@ -1,10 +1,5 @@
-<<<<<<< HEAD
 import React from 'react'
 import { ExperienceType } from "@/app/home/settings/resume/experience"
-=======
-import React from "react";
-import { ExperienceType } from "@/app/home/settings/resume/Experience";
->>>>>>> c10b75bec4ea733a7b64174ec6f0f28430a0cf8c
 
 type TStatus =
   | "Available"
