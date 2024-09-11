@@ -1,5 +1,5 @@
-import React from "react";
-import { ExperienceType } from "@/app/home/settings/resume/Experience";
+import React from 'react'
+import { ExperienceType } from "@/app/home/settings/resume/experience"
 
 type TStatus =
   | "Available"
