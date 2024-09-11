@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { TimePicker12HourWrapper } from "@/Components/time-picker/time-picker-12hour-wrapper";
+
 import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { ScheduleType, useSchedule } from "@/hooks/use-timeavail";
@@ -37,11 +37,11 @@ const AvailableTimeModal = () => {
         <div className="flex flex-col gap-4 lg:flex-row">
           <div className="flex flex-1 flex-col items-center gap-4 rounded-lg border border-zinc-700 p-6">
             <p className="text-lg">Start Time</p>
-            <TimePicker12HourWrapper />
+            
           </div>
           <div className="flex flex-1 flex-col items-center gap-4 rounded-lg border border-zinc-700 p-6">
             <p className="text-lg">End Time</p>
-            <TimePicker12HourWrapper />
+          
           </div>
         </div>
 
