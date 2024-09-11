@@ -1,4 +1,5 @@
-"use client";
+/* eslint-disable no-unused-vars */
+"use client"
 
 import Image from "next/image";
 import Link from "next/link";

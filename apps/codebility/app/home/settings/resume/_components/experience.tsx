@@ -1,53 +1,48 @@
 /* eslint-disable no-unused-vars */
-import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  addWorkExperience,
-  deleteWorkExperience,
-  getWorkExperiencesPerUser,
-  updateProfile,
-  updateWorkExperience,
-} from "@/app/api/resume";
-import Skills from "@/app/home/settings/resume/Skills";
-import Box from "@/Components/shared/dashboard/Box";
-import { Button } from "@/Components/ui/button";
-import useToken from "@/hooks/use-token";
-import { IconDelete, IconEdit } from "@/public/assets/svgs";
-import { User } from "@/types";
-import toast from "react-hot-toast";
+"use client"
+import React from "react"
+import toast from "react-hot-toast"
+import { useCallback, useEffect, useRef, useState } from "react"
 
-import { Input } from "@codevs/ui/input";
-import { Textarea } from "@codevs/ui/textarea";
+import { Input } from "@codevs/ui/input"
+import { Button } from "@/Components/ui/button"
+import { IconEdit, IconDelete } from "@/public/assets/svgs"
+import Box from "@/Components/shared/dashboard/Box"
 
-type ExperienceType = {
-  id?: string;
-  userWorkExpId?: string;
-  position: string;
-  short_desc: string;
-  dateFrom: string;
-  dateTo: string;
-  created_at?: string;
-  updated_at?: string;
-};
+import { Textarea } from "@codevs/ui/textarea"
+import {  updateWorkExperience, deleteWorkExperience, createWorkExperience } from "../action"
 
-const Experience = ({ user }: { user: User }) => {
-  const [experienceData, setExperienceData] = useState<ExperienceType[]>([]);
-  const [isLoadingMain, setIsLoadingMain] = useState(false);
-  const [isEditMain] = useState(false);
+export type Experience_Type = {
+  id?: string
+  userWorkExpId?: string
+  position: string
+  description: string
+  date_from: string
+  date_to: string
+  created_at?: string
+  updated_at?: string
+}
+interface ExperienceProps {
+  data: Experience_Type[];
+}
+
+const Experience = ({data}: ExperienceProps) => {
+  const [experienceData, setExperienceData] = useState<Experience_Type[]>(data)
+  const [isLoadingMain, setIsLoadingMain] = useState(false)
+  const [isEditMain] = useState(false)
 
   interface EditModePerItem {
     [key: string]: boolean;
   }
-  const editModePerItem: React.MutableRefObject<EditModePerItem> = useRef({});
-
-  const { id, tech_stacks } = user;
-  const { token } = useToken();
-
+  const editModePerItem: React.MutableRefObject<EditModePerItem> = useRef({})
+  
+  
   const getWorkExperiences = useCallback(async () => {
     try {
-      setIsLoadingMain(true);
-      const res: any = await getWorkExperiencesPerUser(id, token);
-      setExperienceData([...res.data]);
-      const updateObject: any = {};
+      setIsLoadingMain(true)
+      const res: any = await getWorkExperiences()
+      setExperienceData([...res.data])
+      const updateObject: any = {}
       res.data.map((item: any, index: number) => {
         updateObject[index] = false;
       });
@@ -58,13 +53,11 @@ const Experience = ({ user }: { user: User }) => {
     } finally {
       setIsLoadingMain(false);
     }
-  }, [id, token]);
+  }, [])
 
-  /*   useEffect(() => {
-    if (id && token) {
-      getWorkExperiences()
-    }
-  }, [user.Work_Experience.length, token, id, getWorkExperiences]) */
+  useEffect(() => {
+    getWorkExperiences();
+  }, [getWorkExperiences]);
 
   const handleUpdateExperience = (itemNo: number, e: any) => {
     const updatedExperiences = experienceData.map((item, id) => {
@@ -81,7 +74,7 @@ const Experience = ({ user }: { user: User }) => {
       setIsLoadingMain(true);
 
       if (id) {
-        await deleteWorkExperience(id, token);
+        await deleteWorkExperience(id)
       }
       const updatedExperiences = experienceData.filter(
         (_, id) => id !== itemNo,
@@ -104,28 +97,8 @@ const Experience = ({ user }: { user: User }) => {
   };
 
   const handleEditModePerItem = (itemNo: number, editable: boolean) => {
-    editModePerItem.current = {
-      ...editModePerItem.current,
-      [itemNo]: editable,
-    };
-  };
-
-  const handleUpdateProfileSkills = async (data: any) => {
-    try {
-      const updatedData = { ...data };
-      await updateProfile(id, updatedData, token).then((response) => {
-        if (response) {
-          toast.success("Successfully Updated!");
-        } else if (!response) {
-          toast.error(response.statusText);
-        }
-      });
-    } catch (e) {
-      toast.error("Something went wrong!");
-    } finally {
-      return;
-    }
-  };
+    editModePerItem.current = { ...editModePerItem.current, [itemNo]: editable }
+  }
 
   return (
     <>
@@ -144,19 +117,16 @@ const Experience = ({ user }: { user: User }) => {
 
             if (
               experienceLast?.position === "" ||
-              experienceLast?.short_desc === "" ||
-              experienceLast?.dateTo === "" ||
-              experienceLast?.dateFrom === ""
+              experienceLast?.description === "" ||
+              experienceLast?.date_to === "" ||
+              experienceLast?.date_from === ""
             ) {
               toast.error("Fill the empty fields first..");
             } else if (editModeMap) {
               toast.error("Save your changes first..");
             } else {
-              setExperienceData((prev) => [
-                ...prev,
-                { position: "", short_desc: "", dateFrom: "", dateTo: "" },
-              ]);
-              toast.success("Added new experience entry");
+              setExperienceData((prev) => [...prev, { position: "", description: "", date_from: "", date_to: "" }])
+             
             }
           }}
           variant="outlined"
@@ -174,43 +144,28 @@ const Experience = ({ user }: { user: User }) => {
             editModePerItem={editModePerItem}
             handleEditModePerItem={handleEditModePerItem}
             handleDeleteExperience={handleDeleteExperience}
-            updateExperience={getWorkExperiences}
-            userId={id}
-            token={token}
+          
+      
             isLoadingMain={isLoadingMain}
             isEditMain={isEditMain}
           />
         ))}
       </Box>
-      <div>
-        {tech_stacks && (
-          <Skills
-            tech_stacks={tech_stacks}
-            updateProfile={handleUpdateProfileSkills}
-          />
-        )}
-      </div>
+      {/* <div>{tech_stacks && <Skills tech_stacks={tech_stacks} updateProfile={handleUpdateProfileSkills} />}</div> */}
     </>
   );
 };
 
 interface ExperienceFormProps {
-  experience: ExperienceType;
-  handleUpdateExperience: (itemNo: number, e: any) => void;
-  itemNo: number;
-  totalNo: number;
-  editModePerItem: any;
-  handleEditModePerItem: (itemNo: number, editable: boolean) => void;
-  handleDeleteExperience: (
-    itemNo: number,
-    id: string,
-    type: "delete" | "cancel",
-  ) => void;
-  updateExperience: () => void;
-  userId: string;
-  token: string;
-  isLoadingMain: boolean;
-  isEditMain: boolean;
+  experience: Experience_Type
+  handleUpdateExperience: (itemNo: number, e: any) => void
+  itemNo: number
+  totalNo: number
+  editModePerItem: any
+  handleEditModePerItem: (itemNo: number, editable: boolean) => void
+  handleDeleteExperience: (itemNo: number, id: string, type: "delete" | "cancel") => void
+  isLoadingMain: boolean
+  isEditMain: boolean
 }
 
 const ExperienceForm = ({
@@ -221,9 +176,6 @@ const ExperienceForm = ({
   editModePerItem,
   handleEditModePerItem,
   handleDeleteExperience,
-  updateExperience,
-  userId,
-  token,
   isLoadingMain,
 }: ExperienceFormProps) => {
   const [editMode, setEditMode] = useState(false);
@@ -234,17 +186,17 @@ const ExperienceForm = ({
       itemNo,
       totalNo === itemNo + 1 &&
         experience.position === "" &&
-        experience.short_desc === "" &&
-        experience.dateFrom === "" &&
-        experience.dateTo === ""
+        experience.description === "" &&
+        experience.date_from === "" &&
+        experience.date_to === ""
         ? true
         : false,
     );
   }, [
     experience.position,
-    experience.short_desc,
-    experience.dateFrom,
-    experience.dateTo,
+    experience.description,
+    experience.date_from,
+    experience.date_to,
     handleEditModePerItem,
     itemNo,
     totalNo,
@@ -255,46 +207,36 @@ const ExperienceForm = ({
   }, [editModePerItem, itemNo]);
 
   const handleEditMode = () => {
-    setEditMode(true);
-    editModePerItem.current[itemNo] = true;
-  };
-
+    setEditMode(true)
+    editModePerItem.current[itemNo] = true
+  }
   const handleSaveAndUpdate = async (id: string | undefined) => {
-    if (
-      experience?.position === "" ||
-      experience?.short_desc === "" ||
-      experience?.dateTo === "" ||
-      experience?.dateFrom === ""
-    ) {
-      toast.error("Fill the empty fields first..");
-    } else {
-      const data = {
-        position: experience.position,
-        short_desc: experience.short_desc,
-        dateFrom: experience.dateFrom,
-        dateTo: experience.dateTo,
-        userWorkExpId: userId,
-        company: "no ui",
-        location: "no ui",
-      };
-      try {
-        setIsLoading(true);
-        if (!id) {
-          await addWorkExperience(data, token);
-          updateExperience();
+    const data: any = {
+      position: experience.position,
+      description: experience.description,
+      date_from: experience.date_from,
+      date_to: experience.date_to,
+    };
+  
+    try {
+      setIsLoading(true);
+      if (!id) {
+        const { error } = await createWorkExperience(data); 
+        if (!error) {
           toast.success("Successfully Added!");
-        } else {
-          await updateWorkExperience(data, token, id);
+        }
+      } else {
+        const { error } = await updateWorkExperience(id, data); 
+        if (!error) {
           toast.success("Successfully Updated!");
         }
-        handleEditModePerItem(itemNo, false);
-        setEditMode(false);
-      } catch (error) {
-        console.error("Error updating profile:", error);
-        toast.error("Something went wrong!");
-      } finally {
-        setIsLoading(false);
       }
+      handleEditModePerItem(itemNo, false); 
+      setEditMode(false);
+    } catch (error) {
+      toast.error("Something went wrong!");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -342,8 +284,8 @@ const ExperienceForm = ({
           <Textarea
             variant="resume"
             onChange={(e) => handleUpdateExperience(itemNo, e)}
-            value={experience.short_desc}
-            name="short_desc"
+            value={experience.description}
+            name="description"
             className={` ${
               editMode
                 ? " border-lightgray text-black-100 dark:bg-dark-200 border bg-white dark:border-zinc-700 dark:text-white"
@@ -357,9 +299,9 @@ const ExperienceForm = ({
             Date From
             <Input
               onChange={(e) => handleUpdateExperience(itemNo, e)}
-              value={experience.dateFrom}
+              value={experience.date_from}
               type="text"
-              name="dateFrom"
+              name="date_from"
               variant={editMode ? "lightgray" : "darkgray"}
               className="rounded capitalize"
               disabled={!editMode || isLoading}
@@ -369,9 +311,9 @@ const ExperienceForm = ({
             Date To
             <Input
               onChange={(e) => handleUpdateExperience(itemNo, e)}
-              value={experience.dateTo}
+              value={experience.date_to}
               type="text"
-              name="dateTo"
+              name="date_to"
               variant={editMode ? "lightgray" : "darkgray"}
               className="rounded capitalize"
               disabled={!editMode || isLoading}
@@ -384,9 +326,9 @@ const ExperienceForm = ({
               onClick={() => {
                 if (
                   experience.position === "" &&
-                  experience.short_desc === "" &&
-                  experience.dateFrom === "" &&
-                  experience.dateTo === ""
+                  experience.description === "" &&
+                  experience.date_from === "" &&
+                  experience.date_to === ""
                 ) {
                   handleDeleteExperience(
                     itemNo,
@@ -419,4 +361,4 @@ const ExperienceForm = ({
   );
 };
 
-export default Experience;
+export default Experience
