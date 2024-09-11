@@ -1,48 +1,52 @@
-import { useState } from "react";
-import { updateProfile } from "@/app/api/resume";
-import Box from "@/Components/shared/dashboard/Box";
-import { Button } from "@/Components/ui/button";
-import useToken from "@/hooks/use-token";
-import { IconEdit } from "@/public/assets/svgs";
-import { User } from "@/types";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+"use client"
+import {  useEffect, useState } from "react"
+import toast from "react-hot-toast"
+import { useForm } from "react-hook-form"
+import { Button } from "@/Components/ui/button"
+import { IconEdit } from "@/public/assets/svgs"
+import Box from "@/Components/shared/dashboard/Box"
+import { Textarea } from "@codevs/ui/textarea"
+import { Label } from "@codevs/ui/label"
+import {   updateProfile } from "../action"
+import { Profile_Types } from "../_types/resume"
 
-import { Label } from "@codevs/ui/label";
-import { Textarea } from "@codevs/ui/textarea";
+type About_Props = {
+data: Profile_Types
+}
 
-const About = ({ user }: { user: User }) => {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const { id, about_me } = user;
-  const { token } = useToken();
+const About = ({data}: About_Props) => {
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
 
   const {
     register,
     handleSubmit,
     reset,
     formState: {},
-  } = useForm({
+  } = useForm(
+    {
     defaultValues: {
-      about_me: about_me,
-    },
-  });
+        about: "",
+  },})
+  useEffect(() => {
+    if(data) {
+      reset({
+        about: data.about,
+      })
+    }
+  }, [data, reset])
 
   const onSubmit = async (data: any) => {
-    setIsLoading(true);
+    const toastId = toast.loading("Your info was being updated")
     try {
-      const updatedData = { ...data };
-      await updateProfile(id, updatedData, token).then((response) => {
-        if (response) {
-          toast.success("Successfully Updated!");
-          reset(updatedData);
-          setIsEditMode(false);
-        } else if (!response) {
-          toast.error(response.statusText);
-        }
-      });
-    } catch (e) {
-      toast.error("Something went wrong!");
+      setIsLoading(true)
+      const {about} = data
+      await updateProfile({about})
+      toast.success("Your about was sucessfully updated!", {id: toastId})
+      setIsEditMode(false)
+    } catch(error){
+      console.log(error)
+      toast.error("Something went wrong, Please try again later!")
     } finally {
       setIsLoading(false);
     }
@@ -79,7 +83,7 @@ const About = ({ user }: { user: User }) => {
                 variant="resume"
                 placeholder="Write something about yourself..."
                 id="about_me"
-                {...register("about_me")}
+                {...register("about")}
                 disabled={!isEditMode}
                 className={` placeholder-${
                   !isEditMode
@@ -114,4 +118,4 @@ const About = ({ user }: { user: User }) => {
   );
 };
 
-export default About;
+export default About
