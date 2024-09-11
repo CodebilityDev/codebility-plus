@@ -1,76 +1,90 @@
-import { useState } from "react";
-import { updateProfile } from "@/app/api/resume";
-import Box from "@/Components/shared/dashboard/Box";
-import InputPhone from "@/Components/shared/dashboard/InputPhone";
-import { Button } from "@/Components/ui/button";
-import useToken from "@/hooks/use-token";
-import {
-  contactInfoValidation,
-  contactInfoValidationSchema,
-} from "@/lib/validations/resumeSettings";
-import { IconEdit } from "@/public/assets/svgs";
-import { User } from "@/types";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+"use client"
+import { useEffect, useState } from "react"
+import toast from "react-hot-toast"
+import { useForm } from "react-hook-form"
 
-import { Input } from "@codevs/ui/input";
 
-const ContactInfo = ({ user }: { user: User }) => {
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [isLoading, setIsLoading] = useState(false);
-  const {
-    id,
-    phone_no,
-    portfolio_website,
-    github_link,
-    linkedin_link,
-    fb_link,
-    telegram_link,
-    whatsapp_link,
-    skype_link,
-  } = user;
-  const { token } = useToken();
+import { Button } from "@/Components/ui/button"
+import { IconEdit } from "@/public/assets/svgs"
+import Box from "@/Components/shared/dashboard/Box"
 
+import InputPhone from "@/Components/shared/dashboard/InputPhone"
+
+import { Input } from "@codevs/ui/input"
+
+import { updateSocial } from "../action"
+import { Social_Types } from "../_types/resume"
+
+type Social_Props ={
+  data: Social_Types
+}
+
+
+const ContactInfo = ({data}: Social_Props) => {
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+ 
   const {
     register,
     handleSubmit,
     reset,
     control,
     formState: { errors },
-  } = useForm<contactInfoValidationSchema>({
+  } = useForm({
     defaultValues: {
-      phone_no: phone_no || undefined,
-      portfolio_website: portfolio_website || undefined,
-      github_link: github_link || undefined,
-      linkedin_link: linkedin_link || undefined,
-      fb_link: fb_link || undefined,
-      telegram_link: telegram_link || undefined,
-      whatsapp_link: whatsapp_link || undefined,
-      skype_link: skype_link || undefined,
+      phone_no: "" ,
+      portfolio_website: "",
+      github_link: "",
+      linkedin_link: "",
+      fb_link: "",
+      telegram_link: "",
+      whatsapp_link: "",
+      skype_link: "",
     },
-    resolver: zodResolver(contactInfoValidation),
-  });
+   
+  })
+  
 
-  const onSubmit = async (data: any) => {
-    setIsLoading(true);
+  useEffect(() => {
+    if (data) {
+      reset({
+        phone_no: data.phone_no || "",
+        portfolio_website: data.portfolio_website || "",
+        github_link: data.github_link || "",
+        linkedin_link: data.linkedin_link || "",
+        fb_link: data.fb_link || "",
+        telegram_link: data.telegram_link || "",
+        whatsapp_link: data.whatsapp_link || "",
+        skype_link: data.skype_link || ""
+      })
+    }
+  }, [data, reset])
+
+  const onSubmit = async (data: Social_Types) => {
+    const toastId = toast.loading("Your social info was being updated")
     try {
-      const updatedData = { ...data };
-      await updateProfile(id, updatedData, token).then((response) => {
-        if (response) {
-          toast.success("Successfully Updated!");
-          reset(updatedData);
-          setIsEditMode(false);
-        } else if (!response) {
-          toast.error(response.statusText);
-        }
-      });
-    } catch (e) {
-      toast.error("Something went wrong!");
+      setIsLoading(true)
+      const {
+        phone_no,
+        portfolio_website,
+        github_link,
+        linkedin_link,
+        fb_link,
+        telegram_link,
+        whatsapp_link,
+        skype_link
+      } = data;
+      await updateSocial({phone_no, portfolio_website, github_link, linkedin_link, fb_link, telegram_link, whatsapp_link, skype_link})
+      toast.success("Your contact info was sucessfully updated!", {id: toastId})
+      setIsEditMode(false)
+    } catch(error){
+      console.log(error)
+      toast.error("Something went wrong, Please try again later!")
     } finally {
       setIsLoading(false);
     }
-  };
+  }
+ 
 
   const handleEditClick = () => {
     setIsEditMode(!isEditMode);
@@ -96,117 +110,98 @@ const ContactInfo = ({ user }: { user: User }) => {
           <InputPhone
             id="phone_no"
             control={control}
-            label="Phone"
+            label="eg. 9054936302"
             disabled={!isEditMode}
             inputClassName={` ${
               isEditMode
                 ? " border border-lightgray bg-white text-black-100 dark:border-zinc-700 dark:bg-dark-200 dark:text-white"
                 : " bg-white  text-dark-200 dark:bg-dark-200 dark:text-gray"
             }`}
+            {...register("phone_no", {
+              pattern: {
+                value: /^\d{3}[-\s]?\d{3}[-\s]?\d{4}$/,
+                message: "Invalid phone number. Please enter a 10-digit number.",
+              },
+            })}
           />
-          {errors.phone_no?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">
-              {errors.phone_no?.message}
-            </p>
-          )}
+       
           <Input
             id="portfolio_website"
             {...register("portfolio_website")}
             label="Website"
+            placeholder="eg. Codebility.tech"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.portfolio_website?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">
-              {errors.portfolio_website?.message}
-            </p>
-          )}
+        
           <Input
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
             id="github_link"
+            placeholder="eg. https://github.com/CodebilityDev/"
             {...register("github_link")}
             label="Github"
             disabled={!isEditMode}
           />
-          {errors.github_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">
-              {errors.github_link?.message}
-            </p>
-          )}
+         
           <Input
             id="fb_link"
             {...register("fb_link")}
             label="Facebook"
+            placeholder="eg. https://www.facebook.com/Codebilitydev"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.fb_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">
-              {errors.fb_link?.message}
-            </p>
-          )}
+        
           <Input
             id="linkedin_link"
             {...register("linkedin_link")}
             label="Linkedin"
             disabled={!isEditMode}
+            placeholder="eg. https://www.linkedin.com/company/codebilitytech/"
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.linkedin_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">
-              {errors.linkedin_link?.message}
-            </p>
-          )}
+        
           <Input
             id="telegram_link"
             {...register("telegram_link")}
             label="Telegram"
+            placeholder="eg. https://www.telegram.com/codebility"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.telegram_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">
-              {errors.telegram_link?.message}
-            </p>
-          )}
+      
           <Input
             id="whatsapp_link"
             {...register("whatsapp_link")}
             label="Whatsapp"
+            placeholder="eg. https://www.whatsapp.com/codebility"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.whatsapp_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">
-              {errors.whatsapp_link?.message}
-            </p>
-          )}
+         
           <Input
             id="skype_link"
             {...register("skype_link")}
             label="Skype"
+            placeholder="eg. https://www.skype.com/codebility"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          {errors.skype_link?.message && (
-            <p className="ml-24 mt-2 text-sm text-red-400">
-              {errors.skype_link?.message}
-            </p>
-          )}
+          
         </div>
         {isEditMode ? (
           <div className="mt-4 flex justify-end gap-2">
@@ -227,4 +222,4 @@ const ContactInfo = ({ user }: { user: User }) => {
   );
 };
 
-export default ContactInfo;
+export default ContactInfo

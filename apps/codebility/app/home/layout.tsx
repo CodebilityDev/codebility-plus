@@ -1,4 +1,7 @@
+/* eslint-disable no-unused-vars */
 import "server-only";
+
+
 
 import React from "react";
 import ReactQueryProvider from "@/hooks/reactQuery";

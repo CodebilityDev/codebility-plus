@@ -7,20 +7,25 @@ import { Period } from "@/Components/time-picker/time-picker-utils";
 
 import { Label } from "@codevs/ui/label";
 
-interface TimePickerDemoProps {
-  date: Date | undefined;
+
+interface TimePickerProps {
+  date?: Date
+  period: Period
   // eslint-disable-next-line no-unused-vars
-  setDate: (date: Date | undefined) => void;
+  setDate: (date: Date | undefined) => void
+  disabled?: boolean
 }
 
-export function TimePicker12Demo({ date, setDate }: TimePickerDemoProps) {
-  const [period, setPeriod] = React.useState<Period>("PM");
+export function TimePicker12({ date, setDate, period, disabled = false }: TimePickerProps) {
+  const [currentPeriod, setCurrentPeriod] = React.useState<Period>(period)
 
-  const minuteRef = React.useRef<HTMLInputElement>(null);
-  const hourRef = React.useRef<HTMLInputElement>(null);
-  const secondRef = React.useRef<HTMLInputElement>(null);
-  const periodRef = React.useRef<HTMLButtonElement>(null);
-
+  const minuteRef = React.useRef<HTMLInputElement>(null)
+  const hourRef = React.useRef<HTMLInputElement>(null)
+ 
+  const periodRef = React.useRef<HTMLButtonElement>(null)
+  const handleDateChange = (newDate: Date | undefined) => {
+    setDate(newDate)
+  }
   return (
     <div className="flex items-end gap-2">
       <div className="grid gap-1 text-center">
@@ -31,8 +36,9 @@ export function TimePicker12Demo({ date, setDate }: TimePickerDemoProps) {
           picker="12hours"
           period={period}
           date={date}
-          setDate={setDate}
+          setDate={handleDateChange}
           ref={hourRef}
+          disabled={disabled}
           onRightFocus={() => minuteRef.current?.focus()}
         />
       </div>
@@ -44,37 +50,27 @@ export function TimePicker12Demo({ date, setDate }: TimePickerDemoProps) {
           picker="minutes"
           id="minutes12"
           date={date}
-          setDate={setDate}
+          setDate={handleDateChange}
           ref={minuteRef}
+          disabled={disabled}
           onLeftFocus={() => hourRef.current?.focus()}
-          onRightFocus={() => secondRef.current?.focus()}
+          onRightFocus={() => periodRef.current?.focus()}
+        
         />
       </div>
-      {/* <div className="grid gap-1 text-center">
-        <Label htmlFor="seconds" className="text-xs">
-          Seconds
-        </Label>
-        <TimePickerInput
-          picker="seconds"
-          id="seconds12"
-          date={date}
-          setDate={setDate}
-          ref={secondRef}
-          onLeftFocus={() => minuteRef.current?.focus()}
-          onRightFocus={() => periodRef.current?.focus()}
-        />
-      </div> */}
+    
       <div className="grid gap-1 text-center">
         <Label htmlFor="period" className="text-xs">
           Period
         </Label>
         <TimePeriodSelect
-          period={period}
-          setPeriod={setPeriod}
+         period={currentPeriod}
+         setPeriod={setCurrentPeriod}
           date={date}
-          setDate={setDate}
+          setDate={handleDateChange}
           ref={periodRef}
-          onLeftFocus={() => secondRef.current?.focus()}
+          disabled={disabled}
+          onLeftFocus={() => minuteRef.current?.focus()}
         />
       </div>
     </div>
