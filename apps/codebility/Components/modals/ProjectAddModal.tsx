@@ -1,46 +1,33 @@
-import { ChangeEvent, useState } from "react";
-import Image from "next/image";
-import { createProjects } from "@/app/api/projects";
-import { Button } from "@/Components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/Components/ui/select";
-import { useModal } from "@/hooks/use-modal-projects";
-import useToken from "@/hooks/use-token";
-import { API } from "@/lib/constants";
-import { IconPlus } from "@/public/assets/svgs";
-import { User } from "@/types";
-import { modals_ProjectModal } from "@/types/components";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogTitle } from "@radix-ui/react-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
-import axios from "axios";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
-import * as z from "zod";
+import * as z from "zod"
+import axios from "axios"
+import Image from "next/image"
+import { ChangeEvent, useState } from "react"
+import toast from "react-hot-toast"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { useQuery, UseQueryResult } from "@tanstack/react-query"
+import { DialogTitle } from "@radix-ui/react-dialog"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
+import { DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-} from "@codevs/ui/dialog";
-import { Input } from "@codevs/ui/input";
-import { Textarea } from "@codevs/ui/textarea";
+import { User } from "@/types"
+import { Input } from "@codevs/ui/input"
+import { Button } from "@/Components/ui/button"
+import { API } from "@/lib/constants"
+import useToken from "@/hooks/use-token"
+import { Textarea } from "@codevs/ui/textarea"
+import { IconPlus } from "@/public/assets/svgs"
+import { createProjects } from "@/app/api/projects"
+import { useModal } from "@/hooks/use-modal-projects"
+import { modals_ProjectModal } from "@/types/components"
+import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@codevs/ui/dialog"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select"
+
+
+import { InsertData } from "@/app/home/projects/actions"
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase"
+
+
 
 const projectSchema = z.object({
   project_name: z.string().min(1, { message: "Project name is required" }),
@@ -58,36 +45,47 @@ const defaultImage =
   "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
 
 const ProjectAddModal = () => {
-  const { isOpen, onClose, type } = useModal();
-  const isModalOpen = isOpen && type === "projectAddModal";
-  const { token } = useToken();
-  const [isLoading, setIsLoading] = useState(false);
-  const [projectImage, setProjectImage] = useState<string | any>();
+
+
+  const supabase = useSupabase();
+
+  const { isOpen, onClose, type } = useModal()
+  const isModalOpen = isOpen && type === "projectAddModal"
+  const { token } = useToken()
+  const [isLoading, setIsLoading] = useState(false)
+  const [projectImage, setProjectImage] = useState<string | any>()
+
+  
 
   const { data: clients }: UseQueryResult<modals_ProjectModal[]> = useQuery({
     queryKey: ["clients"],
     queryFn: async () => {
-      const response = await axios(API.CLIENTS);
-      return response.data.data;
+      const { data, error } = await supabase.from('clients').select('*');
+      if (error) throw error;
+      return data;
     },
   });
 
   const { data: users }: UseQueryResult<User[]> = useQuery({
-    queryKey: ["users"],
+    queryKey: ["profile"],
     queryFn: async () => {
-      const response = await axios(API.USERS);
-      return response.data.data;
+      const { data, error } = await supabase.from('profile').select('*');
+      if (error) throw error;
+      return data;
     },
   });
 
-  const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
-  const [searchQuery, setSearchQuery] = useState<string>("");
+  const [selectedMembers, setSelectedMembers] = useState<User[]>([])
+  const [searchQuery, setSearchQuery] = useState<string>("")
+
+  const [usersTest, setUsers] = useState<User[]>([]); // Default to an empty array
 
   const {
     register,
     handleSubmit,
     setValue,
     reset,
+    getValues,
     formState: { errors, isValid },
   } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
@@ -98,7 +96,9 @@ const ProjectAddModal = () => {
     if (!selectedMembers.some((m) => m.id === member.id)) {
       setSelectedMembers((prevMembers) => [...prevMembers, member]);
     }
-  };
+
+    console.log(selectedMembers)
+  }
 
   const removeMember = (id: string) => {
     setSelectedMembers((prevMembers) =>
@@ -113,27 +113,48 @@ const ProjectAddModal = () => {
     onClose();
   };
 
-  const onSubmit = async (data: ProjectFormValues) => {
-    setIsLoading(true);
+  const handleSubmitData = async (event: React.FormEvent<HTMLFormElement> ) => {
+    event.preventDefault(); // Prevent default form submission behavior
+
+    const formData = new FormData(event.currentTarget);
+    const formValues = Object.fromEntries(formData) as ProjectFormValues;
+   
 
     try {
-      const response = await createProjects(
-        {
-          ...data,
-          project_thumbnail: projectImage, // Include the uploaded image URL
-        },
-        selectedMembers.map((member) => ({ id: member.id })),
-        token,
-      );
 
-      if (response.status === 201) {
-        resetForm();
-        toast.success("New Project has been Added!");
-      }
+      projectSchema.parse(formValues); // This will throw an error if validation fails
+
+       const teamLeaderId = formValues.team_leader_id; 
+
+
+      if (!users) return
+
+
+    // Assuming users is an array of user objects
+    const teamLeader = users.find((user) => user.id === teamLeaderId); // Find user object
+
+    // Extract first name
+    const teamLeaderFirstName = teamLeader ? teamLeader.first_name : "Unknown";
+    const teamLeaderLastName = teamLeader ? teamLeader.last_name : "Unknown";
+
+    console.log("Selected Team Leader ID:", teamLeaderId);
+    console.log("Selected Team Leader First Name:", teamLeader);
+
+
+      await InsertData(formData, selectedMembers,teamLeaderFirstName ,teamLeaderLastName ); // Pass form data to DeleteData
+
+      toast.success("New Project has been added!")
+
+      reset();
+      setProjectImage(null);
+      setSelectedMembers([])
+      onClose(); // Close the modal after successful deletion
+
+
+
+
     } catch (error) {
-      toast.error("Something went wrong!");
-    } finally {
-      setIsLoading(false);
+      toast.error("Something went wrong!")
     }
   };
 
@@ -157,8 +178,24 @@ const ProjectAddModal = () => {
   };
 
   const handleRemoveProjectThumbnail = () => {
-    setProjectImage(null);
-  };
+    setProjectImage(null)
+  }
+
+
+  const clientsDummy = [
+    { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', clients: 'Alice Johnson' },
+  { id: 'a27c6d87-08e3-4eb2-9c28-d2d34b275a7c', clients: 'Bob Smith' },
+  { id: '8f9f1a27-89b1-4b6e-9d8c-fc786e68de7d', clients: 'Charlie Davis' },
+  { id: 'e3a64b68-16d7-4e3a-bd14-df94e4d6a5f1', clients: 'Dana Lee' },
+  { id: 'd55a45e8-d1e6-4f75-8777-1bfb57fc8552', clients: 'Eva Martinez' },
+  { id: 'f15b5c58-658e-46c1-96a0-d4f8cfb85e8b', clients: 'Frank Wilson' },
+  { id: 'a6b9e1d6-2e42-4660-89ec-c7b37b1b9c8e', clients: 'Grace Kim' },
+  { id: 'c9a05b62-f5fc-42e6-9460-6e7a7f3d6579', clients: 'Hannah Brown' },
+  { id: 'b08b5a0e-9b8e-4c0c-8d5e-0fef0a2799a2', clients: 'Isaac Wilson' },
+  { id: 'e278e925-3cf3-4a9b-9c35-806a4892b35f', clients: 'Jack Taylor' }
+  ];
+
+  
 
   return (
     <Dialog open={isModalOpen} onOpenChange={resetForm}>
@@ -169,7 +206,12 @@ const ProjectAddModal = () => {
           </DialogTitle>
         </DialogHeader>
 
+
+        <form onSubmit={handleSubmitData} className="flex flex-col gap-4">
+
         <div className="flex flex-col gap-4">
+
+          
           <div className="flex gap-4">
             <div className="bg-gray flex h-14 w-28 items-center justify-center overflow-hidden rounded-lg md:h-20 md:w-40">
               {projectImage ? (
@@ -202,6 +244,7 @@ const ProjectAddModal = () => {
                   id="projectThumbnailUpload"
                   type="file"
                   className="hidden"
+                  name="file"
                 />
                 {projectImage && (
                   <p
@@ -215,10 +258,10 @@ const ProjectAddModal = () => {
             </div>
           </div>
 
-          <form
-            onSubmit={handleSubmit(onSubmit)}
-            className="flex flex-col gap-4"
-          >
+
+          <input type="hidden" name="projectImageId" value={projectImage} /> 
+
+         
             <div className="flex flex-col lg:flex-row lg:gap-8">
               <div className="w-full space-y-3">
                 <Input
@@ -227,11 +270,8 @@ const ProjectAddModal = () => {
                   label="Name"
                   placeholder="Enter Project Name"
                   {...register("project_name")}
-                  className={
-                    errors.project_name
-                      ? "border border-red-500 focus:outline-none"
-                      : ""
-                  }
+                  name="project_name"
+                  className={errors.project_name ? "border border-red-500 focus:outline-none" : ""}
                 />
                 {errors.project_name && (
                   <span className="text-sm text-red-400">
@@ -241,22 +281,30 @@ const ProjectAddModal = () => {
 
                 <div className="">
                   <label>Client</label>
-                  <Select
-                    onValueChange={(value) => setValue("clientId", value)}
-                  >
+                  <Select onValueChange={(value) => setValue("clientId", value) } name="clientId">
                     <SelectTrigger>
                       <SelectValue placeholder="Select a Client"></SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Clients</SelectLabel>
-                        {clients?.map(
-                          (client: { id: string; company_name: string }) => (
-                            <SelectItem key={client.id} value={client.id}>
-                              {client.company_name}
-                            </SelectItem>
-                          ),
-                        )}
+
+
+                        {/* {clients?.map((client: { id: string; company_name: string }) => (
+                          <SelectItem key={client.id} value={client.id}>
+                            {client.company_name}
+                          </SelectItem>
+                        ))} */}
+
+
+                    {clientsDummy.map((data) => (
+                      <SelectItem key={data.id} value={data.id}>
+                        {data.clients}
+                      </SelectItem>
+                    ))}
+
+
+
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -268,9 +316,7 @@ const ProjectAddModal = () => {
                 </div>
                 <div className="">
                   <label>Team Leader</label>
-                  <Select
-                    onValueChange={(value) => setValue("team_leader_id", value)}
-                  >
+                  <Select onValueChange={(value) => setValue("team_leader_id", value)} name="team_leader_id">
                     <SelectTrigger>
                       <SelectValue placeholder="Select a Team Leader"></SelectValue>
                     </SelectTrigger>
@@ -301,11 +347,8 @@ const ProjectAddModal = () => {
                   label="Github"
                   placeholder="Enter Github Link"
                   {...register("github_link")}
-                  className={
-                    errors.github_link
-                      ? "border border-red-500 focus:outline-none"
-                      : ""
-                  }
+                    name="github_link"
+                  className={errors.github_link ? "border border-red-500 focus:outline-none" : ""}
                 />
                 {errors.github_link && (
                   <span className="text-sm text-red-400">
@@ -319,11 +362,8 @@ const ProjectAddModal = () => {
                   label="Live URL"
                   placeholder="Enter Live URL"
                   {...register("live_link")}
-                  className={
-                    errors.live_link
-                      ? "border border-red-500 focus:outline-none"
-                      : ""
-                  }
+                   name="live_link"
+                  className={errors.live_link ? "border border-red-500 focus:outline-none" : ""}
                 />
                 {errors.live_link && (
                   <span className="text-sm text-red-400">
@@ -337,11 +377,8 @@ const ProjectAddModal = () => {
                   label="Link"
                   placeholder="Enter Project Thumbnail URL"
                   {...register("project_thumbnail")}
-                  className={
-                    errors.project_thumbnail
-                      ? "border border-red-500 focus:outline-none"
-                      : ""
-                  }
+                  name="project_thumbnail"
+                  className={errors.project_thumbnail ? "border border-red-500 focus:outline-none" : ""}
                 />
                 {errors.project_thumbnail && (
                   <span className="text-sm text-red-400">
@@ -357,16 +394,11 @@ const ProjectAddModal = () => {
               style={{ color: "black" }}
               placeholder="Enter Summary"
               {...register("summary")}
-              className={
-                errors.summary ? "border border-red-500 focus:outline-none" : ""
-              }
+              name="summary"
+              className={errors.summary ? "border border-red-500 focus:outline-none" : ""}
             />
-            {errors.summary && (
-              <span className="text-sm text-red-400">
-                {errors.summary.message}
-              </span>
-            )}
-          </form>
+            {errors.summary && <span className="text-sm text-red-400">{errors.summary.message}</span>}
+       
         </div>
 
         <div className="flex flex-col gap-1">
@@ -449,25 +481,29 @@ const ProjectAddModal = () => {
         </div>
 
         <DialogFooter className="flex flex-col gap-4 lg:flex-row">
-          <Button
-            variant="hollow"
-            className="order-2 w-full sm:order-1 sm:w-[130px]"
-            onClick={resetForm}
-          >
+          <Button variant="hollow" className="order-2 w-full sm:order-1 sm:w-[130px]" onClick={(e) => {
+                e.preventDefault(); // Prevent form submission
+                resetForm();
+              }}>
             Cancel
           </Button>
           <Button
             disabled={!isValid || isLoading}
             variant="default"
             className="order-1 w-full sm:order-2 sm:w-[130px]"
-            onClick={handleSubmit(onSubmit)}
+            type="submit"
           >
             Add Project
           </Button>
         </DialogFooter>
+
+        </form>
+
       </DialogContent>
     </Dialog>
   );
 };
 
-export default ProjectAddModal;
+export default ProjectAddModal
+
+

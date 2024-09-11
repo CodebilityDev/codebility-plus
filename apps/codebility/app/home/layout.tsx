@@ -5,6 +5,7 @@ import ReactQueryProvider from "@/hooks/reactQuery";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
+import { permissionsString } from "../../constants";
 import LeftSidebar from "./_components/home-left-sidebar";
 import Navbar from "./_components/home-navbar";
 import UserContextProvider from "./_components/user-provider";
@@ -43,21 +44,7 @@ export default async function HomeLayout({
       start_time,
       end_time
     ),
-    user_type(
-      roles,
-      kanban,
-      clients,
-      interns,
-      my_task,
-      in_house,
-      projects,
-      services,
-      dashboard,
-      applicants,
-      org_charts,
-      permissions,
-      time_tracker
-    ),
+    user_type(${permissionsString}),
     profile(*)
   `,
     )

@@ -16,9 +16,13 @@ const PathsSchema = z.object({
     kanban: z.string().min(1),
     orgchart: z.string().min(1),
     projects: z.string().min(1),
-    settings: z.string().min(1),
     tasks: z.string().min(1),
     time_tracker: z.string().min(1),
+    settings: z.string().min(1),
+    roles: z.string().min(1),
+    services: z.string().min(1),
+    permissions: z.string().min(1),
+    resume: z.string().min(1)
   }),
 });
 
@@ -38,9 +42,13 @@ const pathsConfig = PathsSchema.parse({
     kanban: "/home/kanban",
     orgchart: "/home/orgchart",
     projects: "/home/projects",
-    settings: "/home/settings",
     tasks: "/home/tasks",
     time_tracker: "/home/time-tracker",
+    settings: "/home/settings",
+    roles: "/home/settings/roles",
+    services: "/home/settings/services",
+    permissions: "/home/settings/permissions",
+    resume: "/home/settings/resume",
   },
 } satisfies z.infer<typeof PathsSchema>);
 

@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server";
-import { API } from "@/lib/constants";
-import { ProjectT } from "@/types";
-import axios from "axios";
+import axios from "axios"
+import { ProjectT } from "@/types"
+import { API } from "@/lib/constants"
+import { NextResponse } from "next/server"
 
 /* 
 
@@ -19,13 +19,15 @@ export const getProjects = async () => {
       headers: {
         "Content-Type": "application/json",
       },
-    });
+    })
 
-    return response.data.data;
+    return response.data.data
   } catch (error) {
-    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
+    return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 })
   }
-};
+}
+
+
 
 export const createProjects = async (
   data: ProjectT,
@@ -92,4 +94,10 @@ export const deleteProjects = async (id: string, token: string) => {
   } catch (error) {
     return new NextResponse("INTERNAL_SERVER_ERROR", { status: 500 });
   }
-};
+}
+
+
+
+
+
+

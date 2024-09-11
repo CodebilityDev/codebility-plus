@@ -77,11 +77,11 @@
     "zustand": "^4.4.7"
   },
   "devDependencies": {
-    "@codevs/prettier-config": "workspace:*",
     "@chromatic-com/storybook": "1.6.1",
+    "@codevs/eslint-config": "workspace:*",
+    "@codevs/prettier-config": "workspace:*",
     "@codevs/tailwind-config": "workspace:*",
     "@codevs/tsconfig": "workspace:*",
-    "@codevs/eslint-config": "workspace:*",
     "@opentelemetry/api": "^1.9.0",
     "@opentelemetry/resources": "1.18.1",
     "@opentelemetry/sdk-node": "0.45.1",
