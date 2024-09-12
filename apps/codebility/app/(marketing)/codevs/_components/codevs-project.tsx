@@ -12,8 +12,10 @@ export default async function Project() {
   const OPTIONS: EmblaOptionsType = { loop: true };
 
   const slides = projects
-    ?.filter((project) => project.thumbnail)
-    .map((project) => project.thumbnail) as string[];
+    ? (projects
+        ?.filter((project) => project.thumbnail)
+        .map((project) => project.thumbnail) as string[])
+    : [];
   /*   const SLIDES = ["/assets/images/codebility-home.jpg", "/assets/images/campaign/inquire.png", "/assets/images/services/social-networking-app.png", "/assets/images/services/e-commerce-app.png"] */
   return (
     <section className="bg-black-400 relative flex min-h-screen w-full flex-col justify-center text-center">
