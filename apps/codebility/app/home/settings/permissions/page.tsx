@@ -1,14 +1,21 @@
 import Link from "next/link";
-import PermissionsTable from "@/app/home/settings/permissions/PermissionsTable";
 import { Box, H1 } from "@/Components/shared/dashboard";
 import { ArrowRightIcon } from "@/public/assets/svgs";
 
-const PermissionSettings = () => {
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+
+import PermissionsTable from "./_components/permissions-table";
+import { permissions_TableRowProps as TableRowProps } from "./_types/permissions";
+
+const PermissionSettings = async () => {
+  const supabase = getSupabaseServerComponentClient();
+  const { data: Roles, error } = await supabase.from("roles").select("*");
+
   return (
     <div className="flex max-w-[1600px] flex-col gap-6 overflow-x-auto">
       <div className="text-dark100_light900 flex flex-col gap-4 ">
         <div className="flex flex-row items-center gap-4 text-sm">
-          <Link href={"/settings"}>
+          <Link href={"/home/settings"}>
             <span className="dark:text-white/50">Settings</span>
           </Link>
           <ArrowRightIcon />
@@ -19,7 +26,11 @@ const PermissionSettings = () => {
         <H1>Permissions</H1>
       </div>
       <Box className="p-0">
-        <PermissionsTable />
+        {error ? (
+          <div>Error</div>
+        ) : (
+          <PermissionsTable Roles={Roles as TableRowProps[]} />
+        )}
       </Box>
     </div>
   );
