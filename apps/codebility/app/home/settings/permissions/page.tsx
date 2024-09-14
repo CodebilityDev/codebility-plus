@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { Box, H1 } from "@/Components/shared/dashboard";
-// import PermissionsTable from "@/app/home/settings/permissions/_components/permissions-table"
 import { ArrowRightIcon } from "@/public/assets/svgs";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
