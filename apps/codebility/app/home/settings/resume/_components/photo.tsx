@@ -16,12 +16,12 @@ type PhotoProps = {
 }
 const Photo = ({data}: PhotoProps) => {
   const supabase = getSupabaseBrowserClient();
-  const [myAvatar, setAvatar] = useState<string | any>(defaultAvatar || data.image_url )
+  const [myAvatar, setAvatar] = useState<string | any>(defaultAvatar || data?.image_url )
   useEffect(() => {
-    if (data.image_url) {
-        setAvatar(data.image_url);
+    if (data?.image_url) {
+        setAvatar(data?.image_url);
     }
-}, [data.image_url]);
+}, [data?.image_url]);
 
 
 const handleUploadAvatar = async (event: React.ChangeEvent<HTMLInputElement>) => {

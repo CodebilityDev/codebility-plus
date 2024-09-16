@@ -25,15 +25,13 @@ const Resume = async () => {
   
     const supabase = getSupabaseServerComponentClient()
     const {data: {user} } = await supabase.auth.getUser()
-    const {data: profileData, error: profileError} = await supabase.from("profile").select().eq("id", user?.id).single()
-    const {data: socialData, error: socialError} = await supabase.from("social").select().eq("id", user?.id).single()
+    const {data: profileData, error: profileError} = await supabase.from("profile").select("*").eq("user_id", user?.id).single()
+    const {data: socialData, error: socialError} = await supabase.from("social").select("*").eq("user_id", user?.id).single()
     const { data: experienceData, error: experienceError } = await supabase
     .from("experience")
-    .select()
+    .select("*")
     .eq("profile_id", user?.id)
-    
-
- 
+   
   return (
     <>
       <Breadcrumb>
@@ -58,7 +56,7 @@ const Resume = async () => {
           <Skills data={profileData as Profile_Types} />
         </div>
         <div className="flex w-full basis-[30%] flex-col gap-8">
-        <Photo data={ profileData as Profile_Types} />
+        <Photo data={profileData as Profile_Types} />
           <TimeSchedule data={profileData as Profile_Types}/>
           </div>
         </div> }
