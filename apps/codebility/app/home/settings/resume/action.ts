@@ -41,11 +41,12 @@ export async function removeAvatar(avatar: string | null ): Promise<void>{
 }
 export async function updateProfile(updatedData: Profile_Types) {
     const {data: {user}} = await supabase.auth.getUser()
-    const {data, error} = await supabase.from("profile").update({...updatedData, id: user?.id }).eq("id", user?.id).select()
+    const {data, error} = await supabase.from("profile").update({...updatedData, id: user?.id }).eq("user_id", user?.id).select("*")
 }
 export async function updateSocial(updatedData: Social_Types) {
     const {data: {user}} = await supabase.auth.getUser()
-    const {data} = await supabase.from("social").update(updatedData).eq("id", user?.id).select()
+    const {data, error} = await supabase.from("social").update(updatedData).eq("user_id", user?.id).select("*")
+  
   
 }
 export async function createWorkExperience(createWorkExp: Experience_Type[]) {
@@ -56,10 +57,10 @@ export async function createWorkExperience(createWorkExp: Experience_Type[]) {
 }
 export async function updateWorkExperience( id: string, expData: Experience_Type) {
     const {data: {user}} = await supabase.auth.getUser()
-    const {data, error} = await supabase.from("experience").update(expData).eq("id", id)
+    const {data, error} = await supabase.from("experience").update(expData).eq("profile_id", id)
     return {data, error}
 }
 export async function deleteWorkExperience(id: string){
     const {data: {user}} = await supabase.auth.getUser()
-    return supabase.from("experience").delete().eq("id", id)
+    return supabase.from("experience").delete().eq("profile_id", id)
 }
