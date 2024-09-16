@@ -26,10 +26,10 @@ import TaskViewModal from "@/Components/modals/TaskViewModal";
 import TechStackModal from "@/Components/modals/TechStackModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
-
-import ServiceCategoriesDeleteModal from "../modals/ServiceCategoriesDeleteModal";
-import ServiceCategoriesModal from "../modals/ServiceCategoriesModal";
-
+import ServiceCategoriesDeleteModal from "@/Components/modals/ServiceCategoriesDeleteModal";
+import ServiceCategoriesModal from "@/Components/modals/ServiceCategoriesModal";
+import ApplicantsAddModal from "@/Components/modals/ApplicantsAddModal";
+import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -63,6 +63,9 @@ export const ModalProvider = () => {
       <ServicesModal />
       <ServiceCategoriesModal />
       <ServiceCategoriesDeleteModal />
+
+      <ApplicantsAddModal />
+      <ApplicantsEditModal />
       <ContactUsModal />
       <PrivacyPolicyModal />
       <TermsOfServiceModal />
