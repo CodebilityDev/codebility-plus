@@ -34,12 +34,12 @@ const ContactInfo = ({data}: Social_Props) => {
     defaultValues: {
       phone_no: "" ,
       portfolio_website: "",
-      github_link: "",
-      linkedin_link: "",
-      fb_link: "",
-      telegram_link: "",
-      whatsapp_link: "",
-      skype_link: "",
+      github: "",
+      linkedin: "",
+      facebook: "",
+      telegram: "",
+      whatsapp: "",
+      skype: "",
     },
    
   })
@@ -50,12 +50,12 @@ const ContactInfo = ({data}: Social_Props) => {
       reset({
         phone_no: data.phone_no || "",
         portfolio_website: data.portfolio_website || "",
-        github_link: data.github_link || "",
-        linkedin_link: data.linkedin_link || "",
-        fb_link: data.fb_link || "",
-        telegram_link: data.telegram_link || "",
-        whatsapp_link: data.whatsapp_link || "",
-        skype_link: data.skype_link || ""
+        github: data.github || "",
+        linkedin: data.linkedin || "",
+        facebook: data.facebook || "",
+        telegram: data.telegram || "",
+        whatsapp: data.whatsapp || "",
+        skype: data.skype || ""
       })
     }
   }, [data, reset])
@@ -67,14 +67,14 @@ const ContactInfo = ({data}: Social_Props) => {
       const {
         phone_no,
         portfolio_website,
-        github_link,
-        linkedin_link,
-        fb_link,
-        telegram_link,
-        whatsapp_link,
-        skype_link
+        github,
+        linkedin,
+        facebook,
+        telegram,
+        whatsapp,
+        skype
       } = data;
-      await updateSocial({phone_no, portfolio_website, github_link, linkedin_link, fb_link, telegram_link, whatsapp_link, skype_link})
+      await updateSocial({phone_no, portfolio_website, github, linkedin, facebook, telegram, whatsapp, skype})
       toast.success("Your contact info was sucessfully updated!", {id: toastId})
       setIsEditMode(false)
     } catch(error){
@@ -140,16 +140,16 @@ const ContactInfo = ({data}: Social_Props) => {
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
-            id="github_link"
+            id="github"
             placeholder="eg. https://github.com/CodebilityDev/"
-            {...register("github_link")}
+            {...register("github")}
             label="Github"
             disabled={!isEditMode}
           />
          
           <Input
-            id="fb_link"
-            {...register("fb_link")}
+            id="facebook"
+            {...register("facebook")}
             label="Facebook"
             placeholder="eg. https://www.facebook.com/Codebilitydev"
             disabled={!isEditMode}
@@ -159,8 +159,8 @@ const ContactInfo = ({data}: Social_Props) => {
           />
         
           <Input
-            id="linkedin_link"
-            {...register("linkedin_link")}
+            id="linkedin"
+            {...register("linkedin")}
             label="Linkedin"
             disabled={!isEditMode}
             placeholder="eg. https://www.linkedin.com/company/codebilitytech/"
@@ -170,8 +170,8 @@ const ContactInfo = ({data}: Social_Props) => {
           />
         
           <Input
-            id="telegram_link"
-            {...register("telegram_link")}
+            id="telegram"
+            {...register("telegram")}
             label="Telegram"
             placeholder="eg. https://www.telegram.com/codebility"
             disabled={!isEditMode}
@@ -181,8 +181,8 @@ const ContactInfo = ({data}: Social_Props) => {
           />
       
           <Input
-            id="whatsapp_link"
-            {...register("whatsapp_link")}
+            id="whatsapp"
+            {...register("whatsapp")}
             label="Whatsapp"
             placeholder="eg. https://www.whatsapp.com/codebility"
             disabled={!isEditMode}
@@ -192,8 +192,8 @@ const ContactInfo = ({data}: Social_Props) => {
           />
          
           <Input
-            id="skype_link"
-            {...register("skype_link")}
+            id="skype"
+            {...register("skype")}
             label="Skype"
             placeholder="eg. https://www.skype.com/codebility"
             disabled={!isEditMode}
