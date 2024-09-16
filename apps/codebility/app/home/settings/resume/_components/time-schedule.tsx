@@ -15,21 +15,21 @@ interface TimeScheduleProps {
   data: Profile_Types
 }
 const TimeSchedule = ({data}: TimeScheduleProps) => {
-  const [start, setStart] = useState(data.start_time || "")
-  const [end, setEnd] = useState(data.end_time || "")
+  const [start, setStart] = useState(data?.start_time || "")
+  const [end, setEnd] = useState(data?.end_time || "")
   const [isEditMode, setIsEditMode] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
 
   useEffect(() => {
-    const { date } = parseTime(data.start_time || "");
+    const { date } = parseTime(data?.start_time || "");
     setStart(date.toTimeString().substring(0, 5));
     
-  }, [data.start_time]);
+  }, [data?.start_time]);
   useEffect(() => {
-    const { date} = parseTime(data.end_time || "");
+    const { date} = parseTime(data?.end_time || "");
     setEnd(date.toTimeString().substring(0, 5));
  
-  }, [data.end_time]);
+  }, [data?.end_time]);
   const handleEditClick = () => {
     setIsEditMode(!isEditMode)
   }
