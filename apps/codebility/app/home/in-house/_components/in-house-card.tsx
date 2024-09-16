@@ -10,7 +10,7 @@ interface Props {
   handleEditButton: (id: string) => void;
 }
 
-function Card({ member, handleEditButton }: Props) {
+export default function Card({ member, handleEditButton }: Props) {
   return (
     <div className="text-dark100_light900 dark:bg-dark-200 bg-light-300 flex h-72 w-64 flex-col justify-between gap-4 rounded-md p-4">
       <div className="flex flex-col">
@@ -57,5 +57,3 @@ function Card({ member, handleEditButton }: Props) {
     </div>
   );
 }
-
-export default Card;
