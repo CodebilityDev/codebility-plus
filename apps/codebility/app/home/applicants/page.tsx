@@ -1,40 +1,25 @@
-"use client";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
+import ApplicantsList from "@/app/home/applicants/_components/applicants-list"
+import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants"
 
-import { getApplicants } from "@/app/api/applicants";
-import ApplicantTable from "@/app/home/applicants/ApplicantsList";
-import Error from "@/app/home/applicants/error";
-import Loading from "@/app/home/applicants/loading";
-import { Box } from "@/Components/shared/dashboard";
-import H1 from "@/Components/shared/dashboard/H1";
-import { User } from "@/types";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+const ApplicantsPage = async () => {
 
-const ApplicantsPage = () => {
-  const {
-    data: Applicants,
-    isLoading: LoadingApplicants,
-    error: ErrorApplicants,
-  }: UseQueryResult<User[]> = useQuery({
-    queryKey: ["applicants"],
-    queryFn: async () => {
-      return await getApplicants();
-    },
-    refetchInterval: 3000,
-  });
+  const supabase = getSupabaseServerComponentClient();
+  const { data: applicants, error } = await supabase
+    .from("applicants")
+    .select('*')
 
-  if (LoadingApplicants) return <Loading />;
-
-  if (ErrorApplicants)
-    return <Error error={ErrorApplicants} reset={() => getApplicants()} />;
 
   return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
-      <H1>Applicants List</H1>
-      <Box>
-        <ApplicantTable applicants={Applicants as User[]} />
-      </Box>
+    <div className="max-w-screen-xl mx-auto flex flex-col gap-4">
+      {
+        error ?
+          <div>ERROR</div>
+          :
+          <ApplicantsList applicants={applicants as ApplicantsList_Types[]} />
+      }
     </div>
-  );
-};
+  )
+}
 
-export default ApplicantsPage;
+export default ApplicantsPage
