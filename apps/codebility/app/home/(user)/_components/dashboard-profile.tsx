@@ -30,7 +30,7 @@ export default async function DashboardProfile() {
               alt="Avatar"
               src={
                 userData.image_url
-                  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${userData.image_url}`
+                  ? `${userData.image_url}`
                   : defaultAvatar
               }
               width={100}

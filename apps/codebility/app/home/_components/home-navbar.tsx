@@ -48,7 +48,7 @@ const Navbar = () => {
                     alt="Avatar"
                     src={
                       image_url
-                        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${image_url}`
+                        ? `${image_url}`
                         : defaultAvatar
                     }
                     fill
