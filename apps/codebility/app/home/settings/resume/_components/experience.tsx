@@ -37,27 +37,27 @@ const Experience = ({data}: ExperienceProps) => {
   const editModePerItem: React.MutableRefObject<EditModePerItem> = useRef({})
   
   
-  const getWorkExperiences = useCallback(async () => {
-    try {
-      setIsLoadingMain(true)
-      const res: any = await getWorkExperiences()
-      setExperienceData([...res.data])
-      const updateObject: any = {}
-      res.data.map((item: any, index: number) => {
-        updateObject[index] = false;
-      });
-      editModePerItem.current = updateObject;
-      setIsLoadingMain(false);
-    } catch (e: any) {
-      setIsLoadingMain(false);
-    } finally {
-      setIsLoadingMain(false);
-    }
-  }, [])
+  // const getWorkExperiences = useCallback(async () => {
+  //   try {
+  //     setIsLoadingMain(true)
+  //     const res: any = await getWorkExperiences()
+  //     setExperienceData([...res.data])
+  //     const updateObject: any = {}
+  //     res.data.map((item: any, index: number) => {
+  //       updateObject[index] = false;
+  //     });
+  //     editModePerItem.current = updateObject;
+  //     setIsLoadingMain(false);
+  //   } catch (e: any) {
+  //     setIsLoadingMain(false);
+  //   } finally {
+  //     setIsLoadingMain(false);
+  //   }
+  // }, [])
 
-  useEffect(() => {
-    getWorkExperiences();
-  }, [getWorkExperiences]);
+  // useEffect(() => {
+  //   getWorkExperiences();
+  // }, [getWorkExperiences]);
 
   const handleUpdateExperience = (itemNo: number, e: any) => {
     const updatedExperiences = experienceData.map((item, id) => {
@@ -96,9 +96,10 @@ const Experience = ({data}: ExperienceProps) => {
     }
   };
 
-  const handleEditModePerItem = (itemNo: number, editable: boolean) => {
-    editModePerItem.current = { ...editModePerItem.current, [itemNo]: editable }
-  }
+  const handleEditModePerItem = useCallback((itemNo: number, editable: boolean) => {
+    editModePerItem.current[itemNo] = editable;
+  }, []);
+
 
   return (
     <>
@@ -206,40 +207,36 @@ const ExperienceForm = ({
     setEditMode(editModePerItem.current[itemNo]);
   }, [editModePerItem, itemNo]);
 
-  const handleEditMode = () => {
-    setEditMode(true)
-    editModePerItem.current[itemNo] = true
-  }
-  const handleSaveAndUpdate = async (id: string | undefined) => {
+ 
+  const handleSaveAndUpdate = useCallback(async (id: string | undefined) => {
     const data: any = {
       position: experience.position,
       description: experience.description,
       date_from: experience.date_from,
       date_to: experience.date_to,
     };
-  
+
     try {
       setIsLoading(true);
       if (!id) {
-        const { error } = await createWorkExperience(data); 
-        if (!error) {
-          toast.success("Successfully Added!");
-        }
+        await createWorkExperience(data);
+        toast.success("Successfully added!");
       } else {
-        const { error } = await updateWorkExperience(id, data); 
-        if (!error) {
-          toast.success("Successfully Updated!");
-        }
+        await updateWorkExperience(id, data);
       }
-      handleEditModePerItem(itemNo, false); 
+      handleEditModePerItem(itemNo, false);
       setEditMode(false);
     } catch (error) {
       toast.error("Something went wrong!");
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [experience, itemNo, handleEditModePerItem]);
 
+  const handleEditMode = () => {
+    setEditMode(true);
+    editModePerItem.current[itemNo] = true;
+  };
   return (
     <>
       <div className="dark:bg-dark-500 mt-8 flex w-full  flex-col  rounded-md bg-slate-50 px-[24px] py-[29px]">

@@ -28,7 +28,7 @@ const Resume = async () => {
     const {data: profileData, error: profileError} = await supabase.from("profile").select("*").eq("user_id", user?.id).single()
     const {data: socialData, error: socialError} = await supabase.from("social").select("*").eq("user_id", user?.id).single()
     const { data: experienceData, error: experienceError } = await supabase
-    .from("experience")
+    .from("experiences")
     .select("*")
     .eq("profile_id", user?.id)
    
