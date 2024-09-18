@@ -46,21 +46,23 @@ export async function updateProfile(updatedData: Profile_Types) {
 export async function updateSocial(updatedData: Social_Types) {
     const {data: {user}} = await supabase.auth.getUser()
     const {data, error} = await supabase.from("social").update(updatedData).eq("user_id", user?.id).select("*")
-  
-  
 }
 export async function createWorkExperience(createWorkExp: Experience_Type[]) {
-    const {data: {user}} = await supabase.auth.getUser()
-    const workExperience = { ...createWorkExp, profile_id: user?.id };
-    return supabase.from("experience").insert(workExperience).eq("profile_id", user?.id).select()
-   
+  const {data: {user}} = await supabase.auth.getUser()
+  const workExperience = { ...createWorkExp, profile_id: user?.id };
+  const {data, error} = await supabase.from("experiences").insert(workExperience).eq("profile_id", user?.id).select()
+
+  if (error) {
+    throw error;
+  }
+
+  return data;
 }
 export async function updateWorkExperience( id: string, expData: Experience_Type) {
-    const {data: {user}} = await supabase.auth.getUser()
-    const {data, error} = await supabase.from("experience").update(expData).eq("profile_id", id)
-    return {data, error}
+  const {data: {user}} = await supabase.auth.getUser()
+ return await supabase.from("experiences").update(expData).eq("profile_id", user?.id).eq("id", id)
 }
 export async function deleteWorkExperience(id: string){
     const {data: {user}} = await supabase.auth.getUser()
-    return supabase.from("experience").delete().eq("profile_id", id)
+   return await supabase.from("experiences").delete().eq("profile_id", user?.id).eq("id", id)
 }
