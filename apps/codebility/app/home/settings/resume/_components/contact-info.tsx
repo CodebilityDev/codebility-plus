@@ -118,10 +118,10 @@ const ContactInfo = ({data}: Social_Props) => {
                 : " bg-white  text-dark-200 dark:bg-dark-200 dark:text-gray"
             }`}
             {...register("phone_no", {
-              pattern: {
-                value: /^\d{3}[-\s]?\d{3}[-\s]?\d{4}$/,
-                message: "Invalid phone number. Please enter a 10-digit number.",
-              },
+              // pattern: {
+              //   value: /^\d{3}[-\s]?\d{3}[-\s]?\d{4}$/,
+              //   message: "Invalid phone number. Please enter a 10-digit number.",
+              // },
             })}
           />
        
