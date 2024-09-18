@@ -1,10 +1,10 @@
 import React, { useState } from "react";
 import Box from "@/Components/shared/dashboard/Box";
-import format from "date-fns/format";
-import getDay from "date-fns/getDay";
-import enUS from "date-fns/locale/en-US";
-import parse from "date-fns/parse";
-import startOfWeek from "date-fns/startOfWeek";
+import { format } from "date-fns/format";
+import { getDay } from "date-fns/getDay";
+import { enUS } from "date-fns/locale/en-US";
+import { parse } from "date-fns/parse";
+import { startOfWeek } from "date-fns/startOfWeek";
 
 import "react-big-calendar/lib/css/react-big-calendar.css";
 
