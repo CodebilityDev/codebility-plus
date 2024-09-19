@@ -5,6 +5,7 @@ import { createMiddlewareClient } from "@codevs/supabase/middleware-client";
 
 import pathsConfig from "./config/paths.config";
 import { permissionsString } from "./constants";
+import { getSplit } from "./lib/get-split";
 
 export const config = {
   matcher: [
@@ -102,8 +103,12 @@ function getPatterns() {
         if (!user) return redirectToSignIn;
 
         const currDashboardPath = req.nextUrl.pathname.split("/home/")[1]; // the current path user is on.
+        const allowedPath = [
+          getSplit(pathsConfig.app.settings, "/", { getLast: true }),
+          getSplit(pathsConfig.app.orgchart, "/", { getLast: true }),
+        ]
 
-        if (!currDashboardPath) return; // checking won't be required because user is on their personal dashboard.
+        if (!currDashboardPath || allowedPath.includes(currDashboardPath)) return; // checking won't be required because user is on their personal dashboard or when the path is allowed for everyone 
 
         // get user dashboard permissions
         const { data, error } = await supabase.from("user")
@@ -115,7 +120,6 @@ function getPatterns() {
         .single();
 
         if (error || !data) return redirectToSignIn;
-        
         
         // redirect to personal dashboard if user didn't have any permission to access the path.
         if (!data.user_type[currDashboardPath as keyof typeof data.user_type]) return NextResponse.redirect(new URL(pathsConfig.app.home, origin).href);
