@@ -4,7 +4,7 @@ import Card from './in-house-card';
 import { Codev } from '@/types/home/codev';
 
 const meta: Meta<typeof Card> = {
-  title: 'Components/InHouseCard',
+  title: 'Home/InHouse/InHouseCard',
   component: Card,
   tags: ['autodocs'],
   argTypes: {
