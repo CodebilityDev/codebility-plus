@@ -7,14 +7,14 @@ interface Props {
 }
 
 export default function ServiceCard({ service }: Props) {
-  const { name, main_image_url, description } = service;
+  const { name, mainImage, description } = service;
 
   return (
     <div className="border-light-900/5 bg-light-700/10 flex flex-1 flex-col gap-4 rounded-lg border-2 p-4 text-white">
       <Image
         src={
-          main_image_url
-            ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${main_image_url}`
+          mainImage
+            ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/services-image/${mainImage}`
             : "https://codebility-cdn.pages.dev/assets/images/dafault-avatar-1248x845.jpg"
         }
         alt={name}
