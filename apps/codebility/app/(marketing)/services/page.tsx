@@ -9,7 +9,7 @@ import ServicesTab from "./_components/services-tab";
 
 export default async function ServicesPage() {
   const supabase = getSupabaseServerComponentClient();
-  const { data } = await supabase.from("service").select();
+  const { data } = await supabase.from("services").select();
 
   const services = data || [];
   return (
