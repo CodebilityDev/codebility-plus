@@ -12,49 +12,44 @@ jobs:
   turbo:
     runs-on: ubuntu-latest
 
-    # Set up environment variables
     env:
       NEXT_PUBLIC_PRODUCT_NAME: "ClapUp"
       NEXT_PUBLIC_SITE_TITLE: "Clapper Digital Business Card"
       NEXT_PUBLIC_SITE_DESCRIPTION: "App"
       NEXT_PUBLIC_SITE_URL: "https://localhost:3000"
       NEXT_PUBLIC_DEFAULT_LOCALE: "en"
-      NEXT_PUBLIC_DEFAULT_THEME_MODE: "light"    
+      NEXT_PUBLIC_DEFAULT_THEME_MODE: "light"
       NEXT_PUBLIC_THEME_COLOR: "#22C55E"
       NEXT_PUBLIC_THEME_COLOR_DARK: "#1e1e1e"
       NEXT_PUBLIC_SUPABASE_URL: "supabaseurl"
       NEXT_PUBLIC_SUPABASE_ANON_KEY: "supabaseanonkey"
 
     steps:
-      # Checkout the repository
       - name: Checkout repository
         uses: actions/checkout@v2
- 
-      # Install pnpm using the official pnpm/action-setup
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v3
         with:
           version: 8
 
-      # Set up Node.js
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'pnpm'
 
-      # Cache dependencies and Turbo's output
       - name: Cache node_modules and Turbo output
         uses: actions/cache@v2
         with:
           path: |
             node_modules
             .turbo
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+            packages/*/node_modules
+          key: ${{ runner.os }}-node-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-node-
-      
-      # Cache pnpm dependencies
+
       - name: Cache pnpm dependencies
         uses: actions/cache@v2
         with:
@@ -62,19 +57,20 @@ jobs:
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
-            
-      # Install dependencies using pnpm
-      - name: Install dependencies
-        run: pnpm install
 
-      # Fetch the dev branch to make it available for comparison
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Fetch dev branch
         run: git fetch origin dev
 
-      # Run build for only affected packages (based on changed files)
       - name: Build changed packages
         run: pnpm dlx turbo@latest run build --filter=...[origin/dev]
 
-      # Run tests only for changed packages
+      # Uncomment when ready for tests
       # - name: Run tests for changed packages
       #   run: pnpm dlx turbo@latest run test --filter=...[origin/dev]
+
+      # Trigger Vercel deployment using deploy hook
+      - name: Deploy to Vercel
+        run: curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_9kHRoASFcMABb4SuIcPINlnyH3tR/IT917LIeVF"
