@@ -30,7 +30,7 @@ export interface Codev {
   // for relational data type
   user?: User;
   projects: Project[];
-  work_experience?: WorkExperience[];
+  experiences?: WorkExperience[];
 }
 
 export interface Project {

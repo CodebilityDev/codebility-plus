@@ -18,7 +18,7 @@ export const getCodevs = async (
         *,
         profile(
           *,
-          work_experience(*)
+          experiences(*)
         ),
         social(*)
       )
@@ -63,7 +63,7 @@ export const getCodevs = async (
       portfolio_website,
       contact,
       education,
-      work_experience,
+      experiences,
     } = codev.user.profile;
 
     return {
@@ -82,7 +82,7 @@ export const getCodevs = async (
       address,
       about,
       education,
-      work_experience,
+      experiences,
       socials: codev.user.social,
       job_status: codev.job_status,
       nda_status: codev.nda_status,

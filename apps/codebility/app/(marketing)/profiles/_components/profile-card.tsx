@@ -54,7 +54,7 @@ const ProfileCard = ({ codev, color }: Props) => {
               codev.image_url && codev.image_url.startsWith("http")
                 ? codev.image_url
                 : codev.image_url
-                  ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}${codev.image_url}`
+                  ? `${codev.image_url}`
                   : "/assets/svgs/icon-codebility-black.svg"
             }
             width={60}
