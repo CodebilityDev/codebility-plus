@@ -15,7 +15,7 @@ type Story = StoryObj<typeof InHouseCards>;
 
 export const Default: Story = {
   args: {
-    data: [mockCodev],
+    data: mockCodev,
     editableIds: [],
     handlers: {
       setData: () => {},

@@ -15,7 +15,7 @@ type Story = StoryObj<typeof InHouseContainer>;
 
 export const Default: Story = {
   args: {
-    codevData: [mockCodevData],
+    codevData: mockCodevData,
   }
 };
 
