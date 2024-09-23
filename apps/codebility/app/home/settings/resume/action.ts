@@ -3,7 +3,7 @@
 
 
 import { Profile_Types, Social_Types } from "./_types/resume";
-import { Experience_Type } from "./_components/experience";
+import { Experience_Type } from "./_components/resume-experience";
 import toast from "react-hot-toast";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
