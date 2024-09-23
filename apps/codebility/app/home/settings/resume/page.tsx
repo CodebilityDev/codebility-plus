@@ -11,14 +11,14 @@ import {
   BreadcrumbSeparator,
 } from "@codevs/ui/breadcrumb"
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
-import TimeSchedule from "./_components/time-schedule"
-import Photo from "./_components/photo"
-import PersonalInfo from "./_components/personal-info"
-import About from "./_components/about"
-import ContactInfo from "./_components/contact-info"
+import TimeSchedule from "./_components/resume-time-schedule"
+import Photo from "./_components/resume-photo"
+import PersonalInfo from "./_components/resume-personal-info"
+import About from "./_components/resume-about"
+import ContactInfo from "./_components/resume-contact-info"
 
-import Skills from "./_components/skills"
-import Experience, { Experience_Type } from "./_components/experience"
+import Skills from "./_components/resume-skills"
+import Experience, { Experience_Type } from "./_components/resume-experience"
 import { Profile_Types, Social_Types } from "./_types/resume"
 
 const Resume = async () => { 
