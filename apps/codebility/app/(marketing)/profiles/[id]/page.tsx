@@ -48,7 +48,7 @@ export default async function CodevBioPage({ params }: Props) {
     education,
     tech_stacks,
     contact,
-    work_experience,
+    experiences,
   } = data as Codev;
 
   const { facebook, linkedin, github } = socials;
@@ -73,7 +73,7 @@ export default async function CodevBioPage({ params }: Props) {
                 alt={`${first_name} Avatar`}
                 src={
                   image_url
-                    ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${image_url}`
+                    ? `${image_url}`
                     : "/assets/svgs/icon-codebility-black.svg"
                 }
                 width={130}
@@ -272,7 +272,7 @@ export default async function CodevBioPage({ params }: Props) {
                   ))}
               </div>
             </div>
-            {work_experience && work_experience.length > 0 && (
+            {experiences && experiences.length > 0 && (
               <div>
                 <div className="mb-4 flex items-center gap-2">
                   <IconBag className="text-2xl" />
@@ -281,7 +281,7 @@ export default async function CodevBioPage({ params }: Props) {
                   </h3>
                 </div>
                 <div className="flex flex-col gap-6 md:gap-8">
-                  {work_experience.map((exp, expNo) => (
+                  {experiences.map((exp, expNo) => (
                     <div
                       key={`experience-${expNo}`}
                       className="bg-black-100 flex flex-col gap-4 rounded-lg p-6"
