@@ -14,5 +14,21 @@ export const mockCodevData = [
     internal_status: 'AVAILABLE',
     main_position: 'Developer',
     projects: [],
-  }
+  },
+  {
+    id: '3',
+    first_name: 'Alice',
+    last_name: 'Smith',
+    internal_status: 'BUSY',
+    main_position: 'Project Manager',
+    projects: [],
+  },
+  {
+    id: '4',
+    first_name: 'Bob',
+    last_name: 'Johnson',
+    internal_status: 'AVAILABLE',
+    main_position: 'Developer',
+    projects: [],
+  },
 ];
