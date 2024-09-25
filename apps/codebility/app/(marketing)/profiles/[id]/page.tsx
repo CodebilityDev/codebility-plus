@@ -58,9 +58,11 @@ export default async function CodevBioPage({ params }: Props) {
   }
 
   return (
-    <section className="from-black-500 to-black-100 relative min-h-screen w-full bg-gradient-to-l">
+    <section className="from-black-500 to-black-100 relative min-h-screen flex flex-col bg-gradient-to-l">
       <div className="bg-section-wrapper absolute inset-0 bg-fixed bg-repeat opacity-20"></div>
-      <div className="relative px-5 py-5 md:px-10 md:py-10 lg:px-32 lg:py-20">
+
+
+      <div className="relative flex-grow px-5 py-5 md:px-10 md:py-10 lg:px-32 lg:py-20">
         <div className="flex justify-between gap-2">
           <Logo />
           <ProfileCloseButton />
