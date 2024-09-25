@@ -10,6 +10,11 @@ const isValidGitHubUrl = (url: string) => {
     return false;
   }
 };
+const isValidUrl = (url: string) => {
+  if (!url) return true; 
+  const urlRegex = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?$/;
+  return urlRegex.test(url);
+};
 
 export const SignUpValidation = z
   .object({
@@ -28,7 +33,7 @@ export const SignUpValidation = z
     website: z
       .string()
       .optional()
-      .refine((value: string | undefined) => isValidGitHubUrl(value || ""), {
+      .refine((value: string | undefined) => isValidUrl(value || ""), {
         message: "Invalid Url Format",
       }),
     techstack: z.string().min(1, { message: "Required" }),
