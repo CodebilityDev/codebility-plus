@@ -394,6 +394,16 @@ export const navItems = [
     title: "Hire a CoDevs",
     path: "/codevs",
   },
+  {
+    id: "5",
+    title: "Sign In",
+    path: "/authv2/sign-in",
+  },
+  {
+    id: "6",
+    title: "Sign Up",
+    path: "/authv2/sign-up",
+  },
 ];
 
 export const permissionsString = `
