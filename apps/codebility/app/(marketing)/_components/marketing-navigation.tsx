@@ -93,14 +93,14 @@ const Navigation = () => {
               </SheetTrigger>
               <SheetContent
                 side="top"
-                className="flex h-auto w-full flex-col items-center justify-center border-none text-white"
+                className="flex h-auto w-full flex-col items-center justify-center border-none bg-light-900 text-stone-900 dark:bg-stone-900 dark:text-white"
               >
                 {navItems.map((item, index) => (
                   <Link
                     onClick={() => setOpenSheet(false)}
                     href={item.path}
                     key={item.id}
-                    className={`w-full ${index === 3 ? "border-none" : "border-black-100 border-b"}`}
+                    className={`w-full ${index === 3 ? "border-none" : "border-black-100 dark:border-light-900"}`}
                   >
                     <p className="w-full cursor-pointer px-2 py-3 text-center text-base">
                       {item.title}
