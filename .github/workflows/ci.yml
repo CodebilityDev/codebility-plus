@@ -73,4 +73,4 @@ jobs:
 
       # Trigger Vercel deployment using deploy hook
       - name: Deploy to Vercel
-        run: curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_9kHRoASFcMABb4SuIcPINlnyH3tR/IT917LIeVF"
+        run: curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_9kHRoASFcMABb4SuIcPINlnyH3tR/2azM3yQP4t"
