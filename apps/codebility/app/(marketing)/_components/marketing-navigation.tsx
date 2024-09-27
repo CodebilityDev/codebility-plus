@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Logo from "@/Components/shared/home/Logo";
 import { Button } from "@/Components/ui/button";
@@ -21,6 +21,23 @@ const Navigation = () => {
   const { color } = useChangeBgNavigation();
   const [openSheet, setOpenSheet] = useState(false);
   const [isOpen, setIsOpen] = useState(false)
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 1024) {
+        setIsOpen(false);
+      }
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    handleResize();
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
   return (
     <>
       <div
