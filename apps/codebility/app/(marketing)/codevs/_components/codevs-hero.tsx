@@ -7,6 +7,7 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 
 import SideNavMenu from "../../_components/marketing-sidenav-menu";
 import OrbitingCirclesBackground from "./codevs-orbiting-circles-bg";
+import { getApplicationStatus } from "../service";
 
 const rowdies = Rowdies({
   weight: "300",
@@ -18,6 +19,8 @@ export default async function Hero() {
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const { data } = await getApplicationStatus(user?.id!);
 
   return (
     <section
@@ -49,14 +52,20 @@ export default async function Hero() {
           Where Diversity Flourishes and Connections Thrive
         </p>
         <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
-          <Link href={user ? pathsConfig.app.home : pathsConfig.auth.signUp}>
+          <Link
+            href={
+              data?.application_status === "ACCEPTED"
+                ? pathsConfig.app.home
+                : pathsConfig.auth.signUp
+            }
+          >
             <Button
               variant="purple"
               size="lg"
               rounded="full"
               className="md:w-40"
             >
-              {user ? "Dashboard" : "Join"}
+              {data?.application_status === "ACCEPTED" ? "Dashboard" : "Join"}
             </Button>
           </Link>
           <Link href="#codevs">
