@@ -6,12 +6,15 @@ import { Button } from "@/Components/ui/button";
 import pathsConfig from "@/config/paths.config";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { getApplicationStatus } from "../service";
 
 export default async function CTA() {
   const supabase = getSupabaseServerComponentClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const { data } = await getApplicationStatus(user?.id!);
 
   return (
     <div className="mx-auto flex h-screen w-full max-w-3xl flex-col items-center justify-center gap-4 px-5 text-center text-white">
@@ -31,9 +34,15 @@ export default async function CTA() {
         with Codebility.
       </Paragraph>
 
-      <Link href={user ? pathsConfig.app.home : pathsConfig.auth.signIn}>
+      <Link
+        href={
+          data?.application_status === "ACCEPTED"
+            ? pathsConfig.app.home
+            : pathsConfig.auth.signIn
+        }
+      >
         <Button variant="purple" size="lg" rounded="full" className="md:w-40">
-          {user ? "Dashboard" : "Join Now"}
+          {data?.application_status === "ACCEPTED" ? "Dashboard" : "Join Now"}
         </Button>
       </Link>
     </div>
