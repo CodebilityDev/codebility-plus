@@ -7,13 +7,20 @@ import { Button } from "@/Components/ui/button";
 import { navItems } from "@/constants";
 import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
 import { IconFourDotsMenu } from "@/public/assets/svgs";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@codevs/ui/dropdown-menu"
+import { ChevronDown, ChevronUp } from "lucide-react"
 
 import { Sheet, SheetContent, SheetTrigger } from "@codevs/ui/sheet";
 
 const Navigation = () => {
   const { color } = useChangeBgNavigation();
   const [openSheet, setOpenSheet] = useState(false);
-
+  const [isOpen, setIsOpen] = useState(false)
   return (
     <>
       <div
@@ -23,7 +30,7 @@ const Navigation = () => {
         <div className="flex w-full  items-center justify-between">
           <Logo />
 
-          <div className="flex items-center">
+          <div className="flex gap-2 items-center">
             <Link href="/bookacall">
               <Button
                 variant="purple"
@@ -34,14 +41,42 @@ const Navigation = () => {
                 Let{`'`}s Connect
               </Button>
             </Link>
-
+            <div className="hidden lg:block">
+              <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="link" size="icon" className="focus-visible:ring-0 w-10 h-10 p-0">
+                    {isOpen ? (
+                      <ChevronUp className="text-white h-6 w-6" />
+                    ) : (
+                      <ChevronDown className="text-white h-6 w-6" />
+                    )}
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  className="border-darkgray bg-light-700/10  w-[120px] transition-none"
+                  align="end"
+                  sideOffset={15}
+                >
+                  <DropdownMenuItem className="focus:bg-[#9747FF] rounded-md"  >
+                    <Link href="/authv2/sign-in" className="w-full text-white text-base">
+                      Sign In
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="focus:bg-[#9747FF] rounded-md" >
+                    <Link href="/authv2/sign-up" className="w-full text-white text-base">
+                      Sign Up
+                    </Link>
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
             <Sheet open={openSheet} onOpenChange={setOpenSheet}>
               <SheetTrigger>
                 <IconFourDotsMenu className="lg:hidden" />
               </SheetTrigger>
               <SheetContent
                 side="top"
-                className="flex h-96 w-full flex-col items-center justify-center border-none text-white"
+                className="flex h-auto w-full flex-col items-center justify-center border-none text-white"
               >
                 {navItems.map((item, index) => (
                   <Link
