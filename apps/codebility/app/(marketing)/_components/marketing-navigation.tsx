@@ -93,7 +93,7 @@ const Navigation = () => {
               </SheetTrigger>
               <SheetContent
                 side="top"
-                className="flex h-auto w-full flex-col items-center justify-center border-none bg-light-900 text-stone-900 dark:bg-stone-900 dark:text-white"
+                className="flex h-auto w-full flex-col items-center justify-center border-none bg-light-900 text-stone-900 dark:bg-black-400 dark:text-white"
               >
                 {navItems.map((item, index) => (
                   <Link
