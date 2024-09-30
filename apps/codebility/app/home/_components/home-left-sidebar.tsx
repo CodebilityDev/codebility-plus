@@ -16,6 +16,7 @@ const LeftSidebar = () => {
 
   const { isToggleOpen, toggleNav } = useNavStore();
   const pathname = usePathname();
+  // test
 
   return (
     <section className="hidden background-navbar sticky left-0 top-0 z-20 lg:flex h-screen flex-col gap-14 overflow-y-auto p-6 shadow-lg max-lg:hidden">
