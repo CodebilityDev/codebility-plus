@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { createRole } from "@/app/home/settings/roles/action";
 import { Button } from "@/Components/ui/button";
 import Input from "@/Components/ui/forms/input";
 import { useModal } from "@/hooks/use-modal";
@@ -16,11 +17,9 @@ import {
 } from "@codevs/ui/dialog";
 import { Label } from "@codevs/ui/label";
 
-// import { createRoles } from "@/app/api/settings"
-// import useToken from "@/hooks/use-token"
 
-const AddRoleModal = () => {
-  // const { token } = useToken()
+const AddRoleModal = ({ refreshRoles }: { refreshRoles: () => Promise<void> }) => {
+
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "addRoleModal";
 
@@ -35,8 +34,8 @@ const AddRoleModal = () => {
     if (!newRole) return toast.error("Name is Empty");
 
     try {
-      // await createRoles({ name: newRole }, token)
-      toast.success(`${newRole} role successfully added!`);
+      await createRole({ name: newRole });
+      refreshRoles(); 
       onClose();
     } catch (error) {}
   };

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import { updateRole } from "@/app/home/settings/roles/action";
 import { Button } from "@/Components/ui/button";
 import Input from "@/Components/ui/forms/input";
 import { useModal } from "@/hooks/use-modal";
@@ -35,10 +36,13 @@ const EditRoleModal = () => {
     onClose();
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!editedRole) return toast.error("Name is Empty");
-    toast.success(`${editedRole} role successfully edited!`);
-    onClose();
+    try {
+      await updateRole({ name: editedRole });
+      toast.success(`${editedRole} role successfully edited!`);
+      onClose();
+    } catch (error) {}
   };
 
   return (
