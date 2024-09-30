@@ -7,11 +7,12 @@ const RolesPage = async () => {
   const supabase = getSupabaseServerComponentClient();
   const { data } = await supabase.from("roles").select("*");
 
+  const role = data || [];
+
   return (
     <>
-      {" "}
       {data && data.length > 0 && (
-        <RoleContainer data={(data as Role[]) || []} />
+        <RoleContainer data={(role as Role[])} />
       )}
     </>
   );

@@ -18,7 +18,7 @@ import {
 import { Label } from "@codevs/ui/label";
 
 const EditRoleModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
+  const { isOpen, onClose, type, data, dataObject } = useModal();
   const isModalOpen = isOpen && type === "editRoleModal";
 
   const [editedRole, setEditedRole] = useState<string | undefined>("");
@@ -39,10 +39,13 @@ const EditRoleModal = () => {
   const handleSave = async () => {
     if (!editedRole) return toast.error("Name is Empty");
     try {
-      await updateRole({ name: editedRole });
-      toast.success(`${editedRole} role successfully edited!`);
+      await updateRole(data.id, data.name);
+      toast.success(` role successfully edited!`);
       onClose();
-    } catch (error) {}
+    } catch (error) {
+      toast.error("An unexpected error occurred.");
+      console.error(error);
+    }
   };
 
   return (

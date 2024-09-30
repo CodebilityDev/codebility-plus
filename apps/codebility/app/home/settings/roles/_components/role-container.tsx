@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import RoleListsTable from "@/app/home/settings/roles/_components/role-list-table";
 import { H1 } from "@/Components/shared/dashboard";
@@ -13,6 +13,9 @@ import { Role } from "../_types/roles";
 export default function RoleContainer({ data }: { data: Role[] }) {
   const { onOpen } = useModal();
   const [roles, setRoles] = useState(data);
+  useEffect(() => {
+    setRoles(roles);
+  });
   return (
     <div className="flex max-w-[1600px] flex-col gap-6">
       <div className="text-dark100_light900 flex flex-col gap-4 ">
