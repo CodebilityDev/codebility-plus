@@ -1,4 +1,4 @@
-import { getRoles } from "@/app/api/settings";
+import { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -9,18 +9,12 @@ import {
 } from "@/Components/ui/table";
 import { useModal } from "@/hooks/use-modal";
 import { IconDelete, IconEdit } from "@/public/assets/svgs";
-import { useQuery } from "@tanstack/react-query";
 
-const RoleListsTableDesktop = () => {
+import { Role } from "../_types/roles";
+
+const RoleListsTableDesktop = ({ roles }: { roles: Role[] }) => {
   const { onOpen } = useModal();
 
-  const { data: Roles } = useQuery({
-    queryKey: ["Roles"],
-    queryFn: async () => {
-      return getRoles();
-    },
-    refetchInterval: 3000,
-  });
   return (
     <Table className="background-box text-dark100_light900 h-[240px] w-full  rounded-lg shadow-lg">
       <TableHeader className=" dark:bg-dark-100 rounded-lg">
@@ -33,7 +27,7 @@ const RoleListsTableDesktop = () => {
         </TableRow>
       </TableHeader>
       <TableBody className="flex w-full flex-col">
-        {Roles?.map((role: { id: string; name: string }) => (
+        {roles.map((role) => (
           <TableRow
             key={role.id}
             className=" md:text-md even:bg-black-300 flex w-full flex-row  items-center text-sm lg:text-lg"
@@ -42,10 +36,7 @@ const RoleListsTableDesktop = () => {
               {role.name}
             </TableCell>
             <TableCell className=" hover:text-black-200   basis-[10%] cursor-pointer items-center justify-center">
-              <button
-                className=""
-                onClick={() => onOpen("editRoleModal", role.name)}
-              >
+              <button onClick={() => onOpen("editRoleModal", role)}>
                 <IconEdit />
               </button>
             </TableCell>
