@@ -18,7 +18,7 @@ import {
 import { Label } from "@codevs/ui/label";
 
 
-const AddRoleModal = ({ refreshRoles }: { refreshRoles: () => Promise<void> }) => {
+const AddRoleModal = () => {
 
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "addRoleModal";
@@ -35,9 +35,10 @@ const AddRoleModal = ({ refreshRoles }: { refreshRoles: () => Promise<void> }) =
 
     try {
       await createRole({ name: newRole });
-      refreshRoles(); 
       onClose();
-    } catch (error) {}
+    } catch (error) {
+      console.error("Something went wronga")
+    }
   };
 
   return (
