@@ -8,7 +8,7 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import { useModal } from "@/hooks/use-modal";
-import { IconDelete, IconEdit } from "@/public/assets/svgs";
+import { IconDelete, IconEdit, IconEditFillNone } from "@/public/assets/svgs";
 
 import { Role } from "../_types/roles";
 
@@ -27,17 +27,19 @@ const RoleListsTableDesktop = ({ roles }: { roles: Role[] }) => {
         </TableRow>
       </TableHeader>
       <TableBody className="flex w-full flex-col">
-        {roles.map((role) => (
+        {roles?.map((role) => (
           <TableRow
             key={role.id}
-            className=" md:text-md even:bg-black-300 flex w-full flex-row  items-center text-sm lg:text-lg"
+            className="md:text-md flex  w-full flex-row items-center  text-sm hover:opacity-90 lg:text-lg"
           >
             <TableCell className="basis-[80%] pl-9  font-medium">
               {role.name}
             </TableCell>
-            <TableCell className=" hover:text-black-200   basis-[10%] cursor-pointer items-center justify-center">
-              <button onClick={() => onOpen("editRoleModal", role)}>
-                <IconEdit />
+            <TableCell className=" hover:text-black-200  basis-[10%] cursor-pointer items-center justify-center text-blue-600">
+              <button
+                onClick={() => onOpen("editRoleModal", role.name)}
+              >
+                <IconEditFillNone className="text-black-400 hover:text-black-500 dark:text-white hover:dark:text-white" />
               </button>
             </TableCell>
             <TableCell className=" hover:text-black-200 basis-[10%] cursor-pointer items-center justify-center">
@@ -45,7 +47,7 @@ const RoleListsTableDesktop = ({ roles }: { roles: Role[] }) => {
                 className=""
                 onClick={() => onOpen("deleteRoleModal", role)}
               >
-                <IconDelete className="text-blue-100 hover:text-blue-200" />
+                <IconDelete className="text-red-600 hover:text-red-500" />
               </button>
             </TableCell>
           </TableRow>

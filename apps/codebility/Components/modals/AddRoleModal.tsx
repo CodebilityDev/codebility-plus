@@ -35,7 +35,7 @@ const AddRoleModal = () => {
       await createRole({ name: newRole });
       onClose();
     } catch (error) {
-      console.error("Something went wronga");
+      console.error("Something went wrong");
     }
   };
 
