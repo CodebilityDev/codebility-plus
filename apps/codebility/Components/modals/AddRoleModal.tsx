@@ -17,9 +17,7 @@ import {
 } from "@codevs/ui/dialog";
 import { Label } from "@codevs/ui/label";
 
-
 const AddRoleModal = () => {
-
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "addRoleModal";
 
@@ -37,13 +35,17 @@ const AddRoleModal = () => {
       await createRole({ name: newRole });
       onClose();
     } catch (error) {
-      console.error("Something went wronga")
+      console.error("Something went wronga");
     }
   };
 
   return (
     <Dialog open={isModalOpen}>
-      <DialogContent className="background-lightsection_darksection flex h-auto w-[95%] max-w-3xl flex-col justify-items-center gap-6 ">
+      <DialogContent
+        className=" bg-light-900 flex h-auto w-[95%] max-w-3xl flex-col justify-items-center 
+      gap-6  text-stone-900 dark:bg-stone-900 dark:text-white
+      "
+      >
         <div className=" mt-16 flex flex-col  gap-6">
           <div className="flex flex-col gap-2">
             <Label htmlFor="title">
@@ -53,7 +55,7 @@ const AddRoleModal = () => {
               id="title"
               value={newRole}
               onChange={(e) => setNewRole(e.target.value)}
-              className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
+              className="dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
               placeholder=""
             />
           </div>
