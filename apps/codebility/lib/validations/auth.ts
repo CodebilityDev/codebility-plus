@@ -25,12 +25,9 @@ export const SignUpValidation = z
     facebook: z
       .string()
       .min(1, { message: "Required" })
-      .refine(
-        (value: string | undefined) => isValidGitHubUrl(value as string),
-        {
-          message: "Invalid Url Format",
-        },
-      ),
+      .refine((value: string | undefined) => isValidUrl(value as string), {
+        message: "Invalid Url Format",
+      }),
     website: z
       .string()
       .optional()
