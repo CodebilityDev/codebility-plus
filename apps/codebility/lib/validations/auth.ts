@@ -11,8 +11,9 @@ const isValidGitHubUrl = (url: string) => {
   }
 };
 const isValidUrl = (url: string) => {
-  if (!url) return true; 
-  const urlRegex = /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?$/;
+  if (!url) return true;
+  const urlRegex =
+    /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?$/;
   return urlRegex.test(url);
 };
 
@@ -24,12 +25,9 @@ export const SignUpValidation = z
     facebook: z
       .string()
       .min(1, { message: "Required" })
-      .refine(
-        (value: string | undefined) => isValidGitHubUrl(value as string),
-        {
-          message: "Invalid Url Format",
-        },
-      ),
+      .refine((value: string | undefined) => isValidUrl(value as string), {
+        message: "Invalid Url Format",
+      }),
     website: z
       .string()
       .optional()
