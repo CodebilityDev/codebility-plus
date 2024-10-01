@@ -4,11 +4,11 @@ import { revalidatePath } from "next/cache";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import { Role } from "./_types/roles";
+import { Role_Type } from "./_types/roles";
 
 const supabase = getSupabaseServerComponentClient();
 
-export async function createRole(roleData: Role) {
+export async function createRole(roleData: Role_Type) {
   const { data, error } = await supabase
     .from("roles")
     .insert(roleData)
@@ -17,13 +17,11 @@ export async function createRole(roleData: Role) {
   revalidatePath("/home/settings/roles");
   return { success: true, data };
 }
-export async function updateRole(id: string, name: string) {
-    
+export async function updateRole(roleData: string) {
   const { data, error } = await supabase
     .from("roles")
-    .update({ name })
-    .eq("id", id)
-    .single();
+    .update(roleData)
+ 
 
   console.log(data);
   console.log(error);
