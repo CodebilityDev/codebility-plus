@@ -20,7 +20,7 @@ const RoleListsTableMobile = ({ roles }: { roles: Role_Type[] }) => {
               <TableCell className="flex cursor-pointer flex-row justify-end gap-5">
                 <button
                   className=""
-                  onClick={() => onOpen("editRoleModal", role.name)}
+                  onClick={() => onOpen("editRoleModal", role)}
                 >
                   <IconEdit />
                 </button>

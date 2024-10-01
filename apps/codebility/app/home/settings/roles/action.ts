@@ -17,11 +17,12 @@ export async function createRole(roleData: Role_Type) {
   revalidatePath("/home/settings/roles");
   return { success: true, data };
 }
-export async function updateRole(roleData: string) {
+export async function updateRole(id: string, roleData: string) {
+
   const { data, error } = await supabase
     .from("roles")
-    .update(roleData)
- 
+    .update({name: roleData}).eq("id", id).select("name").single()
+
 
   console.log(data);
   console.log(error);
