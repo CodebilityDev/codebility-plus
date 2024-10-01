@@ -27,14 +27,14 @@ const NavContent = () => {
           <h4 className={`text-gray text-sm uppercase`}>{item.title}</h4>
           <div className="mt-3">
             {item.links.map((link) => {
-              const allowedRoutes = [
-                getSplit(pathsConfig.app.settings, "/", { getLast: true }),
-                getSplit(pathsConfig.app.orgchart, "/", { getLast: true }),
-                ...user.permissions,
-              ];
-
-              const accessRoutes = allowedRoutes.includes(link.permission);
+              const accessRoutes = user.permissions.includes(
+                link.permission,
+              );
               const isActive = pathname === link.route;
+
+              if (!accessRoutes) {
+                return null
+              }
 
               return (
                 <SheetClose asChild key={link.route}>
