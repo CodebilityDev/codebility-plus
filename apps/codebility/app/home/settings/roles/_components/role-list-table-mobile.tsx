@@ -9,10 +9,10 @@ const RoleListsTableMobile = ({ roles }: { roles: Role_Type[] }) => {
 
   return (
     <>
-      {roles?.map((role) => (
-        <Table className="background-box  text-dark100_light900 my-[10px] flex h-auto flex-col  rounded border border-zinc-200 shadow-sm dark:border-zinc-700 ">
+      {roles?.map((role, index) => (
+        <Table key={index} className="background-box  text-dark100_light900 my-[10px] flex h-auto flex-col  rounded border border-zinc-200 shadow-sm dark:border-zinc-700 ">
           <TableBody className="flex flex-col">
-            <TableRow key={role?.id}>
+            <TableRow >
               <TableCell>{role.name}</TableCell>
             </TableRow>
 
