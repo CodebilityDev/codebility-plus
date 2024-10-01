@@ -1,7 +1,7 @@
 "use client";
 
-import { cn } from "@codevs/ui";
 import { Button } from "@codevs/ui/button";
+import { cn } from "@codevs/ui/utils";
 
 import useBuilderForm from "../_hooks/useBuilderForm";
 import SidebarItems from "../_lib/builder-form-sidebar-items";

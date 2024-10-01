@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { index_ServiceCardT } from "@/types/home";
 
-import { cn } from "@codevs/ui";
+import { cn } from "@codevs/ui/utils";
 
 const ServicesCard = ({
   imageUrl,

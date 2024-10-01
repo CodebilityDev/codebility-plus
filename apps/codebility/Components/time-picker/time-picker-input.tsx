@@ -7,8 +7,8 @@ import {
   TimePickerType,
 } from "@/Components/time-picker/time-picker-utils";
 
-import { cn } from "@codevs/ui";
 import { Input } from "@codevs/ui/input";
+import { cn } from "@codevs/ui/utils";
 
 export interface TimePickerInputProps
   extends React.InputHTMLAttributes<HTMLInputElement> {

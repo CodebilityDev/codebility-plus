@@ -5,7 +5,7 @@ import { IconDropdown } from "@/public/assets/svgs";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
-import { cn } from "@codevs/ui";
+import { cn } from "@codevs/ui/utils";
 
 const Select = SelectPrimitive.Root;
 

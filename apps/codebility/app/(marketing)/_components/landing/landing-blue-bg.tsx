@@ -1,6 +1,6 @@
 import React from "react";
 
-import { cn } from "@codevs/ui";
+import { cn } from "@codevs/ui/utils";
 
 const BlueBg = ({ className }: { className?: string }) => {
   return (

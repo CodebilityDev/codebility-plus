@@ -6,8 +6,9 @@ import { useRouter } from "next/navigation";
 import AuthForm from "@/app/auth/signin/SigninForm";
 import Loader from "@/Components/shared/Loader";
 import Logo from "@/Components/shared/Logo";
-import { Toaster } from "@/Components/ui/toaster";
 import useAuthCookie from "@/hooks/use-cookie";
+
+import { Toaster } from "@codevs/ui/sonner";
 
 const Sign = () => {
   const router = useRouter();
