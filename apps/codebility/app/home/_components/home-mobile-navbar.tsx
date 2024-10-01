@@ -4,7 +4,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sidebarData } from "@/constants";
-import useAuthCookie from "@/hooks/use-cookie";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
 
 import {
@@ -13,11 +12,13 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@codevs/ui/sheet";
+import useUser from "../_hooks/use-user";
+import { getSplit } from "@/lib/get-split";
+import pathsConfig from "@/config/paths.config";
 
 const NavContent = () => {
+  const user = useUser();
   const pathname = usePathname();
-  const { data: authData } = useAuthCookie();
-  const { userType } = authData || {};
 
   return (
     <section className="flex h-full flex-col gap-2 pt-4 ">
@@ -26,20 +27,14 @@ const NavContent = () => {
           <h4 className={`text-gray text-sm uppercase`}>{item.title}</h4>
           <div className="mt-3">
             {item.links.map((link) => {
-              const allowedRoutes = ["/settings", "/orgchart"];
-              const isAdminOrUser =
-                userType?.name === "ADMIN" || userType?.name === "USER";
-              const isAllowedRoute =
-                isAdminOrUser && allowedRoutes.includes(link.route);
-              const accessRoutes =
-                userType?.[link.permission] || isAllowedRoute;
-              const isActive =
-                (pathname.includes(link.route) && link.route.length > 1) ||
-                pathname === link.route;
+              const allowedRoutes = [
+                getSplit(pathsConfig.app.settings, "/", { getLast: true }),
+                getSplit(pathsConfig.app.orgchart, "/", { getLast: true }),
+                ...user.permissions,
+              ];
 
-              if (!accessRoutes) {
-                return null;
-              }
+              const accessRoutes = allowedRoutes.includes(link.permission);
+              const isActive = pathname === link.route;
 
               return (
                 <SheetClose asChild key={link.route}>
