@@ -12,7 +12,6 @@ const LeftSidebar = () => {
   const user = useUser();
   const { isToggleOpen, toggleNav } = useNavStore();
   const pathname = usePathname();
-  // test
 
   return (
     <section className="hidden background-navbar sticky left-0 top-0 z-20 lg:flex h-screen flex-col gap-14 overflow-y-auto p-6 shadow-lg max-lg:hidden">
@@ -54,13 +53,13 @@ const LeftSidebar = () => {
           );
 
           return (
-            <div key={item.id} className={`${!isToggleOpen ? "mt-0" : "mt-5"}`}>
+            <div key={item.id} className={`${!isToggleOpen || !hasPermission ? "mt-0" : "mt-5"}`}>
               <h4
                 className={`text-gray text-sm uppercase ${!isToggleOpen || !hasPermission ? "hidden" : "block"}`}
               >
                 {item.title}
               </h4>
-              <div className="mt-3 flex flex-1 flex-col gap-2 max-lg:hidden">
+              <div className={`${!isToggleOpen ? "mt-0" : "mt-3"} flex flex-1 flex-col gap-2 max-lg:hidden`}>
                 {item.links.map((link) => {
                   const accessRoutes = user.permissions.includes(
                     link.permission,
