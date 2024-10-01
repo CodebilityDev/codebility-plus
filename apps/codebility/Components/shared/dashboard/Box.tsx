@@ -1,6 +1,6 @@
 import React, { ReactNode } from "react";
 
-import { cn } from "@codevs/ui";
+import { cn } from "@codevs/ui/utils";
 
 interface Box {
   children: ReactNode;

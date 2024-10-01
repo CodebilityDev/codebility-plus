@@ -3,7 +3,7 @@ import { Inter } from "next/font/google";
 
 import "./globals.css";
 
-import { cn } from "@codevs/ui";
+import { cn } from "@codevs/ui/utils";
 
 import appConfig from "~/config/app.config";
 

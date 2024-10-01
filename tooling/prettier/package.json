@@ -3,9 +3,6 @@
   "version": "1.0.0",
   "type": "module",
   "private": true,
-  "exports": {
-    ".": "./index.js"
-  },
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
@@ -18,7 +15,7 @@
   },
   "devDependencies": {
     "@codevs/tsconfig": "workspace:*",
-    "typescript": "^5.5.4"
+    "typescript": "^5.6.2"
   },
-  "prettier": "@codevs/prettier-config"
+  "prettier": "./index.mjs"
 }

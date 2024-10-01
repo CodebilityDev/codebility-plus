@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import { cn } from "@codevs/ui";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { cn } from "@codevs/ui/utils";
 
 import ProfileContextProvider from "~/components/profile-context";
 import appConfig from "~/config/app.config";

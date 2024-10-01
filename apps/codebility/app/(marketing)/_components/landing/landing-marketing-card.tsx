@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { index_MarketingCardT } from "@/types/home";
 
-import { cn } from "@codevs/ui";
+import { cn } from "@codevs/ui/utils";
 
 export default function MarketingCard({
   title,

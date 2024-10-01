@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-import { cn } from "@codevs/ui";
+import { cn } from "@codevs/ui/utils";
 
 import { signOut } from "~/app/auth/actions";
 import appConfig from "~/config/app.config";

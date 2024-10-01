@@ -4,52 +4,39 @@
   "private": true,
   "scripts": {
     "clean": "rm -rf node_modules",
-    "dev": "tsc",
-    "build": "tsc",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
+  "prettier": "@codevs/prettier-config",
   "exports": {
-    "./server-actions-client": {
-      "types": "./dist/clients/server-actions.client.d.ts",
-      "default": "./dist/clients/server-actions.client.js"
-    },
-    "./server-component-client": {
-      "types": "./dist/clients/server-component.client.d.ts",
-      "default": "./dist/clients/server-component.client.js"
-    },
-    "./route-handler-client": {
-      "types": "./dist/clients/route-handler.client.d.ts",
-      "default": "./dist/clients/route-handler.client.js"
-    },
-    "./browser-client": {
-      "types": "./dist/clients/browser.client.d.ts",
-      "default": "./dist/clients/browser.client.js"
-    },
-    "./middleware-client": {
-      "types": "./dist/clients/middleware.client.d.ts",
-      "default": "./dist/clients/middleware.client.js"
-    },
-    "./hooks/*": {
-      "types": "./dist/hooks/*.d.ts",
-      "default": "./dist/hooks/*.js"
-    }
+    "./server-client": "./src/clients/server-client.ts",
+    "./server-admin-client": "./src/clients/server-admin-client.ts",
+    "./middleware-client": "./src/clients/middleware-client.ts",
+    "./server-actions-client": "./src/clients/server-actions-client.ts",
+    "./route-handler-client": "./src/clients/route-handler-client.ts",
+    "./server-component-client": "./src/clients/server-component-client.ts",
+    "./browser-client": "./src/clients/browser-client.ts",
+    "./check-requires-mfa": "./src/check-requires-mfa.ts",
+    "./require-user": "./src/require-user.ts",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./database": "./src/database.types.ts",
+    "./auth": "./src/auth.ts"
   },
   "devDependencies": {
-    "@codevs/tsconfig": "workspace:*",
-    "@codevs/prettier-config": "workspace:*",
     "@codevs/eslint-config": "workspace:*",
-    "prettier": "^3.3.3",
+    "@codevs/prettier-config": "workspace:*",
+    "@codevs/tailwind-config": "workspace:*",
+    "@codevs/tsconfig": "workspace:*",
+    "@supabase/ssr": "^0.5.1",
+    "@supabase/supabase-js": "^2.45.4",
+    "@tanstack/react-query": "5.56.2",
     "@types/react": "^18.3.5",
+    "next": "14.2.13",
+    "prettier": "^3.3.3",
+    "react": "18.3.1",
     "server-only": "^0.0.1",
     "zod": "^3.23.8"
-  },
-  "dependencies": {
-    "@supabase/auth-helpers-nextjs": "^0.10.0",
-    "@supabase/supabase-js": "^2.45.1",
-    "next": "^14.2.5",
-    "react": "^18.3.1"
   },
   "eslintConfig": {
     "root": true,
@@ -58,5 +45,11 @@
       "@codevs/eslint-config/react"
     ]
   },
-  "prettier": "@codevs/prettier-config"
+  "typesVersions": {
+    "*": {
+      "*": [
+        "src/*"
+      ]
+    }
+  }
 }

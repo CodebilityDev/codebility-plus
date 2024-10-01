@@ -17,8 +17,8 @@ import clsx from "clsx";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 
-import { cn } from "@codevs/ui";
 import { Input } from "@codevs/ui/input";
+import { cn } from "@codevs/ui/utils";
 
 type Inputs = z.infer<typeof SignUpValidation>;
 

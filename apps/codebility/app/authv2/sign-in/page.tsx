@@ -1,7 +1,8 @@
 import Link from "next/link";
 import Logo from "@/Components/shared/Logo";
-import { Toaster } from "@/Components/ui/toaster";
 import pathsConfig from "@/config/paths.config";
+
+import { Toaster } from "@codevs/ui/sonner";
 
 import AuthForm from "./_components/sign-in-form";
 

@@ -5,8 +5,8 @@ import * as React from "react";
 import { IconChevronLeft, IconChevronRight } from "@/public/assets/svgs";
 import useEmblaCarousel from "embla-carousel-react";
 
-import { cn } from "@codevs/ui";
 import { Button } from "@codevs/ui/button";
+import { cn } from "@codevs/ui/utils";
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;

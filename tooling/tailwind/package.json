@@ -2,17 +2,21 @@
   "name": "@codevs/tailwind-config",
   "version": "1.0.0",
   "main": "index.ts",
+  "license": "ISC",
+  "files": [
+    "index.ts",
+    "postcss.js"
+  ],
   "scripts": {
     "clean": "rm -rf .turbo node_modules",
     "format": "prettier --check . --ignore-path ../../.gitignore",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit"
   },
-  "exports": {
-    "./web": "./web.ts"
-  },
-  "license": "ISC",
   "dependencies": {
+    "autoprefixer": "^10.4.20",
+    "postcss": "8.4.47",
+    "tailwindcss": "3.4.12",
     "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
@@ -21,7 +25,6 @@
     "@codevs/tsconfig": "workspace:*",
     "eslint": "^9.9.1",
     "prettier": "^3.3.3",
-    "tailwindcss": "^3.4.9",
     "typescript": "^5.5.4"
   },
   "eslintConfig": {

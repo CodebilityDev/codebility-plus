@@ -1,7 +1,7 @@
 import * as React from "react";
 import { cva, VariantProps } from "class-variance-authority";
 
-import { cn } from "@codevs/ui";
+import { cn } from "@codevs/ui/utils";
 
 const InputVariants = cva(
   "flex h-10 w-full rounded-md px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 ",

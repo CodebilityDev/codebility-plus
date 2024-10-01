@@ -2,7 +2,7 @@ import React, { forwardRef } from "react";
 import codes from "country-calling-code";
 import { Controller } from "react-hook-form";
 
-import { cn } from "@codevs/ui";
+import { cn } from "@codevs/ui/utils";
 
 type InputProps = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
