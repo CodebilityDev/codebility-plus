@@ -8,9 +8,9 @@ import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { ArrowRightIcon, IconAdd } from "@/public/assets/svgs";
 
-import { Role } from "../_types/roles";
+import { Role_Type } from "../_types/roles";
 
-export default function RoleContainer({ data }: { data: Role[] }) {
+export default function RoleContainer({ data }: { data: Role_Type[] }) {
   const { onOpen } = useModal();
   const [roles, setRoles] = useState(data);
   useEffect(() => {

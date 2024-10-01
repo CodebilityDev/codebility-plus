@@ -2,9 +2,9 @@ import { Table, TableBody, TableCell, TableRow } from "@/Components/ui/table";
 import { useModal } from "@/hooks/use-modal";
 import { IconDelete, IconEdit } from "@/public/assets/svgs";
 
-import { Role } from "../_types/roles";
+import { Role_Type } from "../_types/roles";
 
-const RoleListsTableMobile = ({ roles }: { roles: Role[] }) => {
+const RoleListsTableMobile = ({ roles }: { roles: Role_Type[] }) => {
   const { onOpen } = useModal();
 
   return (

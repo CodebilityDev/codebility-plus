@@ -10,9 +10,9 @@ import {
 import { useModal } from "@/hooks/use-modal";
 import { IconDelete, IconEdit, IconEditFillNone } from "@/public/assets/svgs";
 
-import { Role } from "../_types/roles";
+import { Role_Type } from "../_types/roles";
 
-const RoleListsTableDesktop = ({ roles }: { roles: Role[] }) => {
+const RoleListsTableDesktop = ({ roles }: { roles: Role_Type[] }) => {
   const { onOpen } = useModal();
 
   return (
@@ -37,7 +37,7 @@ const RoleListsTableDesktop = ({ roles }: { roles: Role[] }) => {
             </TableCell>
             <TableCell className=" hover:text-black-200  basis-[10%] cursor-pointer items-center justify-center text-blue-600">
               <button
-                onClick={() => onOpen("editRoleModal", role.name)}
+                onClick={() => onOpen("editRoleModal", role)}
               >
                 <IconEditFillNone className="text-black-400 hover:text-black-500 dark:text-white hover:dark:text-white" />
               </button>
