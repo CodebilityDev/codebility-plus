@@ -14,7 +14,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@codevs/ui/dialog";
+} from "@/Components/ui/dialog";
 import { Label } from "@codevs/ui/label";
 
 const AddRoleModal = () => {

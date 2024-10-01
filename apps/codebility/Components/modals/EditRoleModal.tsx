@@ -15,7 +15,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@codevs/ui/dialog";
+} from "@/Components/ui/dialog";
 import { Label } from "@codevs/ui/label";
 
 const EditRoleModal = () => {
@@ -37,10 +37,12 @@ const EditRoleModal = () => {
     }
   }, [isModalOpen, data, reset]);
 
-  const handleSave = async () => {
+  const handleSave = async (formData: { name: string }) => {
     try {
-      const { name } = data;
-      await updateRole(name);
+      const { id } = data;
+      const { name } = formData;
+
+      await updateRole(id, name);
 
       toast.success(`Role successfully edited!`);
       onClose();
@@ -57,7 +59,7 @@ const EditRoleModal = () => {
 
   return (
     <Dialog open={isModalOpen}>
-      <DialogContent className="background-lightsection_darksection flex h-auto w-[95%] max-w-3xl flex-col justify-items-center gap-6 ">
+      <DialogContent className=" flex h-auto w-[95%] max-w-3xl flex-col justify-items-center gap-6 ">
         <div className="mt-16 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">
