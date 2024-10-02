@@ -1,14 +1,14 @@
 /* eslint-disable no-unused-vars */
 import "server-only";
 
-
-
 import React from "react";
 import ReactQueryProvider from "@/hooks/reactQuery";
+import { redirect } from "next/navigation";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import { permissionsString } from "../../constants";
+import { getApplicationStatus } from "../(marketing)/codevs/service";
 import LeftSidebar from "./_components/home-left-sidebar";
 import Navbar from "./_components/home-navbar";
 import UserContextProvider from "./_components/user-provider";
@@ -23,6 +23,8 @@ export default async function HomeLayout({
   const {
     data: { user },
   } = await supabase.auth.getUser();
+
+  const { data: codev } = await getApplicationStatus(user?.id!);
 
   let userData = {
     id: "",
@@ -75,6 +77,8 @@ export default async function HomeLayout({
       permissions,
     };
   }
+
+  if (codev?.application_status !== "ACCEPTED") return redirect("/");
 
   return (
     <ReactQueryProvider>
