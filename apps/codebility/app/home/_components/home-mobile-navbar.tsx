@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sidebarData } from "@/constants";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
+import useUser from "../_hooks/use-user";
 
 import {
   Sheet,
@@ -12,9 +13,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@codevs/ui/sheet";
-import useUser from "../_hooks/use-user";
-import { getSplit } from "@/lib/get-split";
-import pathsConfig from "@/config/paths.config";
 
 const NavContent = () => {
   const user = useUser();
@@ -22,47 +20,55 @@ const NavContent = () => {
 
   return (
     <section className="flex h-full flex-col gap-2 pt-4 ">
-      {sidebarData.map((item) => (
-        <div key={item.id}>
-          <h4 className={`text-gray text-sm uppercase`}>{item.title}</h4>
-          <div className="mt-3">
-            {item.links.map((link) => {
-              const accessRoutes = user.permissions.includes(
-                link.permission,
-              );
-              const isActive = pathname === link.route;
+      {sidebarData.map((item) => {
+        const hasPermission = item.links.some((link) =>
+          user.permissions.includes(link.permission),
+        );
 
-              if (!accessRoutes) {
-                return null
-              }
+        return (
+          <div key={item.id}>
+            <h4
+              className={`text-gray text-sm uppercase ${!hasPermission ? "hidden" : "block"}`}
+            >
+              {item.title}
+            </h4>
+            <div className={`${!hasPermission ? "mt-0" : "mt-3"}`}>
+              {item.links.map((link) => {
+                const accessRoutes = user.permissions.includes(link.permission);
+                const isActive = pathname === link.route;
 
-              return (
-                <SheetClose asChild key={link.route}>
-                  <Link
-                    href={link.route}
-                    className={`${
-                      isActive
-                        ? "default-color text-light-900 rounded-lg"
-                        : "text-dark300_light900"
-                    } flex items-center justify-start gap-4 bg-transparent p-4`}
-                  >
-                    <Image
-                      src={link.imgURL}
-                      alt={link.label}
-                      width={20}
-                      height={20}
-                      className={`${isActive ? "" : "invert-colors"} h-auto w-auto`}
-                    />
-                    <p className={`${isActive ? "base-normal" : "base-sm"}`}>
-                      {link.label}
-                    </p>
-                  </Link>
-                </SheetClose>
-              );
-            })}
+                if (!accessRoutes) {
+                  return null;
+                }
+
+                return (
+                  <SheetClose asChild key={link.route}>
+                    <Link
+                      href={link.route}
+                      className={`${
+                        isActive
+                          ? "primary-gradient text-light-900 rounded-lg"
+                          : "text-dark300_light900"
+                      } flex items-center justify-start gap-4 rounded-sm bg-transparent p-4`}
+                    >
+                      <Image
+                        src={link.imgURL}
+                        alt={link.label}
+                        width={20}
+                        height={20}
+                        className={`${isActive ? "" : "invert-colors"} h-auto w-auto`}
+                      />
+                      <p className={`${isActive ? "base-normal" : "base-sm"}`}>
+                        {link.label}
+                      </p>
+                    </Link>
+                  </SheetClose>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </section>
   );
 };
