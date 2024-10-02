@@ -203,7 +203,7 @@ const checkPermissions = async (userId: string, path: string) => {
   }
   
   const pathSegments = path.split('/');
-  let lastSegment = pathSegments[pathSegments.length - 1];
+  let lastSegment = pathSegments[2];
 
   if (lastSegment === "in-house") {
     lastSegment = "in_house";
