@@ -1,16 +1,18 @@
 import RoleListsTableDesktop from "@/app/home/settings/roles/_components/role-list-table-desktop";
 import RoleListsTableMobile from "@/app/home/settings/roles/_components/role-list-table-mobile";
 
-const RoleListsTable = ({ roles }: { roles: any }) => {
+import { Role_Type } from "../_types/roles";
+
+const RoleListsTable = ({ roles }: { roles: Role_Type[] }) => {
   return (
     <>
       <>
         <div className="hidden md:block">
-          <RoleListsTableDesktop roles={roles} />
+          <RoleListsTableDesktop roles={roles as Role_Type[]} />
         </div>
 
         <div className="block md:hidden">
-          <RoleListsTableMobile roles={roles} />
+          <RoleListsTableMobile roles={roles as Role_Type[]} />
         </div>
       </>
       {/* ) : ( */}
