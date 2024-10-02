@@ -1,34 +1,32 @@
 import React, { useState } from "react";
-import { positionTitles } from "@/app/home/interns/data";
+import { PositionTitle, positionTitles } from "@/app/home/interns/data";
 import { Box } from "@/Components/shared/dashboard";
 import { Button } from "@/Components/ui/button";
-import { interns_FilterInternsT } from "@/types/protectedroutes";
-
 import { Checkbox } from "@codevs/ui/checkbox";
+import { interns_FilterInternsT } from "../_types/intern";
 
-const FilterInterns = ({ filters, setFilters }: interns_FilterInternsT) => {
+
+const FilterInterns = ({ filters, setFilters }:interns_FilterInternsT ) => {
   const [showFilter, setShowFilter] = useState<boolean>(false);
 
   const updateFilter = (
-    filterValue: interns_FilterInternsT["filters"][number],
-    previousFilterValue: interns_FilterInternsT["filters"],
+    filterValue: PositionTitle,
+    previousFilterValue: PositionTitle[],
   ) => {
     if (previousFilterValue.includes(filterValue)) {
       const index = previousFilterValue.indexOf(filterValue);
-      const isEmpty = index > -1;
-
-      if (isEmpty) {
-        previousFilterValue.splice(index, 1);
+      if (index > -1) {
+        previousFilterValue.splice(index, 1); 
       }
     } else {
-      previousFilterValue.push(filterValue);
+      previousFilterValue.push(filterValue); 
     }
 
-    return [...previousFilterValue];
+    return [...previousFilterValue]; 
   };
 
-  const selectFilter = (value: interns_FilterInternsT["filters"][number]) => {
-    setFilters(updateFilter.bind(null, value));
+  const selectFilter = (value: PositionTitle) => {
+    setFilters(updateFilter(value, filters)); 
   };
   const clearFilter = () => setFilters([]);
   const toggleFilter = () => setShowFilter((prev) => !prev);
