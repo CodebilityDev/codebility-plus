@@ -14,7 +14,7 @@ const LeftSidebar = () => {
   const pathname = usePathname();
 
   return (
-    <section className="hidden background-navbar sticky left-0 top-0 z-20 lg:flex h-screen flex-col gap-14 overflow-y-auto p-6 shadow-lg max-lg:hidden">
+    <section className="hidden background-navbar sticky left-0 top-0 z-20 lg:flex h-screen flex-col gap-14 p-6 shadow-lg max-lg:hidden">
       <div className="flex justify-stretch gap-4 max-lg:hidden">
         <div
           className={`transition-all ${!isToggleOpen ? "flex-0" : "flex-1"} flex overflow-hidden`}
@@ -46,7 +46,7 @@ const LeftSidebar = () => {
           className={`toggle-logo-btn ${isToggleOpen ? "close-nav" : "open-nav mx-auto"}`}
         />
       </div>
-      <div className="flex flex-1 flex-col gap-2 max-lg:hidden">
+      <div className="overflow-y-auto flex flex-1 flex-col gap-2 max-lg:hidden">
         {sidebarData.map((item) => {
           const hasPermission = item.links.some((link) =>
             user.permissions.includes(link.permission),
