@@ -147,7 +147,7 @@ export const sidebarData: Sidebar[] = [
         route: pathsConfig.app.orgchart,
         imgURL: "/assets/svgs/icon-org-chart.svg",
         label: "Org Chart",
-        permission: "org_charts",
+        permission: "orgchart",
       },
     ],
   },
