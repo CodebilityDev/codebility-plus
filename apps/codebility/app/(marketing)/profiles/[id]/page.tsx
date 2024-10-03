@@ -30,7 +30,7 @@ interface Props {
 export default async function CodevBioPage({ params }: Props) {
   const showWayToContact = false; // to change if client is connected to codebility.
   const id = params.id;
-  const { data, error } = await getCodevs(id);
+  const { data, error } = await getCodevs("INHOUSE", id);
 
   if (error) return <div>ERROR</div>;
 
