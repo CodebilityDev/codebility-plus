@@ -11,19 +11,21 @@ interface Props {
 
 export default function TableBody({ member, handleEditButton }: Props) {
   const internal_status = convertToTitleCase(member.internal_status);
+  const type = convertToTitleCase(member.type || "");
 
   return (
     <tr
       className="table-border-light_dark border-b-[1px] font-light"
       key={member.id}
     >
-      <td className="p-4">{member.first_name}</td>
-      <td className="table-border-light_dark border-r-[1px] p-4">
+      <td className="p-4 capitalize">{member.first_name}</td>
+      <td className="table-border-light_dark border-r-[1px] p-4 capitalize">
         {member.last_name}
       </td>
       <td className={`${statusColors[internal_status]} p-4`}>
         {internal_status}
       </td>
+      <td className="p-4">{type}</td>
       <td className="p-4">{member.main_position}</td>
       <td className="flex flex-col p-4">
         {member.projects?.map((item, key) => (
