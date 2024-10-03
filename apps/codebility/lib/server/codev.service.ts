@@ -5,6 +5,7 @@ import { Codev, Project } from "@/types/home/codev";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 export const getCodevs = async (
+  type?: string,
   id?: string,
 ): Promise<{ error: any; data: Codev[] | Codev | null }> => {
   const supabase = getSupabaseServerComponentClient();
@@ -24,9 +25,12 @@ export const getCodevs = async (
       )
     `,
     )
-    .eq("type", "INHOUSE");
+  
+  if (type === "INHOUSE") {
+    codevQuery = codevQuery.eq("type", "INHOUSE");
+  }
 
-  if (id) {
+  if (type === "INHOUSE" && id) {
     // filter codevs data to get only match id.
     codevQuery = codevQuery.eq("id", id);
   }
@@ -86,10 +90,11 @@ export const getCodevs = async (
       socials: codev.user.social,
       job_status: codev.job_status,
       nda_status: codev.nda_status,
+      type: codev.type
     };
   });
 
-  if (id) return { error: null, data: data[0] as Codev }; // if we are targeting a specific codev.
+  if (type === "INHOUSE" && id) return { error: null, data: data[0] as Codev }; // if we are targeting a specific codev.
 
   return { error: null, data };
 };
