@@ -76,7 +76,7 @@ export default async function HomeLayout({
   const { data } = await supabase
     .from("profile")
     .select("*, user(*, user_type(*))")
-    .eq("id", user?.id!)
+    .eq("user_id", user?.id!)
     .single();
 
   const permissionNames = Object.keys(data.user.user_type || {});
