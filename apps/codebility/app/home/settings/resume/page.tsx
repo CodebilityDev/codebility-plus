@@ -37,7 +37,7 @@ const Resume = async () => {
       <Breadcrumb>
         <BreadcrumbList>
           <BreadcrumbItem>
-            <BreadcrumbLink href="/settings">Settings</BreadcrumbLink>
+            <BreadcrumbLink href="/home/settings">Settings</BreadcrumbLink>
           </BreadcrumbItem>
           <BreadcrumbSeparator />
           <BreadcrumbItem>Resume</BreadcrumbItem>
