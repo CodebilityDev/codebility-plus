@@ -55,6 +55,13 @@ export default function EditTabelBody({ data, handleSaveButton }: Props) {
       </td>
       <td className="p-4">
         <Select
+          type="type"
+          placeholder={convertToTitleCase(editableMember.type)}
+          handleChange={(value) => handleSelectChange("type", value)}
+        />
+      </td>
+      <td className="p-4">
+        <Select
           type="main_positon"
           placeholder={editableMember.main_position}
           handleChange={(value) => handleSelectChange("main_position", value)}

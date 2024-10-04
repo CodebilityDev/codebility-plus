@@ -12,10 +12,10 @@ interface Props {
 
 function Card({ member, handleEditButton }: Props) {
   return (
-    <div className="text-dark100_light900 dark:bg-dark-200 bg-light-300 flex h-72 w-64 flex-col justify-between gap-4 rounded-md p-4">
-      <div className="flex flex-col">
+    <div className="text-dark100_light900 dark:bg-dark-200 bg-light-300 flex w-full flex-col justify-between gap-4 rounded-md p-4">
+      <div className="flex flex-col gap-1">
         <div className="flex justify-between">
-          <div className="text-lg font-bold">
+          <div className="text-lg font-bold capitalize">
             {member.first_name} {member.last_name}
           </div>
           <div
@@ -25,6 +25,7 @@ function Card({ member, handleEditButton }: Props) {
           </div>
         </div>
         <div className="text-sm">{member.main_position}</div>
+        <div className="text-sm">{convertToTitleCase(member.type || "")}</div>
       </div>
 
       <div className="ml-2 flex-1">

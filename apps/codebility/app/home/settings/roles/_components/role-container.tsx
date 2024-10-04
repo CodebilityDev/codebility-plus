@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import RoleListsTable from "@/app/home/settings/roles/_components/role-list-table";
 import { H1 } from "@/Components/shared/dashboard";
@@ -8,16 +8,19 @@ import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { ArrowRightIcon, IconAdd } from "@/public/assets/svgs";
 
-import { Role } from "../_types/roles";
+import { Role_Type } from "../_types/roles";
 
-export default function RoleContainer({ data }: { data: Role[] }) {
+export default function RoleContainer({ data }: { data: Role_Type[] }) {
   const { onOpen } = useModal();
   const [roles, setRoles] = useState(data);
+  useEffect(() => {
+    setRoles(roles);
+  });
   return (
     <div className="flex max-w-[1600px] flex-col gap-6">
       <div className="text-dark100_light900 flex flex-col gap-4 ">
         <div className="flex flex-row items-center gap-4 text-sm">
-          <Link href={"/settings"}>
+          <Link href={"/home/settings"}>
             <span className="dark:text-white/50">Settings</span>
           </Link>
           <ArrowRightIcon />
