@@ -19,8 +19,8 @@ const AdminCard = ({ admin, color }: index_AdminCardT) => {
           height={60}
           className={`${color} h-[250px] w-full  rounded-lg bg-cover object-cover`}
         />
-        <div className="flex w-full flex-col gap-1">
-          <p className="md:text-md text-sm text-white lg:text-lg">
+        <div className="flex w-full flex-col gap-1 capitalize">
+          <p className="md:text-md text-sm text-white lg:text-lg ">
             {admin.first_name} {admin.last_name}
           </p>
           {admin.main_position ? (
