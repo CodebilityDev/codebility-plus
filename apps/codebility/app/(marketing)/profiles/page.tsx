@@ -8,7 +8,7 @@ import ProfileContainer from "./_components/profile-container";
 import CodevLists from "./_components/profile-lists";
 
 export default async function Profiles() {
-  const { data } = await getCodevs();
+  const { data } = await getCodevs("INHOUSE");
 
   const codevs = (data as Codev[]) || [];
 
