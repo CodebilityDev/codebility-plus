@@ -117,7 +117,7 @@ export const sidebarData: Sidebar[] = [
         route: pathsConfig.app.tasks,
         imgURL: "/assets/svgs/icon-task.svg",
         label: "My Tasks",
-        permission: "my_task",
+        permission: "tasks",
       },
       {
         route: pathsConfig.app.kanban,
@@ -147,7 +147,7 @@ export const sidebarData: Sidebar[] = [
         route: pathsConfig.app.orgchart,
         imgURL: "/assets/svgs/icon-org-chart.svg",
         label: "Org Chart",
-        permission: "org_charts",
+        permission: "orgchart",
       },
     ],
   },
@@ -165,7 +165,7 @@ export const sidebarData: Sidebar[] = [
         route: pathsConfig.app.in_hose,
         imgURL: "/assets/svgs/icon-applicant2.svg",
         label: "In-House",
-        permission: "inhouse",
+        permission: "in_house",
       },
       {
         route: pathsConfig.app.clients,
