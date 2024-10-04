@@ -12,7 +12,7 @@ const AdminCard = ({ admin, color }: index_AdminCardT) => {
           alt={`${admin.first_name} Avatar`}
           src={
             admin.image_url
-              ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${admin.image_url}`
+              ? `${admin.image_url}`
               : "/assets/svgs/icon-codebility-black.svg"
           }
           width={60}
