@@ -1,29 +1,36 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
+
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import { Role } from "./_types/roles";
+import { Role_Type } from "./_types/roles";
 
 const supabase = getSupabaseServerComponentClient();
 
-export async function createRole(roleData: Role) {
+export async function createRole(roleData: Role_Type) {
   const { data, error } = await supabase
     .from("roles")
     .insert(roleData)
     .select("*");
-  if (error) {
-    throw new Error();
-  }
-  return data;
+
+  revalidatePath("/home/settings/roles");
+  return { success: true, data };
 }
-export async function updateRole(roleData: any) {
-  const { data, error } = await supabase.from("roles").update(roleData);
-  // .eq("id", id);
+export async function updateRole(id: string, roleData: string) {
+
+  const { data, error } = await supabase
+    .from("roles")
+    .update({name: roleData}).eq("id", id).select("name").single()
+
 
   console.log(data);
   console.log(error);
-  return data;
+  revalidatePath("/home/settings/roles");
+  return { success: true, data };
 }
 export async function deleteRole(id: string) {
-  return await supabase.from("roles").delete().eq("id", id);
+  const { data } = await supabase.from("roles").delete().eq("id", id);
+  revalidatePath("/home/settings/roles");
+  return { success: true, data };
 }
