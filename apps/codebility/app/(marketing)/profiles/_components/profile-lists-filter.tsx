@@ -46,7 +46,11 @@ const ProfileListsFilter: React.FC<profiles_ListFilterT> = ({
           >
             <SelectGroup className="mt-12">
               {positions.map((position, i) => (
-                <SelectItem key={i} value={position}>
+                <SelectItem
+                  key={i}
+                  value={position}
+                  className="focus:dark:bg-dark-300"
+                >
                   {position}
                 </SelectItem>
               ))}
