@@ -26,7 +26,7 @@ const NavContent = () => {
         );
 
         return (
-          <div key={item.id}>
+          <div key={item.id} className={`${!hasPermission ? "hidden" : "block"}`}>
             <h4
               className={`text-gray text-sm uppercase ${!hasPermission ? "hidden" : "block"}`}
             >
