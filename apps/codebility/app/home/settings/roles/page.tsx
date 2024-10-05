@@ -5,7 +5,7 @@ import { Role_Type } from "./_types/roles";
 
 const RolesPage = async () => {
   const supabase = getSupabaseServerComponentClient();
-  const { data } = await supabase.from("roles").select("*");
+  const { data } = await supabase.from("user_type").select("*");
 
   const role = data || [];
 
