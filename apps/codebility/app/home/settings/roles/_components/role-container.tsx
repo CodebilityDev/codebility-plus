@@ -17,7 +17,7 @@ export default function RoleContainer({ data }: { data: Role_Type[] }) {
     setRoles(roles);
   });
   return (
-    <div className="flex max-w-[1600px] flex-col gap-6">
+    <div className="flex max-w-screen-xl mx-auto flex-col gap-6">
       <div className="text-dark100_light900 flex flex-col gap-4 ">
         <div className="flex flex-row items-center gap-4 text-sm">
           <Link href={"/home/settings"}>
