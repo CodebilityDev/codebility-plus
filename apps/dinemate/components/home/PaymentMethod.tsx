@@ -65,7 +65,7 @@ const handlePwdClick = (card: string) => {
 
       <Link  
       href={{
-        pathname: "/cart/confirmation",
+        pathname: "/app/cart/confirmation",
         query: {
           mode: "paypal"
         }
