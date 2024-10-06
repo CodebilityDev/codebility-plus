@@ -151,7 +151,7 @@ useEffect(() => {
         <h1 className="text-center text-white text-2xl font-semibold">Confirmation</h1>        
         <section className="flex flex-col text-custom-accent">
           <div className="flex flex-col gap-y-3">
-            <Link href={"/payment"}
+            <Link href={"/app/payment"}
             className=" flex flex-row items-center justify-between bg-white rounded-[20px] px-6 py-5"
             >
               <div className="flex flex-row items-center gap-x-2">
