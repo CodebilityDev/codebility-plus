@@ -293,6 +293,10 @@ export const updateProject = async (
   };
 
   if (thumbnail) {
+    if (projectsData.thumbnail) {
+      await deleteImageByPublicUrl(projectsData.thumbnail);
+    }
+
     updateProject.thumbnail = await uploadProjectImage(
       thumbnail,
       "public",
