@@ -1,0 +1,10 @@
+@media (max-width: 576px) {
+  #product-tiles::-webkit-scrollbar {
+    width: none; /* for mobile view  */
+  }
+
+  #product-tiles {
+    scrollbar-width: none; /* Firefox - hide scrollbar */
+    -ms-overflow-style: none; /* IE and Edge - hide scrollbar */
+  }
+}
