@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-import { User } from "./_types/projects";
+import { Member, User } from "./_types/projects";
 
 const deleteImageByPublicUrl = async (publicUrlOrFilePath: string) => {
   const supabase = getSupabaseServerComponentClient();
@@ -20,128 +20,6 @@ const deleteImageByPublicUrl = async (publicUrlOrFilePath: string) => {
     console.error("Failed to extract file path from public URL");
   }
 };
-
-// export async function DeleteProjectMembers(e: FormData, newMembers: User[]) {
-//   const supabase = getSupabaseServerComponentClient();
-
-//   const user_id_search = e.get("userId")?.toString();
-
-//   if (!user_id_search) return;
-
-//   // Step 1: Fetch the existing project data (including members)
-//   const { data: projectData, error } = await supabase
-//     .from("projects")
-//     .select("members")
-//     .eq("id", user_id_search)
-//     .single();
-
-//   if (error) {
-//     console.error("Error fetching project:", error.message);
-//     return;
-//   }
-
-//   // Step 2: Parse the existing members (if they are stored as a JSON string)
-//   let existingMembers: User[] = [];
-//   if (projectData?.members) {
-//     existingMembers = projectData.members.map((member: string) =>
-//       JSON.parse(member),
-//     );
-//   }
-
-//   // Step 3: Determine the IDs of members to remove
-//   const idsToRemove = newMembers.map((member) => member.id);
-
-//   // Filter out members whose IDs are in the `idsToRemove` array
-//   const updatedMembers = existingMembers.filter(
-//     (member) => !idsToRemove.includes(member.id),
-//   );
-
-//   // Step 4: Stringify the updated members array before updating the project
-//   const updatedMembersStringified = updatedMembers.map((member) =>
-//     JSON.stringify(member),
-//   );
-
-//   // Step 5: Update the project with the filtered members
-//   const { error: updateError } = await supabase
-//     .from("projects")
-//     .update({ members: updatedMembersStringified })
-//     .eq("id", user_id_search);
-
-//   if (updateError) {
-//     console.error("Error updating project:", updateError.message);
-//     return;
-//   }
-
-//   console.log("Members successfully updated in the project!");
-//   // Optional: Revalidate path or perform other actions
-//   revalidatePath("/home/projects");
-// }
-
-// export async function InsertTeamLeader(e: FormData, newMembers: User[]) {
-//   const supabase = getSupabaseServerComponentClient();
-
-//   const user_id_search = e.get("userId")?.toString();
-
-//   if (!user_id_search) return;
-
-//   // Step 1: Fetch the existing project data (including members)
-//   const { data: projectData, error } = await supabase
-//     .from("projects")
-//     .select("members")
-//     .eq("id", user_id_search)
-//     .single();
-
-//   if (error) {
-//     console.error("Error fetching project:", error.message);
-//     return;
-//   }
-
-//   // Step 2: Parse the existing members (if they are stored as a JSON string)
-//   let existingMembers: User[] = [];
-//   if (projectData?.members) {
-//     existingMembers = projectData.members.map((member: string) =>
-//       JSON.parse(member),
-//     );
-//   }
-
-//   // Step 3: Filter out new members that are already in the existing members
-//   const updatedMembers = [
-//     ...existingMembers,
-//     ...newMembers
-//       .filter(
-//         (newMember) =>
-//           !existingMembers.some(
-//             (existingMember) => existingMember.id === newMember.id,
-//           ),
-//       )
-//       .map((member) => ({
-//         id: member.id,
-//         first_name: member.first_name,
-//         last_name: member.last_name,
-//         image_url: member.image_url,
-//         position: member.main_position,
-//       })),
-//   ];
-
-//   // Step 4: Stringify the updated members array before updating the project
-//   const updatedMembersStringified = updatedMembers.map((member) =>
-//     JSON.stringify(member),
-//   );
-
-//   // Step 5: Update the project with the new members
-//   const { error: updateError } = await supabase
-//     .from("projects")
-//     .update({ members: updatedMembersStringified })
-//     .eq("id", user_id_search);
-
-//   if (updateError) {
-//     console.error("Error updating project:", updateError.message);
-//     return;
-//   }
-
-//   console.log("Members successfully added to the project!");
-//   revalidatePath("/home/projects");
-// }
 
 const uploadProjectImage = async (
   file: File,
@@ -251,11 +129,7 @@ export const createProject = async (formData: FormData, members: User[]) => {
   return { success: true, data };
 };
 
-export const updateProject = async (
-  id: string,
-  formData: FormData,
-  members: User[],
-) => {
+export const updateProject = async (id: string, formData: FormData) => {
   const thumbnail = formData.get("thumbnail") as File | null;
   const project_name = formData.get("project_name") as string;
   const clientId = formData.get("clientId") as string;
@@ -289,7 +163,7 @@ export const updateProject = async (
     status: status || projectsData.status,
     team_leader_id: team_leader_id || projectsData.team_leader_id,
     client_id: clientId || projectsData.client_id,
-    members: members || projectsData.members, // note wala pang add members
+    members: projectsData.members,
   };
 
   if (thumbnail) {
@@ -314,6 +188,27 @@ export const updateProject = async (
 
   revalidatePath("/home/projects");
   return { success: true, data: updateProjectsData };
+};
+
+export const updateProjectMembers = async (
+  projectId: string,
+  members: Member[],
+) => {
+  const supabase = getSupabaseServerComponentClient();
+
+  const { data, error } = await supabase
+    .from("projects")
+    .update({ members })
+    .eq("id", projectId)
+    .single();
+
+  if (error) {
+    console.error("Error updating project members:", error.message);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/home/projects");
+  return { success: true, data };
 };
 
 export const deleteProject = async (projectId: string) => {
