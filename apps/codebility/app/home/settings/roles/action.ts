@@ -10,7 +10,7 @@ const supabase = getSupabaseServerComponentClient();
 
 export async function createRole(roleData: Role_Type) {
   const { data, error } = await supabase
-    .from("roles")
+    .from("user_type")
     .insert(roleData)
     .select("*");
 
@@ -20,7 +20,7 @@ export async function createRole(roleData: Role_Type) {
 export async function updateRole(id: string, roleData: string) {
 
   const { data, error } = await supabase
-    .from("roles")
+    .from("user_type")
     .update({name: roleData}).eq("id", id).select("name").single()
 
 
@@ -30,7 +30,7 @@ export async function updateRole(id: string, roleData: string) {
   return { success: true, data };
 }
 export async function deleteRole(id: string) {
-  const { data } = await supabase.from("roles").delete().eq("id", id);
+  const { data } = await supabase.from("user_type").delete().eq("id", id);
   revalidatePath("/home/settings/roles");
   return { success: true, data };
 }

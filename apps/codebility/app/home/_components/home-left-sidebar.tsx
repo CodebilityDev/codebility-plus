@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sidebarData } from "@/constants";
 import { useNavStore } from "@/hooks/use-sidebar";
+
 import useUser from "../_hooks/use-user";
 
 const LeftSidebar = () => {
@@ -14,7 +15,7 @@ const LeftSidebar = () => {
   const pathname = usePathname();
 
   return (
-    <section className="hidden background-navbar sticky left-0 top-0 z-20 lg:flex h-screen flex-col gap-14 p-6 shadow-lg max-lg:hidden">
+    <section className="background-navbar sticky left-0 top-0 z-20 hidden h-screen flex-col gap-14 p-6 shadow-lg max-lg:hidden lg:flex">
       <div className="flex justify-stretch gap-4 max-lg:hidden">
         <div
           className={`transition-all ${!isToggleOpen ? "flex-0" : "flex-1"} flex overflow-hidden`}
@@ -46,20 +47,25 @@ const LeftSidebar = () => {
           className={`toggle-logo-btn ${isToggleOpen ? "close-nav" : "open-nav mx-auto"}`}
         />
       </div>
-      <div className="overflow-y-auto flex flex-1 flex-col gap-2 max-lg:hidden">
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto max-lg:hidden">
         {sidebarData.map((item) => {
           const hasPermission = item.links.some((link) =>
             user.permissions.includes(link.permission),
           );
 
           return (
-            <div key={item.id} className={`${!isToggleOpen || !hasPermission ? "mt-0" : "mt-5"}`}>
+            <div
+              key={item.id}
+              className={`${!hasPermission ? "hidden" : "block"} ${!isToggleOpen ? "mt-0" : "mt-5"}`}
+            >
               <h4
                 className={`text-gray text-sm uppercase ${!isToggleOpen || !hasPermission ? "hidden" : "block"}`}
               >
                 {item.title}
               </h4>
-              <div className={`${!isToggleOpen ? "mt-0" : "mt-3"} flex flex-1 flex-col gap-2 max-lg:hidden`}>
+              <div
+                className={`${!isToggleOpen ? "mt-0" : "mt-3"} flex flex-1 flex-col gap-2 max-lg:hidden`}
+              >
                 {item.links.map((link) => {
                   const accessRoutes = user.permissions.includes(
                     link.permission,
