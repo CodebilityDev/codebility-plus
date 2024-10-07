@@ -30,6 +30,7 @@ import ServiceCategoriesDeleteModal from "@/Components/modals/ServiceCategoriesD
 import ServiceCategoriesModal from "@/Components/modals/ServiceCategoriesModal";
 import ApplicantsAddModal from "@/Components/modals/ApplicantsAddModal";
 import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
+import ProjectMembersModal from "../modals/ProjectMembersModal";
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -56,6 +57,7 @@ export const ModalProvider = () => {
       <ProjectEditModal />
       <ProjectViewModal />
       <ProjectDeleteModal />
+      <ProjectMembersModal />
 
       <ClientAddModal />
       <ClientEditModal />
