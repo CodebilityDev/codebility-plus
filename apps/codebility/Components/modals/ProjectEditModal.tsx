@@ -1,11 +1,12 @@
-import { ChangeEvent, SetStateAction, useEffect, useState } from "react";
+import { ChangeEvent, useEffect, useState } from "react";
 import Image from "next/image";
+import { parseMembers } from "@/app/home/projects/_lib";
 import { DEFAULT_AVATAR, STATUS } from "@/app/home/projects/_lib/constants";
 import {
   ProjectFormValues,
   projectSchema,
 } from "@/app/home/projects/_lib/schema";
-import { Client, Member, User } from "@/app/home/projects/_types/projects";
+import { Client, User } from "@/app/home/projects/_types/projects";
 import { updateProject } from "@/app/home/projects/actions";
 import { Button } from "@/Components/ui/button";
 import {
@@ -39,18 +40,14 @@ import {
 const ProjectEditModal = () => {
   const supabase = useSupabase();
 
-  const { isOpen, onClose, type, data } = useModal();
+  const { isOpen, onClose, type, onOpen, data } = useModal();
   const isModalOpen = isOpen && type === "projectEditModal";
 
   const [users, setUsers] = useState<User[] | null>([]);
   const [clients, setClients] = useState<Client[] | null>([]);
   const [projectImage, setProjectImage] = useState<string | any>();
-  const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
-  const [selectedRemoveMembers, setSelectedRemoveMembers] = useState<User[]>(
-    [],
-  );
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+  const membersParsed = parseMembers(data?.members || []);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -107,36 +104,6 @@ const ProjectEditModal = () => {
     }
   }, [data]);
 
-  const handleMemberSearch = (e: {
-    target: { value: SetStateAction<string> };
-  }) => {
-    setSearchQuery(e.target.value);
-  };
-
-  const addMember = (member: User) => {
-    if (!selectedMembers.some((m) => m.id === member.id)) {
-      setSelectedMembers((prevMembers) => [...prevMembers, member]);
-    }
-  };
-
-  const removeMember = (id: string) => {
-    setSelectedMembers((prevMembers) =>
-      prevMembers.filter((member) => member.id !== id),
-    );
-  };
-
-  const addToRemoveMember = (member: User) => {
-    if (!selectedRemoveMembers.some((m) => m.id === member.id)) {
-      setSelectedRemoveMembers((prevMembers) => [...prevMembers, member]);
-    }
-  };
-
-  const removetoCancelRemoveMember = (id: string) => {
-    setSelectedRemoveMembers((prevMembers) =>
-      prevMembers.filter((member) => member.id !== id),
-    );
-  };
-
   const handleUploadProjectThumbnail = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -148,12 +115,6 @@ const ProjectEditModal = () => {
   const handleRemoveProjectThumbnail = () => {
     setProjectImage(null);
   };
-
-  const parseMembers = (membersData: string[]): Member[] => {
-    return membersData.map((member) => JSON.parse(member) as Member);
-  };
-
-  const membersParsed = parseMembers(data?.members || []);
 
   const handleSubmitData = async (editData: ProjectFormValues) => {
     setIsLoading(true);
@@ -172,11 +133,7 @@ const ProjectEditModal = () => {
         formData.append("figma_link", editData.figma_link);
       if (editData.summary) formData.append("summary", editData.summary);
 
-      const response = await updateProject(
-        data?.id as string,
-        formData,
-        selectedMembers,
-      );
+      const response = await updateProject(data?.id as string, formData);
       if (response.success) {
         toast.success("Project updated succesfully!");
       } else {
@@ -188,8 +145,6 @@ const ProjectEditModal = () => {
       reset();
       setProjectImage(null);
       setIsLoading(false);
-      // setSelectedMembers([]);
-      // setSelectedRemoveMembers([]);
       onClose();
     }
   };
@@ -376,7 +331,9 @@ const ProjectEditModal = () => {
                       <div className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover">
                         <Button
                           variant="hollow"
+                          type="button"
                           className="h-12 w-12 rounded-full p-0"
+                          onClick={() => onOpen("projectMembersModal", data)}
                         >
                           <IconPlus className="invert dark:invert-0" />
                         </Button>
