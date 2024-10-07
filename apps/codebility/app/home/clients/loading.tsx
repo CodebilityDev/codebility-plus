@@ -3,8 +3,9 @@ import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 
 const Loading = () => {
   return (
-    <div>
-      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+      <Skeleton className="h-10 w-40 rounded-lg" />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {Array(4)
           .fill(null)
           .map((_, index) => (
