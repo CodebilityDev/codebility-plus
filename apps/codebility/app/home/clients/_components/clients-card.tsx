@@ -37,7 +37,7 @@ const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
     setCurrentPage,
   } = usePagination(clients, pageSize.clients);
 
-  const handleArchive = async (id: string) => {
+  const handleArchive = async (id: number) => {
     if (!id) {
       toast.error("Can't Archived: Invalid client ID");
       return;
@@ -61,7 +61,7 @@ const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
     }
   };
 
-  const handleDeleteClient = async (id: string) => {
+  const handleDeleteClient = async (id: number) => {
     if (!id) {
       toast.error("Can't Archived: Invalid client ID");
       return;
@@ -96,7 +96,7 @@ const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
             >
               <button
                 onClick={() => {
-                  handleArchive(client.id!);
+                  handleArchive(parseInt(client.id!));
                   console.log("handle archive click");
                 }}
                 className="absolute right-4 top-4 z-10 cursor-pointer text-white  hover:cursor-pointer"
@@ -110,7 +110,9 @@ const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
                       src={client.logo || DEFAULT_AVATAR}
                       alt="Avatar"
                       fill
-                      className="bg-dark-400 h-auto w-auto rounded-full bg-cover object-cover"
+                      loading="eager"
+                      priority
+                      className="bg-red-400 h-auto w-auto rounded-full bg-cover object-cover"
                     />
                   </div>
                 </div>
@@ -212,7 +214,7 @@ const ClientCards = ({ clients }: { clients: ClientDetails[] }) => {
                         type="button"
                         variant="destructive"
                         className="w-full"
-                        onClick={() => handleDeleteClient(client.id!)}
+                        onClick={() => handleDeleteClient(parseInt(client.id!))}
                         disabled={isLoading}
                       >
                         Delete
