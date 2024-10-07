@@ -35,7 +35,7 @@ const SignInForm = () => {
       toast.success("Logged in successfully!");
       setIsLoading(false);
     } catch (e) {
-      toast.error((e as { message: string }).message);
+      toast.error((e as { message: string }).message || "Login failed");
       setIsLoading(false);
     }
   };

@@ -152,17 +152,17 @@ const AuthForm = () => {
   const onSubmit: SubmitHandler<FieldValues> = async (data) => {
     setIsLoading(true);
     try {
-      console.log(data);
       await signupUser(data);
-
       clearTime();
       clearStack();
       reset();
       toast.success("Your account has been successfully created");
       router.push("/waiting");
     } catch (e) {
+      const errorMessage = (e as { message: string }).message || "Something went wrong, please try again.";
+      toast.error(errorMessage);
+    } finally {
       setIsLoading(false);
-      toast.error((e as { message: string }).message);
     }
   };
 
