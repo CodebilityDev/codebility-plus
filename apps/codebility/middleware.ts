@@ -1,6 +1,8 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+
 import pathsConfig from "./config/paths.config";
 
 export const config = {
@@ -160,7 +162,7 @@ export async function middleware(req: NextRequest) {
     .eq("user_id", user?.id)
     .single();
 
-  // if the applicants is not yet accepted
+  // if the applicants is not yet accepted and trying to access home/dashboard
   if (
     codev?.application_status !== "ACCEPTED" &&
     req.nextUrl.pathname.startsWith("/home")
@@ -170,10 +172,7 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const hasPermission = await checkPermissions(
-    user?.id!,
-    req.nextUrl.pathname,
-  );
+  const hasPermission = await checkPermissions(user?.id!, req.nextUrl.pathname);
 
   // if no permission redirect to dashboard
   if (codev?.application_status === "ACCEPTED" && !hasPermission) {
@@ -197,23 +196,39 @@ const checkPermissions = async (userId: string, path: string) => {
   if (error || !data) return false;
 
   const permissions = data.user_type;
-  
+
+  // if path is equal to "/home" and return true if the conditions met
   if (path === pathsConfig.app.home) {
     return permissions.dashboard === true;
   }
-  
-  const pathSegments = path.split('/');
-  let lastSegment = pathSegments[2];
 
+  // ex. /home/applicants => ["", "home", "applicants"]
+  const pathSegments = path.split("/");
+
+  let lastSegment;
+  // if the path is from settings
+  // ex. /home/settings/permissions => ["", "home", "settings", "permissions"]
+  if (
+    pathSegments.length === 4 &&
+    pathSegments[1] === "home" &&
+    pathSegments[2] === "settings" // in here we need to specify from what route, because we have another path with length of 4, which is in clients archive - /home/clients/archive => ["", "home", "clients", "archive"]
+  ) {
+    lastSegment = pathSegments[3]; // lastSegment now is equal to "permissions"
+  } else {
+    lastSegment = pathSegments[2]; // this will check the path (ex. /home/applicants => ["", "home", "applicants"])
+  }
+
+  // this one is renaming only because in the url it uses "-" not "_"
   if (lastSegment === "in-house") {
     lastSegment = "in_house";
   } else if (lastSegment === "time-tracker") {
     lastSegment = "time_tracker";
   }
 
+  // if we have permission we can access that page
   if (lastSegment && lastSegment in permissions) {
-    return permissions[lastSegment] === true; 
+    return permissions[lastSegment] === true;
   }
 
   return false;
-}
+};
