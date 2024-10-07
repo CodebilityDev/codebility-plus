@@ -1,144 +1,156 @@
-import Link from "next/link"
-import Image from "next/image"
+import { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Member, User } from "@/app/home/projects/_types/projects";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal-projects";
+import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
+import { format, parseISO } from "date-fns";
 
-import { Button } from "@codevs/ui/button"
-import { Dialog, DialogContent } from "@codevs/ui/dialog"
-import { useModal } from "@/hooks/use-modal-projects"
-import { IconGithub, IconLink } from "@/public/assets/svgs"
-import { defaultAvatar } from "@/public/assets/images"
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@codevs/ui/hover-card"
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@codevs/ui/hover-card";
 
-import { format, parseISO } from 'date-fns';
-import { User, ViewType } from "@/app/home/projects/_types/projects"
+import { Dialog, DialogContent } from "../ui/dialog";
+import { DEFAULT_AVATAR } from "@/app/home/projects/_lib/constants";
+import { parseMembers } from "@/app/home/projects/_lib";
 
 const ProjectViewModal = () => {
+  const supabase = useSupabase();
+
   const { isOpen, type, onClose, onOpen, data } = useModal();
+  const isModalOpen = isOpen && type === "projectViewModal";
 
-  const {
-    name,
-    summary,
-    live_link,
-    users,
-    github_link,
-    status,
-    team_leader,
-    created_at,
-    thumbnail,
-    view_type,
-    members = [],
-  } = data || {}
+  const [teamLead, setTeamLead] = useState<User[]>([]);
+  const team_leader_id = data?.team_leader_id;
+  const membersParsed = parseMembers(data?.members || []);
+  const formattedDate = data?.created_at
+    ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
+    : null;
 
-  const parseMembers = (membersData: string[]): User[] => {
-    return membersData.map((member) => JSON.parse(member) as User);
+  useEffect(() => {
+    const getTeamLead = async () => {
+      const { data, error } = await supabase
+        .from("profile")
+        .select("*")
+        .eq("id", team_leader_id);
+
+      if (error) {
+        if (error) throw error;
+        console.error("Error fetching team lead:", error);
+      } else {
+        setTeamLead(data);
+      }
+    };
+    getTeamLead();
+  }, [isOpen]);
+
+  // Ensure view_type is a string before parsing, and use type assertion
+  // const viewType: ViewType =
+  //   typeof view_type === "string"
+  //     ? (JSON.parse(view_type) as ViewType)
+  //     : { first_name: "Unknown", last_name: "Unknown" };
+
+  const handleDialogChange = () => {
+    onClose();
   };
 
-   // Parse the members data
-   const membersParsed = parseMembers(members);
-
-
-
-    // Ensure view_type is a string before parsing, and use type assertion
-    const viewType: ViewType = typeof view_type === "string"
-    ? JSON.parse(view_type) as ViewType
-    : { first_name: "Unknown", last_name: "Unknown" };
-
-
-// Parse the date string using date-fns
-const formattedDate = created_at ? format(parseISO(created_at), 'MM/dd/yyyy hh:mm:ss a') : null;
-
-  const isModalOpen = isOpen && type === "projectViewModal"
-
   return (
-    <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
+    <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
       <DialogContent className="xs:w-[80%] h-[32rem] w-[95%] max-w-3xl overflow-x-auto overflow-y-auto sm:w-[70%] lg:h-auto">
         <div className="flex flex-col gap-8">
-          <div className="flex justify-center rounded-lg bg-dark-100">
- {thumbnail ? (
-              <Image
-                alt={`${name}`}
-                src={thumbnail}
-                width={120}
-                height={91}
-                className="h-[120px] w-[91px] object-contain"
-                loading="eager"
-                priority
-              />
-            ) : (
-              <Image
-                alt={`${name}`}
-                src={defaultAvatar}
-                width={120}
-                height={91}
-                className="h-[120px] w-[91px] object-contain"
-                loading="eager"
-                priority
-              />
-            )}
+          <div className="dark:bg-dark-100 flex justify-center rounded-lg bg-slate-300">
+            <Image
+              alt={`${data?.name} project image`}
+              src={data?.thumbnail || DEFAULT_AVATAR}
+              width={120}
+              height={91}
+              className="h-[120px] w-[91px] object-contain"
+              loading="eager"
+              priority
+            />
           </div>
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="dark:bg-dark-200 flex flex-1 flex-col gap-4 rounded-lg p-4">
               <div className="flex items-center gap-2">
-                <p className="text-2xl">{name}</p>
+                <p className="text-2xl">{data?.name}</p>
               </div>
-              <p className="md:text-md text-gray text-sm lg:text-lg">
-                {summary}
-              </p>
+              {data?.summary && (
+                <p className="md:text-md text-gray max-h-20 overflow-auto text-sm lg:text-lg">
+                  {data.summary}
+                </p>
+              )}
               <div className="flex items-center gap-2">
-                <Link href={github_link as string} target="_blank">
-                  <IconGithub className="h-8 w-8 invert duration-300 hover:-translate-y-1 dark:invert-0" />
-                </Link>
-                {live_link && (
-                  <Link href={live_link} target="_blank">
+                {data?.github_link && (
+                  <Link href={data.github_link} target="_blank">
+                    <IconGithub className="size-5 invert duration-300 hover:-translate-y-1 dark:invert-0" />
+                  </Link>
+                )}
+                {data?.live_link && (
+                  <Link href={data.live_link} target="_blank">
                     <IconLink className="size-5 invert duration-300 hover:-translate-y-1 dark:invert-0" />
+                  </Link>
+                )}
+                {data?.figma_link && (
+                  <Link href={data.figma_link} target="_blank">
+                    <IconFigma className="size-5 invert duration-300 hover:-translate-y-1 dark:invert-0" />
                   </Link>
                 )}
               </div>
             </div>
             <div className="dark:bg-dark-200 flex flex-1 flex-col gap-2 rounded-lg p-4">
               <p className="text-2xl">Status</p>
-              <p className="text-lg text-orange-400">{status}</p>
+              <p className="text-lg text-orange-400">{data?.status}</p>
               <p className="text-md text-gray">Date Started: {formattedDate}</p>
               <p className="text-md text-gray">
                 Lead by:{" "}
-                <span className="text-blue-100">
-                   {viewType.first_name} {viewType.last_name}
+                <span className="capitalize text-blue-100">
+                  {teamLead[0]?.first_name} {teamLead[0]?.last_name}
                 </span>
+                {/* <span className="text-blue-100">
+                  {viewType.first_name} {viewType.last_name}
+                </span> */}
               </p>
             </div>
           </div>
           <div className="dark:bg-dark-200 flex flex-col gap-4 rounded-lg p-4">
             <p className="text-2xl">Contributors</p>
-            <div className="max-h-40 h-40 overflow-y-auto flex flex-col gap-3 xl:h-auto xl:max-h-max xl:flex-row">
-            {membersParsed?.map((user) => (
-                <div key={user.id} className="flex gap-1 items-center">
+            <div className="flex h-40 max-h-40 flex-col gap-3 overflow-y-auto xl:h-auto xl:max-h-max xl:flex-row">
+              {membersParsed?.map((user) => (
+                <div key={user.id} className="flex items-center gap-1">
                   <HoverCard>
                     <HoverCardTrigger className="cursor-pointer">
-                      <div className="relative size-[55px] overflow-hidden rounded-full bg-gradient-to-b from-teal to-violet bg-cover object-cover p-[2px]">
+                      <div className="from-teal to-violet relative size-[55px] overflow-hidden rounded-full bg-gradient-to-b bg-cover object-cover p-[2px]">
                         <Image
                           alt={`${user.first_name} ${user.last_name}`}
-                          src={user.image_url || defaultAvatar}
+                          src={user.image_url || DEFAULT_AVATAR}
                           width={60}
                           height={60}
-                          className="h-auto w-full rounded-full bg-gradient-to-b from-violet to-blue-500 bg-cover object-cover"
+                          className="from-violet h-auto w-full rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover"
                         />
                       </div>
                     </HoverCardTrigger>
-                    <HoverCardContent align="start" className="ml-2 border-none">
-                      <p className="text-base font-semibold">{`${user.first_name} ${user.last_name}`}</p>
-                      <p className="text-gray-500 text-xs">{user.position}</p>
+                    <HoverCardContent
+                      align="start"
+                      className="ml-2 border-none"
+                    >
+                      <p className="text-base font-semibold capitalize">{`${user.first_name} ${user.last_name}`}</p>
+                      <p className="text-xs text-gray-500">{user.position}</p>
                     </HoverCardContent>
                   </HoverCard>
                   <div className="ml-2 xl:hidden">
-                    <p className="text-sm font-semibold">{`${user.first_name} ${user.last_name}`}</p>
-                    <p className="text-gray-500 text-xs">{user.position}</p>
+                    <p className="text-sm font-semibold capitalize">{`${user.first_name} ${user.last_name}`}</p>
+                    <p className="text-xs text-gray-500">{user.position}</p>
                   </div>
                 </div>
               ))}
-
             </div>
           </div>
 
-          <div className="flex justify-end space-x-5">
+          <div className="flex flex-col gap-4 md:flex-row md:justify-end">
             <Button
               variant="destructive"
               className="w-full lg:w-[130px]"
@@ -146,8 +158,12 @@ const formattedDate = created_at ? format(parseISO(created_at), 'MM/dd/yyyy hh:m
             >
               Delete
             </Button>
-            <Button variant="default" className="w-full lg:w-[130px]" onClick={() => onOpen("projectEditModal", data)}>
-              Edit
+            <Button
+              variant="hollow"
+              className="w-full lg:w-[130px]"
+              onClick={handleDialogChange}
+            >
+              Cancel
             </Button>
           </div>
         </div>
