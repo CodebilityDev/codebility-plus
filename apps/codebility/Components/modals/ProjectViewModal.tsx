@@ -16,6 +16,7 @@ import {
 
 import { Dialog, DialogContent } from "../ui/dialog";
 import { DEFAULT_AVATAR } from "@/app/home/projects/_lib/constants";
+import { parseMembers } from "@/app/home/projects/_lib";
 
 const ProjectViewModal = () => {
   const supabase = useSupabase();
@@ -25,6 +26,10 @@ const ProjectViewModal = () => {
 
   const [teamLead, setTeamLead] = useState<User[]>([]);
   const team_leader_id = data?.team_leader_id;
+  const membersParsed = parseMembers(data?.members || []);
+  const formattedDate = data?.created_at
+    ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
+    : null;
 
   useEffect(() => {
     const getTeamLead = async () => {
@@ -43,23 +48,11 @@ const ProjectViewModal = () => {
     getTeamLead();
   }, [isOpen]);
 
-  const parseMembers = (membersData: string[]): Member[] => {
-    return membersData.map((member) => JSON.parse(member) as Member);
-  };
-
-  // Parse the members data
-  const membersParsed = parseMembers(data?.members || []);
-
   // Ensure view_type is a string before parsing, and use type assertion
   // const viewType: ViewType =
   //   typeof view_type === "string"
   //     ? (JSON.parse(view_type) as ViewType)
   //     : { first_name: "Unknown", last_name: "Unknown" };
-
-  // Parse the date string using date-fns
-  const formattedDate = data?.created_at
-    ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
-    : null;
 
   const handleDialogChange = () => {
     onClose();
