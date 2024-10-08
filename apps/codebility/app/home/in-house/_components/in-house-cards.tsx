@@ -5,7 +5,7 @@ import { InHouseProps } from "../_types/in-house";
 import Card from "./in-house-card";
 import EditableCard from "./in-house-editable-card";
 
-function InHouseCards({
+export default function InHouseCards({
   data,
   editableIds,
   handlers,
@@ -59,5 +59,3 @@ function InHouseCards({
     </>
   );
 }
-
-export default InHouseCards;
