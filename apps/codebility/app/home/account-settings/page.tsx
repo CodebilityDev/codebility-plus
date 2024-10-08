@@ -3,7 +3,7 @@ import { Separator } from "@codevs/ui/separator";
 
 import AccountSettings2FA from "./_components/account-settings-2FA";
 import AccountSettingsChangePassword from "./_components/account-settings-change-password";
-import AccountSettingsDelete from "./_components/account-settings-delete.tsx";
+import AccountSettingsDelete from "./_components/account-settings-delete";
 import AccountSettingsHeader from "./_components/account-settings-header";
 
 export default function AccountSettingsPage() {
