@@ -5,15 +5,22 @@ import { Task } from "@/types/home/task";
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
 import { BoardTask } from "./_types/board";
+import { revalidatePath } from "next/cache";
 
 export const createNewList = async (name: string, board_id: string) => {
   const supabase = getSupabaseServerActionClient();
-  const { error } = await supabase.from("list").insert({
+  const { data, error } = await supabase.from("list").insert({
     name,
     board_id,
   });
 
-  if (error) throw error;
+  if (error) {
+    console.log("Error creating list: ", error.message)
+    return { success: false, error: error.message }
+  }
+
+  revalidatePath("/home/kanban")
+  return { success: true, data }
 };
 
 export const createNewTask = async (formData: FormData) => {
@@ -41,7 +48,10 @@ export const createNewTask = async (formData: FormData) => {
     .select("*")
     .eq("project_id", project_id);
 
-  if (fetchingTasksError) throw fetchingTasksError;
+  if (fetchingTasksError) {
+    console.log("Error fetching task: ", fetchingTasksError.message)
+    return { success: false, error: fetchingTasksError.message }
+  }
 
   const listTotalTask = Number(formData.get("totalTask") || 0);
 
@@ -63,7 +73,10 @@ export const createNewTask = async (formData: FormData) => {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.log("Error creating task: ", error.message)
+    return { success: false, error: error.message }
+  }
 
   const membersId = (
     formData.get("membersId")
@@ -77,8 +90,14 @@ export const createNewTask = async (formData: FormData) => {
       task_id: data.id,
     });
 
-    if (error) throw error;
+    if (error) {
+      console.log("Error creating codev task: ", error.message)
+      return { success: false, error: error.message }
+    }
   }
+
+  revalidatePath("/home/kanban")
+  return { success: true }
 };
 
 export const updateTaskListId = async (taskId: string, newListId: string) => {
