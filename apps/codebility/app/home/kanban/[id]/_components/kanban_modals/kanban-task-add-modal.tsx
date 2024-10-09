@@ -1,23 +1,8 @@
 "use client";
 
-import React from "react";
 import { useRouter } from "next/navigation";
 import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum";
 import { Button } from "@/Components/ui/button";
-import Input from "@/Components/ui/forms/input";
-import { taskPrioLevels, taskTypes } from "@/constants";
-import { IconClose, IconDropdown } from "@/public/assets/svgs";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectItemText,
-  SelectTrigger,
-  SelectValue,
-} from "@radix-ui/react-select";
-import toast from "react-hot-toast";
-
 import {
   Dialog,
   DialogClose,
@@ -26,7 +11,19 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@codevs/ui/dialog";
+} from "@/Components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/Components/ui/select";
+import { taskPrioLevels, taskTypes } from "@/constants";
+import toast from "react-hot-toast";
+
+import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
@@ -73,11 +70,17 @@ export default function KanbanTaskAddModal({
     try {
       validateInput(formData);
 
-      await createNewTask(formData);
-      toast.success("Task Created!");
-      router.refresh(); // show new task.
-    } catch (e: any) {
-      toast.error(e.message);
+      const response = await createNewTask(formData);
+      if (response.success) {
+        toast.success("Create task successful.");
+        router.refresh(); // show new task.
+      } else {
+        console.log("Error creating task: ", response.error);
+        toast.error("Failed to create task.");
+      }
+    } catch (error) {
+      console.log("Error creating task: ", error);
+      toast.error("Something went wrong.");
     }
   };
 
@@ -92,180 +95,132 @@ export default function KanbanTaskAddModal({
           <p>Add a card</p>
         </button>
       </DialogTrigger>
-      <DialogContent
-        hideCloseButton={true}
-        className="background-lightsection_darksection text-dark100_light900 h-[32rem] w-full max-w-3xl lg:h-auto"
-      >
-        <form
-          action={handleSubmit}
-          className="flex flex-col justify-items-center gap-6 overflow-x-auto overflow-y-auto"
-        >
+      <DialogContent className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-auto">
+        <form action={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader className="relative">
-            <DialogTitle className="mb-2 text-left text-lg">
+            <DialogTitle className="text-left text-lg">
               Add New Task
             </DialogTitle>
           </DialogHeader>
-          <div className="flex flex-col gap-6">
-            <input type="hidden" name="projectId" value={projectId} />
-            <input type="hidden" name="listId" value={listId} />
-            <input type="hidden" name="totalTask" value={totalTask} />
-            <div className="flex flex-col gap-2">
-              <Label htmlFor="title">Task Name</Label>
-              <Input
-                id="title"
-                name="title"
-                className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
-                placeholder="Enter Task Name"
-              />
-              <div className="flex gap-1">
-                <Label>in list</Label>
-                <Label className="underline">{listName}</Label>
-              </div>
+          <Label>
+            in list:{" "}
+            <span className="text-yellow-500 underline">{listName}</span>
+          </Label>
+          <input type="hidden" name="projectId" value={projectId} />
+          <input type="hidden" name="listId" value={listId} />
+          <input type="hidden" name="totalTask" value={totalTask} />
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+            <Input
+              id="title"
+              type="text"
+              label="Task Name"
+              name="title"
+              placeholder="Enter Task Name"
+              className="dark:bg-dark-200"
+            />
+            <div className="flex flex-col justify-end">
+              <label htmlFor="category">Category</label>
+              <Select name="category">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Category"></SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {categories?.map((category: string, i: number) => (
+                      <SelectItem key={i} value={category}>
+                        {category}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
-            <div className="flex w-full flex-col gap-4 md:flex-row">
-              <div className="flex w-1/2 gap-4">
-                <div className="flex w-1/3 flex-col gap-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select name="category">
-                    <SelectTrigger
-                      aria-label="Category"
-                      className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
-                    >
-                      <SelectValue className="text-sm" />
-                      <IconDropdown className="h-5 invert dark:invert-0" />
-                    </SelectTrigger>
-
-                    <SelectContent
-                      position="popper"
-                      className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
-                    >
-                      <SelectGroup>
-                        {categories &&
-                          categories.map((category: string, i: number) => (
-                            <SelectItem
-                              key={i}
-                              className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
-                              value={category}
-                            >
-                              <SelectItemText>{category}</SelectItemText>
-                            </SelectItem>
-                          ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex w-1/3 flex-col gap-2">
-                  <Label htmlFor="duration">Duration hrs</Label>
-                  <Input
-                    id="duration"
-                    type="number"
-                    name="duration"
-                    min="0"
-                    step="0.25"
-                    isKeyboard={true}
-                    className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
-                  />
-                </div>
-                <div className="flex w-1/3 flex-col gap-2">
-                  <Label htmlFor="points">Points</Label>
-                  <Input
-                    id="points"
-                    name="points"
-                    type="number"
-                    min="0"
-                    className="border-light_dark dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
-                  />
-                </div>
-              </div>
-              <div className="flex w-1/2 gap-4">
-                <div className="flex w-1/2 flex-col gap-2">
-                  <Label htmlFor="priority">Priority Level</Label>
-                  <Select name="priority">
-                    <SelectTrigger
-                      aria-label="Priority Level"
-                      className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
-                    >
-                      <SelectValue className="text-sm" />
-                      <IconDropdown className="h-5 invert dark:invert-0" />
-                    </SelectTrigger>
-
-                    <SelectContent
-                      position="popper"
-                      className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
-                    >
-                      <SelectGroup>
-                        {taskPrioLevels.map((prioLevel, i) => (
-                          <SelectItem
-                            key={i}
-                            className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
-                            value={prioLevel}
-                          >
-                            <SelectItemText>{prioLevel}</SelectItemText>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex w-1/2 flex-col gap-2">
-                  <Label htmlFor="type">Type</Label>
-                  <Select name="type">
-                    <SelectTrigger
-                      aria-label="Type"
-                      className="border-light_dark dark:bg-dark-200 flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
-                    >
-                      <SelectValue className="text-sm" />
-                      <IconDropdown className="h-5 invert dark:invert-0" />
-                    </SelectTrigger>
-
-                    <SelectContent
-                      position="popper"
-                      className="border-light_dark dark:bg-black-100 z-10 rounded-md border bg-[#FFF]"
-                    >
-                      <SelectGroup>
-                        {taskTypes.map((type, i) => (
-                          <SelectItem
-                            key={i}
-                            className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
-                            value={type}
-                          >
-                            <SelectItemText>{type}</SelectItemText>
-                          </SelectItem>
-                        ))}
-                      </SelectGroup>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
+            <Input
+              id="duration"
+              type="number"
+              label="Task Duration (in hrs)"
+              name="duration"
+              min="0"
+              step="0.25"
+              placeholder="Enter Task Duration"
+              className="dark:bg-dark-200"
+            />
+            <Input
+              id="points"
+              type="number"
+              label="Points"
+              name="points"
+              min="0"
+              placeholder="Enter Task Points"
+              className="dark:bg-dark-200"
+            />
+            <div>
+              <label htmlFor="priority">Priority Level</label>
+              <Select name="priority">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Priority Level"></SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {taskPrioLevels.map((prioLevel, i) => (
+                      <SelectItem key={i} value={prioLevel}>
+                        {prioLevel}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
-            <KanbanTaskAddModalMembers />
-            <div className="flex flex-col gap-1">
-              <Label htmlFor="desc">Description</Label>
-              <Textarea
-                id="desc"
-                variant="ghost"
-                name="description"
-                className="dark:bg-dark-200 h-[8rem] resize-none text-sm"
-                placeholder="Add a more detailed description..."
-              />
+            <div>
+              <label htmlFor="type">Type</label>
+              <Select name="type">
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Type"></SelectValue>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {taskTypes.map((type, i) => (
+                      <SelectItem key={i} value={type}>
+                        {type}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             </div>
+          </div>
+          <KanbanTaskAddModalMembers />
+          <div>
+            <label htmlFor="desc">Description</label>
+            <Textarea
+              id="desc"
+              variant="ghost"
+              name="description"
+              className="dark:bg-dark-200 h-[8rem] resize-none text-sm"
+              placeholder="Add a more detailed description..."
+            />
           </div>
 
           <DialogFooter className="flex flex-col gap-2 lg:flex-row">
-            <Button
-              variant="default"
-              className="order-1 w-full sm:order-2 sm:w-[130px]"
-            >
-              Save
-            </Button>
-          </DialogFooter>
-          <div>
-            <DialogClose asChild>
-              <button className="absolute right-4 top-4">
-                <IconClose className="h-5 invert dark:invert-0" />
-              </button>
+            <DialogClose>
+              <Button
+                type="button"
+                variant="hollow"
+                className="order-2 w-full sm:order-1 sm:w-[130px]"
+              >
+                Cancel
+              </Button>
             </DialogClose>
-          </div>
+            <DialogClose>
+              <Button
+                type="submit"
+                variant="default"
+                className="order-1 w-full sm:order-2 sm:w-[130px]"
+              >
+                Save
+              </Button>
+            </DialogClose>
+          </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
