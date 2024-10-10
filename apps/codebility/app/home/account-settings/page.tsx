@@ -8,17 +8,17 @@ import AccountSettingsHeader from "./_components/account-settings-header";
 
 export default function AccountSettingsPage() {
   return (
-    <div className="text-dark100_light900 container max-w-[700px] px-4  ">
+    <div className="text-dark100_light900 container max-w-[700px] px-2 ">
       <h1 className=" mb-6 text-3xl font-bold">Account Settings</h1>
       <Card className="background-box space-y-8 ">
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-6 p-4">
           <AccountSettingsHeader />
           <Separator />
           <AccountSettingsChangePassword />
           <Separator />
           <AccountSettings2FA />
         </CardContent>
-        <CardFooter>
+        <CardFooter className="px-3">
           <AccountSettingsDelete />
         </CardFooter>
       </Card>
