@@ -24,7 +24,7 @@ const ProjectMembersModal = () => {
   const { isOpen, type, onClose, data } = useModal();
   const isModalOpen = isOpen && type === "projectMembersModal";
 
-  const [users, setUsers] = useState<User[] | null>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [teamLead, setTeamLead] = useState<User[]>([]);
   const team_leader_id = data?.team_leader_id;
   const parseMembers = (membersData: string[]): Member[] => {
@@ -32,23 +32,33 @@ const ProjectMembersModal = () => {
   };
   const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [teamLeadLoading, setTeamLeadLoading] = useState(true);
+
+  const getTeamLead = async () => {
+    if (!team_leader_id) {
+      console.log("Team leader ID is undefined");
+      return;
+    }
+
+    setTeamLeadLoading(true);
+
+    const { data, error } = await supabase
+      .from("profile")
+      .select("*")
+      .eq("id", team_leader_id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching team lead:", error);
+    } else {
+      setTeamLead(data ? [data] : []);
+    }
+    setTeamLeadLoading(false);
+  };
 
   useEffect(() => {
-    const getTeamLead = async () => {
-      const { data, error } = await supabase
-        .from("profile")
-        .select("*")
-        .eq("id", team_leader_id);
-
-      if (error) {
-        if (error) throw error;
-        console.error("Error fetching team lead:", error);
-      } else {
-        setTeamLead(data);
-      }
-    };
     getTeamLead();
-  }, [isOpen]);
+  }, [isOpen, team_leader_id]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -141,9 +151,11 @@ const ProjectMembersModal = () => {
                     loading="eager"
                   />
                 </div>
-                <span>
-                  {teamLead[0]?.first_name} {teamLead[0]?.last_name}
-                </span>
+                {teamLead[0] && (
+                  <span>
+                    {teamLead[0].first_name} {teamLead[0].last_name}
+                  </span>
+                )}
               </div>
             </div>
             <div className="dark:bg-dark-200 flex h-44 flex-col gap-2 overflow-auto rounded-lg p-4 md:h-52 lg:h-[25rem]">
@@ -162,7 +174,7 @@ const ProjectMembersModal = () => {
                     />
                     <label
                       htmlFor={`member-${member.id}`}
-                      className="flex items-center gap-2 cursor-pointer"
+                      className="flex cursor-pointer items-center gap-2"
                     >
                       <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
                         <Image
