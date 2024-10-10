@@ -50,16 +50,19 @@ const ProjectAddModal = () => {
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "projectAddModal";
 
-  const [users, setUsers] = useState<User[] | null>([]);
+  const [users, setUsers] = useState<User[] | any[] | null>([]);
   const [clients, setClients] = useState<Client[] | null>([]);
   const [projectImage, setProjectImage] = useState<string | null>(null);
-  const [selectedMembers, setSelectedMembers] = useState<User[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<User[] | any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase.from("profile").select("*");
+      const { data, error } = await supabase
+        .from("codev")
+        .select("*, user(*, profile(*))")
+        .eq("application_status", "ACCEPTED");
 
       if (error) {
         if (error) throw error;
@@ -371,26 +374,24 @@ const ProjectAddModal = () => {
               <label htmlFor="members">Members</label>
               <div className="flex gap-2">
                 <div className="flex flex-wrap items-center">
-                  {selectedMembers.map((member, index) => (
-                    <div
-                      className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-                      key={`${member.id}_${index}`}
-                      onClick={() => removeMember(member.id)}
-                    >
-                      <Image
-                        alt="Avatar"
-                        src={
-                          member.image_url && member.image_url.trim() !== ""
-                            ? member.image_url
-                            : DEFAULT_AVATAR
-                        }
-                        fill
-                        title={`${member.first_name} ${member.last_name}`}
-                        className="h-auto w-full rounded-full bg-cover object-cover"
-                        loading="eager"
-                      />
-                    </div>
-                  ))}
+                  {selectedMembers.map((member, index) => {
+                    return (
+                      <div
+                        className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
+                        key={`${member.id}_${index}`}
+                        onClick={() => removeMember(member.id)}
+                      >
+                        <Image
+                          alt="Avatar"
+                          src={member.user.profile.image_url || DEFAULT_AVATAR}
+                          fill
+                          title={`${member.user.profile.first_name} ${member.user.profile.last_name}`}
+                          className="h-auto w-full rounded-full bg-cover object-cover"
+                          loading="eager"
+                        />
+                      </div>
+                    );
+                  })}
                 </div>
                 <DropdownMenu>
                   <DropdownMenuTrigger className="cursor-pointer">
@@ -438,17 +439,15 @@ const ProjectAddModal = () => {
                               <Image
                                 alt="Avatar"
                                 src={
-                                  user.image_url && user.image_url.trim() !== ""
-                                    ? user.image_url
-                                    : DEFAULT_AVATAR
+                                  user.user.profile.image_url || DEFAULT_AVATAR
                                 }
                                 fill
-                                title={`${user.first_name} ${user.last_name}`}
+                                title={`${user.user.profile.first_name} ${user.user.profile.last_name}`}
                                 className="h-auto w-full rounded-full bg-cover object-cover"
                                 loading="eager"
                               />
                             </div>
-                            <span>{`${user.first_name} ${user.last_name}`}</span>
+                            <span className="capitalize">{`${user.first_name} ${user.last_name}`}</span>
                           </div>
                         </DropdownMenuItem>
                       ))}
