@@ -1,11 +1,11 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { Task } from "@/types/home/task";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
 import { BoardTask } from "./_types/board";
-import { revalidatePath } from "next/cache";
 
 export const createNewList = async (name: string, board_id: string) => {
   const supabase = getSupabaseServerActionClient();
@@ -15,12 +15,12 @@ export const createNewList = async (name: string, board_id: string) => {
   });
 
   if (error) {
-    console.log("Error creating list: ", error.message)
-    return { success: false, error: error.message }
+    console.log("Error creating list: ", error.message);
+    return { success: false, error: error.message };
   }
 
-  revalidatePath("/home/kanban")
-  return { success: true, data }
+  revalidatePath("/home/kanban");
+  return { success: true, data };
 };
 
 export const createNewTask = async (formData: FormData) => {
@@ -49,8 +49,8 @@ export const createNewTask = async (formData: FormData) => {
     .eq("project_id", project_id);
 
   if (fetchingTasksError) {
-    console.log("Error fetching task: ", fetchingTasksError.message)
-    return { success: false, error: fetchingTasksError.message }
+    console.log("Error fetching task: ", fetchingTasksError.message);
+    return { success: false, error: fetchingTasksError.message };
   }
 
   const listTotalTask = Number(formData.get("totalTask") || 0);
@@ -74,8 +74,8 @@ export const createNewTask = async (formData: FormData) => {
     .single();
 
   if (error) {
-    console.log("Error creating task: ", error.message)
-    return { success: false, error: error.message }
+    console.log("Error creating task: ", error.message);
+    return { success: false, error: error.message };
   }
 
   const membersId = (
@@ -91,13 +91,13 @@ export const createNewTask = async (formData: FormData) => {
     });
 
     if (error) {
-      console.log("Error creating codev task: ", error.message)
-      return { success: false, error: error.message }
+      console.log("Error creating codev task: ", error.message);
+      return { success: false, error: error.message };
     }
   }
 
-  revalidatePath("/home/kanban")
-  return { success: true }
+  revalidatePath("/home/kanban");
+  return { success: true };
 };
 
 export const updateTaskListId = async (taskId: string, newListId: string) => {
@@ -166,7 +166,10 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
     })
     .eq("id", prevTask.id);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.log("Error updating task: ", error.message);
+    return { success: false, error: error.message };
+  }
 
   const newMembersId = (
     formData.get("membersId")
@@ -201,7 +204,10 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
         task_id: prevTask.id,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.log("Error updating codev task: ", error.message);
+        return { success: false, error: error.message };
+      }
     }
 
     if (removed && prevMemberId) {
@@ -210,11 +216,16 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
         task_id: prevTask.id,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.log("Error deleting codev task member: ", error.message);
+        return { success: false, error: error.message };
+      }
     }
 
     i++;
   }
+
+  return { success: true }
 };
 
 export const updateTasksQueue = async (tasks: BoardTask[]) => {
@@ -250,16 +261,25 @@ export const updateTasksQueue = async (tasks: BoardTask[]) => {
 export const deleteTask = async (taskId: string) => {
   const supabase = getSupabaseServerActionClient();
 
-  const { error: deleteCodevTask } = await supabase
+  const { error: codevTaskError } = await supabase
     .from("codev_task")
     .delete()
     .eq("task_id", taskId);
 
-  if (deleteCodevTask) throw deleteCodevTask;
+  if (codevTaskError) {
+    console.log("Error deleting codev task: ", codevTaskError.message);
+    return { success: false, error: codevTaskError.message };
+  }
 
-  const { error } = await supabase.from("task").delete().eq("id", taskId);
+  const { error: taskError } = await supabase.from("task").delete().eq("id", taskId);
 
-  if (error) throw error;
+  if (taskError) {
+    console.log("Error deleting task: ", taskError.message);
+    return { success: false, error: taskError.message };
+  }
+
+  revalidatePath("/home/kanban");
+  return { success: true };
 };
 
 /**
