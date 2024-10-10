@@ -24,45 +24,37 @@ const ProjectMembersModal = () => {
   const { isOpen, type, onClose, data } = useModal();
   const isModalOpen = isOpen && type === "projectMembersModal";
 
-  const [users, setUsers] = useState<User[]>([]);
-  const [teamLead, setTeamLead] = useState<User[]>([]);
+  const [users, setUsers] = useState<User[] | any[] | null>([]);
+  const [teamLead, setTeamLead] = useState<User[] | any[]>([]);
   const team_leader_id = data?.team_leader_id;
   const parseMembers = (membersData: string[]): Member[] => {
     return membersData.map((member) => JSON.parse(member) as Member);
   };
   const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [teamLeadLoading, setTeamLeadLoading] = useState(true);
-
-  const getTeamLead = async () => {
-    if (!team_leader_id) {
-      console.log("Team leader ID is undefined");
-      return;
-    }
-
-    setTeamLeadLoading(true);
-
-    const { data, error } = await supabase
-      .from("profile")
-      .select("*")
-      .eq("id", team_leader_id)
-      .single();
-
-    if (error) {
-      console.error("Error fetching team lead:", error);
-    } else {
-      setTeamLead(data ? [data] : []);
-    }
-    setTeamLeadLoading(false);
-  };
-
+ 
   useEffect(() => {
+    const getTeamLead = async () => {
+      const { data, error } = await supabase
+        .from("profile")
+        .select("*")
+        .eq("id", team_leader_id);
+
+      if (error) {
+        console.error("Error fetching team lead:", error);
+      } else {
+        setTeamLead(data ? [data] : []);
+      }
+    };
     getTeamLead();
   }, [isOpen, team_leader_id]);
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase.from("profile").select("*");
+      const { data, error } = await supabase
+        .from("codev")
+        .select("*, user(*, profile(*))")
+        .eq("application_status", "ACCEPTED");
 
       if (error) {
         if (error) throw error;
@@ -98,7 +90,7 @@ const ProjectMembersModal = () => {
           id: userToAdd.id,
           first_name: userToAdd.first_name,
           last_name: userToAdd.last_name,
-          image_url: userToAdd.image_url,
+          image_url: userToAdd.user.profile.image_url,
           position: userToAdd.main_position,
         };
         setSelectedMembers((prevMembers) => [...prevMembers, newMember]);
@@ -144,7 +136,7 @@ const ProjectMembersModal = () => {
                 <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
                   <Image
                     alt={`${teamLead[0]?.first_name} ${teamLead[0]?.last_name} avatar`}
-                    src={teamLead[0]?.image_url || DEFAULT_AVATAR}
+                    src={teamLead[0]?.user.profile.image_url || DEFAULT_AVATAR}
                     fill
                     title={`${teamLead[0]?.first_name} ${teamLead[0]?.last_name}`}
                     className="h-auto w-full rounded-full bg-cover object-cover"
@@ -160,7 +152,7 @@ const ProjectMembersModal = () => {
             </div>
             <div className="dark:bg-dark-200 flex h-44 flex-col gap-2 overflow-auto rounded-lg p-4 md:h-52 lg:h-[25rem]">
               <p className="text-md text-gray">Members </p>
-              {users?.map((member: User) => {
+              {users?.map((member: User | any) => {
                 const isChecked = selectedMembers.some(
                   (m) => m.id === member.id,
                 );
@@ -179,7 +171,9 @@ const ProjectMembersModal = () => {
                       <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
                         <Image
                           alt={`${member.first_name} ${member.last_name} avatar`}
-                          src={member.image_url || DEFAULT_AVATAR}
+                          src={
+                            member?.user?.profile?.image_url || DEFAULT_AVATAR
+                          }
                           fill
                           title={`${member.first_name} ${member.last_name}`}
                           className="h-auto w-full rounded-full bg-cover object-cover"

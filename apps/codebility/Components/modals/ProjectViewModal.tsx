@@ -55,6 +55,19 @@ const ProjectViewModal = () => {
   };
 
   useEffect(() => {
+    const getTeamLead = async () => {
+      const { data, error } = await supabase
+        .from("codev")
+        .select("*")
+        .eq("id", team_leader_id);
+
+      if (error) {
+        if (error) throw error;
+        console.error("Error fetching team lead:", error);
+      } else {
+        setTeamLead(data);
+      }
+    };
     getTeamLead();
   }, [isOpen, team_leader_id]);
 
