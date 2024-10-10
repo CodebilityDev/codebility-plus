@@ -6,6 +6,9 @@ import PrivacyPolicyModalHome from "@/app/(marketing)/_components/marketing_moda
 import TermsAndConditionModal from "@/app/(marketing)/_components/marketing_modals/marketing-terms-and-condition-modal";
 import ContactUsModal from "@/Components/modals/ContactUsModal";
 
+import AvailableTimeModal from "../modals/AvailableTimeModal";
+import TechStackModal from "../modals/TechStackModal";
+
 export const ModalProviderMarketing = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -17,6 +20,8 @@ export const ModalProviderMarketing = () => {
   }
   return (
     <>
+      <AvailableTimeModal />
+      <TechStackModal />
       <TermsAndConditionModal />
       <PrivacyPolicyModalHome />
       <FaqsModal />
