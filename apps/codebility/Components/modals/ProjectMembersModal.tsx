@@ -32,23 +32,22 @@ const ProjectMembersModal = () => {
   };
   const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
+ 
   useEffect(() => {
     const getTeamLead = async () => {
       const { data, error } = await supabase
-        .from("codev")
-        .select("*, user(*, profile(*))")
+        .from("profile")
+        .select("*")
         .eq("id", team_leader_id);
 
       if (error) {
-        if (error) throw error;
         console.error("Error fetching team lead:", error);
       } else {
-        setTeamLead(data);
+        setTeamLead(data ? [data] : []);
       }
     };
     getTeamLead();
-  }, [isOpen]);
+  }, [isOpen, team_leader_id]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -144,9 +143,11 @@ const ProjectMembersModal = () => {
                     loading="eager"
                   />
                 </div>
-                <span>
-                  {teamLead[0]?.first_name} {teamLead[0]?.last_name}
-                </span>
+                {teamLead[0] && (
+                  <span>
+                    {teamLead[0].first_name} {teamLead[0].last_name}
+                  </span>
+                )}
               </div>
             </div>
             <div className="dark:bg-dark-200 flex h-44 flex-col gap-2 overflow-auto rounded-lg p-4 md:h-52 lg:h-[25rem]">
