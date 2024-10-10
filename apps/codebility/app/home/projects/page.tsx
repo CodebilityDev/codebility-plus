@@ -12,7 +12,7 @@ const Projects = () => {
 
   const Projects = use(
     supabase
-      .from("projects")
+      .from("project")
       .select("*")
       .then(({ data, error }) => {
         if (error) throw error;

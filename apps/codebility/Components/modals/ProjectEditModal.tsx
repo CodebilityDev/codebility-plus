@@ -51,7 +51,10 @@ const ProjectEditModal = () => {
 
   useEffect(() => {
     const fetchUsers = async () => {
-      const { data, error } = await supabase.from("profile").select("*");
+      const { data, error } = await supabase
+        .from("codev")
+        .select("*")
+        .eq("application_status", "ACCEPTED");
 
       if (error) {
         if (error) throw error;
