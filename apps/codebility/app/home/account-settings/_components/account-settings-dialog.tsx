@@ -62,7 +62,7 @@ export default function AccountSettingsDialog() {
               Change email
             </Button>
           </DialogTrigger>
-          <DialogContent className="text-dark100_light900 background-box">
+          <DialogContent className="text-dark100_light900 background-box w-[90%] sm:w-full">
             <DialogHeader>
               <DialogTitle>Change Email Address</DialogTitle>
               <DialogDescription>
