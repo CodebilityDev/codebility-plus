@@ -192,11 +192,11 @@ export const sidebarData: Sidebar[] = [
 // ====================================================================================
 
 export const taskPrioLevels = [
-  "Critical",
-  "Highest",
-  "High",
-  "Medium",
-  "Low",
+  "CRITICAL",
+  "HIGHEST",
+  "HIGH",
+  "MEDIUM",
+  "LOW",
 ] as const;
 
 // ====================================================================================
