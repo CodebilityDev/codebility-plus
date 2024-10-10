@@ -4,7 +4,6 @@ import { useEffect, useState } from "react";
 import AddRoleModal from "@/Components/modals/AddRoleModal";
 import ApplicantsAddModal from "@/Components/modals/ApplicantsAddModal";
 import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
-import AvailableTimeModal from "@/Components/modals/AvailableTimeModal";
 import BoardAddModal from "@/Components/modals/BoardAddModal";
 import ClientAddModal from "@/Components/modals/ClientAddModal";
 import ClientEditModal from "@/Components/modals/ClientEditModal";
@@ -23,7 +22,6 @@ import ServicesModal from "@/Components/modals/ServicesModal";
 import TaskAddModal from "@/Components/modals/TaskAddModal";
 import TaskViewEditModal from "@/Components/modals/TaskViewEditModal";
 import TaskViewModal from "@/Components/modals/TaskViewModal";
-import TechStackModal from "@/Components/modals/TechStackModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
 
@@ -40,9 +38,6 @@ export const ModalProviderHome = () => {
   }
   return (
     <>
-      <TechStackModal />
-      <AvailableTimeModal />
-
       <TaskAddModal />
       <TaskViewEditModal />
       <TaskViewModal />
