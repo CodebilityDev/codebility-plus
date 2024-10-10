@@ -1,5 +1,12 @@
 import * as z from "zod";
 
+const isFile = (value: any): value is File =>
+  typeof File !== "undefined" && value instanceof File;
+
+const fileSchema = z.custom<File>((val) => isFile(val), {
+  message: "Must be a File object",
+});
+
 export const projectSchema = z.object({
   // Required fields
   project_name: z.string().min(1, { message: "Project name is required" }),
@@ -18,7 +25,7 @@ export const projectSchema = z.object({
   //   .nonempty("At least one member must be selected"),
 
   // Optional fields
-  thumbnail: z.union([z.instanceof(File), z.string()]).optional(),
+  thumbnail: z.union([fileSchema, z.string()]).optional(),
   summary: z.string().optional(),
   live_link: z.union([z.string().url(), z.literal("")]),
   figma_link: z.union([z.string().url(), z.literal("")]),
