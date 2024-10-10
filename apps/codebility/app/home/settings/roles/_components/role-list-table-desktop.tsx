@@ -1,4 +1,4 @@
-import { getRoles } from "@/app/api/settings";
+import { useEffect } from "react";
 import {
   Table,
   TableBody,
@@ -8,19 +8,13 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import { useModal } from "@/hooks/use-modal";
-import { IconDelete, IconEdit } from "@/public/assets/svgs";
-import { useQuery } from "@tanstack/react-query";
+import { IconDelete, IconEdit, IconEditFillNone } from "@/public/assets/svgs";
 
-const RoleListsTableDesktop = () => {
+import { Role_Type } from "../_types/roles";
+
+const RoleListsTableDesktop = ({ roles }: { roles: Role_Type[] }) => {
   const { onOpen } = useModal();
 
-  const { data: Roles } = useQuery({
-    queryKey: ["Roles"],
-    queryFn: async () => {
-      return getRoles();
-    },
-    refetchInterval: 3000,
-  });
   return (
     <Table className="background-box text-dark100_light900 h-[240px] w-full  rounded-lg shadow-lg">
       <TableHeader className=" dark:bg-dark-100 rounded-lg">
@@ -33,20 +27,19 @@ const RoleListsTableDesktop = () => {
         </TableRow>
       </TableHeader>
       <TableBody className="flex w-full flex-col">
-        {Roles?.map((role: { id: string; name: string }) => (
+        {roles?.map((role) => (
           <TableRow
             key={role.id}
-            className=" md:text-md even:bg-black-300 flex w-full flex-row  items-center text-sm lg:text-lg"
+            className="md:text-md flex  w-full flex-row items-center  text-sm hover:opacity-90 lg:text-lg"
           >
             <TableCell className="basis-[80%] pl-9  font-medium">
               {role.name}
             </TableCell>
-            <TableCell className=" hover:text-black-200   basis-[10%] cursor-pointer items-center justify-center">
+            <TableCell className=" hover:text-black-200  basis-[10%] cursor-pointer items-center justify-center text-blue-600">
               <button
-                className=""
-                onClick={() => onOpen("editRoleModal", role.name)}
+                onClick={() => onOpen("editRoleModal", role)}
               >
-                <IconEdit />
+                <IconEditFillNone className="text-black-400 hover:text-black-500 dark:text-white hover:dark:text-white" />
               </button>
             </TableCell>
             <TableCell className=" hover:text-black-200 basis-[10%] cursor-pointer items-center justify-center">
@@ -54,7 +47,7 @@ const RoleListsTableDesktop = () => {
                 className=""
                 onClick={() => onOpen("deleteRoleModal", role)}
               >
-                <IconDelete className="text-blue-100 hover:text-blue-200" />
+                <IconDelete className="text-red-600 hover:text-red-500" />
               </button>
             </TableCell>
           </TableRow>

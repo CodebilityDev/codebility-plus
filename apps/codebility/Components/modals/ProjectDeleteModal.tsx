@@ -1,66 +1,72 @@
-import { Button } from "@/Components/ui/button"
+import { deleteProject } from "@/app/home/projects/actions";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal-projects";
+import toast from "react-hot-toast";
 
-import { useModal } from "@/hooks/use-modal-projects"
-import { Dialog, DialogContent } from "@codevs/ui/dialog"
-
-import useToken from "@/hooks/use-token"
-import { deleteProjects } from "@/app/api/projects"
-import { DeleteData } from "@/app/home/projects/actions"
-import toast from "react-hot-toast"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "../ui/dialog";
 
 const ProjectDeleteModal = () => {
-
-
-  const { isOpen, onClose, type, data } = useModal()
-
-  const { id } = data || {}
-
-
+  const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "projectDeleteModal";
 
-  const { token } = useToken();
+  const handleDialogChange = () => {
+    onClose();
+  };
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault(); // Prevent default form submission behavior
-
-    const formData = new FormData(event.currentTarget);
+    if (!data?.id) return;
 
     try {
-      await DeleteData(formData); // Pass form data to DeleteData
-      onClose(); // Close the modal after successful deletion
-      toast.success("Project has been deleted!")
+      const response = await deleteProject(data.id);
+      if (response.success) {
+        toast.success("Project has been deleted!");
+      } else {
+        toast.error("Failed to delete project, please try again.");
+      }
     } catch (error) {
-      toast.error("Something went wrong!")
+      toast.error("Something went wrong!");
+    } finally {
+      onClose();
     }
-  }
-
+  };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
-      <DialogContent>
-
-         <form onSubmit={handleSubmit}>
-        <p className="text-2xl">Are you sure?</p>
-
-        <input type="hidden" name="userId" value={id} /> 
-
-        <div className="flex space-x-4">
-          <Button variant="destructive" type="submit">
-            Yes, Delete it
-          </Button>
-          <Button variant="gradient"  onClick={(e) => {
-                e.preventDefault(); // Prevent form submission
-                onClose();
-              }}>
-            No, Cancel
-          </Button>
-        </div>
-
-        </form>
-
-        
-
+    <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
+      <DialogContent className="w-[90%]">
+        <DialogHeader>
+          <DialogTitle className="mb-2 text-left text-xl">
+            Delete Project
+          </DialogTitle>
+        </DialogHeader>
+        <DialogDescription>
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <p className="text-lg">
+              Are you sure you want to delete{" "}
+              <span className="text-red-500">{data?.name}</span>?
+            </p>
+            <div className="flex flex-col gap-4 md:flex-row">
+              <Button variant="destructive" type="submit">
+                Yes, Delete it
+              </Button>
+              <Button
+                type="button"
+                className="text-white"
+                variant="gradient"
+                onClick={handleDialogChange}
+              >
+                No, Cancel
+              </Button>
+            </div>
+          </form>
+        </DialogDescription>
       </DialogContent>
     </Dialog>
   );

@@ -13,6 +13,7 @@ import { CSS } from "@dnd-kit/utilities";
 
 import { getTaskMembers } from "../../../_lib/get-task-members";
 import KanbanTaskViewEditModal from "./kanban_modals/kanban-task-view-edit-modal";
+import { DEFAULT_AVATAR } from "../_lib/constants";
 
 interface Props {
   task: Task;
@@ -91,11 +92,7 @@ function KanbanTask({ task }: Props) {
                 <div key={idx} className="h-6 w-6 rounded-full ">
                   <Image
                     alt="Avatar"
-                    src={
-                      member.image_url
-                        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${member.image_url}`
-                        : defautlAvatar
-                    }
+                    src={member.image_url || DEFAULT_AVATAR}
                     width={8}
                     height={8}
                     title={` ${member.first_name} ${member.last_name}`}

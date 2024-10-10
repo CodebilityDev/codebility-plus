@@ -4,7 +4,6 @@ import React, { createContext } from "react";
 
 export interface User {
   id: string;
-  codev_id: string;
   first_name: string;
   last_name: string;
   email: string;
@@ -13,6 +12,13 @@ export interface User {
   end_time: number;
   image_url: string;
   permissions: string[];
+  pronoun: string;
+  address: string;
+  about: string;
+  education: string;
+  positions: string;
+  portfolio_website: string;
+  tech_stacks: string[];
 }
 
 export const UserContext = createContext<User>({} as User);

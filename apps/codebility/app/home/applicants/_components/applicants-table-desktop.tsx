@@ -58,10 +58,10 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: ApplicantsList_Typ
                                     )}
                                 </TableCell>
                                 <TableCell className="col-span-3 h-full w-full">
-                                    <div className="flex h-full w-full flex-wrap items-center justify-start gap-2 ">
+                                    <div className="flex w-full flex-wrap justify-start gap-2 ">
                                         {tech_stacks &&
                                             tech_stacks.map((stack: any, i: any) => (
-                                                <div key={i} className="flex items-center">
+                                                <div key={i} className="flex">
                                                     {stack && (
                                                         <Image
                                                             src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
@@ -83,7 +83,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: ApplicantsList_Typ
                         )
                     )}
             </TableBody>
-            <TableCaption className="text-right">
+            <TableCaption className="w-max">
                 {applicantsLen === 1
                     ? `${applicantsLen} item`
                     : applicantsLen > 0

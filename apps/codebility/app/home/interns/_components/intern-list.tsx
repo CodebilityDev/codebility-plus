@@ -1,37 +1,27 @@
 import React from "react";
-import { getInterns } from "@/app/api/interns";
-import { positionTitles } from "@/app/home/interns/data";
-import InternCard from "@/app/home/interns/InternCard";
+
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 import { User } from "@/types";
-import { useQuery, UseQueryResult } from "@tanstack/react-query";
+import InternCard from "./intern-card";
 
-const Intern = ({
+const InternList = ({
+  data,
   filters,
 }: {
-  filters: Partial<(typeof positionTitles)[number]>[];
+  data: User[];
+  filters: string[];
 }) => {
-  const {
-    data: Interns,
-    isLoading: LoadingInterns,
-    error: ErrorInterns,
-  }: UseQueryResult<User[]> = useQuery({
-    queryKey: ["Interns"],
-    queryFn: async () => {
-      return await getInterns();
-    },
-    refetchInterval: 3000,
-  });
-
-  const filteredInterns = Array.isArray(Interns)
-    ? filters.length === 0
-      ? Interns
-      : Interns.filter((intern) =>
+  
+  const filteredInterns = Array.isArray(data)
+    ? filters.length > 0
+      ? data.filter((intern) =>
           filters.includes(intern.main_position || "not found"),
         )
+      : data 
     : [];
+
 
   const {
     currentPage,
@@ -42,12 +32,9 @@ const Intern = ({
     setCurrentPage,
   } = usePagination<User>(filteredInterns, pageSize.interns);
 
-  if (LoadingInterns) return;
-
-  if (ErrorInterns) return;
-
   return (
     <>
+  
       {paginatedInterns.length > 0 ? (
         <div className="xs:grid-cols-2 grid place-items-center gap-6 sm:place-items-start md:grid-cols-3 lg:grid-cols-4">
           {paginatedInterns.map((intern: User) => (
@@ -57,7 +44,9 @@ const Intern = ({
       ) : (
         <p className="text-lightgray text-center text-xl">No interns found</p>
       )}
-      {Interns && Interns.length > pageSize.interns && (
+
+
+      {filteredInterns.length > pageSize.interns && (
         <DefaultPagination
           currentPage={currentPage}
           handleNextPage={handleNextPage}
@@ -70,4 +59,4 @@ const Intern = ({
   );
 };
 
-export default Intern;
+export default InternList;

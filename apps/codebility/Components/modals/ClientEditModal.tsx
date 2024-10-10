@@ -43,19 +43,17 @@ const ClientEditModal = () => {
   useEffect(() => {
     if (data) {
       setLogoPreview(data.logo);
-      reset({
-        id: data.id ? Number(data.id) : undefined,
-        name: data.name,
-        email: data.email || "",
-        location: data.location || "",
-        contact_number: data.contact_number || "",
-        linkedin_link: data.linkedin_link || "",
-        start_time: data.start_time || "",
-        end_time: data.end_time || "",
-        logo: data.logo || "",
-      });
+
+      setValue("id", data.id ? Number(data.id) : undefined);
+      setValue("name", data.name);
+      setValue("email", data.email || "");
+      setValue("location", data.location || "");
+      setValue("contact_number", data.contact_number || "");
+      setValue("linkedin_link", data.linkedin_link || "");
+      setValue("start_time", data.start_time || "");
+      setValue("end_time", data.end_time || "");
     }
-  }, [data, reset]);
+  }, [data, reset, setValue]);
 
   const handleDialogChange = (open: boolean) => {
     if (!open) {
@@ -74,6 +72,7 @@ const ClientEditModal = () => {
 
   const handleRemoveLogo = () => {
     setLogoPreview(null);
+    setValue("logo", undefined);
   };
 
   const handleUpdateClient = async (data: ClientFormValues) => {

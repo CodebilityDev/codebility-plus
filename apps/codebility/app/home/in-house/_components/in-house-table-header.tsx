@@ -31,6 +31,11 @@ const TableHeader = ({ onSort }: Props) => {
           onSort={onSort}
         />
         <TableHeaderCell
+          title="Type"
+          type="type"
+          onSort={onSort}
+        />
+        <TableHeaderCell
           title="Position"
           type="main_position"
           onSort={onSort}
@@ -48,6 +53,7 @@ type TableHeaderCellProps = {
     | "First Name"
     | "Last Name"
     | "Status"
+    | "Type"
     | "Position"
     | "Project"
     | "NDA"

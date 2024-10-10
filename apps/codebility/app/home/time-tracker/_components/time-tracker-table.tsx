@@ -21,9 +21,15 @@ export default function TimeTrackerTable({ timeLog }: Props) {
   return (
     <>
       {timeLog ? (
-        <div className="hidden md:block">
-          <TimeTrackerTableDesktop timeLog={timeLog} />
-        </div>
+        <>
+          <div className="hidden md:block">
+            <TimeTrackerTableDesktop timeLog={timeLog} />
+          </div>
+
+          <div className="block md:hidden">
+            <TimeTrackerTableMobile timeLog={timeLog} />
+          </div>
+        </>
       ) : (
         <Box className="h-70">
           <div className="mx-auto flex flex-col items-center gap-3">
@@ -34,9 +40,6 @@ export default function TimeTrackerTable({ timeLog }: Props) {
           </div>
         </Box>
       )}
-      <div className="block md:hidden">
-        <TimeTrackerTableMobile timeLog={timeLog} />
-      </div>
     </>
   );
 }

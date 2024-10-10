@@ -4,7 +4,7 @@ import React from "react";
 import { Metadata } from "next";
 import { Outfit } from "next/font/google";
 import { headers } from "next/headers";
-import { ModalProvider } from "@/Components/providers/modal-provider";
+import { ModalProviderMarketing } from "@/Components/providers/modal-provider-marketing";
 import appConfig from "@/config/app.config";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import ToasterContext from "@/context/ToasterProvider";
@@ -35,7 +35,7 @@ export default function RootLayout({
         <body>
           <ThemeProvider>
             <ToasterContext />
-            <ModalProvider />
+            <ModalProviderMarketing />
             {children}
           </ThemeProvider>
         </body>

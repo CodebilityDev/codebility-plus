@@ -7,7 +7,7 @@ interface PostStore {
 }
 
 export const useNavStore = create<PostStore>((set) => ({
-  isToggleOpen: false,
+  isToggleOpen: true,
   toggleNav: () => set((state) => ({ isToggleOpen: !state.isToggleOpen })),
   closeNav: () => set((state) => ({ isToggleOpen: false })),
 }));

@@ -41,25 +41,27 @@ function EditableCard({ data, handleSaveButton }: Props) {
   const cleanedData = cleanProjects(editableMember.projects);
 
   return (
-    <div className="text-dark100_light900 dark:bg-dark-200 bg-light-300 flex h-72 w-64 flex-col justify-between gap-4 rounded-md p-4">
-      <div className="flex flex-col">
-        <div className="flex justify-between">
-          <div className="text-lg font-bold">
-            {data.first_name} {data.last_name}
-          </div>
-          <Select
-            type="internal_status"
-            placeholder={convertToTitleCase(editableMember.internal_status)}
-            handleChange={(value) =>
-              handleSelectChange("internal_status", value)
-            }
-          />
+    <div className="text-dark100_light900 dark:bg-dark-200 bg-light-300 flex w-full flex-col justify-between gap-4 rounded-md p-4">
+      <div className="flex flex-col gap-2">
+        <div className="text-lg font-bold capitalize">
+          {data.first_name} {data.last_name}
         </div>
+        <Select
+          type="internal_status"
+          placeholder={convertToTitleCase(editableMember.internal_status)}
+          handleChange={(value) => handleSelectChange("internal_status", value)}
+        />
         <Select
           className="text-sm"
           type="main_positon"
           placeholder={editableMember.main_position}
           handleChange={(value) => handleSelectChange("main_position", value)}
+        />
+        <Select
+          className="text-sm"
+          type="type"
+          placeholder={editableMember.type}
+          handleChange={(value) => handleSelectChange("type", value)}
         />
       </div>
 
@@ -72,8 +74,8 @@ function EditableCard({ data, handleSaveButton }: Props) {
         />
       </div>
 
-      <div className="flex justify-between gap-2">
-        <div className="flex w-full content-center gap-1">
+      <div className="flex flex-col justify-between gap-2">
+        <div className="flex w-full items-center gap-2">
           <div className="align-baseline">NDA: </div>
           <div className="w-full">
             <Select
@@ -84,7 +86,7 @@ function EditableCard({ data, handleSaveButton }: Props) {
             />
           </div>
         </div>
-        <span className="flex gap-2">
+        <span className="flex justify-end gap-4">
           <ViewProfile user={editableMember} />
           <button onClick={() => handleSaveButton(editableMember)}>
             <Image

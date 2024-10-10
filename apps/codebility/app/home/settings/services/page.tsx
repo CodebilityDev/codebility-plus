@@ -3,12 +3,9 @@ import { getAllServices } from "@/app/home/settings/services/service";
 import { H1 } from "@/Components/shared/dashboard";
 import CustomBreadcrumb from "@/Components/shared/dashboard/CustomBreadcrumb";
 import { Button } from "@/Components/ui/button";
-import { Table, TableHead, TableHeader, TableRow } from "@/Components/ui/table";
 import { IconAdd } from "@/public/assets/svgs";
+import ServiceTable from "./_components/service-table";
 
-import ServiceList from "./_components/service-list";
-
-const headers = ["Name", "Category", "Description", "Edit", "Delete"];
 
 const items = [
   { label: "Settings", href: "/home/settings" },
@@ -39,21 +36,7 @@ const ServicesSetting = async () => {
           </div>
         </div>
 
-        <Table className="text-dark100_light900 mt-8 w-full table-fixed overflow-auto">
-          <TableHeader className="background-lightbox_darkbox border-top hidden text-xl lg:grid">
-            <TableRow className="lg:grid lg:grid-cols-8">
-              {headers.map((header) => (
-                <TableHead
-                  key={header}
-                  className={`table-border-light_dark border-b-[1px] p-4 text-left text-xl font-light ${header === "Edit" || header === "Delete" ? "text-center" : "col-span-2"}`}
-                >
-                  {header}
-                </TableHead>
-              ))}
-            </TableRow>
-          </TableHeader>
-          <ServiceList data={data} />
-        </Table>
+        <ServiceTable data={data} />
       </div>
     </div>
   );
