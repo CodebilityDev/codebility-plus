@@ -31,6 +31,8 @@ import ServiceCategoriesModal from "@/Components/modals/ServiceCategoriesModal";
 import ApplicantsAddModal from "@/Components/modals/ApplicantsAddModal";
 import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
 import ProjectMembersModal from "../modals/ProjectMembersModal";
+import TaskDeleteModal from "../modals/TaskDeleteModal";
+import TaskEditModal from "../modals/TaskEditModal";
 export const ModalProvider = () => {
   const [isMounted, setIsMounted] = useState(false);
 
@@ -48,6 +50,8 @@ export const ModalProvider = () => {
       <TaskAddModal />
       <TaskViewEditModal />
       <TaskViewModal />
+      <TaskEditModal />
+      <TaskDeleteModal />
 
       <BoardAddModal />
       <BoardAddModal />
