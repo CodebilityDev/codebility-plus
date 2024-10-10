@@ -5,7 +5,7 @@ import {
   IconSlackColored,
 } from "@/public/assets/svgs";
 
-export const positionTitles = [
+export const positionTitles: string[] = [
   "Fullstack Developer",
   "Backend Developer",
   "Frontend Developer",
@@ -22,7 +22,7 @@ export const positionTitles = [
   "Technical HR Manager",
   "Chief Human Resources Officer",
 ] as const;
-
+export type PositionTitle = typeof positionTitles[number]; 
 export const tokenPoints = [
   {
     position: "Frontend",

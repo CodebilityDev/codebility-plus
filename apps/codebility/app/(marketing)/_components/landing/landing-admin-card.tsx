@@ -2,6 +2,7 @@ import Image from "next/image";
 import { index_AdminCardT } from "@/types/home";
 
 const AdminCard = ({ admin, color }: index_AdminCardT) => {
+
   return (
     <div>
       <div
