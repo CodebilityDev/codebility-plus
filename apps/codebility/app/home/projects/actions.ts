@@ -71,7 +71,7 @@ const uploadProjectImage = async (
   }
 };
 
-export const createProject = async (formData: FormData, members: User[]) => {
+export const createProject = async (formData: FormData, members: User[] | any[]) => {
   const thumbnail = formData.get("thumbnail") as File | null;
   const project_name = formData.get("project_name") as string;
   const clientId = formData.get("clientId") as string;
@@ -87,7 +87,7 @@ export const createProject = async (formData: FormData, members: User[]) => {
     id: member.id,
     first_name: member.first_name,
     last_name: member.last_name,
-    image_url: member.image_url,
+    image_url: member.user.profile.image_url,
     position: member.main_position,
   }));
 
@@ -107,7 +107,6 @@ export const createProject = async (formData: FormData, members: User[]) => {
     github_link: github_link || null,
     live_link: live_link || null,
     figma_link: figma_link || null,
-    status: "Pending",
     team_leader_id,
     client_id: clientId,
     members: membersData,
@@ -116,12 +115,12 @@ export const createProject = async (formData: FormData, members: User[]) => {
   console.log("new project action: ", newProject);
 
   const { data, error } = await supabase
-    .from("projects")
+    .from("project")
     .insert(newProject)
     .single();
 
   if (error) {
-    console.error("Error creating projects:", error.message);
+    console.error("Error creating project:", error.message);
     return { success: false, error: error.message };
   }
 
@@ -143,13 +142,13 @@ export const updateProject = async (id: string, formData: FormData) => {
   const supabase = getSupabaseServerComponentClient();
 
   const { data: projectsData, error: projectsError } = await supabase
-    .from("projects")
+    .from("project")
     .select("*")
     .eq("id", id)
     .single();
 
   if (projectsError) {
-    console.error("Error fetching projects data:", projectsError.message);
+    console.error("Error fetching project data:", projectsError.message);
     return { success: false, error: projectsError.message };
   }
 
@@ -179,7 +178,7 @@ export const updateProject = async (id: string, formData: FormData) => {
   }
 
   const { data: updateProjectsData, error: updateProjectsError } =
-    await supabase.from("projects").update(updateProject).eq("id", id).single();
+    await supabase.from("project").update(updateProject).eq("id", id).single();
 
   if (updateProjectsError) {
     console.error("Error updating project:", updateProjectsError.message);
@@ -197,7 +196,7 @@ export const updateProjectMembers = async (
   const supabase = getSupabaseServerComponentClient();
 
   const { data, error } = await supabase
-    .from("projects")
+    .from("project")
     .update({ members })
     .eq("id", projectId)
     .single();
@@ -215,7 +214,7 @@ export const deleteProject = async (projectId: string) => {
   const supabase = getSupabaseServerComponentClient();
 
   const { data: projectData, error: projectError } = await supabase
-    .from("projects")
+    .from("project")
     .select("thumbnail")
     .eq("id", projectId)
     .single();
@@ -230,7 +229,7 @@ export const deleteProject = async (projectId: string) => {
   }
 
   const { error } = await supabase
-    .from("projects")
+    .from("project")
     .delete()
     .eq("id", projectId)
     .single();
