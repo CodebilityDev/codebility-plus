@@ -55,7 +55,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                 className={`flex w-full items-center justify-center px-2 lg:px-10 `}
               >
                 <Image
-                  src={`${process.env.NEXT_PUBLIC_SUPABASE_URL}/${src}`}
+                  src={src}
                   alt="Project Image"
                   width={1000}
                   height={500}
