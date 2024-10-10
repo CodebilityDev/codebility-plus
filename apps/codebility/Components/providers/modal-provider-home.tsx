@@ -26,6 +26,8 @@ import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
 
 import ProjectMembersModal from "../modals/ProjectMembersModal";
+import TaskEditModal from "../modals/TaskEditModal";
+import TaskDeleteModal from "../modals/TaskDeleteModal";
 
 export const ModalProviderHome = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -41,6 +43,8 @@ export const ModalProviderHome = () => {
       <TaskAddModal />
       <TaskViewEditModal />
       <TaskViewModal />
+      <TaskEditModal />
+      <TaskDeleteModal />
 
       <BoardAddModal />
       <BoardAddModal />
