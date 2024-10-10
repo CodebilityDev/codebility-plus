@@ -34,7 +34,7 @@ const ProjectViewModal = () => {
   useEffect(() => {
     const getTeamLead = async () => {
       const { data, error } = await supabase
-        .from("profile")
+        .from("codev")
         .select("*")
         .eq("id", team_leader_id);
 
