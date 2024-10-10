@@ -10,6 +10,8 @@ export type ModalType =
   | "scheduleModal"
   | "taskAddModal"
   | "taskViewModal"
+  | "taskEditModal"
+  | "taskDeleteModal"
   | "taskViewEditModal"
   | "contactUsModal"
   | "privacyPolicyModal"
