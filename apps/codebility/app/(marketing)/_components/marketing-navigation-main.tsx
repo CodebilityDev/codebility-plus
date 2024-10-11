@@ -82,16 +82,19 @@ const NavigationMain = ({ isLoggedIn, first_name, last_name, image_url, email}: 
           <Logo />
 
           <div className="flex items-center gap-2">
-            <Link href="/bookacall" className={`${isLoggedIn ? 'hidden' : 'lg:block' }`}>
-              <Button
-                variant="purple"
-                rounded="full"
-                size="lg"
-                className="hidden lg:block"
-              >
-                Let{`'`}s Connect
-              </Button>
-            </Link>
+
+{!isLoggedIn && (
+    <Link href="/bookacall">
+    <Button
+      variant="purple"
+      rounded="full"
+      size="lg"
+      className="hidden lg:block"
+    >
+      Let{`'`}s Connect
+    </Button>
+  </Link>
+)}
 
             {isLoggedIn ? <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none">
