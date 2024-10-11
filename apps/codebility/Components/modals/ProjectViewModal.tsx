@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { parseMembers } from "@/app/home/projects/_lib";
+import { DEFAULT_AVATAR } from "@/app/home/projects/_lib/constants";
 import { Member, User } from "@/app/home/projects/_types/projects";
 import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal-projects";
@@ -15,8 +17,6 @@ import {
 } from "@codevs/ui/hover-card";
 
 import { Dialog, DialogContent } from "../ui/dialog";
-import { DEFAULT_AVATAR } from "@/app/home/projects/_lib/constants";
-import { parseMembers } from "@/app/home/projects/_lib";
 
 const ProjectViewModal = () => {
   const supabase = useSupabase();
@@ -30,11 +30,34 @@ const ProjectViewModal = () => {
   const formattedDate = data?.created_at
     ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
     : null;
+  const [teamLeadLoading, setTeamLeadLoading] = useState(true);
+
+  const getTeamLead = async () => {
+    if (!team_leader_id) {
+      console.log("Team leader ID is undefined");
+      return;
+    }
+
+    setTeamLeadLoading(true);
+
+    const { data, error } = await supabase
+      .from("profile")
+      .select("*")
+      .eq("id", team_leader_id)
+      .single();
+
+    if (error) {
+      console.error("Error fetching team lead:", error);
+    } else {
+      setTeamLead(data ? [data] : []);
+    }
+    setTeamLeadLoading(false);
+  };
 
   useEffect(() => {
     const getTeamLead = async () => {
       const { data, error } = await supabase
-        .from("profile")
+        .from("codev")
         .select("*")
         .eq("id", team_leader_id);
 
@@ -46,7 +69,7 @@ const ProjectViewModal = () => {
       }
     };
     getTeamLead();
-  }, [isOpen]);
+  }, [isOpen, team_leader_id]);
 
   // Ensure view_type is a string before parsing, and use type assertion
   // const viewType: ViewType =

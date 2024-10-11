@@ -1,16 +1,22 @@
 import { Suspense } from "react";
 import SectionWrapper from "@/Components/shared/home/SectionWrapper";
 import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
-import { getCodevs } from "@/lib/server/codev.service";
+import { getAdmins, getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
 
 import ProfileContainer from "./_components/profile-container";
 import CodevLists from "./_components/profile-lists";
 
 export default async function Profiles() {
-  const { data } = await getCodevs("INHOUSE");
+  const [{ data: codevs }, { data: admins }] = await Promise.all([
+    getCodevs("INHOUSE"),
+    getAdmins(),
+  ]);
 
-  const codevs = (data as Codev[]) || [];
+  const filteredCodevs = (codevs as Codev[]).filter(
+    (codev) =>
+      !(admins as Codev[]).some((admin) => admin.user_id === codev.user_id),
+  );
 
   return (
     <SectionWrapper
@@ -21,7 +27,7 @@ export default async function Profiles() {
       <div className="relative flex flex-col gap-8">
         <ProfileContainer />
         <Suspense fallback={<UsersSkeleton />}>
-          <CodevLists codevs={codevs} />
+          <CodevLists codevs={filteredCodevs} />
         </Suspense>
       </div>
     </SectionWrapper>
