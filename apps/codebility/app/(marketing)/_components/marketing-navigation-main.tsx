@@ -2,29 +2,44 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { signOut } from "@/app/authv2/actions";
 import Logo from "@/Components/shared/home/Logo";
 import { Button } from "@/Components/ui/button";
 import { navItems } from "@/constants";
 import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
 import { IconFourDotsMenu } from "@/public/assets/svgs";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { IconDropdown, IconLogout, IconProfile } from "@/public/assets/svgs";
+import { Sheet, SheetContent, SheetTrigger } from "@codevs/ui/sheet";
 
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-  SheetTrigger,
-} from "@codevs/ui/sheet";
 
-const NavigationMain = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
+
+import { defaultAvatar } from "@/public/assets/images";
+import useUser from "@/app/home/_hooks/use-user";
+import { signOut } from "@/app/authv2/actions";
+import MobileNav from "@/Components/shared/dashboard/MobileNav";
+import Image from "next/image";
+
+export const menuItems = [
+  { href: "/settings", icon: IconProfile, label: "Settings" },
+];
+
+
+type NavigationMainProps = {
+  isLoggedIn: boolean;
+  first_name: string;
+  last_name: string;
+  image_url: string;
+  email: string
+};
+
+const NavigationMain = ({ isLoggedIn, first_name, last_name, image_url, email}: NavigationMainProps) => {
   const { color } = useChangeBgNavigation();
   const [openSheet, setOpenSheet] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -77,7 +92,55 @@ const NavigationMain = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
                 Let{`'`}s Connect
               </Button>
             </Link>
-            <div className="hidden lg:block">
+
+            {isLoggedIn ? <DropdownMenu>
+              <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none">
+                <div className="hidden flex-col items-end md:flex ">
+                  <p className="capitalize dark:text-white">
+                    {first_name} {last_name}
+                  </p>
+                  <p className="text-gray text-sm">{email}</p>
+                </div>
+                <div className="from-violet relative size-[44px] rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover p-[1.5px]">
+                  <Image
+                    alt="Avatar"
+                    src={
+                      image_url
+                        ? `${image_url}`
+                        : defaultAvatar
+                    }
+                    fill
+                    title={`${first_name}'s Avatar`}
+                    className="from-violet h-auto w-full rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover"
+                    loading="eager"
+                  />
+                </div>
+                <IconDropdown className="hidden invert dark:invert-0 md:block" />
+              </DropdownMenuTrigger>
+
+              <DropdownMenuContent className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]">
+                {menuItems.map((item) => (
+                  <Link href={item.href} key={item.label}>
+                    <DropdownMenuItem className="flex cursor-pointer items-center gap-6 p-3 px-5">
+                      <item.icon className="invert dark:invert-0" />
+                      {item.label}
+                    </DropdownMenuItem>
+                  </Link>
+                ))}
+
+                <DropdownMenuSeparator />
+
+                <DropdownMenuItem
+                  onClick={async (e) => {
+                    e.stopPropagation();
+                    await signOut();
+                  }}
+                  className="flex cursor-pointer items-center gap-6 p-3 px-5"
+                >
+                  <IconLogout className="invert dark:invert-0" /> Logout
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu> : <div className="hidden lg:block">
               <DropdownMenu open={isOpen} onOpenChange={setIsOpen}>
                 <DropdownMenuTrigger asChild>
                   <Button
@@ -129,7 +192,8 @@ const NavigationMain = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
                   )}
                 </DropdownMenuContent>
               </DropdownMenu>
-            </div>
+            </div>}
+            
             <Sheet open={openSheet} onOpenChange={setOpenSheet}>
               <SheetTrigger>
                 <IconFourDotsMenu className="lg:hidden" />

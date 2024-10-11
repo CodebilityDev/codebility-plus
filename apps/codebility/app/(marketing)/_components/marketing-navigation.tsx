@@ -6,9 +6,27 @@ const Navigation = async () => {
 
   const isLoggedIn = user ? true : false
 
+
+  const { data } = await supabase
+  .from("profile")
+  .select("*, user(*, user_type(*))")
+  .eq("user_id", user?.id!)
+  .single();
+
+  
+  const {
+    first_name,
+    last_name,
+    image_url,
+  } = data;
+
+
+  console.log(image_url)
+
+
   return (
     <>
-      <NavigationMain isLoggedIn={isLoggedIn} />
+      <NavigationMain isLoggedIn={isLoggedIn} image_url={image_url}/>
     </>
   );
 };
