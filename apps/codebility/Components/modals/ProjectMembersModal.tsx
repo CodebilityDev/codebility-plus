@@ -12,7 +12,6 @@ import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -25,29 +24,11 @@ const ProjectMembersModal = () => {
   const isModalOpen = isOpen && type === "projectMembersModal";
 
   const [users, setUsers] = useState<User[] | any[] | null>([]);
-  const [teamLead, setTeamLead] = useState<User[] | any[]>([]);
-  const team_leader_id = data?.team_leader_id;
   const parseMembers = (membersData: string[]): Member[] => {
     return membersData.map((member) => JSON.parse(member) as Member);
   };
   const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
   const [isLoading, setIsLoading] = useState(false);
- 
-  useEffect(() => {
-    const getTeamLead = async () => {
-      const { data, error } = await supabase
-        .from("profile")
-        .select("*")
-        .eq("id", team_leader_id);
-
-      if (error) {
-        console.error("Error fetching team lead:", error);
-      } else {
-        setTeamLead(data ? [data] : []);
-      }
-    };
-    getTeamLead();
-  }, [isOpen, team_leader_id]);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -73,6 +54,9 @@ const ProjectMembersModal = () => {
       setSelectedMembers(membersParsed);
     }
   }, [data]);
+
+  const team_leader =
+    users?.filter((user) => user.id === data?.team_leader_id) || [];
 
   const handleDialogChange = () => {
     onClose();
@@ -122,92 +106,92 @@ const ProjectMembersModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
-      <DialogContent className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[44rem] lg:overflow-hidden">
+      <DialogContent
+        aria-describedby={undefined}
+        className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[44rem] lg:overflow-hidden"
+      >
         <DialogHeader className="relative">
           <DialogTitle className="mb-2 text-left text-xl">
             Project Members
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div className="dark:bg-dark-200 flex flex-1 flex-col gap-2 rounded-lg p-4">
-              <p className="text-md text-gray">Lead by: </p>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <div className="dark:bg-dark-200 flex flex-1 flex-col gap-2 rounded-lg p-4">
+            <p className="text-md text-gray">Lead by: </p>
+            {team_leader.length > 0 && (
               <div className="flex items-center gap-2">
                 <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
                   <Image
-                    alt={`${teamLead[0]?.first_name} ${teamLead[0]?.last_name} avatar`}
-                    src={teamLead[0]?.user.profile.image_url || DEFAULT_AVATAR}
+                    alt={`${team_leader[0].first_name} ${team_leader[0].last_name} avatar`}
+                    src={
+                      team_leader[0].user.profile.image_url || DEFAULT_AVATAR
+                    }
                     fill
-                    title={`${teamLead[0]?.first_name} ${teamLead[0]?.last_name}`}
+                    title={`${team_leader[0].first_name} ${team_leader[0].last_name}`}
                     className="h-auto w-full rounded-full bg-cover object-cover"
                     loading="eager"
                   />
                 </div>
-                {teamLead[0] && (
-                  <span>
-                    {teamLead[0].first_name} {teamLead[0].last_name}
-                  </span>
-                )}
+
+                <span className="capitalize">
+                  {team_leader[0].first_name} {team_leader[0].last_name}
+                </span>
               </div>
-            </div>
-            <div className="dark:bg-dark-200 flex h-44 flex-col gap-2 overflow-auto rounded-lg p-4 md:h-52 lg:h-[25rem]">
-              <p className="text-md text-gray">Members </p>
-              {users?.map((member: User | any) => {
-                const isChecked = selectedMembers.some(
-                  (m) => m.id === member.id,
-                );
-                return (
-                  <div key={member.id} className="flex items-center gap-2">
-                    <input
-                      type="checkbox"
-                      id={`member-${member.id}`}
-                      checked={isChecked}
-                      onChange={() => handleCheckboxChange(member.id)}
-                    />
-                    <label
-                      htmlFor={`member-${member.id}`}
-                      className="flex cursor-pointer items-center gap-2"
-                    >
-                      <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
-                        <Image
-                          alt={`${member.first_name} ${member.last_name} avatar`}
-                          src={
-                            member?.user?.profile?.image_url || DEFAULT_AVATAR
-                          }
-                          fill
-                          title={`${member.first_name} ${member.last_name}`}
-                          className="h-auto w-full rounded-full bg-cover object-cover"
-                          loading="eager"
-                        />
-                      </div>
-                      <span className="capitalize">
-                        {member.first_name} {member.last_name}
-                      </span>
-                    </label>
-                  </div>
-                );
-              })}
-            </div>
-            <DialogFooter className="flex flex-col gap-4 lg:flex-row">
-              <Button
-                type="submit"
-                variant="default"
-                className="w-full lg:w-[130px]"
-                disabled={isLoading}
-              >
-                Save
-              </Button>
-              <Button
-                type="button"
-                variant="hollow"
-                className="w-full lg:w-[130px]"
-                onClick={handleDialogChange}
-              >
-                Cancel
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogDescription>
+            )}
+          </div>
+          <div className="dark:bg-dark-200 flex h-44 flex-col gap-2 overflow-auto rounded-lg p-4 md:h-52 lg:h-[25rem]">
+            <p className="text-md text-gray">Members </p>
+            {users?.map((member: User | any) => {
+              const isChecked = selectedMembers.some((m) => m.id === member.id);
+              return (
+                <div key={member.id} className="flex items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id={`member-${member.id}`}
+                    checked={isChecked}
+                    onChange={() => handleCheckboxChange(member.id)}
+                  />
+                  <label
+                    htmlFor={`member-${member.id}`}
+                    className="flex cursor-pointer items-center gap-2"
+                  >
+                    <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
+                      <Image
+                        alt={`${member.first_name} ${member.last_name} avatar`}
+                        src={member?.user?.profile?.image_url || DEFAULT_AVATAR}
+                        fill
+                        title={`${member.first_name} ${member.last_name}`}
+                        className="h-auto w-full rounded-full bg-cover object-cover"
+                        loading="eager"
+                      />
+                    </div>
+                    <span className="capitalize">
+                      {member.first_name} {member.last_name}
+                    </span>
+                  </label>
+                </div>
+              );
+            })}
+          </div>
+          <DialogFooter className="flex flex-col gap-4 lg:flex-row">
+            <Button
+              type="submit"
+              variant="default"
+              className="w-full lg:w-[130px]"
+              disabled={isLoading}
+            >
+              Save
+            </Button>
+            <Button
+              type="button"
+              variant="hollow"
+              className="w-full lg:w-[130px]"
+              onClick={handleDialogChange}
+            >
+              Cancel
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
