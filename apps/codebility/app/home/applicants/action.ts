@@ -53,6 +53,7 @@ export async function approveAction(id: string) {
     const applicant = applicants[0];
 
     const { error: insertError } = await supabase.from("interns").insert({
+      user_id: applicant.id,
       first_name: applicant.first_name,
       last_name: applicant.last_name,
       email_address: applicant.email_address,

@@ -1,28 +1,26 @@
 import React from "react";
 import getRandomColor from "@/lib/getRandomColor";
+import { getAdmins } from "@/lib/server/codev.service";
 import { Profile } from "@/types/home/user";
-
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import AdminCard from "./landing-admin-card";
 import BlueBg from "./landing-blue-bg";
 
+//we could put this into env, this is my userID -Zeff
+const FOUNDER_USER_ID = "f99e3121-308c-4472-b4e8-dfd0ce593f72";
+
 export default async function Admins() {
-  const adminUserTypeId = 3; // update if user type for admin changes
-  const supabase = getSupabaseServerComponentClient();
-  const { data, error } = await supabase
-    .from("user")
-    .select(
-      `
-    *,
-    profile(*)
-  `,
-    )
-    .eq("type_id", adminUserTypeId);
+  const { data: admins, error } = await getAdmins();
 
   if (error) return <div>ERROR</div>;
 
-  const admins = data.map((user) => user.profile);
+  const sortedAdmins = admins
+    ? [...admins].sort((a, b) => {
+        if (a.user_id === FOUNDER_USER_ID) return -1;
+        if (b.user_id === FOUNDER_USER_ID) return 1;
+        return 0;
+      })
+    : [];
 
   return (
     <section id="admins" className="text-light-900 relative w-full pt-10">
@@ -36,7 +34,7 @@ export default async function Admins() {
           </p>
           <BlueBg className="h-[300px] w-full max-w-[1200px] lg:top-[45%]" />
           <div className="grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4">
-            {admins.map((admin: { admin: Profile; color: string }["admin"]) => (
+            {sortedAdmins.map((admin: Profile) => (
               <AdminCard
                 color={getRandomColor() || ""}
                 key={admin.id}
