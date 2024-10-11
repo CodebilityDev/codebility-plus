@@ -118,7 +118,7 @@ const NavigationMain = ({ isLoggedIn, first_name, last_name, image_url, email}: 
                     loading="eager"
                   />
                 </div>
-                <IconDropdown className="hidden invert dark:invert-0 md:block" />
+                <IconDropdown className="hidden text-white md:block" />
               </DropdownMenuTrigger>
 
               <DropdownMenuContent className="dark:bg-dark-100 bg-dark-100 absolute -left-24 top-3  dark:border-zinc-700 border-zinc-700 md:w-[200px]">
