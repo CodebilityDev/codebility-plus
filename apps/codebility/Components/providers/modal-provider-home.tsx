@@ -1,15 +1,12 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import FaqsModal from "@/app/(marketing)/_components/marketing_modals/marketing-faqs-modal";
-import PrivacyPolicyModalHome from "@/app/(marketing)/_components/marketing_modals/marketing-privacy-policy-modal";
-import TermsAndConditionModal from "@/app/(marketing)/_components/marketing_modals/marketing-terms-and-condition-modal";
 import AddRoleModal from "@/Components/modals/AddRoleModal";
-import AvailableTimeModal from "@/Components/modals/AvailableTimeModal";
+import ApplicantsAddModal from "@/Components/modals/ApplicantsAddModal";
+import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
 import BoardAddModal from "@/Components/modals/BoardAddModal";
 import ClientAddModal from "@/Components/modals/ClientAddModal";
 import ClientEditModal from "@/Components/modals/ClientEditModal";
-import ContactUsModal from "@/Components/modals/ContactUsModal";
 import DeleteRoleModal from "@/Components/modals/DeleteRoleModal";
 import EditRoleModal from "@/Components/modals/EditRoleModal";
 import ListAddModal from "@/Components/modals/ListAddModal";
@@ -19,19 +16,20 @@ import ProjectAddModal from "@/Components/modals/ProjectAddModal";
 import ProjectDeleteModal from "@/Components/modals/ProjectDeleteModal";
 import ProjectEditModal from "@/Components/modals/ProjectEditModal";
 import ProjectViewModal from "@/Components/modals/ProjectViewModal";
+import ServiceCategoriesDeleteModal from "@/Components/modals/ServiceCategoriesDeleteModal";
+import ServiceCategoriesModal from "@/Components/modals/ServiceCategoriesModal";
 import ServicesModal from "@/Components/modals/ServicesModal";
 import TaskAddModal from "@/Components/modals/TaskAddModal";
 import TaskViewEditModal from "@/Components/modals/TaskViewEditModal";
 import TaskViewModal from "@/Components/modals/TaskViewModal";
-import TechStackModal from "@/Components/modals/TechStackModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
-import ServiceCategoriesDeleteModal from "@/Components/modals/ServiceCategoriesDeleteModal";
-import ServiceCategoriesModal from "@/Components/modals/ServiceCategoriesModal";
-import ApplicantsAddModal from "@/Components/modals/ApplicantsAddModal";
-import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
+
 import ProjectMembersModal from "../modals/ProjectMembersModal";
-export const ModalProvider = () => {
+import TaskEditModal from "../modals/TaskEditModal";
+import TaskDeleteModal from "../modals/TaskDeleteModal";
+
+export const ModalProviderHome = () => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
@@ -42,12 +40,11 @@ export const ModalProvider = () => {
   }
   return (
     <>
-      <TechStackModal />
-      <AvailableTimeModal />
-
       <TaskAddModal />
       <TaskViewEditModal />
       <TaskViewModal />
+      <TaskEditModal />
+      <TaskDeleteModal />
 
       <BoardAddModal />
       <BoardAddModal />
@@ -68,17 +65,12 @@ export const ModalProvider = () => {
 
       <ApplicantsAddModal />
       <ApplicantsEditModal />
-      <ContactUsModal />
       <PrivacyPolicyModal />
       <TermsOfServiceModal />
 
       <ProfileModal />
 
       <TimeTrackerModal />
-
-      <TermsAndConditionModal />
-      <PrivacyPolicyModalHome />
-      <FaqsModal />
 
       <AddRoleModal />
       <EditRoleModal />

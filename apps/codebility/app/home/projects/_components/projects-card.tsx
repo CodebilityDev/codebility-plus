@@ -46,7 +46,7 @@ const ProjectsCard = ({ projects }: { projects: ProjectT[] }) => {
               <div className="flex w-full items-center justify-between gap-2">
                 <p className="text-xl w-[70%] whitespace-normal break-words line-clamp-2">{project.name}</p>
                 <p
-                  className={`rounded-full border px-2 py-1 text-xs ${project.status?.toLowerCase() === "pending" ? "border-orange-500 text-orange-500" : project.status?.toLowerCase() === "on-going" ? "border-yellow-500 text-yellow-500" : project.status?.toLowerCase() === "completed" ? "text-green border-green" : "text-white"}`}
+                  className={`rounded-full border px-2 py-1 text-xs ${project.status?.toLowerCase() === "pending" ? "border-orange-500 text-orange-500" : project.status?.toLowerCase() === "inprogress" ? "border-yellow-500 text-yellow-500" : project.status?.toLowerCase() === "completed" ? "text-green border-green" : "text-white"}`}
                 >
                   {project.status}
                 </p>
