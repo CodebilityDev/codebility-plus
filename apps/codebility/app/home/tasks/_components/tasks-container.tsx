@@ -42,9 +42,15 @@ export default function TasksContainer({ tasks }: Props) {
   return (
     <div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {paginatedTasks.map((task: Task) => {
-          return <TaskCard key={task.id} task={task} />;
-        })}
+        {paginatedTasks.length > 0 ? (
+          paginatedTasks.map((task: Task) => {
+            return <TaskCard key={task.id} task={task} />;
+          })
+        ) : (
+          <div>
+            <h1 className="dark:text-white">No assigned task</h1>
+          </div>
+        )}
       </div>
       {tasks && tasks.length > PAGE_SIZE && (
         <Pagination>
