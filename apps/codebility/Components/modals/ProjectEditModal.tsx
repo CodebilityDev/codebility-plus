@@ -31,7 +31,6 @@ import { Textarea } from "@codevs/ui/textarea";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -154,228 +153,224 @@ const ProjectEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[44rem] lg:justify-between lg:overflow-hidden">
+      <DialogContent aria-describedby={undefined} className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[45rem] lg:justify-between lg:overflow-hidden">
         <DialogHeader className="relative">
           <DialogTitle className="mb-2 text-left text-xl">
             Edit Project
           </DialogTitle>
         </DialogHeader>
-
-        <DialogDescription>
-          <form
-            onSubmit={handleSubmit(handleSubmitData)}
-            className="flex flex-col gap-4"
-          >
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-4">
-                <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
-                  <Image
-                    src={projectImage || DEFAULT_AVATAR}
-                    alt="Project Thumbnail"
-                    fill
-                    className="bg-dark-400 h-auto w-auto rounded-full bg-cover object-cover"
+        <form
+          onSubmit={handleSubmit(handleSubmitData)}
+          className="flex flex-col gap-4"
+        >
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
+                <Image
+                  src={projectImage || DEFAULT_AVATAR}
+                  alt="Project Thumbnail"
+                  fill
+                  className="bg-dark-400 h-auto w-auto rounded-full bg-cover object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-center gap-2">
+                <p className="text-md text-gray">Image size 1080 x 768 px</p>
+                <div className="flex gap-4">
+                  {!projectImage && (
+                    <label
+                      htmlFor="thumbnail"
+                      className="cursor-pointer text-blue-100"
+                    >
+                      Upload Image
+                    </label>
+                  )}
+                  <input
+                    id="thumbnail"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    name="thumbnail"
+                    onChange={handleUploadProjectThumbnail}
                   />
-                </div>
-                <div className="flex flex-col justify-center gap-2">
-                  <p className="text-md text-gray">Image size 1080 x 768 px</p>
-                  <div className="flex gap-4">
-                    {!projectImage && (
-                      <label htmlFor="thumbnail">
-                        <p className="cursor-pointer text-blue-100">
-                          Upload Image
-                        </p>
-                      </label>
-                    )}
-                    <input
-                      id="thumbnail"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      name="thumbnail"
-                      onChange={handleUploadProjectThumbnail}
-                    />
-                    {projectImage && (
-                      <p
-                        className="text-violet cursor-pointer"
-                        onClick={handleRemoveProjectThumbnail}
-                      >
-                        Remove Image
-                      </p>
-                    )}
-                  </div>
+                  {projectImage && (
+                    <p
+                      className="text-violet cursor-pointer"
+                      onClick={handleRemoveProjectThumbnail}
+                    >
+                      Remove Image
+                    </p>
+                  )}
                 </div>
               </div>
+            </div>
 
-              <div className="flex flex-col lg:flex-row lg:gap-8">
-                <div className="w-full space-y-3">
-                  <Input
-                    id="projectName"
-                    type="text"
-                    label="Name"
-                    {...register("project_name")}
-                    className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
-                  />
+            <div className="flex flex-col lg:flex-row lg:gap-8">
+              <div className="w-full space-y-3">
+                <Input
+                  id="projectName"
+                  type="text"
+                  label="Name"
+                  {...register("project_name")}
+                  className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
+                />
 
-                  <div>
-                    <label>Client</label>
-                    <Select
-                      {...register("clientId")}
-                      onValueChange={(value) => setValue("clientId", value)}
-                      defaultValue={data?.client_id}
-                    >
-                      <SelectTrigger className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white">
-                        <SelectValue placeholder="Select a client" />
-                      </SelectTrigger>
+                <div>
+                  <label>Client</label>
+                  <Select
+                    {...register("clientId")}
+                    onValueChange={(value) => setValue("clientId", value)}
+                    defaultValue={data?.client_id}
+                  >
+                    <SelectTrigger className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white">
+                      <SelectValue placeholder="Select a client" />
+                    </SelectTrigger>
 
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Clients</SelectLabel>
-                          {clients?.map((data) => (
-                            <SelectItem key={data.id} value={String(data.id)}>
-                              {data.name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div>
-                    <label>Team Leader</label>
-                    <Select
-                      {...register("team_leader_id")}
-                      onValueChange={(value) =>
-                        setValue("team_leader_id", value)
-                      }
-                      defaultValue={data?.team_leader_id}
-                    >
-                      <SelectTrigger className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white">
-                        <SelectValue placeholder="Select a Team Leader"></SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Users</SelectLabel>
-                          {users?.map((user) => (
-                            <SelectItem
-                              key={user.id}
-                              value={user.id}
-                              className="capitalize"
-                            >
-                              {user.first_name} {user.last_name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  <div>
-                    <label>Status</label>
-                    <Select
-                      {...register("status")}
-                      onValueChange={(value) => setValue("status", value)}
-                      defaultValue={data?.status}
-                    >
-                      <SelectTrigger className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white">
-                        <SelectValue placeholder="Select project status"></SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Status</SelectLabel>
-                          {STATUS?.map((data) => (
-                            <SelectItem key={data} value={data}>
-                              {data}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                  </div>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Clients</SelectLabel>
+                        {clients?.map((data) => (
+                          <SelectItem key={data.id} value={String(data.id)}>
+                            {data.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <div className="w-full">
-                  <Input
-                    id="githubLink"
-                    type="text"
-                    label="Github"
-                    {...register("github_link")}
-                    className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
-                  />
-                  <Input
-                    id="liveLink"
-                    type="text"
-                    label="Live URL"
-                    {...register("live_link")}
-                    className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
-                  />
-                  <Input
-                    id="figmaLink"
-                    type="text"
-                    label="Figma Link"
-                    {...register("figma_link")}
-                    className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
-                  />
-                  <div className="mt-4 flex flex-col gap-1">
-                    <label>Members</label>
-                    <div className="flex -space-x-3 *:ring">
-                      {membersParsed.slice(0, 5).map((member) => (
-                        <div
-                          className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-                          key={member.id}
-                        >
-                          <Image
-                            alt={`${member.first_name}'s avatar`}
-                            src={member.image_url || DEFAULT_AVATAR}
-                            fill
-                            title={`${member.first_name}'s avatar`}
-                            className="h-auto w-full rounded-full bg-cover object-cover"
-                            loading="eager"
-                          />
-                        </div>
-                      ))}
-                      <div className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover">
-                        <Button
-                          variant="hollow"
-                          type="button"
-                          className="h-12 w-12 rounded-full p-0"
-                          onClick={() => onOpen("projectMembersModal", data)}
-                        >
-                          <IconPlus className="invert dark:invert-0" />
-                        </Button>
+
+                <div>
+                  <label>Team Leader</label>
+                  <Select
+                    {...register("team_leader_id")}
+                    onValueChange={(value) => setValue("team_leader_id", value)}
+                    defaultValue={data?.team_leader_id}
+                  >
+                    <SelectTrigger className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white">
+                      <SelectValue placeholder="Select a Team Leader"></SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Users</SelectLabel>
+                        {users?.map((user) => (
+                          <SelectItem
+                            key={user.id}
+                            value={user.id}
+                            className="capitalize"
+                          >
+                            {user.first_name} {user.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label>Status</label>
+                  <Select
+                    {...register("status")}
+                    onValueChange={(value) => setValue("status", value)}
+                    defaultValue={data?.status}
+                  >
+                    <SelectTrigger className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white">
+                      <SelectValue placeholder="Select project status"></SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Status</SelectLabel>
+                        {STATUS?.map((data) => (
+                          <SelectItem key={data} value={data}>
+                            {data}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="w-full">
+                <Input
+                  id="githubLink"
+                  type="text"
+                  label="Github"
+                  {...register("github_link")}
+                  className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
+                />
+                <Input
+                  id="liveLink"
+                  type="text"
+                  label="Live URL"
+                  {...register("live_link")}
+                  className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
+                />
+                <Input
+                  id="figmaLink"
+                  type="text"
+                  label="Figma Link"
+                  {...register("figma_link")}
+                  className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
+                />
+                <div className="mt-4 flex flex-col gap-1">
+                  <label>Members</label>
+                  <div className="flex -space-x-3 *:ring">
+                    {membersParsed.slice(0, 5).map((member) => (
+                      <div
+                        className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
+                        key={member.id}
+                      >
+                        <Image
+                          alt={`${member.first_name}'s avatar`}
+                          src={member.image_url || DEFAULT_AVATAR}
+                          fill
+                          title={`${member.first_name}'s avatar`}
+                          className="h-auto w-full rounded-full bg-cover object-cover"
+                          loading="eager"
+                        />
                       </div>
+                    ))}
+                    <div className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover">
+                      <Button
+                        variant="hollow"
+                        type="button"
+                        className="h-12 w-12 rounded-full p-0"
+                        onClick={() => onOpen("projectMembersModal", data)}
+                      >
+                        <IconPlus className="invert dark:invert-0" />
+                      </Button>
                     </div>
                   </div>
                 </div>
               </div>
-              <Textarea
-                id="summary"
-                label="Summary"
-                {...register("summary")}
-                className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
-              />
             </div>
+            <Textarea
+              id="summary"
+              label="Summary"
+              {...register("summary")}
+              className="dark:bg-dark-200 bg-slate-200 text-black dark:text-white"
+            />
+          </div>
 
-            <DialogFooter className="flex flex-col gap-4 lg:flex-row">
-              <Button
-                variant="hollow"
-                className="order-2 w-full sm:order-1 sm:w-[130px]"
-                onClick={(e) => {
-                  e.preventDefault();
-                  onClose();
-                }}
-                disabled={isLoading}
-              >
-                Cancel
-              </Button>
-              <Button
-                variant="default"
-                className="order-1 w-full sm:order-2 sm:w-[130px]"
-                type="submit"
-                disabled={isLoading}
-              >
-                Update
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogDescription>
+          <DialogFooter className="flex flex-col gap-4 lg:flex-row">
+            <Button
+              variant="hollow"
+              className="order-2 w-full sm:order-1 sm:w-[130px]"
+              onClick={(e) => {
+                e.preventDefault();
+                onClose();
+              }}
+              disabled={isLoading}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="default"
+              className="order-1 w-full sm:order-2 sm:w-[130px]"
+              type="submit"
+              disabled={isLoading}
+            >
+              Update
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );
