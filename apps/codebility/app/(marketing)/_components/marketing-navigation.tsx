@@ -23,7 +23,6 @@ const Navigation = async () => {
   } = data || {};
 
 
-  console.log(data)
 
 
   return (
