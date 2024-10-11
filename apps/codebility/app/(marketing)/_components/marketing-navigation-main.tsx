@@ -121,26 +121,26 @@ const NavigationMain = ({ isLoggedIn, first_name, last_name, image_url, email}: 
                 <IconDropdown className="hidden invert dark:invert-0 md:block" />
               </DropdownMenuTrigger>
 
-              <DropdownMenuContent className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]">
+              <DropdownMenuContent className="dark:bg-dark-100 bg-dark-100 absolute -left-24 top-3  dark:border-zinc-700 border-zinc-700 md:w-[200px]">
                 {menuItems.map((item) => (
                   <Link href={item.href} key={item.label}>
-                    <DropdownMenuItem className="flex cursor-pointer items-center gap-6 p-3 px-5">
-                      <item.icon className="invert dark:invert-0" />
+                    <DropdownMenuItem className="flex cursor-pointer items-center gap-6 p-3 px-5 text-white">
+                      <item.icon className=" text-white" />
                       {item.label}
                     </DropdownMenuItem>
                   </Link>
                 ))}
 
-                <DropdownMenuSeparator />
+                <DropdownMenuSeparator className="bg-dark-100"/>
 
                 <DropdownMenuItem
                   onClick={async (e) => {
                     e.stopPropagation();
                     await signOut();
                   }}
-                  className="flex cursor-pointer items-center gap-6 p-3 px-5"
+                  className="flex cursor-pointer items-center gap-6 p-3 px-5 text-white"
                 >
-                  <IconLogout className="invert dark:invert-0" /> Logout
+                  <IconLogout className="  text-white" /> Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu> : <div className="hidden lg:block">

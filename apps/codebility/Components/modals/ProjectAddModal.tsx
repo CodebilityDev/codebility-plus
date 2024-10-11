@@ -437,10 +437,10 @@ const ProjectAddModal = () => {
                             <Image
                               alt="Avatar"
                               src={
-                                user.user.profile.image_url || DEFAULT_AVATAR
+                                user.user.profile?.image_url || DEFAULT_AVATAR
                               }
                               fill
-                              title={`${user.user.profile.first_name} ${user.user.profile.last_name}`}
+                              title={`${user.user.profile?.first_name} ${user.user.profile?.last_name}`}
                               className="h-auto w-full rounded-full bg-cover object-cover"
                               loading="eager"
                             />
