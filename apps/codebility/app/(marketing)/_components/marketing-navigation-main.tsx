@@ -67,7 +67,7 @@ const NavigationMain = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
           <Logo />
 
           <div className="flex items-center gap-2">
-            <Link href="/bookacall">
+            <Link href="/bookacall" className={`${isLoggedIn ? 'hidden' : 'lg:block' }`}>
               <Button
                 variant="purple"
                 rounded="full"
