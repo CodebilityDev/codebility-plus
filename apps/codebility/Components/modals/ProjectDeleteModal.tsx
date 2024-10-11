@@ -3,13 +3,7 @@ import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal-projects";
 import toast from "react-hot-toast";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 const ProjectDeleteModal = () => {
   const { isOpen, onClose, type, data } = useModal();
@@ -40,33 +34,32 @@ const ProjectDeleteModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
-      <DialogContent className="w-[90%]">
+      <DialogContent aria-describedby={undefined} className="w-[90%]">
         <DialogHeader>
           <DialogTitle className="mb-2 text-left text-xl">
             Delete Project
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription>
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <p className="text-lg">
-              Are you sure you want to delete{" "}
-              <span className="text-red-500">{data?.name}</span>?
-            </p>
-            <div className="flex flex-col gap-4 md:flex-row">
-              <Button variant="destructive" type="submit">
-                Yes, Delete it
-              </Button>
-              <Button
-                type="button"
-                className="text-white"
-                variant="gradient"
-                onClick={handleDialogChange}
-              >
-                No, Cancel
-              </Button>
-            </div>
-          </form>
-        </DialogDescription>
+
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <p className="text-lg">
+            Are you sure you want to delete{" "}
+            <span className="text-red-500">{data?.name}</span>?
+          </p>
+          <div className="flex flex-col gap-4 md:flex-row">
+            <Button variant="destructive" type="submit">
+              Yes, Delete it
+            </Button>
+            <Button
+              type="button"
+              className="text-white"
+              variant="gradient"
+              onClick={handleDialogChange}
+            >
+              No, Cancel
+            </Button>
+          </div>
+        </form>
       </DialogContent>
     </Dialog>
   );
