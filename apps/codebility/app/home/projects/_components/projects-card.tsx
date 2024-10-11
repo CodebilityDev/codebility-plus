@@ -33,7 +33,7 @@ const ProjectsCard = ({ projects }: { projects: ProjectT[] }) => {
           >
             <div className="dark:bg-dark-100 flex justify-center rounded-t-lg bg-slate-300">
               <Image
-                alt={project.thumbnail as string}
+                alt={`${project.name} image`}
                 src={project.thumbnail || defaultAvatar}
                 width={120}
                 height={91}
