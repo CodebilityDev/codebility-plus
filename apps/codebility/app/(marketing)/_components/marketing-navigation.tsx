@@ -26,7 +26,7 @@ const Navigation = async () => {
 
   return (
     <>
-      <NavigationMain isLoggedIn={isLoggedIn} image_url={image_url}/>
+      <NavigationMain isLoggedIn={isLoggedIn} first_name={first_name} image_url={image_url}/>
     </>
   );
 };
