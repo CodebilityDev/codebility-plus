@@ -18,15 +18,16 @@ const Navigation = async () => {
     first_name,
     last_name,
     image_url,
+    user: { email }
   } = data;
 
 
-  console.log(image_url)
+  console.log(data)
 
 
   return (
     <>
-      <NavigationMain isLoggedIn={isLoggedIn} first_name={first_name} last_name={last_name} image_url={image_url}/>
+      <NavigationMain isLoggedIn={isLoggedIn} first_name={first_name} last_name={last_name} image_url={image_url} email={email}/>
     </>
   );
 };
