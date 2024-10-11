@@ -99,7 +99,7 @@ const NavigationMain = ({ isLoggedIn, first_name, last_name, image_url, email}: 
             {isLoggedIn ? <DropdownMenu>
               <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none">
                 <div className="hidden flex-col items-end md:flex ">
-                  <p className="capitalize dark:text-white">
+                  <p className="capitalize dark:text-white text-white">
                     {first_name} {last_name}
                   </p>
                   <p className="text-gray text-sm">{email}</p>
