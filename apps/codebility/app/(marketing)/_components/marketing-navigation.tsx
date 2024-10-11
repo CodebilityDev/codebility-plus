@@ -14,12 +14,13 @@ const Navigation = async () => {
   .single();
 
   
+  // Destructure with fallback
   const {
-    first_name,
-    last_name,
-    image_url,
-    user: { email }
-  } = data;
+    first_name = "",
+    last_name = "",
+    image_url = "",
+    user: { email = "" } = {} // Fallback for user object
+  } = data || {};
 
 
   console.log(data)
@@ -27,7 +28,7 @@ const Navigation = async () => {
 
   return (
     <>
-      <NavigationMain isLoggedIn={isLoggedIn} first_name={first_name} last_name={last_name} image_url={image_url} email={email}/>
+      <NavigationMain isLoggedIn={isLoggedIn} first_name={first_name } last_name={last_name} image_url={image_url} email={email}/>
     </>
   );
 };
