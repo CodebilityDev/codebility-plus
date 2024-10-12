@@ -44,6 +44,10 @@ const NavigationMain = ({ isLoggedIn, first_name, last_name, image_url, email}: 
   const [openSheet, setOpenSheet] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
 
+
+  const [isHovered, setIsHovered] = useState(false); // State for hover
+  const [isHoveredLogout, setIsHoveredHoveredLogout] = useState(false); // State for hover
+
   useEffect(() => {
     const handleResize = () => {
       if (window.innerWidth >= 1024) {
@@ -123,24 +127,39 @@ const NavigationMain = ({ isLoggedIn, first_name, last_name, image_url, email}: 
 
               <DropdownMenuContent className="dark:bg-dark-100 bg-dark-100 absolute -left-24 top-3  dark:border-zinc-700 border-zinc-700 md:w-[200px]">
                 {menuItems.map((item) => (
-                  <Link href={item.href} key={item.label}>
-                    <DropdownMenuItem className="flex cursor-pointer items-center gap-6 p-3 px-5 text-white">
-                      <item.icon className=" text-white" />
-                      {item.label}
-                    </DropdownMenuItem>
+                  <Link href={item.href} key={item.label} className="dark:bg-dark-100 bg-dark-100">
+                    <DropdownMenuItem
+      className="flex cursor-pointer items-center gap-6 p-3 px-5"
+      style={{
+        backgroundColor: isHovered ? '#292524' : 'transparent', // Change to hover color
+        color: '#ffffff', // Text color remains white
+      }}
+      onMouseEnter={() => setIsHovered(true)} // Mouse enters, set hover state to true
+      onMouseLeave={() => setIsHovered(false)} // Mouse leaves, set hover state to false
+    >
+      <item.icon style={{ color: '#ffffff' }} /> {/* Explicit icon color */}
+      {item.label}
+    </DropdownMenuItem>
                   </Link>
                 ))}
 
-                <DropdownMenuSeparator className="bg-dark-100"/>
+                <DropdownMenuSeparator className="bg-zinc-800"/>
 
                 <DropdownMenuItem
                   onClick={async (e) => {
                     e.stopPropagation();
                     await signOut();
                   }}
-                  className="flex cursor-pointer items-center gap-6 p-3 px-5 text-white"
+                  className="flex cursor-pointer items-center gap-6 p-3 px-5 text-white "
+                  style={{
+                    backgroundColor: isHoveredLogout ? '#292524' : 'transparent', // Change to hover color
+                    color: '#ffffff', // Text color remains white
+                  }}
+                  onMouseEnter={() => setIsHoveredHoveredLogout(true)} // Mouse enters, set hover state to true
+                  onMouseLeave={() => setIsHoveredHoveredLogout(false)} // Mouse leaves, set hover state to false
+                  
                 >
-                  <IconLogout className="  text-white" /> Logout
+                  <IconLogout className="  text-white bg:bg-zinc-800" /> Logout
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu> : <div className="hidden lg:block">
