@@ -34,6 +34,12 @@ export const SignUpValidation = z
       .refine((value: string | undefined) => isValidUrl(value || ""), {
         message: "Invalid Url Format",
       }),
+    github: z
+      .string()
+      .optional()
+      .refine((value: string | undefined) => isValidGitHubUrl(value || ""), {
+        message: "Invalid Url Format",
+      }),
     techstack: z.string().min(1, { message: "Required" }),
     password: z
       .string()
@@ -56,6 +62,7 @@ export const SignUpValidation = z
     confirmPassword: z.string().min(1, { message: "Required" }),
     schedule: z.string().min(1, { message: "Required" }),
     position: z.string().min(1, { message: "Required" }),
+    profileImage: z.instanceof(File, { message: "Profile image is required" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Password don't match",
