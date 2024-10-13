@@ -15,7 +15,7 @@ export const config = {
      * Feel free to modify this pattern to include more paths.
      */
     // '/((?!_next/static|_next/image|favicon.ico).*)',
-    "/((?!api|auth/signin|auth/signup|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|waiting|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
+    "/((?!api|auth/signin|auth/signup|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|waiting|declined|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
   ],
 };
 
