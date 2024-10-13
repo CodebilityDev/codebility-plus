@@ -15,6 +15,28 @@ const toArray = (str: string) => {
 
 export async function rejectAction(id: string) {
   try {
+    const { data: applicants, error: fetchError } = await supabase
+      .from("applicants")
+      .select("*")
+      .eq("id", id);
+
+    if (fetchError) throw fetchError;
+
+    const applicant = applicants[0];
+
+    const { error: insertError } = await supabase.from("declined_applicants").insert({
+      user_id: applicant.id,
+      first_name: applicant.first_name,
+      last_name: applicant.last_name,
+      email: applicant.email_address,
+      portfolio_website: applicant.portfolio_website,
+      github_link: applicant.github_link,
+      tech_stacks: applicant.tech_stacks,
+      image_url: applicant.image_url
+    });
+
+    if (insertError) throw insertError;
+
     const { error: updateCodevError } = await supabase
       .from("codev")
       .update({
