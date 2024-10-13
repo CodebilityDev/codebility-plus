@@ -2,7 +2,13 @@ import Image from "next/image";
 import Link from "next/link";
 import ApplicantsActionButtons from "@/app/home/applicants/_components/applicants-action-buttons";
 import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants";
-import { Table, TableCell, TableHeader, TableRow } from "@/Components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHeader,
+  TableRow,
+} from "@/Components/ui/table";
 import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
 
 import {
@@ -11,6 +17,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@codevs/ui/accordion";
+import { Avatar, AvatarFallback, AvatarImage } from "@codevs/ui/avatar";
+
+import { DEFAULT_AVATAR } from "../_lib/constants";
 
 const ApplicantsTableMobile = ({
   applicants,
@@ -30,6 +39,7 @@ const ApplicantsTableMobile = ({
             github_link,
             portfolio_website,
             tech_stacks,
+            image_url,
           }: ApplicantsList_Types) => (
             <Accordion key={id} type="single" collapsible className="w-full">
               <AccordionItem
@@ -37,12 +47,19 @@ const ApplicantsTableMobile = ({
                 className="border-zinc-300 dark:border-zinc-800"
               >
                 <AccordionTrigger className="flex p-4 text-base hover:bg-muted/50 md:text-lg ">
-                  <div className="flex w-1/2 justify-start">
-                    <p className="capitalize">
+                  <div className="flex items-center justify-start gap-3 md:w-1/2">
+                    <Avatar>
+                      <AvatarImage src={image_url || DEFAULT_AVATAR} />
+                      <AvatarFallback>
+                        {first_name[0]?.toUpperCase()}
+                        {last_name[0]?.toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <p className="text-sm capitalize">
                       {first_name} {last_name}
                     </p>
                   </div>
-                  <div className="hidden md:flex w-1/2 justify-end pr-4 md:pr-8">
+                  <div className="hidden w-1/2 justify-end pr-4 md:flex md:pr-8">
                     <ApplicantsActionButtons
                       applicant={{
                         id,
@@ -52,6 +69,7 @@ const ApplicantsTableMobile = ({
                         github_link,
                         portfolio_website,
                         tech_stacks,
+                        image_url,
                       }}
                     />
                   </div>
@@ -60,7 +78,7 @@ const ApplicantsTableMobile = ({
                   <Table className="text-dark100_light900">
                     <TableHeader>
                       <TableRow className="grid grid-cols-2 p-2">
-                        <TableCell>Gmail</TableCell>
+                        <TableCell className="text-sm">Gmail</TableCell>
                         <TableCell>
                           <Link href={`mailto:${email_address}`}>
                             <div>
@@ -70,7 +88,7 @@ const ApplicantsTableMobile = ({
                         </TableCell>
                       </TableRow>
                       <TableRow className="grid grid-cols-2 p-2">
-                        <TableCell>Github</TableCell>
+                        <TableCell className="text-sm">Github</TableCell>
                         <TableCell>
                           {github_link && (
                             <Link href={github_link} target="_blank">
@@ -82,7 +100,7 @@ const ApplicantsTableMobile = ({
                         </TableCell>
                       </TableRow>
                       <TableRow className="grid grid-cols-2 p-2">
-                        <TableCell>Portfolio</TableCell>
+                        <TableCell className="text-sm">Portfolio</TableCell>
                         <TableCell>
                           {portfolio_website && (
                             <Link href={portfolio_website} target="_blank">
@@ -94,7 +112,7 @@ const ApplicantsTableMobile = ({
                         </TableCell>
                       </TableRow>
                       <TableRow className="grid grid-cols-2 p-2">
-                        <TableCell>Tech Stack</TableCell>
+                        <TableCell className="text-sm">Tech Stack</TableCell>
                         <TableCell>
                           <div className="flex h-full w-full flex-wrap items-center justify-start gap-2 ">
                             {tech_stacks &&
@@ -116,21 +134,24 @@ const ApplicantsTableMobile = ({
                         </TableCell>
                       </TableRow>
                     </TableHeader>
-                    <TableRow className="md:hidden">
-                      <TableCell>
-                        <ApplicantsActionButtons
-                          applicant={{
-                            id,
-                            first_name,
-                            last_name,
-                            email_address,
-                            github_link,
-                            portfolio_website,
-                            tech_stacks,
-                          }}
-                        />
-                      </TableCell>
-                    </TableRow>
+                    <TableBody className="md:hidden">
+                      <TableRow>
+                        <TableCell>
+                          <ApplicantsActionButtons
+                            applicant={{
+                              id,
+                              first_name,
+                              last_name,
+                              email_address,
+                              github_link,
+                              portfolio_website,
+                              tech_stacks,
+                              image_url,
+                            }}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    </TableBody>
                   </Table>
                 </AccordionContent>
               </AccordionItem>
