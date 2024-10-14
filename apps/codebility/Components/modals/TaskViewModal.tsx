@@ -14,7 +14,6 @@ import {
 import { useModal } from "@/hooks/use-modal";
 import { IconCopy } from "@/public/assets/svgs";
 import { Ellipsis } from "lucide-react";
-import toast from "react-hot-toast";
 
 import {
   DropdownMenu,
@@ -31,7 +30,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/Components/ui/dialog";
 
 const TaskViewModal = () => {
   const { isOpen, onOpen, onClose, type, data } = useModal();
@@ -43,7 +42,10 @@ const TaskViewModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]">
+      <DialogContent
+        aria-describedby={undefined}
+        className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]"
+      >
         <div className="flex flex-col gap-4">
           <div className="flex items-center gap-4">
             <DialogHeader className="relative">
@@ -55,7 +57,10 @@ const TaskViewModal = () => {
               <DropdownMenuTrigger asChild>
                 <Ellipsis className="cursor-pointer" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" className="dark:bg-black-200 w-56">
+              <DropdownMenuContent
+                align="start"
+                className="dark:bg-black-200 w-56"
+              >
                 <DropdownMenuItem
                   onClick={() => onOpen("taskEditModal", data)}
                   className="cursor-pointer"
