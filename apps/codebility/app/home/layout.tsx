@@ -48,7 +48,7 @@ export default async function HomeLayout({
     image_url,
     start_time,
     end_time,
-  } = data;
+  } = data || {};
 
   const userData = {
     id: user_id,
