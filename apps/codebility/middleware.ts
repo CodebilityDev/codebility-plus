@@ -163,12 +163,27 @@ export async function middleware(req: NextRequest) {
     .single();
 
   // if the applicants is not yet accepted and trying to access home/dashboard
+  // if (
+  //   codev?.application_status !== "ACCEPTED" &&
+  //   req.nextUrl.pathname.startsWith("/home")
+  // ) {
+  //   const url = req.nextUrl.clone();
+  //   url.pathname = "/waiting";
+  //   return NextResponse.redirect(url);
+  // }
+
   if (
-    codev?.application_status !== "ACCEPTED" &&
-    req.nextUrl.pathname.startsWith("/home")
+    codev?.application_status === "PENDING" &&
+    req.nextUrl.pathname !== "/home/account-settings"
   ) {
     const url = req.nextUrl.clone();
     url.pathname = "/waiting";
+    return NextResponse.redirect(url);
+  }
+
+  if (codev?.application_status === "DECLINED") {
+    const url = req.nextUrl.clone();
+    url.pathname = "/declined";
     return NextResponse.redirect(url);
   }
 
@@ -223,6 +238,8 @@ const checkPermissions = async (userId: string, path: string) => {
     lastSegment = "in_house";
   } else if (lastSegment === "time-tracker") {
     lastSegment = "time_tracker";
+  } else if (lastSegment === "account-settings") {
+    lastSegment = "account_settings";
   }
 
   // if we have permission we can access that page
