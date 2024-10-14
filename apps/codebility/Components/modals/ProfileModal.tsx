@@ -3,17 +3,21 @@ import Link from "next/link";
 import { tokenPoints } from "@/app/home/interns/data";
 import Badges from "@/Components/shared/Badges";
 import Box from "@/Components/shared/dashboard/Box";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
 import { socialIcons, techstacks } from "@/constants";
 import { useModal } from "@/hooks/use-modal-users";
 import { defaultAvatar } from "@/public/assets/images";
 import { Codev } from "@/types/home/codev";
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
-
 const ProfileModal = () => {
   const { isOpen, type, onClose, data } = useModal();
   const isModalOpen = isOpen && type === "profileModal";
-  
+
   const {
     first_name,
     last_name,

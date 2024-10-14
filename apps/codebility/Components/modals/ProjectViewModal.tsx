@@ -5,6 +5,12 @@ import { parseMembers } from "@/app/home/projects/_lib";
 import { DEFAULT_AVATAR } from "@/app/home/projects/_lib/constants";
 import { User } from "@/app/home/projects/_types/projects";
 import { Button } from "@/Components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
 import { useModal } from "@/hooks/use-modal-projects";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { format, parseISO } from "date-fns";
@@ -15,8 +21,6 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@codevs/ui/hover-card";
-
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 const ProjectViewModal = () => {
   const supabase = useSupabase();
