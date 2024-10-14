@@ -39,7 +39,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/Components/ui/dialog";
 
 const TaskEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
@@ -123,7 +123,10 @@ const TaskEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]">
+      <DialogContent
+        aria-describedby={undefined}
+        className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]"
+      >
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader className="relative">
             <DialogTitle className="text-left text-lg font-bold capitalize">

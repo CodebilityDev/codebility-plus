@@ -5,14 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sidebarData } from "@/constants";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
-import useUser from "../_hooks/use-user";
 
 import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@codevs/ui/sheet";
+
+import useUser from "../_hooks/use-user";
 
 const NavContent = () => {
   const user = useUser();
@@ -26,7 +29,10 @@ const NavContent = () => {
         );
 
         return (
-          <div key={item.id} className={`${!hasPermission ? "hidden" : "block"}`}>
+          <div
+            key={item.id}
+            className={`${!hasPermission ? "hidden" : "block"}`}
+          >
             <h4
               className={`text-gray text-sm uppercase ${!hasPermission ? "hidden" : "block"}`}
             >
@@ -89,9 +95,13 @@ const MobileNav = () => {
         />
       </SheetTrigger>
       <SheetContent
+        aria-describedby={undefined}
         side="left"
         className="overflow-y-auto border-r border-zinc-300 bg-[#OEOEOE] dark:border-zinc-800"
       >
+        <SheetHeader className="hidden">
+          <SheetTitle>Sidebar</SheetTitle>
+        </SheetHeader>
         <Link href="/" className="flex items-center gap-1">
           <Image
             src="/assets/svgs/codebility-violet.svg"
