@@ -1,27 +1,23 @@
-import React from "react";
-
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
-import { User } from "@/types";
+import { Codev } from "@/types/home/codev";
 import InternCard from "./intern-card";
 
 const InternList = ({
   data,
   filters,
 }: {
-  data: User[];
+  data: Codev[];
   filters: string[];
 }) => {
-  
   const filteredInterns = Array.isArray(data)
     ? filters.length > 0
       ? data.filter((intern) =>
           filters.includes(intern.main_position || "not found"),
         )
-      : data 
+      : data
     : [];
-
 
   const {
     currentPage,
@@ -30,21 +26,19 @@ const InternList = ({
     handleNextPage,
     handlePreviousPage,
     setCurrentPage,
-  } = usePagination<User>(filteredInterns, pageSize.interns);
+  } = usePagination<Codev>(filteredInterns, pageSize.interns);
 
   return (
     <>
-  
       {paginatedInterns.length > 0 ? (
-        <div className="xs:grid-cols-2 grid place-items-center gap-6 sm:place-items-start md:grid-cols-3 lg:grid-cols-4">
-          {paginatedInterns.map((intern: User) => (
+        <div className="grid place-items-center gap-6 md:grid-cols-2 xl:grid-cols-4">
+          {paginatedInterns.map((intern: Codev) => (
             <InternCard color="" key={intern.id} user={intern} />
           ))}
         </div>
       ) : (
         <p className="text-lightgray text-center text-xl">No interns found</p>
       )}
-
 
       {filteredInterns.length > pageSize.interns && (
         <DefaultPagination
