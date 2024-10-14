@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/Components/ui/dialog";
 
 const AvailableTimeModal = () => {
   const { isOpen, onClose, type } = useModal();

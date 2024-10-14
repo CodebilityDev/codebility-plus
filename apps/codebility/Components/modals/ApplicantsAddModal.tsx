@@ -15,7 +15,6 @@ import {
 import { useModal as useModalTechkStack } from "@/hooks/use-modal";
 import { useModal } from "@/hooks/use-modal-applicants";
 import { useTechStackStore } from "@/hooks/use-techstack";
-import { IconClose } from "@/public/assets/svgs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";
