@@ -4,18 +4,17 @@ import { DEFAULT_AVATAR } from "@/app/home/projects/_lib/constants";
 import { Member, User } from "@/app/home/projects/_types/projects";
 import { updateProjectMembers } from "@/app/home/projects/actions";
 import { Button } from "@/Components/ui/button";
-import { useModal } from "@/hooks/use-modal-projects";
-import toast from "react-hot-toast";
-
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
-
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/Components/ui/dialog";
+import { useModal } from "@/hooks/use-modal-projects";
+import toast from "react-hot-toast";
+
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 
 const ProjectMembersModal = () => {
   const supabase = useSupabase();
