@@ -1,23 +1,22 @@
 import Image from "next/image";
-import bradWell from "@/public/assets/images/partners/bradwell.png";
-import federalPlans from "@/public/assets/images/partners/federal-plans.png";
-import geniusWebservices from "@/public/assets/images/partners/genius-web-services.png";
-import infraspan from "@/public/assets/images/partners/infraspan.png";
-import netmedia from "@/public/assets/images/partners/netmedia.png";
-import travelTribe from "@/public/assets/images/partners/travel-tribe.png";
-import zwiftTech from "@/public/assets/images/partners/zwift-tech.png";
 
 export default function Partners() {
-  const topPartners = [
-    { name: "Infraspan", logo: infraspan },
-    { name: "Federal PLANS", logo: federalPlans },
-    { name: "Genius Web Services", logo: geniusWebservices },
-  ];
-  const bottomPartners = [
-    { name: "Travel Tribe", logo: travelTribe },
-    { name: "netmedia", logo: netmedia },
-    { name: "zwift Tech", logo: zwiftTech },
-    { name: "Bradwell", logo: bradWell },
+  const partners = [
+    { name: "Infraspan", logo: "/assets/images/partners/infraspan.png" },
+    {
+      name: "Federal PLANS",
+      logo: "/assets/images/partners/federal-plans.png",
+    },
+    {
+      name: "Genius Web Services",
+      logo: "/assets/images/partners/genius-web-services.png",
+    },
+    { name: "Travel Tribe", logo: "/assets/images/partners/travel-tribe.png" },
+    { name: "netmedia", logo: "/assets/images/partners/netmedia.png" },
+    { name: "zwift Tech", logo: "/assets/images/partners/zwift-tech.png" },
+    { name: "Bradwell", logo: "/assets/images/partners/bradwell.png" },
+    { name: "Ai", logo: "/assets/images/partners/ai.png" },
+    { name: "Averps", logo: "/assets/images/partners/averps.png" },
   ];
 
   return (
@@ -28,32 +27,29 @@ export default function Partners() {
       <p className="mb-8 text-center text-sm sm:text-xl">
         Meet Our Trusted Partners
       </p>
-      <div className="space-y-6">
-        <div className="grid grid-cols-3 gap-6 md:grid-cols-1 lg:grid-cols-3">
-          {topPartners.map((partner) => (
+      <div className="mt-14 space-y-16">
+        <div className="grid grid-cols-2 items-center justify-center gap-8 md:grid-cols-3">
+          {partners.map((partner) => (
             <div
               key={partner.name}
-              className="flex items-center justify-center"
+              className={`relative flex aspect-video w-full items-center justify-center ${
+                partner.name === "Travel Tribe"
+                  ? "h-20"
+                  : partner.name === "netmedia" || partner.name === "zwift Tech"
+                    ? "h-10"
+                    : partner.name === "Bradwell" || partner.name === "Ai"
+                      ? "h-24"
+                      : partner.name === "Averps"
+                        ? "h-10"
+                        : "h-12"
+              }`}
             >
               <Image
                 src={partner.logo}
                 alt={`${partner.name} logo`}
                 className=" object-contain"
-              />
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-4">
-          {bottomPartners.map((partner) => (
-            <div
-              key={partner.name}
-              className="flex items-center justify-center"
-            >
-              <Image
-                src={partner.logo}
-                alt={`${partner.name} logo`}
-                className=" object-contain"
+                fill
+                sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, (max-width: 1280px) 25vw, 20vw"
               />
             </div>
           ))}
