@@ -38,7 +38,6 @@ import { Textarea } from "@codevs/ui/textarea";
 import {
   Dialog,
   DialogContent,
-  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -167,234 +166,234 @@ const ProjectAddModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={resetForm}>
-      <DialogContent className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[44rem] lg:justify-between lg:overflow-hidden">
+      <DialogContent
+        aria-describedby={undefined}
+        className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[45rem] lg:justify-between lg:overflow-hidden"
+      >
         <DialogHeader className="relative">
           <DialogTitle className="mb-2 text-left text-xl">
             Add New Project
           </DialogTitle>
         </DialogHeader>
-        <DialogDescription>
-          <form
-            onSubmit={handleSubmit(handleSubmitData)}
-            className="flex flex-col gap-4"
-          >
-            <div className="flex flex-col gap-4">
-              <div className="flex gap-4">
-                <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
-                  <Image
-                    src={projectImage || DEFAULT_AVATAR}
-                    alt="Project Thumbnail"
-                    fill
-                    className="bg-dark-400 h-auto w-auto rounded-full bg-cover object-cover"
-                  />
-                </div>
-                <div className="flex flex-col justify-center gap-2">
-                  <p className="text-md text-gray">Image size 1080 x 768 px</p>
-                  <div className="flex gap-4">
-                    {!projectImage && (
-                      <label htmlFor="thumbnail">
-                        <p className="cursor-pointer text-blue-100">
-                          Upload Image
-                        </p>
-                      </label>
-                    )}
-                    <input
-                      id="thumbnail"
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      name="thumbnail"
-                      onChange={handleUploadProjectThumbnail}
-                    />
-                    {projectImage && (
-                      <p
-                        className="text-violet cursor-pointer"
-                        onClick={handleRemoveProjectThumbnail}
-                      >
-                        Remove Image
+        <form
+          onSubmit={handleSubmit(handleSubmitData)}
+          className="flex flex-col gap-4"
+        >
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
+                <Image
+                  src={projectImage || DEFAULT_AVATAR}
+                  alt="Project Thumbnail"
+                  fill
+                  className="bg-dark-400 h-auto w-auto rounded-full bg-cover object-cover"
+                />
+              </div>
+              <div className="flex flex-col justify-center gap-2">
+                <p className="text-md text-gray">Image size 1080 x 768 px</p>
+                <div className="flex gap-4">
+                  {!projectImage && (
+                    <label htmlFor="thumbnail">
+                      <p className="cursor-pointer text-blue-100">
+                        Upload Image
                       </p>
-                    )}
-                  </div>
-                </div>
-              </div>
-              <div className="flex flex-col lg:flex-row lg:gap-8">
-                <div className="w-full space-y-3">
-                  <Input
-                    id="projectName"
-                    type="text"
-                    label="Name"
-                    placeholder="Enter Project Name"
-                    {...register("project_name")}
-                    className={`dark:bg-dark-200 ${
-                      errors.project_name
-                        ? "border border-red-500 focus:outline-none"
-                        : ""
-                    }`}
-                  />
-                  {errors.project_name && (
-                    <span className="text-sm text-red-400">
-                      {errors.project_name.message}
-                    </span>
+                    </label>
                   )}
-                  <div>
-                    <label>Client</label>
-                    <Select
-                      onValueChange={(value) => {
-                        setValue("clientId", value);
-                        clearErrors("clientId");
-                      }}
-                      name="clientId"
+                  <input
+                    id="thumbnail"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    name="thumbnail"
+                    onChange={handleUploadProjectThumbnail}
+                  />
+                  {projectImage && (
+                    <p
+                      className="text-violet cursor-pointer"
+                      onClick={handleRemoveProjectThumbnail}
                     >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a Client"></SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Clients</SelectLabel>
-                          {clients?.map((data) => (
-                            <SelectItem key={data.id} value={String(data.id)}>
-                              {data.name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    {errors.clientId && (
-                      <span className="text-sm text-red-400">
-                        {errors.clientId.message}
-                      </span>
-                    )}
-                  </div>
-                  <div>
-                    <label>Team Leader</label>
-                    <Select
-                      onValueChange={(value) => {
-                        setValue("team_leader_id", value);
-                        clearErrors("team_leader_id");
-                      }}
-                      name="team_leader_id"
-                    >
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a Team Leader"></SelectValue>
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectGroup>
-                          <SelectLabel>Users</SelectLabel>
-                          {users?.map((user) => (
-                            <SelectItem
-                              key={user.id}
-                              value={user.id}
-                              className="capitalize"
-                            >
-                              {user.first_name} {user.last_name}
-                            </SelectItem>
-                          ))}
-                        </SelectGroup>
-                      </SelectContent>
-                    </Select>
-                    {errors.team_leader_id && (
-                      <span className="text-sm text-red-400">
-                        {errors.team_leader_id.message}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="w-full">
-                  <Input
-                    id="githubLink"
-                    type="text"
-                    label="Github"
-                    placeholder="Enter Github Link"
-                    {...register("github_link")}
-                    className={`dark:bg-dark-200 ${
-                      errors.github_link
-                        ? "border border-red-500 focus:outline-none"
-                        : ""
-                    }`}
-                  />
-                  {errors.github_link && (
-                    <span className="text-sm text-red-400">
-                      {errors.github_link.message}
-                    </span>
-                  )}
-                  <Input
-                    id="liveLink"
-                    type="text"
-                    label="Live URL"
-                    placeholder="Enter Live URL"
-                    {...register("live_link")}
-                    className={`dark:bg-dark-200 ${
-                      errors.live_link
-                        ? "border border-red-500 focus:outline-none"
-                        : ""
-                    }`}
-                  />
-                  {errors.live_link && (
-                    <span className="text-sm text-red-400">
-                      {errors.live_link.message}
-                    </span>
-                  )}
-                  <Input
-                    id="figmaLink"
-                    type="text"
-                    label="Figma Link"
-                    placeholder="Enter Figma Link"
-                    {...register("figma_link")}
-                    className={`dark:bg-dark-200 ${
-                      errors.figma_link
-                        ? "border border-red-500 focus:outline-none"
-                        : ""
-                    }`}
-                  />
-                  {errors.figma_link && (
-                    <span className="text-sm text-red-400">
-                      {errors.figma_link.message}
-                    </span>
+                      Remove Image
+                    </p>
                   )}
                 </div>
               </div>
-              <Textarea
-                id="summary"
-                label="Summary"
-                placeholder="Enter Summary"
-                {...register("summary")}
-                className={`dark:bg-dark-200 ${
-                  errors.summary
-                    ? "border border-red-500 focus:outline-none"
-                    : ""
-                }`}
-              />
-              {errors.summary && (
-                <span className="text-sm text-red-400">
-                  {errors.summary.message}
-                </span>
-              )}
             </div>
-            <div className="flex flex-col gap-1">
-              <label htmlFor="members">Members</label>
-              <div className="flex gap-2">
-                <div className="flex flex-wrap items-center">
-                  {selectedMembers.map((member, index) => {
-                    return (
-                      <div
-                        className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-                        key={`${member.id}_${index}`}
-                        onClick={() => removeMember(member.id)}
-                      >
-                        <Image
-                          alt="Avatar"
-                          src={member.user.profile.image_url || DEFAULT_AVATAR}
-                          fill
-                          title={`${member.user.profile.first_name} ${member.user.profile.last_name}`}
-                          className="h-auto w-full rounded-full bg-cover object-cover"
-                          loading="eager"
-                        />
-                      </div>
-                    );
-                  })}
+            <div className="flex flex-col lg:flex-row lg:gap-8">
+              <div className="w-full space-y-3">
+                <Input
+                  id="projectName"
+                  type="text"
+                  label="Name"
+                  placeholder="Enter Project Name"
+                  {...register("project_name")}
+                  className={`dark:bg-dark-200 ${
+                    errors.project_name
+                      ? "border border-red-500 focus:outline-none"
+                      : ""
+                  }`}
+                />
+                {errors.project_name && (
+                  <span className="text-sm text-red-400">
+                    {errors.project_name.message}
+                  </span>
+                )}
+                <div>
+                  <label>Client</label>
+                  <Select
+                    onValueChange={(value) => {
+                      setValue("clientId", value);
+                      clearErrors("clientId");
+                    }}
+                    name="clientId"
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a Client"></SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Clients</SelectLabel>
+                        {clients?.map((data) => (
+                          <SelectItem key={data.id} value={String(data.id)}>
+                            {data.name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {errors.clientId && (
+                    <span className="text-sm text-red-400">
+                      {errors.clientId.message}
+                    </span>
+                  )}
                 </div>
+                <div>
+                  <label>Team Leader</label>
+                  <Select
+                    onValueChange={(value) => {
+                      setValue("team_leader_id", value);
+                      clearErrors("team_leader_id");
+                    }}
+                    name="team_leader_id"
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a Team Leader"></SelectValue>
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectGroup>
+                        <SelectLabel>Users</SelectLabel>
+                        {users?.map((user) => (
+                          <SelectItem
+                            key={user.id}
+                            value={user.id}
+                            className="capitalize"
+                          >
+                            {user.first_name} {user.last_name}
+                          </SelectItem>
+                        ))}
+                      </SelectGroup>
+                    </SelectContent>
+                  </Select>
+                  {errors.team_leader_id && (
+                    <span className="text-sm text-red-400">
+                      {errors.team_leader_id.message}
+                    </span>
+                  )}
+                </div>
+              </div>
+              <div className="w-full">
+                <Input
+                  id="githubLink"
+                  type="text"
+                  label="Github"
+                  placeholder="Enter Github Link"
+                  {...register("github_link")}
+                  className={`dark:bg-dark-200 ${
+                    errors.github_link
+                      ? "border border-red-500 focus:outline-none"
+                      : ""
+                  }`}
+                />
+                {errors.github_link && (
+                  <span className="text-sm text-red-400">
+                    {errors.github_link.message}
+                  </span>
+                )}
+                <Input
+                  id="liveLink"
+                  type="text"
+                  label="Live URL"
+                  placeholder="Enter Live URL"
+                  {...register("live_link")}
+                  className={`dark:bg-dark-200 ${
+                    errors.live_link
+                      ? "border border-red-500 focus:outline-none"
+                      : ""
+                  }`}
+                />
+                {errors.live_link && (
+                  <span className="text-sm text-red-400">
+                    {errors.live_link.message}
+                  </span>
+                )}
+                <Input
+                  id="figmaLink"
+                  type="text"
+                  label="Figma Link"
+                  placeholder="Enter Figma Link"
+                  {...register("figma_link")}
+                  className={`dark:bg-dark-200 ${
+                    errors.figma_link
+                      ? "border border-red-500 focus:outline-none"
+                      : ""
+                  }`}
+                />
+                {errors.figma_link && (
+                  <span className="text-sm text-red-400">
+                    {errors.figma_link.message}
+                  </span>
+                )}
+              </div>
+            </div>
+            <Textarea
+              id="summary"
+              label="Summary"
+              placeholder="Enter Summary"
+              {...register("summary")}
+              className={`dark:bg-dark-200 ${
+                errors.summary ? "border border-red-500 focus:outline-none" : ""
+              }`}
+            />
+            {errors.summary && (
+              <span className="text-sm text-red-400">
+                {errors.summary.message}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-col gap-1">
+            <label htmlFor="members">Members</label>
+            <div className="flex gap-2">
+              <div className="flex flex-wrap items-center">
+                {selectedMembers.map((member, index) => {
+                  return (
+                    <div
+                      className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
+                      key={`${member.id}_${index}`}
+                      onClick={() => removeMember(member.id)}
+                    >
+                      <Image
+                        alt="Avatar"
+                        src={member.user.profile.image_url || DEFAULT_AVATAR}
+                        fill
+                        title={`${member.user.profile.first_name} ${member.user.profile.last_name}`}
+                        className="h-auto w-full rounded-full bg-cover object-cover"
+                        loading="eager"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="cursor-pointer">
+                  <DropdownMenuTrigger asChild className="cursor-pointer">
                     <Button
                       variant="hollow"
                       className="h-12 w-12 rounded-full p-0"
@@ -408,75 +407,74 @@ const ProjectAddModal = () => {
                     align="start"
                     className="dark:bg-dark-100 z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white"
                   >
-                    <DropdownMenuLabel className="pb-2 text-center text-sm">
-                      Add Members
-                    </DropdownMenuLabel>
-                    <input
-                      type="text"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      placeholder="Search members"
-                      className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
-                    />
-                    <DropdownMenuSeparator />
-                    <DropdownMenuLabel className="px-4 py-2 text-xs">
-                      Available Members
-                    </DropdownMenuLabel>
-                    {users
-                      ?.filter((user) =>
-                        `${user.first_name} ${user.last_name}`
-                          .toLowerCase()
-                          .includes(searchQuery.toLowerCase()),
-                      )
-                      .map((user) => (
-                        <DropdownMenuItem
-                          key={user.id}
-                          className="dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100"
-                          onClick={() => addMember(user)}
-                        >
-                          <div className="flex items-center gap-2">
-                            <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
-                              <Image
-                                alt="Avatar"
-                                src={
-                                  user.user.profile.image_url || DEFAULT_AVATAR
-                                }
-                                fill
-                                title={`${user.user.profile.first_name} ${user.user.profile.last_name}`}
-                                className="h-auto w-full rounded-full bg-cover object-cover"
-                                loading="eager"
-                              />
-                            </div>
-                            <span className="capitalize">{`${user.first_name} ${user.last_name}`}</span>
+                  <DropdownMenuLabel className="pb-2 text-center text-sm">
+                    Add Members
+                  </DropdownMenuLabel>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search members"
+                    className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
+                  />
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel className="px-4 py-2 text-xs">
+                    Available Members
+                  </DropdownMenuLabel>
+                  {users
+                    ?.filter((user) =>
+                      `${user.first_name} ${user.last_name}`
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()),
+                    )
+                    .map((user) => (
+                      <DropdownMenuItem
+                        key={user.id}
+                        className="dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100"
+                        onClick={() => addMember(user)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
+                            <Image
+                              alt="Avatar"
+                              src={
+                                user.user.profile.image_url || DEFAULT_AVATAR
+                              }
+                              fill
+                              title={`${user.user.profile.first_name} ${user.user.profile.last_name}`}
+                              className="h-auto w-full rounded-full bg-cover object-cover"
+                              loading="eager"
+                            />
                           </div>
-                        </DropdownMenuItem>
-                      ))}
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
+                          <span className="capitalize">{`${user.first_name} ${user.last_name}`}</span>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
             </div>
-            <DialogFooter className="flex flex-col gap-4 lg:flex-row">
-              <Button
-                variant="hollow"
-                className="order-2 w-full sm:order-1 sm:w-[130px]"
-                onClick={(e) => {
-                  e.preventDefault();
-                  resetForm();
-                }}
-              >
-                Cancel
-              </Button>
-              <Button
-                disabled={isLoading}
-                variant="default"
-                className="order-1 w-full sm:order-2 sm:w-[130px]"
-                type="submit"
-              >
-                Add Project
-              </Button>
-            </DialogFooter>
-          </form>
-        </DialogDescription>
+          </div>
+          <DialogFooter className="flex flex-col gap-4 lg:flex-row">
+            <Button
+              variant="hollow"
+              className="order-2 w-full sm:order-1 sm:w-[130px]"
+              onClick={(e) => {
+                e.preventDefault();
+                resetForm();
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={isLoading}
+              variant="default"
+              className="order-1 w-full sm:order-2 sm:w-[130px]"
+              type="submit"
+            >
+              Add Project
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

@@ -1,14 +1,13 @@
-"use client"
+"use client";
+
 import { useState } from "react";
-
-
 import H1 from "@/Components/shared/dashboard/H1";
-import { User } from "@/types";
+import { Codev } from "@/types/home/codev";
 
 import InternList from "./intern-list";
 import FilterInterns from "./interns-filter";
 
-export default function InternContainer({ data }: { data: User[] }) {
+export default function InternContainer({ data }: { data: Codev[] }) {
   const [filters, setFilters] = useState<string[]>([]);
 
   return (
