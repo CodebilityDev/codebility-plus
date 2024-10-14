@@ -1,17 +1,16 @@
 import Image from "next/image";
 import { Button } from "@/Components/ui/button";
-import { techstacks } from "@/constants";
-import { useModal } from "@/hooks/use-modal";
-import { useTechStackStore } from "@/hooks/use-techstack";
-import { IconClose } from "@/public/assets/svgs";
-
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/Components/ui/dialog";
+import { techstacks } from "@/constants";
+import { useModal } from "@/hooks/use-modal";
+import { useTechStackStore } from "@/hooks/use-techstack";
+import { IconClose } from "@/public/assets/svgs";
 
 const TechStackModal = () => {
   const { isOpen, onClose, type } = useModal();

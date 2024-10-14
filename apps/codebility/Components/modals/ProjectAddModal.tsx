@@ -9,6 +9,13 @@ import { Client, User } from "@/app/home/projects/_types/projects";
 import { createProject } from "@/app/home/projects/actions";
 import { Button } from "@/Components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -34,14 +41,6 @@ import toast from "react-hot-toast";
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
 
 const ProjectAddModal = () => {
   const supabase = useSupabase();
@@ -392,21 +391,21 @@ const ProjectAddModal = () => {
                   );
                 })}
               </div>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild className="cursor-pointer">
-                    <Button
-                      variant="hollow"
-                      className="h-12 w-12 rounded-full p-0"
-                    >
-                      <IconPlus className="invert dark:invert-0" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    side="bottom"
-                    sideOffset={10}
-                    align="start"
-                    className="dark:bg-dark-100 z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white"
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild className="cursor-pointer">
+                  <Button
+                    variant="hollow"
+                    className="h-12 w-12 rounded-full p-0"
                   >
+                    <IconPlus className="invert dark:invert-0" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="bottom"
+                  sideOffset={10}
+                  align="start"
+                  className="dark:bg-dark-100 z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white"
+                >
                   <DropdownMenuLabel className="pb-2 text-center text-sm">
                     Add Members
                   </DropdownMenuLabel>

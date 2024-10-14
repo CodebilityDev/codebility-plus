@@ -10,6 +10,13 @@ import { Client, User } from "@/app/home/projects/_types/projects";
 import { updateProject } from "@/app/home/projects/actions";
 import { Button } from "@/Components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -27,14 +34,6 @@ import toast from "react-hot-toast";
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
 
 const ProjectEditModal = () => {
   const supabase = useSupabase();
@@ -153,7 +152,10 @@ const ProjectEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent aria-describedby={undefined} className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[45rem] lg:justify-between lg:overflow-hidden">
+      <DialogContent
+        aria-describedby={undefined}
+        className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[45rem] lg:justify-between lg:overflow-hidden"
+      >
         <DialogHeader className="relative">
           <DialogTitle className="mb-2 text-left text-xl">
             Edit Project

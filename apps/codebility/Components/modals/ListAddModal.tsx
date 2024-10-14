@@ -7,13 +7,14 @@ import { useModal } from "@/hooks/use-modal";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
+
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../ui/dialog";
+} from "@/Components/ui/dialog";
 
 const ListAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
@@ -52,7 +53,7 @@ const ListAddModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="w-[90%] max-w-3xl">
+      <DialogContent aria-describedby={undefined} className="w-[90%] max-w-3xl">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader className="relative">
             <DialogTitle className="mb-2 text-left text-lg">
