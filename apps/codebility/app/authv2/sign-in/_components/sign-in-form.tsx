@@ -41,7 +41,7 @@ const SignInForm = () => {
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 w-full max-w-md mx-auto">
       <form onSubmit={handleSubmit(onSubmit)}>
         <div className="flex flex-col gap-4 py-3">
           <SignInInputs
@@ -65,7 +65,7 @@ const SignInForm = () => {
           <button
             type="button"
             onClick={() => router.push(pathsConfig.auth.passwordReset)}
-            className="text-md text-right duration-300 hover:text-blue-100"
+            className="w-max self-end text-md text-right duration-300 hover:text-blue-100"
           >
             Forgot Password?
           </button>
