@@ -1,9 +1,13 @@
 import { deleteProject } from "@/app/home/projects/actions";
 import { Button } from "@/Components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
 import { useModal } from "@/hooks/use-modal-projects";
 import toast from "react-hot-toast";
-
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/dialog";
 
 const ProjectDeleteModal = () => {
   const { isOpen, onClose, type, data } = useModal();
