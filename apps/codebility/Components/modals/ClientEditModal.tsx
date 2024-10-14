@@ -4,6 +4,13 @@ import { DEFAULT_AVATAR } from "@/app/home/clients/_lib/constants";
 import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema";
 import { updateClientAction } from "@/app/home/clients/action";
 import { Button } from "@/Components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
 import { useModal } from "@/hooks/use-modal-clients";
 import { IconClose } from "@/public/assets/svgs";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -11,14 +18,6 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
-
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "../ui/dialog";
 
 const ClientEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
@@ -114,13 +113,10 @@ const ClientEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
-      <DialogContent className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto">
-        <button
-          onClick={() => handleDialogChange(false)}
-          className="absolute right-4 top-4"
-        >
-          <IconClose />
-        </button>
+      <DialogContent
+        aria-describedby={undefined}
+        className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl">Edit Company</DialogTitle>
         </DialogHeader>
