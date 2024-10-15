@@ -107,7 +107,7 @@ const TaskEditModal = () => {
       const response = await updateTask(formData, data);
       if (response.success) {
         toast.success("Create task successful.");
-        router.refresh(); // show new task.
+        router.refresh();
       } else {
         console.log("Error creating task: ", response.error);
         toast.error("Failed to create task.");
@@ -131,8 +131,8 @@ const TaskEditModal = () => {
         className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]"
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <DialogHeader className="relative">
-            <DialogTitle className="text-left text-lg font-bold capitalize">
+          <DialogHeader className="relative max-w-[17.5rem] md:max-w-xl lg:max-w-[39rem] ">
+            <DialogTitle className="text-left text-lg font-bold capitalize break-words">
               Edit Task: {data?.title}
             </DialogTitle>
           </DialogHeader>
@@ -340,7 +340,7 @@ const TaskEditModal = () => {
                               loading="eager"
                             />
                           </div>
-                          <span>{`${user.first_name} ${user.last_name}`}</span>
+                          <span className="capitalize">{`${user.first_name} ${user.last_name}`}</span>
                         </div>
                       </DropdownMenuItem>
                     ))}

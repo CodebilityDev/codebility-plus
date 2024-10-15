@@ -78,8 +78,8 @@ function KanbanTask({ task }: Props) {
         {...listeners}
         className="cursor-grabs ring-violet relative flex h-auto max-w-72 cursor-grab flex-col gap-2 rounded-lg bg-white p-2.5 text-left ring-inset hover:ring-2 dark:bg-[#1E1F26]"
       >
-        <div className="flex justify-between text-xs">
-          {task.title}
+        <div className="flex justify-between gap-2 text-xs">
+          <p className="line-clamp-6 flex-1 break-words">{task.title}</p>
           {<PriorityIcon />}
         </div>
         <div className="relative">
