@@ -10,6 +10,13 @@ import { Member } from "@/app/home/kanban/[id]/_types/member";
 import { updateTask } from "@/app/home/kanban/[id]/actions";
 import { Button } from "@/Components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -33,14 +40,6 @@ import toast from "react-hot-toast";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/Components/ui/dialog";
-
 const TaskEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskEditModal";
@@ -54,13 +53,17 @@ const TaskEditModal = () => {
   const [taskType, setTaskType] = useState("");
   const [prLink, setPrLink] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<Member[] | any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: members } = useFetchMembers();
 
+  const editTaskNumber = isModalOpen ? data.number : 0;
+  const editTaskTitle = isModalOpen ? taskTitle.split(" ").join("-") : "";
+  const editBranchName = `${editTaskNumber}-${editTaskTitle}`;
+
   useEffect(() => {
-    if (data) {
+    if (data && isModalOpen) {
       setTaskTitle(data.title);
       setCategory(data.category || "");
       setDuration(data.duration || "");
@@ -71,7 +74,7 @@ const TaskEditModal = () => {
       setDescription(data.description || "");
       setSelectedMembers(data.codev_task || []);
     }
-  }, [data]);
+  }, [isModalOpen]);
 
   const addMember = (member: Member) => {
     setSelectedMembers((prevMembers) => {
@@ -237,9 +240,10 @@ const TaskEditModal = () => {
                 label="Branch Name"
                 name="branchName"
                 className="dark:bg-dark-200 cursor-not-allowed"
+                value={editBranchName}
                 disabled
               />
-              <button type="button" onClick={() => handleCopy(data.pr_link)}>
+              <button type="button" onClick={() => handleCopy(editBranchName)}>
                 <IconCopy className="h-5 invert dark:invert-0" />
               </button>
             </div>
@@ -267,17 +271,16 @@ const TaskEditModal = () => {
                   return (
                     <div
                       className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-                      key={member.id}
+                      key={member.codev.id}
                       onClick={() => removeMember(member.id)}
                     >
                       <Image
                         alt="Avatar"
-                        // src={
-                        //   member?.codev?.user?.profile?.image_url || DEFAULT_AVATAR
-                        // }
-                        src={DEFAULT_AVATAR}
+                        src={
+                          member.codev.user.profile.image_url || DEFAULT_AVATAR
+                        }
                         fill
-                        // title={`${member?.codev?.first_name} ${member?.codev?.last_name}'s avatar`}
+                        title={`${member.codev.user.profile.first_name} ${member.codev.user.profile.last_name}'s avatar`}
                         className="h-auto w-full rounded-full bg-cover object-cover"
                         loading="eager"
                       />
