@@ -16,7 +16,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@codevs/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@codevs/ui/sheet";
 
 const NavigationMain = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
   const { color } = useChangeBgNavigation();
@@ -130,8 +136,12 @@ const NavigationMain = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
               </SheetTrigger>
               <SheetContent
                 side="left"
+                aria-describedby={undefined}
                 className="bg-black-900 flex h-full w-full flex-col justify-start border-none bg-stone-900 pt-20 text-white"
               >
+                <SheetHeader className="hidden">
+                  <SheetTitle>Sidebar</SheetTitle>
+                </SheetHeader>
                 {navItems.map((item, index) => {
                   if (isLoggedIn && index >= navItems.length - 2) {
                     return null;
@@ -141,11 +151,8 @@ const NavigationMain = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
                       onClick={() => setOpenSheet(false)}
                       href={item.path}
                       key={item.id}
-                      className={`w-full ${
-                        index === 3 ? "border-none" : "border-b border-gray-700"
-                      }`}
                     >
-                      <p className="w-full cursor-pointer px-4 py-6 text-left text-xl font-semibold">
+                      <p className="w-full cursor-pointer p-4 text-left text-xl font-semibold">
                         {item.title}
                       </p>
                     </Link>
@@ -155,7 +162,7 @@ const NavigationMain = ({ isLoggedIn }: { isLoggedIn: boolean }) => {
                 {isLoggedIn && (
                   <button
                     onClick={() => handleLogout()}
-                    className="w-full cursor-pointer border-none px-4 py-6 text-left text-xl font-semibold"
+                    className="w-full cursor-pointer border-none p-4 text-left text-xl font-semibold"
                   >
                     Logout
                   </button>
