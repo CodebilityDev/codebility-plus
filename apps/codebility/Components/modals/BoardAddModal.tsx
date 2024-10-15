@@ -4,6 +4,13 @@ import { FormEvent, useEffect, useState } from "react";
 import { createNewBoard } from "@/app/home/kanban/actions";
 import { Button } from "@/Components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -16,19 +23,11 @@ import { useModal } from "@/hooks/use-modal";
 import { ProjectT } from "@/types";
 import toast from "react-hot-toast";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import { Input } from "@codevs/ui/input";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/Components/ui/dialog";
-
 const BoardAddModal = () => {
-  const supabase = useSupabase();
+  const supabase = getSupabaseBrowserClient();
 
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "boardAddModal";
