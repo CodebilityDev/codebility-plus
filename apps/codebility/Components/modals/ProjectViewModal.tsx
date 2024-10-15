@@ -15,7 +15,7 @@ import { useModal } from "@/hooks/use-modal-projects";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { format, parseISO } from "date-fns";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import {
   HoverCard,
   HoverCardContent,
@@ -23,13 +23,13 @@ import {
 } from "@codevs/ui/hover-card";
 
 const ProjectViewModal = () => {
-  const supabase = useSupabase();
+  const supabase = getSupabaseBrowserClient();
 
   const { isOpen, type, onClose, onOpen, data } = useModal();
   const isModalOpen = isOpen && type === "projectViewModal";
 
   const [teamLead, setTeamLead] = useState<User[]>([]);
-  const team_leader_id = data?.team_leader_id;
+  const team_leader_id = isModalOpen ? data?.team_leader_id : null;
   const membersParsed = parseMembers(data?.members || []);
   const formattedDate = data?.created_at
     ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
@@ -45,7 +45,8 @@ const ProjectViewModal = () => {
       const { data, error } = await supabase
         .from("codev")
         .select("*")
-        .eq("id", team_leader_id);
+        .eq("id", team_leader_id)
+        .single();
 
       if (error) {
         if (error) throw error;
@@ -54,7 +55,10 @@ const ProjectViewModal = () => {
         setTeamLead(data);
       }
     };
-    getTeamLead();
+
+    if (isModalOpen) {
+      getTeamLead();
+    }
   }, [isModalOpen, team_leader_id]);
 
   // Ensure view_type is a string before parsing, and use type assertion
