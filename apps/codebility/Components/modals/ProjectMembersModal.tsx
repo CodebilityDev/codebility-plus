@@ -14,10 +14,10 @@ import {
 import { useModal } from "@/hooks/use-modal-projects";
 import toast from "react-hot-toast";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 
 const ProjectMembersModal = () => {
-  const supabase = useSupabase();
+  const supabase = getSupabaseBrowserClient();
 
   const { isOpen, type, onClose, data } = useModal();
   const isModalOpen = isOpen && type === "projectMembersModal";
