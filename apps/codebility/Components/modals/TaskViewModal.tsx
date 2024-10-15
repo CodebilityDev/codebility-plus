@@ -50,14 +50,14 @@ const TaskViewModal = () => {
         className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]"
       >
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <DialogHeader className="relative">
-              <DialogTitle className="text-left text-lg font-bold capitalize">
+          <div className="flex gap-4">
+            <DialogHeader className="relative max-w-[15rem] md:max-w-xl lg:max-w-[39rem] ">
+              <DialogTitle className="text-left text-lg font-bold capitalize break-words">
                 {data?.title}
               </DialogTitle>
             </DialogHeader>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild className="mt-5 md:mt-0">
                 <Ellipsis className="cursor-pointer" />
               </DropdownMenuTrigger>
               <DropdownMenuContent

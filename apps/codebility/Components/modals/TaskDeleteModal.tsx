@@ -44,10 +44,10 @@ const TaskDeleteModal = () => {
             Delete Task
           </DialogTitle>
         </DialogHeader>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4 max-w-[17.5rem] md:max-w-md overflow-y-auto">
           <p className="text-lg">
-            Are you sure you want to delete task{" "}
-            <span className="text-red-500">{data?.title}</span>?
+            Are you sure you want to delete task{"  "}
+            <span className="text-red-500 break-words">{data?.title}</span>?
           </p>
           <div className="flex flex-col gap-4 md:flex-row">
             <Button variant="destructive" type="submit">
