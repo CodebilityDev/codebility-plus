@@ -30,7 +30,7 @@ export default async function HomeLayout({
 
   const permissionNames = Object.keys(data.user.user_type || {});
   const permissions = permissionNames.filter(
-    (permissionName) => data.user.user_type[permissionName] === true,
+    (permissionName) => data?.user.user_type[permissionName] === true,
   );
 
   const {
@@ -48,7 +48,7 @@ export default async function HomeLayout({
     image_url,
     start_time,
     end_time,
-  } = data;
+  } = data || {};
 
   const userData = {
     id: user_id,
