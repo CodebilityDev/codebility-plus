@@ -27,7 +27,7 @@ import MobileNav from "@/Components/shared/dashboard/MobileNav";
 import Image from "next/image";
 
 export const menuItems = [
-  { href: "/settings", icon: IconProfile, label: "Settings" },
+  { href: "home/account-settings", icon: IconProfile, label: "Settings" },
 ];
 
 
