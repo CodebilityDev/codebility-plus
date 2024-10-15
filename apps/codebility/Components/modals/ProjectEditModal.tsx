@@ -31,12 +31,12 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 
 const ProjectEditModal = () => {
-  const supabase = useSupabase();
+  const supabase = getSupabaseBrowserClient();
 
   const { isOpen, onClose, type, onOpen, data } = useModal();
   const isModalOpen = isOpen && type === "projectEditModal";
