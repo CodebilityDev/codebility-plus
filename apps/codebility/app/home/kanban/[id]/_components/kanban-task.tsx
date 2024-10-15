@@ -1,5 +1,4 @@
 import Image from "next/image";
-import defautlAvatar from "@/public/assets/images/default-avatar-200x200.jpg";
 import {
   IconPriority1,
   IconPriority2,
@@ -11,9 +10,9 @@ import { Task } from "@/types/home/task";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+import { DEFAULT_AVATAR } from "../_lib/constants";
 import { getTaskMembers } from "../../../_lib/get-task-members";
 import KanbanTaskViewEditModal from "./kanban_modals/kanban-task-view-edit-modal";
-import { DEFAULT_AVATAR } from "../_lib/constants";
 
 interface Props {
   task: Task;
@@ -48,8 +47,9 @@ function KanbanTask({ task }: Props) {
     LOW: IconPriority5,
   };
 
-  const PriorityIcon =
-    PriorityIconMap[task.priority_level as keyof typeof PriorityIconMap];
+  const PriorityIcon = task.priority_level
+    ? PriorityIconMap[task.priority_level as keyof typeof PriorityIconMap]
+    : IconPriority5;
 
   if (isDragging) {
     return (
