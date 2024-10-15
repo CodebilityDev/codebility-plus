@@ -5,6 +5,13 @@ import { handleCopy } from "@/app/home/kanban/[id]/_lib";
 import { DEFAULT_AVATAR } from "@/app/home/kanban/[id]/_lib/constants";
 import { Button } from "@/Components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -24,14 +31,6 @@ import {
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/Components/ui/dialog";
-
 const TaskViewModal = () => {
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskViewModal";
@@ -40,6 +39,10 @@ const TaskViewModal = () => {
     onClose();
   };
 
+  const taskNumber = isModalOpen ? data.number : 0;
+  const taskTitle = isModalOpen ? data?.title.split(" ").join("-") : "";
+  const branchName = `${taskNumber}-${taskTitle}`;
+
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent
@@ -47,14 +50,14 @@ const TaskViewModal = () => {
         className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]"
       >
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-4">
-            <DialogHeader className="relative">
-              <DialogTitle className="text-left text-lg font-bold capitalize">
+          <div className="flex gap-4">
+            <DialogHeader className="relative max-w-[15rem] md:max-w-xl lg:max-w-[39rem] ">
+              <DialogTitle className="text-left text-lg font-bold capitalize break-words">
                 {data?.title}
               </DialogTitle>
             </DialogHeader>
             <DropdownMenu>
-              <DropdownMenuTrigger asChild>
+              <DropdownMenuTrigger asChild className="mt-5 md:mt-0">
                 <Ellipsis className="cursor-pointer" />
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -150,10 +153,10 @@ const TaskViewModal = () => {
                 label="Branch Name"
                 name="branchName"
                 className="dark:bg-dark-200 cursor-not-allowed"
-                value={data?.pr_link}
+                value={branchName}
                 disabled
               />
-              <button type="button" onClick={() => handleCopy(data.pr_link)}>
+              <button type="button" onClick={() => handleCopy(branchName)}>
                 <IconCopy className="h-5 invert dark:invert-0" />
               </button>
             </div>
@@ -163,7 +166,7 @@ const TaskViewModal = () => {
               label="Pull Request Link"
               name="pr_link"
               className="dark:bg-dark-200 cursor-not-allowed"
-              value={data?.pr_link}
+              value={data?.pr_link || ""}
               disabled
             />
           </div>
@@ -174,7 +177,7 @@ const TaskViewModal = () => {
                 return (
                   <div
                     className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-                    key={codev.id}
+                    key={codev.codev.id}
                   >
                     <Image
                       alt="Avatar"

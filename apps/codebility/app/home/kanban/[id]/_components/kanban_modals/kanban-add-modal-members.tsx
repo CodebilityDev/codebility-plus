@@ -118,7 +118,7 @@ export default function KanbanAddModalMembers({
                         loading="eager"
                       />
                     </div>
-                    <span>{`${user.first_name} ${user.last_name}`}</span>
+                    <span className="capitalize">{`${user.first_name} ${user.last_name}`}</span>
                   </div>
                 </DropdownMenuItem>
               ))}

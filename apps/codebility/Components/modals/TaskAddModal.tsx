@@ -6,6 +6,13 @@ import KanbanTaskAddModalMembers from "@/app/home/kanban/[id]/_components/kanban
 import { createNewTask } from "@/app/home/kanban/[id]/actions";
 import { Button } from "@/Components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -21,14 +28,6 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/Components/ui/dialog";
-
 const TaskAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskAddModal";
@@ -42,7 +41,7 @@ const TaskAddModal = () => {
     // get all input name and value as key: value pair.
     for (let [key, value] of formData.entries()) inputs[key] = value;
 
-    const required = ["title", "category", "priority", "type"];
+    const required = ["title"];
 
     for (let key of formData.keys()) {
       const value = inputs[key];

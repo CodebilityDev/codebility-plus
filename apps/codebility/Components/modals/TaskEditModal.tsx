@@ -10,6 +10,13 @@ import { Member } from "@/app/home/kanban/[id]/_types/member";
 import { updateTask } from "@/app/home/kanban/[id]/actions";
 import { Button } from "@/Components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import {
   Select,
   SelectContent,
   SelectGroup,
@@ -33,14 +40,6 @@ import toast from "react-hot-toast";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/Components/ui/dialog";
-
 const TaskEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskEditModal";
@@ -54,13 +53,17 @@ const TaskEditModal = () => {
   const [taskType, setTaskType] = useState("");
   const [prLink, setPrLink] = useState("");
   const [description, setDescription] = useState("");
-  const [selectedMembers, setSelectedMembers] = useState<Member[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<Member[] | any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
 
   const { data: members } = useFetchMembers();
 
+  const editTaskNumber = isModalOpen ? data.number : 0;
+  const editTaskTitle = isModalOpen ? taskTitle.split(" ").join("-") : "";
+  const editBranchName = `${editTaskNumber}-${editTaskTitle}`;
+
   useEffect(() => {
-    if (data) {
+    if (data && isModalOpen) {
       setTaskTitle(data.title);
       setCategory(data.category || "");
       setDuration(data.duration || "");
@@ -71,7 +74,7 @@ const TaskEditModal = () => {
       setDescription(data.description || "");
       setSelectedMembers(data.codev_task || []);
     }
-  }, [data]);
+  }, [isModalOpen]);
 
   const addMember = (member: Member) => {
     setSelectedMembers((prevMembers) => {
@@ -101,10 +104,13 @@ const TaskEditModal = () => {
       formData.append("pr_link", prLink);
       formData.append("description", description);
 
+      const memberIds = selectedMembers.map((member) => member.id).join(",");
+      formData.append("membersId", memberIds);
+
       const response = await updateTask(formData, data);
       if (response.success) {
         toast.success("Create task successful.");
-        router.refresh(); // show new task.
+        router.refresh();
       } else {
         console.log("Error creating task: ", response.error);
         toast.error("Failed to create task.");
@@ -128,8 +134,8 @@ const TaskEditModal = () => {
         className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]"
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <DialogHeader className="relative">
-            <DialogTitle className="text-left text-lg font-bold capitalize">
+          <DialogHeader className="relative max-w-[17.5rem] md:max-w-xl lg:max-w-[39rem] ">
+            <DialogTitle className="break-words text-left text-lg font-bold capitalize">
               Edit Task: {data?.title}
             </DialogTitle>
           </DialogHeader>
@@ -237,9 +243,10 @@ const TaskEditModal = () => {
                 label="Branch Name"
                 name="branchName"
                 className="dark:bg-dark-200 cursor-not-allowed"
+                value={editBranchName}
                 disabled
               />
-              <button type="button" onClick={() => handleCopy(data.pr_link)}>
+              <button type="button" onClick={() => handleCopy(editBranchName)}>
                 <IconCopy className="h-5 invert dark:invert-0" />
               </button>
             </div>
@@ -260,24 +267,26 @@ const TaskEditModal = () => {
               name="membersId"
               value={selectedMembers.map((member) => member.id)}
             />
-            {/* note: not working yung update task sa member */}
             <div className="flex gap-2">
               <div className="flex flex-wrap items-center">
                 {selectedMembers.map((member) => {
                   return (
                     <div
                       className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-                      key={member.id}
+                      key={
+                        member.codev ? member.codev.user.profile.id : member.id
+                      }
                       onClick={() => removeMember(member.id)}
                     >
                       <Image
                         alt="Avatar"
-                        // src={
-                        //   member?.codev?.user?.profile?.image_url || DEFAULT_AVATAR
-                        // }
-                        src={DEFAULT_AVATAR}
+                        src={
+                          member.codev
+                            ? member.codev.user.profile.image_url
+                            : member.image_url || DEFAULT_AVATAR
+                        }
                         fill
-                        // title={`${member?.codev?.first_name} ${member?.codev?.last_name}'s avatar`}
+                        title={`${member.codev ? member.codev.user.profile.first_name : member.first_name} ${member.codev ? member.codev.user.profile.last_name : member.last_name}'s avatar`}
                         className="h-auto w-full rounded-full bg-cover object-cover"
                         loading="eager"
                       />
@@ -337,7 +346,7 @@ const TaskEditModal = () => {
                               loading="eager"
                             />
                           </div>
-                          <span>{`${user.first_name} ${user.last_name}`}</span>
+                          <span className="capitalize">{`${user.first_name} ${user.last_name}`}</span>
                         </div>
                       </DropdownMenuItem>
                     ))}

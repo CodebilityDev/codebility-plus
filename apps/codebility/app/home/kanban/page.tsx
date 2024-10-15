@@ -16,7 +16,6 @@ import { IconKanban } from "@/public/assets/svgs";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import BoardAddModal from "./_components/kanban-board-add-modal";
 import KanbanBoardsSearch from "./_components/kanban-boards-search";
 
 export default async function KanbanPage({
@@ -52,14 +51,13 @@ export default async function KanbanPage({
 
   return (
     <div className="text-dark100_light900 mx-auto flex max-w-7xl flex-col gap-4 ">
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <H1>Codevs Board</H1>
         <div className="flex flex-col items-end gap-4 md:flex-row md:items-center md:justify-end">
           <KanbanBoardsSearch
             className="border-gray h-10 w-full rounded-full border border-opacity-50 bg-inherit px-5 text-xs focus:outline-none md:w-80"
             placeholder="Search Board"
           />
-          <BoardAddModal />
         </div>
       </div>
       <Table>
