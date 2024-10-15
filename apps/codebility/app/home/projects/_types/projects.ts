@@ -42,3 +42,27 @@ export type Member = {
   image_url: string;
   position: string;
 };
+
+export type Project = {
+  id?: string;
+  name: string;
+  summary: string | null;
+  thumbnail: string | null;
+  github_link: string | null;
+  live_link: string | null;
+  figma_link: string | null;
+  team_leader_id: string;
+  client_id: string;
+  members: Array<Member>;
+};
+
+export type Board = {
+  id: string;
+  name: string;
+  project_id: string;
+};
+
+export type List = {
+  name: string;
+  board_id: string;
+}
