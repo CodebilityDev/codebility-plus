@@ -38,12 +38,12 @@ import {
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 
 const ProjectAddModal = () => {
-  const supabase = useSupabase();
+  const supabase = getSupabaseBrowserClient();
 
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "projectAddModal";
