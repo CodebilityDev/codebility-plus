@@ -9,7 +9,7 @@ import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
 import { IconFourDotsMenu } from "@/public/assets/svgs";
 import { ChevronDown, ChevronUp } from "lucide-react";
 import { IconDropdown, IconLogout, IconProfile } from "@/public/assets/svgs";
-import { Sheet, SheetContent, SheetTrigger } from "@codevs/ui/sheet";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@codevs/ui/sheet";
 
 import {
   DropdownMenu,
