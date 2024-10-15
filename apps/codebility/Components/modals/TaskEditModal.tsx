@@ -104,6 +104,9 @@ const TaskEditModal = () => {
       formData.append("pr_link", prLink);
       formData.append("description", description);
 
+      const memberIds = selectedMembers.map((member) => member.id).join(",");
+      formData.append("membersId", memberIds);
+
       const response = await updateTask(formData, data);
       if (response.success) {
         toast.success("Create task successful.");
@@ -132,7 +135,7 @@ const TaskEditModal = () => {
       >
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader className="relative max-w-[17.5rem] md:max-w-xl lg:max-w-[39rem] ">
-            <DialogTitle className="text-left text-lg font-bold capitalize break-words">
+            <DialogTitle className="break-words text-left text-lg font-bold capitalize">
               Edit Task: {data?.title}
             </DialogTitle>
           </DialogHeader>
@@ -264,23 +267,26 @@ const TaskEditModal = () => {
               name="membersId"
               value={selectedMembers.map((member) => member.id)}
             />
-            {/* note: not working yung update task sa member */}
             <div className="flex gap-2">
               <div className="flex flex-wrap items-center">
                 {selectedMembers.map((member) => {
                   return (
                     <div
                       className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-                      key={member.codev.id}
+                      key={
+                        member.codev ? member.codev.user.profile.id : member.id
+                      }
                       onClick={() => removeMember(member.id)}
                     >
                       <Image
                         alt="Avatar"
                         src={
-                          member.codev.user.profile.image_url || DEFAULT_AVATAR
+                          member.codev
+                            ? member.codev.user.profile.image_url
+                            : member.image_url || DEFAULT_AVATAR
                         }
                         fill
-                        title={`${member.codev.user.profile.first_name} ${member.codev.user.profile.last_name}'s avatar`}
+                        title={`${member.codev ? member.codev.user.profile.first_name : member.first_name} ${member.codev ? member.codev.user.profile.last_name : member.last_name}'s avatar`}
                         className="h-auto w-full rounded-full bg-cover object-cover"
                         loading="eager"
                       />
