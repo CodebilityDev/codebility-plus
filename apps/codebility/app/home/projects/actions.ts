@@ -1,8 +1,10 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-import { Member, User } from "./_types/projects";
+
+import { Board, List, Member, Project, User } from "./_types/projects";
 
 const deleteImageByPublicUrl = async (publicUrlOrFilePath: string) => {
   const supabase = getSupabaseServerComponentClient();
@@ -71,7 +73,10 @@ const uploadProjectImage = async (
   }
 };
 
-export const createProject = async (formData: FormData, members: User[] | any[]) => {
+export const createProject = async (
+  formData: FormData,
+  members: User[] | any[],
+) => {
   const thumbnail = formData.get("thumbnail") as File | null;
   const project_name = formData.get("project_name") as string;
   const clientId = formData.get("clientId") as string;
@@ -100,7 +105,7 @@ export const createProject = async (formData: FormData, members: User[] | any[])
     );
   }
 
-  const newProject = {
+  const newProject: Project = {
     name: project_name,
     summary: summary || null,
     thumbnail: thumbnailPath,
@@ -112,20 +117,50 @@ export const createProject = async (formData: FormData, members: User[] | any[])
     members: membersData,
   };
 
-  console.log("new project action: ", newProject);
-
-  const { data, error } = await supabase
+  const { data: projectData, error: projectError } = await supabase
     .from("project")
     .insert(newProject)
-    .single();
+    .select();
 
-  if (error) {
-    console.error("Error creating project:", error.message);
-    return { success: false, error: error.message };
+  if (projectError) {
+    console.error("Error creating project:", projectError.message);
+    return { success: false, error: projectError.message };
+  }
+
+  const project: Project = projectData[0];
+
+  const { data: boardData, error: boardError } = await supabase
+    .from("board")
+    .insert({
+      name: `${project_name} Board`,
+      project_id: project.id as string,
+    })
+    .select();
+
+  if (boardError) {
+    console.error("Error creating board:", boardError.message);
+    return { success: false, error: boardError.message };
+  }
+
+  const board: Board = boardData[0];
+
+  const DEFAULT_LIST = ["pending", "in progress", "for review", "done"];
+  const listsToInsert: List[] = DEFAULT_LIST.map((name) => ({
+    name,
+    board_id: board.id,
+  }));
+
+  const { error: listError } = await supabase
+    .from("list")
+    .insert(listsToInsert);
+
+  if (listError) {
+    console.log("Error creating list: ", listError.message);
+    return { success: false, error: listError.message };
   }
 
   revalidatePath("/home/clients");
-  return { success: true, data };
+  return { success: true, data: projectData };
 };
 
 export const updateProject = async (id: string, formData: FormData) => {
