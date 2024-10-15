@@ -225,7 +225,7 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
     i++;
   }
 
-  return { success: true }
+  return { success: true };
 };
 
 export const updateTasksQueue = async (tasks: BoardTask[]) => {
@@ -271,7 +271,10 @@ export const deleteTask = async (taskId: string) => {
     return { success: false, error: codevTaskError.message };
   }
 
-  const { error: taskError } = await supabase.from("task").delete().eq("id", taskId);
+  const { error: taskError } = await supabase
+    .from("task")
+    .delete()
+    .eq("id", taskId);
 
   if (taskError) {
     console.log("Error deleting task: ", taskError.message);
@@ -293,6 +296,8 @@ export const deleteTask = async (taskId: string) => {
 function castType(data: FormData, CastInstruction: Record<string, string[]>) {
   const castedData: Record<string, any> = {}; // get value as an literal object {key: value}.
 
+  const NULLABLE_FIELDS = ["category", "priority", "type"];
+
   for (let [key, value] of data.entries()) {
     let newValue: any = value;
 
@@ -306,6 +311,10 @@ function castType(data: FormData, CastInstruction: Record<string, string[]>) {
       case CastInstruction["enum"] && CastInstruction["enum"]?.includes(key): // if enum
         newValue = newValue.toString().toUpperCase(); // enum value are typically uppercased(e.g ENUM,VALUE).
         break;
+    }
+
+    if (NULLABLE_FIELDS.includes(key) && newValue === "") {
+      newValue = null;
     }
 
     castedData[key] = newValue;
