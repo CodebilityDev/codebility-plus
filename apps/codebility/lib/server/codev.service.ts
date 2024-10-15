@@ -68,7 +68,7 @@ export const getCodevs = async (
       contact,
       education,
       experiences,
-    } = codev.user.profile;
+    } = codev.user.profile || {};
 
     return {
       id: codev.id,
