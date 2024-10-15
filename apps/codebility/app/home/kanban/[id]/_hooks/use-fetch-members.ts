@@ -19,7 +19,7 @@ export function useFetchMembers() {
                 ),
                 codev(id)
             )
-        `);
+        `).eq("application_status", "ACCEPTED");
     if (error) throw error;
 
     return data.map(({ id, user }) => {
