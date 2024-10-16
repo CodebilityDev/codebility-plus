@@ -181,7 +181,10 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (codev?.application_status === "DECLINED") {
+  if (
+    codev?.application_status === "DECLINED" &&
+    req.nextUrl.pathname !== "/home/account-settings"
+  ) {
     const url = req.nextUrl.clone();
     url.pathname = "/declined";
     return NextResponse.redirect(url);
