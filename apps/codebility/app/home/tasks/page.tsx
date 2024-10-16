@@ -43,8 +43,8 @@ export default async function TaskPage() {
   }
 
   return (
-    <div className="max-w-screen-xl mx-auto flex min-h-[70vh] flex-col gap-4">
-      <div className="flex flex-row justify-between gap-4">
+    <div className="mx-auto flex min-h-[70vh] max-w-screen-xl flex-col gap-4">
+      <div className="flex justify-between gap-4">
         <H1>My Tasks</H1>
       </div>
       <TasksContainer tasks={tasks} />
