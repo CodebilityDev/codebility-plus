@@ -28,6 +28,8 @@ const NavContent = () => {
           user.permissions.includes(link.permission),
         );
 
+        if (user.application_status !== "ACCEPTED") return null
+
         return (
           <div
             key={item.id}

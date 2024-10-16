@@ -19,6 +19,7 @@ export interface User {
   positions: string;
   portfolio_website: string;
   tech_stacks: string[];
+  application_status: string;
 }
 
 export const UserContext = createContext<User>({} as User);
