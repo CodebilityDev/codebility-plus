@@ -4,22 +4,22 @@ import { BsThreeDotsVertical } from 'react-icons/bs'
 export const headerOptions = [
   {
     name: 'Cart',
-    href: '/cart',
+    href: '/app/cart',
     icon: <NotificationButton/>
   },
   {
     name: 'Assistance',
-    href: '/assist',
+    href: '/app/assist',
     icon: <NotificationButton/>
   },
   {
     name: 'Share QR',
-    href: '/share',
+    href: '/app/share',
     icon: <NotificationButton/>
   },
   {
     name: 'Notifications',
-    href: '/notifications',
+    href: '/app/notifications',
     icon: <BsThreeDotsVertical/>
   }, 
 ]
