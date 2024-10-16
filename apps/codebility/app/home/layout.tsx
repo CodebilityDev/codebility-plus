@@ -24,7 +24,7 @@ export default async function HomeLayout({
 
   const { data } = await supabase
     .from("profile")
-    .select("*, user(*, user_type(*))")
+    .select("*, user(*, user_type(*), codev(application_status))")
     .eq("user_id", user?.id!)
     .single();
 
@@ -32,6 +32,7 @@ export default async function HomeLayout({
   const permissions = permissionNames.filter(
     (permissionName) => data?.user.user_type[permissionName] === true,
   );
+  const applicationStatus = data?.user.codev.application_status
 
   const {
     user_id,
@@ -67,6 +68,7 @@ export default async function HomeLayout({
     start_time,
     end_time,
     permissions,
+    application_status: applicationStatus
   };
 
   return (
