@@ -34,7 +34,8 @@ export interface InputProps {
     | "password"
     | "confirmPassword"
     | "schedule"
-    | "position";
+    | "position"
+    | "github"
   type?: string;
   required?: boolean;
   register: UseFormRegister<Inputs>;

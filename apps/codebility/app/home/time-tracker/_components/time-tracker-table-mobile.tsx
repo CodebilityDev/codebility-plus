@@ -2,6 +2,7 @@ import { Table, TableBody, TableCell, TableRow } from "@/Components/ui/table";
 import { IconEdit } from "@/public/assets/svgs";
 
 import { TimeLog } from "../_types/time-log";
+import { convertHoursToHMS } from "../../tasks/_lib/utils";
 
 interface Props {
   timeLog: TimeLog[];
@@ -17,7 +18,7 @@ const TimeTrackerTableMobile = ({ timeLog }: Props) => {
         ) => (
           <Table
             key={index}
-            className="background-box text-dark100_light900 my-[10px] flex h-[355px] flex-col  rounded border border-zinc-200 shadow-sm dark:border-zinc-700 "
+            className="background-box text-dark100_light900 my-[10px] flex flex-col  rounded border border-zinc-200 shadow-sm dark:border-zinc-700 "
           >
             <TableBody className="flex flex-col">
               <TableRow>
@@ -27,10 +28,10 @@ const TimeTrackerTableMobile = ({ timeLog }: Props) => {
                 <TableCell>Points: {0}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Rendered Hours: {log.worked_hours}</TableCell>
+                <TableCell>Rendered Hours: {convertHoursToHMS(log.worked_hours)}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Duration Hours: {log.task.duration}</TableCell>
+                <TableCell>Duration Hours: {convertHoursToHMS(log.task.duration)}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Project: {log.task.project.name}</TableCell>

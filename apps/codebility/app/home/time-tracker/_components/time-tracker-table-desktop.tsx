@@ -9,6 +9,7 @@ import {
 import { IconEdit } from "@/public/assets/svgs";
 
 import { TimeLog } from "../_types/time-log";
+import { convertHoursToHMS } from "../../tasks/_lib/utils";
 
 interface Props {
   timeLog: TimeLog[];
@@ -16,54 +17,58 @@ interface Props {
 
 export default function TimeTrackerTableDesktop({ timeLog }: Props) {
   return (
-    <Table className="background-box text-dark100_light900 h-[240px] max-w-[1320px]  rounded-lg shadow-lg">
-      <TableHeader className="dark:bg-dark-100 max-w-[1320px] rounded-lg">
-        <TableRow className="flex h-14 w-full max-w-[1320px] flex-row rounded-lg">
-          <TableHead className="flex basis-[20%] items-center justify-center">
-            Task
-          </TableHead>
-          <TableHead className="flex basis-[30%] items-center justify-center pl-60">
-            Points
-          </TableHead>
-          <TableHead className="flex basis-[50%] items-center justify-center">
+    <Table className="background-box text-dark100_light900">
+      <TableHeader className="dark:bg-dark-100">
+        <TableRow className="grid grid-cols-10 xl:grid-cols-11">
+          <TableHead className="col-span-2 p-2 xl:col-span-3">Task</TableHead>
+          <TableHead className="p-2 text-center">Points</TableHead>
+          <TableHead className="col-span-2 p-2 text-center">
             Rendered Hours
           </TableHead>
-          <TableHead className="flex basis-[50%] items-center justify-center">
+          <TableHead className="col-span-2 p-2 text-center">
             Duration Hours
           </TableHead>
-          <TableHead className="ml-10 flex basis-[90%] items-center">
-            Project
-          </TableHead>
+          <TableHead className="col-span-2 p-2 text-center">Project</TableHead>
+          <TableHead className="p-2 text-center">Action</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody className="flex w-full flex-col">
-        {timeLog.reverse().map(
-          (
-            log,
-            index, // reverse log array to start from newest log.
-          ) => (
-            <TableRow
-              key={index}
-              className="md:text-md flex w-full flex-row items-center text-sm lg:text-lg"
-            >
-              <TableCell className="basis-[24%] pl-9  font-medium">
-                {log.task.title}
-              </TableCell>
-              <TableCell className="basis-[8%] text-center">{0}</TableCell>
-              <TableCell className="basis-[18%] text-center">
-                {log.worked_hours.toFixed(8)}
-              </TableCell>
-              <TableCell className="basis-[15%] text-center">
-                {(log.task.duration || 0).toFixed(2)}
-              </TableCell>
-              <TableCell className="basis-[16%] text-center">
-                {log.task.project.name}
-              </TableCell>
-              <TableCell className="hover:text-black-200 ml-20 basis-[10%] cursor-pointer text-center">
-                <IconEdit />
-              </TableCell>
-            </TableRow>
-          ),
+      <TableBody>
+        {timeLog.length > 0 ? (
+          timeLog.map(
+            (
+              log,
+              index, // reverse log array to start from newest log.
+            ) => {
+              console.log("log: ", log);
+              return (
+                <TableRow
+                  key={index}
+                  className="grid grid-cols-10 xl:grid-cols-11"
+                >
+                  <TableCell className="col-span-2 flex-wrap xl:col-span-3">
+                    {log.task.title}
+                  </TableCell>
+                  <TableCell className="text-center">{0}</TableCell>
+                  <TableCell className="col-span-2 text-center">
+                    {convertHoursToHMS(log.worked_hours)}
+                  </TableCell>
+                  <TableCell className="col-span-2 text-center">
+                    {convertHoursToHMS(log.task.duration)}
+                  </TableCell>
+                  <TableCell className="col-span-2 text-center">
+                    {log.task.project.name}
+                  </TableCell>
+                  <TableCell className="flex justify-center">
+                    <IconEdit />
+                  </TableCell>
+                </TableRow>
+              );
+            },
+          )
+        ) : (
+          <TableRow>
+            <TableCell>No data</TableCell>
+          </TableRow>
         )}
       </TableBody>
     </Table>

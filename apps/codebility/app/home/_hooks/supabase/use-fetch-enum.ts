@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 
 export function useFetchEnum(schema_name: string, enum_name: string) {
-  const client = useSupabase();
+  const client = getSupabaseBrowserClient();
 
   const queryFn = async () => {
     const { data, error } = await client.rpc("get_enum_values", {

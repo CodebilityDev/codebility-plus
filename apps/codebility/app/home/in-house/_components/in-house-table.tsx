@@ -42,7 +42,7 @@ function Tables({
 
   return (
     <>
-      <div className="hidden overflow-hidden rounded-md lg:flex ">
+      <div className="hidden overflow-hidden rounded-md xl:flex ">
         <table className="background-box text-dark100_light900 w-full min-w-[850px] table-fixed">
           <TableHeader onSort={handleTableHeaderButton} />
           <tbody>
@@ -71,7 +71,7 @@ function Tables({
             ? `${data.length} items`
             : "The applicants list is empty at the moment."}
       </div>
-      <div className="hidden h-full w-full items-center justify-center lg:flex ">
+      <div className="hidden h-full w-full items-center justify-center xl:flex ">
         <DefaultPagination
           currentPage={currentPage}
           handleNextPage={handleNextPage}

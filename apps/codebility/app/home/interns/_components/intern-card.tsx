@@ -1,14 +1,13 @@
 "use client";
 
-import React from "react";
 import Image from "next/image";
 import Box from "@/Components/shared/dashboard/Box";
 import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal-users";
 import { defaultAvatar } from "@/public/assets/images";
-import { User } from "@/types";
+import { Codev } from "@/types/home/codev";
 
-const InternCard = ({ user }: { user: User; color: string }) => {
+const InternCard = ({ user }: { user: Codev; color: string }) => {
   const { onOpen } = useModal();
 
   return (
@@ -19,7 +18,7 @@ const InternCard = ({ user }: { user: User; color: string }) => {
       <div className="flex w-full flex-col items-center gap-4 rounded-lg text-center">
         <div className="relative size-16 rounded-full bg-cover object-cover">
           <Image
-            alt={`${user.first_name} Avatar`}
+            alt={`${user.first_name} avatar`}
             src={user.image_url || defaultAvatar}
             fill
             className="h-[70px] w-[70px] rounded-full bg-cover object-cover p-0.5"
@@ -28,9 +27,9 @@ const InternCard = ({ user }: { user: User; color: string }) => {
           <div className="absolute bottom-[4px] right-[2px]">
             <p
               className={`rounded-full  p-2 text-[9px] ${
-                user.jobStatusType === "AVAILABLE"
+                user.internal_status === "AVAILABLE"
                   ? "bg-green"
-                  : user.jobStatusType === "DEPLOYED"
+                  : user.internal_status === "DEPLOYED"
                     ? "bg-orange-400"
                     : "bg-gray"
               }`}
@@ -49,16 +48,16 @@ const InternCard = ({ user }: { user: User; color: string }) => {
 
           <p
             className={`w-min rounded-md px-3 py-1 ${
-              user.jobStatusType === "AVAILABLE"
-                ? "bg-green-400"
-                : user.jobStatusType === "DEPLOYED"
+              user.internal_status === "AVAILABLE"
+                ? "bg-green"
+                : user.internal_status === "DEPLOYED"
                   ? "bg-orange-400"
                   : "bg-gray"
             }`}
           >
-            {user.jobStatusType === "AVAILABLE"
+            {user.internal_status === "AVAILABLE"
               ? "Available"
-              : user.jobStatusType === "DEPLOYED"
+              : user.internal_status === "DEPLOYED"
                 ? "Deployed"
                 : "Inactive"}
           </p>

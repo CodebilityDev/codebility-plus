@@ -12,8 +12,11 @@ function FaqsModal() {
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className=" bg-black-800 flex max-w-[1260px] flex-col justify-between gap-4 text-white">
-        <div className="flex max-h-[500px] flex-col gap-2 overflow-hidden overflow-y-scroll p-20 ">
-          <h1 className="mb-8 text-center text-4xl font-semibold">
+        
+        
+        <div className="flex max-h-[500px] flex-col gap-2 overflow-hidden overflow-y-scroll ">
+         
+          <h1 className="mb-8 text-center text-4xl font-semibold ">
             Frequently Asked Questions
           </h1>
           <Accordion title="Q1 What makes Codebility different from other development companies?">
@@ -55,6 +58,8 @@ function FaqsModal() {
             amet, luctus vitae lorem.
           </Accordion>
         </div>
+
+
         <div className="flex gap-4 self-end">
           <button
             onClick={onClose}

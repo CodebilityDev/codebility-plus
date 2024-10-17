@@ -1,5 +1,4 @@
 import Image from "next/image";
-import defautlAvatar from "@/public/assets/images/default-avatar-200x200.jpg";
 import {
   IconPriority1,
   IconPriority2,
@@ -11,6 +10,7 @@ import { Task } from "@/types/home/task";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
+import { DEFAULT_AVATAR } from "../_lib/constants";
 import { getTaskMembers } from "../../../_lib/get-task-members";
 import KanbanTaskViewEditModal from "./kanban_modals/kanban-task-view-edit-modal";
 
@@ -47,8 +47,9 @@ function KanbanTask({ task }: Props) {
     LOW: IconPriority5,
   };
 
-  const PriorityIcon =
-    PriorityIconMap[task.priority_level as keyof typeof PriorityIconMap];
+  const PriorityIcon = task.priority_level
+    ? PriorityIconMap[task.priority_level as keyof typeof PriorityIconMap]
+    : IconPriority5;
 
   if (isDragging) {
     return (
@@ -77,8 +78,8 @@ function KanbanTask({ task }: Props) {
         {...listeners}
         className="cursor-grabs ring-violet relative flex h-auto max-w-72 cursor-grab flex-col gap-2 rounded-lg bg-white p-2.5 text-left ring-inset hover:ring-2 dark:bg-[#1E1F26]"
       >
-        <div className="flex justify-between text-xs">
-          {task.title}
+        <div className="flex justify-between gap-2 text-xs">
+          <p className="line-clamp-6 flex-1 break-words">{task.title}</p>
           {<PriorityIcon />}
         </div>
         <div className="relative">
@@ -91,11 +92,7 @@ function KanbanTask({ task }: Props) {
                 <div key={idx} className="h-6 w-6 rounded-full ">
                   <Image
                     alt="Avatar"
-                    src={
-                      member.image_url
-                        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${member.image_url}`
-                        : defautlAvatar
-                    }
+                    src={member.image_url || DEFAULT_AVATAR}
                     width={8}
                     height={8}
                     title={` ${member.first_name} ${member.last_name}`}

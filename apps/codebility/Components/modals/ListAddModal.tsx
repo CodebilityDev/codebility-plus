@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
-import { createListonBoard } from "@/app/api/kanban";
+import { FormEvent, useState } from "react";
+import { createNewList } from "@/app/home/kanban/[id]/actions";
 import { Button } from "@/Components/ui/button";
-import Input from "@/Components/ui/forms/input";
 import { useModal } from "@/hooks/use-modal";
-import useToken from "@/hooks/use-token";
 import toast from "react-hot-toast";
+
+import { Input } from "@codevs/ui/input";
 
 import {
   Dialog,
@@ -14,77 +14,80 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@codevs/ui/dialog";
-import { Label } from "@codevs/ui/label";
+} from "@/Components/ui/dialog";
 
 const ListAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
-  const [newList, setNewList] = useState({
-    name: "",
-    boardId: "",
-  });
-  const { token } = useToken();
+  const isModalOpen = isOpen && type === "listAddModal";
 
-  const handleNameChange = (e: any) => {
-    setNewList({ ...newList, name: e.target.value, boardId: data as string });
-  };
+  const [listName, setListName] = useState("");
 
-  const handleSave = async () => {
-    if (newList.name === "") {
-      toast.error("Name is Empty");
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (!listName) {
+      toast.error("Please enter a list name.");
       return;
     }
 
     try {
-      const response = await createListonBoard(newList, token);
-      if (response.status === 201) {
-        toast.success("List Added");
-        onClose();
+      const response = await createNewList(listName, data);
+      if (response.success) {
+        toast.success("Create list successful.");
+      } else {
+        console.log(response.error);
+        toast.error("Failed to create list.");
       }
     } catch (error) {
+      console.log("Error create list modal: ", error);
       toast.error("Something went wrong!");
+    } finally {
+      onClose();
+      setListName("");
     }
   };
 
   const handleClose = () => {
-    setNewList({ ...newList, name: "" });
     onClose();
   };
 
-  const isModalOpen = isOpen && type === "listAddModal";
-
   return (
-    <Dialog open={isModalOpen}>
-      <DialogContent className="flex h-auto w-[100%] max-w-3xl flex-col gap-6 overflow-x-auto overflow-y-auto">
-        <DialogHeader className="relative">
-          <DialogTitle className="mb-2 text-left text-lg">
-            Add New List
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex flex-col gap-6 lg:flex-row">
-          <div className="flex basis-[50%] flex-col gap-4">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" onChange={handleNameChange} />
-          </div>
-        </div>
-
-        <DialogFooter className="flex flex-col gap-2 lg:flex-row">
-          <Button
-            variant="hollow"
-            className="order-2 w-full sm:order-1 sm:w-[130px]"
-            onClick={handleClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            className="order-1 w-full sm:order-2 sm:w-[130px]"
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-        </DialogFooter>
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
+      <DialogContent aria-describedby={undefined} className="w-[90%] max-w-3xl">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <DialogHeader className="relative">
+            <DialogTitle className="mb-2 text-left text-lg">
+              Add New List
+            </DialogTitle>
+          </DialogHeader>
+          <Input
+            id="name"
+            type="text"
+            label="List Name"
+            name="name"
+            placeholder="Enter List Name"
+            className="dark:bg-dark-200"
+            value={listName}
+            onChange={(e) => setListName(e.target.value)}
+          />
+          <DialogFooter className="flex flex-col gap-2 lg:flex-row">
+            <Button
+              type="button"
+              variant="hollow"
+              className="order-2 w-full sm:order-1 sm:w-[130px]"
+              onClick={handleClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="default"
+              className="order-1 w-full sm:order-2 sm:w-[130px]"
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

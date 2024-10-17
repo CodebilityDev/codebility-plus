@@ -12,7 +12,7 @@ export const updateCodev = async (
   const supabase = getSupabaseServerActionClient();
   const keys = {
     project: ["projects"],
-    codev: ["internal_status", "nda_status"],
+    codev: ["internal_status", "nda_status", "type"],
     profile: ["main_position"],
   };
 

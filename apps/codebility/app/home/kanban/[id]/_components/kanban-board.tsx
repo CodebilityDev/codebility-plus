@@ -23,17 +23,17 @@ const KanbanBoard = ({ boardData }: Props) => {
             <ArrowRightIcon />
             <span>{boardData.name}</span>
           </div>
-          <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col gap-4 md:flex-row md:justify-between">
             <div className="text-dark100_light900 text-md font-semibold md:text-2xl">
               {boardData.name}
             </div>
-            <div className="flex gap-4">
-              <div className="bg-light-900 flex items-center gap-3 rounded-md border border-zinc-300 px-2 dark:border-zinc-500 dark:bg-[#2C303A]">
+            <div className="flex flex-col gap-4 md:flex-row">
+              <div className="w-full bg-light-900 flex items-center gap-3 rounded-md border border-zinc-300 p-2 dark:border-zinc-500 dark:bg-[#2C303A]">
                 <label htmlFor="kanbanSearch">
                   <IconSearch />
                 </label>
                 <KanbanBoardsSearch
-                  className="w-32 bg-transparent outline-none"
+                  className=" bg-transparent outline-none"
                   placeholder="Search"
                 />
               </div>
