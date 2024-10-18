@@ -1,17 +1,23 @@
-import Card from "@/app/home/orgchart/Card";
-import { orgChartData } from "@/app/home/orgchart/data";
-import Box from "@/Components/shared/dashboard/Box";
-import H1 from "@/Components/shared/dashboard/H1";
+import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
-import OrgCharts from "./org-chart";
+import OrgCharts from "./_components/org-chart";
 
-const Page = () => {
+
+const Page = async () => {
+  const supabase = getSupabaseServerActionClient();
+  const { data: orgChartData, error } = await supabase
+    .from("org_chart")
+    .select(
+      "id, team, profile_id (image_url, main_position, first_name, last_name)",
+    );
+
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
-      {/* <Box> */}
-      {/* <Card orgChartData={orgChartData} /> */}
-      {/* </Box> */}
-      <OrgCharts />
+      {error ? (
+        "error"
+      ) : (
+        <OrgCharts data={orgChartData as any[]} />
+      )}
     </div>
   );
 };
