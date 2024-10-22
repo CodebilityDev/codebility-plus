@@ -43,8 +43,11 @@ export const uploadImage = async (
       return null;
     }
 
-    console.log("File uploaded successfully:", data.path);
-    return data.path ?? null;
+    const { data: imageData } = supabase.storage
+      .from("clients-image")
+      .getPublicUrl(`public/${filename}`);
+
+    return imageData?.publicUrl || null;
   } catch (error) {
     console.error("Error in upload image:", error);
     throw error;
@@ -52,16 +55,10 @@ export const uploadImage = async (
 };
 
 export const deleteImage = async (path: string) => {
-  try {
-    const filePath = path.replace("public/", "");
-    console.log("File path: ", filePath);
+  const supabase = await getSupabaseServerActionClient();
+  const filePath = path.split("/public/")[2];
 
-    if (!filePath) {
-      throw new Error("File path could not be extracted from URL");
-    }
-
-    const supabase = await getSupabaseServerActionClient();
-
+  if (filePath) {
     const { error } = await supabase.storage
       .from("clients-image")
       .remove([`public/${filePath}`]);
@@ -69,10 +66,8 @@ export const deleteImage = async (path: string) => {
     if (error) {
       return { success: false, error: error.message };
     }
-
-    console.log(`Image deleted successfully`);
-  } catch (error) {
-    console.error("Error deleting image:", error);
+  } else {
+    console.error("Failed to extract file path from public URL");
   }
 };
 
@@ -116,7 +111,7 @@ export const createClientAction = async (formData: FormData) => {
   return { success: true, clientsData };
 };
 
-export const updateClientAction = async (id: number, formData: FormData) => {
+export const updateClientAction = async (clientId: number, formData: FormData) => {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const location = formData.get("location") as string;
@@ -128,55 +123,62 @@ export const updateClientAction = async (id: number, formData: FormData) => {
 
   const supabase = await getSupabaseServerActionClient();
 
-  const { data: clientData, error: getClientError } = await supabase
-    .from("clients")
-    .select("logo")
-    .eq("id", id)
-    .single();
-
-  if (getClientError) {
-    console.error("Error fetching client data:", getClientError.message);
-    return { success: false, error: getClientError.message };
-  }
-
-  await deleteImage(clientData.logo);
-
-  let updatedLogoPath = null;
-  if (logo) {
-    updatedLogoPath = await uploadImage(logo, "public", "clients-image");
-  }
-
   const { data: clientsData, error: clientsError } = await supabase
     .from("clients")
-    .update({
-      name,
-      logo: updatedLogoPath,
-      location: location || null,
-      email,
-      contact_number: contact_number || null,
-      linkedin_link,
-      start_time: start_time || null,
-      end_time: end_time || null,
-    })
-    .eq("id", id)
+    .select("*")
+    .eq("id", clientId)
     .single();
 
   if (clientsError) {
-    console.error("Error updating client:", clientsError.message);
+    console.error("Error fetching projects data:", clientsError.message);
     return { success: false, error: clientsError.message };
   }
 
+  const updateClient = {
+    name: name || clientsData.name,
+    email: email || clientsData.email,
+    location: location || clientsData.location,
+    contact_number: contact_number || clientsData.contact_number,
+    linkedin_link: linkedin_link || clientsData.linkedin_link,
+    start_time: start_time || clientsData.start_time,
+    end_time: end_time || clientsData.end_time,
+    logo: clientsData.logo
+  };
+
+  if (logo) {
+    if (clientsData.logo) {
+      await deleteImage(clientsData.logo);
+    }
+
+    updateClient.logo = await uploadImage(
+      logo,
+      "public",
+      "clients-image",
+    );
+  }
+
+  const { data: updateClientsData, error: updateClientsError } = await supabase
+    .from("clients")
+    .update(updateClient)
+    .eq("id", clientId)
+    .single();
+
+  if (updateClientsError) {
+    console.error("Error updating client:", updateClientsError.message);
+    return { success: false, error: updateClientsError.message };
+  }
+
   revalidatePath("/home/clients");
-  return { success: true, clientsData };
+  return { success: true, data: updateClientsData };
 };
 
-export const toggleClientArchiveAction = async (id: string) => {
+export const toggleClientArchiveAction = async (clientId: number) => {
   const supabase = await getSupabaseServerActionClient();
 
   const { data: client, error: fetchError } = await supabase
     .from("clients")
     .select("is_archive")
-    .eq("id", id)
+    .eq("id", clientId)
     .single();
 
   if (fetchError) {
@@ -191,7 +193,7 @@ export const toggleClientArchiveAction = async (id: string) => {
     .update({
       is_archive: newIsArchiveValue,
     })
-    .eq("id", id)
+    .eq("id", clientId)
     .single();
 
   if (updateError) {
@@ -203,7 +205,7 @@ export const toggleClientArchiveAction = async (id: string) => {
   return { success: true, updatedClient };
 };
 
-export const deleteClientAction = async (id: string | number) => {
+export const deleteClientAction = async (id: number) => {
   const supabase = await getSupabaseServerActionClient();
 
   const { data: clientData, error: getClientError } = await supabase
@@ -217,7 +219,9 @@ export const deleteClientAction = async (id: string | number) => {
     return { success: false, error: getClientError.message };
   }
 
-  await deleteImage(clientData.logo);
+  if (clientData.logo) {
+    await deleteImage(clientData.logo);
+  }
 
   const { error: deleteClientError } = await supabase
     .from("clients")

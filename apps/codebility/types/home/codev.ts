@@ -26,6 +26,7 @@ export interface Codev {
   nda_status: string;
   job_status: string;
   portfolio_website: string;
+  type: string;
 
   // for relational data type
   user?: User;

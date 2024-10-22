@@ -11,30 +11,12 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    "./server-actions-client": {
-      "types": "./dist/clients/server-actions.client.d.ts",
-      "default": "./dist/clients/server-actions.client.js"
-    },
-    "./server-component-client": {
-      "types": "./dist/clients/server-component.client.d.ts",
-      "default": "./dist/clients/server-component.client.js"
-    },
-    "./route-handler-client": {
-      "types": "./dist/clients/route-handler.client.d.ts",
-      "default": "./dist/clients/route-handler.client.js"
-    },
-    "./browser-client": {
-      "types": "./dist/clients/browser.client.d.ts",
-      "default": "./dist/clients/browser.client.js"
-    },
-    "./middleware-client": {
-      "types": "./dist/clients/middleware.client.d.ts",
-      "default": "./dist/clients/middleware.client.js"
-    },
-    "./hooks/*": {
-      "types": "./dist/hooks/*.d.ts",
-      "default": "./dist/hooks/*.js"
-    }
+    "./browser-client": "./src/clients/browser.client.ts",
+    "./middleware-client": "./src/clients/middleware.client.ts",
+    "./route-handler-client": "./src/clients/route-handler.client.ts",
+    "./server-actions-client": "./src/clients/server-actions.client.ts",
+    "./server-component-client": "./src/clients/server-component.client.ts",
+    "./hooks/*": "./src/hooks/*.ts"
   },
   "devDependencies": {
     "@codevs/tsconfig": "workspace:*",

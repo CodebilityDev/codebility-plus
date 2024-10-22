@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { Task } from "@/types/home/task";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
@@ -8,12 +9,18 @@ import { BoardTask } from "./_types/board";
 
 export const createNewList = async (name: string, board_id: string) => {
   const supabase = getSupabaseServerActionClient();
-  const { error } = await supabase.from("list").insert({
+  const { data, error } = await supabase.from("list").insert({
     name,
     board_id,
   });
 
-  if (error) throw error;
+  if (error) {
+    console.log("Error creating list: ", error.message);
+    return { success: false, error: error.message };
+  }
+
+  revalidatePath("/home/kanban");
+  return { success: true, data };
 };
 
 export const createNewTask = async (formData: FormData) => {
@@ -41,7 +48,10 @@ export const createNewTask = async (formData: FormData) => {
     .select("*")
     .eq("project_id", project_id);
 
-  if (fetchingTasksError) throw fetchingTasksError;
+  if (fetchingTasksError) {
+    console.log("Error fetching task: ", fetchingTasksError.message);
+    return { success: false, error: fetchingTasksError.message };
+  }
 
   const listTotalTask = Number(formData.get("totalTask") || 0);
 
@@ -63,7 +73,10 @@ export const createNewTask = async (formData: FormData) => {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    console.log("Error creating task: ", error.message);
+    return { success: false, error: error.message };
+  }
 
   const membersId = (
     formData.get("membersId")
@@ -77,8 +90,14 @@ export const createNewTask = async (formData: FormData) => {
       task_id: data.id,
     });
 
-    if (error) throw error;
+    if (error) {
+      console.log("Error creating codev task: ", error.message);
+      return { success: false, error: error.message };
+    }
   }
+
+  revalidatePath("/home/kanban");
+  return { success: true };
 };
 
 export const updateTaskListId = async (taskId: string, newListId: string) => {
@@ -147,7 +166,10 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
     })
     .eq("id", prevTask.id);
 
-  if (error) throw new Error(error.message);
+  if (error) {
+    console.log("Error updating task: ", error.message);
+    return { success: false, error: error.message };
+  }
 
   const newMembersId = (
     formData.get("membersId")
@@ -182,7 +204,10 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
         task_id: prevTask.id,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.log("Error updating codev task: ", error.message);
+        return { success: false, error: error.message };
+      }
     }
 
     if (removed && prevMemberId) {
@@ -191,11 +216,16 @@ export const updateTask = async (formData: FormData, prevTask: Task) => {
         task_id: prevTask.id,
       });
 
-      if (error) throw error;
+      if (error) {
+        console.log("Error deleting codev task member: ", error.message);
+        return { success: false, error: error.message };
+      }
     }
 
     i++;
   }
+
+  return { success: true };
 };
 
 export const updateTasksQueue = async (tasks: BoardTask[]) => {
@@ -231,16 +261,28 @@ export const updateTasksQueue = async (tasks: BoardTask[]) => {
 export const deleteTask = async (taskId: string) => {
   const supabase = getSupabaseServerActionClient();
 
-  const { error: deleteCodevTask } = await supabase
+  const { error: codevTaskError } = await supabase
     .from("codev_task")
     .delete()
     .eq("task_id", taskId);
 
-  if (deleteCodevTask) throw deleteCodevTask;
+  if (codevTaskError) {
+    console.log("Error deleting codev task: ", codevTaskError.message);
+    return { success: false, error: codevTaskError.message };
+  }
 
-  const { error } = await supabase.from("task").delete().eq("id", taskId);
+  const { error: taskError } = await supabase
+    .from("task")
+    .delete()
+    .eq("id", taskId);
 
-  if (error) throw error;
+  if (taskError) {
+    console.log("Error deleting task: ", taskError.message);
+    return { success: false, error: taskError.message };
+  }
+
+  revalidatePath("/home/kanban");
+  return { success: true };
 };
 
 /**
@@ -253,6 +295,8 @@ export const deleteTask = async (taskId: string) => {
  */
 function castType(data: FormData, CastInstruction: Record<string, string[]>) {
   const castedData: Record<string, any> = {}; // get value as an literal object {key: value}.
+
+  const NULLABLE_FIELDS = ["category", "priority", "type"];
 
   for (let [key, value] of data.entries()) {
     let newValue: any = value;
@@ -267,6 +311,10 @@ function castType(data: FormData, CastInstruction: Record<string, string[]>) {
       case CastInstruction["enum"] && CastInstruction["enum"]?.includes(key): // if enum
         newValue = newValue.toString().toUpperCase(); // enum value are typically uppercased(e.g ENUM,VALUE).
         break;
+    }
+
+    if (NULLABLE_FIELDS.includes(key) && newValue === "") {
+      newValue = null;
     }
 
     castedData[key] = newValue;

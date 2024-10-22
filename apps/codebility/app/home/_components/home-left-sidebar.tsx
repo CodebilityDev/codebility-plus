@@ -4,21 +4,18 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import pathsConfig from "@/config/paths.config";
 import { sidebarData } from "@/constants";
 import { useNavStore } from "@/hooks/use-sidebar";
-import { getSplit } from "@/lib/get-split";
 
 import useUser from "../_hooks/use-user";
 
 const LeftSidebar = () => {
   const user = useUser();
-
   const { isToggleOpen, toggleNav } = useNavStore();
   const pathname = usePathname();
 
   return (
-    <section className="background-navbar sticky left-0 top-0 z-20 flex h-screen flex-col gap-14 overflow-y-auto p-6 shadow-lg max-lg:hidden">
+    <section className="background-navbar sticky left-0 top-0 z-20 hidden h-screen flex-col gap-14 p-6 shadow-lg max-lg:hidden lg:flex">
       <div className="flex justify-stretch gap-4 max-lg:hidden">
         <div
           className={`transition-all ${!isToggleOpen ? "flex-0" : "flex-1"} flex overflow-hidden`}
@@ -50,53 +47,62 @@ const LeftSidebar = () => {
           className={`toggle-logo-btn ${isToggleOpen ? "close-nav" : "open-nav mx-auto"}`}
         />
       </div>
-      <div className="flex flex-1 flex-col gap-2 max-lg:hidden">
-        {sidebarData.map((item) => (
-          <div key={item.id} className={`${!isToggleOpen ? "mt-0" : "mt-5"}`}>
-            <h4
-              className={`text-gray text-sm uppercase ${!isToggleOpen ? "hidden" : "block"}`}
+      <div className="flex flex-1 flex-col gap-2 overflow-y-auto max-lg:hidden">
+        {sidebarData.map((item) => {
+          const hasPermission = item.links.some((link) =>
+            user.permissions.includes(link.permission),
+          );
+
+          if (user.application_status !== "ACCEPTED") return null
+
+          return (
+            <div
+              key={item.id}
+              className={`${!hasPermission ? "hidden" : "block"} ${!isToggleOpen ? "mt-0" : "mt-5"}`}
             >
-              {item.title}
-            </h4>
-            <div className="mt-3 flex flex-1 flex-col gap-2 max-lg:hidden">
-              {item.links.map((link) => {
-                const allowedRoutes = [
-                  getSplit(pathsConfig.app.settings, "/", { getLast: true }),
-                  getSplit(pathsConfig.app.orgchart, "/", { getLast: true }),
-                  ...user.permissions,
-                ];
-
-                const accessRoutes = allowedRoutes.includes(link.permission);
-                const isActive = pathname === link.route;
-
-                if (!accessRoutes || accessRoutes) {
-                  return (
-                    <Link
-                      href={link.route}
-                      key={link.label}
-                      className={`${
-                        isActive
-                          ? "primary-gradient text-light-900 rounded-lg"
-                          : "text-dark300_light900"
-                      } flex items-center justify-start gap-4 rounded-sm bg-transparent px-4 py-3 duration-100 hover:bg-[#F5F5F5] dark:hover:bg-[#131417]`}
-                    >
-                      <Image
-                        src={link.imgURL}
-                        alt={link.label}
-                        width={18}
-                        height={18}
-                        className={`${isActive ? "" : "invert-colors"} h-[18px] w-[18px]`}
-                      />
-                      <p className={`${isToggleOpen ? "block" : "hidden"}`}>
-                        {link.label}
-                      </p>
-                    </Link>
+              <h4
+                className={`text-gray text-sm uppercase ${!isToggleOpen || !hasPermission ? "hidden" : "block"}`}
+              >
+                {item.title}
+              </h4>
+              <div
+                className={`${!isToggleOpen ? "mt-0" : "mt-3"} flex flex-1 flex-col gap-2 max-lg:hidden`}
+              >
+                {item.links.map((link) => {
+                  const accessRoutes = user.permissions.includes(
+                    link.permission,
                   );
-                }
-              })}
+                  const isActive = pathname === link.route;
+
+                  if (accessRoutes) {
+                    return (
+                      <Link
+                        href={link.route}
+                        key={link.label}
+                        className={`${
+                          isActive
+                            ? "primary-gradient text-light-900 rounded-lg"
+                            : "text-dark300_light900"
+                        } flex items-center justify-start gap-4 rounded-sm bg-transparent px-4 py-3 duration-100 hover:bg-[#F5F5F5] dark:hover:bg-[#131417]`}
+                      >
+                        <Image
+                          src={link.imgURL}
+                          alt={link.label}
+                          width={18}
+                          height={18}
+                          className={`${isActive ? "" : "invert-colors"} h-[18px] w-[18px]`}
+                        />
+                        <p className={`${isToggleOpen ? "block" : "hidden"}`}>
+                          {link.label}
+                        </p>
+                      </Link>
+                    );
+                  }
+                })}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </section>
   );

@@ -1,17 +1,16 @@
 import Image from "next/image";
 import { Button } from "@/Components/ui/button";
-import { techstacks } from "@/constants";
-import { useModal } from "@/hooks/use-modal";
-import { useTechStackStore } from "@/hooks/use-techstack";
-import { IconClose } from "@/public/assets/svgs";
-
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@codevs/ui/dialog";
+} from "@/Components/ui/dialog";
+import { techstacks } from "@/constants";
+import { useModal } from "@/hooks/use-modal";
+import { useTechStackStore } from "@/hooks/use-techstack";
+import { IconClose } from "@/public/assets/svgs";
 
 const TechStackModal = () => {
   const { isOpen, onClose, type } = useModal();
@@ -27,7 +26,10 @@ const TechStackModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
-      <DialogContent className="bg-black-100 h-auto max-w-md overflow-y-auto py-8 sm:max-w-2xl sm:px-12 sm:py-16">
+      <DialogContent
+        aria-describedby={undefined}
+        className="bg-black-100 h-auto w-[90%] max-w-md overflow-y-auto py-8 sm:max-w-2xl sm:px-12 sm:py-16"
+      >
         <button onClick={onClose} className="absolute right-4 top-4">
           <IconClose />
         </button>
@@ -68,7 +70,7 @@ const TechStackModal = () => {
           <Button
             onClick={() => onClose()}
             variant="default"
-            className="mx-auto w-[100px] sm:mx-0 sm:w-[150px]"
+            className="mx-auto md:w-[100px]"
           >
             Ok
           </Button>

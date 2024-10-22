@@ -60,7 +60,7 @@ const Skills = ({data}: Skills_Prop) => {
         onClick={handleEditMode}
       />
       <p className="text-lg">Skills</p>
-      <div className="mt-4 flex h-full w-full flex-wrap items-center justify-start gap-2">
+      <div className="mt-4 flex w-full flex-wrap items-center justify-start gap-2">
         {stack &&
           stack.map((item: any, i: any) => (
             <div key={i} className="flex items-center">

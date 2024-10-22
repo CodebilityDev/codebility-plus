@@ -3,25 +3,25 @@ import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 
 const Loading = () => {
   return (
-    <div className="flex flex-col gap-4">
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+    <div className="mx-auto flex min-h-[70vh] max-w-screen-xl flex-col gap-4">
+      <Skeleton className="h-8 w-24" />
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {Array(6)
           .fill(null)
-          .map((value, i) => (
+          .map((_, i) => (
             <Box key={i}>
-              <div className="flex h-full flex-col justify-between">
-                <div className="relative flex flex-col gap-1">
-                  <Skeleton className="absolute right-0 top-0  h-4 w-20" />
-                  <Skeleton className="h-8 w-16" />
-                  <Skeleton className="h-7 w-full" />
-                  <Skeleton className="h-6 w-1/2" />
-                  <Skeleton className="h-4 w-full" />
-                  <Skeleton className="h-4 w-full" />
+              <div className="flex flex-col justify-between gap-2">
+                <div className="flex items-center justify-between">
+                  <Skeleton className="h-8 w-10" />
+                  <Skeleton className="h-8 w-10" />
                 </div>
-                <div className="mt-2 flex flex-row justify-between gap-2">
-                  <Skeleton className="h-6 w-20" />
-                  <Skeleton className="h-[30px] w-[30px] rounded-full" />
-                </div>
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
               </div>
             </Box>
           ))}

@@ -1,12 +1,18 @@
-import React from "react";
 import RenderTeam from "@/Components/shared/dashboard/RenderTeam";
 import { Paragraph } from "@/Components/shared/home";
 import { Button } from "@/Components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/Components/ui/dialog";
 import { Task } from "@/types/home/task";
 
-import { Dialog, DialogContent, DialogTrigger } from "@codevs/ui/dialog";
-
 import { Member } from "../../_types/member";
+import { DEFAULT_AVATAR } from "../../applicants/_lib/constants";
+import { convertHoursToHMS } from "../_lib/utils";
 
 interface Props {
   children: React.ReactNode;
@@ -18,17 +24,24 @@ export default function TaskViewModal({ children, task, taskMembers }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="h-[32rem] w-[80%] max-w-sm overflow-x-auto overflow-y-auto lg:h-auto">
+      <DialogContent
+        aria-describedby={undefined}
+        className="w-[90%] max-w-md"
+      >
+        <DialogHeader className="relative hidden">
+          <DialogTitle className="mb-2 text-left text-xl">
+            Task View
+          </DialogTitle>
+        </DialogHeader>
         <div className="flex flex-col gap-6">
           <div key={task.id} className="flex flex-col gap-y-5">
             <div className="relative flex flex-col gap-1">
               <p className="text-lg font-semibold text-white">{task.title}</p>
-              {/* <p className="text-sm">{task.subheader}</p> */}
               <Paragraph>{task.description}</Paragraph>
               <div className="text-gray mt-1 flex items-center gap-2 text-xs">
                 Duration Hours:{" "}
-                <p className="text-dark-100 text-sm uppercase dark:text-white">
-                  {task.duration}
+                <p className="text-dark-100 text-sm dark:text-white">
+                  {convertHoursToHMS(task.duration)}
                 </p>
               </div>
               <div className="text-gray mt-1 flex items-center gap-2 text-xs">
@@ -39,25 +52,23 @@ export default function TaskViewModal({ children, task, taskMembers }: Props) {
               </div>
               <div className="text-gray mt-1 flex items-center gap-2 text-xs">
                 Priority Level:{" "}
-                <p className="text-dark-100 text-sm uppercase dark:text-white">
+                <p className="text-dark-100 text-sm dark:text-white">
                   {task.priority_level}
                 </p>
               </div>
             </div>
-
             <div className="flex flex-row justify-between gap-2">
               <div className="flex flex-col gap-1">
                 <p className="text-sm text-white">Members</p>
                 <div>
-                  {taskMembers.map((member) => (
-                    <RenderTeam
-                      key={member.id}
-                      imgURL={
-                        member.image_url &&
-                        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/${member.image_url}`
-                      }
-                    />
-                  ))}
+                  {taskMembers.map((member, index) => {
+                    return (
+                      <RenderTeam
+                        key={index}
+                        imgURL={member.image_url || DEFAULT_AVATAR}
+                      />
+                    );
+                  })}
                 </div>
               </div>
             </div>

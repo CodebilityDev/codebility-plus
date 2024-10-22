@@ -1,14 +1,15 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import { createBoard } from "@/app/api/kanban";
-import { getProjects } from "@/app/api/projects";
+import { FormEvent, useEffect, useState } from "react";
+import { createNewBoard } from "@/app/home/kanban/actions";
 import { Button } from "@/Components/ui/button";
-import Input from "@/Components/ui/forms/input";
-import { useModal } from "@/hooks/use-modal";
-import useToken from "@/hooks/use-token";
-import { IconDropdown } from "@/public/assets/svgs";
-import { ProjectT } from "@/types";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -17,147 +18,132 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@radix-ui/react-select";
+} from "@/Components/ui/select";
+import { useModal } from "@/hooks/use-modal";
+import { ProjectT } from "@/types";
 import toast from "react-hot-toast";
 
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@codevs/ui/dialog";
-import { Label } from "@codevs/ui/label";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
+import { Input } from "@codevs/ui/input";
 
 const BoardAddModal = () => {
+  const supabase = getSupabaseBrowserClient();
+
   const { isOpen, onClose, type } = useModal();
+  const isModalOpen = isOpen && type === "boardAddModal";
+
   const [projects, setProjects] = useState<ProjectT[]>([]);
-  const [selectedProjectName, setSelectedProjectName] = useState<string | null>(
-    null,
-  );
-  const [newBoard, setNewBoard] = useState({
-    name: "",
-    projects: [{ projectsId: "" }],
-  });
-  const { token } = useToken();
+  const [projectId, setProjectId] = useState("");
+  const [name, setName] = useState("");
 
   useEffect(() => {
     const fetchProjects = async () => {
-      const projects = await getProjects();
-      setProjects(projects);
+      const { data, error } = await supabase.from("project").select();
+
+      if (error) {
+        if (error) throw error;
+        console.error("Error fetching projects:", error);
+      } else {
+        setProjects(data);
+      }
     };
 
-    fetchProjects();
-  }, []);
+    if (isModalOpen) {
+      fetchProjects();
+    }
+  }, [isModalOpen]);
 
-  const handleNameChange = (e: any) => {
-    setNewBoard({ ...newBoard, name: e.target.value });
-  };
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
 
-  const handleValueChange = (value: string) => {
-    setNewBoard({ ...newBoard, projects: [{ projectsId: value }] });
-    projects.forEach((proj) => {
-      if (proj.id === value) {
-        setSelectedProjectName(proj.name as string);
-      }
-    });
-  };
-
-  const handleSave = async () => {
-    if (newBoard.name === "") {
-      toast.error("Name is Empty");
+    if (!projectId || !name) {
+      toast.error("Please select a project and enter a board name.");
       return;
     }
 
     try {
-      const response = await createBoard(newBoard, token);
-      if (response.status === 201) {
-        toast.success("Board Added");
-        onClose();
+      const formData = new FormData();
+      formData.append("name", name);
+      formData.append("projectId", projectId);
+
+      const response = await createNewBoard(formData);
+      if (response.success) {
+        toast.success("Create board successful.");
+      } else {
+        console.log(response.error);
+        toast.error("Failed to create board.");
       }
     } catch (error) {
+      console.log("Error create board modal: ", error);
       toast.error("Something went wrong!");
+    } finally {
+      onClose();
+      setName("");
+      setProjectId("");
     }
   };
 
   const handleClose = () => {
-    setNewBoard({
-      name: "",
-      projects: [{ projectsId: "" }],
-    });
     onClose();
   };
 
-  const isModalOpen = isOpen && type === "boardAddModal";
-
   return (
-    <Dialog open={isModalOpen}>
-      <DialogContent className="background-lightbox_darkbox text-dark100_light900 flex h-auto w-[100%] max-w-3xl flex-col gap-6 overflow-x-auto overflow-y-auto">
-        <DialogHeader className="relative">
-          <DialogTitle className="mb-2 text-left text-lg">
-            Add New Board
-          </DialogTitle>
-        </DialogHeader>
-
-        <div className="flex flex-col gap-6 lg:flex-row">
-          <div className="flex basis-[50%] flex-col gap-4">
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
+      <DialogContent aria-describedby={undefined} className="w-[90%] max-w-3xl">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          <DialogHeader className="relative">
+            <DialogTitle className="mb-2 text-left text-lg">
+              Add New Board
+            </DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col gap-4">
             <div>
-              <Label>Project</Label>
-              <Select onValueChange={(value) => handleValueChange(value)}>
-                <SelectTrigger
-                  aria-label="Projects"
-                  className="border-light_dark flex w-full items-center justify-between rounded border bg-transparent px-3 py-2 text-left text-sm focus:outline-none"
-                >
-                  <SelectValue
-                    className="text-sm"
-                    placeholder="Select a Project"
-                  >
-                    {selectedProjectName}
-                  </SelectValue>
-                  <IconDropdown className="invert dark:invert-0" />
+              <label>Project</label>
+              <Select name="projectId" onValueChange={setProjectId}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select project"></SelectValue>
                 </SelectTrigger>
-
-                <SelectContent className="border-light_dark dark:bg-black-100 rounded-md border bg-[#FFF]">
+                <SelectContent>
                   <SelectGroup>
-                    <SelectLabel className="text-gray px-3 py-2 text-xs">
-                      Projects
-                    </SelectLabel>
-                    {projects?.map(({ id, name }: ProjectT) => (
-                      <SelectItem
-                        key={id}
-                        className="w-[345px] cursor-default px-3 py-2 text-sm hover:bg-blue-100"
-                        value={id as string}
-                      >
-                        {name}
+                    <SelectLabel>Projects</SelectLabel>
+                    {projects?.map((data) => (
+                      <SelectItem key={data.id} value={data.id as string}>
+                        {data.name}
                       </SelectItem>
                     ))}
                   </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
-            <div>
-              <Label htmlFor="name">Name</Label>
-              <Input id="name" onChange={handleNameChange} />
-            </div>
+            <Input
+              id="name"
+              type="text"
+              label="Board Name"
+              name="name"
+              placeholder="Enter Board Name"
+              className="dark:bg-dark-200"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+            />
           </div>
-        </div>
-
-        <DialogFooter className="flex flex-col gap-2 lg:flex-row">
-          <Button
-            variant="hollow"
-            className="order-2 w-full sm:order-1 sm:w-[130px]"
-            onClick={handleClose}
-          >
-            Cancel
-          </Button>
-          <Button
-            variant="default"
-            className="order-1 w-full sm:order-2 sm:w-[130px]"
-            onClick={handleSave}
-          >
-            Save
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="flex flex-col gap-2 lg:flex-row">
+            <Button
+              type="button"
+              variant="hollow"
+              className="order-2 w-full sm:order-1 sm:w-[130px]"
+              onClick={handleClose}
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              variant="default"
+              className="order-1 w-full sm:order-2 sm:w-[130px]"
+            >
+              Save
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   );

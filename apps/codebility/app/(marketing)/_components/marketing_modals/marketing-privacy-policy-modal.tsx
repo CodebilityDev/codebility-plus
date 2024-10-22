@@ -14,7 +14,9 @@ function PrivacyPolicyModal() {
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="bg-black-800 flex max-h-full max-w-[1260px] flex-col justify-between text-white">
         <div className="flex h-full overflow-hidden rounded-[10px] border border-[#1D1D1E]">
+          <div className="hidden sm:flex">
           <NavBar />
+          </div>
           <Content />
         </div>
         <Footer onClose={onClose} />

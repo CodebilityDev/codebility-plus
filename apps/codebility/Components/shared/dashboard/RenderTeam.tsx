@@ -17,6 +17,7 @@ const RenderTeam = ({ imgURL, onClick }: Props) => {
         src={imgURL || defaultAvatar}
         width={30}
         height={30}
+        className="rounded-full"
       />
     </div>
   );

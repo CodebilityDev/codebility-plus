@@ -10,7 +10,7 @@ async function InHousePage() {
   if (error) return <div>ERROR</div>;
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="max-w-screen-xl mx-auto flex flex-col gap-2">
       <H1>In-House Codebility</H1>
       {error ? (
         <div>ERROR</div>

@@ -1,11 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 
 import { Member } from "../../../_types/member";
 
 export function useFetchMembers() {
-  const supabase = useSupabase();
+  const supabase = getSupabaseBrowserClient();
 
   const queryFn = async () => {
     const { data, error } = await supabase.from("codev").select(`
@@ -19,7 +19,7 @@ export function useFetchMembers() {
                 ),
                 codev(id)
             )
-        `);
+        `).eq("application_status", "ACCEPTED");
     if (error) throw error;
 
     return data.map(({ id, user }) => {
