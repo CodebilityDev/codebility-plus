@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum";
+// import { useFetchEnum } from "@/app/home/_hooks/supabase/use-fetch-enum";
 import KanbanTaskAddModalMembers from "@/app/home/kanban/[id]/_components/kanban_modals/kanban-add-modal-members";
 import { createNewTask } from "@/app/home/kanban/[id]/actions";
 import { Button } from "@/Components/ui/button";
@@ -32,7 +32,8 @@ const TaskAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskAddModal";
 
-  const { data: categories } = useFetchEnum("public", "taskcategory");
+  // const { data: categories } = useFetchEnum("public", "taskcategory");
+  const categories = ['AD', 'BE', 'FE', 'MD', 'UI/UX']
   const router = useRouter();
 
   const validateInput = (formData: FormData) => {
