@@ -62,8 +62,10 @@ const ProjectEditModal = () => {
       }
     };
 
-    fetchUsers();
-  }, []);
+    if (isModalOpen) {
+      fetchUsers();
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     const fetchClients = async () => {
@@ -77,8 +79,10 @@ const ProjectEditModal = () => {
       }
     };
 
-    fetchClients();
-  }, []);
+    if (isModalOpen) {
+      fetchClients();
+    }
+  }, [isModalOpen]);
 
   const {
     register,
