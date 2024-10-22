@@ -20,7 +20,6 @@ import ServiceCategoriesDeleteModal from "@/Components/modals/ServiceCategoriesD
 import ServiceCategoriesModal from "@/Components/modals/ServiceCategoriesModal";
 import ServicesModal from "@/Components/modals/ServicesModal";
 import TaskAddModal from "@/Components/modals/TaskAddModal";
-import TaskViewEditModal from "@/Components/modals/TaskViewEditModal";
 import TaskViewModal from "@/Components/modals/TaskViewModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
@@ -41,7 +40,6 @@ export const ModalProviderHome = () => {
   return (
     <>
       <TaskAddModal />
-      <TaskViewEditModal />
       <TaskViewModal />
       <TaskEditModal />
       <TaskDeleteModal />
