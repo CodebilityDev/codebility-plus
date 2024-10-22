@@ -48,8 +48,10 @@ const BoardAddModal = () => {
       }
     };
 
-    fetchProjects();
-  }, []);
+    if (isModalOpen) {
+      fetchProjects();
+    }
+  }, [isModalOpen]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
