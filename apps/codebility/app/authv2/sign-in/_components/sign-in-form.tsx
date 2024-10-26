@@ -34,9 +34,6 @@ const SignInForm = () => {
       await signinUser(values.email_address, values.password);
       toast.success("Logged in successfully!");
 
-      setTimeout(() => {
-        toast.success("Congratulations! You are now an official member of Codebility.");
-      }, 2000); 
       
       setIsLoading(false);
     } catch (e) {
