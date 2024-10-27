@@ -14,8 +14,18 @@ const ToastNotification = () => {
 
   // Show the toast only after the component has mounted
   useEffect(() => {
-    if (isMounted && pathname === "/home") {
+
+    // Check if the toast has been shown before
+    const hasShownToast = localStorage.getItem("hasShownToast");
+
+
+    if (isMounted && pathname === "/home" && !hasShownToast) {
       toast.success("Congratulations! You are now an official member of Codebility.");
+
+      // Set flag in local storage to indicate the toast has been shown
+      localStorage.setItem("hasShownToast", "true");
+
+
     }
   }, [isMounted]);
 

@@ -18,6 +18,7 @@ type Inputs = z.infer<typeof SignInValidation>;
 const SignInForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+  //sa
 
   const {
     register,
@@ -32,6 +33,7 @@ const SignInForm = () => {
 
     try {
       await signinUser(values.email_address, values.password);
+      localStorage.removeItem("hasShownToast");
       toast.success("Logged in successfully!");
 
       
