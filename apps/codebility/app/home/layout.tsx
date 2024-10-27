@@ -10,6 +10,7 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 import LeftSidebar from "./_components/home-left-sidebar";
 import Navbar from "./_components/home-navbar";
 import UserContextProvider from "./_components/user-provider";
+import ToastNotification from "./_components/home-toast-notification";
 
 export default async function HomeLayout({
   children,
@@ -75,6 +76,7 @@ export default async function HomeLayout({
     <ReactQueryProvider>
       <UserContextProvider userData={userData}>
         <ModalProviderHome />
+        {applicationStatus === "ACCEPTED" && <ToastNotification />}
         <main className="background-light850_dark100 relative">
           <Navbar />
           <div className="flex">
