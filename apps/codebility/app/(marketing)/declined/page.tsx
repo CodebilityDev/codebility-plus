@@ -4,6 +4,7 @@ import Logo from "@/Components/shared/Logo";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import DeclinedButtons from "./_components/declined-buttons";
+import DeclinedCountdown from "./_components/declined-countdown";
 import { DeclinedApplicant } from "./_types";
 
 const DeclinedPage = async () => {
@@ -35,6 +36,7 @@ const DeclinedPage = async () => {
             after 3 months.
           </p>
         </div>
+        <DeclinedCountdown data={data as DeclinedApplicant} />
         <DeclinedButtons data={data as DeclinedApplicant} />
 
         <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
