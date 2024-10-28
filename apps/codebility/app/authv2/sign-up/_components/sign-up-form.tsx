@@ -175,7 +175,7 @@ const AuthForm = () => {
       const response = await signupUser(formData);
       if (response.success) {
         toast.success("Your account has been successfully created");
-        router.push("/waiting");
+        router.push("/thank-you");
         clearTime();
         clearStack();
         reset();
