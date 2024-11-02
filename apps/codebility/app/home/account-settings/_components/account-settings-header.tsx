@@ -1,4 +1,3 @@
-import React from "react";
 import { Lock } from "lucide-react";
 
 import { CardDescription, CardHeader, CardTitle } from "@codevs/ui/card";
@@ -6,7 +5,11 @@ import { Input } from "@codevs/ui/input";
 
 import AccountSettingsDialog from "./account-settings-dialog";
 
-export default function AccountSettingsHeader() {
+export default async function AccountSettingsHeader({
+  email,
+}: {
+  email: string;
+}) {
   return (
     <>
       <CardHeader className="px-0 sm:p-6">
@@ -22,6 +25,8 @@ export default function AccountSettingsHeader() {
           readOnly
           label="Email Address"
           parentClassName="flex justify-center flex-col gap-2 w-full"
+          variant="lightgray"
+          defaultValue={email}
         />
         <AccountSettingsDialog />
       </div>
