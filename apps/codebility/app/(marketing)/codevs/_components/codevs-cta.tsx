@@ -6,15 +6,21 @@ import { Button } from "@/Components/ui/button";
 import pathsConfig from "@/config/paths.config";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+
 import { getApplicationStatus } from "../service";
 
 export default async function CTA() {
   const supabase = getSupabaseServerComponentClient();
   const {
     data: { user },
+    error,
   } = await supabase.auth.getUser();
 
-  const { data } = await getApplicationStatus(user?.id!);
+  let data = null;
+
+  if (!error && user) {
+    data = (await getApplicationStatus(user?.id!)).data;
+  }
 
   return (
     <div className="mx-auto flex h-screen w-full max-w-3xl flex-col items-center justify-center gap-4 px-5 text-center text-white">
@@ -36,13 +42,15 @@ export default async function CTA() {
 
       <Link
         href={
-          data?.application_status === "ACCEPTED"
+          data && data?.application_status === "ACCEPTED"
             ? pathsConfig.app.home
             : pathsConfig.auth.signIn
         }
       >
         <Button variant="purple" size="lg" rounded="full" className="md:w-40">
-          {data?.application_status === "ACCEPTED" ? "Dashboard" : "Join Now"}
+          {data && data?.application_status === "ACCEPTED"
+            ? "Dashboard"
+            : "Join Now"}
         </Button>
       </Link>
     </div>
