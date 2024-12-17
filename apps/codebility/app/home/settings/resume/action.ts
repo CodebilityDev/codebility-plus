@@ -6,6 +6,7 @@ import { Profile_Types, Social_Types } from "./_types/resume";
 import { Experience_Type } from "./_components/resume-experience";
 import toast from "react-hot-toast";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { cachedUser } from "@/lib/server/supabase-action";
 
 
 const supabase = getSupabaseServerComponentClient()
@@ -40,15 +41,15 @@ export async function removeAvatar(avatar: string | null ): Promise<void>{
       }
 }
 export async function updateProfile(updatedData: Profile_Types) {
-    const {data: {user}} = await supabase.auth.getUser()
+    const user = await cachedUser();
     const {data, error} = await supabase.from("profile").update({...updatedData, id: user?.id }).eq("user_id", user?.id).select("*")
 }
 export async function updateSocial(updatedData: Social_Types) {
-    const {data: {user}} = await supabase.auth.getUser()
+    const user = await cachedUser();
     const {data, error} = await supabase.from("social").update(updatedData).eq("user_id", user?.id).select("*")
 }
 export async function createWorkExperience(createWorkExp: Experience_Type[]) {
-  const {data: {user}} = await supabase.auth.getUser()
+  const user = await cachedUser();
   const workExperience = { ...createWorkExp, profile_id: user?.id };
   const {data, error} = await supabase.from("experiences").insert(workExperience).eq("profile_id", user?.id).select()
 
@@ -59,10 +60,10 @@ export async function createWorkExperience(createWorkExp: Experience_Type[]) {
   return data;
 }
 export async function updateWorkExperience( id: string, expData: Experience_Type) {
-  const {data: {user}} = await supabase.auth.getUser()
- return await supabase.from("experiences").update(expData).eq("profile_id", user?.id).eq("id", id)
+  const user = await cachedUser();
+  return await supabase.from("experiences").update(expData).eq("profile_id", user?.id).eq("id", id)
 }
 export async function deleteWorkExperience(id: string){
-    const {data: {user}} = await supabase.auth.getUser()
+   const user = await cachedUser();
    return await supabase.from("experiences").delete().eq("profile_id", user?.id).eq("id", id)
 }

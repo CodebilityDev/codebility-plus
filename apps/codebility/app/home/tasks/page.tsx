@@ -1,4 +1,5 @@
 import H1 from "@/Components/shared/dashboard/H1";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { Task } from "@/types/home/task";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
@@ -7,9 +8,7 @@ import TasksContainer from "./_components/tasks-container";
 
 export default async function TaskPage() {
   const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
   const { data } = await supabase
     .from("codev")
     .select(

@@ -2,6 +2,7 @@ import TimeTrackerTable from "@/app/home/time-tracker/_components/time-tracker-t
 import Box from "@/Components/shared/dashboard/Box";
 import H1 from "@/Components/shared/dashboard/H1";
 import { formatToLocaleTime } from "@/lib/format-date-time";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -9,9 +10,7 @@ import { TimeLog } from "./_types/time-log";
 
 export default async function TimeTracker() {
   const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   const { data, error } = await supabase
     .from("codev")
