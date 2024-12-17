@@ -1,19 +1,15 @@
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import ServiceForm from "../_components/service-form";
 import { Category } from "../categories/_types/category";
 import { getAllServiceCategories } from "../categories/service";
 
 const AddNewService = async () => {
-  const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
   const categories = await getAllServiceCategories();
 
-  if (error) {
-    console.error("Error fetching user:", error);
+  if (!user) {
+    console.error("Error fetching user");
     return <p>Error fetching user</p>;
   }
 

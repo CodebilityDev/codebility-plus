@@ -4,21 +4,16 @@ import Link from "next/link";
 import { H2, Paragraph } from "@/Components/shared/home";
 import { Button } from "@/Components/ui/button";
 import pathsConfig from "@/config/paths.config";
-
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import { getApplicationStatus } from "../service";
 
 export default async function CTA() {
-  const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   let data = null;
 
-  if (!error && user) {
+  if (user) {
     data = (await getApplicationStatus(user?.id!)).data;
   }
 
