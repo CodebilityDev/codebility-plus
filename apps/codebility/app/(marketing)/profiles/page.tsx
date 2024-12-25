@@ -4,6 +4,8 @@ import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
 import { getAdmins, getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
 
+import "./style.css";
+
 import ProfileContainer from "./_components/profile-container";
 import CodevLists from "./_components/profile-lists";
 
