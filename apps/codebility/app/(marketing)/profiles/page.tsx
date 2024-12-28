@@ -7,6 +7,8 @@ import { Codev } from "@/types/home/codev";
 import ProfileContainer from "./_components/profile-container";
 import CodevLists from "./_components/profile-lists";
 
+import "./style.css";
+
 export default async function Profiles() {
   const [{ data: codevs }, { data: admins }] = await Promise.all([
     getCodevs("INHOUSE"),
