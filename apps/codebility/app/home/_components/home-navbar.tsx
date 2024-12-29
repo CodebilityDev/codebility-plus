@@ -35,7 +35,7 @@ const Navbar = () => {
           <div className="flex flex-1 items-center justify-end gap-6 p-4">
             {/* <IconBell className="invert dark:invert-0" /> */}
             <Theme />
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none">
                 <div className="hidden flex-col items-end md:flex ">
                   <p className="capitalize dark:text-white">
