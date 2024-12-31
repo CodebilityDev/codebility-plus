@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Box from "@/Components/shared/dashboard/Box";
 import { Button } from "@/Components/ui/button";
 import {
@@ -51,7 +51,6 @@ const PersonalInfo = ({ data }: Profile_Props) => {
   });
 
   const onSubmit = async (data: Profile_Types) => {
-    console.log("on submit data:", data);
     const toastId = toast.loading("Your info is being updated");
     try {
       setIsLoading(true);

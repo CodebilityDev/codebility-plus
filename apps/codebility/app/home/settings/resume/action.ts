@@ -58,6 +58,9 @@ export async function updateSocial(updatedData: Social_Types) {
     .update(updatedData)
     .eq("user_id", user?.id)
     .select("*");
+
+  if (error) throw error;
+  return data;
 }
 export async function createWorkExperience(createWorkExp: Experience_Type[]) {
   const {
