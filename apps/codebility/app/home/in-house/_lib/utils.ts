@@ -10,10 +10,20 @@ export const statusColors: Record<string, string> = {
 };
 
 //clean data example BE has "AVAILABLE" to "Available"
-export const convertToTitleCase = (word: string) => {
+// export const convertToTitleCase = (word: string) => {
+//   return word
+//     .toLowerCase()
+//     .split(" ")
+//     .map((letter) => letter.charAt(0).toUpperCase() + letter.slice(1))
+//     .join(" ");
+// };
+
+//altered to handle undefined or null values for storybook error handling
+export const convertToTitleCase = (word: string | undefined | null) => {
+  if (!word) return '';
   return word
     .toLowerCase()
-    .split(" ")
+    .split("_")
     .map((letter) => letter.charAt(0).toUpperCase() + letter.slice(1))
     .join(" ");
 };
