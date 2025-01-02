@@ -1,12 +1,11 @@
 import { Box } from "@/Components/shared/dashboard";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 export default async function TokenPoints() {
   const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   const { data } = await supabase
     .from("codev")

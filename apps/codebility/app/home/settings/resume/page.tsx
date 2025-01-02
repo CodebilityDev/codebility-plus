@@ -2,6 +2,7 @@
 
 import { H1 } from "@/Components/shared/dashboard";
 import CustomBreadcrumb from "@/Components/shared/dashboard/CustomBreadcrumb";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { Toaster } from "react-hot-toast";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
@@ -22,9 +23,8 @@ const items = [
 
 const Resume = async () => {
   const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
+
   const { data: profileData, error: profileError } = await supabase
     .from("profile")
     .select("*")
