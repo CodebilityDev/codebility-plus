@@ -1,3 +1,5 @@
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
+
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import ServiceForm from "../_components/service-form";
@@ -8,15 +10,11 @@ import { getServiceById } from "../service";
 const UpdateService = async ({ params }: { params: { serviceId: string } }) => {
   const { serviceId } = params;
   const service = await getServiceById(serviceId);
-  const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-    error,
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
   const categories = await getAllServiceCategories();
 
-  if (error) {
-    console.error("Error fetching user:", error);
+  if (!user) {
+    console.error("Error fetching user");
     return <p>Error fetching user</p>;
   }
 

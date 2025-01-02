@@ -1,5 +1,6 @@
 import { Box } from "@/Components/shared/dashboard";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { Task } from "@/types/home/task";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
@@ -10,9 +11,7 @@ import TimeTrackerTimer from "./dashboard-time-tracker-timer";
 
 export default async function TimeTracker() {
   const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   const { data, error } = await supabase
     .from("user")
