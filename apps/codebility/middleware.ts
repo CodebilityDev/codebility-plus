@@ -5,6 +5,8 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 
 import pathsConfig from "./config/paths.config";
 
+import { getCachedUser } from "./lib/server/supabase-server-comp";
+
 export const config = {
   matcher: [
     /*
@@ -145,9 +147,7 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = getSupabaseServerComponentClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   // if not signed in
   if (!user && !req.nextUrl.pathname.startsWith("/authv2")) {

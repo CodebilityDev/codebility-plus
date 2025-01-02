@@ -5,6 +5,7 @@ import pathsConfig from "@/config/paths.config";
 import { formatToUnix } from "@/lib/format-date-time";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+import { cookies } from "next/headers";
 
 const uploadProfileImage = async (
   file: File,
@@ -133,20 +134,26 @@ export const signupUser = async (formData: FormData) => {
 };
 
 export const signinUser = async (email: string, password: string) => {
+  const cookieStore = cookies();
   const supabase = getSupabaseServerActionClient();
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data: { user }, error } = await supabase.auth.signInWithPassword({
     email,
     password,
   });
 
-  if (error) throw error;
+  if (!user || error) throw error;
+
+  cookieStore.set("supabase-user", JSON.stringify({ id: user.id, email: user.email }));
 
   redirect(pathsConfig.app.home); // redirect to home after sign in
 };
 
 export const signOut = async () => {
+  const cookieStore = cookies();
   const supabase = getSupabaseServerActionClient();
   await supabase.auth.signOut();
+
+  cookieStore.delete("supabase-user");
   redirect("/");
 };

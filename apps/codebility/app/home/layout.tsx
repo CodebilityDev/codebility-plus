@@ -4,13 +4,14 @@ import "server-only";
 import React from "react";
 import { ModalProviderHome } from "@/Components/providers/modal-provider-home";
 import ReactQueryProvider from "@/hooks/reactQuery";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import LeftSidebar from "./_components/home-left-sidebar";
 import Navbar from "./_components/home-navbar";
-import UserContextProvider from "./_components/user-provider";
 import ToastNotification from "./_components/home-toast-notification";
+import UserContextProvider from "./_components/user-provider";
 
 export default async function HomeLayout({
   children,
@@ -19,9 +20,7 @@ export default async function HomeLayout({
 }) {
   const supabase = getSupabaseServerComponentClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   const { data } = await supabase
     .from("profile")
@@ -33,7 +32,7 @@ export default async function HomeLayout({
   const permissions = permissionNames.filter(
     (permissionName) => data?.user.user_type[permissionName] === true,
   );
-  const applicationStatus = data?.user.codev.application_status
+  const applicationStatus = data?.user.codev.application_status;
 
   const {
     user_id,
@@ -69,7 +68,7 @@ export default async function HomeLayout({
     start_time,
     end_time,
     permissions,
-    application_status: applicationStatus
+    application_status: applicationStatus,
   };
 
   return (
