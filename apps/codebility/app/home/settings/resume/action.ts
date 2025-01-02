@@ -1,13 +1,10 @@
 /* eslint-disable no-unused-vars */
-"use server"
+"use server";
 
-
-import { Profile_Types, Social_Types } from "./_types/resume";
-import { Experience_Type } from "./_components/resume-experience";
+import { cachedUser } from "@/lib/server/supabase-action";
 import toast from "react-hot-toast";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-import { cachedUser } from "@/lib/server/supabase-action";
 
 import { Experience_Type } from "./_components/resume-experience";
 import { Profile_Types, Social_Types } from "./_types/resume";
