@@ -1,4 +1,5 @@
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
+
 import { Card, CardContent, CardFooter } from "@codevs/ui/card";
 import { Separator } from "@codevs/ui/separator";
 
@@ -8,11 +9,7 @@ import AccountSettingsDelete from "./_components/account-settings-delete";
 import AccountSettingsHeader from "./_components/account-settings-header";
 
 export default async function AccountSettingsPage() {
-  const supabase = getSupabaseServerComponentClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   return (
     <div className="mx-auto max-w-screen-xl">

@@ -2,12 +2,11 @@ import { Rowdies } from "next/font/google";
 import Link from "next/link";
 import { Button } from "@/Components/ui/button";
 import pathsConfig from "@/config/paths.config";
-
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import SideNavMenu from "../../_components/marketing-sidenav-menu";
-import OrbitingCirclesBackground from "./codevs-orbiting-circles-bg";
 import { getApplicationStatus } from "../service";
+import OrbitingCirclesBackground from "./codevs-orbiting-circles-bg";
 
 const rowdies = Rowdies({
   weight: "300",
@@ -15,10 +14,7 @@ const rowdies = Rowdies({
 });
 
 export default async function Hero() {
-  const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   const { data } = await getApplicationStatus(user?.id!);
 

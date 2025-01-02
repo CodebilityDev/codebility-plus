@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import Logo from "@/Components/shared/Logo";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -9,9 +10,7 @@ import { DeclinedApplicant } from "./_types";
 
 const DeclinedPage = async () => {
   const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   if (!user) {
     redirect("/login");
