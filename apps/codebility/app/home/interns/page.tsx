@@ -1,30 +1,50 @@
-"use client";
+import { Codev } from "@/types/home/codev";
+import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import InternContainer from "./_components/intern-container";
 
-import { useState } from "react";
-import { positionTitles } from "@/app/home/interns/data";
-import FilterInterns from "@/app/home/interns/FilterInterns";
-import InternList from "@/app/home/interns/InternList";
-import H1 from "@/Components/shared/dashboard/H1";
+const Interns = async () => {
+  const supabase = getSupabaseServerComponentClient();
+  const [
+    { data: interns, error: internsError },
+    { data: profiles, error: profilesError },
+  ] = await Promise.all([
+    supabase.from("interns").select("*"),
+    supabase.from("profile").select("*, user(*, codev(*), social(*))"),
+  ]);
 
-const Interns = () => {
-  const [filters, setFilters] = useState<
-    Partial<(typeof positionTitles)[number]>[]
-  >([]);
+  if (internsError || profilesError) {
+    return "Error fetching data";
+  }
+
+  const data = interns.map((intern) => {
+    const profile = profiles.find((p) => p?.user_id === intern?.user_id);
+
+    return {
+      id: intern.id,
+      email: intern.email,
+      user_id: intern.user_id,
+      first_name: intern.first_name,
+      last_name: intern.last_name,
+      image_url: profile.image_url,
+      address: profile.address,
+      about: profile.about,
+      contact: profile.user.social.phone_no,
+      education: profile.education,
+      socials: profile.user.social,
+      main_position: profile.main_position,
+      internal_status: profile.user.codev.internal_status,
+      tech_stacks: profile.tech_stacks,
+      nda_status: profile.user.codev.nda_status,
+      job_status: profile.user.codev.job_status,
+      portfolio_website: profile.portfolio_website,
+      type: profile.user.codev.type,
+    };
+  });
 
   return (
-    <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
-      <div className="flex flex-col gap-6 md:flex-row">
-        <div className="flex-1">
-          <H1>Interns</H1>
-        </div>
-        <div className="flex flex-1 flex-col justify-center gap-4">
-          <div className="flex justify-center md:justify-end">
-            <FilterInterns filters={filters} setFilters={setFilters} />
-          </div>
-        </div>
-      </div>
-      <InternList filters={filters} />
-    </div>
+    <>
+      <InternContainer data={(data as Codev[]) || []} />
+    </>
   );
 };
 

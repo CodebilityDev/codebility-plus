@@ -5,7 +5,7 @@ import { InHouseProps } from "../_types/in-house";
 import Card from "./in-house-card";
 import EditableCard from "./in-house-editable-card";
 
-function InHouseCards({
+export default function InHouseCards({
   data,
   editableIds,
   handlers,
@@ -24,7 +24,7 @@ function InHouseCards({
 
   return (
     <>
-      <div className="flex flex-wrap justify-center gap-4 lg:hidden">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 xl:hidden">
         {data.map((member: any) =>
           editableIds.includes(member.id) ? (
             <EditableCard
@@ -48,7 +48,7 @@ function InHouseCards({
             ? `${data.length} items`
             : "The applicants list is empty at the moment."}
       </div>
-      <div className="flex h-full w-full items-center justify-center lg:hidden">
+      <div className="flex h-full w-full items-center justify-center xl:hidden">
         <DefaultPagination
           currentPage={currentPage}
           handleNextPage={handleNextPage}
@@ -59,5 +59,3 @@ function InHouseCards({
     </>
   );
 }
-
-export default InHouseCards;

@@ -30,15 +30,17 @@ const positionArray = [
   "CEO",
 ];
 const ndaArray = ["Received", "Sent", "-"];
+const typeArray = ["Intern", "Inhouse"]
 
 const optionsMap: Record<string, (string | undefined)[]> = {
   internal_status: statusArray,
   main_positon: positionArray,
   nda_status: ndaArray,
+  type: typeArray
 };
 
 interface Props {
-  type: "internal_status" | "main_positon" | "nda_status";
+  type: "internal_status" | "main_positon" | "nda_status" | "type";
   placeholder?: string;
   handleChange: (value: string) => void;
   className?: string;

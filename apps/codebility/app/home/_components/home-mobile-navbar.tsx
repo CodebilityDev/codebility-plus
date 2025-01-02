@@ -4,70 +4,79 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sidebarData } from "@/constants";
-import useAuthCookie from "@/hooks/use-cookie";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
 
 import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@codevs/ui/sheet";
 
+import useUser from "../_hooks/use-user";
+
 const NavContent = () => {
+  const user = useUser();
   const pathname = usePathname();
-  const { data: authData } = useAuthCookie();
-  const { userType } = authData || {};
 
   return (
     <section className="flex h-full flex-col gap-2 pt-4 ">
-      {sidebarData.map((item) => (
-        <div key={item.id}>
-          <h4 className={`text-gray text-sm uppercase`}>{item.title}</h4>
-          <div className="mt-3">
-            {item.links.map((link) => {
-              const allowedRoutes = ["/settings", "/orgchart"];
-              const isAdminOrUser =
-                userType?.name === "ADMIN" || userType?.name === "USER";
-              const isAllowedRoute =
-                isAdminOrUser && allowedRoutes.includes(link.route);
-              const accessRoutes =
-                userType?.[link.permission] || isAllowedRoute;
-              const isActive =
-                (pathname.includes(link.route) && link.route.length > 1) ||
-                pathname === link.route;
+      {sidebarData.map((item) => {
+        const hasPermission = item.links.some((link) =>
+          user.permissions.includes(link.permission),
+        );
 
-              if (!accessRoutes) {
-                return null;
-              }
+        if (user.application_status !== "ACCEPTED") return null
 
-              return (
-                <SheetClose asChild key={link.route}>
-                  <Link
-                    href={link.route}
-                    className={`${
-                      isActive
-                        ? "default-color text-light-900 rounded-lg"
-                        : "text-dark300_light900"
-                    } flex items-center justify-start gap-4 bg-transparent p-4`}
-                  >
-                    <Image
-                      src={link.imgURL}
-                      alt={link.label}
-                      width={20}
-                      height={20}
-                      className={`${isActive ? "" : "invert-colors"} h-auto w-auto`}
-                    />
-                    <p className={`${isActive ? "base-normal" : "base-sm"}`}>
-                      {link.label}
-                    </p>
-                  </Link>
-                </SheetClose>
-              );
-            })}
+        return (
+          <div
+            key={item.id}
+            className={`${!hasPermission ? "hidden" : "block"}`}
+          >
+            <h4
+              className={`text-gray text-sm uppercase ${!hasPermission ? "hidden" : "block"}`}
+            >
+              {item.title}
+            </h4>
+            <div className={`${!hasPermission ? "mt-0" : "mt-3"}`}>
+              {item.links.map((link) => {
+                const accessRoutes = user.permissions.includes(link.permission);
+                const isActive = pathname === link.route;
+
+                if (!accessRoutes) {
+                  return null;
+                }
+
+                return (
+                  <SheetClose asChild key={link.route}>
+                    <Link
+                      href={link.route}
+                      className={`${
+                        isActive
+                          ? "primary-gradient text-light-900 rounded-lg"
+                          : "text-dark300_light900"
+                      } flex items-center justify-start gap-4 rounded-sm bg-transparent p-4`}
+                    >
+                      <Image
+                        src={link.imgURL}
+                        alt={link.label}
+                        width={20}
+                        height={20}
+                        className={`${isActive ? "" : "invert-colors"} h-auto w-auto`}
+                      />
+                      <p className={`${isActive ? "base-normal" : "base-sm"}`}>
+                        {link.label}
+                      </p>
+                    </Link>
+                  </SheetClose>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        );
+      })}
     </section>
   );
 };
@@ -88,9 +97,13 @@ const MobileNav = () => {
         />
       </SheetTrigger>
       <SheetContent
+        aria-describedby={undefined}
         side="left"
         className="overflow-y-auto border-r border-zinc-300 bg-[#OEOEOE] dark:border-zinc-800"
       >
+        <SheetHeader className="hidden">
+          <SheetTitle>Sidebar</SheetTitle>
+        </SheetHeader>
         <Link href="/" className="flex items-center gap-1">
           <Image
             src="/assets/svgs/codebility-violet.svg"

@@ -13,12 +13,45 @@ const toArray = (str: string) => {
   return str.split(",").map((item) => item.trim()); // Split by comma and trim spaces
 };
 
-export async function rejectAction(email_address: string) {
+export async function rejectAction(id: string) {
   try {
+    const { data: applicants, error: fetchError } = await supabase
+      .from("applicants")
+      .select("*")
+      .eq("id", id);
+
+    if (fetchError) throw fetchError;
+
+    const applicant = applicants[0];
+
+    const { error: insertError } = await supabase.from("declined_applicants").insert({
+      user_id: applicant.id,
+      first_name: applicant.first_name,
+      last_name: applicant.last_name,
+      email: applicant.email_address,
+      portfolio_website: applicant.portfolio_website,
+      github_link: applicant.github_link,
+      tech_stacks: applicant.tech_stacks,
+      image_url: applicant.image_url
+    });
+
+    if (insertError) throw insertError;
+
+    const { error: updateCodevError } = await supabase
+      .from("codev")
+      .update({
+        application_status: "DECLINED",
+      })
+      .eq("user_id", id)
+      .single();
+
+    if (updateCodevError) throw updateCodevError;
+
     const { error: deleteError } = await supabase
       .from("applicants")
       .delete()
-      .eq("email_address", email_address);
+      .eq("id", id)
+      .single();
 
     if (deleteError) throw deleteError;
 
@@ -30,42 +63,44 @@ export async function rejectAction(email_address: string) {
   }
 }
 
-export async function approveAction(email_address: string) {
+export async function approveAction(id: string) {
   try {
     const { data: applicants, error: fetchError } = await supabase
       .from("applicants")
       .select("*")
-      .eq("email_address", email_address);
+      .eq("id", id);
 
     if (fetchError) throw fetchError;
 
-    const {
-      Afirst_name,
-      Alast_name,
-      Aemail_address,
-      Agithub_link,
-      Aportfolio_website,
-      Atech_stacks,
-    } = applicants[0];
+    const applicant = applicants[0];
 
     const { error: insertError } = await supabase.from("interns").insert({
-      first_name: Afirst_name,
-      last_name: Alast_name,
-      email_address: Aemail_address,
-      github_link: Agithub_link,
-      portfolio_website: Aportfolio_website,
-      tech_stacks: Atech_stacks,
+      user_id: applicant.id,
+      first_name: applicant.first_name,
+      last_name: applicant.last_name,
+      email_address: applicant.email_address,
+      github_link: applicant.github_link,
+      portfolio_website: applicant.portfolio_website,
+      tech_stacks: applicant.tech_stacks,
     });
 
     if (insertError) throw insertError;
 
+    const { error: updateCodevError } = await supabase
+      .from("codev")
+      .update({
+        application_status: "ACCEPTED",
+      })
+      .eq("user_id", id)
+      .single();
+
+    if (updateCodevError) throw updateCodevError;
+
     const { error: deleteError } = await supabase
       .from("applicants")
       .delete()
-      .in(
-        "email_address",
-        applicants.map((item) => item.email_address),
-      );
+      .eq("id", id)
+      .single();
 
     if (deleteError) throw deleteError;
 
