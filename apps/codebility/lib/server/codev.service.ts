@@ -4,15 +4,16 @@ import { Codev, Project } from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
+const adminUserTypeId = 3;
+
 export const getCodevs = async (
+  type?: string,
   id?: string,
 ): Promise<{ error: any; data: Codev[] | Codev | null }> => {
   const supabase = getSupabaseServerComponentClient();
 
-  let codevQuery = supabase
-    .from("codev")
-    .select(
-      `
+  let codevQuery = supabase.from("codev").select(
+    `
       *,
       user(
         *,
@@ -23,10 +24,13 @@ export const getCodevs = async (
         social(*)
       )
     `,
-    )
-    .eq("type", "INHOUSE");
+  );
 
-  if (id) {
+  if (type === "INHOUSE") {
+    codevQuery = codevQuery.eq("type", "INHOUSE");
+  }
+
+  if (type === "INHOUSE" && id) {
     // filter codevs data to get only match id.
     codevQuery = codevQuery.eq("id", id);
   }
@@ -64,7 +68,7 @@ export const getCodevs = async (
       contact,
       education,
       experiences,
-    } = codev.user.profile;
+    } = codev.user.profile || {};
 
     return {
       id: codev.id,
@@ -86,10 +90,38 @@ export const getCodevs = async (
       socials: codev.user.social,
       job_status: codev.job_status,
       nda_status: codev.nda_status,
+      type: codev.type,
     };
   });
 
-  if (id) return { error: null, data: data[0] as Codev }; // if we are targeting a specific codev.
+  if (type === "INHOUSE" && id) return { error: null, data: data[0] as Codev }; // if we are targeting a specific codev.
 
   return { error: null, data };
+};
+
+export const getAdmins = async (): Promise<{
+  error: any;
+  data: Codev[] | null;
+}> => {
+  const supabase = getSupabaseServerComponentClient();
+
+  const { data, error } = await supabase
+    .from("user")
+    .select(
+      `
+      *,
+      profile(*)
+    `,
+    )
+    .eq("type_id", adminUserTypeId);
+
+  if (error) return { error, data: null };
+
+  const admins = data.map((user) => ({
+    ...user.profile,
+    email: user.email,
+    user_id: user.id,
+  }));
+
+  return { error: null, data: admins };
 };

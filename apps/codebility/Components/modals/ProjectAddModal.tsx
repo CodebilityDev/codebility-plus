@@ -1,91 +1,103 @@
-import * as z from "zod"
-import axios from "axios"
-import Image from "next/image"
-import { ChangeEvent, useState } from "react"
-import toast from "react-hot-toast"
-import { useForm } from "react-hook-form"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useQuery, UseQueryResult } from "@tanstack/react-query"
-import { DialogTitle } from "@radix-ui/react-dialog"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@radix-ui/react-dropdown-menu"
-import { DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from "@radix-ui/react-dropdown-menu"
+import { ChangeEvent, useEffect, useState } from "react";
+import Image from "next/image";
+import { DEFAULT_AVATAR } from "@/app/home/projects/_lib/constants";
+import {
+  ProjectFormValues,
+  projectSchema,
+} from "@/app/home/projects/_lib/schema";
+import { Client, User } from "@/app/home/projects/_types/projects";
+import { createProject } from "@/app/home/projects/actions";
+import { Button } from "@/Components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/Components/ui/select";
+import { useModal } from "@/hooks/use-modal-projects";
+import { IconPlus } from "@/public/assets/svgs";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@radix-ui/react-dropdown-menu";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
-import { User } from "@/types"
-import { Input } from "@codevs/ui/input"
-import { Button } from "@/Components/ui/button"
-import { API } from "@/lib/constants"
-import useToken from "@/hooks/use-token"
-import { Textarea } from "@codevs/ui/textarea"
-import { IconPlus } from "@/public/assets/svgs"
-import { createProjects } from "@/app/api/projects"
-import { useModal } from "@/hooks/use-modal-projects"
-import { modals_ProjectModal } from "@/types/components"
-import { Dialog, DialogContent, DialogFooter, DialogHeader } from "@codevs/ui/dialog"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/Components/ui/select"
-
-
-import { InsertData } from "@/app/home/projects/actions"
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase"
-
-
-
-const projectSchema = z.object({
-  project_name: z.string().min(1, { message: "Project name is required" }),
-  github_link: z.string().url({ message: "Invalid URL" }).optional(),
-  summary: z.string().min(1, { message: "Summary is required" }),
-  live_link: z.string().url({ message: "Invalid URL" }).optional(),
-  project_thumbnail: z.string().url({ message: "Invalid URL" }).optional(),
-  clientId: z.string().min(1, { message: "Client is required" }),
-  team_leader_id: z.string().min(1, { message: "Team Leader is required" }),
-});
-
-type ProjectFormValues = z.infer<typeof projectSchema>;
-
-const defaultImage =
-  "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
+import { Input } from "@codevs/ui/input";
+import { Textarea } from "@codevs/ui/textarea";
 
 const ProjectAddModal = () => {
+  const supabase = getSupabaseBrowserClient();
 
+  const { isOpen, onClose, type } = useModal();
+  const isModalOpen = isOpen && type === "projectAddModal";
 
-  const supabase = useSupabase();
+  const [users, setUsers] = useState<User[] | any[] | null>([]);
+  const [clients, setClients] = useState<Client[] | null>([]);
+  const [projectImage, setProjectImage] = useState<string | null>(null);
+  const [selectedMembers, setSelectedMembers] = useState<User[] | any[]>([]);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const { isOpen, onClose, type } = useModal()
-  const isModalOpen = isOpen && type === "projectAddModal"
-  const { token } = useToken()
-  const [isLoading, setIsLoading] = useState(false)
-  const [projectImage, setProjectImage] = useState<string | any>()
+  useEffect(() => {
+    const fetchUsers = async () => {
+      const { data, error } = await supabase
+        .from("codev")
+        .select("*, user(*, profile(*))")
+        .eq("application_status", "ACCEPTED");
 
-  
+      if (error) {
+        if (error) throw error;
+        console.error("Error fetching users:", error);
+      } else {
+        setUsers(data);
+      }
+    };
 
-  const { data: clients }: UseQueryResult<modals_ProjectModal[]> = useQuery({
-    queryKey: ["clients"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('clients').select('*');
-      if (error) throw error;
-      return data;
-    },
-  });
+    if (isModalOpen) {
+      fetchUsers();
+    }
+  }, [isModalOpen]);
 
-  const { data: users }: UseQueryResult<User[]> = useQuery({
-    queryKey: ["profile"],
-    queryFn: async () => {
-      const { data, error } = await supabase.from('profile').select('*');
-      if (error) throw error;
-      return data;
-    },
-  });
+  useEffect(() => {
+    const fetchClients = async () => {
+      const { data, error } = await supabase.from("clients").select("*");
 
-  const [selectedMembers, setSelectedMembers] = useState<User[]>([])
-  const [searchQuery, setSearchQuery] = useState<string>("")
+      if (error) {
+        if (error) throw error;
+        console.error("Error fetching clients:", error);
+      } else {
+        setClients(data);
+      }
+    };
 
-  const [usersTest, setUsers] = useState<User[]>([]); // Default to an empty array
+    if (isModalOpen) {
+      fetchClients();
+    }
+  }, [isModalOpen]);
 
   const {
     register,
     handleSubmit,
     setValue,
     reset,
-    getValues,
+    clearErrors,
     formState: { errors, isValid },
   } = useForm<ProjectFormValues>({
     resolver: zodResolver(projectSchema),
@@ -96,9 +108,7 @@ const ProjectAddModal = () => {
     if (!selectedMembers.some((m) => m.id === member.id)) {
       setSelectedMembers((prevMembers) => [...prevMembers, member]);
     }
-
-    console.log(selectedMembers)
-  }
+  };
 
   const removeMember = (id: string) => {
     setSelectedMembers((prevMembers) =>
@@ -113,155 +123,104 @@ const ProjectAddModal = () => {
     onClose();
   };
 
-  const handleSubmitData = async (event: React.FormEvent<HTMLFormElement> ) => {
-    event.preventDefault(); // Prevent default form submission behavior
-
-    const formData = new FormData(event.currentTarget);
-    const formValues = Object.fromEntries(formData) as ProjectFormValues;
-   
-
-    try {
-
-      projectSchema.parse(formValues); // This will throw an error if validation fails
-
-       const teamLeaderId = formValues.team_leader_id; 
-
-
-      if (!users) return
-
-
-    // Assuming users is an array of user objects
-    const teamLeader = users.find((user) => user.id === teamLeaderId); // Find user object
-
-    // Extract first name
-    const teamLeaderFirstName = teamLeader ? teamLeader.first_name : "Unknown";
-    const teamLeaderLastName = teamLeader ? teamLeader.last_name : "Unknown";
-
-    console.log("Selected Team Leader ID:", teamLeaderId);
-    console.log("Selected Team Leader First Name:", teamLeader);
-
-
-      await InsertData(formData, selectedMembers,teamLeaderFirstName ,teamLeaderLastName ); // Pass form data to DeleteData
-
-      toast.success("New Project has been added!")
-
-      reset();
-      setProjectImage(null);
-      setSelectedMembers([])
-      onClose(); // Close the modal after successful deletion
-
-
-
-
-    } catch (error) {
-      toast.error("Something went wrong!")
-    }
-  };
-
-  const handleUploadProjectThumbnail = async (
-    ev: ChangeEvent<HTMLInputElement>,
-  ) => {
-    const file = ev.target.files?.[0];
-
+  const handleUploadProjectThumbnail = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (file) {
-      const formData = new FormData();
-      formData.append("image", file);
-      const response = await axios.post(`${API.USERS}/upload-image`, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      });
-
-      const image_url = response.data.data.image_url;
-      setProjectImage(image_url);
+      setValue("thumbnail", file);
+      setProjectImage(URL.createObjectURL(file));
     }
   };
 
   const handleRemoveProjectThumbnail = () => {
-    setProjectImage(null)
-  }
+    setProjectImage(null);
+  };
 
+  const handleSubmitData = async (data: ProjectFormValues) => {
+    setIsLoading(true);
 
-  const clientsDummy = [
-    { id: 'f47ac10b-58cc-4372-a567-0e02b2c3d479', clients: 'Alice Johnson' },
-  { id: 'a27c6d87-08e3-4eb2-9c28-d2d34b275a7c', clients: 'Bob Smith' },
-  { id: '8f9f1a27-89b1-4b6e-9d8c-fc786e68de7d', clients: 'Charlie Davis' },
-  { id: 'e3a64b68-16d7-4e3a-bd14-df94e4d6a5f1', clients: 'Dana Lee' },
-  { id: 'd55a45e8-d1e6-4f75-8777-1bfb57fc8552', clients: 'Eva Martinez' },
-  { id: 'f15b5c58-658e-46c1-96a0-d4f8cfb85e8b', clients: 'Frank Wilson' },
-  { id: 'a6b9e1d6-2e42-4660-89ec-c7b37b1b9c8e', clients: 'Grace Kim' },
-  { id: 'c9a05b62-f5fc-42e6-9460-6e7a7f3d6579', clients: 'Hannah Brown' },
-  { id: 'b08b5a0e-9b8e-4c0c-8d5e-0fef0a2799a2', clients: 'Isaac Wilson' },
-  { id: 'e278e925-3cf3-4a9b-9c35-806a4892b35f', clients: 'Jack Taylor' }
-  ];
+    try {
+      const formData = new FormData();
+      if (data.thumbnail) formData.append("thumbnail", data.thumbnail);
+      formData.append("project_name", data.project_name);
+      formData.append("clientId", data.clientId);
+      formData.append("team_leader_id", data.team_leader_id);
+      if (data.github_link) formData.append("github_link", data.github_link);
+      if (data.live_link) formData.append("live_link", data.live_link);
+      if (data.figma_link) formData.append("figma_link", data.figma_link);
+      if (data.summary) formData.append("summary", data.summary);
 
-  
+      const response = await createProject(formData, selectedMembers);
+
+      if (response.success) {
+        toast.success("New Project has been added!");
+      } else {
+        toast.error("Failed to create project");
+      }
+    } catch (error) {
+      toast.error("Something went wrong!");
+    } finally {
+      reset();
+      setProjectImage(null);
+      setSelectedMembers([]);
+      setIsLoading(false);
+      onClose();
+    }
+  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={resetForm}>
-      <DialogContent className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-[44rem]">
+      <DialogContent
+        aria-describedby={undefined}
+        className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[45rem] lg:justify-between lg:overflow-hidden"
+      >
         <DialogHeader className="relative">
           <DialogTitle className="mb-2 text-left text-xl">
             Add New Project
           </DialogTitle>
         </DialogHeader>
-
-
-        <form onSubmit={handleSubmitData} className="flex flex-col gap-4">
-
-        <div className="flex flex-col gap-4">
-
-          
-          <div className="flex gap-4">
-            <div className="bg-gray flex h-14 w-28 items-center justify-center overflow-hidden rounded-lg md:h-20 md:w-40">
-              {projectImage ? (
+        <form
+          onSubmit={handleSubmit(handleSubmitData)}
+          className="flex flex-col gap-4"
+        >
+          <div className="flex flex-col gap-4">
+            <div className="flex gap-4">
+              <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
                 <Image
-                  src={projectImage}
-                  width={120}
-                  height={120}
+                  src={projectImage || DEFAULT_AVATAR}
                   alt="Project Thumbnail"
-                  className="w-full"
+                  fill
+                  className="bg-dark-400 h-auto w-auto rounded-full bg-cover object-cover"
                 />
-              ) : (
-                <Image
-                  src="/assets/svgs/icon-cog.svg"
-                  width={30}
-                  height={30}
-                  alt="logo"
-                />
-              )}
-            </div>
-            <div className="flex flex-col justify-center gap-2">
-              <p className="text-md text-gray">Image size 1080 x 768 px</p>
-              <div className="flex gap-4">
-                {!projectImage && (
-                  <label htmlFor="projectThumbnailUpload">
-                    <p className="cursor-pointer text-blue-100">Upload Image</p>
-                  </label>
-                )}
-                <input
-                  onChange={handleUploadProjectThumbnail}
-                  id="projectThumbnailUpload"
-                  type="file"
-                  className="hidden"
-                  name="file"
-                />
-                {projectImage && (
-                  <p
-                    className="text-violet cursor-pointer"
-                    onClick={handleRemoveProjectThumbnail}
-                  >
-                    Remove Image
-                  </p>
-                )}
+              </div>
+              <div className="flex flex-col justify-center gap-2">
+                <p className="text-md text-gray">Image size 1080 x 768 px</p>
+                <div className="flex gap-4">
+                  {!projectImage && (
+                    <label htmlFor="thumbnail">
+                      <p className="cursor-pointer text-blue-100">
+                        Upload Image
+                      </p>
+                    </label>
+                  )}
+                  <input
+                    id="thumbnail"
+                    type="file"
+                    accept="image/*"
+                    className="hidden"
+                    name="thumbnail"
+                    onChange={handleUploadProjectThumbnail}
+                  />
+                  {projectImage && (
+                    <p
+                      className="text-violet cursor-pointer"
+                      onClick={handleRemoveProjectThumbnail}
+                    >
+                      Remove Image
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
-          </div>
-
-
-          <input type="hidden" name="projectImageId" value={projectImage} /> 
-
-         
             <div className="flex flex-col lg:flex-row lg:gap-8">
               <div className="w-full space-y-3">
                 <Input
@@ -270,41 +229,37 @@ const ProjectAddModal = () => {
                   label="Name"
                   placeholder="Enter Project Name"
                   {...register("project_name")}
-                  name="project_name"
-                  className={errors.project_name ? "border border-red-500 focus:outline-none" : ""}
+                  className={`dark:bg-dark-200 ${
+                    errors.project_name
+                      ? "border border-red-500 focus:outline-none"
+                      : ""
+                  }`}
                 />
                 {errors.project_name && (
                   <span className="text-sm text-red-400">
                     {errors.project_name.message}
                   </span>
                 )}
-
-                <div className="">
+                <div>
                   <label>Client</label>
-                  <Select onValueChange={(value) => setValue("clientId", value) } name="clientId">
+                  <Select
+                    onValueChange={(value) => {
+                      setValue("clientId", value);
+                      clearErrors("clientId");
+                    }}
+                    name="clientId"
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a Client"></SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Clients</SelectLabel>
-
-
-                        {/* {clients?.map((client: { id: string; company_name: string }) => (
-                          <SelectItem key={client.id} value={client.id}>
-                            {client.company_name}
+                        {clients?.map((data) => (
+                          <SelectItem key={data.id} value={String(data.id)}>
+                            {data.name}
                           </SelectItem>
-                        ))} */}
-
-
-                    {clientsDummy.map((data) => (
-                      <SelectItem key={data.id} value={data.id}>
-                        {data.clients}
-                      </SelectItem>
-                    ))}
-
-
-
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -314,22 +269,30 @@ const ProjectAddModal = () => {
                     </span>
                   )}
                 </div>
-                <div className="">
+                <div>
                   <label>Team Leader</label>
-                  <Select onValueChange={(value) => setValue("team_leader_id", value)} name="team_leader_id">
+                  <Select
+                    onValueChange={(value) => {
+                      setValue("team_leader_id", value);
+                      clearErrors("team_leader_id");
+                    }}
+                    name="team_leader_id"
+                  >
                     <SelectTrigger>
                       <SelectValue placeholder="Select a Team Leader"></SelectValue>
                     </SelectTrigger>
                     <SelectContent>
                       <SelectGroup>
                         <SelectLabel>Users</SelectLabel>
-                        {users?.map(
-                          (user: { id: string; first_name: string }) => (
-                            <SelectItem key={user.id} value={user.id}>
-                              {user.first_name}
-                            </SelectItem>
-                          ),
-                        )}
+                        {users?.map((user) => (
+                          <SelectItem
+                            key={user.id}
+                            value={user.id}
+                            className="capitalize"
+                          >
+                            {user.first_name} {user.last_name}
+                          </SelectItem>
+                        ))}
                       </SelectGroup>
                     </SelectContent>
                   </Select>
@@ -347,163 +310,177 @@ const ProjectAddModal = () => {
                   label="Github"
                   placeholder="Enter Github Link"
                   {...register("github_link")}
-                    name="github_link"
-                  className={errors.github_link ? "border border-red-500 focus:outline-none" : ""}
+                  className={`dark:bg-dark-200 ${
+                    errors.github_link
+                      ? "border border-red-500 focus:outline-none"
+                      : ""
+                  }`}
                 />
                 {errors.github_link && (
                   <span className="text-sm text-red-400">
                     {errors.github_link.message}
                   </span>
                 )}
-
                 <Input
                   id="liveLink"
                   type="text"
                   label="Live URL"
                   placeholder="Enter Live URL"
                   {...register("live_link")}
-                   name="live_link"
-                  className={errors.live_link ? "border border-red-500 focus:outline-none" : ""}
+                  className={`dark:bg-dark-200 ${
+                    errors.live_link
+                      ? "border border-red-500 focus:outline-none"
+                      : ""
+                  }`}
                 />
                 {errors.live_link && (
                   <span className="text-sm text-red-400">
                     {errors.live_link.message}
                   </span>
                 )}
-
                 <Input
-                  id="productionLink"
+                  id="figmaLink"
                   type="text"
-                  label="Link"
-                  placeholder="Enter Project Thumbnail URL"
-                  {...register("project_thumbnail")}
-                  name="project_thumbnail"
-                  className={errors.project_thumbnail ? "border border-red-500 focus:outline-none" : ""}
+                  label="Figma Link"
+                  placeholder="Enter Figma Link"
+                  {...register("figma_link")}
+                  className={`dark:bg-dark-200 ${
+                    errors.figma_link
+                      ? "border border-red-500 focus:outline-none"
+                      : ""
+                  }`}
                 />
-                {errors.project_thumbnail && (
+                {errors.figma_link && (
                   <span className="text-sm text-red-400">
-                    {errors.project_thumbnail.message}
+                    {errors.figma_link.message}
                   </span>
                 )}
               </div>
             </div>
-
             <Textarea
               id="summary"
               label="Summary"
-              style={{ color: "black" }}
               placeholder="Enter Summary"
               {...register("summary")}
-              name="summary"
-              className={errors.summary ? "border border-red-500 focus:outline-none" : ""}
+              className={`dark:bg-dark-200 ${
+                errors.summary ? "border border-red-500 focus:outline-none" : ""
+              }`}
             />
-            {errors.summary && <span className="text-sm text-red-400">{errors.summary.message}</span>}
-       
-        </div>
-
-        <div className="flex flex-col gap-1">
-          <label htmlFor="members">Members</label>
-          <div className="flex gap-2">
-            <div className="flex flex-wrap items-center">
-              {selectedMembers.map((member, index) => (
-                <div
-                  className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-                  key={`${member.id}_${index}`}
-                  onClick={() => removeMember(member.id)}
-                >
-                  <Image
-                    alt="Avatar"
-                    src={member.image_url ?? defaultImage}
-                    fill
-                    title={`${member.id}'s Avatar`}
-                    className="h-auto w-full rounded-full bg-cover object-cover"
-                    loading="eager"
-                  />
-                </div>
-              ))}
-            </div>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="cursor-pointer">
-                <Button variant="hollow" className="h-12 w-12 rounded-full p-0">
-                  <IconPlus className="invert dark:invert-0" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                side="bottom"
-                sideOffset={10}
-                align="start"
-                className="dark:bg-dark-100 z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white"
-              >
-                <DropdownMenuLabel className="pb-2 text-center text-sm">
-                  Add Members
-                </DropdownMenuLabel>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search members"
-                  className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
-                />
-                <DropdownMenuSeparator />
-                <DropdownMenuLabel className="px-4 py-2 text-xs">
-                  Available Members
-                </DropdownMenuLabel>
-                {users
-                  ?.filter((user: { first_name: any; last_name: any }) =>
-                    `${user.first_name} ${user.last_name}`
-                      .toLowerCase()
-                      .includes(searchQuery.toLowerCase()),
-                  )
-                  .map((user: User) => (
-                    <DropdownMenuItem
-                      key={user.id}
-                      className="dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100"
-                      onClick={() => addMember(user)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
-                          <Image
-                            alt="Avatar"
-                            src={user.image_url ?? defaultImage}
-                            fill
-                            title={`${user.id}'s Avatar`}
-                            className="h-auto w-full rounded-full bg-cover object-cover"
-                            loading="eager"
-                          />
-                        </div>
-                        <span>{`${user.first_name} ${user.last_name}`}</span>
-                      </div>
-                    </DropdownMenuItem>
-                  ))}
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {errors.summary && (
+              <span className="text-sm text-red-400">
+                {errors.summary.message}
+              </span>
+            )}
           </div>
-        </div>
-
-        <DialogFooter className="flex flex-col gap-4 lg:flex-row">
-          <Button variant="hollow" className="order-2 w-full sm:order-1 sm:w-[130px]" onClick={(e) => {
-                e.preventDefault(); // Prevent form submission
+          <div className="flex flex-col gap-1">
+            <label htmlFor="members">Members</label>
+            <div className="flex gap-2">
+              <div className="flex flex-wrap items-center">
+                {selectedMembers.map((member, index) => {
+                  return (
+                    <div
+                      className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
+                      key={`${member.id}_${index}`}
+                      onClick={() => removeMember(member.id)}
+                    >
+                      <Image
+                        alt="Avatar"
+                        src={member.user.profile.image_url || DEFAULT_AVATAR}
+                        fill
+                        title={`${member.user.profile.first_name} ${member.user.profile.last_name}`}
+                        className="h-auto w-full rounded-full bg-cover object-cover"
+                        loading="eager"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild className="cursor-pointer">
+                  <Button
+                    variant="hollow"
+                    className="h-12 w-12 rounded-full p-0"
+                  >
+                    <IconPlus className="invert dark:invert-0" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                  side="bottom"
+                  sideOffset={10}
+                  align="start"
+                  className="dark:bg-dark-100 z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white"
+                >
+                  <DropdownMenuLabel className="pb-2 text-center text-sm">
+                    Add Members
+                  </DropdownMenuLabel>
+                  <input
+                    type="text"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    placeholder="Search members"
+                    className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
+                  />
+                  <DropdownMenuSeparator />
+                  <DropdownMenuLabel className="px-4 py-2 text-xs">
+                    Available Members
+                  </DropdownMenuLabel>
+                  {users
+                    ?.filter((user) =>
+                      `${user.first_name} ${user.last_name}`
+                        .toLowerCase()
+                        .includes(searchQuery.toLowerCase()),
+                    )
+                    .map((user) => (
+                      <DropdownMenuItem
+                        key={user.id}
+                        className="dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100"
+                        onClick={() => addMember(user)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
+                            <Image
+                              alt="Avatar"
+                              src={
+                                user.user.profile?.image_url || DEFAULT_AVATAR
+                              }
+                              fill
+                              title={`${user.user.profile?.first_name} ${user.user.profile?.last_name}`}
+                              className="h-auto w-full rounded-full bg-cover object-cover"
+                              loading="eager"
+                            />
+                          </div>
+                          <span className="capitalize">{`${user.first_name} ${user.last_name}`}</span>
+                        </div>
+                      </DropdownMenuItem>
+                    ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            </div>
+          </div>
+          <DialogFooter className="flex flex-col gap-4 lg:flex-row">
+            <Button
+              variant="hollow"
+              className="order-2 w-full sm:order-1 sm:w-[130px]"
+              onClick={(e) => {
+                e.preventDefault();
                 resetForm();
-              }}>
-            Cancel
-          </Button>
-          <Button
-            disabled={!isValid || isLoading}
-            variant="default"
-            className="order-1 w-full sm:order-2 sm:w-[130px]"
-            type="submit"
-          >
-            Add Project
-          </Button>
-        </DialogFooter>
-
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              disabled={isLoading}
+              variant="default"
+              className="order-1 w-full sm:order-2 sm:w-[130px]"
+              type="submit"
+            >
+              Add Project
+            </Button>
+          </DialogFooter>
         </form>
-
       </DialogContent>
     </Dialog>
   );
 };
 
-export default ProjectAddModal
-
-
+export default ProjectAddModal;

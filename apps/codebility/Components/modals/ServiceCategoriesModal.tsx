@@ -9,7 +9,6 @@ import {
 } from "@/app/home/settings/services/categories/action";
 import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal-service-categories";
-import { IconClose } from "@/public/assets/svgs";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTitle } from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";
@@ -22,7 +21,7 @@ import {
   DialogContent,
   DialogFooter,
   DialogHeader,
-} from "../ui/dialog";
+} from "@/Components/ui/dialog";
 
 const ServiceCategoriesModal = () => {
   const { isOpen, onClose, type, data: passedData } = useModal();
@@ -88,13 +87,10 @@ const ServiceCategoriesModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
-      <DialogContent className="flex h-[32rem] w-[50%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto">
-        <button
-          onClick={() => handleDialogChange(false)}
-          className="absolute right-4 top-4"
-        >
-          <IconClose />
-        </button>
+      <DialogContent
+        aria-describedby={undefined}
+        className="flex h-[32rem] w-[50%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl">
             {passedData ? "Edit Category" : "Add New Category"}
