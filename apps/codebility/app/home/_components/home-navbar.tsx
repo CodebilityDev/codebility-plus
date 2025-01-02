@@ -20,7 +20,7 @@ import { signOut } from "../../authv2/actions";
 import MobileNav from "./home-mobile-navbar";
 
 export const menuItems = [
-  { href: "/settings", icon: IconProfile, label: "Settings" },
+  { href: "/home/account-settings", icon: IconProfile, label: "Settings" },
 ];
 
 const Navbar = () => {
@@ -35,7 +35,7 @@ const Navbar = () => {
           <div className="flex flex-1 items-center justify-end gap-6 p-4">
             {/* <IconBell className="invert dark:invert-0" /> */}
             <Theme />
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
               <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none">
                 <div className="hidden flex-col items-end md:flex ">
                   <p className="capitalize dark:text-white">
@@ -46,11 +46,7 @@ const Navbar = () => {
                 <div className="from-violet relative size-[44px] rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover p-[1.5px]">
                   <Image
                     alt="Avatar"
-                    src={
-                      image_url
-                        ? `${image_url}`
-                        : defaultAvatar
-                    }
+                    src={image_url ? `${image_url}` : defaultAvatar}
                     fill
                     title={`${first_name}'s Avatar`}
                     className="from-violet h-auto w-full rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover"

@@ -1,19 +1,19 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import { ChangeEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button, buttonVariants } from "@/Components/ui/button";
+import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { useSchedule } from "@/hooks/use-timeavail";
 import { SignUpValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
+import { SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
 import { Checkbox } from "@codevs/ui/checkbox";
+import { Input } from "@codevs/ui/input";
 
 import { signupUser } from "../../actions";
 import SignUpInputs from "./sign-up-input";
@@ -30,7 +30,8 @@ interface Field {
     | "password"
     | "confirmPassword"
     | "schedule"
-    | "position";
+    | "position"
+    | "github";
   label: string;
   placeholder: string;
   type?: string;
@@ -71,6 +72,13 @@ const steps: FieldType[] = [
         id: "website",
         label: "Website",
         placeholder: "Enter your website (Optional)",
+        optional: true,
+        type: "text",
+      },
+      {
+        id: "github",
+        label: "Github",
+        placeholder: "Enter your github (Optional)",
         optional: true,
         type: "text",
       },
@@ -128,6 +136,7 @@ const AuthForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { stack, clearStack } = useTechStackStore();
   const { time, clearTime } = useSchedule();
+  const [profileImage, setProfileImage] = useState<File | null>(null);
   const [isMounted, setIsMounted] = useState(false);
 
   const { onOpen } = useModal();
@@ -149,20 +158,35 @@ const AuthForm = () => {
     };
   }, [string, newTime, isMounted, setValue]);
 
-  const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+  const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setIsLoading(true);
-    try {
-      console.log(data);
-      await signupUser(data);
 
-      clearTime();
-      clearStack();
-      reset();
-      toast.success("Your account has been successfully created");
-      router.push("/waiting");
+    try {
+      const formData = new FormData();
+
+      Object.entries(data).forEach(([key, value]) => {
+        formData.append(key, value as string);
+      });
+
+      if (profileImage) {
+        formData.append("profileImage", profileImage);
+      }
+
+      const response = await signupUser(formData);
+      if (response.success) {
+        toast.success("Your account has been successfully created");
+        router.push("/thank-you");
+        clearTime();
+        clearStack();
+        reset();
+      } else {
+        toast.error(response.error as string);
+        console.log("Error in registration: ", response.error);
+      }
     } catch (e) {
-      setIsLoading(false);
       toast.error((e as { message: string }).message);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -189,6 +213,22 @@ const AuthForm = () => {
   const handleTriggerDropdown = () => {
     trigger("position");
   };
+
+  const handleCancel = () => {
+    clearTime();
+    clearStack();
+    reset();
+    router.replace("/");
+  };
+
+  const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setProfileImage(file);
+      setValue("profileImage", file);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
       <input type="hidden" id="start_time" value={time.start_time} />
@@ -230,13 +270,33 @@ const AuthForm = () => {
                 trigger={
                   field.type === "dropdown" ? handleTriggerDropdown : undefined
                 }
-                setValue={field.id === "position" && setValue}
+                setValue={setValue}
               />
             ))}
             {index_div === 1 && (
               <>
+                <div className="flex flex-col gap-1">
+                  <label
+                    htmlFor="profileImage"
+                    className={`text-white ${errors.profileImage && "text-red-400"}`}
+                  >
+                    Profile Image
+                  </label>
+                  <Input
+                    id="profileImage"
+                    type="file"
+                    className={`md:text-md bg-dark-200 text-gray cursor-pointer border-b-2 p-2 text-sm file:text-white focus:outline-none ${errors.profileImage ? "border-red-400" : "border-darkgray"}`}
+                    onChange={handleFileChange}
+                  />
+                </div>
+                {errors.profileImage?.message && (
+                  <p className="mt-2 text-sm text-red-400">
+                    {(errors.profileImage?.message as string) ||
+                      "An error occurred"}
+                  </p>
+                )}
                 <label className="flex items-center gap-4 text-sm ">
-                  <Checkbox required />
+                  <Checkbox required className="border-white" />
                   <p>
                     I agree to the{" "}
                     <span
@@ -247,22 +307,17 @@ const AuthForm = () => {
                     </span>
                   </p>
                 </label>
-                <div className="mt-4 flex flex-row-reverse gap-4">
+                <div className="flex flex-col gap-4 p-4 md:flex-row md:items-center md:justify-center">
+                  <Button type="submit" variant="default" disabled={isLoading}>
+                    Register
+                  </Button>
                   <Button
                     type="button"
-                    className={`${buttonVariants({ variant: "link" })} order-1 w-36 py-6 `}
+                    variant="link"
                     disabled={isLoading}
+                    onClick={handleCancel}
                   >
-                    <Link href="/">Cancel</Link>
-                  </Button>
-
-                  <Button
-                    type="submit"
-                    variant="default"
-                    className="w-36 py-6"
-                    disabled={isLoading}
-                  >
-                    Register
+                    Cancel
                   </Button>
                 </div>
               </>

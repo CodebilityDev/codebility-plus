@@ -9,7 +9,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@codevs/ui/dialog";
+} from "@/Components/ui/dialog";
 
 const AvailableTimeModal = () => {
   const { isOpen, onClose, type } = useModal();
@@ -81,7 +81,10 @@ const AvailableTimeModal = () => {
         onClose();
       }}
     >
-      <DialogContent className="bg-black-100 flex max-w-[30rem] flex-col gap-8 overflow-y-auto p-6 text-white lg:p-12">
+      <DialogContent
+        aria-describedby={undefined}
+        className="bg-black-100 w-[90%] flex max-w-[30rem] flex-col gap-8 overflow-y-auto p-6 text-white lg:p-12"
+      >
         <DialogHeader>
           <DialogTitle className="text-md text-center font-normal md:text-2xl">
             What is your available time with us?

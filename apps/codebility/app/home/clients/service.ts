@@ -11,13 +11,5 @@ export const getAllClients = async () => {
     return { data: null, error: error.message };
   }
 
-  data.forEach((client) => {
-    if (client.logo) {
-      client.logo = supabase.storage
-        .from("clients-image")
-        .getPublicUrl(client.logo).data.publicUrl;
-    }
-  });
-
   return { data, error: null };
 };

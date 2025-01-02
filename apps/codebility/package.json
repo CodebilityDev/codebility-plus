@@ -2,6 +2,7 @@
   "name": "codebility",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "cross-env FORCE_COLOR=1 next dev",
     "build": "next build",
