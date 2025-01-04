@@ -12,7 +12,6 @@ export type ModalType =
   | "taskViewModal"
   | "taskEditModal"
   | "taskDeleteModal"
-  | "taskViewEditModal"
   | "contactUsModal"
   | "privacyPolicyModal"
   | "termsOfServiceModal"

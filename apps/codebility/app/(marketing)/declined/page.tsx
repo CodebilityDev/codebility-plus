@@ -1,16 +1,16 @@
 import { redirect } from "next/navigation";
 import Logo from "@/Components/shared/Logo";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import DeclinedButtons from "./_components/declined-buttons";
+import DeclinedCountdown from "./_components/declined-countdown";
 import { DeclinedApplicant } from "./_types";
 
 const DeclinedPage = async () => {
   const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   if (!user) {
     redirect("/login");
@@ -35,6 +35,7 @@ const DeclinedPage = async () => {
             after 3 months.
           </p>
         </div>
+        <DeclinedCountdown data={data as DeclinedApplicant} />
         <DeclinedButtons data={data as DeclinedApplicant} />
 
         <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>

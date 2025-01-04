@@ -5,6 +5,8 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 
 import pathsConfig from "./config/paths.config";
 
+import { getCachedUser } from "./lib/server/supabase-server-comp";
+
 export const config = {
   matcher: [
     /*
@@ -15,7 +17,7 @@ export const config = {
      * Feel free to modify this pattern to include more paths.
      */
     // '/((?!_next/static|_next/image|favicon.ico).*)',
-    "/((?!api|auth/signin|auth/signup|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|waiting|declined|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
+    "/((?!api|auth/signin|auth/signup|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|waiting|declined|thank-you|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
   ],
 };
 
@@ -145,9 +147,7 @@ export async function middleware(req: NextRequest) {
   const res = NextResponse.next();
   const supabase = getSupabaseServerComponentClient();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
 
   // if not signed in
   if (!user && !req.nextUrl.pathname.startsWith("/authv2")) {

@@ -2,15 +2,14 @@ import Image from "next/image";
 import Badges from "@/Components/shared/Badges";
 import Box from "@/Components/shared/dashboard/Box";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { defaultAvatar } from "@/public/assets/images";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 export default async function DashboardProfile() {
   const supabase = getSupabaseServerComponentClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCachedUser();
   const { data: userData } = await supabase
     .from("profile")
     .select("first_name, image_url, main_position")
@@ -28,11 +27,7 @@ export default async function DashboardProfile() {
 
             <Image
               alt="Avatar"
-              src={
-                userData.image_url
-                  ? `${userData.image_url}`
-                  : defaultAvatar
-              }
+              src={userData.image_url ? `${userData.image_url}` : defaultAvatar}
               width={100}
               height={100}
               title={`${userData.first_name}'s Avatar`}

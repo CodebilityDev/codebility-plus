@@ -44,8 +44,10 @@ const ProjectMembersModal = () => {
       }
     };
 
-    fetchUsers();
-  }, []);
+    if (isModalOpen) {
+      fetchUsers();
+    }
+  }, [isModalOpen]);
 
   useEffect(() => {
     if (data?.members) {
