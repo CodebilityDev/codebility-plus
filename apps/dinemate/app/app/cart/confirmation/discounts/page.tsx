@@ -2,11 +2,9 @@
 
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
-// import BgHandler from "@/components/home/BgHandler"
 import { useState } from "react";
 import BackWithNotif from "~/components/BackWithNotif";
 import BgHandler from "~/components/home/BgHandler";
-// import BackWithNotif from "@/components/BackWithNotif"
 
 export default function DiscountPage() {
   const [promoDiscountApplied, setPromoDiscountApplied] = useState(false);

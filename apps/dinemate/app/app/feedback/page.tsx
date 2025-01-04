@@ -1,33 +1,20 @@
+// import Feedback from "@/components/feedback/feedback"
+// import BackButton from '@/components/BackButton'
+// import NotificationButton from '@/components/NotificationButton'
 
-import Feedback from "@/components/feedback/feedback"
-import BackButton from '@/components/BackButton'
-import NotificationButton from '@/components/NotificationButton'
+import BackButton from "~/components/BackButton";
+import NotificationButton from "~/components/NotificationButton";
 
-export default function FeedbackPage(){
-
-
-    return (
-    
-        <>
-
-<header className='flex justify-between items-center mt-[1.25em] text-[white]'>
+export default function FeedbackPage() {
+  return (
+    <>
+      <header className="flex justify-between items-center mt-[1.25em] text-[white]">
         <BackButton />
         <h1 className="text-[white]">Feedback & Ratings</h1>
-        <NotificationButton/>
+        <NotificationButton />
       </header>
 
-
-        
-        <main className='mt-[2em]'>
-
-            <Feedback />
-
-     </main>
-
-
-        
-        
-        </>
-        
-    )
+      <main className="mt-[2em]">{/* <Feedback /> */}</main>
+    </>
+  );
 }
