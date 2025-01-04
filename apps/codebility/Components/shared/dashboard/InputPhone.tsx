@@ -62,10 +62,9 @@ const InputPhone = forwardRef<HTMLInputElement, InputProps>(
                 >
                   <option
                     value=""
-                    disabled
                     className="md:text-md dark:bg-dark-100 absolute h-52 overflow-y-auto border-white text-sm dark:border-zinc-700 sm:text-sm md:w-[200px] lg:text-lg"
                   >
-                    Code
+                    Please select
                   </option>
                   {codes.map((item, index) => (
                     <option

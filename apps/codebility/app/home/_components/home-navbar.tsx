@@ -48,6 +48,7 @@ const Navbar = () => {
                     alt="Avatar"
                     src={image_url ? `${image_url}` : defaultAvatar}
                     fill
+                    sizes="44px"
                     title={`${first_name}'s Avatar`}
                     className="from-violet h-auto w-full rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover"
                     loading="eager"

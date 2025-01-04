@@ -1,34 +1,37 @@
 "use client";
 import React, { useState } from "react";
 import Link from "next/link";
-import { adminService } from "@/modules";
-import { useToast } from "@/components/ui/use-toast";
+import { adminService } from "~/modules";
+// import { useToast } from "@/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-
+import { useToast } from "~/hooks/use-toast";
 
 const LoginForm: React.FC = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const {toast} = useToast()
+  const { toast } = useToast();
 
-  const handleLogin = async  (event: React.FormEvent) => {
+  const handleLogin = async (event: React.FormEvent) => {
     event.preventDefault();
     console.log("Username:", username);
     console.log("Password:", password);
-    const result = await adminService.adminLogin({email:username, password})
-    if (!result){
+    const result = await adminService.adminLogin({ email: username, password });
+    if (!result) {
       toast({
         variant: "destructive",
-        title: "Username or Password is incorrect"
-      })
-    } else {      
-      router.replace("/dashboard")
+        title: "Username or Password is incorrect",
+      });
+    } else {
+      router.replace("/dashboard");
     }
   };
 
   return (
-    <form onSubmit={handleLogin} className="w-full max-w-md mx-auto">
+    <form
+      onSubmit={handleLogin}
+      className="w-full max-w-md mx-auto"
+    >
       <div className="mb-4">
         <label
           htmlFor="username"
@@ -40,7 +43,7 @@ const LoginForm: React.FC = () => {
           type="text"
           id="username"
           value={username}
-          onChange={(e) => setUsername(e.target.value)}
+          onChange={e => setUsername(e.target.value)}
           required
           className="mt-1 block w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
         />
@@ -56,7 +59,7 @@ const LoginForm: React.FC = () => {
           type="password"
           id="password"
           value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          onChange={e => setPassword(e.target.value)}
           required
           className="mt-1 block w-full px-3 py-2 border border-black rounded-md shadow-sm focus:outline-none focus:ring-orange-500 focus:border-orange-500"
         />

@@ -1,95 +1,80 @@
-"use client"
-import { useEffect, useState } from "react"
-import toast from "react-hot-toast"
-import { useForm } from "react-hook-form"
+"use client";
 
+import { useState } from "react";
+import Box from "@/Components/shared/dashboard/Box";
+import InputPhone from "@/Components/shared/dashboard/InputPhone";
+import { Button } from "@/Components/ui/button";
+import { IconEdit } from "@/public/assets/svgs";
+import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 
-import { Button } from "@/Components/ui/button"
-import { IconEdit } from "@/public/assets/svgs"
-import Box from "@/Components/shared/dashboard/Box"
+import { Input } from "@codevs/ui/input";
 
-import InputPhone from "@/Components/shared/dashboard/InputPhone"
+import { Social_Types } from "../_types/resume";
+import { updateSocial } from "../action";
 
-import { Input } from "@codevs/ui/input"
+type Social_Props = {
+  data: Social_Types;
+};
 
-import { updateSocial } from "../action"
-import { Social_Types } from "../_types/resume"
+const ContactInfo = ({ data }: Social_Props) => {
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
-type Social_Props ={
-  data: Social_Types
-}
+  const {
+    phone_no,
+    portfolio_website,
+    github,
+    linkedin,
+    facebook,
+    telegram,
+    whatsapp,
+    skype,
+  } = data;
 
-
-const ContactInfo = ({data}: Social_Props) => {
-  const [isEditMode, setIsEditMode] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
- 
   const {
     register,
     handleSubmit,
     reset,
     control,
-    formState: { errors },
+    formState: { isDirty },
   } = useForm({
     defaultValues: {
-      phone_no: "" ,
-      portfolio_website: "",
-      github: "",
-      linkedin: "",
-      facebook: "",
-      telegram: "",
-      whatsapp: "",
-      skype: "",
+      phone_no,
+      portfolio_website,
+      github,
+      linkedin,
+      facebook,
+      telegram,
+      whatsapp,
+      skype,
     },
-   
-  })
-  
-
-  useEffect(() => {
-    if (data) {
-      reset({
-        phone_no: data.phone_no || "",
-        portfolio_website: data.portfolio_website || "",
-        github: data.github || "",
-        linkedin: data.linkedin || "",
-        facebook: data.facebook || "",
-        telegram: data.telegram || "",
-        whatsapp: data.whatsapp || "",
-        skype: data.skype || ""
-      })
-    }
-  }, [data, reset])
+  });
 
   const onSubmit = async (data: Social_Types) => {
-    const toastId = toast.loading("Your social info was being updated")
+    const toastId = toast.loading("Your social info is being updated");
     try {
-      setIsLoading(true)
-      const {
-        phone_no,
-        portfolio_website,
-        github,
-        linkedin,
-        facebook,
-        telegram,
-        whatsapp,
-        skype
-      } = data;
-      await updateSocial({phone_no, portfolio_website, github, linkedin, facebook, telegram, whatsapp, skype})
-      toast.success("Your contact info was sucessfully updated!", {id: toastId})
-      setIsEditMode(false)
-    } catch(error){
-      console.log(error)
-      toast.error("Something went wrong, Please try again later!")
+      setIsLoading(true);
+      await updateSocial(data);
+
+      toast.success("Your contact info was sucessfully updated!", {
+        id: toastId,
+      });
+      setIsEditMode(false);
+    } catch (error) {
+      console.log(error);
+      toast.error("Something went wrong, please try again later!");
     } finally {
       setIsLoading(false);
     }
-  }
- 
-
-  const handleEditClick = () => {
-    setIsEditMode(!isEditMode);
   };
-  const handleSaveClick = () => {
+
+  const handleCancel = () => {
+    reset();
+    toast("Update cancelled", {
+      duration: 2000,
+      icon: "⚠️",
+    });
     setIsEditMode(false);
   };
 
@@ -101,7 +86,7 @@ const ContactInfo = ({data}: Social_Props) => {
             ? "hidden"
             : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
         }  `}
-        onClick={handleEditClick}
+        onClick={() => setIsEditMode(true)}
       />
       <form className="px-2" onSubmit={handleSubmit(onSubmit)}>
         <p className="text-lg">Contact Info</p>
@@ -124,7 +109,7 @@ const ContactInfo = ({data}: Social_Props) => {
               // },
             })}
           />
-       
+
           <Input
             id="portfolio_website"
             {...register("portfolio_website")}
@@ -135,7 +120,7 @@ const ContactInfo = ({data}: Social_Props) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-        
+
           <Input
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
@@ -146,7 +131,7 @@ const ContactInfo = ({data}: Social_Props) => {
             label="Github"
             disabled={!isEditMode}
           />
-         
+
           <Input
             id="facebook"
             {...register("facebook")}
@@ -157,7 +142,7 @@ const ContactInfo = ({data}: Social_Props) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-        
+
           <Input
             id="linkedin"
             {...register("linkedin")}
@@ -168,7 +153,7 @@ const ContactInfo = ({data}: Social_Props) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-        
+
           <Input
             id="telegram"
             {...register("telegram")}
@@ -179,7 +164,7 @@ const ContactInfo = ({data}: Social_Props) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-      
+
           <Input
             id="whatsapp"
             {...register("whatsapp")}
@@ -190,7 +175,7 @@ const ContactInfo = ({data}: Social_Props) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-         
+
           <Input
             id="skype"
             {...register("skype")}
@@ -201,18 +186,21 @@ const ContactInfo = ({data}: Social_Props) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
-          
         </div>
         {isEditMode ? (
           <div className="mt-4 flex justify-end gap-2">
             <Button
               variant="hollow"
-              onClick={handleSaveClick}
+              onClick={handleCancel}
               disabled={isLoading}
             >
               Cancel
             </Button>
-            <Button variant="default" type="submit" disabled={isLoading}>
+            <Button
+              variant="default"
+              type="submit"
+              disabled={isLoading || !isDirty}
+            >
               {isLoading ? "Saving..." : "Save"}
             </Button>
           </div>
@@ -222,4 +210,4 @@ const ContactInfo = ({data}: Social_Props) => {
   );
 };
 
-export default ContactInfo
+export default ContactInfo;

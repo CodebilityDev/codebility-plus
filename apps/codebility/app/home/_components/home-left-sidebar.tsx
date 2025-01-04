@@ -26,14 +26,14 @@ const LeftSidebar = () => {
               width={147}
               height={30}
               alt="Codebility white logo"
-              className={`hidden h-[40px] transition-all dark:block ${!isToggleOpen && "w-0"}`}
+              className={`hidden h-[40px] w-auto transition-all dark:block ${!isToggleOpen && "w-0"}`}
             />
             <Image
               src="/assets/svgs/codebility-black.svg"
               width={147}
               height={30}
               alt="Codebility black logo"
-              className={`h-[40px] transition-all dark:hidden ${!isToggleOpen && "w-0"}`}
+              className={`h-[40px] w-auto transition-all dark:hidden ${!isToggleOpen && "w-0"}`}
             />
           </Link>
         </div>
@@ -53,7 +53,7 @@ const LeftSidebar = () => {
             user.permissions.includes(link.permission),
           );
 
-          if (user.application_status !== "ACCEPTED") return null
+          if (user.application_status !== "ACCEPTED") return null;
 
           return (
             <div
