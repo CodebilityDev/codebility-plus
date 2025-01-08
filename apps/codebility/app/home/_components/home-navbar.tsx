@@ -79,7 +79,9 @@ const Navbar = () => {
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            <MobileNav />
+            <div className="phone:order-first phone:mr-auto">
+              <MobileNav />
+            </div>
           </div>
         </div>
       </nav>
