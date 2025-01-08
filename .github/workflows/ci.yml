@@ -26,7 +26,7 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -40,7 +40,7 @@ jobs:
           cache: "pnpm"
 
       - name: Cache node_modules and Turbo output
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: |
             node_modules
@@ -51,7 +51,7 @@ jobs:
             ${{ runner.os }}-node-
 
       - name: Cache pnpm dependencies
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.pnpm-store
           key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
@@ -59,7 +59,7 @@ jobs:
             ${{ runner.os }}-pnpm-store-
 
       - name: Install dependencies
-        run: pnpm install --no-frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
       - name: Fetch dev branch
         run: git fetch origin dev
