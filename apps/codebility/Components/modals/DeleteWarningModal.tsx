@@ -23,28 +23,23 @@ export default function DeleteWarningModal() {
   }
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose} modal={false}>
-      <DialogOverlay className="fixed inset-0 h-screen w-full bg-black bg-opacity-50 backdrop-blur-sm" />
+    <Dialog open={isModalOpen} onOpenChange={onClose}>
+      <DialogOverlay className="bg-black-800 fixed inset-0 bg-opacity-50 backdrop-blur-sm" />
       <DialogContent
         aria-describedby={undefined}
-        className="bg-light-900 flex h-auto w-[95%] max-w-3xl flex-col justify-items-center gap-6 text-stone-900 dark:text-white"
+        className="dark:bg-dark-200 text-stone-900 dark:text-white"
       >
         <DialogHeader>
-          <DialogTitle>Are you sure you want to delete your photo?</DialogTitle>
+          <DialogTitle>Confirm Deletion</DialogTitle>
         </DialogHeader>
-        <div className=" mt-10 flex flex-col gap-6">
-          <div className="flex flex-col gap-2">
-            <p>
-              This will delete the item from the list. You cannot restore a
-              deleted item.
-            </p>
-          </div>
+        <div className="my-4 flex flex-col">
+          <p>Are you sure you want to delete this?</p>
         </div>
-        <DialogFooter className="flex flex-col gap-2 lg:flex-row ">
+        <DialogFooter className="flex flex-col gap-2 lg:w-[50%] lg:flex-row lg:place-self-end">
           <Button
             type="button"
             variant="outline"
-            className="order-2 w-full sm:order-1 sm:w-[130px]"
+            className="order-2 w-auto dark:border-white dark:bg-transparent sm:order-1"
             onClick={onClose}
           >
             Cancel
@@ -52,7 +47,7 @@ export default function DeleteWarningModal() {
           <Button
             type="button"
             variant="destructive"
-            className="order-1 w-auto sm:order-2 "
+            className="order-1 w-auto sm:order-2"
             onClick={handleConfirmDelete}
           >
             Delete
