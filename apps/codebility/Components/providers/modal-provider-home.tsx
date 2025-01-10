@@ -24,9 +24,10 @@ import TaskViewModal from "@/Components/modals/TaskViewModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
 
+import DeleteWarningModal from "../modals/DeleteWarningModal";
 import ProjectMembersModal from "../modals/ProjectMembersModal";
-import TaskEditModal from "../modals/TaskEditModal";
 import TaskDeleteModal from "../modals/TaskDeleteModal";
+import TaskEditModal from "../modals/TaskEditModal";
 
 export const ModalProviderHome = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -73,6 +74,7 @@ export const ModalProviderHome = () => {
       <AddRoleModal />
       <EditRoleModal />
       <DeleteRoleModal />
+      <DeleteWarningModal />
     </>
   );
 };

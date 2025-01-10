@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import Box from "@/Components/shared/dashboard/Box";
 import { Paragraph } from "@/Components/shared/home";
+import { useModal } from "@/hooks/use-modal";
 import { defaultAvatar } from "@/public/assets/images";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -17,11 +18,14 @@ import { removeAvatar, updateProfile } from "../action";
 type PhotoProps = {
   data: Profile_Types;
 };
+
 const Photo = ({ data }: PhotoProps) => {
   const supabase = getSupabaseBrowserClient();
   const [myAvatar, setAvatar] = useState<string | any>(
     defaultAvatar || data?.image_url,
   );
+  const { onOpen } = useModal();
+
   useEffect(() => {
     if (data?.image_url) {
       setAvatar(data?.image_url);
@@ -76,6 +80,11 @@ const Photo = ({ data }: PhotoProps) => {
   } = useForm({
     defaultValues: {},
   });
+
+  const handleDeleteWarning = () => {
+    onOpen("deleteWarningModal", {}, {}, handleRemoveAvatar);
+  };
+
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <p className="text-lg">Your Photo</p>
@@ -114,7 +123,7 @@ const Photo = ({ data }: PhotoProps) => {
               <Link href={`#`}>
                 <p
                   className="cursor-pointer transition duration-300 hover:text-blue-100"
-                  onClick={handleRemoveAvatar}
+                  onClick={handleDeleteWarning}
                 >
                   Remove Image
                 </p>
