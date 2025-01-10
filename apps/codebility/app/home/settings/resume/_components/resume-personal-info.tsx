@@ -31,59 +31,49 @@ const PersonalInfo = ({ data }: Profile_Props) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
-  const { register, handleSubmit, reset } = useForm({
+  const { pronoun, first_name, last_name, address, main_position } = data;
+
+  const {
+    register,
+    handleSubmit,
+    watch,
+    setValue,
+    reset,
+    formState: { isDirty },
+  } = useForm({
     defaultValues: {
-      pronoun: "",
-      first_name: "",
-      last_name: "",
-      address: "",
-      main_position: "",
+      pronoun,
+      first_name,
+      last_name,
+      address,
+      main_position,
     },
   });
-  const [selectedPronoun, setSelectedPronoun] = useState<string | null>(null);
-  const [selectedPosition, setSelectedPosition] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (data) {
-      reset({
-        pronoun: data.pronoun || "",
-        first_name: data.first_name,
-        last_name: data.last_name,
-        address: data.address,
-        main_position: data.main_position || "",
-      });
-      setSelectedPronoun(data.pronoun || "");
-      setSelectedPosition(data.main_position || "");
-    }
-  }, [data, reset]);
 
   const onSubmit = async (data: Profile_Types) => {
-    const toastId = toast.loading("Your info was being updated");
+    const toastId = toast.loading("Your info is being updated");
     try {
       setIsLoading(true);
-      const { first_name, last_name, address } = data;
-      await updateProfile({
-        first_name,
-        last_name,
-        address,
-        pronoun: selectedPronoun,
-        main_position: selectedPosition,
-      });
+
+      await updateProfile(data);
       toast.success("Your personal information was sucessfully updated!", {
         id: toastId,
       });
       setIsEditMode(false);
     } catch (error) {
       console.log(error);
-      toast.error("Your personal info was failed to update!");
+      toast.error("Your personal info failed to update!");
     } finally {
       setIsLoading(false);
     }
   };
-  const handleEditClick = () => {
-    setIsEditMode(!isEditMode);
-  };
-  const handleSaveClick = () => {
+
+  const handleCancel = () => {
+    reset();
+    toast("Update cancelled", {
+      duration: 2000,
+      icon: "⚠️",
+    });
     setIsEditMode(false);
   };
 
@@ -91,7 +81,7 @@ const PersonalInfo = ({ data }: Profile_Props) => {
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
         className={`${isEditMode ? "hidden" : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"}`}
-        onClick={handleEditClick}
+        onClick={() => setIsEditMode(true)}
       />
       <p className="text-lg">Personal Information</p>
       <div className="flex flex-col gap-6 px-2">
@@ -100,7 +90,10 @@ const PersonalInfo = ({ data }: Profile_Props) => {
             <Label className="text-md ">Pronoun</Label>
             <div className="flex flex-col gap-2 pt-2">
               <Select
-                onValueChange={(value) => setSelectedPronoun(value)}
+                onValueChange={(value) =>
+                  setValue("pronoun", value, { shouldDirty: true })
+                }
+                value={watch("pronoun") ?? "Please select"}
                 disabled={!isEditMode}
               >
                 <SelectTrigger
@@ -111,9 +104,9 @@ const PersonalInfo = ({ data }: Profile_Props) => {
                       : "text-dark-200 dark:bg-dark-200 dark:text-gray  border-none bg-white"
                   } h-11 w-full`}
                 >
-                  <SelectValue placeholder={selectedPronoun || `Please select`}>
-                    {selectedPronoun}
-                  </SelectValue>
+                  <SelectValue
+                    placeholder={watch("pronoun") || `Please select`}
+                  />
                 </SelectTrigger>
 
                 <SelectContent className=" dark:bg-dark-200 bg-white">
@@ -166,9 +159,10 @@ const PersonalInfo = ({ data }: Profile_Props) => {
             <Label className="text-md">Position</Label>
 
             <Select
-              onValueChange={(value) => setSelectedPosition(value)}
-              disabled={!isEditMode}
-              {...register("main_position")}
+              onValueChange={(value) =>
+                setValue("main_position", value, { shouldDirty: true })
+              }
+              value={watch("main_position") ?? "Please select"}
             >
               <SelectTrigger
                 aria-label="main_position"
@@ -178,9 +172,7 @@ const PersonalInfo = ({ data }: Profile_Props) => {
                     : "text-dark-200 dark:bg-dark-200 dark:text-gray  border-none bg-white"
                 } h-11 w-full`}
               >
-                <SelectValue placeholder={selectedPosition || `Please select`}>
-                  {selectedPosition}
-                </SelectValue>
+                <SelectValue placeholder={main_position || "Please select"} />
               </SelectTrigger>
 
               <SelectContent className=" rounded-md">
@@ -199,12 +191,16 @@ const PersonalInfo = ({ data }: Profile_Props) => {
             <div className="mt-5 flex justify-end gap-2">
               <Button
                 variant="hollow"
-                onClick={handleSaveClick}
+                onClick={handleCancel}
                 disabled={isLoading}
               >
                 Cancel
               </Button>
-              <Button variant="default" type="submit" disabled={isLoading}>
+              <Button
+                variant="default"
+                type="submit"
+                disabled={isLoading || !isDirty}
+              >
                 {isLoading ? "Saving..." : "Save"}
               </Button>
             </div>
