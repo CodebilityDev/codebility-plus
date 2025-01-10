@@ -430,3 +430,8 @@ body {
       1px 1px 0 #ffffff;
   }
 }
+
+html body[data-scroll-locked] {
+  overflow: visible !important;
+  margin-right: 0 !important;
+}

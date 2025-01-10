@@ -11,6 +11,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
+import { Button } from "@codevs/ui/button";
 
 import { Profile_Types } from "../_types/resume";
 import { removeAvatar, updateProfile } from "../action";
@@ -120,14 +121,13 @@ const Photo = ({ data }: PhotoProps) => {
                 <input type="hidden" name="avatar" value={myAvatar} />
               </div>
             ) : (
-              <Link href={`#`}>
-                <p
-                  className="cursor-pointer transition duration-300 hover:text-blue-100"
-                  onClick={handleDeleteWarning}
-                >
-                  Remove Image
-                </p>
-              </Link>
+              <Button
+                variant="link"
+                onClick={handleDeleteWarning}
+                className="cursor-pointer transition duration-300 hover:text-blue-100 hover:no-underline dark:text-white"
+              >
+                Remove Image
+              </Button>
             )}
           </div>
         </div>
