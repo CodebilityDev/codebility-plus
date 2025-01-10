@@ -1,27 +1,32 @@
 "use client";
-import Link from "next/link";
-import Image from "next/image";
+
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
 import Box from "@/Components/shared/dashboard/Box";
 import { Paragraph } from "@/Components/shared/home";
 import { defaultAvatar } from "@/public/assets/images";
-import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
-import { removeAvatar, updateProfile } from "../action";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+
+import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
+
 import { Profile_Types } from "../_types/resume";
+import { removeAvatar, updateProfile } from "../action";
 
 type PhotoProps = {
   data: Profile_Types;
 };
 const Photo = ({ data }: PhotoProps) => {
   const supabase = getSupabaseBrowserClient();
-  const [myAvatar, setAvatar] = useState<string | any>(defaultAvatar || data?.image_url )
+  const [myAvatar, setAvatar] = useState<string | any>(
+    defaultAvatar || data?.image_url,
+  );
   useEffect(() => {
     if (data?.image_url) {
-        setAvatar(data?.image_url);
+      setAvatar(data?.image_url);
     }
-}, [data?.image_url]);
+  }, [data?.image_url]);
 
   const handleUploadAvatar = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -84,6 +89,7 @@ const Photo = ({ data }: PhotoProps) => {
             src={myAvatar}
             alt="Avatar"
             fill
+            sizes="80px"
             className="from-violet h-auto w-auto rounded-lg bg-gradient-to-b to-blue-500 bg-cover object-cover"
           />
         </div>
