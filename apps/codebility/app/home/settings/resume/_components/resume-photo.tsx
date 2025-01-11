@@ -5,11 +5,13 @@ import Image from "next/image";
 import Link from "next/link";
 import Box from "@/Components/shared/dashboard/Box";
 import { Paragraph } from "@/Components/shared/home";
+import { useModal } from "@/hooks/use-modal";
 import { defaultAvatar } from "@/public/assets/images";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
+import { Button } from "@codevs/ui/button";
 
 import { Profile_Types } from "../_types/resume";
 import { removeAvatar, updateProfile } from "../action";
@@ -17,11 +19,14 @@ import { removeAvatar, updateProfile } from "../action";
 type PhotoProps = {
   data: Profile_Types;
 };
+
 const Photo = ({ data }: PhotoProps) => {
   const supabase = getSupabaseBrowserClient();
   const [myAvatar, setAvatar] = useState<string | any>(
     defaultAvatar || data?.image_url,
   );
+  const { onOpen } = useModal();
+
   useEffect(() => {
     if (data?.image_url) {
       setAvatar(data?.image_url);
@@ -76,6 +81,11 @@ const Photo = ({ data }: PhotoProps) => {
   } = useForm({
     defaultValues: {},
   });
+
+  const handleDeleteWarning = () => {
+    onOpen("deleteWarningModal", {}, {}, handleRemoveAvatar);
+  };
+
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <p className="text-lg">Your Photo</p>
@@ -111,14 +121,13 @@ const Photo = ({ data }: PhotoProps) => {
                 <input type="hidden" name="avatar" value={myAvatar} />
               </div>
             ) : (
-              <Link href={`#`}>
-                <p
-                  className="cursor-pointer transition duration-300 hover:text-blue-100"
-                  onClick={handleRemoveAvatar}
-                >
-                  Remove Image
-                </p>
-              </Link>
+              <Button
+                variant="link"
+                onClick={handleDeleteWarning}
+                className="cursor-pointer transition duration-300 hover:text-blue-100 hover:no-underline dark:text-white"
+              >
+                Remove Image
+              </Button>
             )}
           </div>
         </div>

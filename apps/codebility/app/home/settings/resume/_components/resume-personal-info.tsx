@@ -163,6 +163,7 @@ const PersonalInfo = ({ data }: Profile_Props) => {
                 setValue("main_position", value, { shouldDirty: true })
               }
               value={watch("main_position") ?? "Please select"}
+              disabled={!isEditMode}
             >
               <SelectTrigger
                 aria-label="main_position"
