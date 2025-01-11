@@ -23,17 +23,20 @@ export type ModalType =
   | "homePrivacyPolicyModal"
   | "addRoleModal"
   | "editRoleModal"
-  | "deleteRoleModal";
+  | "deleteRoleModal"
+  | "deleteWarningModal";
 
 interface ModalStore {
   type: ModalType | null;
   data?: TaskT | client_ClientCardT[] | any;
   dataObject?: any;
+  callback?: () => void;
   isOpen: boolean;
   onOpen: (
     type: ModalType,
     data?: TaskT | client_ClientCardT[] | any,
     dataObject?: any,
+    callback?: () => void,
   ) => void;
   onClose: () => void;
 }
@@ -42,7 +45,12 @@ export const useModal = create<ModalStore>((set) => ({
   type: null,
   dataObject: {},
   isOpen: false,
-  onOpen: (type, data?: TaskT | client_ClientCardT[] | any, dataObject?) =>
-    set({ isOpen: true, type, data, dataObject }),
-  onClose: () => set({ type: null, isOpen: false }),
+  callback: undefined,
+  onOpen: (
+    type,
+    data?: TaskT | client_ClientCardT[] | any,
+    dataObject?,
+    callback?,
+  ) => set({ isOpen: true, type, data, dataObject, callback }),
+  onClose: () => set({ type: null, isOpen: false, callback: undefined }),
 }));
