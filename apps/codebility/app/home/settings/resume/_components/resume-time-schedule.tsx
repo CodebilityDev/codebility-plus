@@ -29,9 +29,7 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
     const { date } = parseTime(data?.end_time || "");
     setEnd(date.toTimeString().substring(0, 5));
   }, [data?.end_time]);
-  const handleEditClick = () => {
-    setIsEditMode(!isEditMode);
-  };
+
   const handleSaveClick = async () => {
     setIsLoading(true);
     const toastId = toast.loading("Your time schedule was being updated");
@@ -63,8 +61,12 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
-        className="w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
-        onClick={handleEditClick}
+        className={` ${
+          isEditMode
+            ? "hidden"
+            : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+        }  `}
+        onClick={() => setIsEditMode(true)}
       />
       <p className="text-lg">My Time Schedule</p>
       <Paragraph className="py-4">
@@ -100,7 +102,7 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
         <div className="mt-4 flex justify-end gap-2">
           <Button
             variant="hollow"
-            onClick={handleSaveClick}
+            onClick={() => setIsEditMode(false)}
             disabled={isLoading}
           >
             Cancel
