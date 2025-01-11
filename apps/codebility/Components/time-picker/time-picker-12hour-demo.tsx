@@ -7,28 +7,32 @@ import { Period } from "@/Components/time-picker/time-picker-utils";
 
 import { Label } from "@codevs/ui/label";
 
-
 interface TimePickerProps {
-  date?: Date
-  period: Period
+  date?: Date;
+  period: Period;
   // eslint-disable-next-line no-unused-vars
-  setDate: (date: Date | undefined) => void
-  disabled?: boolean
+  setDate: (date: Date | undefined) => void;
+  disabled?: boolean;
 }
 
-export function TimePicker12({ date, setDate, period, disabled = false }: TimePickerProps) {
-  const [currentPeriod, setCurrentPeriod] = React.useState<Period>(period)
+export function TimePicker12({
+  date,
+  setDate,
+  period,
+  disabled = false,
+}: TimePickerProps) {
+  const [currentPeriod, setCurrentPeriod] = React.useState<Period>(period);
 
-  const minuteRef = React.useRef<HTMLInputElement>(null)
-  const hourRef = React.useRef<HTMLInputElement>(null)
- 
-  const periodRef = React.useRef<HTMLButtonElement>(null)
+  const minuteRef = React.useRef<HTMLInputElement>(null);
+  const hourRef = React.useRef<HTMLInputElement>(null);
+
+  const periodRef = React.useRef<HTMLButtonElement>(null);
   const handleDateChange = (newDate: Date | undefined) => {
-    setDate(newDate)
-  }
+    setDate(newDate);
+  };
   return (
-    <div className="flex items-end gap-2">
-      <div className="grid gap-1 text-center">
+    <div className="grid grid-cols-3 gap-2">
+      <div className="min:w-[48px] flex h-full flex-col justify-between text-center">
         <Label htmlFor="hours" className="text-xs">
           Hours
         </Label>
@@ -42,7 +46,7 @@ export function TimePicker12({ date, setDate, period, disabled = false }: TimePi
           onRightFocus={() => minuteRef.current?.focus()}
         />
       </div>
-      <div className="grid gap-1 text-center">
+      <div className="min:w-[48px] flex h-full flex-col justify-between text-center">
         <Label htmlFor="minutes" className="text-xs">
           Minutes
         </Label>
@@ -55,17 +59,16 @@ export function TimePicker12({ date, setDate, period, disabled = false }: TimePi
           disabled={disabled}
           onLeftFocus={() => hourRef.current?.focus()}
           onRightFocus={() => periodRef.current?.focus()}
-        
         />
       </div>
-    
-      <div className="grid gap-1 text-center">
+
+      <div className="min:w-[48px] flex h-full flex-col justify-between text-center">
         <Label htmlFor="period" className="text-xs">
           Period
         </Label>
         <TimePeriodSelect
-         period={currentPeriod}
-         setPeriod={setCurrentPeriod}
+          period={currentPeriod}
+          setPeriod={setCurrentPeriod}
           date={date}
           setDate={handleDateChange}
           ref={periodRef}
