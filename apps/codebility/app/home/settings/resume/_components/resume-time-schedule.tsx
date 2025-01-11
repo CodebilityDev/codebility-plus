@@ -71,7 +71,7 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
         Update your time schedule here. This will help us to monitor your
         working hours.
       </Paragraph>
-      <div className="flex flex-col gap-6 sm:flex-row md:flex-col xl:flex-row">
+      <div className="flex flex-col gap-6 sm:flex-row md:flex-col 2xl:flex-row">
         <div className="flex flex-1 flex-col items-center gap-4 rounded-lg border border-zinc-700 p-6">
           <p className="text-lg">Start Time</p>
 
