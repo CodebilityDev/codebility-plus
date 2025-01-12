@@ -50,14 +50,14 @@ const Resume = async () => {
           "Something went wrong!"
         ) : (
           <div className="flex flex-col gap-8 md:flex-row">
-            <div className="flex w-full basis-[70%] flex-col gap-8">
+            <div className="flex w-full basis-[70%] flex-col gap-8 2xl:basis-[60%]">
               <PersonalInfo data={profileData as Profile_Types} />
               <About data={profileData as Profile_Types} />
               <ContactInfo data={socialData as Social_Types} />
               <Experience data={experienceData as Experience_Type[]} />
               <Skills data={profileData as Profile_Types} />
             </div>
-            <div className="flex w-full basis-[30%] flex-col gap-8">
+            <div className="flex w-full basis-[30%] flex-col gap-8 2xl:basis-[40%]">
               <Photo data={profileData as Profile_Types} />
               <TimeSchedule data={profileData as Profile_Types} />
             </div>
