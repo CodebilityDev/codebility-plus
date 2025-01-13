@@ -16,7 +16,11 @@ const rowdies = Rowdies({
 export default async function Hero() {
   const user = await getCachedUser();
 
-  const { data } = await getApplicationStatus(user?.id!);
+  let data = null;
+
+  if (user) {
+    data = (await getApplicationStatus(user?.id!)).data;
+  }
 
   return (
     <section
