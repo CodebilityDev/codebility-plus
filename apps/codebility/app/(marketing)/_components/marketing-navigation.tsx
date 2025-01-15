@@ -10,11 +10,17 @@ const Navigation = async () => {
 
   const isLoggedIn = user ? true : false;
 
-  const { data } = await supabase
-    .from("profile")
-    .select("*, user(*, user_type(*))")
-    .eq("user_id", user?.id!)
-    .single();
+  let data = null;
+
+  if (user) {
+    const { data: userData } = await supabase
+      .from("profile")
+      .select("*, user(*, user_type(*))")
+      .eq("user_id", user?.id!)
+      .single();
+
+    data = userData;
+  }
 
   // Destructure with fallback
   const {
