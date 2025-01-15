@@ -156,11 +156,17 @@ export async function middleware(req: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  const { data: codev } = await supabase
-    .from("codev")
-    .select("application_status, user(*, user_type(*))")
-    .eq("user_id", user?.id)
-    .single();
+  let codev = null;
+
+  if (user) {
+    const { data } = await supabase
+      .from("codev")
+      .select("application_status, user(*, user_type(*))")
+      .eq("user_id", user?.id)
+      .single();
+
+    codev = data;
+  }
 
   // if the applicants is not yet accepted and trying to access home/dashboard
   // if (
@@ -172,32 +178,34 @@ export async function middleware(req: NextRequest) {
   //   return NextResponse.redirect(url);
   // }
 
-  if (
-    codev?.application_status === "PENDING" &&
-    req.nextUrl.pathname !== "/home/account-settings"
-  ) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/waiting";
-    return NextResponse.redirect(url);
-  }
-
-  if (
-    codev?.application_status === "DECLINED" &&
-    req.nextUrl.pathname !== "/home/account-settings"
-  ) {
-    const url = req.nextUrl.clone();
-    url.pathname = "/declined";
-    return NextResponse.redirect(url);
-  }
-
-  const hasPermission = await checkPermissions(user?.id!, req.nextUrl.pathname);
-
-  // if no permission redirect to dashboard
-  if (codev?.application_status === "ACCEPTED" && !hasPermission) {
-    console.log(`Access denied for ${user?.email} on ${req.nextUrl.pathname}`);
-    const url = req.nextUrl.clone();
-    url.pathname = "/home";
-    return NextResponse.redirect(url);
+  if (codev) {
+    if (
+      codev?.application_status === "PENDING" &&
+      req.nextUrl.pathname !== "/home/account-settings"
+    ) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/waiting";
+      return NextResponse.redirect(url);
+    }
+  
+    if (
+      codev?.application_status === "DECLINED" &&
+      req.nextUrl.pathname !== "/home/account-settings"
+    ) {
+      const url = req.nextUrl.clone();
+      url.pathname = "/declined";
+      return NextResponse.redirect(url);
+    }
+  
+    const hasPermission = await checkPermissions(user?.id!, req.nextUrl.pathname);
+  
+    // if no permission redirect to dashboard
+    if (codev?.application_status === "ACCEPTED" && !hasPermission) {
+      console.log(`Access denied for ${user?.email} on ${req.nextUrl.pathname}`);
+      const url = req.nextUrl.clone();
+      url.pathname = "/home";
+      return NextResponse.redirect(url);
+    }
   }
 
   return res;
