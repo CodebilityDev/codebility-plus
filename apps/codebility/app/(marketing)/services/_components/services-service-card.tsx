@@ -25,7 +25,9 @@ export default function ServiceCard({ service }: Props) {
       />
       <div className="flex flex-col gap-3">
         <h3 className="text-base font-medium lg:text-xl">{name}</h3>
-        <p className="line-clamp-3 text-sm lg:text-base">{description}</p>
+        <p className="line-clamp-3 overflow-y-scroll text-sm lg:text-base">
+          {description}
+        </p>
       </div>
     </div>
   );
