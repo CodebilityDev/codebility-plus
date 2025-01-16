@@ -9,13 +9,17 @@ interface Props {
 export default function ServiceCard({ service }: Props) {
   const { name, mainImage, description } = service;
 
+  const isImageUrlSegmented = mainImage && mainImage.split("/")[0] === "public";
+
   return (
-    <div className="border-light-900/5 bg-light-700/10 flex flex-1 flex-col gap-4 rounded-lg border-2 p-4 text-white">
+    <div className="border-light-900/5 bg-light-700/10 flex flex-1 flex-col justify-between gap-4 rounded-lg border-2 p-4 text-white">
       <Image
         src={
-          mainImage
+          mainImage && isImageUrlSegmented
             ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/services-image/${mainImage}`
-            : "https://codebility-cdn.pages.dev/assets/images/dafault-avatar-1248x845.jpg"
+            : mainImage && !isImageUrlSegmented
+              ? mainImage
+              : "https://codebility-cdn.pages.dev/assets/images/dafault-avatar-1248x845.jpg"
         }
         alt={name}
         width={600}
@@ -23,9 +27,13 @@ export default function ServiceCard({ service }: Props) {
         className="h-full w-full rounded-lg object-cover"
         priority
       />
-      <div className="flex basis-1/3 flex-col gap-3">
-        <h3 className="text-base font-medium lg:text-xl">{name}</h3>
-        <p className="line-clamp-3 text-sm lg:text-base">{description}</p>
+      <div className="flex h-1/3 flex-col gap-3">
+        <h3 className="line-clamp-1 text-base font-medium lg:text-xl">
+          {name}
+        </h3>
+        <p className="line-clamp-3 text-ellipsis text-sm lg:text-base">
+          {description}
+        </p>
       </div>
     </div>
   );
