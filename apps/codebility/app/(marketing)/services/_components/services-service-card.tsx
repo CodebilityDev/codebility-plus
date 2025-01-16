@@ -18,16 +18,14 @@ export default function ServiceCard({ service }: Props) {
             : "https://codebility-cdn.pages.dev/assets/images/dafault-avatar-1248x845.jpg"
         }
         alt={name}
-        width={300}
-        height={300}
+        width={600}
+        height={600}
         className="h-full w-full rounded-lg object-cover"
         priority
       />
-      <div className="flex flex-col gap-3">
+      <div className="flex basis-1/3 flex-col gap-3">
         <h3 className="text-base font-medium lg:text-xl">{name}</h3>
-        <p className="line-clamp-3 overflow-y-scroll text-sm lg:text-base">
-          {description}
-        </p>
+        <p className="line-clamp-3 text-sm lg:text-base">{description}</p>
       </div>
     </div>
   );
