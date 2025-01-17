@@ -80,7 +80,7 @@ export default async function HomeLayout({
           <Navbar />
           <div className="flex">
             <LeftSidebar />
-            <section className="background-lightsection_darksection flex min-h-screen flex-1 flex-col px-4 pb-6 pt-36 max-md:pb-14 md:px-8 lg:px-12">
+            <section className="background-lightsection_darksection flex min-h-screen flex-1 flex-col px-4 pb-6 pt-28 max-md:pb-14 md:px-8 lg:px-12">
               <div className="max-w-8xl mx-auto h-full w-full">{children}</div>
             </section>
           </div>
