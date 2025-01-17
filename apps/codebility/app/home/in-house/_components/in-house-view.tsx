@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { H1 } from "@/Components/shared/home";
 import useMediaQuery from "@/hooks/use-media-query";
 import usePagination from "@/hooks/use-pagination";
@@ -17,7 +17,10 @@ interface InHouseViewProps {
 }
 
 export default function InHouseView({ initialData }: InHouseViewProps) {
-  const [data, setData] = useState(initialData);
+  // Ensure we start with an array, even if empty
+  const [data, setData] = useState<Codev[]>(
+    Array.isArray(initialData) ? initialData : [],
+  );
   const isDesktop = useMediaQuery("(min-width: 768px)");
   const supabase = useSupabase();
 
@@ -31,8 +34,9 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
 
   const sharedProps = {
     data: paginatedData,
-    onDataChange: setData,
-    supabase, // Pass the supabase client
+    onDataChange: (newData: Codev[]) =>
+      setData(Array.isArray(newData) ? newData : []),
+    supabase,
     pagination: {
       currentPage,
       totalPages,

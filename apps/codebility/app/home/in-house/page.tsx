@@ -7,5 +7,6 @@ export default async function InHousePage() {
 
   if (error) throw new Error("Failed to fetch data");
 
-  return <InHouseView initialData={data} />;
+  // Always pass an array to InHouseView
+  return <InHouseView initialData={Array.isArray(data) ? data : []} />;
 }
