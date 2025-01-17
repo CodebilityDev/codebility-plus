@@ -12,6 +12,7 @@ import {
   TableRow,
 } from "@codevs/ui/table";
 
+import { StatusBadge } from "../shared/status-badge";
 import { columns } from "./columns";
 import { EditableRow } from "./editable-row";
 import { TableActions } from "./table-actions";
@@ -28,6 +29,8 @@ interface InHouseTableProps {
   };
 }
 
+const defaultImage = "/assets/svgs/icon-codebility-black.svg";
+
 export function InHouseTable({
   data,
   onDataChange,
@@ -38,6 +41,7 @@ export function InHouseTable({
     status: "",
     type: "",
     position: "",
+    project: "",
   });
 
   // Filter data
@@ -46,21 +50,17 @@ export function InHouseTable({
     if (filters.type && item.type !== filters.type) return false;
     if (filters.position && item.main_position !== filters.position)
       return false;
+    if (
+      filters.project &&
+      !item.projects?.some((project) => project.id === filters.project)
+    ) {
+      return false;
+    }
     return true;
   });
-  console.log("filteredData:", filteredData);
 
-  // Status color mapping
-  const getStatusColor = (status: string) => {
-    const colors: Record<string, string> = {
-      AVAILABLE: "text-codeGreen",
-      DEPLOYED: "text-codeViolet",
-      TRAINING: "text-codeYellow",
-      VACATION: "text-codeBlue",
-      BUSY: "text-codeRed",
-      CLIENT_READY: "text-codePurple",
-    };
-    return colors[status] || "text-light-900";
+  const handleDelete = (deletedId: string) => {
+    onDataChange(data.filter((item) => item.id !== deletedId));
   };
 
   const capitalize = (str: string) => {
@@ -69,14 +69,14 @@ export function InHouseTable({
 
   return (
     <div className="space-y-4">
-      {/* Items count */}
+      {/* Count and Filters */}
       <div className="flex items-center justify-between">
-        <p className="text-light-900 text-sm">
-          {filteredData.length} {filteredData.length === 1 ? "item" : "items"}
+        <p className="dark:text-light-900 text-sm text-black">
+          {filteredData.length}{" "}
+          {filteredData.length === 1 ? "member" : "members"}
         </p>
       </div>
 
-      {/* Filters */}
       <TableFilters
         filters={filters}
         onFilterChange={(key, value) =>
@@ -85,19 +85,19 @@ export function InHouseTable({
       />
 
       {/* Table */}
-      <div className="border-dark-200 bg-dark-100 rounded-lg border">
+      <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 rounded-lg border">
         <Table>
           <TableHeader>
-            <TableRow className="border-dark-200 hover:bg-dark-200">
+            <TableRow className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-200">
               {columns.map((column) => (
                 <TableHead
                   key={column.key}
-                  className="text-light-900 text-base font-semibold"
+                  className="dark:text-light-900 text-base font-semibold text-black"
                 >
                   {column.label}
                 </TableHead>
               ))}
-              <TableHead className="text-light-900 text-base font-semibold">
+              <TableHead className="dark:text-light-900 text-base font-semibold text-black">
                 Actions
               </TableHead>
             </TableRow>
@@ -119,54 +119,53 @@ export function InHouseTable({
               ) : (
                 <TableRow
                   key={item.id}
-                  className="border-dark-200 hover:bg-dark-200"
+                  className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-200"
                 >
-                  <TableCell className="text-light-900 text-base">
+                  <TableCell className="dark:text-light-900 text-base text-black">
                     <Image
-                      src={
-                        item.image_url ||
-                        "/assets/svgs/icon-codebility-black.svg"
-                      }
+                      src={item.image_url || defaultImage}
                       alt={`${item.first_name} avatar`}
                       width={40}
                       height={40}
                       className="rounded-full"
                     />
                   </TableCell>
-                  <TableCell className="text-light-900 text-base">
+                  <TableCell className="dark:text-light-900 text-base text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
-                  <TableCell className="text-light-900 text-base">
+                  <TableCell className="dark:text-light-900 text-base text-black">
                     {capitalize(item.last_name)}
                   </TableCell>
-                  <TableCell className="text-light-900 text-base">
+                  <TableCell className="dark:text-light-900 text-base text-black">
                     {item.email}
                   </TableCell>
-                  <TableCell
-                    className={`text-base ${getStatusColor(item.internal_status)}`}
-                  >
-                    {capitalize(item.internal_status)}
+                  <TableCell>
+                    <StatusBadge status={item.internal_status} />
                   </TableCell>
-                  <TableCell className="text-light-900 text-base">
-                    {capitalize(item.type)}
+                  <TableCell className="dark:text-light-900 text-base text-black">
+                    {capitalize(item.type || "")}
                   </TableCell>
-                  <TableCell className="text-light-900 text-base">
-                    {capitalize(item.main_position)}
+                  <TableCell className="dark:text-light-900 text-base text-black">
+                    {item.main_position}
                   </TableCell>
-                  <TableCell className="text-light-900 text-base">
-                    <ul className="list-disc pl-4">
-                      {item.projects?.map((project) => (
-                        <li key={project.id}>{capitalize(project.name)}</li>
-                      ))}
-                    </ul>
+                  <TableCell className="dark:text-light-900 text-base text-black">
+                    {item.projects?.length ? (
+                      <div className="space-y-1">
+                        {item.projects.map((project) => (
+                          <div key={project.id}>{project.name}</div>
+                        ))}
+                      </div>
+                    ) : (
+                      "-"
+                    )}
                   </TableCell>
-                  <TableCell className="text-light-900 text-base">
-                    {capitalize(item.nda_status || "Not Set")}
+                  <TableCell className="dark:text-light-900 text-base text-black">
+                    {item.nda_status ? capitalize(item.nda_status) : "-"}
                   </TableCell>
-                  <TableCell className="text-light-900 text-base">
-                    {item.portfolio_url ? (
+                  <TableCell className="dark:text-light-900 text-base text-black">
+                    {item.portfolio_website ? (
                       <a
-                        href={item.portfolio_url}
+                        href={item.portfolio_website}
                         target="_blank"
                         rel="noopener noreferrer"
                         className="inline-flex items-center text-blue-100 hover:text-blue-200"
@@ -175,13 +174,14 @@ export function InHouseTable({
                         Portfolio
                       </a>
                     ) : (
-                      "Not Available"
+                      "-"
                     )}
                   </TableCell>
                   <TableCell>
                     <TableActions
                       item={item}
                       onEdit={() => setEditingId(item.id)}
+                      onDelete={() => handleDelete(item.id)}
                     />
                   </TableCell>
                 </TableRow>
@@ -193,21 +193,21 @@ export function InHouseTable({
 
       {/* Pagination */}
       {pagination && filteredData.length > 0 && (
-        <div className="flex items-center justify-end gap-2">
+        <div className="flex items-center justify-between">
           <button
             onClick={pagination.onPreviousPage}
             disabled={pagination.currentPage === 1}
-            className="text-light-900 hover:bg-dark-200 rounded px-3 py-1 text-sm disabled:opacity-50"
+            className="dark:text-light-900 dark:hover:text-light-900/80 hover:bg-light-800 dark:hover:bg-dark-200 rounded px-3 py-1 text-sm text-black hover:text-black/80 disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-light-900 text-sm">
+          <span className="dark:text-light-900 text-sm text-black">
             Page {pagination.currentPage} of {pagination.totalPages}
           </span>
           <button
             onClick={pagination.onNextPage}
             disabled={pagination.currentPage === pagination.totalPages}
-            className="text-light-900 hover:bg-dark-200 rounded px-3 py-1 text-sm disabled:opacity-50"
+            className="dark:text-light-900 dark:hover:text-light-900/80 hover:bg-light-800 dark:hover:bg-dark-200 rounded px-3 py-1 text-sm text-black hover:text-black/80 disabled:opacity-50"
           >
             Next
           </button>

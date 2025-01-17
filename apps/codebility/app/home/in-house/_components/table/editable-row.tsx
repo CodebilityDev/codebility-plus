@@ -1,8 +1,19 @@
-import { Codev } from "@/types/home/codev";
-import { Check, Plus, Trash2, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Codev, Project } from "@/types/home/codev";
+import { Check, X } from "lucide-react";
 
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { Badge } from "@codevs/ui/badge";
 import { Button } from "@codevs/ui/button";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@codevs/ui/command";
 import { Input } from "@codevs/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover";
 import {
   Select,
   SelectContent,
@@ -13,17 +24,18 @@ import {
 import { TableCell, TableRow } from "@codevs/ui/table";
 
 import { useCodevForm } from "../../_hooks/use-codev-form";
+import { ProjectSelect } from "../shared/project-select";
 import { columns } from "./columns";
 
 const STATUS_OPTIONS = [
-  { label: "Available", value: "AVAILABLE" },
-  { label: "Deployed", value: "DEPLOYED" },
-  { label: "Training", value: "TRAINING" },
-  { label: "Vacation", value: "VACATION" },
-  { label: "Busy", value: "BUSY" },
-  { label: "Client Ready", value: "CLIENT_READY" },
-  { label: "Blocked", value: "BLOCKED" },
-  { label: "Graduated", value: "GRADUATED" },
+  { label: "Available", value: "AVAILABLE", color: "text-codeGreen" },
+  { label: "Deployed", value: "DEPLOYED", color: "text-codeViolet" },
+  { label: "Training", value: "TRAINING", color: "text-codeYellow" },
+  { label: "Vacation", value: "VACATION", color: "text-codeBlue" },
+  { label: "Busy", value: "BUSY", color: "text-codeRed" },
+  { label: "Client Ready", value: "CLIENT_READY", color: "text-codePurple" },
+  { label: "Blocked", value: "BLOCKED", color: "text-gray" },
+  { label: "Graduated", value: "GRADUATED", color: "text-gray" },
 ];
 
 const TYPE_OPTIONS = [
@@ -53,6 +65,24 @@ interface EditableRowProps {
 
 export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
   const { data: formData, handleChange, isSubmitting } = useCodevForm(data);
+  const [availableProjects, setAvailableProjects] = useState<Project[]>([]);
+  const supabase = useSupabase();
+
+  // Fetch available projects
+  useEffect(() => {
+    async function fetchProjects() {
+      const { data: projects } = await supabase
+        .from("project")
+        .select("*")
+        .order("name");
+
+      if (projects) {
+        setAvailableProjects(projects);
+      }
+    }
+
+    fetchProjects();
+  }, [supabase]);
 
   const renderCell = (key: keyof Codev) => {
     switch (key) {
@@ -65,16 +95,19 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             }
             disabled={isSubmitting}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-light-800 dark:bg-dark-200">
               {STATUS_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
+                <SelectItem
+                  key={option.value}
+                  value={option.value}
+                  className={option.color}
+                >
                   {option.label}
                 </SelectItem>
               ))}
-              <SelectItem value="none">None</SelectItem>
             </SelectContent>
           </Select>
         );
@@ -88,11 +121,10 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             }
             disabled={isSubmitting}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
               <SelectValue placeholder="Select type" />
             </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">None</SelectItem>
+            <SelectContent className="bg-light-800 dark:bg-dark-200">
               {TYPE_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -109,10 +141,10 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             onValueChange={(value) => handleChange(key, value)}
             disabled={isSubmitting}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
               <SelectValue placeholder="Select position" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-light-800 dark:bg-dark-200">
               {POSITION_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -124,54 +156,11 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
 
       case "projects":
         return (
-          <div className="flex flex-col gap-2">
-            {formData.projects?.map((project, index) => (
-              <div key={project.id} className="flex items-center gap-2">
-                <Input
-                  value={project.name}
-                  onChange={(e) => {
-                    const updatedProjects = [...(formData.projects || [])];
-                    updatedProjects[index] = {
-                      ...project,
-                      name: e.target.value,
-                    };
-                    handleChange("projects", updatedProjects);
-                  }}
-                  disabled={isSubmitting}
-                  placeholder="Project name"
-                />
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  onClick={() => {
-                    const updatedProjects = formData.projects?.filter(
-                      (_, i) => i !== index,
-                    );
-                    handleChange("projects", updatedProjects);
-                  }}
-                  disabled={isSubmitting}
-                >
-                  <Trash2 className="h-4 w-4" />
-                </Button>
-              </div>
-            ))}
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={() => {
-                const updatedProjects = [
-                  ...(formData.projects || []),
-                  { id: Date.now().toString(), name: "" },
-                ];
-                handleChange("projects", updatedProjects);
-              }}
-              disabled={isSubmitting}
-              className="w-full"
-            >
-              <Plus className="mr-2 h-4 w-4" />
-              Add Project
-            </Button>
-          </div>
+          <ProjectSelect
+            value={formData.projects || []}
+            onChange={(projects) => handleChange("projects", projects)}
+            disabled={isSubmitting}
+          />
         );
 
       case "nda_status":
@@ -181,10 +170,10 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             onValueChange={(value) => handleChange(key, value)}
             disabled={isSubmitting}
           >
-            <SelectTrigger>
+            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
               <SelectValue placeholder="Select NDA status" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="bg-light-800 dark:bg-dark-200">
               {NDA_OPTIONS.map((option) => (
                 <SelectItem key={option.value} value={option.value}>
                   {option.label}
@@ -200,24 +189,26 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             value={formData[key] || ""}
             onChange={(e) => handleChange(key, e.target.value)}
             disabled={isSubmitting}
+            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200"
           />
         );
     }
   };
 
   return (
-    <TableRow>
+    <TableRow className="bg-light-800 dark:bg-dark-200">
       {columns.map((column) => (
-        <TableCell key={column.key}>
+        <TableCell key={column.key} className="p-2">
           {renderCell(column.key as keyof Codev)}
         </TableCell>
       ))}
-      <TableCell>
+      <TableCell className="p-2">
         <div className="flex space-x-2">
           <Button
             size="sm"
             onClick={() => onSave(formData)}
             disabled={isSubmitting}
+            className="bg-green-500 hover:bg-green-600"
           >
             <Check className="h-4 w-4" />
           </Button>
@@ -226,6 +217,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             variant="ghost"
             onClick={onCancel}
             disabled={isSubmitting}
+            className="hover:bg-red-500/20 hover:text-red-500"
           >
             <X className="h-4 w-4" />
           </Button>
