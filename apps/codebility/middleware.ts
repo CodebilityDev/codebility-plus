@@ -132,7 +132,7 @@ const checkPermissions = async (userId: string, path: string) => {
   }
 
   const pathSegments = path.split("/");
-  let lastSegment;
+  let lastSegment: string | undefined;
 
   // Handle nested routes (e.g., settings pages)
   if (
@@ -146,17 +146,20 @@ const checkPermissions = async (userId: string, path: string) => {
   }
 
   // Map URL-friendly paths to permission keys
-  const segmentMap = {
+  const segmentMap: { [key: string]: string } = {
     "in-house": "in_house",
     "time-tracker": "time_tracker",
     "account-settings": "account_settings",
   };
 
-  lastSegment = segmentMap[lastSegment] || lastSegment;
+  // Ensure `lastSegment` is defined
+  if (lastSegment) {
+    lastSegment = segmentMap[lastSegment] || lastSegment;
 
-  // Check if user has permission for the requested route
-  if (lastSegment && lastSegment in permissions) {
-    return permissions[lastSegment] === true;
+    // Check if user has permission for the requested route
+    if (lastSegment in permissions) {
+      return permissions[lastSegment] === true;
+    }
   }
 
   return false;
