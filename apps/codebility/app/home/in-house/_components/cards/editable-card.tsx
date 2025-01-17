@@ -14,18 +14,18 @@ import {
 } from "@codevs/ui/select";
 
 import { useCodevForm } from "../../_hooks/use-codev-form";
-import { StatusBadge } from "../shared/status-badge";
+import {
+  InternalStatus,
+  STATUS_CONFIG,
+  StatusBadge,
+} from "../shared/status-badge";
 
-const STATUS_OPTIONS = [
-  { label: "Available", value: "AVAILABLE" },
-  { label: "Deployed", value: "DEPLOYED" },
-  { label: "Training", value: "TRAINING" },
-  { label: "Vacation", value: "VACATION" },
-  { label: "Busy", value: "BUSY" },
-  { label: "Client Ready", value: "CLIENT_READY" },
-  { label: "Blocked", value: "BLOCKED" },
-  { label: "Graduated", value: "GRADUATED" },
-];
+const STATUS_OPTIONS = Object.entries(STATUS_CONFIG).map(
+  ([value, { label }]) => ({
+    label,
+    value: value as InternalStatus,
+  }),
+);
 
 const TYPE_OPTIONS = [
   { label: "Intern", value: "INTERN" },
@@ -99,9 +99,7 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
               <SelectContent>
                 {STATUS_OPTIONS.map((option) => (
                   <SelectItem key={option.value} value={option.value}>
-                    <StatusBadge
-                      status={option.value as keyof typeof STATUS_OPTIONS}
-                    />
+                    <StatusBadge status={option.value} />
                   </SelectItem>
                 ))}
               </SelectContent>
