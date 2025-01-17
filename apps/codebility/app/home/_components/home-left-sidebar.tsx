@@ -53,12 +53,12 @@ const LeftSidebar = () => {
             user.permissions.includes(link.permission),
           );
 
-          if (user.application_status !== "ACCEPTED") return null
+          if (user.application_status !== "ACCEPTED") return null;
 
           return (
             <div
               key={item.id}
-              className={`${!hasPermission ? "hidden" : "block"} ${!isToggleOpen ? "mt-0" : "mt-5"}`}
+              className={`${!hasPermission ? "hidden" : "block"} ${!isToggleOpen ? "mt-0" : "mt-5"} mr-4`}
             >
               <h4
                 className={`text-gray text-sm uppercase ${!isToggleOpen || !hasPermission ? "hidden" : "block"}`}
