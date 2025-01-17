@@ -44,7 +44,11 @@ export default function ServicesPage() {
       }),
   );
 
-  const combinedProjectsAndServices = [...liveProjects, ...services];
+  // temporary fix to maintain [Web Application, Mobile Application, Product Design] tab order
+  const codebility = liveProjects.find((item) => item.name === "Codebility");
+  const rest = liveProjects.filter((item) => item.name !== "Codebility");
+
+  const combinedProjectsAndServices = [codebility, ...rest, ...services];
 
   return (
     <div
