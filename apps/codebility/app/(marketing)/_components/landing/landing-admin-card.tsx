@@ -2,11 +2,10 @@ import Image from "next/image";
 import { index_AdminCardT } from "@/types/home";
 
 const AdminCard = ({ admin, color }: index_AdminCardT) => {
-
   return (
     <div>
       <div
-        className={`flex h-full w-full flex-col items-center justify-between gap-4 rounded-lg   `}
+        className={`flex h-full w-full flex-col items-center gap-4 overflow-hidden rounded-lg   `}
       >
         <Image
           unoptimized
