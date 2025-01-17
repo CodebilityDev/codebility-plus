@@ -1,5 +1,5 @@
 export const columns = [
-  { key: "avatar", label: "Avatar" },
+  { key: "image_url", label: "Avatar" },
   { key: "first_name", label: "First Name" },
   { key: "last_name", label: "Last Name" },
   { key: "email", label: "Email" },
@@ -7,6 +7,6 @@ export const columns = [
   { key: "type", label: "Type" },
   { key: "main_position", label: "Position" },
   { key: "projects", label: "Projects" },
-  { key: "nda_status", label: "NDA" },
-  { key: "portfolio", label: "Portfolio" },
+  { key: "nda_status", label: "NDA Status" },
+  { key: "portfolio_website", label: "Portfolio" },
 ] as const;
