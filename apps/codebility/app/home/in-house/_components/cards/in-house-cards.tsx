@@ -28,17 +28,35 @@ export function InHouseCards({
     status: "",
     type: "",
     position: "",
+    project: "",
   });
+
+  const handleDelete = (deletedId: string) => {
+    onDataChange(data.filter((item) => item.id !== deletedId));
+  };
 
   // Filter data
   const filteredData = data.filter((item) => {
+    // Status filter
     if (filters.status && item.internal_status !== filters.status) return false;
+
+    // Type filter
     if (filters.type && item.type !== filters.type) return false;
+
+    // Position filter
     if (filters.position && item.main_position !== filters.position)
       return false;
+
+    // Project filter
+    if (
+      filters.project &&
+      !item.projects?.some((project) => project.id === filters.project)
+    ) {
+      return false;
+    }
+
     return true;
   });
-
   return (
     <div className="space-y-4">
       {/* Count and Filters */}
@@ -76,6 +94,7 @@ export function InHouseCards({
               key={item.id}
               data={item}
               onEdit={() => setEditingId(item.id)}
+              onDelete={() => handleDelete(item.id)}
             />
           ),
         )}
