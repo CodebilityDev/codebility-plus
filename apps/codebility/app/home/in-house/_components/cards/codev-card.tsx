@@ -12,10 +12,11 @@ const defaultImage = "/assets/svgs/icon-codebility-black.svg";
 interface CodevCardProps {
   data: Codev;
   onEdit: () => void;
+  onDelete: () => void;
 }
 
-export function CodevCard({ data, onEdit }: CodevCardProps) {
-  const capitalize = (str: string) => {
+export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
+  const capitalize = (str: string | undefined | null) => {
     return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
   };
 
@@ -44,13 +45,13 @@ export function CodevCard({ data, onEdit }: CodevCardProps) {
           <div className="flex justify-between text-sm">
             <span className="text-gray dark:text-light-500">Position:</span>
             <span className="dark:text-light-900 text-black">
-              {data.main_position}
+              {data.main_position || "-"}
             </span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-gray dark:text-light-500">Type:</span>
             <span className="dark:text-light-900 text-black">
-              {capitalize(data.type)}
+              {capitalize(data.type) || "-"}
             </span>
           </div>
         </div>
@@ -104,15 +105,25 @@ export function CodevCard({ data, onEdit }: CodevCardProps) {
           <Eye className="mr-2 h-4 w-4" />
           View
         </Button>
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={onEdit}
-          className="dark:text-light-900 dark:hover:text-light-900/80 text-black hover:text-black/80"
-        >
-          <Edit2 className="mr-2 h-4 w-4" />
-          Edit
-        </Button>
+        <div className="flex gap-2">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onEdit}
+            className="dark:text-light-900 dark:hover:text-light-900/80 text-black hover:text-black/80"
+          >
+            <Edit2 className="mr-2 h-4 w-4" />
+            Edit
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onDelete}
+            className="text-red-500 hover:text-red-600 dark:text-red-400 dark:hover:text-red-500"
+          >
+            Delete
+          </Button>
+        </div>
       </CardFooter>
     </Card>
   );

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { Codev } from "@/types/home/codev";
 import { Link2 } from "lucide-react";
 
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import {
   Table,
   TableBody,
@@ -12,7 +13,7 @@ import {
   TableRow,
 } from "@codevs/ui/table";
 
-import { StatusBadge } from "../shared/status-badge";
+import { InternalStatus, StatusBadge } from "../shared/status-badge";
 import { columns } from "./columns";
 import { EditableRow } from "./editable-row";
 import { TableActions } from "./table-actions";
@@ -44,7 +45,8 @@ export function InHouseTable({
     project: "",
   });
 
-  // Filter data
+  const supabase = useSupabase();
+
   const filteredData = data.filter((item) => {
     if (filters.status && item.internal_status !== filters.status) return false;
     if (filters.type && item.type !== filters.type) return false;
@@ -140,7 +142,9 @@ export function InHouseTable({
                     {item.email}
                   </TableCell>
                   <TableCell>
-                    <StatusBadge status={item.internal_status} />
+                    <StatusBadge
+                      status={item.internal_status as InternalStatus}
+                    />
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {capitalize(item.type || "")}
@@ -182,6 +186,7 @@ export function InHouseTable({
                       item={item}
                       onEdit={() => setEditingId(item.id)}
                       onDelete={() => handleDelete(item.id)}
+                      supabase={supabase}
                     />
                   </TableCell>
                 </TableRow>
