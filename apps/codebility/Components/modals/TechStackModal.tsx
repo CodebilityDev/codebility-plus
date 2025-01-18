@@ -42,7 +42,7 @@ const TechStackModal = () => {
         <div className="grid w-full grid-cols-3 gap-2">
           {techstacks?.map((stack, i) => (
             <div
-              className={`border-darkgray hover:text-black-500 flex cursor-pointer rounded-md border p-2 text-black hover:bg-black hover:bg-white dark:text-white ${
+              className={`border-darkgray hover:text-black-500 flex cursor-pointer rounded-md border p-2 text-black hover:bg-blue-100 dark:text-white ${
                 checkArray(stack.name.toLowerCase()) && "bg-blue-100"
               }`}
               key={`stack-item-${i}`}
