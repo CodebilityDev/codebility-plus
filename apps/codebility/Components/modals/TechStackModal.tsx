@@ -28,13 +28,13 @@ const TechStackModal = () => {
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogContent
         aria-describedby={undefined}
-        className="bg-black-100 h-auto w-[90%] max-w-md overflow-y-auto py-8 sm:max-w-2xl sm:px-12 sm:py-16"
+        className="bg-light-900 dark:bg-dark-100 h-auto w-[90%] max-w-md overflow-y-auto py-8 sm:max-w-2xl sm:px-12 sm:py-16"
       >
         <button onClick={onClose} className="absolute right-4 top-4">
           <IconClose />
         </button>
         <DialogHeader>
-          <DialogTitle className="text-md mb-4 text-center text-white md:text-xl">
+          <DialogTitle className="text-md mb-4 text-center text-black dark:text-white md:text-xl">
             Select your Tech Stack
           </DialogTitle>
         </DialogHeader>
@@ -42,7 +42,7 @@ const TechStackModal = () => {
         <div className="grid w-full grid-cols-3 gap-2">
           {techstacks?.map((stack, i) => (
             <div
-              className={`border-darkgray hover:text-black-500 flex cursor-pointer rounded-md border p-2 text-white hover:bg-black hover:bg-white ${
+              className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                 checkArray(stack.name.toLowerCase()) && "bg-blue-100"
               }`}
               key={`stack-item-${i}`}
