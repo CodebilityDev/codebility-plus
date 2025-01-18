@@ -1,29 +1,27 @@
 /* eslint-disable no-unused-vars */
-"use client"
-import Image from "next/image"
+"use client";
 
-import { useModal } from "@/hooks/use-modal"
-import { Button } from "@/Components/ui/button"
-import { IconEdit } from "@/public/assets/svgs"
-import React, { useEffect, useState } from "react"
-import { Box } from "@/Components/shared/dashboard"
-import { useTechStackStore } from "@/hooks/use-techstack"
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
+import { Box } from "@/Components/shared/dashboard";
+import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal";
+import { useTechStackStore } from "@/hooks/use-techstack";
+import { IconEdit } from "@/public/assets/svgs";
+import toast from "react-hot-toast";
 
-import {  updateProfile } from "../action"
-
-import toast from "react-hot-toast"
-import { Profile_Types } from "../_types/resume"
-
+import { Profile_Types } from "../_types/resume";
+import { updateProfile } from "../action";
 
 type Skills_Prop = {
-  data: Profile_Types
-}
+  data: Profile_Types;
+};
 
-const Skills = ({data}: Skills_Prop) => {
-  const [isEditMode, setIsEditMode] = useState(false)
-  const [isLoading] = useState(false)
-  const { onOpen } = useModal()
-  const { stack, setStack } = useTechStackStore()
+const Skills = ({ data }: Skills_Prop) => {
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [isLoading] = useState(false);
+  const { onOpen } = useModal();
+  const { stack, setStack } = useTechStackStore();
   useEffect(() => {
     if (data?.tech_stacks) {
       setStack(data.tech_stacks.map((stack: string) => stack.toLowerCase()));
@@ -39,20 +37,20 @@ const Skills = ({data}: Skills_Prop) => {
       if (data?.tech_stacks) {
         setStack(data.tech_stacks.map((stack: string) => stack.toLowerCase()));
       } else {
-        setStack([]); 
+        setStack([]);
       }
-      setIsEditMode(false)
+      setIsEditMode(false);
     } catch (error) {
-      toast.error("Failed to update your tech stack")
+      toast.error("Failed to update your tech stack");
     }
-  }
+  };
 
   const handleSave = () => {
-    const toastId = toast.loading("Your tech stack was being updated")
-    updateProfile({ tech_stacks: stack })
-    setIsEditMode(false)
-    toast.success("Successfully updated your tech stacks!", {id: toastId})
-  }
+    const toastId = toast.loading("Your tech stack was being updated");
+    updateProfile({ tech_stacks: stack });
+    setIsEditMode(false);
+    toast.success("Successfully updated your tech stacks!", { id: toastId });
+  };
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative">
       <IconEdit
@@ -96,4 +94,4 @@ const Skills = ({data}: Skills_Prop) => {
   );
 };
 
-export default Skills
+export default Skills;
