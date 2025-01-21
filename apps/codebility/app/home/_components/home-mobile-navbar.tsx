@@ -28,7 +28,7 @@ const NavContent = () => {
           user.permissions.includes(link.permission),
         );
 
-        if (user.application_status !== "ACCEPTED") return null
+        if (user.application_status !== "ACCEPTED") return null;
 
         return (
           <div
@@ -99,7 +99,7 @@ const MobileNav = () => {
       <SheetContent
         aria-describedby={undefined}
         side="left"
-        className="overflow-y-auto border-r border-zinc-300 bg-[#OEOEOE] dark:border-zinc-800"
+        className="overflow-y-auto border-r border-zinc-300 bg-[#OEOEOE] bg-opacity-80 backdrop-blur-lg dark:border-zinc-800"
       >
         <SheetHeader className="hidden">
           <SheetTitle>Sidebar</SheetTitle>
