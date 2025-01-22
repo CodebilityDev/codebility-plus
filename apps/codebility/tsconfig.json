@@ -28,7 +28,6 @@
     "**/*.ts",
     "**/*.tsx",
     "**/*.mjs",
-    "jest.config.js",
     ".next/types/**/*.ts",
     "public/assets/svgs/index.js"
   ],

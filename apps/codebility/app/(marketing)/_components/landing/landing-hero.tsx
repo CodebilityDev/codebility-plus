@@ -50,7 +50,8 @@ const Hero = () => {
               alt="Hero Grid Background"
               width={1300}
               height={340}
-              className="absolute -top-[10%] left-1/2 h-[340px] w-[1300px] -translate-x-1/2 transform"
+              className="absolute -top-[10%] left-1/2 -translate-x-1/2 transform"
+              priority
             />
           </div>
 

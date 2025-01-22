@@ -1,97 +1,87 @@
 import * as z from "zod";
 
-const isValidGitHubUrl = (url: string) => {
-  try {
-    if (url === "") return true;
-    const githubUrlRegex =
-      /^(?:https?:\/\/)?(?:www\.)?[a-zA-Z0-9-]+\.[a-zA-Z]{2,}(?:\/[a-zA-Z0-9-._~:/?#[\]@!$&'()*+,;=]*)?$/;
-    return githubUrlRegex.test(url);
-  } catch (e) {
-    return false;
-  }
-};
+const ACCEPTED_IMAGE_TYPES = [
+  "image/jpeg",
+  "image/jpg",
+  "image/png",
+  "image/webp",
+];
+
 const isValidUrl = (url: string) => {
   if (!url) return true;
-  const urlRegex =
-    /^(https?:\/\/)?(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?$/;
-  return urlRegex.test(url);
+  try {
+    const urlRegex =
+      /^(?:https?:\/\/)?(?:www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{2,6}\b([-a-zA-Z0-9()@:%_\+.~#?&//=]*)?$/;
+    return urlRegex.test(url);
+  } catch {
+    return false;
+  }
 };
 
 export const SignUpValidation = z
   .object({
-    firstName: z.string().min(1, { message: "Required" }),
-    lastName: z.string().min(1, { message: "Required" }),
-    email_address: z.string().email().min(1, { message: "Required" }),
-    facebook: z
+    first_name: z.string().min(1, "First name is required"),
+    last_name: z.string().min(1, "Last name is required"),
+    email_address: z.string().email("Please enter a valid email"),
+    phone_number: z
       .string()
-      .min(1, { message: "Required" })
-      .refine((value: string | undefined) => isValidUrl(value as string), {
-        message: "Invalid Url Format",
-      }),
-    website: z
+      .min(1, "Phone number is required")
+      .regex(/^[\d\s\+\-\(\)]+$/, "Please enter a valid phone number"), // More lenient phone regex
+
+    years_of_experience: z
       .string()
-      .optional()
-      .refine((value: string | undefined) => isValidUrl(value || ""), {
-        message: "Invalid Url Format",
-      }),
-    github: z
-      .string()
-      .optional()
-      .refine((value: string | undefined) => isValidGitHubUrl(value || ""), {
-        message: "Invalid Url Format",
-      }),
-    techstack: z.string().min(1, { message: "Required" }),
+      .transform((val) => (val ? Number(val) : 0))
+      .pipe(
+        z
+          .number()
+          .min(0, "Years must be 0 or greater")
+          .max(50, "Years must be 50 or less"),
+      ),
+
+    portfolio_website: z.string().optional(),
+
+    techstack: z.string().min(1, "Please select at least one tech stack"),
+
+    position: z.string().min(1, "Please select a position"),
+
+    facebook_link: z.string().min(1, "Facebook link is required"),
+    github: z.string().optional(),
+    linkedin: z.string().optional(),
+    discord: z.string().optional(),
+
     password: z
       .string()
-      .min(8, { message: "Password must be at least 8 characters long" })
-      .refine((value: string) => /[a-z]/.test(value), {
-        message: "Password must contain at least one lowercase letter",
-      })
-      .refine((value: string) => /[A-Z]/.test(value), {
-        message: "Password must contain at least one uppercase letter",
-      })
-      .refine((value: string) => /\d/.test(value), {
-        message: "Password must contain at least one digit",
-      })
+      .min(6, "Password must be at least 6 characters")
+      .regex(/[A-Z]/, "Add at least one uppercase letter")
+      .regex(/[0-9]/, "Add at least one number"),
+
+    confirmPassword: z.string(),
+
+    profileImage: z
+      .any()
+      .optional()
       .refine(
-        (value: string) => /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value),
-        {
-          message: "Password must contain at least one special character",
-        },
+        (file) => !file || file?.size <= 5000000,
+        "Image must be 5MB or less",
+      )
+      .refine(
+        (file) => !file || ACCEPTED_IMAGE_TYPES.includes(file?.type),
+        "Use .jpg, .jpeg, .png or .webp",
       ),
-    confirmPassword: z.string().min(1, { message: "Required" }),
-    schedule: z.string().min(1, { message: "Required" }),
-    position: z.string().min(1, { message: "Required" }),
-    profileImage: z.instanceof(File, { message: "Profile image is required" }),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: "Password don't match",
+    message: "Passwords don't match",
     path: ["confirmPassword"],
   });
 
+// Sign In Validation
 export const SignInValidation = z.object({
-  email_address: z.string().email().min(1, { message: "Email Required" }),
-  password: z.string().min(1, { message: "Password Required" }),
-});
-
-export const EmailValidation = z.object({
-  email: z.string().email().min(1, { message: "Email Required" }),
-});
-
-export const PasswordValidation = z.object({
-  password: z
+  email_address: z
     .string()
-    .min(8, { message: "Password must be at least 8 characters long" })
-    .refine((value: string) => /[a-z]/.test(value), {
-      message: "Password must contain at least one lowercase letter",
-    })
-    .refine((value: string) => /[A-Z]/.test(value), {
-      message: "Password must contain at least one uppercase letter",
-    })
-    .refine((value: string) => /\d/.test(value), {
-      message: "Password must contain at least one digit",
-    })
-    .refine((value: string) => /[!@#$%^&*()_+{}\[\]:;<>,.?~\\/-]/.test(value), {
-      message: "Password must contain at least one special character",
-    }),
+    .min(1, "Email is required")
+    .email("Please enter a valid email"),
+  password: z.string().min(1, "Password is required"),
 });
+
+export type SignUpInputs = z.infer<typeof SignUpValidation>;
+export type SignInInputs = z.infer<typeof SignInValidation>;
