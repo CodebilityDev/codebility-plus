@@ -1,166 +1,156 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { User } from "@supabase/supabase-js"; // Import User type
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import pathsConfig from "./config/paths.config";
-import { getCachedUser } from "./lib/server/supabase-server-comp";
-
-//ROUTE PROTECTION: Define which routes should be protected by middleware
 export const config = {
   matcher: [
-    "/((?!api|auth/signin|auth/signup|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|waiting|declined|thank-you|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
+    "/((?!api|auth/signin|auth/signup|auth/verify|waiting|declined|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|thank-you|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
   ],
 };
 
-// Helper to check if route is public
-const isPublicRoute = (pathname: string): boolean => {
-  const publicRoutes = [
-    "/api",
-    "/auth",
-    "/privacy-policy",
-    "/terms",
-    "/codevs",
-    "/index",
-    "/profiles",
-    "/waiting",
-    "/declined",
-    "/thank-you",
-    "/campaign",
-    "/services",
-    "/ai-integration",
-    "/bookacall",
-  ];
+const PUBLIC_ROUTES = [
+  "/auth/sign-in",
+  "/auth/sign-up",
+  "/auth/verify",
+  "/auth/waiting",
+  "/auth/declined",
+  "/privacy-policy",
+  "/terms",
+  "/",
+] as const;
 
-  return publicRoutes.some((route) => pathname.startsWith(route));
-};
-
-// Helper to identify authentication errors
-const isAuthError = (error: any): boolean => {
-  return (
-    error?.message?.includes("refresh_token_not_found") ||
-    error?.message?.includes("invalid_token")
-  );
-};
+const VERIFICATION_ROUTES = ["/auth/waiting", "/auth/verify"] as const;
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
+  const { pathname } = req.nextUrl;
 
-  // Check public routes first to avoid unnecessary auth checks
-  if (isPublicRoute(req.nextUrl.pathname)) {
-    return res;
+  // Allow public routes
+  if (PUBLIC_ROUTES.includes(pathname)) {
+    return NextResponse.next();
   }
 
   try {
     const supabase = getSupabaseServerComponentClient();
-    const user = await getCachedUser();
 
-    //AUTHENTICATION CHECK: Redirect to login if not authenticated
-    if (!user && !req.nextUrl.pathname.startsWith("/authv2")) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/authv2/sign-in";
-      return NextResponse.redirect(url);
+    // Check authentication
+    const {
+      data: { session },
+      error: authError,
+    } = await supabase.auth.getSession();
+
+    if (authError || !session?.user) {
+      return redirectToLogin(req);
     }
 
-    if (!user) return res;
+    // Get user metadata to check email confirmation
+    const {
+      data: { user: userData },
+      error: userMetaError,
+    } = await supabase.auth.admin.getUserById(session.user.id);
 
-    //FETCH USER DATA: Get user's application status and permissions
-    const { data: codev } = await supabase
+    if (userMetaError || !userData) {
+      return redirectToLogin(req);
+    }
+
+    // Get user data with role
+    const { data: codevData, error: userError } = await supabase
       .from("codev")
-      .select("application_status, user(*, user_type(*))")
-      .eq("user_id", user.id)
+      .select(
+        `
+        id,
+        application_status,
+        role_id,
+        roles (
+          id,
+          name,
+          dashboard,
+          kanban,
+          time_tracker,
+          interns,
+          applicants,
+          inhouse,
+          clients,
+          projects,
+          roles,
+          permissions,
+          services,
+          resume,
+          settings,
+          orgchart
+        )
+      `,
+      )
+      .eq("id", session.user.id)
       .single();
 
-    if (!codev) return res;
+    if (userError || !codevData) {
+      return redirectToLogin(req);
+    }
 
-    //APPLICATION STATUS HANDLING: Manage routing based on application status
+    // Check email verification using confirmed_at
+    if (!userData.confirmed_at && !VERIFICATION_ROUTES.includes(pathname)) {
+      return redirectTo(req, "/auth/verify");
+    }
+
+    // Handle application status
     if (
-      codev.application_status === "PENDING" &&
-      req.nextUrl.pathname !== "/home/account-settings"
+      codevData.application_status === "applying" &&
+      !VERIFICATION_ROUTES.includes(pathname)
     ) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/waiting";
-      return NextResponse.redirect(url);
+      return redirectTo(req, "/auth/waiting");
     }
 
-    if (
-      codev.application_status === "DECLINED" &&
-      req.nextUrl.pathname !== "/home/account-settings"
-    ) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/declined";
-      return NextResponse.redirect(url);
+    // If we're on a verification route, allow access
+    if (VERIFICATION_ROUTES.includes(pathname)) {
+      return NextResponse.next();
     }
 
-    //CHECK PERMISSIONS: Verify user has access to requested route
-    const hasPermission = await checkPermissions(user.id, req.nextUrl.pathname);
-
-    //PERMISSION-BASED REDIRECT: Handle unauthorized access attempts
-    if (codev.application_status === "ACCEPTED" && !hasPermission) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/home";
-      return NextResponse.redirect(url);
+    // Check role-based permissions
+    const hasPermission = checkPermission(pathname, codevData.roles);
+    if (!hasPermission) {
+      return redirectTo(req, "/");
     }
+
+    return NextResponse.next();
   } catch (error) {
-    // Handle authentication errors gracefully
-    if (isAuthError(error) && !req.nextUrl.pathname.startsWith("/authv2")) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/authv2/sign-in";
-      return NextResponse.redirect(url);
-    }
+    console.error("Middleware error:", error);
+    return redirectToLogin(req);
   }
-
-  return res;
 }
 
-//PERMISSION CHECKING: Validate user's access rights for specific routes
-const checkPermissions = async (userId: string, path: string) => {
-  const supabase = getSupabaseServerComponentClient();
-  const { data, error } = await supabase
-    .from("user")
-    .select("*, user_type(*)")
-    .eq("id", userId)
-    .single();
-
-  if (error || !data) return false;
-
-  const permissions = data.user_type;
-
-  // Special handling for dashboard access
-  if (path === pathsConfig.app.home) {
-    return permissions.dashboard === true;
-  }
-
-  const pathSegments = path.split("/");
-  let lastSegment: string | undefined;
-
-  // Handle nested routes (e.g., settings pages)
-  if (
-    pathSegments.length === 4 &&
-    pathSegments[1] === "home" &&
-    pathSegments[2] === "settings"
-  ) {
-    lastSegment = pathSegments[3];
-  } else {
-    lastSegment = pathSegments[2];
-  }
-
-  // Map URL-friendly paths to permission keys
-  const segmentMap: { [key: string]: string } = {
-    "in-house": "in_house",
-    "time-tracker": "time_tracker",
-    "account-settings": "account_settings",
+function checkPermission(pathname: string, roles: any): boolean {
+  const routePermissions: Record<string, keyof typeof roles> = {
+    "/dashboard": "dashboard",
+    "/kanban": "kanban",
+    "/time-tracker": "time_tracker",
+    "/interns": "interns",
+    "/applicants": "applicants",
+    "/inhouse": "inhouse",
+    "/clients": "clients",
+    "/projects": "projects",
+    "/roles": "roles",
+    "/settings": "settings",
+    "/orgchart": "orgchart",
   };
 
-  // Ensure `lastSegment` is defined
-  if (lastSegment) {
-    lastSegment = segmentMap[lastSegment] || lastSegment;
+  const baseRoute = "/" + pathname.split("/")[1];
 
-    // Check if user has permission for the requested route
-    if (lastSegment in permissions) {
-      return permissions[lastSegment] === true;
-    }
+  if (!routePermissions[baseRoute]) {
+    return true;
   }
 
-  return false;
-};
+  const requiredPermission = routePermissions[baseRoute];
+  return roles[requiredPermission] === true;
+}
+
+function redirectToLogin(req: NextRequest) {
+  const redirectUrl = new URL("/auth/sign-in", req.url);
+  redirectUrl.searchParams.set("from", req.nextUrl.pathname);
+  return NextResponse.redirect(redirectUrl);
+}
+
+function redirectTo(req: NextRequest, path: string) {
+  return NextResponse.redirect(new URL(path, req.url));
+}

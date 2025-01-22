@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import React, { ReactNode, Suspense } from "react";
 import { Poppins } from "next/font/google";
 
 const poppins = Poppins({
@@ -10,9 +10,13 @@ const poppins = Poppins({
 
 const RootLayout = ({ children }: { children: ReactNode }) => {
   return (
-    <main className={poppins.className}>
-      <div>{children}</div>
-    </main>
+    <html lang="en" className={poppins.className}>
+      <body>
+        <Suspense>
+          <main>{children}</main>
+        </Suspense>
+      </body>
+    </html>
   );
 };
 
