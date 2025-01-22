@@ -16,7 +16,7 @@ import {
 } from "@codevs/ui/dropdown-menu";
 
 import useUser from "../_hooks/use-user";
-import { signOut } from "../../authv2/actions";
+import { signOut } from "../../auth/actions";
 import MobileNav from "./home-mobile-navbar";
 
 export const menuItems = [

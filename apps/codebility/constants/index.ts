@@ -397,12 +397,12 @@ export const navItems = [
   {
     id: "5",
     title: "Sign In",
-    path: "/authv2/sign-in",
+    path: "/auth/sign-in",
   },
   {
     id: "6",
     title: "Sign Up",
-    path: "/authv2/sign-up",
+    path: "/auth/sign-up",
   },
 ];
 
