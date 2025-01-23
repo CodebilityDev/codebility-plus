@@ -20,8 +20,6 @@ const PUBLIC_ROUTES = [
   "/",
 ] as const;
 
-const VERIFICATION_ROUTES = ["/auth/waiting", "/auth/verify"] as const;
-
 export async function middleware(req: NextRequest) {
   const { pathname } = req.nextUrl;
 

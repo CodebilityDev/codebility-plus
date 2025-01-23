@@ -27,7 +27,11 @@ export async function GET(request: Request) {
       const applicantRoleId = rolesData?.id;
 
       // Ensure user is fetched from session or some other means
-      const { data: user, error: userError } = await supabase.auth.getUser();
+      const {
+        data: { user },
+        error: userError,
+      } = await supabase.auth.getUser();
+
       if (userError || !user) {
         throw new Error("User not found or not authenticated");
       }
