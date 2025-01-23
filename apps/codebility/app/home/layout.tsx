@@ -1,10 +1,8 @@
-/* eslint-disable no-unused-vars */
 import "server-only";
 
 import React from "react";
 import { ModalProviderHome } from "@/Components/providers/modal-provider-home";
 import ReactQueryProvider from "@/hooks/reactQuery";
-import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -20,62 +18,103 @@ export default async function HomeLayout({
 }) {
   const supabase = getSupabaseServerComponentClient();
 
-  const user = await getCachedUser();
+  // Fetch authenticated user session
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
 
-  const { data } = await supabase
-    .from("profile")
-    .select("*, user(*, user_type(*), codev(application_status))")
-    .eq("user_id", user?.id!)
+  if (!session?.user) {
+    throw new Error("User not authenticated");
+  }
+
+  const userId = session.user.id;
+
+  // Fetch user data from codev table
+  const { data: codevData, error: codevError } = await supabase
+    .from("codev")
+    .select(
+      `
+      id,
+      first_name,
+      last_name,
+      address,
+      about,
+      positions,
+      display_position,
+      portfolio_website,
+      tech_stacks,
+      image_url,
+      application_status,
+      role_id,
+      education(
+        id,
+        codev_id,
+        institution,
+        degree,
+        start_date,
+        end_date,
+        description
+      )
+    `,
+    )
+    .eq("id", userId)
     .single();
 
-  const permissionNames = Object.keys(data.user.user_type || {});
-  const permissions = permissionNames.filter(
-    (permissionName) => data?.user.user_type[permissionName] === true,
+  if (codevError || !codevData) {
+    throw new Error("Failed to fetch user data");
+  }
+
+  // Fetch role permissions using role_id
+  const { data: roleData, error: roleError } = await supabase
+    .from("roles")
+    .select(
+      `
+      id,
+      name,
+      dashboard,
+      kanban,
+      time_tracker,
+      interns,
+      applicants,
+      inhouse,
+      clients,
+      projects,
+      roles,
+      permissions,
+      services,
+      resume,
+      settings,
+      orgchart
+    `,
+    )
+    .eq("id", codevData.role_id)
+    .single();
+
+  if (roleError || !roleData) {
+    throw new Error("Failed to fetch role data");
+  }
+
+  // Extract permissions and application status
+  const { application_status, ...userDetails } = codevData;
+  const permissions = Object.keys(roleData).filter(
+    (key) => roleData[key] === true,
   );
-  const applicationStatus = data?.user.codev.application_status;
 
-  const {
-    user_id,
-    first_name,
-    last_name,
-    pronoun,
-    address,
-    about,
-    education,
-    positions,
-    main_position,
-    portfolio_website,
-    tech_stacks,
-    image_url,
-    start_time,
-    end_time,
-  } = data || {};
-
+  // Build user context data
   const userData = {
-    id: user_id,
-    first_name,
-    last_name,
-    email: user?.email as string,
-    pronoun,
-    address,
-    about,
-    education,
-    positions,
-    main_position,
-    portfolio_website,
-    tech_stacks,
-    image_url,
-    start_time,
-    end_time,
+    ...userDetails,
+    email: session.user.email,
     permissions,
-    application_status: applicationStatus,
+    role_name: roleData.name,
+    application_status,
+    education: codevData.education || [],
   };
 
   return (
     <ReactQueryProvider>
       <UserContextProvider userData={userData}>
         <ModalProviderHome />
-        {applicationStatus === "ACCEPTED" && <ToastNotification />}
+        {application_status === "passed" && <ToastNotification />}
         <main className="background-light850_dark100 relative">
           <Navbar />
           <div className="flex">
