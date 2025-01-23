@@ -10,35 +10,44 @@ const uploadProfileImage = async (
   bucketName: string,
 ): Promise<string | null> => {
   try {
-    if (!file) return null;
+    if (!file) {
+      console.error("No file provided for upload.");
+      return null;
+    }
 
+    // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
 
+    // Generate a unique filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const extension = file.name.split(".").pop();
+    const extension = file.name.split(".").pop() || "jpg"; // Default to jpg if no extension
     const filename = `${timestamp}.${extension}`;
 
+    // Initialize Supabase client
     const supabase = await getSupabaseServerActionClient();
 
-    const { data, error } = await supabase.storage
+    // Upload the file to Supabase storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucketName)
       .upload(`${folderName}/${filename}`, buffer, {
         contentType: file.type,
       });
 
-    if (error) {
-      console.error(`Failed to upload ${file.name}:`, error.message);
+    if (uploadError) {
+      console.error(`Failed to upload ${file.name}:`, uploadError.message);
       return null;
     }
 
-    const { data: imageData } = supabase.storage
-      .from("profiles")
-      .getPublicUrl(`avatars/${filename}`);
+    // Generate a public URL for the uploaded file
+    const { data: publicUrlData } = supabase.storage
+      .from(bucketName)
+      .getPublicUrl(`${folderName}/${filename}`);
 
-    return imageData?.publicUrl || null;
+    // Return the public URL
+    return publicUrlData.publicUrl || null;
   } catch (error) {
-    console.error("Error in upload image:", error);
+    console.error("Error during upload:", error);
     throw error;
   }
 };

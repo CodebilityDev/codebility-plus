@@ -1,8 +1,9 @@
-import "server-only";
+"use client";
 
 import React from "react";
 import { ModalProviderHome } from "@/Components/providers/modal-provider-home";
 import ReactQueryProvider from "@/hooks/reactQuery";
+import { Codev } from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -46,6 +47,8 @@ export default async function HomeLayout({
       image_url,
       application_status,
       role_id,
+      created_at,
+      updated_at,
       education(
         id,
         codev_id,
@@ -64,27 +67,13 @@ export default async function HomeLayout({
     throw new Error("Failed to fetch user data");
   }
 
-  // Fetch role permissions using role_id
+  // Fetch role details using role_id
   const { data: roleData, error: roleError } = await supabase
     .from("roles")
     .select(
       `
       id,
-      name,
-      dashboard,
-      kanban,
-      time_tracker,
-      interns,
-      applicants,
-      inhouse,
-      clients,
-      projects,
-      roles,
-      permissions,
-      services,
-      resume,
-      settings,
-      orgchart
+      name
     `,
     )
     .eq("id", codevData.role_id)
@@ -94,27 +83,44 @@ export default async function HomeLayout({
     throw new Error("Failed to fetch role data");
   }
 
-  // Extract permissions and application status
-  const { application_status, ...userDetails } = codevData;
-  const permissions = Object.keys(roleData).filter(
-    (key) => roleData[key] === true,
-  );
-
-  // Build user context data
-  const userData = {
-    ...userDetails,
-    email: session.user.email,
-    permissions,
-    role_name: roleData.name,
-    application_status,
+  // Build user context data to match `Codev` type
+  const userData: Codev = {
+    id: codevData.id,
+    first_name: codevData.first_name,
+    last_name: codevData.last_name,
+    email_address: session.user.email!,
+    phone_number: "",
+    address: codevData.address || null,
+    about: codevData.about || null,
     education: codevData.education || [],
+    positions: codevData.positions || [],
+    display_position: codevData.display_position,
+    portfolio_website: codevData.portfolio_website,
+    tech_stacks: codevData.tech_stacks || [],
+    image_url: codevData.image_url || null,
+    availability_status: true,
+    job_status: null,
+    nda_status: false,
+    level: {},
+    application_status: codevData.application_status,
+    rejected_count: 0,
+    facebook_link: "",
+    linkedin: "",
+    github: "",
+    discord: "",
+    projects: [],
+    years_of_experience: 0,
+    role_id: codevData.role_id,
+    internal_status: "AVAILABLE",
+    created_at: codevData.created_at,
+    updated_at: codevData.updated_at,
   };
 
   return (
     <ReactQueryProvider>
       <UserContextProvider userData={userData}>
         <ModalProviderHome />
-        {application_status === "passed" && <ToastNotification />}
+        {userData.application_status === "passed" && <ToastNotification />}
         <main className="background-light850_dark100 relative">
           <Navbar />
           <div className="flex">
