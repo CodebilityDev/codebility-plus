@@ -1,6 +1,5 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
-import { User } from "@supabase/supabase-js"; // Import User type
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -12,7 +11,7 @@ export const config = {
 
 const PUBLIC_ROUTES = [
   "/auth/sign-in",
-  "/auth/sign-up",
+  "/auth-sign-up",
   "/auth/verify",
   "/auth/waiting",
   "/auth/declined",
@@ -28,129 +27,109 @@ export async function middleware(req: NextRequest) {
 
   // Allow public routes
   if (PUBLIC_ROUTES.includes(pathname)) {
+    console.log("[DEBUG] Public route accessed:", pathname);
     return NextResponse.next();
   }
 
-  try {
-    const supabase = getSupabaseServerComponentClient();
+  const supabase = getSupabaseServerComponentClient();
 
-    // Check authentication
-    const {
-      data: { session },
-      error: authError,
-    } = await supabase.auth.getSession();
+  // Check authentication
+  const {
+    data: { session },
+    error: authError,
+  } = await supabase.auth.getSession();
 
-    if (authError || !session?.user) {
-      return redirectToLogin(req);
-    }
-
-    // Get user metadata to check email confirmation
-    const {
-      data: { user: userData },
-      error: userMetaError,
-    } = await supabase.auth.admin.getUserById(session.user.id);
-
-    if (userMetaError || !userData) {
-      return redirectToLogin(req);
-    }
-
-    // Get user data with role
-    const { data: codevData, error: userError } = await supabase
-      .from("codev")
-      .select(
-        `
-        id,
-        application_status,
-        role_id,
-        roles (
-          id,
-          name,
-          dashboard,
-          kanban,
-          time_tracker,
-          interns,
-          applicants,
-          inhouse,
-          clients,
-          projects,
-          roles,
-          permissions,
-          services,
-          resume,
-          settings,
-          orgchart
-        )
-      `,
-      )
-      .eq("id", session.user.id)
-      .single();
-
-    if (userError || !codevData) {
-      return redirectToLogin(req);
-    }
-
-    // Check email verification using confirmed_at
-    if (!userData.confirmed_at && !VERIFICATION_ROUTES.includes(pathname)) {
-      return redirectTo(req, "/auth/verify");
-    }
-
-    // Handle application status
-    if (
-      codevData.application_status === "applying" &&
-      !VERIFICATION_ROUTES.includes(pathname)
-    ) {
-      return redirectTo(req, "/auth/waiting");
-    }
-
-    // If we're on a verification route, allow access
-    if (VERIFICATION_ROUTES.includes(pathname)) {
-      return NextResponse.next();
-    }
-
-    // Check role-based permissions
-    const hasPermission = checkPermission(pathname, codevData.roles);
-    if (!hasPermission) {
-      return redirectTo(req, "/");
-    }
-
-    return NextResponse.next();
-  } catch (error) {
-    console.error("Middleware error:", error);
+  if (authError || !session?.user) {
+    console.log("[DEBUG] User not authenticated. Redirecting to login.");
     return redirectToLogin(req);
   }
-}
 
-function checkPermission(pathname: string, roles: any): boolean {
-  const routePermissions: Record<string, keyof typeof roles> = {
-    "/dashboard": "dashboard",
-    "/kanban": "kanban",
-    "/time-tracker": "time_tracker",
-    "/interns": "interns",
-    "/applicants": "applicants",
-    "/inhouse": "inhouse",
-    "/clients": "clients",
-    "/projects": "projects",
-    "/roles": "roles",
-    "/settings": "settings",
-    "/orgchart": "orgchart",
-  };
+  const userId = session.user.id;
 
-  const baseRoute = "/" + pathname.split("/")[1];
-
-  if (!routePermissions[baseRoute]) {
-    return true;
+  // Handle /home explicitly for authenticated users
+  if (pathname === "/home") {
+    console.log("[DEBUG] /home accessed by authenticated user:", userId);
+    return NextResponse.next();
   }
 
-  const requiredPermission = routePermissions[baseRoute];
-  return roles[requiredPermission] === true;
+  // Fetch user data from codev table
+  const { data: codevData, error: userError } = await supabase
+    .from("codev")
+    .select("id, application_status")
+    .eq("id", userId)
+    .single();
+
+  // Debug: Log codev data and errors
+  console.log("[DEBUG] Codev Data:", codevData);
+  console.log("[DEBUG] Codev Error:", userError);
+
+  if (userError || !codevData) {
+    console.log("[DEBUG] Failed to fetch codev data. Redirecting to login.");
+    return redirectToLogin(req);
+  }
+
+  const { application_status } = codevData;
+
+  // Debug: Log application status
+  console.log("[DEBUG] Application Status:", application_status);
+
+  // Handle application_status redirection rules
+  if (
+    application_status === "passed" &&
+    ["/auth/declined", "/auth/waiting", "/auth/verify"].includes(pathname)
+  ) {
+    console.log(
+      "[DEBUG] User with 'passed' status trying to access restricted route:",
+      pathname,
+    );
+    return redirectTo(req, "/codev");
+  }
+
+  if (
+    application_status === "failed" &&
+    ["/home", "/auth/waiting", "/auth/verify"].includes(pathname)
+  ) {
+    console.log(
+      "[DEBUG] User with 'failed' status trying to access restricted route:",
+      pathname,
+    );
+    return redirectTo(req, "/auth/declined");
+  }
+
+  if (
+    application_status === "applying" &&
+    ["/home", "/auth/declined", "/auth/verify"].includes(pathname)
+  ) {
+    console.log(
+      "[DEBUG] User with 'applying' status trying to access restricted route:",
+      pathname,
+    );
+    return redirectTo(req, "/auth/waiting");
+  }
+
+  // Prevent signed-in users from visiting sign-in/sign-up routes
+  if (["/auth/sign-in", "/auth-sign-up"].includes(pathname)) {
+    console.log(
+      "[DEBUG] Authenticated user trying to access sign-in/sign-up:",
+      pathname,
+    );
+    return redirectTo(req, "/codev");
+  }
+
+  // Allow all other requests to proceed
+  console.log("[DEBUG] User has permission to access:", pathname);
+  return NextResponse.next();
 }
 
 function redirectToLogin(req: NextRequest) {
   const redirectUrl = new URL("/auth/sign-in", req.url);
   redirectUrl.searchParams.set("from", req.nextUrl.pathname);
+  console.log("[DEBUG] Redirecting to login:", redirectUrl.toString());
   return NextResponse.redirect(redirectUrl);
 }
 
 function redirectTo(req: NextRequest, path: string) {
-  return NextResponse.redirect(new URL(path, req.url));
+  const redirectUrl = new URL(path, req.url);
+  console.log("[DEBUG] Redirecting to:", redirectUrl.toString());
+  return NextResponse.redirect(redirectUrl);
 }

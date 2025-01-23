@@ -1,37 +1,67 @@
 import "server-only";
 
-import { Codev, Project } from "@/types/home/codev";
+import { Codev } from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-const adminUserTypeId = 3;
+const adminRoleId = 1;
 
 export const getCodevs = async (
-  type?: string,
   id?: string,
-): Promise<{ error: any; data: Codev[] | Codev | null }> => {
+): Promise<{ error: any; data: Codev | Codev[] | null }> => {
   const supabase = getSupabaseServerComponentClient();
 
   let codevQuery = supabase.from("codev").select(
     `
-      *,
-      user(
-        *,
-        profile(
-          *,
-          experiences(*)
-        ),
-        social(*)
-      )
+    id,
+    first_name,
+    last_name,
+    email_address,
+    phone_number,
+    address,
+    about,
+    education(
+      id,
+      codev_id,
+      institution,
+      degree,
+      start_date,
+      end_date,
+      description
+    ),
+    positions,
+    display_position,
+    portfolio_website,
+    tech_stacks,
+    image_url,
+    availability_status,
+    job_status,
+    nda_status,
+    level,
+    application_status,
+    rejected_count,
+    facebook_link,
+    linkedin,
+    github,
+    discord,
+    years_of_experience,
+    internal_status,
+    role_id,
+    created_at,
+    updated_at,
+    projects(
+      id,
+      name,
+      description,
+      status,
+      github_link,
+      website_url,
+      figma_link
+    )
     `,
   );
 
-  if (type === "INHOUSE") {
-    codevQuery = codevQuery.eq("type", "INHOUSE");
-  }
-
-  if (type === "INHOUSE" && id) {
-    // filter codevs data to get only match id.
+  if (id) {
     codevQuery = codevQuery.eq("id", id);
   }
 
@@ -39,62 +69,39 @@ export const getCodevs = async (
 
   if (error) return { error, data: null };
 
-  const codevProjects = await Promise.all(
-    codevs.map(async (codev: Codev) => {
-      // await for all the promises.
-      const { data: codevProject } = await supabase
-        .from("codev_project")
-        .select("*,project(id,name)") // requires the *, so typescript won't go crazy. thinking that project is of type Project[], instead of Project.
-        .eq("codev_id", codev.id);
+  const data = codevs.map<Codev>((codev) => ({
+    id: codev.id,
+    first_name: codev.first_name,
+    last_name: codev.last_name,
+    email_address: codev.email_address,
+    phone_number: codev.phone_number,
+    address: codev.address || null,
+    about: codev.about || null,
+    education: codev.education || [],
+    positions: codev.positions || [],
+    display_position: codev.display_position,
+    portfolio_website: codev.portfolio_website,
+    tech_stacks: codev.tech_stacks || [],
+    image_url: codev.image_url || null,
+    availability_status: codev.availability_status,
+    job_status: codev.job_status || null,
+    nda_status: codev.nda_status,
+    level: codev.level || {},
+    application_status: codev.application_status,
+    rejected_count: codev.rejected_count,
+    facebook_link: codev.facebook_link,
+    linkedin: codev.linkedin,
+    github: codev.github,
+    discord: codev.discord,
+    projects: codev.projects || [],
+    years_of_experience: codev.years_of_experience,
+    role_id: codev.role_id,
+    internal_status: codev.internal_status,
+    created_at: codev.created_at,
+    updated_at: codev.updated_at,
+  }));
 
-      if (codevProject && codevProject.length > 0) {
-        const projects: Project[] = codevProject.map((item) => item.project); // get project data only.
-        return projects;
-      }
-      return [];
-    }),
-  );
-
-  const data = codevs.map<Codev>((codev, index: number) => {
-    const {
-      first_name,
-      last_name,
-      image_url,
-      address,
-      about,
-      main_position,
-      tech_stacks,
-      portfolio_website,
-      contact,
-      education,
-      experiences,
-    } = codev.user.profile || {};
-
-    return {
-      id: codev.id,
-      email: codev.user.email,
-      user_id: codev.user_id,
-      internal_status: codev.internal_status,
-      first_name,
-      last_name,
-      tech_stacks,
-      main_position,
-      portfolio_website,
-      contact,
-      projects: codevProjects[index] as Project[],
-      image_url,
-      address,
-      about,
-      education,
-      experiences,
-      socials: codev.user.social,
-      job_status: codev.job_status,
-      nda_status: codev.nda_status,
-      type: codev.type,
-    };
-  });
-
-  if (type === "INHOUSE" && id) return { error: null, data: data[0] as Codev }; // if we are targeting a specific codev.
+  if (id) return { error: null, data: data[0] || null };
 
   return { error: null, data };
 };
@@ -106,21 +113,90 @@ export const getAdmins = async (): Promise<{
   const supabase = getSupabaseServerComponentClient();
 
   const { data, error } = await supabase
-    .from("user")
+    .from("codev")
     .select(
       `
-      *,
-      profile(*)
+      id,
+      first_name,
+      last_name,
+      email_address,
+      phone_number,
+      address,
+      about,
+      positions,
+      display_position,
+      portfolio_website,
+      tech_stacks,
+      image_url,
+      availability_status,
+      job_status,
+      nda_status,
+      level,
+      application_status,
+      rejected_count,
+      facebook_link,
+      linkedin,
+      github,
+      discord,
+      years_of_experience,
+      internal_status,
+      role_id,
+      created_at,
+      updated_at,
+      education(
+        id,
+        codev_id,
+        institution,
+        degree,
+        start_date,
+        end_date,
+        description
+      ),
+      projects(
+        id,
+        name,
+        description,
+        status,
+        github_link,
+        website_url,
+        figma_link
+      )
     `,
     )
-    .eq("type_id", adminUserTypeId);
+    .eq("role_id", adminRoleId);
 
   if (error) return { error, data: null };
 
-  const admins = data.map((user) => ({
-    ...user.profile,
-    email: user.email,
-    user_id: user.id,
+  const admins = data.map<Codev>((codev) => ({
+    id: codev.id,
+    first_name: codev.first_name,
+    last_name: codev.last_name,
+    email_address: codev.email_address,
+    phone_number: codev.phone_number,
+    address: codev.address || null,
+    about: codev.about || null,
+    positions: codev.positions || [],
+    display_position: codev.display_position,
+    portfolio_website: codev.portfolio_website,
+    tech_stacks: codev.tech_stacks || [],
+    image_url: codev.image_url || null,
+    availability_status: codev.availability_status,
+    job_status: codev.job_status || null,
+    nda_status: codev.nda_status,
+    level: codev.level || {}, // Ensure JSONB field is defaulted
+    application_status: codev.application_status,
+    rejected_count: codev.rejected_count,
+    facebook_link: codev.facebook_link,
+    linkedin: codev.linkedin,
+    github: codev.github,
+    discord: codev.discord,
+    years_of_experience: codev.years_of_experience,
+    role_id: codev.role_id,
+    internal_status: codev.internal_status,
+    created_at: codev.created_at,
+    updated_at: codev.updated_at,
+    education: codev.education || [], // Relational data for education
+    projects: codev.projects || [], // Relational data for projects
   }));
 
   return { error: null, data: admins };
