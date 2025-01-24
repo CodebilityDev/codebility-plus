@@ -35,7 +35,7 @@ export const PositionSelect = ({
     const fetchPositions = async () => {
       try {
         const { data, error } = await supabase
-          .from("skill_categories")
+          .from("positions")
           .select("id, name")
           .order("name");
 

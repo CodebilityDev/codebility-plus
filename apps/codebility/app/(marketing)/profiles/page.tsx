@@ -8,14 +8,23 @@ import ProfileContainer from "./_components/profile-container";
 import CodevLists from "./_components/profile-lists";
 
 export default async function Profiles() {
-  const [{ data: codevs }, { data: admins }] = await Promise.all([
-    getCodevs("INHOUSE"),
-    getAdmins(),
-  ]);
+  // Fetch data for Codevs and Admins in parallel
+  const [
+    { data: codevsData, error: codevsError },
+    { data: adminsData, error: adminsError },
+  ] = await Promise.all([getCodevs(), getAdmins()]);
 
-  const filteredCodevs = (codevs as Codev[]).filter(
-    (codev) =>
-      !(admins as Codev[]).some((admin) => admin.user_id === codev.user_id),
+  if (codevsError || adminsError) {
+    throw new Error("Failed to fetch profiles data");
+  }
+
+  // Ensure `codevsData` and `adminsData` are arrays
+  const codevsArray: Codev[] = Array.isArray(codevsData) ? codevsData : [];
+  const adminsArray: Codev[] = Array.isArray(adminsData) ? adminsData : [];
+
+  // Filter codevs to exclude those who are admins
+  const filteredCodevs = codevsArray.filter(
+    (codev) => !adminsArray.some((admin) => admin.id === codev.id),
   );
 
   return (

@@ -1,7 +1,9 @@
-"use client"; // This makes the component a client component
-import {  useState, useEffect } from "react";
-import { toast } from "react-hot-toast";
+"use client";
+
+// This makes the component a client component
+import { useEffect, useState } from "react";
 import { usePathname } from "next/navigation";
+import { toast } from "react-hot-toast";
 
 const ToastNotification = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -14,22 +16,20 @@ const ToastNotification = () => {
 
   // Show the toast only after the component has mounted
   useEffect(() => {
-
     // Check if the toast has been shown before
     const hasShownToast = localStorage.getItem("hasShownToast");
 
-
     if (isMounted && pathname === "/home" && !hasShownToast) {
-      toast.success("Congratulations! You are now an official member of Codebility.");
+      toast.success(
+        "Congratulations! You are now an official member of Codebility.",
+      );
 
       // Set flag in local storage to indicate the toast has been shown
       localStorage.setItem("hasShownToast", "true");
-
-
     }
   }, [isMounted]);
 
   return null;
 };
 
-export default ToastNotification
+export default ToastNotification;
