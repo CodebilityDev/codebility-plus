@@ -1,46 +1,38 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import { Box } from "@/Components/shared/dashboard";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
-import { getCachedUser } from "@/lib/server/supabase-server-comp";
-import { Task } from "@/types/home/task";
-
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { useUserStore } from "@/store/codev-store";
 
 import { logUserTime } from "../actions";
 import TimeTrackerSchedule from "./dashboard-time-tracker-schedule";
 import TimeTrackerTimer from "./dashboard-time-tracker-timer";
 
-export default async function TimeTracker() {
-  const supabase = getSupabaseServerComponentClient();
-  const user = await getCachedUser();
+export default function TimeTracker() {
+  const { user } = useUserStore();
+  const [data, setData] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const { data, error } = await supabase
-    .from("user")
-    .select(
-      `
-    *,
-    codev(
-      id,
-      codev_task(
-        task(
-          id,
-          title,
-          duration,
-          points
-        )
-      ),
-      start_time,
-      end_time,
-      task_timer_start_at,
-      task(
-        id
-      )
-    )
-  `,
-    )
-    .eq("id", user?.id)
-    .single();
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!user) return;
 
-  if (error)
+      try {
+        const response = await fetch(`/api/codev/${user.id}/tasks`);
+        const result = await response.json();
+        setData(result);
+      } catch (error) {
+        console.error("Failed to fetch tasks:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [user]);
+
+  if (isLoading || !data) {
     return (
       <Box className="flex-1">
         <div className="mx-auto flex flex-col items-center gap-3">
@@ -51,12 +43,12 @@ export default async function TimeTracker() {
         </div>
       </Box>
     );
+  }
 
-  const tasks = data.codev.codev_task.map((item: { task: Task }) => item.task);
+  const tasks = data.codev.codev_task.map((item: { task: any }) => item.task);
   const timerStartAt = data.codev.task_timer_start_at;
-  const currentTaskId = data.codev.task && data.codev.task.id;
+  const currentTaskId = data.codev.task?.id;
 
-  // get how many seconds have passed since start at time.
   const timerInitialSecond =
     timerStartAt && (Date.now() - new Date(timerStartAt).getTime()) / 1000;
 

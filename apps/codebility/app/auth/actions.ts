@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { useUserStore } from "@/store/codev-store";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
@@ -15,19 +16,14 @@ const uploadProfileImage = async (
       return null;
     }
 
-    // Convert file to buffer
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-
-    // Generate a unique filename
     const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const extension = file.name.split(".").pop() || "jpg"; // Default to jpg if no extension
+    const extension = file.name.split(".").pop() || "jpg";
     const filename = `${timestamp}.${extension}`;
 
-    // Initialize Supabase client
     const supabase = await getSupabaseServerActionClient();
 
-    // Upload the file to Supabase storage
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucketName)
       .upload(`${folderName}/${filename}`, buffer, {
@@ -39,12 +35,10 @@ const uploadProfileImage = async (
       return null;
     }
 
-    // Generate a public URL for the uploaded file
     const { data: publicUrlData } = supabase.storage
       .from(bucketName)
       .getPublicUrl(`${folderName}/${filename}`);
 
-    // Return the public URL
     return publicUrlData.publicUrl || null;
   } catch (error) {
     console.error("Error during upload:", error);
@@ -55,8 +49,8 @@ const uploadProfileImage = async (
 export const signupUser = async (formData: FormData) => {
   try {
     const supabase = getSupabaseServerActionClient();
+    const setUser = useUserStore.getState().setUser;
 
-    // Extract form data
     const first_name = formData.get("first_name") as string;
     const last_name = formData.get("last_name") as string;
     const email_address = formData.get("email_address") as string;
@@ -72,7 +66,6 @@ export const signupUser = async (formData: FormData) => {
     const discord = formData.get("discord") as string;
     const profileImage = formData.get("profileImage") as File;
 
-    // Check if email exists
     const { data: existingUser } = await supabase
       .from("codev")
       .select("email_address")
@@ -80,19 +73,18 @@ export const signupUser = async (formData: FormData) => {
       .single();
 
     if (existingUser) {
-      return {
-        success: false,
-        error: "Email already exists",
-      };
+      return { success: false, error: "Email already exists" };
     }
 
-    // Upload profile image if provided
     let image_url = null;
     if (profileImage) {
-      image_url = await uploadProfileImage(profileImage, "avatars", "profiles");
+      image_url = await uploadProfileImage(
+        profileImage,
+        "profileImage",
+        "codebility",
+      );
     }
 
-    // Create auth user
     const {
       data: { user },
       error: authError,
@@ -106,12 +98,9 @@ export const signupUser = async (formData: FormData) => {
 
     if (authError) throw authError;
 
-    if (!user) {
-      throw new Error("Failed to create user");
-    }
+    if (!user) throw new Error("Failed to create user");
 
-    // Prepare user data
-    const userData = {
+    const userData: User = {
       id: user.id,
       first_name,
       last_name,
@@ -134,17 +123,15 @@ export const signupUser = async (formData: FormData) => {
       updated_at: new Date().toISOString(),
     };
 
-    // Insert into codev table
     const { error: insertError } = await supabase
       .from("codev")
       .insert([userData]);
 
     if (insertError) throw insertError;
 
-    return {
-      success: true,
-      data: user,
-    };
+    setUser(userData);
+
+    return { success: true, data: user };
   } catch (error: any) {
     console.error("Signup error:", error);
     return {
@@ -156,6 +143,7 @@ export const signupUser = async (formData: FormData) => {
 
 export const signinUser = async (email: string, password: string) => {
   const supabase = getSupabaseServerActionClient();
+  const setUser = useUserStore.getState().setUser;
 
   try {
     const { data: signInData, error: signInError } =
@@ -167,66 +155,33 @@ export const signinUser = async (email: string, password: string) => {
     if (signInError) throw signInError;
     if (!signInData.user) throw new Error("Failed to sign in");
 
-    // Check email verification
-    const isEmailVerified = signInData.user.user_metadata?.email_verified;
-
-    if (!isEmailVerified) {
-      throw new Error(
-        "Please verify your email first. Check your inbox for the verification link.",
-      );
-    }
-
-    // Check application status
     const { data: userProfile, error: profileError } = await supabase
       .from("codev")
-      .select("application_status")
+      .select("*")
       .eq("email_address", email)
       .single();
 
     if (profileError) throw profileError;
     if (!userProfile) throw new Error("Account not found");
 
-    // Set auth cookie regardless of status
-    const cookieStore = cookies();
-    cookieStore.set(
-      "supabase-user",
-      JSON.stringify({
-        id: signInData.user.id,
-        email: signInData.user.email,
-      }),
-    );
+    setUser(userProfile);
 
-    // Return appropriate redirect based on status
-    switch (userProfile.application_status.toLowerCase()) {
-      case "applying":
-        return { redirectTo: "/auth/waiting" };
-      case "rejected":
-        return { redirectTo: "/auth/declined" };
-      case "passed":
-        return { redirectTo: "/home" };
-      default:
-        throw new Error("Invalid application status");
-    }
+    return { success: true, redirectTo: "/home" };
   } catch (error: any) {
     console.error("Sign in error:", error);
-    throw error;
+    return { success: false, error: error.message || "Failed to sign in" };
   }
 };
 
-// Function to sign out the user
 export const signOut = async (): Promise<void> => {
   try {
     const supabase = getSupabaseServerActionClient();
+    const clearUser = useUserStore.getState().clearUser;
 
-    // Sign out from Supabase
     const { error } = await supabase.auth.signOut();
-    if (error) {
-      throw new Error(`Sign out error: ${error.message}`);
-    }
+    if (error) throw new Error(`Sign out error: ${error.message}`);
 
-    // Clear cookies
-    const cookieStore = cookies();
-    cookieStore.delete("supabase-user");
+    clearUser();
     console.log("User successfully signed out");
   } catch (error) {
     console.error("Sign out error:", error);

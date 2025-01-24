@@ -33,11 +33,14 @@ export default function ProfileLists({ codevs }: Props) {
         setToPaginateUser(codevs);
         return;
       }
+
+      // Filter users based on the selected displayed position
       const filteredUser = codevs.filter(
-        (pos) => pos?.main_position == selectedPosition,
+        (codev) => codev.display_position === selectedPosition,
       );
       setToPaginateUser(filteredUser);
     };
+
     filteredPosition();
   }, [selectedPosition, codevs]);
 
@@ -59,11 +62,11 @@ export default function ProfileLists({ codevs }: Props) {
           paginatedUsers.length < 5 ? "xl:grid-cols-4" : "xl:grid-cols-5"
         }`}
       >
-        {paginatedUsers.map((user) => (
+        {paginatedUsers.map((codev) => (
           <ProfileCard
             color={getRandomColor() || ""}
-            key={user.id}
-            codev={user}
+            key={codev.id}
+            codev={codev}
           />
         ))}
       </div>

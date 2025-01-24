@@ -8,19 +8,26 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
-import { profiles_ListFilterT } from "@/types/home";
+import { Codev } from "@/types/home/codev"; // Ensure this type includes display_position
 
 import { removeArrayDuplicate } from "../../_lib/util";
 
-const ProfileListsFilter: React.FC<profiles_ListFilterT> = ({
+interface Props {
+  selectedPosition: string;
+  setSelectedPosition: (position: string) => void;
+  users: Codev[]; // Ensure the users array uses the correct type
+}
+
+const ProfileListsFilter: React.FC<Props> = ({
   selectedPosition,
   setSelectedPosition,
   users,
 }) => {
   const selectGroupRef = useRef<HTMLDivElement>(null);
 
+  // Extract unique display_position values
   const positions = removeArrayDuplicate(
-    users.map((user) => user?.main_position),
+    users.map((user) => user.display_position).filter(Boolean), // Safely access display_position
   );
 
   const handleSelectPosition = () => {
@@ -30,9 +37,10 @@ const ProfileListsFilter: React.FC<profiles_ListFilterT> = ({
     }
     setSelectedPosition("");
   };
+
   return (
     <div className="mb-6 flex w-full flex-col items-center justify-between p-3">
-      <div className="flex w-full max-w-80 flex-col ">
+      <div className="flex w-full max-w-80 flex-col">
         <Select value={selectedPosition} onValueChange={setSelectedPosition}>
           <SelectTrigger
             aria-label="Position"
@@ -57,7 +65,7 @@ const ProfileListsFilter: React.FC<profiles_ListFilterT> = ({
               <div className="border-dark-200 bg-dark-300 fixed left-0 right-0 top-0 flex w-full flex-row items-center justify-between border-b px-3 py-2">
                 <span>Filter by</span>
                 <Button
-                  className="w-auto bg-transparent hover:bg-transparent  "
+                  className="w-auto bg-transparent hover:bg-transparent"
                   variant="default"
                   size="sm"
                   onClick={handleSelectPosition}

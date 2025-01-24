@@ -1,10 +1,12 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { sidebarData } from "@/constants";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
+import { useUserStore } from "@/store/codev-store";
 
 import {
   Sheet,
@@ -15,20 +17,18 @@ import {
   SheetTrigger,
 } from "@codevs/ui/sheet";
 
-import useUser from "../_hooks/use-user";
-
 const NavContent = () => {
-  const user = useUser();
+  const { user } = useUserStore();
   const pathname = usePathname();
 
   return (
-    <section className="flex h-full flex-col gap-2 pt-4 ">
+    <section className="flex h-full flex-col gap-2 pt-4">
       {sidebarData.map((item) => {
         const hasPermission = item.links.some((link) =>
-          user.permissions.includes(link.permission),
+          user?.permissions?.includes(link.permission),
         );
 
-        if (user.application_status !== "ACCEPTED") return null
+        if (user?.application_status !== "passed") return null;
 
         return (
           <div
@@ -36,13 +36,17 @@ const NavContent = () => {
             className={`${!hasPermission ? "hidden" : "block"}`}
           >
             <h4
-              className={`text-gray text-sm uppercase ${!hasPermission ? "hidden" : "block"}`}
+              className={`text-gray text-sm uppercase ${
+                !hasPermission ? "hidden" : "block"
+              }`}
             >
               {item.title}
             </h4>
             <div className={`${!hasPermission ? "mt-0" : "mt-3"}`}>
               {item.links.map((link) => {
-                const accessRoutes = user.permissions.includes(link.permission);
+                const accessRoutes = user?.permissions?.includes(
+                  link.permission,
+                );
                 const isActive = pathname === link.route;
 
                 if (!accessRoutes) {
@@ -64,7 +68,9 @@ const NavContent = () => {
                         alt={link.label}
                         width={20}
                         height={20}
-                        className={`${isActive ? "" : "invert-colors"} h-auto w-auto`}
+                        className={`${
+                          isActive ? "" : "invert-colors"
+                        } h-auto w-auto`}
                       />
                       <p className={`${isActive ? "base-normal" : "base-sm"}`}>
                         {link.label}

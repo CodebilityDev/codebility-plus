@@ -1,39 +1,35 @@
+"use client";
+
 import Image from "next/image";
 import Badges from "@/Components/shared/Badges";
 import Box from "@/Components/shared/dashboard/Box";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
-import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { defaultAvatar } from "@/public/assets/images";
+import { useUserStore } from "@/store/codev-store";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+export default function DashboardProfile() {
+  const { user } = useUserStore();
 
-export default async function DashboardProfile() {
-  const supabase = getSupabaseServerComponentClient();
-  const user = await getCachedUser();
-  const { data: userData } = await supabase
-    .from("profile")
-    .select("first_name, image_url, main_position")
-    .eq("user_id", user?.id)
-    .single();
-  const isLoading = !userData;
+  const isLoading = !user;
+
   return (
     <>
       {!isLoading ? (
         <Box className="relative flex-1">
           <div className="mx-auto flex flex-col items-center gap-3">
             <p className="text-2xl font-semibold capitalize">
-              Hello, {userData?.first_name ?? ""}!
+              Hello, {user?.first_name ?? ""}!
             </p>
 
             <Image
               alt="Avatar"
-              src={userData.image_url ? `${userData.image_url}` : defaultAvatar}
+              src={user?.image_url ? `${user.image_url}` : defaultAvatar}
               width={100}
               height={100}
-              title={`${userData.first_name}'s Avatar`}
+              title={`${user?.first_name}'s Avatar`}
               className="from-violet h-[100px] w-[100px] rounded-lg bg-gradient-to-b to-blue-500 bg-cover object-cover"
             />
-            <p className="text-md">{userData.main_position}</p>
+            <p className="text-md">{user?.display_position}</p>
 
             <Badges />
           </div>

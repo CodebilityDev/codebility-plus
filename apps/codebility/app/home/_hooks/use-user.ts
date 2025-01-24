@@ -7,8 +7,11 @@ import { UserContext } from "../_components/user-provider";
 export default function useUser() {
   const user = useContext(UserContext);
 
-  if (!user)
-    throw new Error("useUser hook is being used outside user context.");
+  if (!user) {
+    const error = new Error("useUser hook is being used outside user context.");
+    console.error("useUser Error:", error.stack);
+    throw error;
+  }
 
   return user;
 }
