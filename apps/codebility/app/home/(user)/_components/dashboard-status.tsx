@@ -1,77 +1,99 @@
 "use client";
 
 import React, { useState } from "react";
-import { toggleJobStatusType } from "@/app/api/dashboard";
 import { useUserStore } from "@/store/codev-store";
+import { createClient } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
+
+// Initialize Supabase client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+);
 
 const Status = ({
   jobStatusType,
   userId,
+  availabilityStatus,
 }: {
   jobStatusType: string;
   userId: string;
+  availabilityStatus: boolean;
 }) => {
   const { user } = useUserStore();
-  const [isChecked, setIsChecked] = useState(jobStatusType === "AVAILABLE");
+  const [isChecked, setIsChecked] = useState(availabilityStatus);
   const [isLoading, setIsLoading] = useState(false);
 
   let statusText;
   let statusColor;
 
-  const changeJobStatus = async (jobStatus: string) => {
+  const updateSupabaseField = async (field: string, value: any) => {
     try {
       setIsLoading(true);
-      const jobStatusToggle = await toggleJobStatusType({
-        id: userId,
-        jobStatusType: jobStatus,
-      });
-      return { ...jobStatusToggle, status: true };
-    } catch (e) {
-      setIsLoading(false);
-      return { status: false };
+      const { error } = await supabase
+        .from("codev")
+        .update({ [field]: value, updated_at: new Date() })
+        .eq("id", userId);
+
+      if (error) {
+        console.error("Error updating status:", error.message);
+        toast.error("Failed to update status.");
+        return false;
+      }
+
+      toast.success("Status successfully updated.");
+      return true;
+    } catch (error) {
+      console.error("Unexpected error:", error);
+      toast.error("Something went wrong.");
+      return false;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleChange = async () => {
-    if (!user || user.role_id !== 1) {
-      toast.error("Only admins can perform this action.");
-      return;
-    }
-
-    const { status } = await changeJobStatus(
-      isChecked ? "DEPLOYED" : "AVAILABLE",
+  const handleAvailabilityToggle = async () => {
+    const updated = await updateSupabaseField(
+      "availability_status",
+      !isChecked,
     );
-    if (!status) {
-      toast.error("Failed to change job status.");
-      return;
+    if (updated) {
+      setIsChecked(!isChecked);
     }
-    setIsChecked(!isChecked);
-    toast.success("Job status successfully changed.");
+  };
+
+  const handleJobStatusChange = async () => {
+    const jobStatus = isChecked ? "DEPLOYED" : "AVAILABLE";
+    const updated = await updateSupabaseField("job_status", jobStatus);
+    if (updated) {
+      setIsChecked(!isChecked);
+    }
   };
 
   if (!isChecked) {
-    statusText = "Deployed";
+    statusText = jobStatusType === "AVAILABLE" ? "Deployed" : "Unavailable";
     statusColor = "bg-orange-500";
   } else {
-    statusText = "Available";
+    statusText = jobStatusType === "AVAILABLE" ? "Available" : "Available";
     statusColor = "bg-green-500";
   }
 
   return (
     <label
       className={`inline-flex cursor-pointer items-center ${
-        isLoading || (user?.role_id !== 1 && "pointer-events-none opacity-50")
+        isLoading || (!user && "pointer-events-none opacity-50")
       }`}
     >
       <input
         type="checkbox"
         className="peer sr-only"
         checked={isChecked}
-        onChange={handleChange}
-        disabled={isLoading || user?.role_id !== 1}
+        onChange={
+          jobStatusType === "AVAILABLE"
+            ? handleJobStatusChange
+            : handleAvailabilityToggle
+        }
+        disabled={isLoading}
       />
       <div
         className={`peer relative h-9 w-24 rounded-full after:absolute after:left-1 after:top-1 after:h-7 after:w-7 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-[3.8rem] ${statusColor}`}
