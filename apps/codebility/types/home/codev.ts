@@ -4,6 +4,16 @@ export interface Position {
   description?: string;
 }
 
+export interface WorkExperience {
+  id: string;
+  codev_id: string;
+  position: string;
+  date_from: string;
+  date_to: string;
+  description?: string;
+  profile_id?: string;
+}
+
 export interface Codev {
   id: string;
   first_name: string;

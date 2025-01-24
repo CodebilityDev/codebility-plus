@@ -23,26 +23,28 @@ import {
 import { DEFAULT_AVATAR } from "../_lib/constants";
 import ApplicantsApprovalButtons from "./applicants-action-buttons";
 
-/** Applicants Table Desktop */
 const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
   return (
     <Table className="text-dark100_light900 hidden xl:block">
       <TableHeader>
-        <TableRow className="grid grid-cols-12 p-2">
-          <TableHead className="col-span-3">Name</TableHead>
-          <TableHead className="text-center">Gmail</TableHead>
-          <TableHead className="text-center">Github</TableHead>
-          <TableHead className="text-center">Portfolio</TableHead>
-          <TableHead className="col-span-3 text-center">Tech Stack</TableHead>
-          <TableHead className="col-span-3 text-center">Approval</TableHead>
+        <TableRow>
+          <TableHead className="w-1/12 text-left">Select</TableHead>
+          <TableHead className="w-2/12 text-left">Name</TableHead>
+          <TableHead className="w-2/12 text-center">Gmail</TableHead>
+          <TableHead className="w-2/12 text-center">Github</TableHead>
+          <TableHead className="w-2/12 text-center">Portfolio</TableHead>
+          <TableHead className="w-2/12 text-center">Tech Stack</TableHead>
+          <TableHead className="w-2/12 text-center">Approval</TableHead>
         </TableRow>
       </TableHeader>
-      <TableBody className="grid grid-cols-1">
-        {applicants.length > 0 &&
+      <TableBody>
+        {applicants.length > 0 ? (
           applicants.map((applicant) => (
-            <TableRow key={applicant.id} className="grid grid-cols-12">
-              <TableCell className="col-span-3 flex items-center gap-3">
+            <TableRow key={applicant.id}>
+              <TableCell className="text-center">
                 <Checkbox />
+              </TableCell>
+              <TableCell>
                 <HoverCard>
                   <HoverCardTrigger asChild>
                     <div className="flex cursor-pointer items-center gap-3">
@@ -55,13 +57,13 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                           {applicant.last_name[0]?.toUpperCase()}
                         </AvatarFallback>
                       </Avatar>
-                      <p className="capitalize hover:underline">
+                      <p className="truncate capitalize hover:underline">
                         {applicant.first_name} {applicant.last_name}
                       </p>
                     </div>
                   </HoverCardTrigger>
                   <HoverCardContent>
-                    <div className="flex gap-4">
+                    <div className="flex gap-4 ">
                       <Image
                         src={applicant.image_url || DEFAULT_AVATAR}
                         alt={`${applicant.first_name} avatar`}
@@ -79,45 +81,54 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                   </HoverCardContent>
                 </HoverCard>
               </TableCell>
-              <TableCell>
+              <TableCell className="flex items-center justify-center  text-center">
                 <Link href={`mailto:${applicant.email_address}`}>
                   <IconEmail />
                 </Link>
               </TableCell>
-              <TableCell>
+              <TableCell className="items-center justify-center text-center">
                 {applicant.github && (
                   <Link href={applicant.github}>
                     <IconGithub />
                   </Link>
                 )}
               </TableCell>
-              <TableCell>
+              <TableCell className="items-center justify-center text-center">
                 {applicant.portfolio_website && (
                   <Link href={applicant.portfolio_website}>
                     <IconLink />
                   </Link>
                 )}
               </TableCell>
-              <TableCell className="col-span-3">
-                {applicant.tech_stacks.map((stack) => (
-                  <Image
-                    key={stack}
-                    src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
-                    alt={stack}
-                    width={25}
-                    height={25}
-                  />
-                ))}
+              <TableCell className="text-center">
+                <div className="flex flex-wrap justify-center gap-2">
+                  {applicant.tech_stacks.map((stack) => (
+                    <Image
+                      key={stack}
+                      src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                      alt={stack}
+                      width={25}
+                      height={25}
+                      className="h-6 w-6"
+                    />
+                  ))}
+                </div>
               </TableCell>
-              <TableCell className="col-span-3">
+              <TableCell className="text-center">
                 <ApplicantsApprovalButtons applicant={applicant} />
               </TableCell>
             </TableRow>
-          ))}
+          ))
+        ) : (
+          <TableRow>
+            <TableCell colSpan={7} className="text-center">
+              No applicants found.
+            </TableCell>
+          </TableRow>
+        )}
       </TableBody>
     </Table>
   );
 };
-``;
 
 export default ApplicantsTableDesktop;

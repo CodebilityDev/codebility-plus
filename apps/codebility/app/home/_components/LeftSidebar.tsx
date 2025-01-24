@@ -9,7 +9,6 @@ import { useNavStore } from "@/hooks/use-sidebar";
 import { useUserStore } from "@/store/codev-store";
 import { AnimatePresence, motion } from "framer-motion";
 
-// Define interfaces for type safety
 interface SidebarLink {
   route: string;
   label: string;
@@ -61,10 +60,10 @@ const LeftSidebar = () => {
       initial={false}
       animate={isToggleOpen ? "open" : "closed"}
       variants={sidebarVariants}
-      className="background-navbar sticky left-0 top-0 z-20  flex h-screen flex-col gap-8 overflow-hidden  p-1 shadow-lg max-lg:hidden lg:flex"
+      className="background-navbar sticky left-0 top-0 z-20 hidden h-screen flex-col gap-8 overflow-hidden p-1 shadow-lg lg:flex"
     >
       {/* Logo and Toggle Button */}
-      <div className="mt-4 flex items-center justify-between ">
+      <div className="mt-4 flex items-center justify-between">
         <div className="flex w-full items-center">
           <Link href="/" className="flex-grow overflow-hidden">
             <AnimatePresence>
@@ -118,7 +117,7 @@ const LeftSidebar = () => {
 
       {/* Sidebar Links */}
       {sidebarData.map((section: SidebarSection) => (
-        <div key={section.id} className="mt-4 ">
+        <div key={section.id} className="mt-4">
           <AnimatePresence>
             {isToggleOpen ? (
               <motion.h4
@@ -131,7 +130,7 @@ const LeftSidebar = () => {
                 {section.title}
               </motion.h4>
             ) : (
-              <div className="bg-dark300_light900 my-3  border-2" />
+              <div className="bg-dark300_light900 my-3 border-2" />
             )}
           </AnimatePresence>
 
@@ -146,7 +145,7 @@ const LeftSidebar = () => {
                     isActive
                       ? "primary-gradient text-light-900 rounded-lg"
                       : "text-dark300_light900"
-                  } mt-2 flex items-center gap-4 rounded-sm  px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] dark:hover:bg-[#131417]`}
+                  } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] dark:hover:bg-[#131417]`}
                 >
                   <div
                     className="flex items-center justify-center"
@@ -157,9 +156,7 @@ const LeftSidebar = () => {
                       alt={link.label}
                       width={28}
                       height={28}
-                      className={`${
-                        isActive ? "" : "invert-colors"
-                      } h-full w-full`}
+                      className={`${isActive ? "" : "invert-colors"} h-full w-full`}
                     />
                   </div>
                   <span
