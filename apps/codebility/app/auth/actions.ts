@@ -129,7 +129,7 @@ export const signupUser = async (formData: FormData) => {
       updated_at: new Date().toISOString(),
       years_of_experience: parseInt(years_of_experience),
       role_id: 7,
-      internal_status: "AVAILABLE",
+      internal_status: "TRAINING",
     };
 
     const { error: insertError } = await supabase

@@ -149,14 +149,17 @@ export function InHouseTable({
                   className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-200"
                 >
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    <Image
-                      src={item.image_url || defaultImage}
-                      alt={`${item.first_name} avatar`}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
+                    <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                      <Image
+                        src={item.image_url || defaultImage}
+                        alt={`${item.first_name} avatar`}
+                        width={40}
+                        height={40}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
                   </TableCell>
+
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
