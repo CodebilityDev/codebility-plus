@@ -7,44 +7,59 @@ import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-c
 export const updateCodev = async (
   key: keyof Codev,
   value: any,
-  { codevId, userId }: { codevId: string; userId: string },
+  { codevId }: { codevId: string },
 ) => {
   const supabase = getSupabaseServerActionClient();
+
   const keys = {
-    project: ["projects"],
-    codev: ["internal_status", "nda_status", "type"],
-    profile: ["main_position"],
+    projects: ["projects"],
+    codev: [
+      "internal_status",
+      "nda_status",
+      "availability_status",
+      "application_status",
+      "image_url",
+      "email_address",
+    ],
+    profile: ["display_position", "role_id", "level", "tech_stacks"],
   };
 
-  // target table
+  // Determine the target table based on the key
   const target = Object.keys(keys).find((table) =>
     keys[table as keyof typeof keys].includes(key),
   );
 
-  if (!target) throw new Error(`invalid codev info: ${key}`);
+  if (!target) throw new Error(`Invalid codev info: ${key}`);
 
-  if (target === "project") {
+  if (target === "projects") {
+    // Existing project update logic
     await supabase.from("codev_project").delete().eq("codev_id", codevId);
 
     for (let i = 0; i < value.length; i++) {
-      const { id } = value[i];
+      const { id: projectId } = value[i];
 
-      await supabase.from("codev_project").insert({
+      const { error } = await supabase.from("codev_project").insert({
         codev_id: codevId,
-        project_id: id,
+        project_id: projectId,
       });
+
+      if (error) throw error;
     }
   } else {
     let newValue = value;
 
-    if (target === "codev")
-      // since all the data we are updating in codev table are status. and all status are enums.
-      newValue = value.replace(/ /g, "").toUpperCase(); // we will transform all the new data to a constants naming convention.
+    if (target === "codev") {
+      // Special handling for specific fields
+      if (key === "internal_status" || key === "availability_status") {
+        newValue = value.replace(/ /g, "").toUpperCase();
+      }
+    }
 
     const { error } = await supabase
-      .from(target)
+      .from("codev")
       .update({ [key]: newValue })
-      .eq("user_id", userId);
+      .eq("id", codevId);
+
     if (error) throw error;
   }
 };

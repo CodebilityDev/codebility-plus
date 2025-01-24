@@ -1,10 +1,7 @@
-interface WorkExperience {
+export interface Position {
   id: string;
-  codev_id: string;
-  position: string;
-  date_from: string;
-  date_to: string;
-  description: string;
+  name: string;
+  description?: string;
 }
 
 export interface Codev {
@@ -16,7 +13,7 @@ export interface Codev {
   address: string | null;
   about: string | null;
   education: Education[]; // Education is now relational data
-  positions: string[]; // Array for positions
+  positions: Position[]; // Array of Position objects
   display_position: string; // Main position to display
   portfolio_website: string;
   tech_stacks: string[];
@@ -36,7 +33,7 @@ export interface Codev {
   updated_at: string;
   years_of_experience: number;
   role_id: number; // References `roles` table
-  internal_status: InternalStatus; // New field for internal status
+  internal_status: InternalStatus; // Field for internal status
 
   // Relational data
   experiences?: WorkExperience[]; // Array of WorkExperience

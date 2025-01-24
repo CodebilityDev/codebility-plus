@@ -9,6 +9,19 @@ import { useNavStore } from "@/hooks/use-sidebar";
 import { useUserStore } from "@/store/codev-store";
 import { AnimatePresence, motion } from "framer-motion";
 
+// Define interfaces for type safety
+interface SidebarLink {
+  route: string;
+  label: string;
+  imgURL: string;
+}
+
+interface SidebarSection {
+  id: string;
+  title: string;
+  links: SidebarLink[];
+}
+
 const LeftSidebar = () => {
   const { user } = useUserStore();
   const { isToggleOpen, toggleNav } = useNavStore();
@@ -104,7 +117,7 @@ const LeftSidebar = () => {
       </div>
 
       {/* Sidebar Links */}
-      {sidebarData.map((section) => (
+      {sidebarData.map((section: SidebarSection) => (
         <div key={section.id} className="mt-4 ">
           <AnimatePresence>
             {isToggleOpen ? (
@@ -123,7 +136,7 @@ const LeftSidebar = () => {
           </AnimatePresence>
 
           <div className="mt-3 flex flex-col gap-2">
-            {section.links.map((link) => {
+            {section.links.map((link: SidebarLink) => {
               const isActive = pathname === link.route;
               return (
                 <Link
@@ -142,8 +155,8 @@ const LeftSidebar = () => {
                     <Image
                       src={link.imgURL}
                       alt={link.label}
-                      width={18}
-                      height={18}
+                      width={28}
+                      height={28}
                       className={`${
                         isActive ? "" : "invert-colors"
                       } h-full w-full`}

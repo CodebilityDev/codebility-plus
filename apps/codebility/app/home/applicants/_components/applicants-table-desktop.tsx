@@ -1,6 +1,5 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants";
 import {
   Table,
   TableBody,
@@ -11,6 +10,7 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
+import { Codev } from "@/types/home/codev";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@codevs/ui/avatar";
 import { Checkbox } from "@codevs/ui/checkbox";
@@ -21,14 +21,10 @@ import {
 } from "@codevs/ui/hover-card";
 
 import { DEFAULT_AVATAR } from "../_lib/constants";
-import ApplicantsActionButtons from "./applicants-action-buttons";
+import ApplicantsApprovalButtons from "./applicants-action-buttons";
 
-const ApplicantsTableDesktop = ({
-  applicants,
-}: {
-  applicants: ApplicantsList_Types[];
-}) => {
-  const applicantsLen = applicants?.length as number;
+/** Applicants Table Desktop */
+const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
   return (
     <Table className="text-dark100_light900 hidden xl:block">
       <TableHeader>
@@ -42,144 +38,86 @@ const ApplicantsTableDesktop = ({
         </TableRow>
       </TableHeader>
       <TableBody className="grid grid-cols-1">
-        {applicantsLen > 0 &&
-          applicants.map(
-            ({
-              id,
-              first_name,
-              last_name,
-              email_address,
-              github_link,
-              portfolio_website,
-              tech_stacks,
-              image_url,
-            }: ApplicantsList_Types) => (
-              <TableRow key={id} className="grid grid-cols-12">
-                <TableCell className="col-span-3 flex items-center gap-3">
-                  <Checkbox className="border-black-400 dark:border-white" />
-                  <HoverCard>
-                    <HoverCardTrigger asChild>
-                      <div className="flex cursor-pointer items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={image_url || DEFAULT_AVATAR} />
-                          <AvatarFallback>
-                            {first_name[0]?.toUpperCase()}
-                            {last_name[0]?.toUpperCase()}
-                          </AvatarFallback>
-                        </Avatar>
-                        <p className="text-base capitalize hover:underline">
-                          {first_name} {last_name}
-                        </p>
-                      </div>
-                    </HoverCardTrigger>
-                    <HoverCardContent className="dark:bg-black-200 w-auto">
-                      <div className="flex justify-between space-x-4">
-                        <Image
-                          src={image_url || DEFAULT_AVATAR}
-                          alt={`${first_name} avatar`}
-                          width={1000}
-                          height={1000}
-                          className="h-40 w-40 rounded-md object-cover"
+        {applicants.length > 0 &&
+          applicants.map((applicant) => (
+            <TableRow key={applicant.id} className="grid grid-cols-12">
+              <TableCell className="col-span-3 flex items-center gap-3">
+                <Checkbox />
+                <HoverCard>
+                  <HoverCardTrigger asChild>
+                    <div className="flex cursor-pointer items-center gap-3">
+                      <Avatar>
+                        <AvatarImage
+                          src={applicant.image_url || DEFAULT_AVATAR}
                         />
-                        <div className="text-sm space-y-2">
-                          <div className="space-y-1">
-                            <h4 className="font-semibold capitalize">
-                              {first_name} {last_name}
-                            </h4>
-                            <p>{email_address}</p>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            {github_link && (
-                              <Link href={github_link} target="_blank">
-                                <div className="flex justify-center">
-                                  <IconGithub className="h-[18px] w-[18px] invert dark:invert-0" />
-                                </div>
-                              </Link>
-                            )}
-                            {portfolio_website && (
-                              <Link href={portfolio_website} target="_blank">
-                                <div className="flex xl:justify-center">
-                                  <IconLink className="h-[18px] w-[18px] invert dark:invert-0" />
-                                </div>
-                              </Link>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    </HoverCardContent>
-                  </HoverCard>
-                </TableCell>
-                <TableCell>
-                  <Link href={`mailto:${email_address}`}>
-                    <div className="flex justify-center">
-                      <IconEmail className="h-[18px] w-[18px] invert dark:invert-0" />
+                        <AvatarFallback>
+                          {applicant.first_name[0]?.toUpperCase()}
+                          {applicant.last_name[0]?.toUpperCase()}
+                        </AvatarFallback>
+                      </Avatar>
+                      <p className="capitalize hover:underline">
+                        {applicant.first_name} {applicant.last_name}
+                      </p>
                     </div>
+                  </HoverCardTrigger>
+                  <HoverCardContent>
+                    <div className="flex gap-4">
+                      <Image
+                        src={applicant.image_url || DEFAULT_AVATAR}
+                        alt={`${applicant.first_name} avatar`}
+                        width={100}
+                        height={100}
+                        className="rounded-md"
+                      />
+                      <div>
+                        <h4>
+                          {applicant.first_name} {applicant.last_name}
+                        </h4>
+                        <p>{applicant.email_address}</p>
+                      </div>
+                    </div>
+                  </HoverCardContent>
+                </HoverCard>
+              </TableCell>
+              <TableCell>
+                <Link href={`mailto:${applicant.email_address}`}>
+                  <IconEmail />
+                </Link>
+              </TableCell>
+              <TableCell>
+                {applicant.github && (
+                  <Link href={applicant.github}>
+                    <IconGithub />
                   </Link>
-                </TableCell>
-                <TableCell>
-                  {github_link && (
-                    <Link href={github_link} target="_blank">
-                      <div className="flex justify-center">
-                        <IconGithub className="h-[18px] w-[18px] invert dark:invert-0" />
-                      </div>
-                    </Link>
-                  )}
-                </TableCell>
-                <TableCell>
-                  {portfolio_website && (
-                    <Link href={portfolio_website} target="_blank">
-                      <div className="flex xl:justify-center">
-                        <IconLink className="h-[18px] w-[18px] invert dark:invert-0" />
-                      </div>
-                    </Link>
-                  )}
-                </TableCell>
-                <TableCell className="col-span-3 h-full w-full">
-                  <div className="flex w-full flex-wrap justify-start gap-2 ">
-                    {tech_stacks &&
-                      tech_stacks.map((stack: any, i: any) => (
-                        <div key={i} className="flex">
-                          {stack && (
-                            <Image
-                              src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
-                              alt={`${stack} icon`}
-                              width={25}
-                              height={25}
-                              title={stack}
-                              className="h-[25px] w-[25px] transition duration-300 hover:-translate-y-0.5"
-                            />
-                          )}
-                        </div>
-                      ))}
-                  </div>
-                </TableCell>
-                <TableCell className="col-span-3 flex h-full w-full flex-row items-center justify-center gap-1">
-                  <ApplicantsActionButtons
-                    applicant={{
-                      id,
-                      first_name,
-                      last_name,
-                      email_address,
-                      github_link,
-                      portfolio_website,
-                      tech_stacks,
-                      image_url,
-                    }}
+                )}
+              </TableCell>
+              <TableCell>
+                {applicant.portfolio_website && (
+                  <Link href={applicant.portfolio_website}>
+                    <IconLink />
+                  </Link>
+                )}
+              </TableCell>
+              <TableCell className="col-span-3">
+                {applicant.tech_stacks.map((stack) => (
+                  <Image
+                    key={stack}
+                    src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                    alt={stack}
+                    width={25}
+                    height={25}
                   />
-                </TableCell>
-              </TableRow>
-            ),
-          )}
+                ))}
+              </TableCell>
+              <TableCell className="col-span-3">
+                <ApplicantsApprovalButtons applicant={applicant} />
+              </TableCell>
+            </TableRow>
+          ))}
       </TableBody>
-      <TableCaption className="w-max">
-        {applicantsLen === 1
-          ? `${applicantsLen} item`
-          : applicantsLen > 0
-            ? `${applicantsLen} items`
-            : "The applicants list is empty at the moment."}
-      </TableCaption>
     </Table>
   );
 };
+``;
 
 export default ApplicantsTableDesktop;

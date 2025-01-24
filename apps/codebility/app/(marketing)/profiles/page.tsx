@@ -1,30 +1,32 @@
 import { Suspense } from "react";
 import SectionWrapper from "@/Components/shared/home/SectionWrapper";
 import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
-import { getAdmins, getCodevs } from "@/lib/server/codev.service";
+import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
 
 import ProfileContainer from "./_components/profile-container";
 import CodevLists from "./_components/profile-lists";
 
 export default async function Profiles() {
-  // Fetch data for Codevs and Admins in parallel
-  const [
-    { data: codevsData, error: codevsError },
-    { data: adminsData, error: adminsError },
-  ] = await Promise.all([getCodevs(), getAdmins()]);
+  // Define role IDs
+  const adminRoleId = 1; // Replace with the actual role ID for admins
 
-  if (codevsError || adminsError) {
+  // Fetch data for Codevs and Admins in parallel
+  const [{ data: allCodevs, error }] = await Promise.all([getCodevs()]);
+
+  if (error) {
     throw new Error("Failed to fetch profiles data");
   }
 
-  // Ensure `codevsData` and `adminsData` are arrays
-  const codevsArray: Codev[] = Array.isArray(codevsData) ? codevsData : [];
-  const adminsArray: Codev[] = Array.isArray(adminsData) ? adminsData : [];
+  // Ensure `allCodevs` is an array
+  const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
 
-  // Filter codevs to exclude those who are admins
+  // Filter admins and codevs
+  const adminsArray = codevsArray.filter(
+    (codev) => codev.role_id === adminRoleId,
+  );
   const filteredCodevs = codevsArray.filter(
-    (codev) => !adminsArray.some((admin) => admin.id === codev.id),
+    (codev) => codev.role_id !== adminRoleId,
   );
 
   return (
@@ -34,7 +36,7 @@ export default async function Profiles() {
     >
       <div className="bg-code-pattern absolute inset-0 bg-repeat opacity-5"></div>
       <div className="relative flex flex-col gap-8">
-        <ProfileContainer />
+        <ProfileContainer admins={adminsArray} />
         <Suspense fallback={<UsersSkeleton />}>
           <CodevLists codevs={filteredCodevs} />
         </Suspense>
