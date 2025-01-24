@@ -160,7 +160,7 @@ const SignUpForm = () => {
                         Creating account...
                       </span>
                     ) : (
-                      "Register"
+                      "Apply"
                     )}
                   </Button>
                   <Button

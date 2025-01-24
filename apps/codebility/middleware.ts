@@ -11,17 +11,17 @@ export const config = {
 
 const PUBLIC_ROUTES = [
   "/auth/sign-in",
-  "/auth-sign-up",
+  "/auth/sign-up",
   "/auth/verify",
   "/auth/waiting",
   "/auth/declined",
   "/privacy-policy",
   "/terms",
-  "/",
+  "/", // Other public pages
 ] as const;
 
 export async function middleware(req: NextRequest) {
-  const { pathname } = req.nextUrl;
+  const { pathname, searchParams } = req.nextUrl;
 
   // Allow public routes
   if (PUBLIC_ROUTES.includes(pathname)) {
@@ -31,56 +31,56 @@ export async function middleware(req: NextRequest) {
 
   const supabase = getSupabaseServerComponentClient();
 
-  // Check authentication
+  // Check authentication using getUser
   const {
-    data: { session },
+    data: { user },
     error: authError,
-  } = await supabase.auth.getSession();
+  } = await supabase.auth.getUser();
 
-  if (authError || !session?.user) {
+  if (authError || !user) {
+    // Prevent redirect loops between sign-in and sign-up
+    if (pathname === "/auth/sign-in" || pathname === "/auth/sign-up") {
+      console.log(
+        "[DEBUG] User is already on a public auth route. Allowing access.",
+      );
+      return NextResponse.next();
+    }
+
     console.log("[DEBUG] User not authenticated. Redirecting to login.");
     return redirectToLogin(req);
   }
 
-  const userId = session.user.id;
+  const userId = user.id;
 
-  // Handle /home explicitly for authenticated users
-  if (pathname === "/home") {
-    console.log("[DEBUG] /home accessed by authenticated user:", userId);
-    return NextResponse.next();
-  }
-
-  // Fetch user data from codev table
-  const { data: codevData, error: userError } = await supabase
+  // Fetch user data from the database
+  const { data: userData, error: userError } = await supabase
     .from("codev")
     .select("id, application_status")
     .eq("id", userId)
     .single();
 
-  // Debug: Log codev data and errors
-  console.log("[DEBUG] Codev Data:", codevData);
-  console.log("[DEBUG] Codev Error:", userError);
-
-  if (userError || !codevData) {
-    console.log("[DEBUG] Failed to fetch codev data. Redirecting to login.");
+  if (userError || !userData) {
+    console.log("[DEBUG] Failed to fetch user data. Redirecting to login.");
     return redirectToLogin(req);
   }
 
-  const { application_status } = codevData;
+  const { application_status } = userData;
 
-  // Debug: Log application status
-  console.log("[DEBUG] Application Status:", application_status);
-
-  // Handle application_status redirection rules
+  // Handle application_status-based redirection
   if (
     application_status === "passed" &&
-    ["/auth/declined", "/auth/waiting", "/auth/verify"].includes(pathname)
+    [
+      "/auth/declined",
+      "/auth/waiting",
+      "/auth/verify",
+      "/auth/sign-in",
+      "/auth/sign-up",
+    ].includes(pathname)
   ) {
     console.log(
-      "[DEBUG] User with 'passed' status trying to access restricted route:",
-      pathname,
+      "[DEBUG] User with 'passed' status trying to access restricted route.",
     );
-    return redirectTo(req, "/codev");
+    return redirectTo(req, "/codevs");
   }
 
   if (
@@ -88,8 +88,7 @@ export async function middleware(req: NextRequest) {
     ["/home", "/auth/waiting", "/auth/verify"].includes(pathname)
   ) {
     console.log(
-      "[DEBUG] User with 'failed' status trying to access restricted route:",
-      pathname,
+      "[DEBUG] User with 'failed' status trying to access restricted route.",
     );
     return redirectTo(req, "/auth/declined");
   }
@@ -99,22 +98,11 @@ export async function middleware(req: NextRequest) {
     ["/home", "/auth/declined", "/auth/verify"].includes(pathname)
   ) {
     console.log(
-      "[DEBUG] User with 'applying' status trying to access restricted route:",
-      pathname,
+      "[DEBUG] User with 'applying' status trying to access restricted route.",
     );
     return redirectTo(req, "/auth/waiting");
   }
 
-  // Prevent signed-in users from visiting sign-in/sign-up routes
-  if (["/auth/sign-in", "/auth-sign-up"].includes(pathname)) {
-    console.log(
-      "[DEBUG] Authenticated user trying to access sign-in/sign-up:",
-      pathname,
-    );
-    return redirectTo(req, "/codev");
-  }
-
-  // Allow all other requests to proceed
   console.log("[DEBUG] User has permission to access:", pathname);
   return NextResponse.next();
 }
