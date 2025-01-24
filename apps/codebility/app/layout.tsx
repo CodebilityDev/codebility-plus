@@ -3,14 +3,9 @@ import "@/app/globals.css";
 import React from "react";
 import { Metadata } from "next";
 import { Outfit } from "next/font/google";
-import { headers } from "next/headers";
-import { ModalProviderMarketing } from "@/Components/providers/modal-provider-marketing";
-import appConfig from "@/config/app.config";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import ToasterContext from "@/context/ToasterProvider";
 import ReactQueryProvider from "@/hooks/reactQuery";
-
-export const dynamic = "force-dynamic";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -18,9 +13,8 @@ const outfit = Outfit({
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: appConfig.title,
-    description: appConfig.description,
-    metadataBase: new URL(`https://${headers().get("host")}`),
+    title: "Your App",
+    description: "Your app description here",
   };
 }
 
@@ -30,16 +24,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <ReactQueryProvider>
-      <html lang="en" className={outfit.className}>
-        <body>
+    <html lang="en" className={outfit.className}>
+      <head>
+        {/* Set initial theme based on localStorage or system preference */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+            (function() {
+              const savedTheme = localStorage.getItem('theme');
+              const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+              const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
+              document.documentElement.classList.add(theme);
+            })();
+          `,
+          }}
+        />
+      </head>
+      <body>
+        <ReactQueryProvider>
           <ThemeProvider>
             <ToasterContext />
-            <ModalProviderMarketing />
             {children}
           </ThemeProvider>
-        </body>
-      </html>
-    </ReactQueryProvider>
+        </ReactQueryProvider>
+      </body>
+    </html>
   );
 }

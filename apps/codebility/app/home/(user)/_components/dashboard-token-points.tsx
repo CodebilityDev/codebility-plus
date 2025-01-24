@@ -1,9 +1,29 @@
-// components/TokenPoints.tsx
 "use client";
 
 import { useEffect, useState } from "react";
 import { Box } from "@/Components/shared/dashboard";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+interface SkillCategory {
+  id: string;
+  name: string;
+}
+
+interface PointData {
+  points: number;
+  skill_category: {
+    id: string;
+    name: string;
+  };
+}
+
+interface Level {
+  id: string;
+  skill_category_id: string;
+  level: number;
+  min_points: number;
+  max_points: number;
+}
 
 export default function TokenPoints() {
   const [points, setPoints] = useState<Record<string, number>>({});
@@ -11,57 +31,84 @@ export default function TokenPoints() {
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    const fetchPoints = async () => {
+    const fetchPointsAndCategories = async () => {
       const {
         data: { session },
       } = await supabase.auth.getSession();
       if (!session?.user) return;
 
-      const { data: pointsData } = await supabase
+      // Fetch all skill categories
+      const { data: categories, error: categoriesError } = await supabase
+        .from("skill_category")
+        .select("id, name");
+
+      if (categoriesError) {
+        console.error("Error fetching categories:", categoriesError);
+        return;
+      }
+
+      // Fetch user's points
+      const { data: pointsData, error: pointsError } = await supabase
         .from("codev_points")
         .select(
           `
           points,
-          skill_category:skill_category_id(name)
+          skill_category:skill_category_id(id, name)
         `,
         )
         .eq("codev_id", session.user.id);
 
-      if (pointsData) {
-        const pointsByCategory = pointsData.reduce(
-          (acc, curr) => ({
-            ...acc,
-            [curr.skill_category.name]: curr.points,
-          }),
-          {},
-        );
-        setPoints(pointsByCategory);
+      if (pointsError) {
+        console.error("Error fetching points:", pointsError);
+        return;
       }
 
-      // Fetch levels based on points
-      const { data: levelsData } = await supabase
+      // Map points to skill categories
+      const pointsByCategory = (categories || []).reduce(
+        (acc, category) => ({
+          ...acc,
+          [category.name]:
+            pointsData?.find((point) => point.skill_category.id === category.id)
+              ?.points || 0,
+        }),
+        {},
+      );
+
+      setPoints(pointsByCategory);
+
+      // Fetch levels for all categories
+      const { data: levelsData, error: levelsError } = await supabase
         .from("levels")
         .select("*")
         .order("level", { ascending: true });
 
-      if (levelsData) {
-        const levelsByCategory = pointsData?.reduce((acc, curr) => {
-          const categoryLevels = levelsData.filter(
-            (l) =>
-              l.skill_category_id === curr.skill_category.id &&
-              curr.points >= l.min_points &&
-              curr.points <= l.max_points,
-          );
-          return {
-            ...acc,
-            [curr.skill_category.name]: categoryLevels[0]?.level || 1,
-          };
-        }, {});
-        setLevels(levelsByCategory);
+      if (levelsError) {
+        console.error("Error fetching levels:", levelsError);
+        return;
       }
+
+      // Map levels to categories
+      const levelsByCategory = (categories || []).reduce((acc, category) => {
+        const categoryPoints = pointsByCategory[category.name] || 0;
+        const categoryLevels = levelsData?.filter(
+          (l) => l.skill_category_id === category.id,
+        );
+        const currentLevel =
+          categoryLevels?.find(
+            (l) =>
+              categoryPoints >= l.min_points && categoryPoints <= l.max_points,
+          )?.level || 1;
+
+        return {
+          ...acc,
+          [category.name]: currentLevel,
+        };
+      }, {});
+
+      setLevels(levelsByCategory);
     };
 
-    fetchPoints();
+    fetchPointsAndCategories();
   }, [supabase]);
 
   return (
@@ -71,10 +118,10 @@ export default function TokenPoints() {
         {Object.entries(points).map(([category, point]) => (
           <div
             key={category}
-            className="flex w-full flex-col items-center gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"
+            className="flex w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"
           >
             <p className="text-teal text-4xl">{point}</p>
-            <p className="text-gray text-xl">{category} Points</p>
+            <p className="text-gray text-center text-sm">{category} Points</p>
             <p className="text-sm">Level {levels[category]}</p>
           </div>
         ))}

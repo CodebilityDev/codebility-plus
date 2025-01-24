@@ -14,7 +14,7 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
               <Profile />
-              <TimeTracker />
+              {/* <TimeTracker /> */}
             </div>
             <TokenPoints />
           </div>
