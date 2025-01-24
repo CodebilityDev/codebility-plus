@@ -40,24 +40,49 @@ export function InHouseTable({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     status: "",
-    type: "",
     position: "",
     project: "",
+    internal_status: "",
+    nda_status: "",
+    display_position: "",
   });
 
   const supabase = useSupabase();
 
   const filteredData = data.filter((item) => {
-    if (filters.status && item.internal_status !== filters.status) return false;
-    if (filters.type && item.type !== filters.type) return false;
-    if (filters.position && item.main_position !== filters.position)
+    // Internal Status Filter
+    if (
+      filters.internal_status &&
+      item.internal_status !== filters.internal_status
+    ) {
       return false;
+    }
+
+    // NDA Status Filter
+    if (
+      filters.nda_status &&
+      String(item.nda_status) !== filters.nda_status.toLowerCase()
+    ) {
+      return false;
+    }
+
+    // Display Position Filter (Extract `name` for comparison)
+    if (
+      filters.display_position &&
+      item.display_position.toLowerCase() !==
+        filters.display_position.toLowerCase()
+    ) {
+      return false;
+    }
+
+    // Project Filter
     if (
       filters.project &&
       !item.projects?.some((project) => project.id === filters.project)
     ) {
       return false;
     }
+
     return true;
   });
 
@@ -66,7 +91,7 @@ export function InHouseTable({
   };
 
   const capitalize = (str: string) => {
-    return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
+    return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
   };
 
   return (
@@ -139,7 +164,7 @@ export function InHouseTable({
                     {capitalize(item.last_name)}
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    {item.email}
+                    {item.email_address}
                   </TableCell>
                   <TableCell>
                     <StatusBadge
@@ -147,10 +172,7 @@ export function InHouseTable({
                     />
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    {capitalize(item.type || "")}
-                  </TableCell>
-                  <TableCell className="dark:text-light-900 text-base text-black">
-                    {item.main_position}
+                    {capitalize(item.display_position || "")}
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {item.projects?.length ? (
@@ -164,7 +186,7 @@ export function InHouseTable({
                     )}
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    {item.nda_status ? capitalize(item.nda_status) : "-"}
+                    {item.nda_status ? "Yes" : "No"}
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {item.portfolio_website ? (

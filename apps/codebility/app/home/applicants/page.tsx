@@ -1,25 +1,32 @@
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client"
-import ApplicantsList from "@/app/home/applicants/_components/applicants-list"
-import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants"
+import ApplicantsList from "@/app/home/applicants/_components/applicants-list";
+import { getCodevs } from "@/lib/server/codev.service";
 
 const ApplicantsPage = async () => {
+  const { data: applicants, error } = await getCodevs({
+    filters: {
+      role_id: 7,
+      application_status: "applying",
+    },
+  });
 
-  const supabase = getSupabaseServerComponentClient();
-  const { data: applicants, error } = await supabase
-    .from("applicants")
-    .select('*')
+  // Handle error scenario
+  if (error) {
+    console.error("Error fetching applicants:", error);
+    return (
+      <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+        <div>ERROR: Unable to fetch applicants</div>
+      </div>
+    );
+  }
 
+  // Ensure applicants is always an array
+  const safeApplicants = applicants || [];
 
   return (
-    <div className="max-w-screen-xl mx-auto flex flex-col gap-4">
-      {
-        error ?
-          <div>ERROR</div>
-          :
-          <ApplicantsList applicants={applicants as ApplicantsList_Types[]} />
-      }
+    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+      <ApplicantsList applicants={safeApplicants} />
     </div>
-  )
-}
+  );
+};
 
-export default ApplicantsPage
+export default ApplicantsPage;

@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import AddRoleModal from "@/Components/modals/AddRoleModal";
-import ApplicantsAddModal from "@/Components/modals/ApplicantsAddModal";
 import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
 import BoardAddModal from "@/Components/modals/BoardAddModal";
 import ClientAddModal from "@/Components/modals/ClientAddModal";
@@ -62,7 +61,6 @@ export const ModalProviderHome = () => {
       <ServiceCategoriesModal />
       <ServiceCategoriesDeleteModal />
 
-      <ApplicantsAddModal />
       <ApplicantsEditModal />
       <PrivacyPolicyModal />
       <TermsOfServiceModal />

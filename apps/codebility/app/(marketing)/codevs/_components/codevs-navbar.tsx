@@ -110,7 +110,7 @@ const Navbar = () => {
                 >
                   <Image
                     src="/assets/svgs/codebility-white.svg"
-                    alt="Codebilitssssy Logo"
+                    alt="Codebility Logo"
                     width={100}
                     height={23}
                     className="h-auto w-auto"

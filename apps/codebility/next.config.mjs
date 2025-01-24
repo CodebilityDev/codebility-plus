@@ -45,6 +45,9 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
         hostname: "codebility-cdn.pages.dev",
       },
       {
+        hostname: "hibnlysaokybrsufrdwp.supabase.co",
+      },
+      {
         protocol: "https",
         hostname:
           (process.env.NEXT_PUBLIC_SUPABASE_URL &&
