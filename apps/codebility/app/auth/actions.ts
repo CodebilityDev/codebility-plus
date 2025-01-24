@@ -1,7 +1,7 @@
 "use server";
 
-import { cookies } from "next/headers";
 import { useUserStore } from "@/store/codev-store";
+import { Codev } from "@/types/home/codev";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
@@ -100,27 +100,36 @@ export const signupUser = async (formData: FormData) => {
 
     if (!user) throw new Error("Failed to create user");
 
-    const userData: User = {
+    const userData: Codev = {
       id: user.id,
       first_name,
       last_name,
       email_address,
       phone_number,
+      address: null,
+      about: null,
+      education: [],
+      positions: [{ id: "10", name: position }],
+      display_position: position,
       portfolio_website,
       tech_stacks: tech_stacks.split(", "),
-      display_position: position,
-      positions: [position],
-      years_of_experience: parseInt(years_of_experience),
+      image_url,
+      availability_status: true,
+      job_status: null,
+      nda_status: false,
+      level: {},
+      application_status: "applying",
+      rejected_count: 0,
       facebook_link,
       linkedin,
       github,
       discord,
-      image_url,
-      application_status: "applying",
-      availability_status: "available",
-      nda_status: false,
+      projects: [],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
+      years_of_experience: parseInt(years_of_experience),
+      role_id: 7,
+      internal_status: "AVAILABLE",
     };
 
     const { error: insertError } = await supabase

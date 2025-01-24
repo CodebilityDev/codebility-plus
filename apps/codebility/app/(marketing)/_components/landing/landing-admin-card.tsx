@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { index_AdminCardT } from "@/types/home";
+import { Codev } from "@/types/home/codev";
 
 // Utility function to capitalize the first letter of each word
 const capitalizeWords = (text: string) => {
@@ -9,7 +9,7 @@ const capitalizeWords = (text: string) => {
     .join(" ");
 };
 
-const AdminCard = ({ admin, color }: index_AdminCardT) => {
+const AdminCard = ({ admin, color }: { admin: Codev; color: string }) => {
   const defaultImage = "/assets/svgs/icon-codebility-black.svg";
 
   return (
@@ -33,9 +33,9 @@ const AdminCard = ({ admin, color }: index_AdminCardT) => {
             {capitalizeWords(admin.last_name)}
           </p>
           <div className="min-h-[2.5rem]">
-            {admin.main_position ? (
+            {admin.display_position ? (
               <p className="text-gray text-sm lg:text-base">
-                {capitalizeWords(admin.main_position)}
+                {capitalizeWords(admin.display_position)}
               </p>
             ) : (
               <div className="text-sm lg:text-base">&nbsp;</div>

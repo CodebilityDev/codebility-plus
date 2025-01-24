@@ -1,6 +1,9 @@
-import { Codev } from "@/types/home/codev";
-import { Check, X } from "lucide-react";
+import { useEffect, useState } from "react";
+import { INTERNAL_STATUS } from "@/constants/internal_status";
+import { Codev, InternalStatus, Position, Project } from "@/types/home/codev";
+import { Check, Plus, Upload, X } from "lucide-react";
 
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import {
@@ -14,39 +17,7 @@ import { TableCell, TableRow } from "@codevs/ui/table";
 
 import { useCodevForm } from "../../_hooks/use-codev-form";
 import { ProjectSelect } from "../shared/project-select";
-import { InternalStatus } from "../shared/status-badge";
 import { columns } from "./columns";
-
-// Constants for select options
-const STATUS_OPTIONS = [
-  { label: "Available", value: "AVAILABLE", color: "text-codeGreen" },
-  { label: "Deployed", value: "DEPLOYED", color: "text-codeViolet" },
-  { label: "Training", value: "TRAINING", color: "text-codeYellow" },
-  { label: "Vacation", value: "VACATION", color: "text-codeBlue" },
-  { label: "Busy", value: "BUSY", color: "text-codeRed" },
-  { label: "Client Ready", value: "CLIENTREADY", color: "text-codePurple" },
-  { label: "Blocked", value: "BLOCKED", color: "text-gray" },
-  { label: "Graduated", value: "GRADUATED", color: "text-gray" },
-] as const;
-
-const TYPE_OPTIONS = [
-  { label: "Intern", value: "INTERN" },
-  { label: "In-house", value: "INHOUSE" },
-] as const;
-
-const POSITION_OPTIONS = [
-  { label: "Front End Developer", value: "Front End Developer" },
-  { label: "Back End Developer", value: "Back End Developer" },
-  { label: "Full Stack Developer", value: "Full Stack Developer" },
-  { label: "UI/UX Designer", value: "UI/UX Designer" },
-  { label: "Project Manager", value: "Project Manager" },
-] as const;
-
-const NDA_OPTIONS = [
-  { label: "Received", value: "RECEIVED" },
-  { label: "Sent", value: "SENT" },
-  { label: "Not Required", value: "NOT_REQUIRED" },
-] as const;
 
 interface EditableRowProps {
   data: Codev;
@@ -56,50 +27,90 @@ interface EditableRowProps {
 
 export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
   const { data: formData, handleChange, isSubmitting } = useCodevForm(data);
+  const supabase = useSupabase();
+  const [positions, setPositions] = useState<Position[]>([]);
+  const [uploadedImage, setUploadedImage] = useState<string | null>(
+    formData.image_url || null,
+  );
+  const [imageFile, setImageFile] = useState<File | null>(null);
 
-  // Input fields that should be handled with text input
-  const TEXT_INPUT_FIELDS = [
-    "first_name",
-    "last_name",
-    "email",
-    "image_url",
-    "portfolio_website",
-  ] as const;
+  useEffect(() => {
+    async function fetchPositions() {
+      const { data: positionsData, error } = await supabase
+        .from("positions")
+        .select("id, name");
 
-  // Fields that should not be editable
-  const NON_EDITABLE_FIELDS = [
-    "id",
-    "user_id",
-    "tech_stacks",
-    "socials",
-    "experiences",
-    "education",
-    "about",
-    "address",
-  ] as const;
+      if (error) {
+        console.error("Failed to fetch positions:", error);
+      } else if (positionsData) {
+        setPositions(positionsData);
+      }
+    }
+
+    fetchPositions();
+  }, [supabase]);
+
+  const handleImageUpload = async (file: File) => {
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setUploadedImage(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   const renderCell = (key: keyof Codev) => {
-    // Handle text input fields
-    if (TEXT_INPUT_FIELDS.includes(key as (typeof TEXT_INPUT_FIELDS)[number])) {
+    if (key === "image_url") {
       return (
-        <Input
-          value={String(formData[key] || "")}
-          onChange={(e) => handleChange(key, e.target.value)}
-          disabled={isSubmitting}
-          className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200"
-          placeholder={`Enter ${key.replace(/_/g, " ")}`}
-        />
+        <div className="relative inline-block">
+          {uploadedImage ? (
+            <div className="relative">
+              <img
+                src={uploadedImage}
+                alt="Uploaded Avatar"
+                className="border-light-700 dark:border-dark-200 h-10 w-10 rounded-full border object-cover"
+              />
+              <label
+                htmlFor="upload-avatar"
+                className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-gray-200 p-0.5 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
+              >
+                <Plus className="h-3 w-3 text-gray-500 dark:text-gray-300" />
+                <input
+                  id="upload-avatar"
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => {
+                    if (e.target.files && e.target.files[0]) {
+                      handleImageUpload(e.target.files[0]);
+                    }
+                  }}
+                  className="hidden"
+                />
+              </label>
+            </div>
+          ) : (
+            <label
+              htmlFor="upload-avatar"
+              className="cursor-pointer rounded-full bg-gray-200 p-2 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              <Upload className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+              <input
+                id="upload-avatar"
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  if (e.target.files && e.target.files[0]) {
+                    handleImageUpload(e.target.files[0]);
+                  }
+                }}
+                className="hidden"
+              />
+            </label>
+          )}
+        </div>
       );
     }
 
-    // Handle non-editable fields
-    if (
-      NON_EDITABLE_FIELDS.includes(key as (typeof NON_EDITABLE_FIELDS)[number])
-    ) {
-      return null;
-    }
-
-    // Handle specific fields
     switch (key) {
       case "internal_status":
         return (
@@ -111,56 +122,32 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             disabled={isSubmitting}
           >
             <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
-              <SelectValue placeholder="Select status" />
+              <SelectValue placeholder="Select internal status" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
-              {STATUS_OPTIONS.map((option) => (
-                <SelectItem
-                  key={option.value}
-                  value={option.value}
-                  className={option.color}
-                >
-                  {option.label}
+              {Object.entries(INTERNAL_STATUS).map(([key, label]) => (
+                <SelectItem key={key} value={key}>
+                  {label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         );
 
-      case "type":
+      case "display_position":
         return (
           <Select
-            value={formData.type || undefined}
-            onValueChange={(value) => handleChange("type", value)}
-            disabled={isSubmitting}
-          >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
-              <SelectValue placeholder="Select type" />
-            </SelectTrigger>
-            <SelectContent className="bg-light-800 dark:bg-dark-200">
-              {TYPE_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        );
-
-      case "main_position":
-        return (
-          <Select
-            value={formData.main_position || undefined}
-            onValueChange={(value) => handleChange("main_position", value)}
+            value={formData.display_position || undefined}
+            onValueChange={(value) => handleChange("display_position", value)}
             disabled={isSubmitting}
           >
             <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
               <SelectValue placeholder="Select position" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
-              {POSITION_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
+              {positions.map((position) => (
+                <SelectItem key={position.id} value={position.name}>
+                  {position.name}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -179,24 +166,30 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
       case "nda_status":
         return (
           <Select
-            value={formData.nda_status || undefined}
-            onValueChange={(value) => handleChange("nda_status", value)}
-            disabled={isSubmitting}
+            value={formData.nda_status ? "Received" : "Not Received"}
+            onValueChange={(value) =>
+              handleChange("nda_status", value === "Received")
+            }
           >
             <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
               <SelectValue placeholder="Select NDA status" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
-              {NDA_OPTIONS.map((option) => (
-                <SelectItem key={option.value} value={option.value}>
-                  {option.label}
-                </SelectItem>
-              ))}
+              <SelectItem value="Received">Received</SelectItem>
+              <SelectItem value="Not Received">Not Received</SelectItem>
             </SelectContent>
           </Select>
         );
+
       default:
-        return null;
+        return (
+          <Input
+            value={String(formData[key] || "")}
+            onChange={(e) => handleChange(key, e.target.value)}
+            disabled={isSubmitting}
+            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 text-black dark:text-white"
+          />
+        );
     }
   };
 
@@ -211,7 +204,39 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
         <div className="flex space-x-2">
           <Button
             size="sm"
-            onClick={() => onSave(formData)}
+            onClick={() => {
+              if (imageFile) {
+                // Only upload image when save is clicked
+                const saveWithImageUpload = async () => {
+                  try {
+                    const filePath = `profileImages/${Date.now()}_${imageFile.name}`;
+                    const { error: uploadError } = await supabase.storage
+                      .from("codebility")
+                      .upload(filePath, imageFile, {
+                        cacheControl: "3600",
+                        upsert: true,
+                      });
+
+                    if (uploadError) {
+                      console.error("Upload Error:", uploadError);
+                      return;
+                    }
+
+                    const imageUrl = `https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/${filePath}`;
+
+                    onSave({
+                      ...formData,
+                      image_url: imageUrl,
+                    });
+                  } catch (error) {
+                    console.error("Save Image Error:", error);
+                  }
+                };
+                saveWithImageUpload();
+              } else {
+                onSave(formData);
+              }
+            }}
             disabled={isSubmitting}
             className="bg-green-500 text-white hover:bg-green-600"
           >
