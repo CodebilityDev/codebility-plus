@@ -43,17 +43,7 @@ const Navbar = () => {
   return (
     <nav className="background-navbar fixed top-0 z-10 w-full shadow-sm">
       <div className="flex items-center justify-between px-8 py-4">
-        <div className="flex items-center">
-          <Link href="/">
-            <Image
-              src="/assets/svgs/codebility-logo.svg"
-              alt="Codebility Logo"
-              width={120}
-              height={30}
-              priority
-            />
-          </Link>
-        </div>
+        <div className="flex items-center"></div>
         <div className="flex items-center gap-6">
           <Theme />
           <DropdownMenu modal={false}>
