@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation"; // For getting the current route
-
+import { usePathname } from "next/navigation";
 import { signOut } from "@/app/auth/actions";
 import Logo from "@/Components/shared/home/Logo";
 import { Button } from "@/Components/ui/button";
@@ -28,7 +27,6 @@ import {
 } from "@codevs/ui/dropdown-menu";
 import { Sheet, SheetContent, SheetTrigger } from "@codevs/ui/sheet";
 
-// Navigation items for mobile drawer
 const NAV_ITEMS = [
   { id: "1", title: "Our Services", path: "/services" },
   { id: "2", title: "About Us", path: "/#whychooseus" },
@@ -36,7 +34,6 @@ const NAV_ITEMS = [
   { id: "4", title: "Hire a CoDevs", path: "/codevs" },
 ] as const;
 
-// Get menu items based on application status
 const getMenuItems = (status: string) => {
   if (status === "rejected" || status === "applying") {
     return [
@@ -54,7 +51,6 @@ const getMenuItems = (status: string) => {
   ];
 };
 
-// Mobile Navigation Drawer Component
 const MobileDrawer = ({
   isLoggedIn,
   openSheet,
@@ -102,7 +98,6 @@ const MobileDrawer = ({
   </Sheet>
 );
 
-// User Menu Component
 const UserMenu = ({
   first_name,
   last_name,
@@ -183,11 +178,10 @@ const UserMenu = ({
   );
 };
 
-// Main Navigation Component
 const Navigation = () => {
   const supabase = createClientComponentClient();
   const { color } = useChangeBgNavigation();
-  const pathname = usePathname(); // Get current route
+  const pathname = usePathname();
   const [openSheet, setOpenSheet] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -195,21 +189,37 @@ const Navigation = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const {
-          data: { session },
-        } = await supabase.auth.getSession();
+        const { data, error } = await supabase.auth.getUser();
 
-        if (session?.user) {
-          const { data } = await supabase
+        if (error) {
+          console.error("Error fetching user:", error.message);
+          setUserData(null); // Ensure userData is cleared if there is an error
+          return;
+        }
+
+        if (data?.user) {
+          const { data: userData, error: fetchError } = await supabase
             .from("codev")
             .select("*")
-            .eq("id", session.user.id)
+            .eq("id", data.user.id)
             .single();
 
-          setUserData(data);
+          if (fetchError) {
+            console.error(
+              "Error fetching user data from 'codev':",
+              fetchError.message,
+            );
+            setUserData(null); // Clear userData on error
+            return;
+          }
+
+          setUserData(userData);
+        } else {
+          setUserData(null); // Ensure userData is cleared if no session
         }
       } catch (error) {
-        console.error("Error fetching user data:", error);
+        console.error("Unexpected error fetching user data:", error);
+        setUserData(null); // Ensure userData is cleared on unexpected error
       } finally {
         setIsLoading(false);
       }
@@ -221,7 +231,8 @@ const Navigation = () => {
   const handleLogout = async () => {
     try {
       await signOut();
-      setOpenSheet(false);
+      setUserData(null); // Clear userData after logout
+      setOpenSheet(false); // Close the mobile drawer (if open)
     } catch (error) {
       console.error("Failed to log out:", error);
     }
@@ -249,8 +260,6 @@ const Navigation = () => {
         <div className="flex items-center gap-2">
           {!userData ? (
             <>
-              {/* Show "Sign In" button on the /codev route */}
-
               <Link href="/bookacall">
                 <Button
                   variant="purple"
