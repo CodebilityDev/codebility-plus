@@ -11,6 +11,7 @@ export const updateCodev = async (
 ) => {
   const supabase = getSupabaseServerActionClient();
 
+  // Define keys and their corresponding target tables
   const keys = {
     projects: ["projects"],
     codev: [
@@ -21,10 +22,10 @@ export const updateCodev = async (
       "image_url",
       "email_address",
     ],
-    profile: ["display_position", "role_id", "level", "tech_stacks"],
+    profile: ["display_position", "role_id", "level", "tech_stacks", "email"],
   };
 
-  // Determine the target table based on the key
+  // Dynamically find the target table
   const target = Object.keys(keys).find((table) =>
     keys[table as keyof typeof keys].includes(key),
   );
@@ -50,13 +51,13 @@ export const updateCodev = async (
 
     if (target === "codev") {
       // Special handling for specific fields
-      if (key === "internal_status" || key === "availability_status") {
+      if (["internal_status", "availability_status"].includes(key)) {
         newValue = value.replace(/ /g, "").toUpperCase();
       }
     }
 
     const { error } = await supabase
-      .from("codev")
+      .from(target) // Dynamically select table
       .update({ [key]: newValue })
       .eq("id", codevId);
 

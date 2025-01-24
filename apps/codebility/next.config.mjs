@@ -33,6 +33,9 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
         hostname: "qwmazrujcjuhhdipnywa.supabase.co",
       },
       {
+        hostname: "hibnlysaokybrsufrdwp.supabase.co",
+      },
+      {
         hostname: "res.cloudinary.com",
       },
       {
@@ -44,9 +47,7 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
       {
         hostname: "codebility-cdn.pages.dev",
       },
-      {
-        hostname: "hibnlysaokybrsufrdwp.supabase.co",
-      },
+
       {
         protocol: "https",
         hostname:

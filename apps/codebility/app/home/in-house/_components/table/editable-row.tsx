@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
-import { Codev, InternalStatus, Position, Project } from "@/types/home/codev";
+import { Codev, InternalStatus, Position } from "@/types/home/codev";
 import { Check, Plus, Upload, X } from "lucide-react";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
@@ -51,12 +51,51 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
   }, [supabase]);
 
   const handleImageUpload = async (file: File) => {
-    setImageFile(file);
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      setUploadedImage(reader.result as string);
-    };
-    reader.readAsDataURL(file);
+    try {
+      console.log("Starting image upload...");
+      setImageFile(file);
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setUploadedImage(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+
+      const filePath = `profileImage/${Date.now()}_${file.name}`;
+      console.log("File path for upload:", filePath);
+
+      const { error: uploadError } = await supabase.storage
+        .from("codebility")
+        .upload(filePath, file, {
+          cacheControl: "3600",
+          upsert: true,
+        });
+
+      if (uploadError) {
+        console.error("Upload Error:", uploadError.message);
+        return;
+      }
+
+      console.log("File uploaded successfully.");
+
+      // Fetch the public URL for the uploaded image
+      const { data: publicUrlData } = supabase.storage
+        .from("codebility")
+        .getPublicUrl(filePath);
+
+      if (publicUrlData?.publicUrl) {
+        const publicUrl = publicUrlData.publicUrl;
+        setUploadedImage(publicUrl);
+        handleChange("image_url", publicUrl);
+      } else {
+        console.error("Failed to retrieve public URL for uploaded file.");
+      }
+
+      console.log("Public URL fetched:", publicUrlData.publicUrl);
+      setUploadedImage(publicUrlData.publicUrl);
+    } catch (error) {
+      console.error("Image upload failed:", error);
+    }
   };
 
   const renderCell = (key: keyof Codev) => {
@@ -68,13 +107,13 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
               <img
                 src={uploadedImage}
                 alt="Uploaded Avatar"
-                className="border-light-700 dark:border-dark-200 h-10 w-10 rounded-full border object-cover"
+                className="border-light-700 dark:border-dark-200 h-10 w-10 rounded-full  object-cover"
               />
               <label
                 htmlFor="upload-avatar"
-                className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-gray-200 p-0.5 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
+                className="absolute bottom-0 right-0 cursor-pointer rounded-full  bg-gray-200 p-0.5 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
-                <Plus className="h-3 w-3 text-gray-500 dark:text-gray-300" />
+                <Plus className="]  absolute h-6 w-6 text-gray-500 text-green-500 text-white dark:text-gray-300" />
                 <input
                   id="upload-avatar"
                   type="file"
@@ -204,37 +243,35 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
         <div className="flex space-x-2">
           <Button
             size="sm"
-            onClick={() => {
-              if (imageFile) {
-                // Only upload image when save is clicked
-                const saveWithImageUpload = async () => {
-                  try {
-                    const filePath = `profileImages/${Date.now()}_${imageFile.name}`;
-                    const { error: uploadError } = await supabase.storage
-                      .from("codebility")
-                      .upload(filePath, imageFile, {
-                        cacheControl: "3600",
-                        upsert: true,
-                      });
+            onClick={async () => {
+              try {
+                if (imageFile) {
+                  console.log("Starting save process with image...");
+                  const filePath = `profileImage/${Date.now()}_${imageFile.name}`;
+                  console.log("Uploading file with path:", filePath);
 
-                    if (uploadError) {
-                      console.error("Upload Error:", uploadError);
-                      return;
-                    }
-
-                    const imageUrl = `https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/${filePath}`;
-
-                    onSave({
-                      ...formData,
-                      image_url: imageUrl,
+                  const { error: uploadError } = await supabase.storage
+                    .from("codebility")
+                    .upload(filePath, imageFile, {
+                      cacheControl: "3600",
+                      upsert: true,
                     });
-                  } catch (error) {
-                    console.error("Save Image Error:", error);
+
+                  if (uploadError) {
+                    console.error("Upload Error:", uploadError.message);
+                    return;
                   }
-                };
-                saveWithImageUpload();
-              } else {
-                onSave(formData);
+
+                  const imageUrl = `https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/${filePath}`;
+                  console.log("Generated Image URL:", imageUrl);
+
+                  onSave({ ...formData, image_url: imageUrl });
+                } else {
+                  console.log("No image file selected, saving form data only.");
+                  onSave(formData);
+                }
+              } catch (error) {
+                console.error("Error during save process:", error);
               }
             }}
             disabled={isSubmitting}
@@ -242,6 +279,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
           >
             <Check className="h-4 w-4" />
           </Button>
+
           <Button
             size="sm"
             variant="ghost"
