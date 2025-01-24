@@ -3,7 +3,9 @@ import { getCodevs } from "@/lib/server/codev.service";
 import InHouseView from "./_components/in-house-view";
 
 export default async function InHousePage() {
-  const { data, error } = await getCodevs();
+  const { data, error } = await getCodevs({
+    filters: { application_status: "passed" },
+  });
 
   if (error) throw new Error("Failed to fetch data");
 

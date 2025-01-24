@@ -5,7 +5,7 @@ import ApplicantsLoading from "@/app/home/applicants/loading";
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
-import { Codev } from "@/types/home/codev"; // Ensure this matches your `codev` type
+import { Codev } from "@/types/home/codev";
 
 const ApplicantsTableContainer = ({ applicants }: { applicants: Codev[] }) => {
   const {
