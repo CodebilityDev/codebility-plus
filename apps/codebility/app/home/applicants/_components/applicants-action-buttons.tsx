@@ -3,6 +3,7 @@ import { approveAction, rejectAction } from "@/app/home/applicants/action";
 import { useModal } from "@/hooks/use-modal-applicants";
 import { Codev } from "@/types/home/codev"; // Ensure this matches your schema
 
+import { Edit2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ApplicantsApprovalButtons = ({ applicant }: { applicant: Codev }) => {
@@ -66,10 +67,10 @@ const ApplicantsApprovalButtons = ({ applicant }: { applicant: Codev }) => {
         {isLoading ? "Processing..." : "Deny"}
       </button>
       <button
-        className="h-max w-max cursor-pointer rounded-md border border-blue-600 px-4 py-1 text-blue-600 hover:bg-blue-600 hover:text-white"
+        className="h-max w-max cursor-pointer rounded-md p-2 text-gray-700 transition duration-300 hover:bg-gray-200 dark:hover:bg-gray-700"
         onClick={() => onOpen("applicantsEditModal", applicant)}
       >
-        Edit
+        <Edit2 className="h-5 w-5" />
       </button>
     </div>
   );
