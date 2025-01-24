@@ -2,33 +2,30 @@
 
 import React, { useState } from "react";
 import { toggleJobStatusType } from "@/app/api/dashboard";
-import useAuthCookie from "@/hooks/use-cookie";
-import useToken from "@/hooks/use-token";
-import { dash_StatusT } from "@/types/protectedroutes";
+import { useUserStore } from "@/store/codev-store";
 import toast from "react-hot-toast";
 
-const Status = ({ jobStatusType, userId }: dash_StatusT) => {
-  const { token } = useToken();
-  const auth = useAuthCookie();
+const Status = ({
+  jobStatusType,
+  userId,
+}: {
+  jobStatusType: string;
+  userId: string;
+}) => {
+  const { user } = useUserStore();
   const [isChecked, setIsChecked] = useState(jobStatusType === "AVAILABLE");
   const [isLoading, setIsLoading] = useState(false);
 
   let statusText;
   let statusColor;
 
-  const changeJobStatus = async (
-    jobStatus: dash_StatusT["jobStatusType"],
-    token: string,
-  ) => {
+  const changeJobStatus = async (jobStatus: string) => {
     try {
       setIsLoading(true);
-      const jobStatusToggle: any = await toggleJobStatusType(
-        {
-          id: userId,
-          jobStatusType: jobStatus,
-        },
-        token,
-      );
+      const jobStatusToggle = await toggleJobStatusType({
+        id: userId,
+        jobStatusType: jobStatus,
+      });
       return { ...jobStatusToggle, status: true };
     } catch (e) {
       setIsLoading(false);
@@ -39,16 +36,20 @@ const Status = ({ jobStatusType, userId }: dash_StatusT) => {
   };
 
   const handleChange = async () => {
+    if (!user || user.role_id !== 1) {
+      toast.error("Only admins can perform this action.");
+      return;
+    }
+
     const { status } = await changeJobStatus(
       isChecked ? "DEPLOYED" : "AVAILABLE",
-      token,
     );
     if (!status) {
-      toast.error("Only the admin can make this action.");
+      toast.error("Failed to change job status.");
       return;
     }
     setIsChecked(!isChecked);
-    toast.success("JobStatus successfully changed.");
+    toast.success("Job status successfully changed.");
   };
 
   if (!isChecked) {
@@ -60,33 +61,30 @@ const Status = ({ jobStatusType, userId }: dash_StatusT) => {
   }
 
   return (
-    <>
-      <label
-        className={`inline-flex cursor-pointer items-center ${
-          isLoading ||
-          (auth?.data?.userType !== "ADMIN" && "pointer-events-none opacity-50")
-        }`}
+    <label
+      className={`inline-flex cursor-pointer items-center ${
+        isLoading || (user?.role_id !== 1 && "pointer-events-none opacity-50")
+      }`}
+    >
+      <input
+        type="checkbox"
+        className="peer sr-only"
+        checked={isChecked}
+        onChange={handleChange}
+        disabled={isLoading || user?.role_id !== 1}
+      />
+      <div
+        className={`peer relative h-9 w-24 rounded-full after:absolute after:left-1 after:top-1 after:h-7 after:w-7 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-[3.8rem] ${statusColor}`}
       >
-        <input
-          type="checkbox"
-          className="peer sr-only"
-          checked={isChecked}
-          onChange={handleChange}
-          disabled={isLoading || auth?.data?.userType !== "ADMIN"}
-        />
-        <div
-          className={`peer relative h-9 w-24 rounded-full after:absolute after:left-1 after:top-1 after:h-7 after:w-7 after:rounded-full after:bg-white after:transition-all after:content-[''] peer-checked:after:translate-x-[3.8rem] ${statusColor}`}
+        <span
+          className={`absolute ${
+            isChecked ? "left-[8%]" : "right-[8%]"
+          } top-[50%] translate-y-[-52%] text-xs text-white`}
         >
-          <span
-            className={`absolute ${
-              isChecked ? "left-[8%]" : "right-[8%]"
-            } top-[50%] translate-y-[-52%] text-xs text-white`}
-          >
-            {statusText}
-          </span>
-        </div>
-      </label>
-    </>
+          {statusText}
+        </span>
+      </div>
+    </label>
   );
 };
 

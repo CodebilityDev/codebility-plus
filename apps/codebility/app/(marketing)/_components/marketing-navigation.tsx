@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { usePathname } from "next/navigation"; // For getting the current route
+
 import { signOut } from "@/app/auth/actions";
 import Logo from "@/Components/shared/home/Logo";
 import { Button } from "@/Components/ui/button";
@@ -185,6 +187,7 @@ const UserMenu = ({
 const Navigation = () => {
   const supabase = createClientComponentClient();
   const { color } = useChangeBgNavigation();
+  const pathname = usePathname(); // Get current route
   const [openSheet, setOpenSheet] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -245,16 +248,33 @@ const Navigation = () => {
 
         <div className="flex items-center gap-2">
           {!userData ? (
-            <Link href="/bookacall">
-              <Button
-                variant="purple"
-                rounded="full"
-                size="lg"
-                className="hidden lg:block"
-              >
-                Let&apos;s Connect
-              </Button>
-            </Link>
+            <>
+              {/* Show "Sign In" button on the /codev route */}
+
+              <Link href="/bookacall">
+                <Button
+                  variant="purple"
+                  rounded="full"
+                  size="lg"
+                  className="hidden lg:block"
+                >
+                  Let&apos;s Connect
+                </Button>
+              </Link>
+
+              {pathname === "/codevs" && (
+                <Link href="/auth/sign-in">
+                  <Button
+                    variant="default"
+                    rounded="full"
+                    size="lg"
+                    className="hidden lg:block"
+                  >
+                    Sign In
+                  </Button>
+                </Link>
+              )}
+            </>
           ) : (
             <UserMenu {...userData} handleLogout={handleLogout} />
           )}
