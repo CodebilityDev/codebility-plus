@@ -1,27 +1,29 @@
 "use client";
 
-import { watch } from "fs";
 import { useEffect, useState } from "react";
 import Box from "@/Components/shared/dashboard/Box";
 import { Button } from "@/Components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
+import { Codev } from "@/types/home/codev";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
-import { Profile_Types } from "../_types/resume";
-import { updateProfile } from "../action";
+import { updateCodev } from "../action";
 
-type About_Props = {
-  data: Profile_Types;
+type AboutProps = {
+  data: Codev;
 };
 
-const About = ({ data }: About_Props) => {
+type FormValues = {
+  about: string;
+};
+
+const About = ({ data }: AboutProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const { about } = data;
 
   const {
     register,
@@ -29,21 +31,21 @@ const About = ({ data }: About_Props) => {
     reset,
     watch,
     formState: { isDirty },
-  } = useForm({
+  } = useForm<FormValues>({
     defaultValues: {
-      about,
+      about: data.about,
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (formData: FormValues) => {
     const toastId = toast.loading("Your info is being updated");
     try {
       setIsLoading(true);
-      await updateProfile(data);
-      toast.success("Your about was sucessfully updated!", { id: toastId });
+      await updateCodev(formData);
+      toast.success("Your about was successfully updated!", { id: toastId });
       setIsEditMode(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Something went wrong, please try again later!");
     } finally {
       setIsLoading(false);
@@ -62,11 +64,11 @@ const About = ({ data }: About_Props) => {
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
-        className={` ${
+        className={`${
           isEditMode
             ? "hidden"
-            : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
-        } `}
+            : "h-15 w-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+        }`}
         onClick={() => setIsEditMode(true)}
       />
 
@@ -84,21 +86,21 @@ const About = ({ data }: About_Props) => {
                 id="about_me"
                 {...register("about")}
                 disabled={!isEditMode}
-                value={watch("about")}
-                className={` placeholder-${
+                value={watch("about") || ""}
+                className={`placeholder-${
                   !isEditMode
                     ? "lightgray dark:placeholder-gray"
                     : "black-100 dark:placeholder-gray-400"
-                }  ${
+                } ${
                   isEditMode
-                    ? " border-lightgray text-black-100 dark:bg-dark-200 border bg-white dark:border-zinc-700 dark:text-white"
-                    : "text-dark-200 dark:bg-dark-200 dark:text-gray  border-none bg-white"
+                    ? "border-lightgray text-black-100 dark:bg-dark-200 border bg-white dark:border-zinc-700 dark:text-white"
+                    : "text-dark-200 dark:bg-dark-200 dark:text-gray border-none bg-white"
                 }`}
               />
             </div>
           </div>
 
-          {isEditMode ? (
+          {isEditMode && (
             <div className="mt-4 flex justify-end gap-2">
               <Button
                 variant="hollow"
@@ -115,7 +117,7 @@ const About = ({ data }: About_Props) => {
                 {isLoading ? "Saving..." : "Save"}
               </Button>
             </div>
-          ) : null}
+          )}
         </form>
       </div>
     </Box>

@@ -40,7 +40,7 @@ const SignUpForm = () => {
       portfolio_website: "",
       techstack: "",
       position: "",
-      facebook_link: "",
+      facebook: "",
       github: "",
       linkedin: "",
       discord: "",

@@ -7,116 +7,285 @@ import { TimePicker12 } from "@/Components/time-picker/time-picker-12hour-demo";
 import { Period } from "@/Components/time-picker/time-picker-utils";
 import { Button } from "@/Components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
+import { useUserStore } from "@/store/codev-store";
+import { WorkSchedule } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
-import { Profile_Types } from "../_types/resume";
-import { updateProfile } from "../action";
+import { Checkbox } from "@codevs/ui/checkbox";
+import { Label } from "@codevs/ui/label";
+
+import { updateWorkSchedule } from "../action";
 
 interface TimeScheduleProps {
-  data: Profile_Types;
+  data?: WorkSchedule | null;
 }
+
+const DAYS_OF_WEEK = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+] as const;
+const WEEKDAYS = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+] as const;
+
+const DEFAULT_START_TIME = "09:00";
+const DEFAULT_END_TIME = "17:00";
+
 const TimeSchedule = ({ data }: TimeScheduleProps) => {
-  const [start, setStart] = useState(data?.start_time || "");
-  const [end, setEnd] = useState(data?.end_time || "");
+  const { user } = useUserStore();
+
+  const [schedule, setSchedule] = useState<WorkSchedule>(() => ({
+    id: data?.id ?? "",
+    codev_id: user?.id ?? "",
+    days_of_week: data?.days_of_week ?? [],
+    start_time: data?.start_time ?? DEFAULT_START_TIME,
+    end_time: data?.end_time ?? DEFAULT_END_TIME,
+  }));
+
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    const { date } = parseTime(data?.start_time || "");
-    setStart(date.toTimeString().substring(0, 5));
-  }, [data?.start_time]);
-  useEffect(() => {
-    const { date } = parseTime(data?.end_time || "");
-    setEnd(date.toTimeString().substring(0, 5));
-  }, [data?.end_time]);
+    if (user?.id) {
+      setSchedule((prev) => ({ ...prev, codev_id: user.id }));
+    }
+  }, [user]);
+
+  const parseTime = (timeStr: string): { date: Date; period: Period } => {
+    if (!timeStr || timeStr === "") {
+      const date = new Date();
+      date.setHours(9, 0, 0);
+      return { date, period: "AM" };
+    }
+
+    try {
+      const [hours, minutes] = timeStr.split(":").map(Number);
+      const date = new Date();
+      date.setHours(hours || 9, minutes || 0, 0);
+      return {
+        date,
+        period: (hours || 9) >= 12 ? "PM" : "AM",
+      };
+    } catch (error) {
+      console.error("Error parsing time:", error);
+      const date = new Date();
+      date.setHours(9, 0, 0);
+      return { date, period: "AM" };
+    }
+  };
+
+  const handleDayToggle = (day: string) => {
+    setSchedule((prev) => {
+      const newDays = prev.days_of_week.includes(day)
+        ? prev.days_of_week.filter((d) => d !== day)
+        : [...prev.days_of_week, day].sort(
+            (a, b) =>
+              DAYS_OF_WEEK.indexOf(a as any) - DAYS_OF_WEEK.indexOf(b as any),
+          );
+
+      return {
+        ...prev,
+        days_of_week: newDays,
+      };
+    });
+  };
+
+  const handleTimeChange = (
+    field: "start_time" | "end_time",
+    value: string,
+  ) => {
+    if (!value) return; // Don't update if value is empty
+
+    setSchedule((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
 
   const handleSaveClick = async () => {
+    if (schedule.days_of_week.length === 0) {
+      toast.error("Please select at least one working day");
+      return;
+    }
+
+    if (!schedule.start_time || !schedule.end_time) {
+      toast.error("Please set both start and end times");
+      return;
+    }
+
+    const [startHour, startMinute] = schedule.start_time.split(":").map(Number);
+    const [endHour, endMinute] = schedule.end_time.split(":").map(Number);
+
+    if (
+      endHour! < startHour! ||
+      (endHour === startHour && endMinute! <= startMinute!)
+    ) {
+      toast.error("End time must be after start time");
+      return;
+    }
+
+    const toastId = toast.loading("Updating your schedule...");
     setIsLoading(true);
-    const toastId = toast.loading("Your time schedule was being updated");
+
     try {
-      await updateProfile({ start_time: start, end_time: end });
+      const scheduleData = {
+        codev_id: schedule.codev_id,
+        days_of_week: schedule.days_of_week,
+        start_time: schedule.start_time,
+        end_time: schedule.end_time,
+      };
+
+      console.log("scheduleData:", scheduleData);
+      await updateWorkSchedule(scheduleData);
       toast.success("Schedule updated successfully!", { id: toastId });
-    } catch (error) {
-      toast.error("Error updating schedule");
-    } finally {
       setIsEditMode(false);
+    } catch (error) {
+      console.error("Error updating schedule:", error);
+      toast.error("Failed to update schedule", { id: toastId });
+    } finally {
       setIsLoading(false);
     }
   };
-  const parseTime = (timeStr: string): { date: Date; period: Period } => {
-    if (!timeStr) {
-      const now = new Date();
-      const period = now.getHours() >= 12 ? "PM" : "AM";
-      return { date: now, period };
-    }
 
-    const [hours, minutes]: any = timeStr.split(":");
-    const date = new Date();
-    date.setHours(parseInt(hours, 10), parseInt(minutes, 10));
+  const handleSelectWeekdays = () => {
+    setSchedule((prev) => ({
+      ...prev,
+      days_of_week:
+        prev.days_of_week.length === WEEKDAYS.length ? [] : [...WEEKDAYS],
+    }));
+  };
 
-    const period = parseInt(hours, 10) >= 12 ? "PM" : "AM";
-    return { date, period };
+  const handleCancel = () => {
+    setSchedule({
+      id: data?.id ?? "",
+      codev_id: user?.id ?? "",
+      days_of_week: data?.days_of_week ?? [],
+      start_time: data?.start_time ?? DEFAULT_START_TIME,
+      end_time: data?.end_time ?? DEFAULT_END_TIME,
+    });
+    setIsEditMode(false);
   };
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
-        className={` ${
-          isEditMode
+        className={`$
+          {isEditMode
             ? "hidden"
-            : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
-        }  `}
+            : "h-15 w-15 dark:invert-0" } absolute right-6 top-6 cursor-pointer
+        invert`}
         onClick={() => setIsEditMode(true)}
       />
+
       <p className="text-lg">My Time Schedule</p>
       <Paragraph className="py-4">
-        Update your time schedule here. This will help us to monitor your
-        working hours.
+        Update your work schedule by selecting your working days and setting
+        your hours. This helps us monitor your working hours.
       </Paragraph>
+
+      <div className="mb-4">
+        <Label className="mb-2 block">Working Days</Label>
+        <div className="grid grid-cols-2 gap-2 ">
+          {DAYS_OF_WEEK.map((day) => (
+            <div
+              key={day}
+              className="flex min-w-[120px] items-center gap-2 rounded-md p-1 hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              <Checkbox
+                id={day}
+                checked={schedule.days_of_week.includes(day)}
+                onCheckedChange={() => handleDayToggle(day)}
+                disabled={!isEditMode}
+              />
+              <Label
+                htmlFor={day}
+                className="cursor-pointer text-sm font-medium"
+              >
+                {day}
+              </Label>
+            </div>
+          ))}
+        </div>
+        <Button
+          type="button"
+          size="sm"
+          onClick={handleSelectWeekdays}
+          disabled={!isEditMode}
+          className="mt-2 text-xs"
+        >
+          {schedule.days_of_week.length === WEEKDAYS.length
+            ? "Clear Weekdays"
+            : "Select Weekdays"}
+        </Button>
+      </div>
+
       <div className="flex flex-col gap-6 sm:flex-row md:flex-col 2xl:flex-row">
         <div className="flex flex-1 flex-col items-center gap-4 rounded-lg border border-zinc-700 p-6">
           <p className="text-lg">Start Time</p>
-
           <TimePicker12
             disabled={!isEditMode}
-            setDate={(date) =>
-              setStart(date ? date.toTimeString().substring(0, 5) : "")
-            }
-            date={parseTime(start).date}
-            period={parseTime(start).period}
+            setDate={(date) => {
+              const timeStr = date ? date.toTimeString().substring(0, 5) : "";
+              handleTimeChange("start_time", timeStr);
+            }}
+            date={parseTime(schedule.start_time).date}
+            period={parseTime(schedule.start_time).period}
           />
         </div>
+
         <div className="flex flex-1 flex-col items-center gap-4 rounded-lg border border-zinc-700 p-6">
           <p className="text-lg">End Time</p>
           <TimePicker12
             disabled={!isEditMode}
-            setDate={(date) =>
-              setEnd(date ? date.toTimeString().substring(0, 5) : "")
-            }
-            date={parseTime(end).date}
-            period={parseTime(end).period}
+            setDate={(date) => {
+              const timeStr = date ? date.toTimeString().substring(0, 5) : "";
+              handleTimeChange("end_time", timeStr);
+            }}
+            date={parseTime(schedule.end_time).date}
+            period={parseTime(schedule.end_time).period}
           />
         </div>
       </div>
-      {isEditMode ? (
+
+      {schedule.days_of_week.length > 0 && !isEditMode && (
+        <div className="mt-4">
+          <h3 className="mb-2 text-sm font-medium">Current Schedule:</h3>
+          <div className="rounded-lg border border-zinc-700 p-4">
+            <p className="mb-2">
+              <span className="font-medium">Working Days:</span>{" "}
+              {schedule.days_of_week.join(", ")}
+            </p>
+            <p>
+              <span className="font-medium">Hours:</span> {schedule.start_time}{" "}
+              - {schedule.end_time}
+            </p>
+          </div>
+        </div>
+      )}
+
+      {isEditMode && (
         <div className="mt-4 flex justify-end gap-2">
-          <Button
-            variant="hollow"
-            onClick={() => setIsEditMode(false)}
-            disabled={isLoading}
-          >
+          <Button variant="hollow" onClick={handleCancel} disabled={isLoading}>
             Cancel
           </Button>
           <Button
             variant="default"
-            type="submit"
             onClick={handleSaveClick}
             disabled={isLoading}
           >
             {isLoading ? "Saving..." : "Save"}
           </Button>
         </div>
-      ) : null}
+      )}
     </Box>
   );
 };

@@ -2,85 +2,87 @@
 
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import Box from "@/Components/shared/dashboard/Box";
 import { Paragraph } from "@/Components/shared/home";
 import { useModal } from "@/hooks/use-modal";
 import { defaultAvatar } from "@/public/assets/images";
-import { useForm } from "react-hook-form";
+import { deleteImage, getImagePath, uploadImage } from "@/utils/uploadImage";
 import toast from "react-hot-toast";
 
-import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
 import { Button } from "@codevs/ui/button";
 
-import { Profile_Types } from "../_types/resume";
-import { removeAvatar, updateProfile } from "../action";
+import { updateCodev } from "../action";
 
 type PhotoProps = {
-  data: Profile_Types;
+  data: {
+    image_url: string | null;
+  };
 };
 
 const Photo = ({ data }: PhotoProps) => {
-  const supabase = getSupabaseBrowserClient();
-  const [myAvatar, setAvatar] = useState<string | any>(
-    defaultAvatar || data?.image_url,
-  );
+  const [avatar, setAvatar] = useState<string>(defaultAvatar);
+  const [isUploading, setIsUploading] = useState(false);
   const { onOpen } = useModal();
 
   useEffect(() => {
     if (data?.image_url) {
-      setAvatar(data?.image_url);
+      setAvatar(data.image_url);
     }
   }, [data?.image_url]);
 
   const handleUploadAvatar = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const toastId = toast.loading("Your avatar is being uploaded");
     const file = event.target.files?.[0];
-    if (!file) {
-      console.error("No file selected");
-      return;
-    }
-    const bucket = "profiles";
-    const filePath = `avatars/${file.name}`;
-    const { error: uploadError } = await supabase.storage
-      .from(bucket)
-      .upload(filePath, file);
-    if (uploadError) {
-      console.error("Error uploading file:", uploadError.message);
-      return;
-    }
-    const { data: publicUrlData } = supabase.storage
-      .from(bucket)
-      .getPublicUrl(filePath);
-    const publicUrl = publicUrlData?.publicUrl;
-    if (publicUrl) {
+    if (!file) return;
+
+    const toastId = toast.loading("Uploading your avatar...");
+    setIsUploading(true);
+
+    try {
+      // Upload new image
+      const { publicUrl } = await uploadImage(file, {
+        bucket: "codebility",
+        folder: "avatars",
+      });
+
+      // Update codev record with new image URL
+      await updateCodev({ image_url: publicUrl });
+
+      // Update local state
       setAvatar(publicUrl);
-      await updateProfile({ image_url: publicUrl });
-      toast.success("You sucessfully added an avatar!", { id: toastId });
-    } else {
-      console.error("Public URL is undefined");
+      toast.success("Avatar uploaded successfully!", { id: toastId });
+    } catch (error) {
+      console.error("Error uploading avatar:", error);
+      toast.error("Failed to upload avatar", { id: toastId });
+    } finally {
+      setIsUploading(false);
     }
   };
 
   const handleRemoveAvatar = async () => {
+    if (avatar === defaultAvatar) return;
+
+    const toastId = toast.loading("Removing your avatar...");
     try {
-      setAvatar(defaultAvatar);
-      if (myAvatar !== defaultAvatar) {
-        await updateProfile({ image_url: "" });
-        toast.success("Your Avatar was sucessfully removed!");
-        await removeAvatar(myAvatar);
+      // Get the file path from the URL
+      const filePath = getImagePath(avatar);
+      if (filePath) {
+        // Delete the image from storage
+        await deleteImage(filePath);
       }
+
+      // Update codev record
+      await updateCodev({ image_url: null });
+
+      // Update local state
+      setAvatar(defaultAvatar);
+      toast.success("Avatar removed successfully!", { id: toastId });
     } catch (error) {
-      console.error("Error while removing avatar:", error);
+      console.error("Error removing avatar:", error);
+      toast.error("Failed to remove avatar", { id: toastId });
     }
   };
-  const {
-    formState: {},
-  } = useForm({
-    defaultValues: {},
-  });
 
   const handleDeleteWarning = () => {
     onOpen("deleteWarningModal", {}, {}, handleRemoveAvatar);
@@ -96,7 +98,7 @@ const Photo = ({ data }: PhotoProps) => {
       <div className="flex gap-4">
         <div className="relative size-[80px]">
           <Image
-            src={myAvatar}
+            src={avatar}
             alt="Avatar"
             fill
             sizes="80px"
@@ -105,25 +107,27 @@ const Photo = ({ data }: PhotoProps) => {
         </div>
         <div className="flex flex-col justify-center gap-2">
           <div className="flex gap-4">
-            {myAvatar === defaultAvatar ? (
+            {avatar === defaultAvatar ? (
               <div className="relative">
-                <label htmlFor="image">
-                  <p className="cursor-pointer transition duration-300 hover:text-blue-100">
-                    Upload Image
+                <label htmlFor="image" className="cursor-pointer">
+                  <p className="transition duration-300 hover:text-blue-100">
+                    {isUploading ? "Uploading..." : "Upload Image"}
                   </p>
                 </label>
                 <input
                   onChange={handleUploadAvatar}
                   id="image"
                   type="file"
+                  accept="image/*"
+                  disabled={isUploading}
                   className="hidden"
                 />
-                <input type="hidden" name="avatar" value={myAvatar} />
               </div>
             ) : (
               <Button
                 variant="link"
                 onClick={handleDeleteWarning}
+                disabled={isUploading}
                 className="cursor-pointer transition duration-300 hover:text-blue-100 hover:no-underline dark:text-white"
               >
                 Remove Image
@@ -135,4 +139,5 @@ const Photo = ({ data }: PhotoProps) => {
     </Box>
   );
 };
+
 export default Photo;

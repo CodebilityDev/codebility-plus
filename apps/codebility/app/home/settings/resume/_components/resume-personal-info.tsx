@@ -12,26 +12,32 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
-import { positions, profilePronoun } from "@/constants";
+import { positions } from "@/constants";
 import { IconEdit } from "@/public/assets/svgs";
+import { Codev } from "@/types/home/codev";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { Profile_Types } from "../_types/resume";
-import { updateProfile } from "../action";
+import { updateCodev } from "../action";
 
-type Profile_Props = {
-  data: Profile_Types;
+type PersonalInfoProps = {
+  data: Codev;
 };
 
-const PersonalInfo = ({ data }: Profile_Props) => {
+type FormValues = {
+  first_name: string;
+  last_name: string;
+  address: string | undefined;
+  display_position: string | undefined;
+  years_of_experience: number;
+};
+
+const PersonalInfo = ({ data }: PersonalInfoProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const { pronoun, first_name, last_name, address, main_position } = data;
 
   const {
     register,
@@ -40,29 +46,28 @@ const PersonalInfo = ({ data }: Profile_Props) => {
     setValue,
     reset,
     formState: { isDirty },
-  } = useForm({
+  } = useForm<FormValues>({
     defaultValues: {
-      pronoun,
-      first_name,
-      last_name,
-      address,
-      main_position,
+      first_name: data.first_name,
+      last_name: data.last_name,
+      address: data.address || undefined,
+      display_position: data.display_position || undefined,
+      years_of_experience: data.years_of_experience || 0,
     },
   });
 
-  const onSubmit = async (data: Profile_Types) => {
-    const toastId = toast.loading("Your info is being updated");
+  const onSubmit = async (formData: FormValues) => {
+    const toastId = toast.loading("Updating your information");
     try {
       setIsLoading(true);
-
-      await updateProfile(data);
-      toast.success("Your personal information was sucessfully updated!", {
+      await updateCodev(formData);
+      toast.success("Personal information updated successfully!", {
         id: toastId,
       });
       setIsEditMode(false);
     } catch (error) {
-      console.log(error);
-      toast.error("Your personal info failed to update!");
+      console.error(error);
+      toast.error("Failed to update personal information", { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -80,63 +85,30 @@ const PersonalInfo = ({ data }: Profile_Props) => {
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
-        className={`${isEditMode ? "hidden" : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"}`}
+        className={`$ {
+          isEditMode
+            ? "hidden"
+            : "h-15 w-15 dark:invert-0" } absolute right-6 top-6 cursor-pointer
+        invert`}
         onClick={() => setIsEditMode(true)}
       />
       <p className="text-lg">Personal Information</p>
       <div className="flex flex-col gap-6 px-2">
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="flex w-full flex-col justify-between pt-5">
-            <Label className="text-md ">Pronoun</Label>
-            <div className="flex flex-col gap-2 pt-2">
-              <Select
-                onValueChange={(value) =>
-                  setValue("pronoun", value, { shouldDirty: true })
-                }
-                value={watch("pronoun") ?? "Please select"}
-                disabled={!isEditMode}
-              >
-                <SelectTrigger
-                  aria-label="pronoun"
-                  className={` ${
-                    isEditMode
-                      ? "dark:bg-dark-200 bg-white"
-                      : "text-dark-200 dark:bg-dark-200 dark:text-gray  border-none bg-white"
-                  } h-11 w-full`}
-                >
-                  <SelectValue
-                    placeholder={watch("pronoun") || `Please select`}
-                  />
-                </SelectTrigger>
-
-                <SelectContent className=" dark:bg-dark-200 bg-white">
-                  <SelectGroup>
-                    <SelectLabel className="text-gray text-xs">
-                      Please select
-                    </SelectLabel>
-                    {profilePronoun.map((pronoun: any, i: number) => (
-                      <SelectItem key={i} className="text-sm" value={pronoun}>
-                        {pronoun}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
           <Input
-            parentClassName="flex w-full flex-col justify-between gap-2 "
+            parentClassName="flex w-full flex-col justify-between gap-2"
             label="First Name"
             id="first_name"
-            {...register("first_name")}
+            {...register("first_name", { required: true })}
             disabled={!isEditMode}
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded capitalize"
-            placeholder="Your name"
+            placeholder="Your first name"
           />
+
           <Input
             id="last_name"
-            {...register("last_name")}
+            {...register("last_name", { required: true })}
             label="Last Name"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
@@ -144,43 +116,43 @@ const PersonalInfo = ({ data }: Profile_Props) => {
             className="rounded capitalize"
             placeholder="Your last name"
           />
+
           <Input
             id="address"
             {...register("address")}
             label="Address"
             disabled={!isEditMode}
-            parentClassName="flex w-full flex-col justify-between gap-2 "
+            parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
-            className="rounded capitalize"
-            placeholder="Your Address"
+            className="rounded"
+            placeholder="Your address"
           />
 
           <div className="flex w-full flex-col justify-between gap-1 pt-5">
             <Label className="text-md">Position</Label>
-
             <Select
               onValueChange={(value) =>
-                setValue("main_position", value, { shouldDirty: true })
+                setValue("display_position", value, { shouldDirty: true })
               }
-              value={watch("main_position") ?? "Please select"}
+              value={watch("display_position") || undefined}
               disabled={!isEditMode}
             >
               <SelectTrigger
-                aria-label="main_position"
-                className={` ${
+                aria-label="display_position"
+                className={`$ {
                   isEditMode
                     ? "dark:bg-dark-200 bg-white"
-                    : "text-dark-200 dark:bg-dark-200 dark:text-gray  border-none bg-white"
-                } h-11 w-full`}
+                    : "text-dark-200 dark:bg-dark-200 dark:text-gray bg-white" }
+                h-11 w-full border-none`}
               >
-                <SelectValue placeholder={main_position || "Please select"} />
+                <SelectValue placeholder="Select a position" />
               </SelectTrigger>
 
-              <SelectContent className=" rounded-md">
+              <SelectContent className="rounded-md">
                 <SelectGroup>
-                  <SelectLabel className="">Please select</SelectLabel>
-                  {positions.map((position: any, i: number) => (
-                    <SelectItem key={i} className="text-sm" value={position}>
+                  <SelectLabel>Select Position</SelectLabel>
+                  {positions.map((position: string) => (
+                    <SelectItem key={position} value={position}>
                       {position}
                     </SelectItem>
                   ))}
@@ -188,7 +160,23 @@ const PersonalInfo = ({ data }: Profile_Props) => {
               </SelectContent>
             </Select>
           </div>
-          {isEditMode ? (
+
+          <Input
+            id="years_of_experience"
+            type="number"
+            {...register("years_of_experience", {
+              valueAsNumber: true,
+              min: 0,
+            })}
+            label="Years of Experience"
+            disabled={!isEditMode}
+            parentClassName="flex w-full flex-col justify-between gap-2"
+            variant={isEditMode ? "lightgray" : "darkgray"}
+            className="rounded"
+            placeholder="Years of experience"
+          />
+
+          {isEditMode && (
             <div className="mt-5 flex justify-end gap-2">
               <Button
                 variant="hollow"
@@ -205,7 +193,7 @@ const PersonalInfo = ({ data }: Profile_Props) => {
                 {isLoading ? "Saving..." : "Save"}
               </Button>
             </div>
-          ) : null}
+          )}
         </form>
       </div>
     </Box>

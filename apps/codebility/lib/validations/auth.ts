@@ -44,7 +44,7 @@ export const SignUpValidation = z
 
     position: z.string().min(1, "Please select a position"),
 
-    facebook_link: z.string().min(1, "Facebook link is required"),
+    facebook: z.string().min(1, "Facebook link is required"),
     github: z.string().optional(),
     linkedin: z.string().optional(),
     discord: z.string().optional(),
