@@ -60,7 +60,7 @@ export const signupUser = async (formData: FormData) => {
     const portfolio_website = formData.get("portfolio_website") as string;
     const tech_stacks = formData.get("techstack") as string;
     const position = formData.get("position") as string;
-    const facebook_link = formData.get("facebook_link") as string;
+    const facebook = formData.get("facebook") as string;
     const github = formData.get("github") as string;
     const linkedin = formData.get("linkedin") as string;
     const discord = formData.get("discord") as string;
@@ -120,7 +120,7 @@ export const signupUser = async (formData: FormData) => {
       level: {},
       application_status: "applying",
       rejected_count: 0,
-      facebook_link,
+      facebook,
       linkedin,
       github,
       discord,

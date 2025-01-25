@@ -88,7 +88,7 @@ export const FORM_STEPS: FormField[][] = [
   // Social Links and Contact
   [
     {
-      id: "facebook_link",
+      id: "facebook",
       label: "Facebook",
       placeholder: "Enter your Facebook profile",
       type: "text",

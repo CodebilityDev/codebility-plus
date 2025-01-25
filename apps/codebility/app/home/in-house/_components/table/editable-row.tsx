@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
 import { Codev, InternalStatus, Position } from "@/types/home/codev";
+import { uploadImage } from "@/utils/uploadImage";
 import { Check, Plus, Upload, X } from "lucide-react";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
@@ -32,7 +33,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
   const [uploadedImage, setUploadedImage] = useState<string | null>(
     formData.image_url || null,
   );
-  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   useEffect(() => {
     async function fetchPositions() {
@@ -52,49 +53,28 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
 
   const handleImageUpload = async (file: File) => {
     try {
-      console.log("Starting image upload...");
-      setImageFile(file);
+      setIsUploading(true);
 
+      // Show preview immediately
       const reader = new FileReader();
       reader.onloadend = () => {
         setUploadedImage(reader.result as string);
       };
       reader.readAsDataURL(file);
 
-      const filePath = `profileImage/${Date.now()}_${file.name}`;
-      console.log("File path for upload:", filePath);
+      // Upload image using our utility
+      const { publicUrl } = await uploadImage(file, {
+        bucket: "codebility",
+        folder: "profileImage",
+      });
 
-      const { error: uploadError } = await supabase.storage
-        .from("codebility")
-        .upload(filePath, file, {
-          cacheControl: "3600",
-          upsert: true,
-        });
-
-      if (uploadError) {
-        console.error("Upload Error:", uploadError.message);
-        return;
-      }
-
-      console.log("File uploaded successfully.");
-
-      // Fetch the public URL for the uploaded image
-      const { data: publicUrlData } = supabase.storage
-        .from("codebility")
-        .getPublicUrl(filePath);
-
-      if (publicUrlData?.publicUrl) {
-        const publicUrl = publicUrlData.publicUrl;
-        setUploadedImage(publicUrl);
-        handleChange("image_url", publicUrl);
-      } else {
-        console.error("Failed to retrieve public URL for uploaded file.");
-      }
-
-      console.log("Public URL fetched:", publicUrlData.publicUrl);
-      setUploadedImage(publicUrlData.publicUrl);
+      // Update form data with the new URL
+      setUploadedImage(publicUrl);
+      handleChange("image_url", publicUrl);
     } catch (error) {
       console.error("Image upload failed:", error);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -106,24 +86,24 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             <div className="relative">
               <img
                 src={uploadedImage}
-                alt="Uploaded Avatar"
-                className="border-light-700 dark:border-dark-200 h-10 w-10 rounded-full  object-cover"
+                alt="Profile"
+                className="border-light-700 dark:border-dark-200 h-10 w-10 rounded-full object-cover"
               />
               <label
                 htmlFor="upload-avatar"
-                className="absolute bottom-0 right-0 cursor-pointer rounded-full  bg-gray-200 p-0.5 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
+                className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-gray-200 p-0.5 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
-                <Plus className="]  absolute h-6 w-6 text-gray-500 text-green-500 text-white dark:text-gray-300" />
+                <Plus className="h-6 w-6 text-gray-500 text-green-500 dark:text-gray-300" />
                 <input
                   id="upload-avatar"
                   type="file"
                   accept="image/*"
                   onChange={(e) => {
-                    if (e.target.files && e.target.files[0]) {
-                      handleImageUpload(e.target.files[0]);
-                    }
+                    const file = e.target.files?.[0];
+                    if (file) handleImageUpload(file);
                   }}
                   className="hidden"
+                  disabled={isUploading}
                 />
               </label>
             </div>
@@ -138,11 +118,11 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
                 type="file"
                 accept="image/*"
                 onChange={(e) => {
-                  if (e.target.files && e.target.files[0]) {
-                    handleImageUpload(e.target.files[0]);
-                  }
+                  const file = e.target.files?.[0];
+                  if (file) handleImageUpload(file);
                 }}
                 className="hidden"
+                disabled={isUploading}
               />
             </label>
           )}
@@ -160,7 +140,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             }
             disabled={isSubmitting}
           >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
+            <SelectTrigger className="border-light-700 bg-light-800 dark:border-dark-200 dark:bg-dark-200">
               <SelectValue placeholder="Select internal status" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
@@ -180,7 +160,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             onValueChange={(value) => handleChange("display_position", value)}
             disabled={isSubmitting}
           >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
+            <SelectTrigger className="border-light-700 bg-light-800 dark:border-dark-200 dark:bg-dark-200">
               <SelectValue placeholder="Select position" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
@@ -210,7 +190,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
               handleChange("nda_status", value === "Received")
             }
           >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200">
+            <SelectTrigger className="border-light-700 bg-light-800 dark:border-dark-200 dark:bg-dark-200">
               <SelectValue placeholder="Select NDA status" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
@@ -226,7 +206,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             value={String(formData[key] || "")}
             onChange={(e) => handleChange(key, e.target.value)}
             disabled={isSubmitting}
-            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 text-black dark:text-white"
+            className="border-light-700 bg-light-800 dark:border-dark-200 dark:bg-dark-200 text-black dark:text-white"
           />
         );
     }
@@ -243,38 +223,8 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
         <div className="flex space-x-2">
           <Button
             size="sm"
-            onClick={async () => {
-              try {
-                if (imageFile) {
-                  console.log("Starting save process with image...");
-                  const filePath = `profileImage/${Date.now()}_${imageFile.name}`;
-                  console.log("Uploading file with path:", filePath);
-
-                  const { error: uploadError } = await supabase.storage
-                    .from("codebility")
-                    .upload(filePath, imageFile, {
-                      cacheControl: "3600",
-                      upsert: true,
-                    });
-
-                  if (uploadError) {
-                    console.error("Upload Error:", uploadError.message);
-                    return;
-                  }
-
-                  const imageUrl = `https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/${filePath}`;
-                  console.log("Generated Image URL:", imageUrl);
-
-                  onSave({ ...formData, image_url: imageUrl });
-                } else {
-                  console.log("No image file selected, saving form data only.");
-                  onSave(formData);
-                }
-              } catch (error) {
-                console.error("Error during save process:", error);
-              }
-            }}
-            disabled={isSubmitting}
+            onClick={() => onSave(formData)}
+            disabled={isSubmitting || isUploading}
             className="bg-green-500 text-white hover:bg-green-600"
           >
             <Check className="h-4 w-4" />
@@ -284,7 +234,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             size="sm"
             variant="ghost"
             onClick={onCancel}
-            disabled={isSubmitting}
+            disabled={isSubmitting || isUploading}
             className="hover:bg-red-500/20 hover:text-red-500"
           >
             <X className="h-4 w-4" />

@@ -42,7 +42,7 @@ const InputPhone = forwardRef<HTMLInputElement, InputProps>(
         <div className="flex flex-row justify-evenly gap-6">
           <Controller
             control={control}
-            name="phone_no"
+            name="phone_number"
             defaultValue=""
             render={({ field: { onChange, onBlur, value } }) => (
               <>
