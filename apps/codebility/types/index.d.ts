@@ -1,5 +1,5 @@
-import React from 'react'
-import { ExperienceType } from "@/app/home/settings/resume/experience"
+import React from "react";
+import { ExperienceType } from "@/app/home/settings/resume/experience";
 
 type TStatus =
   | "Available"
@@ -39,7 +39,7 @@ type User = {
   pronoun?: string | null;
   address?: string;
   email_address?: string | null;
-  phone_no?: string | null;
+  umber?: string | null;
   github_link?: string | null;
   fb_link?: string | null;
   linkedin_link?: string | null;
@@ -168,31 +168,29 @@ type TeamMemberT = {
   nda_status?: TNda;
 };
 
-
 type ViewType = {
   first_name: string;
   last_name: string;
 };
 
-
 type ProjectT = {
-  id?: string
-  name?: string
-  github_link?: string
-  summary?: string
-  status?: string
-  figma_link?: string
-  live_link?: string | null
-  client_id?: string
-  team_leader_id?: string
-  team_leader?: User
-  users?: User[]
-  thumbnail?: string | null
-  created_at?: Date | any
-  updated_at?: string
-  members: string[]
+  id?: string;
+  name?: string;
+  github_link?: string;
+  summary?: string;
+  status?: string;
+  figma_link?: string;
+  live_link?: string | null;
+  client_id?: string;
+  team_leader_id?: string;
+  team_leader?: User;
+  users?: User[];
+  thumbnail?: string | null;
+  created_at?: Date | any;
+  updated_at?: string;
+  members: string[];
   view_type: ViewType;
-}
+};
 
 type BoardUserT = {
   id: string;

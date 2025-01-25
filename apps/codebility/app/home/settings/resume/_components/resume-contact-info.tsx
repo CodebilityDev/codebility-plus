@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Box from "@/Components/shared/dashboard/Box";
 import InputPhone from "@/Components/shared/dashboard/InputPhone";
 import { Button } from "@/Components/ui/button";
@@ -10,27 +10,31 @@ import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 
-import { Social_Types } from "../_types/resume";
-import { updateSocial } from "../action";
+import { updateSocialLinks } from "../action";
 
-type Social_Props = {
-  data: Social_Types;
+type ContactInfoProps = {
+  data: {
+    facebook?: string | null;
+    linkedin?: string | null;
+    github?: string | null;
+    discord?: string | null;
+    portfolio_website?: string | null;
+    phone_number?: string | null;
+  };
 };
 
-const ContactInfo = ({ data }: Social_Props) => {
+type FormValues = {
+  facebook?: string;
+  linkedin?: string;
+  github?: string;
+  discord?: string;
+  portfolio_website?: string;
+  phone_number?: string;
+};
+
+const ContactInfo = ({ data }: ContactInfoProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-
-  const {
-    phone_no,
-    portfolio_website,
-    github,
-    linkedin,
-    facebook,
-    telegram,
-    whatsapp,
-    skype,
-  } = data;
 
   const {
     register,
@@ -38,30 +42,28 @@ const ContactInfo = ({ data }: Social_Props) => {
     reset,
     control,
     formState: { isDirty },
-  } = useForm({
+  } = useForm<FormValues>({
     defaultValues: {
-      phone_no,
-      portfolio_website,
-      github,
-      linkedin,
-      facebook,
-      telegram,
-      whatsapp,
-      skype,
+      phone_number: data.phone_number || "",
+      portfolio_website: data.portfolio_website || "",
+      github: data.github || "",
+      linkedin: data.linkedin || "",
+      facebook: data.facebook || "",
+      discord: data.discord || "",
     },
   });
 
-  const onSubmit = async (data: Social_Types) => {
-    const toastId = toast.loading("Your social info is being updated");
+  const onSubmit = async (formData: FormValues) => {
+    const toastId = toast.loading("Your contact info is being updated");
     try {
       setIsLoading(true);
-      await updateSocial(data);
-      toast.success("Your contact info was sucessfully updated!", {
+      await updateSocialLinks(formData);
+      toast.success("Your contact info was successfully updated!", {
         id: toastId,
       });
       setIsEditMode(false);
     } catch (error) {
-      console.log(error);
+      console.error(error);
       toast.error("Something went wrong, please try again later!");
     } finally {
       setIsLoading(false);
@@ -80,11 +82,11 @@ const ContactInfo = ({ data }: Social_Props) => {
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-6">
       <IconEdit
-        className={` ${
+        className={`${
           isEditMode
             ? "hidden"
-            : "w-15 h-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
-        }  `}
+            : "h-15 w-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+        }`}
         onClick={() => setIsEditMode(true)}
       />
       <form className="px-2" onSubmit={handleSubmit(onSubmit)}>
@@ -92,21 +94,17 @@ const ContactInfo = ({ data }: Social_Props) => {
 
         <div className="flex flex-col pt-4">
           <InputPhone
-            id="phone_no"
+            id="phone_number"
             control={control}
-            label="eg. 9054936302"
+            label="Phone Number"
+            placeholder="eg. 9054936302"
             disabled={!isEditMode}
-            inputClassName={` ${
+            inputClassName={`${
               isEditMode
-                ? " border border-lightgray bg-white text-black-100 dark:border-zinc-700 dark:bg-dark-200 dark:text-white"
-                : " bg-white  text-dark-200 dark:bg-dark-200 dark:text-gray"
+                ? "border border-lightgray bg-white text-black-100 dark:border-zinc-700 dark:bg-dark-200 dark:text-white"
+                : "bg-white text-dark-200 dark:bg-dark-200 dark:text-gray"
             }`}
-            {...register("phone_no", {
-              // pattern: {
-              //   value: /^\d{3}[-\s]?\d{3}[-\s]?\d{4}$/,
-              //   message: "Invalid phone number. Please enter a 10-digit number.",
-              // },
-            })}
+            {...register("phone_number")}
           />
 
           <Input
@@ -145,7 +143,7 @@ const ContactInfo = ({ data }: Social_Props) => {
           <Input
             id="linkedin"
             {...register("linkedin")}
-            label="Linkedin"
+            label="LinkedIn"
             disabled={!isEditMode}
             placeholder="eg. https://www.linkedin.com/company/codebilitytech/"
             parentClassName="flex w-full flex-col justify-between gap-2"
@@ -154,39 +152,18 @@ const ContactInfo = ({ data }: Social_Props) => {
           />
 
           <Input
-            id="telegram"
-            {...register("telegram")}
-            label="Telegram"
-            placeholder="eg. https://www.telegram.com/codebility"
-            disabled={!isEditMode}
-            parentClassName="flex w-full flex-col justify-between gap-2"
-            variant={isEditMode ? "lightgray" : "darkgray"}
-            className="rounded"
-          />
-
-          <Input
-            id="whatsapp"
-            {...register("whatsapp")}
-            label="Whatsapp"
-            placeholder="eg. https://www.whatsapp.com/codebility"
-            disabled={!isEditMode}
-            parentClassName="flex w-full flex-col justify-between gap-2"
-            variant={isEditMode ? "lightgray" : "darkgray"}
-            className="rounded"
-          />
-
-          <Input
-            id="skype"
-            {...register("skype")}
-            label="Skype"
-            placeholder="eg. https://www.skype.com/codebility"
+            id="discord"
+            {...register("discord")}
+            label="Discord"
+            placeholder="eg. discord.gg/codebility"
             disabled={!isEditMode}
             parentClassName="flex w-full flex-col justify-between gap-2"
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
           />
         </div>
-        {isEditMode ? (
+
+        {isEditMode && (
           <div className="mt-4 flex justify-end gap-2">
             <Button
               variant="hollow"
@@ -203,7 +180,7 @@ const ContactInfo = ({ data }: Social_Props) => {
               {isLoading ? "Saving..." : "Save"}
             </Button>
           </div>
-        ) : null}
+        )}
       </form>
     </Box>
   );

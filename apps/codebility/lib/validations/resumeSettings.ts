@@ -14,7 +14,7 @@ const createValidator = (regex: RegExp, errorMessage: string) => {
 };
 
 export const contactInfoValidation = z.object({
-  phone_no: createValidator(phoneRegex, "Invalid phone number format"),
+  phone_number: createValidator(phoneRegex, "Invalid phone number format"),
   portfolio_website: z.string().url().optional(),
   github_link: createValidator(socialsRegex, "Invalid GitHub link format"),
   fb_link: createValidator(socialsRegex, "Invalid Facebook link format"),

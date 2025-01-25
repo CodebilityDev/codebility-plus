@@ -44,7 +44,7 @@ export default async function CodevBioPage({ params }: Props) {
     portfolio_website,
     address,
     about,
-    facebook_link,
+    facebook,
     linkedin,
     github,
     education,
@@ -111,10 +111,10 @@ export default async function CodevBioPage({ params }: Props) {
             {showWayToContact && (
               <div>
                 <div className="flex gap-4">
-                  {facebook_link && (
+                  {facebook && (
                     <Link
                       className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
-                      href={facebook_link}
+                      href={facebook}
                       target="_blank"
                     >
                       <IconFacebook className="text-2xl" />

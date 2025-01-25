@@ -39,7 +39,7 @@ export const getCodevs = async ({
     level,
     application_status,
     rejected_count,
-    facebook_link,
+    facebook,
     linkedin,
     github,
     discord,
