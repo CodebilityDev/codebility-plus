@@ -12,32 +12,29 @@ import ServicesTab from "./_components/services-tab";
 export default function ServicesPage() {
   const supabase = getSupabaseServerComponentClient();
 
-  const services = use(
-    supabase
-      .from("services")
-      .select("*")
-      .then(({ data, error }) => {
-        if (error) throw error;
-        return data;
-      }),
-  );
-
   const liveProjects = use(
     supabase
-      .from("project")
+      .from("projects")
       .select(
-        `id, name, summary, thumbnail, project_category: project_categories!inner(type)`,
+        `
+        id, 
+        name, 
+        description,
+        website_url,
+        client_id,
+        project_category: projects_category!inner(name)
+      `,
       )
-      .eq("is_displayed", true)
+      .eq("status", "active")
       .then(({ data, error }) => {
         if (error) throw error;
 
         const formattedData = data.map((item) => ({
           id: item.id,
           name: item.name,
-          category: (item.project_category as unknown as { type: string }).type,
-          description: item.summary,
-          mainImage: item.thumbnail,
+          category: (item.project_category as unknown as { name: string }).name,
+          description: item.description,
+          mainImage: item.website_url,
         }));
 
         return formattedData;
@@ -48,7 +45,7 @@ export default function ServicesPage() {
   const codebility = liveProjects.find((item) => item.name === "Codebility");
   const rest = liveProjects.filter((item) => item.name !== "Codebility");
 
-  const combinedProjectsAndServices = [codebility, ...rest, ...services];
+  const projectsData = [codebility, ...rest];
 
   return (
     <div
@@ -56,8 +53,7 @@ export default function ServicesPage() {
     >
       <Navigation />
       <Hero />
-
-      <ServicesTab servicesData={combinedProjectsAndServices} />
+      <ServicesTab servicesData={projectsData} />
       <Calendly />
       <Footer />
     </div>
