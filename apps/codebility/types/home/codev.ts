@@ -1,20 +1,34 @@
 export interface Position {
-  id: bigint; // Changed from string to bigint to match DB
-  name: string | null; // Made nullable to match DB
+  id: bigint;
+  name: string | null;
   description?: string;
 }
 
 export interface WorkExperience {
   id: string; // UUID
-  codev_id: string; // UUID, required in DB
-  position: string; // Character varying in DB
-  date_from: string; // Start date
-  date_to: string | null; // End date, nullable for "Present"
-  description?: string; // Optional description
-  company_name: string; // Company name, added field
-  location: string; // Location, added field
-  profile_id?: string; // UUID, optional
-  is_present?: boolean; // Optional flag for "Up to Present"
+  codev_id: string; // UUID
+  position: string;
+  description: string;
+  date_from: string; // Date as string
+  date_to: string | null; // Nullable for "Present"
+  company_name: string;
+  location: string;
+  profile_id?: string; // Optional
+  is_present: boolean; // Non-optional boolean
+}
+export interface JobStatus {
+  id: string;
+  job_title: string;
+  company_name: string;
+  employment_type: string;
+  description?: string | null;
+  status?: string;
+  salary_range?: string | null;
+  work_setup: string; // Required in DB
+  shift?: string | null;
+  codev_id?: string;
+  created_at?: string;
+  updated_at?: string;
 }
 
 export interface WorkSchedule {
@@ -27,83 +41,80 @@ export interface WorkSchedule {
   updated_at?: string;
 }
 
-const DAYS_OF_WEEK = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-];
-
-export type DayOfWeek = (typeof DAYS_OF_WEEK)[number];
+export type DayOfWeek =
+  | "Monday"
+  | "Tuesday"
+  | "Wednesday"
+  | "Thursday"
+  | "Friday"
+  | "Saturday"
+  | "Sunday";
 
 export interface Codev {
-  id: string; // UUID
-  first_name: string; // Required
-  last_name: string; // Required
-  email_address: string; // Required
+  id: string;
+  first_name: string;
+  last_name: string;
+  email_address: string;
   phone_number?: string;
   address?: string;
   about?: string;
-  education?: string; // Changed to match DB - it's a text field, not an array
-  positions?: string[]; // Changed to ARRAY type
+  education?: Education[];
+  position_id?: bigint;
+  positions?: string[];
   display_position?: string;
   portfolio_website?: string;
-  tech_stacks?: string[]; // ARRAY type
-  image_url?: string;
-  job_status?: string;
-  internal_status?: string; // Default: 'TRAINING'
-  availability_status?: boolean; // Default: true
-  nda_status?: boolean; // Default: false
-  level?: Record<string, any>; // JSONB
-  application_status?: string; // Default: 'pending'
-  rejected_count?: number; // Default: 0
+  tech_stacks?: string[];
+  image_url?: string | null;
+  internal_status?: string;
+  availability_status?: boolean;
+  nda_status?: boolean;
+  level?: Record<string, any>;
+  application_status?: string;
+  rejected_count?: number;
   facebook?: string;
   linkedin?: string;
   github?: string;
   discord?: string;
-  projects?: string[]; // ARRAY type
-  created_at?: string; // timestamp
-  updated_at?: string; // timestamp
-  years_of_experience?: number; // Default: 0
+  projects?: Project[];
+  work_experience?: WorkExperience[];
+  created_at?: string;
+  updated_at?: string;
+  years_of_experience?: number;
   role_id?: number;
 }
 
 export interface Project {
-  id: string; // UUID
-  name: string; // Required
+  id: string;
+  name: string;
   description?: string;
-  status?: string; // Default: 'active'
-  start_date: string; // Required date
+  status?: string;
+  start_date: string;
   end_date?: string;
   github_link?: string;
   website_url?: string;
   figma_link?: string;
-  team_leader_id?: string; // UUID
-  client_id?: string; // UUID
-  members?: string[]; // Added: UUID ARRAY
-  created_at?: string; // timestamp
-  updated_at?: string; // timestamp
+  team_leader_id?: string;
+  client_id?: string;
+  members?: string[];
+  created_at?: string;
+  updated_at?: string;
   project_category_id?: number;
 }
 
 export interface Education {
-  id: string; // UUID
-  codev_id?: string; // UUID
-  institution: string; // Required
+  id: string;
+  codev_id?: string;
+  institution: string;
   degree?: string;
-  start_date?: string; // date
-  end_date?: string; // date
+  start_date?: string;
+  end_date?: string;
   description?: string;
-  created_at?: string; // timestamp
-  updated_at?: string; // timestamp
+  created_at?: string;
+  updated_at?: string;
 }
 
-// Updated to match the database's internal_status default
 export type InternalStatus =
-  | "TRAINING" // Default value in DB
+  | "TRAINING"
   | "GRADUATED"
   | "BUSY"
   | "FAILED"

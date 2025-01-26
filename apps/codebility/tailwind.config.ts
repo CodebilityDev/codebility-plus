@@ -109,7 +109,7 @@ const config: Config = {
         "dark-200": "#2c303a",
         "dark-300": "#131417",
         "dark-400": "#212734",
-        "dark-500": "#0F1013",
+        "dark-500": "#14161a",
         "light-500": "#7B8EC8",
         "light-700": "#DCE3F1",
         "light-800": "#F4F6F8",
