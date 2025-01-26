@@ -46,6 +46,7 @@ export async function approveAction(id: string) {
       .from("codev")
       .update({
         application_status: "passed",
+        role_id: 4,
         updated_at: new Date().toISOString(),
       })
       .eq("id", id);
@@ -57,6 +58,46 @@ export async function approveAction(id: string) {
     return { success: true };
   } catch (error) {
     console.error("Error approving applicant:", error);
+    return { success: false, error };
+  }
+}
+
+export async function updateAction(id: string, formData: FormData) {
+  try {
+    const updateData = {
+      first_name: formData.get("first_name")?.toString().trim(),
+      last_name: formData.get("last_name")?.toString().trim(),
+      email_address: formData.get("email_address")?.toString().trim(),
+      github: formData.get("github_link")?.toString().trim() || null,
+      portfolio_website:
+        formData.get("portfolio_website")?.toString().trim() || null,
+      tech_stacks: formData
+        .get("tech_stacks")
+        ?.toString()
+        .split(",")
+        .map((item) => item.trim()),
+    };
+
+    // Validate required fields
+    if (
+      !updateData.first_name ||
+      !updateData.last_name ||
+      !updateData.email_address
+    ) {
+      throw new Error("Required fields missing");
+    }
+
+    const { error } = await supabase
+      .from("codev")
+      .update(updateData)
+      .eq("id", id);
+
+    if (error) throw error;
+
+    revalidatePath("/home/applicants");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating applicant:", error);
     return { success: false, error };
   }
 }

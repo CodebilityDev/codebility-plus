@@ -1,5 +1,6 @@
 "use client";
 
+import type { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Box from "@/Components/shared/dashboard/Box";
@@ -20,7 +21,7 @@ type PhotoProps = {
 };
 
 const Photo = ({ data }: PhotoProps) => {
-  const [avatar, setAvatar] = useState<string>(defaultAvatar);
+  const [avatar, setAvatar] = useState<string | StaticImageData>(defaultAvatar);
   const [isUploading, setIsUploading] = useState(false);
   const { onOpen } = useModal();
 
@@ -40,16 +41,13 @@ const Photo = ({ data }: PhotoProps) => {
     setIsUploading(true);
 
     try {
-      // Upload new image
       const { publicUrl } = await uploadImage(file, {
         bucket: "codebility",
         folder: "avatars",
       });
 
-      // Update codev record with new image URL
       await updateCodev({ image_url: publicUrl });
 
-      // Update local state
       setAvatar(publicUrl);
       toast.success("Avatar uploaded successfully!", { id: toastId });
     } catch (error) {
@@ -65,17 +63,13 @@ const Photo = ({ data }: PhotoProps) => {
 
     const toastId = toast.loading("Removing your avatar...");
     try {
-      // Get the file path from the URL
-      const filePath = getImagePath(avatar);
+      const filePath = getImagePath(avatar as string);
       if (filePath) {
-        // Delete the image from storage
         await deleteImage(filePath);
       }
 
-      // Update codev record
       await updateCodev({ image_url: null });
 
-      // Update local state
       setAvatar(defaultAvatar);
       toast.success("Avatar removed successfully!", { id: toastId });
     } catch (error) {
@@ -98,7 +92,7 @@ const Photo = ({ data }: PhotoProps) => {
       <div className="flex gap-4">
         <div className="relative size-[80px]">
           <Image
-            src={avatar}
+            src={typeof avatar === "string" ? avatar : defaultAvatar}
             alt="Avatar"
             fill
             sizes="80px"
@@ -108,21 +102,19 @@ const Photo = ({ data }: PhotoProps) => {
         <div className="flex flex-col justify-center gap-2">
           <div className="flex gap-4">
             {avatar === defaultAvatar ? (
-              <div className="relative">
-                <label htmlFor="image" className="cursor-pointer">
-                  <p className="transition duration-300 hover:text-blue-100">
-                    {isUploading ? "Uploading..." : "Upload Image"}
-                  </p>
-                </label>
+              <label htmlFor="image" className="cursor-pointer">
+                <p className="transition duration-300 hover:text-blue-100">
+                  {isUploading ? "Uploading..." : "Upload Image"}
+                </p>
                 <input
-                  onChange={handleUploadAvatar}
                   id="image"
                   type="file"
                   accept="image/*"
+                  onChange={handleUploadAvatar}
                   disabled={isUploading}
                   className="hidden"
                 />
-              </div>
+              </label>
             ) : (
               <Button
                 variant="link"

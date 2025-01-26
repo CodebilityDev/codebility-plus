@@ -28,7 +28,8 @@ interface ExperienceFormProps {
   experience: WorkExperience;
   handleUpdateExperience: (
     itemNo: number,
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    name: string,
+    value: string | boolean,
   ) => void;
   itemNo: number;
   totalNo: number;
@@ -45,14 +46,12 @@ const Experience = ({ data }: ExperienceProps) => {
 
   const handleUpdateExperience = (
     itemNo: number,
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    name: string,
+    value: string | boolean,
   ) => {
-    const updatedExperiences = experienceData.map((item, id) => {
-      if (id === itemNo) {
-        return { ...item, [e.target.name]: e.target.value };
-      }
-      return item;
-    });
+    const updatedExperiences = experienceData.map((item, id) =>
+      id === itemNo ? { ...item, [name]: value } : item,
+    );
     setExperienceData(updatedExperiences);
   };
 
@@ -67,15 +66,7 @@ const Experience = ({ data }: ExperienceProps) => {
       );
       setExperienceData(updatedExperiences);
 
-      // Update edit mode indices
-      delete editModePerItem.current[itemNo];
-      const newObj: EditModePerItem = {};
-      let i = 0;
-      for (const key in editModePerItem.current) {
-        newObj[i++] = editModePerItem.current[key];
-      }
-      editModePerItem.current = newObj;
-
+      editModePerItem.current[itemNo] = false;
       toast.success("Work Experience deleted successfully");
     } catch (error) {
       toast.error("Something went wrong while deleting");
@@ -128,16 +119,17 @@ const Experience = ({ data }: ExperienceProps) => {
             setExperienceData((prev) => [
               ...prev,
               {
-                codev_id: "", // Will be set on save
+                id: "",
+                codev_id: "",
                 position: "",
                 description: "",
                 date_from: "",
-                date_to: "",
+                date_to: null,
                 company_name: "",
                 location: "",
-                id: "", // Will be generated on save
                 profile_id: undefined,
-              },
+                is_present: false,
+              } as WorkExperience,
             ]);
           }
         }}
@@ -191,7 +183,7 @@ const ExperienceForm = ({
   }, [experience, handleEditModePerItem, itemNo, totalNo]);
 
   useEffect(() => {
-    setEditMode(editModePerItem.current[itemNo]);
+    setEditMode(editModePerItem.current[itemNo] ?? false);
   }, [editModePerItem, itemNo]);
 
   const handleSaveAndUpdate = async () => {
@@ -204,12 +196,15 @@ const ExperienceForm = ({
       location: experience.location,
       codev_id: experience.codev_id,
       profile_id: experience.profile_id,
+      is_present: experience.is_present ?? false,
     };
 
     try {
       setIsLoading(true);
       if (!experience.id) {
-        const result = await createWorkExperience(data);
+        const result = await createWorkExperience(
+          data as Omit<WorkExperience, "id">,
+        );
         if (result && result.length) {
           experience.id = result[0].id;
         }
@@ -252,7 +247,9 @@ const ExperienceForm = ({
         <label>
           Position
           <Input
-            onChange={(e) => handleUpdateExperience(itemNo, e)}
+            onChange={(e) =>
+              handleUpdateExperience(itemNo, e.target.name, e.target.value)
+            }
             value={experience.position}
             type="text"
             name="position"
@@ -266,7 +263,9 @@ const ExperienceForm = ({
       <div className="mt-4 w-full">
         <label>Company Name</label>
         <Input
-          onChange={(e) => handleUpdateExperience(itemNo, e)}
+          onChange={(e) =>
+            handleUpdateExperience(itemNo, e.target.name, e.target.value)
+          }
           value={experience.company_name}
           type="text"
           name="company_name"
@@ -279,7 +278,9 @@ const ExperienceForm = ({
       <div className="mt-4 w-full">
         <label>Location</label>
         <Input
-          onChange={(e) => handleUpdateExperience(itemNo, e)}
+          onChange={(e) =>
+            handleUpdateExperience(itemNo, e.target.name, e.target.value)
+          }
           value={experience.location}
           type="text"
           name="location"
@@ -293,14 +294,16 @@ const ExperienceForm = ({
         <label>Description</label>
         <Textarea
           variant="resume"
-          onChange={(e) => handleUpdateExperience(itemNo, e)}
+          onChange={(e) =>
+            handleUpdateExperience(itemNo, e.target.name, e.target.value)
+          }
           value={experience.description}
           name="description"
-          className={`$ {
+          className={`${
             editMode
-              ? "border-lightgray text-black-100 dark:bg-dark-200 dark:text-white" : "text-dark-200 dark:bg-dark-200
-              dark:text-gray bg-white" } border bg-white
-          dark:border-zinc-700`}
+              ? "border-lightgray text-black-100 dark:bg-dark-200 dark:text-white"
+              : "text-dark-200 dark:bg-dark-200 dark:text-gray bg-white"
+          } border bg-white dark:border-zinc-700`}
           disabled={!editMode || isLoading}
         />
       </div>
@@ -309,7 +312,9 @@ const ExperienceForm = ({
         <label className="flex-1">
           Date From
           <Input
-            onChange={(e) => handleUpdateExperience(itemNo, e)}
+            onChange={(e) =>
+              handleUpdateExperience(itemNo, e.target.name, e.target.value)
+            }
             value={experience.date_from}
             type="date"
             name="date_from"
@@ -321,8 +326,10 @@ const ExperienceForm = ({
         <label className="flex-1">
           Date To
           <Input
-            onChange={(e) => handleUpdateExperience(itemNo, e)}
-            value={experience.date_to}
+            onChange={(e) =>
+              handleUpdateExperience(itemNo, e.target.name, e.target.value)
+            }
+            value={experience.date_to || ""}
             type="date"
             name="date_to"
             variant={editMode ? "lightgray" : "darkgray"}
@@ -333,14 +340,9 @@ const ExperienceForm = ({
             <input
               type="checkbox"
               name="is_present"
-              checked={experience.is_present}
+              checked={experience.is_present ?? false}
               onChange={(e) =>
-                handleUpdateExperience(itemNo, {
-                  target: {
-                    name: "is_present",
-                    value: e.target.checked,
-                  },
-                })
+                handleUpdateExperience(itemNo, e.target.name, e.target.checked)
               }
               disabled={!editMode || isLoading}
             />

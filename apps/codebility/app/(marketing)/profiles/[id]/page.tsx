@@ -12,34 +12,37 @@ import {
   IconGithub,
   IconLink,
   IconLinkedIn,
-  IconMail,
   IconMapPin,
   IconSkills,
-  IconTelephone,
 } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 
 import ProfileCloseButton from "./_components/profile-close-button";
 
 interface Props {
-  params: {
-    id: string;
-  };
+  params: { id: string };
 }
 
 export default async function CodevBioPage({ params }: Props) {
-  const showWayToContact = false; // Change if client is connected to Codebility
   const id = params.id;
-  const { data, error } = await getCodevs(id);
 
-  if (error || !data) return <div>ERROR: Failed to fetch codev data</div>;
+  // Fetch data for the profile
+  const { data, error } = await getCodevs({ filters: { id } });
+
+  if (error) {
+    console.error("Failed to fetch Codev data:", error);
+    return <div>ERROR: Failed to fetch Codev data. {error.message}</div>;
+  }
+
+  if (!data || data.length === 0) {
+    return <div>No profiles found.</div>;
+  }
 
   const {
-    email_address,
     first_name,
     last_name,
+    email_address,
     image_url,
-    job_status,
     display_position,
     portfolio_website,
     address,
@@ -47,15 +50,26 @@ export default async function CodevBioPage({ params }: Props) {
     facebook,
     linkedin,
     github,
-    education,
     tech_stacks,
-    phone_number,
-    experiences,
-  } = data as Codev;
+    education,
+    work_experience,
+    availability_status,
+    nda_status,
+  } = data[0] as Codev;
 
-  function getCurrentYear() {
-    return new Date().getFullYear();
-  }
+  const getStatusBadge = () =>
+    availability_status
+      ? "Available"
+      : nda_status
+        ? "Under NDA"
+        : "Unavailable";
+
+  const sanitizeUrl = (url: string) =>
+    url
+      .replace("http://localhost:3000", "")
+      .replace("https://localhost:3000", "");
+
+  const getRandomBgColor = () => `bg-${getRandomColor()}`;
 
   return (
     <section className="from-black-500 to-black-100 relative flex min-h-screen flex-col bg-gradient-to-l">
@@ -73,101 +87,86 @@ export default async function CodevBioPage({ params }: Props) {
             <div className="relative">
               <Image
                 alt={`${first_name} Avatar`}
-                src={
-                  image_url
-                    ? image_url
-                    : "/assets/svgs/icon-codebility-black.svg"
-                }
-                width={130}
-                height={130}
-                className={`bg-${getRandomColor()} h-[120px] w-[120px] rounded-full bg-cover object-cover p-0.5`}
+                src={image_url || "/assets/svgs/icon-codebility-black.svg"}
+                width={200}
+                height={200}
+                className={`${getRandomBgColor()} h-[150px] w-[150px] rounded-full bg-cover object-cover`}
               />
               <div className="absolute bottom-[7px] right-[7px]">
                 <p
-                  className={`border-black-100 rounded-full border-2 p-2 text-[9px] ${
-                    job_status === "AVAILABLE"
-                      ? "bg-green"
-                      : job_status === "DEPLOYED"
-                        ? "bg-orange-400"
-                        : "bg-gray"
+                  className={`border-black-100 rounded-full px-2 text-[9px] ${
+                    availability_status ? "bg-green" : "bg-gray"
                   }`}
-                ></p>
+                >
+                  {getStatusBadge()}
+                </p>
               </div>
             </div>
-
             <p className="text-md text-center capitalize lg:text-2xl">
               {first_name || "Unknown"} {last_name || "Unknown"}
             </p>
-
             {display_position && (
               <div className="bg-darkgray rounded-lg px-4 py-2">
-                <p className="text-gray text-center text-sm capitalize lg:text-lg">
+                <p className=" text-center text-sm capitalize lg:text-lg">
                   {display_position}
                 </p>
               </div>
             )}
-
-            {/* Contact Links */}
-            {showWayToContact && (
-              <div>
-                <div className="flex gap-4">
-                  {facebook && (
-                    <Link
-                      className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
-                      href={facebook}
-                      target="_blank"
-                    >
-                      <IconFacebook className="text-2xl" />
-                    </Link>
-                  )}
-                  {github && (
-                    <Link
-                      className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
-                      href={github}
-                      target="_blank"
-                    >
-                      <IconGithub className="text-2xl" />
-                    </Link>
-                  )}
-                  {linkedin && (
-                    <Link
-                      className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
-                      href={linkedin}
-                      target="_blank"
-                    >
-                      <IconLinkedIn className="text-2xl" />
-                    </Link>
-                  )}
-                  {portfolio_website && (
-                    <Link
-                      className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
-                      href={portfolio_website}
-                      target="_blank"
-                    >
-                      <IconLink className="text-2xl" />
-                    </Link>
-                  )}
+            <div className="flex gap-4">
+              {facebook && (
+                <Link
+                  href={sanitizeUrl(facebook)}
+                  target="_blank"
+                  className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
+                >
+                  <IconFacebook className="text-2xl" />
+                </Link>
+              )}
+              {linkedin && (
+                <Link
+                  href={sanitizeUrl(linkedin)}
+                  target="_blank"
+                  className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
+                >
+                  <IconLinkedIn className="text-2xl" />
+                </Link>
+              )}
+              {github && (
+                <Link
+                  href={sanitizeUrl(github)}
+                  target="_blank"
+                  className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
+                >
+                  <IconGithub className="text-2xl" />
+                </Link>
+              )}
+              {portfolio_website && (
+                <Link
+                  href={sanitizeUrl(portfolio_website)}
+                  target="_blank"
+                  className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
+                >
+                  <IconLink className="text-2xl" />
+                </Link>
+              )}
+            </div>
+            {tech_stacks && tech_stacks.length > 0 && (
+              <div className="mt-4">
+                <div className="mb-4 flex items-center gap-2">
+                  <IconSkills className="text-2xl" />
+                  <h3 className="text-md font-semibold lg:text-2xl">Skills</h3>
                 </div>
-              </div>
-            )}
-
-            {/* Address */}
-            {address && (
-              <div className="bg-black-100 mt-4 flex h-auto w-full flex-col gap-4 rounded-lg p-4">
-                <div className="flex items-center gap-4">
-                  <Link
-                    className="bg-darkgray hover:bg-black-500 rounded-lg p-2 transition duration-300"
-                    href={`https://www.google.com/maps/search/${encodeURIComponent(
-                      address,
-                    )}`}
-                    target="_blank"
-                  >
-                    <IconMapPin className="text-2xl" />
-                  </Link>
-                  <div className="flex flex-col">
-                    <p className="text-md text-gray">Location</p>
-                    <p className="capitalize text-white">{address}</p>
-                  </div>
+                <div className="mt-2 flex flex-wrap gap-4">
+                  {tech_stacks.map((stack) => (
+                    <Image
+                      key={stack}
+                      src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                      alt={stack}
+                      width={25}
+                      height={25}
+                      className="h-6 w-6"
+                    />
+                  ))}
                 </div>
               </div>
             )}
@@ -184,74 +183,43 @@ export default async function CodevBioPage({ params }: Props) {
                 <p className="text-md text-gray lg:text-lg">{about}</p>
               </div>
             )}
-            <div>
-              <div className="mb-4 flex items-center gap-2">
-                <IconSkills className="text-2xl" />
-                <h3 className="text-md font-semibold lg:text-2xl">Skills</h3>
-              </div>
-              <div className="mt-2 flex flex-wrap gap-4">
-                {tech_stacks?.map((stack, i) => (
-                  <div
-                    key={i}
-                    className="bg-darkgray flex items-center rounded-lg p-2"
-                  >
-                    <Image
-                      src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
-                      alt={`${stack} icon`}
-                      width={35}
-                      height={35}
-                      title={stack}
-                      className="h-[35px] w-[35px] transition duration-300 hover:-translate-y-0.5"
-                    />
+
+            {education && education.length > 0 && (
+              <div>
+                <h3 className="text-md font-semibold lg:text-2xl">Education</h3>
+                {education.map((edu) => (
+                  <div key={edu.id} className="bg-black-100 rounded-lg p-6">
+                    <p className="text-lg text-white">{edu.institution}</p>
+                    {edu.degree && (
+                      <p className="text-gray">
+                        {edu.degree} ({edu.start_date || "N/A"} -{" "}
+                        {edu.end_date || "Present"})
+                      </p>
+                    )}
                   </div>
                 ))}
               </div>
-            </div>
-            {experiences && experiences.length > 0 && (
-              <div>
-                <div className="mb-4 flex items-center gap-2">
-                  <IconBag className="text-2xl" />
-                  <h3 className="text-md font-semibold lg:text-2xl">
-                    Experience
-                  </h3>
-                </div>
-                <div className="flex flex-col gap-6 md:gap-8">
-                  {experiences.map((exp, expNo) => (
-                    <div
-                      key={`experience-${expNo}`}
-                      className="bg-black-100 flex flex-col gap-4 rounded-lg p-6"
-                    >
-                      <div>
-                        <p className="text-lg font-semibold text-white lg:text-xl">
-                          {exp.position}
-                        </p>
-                        {exp.company && (
-                          <p className="text-md text-gray font-semibold lg:text-lg">
-                            {exp.company}
-                          </p>
-                        )}
-                        <p className="text-gray text-sm lg:text-lg">
-                          {exp.date_from} - {exp.date_to}
-                        </p>
-                      </div>
-                      <p>{exp.description}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
             )}
-            {education && (
+            {work_experience && work_experience.length > 0 && (
               <div>
-                <h3 className="text-md font-semibold lg:text-2xl">Education</h3>
-                {education.map((edu, eduNo) => (
-                  <div
-                    key={`education-${eduNo}`}
-                    className="bg-black-100 flex flex-col gap-4 rounded-lg p-6"
-                  >
-                    <p className="text-lg text-white">{edu.institution}</p>
-                    <p className="text-gray">
-                      {edu.degree} ({edu.start_date} - {edu.end_date})
+                <h3 className="text-md mb-4 font-semibold lg:text-2xl">
+                  Experience
+                </h3>
+                {work_experience.map((exp) => (
+                  <div key={exp.id} className="bg-black-100 rounded-lg p-6">
+                    <p className="text-lg font-semibold text-white">
+                      {exp.position}
                     </p>
+                    <p className="text-md text-gray font-semibold">
+                      <span className="text-violet mr-2">
+                        {exp.company_name.toUpperCase()}
+                      </span>
+                      ({exp.date_from} - {exp.date_to || "Present"})
+                    </p>
+                    <p className="text-md text-gray font-semibold ">
+                      @{exp.location}
+                    </p>
+                    <p className="text-gray">{exp.description}</p>
                   </div>
                 ))}
               </div>
@@ -259,11 +227,10 @@ export default async function CodevBioPage({ params }: Props) {
           </div>
         </div>
       </div>
+
       <div className="relative flex flex-col items-center gap-4 pb-10">
         <Logo />
-        <Paragraph>
-          © {getCurrentYear()} Codebility. All Right Reserved
-        </Paragraph>
+        <Paragraph>© 2023 Codebility. All Rights Reserved</Paragraph>
       </div>
     </section>
   );
