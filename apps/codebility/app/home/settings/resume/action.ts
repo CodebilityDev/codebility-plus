@@ -1,7 +1,12 @@
 "use server";
 
 import { cachedUser } from "@/lib/server/supabase-action";
-import { Codev, WorkExperience, WorkSchedule } from "@/types/home/codev";
+import {
+  Codev,
+  JobStatus,
+  WorkExperience,
+  WorkSchedule,
+} from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -156,7 +161,10 @@ export async function updateWorkSchedule(
       .eq("codev_id", user.id);
 
     if (deleteError) {
-      console.error("Error deleting existing schedule:", deleteError);
+      console.error(
+        "Error deleting existing schedule:",
+        deleteError.message || deleteError,
+      );
       throw new Error("Failed to delete existing schedule");
     }
 
@@ -179,13 +187,20 @@ export async function updateWorkSchedule(
       .select();
 
     if (insertError) {
-      console.error("Error inserting new schedule:", insertError);
+      console.error(
+        "Error inserting new schedule:",
+        insertError.message || insertError,
+      );
       throw new Error("Failed to insert new schedule");
     }
 
     return data[0];
   } catch (error) {
-    console.error("Error updating work schedule:", error.message || error);
+    if (error instanceof Error) {
+      console.error("Error updating work schedule:", error.message);
+    } else {
+      console.error("Error updating work schedule:", error);
+    }
     throw error;
   }
 }
@@ -204,6 +219,90 @@ export async function getWorkSchedule(codevId: string) {
     return data;
   } catch (error) {
     console.error("Error fetching work schedule:", error);
+    throw error;
+  }
+}
+
+export async function createJobStatus(jobStatus: Omit<JobStatus, "id">) {
+  try {
+    const user = await cachedUser();
+    if (!user?.id) throw new Error("User not found");
+
+    const { data, error } = await supabase
+      .from("job_status")
+      .insert({
+        ...jobStatus,
+        status: "active", // Set default status
+        codev_id: user.id,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      })
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return [data]; // Return as array to match expected format
+  } catch (error) {
+    console.error("Error creating job status:", error);
+    throw error;
+  }
+}
+
+export async function updateJobStatus(
+  id: string,
+  jobStatusData: Partial<JobStatus>,
+) {
+  try {
+    const user = await cachedUser();
+    if (!user?.id) throw new Error("User not found");
+
+    const { data, error } = await supabase
+      .from("job_status")
+      .update({
+        ...jobStatusData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select("*")
+      .single();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error updating job status:", error);
+    throw error;
+  }
+}
+
+export async function deleteJobStatus(id: string) {
+  try {
+    const user = await cachedUser();
+    if (!user?.id) throw new Error("User not found");
+
+    const { error } = await supabase
+      .from("job_status")
+      .delete()
+      .eq("codev_id", user.id)
+      .eq("id", id);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error("Error deleting job status:", error);
+    throw new Error("Failed to delete job status");
+  }
+}
+
+export async function getJobStatuses(codevId: string) {
+  try {
+    const { data, error } = await supabase
+      .from("job_status")
+      .select("*")
+      .eq("codev_id", codevId);
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error fetching job statuses:", error);
     throw error;
   }
 }

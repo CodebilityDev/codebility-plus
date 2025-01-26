@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import DefaultAvatar from "@/Components/DefaultAvatar";
 import {
   Table,
   TableBody,
@@ -20,7 +21,6 @@ import {
   HoverCardTrigger,
 } from "@codevs/ui/hover-card";
 
-import { DEFAULT_AVATAR } from "../_lib/constants";
 import ApplicantsApprovalButtons from "./applicants-action-buttons";
 
 const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
@@ -49,9 +49,11 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                   <HoverCardTrigger asChild>
                     <div className="flex cursor-pointer items-center gap-3">
                       <Avatar>
-                        <AvatarImage
-                          src={applicant.image_url || DEFAULT_AVATAR}
-                        />
+                        {applicant.image_url ? (
+                          <AvatarImage src={applicant.image_url} />
+                        ) : (
+                          <DefaultAvatar size={40} />
+                        )}
                         <AvatarFallback>
                           {applicant.first_name[0]?.toUpperCase()}
                           {applicant.last_name[0]?.toUpperCase()}
@@ -64,13 +66,17 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                   </HoverCardTrigger>
                   <HoverCardContent>
                     <div className="flex gap-4 ">
-                      <Image
-                        src={applicant.image_url || DEFAULT_AVATAR}
-                        alt={`${applicant.first_name} avatar`}
-                        width={100}
-                        height={100}
-                        className="rounded-md"
-                      />
+                      {applicant.image_url ? (
+                        <Image
+                          src={applicant.image_url}
+                          alt={`${applicant.first_name} avatar`}
+                          width={100}
+                          height={100}
+                          className="rounded-md"
+                        />
+                      ) : (
+                        <DefaultAvatar size={100} className="rounded-md" />
+                      )}
                       <div>
                         <h4>
                           {applicant.first_name} {applicant.last_name}
@@ -102,16 +108,17 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
               </TableCell>
               <TableCell className="text-center">
                 <div className="flex flex-wrap justify-center gap-2">
-                  {applicant.tech_stacks.map((stack) => (
-                    <Image
-                      key={stack}
-                      src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
-                      alt={stack}
-                      width={25}
-                      height={25}
-                      className="h-6 w-6"
-                    />
-                  ))}
+                  {applicant.tech_stacks &&
+                    applicant.tech_stacks.map((stack) => (
+                      <Image
+                        key={stack}
+                        src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                        alt={stack}
+                        width={25}
+                        height={25}
+                        className="h-6 w-6"
+                      />
+                    ))}
                 </div>
               </TableCell>
               <TableCell className="text-center">

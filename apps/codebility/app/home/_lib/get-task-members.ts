@@ -1,5 +1,5 @@
+import { Codev } from "@/types/home/codev";
 import { CodevTask } from "@/types/home/task";
-import { Profile } from "@/types/home/user";
 
 import { Member } from "../_types/member";
 

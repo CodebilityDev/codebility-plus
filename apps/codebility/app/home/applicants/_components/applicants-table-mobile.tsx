@@ -1,7 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import ApplicantsActionButtons from "@/app/home/applicants/_components/applicants-action-buttons";
-import { DEFAULT_AVATAR } from "@/app/home/applicants/_lib/constants";
+import DefaultAvatar from "@/Components/DefaultAvatar";
 import {
   Table,
   TableBody,
@@ -40,7 +40,11 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
               <AccordionTrigger className="flex p-4 text-base hover:bg-muted/50 md:text-lg ">
                 <div className="flex items-center justify-start gap-3 md:w-1/2">
                   <Avatar>
-                    <AvatarImage src={applicant.image_url || DEFAULT_AVATAR} />
+                    {applicant.image_url ? (
+                      <AvatarImage src={applicant.image_url} />
+                    ) : (
+                      <DefaultAvatar size={40} />
+                    )}
                     <AvatarFallback>
                       {applicant.first_name[0]?.toUpperCase()}
                       {applicant.last_name[0]?.toUpperCase()}
@@ -92,17 +96,18 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                       <TableCell className="text-sm">Tech Stack</TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-2">
-                          {applicant.tech_stacks.map((stack, i) => (
-                            <Image
-                              key={i}
-                              src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
-                              alt={`${stack} icon`}
-                              width={25}
-                              height={25}
-                              title={stack}
-                              className="h-[25px] w-[25px] transition duration-300 hover:-translate-y-0.5"
-                            />
-                          ))}
+                          {applicant.tech_stacks &&
+                            applicant.tech_stacks.map((stack, i) => (
+                              <Image
+                                key={i}
+                                src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                                alt={`${stack} icon`}
+                                width={25}
+                                height={25}
+                                title={stack}
+                                className="h-[25px] w-[25px] transition duration-300 hover:-translate-y-0.5"
+                              />
+                            ))}
                         </div>
                       </TableCell>
                     </TableRow>
