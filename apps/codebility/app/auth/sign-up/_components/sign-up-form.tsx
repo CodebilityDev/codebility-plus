@@ -36,10 +36,10 @@ const SignUpForm = () => {
       last_name: "",
       email_address: "",
       phone_number: "",
-      years_of_experience: "",
+      years_of_experience: 0,
       portfolio_website: "",
-      techstack: "",
-      position: "",
+      techstack: [],
+      positions: [],
       facebook: "",
       github: "",
       linkedin: "",
@@ -47,13 +47,17 @@ const SignUpForm = () => {
       password: "",
       confirmPassword: "",
       profileImage: null,
+      about: "",
+      application_status: "applying",
+      internal_status: "TRAINING",
+      availability_status: true,
+      role_id: 7,
     },
   });
 
   const onSubmit = async (data: any) => {
     setIsLoading(true);
     try {
-      // Create FormData instance
       const formData = new FormData();
 
       // Add all form fields except profileImage
@@ -62,7 +66,7 @@ const SignUpForm = () => {
           if (typeof value === "number") {
             formData.append(key, value.toString());
           } else if (Array.isArray(value)) {
-            formData.append(key, value.join(", "));
+            formData.append(key, JSON.stringify(value));
           } else {
             formData.append(key, value as string);
           }

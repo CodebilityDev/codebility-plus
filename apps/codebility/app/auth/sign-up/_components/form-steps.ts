@@ -1,10 +1,17 @@
-import type { SignUpInputs } from "@/lib/validations/auth";
+import { SignUpValidation } from "@/lib/validations/auth";
 
 export interface FormField {
-  id: keyof SignUpInputs | "confirmPassword";
+  id: keyof typeof SignUpValidation._type;
   label: string;
   placeholder: string;
-  type: "text" | "email" | "password" | "number" | "tel" | "select";
+  type:
+    | "text"
+    | "email"
+    | "password"
+    | "number"
+    | "tel"
+    | "select"
+    | "textarea";
   optional?: boolean;
   numberProps?: {
     min?: number;
@@ -27,11 +34,10 @@ export const FORM_STEPS: FormField[][] = [
       placeholder: "Enter your last name",
       type: "text",
     },
-
     {
-      id: "position",
-      label: "Position",
-      placeholder: "Select your position",
+      id: "positions",
+      label: "Positions",
+      placeholder: "Select your positions",
       type: "select",
     },
     {
@@ -48,7 +54,14 @@ export const FORM_STEPS: FormField[][] = [
       id: "techstack",
       label: "Tech Stack",
       placeholder: "Select your tech stacks",
-      type: "text",
+      type: "select",
+    },
+    {
+      id: "about",
+      label: "About",
+      placeholder: "Tell us about yourself",
+      type: "textarea",
+      optional: true,
     },
   ],
 

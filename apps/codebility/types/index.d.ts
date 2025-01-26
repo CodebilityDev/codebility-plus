@@ -1,7 +1,6 @@
 import React from "react";
 import { ExperienceType } from "@/app/home/settings/resume/experience";
 
-
 type Tag = {
   tag: string;
 };
@@ -19,8 +18,6 @@ type topNotcher = {
   role: string;
   level: number;
 };
-
-
 
 interface IInhouse {
   data: TeamMemberT[];
@@ -115,17 +112,12 @@ interface PluginFunctionParams {
 }
 
 export {
-  User,
   BoardProjectT,
   BoardUserT,
   ProjectT,
   TeamMemberT,
-  ListT,
-  TaskT,
   topNotcher,
-  SocialIcons,
   Tag,
-  TStatus,
   ServiceCardT,
   Sidebar,
   IInhouse,
