@@ -51,21 +51,22 @@ export const signupUser = async (formData: FormData) => {
     const supabase = getSupabaseServerActionClient();
     const setUser = useUserStore.getState().setUser;
 
-    const first_name = formData.get("first_name") as string;
-    const last_name = formData.get("last_name") as string;
+    // Extract form data with proper typing
     const email_address = formData.get("email_address") as string;
     const password = formData.get("password") as string;
-    const phone_number = formData.get("phone_number") as string;
-    const years_of_experience = formData.get("years_of_experience") as string;
-    const portfolio_website = formData.get("portfolio_website") as string;
-    const tech_stacks = formData.get("techstack") as string;
-    const position = formData.get("position") as string;
-    const facebook = formData.get("facebook") as string;
-    const github = formData.get("github") as string;
-    const linkedin = formData.get("linkedin") as string;
-    const discord = formData.get("discord") as string;
+    const tech_stacks =
+      (formData.get("tech_stacks") as string)
+        ?.split(",")
+        .map((item) => item.trim()) || [];
+    const positions =
+      (formData.get("positions") as string)
+        ?.split(",")
+        .map((item) => item.trim()) || [];
+    const years_of_experience =
+      parseInt(formData.get("years_of_experience") as string) || 0;
     const profileImage = formData.get("profileImage") as File;
 
+    // Check for existing user
     const { data: existingUser } = await supabase
       .from("codev")
       .select("email_address")
@@ -76,62 +77,60 @@ export const signupUser = async (formData: FormData) => {
       return { success: false, error: "Email already exists" };
     }
 
-    let image_url = null;
-    if (profileImage) {
-      image_url = await uploadProfileImage(
-        profileImage,
-        "profileImage",
-        "codebility",
-      );
-    }
+    // Handle profile image upload
+    const image_url = profileImage
+      ? await uploadProfileImage(profileImage, "profileImage", "codebility")
+      : null;
 
+    // Create auth user
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.signUp({
       email: email_address,
-      password: password,
+      password,
       options: {
         emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/auth/callback`,
       },
     });
 
     if (authError) throw authError;
-
     if (!user) throw new Error("Failed to create user");
 
+    // Prepare user data
     const userData: Codev = {
       id: user.id,
-      first_name,
-      last_name,
+      first_name: formData.get("first_name") as string,
+      last_name: formData.get("last_name") as string,
       email_address,
-      phone_number,
+      phone_number: formData.get("phone_number") as string,
       address: null,
-      about: null,
+      about: (formData.get("about") as string) || null,
       education: [],
-      positions: [{ id: "10", name: position }],
-      display_position: position,
-      portfolio_website,
-      tech_stacks: tech_stacks.split(", "),
+      positions: positions.map((pos) => ({ id: "", name: pos })),
+      display_position: positions[0] || "",
+      portfolio_website: (formData.get("portfolio_website") as string) || null,
+      tech_stacks,
       image_url,
       availability_status: true,
       job_status: null,
       nda_status: false,
       level: {},
-      application_status: "applying",
+      application_status: "applying", // Matches DB constraint
       rejected_count: 0,
-      facebook,
-      linkedin,
-      github,
-      discord,
+      facebook: (formData.get("facebook") as string) || null,
+      linkedin: (formData.get("linkedin") as string) || null,
+      github: (formData.get("github") as string) || null,
+      discord: (formData.get("discord") as string) || null,
       projects: [],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
-      years_of_experience: parseInt(years_of_experience),
+      years_of_experience,
       role_id: 7,
       internal_status: "TRAINING",
     };
 
+    // Insert user data
     const { error: insertError } = await supabase
       .from("codev")
       .insert([userData]);
@@ -139,7 +138,6 @@ export const signupUser = async (formData: FormData) => {
     if (insertError) throw insertError;
 
     setUser(userData);
-
     return { success: true, data: user };
   } catch (error: any) {
     console.error("Signup error:", error);
@@ -149,7 +147,6 @@ export const signupUser = async (formData: FormData) => {
     };
   }
 };
-
 export const signinUser = async (email: string, password: string) => {
   const supabase = getSupabaseServerActionClient();
   const setUser = useUserStore.getState().setUser;
