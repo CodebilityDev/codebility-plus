@@ -1,9 +1,9 @@
 import H1 from "@/Components/shared/dashboard/H1";
 
-import Profile from "./(user)/_components/dashboard-profile";
-import TimeTracker from "./(user)/_components/dashboard-time-tracker";
-import TokenPoints from "./(user)/_components/dashboard-token-points";
-import WeeklyTop from "./(user)/_components/dashboard-weekly-top";
+import Profile from "./(dashboard)/_components/dashboard-profile";
+import TimeTracker from "./(dashboard)/_components/dashboard-time-tracker";
+import TokenPoints from "./(dashboard)/_components/dashboard-token-points";
+import WeeklyTop from "./(dashboard)/_components/dashboard-weekly-top";
 
 export default function DashboardPage() {
   return (
