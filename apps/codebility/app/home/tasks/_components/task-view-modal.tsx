@@ -10,9 +10,8 @@ import {
 } from "@/Components/ui/dialog";
 import { Task } from "@/types/home/task";
 
-import { Member } from "../../_types/member";
-import { DEFAULT_AVATAR } from "../../applicants/_lib/constants";
 import { convertHoursToHMS } from "../_lib/utils";
+import { Member } from "../../_types/member";
 
 interface Props {
   children: React.ReactNode;
@@ -24,10 +23,7 @@ export default function TaskViewModal({ children, task, taskMembers }: Props) {
   return (
     <Dialog>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent
-        aria-describedby={undefined}
-        className="w-[90%] max-w-md"
-      >
+      <DialogContent aria-describedby={undefined} className="w-[90%] max-w-md">
         <DialogHeader className="relative hidden">
           <DialogTitle className="mb-2 text-left text-xl">
             Task View
@@ -61,14 +57,9 @@ export default function TaskViewModal({ children, task, taskMembers }: Props) {
               <div className="flex flex-col gap-1">
                 <p className="text-sm text-white">Members</p>
                 <div>
-                  {taskMembers.map((member, index) => {
-                    return (
-                      <RenderTeam
-                        key={index}
-                        imgURL={member.image_url || DEFAULT_AVATAR}
-                      />
-                    );
-                  })}
+                  {taskMembers.map((member, index) => (
+                    <RenderTeam key={index} imgURL={member.image_url} />
+                  ))}
                 </div>
               </div>
             </div>
