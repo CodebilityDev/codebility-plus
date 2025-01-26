@@ -20,7 +20,7 @@ export default async function AccountSettingsPage() {
         <CardContent className="space-y-6 p-4">
           <AccountSettingsHeader email={user?.email as string} />
           <Separator />
-          <AccountSettingsChangePassword email={user?.email as string} />
+          <AccountSettingsChangePassword />
           <Separator />
           <AccountSettings2FA />
         </CardContent>
