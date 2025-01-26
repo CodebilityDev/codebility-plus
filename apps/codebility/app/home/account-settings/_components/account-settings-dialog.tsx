@@ -113,8 +113,8 @@ export default function AccountSettingsDialog() {
             <DialogHeader>
               <DialogTitle>Change Email Address</DialogTitle>
               <DialogDescription>
-                Enter your new email address below. You'll need to verify this
-                email before the change takes effect.
+                Enter your new email address below. You&apos;ll need to verify
+                this email before the change takes effect.
               </DialogDescription>
             </DialogHeader>
             <form
