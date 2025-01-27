@@ -1,5 +1,5 @@
 import { INTERNAL_STATUS } from "@/constants/internal_status";
-import { Codev, InternalStatus, Position } from "@/types/home/codev";
+import { Codev, InternalStatus, Position, Project } from "@/types/home/codev";
 import { Check, Plus, X } from "lucide-react";
 
 import { Button } from "@codevs/ui/button";
@@ -25,6 +25,18 @@ interface EditableCardProps {
 
 export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
   const { data: formData, handleChange, isSubmitting } = useCodevForm(data);
+
+  // Ensure positions are handled correctly
+  const positions: Position[] = (formData.positions || []).map((pos) => {
+    if (typeof pos === "string") {
+      // Convert string to bigint for id and use the string for name
+      return { id: BigInt(pos), name: pos } as Position;
+    }
+    return pos; // Return as-is if already a Position object
+  });
+
+  // Ensure projects are handled correctly
+  const projects: Project[] = formData.projects || [];
 
   return (
     <Card className="w-full max-w-lg p-4">
@@ -79,7 +91,11 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
         <div>
           <Label>Position</Label>
           <Select
-            value={formData.display_position || undefined}
+            value={
+              typeof formData.display_position === "string"
+                ? formData.display_position
+                : undefined
+            }
             onValueChange={(value) => handleChange("display_position", value)}
             disabled={isSubmitting}
           >
@@ -87,9 +103,12 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
               <SelectValue placeholder="Select position" />
             </SelectTrigger>
             <SelectContent>
-              {formData.positions.map((position) => (
-                <SelectItem key={position.id} value={position.name}>
-                  {position.name}
+              {positions.map((position) => (
+                <SelectItem
+                  key={position.id}
+                  value={position.name ?? "Unnamed Position"}
+                >
+                  {position.name || "Unnamed Position"}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -99,16 +118,19 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
         <div>
           <Label>Projects</Label>
           <div className="space-y-2">
-            {formData.projects.map((project, index) => (
-              <div key={project.id} className="flex items-center space-x-2">
+            {projects.map((project, index) => (
+              <div
+                key={typeof project === "string" ? project : project.id}
+                className="flex items-center space-x-2"
+              >
                 <Input
-                  value={project.name}
+                  value={typeof project === "string" ? project : project.name}
                   onChange={(e) => {
-                    const updatedProjects = [...formData.projects];
+                    const updatedProjects = [...projects];
                     updatedProjects[index] = {
                       ...project,
                       name: e.target.value,
-                    };
+                    } as Project;
                     handleChange("projects", updatedProjects);
                   }}
                   disabled={isSubmitting}
@@ -118,7 +140,7 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
                   variant="ghost"
                   size="sm"
                   onClick={() => {
-                    const updatedProjects = formData.projects.filter(
+                    const updatedProjects = projects.filter(
                       (_, i) => i !== index,
                     );
                     handleChange("projects", updatedProjects);
@@ -134,8 +156,8 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
               size="sm"
               onClick={() => {
                 const updatedProjects = [
-                  ...formData.projects,
-                  { id: Date.now().toString(), name: "" },
+                  ...projects,
+                  { id: Date.now().toString(), name: "" } as Project,
                 ];
                 handleChange("projects", updatedProjects);
               }}

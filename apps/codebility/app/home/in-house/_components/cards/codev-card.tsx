@@ -35,7 +35,7 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
           <h3 className="dark:text-light-900 truncate text-lg font-semibold text-black">
             {capitalize(data.first_name)} {capitalize(data.last_name)}
           </h3>
-          <StatusBadge status={data.internal_status} />
+          <StatusBadge status={data.internal_status || "TRAINING"} />
         </div>
       </CardHeader>
 

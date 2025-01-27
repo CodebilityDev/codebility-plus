@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import InputField from "@/Components/shared/dashboard/InputField";
+import InputField from "@/Components/shared/dashboard/InputPhone";
 import { Button } from "@/Components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";

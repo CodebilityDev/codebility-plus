@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Box from "@/Components/shared/dashboard/Box";
-import InputField from "@/Components/shared/dashboard/InputField";
+import InputField from "@/Components/shared/dashboard/InputPhone";
 import { Button } from "@/Components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
 import { useForm } from "react-hook-form";

@@ -156,7 +156,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
       case "display_position":
         return (
           <Select
-            value={formData.display_position || undefined}
+            value={formData.display_position || ""} // Ensure value is a string
             onValueChange={(value) => handleChange("display_position", value)}
             disabled={isSubmitting}
           >
@@ -165,7 +165,7 @@ export function EditableRow({ data, onSave, onCancel }: EditableRowProps) {
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
               {positions.map((position) => (
-                <SelectItem key={position.id} value={position.name}>
+                <SelectItem key={position.id} value={position.name || ""}>
                   {position.name}
                 </SelectItem>
               ))}

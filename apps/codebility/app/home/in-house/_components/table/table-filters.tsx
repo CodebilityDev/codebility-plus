@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
 import { Position, Project } from "@/types/home/codev";
@@ -37,11 +39,16 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
     async function fetchProjects() {
       const { data, error } = await supabase
         .from("projects")
-        .select("id, name");
+        .select("id, name, start_date"); // Align with `Project` type
       if (error) {
         console.error("Failed to fetch projects:", error);
       } else if (data) {
-        setProjects(data);
+        setProjects(
+          data.map((project) => ({
+            ...project,
+            start_date: project.start_date || "", // Ensure required fields have default values
+          })) as Project[],
+        );
       }
     }
 
@@ -52,7 +59,12 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
       if (error) {
         console.error("Failed to fetch positions:", error);
       } else if (data) {
-        setPositions(data);
+        setPositions(
+          data.map((position) => ({
+            ...position,
+            name: position.name || "Unknown", // Ensure `name` is a string
+          })) as Position[],
+        );
       }
     }
 
@@ -101,7 +113,10 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
             <SelectContent className="bg-light-800 dark:bg-dark-200">
               <SelectItem value="all">All Positions</SelectItem>
               {positions.map((position) => (
-                <SelectItem key={position.id} value={position.name}>
+                <SelectItem
+                  key={position.id.toString()}
+                  value={position.name || ""}
+                >
                   {position.name}
                 </SelectItem>
               ))}
@@ -169,7 +184,10 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
             <SelectContent className="bg-light-800 dark:bg-dark-200">
               <SelectItem value="all">All Display Positions</SelectItem>
               {positions.map((position) => (
-                <SelectItem key={position.id} value={position.name}>
+                <SelectItem
+                  key={position.id.toString()}
+                  value={position.name || ""}
+                >
                   {position.name}
                 </SelectItem>
               ))}
