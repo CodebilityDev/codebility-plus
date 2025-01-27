@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import TaskAddModal from "@/app/home/kanban/[id]/_components/tasks/TaskAddModal";
+import TaskViewModal from "@/app/home/kanban/[id]/_components/tasks/TaskViewModal";
 import AddRoleModal from "@/Components/modals/AddRoleModal";
 import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
 import BoardAddModal from "@/Components/modals/BoardAddModal";
@@ -18,15 +20,13 @@ import ProjectViewModal from "@/Components/modals/ProjectViewModal";
 import ServiceCategoriesDeleteModal from "@/Components/modals/ServiceCategoriesDeleteModal";
 import ServiceCategoriesModal from "@/Components/modals/ServiceCategoriesModal";
 import ServicesModal from "@/Components/modals/ServicesModal";
-import TaskAddModal from "@/Components/modals/TaskAddModal";
-import TaskViewModal from "@/Components/modals/TaskViewModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
 
+import TaskDeleteModal from "../../app/home/kanban/[id]/_components/tasks/TaskDeleteModal";
+import TaskEditModal from "../../app/home/kanban/[id]/_components/tasks/TaskEditModal";
 import DeleteWarningModal from "../modals/DeleteWarningModal";
 import ProjectMembersModal from "../modals/ProjectMembersModal";
-import TaskDeleteModal from "../modals/TaskDeleteModal";
-import TaskEditModal from "../modals/TaskEditModal";
 
 export const ModalProviderHome = () => {
   const [isMounted, setIsMounted] = useState(false);
