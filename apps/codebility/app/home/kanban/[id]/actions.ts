@@ -9,11 +9,6 @@ interface CodevMember {
   image_url?: string | null;
 }
 
-interface TaskCreationResult {
-  success: boolean;
-  error?: string;
-}
-
 export const updateTaskColumnId = async (
   taskId: string,
   newColumnId: string,
@@ -203,6 +198,38 @@ export const deleteTask = async (
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to delete task",
+    };
+  }
+};
+
+export const createNewColumn = async (
+  columnName: string,
+  kanbanBoardId: string,
+): Promise<{ success: boolean; error?: string }> => {
+  const supabase = createClientComponentClient();
+
+  try {
+    const { error } = await supabase.from("kanban_columns").insert([
+      {
+        name: columnName,
+        kanban_board_id: kanbanBoardId,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      },
+    ]);
+
+    if (error) {
+      console.error("Error creating column:", error);
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath(`/home/kanban/${kanbanBoardId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Unexpected error creating column:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
     };
   }
 };
