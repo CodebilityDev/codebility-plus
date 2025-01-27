@@ -22,9 +22,9 @@ export default async function Profiles() {
   const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
 
   // Filter admins and codevs
-  const adminsArray = codevsArray.filter(
-    (codev) => codev.role_id === adminRoleId,
-  );
+  // const adminsArray = codevsArray.filter(
+  //   (codev) => codev.role_id === adminRoleId,
+  // );
   const filteredCodevs = codevsArray.filter(
     (codev) => codev.role_id !== adminRoleId,
   );
@@ -36,7 +36,7 @@ export default async function Profiles() {
     >
       <div className="bg-code-pattern absolute inset-0 bg-repeat opacity-5"></div>
       <div className="relative flex flex-col gap-8">
-        <ProfileContainer admins={adminsArray} />
+        <ProfileContainer filteredCodevs={filteredCodevs} />
         <Suspense fallback={<UsersSkeleton />}>
           <CodevLists codevs={filteredCodevs} />
         </Suspense>
