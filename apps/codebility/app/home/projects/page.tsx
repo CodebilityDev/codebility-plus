@@ -1,6 +1,6 @@
 import { use } from "react";
 import H1 from "@/Components/shared/dashboard/H1";
-import { ProjectT } from "@/types/index";
+import { Project } from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -12,7 +12,7 @@ const Projects = () => {
 
   const Projects = use(
     supabase
-      .from("project")
+      .from("projects")
       .select("*")
       .then(({ data, error }) => {
         if (error) throw error;
@@ -29,7 +29,7 @@ const Projects = () => {
         </div>
       </div>
       {Projects && Projects.length > 0 && (
-        <ProjectsCard projects={Projects as ProjectT[]} />
+        <ProjectsCard projects={Projects as Project[]} />
       )}
     </div>
   );
