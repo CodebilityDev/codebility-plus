@@ -12,9 +12,9 @@ import AddRoleModal from "@/Components/modals/AddRoleModal";
 import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
 import ClientAddModal from "@/Components/modals/ClientAddModal";
 import ClientEditModal from "@/Components/modals/ClientEditModal";
+import ColumnAddModal from "@/Components/modals/ColumnAddModal";
 import DeleteRoleModal from "@/Components/modals/DeleteRoleModal";
 import EditRoleModal from "@/Components/modals/EditRoleModal";
-import ListAddModal from "@/Components/modals/ListAddModal";
 import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
 import ProfileModal from "@/Components/modals/ProfileModal";
 import ServiceCategoriesDeleteModal from "@/Components/modals/ServiceCategoriesDeleteModal";
@@ -46,7 +46,7 @@ export const ModalProviderHome = () => {
 
       <BoardAddModal />
       <BoardAddModal />
-      <ListAddModal />
+      <ColumnAddModal />
 
       <ProjectAddModal />
       <ProjectEditModal />

@@ -11,7 +11,7 @@ export default function KanbanListAddModal({ boardId }: { boardId: string }) {
     <Button
       variant="default"
       className="flex w-max items-center gap-2"
-      onClick={() => onOpen("listAddModal", boardId)}
+      onClick={() => onOpen("ColumnAddModal", boardId)}
     >
       <IconAdd />
       <p>Add new list</p>

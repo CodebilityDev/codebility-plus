@@ -72,7 +72,7 @@ const ProjectAddModal = () => {
   const handleUploadProjectThumbnail = (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setValue("thumbnail", file);
+      setValue("main_image", file);
       setProjectImage(URL.createObjectURL(file));
     }
   };
@@ -151,12 +151,59 @@ const ProjectAddModal = () => {
               <Input
                 type="text"
                 placeholder="Enter Project Name"
-                {...register("project_name")}
+                {...register("name")}
               />
+              <Input
+                type="text"
+                placeholder="Enter Project Description"
+                {...register("description")}
+              />
+              <Input
+                type="text"
+                placeholder="Enter GitHub Link"
+                {...register("github_link")}
+              />
+              <Input
+                type="text"
+                placeholder="Enter Website URL"
+                {...register("website_url")}
+              />
+              <Input
+                type="text"
+                placeholder="Enter Figma Link"
+                {...register("figma_link")}
+              />
+              <Input
+                type="date"
+                placeholder="Start Date"
+                {...register("start_date")}
+              />
+              <label>Project Category</label>
+              <Input
+                type="text"
+                placeholder="Enter Category ID"
+                {...register("project_category_id")}
+              />
+              <label>Team Leader</label>
+              <Select
+                onValueChange={(value) => setValue("team_leader_id", value)}
+                name="team_leader_id"
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select a Team Leader" />
+                </SelectTrigger>
+                <SelectContent>
+                  {users.map((user) => (
+                    <SelectItem key={user.id} value={user.id}>
+                      {user.first_name} {user.last_name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <label>Client</label>
               <Select
-                onValueChange={(value) => setValue("clientId", value)}
-                name="clientId"
+                onValueChange={(value) => setValue("client_id", value)}
+                name="client_id"
               >
                 <SelectTrigger>
                   <SelectValue placeholder="Select a Client" />
