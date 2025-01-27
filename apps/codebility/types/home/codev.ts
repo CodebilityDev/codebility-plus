@@ -5,16 +5,16 @@ export interface Position {
 }
 
 export interface WorkExperience {
-  id: string; // UUID
-  codev_id: string; // UUID
-  position: string;
-  description: string;
-  date_from: string; // Date as string
+  id: string; // UUID (required)
+  codev_id: string; // UUID (required)
+  position: string; // (required)
+  description?: string; // optional in DB
+  date_from: string; // Date as string (required)
   date_to: string | null; // Nullable for "Present"
-  company_name: string;
-  location: string;
+  company_name: string; // (required)
+  location: string; // (required)
   profile_id?: string; // Optional
-  is_present: boolean; // Non-optional boolean
+  is_present: boolean; // New field we'll add
 }
 
 export interface JobStatus {
@@ -62,10 +62,10 @@ export interface Codev {
   about?: string | null;
   education?: Education[];
   position_id?: bigint;
-  positions?: string[];
+  positions: string[];
   display_position?: string;
   portfolio_website?: string | null;
-  tech_stacks?: string[];
+  tech_stacks: string[];
   image_url?: string | null;
   internal_status?: InternalStatus;
   availability_status?: boolean;
@@ -77,7 +77,7 @@ export interface Codev {
   linkedin?: string | null;
   github?: string | null;
   discord?: string | null;
-  projects?: Project[];
+  projects: Project[];
   work_experience?: WorkExperience[];
   created_at?: string;
   updated_at?: string;
@@ -181,7 +181,7 @@ export interface Contract {
   updated_at?: string;
 }
 
-export interface KanbanBoard {
+export interface KanbanBoardType {
   id: string; // UUID
   name: string;
   description?: string;
@@ -189,13 +189,14 @@ export interface KanbanBoard {
   updated_at?: string;
 }
 
-export interface KanbanColumn {
+export interface KanbanColumnType {
   id: string; // UUID
   board_id?: string; // UUID
   name: string;
   position: number;
   created_at?: string;
   updated_at?: string;
+  tasks?: Task[];
 }
 
 export interface Task {
@@ -216,4 +217,8 @@ export interface Task {
   pr_link?: string;
   created_at?: string;
   updated_at?: string;
+}
+
+export interface ExtendedTask extends Task {
+  initialColumnId?: string;
 }
