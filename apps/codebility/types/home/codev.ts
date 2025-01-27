@@ -91,6 +91,7 @@ export interface Project {
   start_date: string;
   end_date?: string;
   github_link?: string;
+  main_image?: string;
   website_url?: string;
   figma_link?: string;
   team_leader_id?: string;
