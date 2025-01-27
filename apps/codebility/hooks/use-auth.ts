@@ -1,8 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { getUserDataById } from "@/app/api";
-import useAuthCookie from "@/hooks/use-cookie";
+import { useState } from "react";
 
 const useAuth = () => {
   // const auth = useAuthCookie()
