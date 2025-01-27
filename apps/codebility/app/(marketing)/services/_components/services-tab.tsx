@@ -10,34 +10,33 @@ import Container from "../../_components/marketing-container";
 import Section from "../../_components/marketing-section";
 import ServiceCard from "./services-service-card";
 
-// Predefined categories
-const PROJECT_CATEGORIES = [
-  "Web Development",
-  "Mobile Development",
-  "UI/UX Design",
-];
-
 interface Props {
   servicesData: Project[];
 }
 
 export default function ServicesTab({ servicesData }: Props) {
   const [projects, setProjects] = useState<Project[]>(servicesData);
-  const [category, setCategory] = useState(PROJECT_CATEGORIES[0]);
+  const [category, setCategory] = useState<number>(0); // Use `project_category_id`
 
   // Initialize pagination for each category
-  const initialTabPages: Record<string, number> = {};
-  PROJECT_CATEGORIES.forEach((category) => {
-    initialTabPages[category] = 1;
+  const initialTabPages: Record<number, number> = {};
+  servicesData.forEach((project) => {
+    if (project.project_category_id !== undefined) {
+      initialTabPages[project.project_category_id] = 1;
+    }
   });
 
-  const [tabPages, setTabPages] = useState(initialTabPages);
+  const [tabPages, setTabPages] =
+    useState<Record<number, number>>(initialTabPages);
 
-  // Create tabs from predefined categories
-  const projectTabs = PROJECT_CATEGORIES.map((category, id) => ({
+  const uniqueCategories = Array.from(
+    new Set(servicesData.map((project) => project.project_category_id)),
+  );
+
+  const projectTabs = uniqueCategories.map((categoryId, id) => ({
     id,
-    name: category,
-    number: id + 1,
+    name: `Category ${categoryId}`,
+    number: categoryId || 0,
   }));
 
   const {
@@ -51,8 +50,7 @@ export default function ServicesTab({ servicesData }: Props) {
 
   useEffect(() => {
     const filteredData = servicesData.filter((project) => {
-      // You might need to adjust this filtering based on your project_category relationship
-      return true; // For now, show all projects
+      return project.project_category_id === category;
     });
     setProjects(filteredData);
   }, [category, servicesData]);
@@ -61,13 +59,13 @@ export default function ServicesTab({ servicesData }: Props) {
     setCurrentPage(tabPages[category] || 1);
   }, [category, tabPages, setCurrentPage]);
 
-  const handleTabClick = (tabNumber: number, tabName: string) => {
+  const handleTabClick = (tabNumber: number) => {
     setTabPages((prev) => ({
       ...prev,
       [category]: currentPage,
     }));
 
-    setCategory(tabName);
+    setCategory(tabNumber);
   };
 
   return (
@@ -78,9 +76,9 @@ export default function ServicesTab({ servicesData }: Props) {
             {projectTabs.map((tab) => (
               <p
                 key={tab.id}
-                onClick={() => handleTabClick(tab.number, tab.name)}
+                onClick={() => handleTabClick(tab.number)}
                 className={`cursor-pointer px-2 pb-2 text-base xl:text-xl ${
-                  category === tab.name
+                  category === tab.number
                     ? "border-violet text-violet border-b-2"
                     : "text-white"
                 }`}
@@ -99,8 +97,7 @@ export default function ServicesTab({ servicesData }: Props) {
                     id: project.id,
                     name: project.name,
                     description: project.description || "",
-                    category: category, // Using selected category
-                    mainImage: project.website_url || "",
+                    main_image: project.main_image || "",
                     github_link: project.github_link,
                     figma_link: project.figma_link,
                     start_date: project.start_date,
