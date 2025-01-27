@@ -51,7 +51,7 @@ const SignInForm = () => {
     } catch (error: any) {
       if (error.message?.includes("verify your email")) {
         toast.error("Please verify your email first");
-        router.replace("/verify", { shallow: true });
+        router.replace("/verify");
       } else if (error.message?.includes("Invalid login credentials")) {
         toast.error("Invalid email or password");
       } else {
