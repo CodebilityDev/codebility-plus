@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
-import { ProjectT } from "@/types";
+import { Project } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
 import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
@@ -32,7 +32,7 @@ const BoardAddModal = () => {
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "boardAddModal";
 
-  const [projects, setProjects] = useState<ProjectT[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
   const [projectId, setProjectId] = useState("");
   const [name, setName] = useState("");
 

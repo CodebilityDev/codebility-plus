@@ -5,7 +5,6 @@ import { Button } from "@/Components/ui/button";
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
-import useToken from "@/hooks/use-token";
 import { defaultAvatar } from "@/public/assets/images";
 import {
   IconCopy,
@@ -13,13 +12,11 @@ import {
   IconMapPin,
   IconTelephone,
 } from "@/public/assets/svgs";
-import { client_ClientCardT } from "@/types/protectedroutes/index";
+import { Client } from "@/types/home/codev";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
 
-const ClientArchiveCards = ({ clients }: { clients: client_ClientCardT[] }) => {
-  const { token } = useToken();
-
+const ClientArchiveCards = ({ clients }: { clients: Client[] }) => {
   const {
     currentPage,
     totalPages,
@@ -96,7 +93,7 @@ const ClientArchiveCards = ({ clients }: { clients: client_ClientCardT[] }) => {
     <>
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {clients.length > 0 &&
-          paginatedClients?.map((client: client_ClientCardT, index) => (
+          paginatedClients?.map((client: Client, index) => (
             <div
               key={`${client.company_name}-${index}`}
               className="background-box relative flex flex-col overflow-hidden rounded-lg border border-zinc-200 dark:border-zinc-700"

@@ -1,11 +1,6 @@
 import "server-only";
 
-import {
-  Codev,
-  Education,
-  WorkExperience,
-  WorkSchedule,
-} from "@/types/home/codev";
+import { Client, Codev } from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -73,7 +68,8 @@ export const getCodevs = async ({
       days_of_week,
       start_time,
       end_time
-    )
+    ),
+    projects 
     `,
   );
 
@@ -102,4 +98,15 @@ export const getCodevs = async ({
   }));
 
   return { error: null, data: normalizedData as Codev[] };
+};
+
+export const getClients = async (): Promise<{
+  error: any;
+  data: Client[] | null;
+}> => {
+  const supabase = getSupabaseServerComponentClient();
+
+  const { data, error } = await supabase.from("clients").select("*");
+
+  return { error, data: data || null };
 };

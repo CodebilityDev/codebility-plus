@@ -1,5 +1,4 @@
-import { TaskT } from "@/types";
-import { client_ClientCardT } from "@/types/protectedroutes";
+import { Client, Task } from "@/types/home/codev";
 import { create } from "zustand";
 
 export type ModalType =
@@ -28,13 +27,13 @@ export type ModalType =
 
 interface ModalStore {
   type: ModalType | null;
-  data?: TaskT | client_ClientCardT[] | any;
+  data?: Task | Client[] | any;
   dataObject?: any;
   callback?: () => void;
   isOpen: boolean;
   onOpen: (
     type: ModalType,
-    data?: TaskT | client_ClientCardT[] | any,
+    data?: Task | Client[] | any,
     dataObject?: any,
     callback?: () => void,
   ) => void;
@@ -46,11 +45,7 @@ export const useModal = create<ModalStore>((set) => ({
   dataObject: {},
   isOpen: false,
   callback: undefined,
-  onOpen: (
-    type,
-    data?: TaskT | client_ClientCardT[] | any,
-    dataObject?,
-    callback?,
-  ) => set({ isOpen: true, type, data, dataObject, callback }),
+  onOpen: (type, data?: Task | Client[] | any, dataObject?, callback?) =>
+    set({ isOpen: true, type, data, dataObject, callback }),
   onClose: () => set({ type: null, isOpen: false, callback: undefined }),
 }));
