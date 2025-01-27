@@ -52,7 +52,7 @@ const DevelopmentProcessReactFLow = () => {
           zoomOnScroll={false}
         >
           <Background />
-          <div className="absolute bottom-0 right-0 z-10 h-6 w-20 bg-[#030303]"></div>
+          <div className="bg-backgroundColor absolute bottom-0 right-0 z-10 h-6 w-20"></div>
         </ReactFlow>
       </div>
     </Section>
