@@ -15,7 +15,7 @@ export type ModalType =
   | "privacyPolicyModal"
   | "termsOfServiceModal"
   | "timeTrackerTicketModal"
-  | "listAddModal"
+  | "ColumnAddModal"
   | "boardAddModal"
   | "homeTermsAndConditionModal"
   | "homeFAQSModal"

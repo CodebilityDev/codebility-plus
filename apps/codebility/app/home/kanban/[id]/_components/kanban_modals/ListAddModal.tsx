@@ -1,13 +1,8 @@
 "use client";
 
 import { FormEvent, useState } from "react";
-import { createNewList } from "@/app/home/kanban/[id]/actions";
+import { createNewColumn } from "@/app/home/kanban/[id]/actions";
 import { Button } from "@/Components/ui/button";
-import { useModal } from "@/hooks/use-modal";
-import toast from "react-hot-toast";
-
-import { Input } from "@codevs/ui/input";
-
 import {
   Dialog,
   DialogContent,
@@ -15,35 +10,43 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
+import { useModal } from "@/hooks/use-modal";
+import toast from "react-hot-toast";
 
-const ListAddModal = () => {
+import { Input } from "@codevs/ui/input";
+
+const ColumnAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
-  const isModalOpen = isOpen && type === "listAddModal";
+  const isModalOpen = isOpen && type === "columnAddModal";
 
-  const [listName, setListName] = useState("");
+  const [columnName, setColumnName] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!listName) {
-      toast.error("Please enter a list name.");
+    if (!columnName) {
+      toast.error("Please enter a column name.");
       return;
     }
 
+    setIsLoading(true);
+
     try {
-      const response = await createNewList(listName, data);
+      const response = await createNewColumn(columnName, data);
       if (response.success) {
-        toast.success("Create list successful.");
+        toast.success("New column created successfully!");
       } else {
-        console.log(response.error);
-        toast.error("Failed to create list.");
+        console.error(response.error);
+        toast.error("Failed to create column.");
       }
     } catch (error) {
-      console.log("Error create list modal: ", error);
+      console.error("Error creating column:", error);
       toast.error("Something went wrong!");
     } finally {
+      setIsLoading(false);
       onClose();
-      setListName("");
+      setColumnName("");
     }
   };
 
@@ -57,18 +60,18 @@ const ListAddModal = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader className="relative">
             <DialogTitle className="mb-2 text-left text-lg">
-              Add New List
+              Add Column
             </DialogTitle>
           </DialogHeader>
           <Input
             id="name"
             type="text"
-            label="List Name"
+            label="Column Name"
             name="name"
-            placeholder="Enter List Name"
+            placeholder="Enter Column Name"
             className="dark:bg-dark-200"
-            value={listName}
-            onChange={(e) => setListName(e.target.value)}
+            value={columnName}
+            onChange={(e) => setColumnName(e.target.value)}
           />
           <DialogFooter className="flex flex-col gap-2 lg:flex-row">
             <Button
@@ -83,8 +86,9 @@ const ListAddModal = () => {
               type="submit"
               variant="default"
               className="order-1 w-full sm:order-2 sm:w-[130px]"
+              disabled={isLoading}
             >
-              Save
+              {isLoading ? "Saving..." : "Save"}
             </Button>
           </DialogFooter>
         </form>
@@ -93,4 +97,4 @@ const ListAddModal = () => {
   );
 };
 
-export default ListAddModal;
+export default ColumnAddModal;
