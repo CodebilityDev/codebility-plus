@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
-import { socialIcons, techstacks } from "@/constants";
+import { techstacks } from "@/constants";
 import { useModal } from "@/hooks/use-modal-users";
 import { defaultAvatar } from "@/public/assets/images";
 import { Codev } from "@/types/home/codev";
@@ -24,8 +24,11 @@ const ProfileModal = () => {
     image_url,
     address,
     about,
-    socials,
-    main_position,
+    facebook,
+    github,
+    linkedin,
+    discord,
+    display_position,
     internal_status,
     tech_stacks,
   } = (data as Codev) || {};
@@ -57,9 +60,9 @@ const ProfileModal = () => {
             <p className="text-2xl font-semibold capitalize">
               {first_name} {last_name}
             </p>
-            {main_position ? null : (
+            {display_position ? null : (
               <p className="dark:text-lightgray font-extralight capitalize">
-                {main_position}
+                {display_position}
               </p>
             )}
             <p className="font-normal capitalize">{address}</p>
@@ -101,33 +104,44 @@ const ProfileModal = () => {
           <div>
             <p className="dark:text-gray pb-2.5">Socials</p>
             <div className="flex items-center gap-2">
-              {socials && socials.facebook && (
-                <Link href={socials.facebook} target="_blank">
+              {facebook && (
+                <Link href={facebook} target="_blank">
                   <Image
-                    src={socialIcons[0]?.imgURL as string}
-                    alt="facebook account"
+                    src="/path/to/facebook-icon.svg"
+                    alt="Facebook"
                     width={5}
                     height={5}
                     className="h-5 w-5 duration-300 hover:-translate-y-1"
                   />
                 </Link>
               )}
-              {socials && socials.github && (
-                <Link href={socials.github} target="_blank">
+              {github && (
+                <Link href={github} target="_blank">
                   <Image
-                    src={socialIcons[2]?.imgURL as string}
-                    alt="github account"
+                    src="/path/to/github-icon.svg"
+                    alt="GitHub"
                     width={5}
                     height={5}
                     className="h-5 w-5 duration-300 hover:-translate-y-1"
                   />
                 </Link>
               )}
-              {socials && socials.linkedin && (
-                <Link href={socials.linkedin} target="_blank">
+              {linkedin && (
+                <Link href={linkedin} target="_blank">
                   <Image
-                    src={socialIcons[3]?.imgURL as string}
-                    alt="linkedin account"
+                    src="/path/to/linkedin-icon.svg"
+                    alt="LinkedIn"
+                    width={5}
+                    height={5}
+                    className="h-5 w-5 duration-300 hover:-translate-y-1"
+                  />
+                </Link>
+              )}
+              {discord && (
+                <Link href={discord} target="_blank">
+                  <Image
+                    src="/path/to/discord-icon.svg"
+                    alt="Discord"
                     width={5}
                     height={5}
                     className="h-5 w-5 duration-300 hover:-translate-y-1"
@@ -161,7 +175,7 @@ const ProfileModal = () => {
               {tech_stacks &&
                 tech_stacks.map((name, index) => {
                   const tech = techstacks.find(
-                    (tech) => tech.name.toLowerCase() === name,
+                    (tech) => tech.name.toLowerCase() === name.toLowerCase(),
                   );
                   if (!tech) return null;
                   const { icon: Icon } = tech;
