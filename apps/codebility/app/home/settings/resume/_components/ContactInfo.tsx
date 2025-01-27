@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Box from "@/Components/shared/dashboard/Box";
-import InputPhone from "@/Components/shared/dashboard/InputPhone";
+import InputField from "@/Components/shared/dashboard/InputField";
 import { Button } from "@/Components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
 import { useForm } from "react-hook-form";
@@ -93,9 +93,10 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
         <p className="text-lg">Contact Info</p>
 
         <div className="flex flex-col pt-4">
-          <InputPhone
+          <InputField
             id="phone_number"
             control={control}
+            type="phone"
             label="Phone Number"
             placeholder="eg. 9054936302"
             disabled={!isEditMode}
