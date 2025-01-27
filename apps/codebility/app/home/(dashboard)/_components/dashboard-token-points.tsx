@@ -2,114 +2,115 @@
 
 import { useEffect, useState } from "react";
 import { Box } from "@/Components/shared/dashboard";
+import { CodevPoints, Level, SkillCategory } from "@/types/home/codev";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-
-interface SkillCategory {
-  id: string;
-  name: string;
-}
-
-interface PointData {
-  points: number;
-  skill_category: {
-    id: string;
-    name: string;
-  };
-}
-
-interface Level {
-  id: string;
-  skill_category_id: string;
-  level: number;
-  min_points: number;
-  max_points: number;
-}
 
 export default function TokenPoints() {
   const [points, setPoints] = useState<Record<string, number>>({});
   const [levels, setLevels] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
     const fetchPointsAndCategories = async () => {
+      setLoading(true);
+      setError(null);
+
       const {
         data: { session },
       } = await supabase.auth.getSession();
-      if (!session?.user) return;
-
-      // Fetch all skill categories
-      const { data: categories, error: categoriesError } = await supabase
-        .from("skill_category")
-        .select("id, name");
-
-      if (categoriesError) {
-        console.error("Error fetching categories:", categoriesError);
+      if (!session?.user) {
+        setError("No user session found.");
+        setLoading(false);
         return;
       }
 
-      // Fetch user's points
-      const { data: pointsData, error: pointsError } = await supabase
-        .from("codev_points")
-        .select(
-          `
-          points,
-          skill_category:skill_category_id(id, name)
-        `,
-        )
-        .eq("codev_id", session.user.id);
+      try {
+        // Fetch all skill categories
+        const { data: categories, error: categoriesError } = await supabase
+          .from("skill_category")
+          .select("id, name");
 
-      if (pointsError) {
-        console.error("Error fetching points:", pointsError);
-        return;
-      }
+        if (categoriesError) throw categoriesError;
 
-      // Map points to skill categories
-      const pointsByCategory = (categories || []).reduce(
-        (acc, category) => ({
-          ...acc,
-          [category.name]:
-            pointsData?.find((point) => point.skill_category.id === category.id)
-              ?.points || 0,
-        }),
-        {},
-      );
+        const skillCategories = categories as SkillCategory[];
 
-      setPoints(pointsByCategory);
+        // Fetch user's points
+        const { data: pointsData, error: pointsError } = await supabase
+          .from("codev_points")
+          .select("id, codev_id, skill_category_id, points")
+          .eq("codev_id", session.user.id);
 
-      // Fetch levels for all categories
-      const { data: levelsData, error: levelsError } = await supabase
-        .from("levels")
-        .select("*")
-        .order("level", { ascending: true });
+        if (pointsError) throw pointsError;
 
-      if (levelsError) {
-        console.error("Error fetching levels:", levelsError);
-        return;
-      }
+        const userPoints = pointsData as CodevPoints[];
 
-      // Map levels to categories
-      const levelsByCategory = (categories || []).reduce((acc, category) => {
-        const categoryPoints = pointsByCategory[category.name] || 0;
-        const categoryLevels = levelsData?.filter(
-          (l) => l.skill_category_id === category.id,
+        // Map points to skill categories
+        const pointsByCategory = skillCategories.reduce(
+          (acc, category) => {
+            const matchingPoint = userPoints?.find(
+              (point) => point.skill_category_id === category.id,
+            );
+            acc[category.name] = matchingPoint ? matchingPoint.points : 0;
+            return acc;
+          },
+          {} as Record<string, number>,
         );
-        const currentLevel =
-          categoryLevels?.find(
-            (l) =>
-              categoryPoints >= l.min_points && categoryPoints <= l.max_points,
-          )?.level || 1;
 
-        return {
-          ...acc,
-          [category.name]: currentLevel,
-        };
-      }, {});
+        setPoints(pointsByCategory);
 
-      setLevels(levelsByCategory);
+        // Fetch levels for all categories
+        const { data: levelsData, error: levelsError } = await supabase
+          .from("levels")
+          .select("id, skill_category_id, level, min_points, max_points")
+          .order("level", { ascending: true });
+
+        if (levelsError) throw levelsError;
+
+        const skillLevels = levelsData as Level[];
+
+        // Map levels to categories
+        const levelsByCategory = skillCategories.reduce(
+          (acc, category) => {
+            const categoryPoints = pointsByCategory[category.name] || 0;
+            const categoryLevels = skillLevels?.filter(
+              (l) => l.skill_category_id === category.id,
+            );
+
+            const currentLevel =
+              categoryLevels?.find(
+                (l) =>
+                  categoryPoints >= l.min_points &&
+                  (l.max_points === undefined ||
+                    categoryPoints <= l.max_points),
+              )?.level || 1;
+
+            acc[category.name] = currentLevel;
+            return acc;
+          },
+          {} as Record<string, number>,
+        );
+
+        setLevels(levelsByCategory);
+      } catch (err) {
+        console.error("Error fetching data:", err);
+        setError("Failed to fetch data. Please try again.");
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchPointsAndCategories();
   }, [supabase]);
+
+  if (loading) {
+    return <p>Loading token points...</p>;
+  }
+
+  if (error) {
+    return <p className="text-red-500">{error}</p>;
+  }
 
   return (
     <Box className="flex w-full flex-1 flex-col gap-4">
