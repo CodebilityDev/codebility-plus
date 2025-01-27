@@ -1,6 +1,6 @@
-import { useState } from "react";
+// KanbanAddModalMembers.tsx
+import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Member } from "@/app/home/_types/member";
 import { Button } from "@/Components/ui/button";
 import { IconPlus } from "@/public/assets/svgs";
 import {
@@ -12,116 +12,170 @@ import {
   DropdownMenuTrigger,
 } from "@radix-ui/react-dropdown-menu";
 
-import { useFetchMembers } from "../../_hooks/use-fetch-members";
-import { DEFAULT_AVATAR } from "../../_lib/constants";
+import { fetchAvailableMembers } from "../../actions";
+
+interface CodevMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  image_url?: string | null;
+}
 
 interface Props {
-  initialSelectedMembers?: Member[];
+  initialSelectedMembers?: string[]; // Array of member IDs
+  onMembersChange?: (memberIds: string[]) => void;
 }
 
 export default function KanbanAddModalMembers({
-  initialSelectedMembers,
+  initialSelectedMembers = [],
+  onMembersChange,
 }: Props) {
   const [searchQuery, setSearchQuery] = useState<string>("");
-  const [selectedMembers, setSelectedMembers] = useState<Member[]>(
-    initialSelectedMembers || [],
+  const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>(
+    initialSelectedMembers,
   );
-  const { data: members } = useFetchMembers();
+  const [availableMembers, setAvailableMembers] = useState<CodevMember[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const addMember = (member: Member) => {
-    setSelectedMembers((prevMembers) => {
-      if (prevMembers.some((prevMember) => prevMember.id === member.id))
-        return prevMembers;
-      return [...prevMembers, member];
-    });
+  useEffect(() => {
+    const loadMembers = async () => {
+      try {
+        const members = await fetchAvailableMembers();
+        setAvailableMembers(members);
+      } catch (error) {
+        console.error("Error loading members:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadMembers();
+  }, []);
+
+  const selectedMembers = availableMembers.filter((member) =>
+    selectedMemberIds.includes(member.id),
+  );
+
+  const addMember = (memberId: string) => {
+    if (!selectedMemberIds.includes(memberId)) {
+      const newSelectedIds = [...selectedMemberIds, memberId];
+      setSelectedMemberIds(newSelectedIds);
+      onMembersChange?.(newSelectedIds);
+    }
   };
 
-  const removeMember = (id: string) => {
-    setSelectedMembers((prevMembers) =>
-      prevMembers.filter((member) => member.id !== id),
-    );
+  const removeMember = (memberId: string) => {
+    const newSelectedIds = selectedMemberIds.filter((id) => id !== memberId);
+    setSelectedMemberIds(newSelectedIds);
+    onMembersChange?.(newSelectedIds);
   };
+
+  const filteredMembers = availableMembers.filter((member) =>
+    `${member.first_name} ${member.last_name}`
+      .toLowerCase()
+      .includes(searchQuery.toLowerCase()),
+  );
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor="members">Members</label>
+      <label htmlFor="members" className="text-sm font-medium">
+        Team Members
+      </label>
       <input
         type="hidden"
         name="membersId"
-        value={selectedMembers.map((member) => member.id)}
+        value={selectedMemberIds.join(",")}
       />
-      <div className="flex gap-2">
-        <div className="flex flex-wrap items-center">
-          {selectedMembers.map((member) => (
-            <div
-              className="relative h-12 w-12 cursor-pointer rounded-full bg-cover object-cover"
-              key={member.id}
-              onClick={() => removeMember(member.id)}
-            >
+      <div className="flex flex-wrap gap-2">
+        {selectedMembers.map((member) => (
+          <div
+            key={member.id}
+            className="group relative h-10 w-10 cursor-pointer rounded-full hover:opacity-80"
+            onClick={() => removeMember(member.id)}
+            title={`${member.first_name} ${member.last_name}`}
+          >
+            {member.image_url ? (
               <Image
-                alt="Avatar"
-                src={member.image_url || DEFAULT_AVATAR}
+                src={member.image_url}
+                alt={`${member.first_name}'s avatar`}
                 fill
-                title={`${member.first_name}'s Avatar`}
-                className="h-auto w-full rounded-full bg-cover object-cover"
-                loading="eager"
+                className="rounded-full object-cover"
               />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center rounded-full bg-gray-200 text-sm">
+                {member.first_name[0]}
+              </div>
+            )}
+            <div className="absolute inset-0 hidden items-center justify-center rounded-full bg-black bg-opacity-40 group-hover:flex">
+              <span className="text-xs text-white">✕</span>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
+
         <DropdownMenu>
-          <DropdownMenuTrigger className="cursor-pointer" asChild>
-            <Button variant="hollow" className="h-12 w-12 rounded-full p-0">
-              <IconPlus className="invert dark:invert-0" />
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="default"
+              className="h-10 w-10 rounded-full p-0"
+              disabled={isLoading}
+            >
+              <IconPlus className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
+
           <DropdownMenuContent
-            side="bottom"
-            sideOffset={10}
+            className="max-h-[300px] w-64 overflow-y-auto p-2"
             align="start"
-            className="dark:bg-dark-100 z-10 max-h-[200px] overflow-y-auto rounded-lg bg-white"
           >
-            <DropdownMenuLabel className="pb-2 text-center text-sm">
-              Add Members
-            </DropdownMenuLabel>
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search members"
-              className="dark:bg-dark-200 mb-2 h-10 w-full rounded-lg border border-gray-300 bg-white px-3 text-sm focus:outline-none"
-            />
+            <DropdownMenuLabel>Add Team Members</DropdownMenuLabel>
+
+            <div className="px-2 py-2">
+              <input
+                type="text"
+                placeholder="Search members..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+              />
+            </div>
+
             <DropdownMenuSeparator />
-            <DropdownMenuLabel className="px-4 py-2 text-xs">
-              Available Members
-            </DropdownMenuLabel>
-            {members
-              ?.filter((user) =>
-                `${user.first_name} ${user.last_name}`
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase()),
-              )
-              .map((user) => (
+
+            {isLoading ? (
+              <div className="py-4 text-center text-sm text-gray-500">
+                Loading members...
+              </div>
+            ) : filteredMembers.length === 0 ? (
+              <div className="py-4 text-center text-sm text-gray-500">
+                No members found
+              </div>
+            ) : (
+              filteredMembers.map((member) => (
                 <DropdownMenuItem
-                  key={user.id}
-                  className="dark:hover:bg-dark-200 flex cursor-pointer items-center justify-between px-4 py-2 hover:bg-gray-100"
-                  onClick={() => addMember(user)}
+                  key={member.id}
+                  className="flex cursor-pointer items-center gap-2 px-2 py-1"
+                  onClick={() => addMember(member.id)}
+                  disabled={selectedMemberIds.includes(member.id)}
                 >
-                  <div className="flex items-center gap-2">
-                    <div className="relative h-8 w-8 rounded-full bg-cover object-cover">
-                      <Image
-                        alt="Avatar"
-                        src={user.image_url || DEFAULT_AVATAR}
-                        fill
-                        title={`${user.id}'s Avatar`}
-                        className="h-auto w-full rounded-full bg-cover object-cover"
-                        loading="eager"
-                      />
+                  {member.image_url ? (
+                    <Image
+                      src={member.image_url}
+                      alt={`${member.first_name}'s avatar`}
+                      width={24}
+                      height={24}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-sm">
+                      {member.first_name[0]}
                     </div>
-                    <span className="capitalize">{`${user.first_name} ${user.last_name}`}</span>
-                  </div>
+                  )}
+                  <span className="flex-1 truncate">
+                    {member.first_name} {member.last_name}
+                  </span>
                 </DropdownMenuItem>
-              ))}
+              ))
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </div>

@@ -5,9 +5,14 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 interface Props {
   className: string;
   placeholder: string;
+  id?: string; // Optional ID property
 }
 
-export default function KanbanBoardsSearch({ className, placeholder }: Props) {
+export default function KanbanBoardsSearch({
+  className,
+  placeholder,
+  id,
+}: Props) {
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const { replace } = useRouter();
@@ -27,6 +32,7 @@ export default function KanbanBoardsSearch({ className, placeholder }: Props) {
       onChange={(e) => handleSearch(e.target.value)}
       defaultValue={searchParams.get("query")?.toString()}
       className={className}
+      id={id} // Assigning the optional id
     />
   );
 }

@@ -1,7 +1,6 @@
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import KanbanBoard from "./_components/kanban-board";
-import { List } from "./_types/board";
 
 export default async function KanbanPage({
   params,
@@ -41,9 +40,11 @@ export default async function KanbanPage({
 
   const listQuery = searchParams.query;
 
-  if (listQuery)
-    // filter out board lists by the search input value.
-    board.list = board.list.filter((l: List) => l.name.indexOf(listQuery) >= 0);
+  if (listQuery && board?.list) {
+    board.list = board.list.filter((list: { name: string }) =>
+      list.name.toLowerCase().includes(listQuery.toLowerCase()),
+    );
+  }
 
   return <KanbanBoard boardData={board} />;
 }
