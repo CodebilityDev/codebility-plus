@@ -29,23 +29,33 @@ export default function ServicesPage() {
       .then(({ data, error }) => {
         if (error) throw error;
 
-        const formattedData = data.map((item) => ({
+        // Map data to match Project interface
+        return data.map((item) => ({
           id: item.id,
           name: item.name,
-          category: (item.project_category as unknown as { name: string }).name,
-          description: item.description,
-          mainImage: item.website_url,
+          description: item.description || "",
+          main_image: item.website_url || "",
+          github_link: "", // Add other fields from Project if required
+          figma_link: "",
+          start_date: "",
+          end_date: "",
+          project_category_id: 0, // Replace with actual category ID logic
+          client_id: item.client_id,
+          members: [],
+          created_at: "",
+          updated_at: "",
         }));
-
-        return formattedData;
       }),
   );
 
-  // temporary fix to maintain [Web Application, Mobile Application, Product Design] tab order
+  // Find "Codebility" project and filter the rest
   const codebility = liveProjects.find((item) => item.name === "Codebility");
   const rest = liveProjects.filter((item) => item.name !== "Codebility");
 
-  const projectsData = [codebility, ...rest];
+  // Filter out undefined and construct final projectsData
+  const projectsData = [codebility, ...rest].filter(
+    (project): project is NonNullable<typeof project> => project !== undefined,
+  );
 
   return (
     <div
