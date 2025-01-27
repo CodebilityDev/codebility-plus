@@ -20,17 +20,23 @@ const ProjectDeleteModal = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!data?.id) return;
+    if (!data?.id) {
+      toast.error("Project ID is missing. Unable to delete the project.");
+      return;
+    }
 
     try {
       const response = await deleteProject(data.id);
+
       if (response.success) {
-        toast.success("Project has been deleted!");
+        toast.success("Project has been deleted successfully!");
       } else {
-        toast.error("Failed to delete project, please try again.");
+        toast.error(
+          response.error || "Failed to delete the project. Please try again.",
+        );
       }
     } catch (error) {
-      toast.error("Something went wrong!");
+      toast.error("Something went wrong while deleting the project.");
     } finally {
       onClose();
     }
@@ -38,7 +44,10 @@ const ProjectDeleteModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
-      <DialogContent aria-describedby={undefined} className="w-[90%]">
+      <DialogContent
+        aria-describedby={undefined}
+        className="w-[90%] md:w-[50%]"
+      >
         <DialogHeader>
           <DialogTitle className="mb-2 text-left text-xl">
             Delete Project
@@ -48,15 +57,19 @@ const ProjectDeleteModal = () => {
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <p className="text-lg">
             Are you sure you want to delete{" "}
-            <span className="text-red-500">{data?.name}</span>?
+            <span className="font-semibold text-red-500">{data?.name}</span>?
           </p>
           <div className="flex flex-col gap-4 md:flex-row">
-            <Button variant="destructive" type="submit">
+            <Button
+              variant="destructive"
+              type="submit"
+              className="w-full md:w-auto"
+            >
               Yes, Delete it
             </Button>
             <Button
               type="button"
-              className="text-white"
+              className="w-full md:w-auto"
               variant="gradient"
               onClick={handleDialogChange}
             >
