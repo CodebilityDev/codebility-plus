@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Image from "next/image";
-import { Codev } from "@/types/home/codev";
+import { Codev, InternalStatus } from "@/types/home/codev";
 import { Link2 } from "lucide-react";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@codevs/ui/table";
 
-import { InternalStatus, StatusBadge } from "../shared/status-badge";
+import { StatusBadge } from "../shared/status-badge";
 import { columns } from "./columns";
 import { EditableRow } from "./editable-row";
 import { TableActions } from "./table-actions";
@@ -69,7 +69,7 @@ export function InHouseTable({
     // Display Position Filter (Extract `name` for comparison)
     if (
       filters.display_position &&
-      item.display_position.toLowerCase() !==
+      item.display_position!.toLowerCase() !==
         filters.display_position.toLowerCase()
     ) {
       return false;
@@ -175,8 +175,13 @@ export function InHouseTable({
                     />
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    {capitalize(item.display_position || "")}
+                    {capitalize(
+                      typeof item.display_position === "string"
+                        ? item.display_position
+                        : "-",
+                    )}
                   </TableCell>
+
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {item.projects?.length ? (
                       <div className="space-y-1">
