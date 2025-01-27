@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { IconArrowRight } from "@/public/assets/svgs";
@@ -36,6 +36,15 @@ const ProfileCard = ({ codev, color }: Props) => {
     x.set(event.nativeEvent.offsetX - halfWidth);
   };
 
+  const statusStyles = {
+    AVAILABLE: "bg-green",
+    DEPLOYED: "bg-orange-400",
+    TRAINING: "bg-blue-400",
+    BUSY: "bg-gray",
+  };
+
+  const internalStatus = codev.internal_status || "UNKNOWN"; // Fallback for undefined or null
+
   return (
     <Link
       href={`/profiles/${codev.id}`}
@@ -59,7 +68,7 @@ const ProfileCard = ({ codev, color }: Props) => {
             onMouseMove={handleMouseMove}
           />
           <AnimatePresence>
-            {hovered && (
+            {hovered && internalStatus !== "UNKNOWN" && (
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.6 }}
                 animate={{
@@ -78,14 +87,14 @@ const ProfileCard = ({ codev, color }: Props) => {
                   rotate: rotate,
                   whiteSpace: "nowrap",
                 }}
-                className={`${
-                  codev.job_status === "AVAILABLE"
-                    ? "bg-green"
-                    : "bg-orange-400"
-                } absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 transform flex-col items-center justify-center rounded-md px-4 py-2 shadow-xl`}
+                className={`absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 transform flex-col items-center justify-center rounded-md px-4 py-2 shadow-xl ${
+                  statusStyles[internalStatus as keyof typeof statusStyles] ||
+                  "bg-gray"
+                }`}
               >
                 <div className="relative z-30 text-base text-white">
-                  {codev.job_status === "AVAILABLE" ? "Available" : "Deployed"}
+                  {internalStatus.charAt(0) +
+                    internalStatus.slice(1).toLowerCase()}
                 </div>
               </motion.div>
             )}
@@ -93,11 +102,8 @@ const ProfileCard = ({ codev, color }: Props) => {
           <div className="absolute bottom-[1px] right-[1px]">
             <p
               className={`border-black-100 rounded-full border-2 p-2 text-[9px] ${
-                codev.job_status === "AVAILABLE"
-                  ? "bg-green"
-                  : codev.job_status === "DEPLOYED"
-                    ? "bg-orange-400"
-                    : "bg-gray"
+                statusStyles[internalStatus as keyof typeof statusStyles] ||
+                "bg-gray"
               }`}
             ></p>
           </div>
