@@ -7,6 +7,7 @@ import { SignUpValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import { z } from "zod";
 
 import { Button } from "@codevs/ui/button";
 import { Checkbox } from "@codevs/ui/checkbox";
@@ -15,6 +16,11 @@ import { signupUser } from "../../actions";
 import { FORM_STEPS } from "./form-steps";
 import { ImageUpload } from "./ImageUpload";
 import SignUpInputs from "./sign-up-input";
+
+// Define the form type explicitly
+interface SignUpFormInputs extends z.infer<typeof SignUpValidation> {
+  profileImage: File | null;
+}
 
 const SignUpForm = () => {
   const router = useRouter();
@@ -29,7 +35,7 @@ const SignUpForm = () => {
     trigger,
     reset,
     formState: { errors },
-  } = useForm({
+  } = useForm<SignUpFormInputs>({
     resolver: zodResolver(SignUpValidation),
     defaultValues: {
       first_name: "",
@@ -38,7 +44,7 @@ const SignUpForm = () => {
       phone_number: "",
       years_of_experience: 0,
       portfolio_website: "",
-      techstack: [],
+      tech_stacks: [],
       positions: [],
       facebook: "",
       github: "",
@@ -46,7 +52,7 @@ const SignUpForm = () => {
       discord: "",
       password: "",
       confirmPassword: "",
-      profileImage: null,
+      profileImage: null, // Allow null for profile image
       about: "",
       application_status: "applying",
       internal_status: "TRAINING",
@@ -55,7 +61,7 @@ const SignUpForm = () => {
     },
   });
 
-  const onSubmit = async (data: any) => {
+  const onSubmit = async (data: SignUpFormInputs) => {
     setIsLoading(true);
     try {
       const formData = new FormData();
@@ -74,19 +80,17 @@ const SignUpForm = () => {
       });
 
       // Handle profile image separately
-      if (data.profileImage instanceof File) {
+      if (data.profileImage) {
         formData.append("profileImage", data.profileImage);
       }
 
       const response = await signupUser(formData);
 
       if (response.success) {
-        console.log("goes here");
         toast.success("Account created! Please verify your email.");
-        router.push("/auth/verify"); // Redirect to verify page
-        reset(); // Reset form
+        router.push("/auth/verify");
+        reset();
       } else {
-        // Handle specific error cases
         if (response.error?.includes("email")) {
           toast.error("This email is already registered");
         } else if (response.error?.includes("image")) {
@@ -108,7 +112,7 @@ const SignUpForm = () => {
       {/* Profile Image Upload */}
       <div className="absolute left-4 top-0">
         <ImageUpload
-          onChange={(file) => setValue("profileImage", file)}
+          onChange={(file) => setValue("profileImage", file)} // Accepts File or null
           error={errors.profileImage?.message as string}
         />
       </div>

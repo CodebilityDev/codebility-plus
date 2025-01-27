@@ -51,7 +51,7 @@ export const FORM_STEPS: FormField[][] = [
       },
     },
     {
-      id: "techstack",
+      id: "tech_stacks",
       label: "Tech Stack",
       placeholder: "Select your tech stacks",
       type: "select",
