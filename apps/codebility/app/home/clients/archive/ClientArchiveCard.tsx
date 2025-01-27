@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { deleteClient, updateClient } from "@/app/api/clients";
+// import { deleteClient, updateClient } from "@/app/api/clients";
 import { Button } from "@/Components/ui/button";
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
@@ -40,13 +40,13 @@ const ClientArchiveCards = ({ clients }: { clients: client_ClientCardT[] }) => {
 
   const handleArchive = async (id: string) => {
     try {
-      await updateClient(id, { id: id, isArchive: false }, token).then(
-        (response) => {
-          if (response.status === 200) {
-            toast.success("Client has been restored");
-          }
-        },
-      );
+      // await updateClient(id, { id: id, isArchive: false }, token).then(
+      //   (response) => {
+      //     if (response.status === 200) {
+      //       toast.success("Client has been restored");
+      //     }
+      //   },
+      // );
     } catch (error) {
       toast.error("Something went wrong!");
     }
@@ -80,13 +80,13 @@ const ClientArchiveCards = ({ clients }: { clients: client_ClientCardT[] }) => {
   const handleDeleteClient = async (id: string) => {
     event?.preventDefault();
     try {
-      await deleteClient(id, token).then((response) => {
-        if (response) {
-          toast.success("Client has been deleted");
-        } else if (!response) {
-          toast.error(response.statusText);
-        }
-      });
+      // await deleteClient(id, token).then((response) => {
+      //   if (response) {
+      //     toast.success("Client has been deleted");
+      //   } else if (!response) {
+      //     toast.error(response.statusText);
+      //   }
+      // });
     } catch (error) {
       toast.error("Something went wrong!");
     }
