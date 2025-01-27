@@ -1,19 +1,24 @@
-interface RenderTeamProps {
-  imgURL: string | React.ReactNode;
+import Image from "next/image";
+import { defaultAvatar } from "@/public/assets/images";
+
+interface Props {
+  imgURL?: string;
+  onClick?: () => void;
 }
 
-const RenderTeam: React.FC<RenderTeamProps> = ({ imgURL }) => {
+const RenderTeam = ({ imgURL, onClick }: Props) => {
   return (
-    <div className="flex items-center gap-2">
-      {typeof imgURL === "string" ? (
-        <img
-          src={imgURL}
-          alt="Team Member"
-          className="h-8 w-8 rounded-full object-cover"
-        />
-      ) : (
-        imgURL
-      )}
+    <div
+      className="m-1 inline-flex h-[30px] w-[30px] items-center rounded-full bg-blue-600"
+      onClick={onClick}
+    >
+      <Image
+        alt="avatar"
+        src={imgURL || defaultAvatar}
+        width={30}
+        height={30}
+        className="rounded-full"
+      />
     </div>
   );
 };
