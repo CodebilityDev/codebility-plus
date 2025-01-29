@@ -33,7 +33,7 @@ const ShortSurvey = () => {
           <Select onValueChange={() => {}}>
             <SelectTrigger
               aria-label="Type"
-              className="text- flex w-full items-center justify-between rounded border border-[#1D1D1E] bg-[#1D1D1E] px-3 py-2 text-left text-sm text-white/10"
+              className="text- border-black-800 bg-black-800 flex w-full items-center justify-between rounded border px-3 py-2 text-left text-sm text-white/10"
             >
               <SelectValue placeholder="Select Services" className="text-sm">
                 Test
@@ -66,7 +66,7 @@ const ShortSurvey = () => {
           <Input
             id="exist"
             onChange={() => {}}
-            className="w-full rounded border border-[#1D1D1E] bg-[#1D1D1E] px-3 py-2 text-sm"
+            className="border-black-800 bg-black-800 w-full rounded border px-3 py-2 text-sm"
             placeholder="Type here"
           />
         </div>
@@ -79,7 +79,7 @@ const ShortSurvey = () => {
             id="features"
             onChange={() => {}}
             variant="default"
-            className="w-full rounded border border-[#1D1D1E] bg-[#1D1D1E] px-3 py-2"
+            className="border-black-800 bg-black-800 w-full rounded border px-3 py-2"
             placeholder="Type here"
           />
         </div>
@@ -92,7 +92,7 @@ const ShortSurvey = () => {
             id="requirements"
             onChange={() => {}}
             variant="default"
-            className="w-full rounded border border-[#1D1D1E] bg-[#1D1D1E] px-3 py-2"
+            className="border-black-800 bg-black-800 w-full rounded border px-3 py-2"
             placeholder="Type here"
           />
         </div>
