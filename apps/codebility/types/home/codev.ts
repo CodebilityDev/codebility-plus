@@ -222,3 +222,24 @@ export interface Task {
 export interface ExtendedTask extends Task {
   initialColumnId?: string;
 }
+
+export interface Roles {
+  id: number;
+  name: string;
+  created_at?: string;
+  updated_at?: string;
+  orgchart?: boolean;
+  settings?: boolean;
+  resume?: boolean;
+  services?: boolean;
+  permissions?: boolean;
+  roles?: boolean;
+  projects?: boolean;
+  clients?: boolean;
+  inhouse?: boolean;
+  applicants?: boolean;
+  interns?: boolean;
+  time_tracker?: boolean;
+  kanban?: boolean;
+  dashboard?: boolean;
+}

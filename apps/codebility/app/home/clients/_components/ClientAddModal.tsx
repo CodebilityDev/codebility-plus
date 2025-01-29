@@ -1,8 +1,10 @@
+"use client";
+
 import { useState } from "react";
 import Image from "next/image";
-import { DEFAULT_AVATAR } from "@/app/home/clients/_lib/constants";
 import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema";
 import { createClientAction } from "@/app/home/clients/action";
+import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,
@@ -18,7 +20,7 @@ import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 
-const ClientAddModal = () => {
+export default function ClientAddModal() {
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "clientAddModal";
 
@@ -47,30 +49,34 @@ const ClientAddModal = () => {
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setValue("logo", file);
+      setValue("company_logo", file); // store as `company_logo`
       setLogoPreview(URL.createObjectURL(file));
     }
   };
 
   const handleRemoveLogo = () => {
     setLogoPreview(null);
+    setValue("company_logo", undefined);
   };
 
   const handleCreateClient = async (data: ClientFormValues) => {
     setIsLoading(true);
-
     try {
       const formData = new FormData();
+
+      // Required in your schema
       formData.append("name", data.name);
+
+      // Optional fields
       if (data.email) formData.append("email", data.email);
-      if (data.location) formData.append("location", data.location);
-      if (data.contact_number)
-        formData.append("contact_number", data.contact_number);
-      if (data.linkedin_link)
-        formData.append("linkedin_link", data.linkedin_link);
-      if (data.start_time) formData.append("start_time", data.start_time);
-      if (data.end_time) formData.append("end_time", data.end_time);
-      if (data.logo) formData.append("logo", data.logo as File);
+      if (data.phone_number) formData.append("phone_number", data.phone_number);
+      if (data.address) formData.append("address", data.address);
+      if (data.website) formData.append("website", data.website);
+
+      // File upload
+      if (data.company_logo) {
+        formData.append("logo", data.company_logo as File);
+      }
 
       const response = await createClientAction(formData);
 
@@ -81,7 +87,7 @@ const ClientAddModal = () => {
         toast.error(`Error: ${response.error}`);
       }
     } catch (error) {
-      console.log("123: ", error);
+      console.log("Error creating new client:", error);
       toast.error("Error creating new client");
     } finally {
       setIsLoading(false);
@@ -104,13 +110,16 @@ const ClientAddModal = () => {
           </div>
           <div className="flex flex-col gap-4 md:flex-row">
             <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
-              <Image
-                src={logoPreview || DEFAULT_AVATAR}
-                id="image"
-                alt="Avatar"
-                fill
-                className="bg-dark-400 h-auto w-auto rounded-full bg-cover object-cover"
-              />
+              {logoPreview ? (
+                <Image
+                  src={logoPreview}
+                  alt="Company Logo"
+                  fill
+                  className="bg-dark-400 h-auto w-auto rounded-full bg-cover object-cover"
+                />
+              ) : (
+                <DefaultAvatar />
+              )}
             </div>
 
             <div className="flex flex-col justify-center gap-2">
@@ -118,23 +127,21 @@ const ClientAddModal = () => {
                 Image size 1080 x 768 px
               </p>
               <div className="gap-4">
-                <div className="relative">
-                  {!logoPreview && (
-                    <label htmlFor="logo">
-                      <p className="cursor-pointer text-center text-blue-100 md:text-left">
-                        Upload Image
-                      </p>
-                    </label>
-                  )}
-                  <input
-                    id="logo"
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    name="logo"
-                    onChange={handleLogoChange}
-                  />
-                </div>
+                {!logoPreview && (
+                  <label htmlFor="company_logo">
+                    <p className="cursor-pointer text-center text-blue-100 md:text-left">
+                      Upload Image
+                    </p>
+                  </label>
+                )}
+                <input
+                  id="company_logo"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  name="company_logo"
+                  onChange={handleLogoChange}
+                />
                 {logoPreview && (
                   <p
                     onClick={handleRemoveLogo}
@@ -165,6 +172,7 @@ const ClientAddModal = () => {
                   {errors.name.message}
                 </span>
               )}
+
               <Input
                 variant="lightgray"
                 label="Email"
@@ -180,97 +188,60 @@ const ClientAddModal = () => {
                   {errors.email.message}
                 </span>
               )}
+
               <Input
                 variant="lightgray"
                 label="Address"
                 placeholder="Enter Company Address"
-                {...register("location")}
+                {...register("address")}
                 className={
-                  errors.location
+                  errors.address
                     ? "border border-red-500 focus:outline-none"
                     : ""
                 }
               />
-              {errors.location && (
+              {errors.address && (
                 <span className="text-sm text-red-400">
-                  {errors.location.message}
+                  {errors.address.message}
                 </span>
               )}
             </div>
+
             <div className="flex flex-1 flex-col gap-4">
               <Input
                 variant="lightgray"
-                label="Contact Number"
-                placeholder="Enter Company Contact Number"
-                type="number"
-                {...register("contact_number")}
+                label="Phone Number"
+                placeholder="Enter Company Phone Number"
+                type="tel"
+                {...register("phone_number")}
                 className={
-                  errors.contact_number
+                  errors.phone_number
                     ? "border border-red-500 focus:outline-none"
                     : ""
                 }
               />
-              {errors.contact_number && (
+              {errors.phone_number && (
                 <span className="text-sm text-red-400">
-                  {errors.contact_number.message}
+                  {errors.phone_number.message}
                 </span>
               )}
+
               <Input
                 variant="lightgray"
-                label="Linkedin"
-                placeholder="Enter Company Linkedin Link"
-                {...register("linkedin_link")}
+                label="Website"
+                placeholder="https://example.com"
+                {...register("website")}
                 className={
-                  errors.linkedin_link
+                  errors.website
                     ? "border border-red-500 focus:outline-none"
                     : ""
                 }
               />
-              {errors.linkedin_link && (
+              {errors.website && (
                 <span className="text-sm text-red-400">
-                  {errors.linkedin_link.message}
+                  {errors.website.message}
                 </span>
               )}
-              <div className="flex flex-col gap-4 lg:flex-row">
-                <div className="w-full">
-                  <Input
-                    variant="lightgray"
-                    label="Start Time"
-                    placeholder="Enter Start Time"
-                    type="time"
-                    {...register("start_time")}
-                    className={
-                      errors.start_time
-                        ? "border border-red-500 focus:outline-none"
-                        : ""
-                    }
-                  />
-                  {errors.start_time && (
-                    <span className="text-sm text-red-400">
-                      {errors.start_time.message}
-                    </span>
-                  )}
-                </div>
-                <div className="w-full">
-                  <Input
-                    variant="lightgray"
-                    label="End Time"
-                    placeholder="Enter End Time"
-                    type="time"
-                    {...register("end_time")}
-                    className={
-                      errors.end_time
-                        ? "border border-red-500 focus:outline-none"
-                        : ""
-                    }
-                  />
-                  {errors.end_time && (
-                    <span className="text-sm text-red-400">
-                      {errors.end_time.message}
-                    </span>
-                  )}
-                </div>
-              </div>
             </div>
           </div>
 
@@ -287,7 +258,7 @@ const ClientAddModal = () => {
             <Button
               type="submit"
               className="order-1 w-full sm:order-2 sm:w-[130px]"
-              disabled={isLoading}
+              disabled={isLoading || !isValid}
             >
               Save
             </Button>
@@ -296,6 +267,4 @@ const ClientAddModal = () => {
       </DialogContent>
     </Dialog>
   );
-};
-
-export default ClientAddModal;
+}
