@@ -2,10 +2,11 @@
 
 import Link from "next/link";
 import Logo from "@/Components/shared/Logo";
+import { footerLinks } from "@/constants/links";
 import { useModal } from "@/hooks/use-modal";
 import { IconFacebookWhite } from "@/public/assets/svgs";
 
-import { aboutUsData, companyData, connectUsData } from "../_lib/dummy-data";
+import { aboutUsData, connectUsData } from "../_lib/dummy-data";
 import Container from "./marketing-container";
 
 const Footer = () => {
@@ -37,7 +38,7 @@ const Footer = () => {
             <div className="text-gray flex flex-1 flex-col gap-2">
               <h4 className="pb-1 text-lg text-white">Company</h4>
               <ul className="flex flex-wrap gap-4 lg:flex-col lg:gap-2">
-                {companyData.map((data) => (
+                {footerLinks.map((data) => (
                   <li key={data.id}>
                     <button onClick={() => onOpen(data.href)}>
                       {data.title}

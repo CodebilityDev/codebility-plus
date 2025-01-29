@@ -1,4 +1,7 @@
+"use client";
+
 import H1 from "@/Components/shared/dashboard/H1";
+import { useUserStore } from "@/store/codev-store";
 
 import Profile from "./(dashboard)/_components/dashboard-profile";
 import TimeTracker from "./(dashboard)/_components/dashboard-time-tracker";
@@ -6,6 +9,9 @@ import TokenPoints from "./(dashboard)/_components/dashboard-token-points";
 import WeeklyTop from "./(dashboard)/_components/dashboard-weekly-top";
 
 export default function DashboardPage() {
+  const { user } = useUserStore();
+  console.log("user:", user);
+
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
       <H1>Dashboard</H1>

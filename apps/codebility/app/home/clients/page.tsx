@@ -1,15 +1,15 @@
 import H1 from "@/Components/shared/dashboard/H1";
+import { getClients } from "@/lib/server/codev.service";
+import { Client } from "@/types/home/codev";
 
 import ClientButtons from "./_components/clients-button";
 import ClientCards from "./_components/clients-card";
-import { ClientDetails } from "./_types/clients";
-import { getAllClients } from "./service";
 
-const Clients = async () => {
-  const { data, error } = await getAllClients();
+export default async function Clients() {
+  const { data, error } = await getClients();
 
   const clients = data
-    ? (data as ClientDetails[]).filter((client) => client.is_archive === false)
+    ? (data as Client[]).filter((client) => client.status !== "inactive")
     : [];
 
   return (
@@ -18,6 +18,7 @@ const Clients = async () => {
         <H1>Clients</H1>
         <ClientButtons />
       </div>
+
       {error ? (
         <div className="text-white">ERROR</div>
       ) : (
@@ -25,6 +26,4 @@ const Clients = async () => {
       )}
     </div>
   );
-};
-
-export default Clients;
+}
