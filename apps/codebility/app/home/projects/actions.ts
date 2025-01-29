@@ -33,8 +33,8 @@ export async function createProject(
     let main_image;
     if (mainImage) {
       const { publicUrl } = await uploadImage(mainImage, {
-        bucket: "projects",
-        folder: "main-images",
+        bucket: "codebility",
+        folder: "projectImage",
       });
       main_image = publicUrl;
     }
