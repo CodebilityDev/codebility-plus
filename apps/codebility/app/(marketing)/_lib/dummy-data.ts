@@ -9,12 +9,6 @@ import {
   footer_ConnectUsSocialsT,
 } from "@/types/home";
 
-export const companyData: footer_CompanyModalT[] = [
-  { id: "1", title: "Terms & Condition", href: "homeTermsAndConditionModal" },
-  { id: "2", title: "Privacy Policy", href: "homePrivacyPolicyModal" },
-  { id: "3", title: "FAQs", href: "homeFAQSModal" },
-];
-
 export const aboutUsData: footer_AboutUsLinksT[] = [
   { id: "1", title: "Services", href: "/services" },
   { id: "2", title: "Why Choose Us", href: "/#whychooseus" },

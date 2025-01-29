@@ -5,14 +5,19 @@ import { Role_Type } from "./_types/roles";
 
 const RolesPage = async () => {
   const supabase = getSupabaseServerComponentClient();
-  const { data } = await supabase.from("user_type").select("*");
 
-  const role = data || [];
+  // Fetch data from the "roles" table
+  const { data, error } = await supabase.from("roles").select("*");
+
+  if (error) {
+    // Handle error (optional)
+    console.error("Error fetching roles:", error);
+  }
+
+  const roles = data || [];
 
   return (
-    <>
-      {data && data.length > 0 && <RoleContainer data={role as Role_Type[]} />}
-    </>
+    <>{roles.length > 0 && <RoleContainer data={roles as Role_Type[]} />}</>
   );
 };
 
