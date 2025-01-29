@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Pagination,
   PaginationContent,
@@ -9,7 +9,7 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/Components/ui/pagination/pagination";
-import { Task } from "@/types/home/task";
+import { Task } from "@/types/home/codev";
 
 import TaskCard from "./task-card";
 
@@ -22,6 +22,12 @@ export default function TasksContainer({ tasks }: Props) {
 
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
+
+  useEffect(() => {
+    // Dynamically calculate the total number of pages
+    const pages = Math.ceil((tasks?.length ?? 0) / PAGE_SIZE);
+    setTotalPages(pages || 1);
+  }, [tasks]);
 
   const handleNextPage = () => {
     if (currentPage < totalPages) {
@@ -43,15 +49,16 @@ export default function TasksContainer({ tasks }: Props) {
     <div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
         {paginatedTasks.length > 0 ? (
-          paginatedTasks.map((task: Task) => {
-            return <TaskCard key={task.id} task={task} />;
-          })
+          paginatedTasks.map((task: Task) => (
+            <TaskCard key={task.id} task={task} />
+          ))
         ) : (
           <div>
             <h1 className="dark:text-white">No assigned task</h1>
           </div>
         )}
       </div>
+
       {tasks && tasks.length > PAGE_SIZE && (
         <Pagination>
           <PaginationContent className="dark:text-white">
@@ -61,6 +68,7 @@ export default function TasksContainer({ tasks }: Props) {
                 onClick={handlePreviousPage}
               />
             </PaginationItem>
+
             {[...Array(totalPages)].map((_, index) => (
               <PaginationItem key={index + 1}>
                 <PaginationLink
@@ -72,6 +80,7 @@ export default function TasksContainer({ tasks }: Props) {
                 </PaginationLink>
               </PaginationItem>
             ))}
+
             <PaginationItem>
               <PaginationNext
                 className="cursor-pointer"

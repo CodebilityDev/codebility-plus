@@ -43,7 +43,7 @@ const Photo = ({ data }: PhotoProps) => {
     try {
       const { publicUrl } = await uploadImage(file, {
         bucket: "codebility",
-        folder: "avatars",
+        folder: "profileImage",
       });
 
       await updateCodev({ image_url: publicUrl });

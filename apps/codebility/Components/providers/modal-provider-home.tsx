@@ -1,7 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import ClientAddModal from "@/app/home/clients/_components/ClientAddModal";
+import ClientEditModal from "@/app/home/clients/_components/ClientEditModal";
 import BoardAddModal from "@/app/home/kanban/_components/BoardAddModal";
+import ColumnAddModal from "@/app/home/kanban/[id]/_components/kanban_modals/ListAddModal";
 import TaskAddModal from "@/app/home/kanban/[id]/_components/tasks/TaskAddModal";
 import TaskViewModal from "@/app/home/kanban/[id]/_components/tasks/TaskViewModal";
 import ProjectAddModal from "@/app/home/projects/_components/ProjectAddModal";
@@ -10,9 +13,6 @@ import ProjectEditModal from "@/app/home/projects/_components/ProjectEditModal";
 import ProjectViewModal from "@/app/home/projects/_components/ProjectViewModal";
 import AddRoleModal from "@/Components/modals/AddRoleModal";
 import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
-import ClientAddModal from "@/Components/modals/ClientAddModal";
-import ClientEditModal from "@/Components/modals/ClientEditModal";
-import ColumnAddModal from "@/Components/modals/ColumnAddModal";
 import DeleteRoleModal from "@/Components/modals/DeleteRoleModal";
 import EditRoleModal from "@/Components/modals/EditRoleModal";
 import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
