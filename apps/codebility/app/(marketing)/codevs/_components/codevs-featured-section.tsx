@@ -75,7 +75,7 @@ const FeaturedSection = () => {
             left: "586.13px",
             top: "1816.14px",
           }}
-          className="aspect-[855/678] w-[40rem] bg-[#6A78F2] opacity-15 sm:w-[72.1875rem]"
+          className="aspect-[855/678] w-[40rem] bg-blue-100 opacity-15 sm:w-[72.1875rem]"
         />
       </div>
     </SectionWrapper>

@@ -16,7 +16,7 @@ export default async function CTA() {
         className="z-10 h-[200px] w-[200px] object-contain"
       />
       <H2 className="text-primaryColor capitalize">
-        Become A <span className="text-[#9747FF]">Codev!</span>
+        Become A <span className="text-violet-300">Codev!</span>
       </H2>
 
       <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[550px]">
