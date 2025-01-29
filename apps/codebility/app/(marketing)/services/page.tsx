@@ -5,7 +5,6 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 import Calendly from "../_components/marketing-calendly";
 import Footer from "../_components/marketing-footer";
 import Navigation from "../_components/marketing-navigation";
-import { PoppinFont } from "../_lib/font";
 import Hero from "./_components/services-hero";
 import ServicesTab from "./_components/services-tab";
 
@@ -59,7 +58,7 @@ export default function ServicesPage() {
 
   return (
     <div
-      className={`relative flex w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303] ${PoppinFont.className}`}
+      className={`relative flex w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303] `}
     >
       <Navigation />
       <Hero />
