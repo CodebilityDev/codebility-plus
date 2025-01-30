@@ -10,7 +10,7 @@ import Roadmap from "./_components/codevs-roadmap";
 
 const Codevs = () => {
   return (
-    <div className="bg-black-400 relative flex w-full flex-col overflow-x-hidden overflow-y-hidden">
+    <div className="bg-black-400 relative flex w-full flex-col">
       <Navigation />
       <Hero />
       <FeaturedSection />
