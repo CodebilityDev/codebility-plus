@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
-import { Task } from "@/types/home/task";
+import { Task } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
 import { formatTime } from "../_lib/util";
@@ -92,12 +92,12 @@ export default function TimeTrackerTimer({
         <SelectTrigger className="max-w-[300px] text-center">
           <SelectValue placeholder="Select Task" />
           <SelectContent>
-            {tasks.map((task: Task, index: number) => (
+            {/* {tasks.map((task: Task, index: number) => (
               <SelectItem className="items-center" key={index} value={task.id}>
                 {task.title} - {task.duration && `${task.duration}h - `}{" "}
                 {task.points}pts
               </SelectItem>
-            ))}
+            ))} */}
           </SelectContent>
         </SelectTrigger>
       </Select>

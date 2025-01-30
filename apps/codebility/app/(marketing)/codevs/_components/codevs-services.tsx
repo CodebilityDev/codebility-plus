@@ -2,7 +2,6 @@ import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer";
 import H2 from "@/Components/shared/home/H2";
 import IntroText from "@/Components/shared/home/IntroText";
 import SectionWrapper from "@/Components/shared/home/SectionWrapper";
-import { servicesCardData } from "@/constants";
 import { motion } from "framer-motion";
 
 import ServiceCard from "./codevs-service-card";
@@ -35,7 +34,7 @@ const Services = () => {
         </div>
 
         <div className="grid grid-cols-1 place-items-center gap-4 md:grid-cols-2 xl:grid-cols-4">
-          {servicesCardData.map((card, index) => (
+          {/* {servicesCardData.map((card, index) => (
             <div key={index} className="w-full max-w-96">
               <ServiceCard
                 icon={card.icon}
@@ -43,7 +42,7 @@ const Services = () => {
                 desc={card.desc}
               />
             </div>
-          ))}
+          ))} */}
         </div>
       </div>
     </SectionWrapper>

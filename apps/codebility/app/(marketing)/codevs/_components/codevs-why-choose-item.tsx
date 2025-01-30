@@ -3,16 +3,23 @@ import {
   fadeInOutLeftToRight,
   fadeInOutRightToLeft,
 } from "@/Components/FramerAnimation/Framer";
-import { codevs_WhyChooseItemT } from "@/types/home";
 import { motion } from "framer-motion";
 
-const WhyChooseItem = ({
+interface WhyChooseItemProps {
+  title: string;
+  itemNumber: number;
+  description: string;
+  subTitle: string;
+  color?: string; // Optional
+}
+
+const WhyChooseItem: React.FC<WhyChooseItemProps> = ({
   title,
   itemNumber,
   description,
   subTitle,
-  color,
-}: codevs_WhyChooseItemT) => {
+  color = "",
+}) => {
   return (
     <div
       className={`mx-auto flex w-full flex-col gap-2 rounded-lg p-4 text-white lg:flex-row ${color}`}

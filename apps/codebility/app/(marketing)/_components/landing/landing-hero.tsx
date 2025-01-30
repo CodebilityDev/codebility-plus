@@ -38,7 +38,7 @@ const Hero = () => {
                     </Button>
                   </Link>
                   <Link href="#features">
-                    <Button variant="outlined" size="lg" rounded="full">
+                    <Button variant="outline" size="lg" rounded="full">
                       Learn more
                     </Button>
                   </Link>

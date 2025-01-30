@@ -1,16 +1,23 @@
 import React from "react";
 import Image from "next/image";
-import { index_ServiceCardT } from "@/types/home";
 
 import { cn } from "@codevs/ui";
 
-const ServicesCard = ({
+interface ServicesCardProps {
+  imageUrl: string;
+  imageAlt: string;
+  title: string;
+  description: string;
+  className?: string; // Optional className prop
+}
+
+const ServicesCard: React.FC<ServicesCardProps> = ({
   imageUrl,
   imageAlt,
   title,
   description,
   className,
-}: index_ServiceCardT) => {
+}) => {
   return (
     <div
       className={cn(
