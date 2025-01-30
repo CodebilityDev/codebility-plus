@@ -47,7 +47,7 @@ const FeaturedSection = () => {
             </H2>
           </motion.div>
         </div>
-        <div className="mt-10 grid max-w-6xl grid-cols-1 gap-3 md:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-5">
+        <div className="mt-10 grid max-w-6xl grid-cols-1 gap-3 sm:grid-cols-2 md:gap-5 lg:grid-cols-3 lg:gap-5">
           {FeaturedSectiondata.map((data, index) => (
             <FeaturedCard
               key={index}
@@ -66,7 +66,7 @@ const FeaturedSection = () => {
       </div>
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform overflow-hidden blur-3xl"
+        className="pointer-events-none absolute left-1/2 top-1/2 hidden -translate-x-1/2 -translate-y-1/2 transform overflow-hidden blur-3xl sm:block"
       >
         <div
           style={{
