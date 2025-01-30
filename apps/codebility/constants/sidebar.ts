@@ -1,6 +1,18 @@
 import pathsConfig from "@/config/paths.config";
-import { Sidebar } from "@/types";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+export type SidebarLink = {
+  route: string;
+  imgURL: string;
+  label: string;
+  permission: PermissionKey;
+};
+
+export type Sidebar = {
+  id: string;
+  title: string;
+  links: SidebarLink[];
+};
 
 type RolePermissions = {
   dashboard: boolean;

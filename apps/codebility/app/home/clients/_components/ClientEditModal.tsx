@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+// Import your types + form schema
 import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema";
-import { updateClientAction } from "@/app/home/clients/action";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -13,6 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
+// Hook controlling modal open/close + data
 import { useModal } from "@/hooks/use-modal-clients";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
@@ -20,33 +21,47 @@ import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 
+// Your action that updates a client's fields
+import { updateClientAction } from "../action";
+
 /**
- * This edit modal aligns with your actual DB columns:
- *  - name, email, phone_number, address, website, company_logo
+ * Extend your form type to include `status`.
+ * Alternatively, define `status` directly inside your Zod schema
+ * if you prefer.
  */
+type ClientWithStatusFormValues = ClientFormValues & {
+  status: "active" | "inactive";
+};
+
 export default function ClientEditModal() {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "clientEditModal";
 
+  // For showing a local preview if we upload a new company logo
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [logoPreview, setLogoPreview] = useState<string | null | undefined>(
-    null,
-  );
 
+  // React Hook Form
   const {
     register,
     handleSubmit,
     reset,
     setValue,
+    watch,
     formState: { errors, isValid },
-  } = useForm<ClientFormValues>({
+  } = useForm<ClientWithStatusFormValues>({
     resolver: zodResolver(clientSchema),
     mode: "onChange",
   });
 
+  // We'll watch the `status` field to show on the UI
+  const currentStatus = watch("status");
+
+  /**
+   * On modal open, fill the form with existing client data.
+   */
   useEffect(() => {
     if (data) {
-      // If your data object has different keys, adjust them accordingly
       setValue("id", data.id);
       setValue("name", data.name || "");
       setValue("email", data.email || "");
@@ -54,11 +69,18 @@ export default function ClientEditModal() {
       setValue("address", data.address || "");
       setValue("website", data.website || "");
 
-      // For the logo preview
-      setLogoPreview(data.company_logo);
-    }
-  }, [data, reset, setValue]);
+      // If the DB client is "active", set form to "active", else "inactive"
+      setValue("status", data.status === "active" ? "active" : "inactive");
 
+      if (data.company_logo) {
+        setLogoPreview(data.company_logo);
+      }
+    }
+  }, [data, setValue]);
+
+  /**
+   * On close, reset the form + local states
+   */
   const handleDialogChange = (open: boolean) => {
     if (!open) {
       reset();
@@ -67,6 +89,9 @@ export default function ClientEditModal() {
     onClose();
   };
 
+  /**
+   * If the user selects a new logo file
+   */
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -80,34 +105,42 @@ export default function ClientEditModal() {
     setLogoPreview(null);
   };
 
-  const handleUpdateClient = async (data: ClientFormValues) => {
-    if (!data.id) {
-      toast.error("Can't update client: Invalid client ID");
+  /**
+   * Submit entire form, including `status`.
+   */
+  const handleUpdateClient = async (formData: ClientWithStatusFormValues) => {
+    if (!formData.id) {
+      toast.error("Client ID is missing");
       return;
     }
 
     setIsLoading(true);
     try {
-      const formData = new FormData();
-      formData.append("name", data.name);
+      // We'll send everything as FormData to your existing action
+      const dataToSend = new FormData();
 
-      if (data.email) formData.append("email", data.email);
-      if (data.phone_number) formData.append("phone_number", data.phone_number);
-      if (data.address) formData.append("address", data.address);
-      if (data.website) formData.append("website", data.website);
+      dataToSend.append("name", formData.name);
+      if (formData.email) dataToSend.append("email", formData.email);
+      if (formData.phone_number)
+        dataToSend.append("phone_number", formData.phone_number);
+      if (formData.address) dataToSend.append("address", formData.address);
+      if (formData.website) dataToSend.append("website", formData.website);
 
-      // File upload if changed
-      if (data.company_logo) {
-        formData.append("logo", data.company_logo as File);
+      // Include the status in a single "save" operation
+      dataToSend.append("status", formData.status);
+
+      // If there's a new logo file
+      if (formData.company_logo) {
+        dataToSend.append("logo", formData.company_logo as File);
       }
 
-      const response = await updateClientAction(data.id, formData);
+      const response = await updateClientAction(formData.id, dataToSend);
 
       if (response.success) {
         toast.success("Client updated successfully");
         handleDialogChange(false);
       } else {
-        toast.error(`Error: ${response.error}`);
+        toast.error(response.error || "Failed to update");
       }
     } catch (error) {
       console.error("Error updating client:", error);
@@ -127,10 +160,12 @@ export default function ClientEditModal() {
           <DialogTitle className="text-2xl">Edit Company</DialogTitle>
         </DialogHeader>
 
+        {/* COMPANY LOGO UPLOAD */}
         <div className="flex flex-col gap-4">
           <div className="flex justify-center md:justify-start">
             <label className="md:text-md text-sm lg:text-lg">Logo</label>
           </div>
+
           <div className="flex flex-col gap-4 md:flex-row">
             <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
               {logoPreview ? (
@@ -146,7 +181,9 @@ export default function ClientEditModal() {
             </div>
 
             <div className="flex flex-col justify-center gap-2">
-              <p className="text-md text-gray">Image size 1080 x 768 px</p>
+              <p className="text-md text-gray">
+                Recommended size 1080 x 768 px
+              </p>
               <div className="gap-4">
                 {!logoPreview && (
                   <label htmlFor="edit_company_logo">
@@ -176,6 +213,37 @@ export default function ClientEditModal() {
           </div>
         </div>
 
+        {/* STATUS FIELD (SIMPLE SELECT) */}
+        <div className="flex items-center justify-between border-b pb-3">
+          <span className="font-medium">Status</span>
+          <div className="flex items-center gap-4">
+            <p className="text-sm">
+              Current:{" "}
+              <span
+                className={
+                  currentStatus === "active" ? "text-green-600" : "text-red-600"
+                }
+              >
+                {currentStatus}
+              </span>
+            </p>
+
+            {/* A dropdown for "active" / "inactive" */}
+            <select
+              value={currentStatus}
+              onChange={(e) =>
+                setValue("status", e.target.value as "active" | "inactive")
+              }
+              disabled={isLoading}
+              className="cursor-pointer rounded border px-2 py-1"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+        </div>
+
+        {/* MAIN FORM FIELDS */}
         <form onSubmit={handleSubmit(handleUpdateClient)}>
           <div className="flex flex-col gap-8 lg:flex-row">
             <div className="flex flex-1 flex-col gap-4">
@@ -266,6 +334,7 @@ export default function ClientEditModal() {
             </div>
           </div>
 
+          {/* FOOTER BUTTONS */}
           <DialogFooter className="mt-8 flex flex-col gap-2 lg:flex-row">
             <Button
               type="button"
