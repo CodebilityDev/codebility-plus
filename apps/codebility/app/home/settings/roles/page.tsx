@@ -1,7 +1,8 @@
+import { Roles } from "@/types/home/codev";
+
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import RoleContainer from "./_components/role-container";
-import { Role_Type } from "./_types/roles";
 
 const RolesPage = async () => {
   const supabase = getSupabaseServerComponentClient();
@@ -16,9 +17,7 @@ const RolesPage = async () => {
 
   const roles = data || [];
 
-  return (
-    <>{roles.length > 0 && <RoleContainer data={roles as Role_Type[]} />}</>
-  );
+  return <>{roles.length > 0 && <RoleContainer data={roles as Roles[]} />}</>;
 };
 
 export default RolesPage;

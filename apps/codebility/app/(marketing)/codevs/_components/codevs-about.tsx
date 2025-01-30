@@ -2,7 +2,7 @@ import Image from "next/image";
 import H2 from "@/Components/shared/home/H2";
 import IntroText from "@/Components/shared/home/IntroText";
 import SectionWrapper from "@/Components/shared/home/SectionWrapper";
-import { services } from "@/constants";
+import { services } from "@/constants/services";
 import { motion } from "framer-motion";
 import moon from "public/assets/images/moon.png";
 

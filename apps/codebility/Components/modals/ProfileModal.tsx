@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
-import { techstacks } from "@/constants";
+import { techstacks } from "@/constants/techstack";
 import { useModal } from "@/hooks/use-modal-users";
 import { defaultAvatar } from "@/public/assets/images";
 import { Codev } from "@/types/home/codev";

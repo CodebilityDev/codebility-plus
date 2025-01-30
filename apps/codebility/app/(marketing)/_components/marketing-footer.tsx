@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Logo from "@/Components/shared/Logo";
 import { footerLinks } from "@/constants/links";
-import { useModal } from "@/hooks/use-modal";
+import { ModalType, useModal } from "@/hooks/use-modal";
 import { IconFacebookWhite } from "@/public/assets/svgs";
 
 import { aboutUsData, connectUsData } from "../_lib/dummy-data";
@@ -40,7 +40,7 @@ const Footer = () => {
               <ul className="flex flex-wrap gap-4 lg:flex-col lg:gap-2">
                 {footerLinks.map((data) => (
                   <li key={data.id}>
-                    <button onClick={() => onOpen(data.href)}>
+                    <button onClick={() => onOpen(data.href as ModalType)}>
                       {data.title}
                     </button>
                   </li>

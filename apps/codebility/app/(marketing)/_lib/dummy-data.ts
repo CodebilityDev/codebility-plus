@@ -3,13 +3,48 @@ import {
   IconFacebookWhite,
   IconLinkedInWhite,
 } from "@/public/assets/svgs";
-import {
-  footer_AboutUsLinksT,
-  footer_CompanyModalT,
-  footer_ConnectUsSocialsT,
-} from "@/types/home";
 
-export const aboutUsData: footer_AboutUsLinksT[] = [
+// Define types for each dataset
+export interface AboutUsData {
+  id: string;
+  title: string;
+  href: string;
+}
+
+export interface ConnectUsData {
+  id: string;
+  href: string;
+  icon: React.FC<React.SVGProps<SVGSVGElement>>;
+}
+
+export interface FeaturedSectionData {
+  title: string;
+  description: string;
+  src: string;
+  alt: string;
+}
+
+export interface ServicesCardData {
+  title: string;
+  description: string;
+  imageUrl: string;
+  imageAlt: string;
+}
+
+export interface MarketingCardData {
+  title: string;
+  description: string;
+  url: string;
+}
+
+export interface Service {
+  id: string;
+  title: string;
+  starColor: "violet" | "teal"; // Limited to specific colors
+}
+
+// Data arrays with types applied
+export const aboutUsData: AboutUsData[] = [
   { id: "1", title: "Services", href: "/services" },
   { id: "2", title: "Why Choose Us", href: "/#whychooseus" },
   { id: "3", title: "Our Admins", href: "/#admins" },
@@ -18,7 +53,7 @@ export const aboutUsData: footer_AboutUsLinksT[] = [
   { id: "6", title: "Contact", href: "mailto:codebility.dev@gmail.com" },
 ];
 
-export const connectUsData: footer_ConnectUsSocialsT[] = [
+export const connectUsData: ConnectUsData[] = [
   {
     id: "1",
     href: "https://www.facebook.com/Codebilitydev",
@@ -32,7 +67,7 @@ export const connectUsData: footer_ConnectUsSocialsT[] = [
   { id: "3", href: "https://discord.gg/xhxumQ2dgF", icon: IconDiscord },
 ];
 
-export const FeaturedSectiondata = [
+export const FeaturedSectiondata: FeaturedSectionData[] = [
   {
     title: "Learn Together",
     description:
@@ -77,7 +112,7 @@ export const FeaturedSectiondata = [
   },
 ];
 
-export const ServicesCardData = [
+export const ServicesCardData: ServicesCardData[] = [
   {
     title: "Content Quality",
     description:
@@ -127,7 +162,7 @@ export const ServicesCardData = [
   },
 ];
 
-export const MarketingCardData = [
+export const MarketingCardData: MarketingCardData[] = [
   {
     title: "AI Development",
     description:
@@ -154,7 +189,7 @@ export const MarketingCardData = [
   },
 ];
 
-export const services = [
+export const services: Service[] = [
   {
     id: "1",
     title: "Mobile Development",

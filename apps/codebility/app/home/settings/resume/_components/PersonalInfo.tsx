@@ -12,16 +12,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
-import { positions } from "@/constants";
 import { IconEdit } from "@/public/assets/svgs";
-import { Codev } from "@/types/home/codev";
+import { Codev, Position } from "@/types/home/codev";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { updateCodev } from "../action";
+import { getPositions, updateCodev } from "../action";
 
 type PersonalInfoProps = {
   data: Codev;
@@ -36,6 +35,7 @@ type FormValues = {
 };
 
 const PersonalInfo = ({ data }: PersonalInfoProps) => {
+  const [positions, setPositions] = useState<Position[]>([]);
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -55,6 +55,26 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
       years_of_experience: data.years_of_experience || 0,
     },
   });
+
+  const fetchPositions = async () => {
+    try {
+      const { data, error } = await getPositions();
+      if (error) {
+        console.error("Error fetching positions:", error);
+        toast.error("Failed to fetch positions");
+      } else if (data) {
+        setPositions(data);
+      }
+    } catch (err) {
+      console.error("Error fetching positions:", err);
+      toast.error("Failed to fetch positions");
+    }
+  };
+
+  // On mount, fetch positions
+  useEffect(() => {
+    fetchPositions();
+  }, []);
 
   const onSubmit = async (formData: FormValues) => {
     const toastId = toast.loading("Updating your information");
@@ -85,11 +105,9 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
-        className={`$ {
-          isEditMode
-            ? "hidden"
-            : "h-15 w-15 dark:invert-0" } absolute right-6 top-6 cursor-pointer
-        invert`}
+        className={`${
+          isEditMode ? "hidden" : "h-15 w-15 dark:invert-0"
+        } absolute right-6 top-6 cursor-pointer invert`}
         onClick={() => setIsEditMode(true)}
       />
       <p className="text-lg">Personal Information</p>
@@ -128,22 +146,23 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
             placeholder="Your address"
           />
 
+          {/* POSITION SELECT */}
           <div className="flex w-full flex-col justify-between gap-1 pt-5">
             <Label className="text-md">Position</Label>
             <Select
               onValueChange={(value) =>
                 setValue("display_position", value, { shouldDirty: true })
               }
-              value={watch("display_position") || undefined}
+              value={watch("display_position") || ""}
               disabled={!isEditMode}
             >
               <SelectTrigger
                 aria-label="display_position"
-                className={`$ {
+                className={`${
                   isEditMode
                     ? "dark:bg-dark-200 bg-white"
-                    : "text-dark-200 dark:bg-dark-200 dark:text-gray bg-white" }
-                h-11 w-full border-none`}
+                    : "text-dark-200 dark:bg-dark-200 dark:text-gray bg-white"
+                } h-11 w-full border-none`}
               >
                 <SelectValue placeholder="Select a position" />
               </SelectTrigger>
@@ -151,9 +170,13 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
               <SelectContent className="rounded-md">
                 <SelectGroup>
                   <SelectLabel>Select Position</SelectLabel>
-                  {positions.map((position: string) => (
-                    <SelectItem key={position} value={position}>
-                      {position}
+                  {/* Map the positions from DB */}
+                  {positions.map((position: Position) => (
+                    <SelectItem
+                      key={position.id}
+                      value={position.name || `Position#${position.id}`}
+                    >
+                      {position.name || "Unnamed Position"}
                     </SelectItem>
                   ))}
                 </SelectGroup>

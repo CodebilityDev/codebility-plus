@@ -40,10 +40,10 @@ const InternCard = ({ user }: { user: Codev; color: string }) => {
           <p className="text-lg font-semibold capitalize">
             {user.first_name} {user.last_name}
           </p>
-          {user.main_position === null ? (
+          {user.display_position === null ? (
             <p className="p-4"> </p>
           ) : (
-            <p className="pb-3 font-light">{user.main_position}</p>
+            <p className="pb-3 font-light">{user.display_position}</p>
           )}
 
           <p
