@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Logo from "@/Components/shared/Logo";
-import { aboutLinks, siteLinks } from "@/constants";
+import { aboutLinks, siteLinks } from "@/constants/links";
 import { useModal } from "@/hooks/use-modal";
 
 const Footer = () => {
