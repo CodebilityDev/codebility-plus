@@ -1,11 +1,11 @@
-import { ChangeEvent, useEffect, useState } from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
 import {
   getProjectClients,
   getProjectCodevs,
   updateProject,
 } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
+import { CustomSelect } from "@/Components/ui/CustomSelect";
 import {
   Dialog,
   DialogContent,
@@ -13,23 +13,40 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/Components/ui/select";
+import { MemberSelection } from "@/Components/ui/MemberSelection";
 import { useModal } from "@/hooks/use-modal-projects";
 import { Client, Codev } from "@/types/home/codev";
+import { deleteImage, getImagePath, uploadImage } from "@/utils/uploadImage";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
+import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 
-const PROJECT_STATUSES = ["pending", "inprogress", "completed"];
+const PROJECT_STATUSES = [
+  { id: "pending", value: "pending", label: "Pending" },
+  { id: "inprogress", value: "inprogress", label: "In Progress" },
+  { id: "completed", value: "completed", label: "Completed" },
+];
+
+interface ProjectFormData {
+  name: string;
+  description?: string;
+  github_link?: string;
+  website_url?: string;
+  figma_link?: string;
+  team_leader_id?: string;
+  client_id?: string;
+  status?: string;
+  main_image?: string;
+}
+
+export interface UploadImageOptions {
+  bucket?: string;
+  folder?: string;
+  cacheControl?: string;
+  upsert?: boolean;
+}
 
 const ProjectEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
@@ -38,86 +55,185 @@ const ProjectEditModal = () => {
   const [users, setUsers] = useState<Codev[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [projectImage, setProjectImage] = useState<string | null>(null);
+  const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    const fetchInitialData = async () => {
-      try {
-        const [codevs, clients] = await Promise.all([
-          getProjectCodevs({ filters: { application_status: "ACCEPTED" } }),
-          getProjectClients(),
-        ]);
-
-        setUsers(codevs || []);
-        setClients(clients || []);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to fetch initial data.");
-      }
-    };
-
-    if (isModalOpen) {
-      fetchInitialData();
-    }
-  }, [isModalOpen, data?.members]);
+  const [isDataLoading, setIsDataLoading] = useState(true);
+  const [selectedStatus, setSelectedStatus] = useState<string>(
+    data?.status || "active",
+  );
 
   const {
     register,
     handleSubmit,
     setValue,
+    watch,
     reset,
     formState: { errors },
-  } = useForm({
+  } = useForm<ProjectFormData>({
     mode: "onChange",
   });
 
+  // Watch team leader to filter members
+  const currentTeamLeaderId = watch("team_leader_id");
+
+  // Transform data for select options
+  const userOptions = useMemo(
+    () =>
+      users.map((user) => ({
+        id: user.id,
+        value: user.id,
+        label: `${user.first_name} ${user.last_name}`,
+        subLabel: user.display_position,
+        imageUrl: user.image_url,
+      })),
+    [users],
+  );
+
+  const clientOptions = useMemo(
+    () =>
+      clients.map((client) => ({
+        id: client.id,
+        value: client.id,
+        label: client.name,
+        subLabel: client.company_name,
+        imageUrl: client.company_logo,
+      })),
+    [clients],
+  );
+
+  // Fetch initial data
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!isModalOpen) return;
+
+      setIsDataLoading(true);
+      try {
+        const [codevsRes, clientsRes] = await Promise.all([
+          getProjectCodevs(),
+          getProjectClients(),
+        ]);
+
+        if (codevsRes) setUsers(codevsRes);
+        if (clientsRes) setClients(clientsRes);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+        toast.error("Failed to fetch data");
+      } finally {
+        setIsDataLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [isModalOpen]);
+
+  // Set initial form values
   useEffect(() => {
     if (data) {
-      setValue("name", data.name || "");
+      setValue("name", data.name);
       setValue("description", data.description || "");
-      setValue("client_id", data.client_id || "");
-      setValue("team_leader_id", data.team_leader_id || "");
-      setValue("status", data.status || "pending");
       setValue("github_link", data.github_link || "");
       setValue("website_url", data.website_url || "");
       setValue("figma_link", data.figma_link || "");
+      setValue("team_leader_id", data.team_leader_id || "");
+      setValue("client_id", data.client_id || "");
+      setValue("status", data.status || "pending");
       setProjectImage(data.main_image || null);
-    }
-  }, [data]);
+      setSelectedStatus(data.status || "pending");
 
-  const handleUploadProjectThumbnail = (e: ChangeEvent<HTMLInputElement>) => {
+      // Set initial members if they exist
+      if (
+        data.members &&
+        Array.isArray(data.members) &&
+        data.members.length > 0
+      ) {
+        const initialMembers = users.filter((user) =>
+          data.members?.includes(user.id),
+        );
+        setSelectedMembers(initialMembers);
+      } else {
+        setSelectedMembers([]); // Reset if no members
+      }
+    }
+  }, [data, setValue, users]);
+
+  const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      setValue("main_image", file);
-      setProjectImage(URL.createObjectURL(file));
+    if (!file) return;
+
+    try {
+      // Create file name but don't pass it as an option
+      const fileNameWithoutSpaces = file.name.replace(/\s+/g, "_");
+      const { publicUrl } = await uploadImage(file, {
+        bucket: "codebility",
+        folder: `projectImage/${Date.now()}_${fileNameWithoutSpaces}`,
+      });
+
+      setProjectImage(publicUrl);
+      setValue("main_image", publicUrl);
+    } catch (error) {
+      console.error("Failed to upload image:", error);
+      toast.error("Failed to upload image");
     }
   };
 
-  const handleRemoveProjectThumbnail = () => {
-    setValue("main_image", null);
-    setProjectImage(null);
+  const handleRemoveImage = async () => {
+    if (!projectImage) return;
+
+    try {
+      const imagePath = getImagePath(projectImage);
+      if (imagePath) {
+        await deleteImage(imagePath, "projectImage");
+      }
+      setProjectImage(null);
+      setValue("main_image", undefined);
+    } catch (error) {
+      console.error("Failed to remove image:", error);
+      toast.error("Failed to remove image");
+    }
   };
 
-  const handleSubmitData = async (formData: any) => {
-    setIsLoading(true);
-
+  const onSubmit = async (formData: ProjectFormData) => {
     if (!data?.id) {
-      toast.error("Project ID is missing. Cannot update project.");
-      setIsLoading(false);
+      toast.error("Project ID is missing");
       return;
     }
 
+    setIsLoading(true);
     try {
-      const response = await updateProject(data.id, formData);
+      const form = new FormData();
+
+      // Ensure status is included and valid
+      const validStatus = PROJECT_STATUSES.map((s) => s.value).includes(
+        selectedStatus,
+      )
+        ? selectedStatus
+        : "pending";
+
+      // Add all form data
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          form.append(key, value);
+        }
+      });
+
+      // Explicitly set status
+      form.set("status", validStatus);
+
+      // Add members
+      const memberIds = selectedMembers.map((member) => member.id);
+      form.append("members", JSON.stringify(memberIds));
+
+      const response = await updateProject(data.id, form);
+
       if (response.success) {
         toast.success("Project updated successfully!");
         onClose();
       } else {
-        toast.error(response.error || "Failed to update project.");
+        toast.error(response.error || "Failed to update project");
       }
     } catch (error) {
       console.error("Error updating project:", error);
-      toast.error("Something went wrong!");
+      toast.error("Failed to update project");
     } finally {
       setIsLoading(false);
     }
@@ -125,152 +241,176 @@ const ProjectEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent
-        aria-describedby={undefined}
-        className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-5 overflow-y-auto lg:h-[45rem] lg:justify-between lg:overflow-hidden"
-      >
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Edit Project</DialogTitle>
         </DialogHeader>
-        <form
-          onSubmit={handleSubmit(handleSubmitData)}
-          className="flex flex-col gap-4"
+
+        <div
+          className="overflow-y-auto px-1"
+          style={{ maxHeight: "calc(100vh - 200px)" }}
         >
-          <div className="flex gap-4">
-            <div className="relative flex items-center justify-center">
-              {projectImage ? (
-                <img
-                  src={projectImage}
-                  alt="Project Thumbnail"
-                  className="h-24 w-24 rounded-full object-cover"
-                />
-              ) : (
-                <DefaultAvatar size={96} />
-              )}
-            </div>
-            <div className="flex flex-col justify-center gap-2">
-              <label
-                htmlFor="thumbnail"
-                className="cursor-pointer text-blue-100"
-              >
-                Upload Image
-              </label>
-              <input
-                id="thumbnail"
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleUploadProjectThumbnail}
-              />
-              {projectImage && (
-                <p
-                  className="cursor-pointer text-red-500"
-                  onClick={handleRemoveProjectThumbnail}
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+            {/* Image Upload Section */}
+            <div className="flex items-center gap-4">
+              <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
+                {projectImage ? (
+                  <img
+                    src={projectImage}
+                    alt="Project"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-gray-100">
+                    <DefaultAvatar size={64} />
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-col gap-2">
+                <label
+                  htmlFor="image-upload"
+                  className="cursor-pointer text-sm text-blue-600 hover:text-blue-800"
                 >
-                  Remove Image
-                </p>
-              )}
+                  Upload Image
+                </label>
+                <input
+                  id="image-upload"
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+                {projectImage && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveImage}
+                    className="text-sm text-red-600 hover:text-red-800"
+                  >
+                    Remove Image
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
 
-          <div className="grid gap-4 lg:grid-cols-2">
-            <div>
-              <Input
-                label="Project Name"
-                placeholder="Enter project name"
-                {...register("name")}
+            {/* Project Details */}
+            <div className="grid gap-4">
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <div className="space-y-2">
+                  <Input
+                    type="text"
+                    placeholder="Project Name"
+                    {...register("name", {
+                      required: "Project name is required",
+                    })}
+                    className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+                  />
+                  {errors.name && (
+                    <p className="text-sm text-red-500">
+                      {errors.name.message}
+                    </p>
+                  )}
+                </div>
+
+                <Input
+                  type="text"
+                  placeholder="Project Description"
+                  {...register("description")}
+                  className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <Input
+                  type="text"
+                  placeholder="GitHub Link"
+                  {...register("github_link")}
+                  className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+                />
+                <Input
+                  type="text"
+                  placeholder="Website URL"
+                  {...register("website_url")}
+                  className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <Input
+                  type="text"
+                  placeholder="Figma Link"
+                  {...register("figma_link")}
+                  className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+                />
+
+                <CustomSelect
+                  label="Status"
+                  options={PROJECT_STATUSES}
+                  value={selectedStatus} // Use controlled state
+                  onChange={(value) => {
+                    setSelectedStatus(value);
+                    setValue("status", value);
+                  }}
+                  placeholder="Select Status"
+                  variant="simple"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <CustomSelect
+                  label="Team Leader"
+                  options={userOptions}
+                  value={data?.team_leader_id}
+                  onChange={(value) => setValue("team_leader_id", value)}
+                  placeholder="Select Team Leader"
+                />
+
+                <CustomSelect
+                  label="Client"
+                  options={clientOptions}
+                  value={data?.client_id}
+                  onChange={(value) => setValue("client_id", value)}
+                  placeholder="Select Client"
+                />
+              </div>
+
+              {/* Team Members */}
+              <MemberSelection
+                users={users.filter((user) => user.id !== currentTeamLeaderId)}
+                selectedMembers={selectedMembers}
+                onMemberAdd={(member) =>
+                  setSelectedMembers((prev) => [...prev, member])
+                }
+                onMemberRemove={(memberId) =>
+                  setSelectedMembers((prev) =>
+                    prev.filter((m) => m.id !== memberId),
+                  )
+                }
+                excludeMembers={
+                  currentTeamLeaderId ? [currentTeamLeaderId] : []
+                }
               />
-              <Input
-                label="Description"
-                placeholder="Enter project description"
-                {...register("description")}
-              />
-              <Select
-                onValueChange={(value) => setValue("client_id", value)}
-                defaultValue={data?.client_id}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select a Client" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Clients</SelectLabel>
-                    {clients.map((client) => (
-                      <SelectItem key={client.id} value={client.id}>
-                        {client.name}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
             </div>
+          </form>
+        </div>
 
-            <div>
-              <Select
-                onValueChange={(value) => setValue("status", value)}
-                defaultValue={data?.status || "pending"}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Project Status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Status</SelectLabel>
-                    {PROJECT_STATUSES.map((status) => (
-                      <SelectItem key={status} value={status}>
-                        {status}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-
-              <Select
-                onValueChange={(value) => setValue("team_leader_id", value)}
-                defaultValue={data?.team_leader_id}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Team Leader" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectGroup>
-                    <SelectLabel>Users</SelectLabel>
-                    {users.map((user) => (
-                      <SelectItem key={user.id} value={user.id}>
-                        {`${user.first_name} ${user.last_name}`}
-                      </SelectItem>
-                    ))}
-                  </SelectGroup>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
-
-          <Input
-            label="GitHub Link"
-            placeholder="Enter GitHub link"
-            {...register("github_link")}
-          />
-          <Input
-            label="Website URL"
-            placeholder="Enter website URL"
-            {...register("website_url")}
-          />
-          <Input
-            label="Figma Link"
-            placeholder="Enter Figma link"
-            {...register("figma_link")}
-          />
-
-          <DialogFooter className="flex justify-between">
-            <Button type="button" variant="hollow" onClick={onClose}>
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Updating..." : "Update"}
-            </Button>
-          </DialogFooter>
-        </form>
+        <DialogFooter>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={onClose}
+            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+          >
+            Cancel
+          </Button>
+          <Button
+            type="submit"
+            disabled={isLoading}
+            onClick={handleSubmit(onSubmit)}
+            className="text-white"
+          >
+            {isLoading ? "Updating..." : "Update Project"}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

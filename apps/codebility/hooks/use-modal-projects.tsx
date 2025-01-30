@@ -5,8 +5,7 @@ export type ModalType =
   | "projectAddModal"
   | "projectEditModal"
   | "projectViewModal"
-  | "projectDeleteModal"
-  | "projectMembersModal";
+  | "projectDeleteModal";
 
 interface ModalStore {
   type: ModalType | null;

@@ -125,7 +125,7 @@ const JobStatuses = ({ data }: JobStatusProps) => {
             ]);
           }
         }}
-        variant="outlined"
+        variant="outline"
         className="border-black-100 w-[10rem] border px-[20px] py-6 text-black dark:border-white"
       >
         Add Job Status
@@ -329,7 +329,7 @@ const JobStatusForm = ({
         <div className="mt-6 flex flex-col-reverse items-center justify-center gap-2 md:flex-row md:justify-end">
           <Button
             onClick={() => handleEditModePerItem(itemNo, false)}
-            variant="outlined"
+            variant="outline"
             className="border-black-100 text-black-100 w-[10rem] px-[20px] py-6 dark:border-white dark:text-white"
             disabled={isLoading || isLoadingMain}
           >
