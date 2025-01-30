@@ -6,11 +6,19 @@ import ClientButtons from "./_components/clients-button";
 import ClientCards from "./_components/clients-card";
 
 export default async function Clients() {
+  // Fetch clients data
   const { data, error } = await getClients();
 
-  const clients = data
-    ? (data as Client[]).filter((client) => client.status !== "inactive")
-    : [];
+  // If 'data' is nullish, fallback to an empty array
+  let clients: Client[] = data ?? [];
+
+  // Sort so 'active' clients come first, and 'inactive' clients come last
+  // If you have more statuses, extend this logic
+  clients.sort((a, b) => {
+    if (a.status === b.status) return 0;
+    if (a.status === "active") return -1;
+    return 1;
+  });
 
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
@@ -22,6 +30,7 @@ export default async function Clients() {
       {error ? (
         <div className="text-white">ERROR</div>
       ) : (
+        // Pass our sorted array to the client-card component
         <ClientCards clients={clients} />
       )}
     </div>

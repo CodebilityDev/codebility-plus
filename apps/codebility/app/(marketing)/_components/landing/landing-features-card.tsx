@@ -1,12 +1,18 @@
 import Image from "next/image";
-import { index_FeatureCardT } from "@/types/home";
 
-const FeaturesCard = ({
+interface FeaturesCardProps {
+  imageName: string;
+  imageAlt: string;
+  title: string;
+  description: string;
+}
+
+const FeaturesCard: React.FC<FeaturesCardProps> = ({
   imageName,
   imageAlt,
   title,
   description,
-}: index_FeatureCardT) => {
+}) => {
   return (
     <div className="border-dark-100 bg-black-600 z-10 w-full rounded-lg border-2 p-4">
       <div className="flex flex-col gap-3">

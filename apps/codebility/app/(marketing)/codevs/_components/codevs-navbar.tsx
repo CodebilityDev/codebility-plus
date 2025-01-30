@@ -4,7 +4,7 @@ import { usePathname } from "next/navigation";
 import useUser from "@/app/home/_hooks/use-user";
 import Logo from "@/Components/shared/Logo";
 import { Button } from "@/Components/ui/button";
-import { navLinks } from "@/constants";
+import { navLinks } from "@/constants/navigation";
 import { useModal } from "@/hooks/use-modal";
 import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
