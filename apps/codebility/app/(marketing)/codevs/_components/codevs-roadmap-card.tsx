@@ -1,6 +1,21 @@
-import { roadmap_CardT } from "@/types/home";
+interface Step {
+  id: string;
+  step: string;
+}
 
-const RoadmapCard = ({ id, phase, title, steps }: roadmap_CardT) => {
+interface RoadmapCardProps {
+  id: string;
+  phase: string;
+  title: string;
+  steps: Step[];
+}
+
+const RoadmapCard: React.FC<RoadmapCardProps> = ({
+  id,
+  phase,
+  title,
+  steps,
+}) => {
   return (
     <div id={id} className="flex w-max flex-col gap-3 text-white md:mx-auto">
       <h3 className="text-teal text-lg font-medium xl:text-2xl">{phase}</h3>
