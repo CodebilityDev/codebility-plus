@@ -57,7 +57,7 @@ const ProfileListsFilter: React.FC<Props> = ({
                 <SelectItem
                   key={i}
                   value={position}
-                  className="focus:dark:bg-dark-300"
+                  className="cursor-pointer dark:text-red-100"
                 >
                   {position}
                 </SelectItem>
