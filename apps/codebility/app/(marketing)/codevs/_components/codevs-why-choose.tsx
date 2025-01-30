@@ -3,7 +3,7 @@ import H2 from "@/Components/shared/home/H2";
 import SectionWrapper from "@/Components/shared/home/SectionWrapper";
 import { motion } from "framer-motion";
 
-import WhyChooseItem from "./coves-why-choose-item";
+import WhyChooseItem from "./codevs-why-choose-item";
 
 const WhyChooseUs = () => {
   return (

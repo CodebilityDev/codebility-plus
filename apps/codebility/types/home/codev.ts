@@ -5,27 +5,27 @@ export interface Position {
 }
 
 export interface WorkExperience {
-  id: string;
-  codev_id: string; // Required - matches DB NOT NULL
-  position: string; // Required - matches DB NOT NULL
-  description?: string;
-  date_from: string; // Required - matches DB NOT NULL
-  date_to?: string | null;
-  company_name: string; // Required - matches DB NOT NULL
-  location: string; // Required - matches DB NOT NULL
-  profile_id?: string;
-  is_present: boolean; // Required - matches DB NOT NULL
+  id: string; // UUID (required)
+  codev_id: string; // UUID (required)
+  position: string; // (required)
+  description?: string; // optional in DB
+  date_from: string; // Date as string (required)
+  date_to: string | null; // Nullable for "Present"
+  company_name: string; // (required)
+  location: string; // (required)
+  profile_id?: string; // Optional
+  is_present: boolean; // New field we'll add
 }
 
 export interface JobStatus {
   id: string;
-  job_title: string; // Required - matches DB NOT NULL
-  company_name: string; // Required - matches DB NOT NULL
-  employment_type: string; // Required - matches DB NOT NULL
+  job_title: string;
+  company_name: string;
+  employment_type: string;
   description?: string | null;
   status?: string;
   salary_range?: string | null;
-  work_setup: string; // Required - matches DB NOT NULL
+  work_setup: string; // Required in DB
   shift?: string | null;
   codev_id?: string;
   hours_per_week?: number;
@@ -61,10 +61,11 @@ export interface Codev {
   address?: string | null;
   about?: string | null;
   education?: Education[];
+  position_id?: bigint;
   positions: string[];
   display_position?: string;
   portfolio_website?: string | null;
-  tech_stacks: Array<string>;
+  tech_stacks: string[];
   image_url?: string | null;
   internal_status?: InternalStatus;
   availability_status?: boolean;
@@ -241,10 +242,4 @@ export interface Roles {
   time_tracker?: boolean;
   kanban?: boolean;
   dashboard?: boolean;
-}
-
-export interface ProjectCategory {
-  id: number;
-  name: string;
-  description: string;
 }

@@ -1,8 +1,14 @@
-import { home_SectionT } from "@/types/home";
+import React, { ReactNode } from "react";
 
-const Section = ({ children, className, id }: home_SectionT) => {
+interface SectionProps {
+  children: ReactNode;
+  className?: string; // Optional className prop
+  id?: string; // Optional id prop
+}
+
+const Section: React.FC<SectionProps> = ({ children, className = "", id }) => {
   return (
-    <section id={`${id}`} className={`mx-auto py-10 lg:py-20 ${className}`}>
+    <section id={id} className={`mx-auto py-10 lg:py-20 ${className}`}>
       {children}
     </section>
   );
