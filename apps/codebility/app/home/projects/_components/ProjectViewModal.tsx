@@ -15,20 +15,30 @@ import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 import { format, parseISO } from "date-fns";
 
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@codevs/ui/hover-card";
+const PROJECT_CATEGORIES: Record<string, string> = {
+  "1": "Web Development",
+  "2": "Mobile Development",
+  "3": "Design",
+};
 
 const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
+
   const isModalOpen = isOpen && type === "projectViewModal";
 
   const [teamLead, setTeamLead] = useState<Codev | null>(null);
   const [members, setMembers] = useState<Codev[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const formattedDate = data?.created_at
+  const startDate = data?.start_date
+    ? format(parseISO(data.start_date), "MM/dd/yyyy")
+    : null;
+
+  const endDate = data?.end_date
+    ? format(parseISO(data.end_date), "MM/dd/yyyy")
+    : "Ongoing";
+
+  const createdAt = data?.created_at
     ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
     : null;
 
@@ -36,22 +46,34 @@ const ProjectViewModal = () => {
     const fetchTeamLeadAndMembers = async () => {
       if (!data) return;
 
-      // Fetch Team Lead
-      if (data.team_leader_id) {
-        const { error, data: fetchedTeamLead } = await getTeamLead(
-          data.team_leader_id,
-        );
-        if (!error && fetchedTeamLead) {
-          setTeamLead(fetchedTeamLead);
+      setIsLoading(true);
+      try {
+        // Fetch team lead
+        if (data.team_leader_id) {
+          const { error: leadError, data: fetchedTeamLead } = await getTeamLead(
+            data.team_leader_id,
+          );
+          if (!leadError && fetchedTeamLead) {
+            setTeamLead(fetchedTeamLead);
+          }
         }
-      }
 
-      // Fetch Members
-      if (data.members && data.members.length > 0) {
-        const { error, data: fetchedMembers } = await getMembers(data.members);
-        if (!error && fetchedMembers) {
-          setMembers(fetchedMembers);
+        // Fetch members
+        if (
+          data.members &&
+          Array.isArray(data.members) &&
+          data.members.length > 0
+        ) {
+          const { error: membersError, data: fetchedMembers } =
+            await getMembers(data.members);
+          if (!membersError && fetchedMembers) {
+            setMembers(fetchedMembers);
+          }
         }
+      } catch (error) {
+        console.error("Error fetching team data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -60,144 +82,209 @@ const ProjectViewModal = () => {
     }
   }, [isModalOpen, data]);
 
-  const handleDialogChange = () => {
-    onClose();
-  };
-
   return (
-    <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
-      <DialogContent
-        aria-describedby={undefined}
-        className="xs:w-[80%] h-[32rem] w-[95%] max-w-3xl overflow-x-auto overflow-y-auto sm:w-[70%] lg:h-auto"
-      >
+    <Dialog open={isModalOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl">
         <DialogHeader>
-          <DialogTitle className="mb-2 text-left text-xl">
-            Project View
-          </DialogTitle>
+          <DialogTitle className="text-xl">View Project</DialogTitle>
         </DialogHeader>
-        <div className="flex flex-col gap-8">
+
+        <div className="flex flex-col gap-6">
           {/* Project Image */}
-          <div className="dark:bg-dark-100 flex justify-center rounded-lg bg-slate-300">
+          <div className="dark:bg-dark-100 flex justify-center rounded-lg bg-slate-100 p-6">
             {data?.main_image ? (
-              <Image
-                alt={`${data?.name} project image`}
-                src={data.main_image}
-                width={120}
-                height={91}
-                className="h-[120px] w-[91px] object-contain"
-                loading="eager"
-                priority
-              />
+              <div className="relative h-[200px] w-[200px]">
+                <Image
+                  src={data.main_image}
+                  alt={data?.name || "Project Image"}
+                  fill
+                  className="rounded-lg object-cover"
+                  priority
+                />
+              </div>
             ) : (
-              <DefaultAvatar size={120} />
+              <div className="dark:bg-dark-200 flex h-[200px] w-[200px] items-center justify-center rounded-lg bg-gray-200">
+                <DefaultAvatar size={120} />
+              </div>
             )}
           </div>
 
-          <div className="flex flex-col gap-8 lg:flex-row">
+          <div className="grid gap-6 md:grid-cols-2">
             {/* Project Details */}
-            <div className="dark:bg-dark-200 flex flex-1 flex-col gap-4 rounded-lg p-4">
-              <p className="text-2xl">{data?.name}</p>
-              {data?.description && (
-                <p className="md:text-md text-gray max-h-20 overflow-auto text-sm lg:text-lg">
-                  {data.description}
+            <div className="dark:bg-dark-200 space-y-4 rounded-lg bg-slate-100 p-4">
+              <div>
+                <h3 className="text-lg font-semibold">Project Details</h3>
+                <p className="text-2xl text-blue-600 dark:text-blue-400">
+                  {data?.name}
                 </p>
+              </div>
+
+              {data?.description && (
+                <div>
+                  <h4 className="text-sm text-gray-500">Description</h4>
+                  <p className="text-sm">{data.description}</p>
+                </div>
               )}
-              <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-4">
                 {data?.github_link && (
-                  <Link href={data.github_link} target="_blank">
-                    <IconGithub className="size-5 invert duration-300 hover:-translate-y-1 dark:invert-0" />
+                  <Link
+                    href={data.github_link}
+                    target="_blank"
+                    className="flex items-center gap-2 hover:text-blue-500"
+                  >
+                    <IconGithub className="h-5 w-5 invert dark:invert-0" />
+                    <span className="text-sm">GitHub</span>
                   </Link>
                 )}
                 {data?.website_url && (
-                  <Link href={data.website_url} target="_blank">
-                    <IconLink className="size-5 invert duration-300 hover:-translate-y-1 dark:invert-0" />
+                  <Link
+                    href={data.website_url}
+                    target="_blank"
+                    className="flex items-center gap-2 hover:text-blue-500"
+                  >
+                    <IconLink className="h-5 w-5 invert dark:invert-0" />
+                    <span className="text-sm">Website</span>
                   </Link>
                 )}
                 {data?.figma_link && (
-                  <Link href={data.figma_link} target="_blank">
-                    <IconFigma className="size-5 invert duration-300 hover:-translate-y-1 dark:invert-0" />
+                  <Link
+                    href={data.figma_link}
+                    target="_blank"
+                    className="flex items-center gap-2 hover:text-blue-500"
+                  >
+                    <IconFigma className="h-5 w-5 invert dark:invert-0" />
+                    <span className="text-sm">Figma</span>
                   </Link>
                 )}
               </div>
             </div>
 
-            {/* Additional Info */}
-            <div className="dark:bg-dark-200 flex flex-1 flex-col gap-2 rounded-lg p-4">
-              <p className="text-2xl">Status</p>
-              <p className="text-lg text-orange-400">{data?.status}</p>
-              <p className="text-md text-gray">Date Started: {formattedDate}</p>
-              <p className="text-md text-gray">
-                Lead by:{" "}
-                <span className="capitalize text-blue-100">
-                  {teamLead
-                    ? `${teamLead.first_name} ${teamLead.last_name}`
-                    : "Unknown"}
-                </span>
-              </p>
+            {/* Project Status */}
+            <div className="dark:bg-dark-200 space-y-4 rounded-lg bg-slate-100 p-4">
+              <h3 className="text-lg font-semibold">Project Status</h3>
+
+              <div className="grid gap-2">
+                <div>
+                  <h4 className="text-sm text-gray-500">Current Status</h4>
+                  <p className="capitalize text-orange-400">{data?.status}</p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm text-gray-500">Project Category</h4>
+                  <p>
+                    {data?.project_category_id
+                      ? PROJECT_CATEGORIES[data.project_category_id.toString()]
+                      : "Not specified"}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm text-gray-500">Duration</h4>
+                  <p>Start: {startDate}</p>
+                  <p>End: {endDate}</p>
+                </div>
+
+                <div>
+                  <h4 className="text-sm text-gray-500">Created</h4>
+                  <p>{createdAt}</p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {/* Contributors */}
-          <div className="dark:bg-dark-200 flex flex-col gap-4 rounded-lg p-4">
-            <p className="text-2xl">Contributors</p>
-            <div className="flex h-40 max-h-40 flex-col gap-3 overflow-y-auto xl:h-auto xl:max-h-max xl:flex-row">
-              {members.map((user) => (
-                <div key={user.id} className="flex items-center gap-1">
-                  <HoverCard>
-                    <HoverCardTrigger className="cursor-pointer">
-                      {user.image_url ? (
-                        <div className="relative size-[55px] overflow-hidden rounded-full">
+          {/* Team Information */}
+          <div className="dark:bg-dark-200 space-y-4 rounded-lg bg-slate-100 p-4">
+            <h3 className="text-lg font-semibold">Team Information</h3>
+
+            {isLoading ? (
+              <div className="text-sm text-gray-500">
+                Loading team information...
+              </div>
+            ) : (
+              <>
+                {/* Team Lead */}
+                {teamLead && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm text-gray-500">Team Lead</h4>
+                    <div className="flex items-center gap-3">
+                      {teamLead.image_url ? (
+                        <div className="relative h-12 w-12">
                           <Image
-                            src={user.image_url}
-                            alt={`${user.first_name} ${user.last_name}`}
-                            width={55}
-                            height={55}
+                            src={teamLead.image_url}
+                            alt={`${teamLead.first_name} ${teamLead.last_name}`}
+                            fill
                             className="rounded-full object-cover"
                           />
                         </div>
                       ) : (
-                        <DefaultAvatar size={55} className="p-[2px]" />
+                        <DefaultAvatar size={48} />
                       )}
-                    </HoverCardTrigger>
-
-                    <HoverCardContent
-                      align="start"
-                      className="ml-2 border-none"
-                    >
-                      <p className="text-base font-semibold capitalize">
-                        {`${user.first_name} ${user.last_name}`}
-                      </p>
-                      <p className="text-xs text-gray-500">
-                        {user.display_position}
-                      </p>
-                    </HoverCardContent>
-                  </HoverCard>
-                  <div className="ml-2 xl:hidden">
-                    <p className="text-sm font-semibold capitalize">{`${user.first_name} ${user.last_name}`}</p>
-                    <p className="text-xs text-gray-500">
-                      {user.display_position}
-                    </p>
+                      <div>
+                        <p className="font-medium">
+                          {teamLead.first_name} {teamLead.last_name}
+                        </p>
+                        <p className="text-sm text-gray-500">
+                          {teamLead.display_position}
+                        </p>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                )}
+
+                {/* Team Members */}
+                {members.length > 0 ? (
+                  <div className="space-y-2">
+                    <h4 className="text-sm text-gray-500">Team Members</h4>
+                    <div className="flex flex-wrap gap-4">
+                      {members.map((member) => (
+                        <div
+                          key={member.id}
+                          className="flex items-center gap-3"
+                        >
+                          {member.image_url ? (
+                            <div className="relative h-12 w-12">
+                              <Image
+                                src={member.image_url}
+                                alt={`${member.first_name} ${member.last_name}`}
+                                fill
+                                className="rounded-full object-cover"
+                              />
+                            </div>
+                          ) : (
+                            <DefaultAvatar size={48} />
+                          )}
+                          <div>
+                            <p className="font-medium">
+                              {member.first_name} {member.last_name}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {member.display_position}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <div className="text-sm text-gray-500">
+                    No team members assigned
+                  </div>
+                )}
+              </>
+            )}
           </div>
 
-          {/* Buttons */}
-          <div className="flex flex-col gap-4 md:flex-row md:justify-end">
-            <Button
-              variant="destructive"
-              className="w-full lg:w-[130px]"
-              onClick={() => onOpen("projectDeleteModal", data)}
-            >
-              Delete
+          {/* Action Buttons */}
+          <div className="flex justify-end gap-4">
+            <Button onClick={() => onOpen("projectEditModal", data)}>
+              Edit Project
             </Button>
             <Button
-              variant="hollow"
-              className="w-full lg:w-[130px]"
-              onClick={handleDialogChange}
+              variant="destructive"
+              onClick={() => onOpen("projectDeleteModal", data)}
             >
-              Cancel
+              Delete Project
             </Button>
           </div>
         </div>

@@ -133,7 +133,7 @@ const Experience = ({ data }: ExperienceProps) => {
             ]);
           }
         }}
-        variant="outlined"
+        variant="outline"
         className="border-black-100 w-[10rem] border px-[20px] py-6 text-black dark:border-white"
       >
         Add Experience
@@ -369,7 +369,7 @@ const ExperienceForm = ({
                 setEditMode(false);
               }
             }}
-            variant="outlined"
+            variant="outline"
             className="border-black-100 text-black-100 w-[10rem] px-[20px] py-6 dark:border-white dark:text-white"
             disabled={isLoading || isLoadingMain}
           >

@@ -42,7 +42,7 @@ const Marketing = () => {
                 Start your custom solution
               </Button>
               <Button
-                variant="outlined"
+                variant="outline"
                 className="hover:opacity-15"
                 rounded="full"
               >
