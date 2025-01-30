@@ -1,7 +1,12 @@
 import Image from "next/image";
-import { codevs_AboutCardT } from "@/types/home";
 
-const AboutCard = ({ icon, title, desc }: codevs_AboutCardT) => {
+interface AboutCardProps {
+  icon: string;
+  title: string;
+  desc: string;
+}
+
+const AboutCard: React.FC<AboutCardProps> = ({ icon, title, desc }) => {
   return (
     <div className="bg-black-100 flex h-48 flex-col items-center justify-center gap-2 rounded-lg px-6 text-center lg:h-64 xl:px-10">
       <Image

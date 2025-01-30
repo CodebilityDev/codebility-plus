@@ -28,11 +28,4 @@ export const settingsCardData: SettingsCardDataProps[] = [
     title: "Permissions",
     description: "Setup a permission to roles.",
   },
-  {
-    path: "/home/settings/services",
-    imageName: "icon-flexbox",
-    imageAlt: "Icon Flexbox",
-    title: "Services",
-    description: "Manage the item displayed in the services page.",
-  },
 ];

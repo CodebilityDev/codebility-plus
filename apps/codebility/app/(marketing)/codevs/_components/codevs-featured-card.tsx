@@ -1,16 +1,23 @@
 import Image from "next/image";
+import Link from "next/link";
 
-type featured_CardT = {
-  title?: string;
-  description?: string;
-  url?: string;
+interface FeaturedCardProps {
+  title: string;
+  description: string;
+  url?: string; // Optional, defaults to "#"
   src: string;
   alt: string;
-};
+}
 
-const FeaturedCard = ({ title, description, src, alt }: featured_CardT) => {
+const FeaturedCard: React.FC<FeaturedCardProps> = ({
+  title,
+  description,
+  url = "#",
+  src,
+  alt,
+}) => {
   return (
-    <div className="feature-card cursor-pointer">
+    <Link href={url} className="feature-card">
       <div className="border-light-900/5 bg-light-700/10 hover:bg-light-700/30 flex h-full w-full flex-col gap-2 rounded-md border-2 p-8 text-white backdrop-blur-lg duration-300">
         <span className="relative flex aspect-square w-[25px] flex-col items-center justify-center">
           <Image
@@ -29,7 +36,7 @@ const FeaturedCard = ({ title, description, src, alt }: featured_CardT) => {
         </div>
         <p>{description}</p>
       </div>
-    </div>
+    </Link>
   );
 };
 

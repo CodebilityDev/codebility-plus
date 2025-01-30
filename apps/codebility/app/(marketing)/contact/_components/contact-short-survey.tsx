@@ -2,7 +2,7 @@
 
 import { Button } from "@/Components/ui/button";
 import Input from "@/Components/ui/forms/input";
-import { services } from "@/constants";
+import { services } from "@/constants/services";
 import { IconDropdown } from "@/public/assets/svgs";
 import {
   Select,

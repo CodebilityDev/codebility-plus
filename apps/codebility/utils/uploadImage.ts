@@ -21,9 +21,12 @@ export async function uploadImage(
   const supabase = getSupabaseBrowserClient();
   try {
     const { bucket = "codebility", folder = "profileImage" } = options;
-    const filePath = `${folder}/${Date.now()}_${file.name}`;
 
-    // Upload the file
+    // Generate a cleaner file path
+    const fileExtension = file.name.split(".").pop() || "";
+    const fileName = `${Date.now()}.${fileExtension}`;
+    const filePath = `${folder}/${fileName}`; // Simpler path structure
+
     const { error: uploadError } = await supabase.storage
       .from(bucket)
       .upload(filePath, file, {
@@ -31,11 +34,8 @@ export async function uploadImage(
         upsert: options.upsert ?? true,
       });
 
-    if (uploadError) {
-      throw uploadError;
-    }
+    if (uploadError) throw uploadError;
 
-    // Get the public URL
     const { data: publicUrlData } = supabase.storage
       .from(bucket)
       .getPublicUrl(filePath);

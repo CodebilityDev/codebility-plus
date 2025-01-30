@@ -4,6 +4,7 @@ import { cachedUser } from "@/lib/server/supabase-action";
 import {
   Codev,
   JobStatus,
+  Position,
   WorkExperience,
   WorkSchedule,
 } from "@/types/home/codev";
@@ -306,3 +307,18 @@ export async function getJobStatuses(codevId: string) {
     throw error;
   }
 }
+
+export const getPositions = async (): Promise<{
+  error: any;
+  data: Position[] | null;
+}> => {
+  const supabase = getSupabaseServerComponentClient();
+
+  const { data, error } = await supabase.from("positions").select("*");
+  if (error) {
+    console.error("Error fetching positions:", error);
+    return { error, data: null };
+  }
+
+  return { error: null, data: data || null };
+};

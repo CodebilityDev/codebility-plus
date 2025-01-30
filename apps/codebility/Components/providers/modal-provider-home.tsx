@@ -17,15 +17,11 @@ import DeleteRoleModal from "@/Components/modals/DeleteRoleModal";
 import EditRoleModal from "@/Components/modals/EditRoleModal";
 import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
 import ProfileModal from "@/Components/modals/ProfileModal";
-import ServiceCategoriesDeleteModal from "@/Components/modals/ServiceCategoriesDeleteModal";
-import ServiceCategoriesModal from "@/Components/modals/ServiceCategoriesModal";
-import ServicesModal from "@/Components/modals/ServicesModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
 
 import TaskDeleteModal from "../../app/home/kanban/[id]/_components/tasks/TaskDeleteModal";
 import TaskEditModal from "../../app/home/kanban/[id]/_components/tasks/TaskEditModal";
-import ProjectMembersModal from "../../app/home/projects/_components/ProjectMembersModal";
 import DeleteWarningModal from "../modals/DeleteWarningModal";
 
 export const ModalProviderHome = () => {
@@ -52,14 +48,9 @@ export const ModalProviderHome = () => {
       <ProjectEditModal />
       <ProjectViewModal />
       <ProjectDeleteModal />
-      <ProjectMembersModal />
 
       <ClientAddModal />
       <ClientEditModal />
-
-      <ServicesModal />
-      <ServiceCategoriesModal />
-      <ServiceCategoriesDeleteModal />
 
       <ApplicantsEditModal />
       <PrivacyPolicyModal />

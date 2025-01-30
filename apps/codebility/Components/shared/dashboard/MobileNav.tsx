@@ -1,12 +1,14 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { sidebarData } from "@/constants";
+import { getSidebarData, Sidebar, SidebarLink } from "@/constants/sidebar";
 import useAuthCookie from "@/hooks/use-cookie";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
 
+// UI components
 import {
   Sheet,
   SheetClose,
@@ -14,32 +16,21 @@ import {
   SheetTrigger,
 } from "@codevs/ui/sheet";
 
-const NavContent = () => {
+const NavContent = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
   const pathname = usePathname();
-  const { data: authData } = useAuthCookie();
-  const { userType } = authData || {};
 
   return (
-    <section className="flex h-full flex-col gap-2 pt-4 ">
+    <section className="flex h-full flex-col gap-2 pt-4">
       {sidebarData.map((item) => (
         <div key={item.id}>
-          <h4 className={`text-gray text-sm uppercase`}>{item.title}</h4>
+          <h4 className="text-gray text-sm uppercase">{item.title}</h4>
           <div className="mt-3">
-            {item.links.map((link) => {
-              const allowedRoutes = ["/settings", "/orgchart"];
-              const isAdminOrUser =
-                userType?.name === "ADMIN" || userType?.name === "USER";
-              const isAllowedRoute =
-                isAdminOrUser && allowedRoutes.includes(link.route);
-              const accessRoutes =
-                userType?.[link.permission] || isAllowedRoute;
+            {item.links.map((link: SidebarLink) => {
+              // If you want even more route gating logic, do it here:
+              // e.g. let isAllowedRoute = ...
               const isActive =
                 (pathname.includes(link.route) && link.route.length > 1) ||
                 pathname === link.route;
-
-              if (!accessRoutes) {
-                return null;
-              }
 
               return (
                 <SheetClose asChild key={link.route}>
@@ -75,6 +66,37 @@ const NavContent = () => {
 const MobileNav = () => {
   const { isSheetOpen, setIsSheetOpen } = useHideSidebarOnResize();
 
+  // From your auth cookie
+  const { data: authData } = useAuthCookie();
+  const userType = authData?.userType;
+
+  // We store the fetched sidebar data here
+  const [sidebarData, setSidebarData] = useState<Sidebar[]>([]);
+
+  /**
+   * On mount (and whenever userType?.role_id changes),
+   * fetch the user’s sidebar data from Supabase.
+   */
+  useEffect(() => {
+    const fetchData = async () => {
+      if (!userType?.role_id) {
+        // If no role_id, we can bail or set empty array
+        setSidebarData([]);
+        return;
+      }
+
+      try {
+        const data = await getSidebarData(userType.role_id);
+        setSidebarData(data);
+      } catch (err) {
+        console.error("Error fetching sidebar data:", err);
+        setSidebarData([]);
+      }
+    };
+
+    fetchData();
+  }, [userType?.role_id]);
+
   return (
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
@@ -89,7 +111,7 @@ const MobileNav = () => {
       </SheetTrigger>
       <SheetContent
         side="left"
-        className="overflow-y-auto border-r border-zinc-300 bg-[#OEOEOE] dark:border-zinc-800"
+        className="overflow-y-auto border-r border-zinc-300 bg-[#0E0E0E] dark:border-zinc-800"
       >
         <Link href="/" className="flex items-center gap-1">
           <Image
@@ -100,8 +122,10 @@ const MobileNav = () => {
           />
         </Link>
         <div>
+          {/* The entire NavContent is wrapped in SheetClose
+              so that selecting a link closes the side nav */}
           <SheetClose asChild>
-            <NavContent />
+            <NavContent sidebarData={sidebarData} />
           </SheetClose>
         </div>
       </SheetContent>
