@@ -25,7 +25,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
-import { Sheet, SheetContent, SheetTrigger } from "@codevs/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetTitle,
+  SheetTrigger,
+} from "@codevs/ui/sheet";
 
 const NAV_ITEMS = [
   { id: "1", title: "Our Services", path: "/services" },
@@ -70,6 +76,10 @@ const MobileDrawer = ({
       side="left"
       className="bg-black-900 flex h-full w-full flex-col justify-start border-none bg-stone-900 pt-20 text-white"
     >
+      <SheetTitle className="hidden">Mobile Navbar</SheetTitle>
+      <SheetDescription className="hidden">
+        Navbar that contains links
+      </SheetDescription>
       {NAV_ITEMS.map((item) => {
         if (isLoggedIn && ["Sign In", "Sign Up"].includes(item.title)) {
           return null;
@@ -243,20 +253,13 @@ const Navigation = () => {
   return (
     <div
       className={`fixed z-50 flex w-full items-center justify-center p-5 lg:px-12 ${
-        color ? "bg-[#03030395]" : ""
+        color ? "bg-dark-500/55" : ""
       }`}
     >
       <div className="flex w-full items-center justify-between">
-        <div className="flex items-center gap-4">
-          <MobileDrawer
-            isLoggedIn={!!userData}
-            openSheet={openSheet}
-            setOpenSheet={setOpenSheet}
-            handleLogout={handleLogout}
-          />
+        <div className="flex w-full items-center gap-4">
           <Logo />
         </div>
-
         <div className="flex items-center gap-2">
           {!userData ? (
             <>
@@ -288,6 +291,12 @@ const Navigation = () => {
             <UserMenu {...userData} handleLogout={handleLogout} />
           )}
         </div>
+        <MobileDrawer
+          isLoggedIn={!!userData}
+          openSheet={openSheet}
+          setOpenSheet={setOpenSheet}
+          handleLogout={handleLogout}
+        />
       </div>
     </div>
   );
