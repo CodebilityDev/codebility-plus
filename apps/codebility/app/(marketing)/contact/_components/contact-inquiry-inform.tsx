@@ -10,7 +10,7 @@ const InquiryForm = () => {
     <div className="relative mx-auto flex w-screen max-w-xl flex-col gap-10 text-pretty rounded-lg border border-white/5 bg-white/5 px-10 py-10 text-white ">
       <div className="flex flex-col gap-1">
         <p className="text-xl">Inquire Form</p>
-        <p className="text-[#898989]">Kindly provide your details with us</p>
+        <p className="text-grey-100">Kindly provide your details with us</p>
       </div>
       <div className="flex flex-col gap-3">
         <div className="flex flex-col gap-2">
@@ -18,7 +18,7 @@ const InquiryForm = () => {
           <Input
             id="fullname"
             onChange={() => {}}
-            className="w-full rounded border border-[#1D1D1E] bg-[#1D1D1E] px-3 py-2 text-sm "
+            className="border-black-800 bg-black-800 w-full rounded border px-3 py-2 text-sm "
             placeholder="Enter your full name"
           />
         </div>
@@ -27,7 +27,7 @@ const InquiryForm = () => {
           <Input
             id="email"
             onChange={() => {}}
-            className="w-full rounded border border-[#1D1D1E] bg-[#1D1D1E] px-3 py-2 text-sm "
+            className="border-black-800 bg-black-800 w-full rounded border px-3 py-2 text-sm "
             placeholder="Enter your company email address"
           />
         </div>
@@ -36,7 +36,7 @@ const InquiryForm = () => {
           <Input
             id="email"
             onChange={() => {}}
-            className="w-full rounded border border-[#1D1D1E] bg-[#1D1D1E] px-3 py-2 text-sm "
+            className="border-black-800 bg-black-800 w-full rounded border px-3 py-2 text-sm "
             placeholder="Enter your Company Name"
           />
         </div>
@@ -45,7 +45,7 @@ const InquiryForm = () => {
           <Input
             id="phonenumber"
             onChange={() => {}}
-            className="w-full rounded border border-[#1D1D1E] bg-[#1D1D1E] px-3 py-2 text-sm "
+            className="border-black-800 bg-black-800 w-full rounded border px-3 py-2 text-sm "
           />
         </div>
       </div>

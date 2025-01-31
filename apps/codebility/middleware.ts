@@ -3,164 +3,119 @@ import { NextResponse } from "next/server";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import pathsConfig from "./config/paths.config";
-import { getCachedUser } from "./lib/server/supabase-server-comp";
-
-//ROUTE PROTECTION: Define which routes should be protected by middleware
 export const config = {
   matcher: [
-    "/((?!api|auth/signin|auth/signup|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|waiting|declined|thank-you|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
+    "/((?!api|auth/signin|auth/signup|auth/verify|waiting|declined|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|thank-you|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
   ],
 };
 
-// Helper to check if route is public
-const isPublicRoute = (pathname: string): boolean => {
-  const publicRoutes = [
-    "/api",
-    "/auth",
-    "/privacy-policy",
-    "/terms",
-    "/codevs",
-    "/index",
-    "/profiles",
-    "/waiting",
-    "/declined",
-    "/thank-you",
-    "/campaign",
-    "/services",
-    "/ai-integration",
-    "/bookacall",
-  ];
-
-  return publicRoutes.some((route) => pathname.startsWith(route));
-};
-
-// Helper to identify authentication errors
-const isAuthError = (error: any): boolean => {
-  return (
-    error?.message?.includes("refresh_token_not_found") ||
-    error?.message?.includes("invalid_token")
-  );
-};
+const PUBLIC_ROUTES = [
+  "/auth/sign-in",
+  "/auth/sign-up",
+  "/auth/verify",
+  "/auth/waiting",
+  "/auth/declined",
+  "/privacy-policy",
+  "/terms",
+  "/", // Other public pages
+] as const;
 
 export async function middleware(req: NextRequest) {
-  const res = NextResponse.next();
+  const { pathname, searchParams } = req.nextUrl;
 
-  // Check public routes first to avoid unnecessary auth checks
-  if (isPublicRoute(req.nextUrl.pathname)) {
-    return res;
+  // Allow public routes
+  if (PUBLIC_ROUTES.includes(pathname)) {
+    console.log("[DEBUG] Public route accessed:", pathname);
+    return NextResponse.next();
   }
 
-  try {
-    const supabase = getSupabaseServerComponentClient();
-    const user = await getCachedUser();
-
-    //AUTHENTICATION CHECK: Redirect to login if not authenticated
-    if (!user && !req.nextUrl.pathname.startsWith("/authv2")) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/authv2/sign-in";
-      return NextResponse.redirect(url);
-    }
-
-    if (!user) return res;
-
-    //FETCH USER DATA: Get user's application status and permissions
-    const { data: codev } = await supabase
-      .from("codev")
-      .select("application_status, user(*, user_type(*))")
-      .eq("user_id", user.id)
-      .single();
-
-    if (!codev) return res;
-
-    //APPLICATION STATUS HANDLING: Manage routing based on application status
-    if (
-      codev.application_status === "PENDING" &&
-      req.nextUrl.pathname !== "/home/account-settings"
-    ) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/waiting";
-      return NextResponse.redirect(url);
-    }
-
-    if (
-      codev.application_status === "DECLINED" &&
-      req.nextUrl.pathname !== "/home/account-settings"
-    ) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/declined";
-      return NextResponse.redirect(url);
-    }
-
-    //CHECK PERMISSIONS: Verify user has access to requested route
-    const hasPermission = await checkPermissions(user.id, req.nextUrl.pathname);
-
-    //PERMISSION-BASED REDIRECT: Handle unauthorized access attempts
-    if (codev.application_status === "ACCEPTED" && !hasPermission) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/home";
-      return NextResponse.redirect(url);
-    }
-  } catch (error) {
-    // Handle authentication errors gracefully
-    if (isAuthError(error) && !req.nextUrl.pathname.startsWith("/authv2")) {
-      const url = req.nextUrl.clone();
-      url.pathname = "/authv2/sign-in";
-      return NextResponse.redirect(url);
-    }
-  }
-
-  return res;
-}
-
-//PERMISSION CHECKING: Validate user's access rights for specific routes
-const checkPermissions = async (userId: string, path: string) => {
   const supabase = getSupabaseServerComponentClient();
-  const { data, error } = await supabase
-    .from("user")
-    .select("*, user_type(*)")
+
+  // Check authentication using getUser
+  const {
+    data: { user },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !user) {
+    // Prevent redirect loops between sign-in and sign-up
+    if (pathname === "/auth/sign-in" || pathname === "/auth/sign-up") {
+      console.log(
+        "[DEBUG] User is already on a public auth route. Allowing access.",
+      );
+      return NextResponse.next();
+    }
+
+    console.log("[DEBUG] User not authenticated. Redirecting to login.");
+    return redirectToLogin(req);
+  }
+
+  const userId = user.id;
+
+  // Fetch user data from the database
+  const { data: userData, error: userError } = await supabase
+    .from("codev")
+    .select("id, application_status")
     .eq("id", userId)
     .single();
 
-  if (error || !data) return false;
-
-  const permissions = data.user_type;
-
-  // Special handling for dashboard access
-  if (path === pathsConfig.app.home) {
-    return permissions.dashboard === true;
+  if (userError || !userData) {
+    console.log("[DEBUG] Failed to fetch user data. Redirecting to login.");
+    return redirectToLogin(req);
   }
 
-  const pathSegments = path.split("/");
-  let lastSegment: string | undefined;
+  const { application_status } = userData;
 
-  // Handle nested routes (e.g., settings pages)
+  // Handle application_status-based redirection
   if (
-    pathSegments.length === 4 &&
-    pathSegments[1] === "home" &&
-    pathSegments[2] === "settings"
+    application_status === "passed" &&
+    [
+      "/auth/declined",
+      "/auth/waiting",
+      "/auth/verify",
+      "/auth/sign-in",
+      "/auth/sign-up",
+    ].includes(pathname)
   ) {
-    lastSegment = pathSegments[3];
-  } else {
-    lastSegment = pathSegments[2];
+    console.log(
+      "[DEBUG] User with 'passed' status trying to access restricted route.",
+    );
+    return redirectTo(req, "/codevs");
   }
 
-  // Map URL-friendly paths to permission keys
-  const segmentMap: { [key: string]: string } = {
-    "in-house": "in_house",
-    "time-tracker": "time_tracker",
-    "account-settings": "account_settings",
-  };
-
-  // Ensure `lastSegment` is defined
-  if (lastSegment) {
-    lastSegment = segmentMap[lastSegment] || lastSegment;
-
-    // Check if user has permission for the requested route
-    if (lastSegment in permissions) {
-      return permissions[lastSegment] === true;
-    }
+  if (
+    application_status === "failed" &&
+    ["/home", "/auth/waiting", "/auth/verify"].includes(pathname)
+  ) {
+    console.log(
+      "[DEBUG] User with 'failed' status trying to access restricted route.",
+    );
+    return redirectTo(req, "/auth/declined");
   }
 
-  return false;
-};
+  if (
+    application_status === "applying" &&
+    ["/home", "/auth/declined", "/auth/verify"].includes(pathname)
+  ) {
+    console.log(
+      "[DEBUG] User with 'applying' status trying to access restricted route.",
+    );
+    return redirectTo(req, "/auth/waiting");
+  }
+
+  console.log("[DEBUG] User has permission to access:", pathname);
+  return NextResponse.next();
+}
+
+function redirectToLogin(req: NextRequest) {
+  const redirectUrl = new URL("/auth/sign-in", req.url);
+  redirectUrl.searchParams.set("from", req.nextUrl.pathname);
+  console.log("[DEBUG] Redirecting to login:", redirectUrl.toString());
+  return NextResponse.redirect(redirectUrl);
+}
+
+function redirectTo(req: NextRequest, path: string) {
+  const redirectUrl = new URL(path, req.url);
+  console.log("[DEBUG] Redirecting to:", redirectUrl.toString());
+  return NextResponse.redirect(redirectUrl);
+}

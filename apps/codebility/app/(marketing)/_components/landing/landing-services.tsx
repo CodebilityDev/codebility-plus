@@ -40,7 +40,7 @@ const Services = () => {
           </div>
           <div className="flex flex-col items-center justify-center gap-2 py-6 md:pt-20">
             <Button
-              variant="outlined"
+              variant="outline"
               className="hover:opacity-70"
               rounded="full"
             >

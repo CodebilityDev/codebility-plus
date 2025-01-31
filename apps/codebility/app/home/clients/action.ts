@@ -1,198 +1,119 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { deleteImage, uploadImage } from "@/utils/uploadImage";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
-export const uploadImage = async (
-  file: File,
-  folderName: string,
-  bucketName: string,
-): Promise<string | null> => {
-  try {
-    if (!file) {
-      console.error("No file provided for upload");
-      return null;
-    }
-    console.log(
-      "Uploading file:",
-      file.name,
-      "Size:",
-      file.size,
-      "Type:",
-      file.type,
-    );
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const extension = file.name.split(".").pop();
-    const filename = `${timestamp}.${extension}`;
-
-    const supabase = await getSupabaseServerActionClient();
-
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .upload(`${folderName}/${filename}`, buffer, {
-        contentType: file.type,
-      });
-
-    if (error) {
-      console.error(`Failed to upload ${file.name}:`, error.message);
-      return null;
-    }
-
-    const { data: imageData } = supabase.storage
-      .from("clients-image")
-      .getPublicUrl(`public/${filename}`);
-
-    return imageData?.publicUrl || null;
-  } catch (error) {
-    console.error("Error in upload image:", error);
-    throw error;
-  }
-};
-
-export const deleteImage = async (path: string) => {
-  const supabase = await getSupabaseServerActionClient();
-  const filePath = path.split("/public/")[2];
-
-  if (filePath) {
-    const { error } = await supabase.storage
-      .from("clients-image")
-      .remove([`public/${filePath}`]);
-
-    if (error) {
-      return { success: false, error: error.message };
-    }
-  } else {
-    console.error("Failed to extract file path from public URL");
-  }
-};
-
+/**
+ * CREATE CLIENT ACTION
+ *
+ * Adjust the form fields to match what your `clients` table actually needs.
+ */
 export const createClientAction = async (formData: FormData) => {
+  // Fields that exist in your schema:
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
-  const location = formData.get("location") as string;
-  const contact_number = formData.get("contact_number") as string;
-  const linkedin_link = formData.get("linkedin_link") as string;
-  const start_time = formData.get("start_time") as string;
-  const end_time = formData.get("end_time") as string;
-  const logo = formData.get("logo") as File | null;
+  const phone_number = formData.get("phone_number") as string;
+  const address = formData.get("address") as string;
+  const status = formData.get("status") as string; // e.g. 'prospect' | 'active' | 'inactive'
+  const logoFile = formData.get("logo") as File | null; // This will be uploaded
 
   const supabase = await getSupabaseServerActionClient();
 
-  let logoPath = null;
-  if (logo) {
-    logoPath = await uploadImage(logo, "public", "clients-image");
+  let company_logo: string | null = null;
+  if (logoFile) {
+    // Upload the file and retrieve the publicUrl string
+    const { publicUrl } = await uploadImage(logoFile, {
+      bucket: "codebility",
+      folder: "clientImage",
+    });
+    company_logo = publicUrl;
   }
 
-  const { data: clientsData, error: clientsError } = await supabase
+  const { data: newClient, error: createError } = await supabase
     .from("clients")
     .insert({
-      name: name,
-      logo: logoPath,
-      location: location || null,
-      email,
-      contact_number: contact_number || null,
-      linkedin_link: linkedin_link,
-      start_time: start_time || null,
-      end_time: end_time || null,
+      name,
+      email: email || null,
+      phone_number: phone_number || null,
+      address: address || null,
+      company_logo,
+      status: status || "prospect",
     })
     .single();
 
-  if (clientsError) {
-    console.error("Error creating clients:", clientsError.message);
-    return { success: false, error: clientsError.message };
+  if (createError) {
+    console.error("Error creating client:", createError.message);
+    return { success: false, error: createError.message };
   }
 
+  // Revalidate the path so changes show up on reload
   revalidatePath("/home/clients");
-  return { success: true, clientsData };
+  return { success: true, data: newClient };
 };
 
-export const updateClientAction = async (clientId: number, formData: FormData) => {
+/**
+ * UPDATE CLIENT ACTION
+ *
+ * Updates any of the fields above if new values are provided.
+ * Retains existing data if none is given.
+ */
+export const updateClientAction = async (
+  clientId: string, // UUID from your table
+  formData: FormData,
+) => {
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
-  const location = formData.get("location") as string;
-  const contact_number = formData.get("contact_number") as string;
-  const linkedin_link = formData.get("linkedin_link") as string;
-  const start_time = formData.get("start_time") as string;
-  const end_time = formData.get("end_time") as string;
-  const logo = formData.get("logo") as File | null;
+  const phone_number = formData.get("phone_number") as string;
+  const address = formData.get("address") as string;
+  const status = formData.get("status") as string;
+  const logoFile = formData.get("logo") as File | null;
 
   const supabase = await getSupabaseServerActionClient();
 
-  const { data: clientsData, error: clientsError } = await supabase
+  // Fetch existing client row
+  const { data: clientData, error: fetchError } = await supabase
     .from("clients")
     .select("*")
     .eq("id", clientId)
     .single();
 
-  if (clientsError) {
-    console.error("Error fetching projects data:", clientsError.message);
-    return { success: false, error: clientsError.message };
+  if (fetchError || !clientData) {
+    console.error("Error fetching client:", fetchError?.message);
+    return { success: false, error: fetchError?.message };
   }
 
-  const updateClient = {
-    name: name || clientsData.name,
-    email: email || clientsData.email,
-    location: location || clientsData.location,
-    contact_number: contact_number || clientsData.contact_number,
-    linkedin_link: linkedin_link || clientsData.linkedin_link,
-    start_time: start_time || clientsData.start_time,
-    end_time: end_time || clientsData.end_time,
-    logo: clientsData.logo
+  // Current value of company_logo in the DB (a string)
+  let company_logo = clientData.company_logo;
+
+  // If a new file is uploaded, remove the old image (if any) and upload the new one
+  if (logoFile) {
+    // Delete the old image if it exists
+    if (company_logo) {
+      await deleteImage(company_logo);
+    }
+    // Upload the new file -> publicUrl
+    const { publicUrl } = await uploadImage(logoFile, {
+      bucket: "codebility",
+      folder: "clientImage",
+    });
+    company_logo = publicUrl;
+  }
+
+  const updatedFields = {
+    name: name || clientData.name,
+    email: email || clientData.email,
+    phone_number: phone_number || clientData.phone_number,
+    address: address || clientData.address,
+    status: status || clientData.status,
+    company_logo,
   };
 
-  if (logo) {
-    if (clientsData.logo) {
-      await deleteImage(clientsData.logo);
-    }
-
-    updateClient.logo = await uploadImage(
-      logo,
-      "public",
-      "clients-image",
-    );
-  }
-
-  const { data: updateClientsData, error: updateClientsError } = await supabase
-    .from("clients")
-    .update(updateClient)
-    .eq("id", clientId)
-    .single();
-
-  if (updateClientsError) {
-    console.error("Error updating client:", updateClientsError.message);
-    return { success: false, error: updateClientsError.message };
-  }
-
-  revalidatePath("/home/clients");
-  return { success: true, data: updateClientsData };
-};
-
-export const toggleClientArchiveAction = async (clientId: number) => {
-  const supabase = await getSupabaseServerActionClient();
-
-  const { data: client, error: fetchError } = await supabase
-    .from("clients")
-    .select("is_archive")
-    .eq("id", clientId)
-    .single();
-
-  if (fetchError) {
-    console.error("Error fetching client data:", fetchError.message);
-    return { success: false, error: fetchError.message };
-  }
-
-  const newIsArchiveValue = !client.is_archive;
-
+  // Update row
   const { data: updatedClient, error: updateError } = await supabase
     .from("clients")
-    .update({
-      is_archive: newIsArchiveValue,
-    })
+    .update(updatedFields)
     .eq("id", clientId)
     .single();
 
@@ -202,15 +123,58 @@ export const toggleClientArchiveAction = async (clientId: number) => {
   }
 
   revalidatePath("/home/clients");
-  return { success: true, updatedClient };
+  return { success: true, data: updatedClient };
 };
 
-export const deleteClientAction = async (id: number) => {
+/**
+ * TOGGLE CLIENT STATUS ACTION
+ *
+ * If a client is 'inactive', set them 'active'; otherwise, set them 'inactive'.
+ */
+export const toggleClientStatusAction = async (clientId: string) => {
   const supabase = await getSupabaseServerActionClient();
 
+  const { data: client, error: fetchError } = await supabase
+    .from("clients")
+    .select("status")
+    .eq("id", clientId)
+    .single();
+
+  if (fetchError || !client) {
+    console.error("Error fetching client:", fetchError?.message);
+    return { success: false, error: fetchError?.message };
+  }
+
+  // Toggle logic
+  const newStatus = client.status === "inactive" ? "active" : "inactive";
+
+  const { data: updatedClient, error: updateError } = await supabase
+    .from("clients")
+    .update({ status: newStatus })
+    .eq("id", clientId)
+    .single();
+
+  if (updateError) {
+    console.error("Error toggling client status:", updateError.message);
+    return { success: false, error: updateError.message };
+  }
+
+  revalidatePath("/home/clients");
+  return { success: true, data: updatedClient };
+};
+
+/**
+ * DELETE CLIENT ACTION
+ *
+ * Removes a client row by ID. Also deletes its associated image from storage if present.
+ */
+export const deleteClientAction = async (id: string) => {
+  const supabase = await getSupabaseServerActionClient();
+
+  // 1. Fetch the client’s existing company_logo, if any
   const { data: clientData, error: getClientError } = await supabase
     .from("clients")
-    .select("logo")
+    .select("company_logo")
     .eq("id", id)
     .single();
 
@@ -219,10 +183,12 @@ export const deleteClientAction = async (id: number) => {
     return { success: false, error: getClientError.message };
   }
 
-  if (clientData.logo) {
-    await deleteImage(clientData.logo);
+  // 2. Delete the image if it exists
+  if (clientData?.company_logo) {
+    await deleteImage(clientData.company_logo);
   }
 
+  // 3. Delete the client record
   const { error: deleteClientError } = await supabase
     .from("clients")
     .delete()
@@ -233,6 +199,7 @@ export const deleteClientAction = async (id: number) => {
     return { success: false, error: deleteClientError.message };
   }
 
-  revalidatePath("/home/clients/archive");
+  // Revalidate the clients list
+  revalidatePath("/home/clients");
   return { success: true };
 };

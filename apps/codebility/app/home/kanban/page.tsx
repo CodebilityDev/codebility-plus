@@ -1,3 +1,4 @@
+// page.tsx
 import Link from "next/link";
 import { Box } from "@/Components/shared/dashboard";
 import H1 from "@/Components/shared/dashboard/H1";
@@ -18,123 +19,173 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 
 import KanbanBoardsSearch from "./_components/kanban-boards-search";
 
-export default async function KanbanPage({
-  searchParams,
-}: {
-  searchParams: {
-    query: string;
-  };
-}) {
-  const query = searchParams.query;
+// Types
+interface SearchParams {
+  query?: string;
+}
+
+interface CodevData {
+  id: string;
+  first_name: string;
+  last_name: string;
+  image_url?: string | null;
+}
+
+interface ProjectData {
+  id: string;
+  name: string;
+  team_leader_id: string;
+  codev?: CodevData;
+}
+
+interface KanbanBoardData {
+  id: string;
+  name: string;
+  description?: string | null;
+  created_at?: string;
+  updated_at?: string;
+  projects?: ProjectData | null;
+}
+
+interface PageProps {
+  searchParams: SearchParams;
+}
+
+export default async function KanbanPage({ searchParams }: PageProps) {
   const supabase = getSupabaseServerComponentClient();
 
-  let supabaseBoardQuery = supabase.from("board").select(`*,
-    project(
-      *,
-      codev(
-        user(
-          profile(
-            first_name,
-            last_name
-          )
-        )
+  let boardQuery = supabase.from("kanban_boards").select(`
+    id,
+    name,
+    description,
+    created_at,
+    updated_at,
+    projects!kanban_boards_project_id_fkey (
+      id,
+      name,
+      codev!projects_team_leader_id_fkey (
+        id,
+        first_name,
+        last_name,
+        image_url
       )
     )
   `);
 
-  if (query) {
-    // apply board filter if there is query in url search query.
-    supabaseBoardQuery = supabaseBoardQuery.like("name", `%${query}%`);
+  if (searchParams.query) {
+    boardQuery = boardQuery.ilike("name", `%${searchParams.query}%`);
   }
 
-  const { data, error } = await supabaseBoardQuery;
+  const { data: boards, error } = await boardQuery;
+  const typedBoards = boards as KanbanBoardData[] | null;
+
+  const renderTableContent = () => {
+    if (error) {
+      return (
+        <TableRow>
+          <TableCell colSpan={4} className="text-center text-red-500">
+            {error.message || "Error loading boards"}
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (!typedBoards) {
+      return Array.from({ length: 3 }).map((_, index) => (
+        <TableRow key={`loading-${index}`}>
+          <TableCell colSpan={4}>
+            <Box className="flex-1">
+              <div className="flex flex-col items-center gap-3">
+                <Skeleton className="h-8 w-full" />
+              </div>
+            </Box>
+          </TableCell>
+        </TableRow>
+      ));
+    }
+
+    if (typedBoards.length === 0) {
+      return (
+        <TableRow>
+          <TableCell
+            colSpan={4}
+            className="text-dark100_light900 py-8 text-center"
+          >
+            No boards available. Create a board to get started.
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return typedBoards.map((board) => (
+      <TableRow key={board.id} className="grid grid-cols-1 md:table-row">
+        <TableCell className="md:table-cell">
+          <div className="flex flex-col">
+            <span className="font-medium">{board.name}</span>
+            {board.description && (
+              <span className="text-sm text-gray-500">{board.description}</span>
+            )}
+          </div>
+        </TableCell>
+
+        <TableCell className="md:table-cell">
+          {board.projects?.name || "No project assigned"}
+        </TableCell>
+
+        <TableCell className="md:table-cell">
+          {board.projects?.codev ? (
+            <div className="flex items-center gap-2">
+              {board.projects.codev.image_url && (
+                <img
+                  src={board.projects.codev.image_url}
+                  alt={`${board.projects.codev.first_name}'s avatar`}
+                  className="h-8 w-8 rounded-full object-cover"
+                />
+              )}
+              <span className="capitalize">
+                {`${board.projects.codev.first_name} ${board.projects.codev.last_name}`}
+              </span>
+            </div>
+          ) : (
+            "No team lead assigned"
+          )}
+        </TableCell>
+
+        <TableCell className="text-center md:table-cell">
+          <Link href={`${pathsConfig.app.kanban}/${board.id}`}>
+            <Button variant="hollow" className="inline-flex items-center gap-2">
+              <IconKanban className="h-4 w-4" />
+              <span className="hidden sm:inline">View Board</span>
+            </Button>
+          </Link>
+        </TableCell>
+      </TableRow>
+    ));
+  };
 
   return (
-    <div className="text-dark100_light900 mx-auto flex max-w-7xl flex-col gap-4 ">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <H1>Codevs Board</H1>
-        <div className="flex flex-col items-end gap-4 md:flex-row md:items-center md:justify-end">
+    <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <H1>Kanban Boards</H1>
+        <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
           <KanbanBoardsSearch
-            className="border-gray h-10 w-full rounded-full border border-opacity-50 bg-inherit px-5 text-xs focus:outline-none md:w-80"
-            placeholder="Search Board"
+            className="h-10 w-full rounded-full border border-gray-200 bg-transparent px-5 text-sm focus:outline-none dark:border-gray-700 md:w-80"
+            placeholder="Search boards..."
           />
         </div>
       </div>
+
       <Table>
-        <TableHeader className="hidden xl:block">
-          <TableRow className="text-dark100_light900 grid grid-cols-4 place-items-center border-none">
-            <TableHead>Name</TableHead>
-            <TableHead>Project Name</TableHead>
-            <TableHead>Lead</TableHead>
-            <TableHead>Board</TableHead>
+        <TableHeader className="hidden md:table-header-group">
+          <TableRow>
+            <TableHead className="w-[30%]">Board Name</TableHead>
+            <TableHead className="w-[30%]">Project</TableHead>
+            <TableHead className="w-[30%]">Team Lead</TableHead>
+            <TableHead className="w-[10%] text-center">Actions</TableHead>
           </TableRow>
         </TableHeader>
-        <TableBody className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-1">
-          {!error ? (
-            <>
-              {data?.map((board) => (
-                <TableRow
-                  key={board.id}
-                  className="background-lightbox_darkbox text-dark100_light900 border-lightgray dark:border-black-500 flex flex-col xl:grid xl:flex-none xl:grid-cols-4 xl:place-items-center"
-                >
-                  <TableCell>
-                    <p>{board.name}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p>{board.project.name}</p>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-x-1">
-                      <p className="capitalize">
-                        {board.project?.codev.user.profile.first_name}
-                      </p>
-                      <p className="capitalize">
-                        {board.project?.codev.user.profile.last_name}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="xl:flex xl:items-center xl:justify-center">
-                    <Link href={`${pathsConfig.app.kanban}/${board.id}`}>
-                      <Button variant="hollow" className="border-none xl:w-max">
-                        <IconKanban className="invert dark:invert-0" />
-                      </Button>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </>
-          ) : (
-            <>
-              <TableRow className="background-lightbox_darkbox text-dark100_light900 border-lightgray dark:border-black-500 flex flex-col">
-                <TableCell>
-                  <Box className="flex-1">
-                    <div className="mx-auto flex flex-col items-center gap-3">
-                      <Skeleton className="h-8 w-full" />
-                    </div>
-                  </Box>
-                </TableCell>
-              </TableRow>
-              <TableRow className="background-lightbox_darkbox text-dark100_light900 border-lightgray dark:border-black-500 flex flex-col">
-                <TableCell>
-                  <Box className="flex-1">
-                    <div className="mx-auto flex flex-col items-center gap-3">
-                      <Skeleton className="h-8 w-full" />
-                    </div>
-                  </Box>
-                </TableCell>
-              </TableRow>
-              <TableRow className="background-lightbox_darkbox text-dark100_light900 border-lightgray dark:border-black-500 flex flex-col">
-                <TableCell>
-                  <Box className="flex-1">
-                    <div className="mx-auto flex flex-col items-center gap-3">
-                      <Skeleton className="h-8 w-full" />
-                    </div>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            </>
-          )}
-        </TableBody>
+
+        <TableBody>{renderTableContent()}</TableBody>
       </Table>
     </div>
   );

@@ -64,12 +64,18 @@ const config: Config = {
           300: "#3A4285",
           500: "#583DFF",
           600: "#1F2449",
+          700: "#00738B",
+          800: "#0C3FDB"
         },
         red: {
           100: "#D45454",
           200: "#A23939",
         },
-        violet: "#9747FF",
+        violet: {
+          100: "#9747FF",
+          200: "#C108FE",
+          300: "#9707DD",
+        },
         teal: "#02FFE2",
         white: "#F4F4F4",
         black: {
@@ -81,6 +87,9 @@ const config: Config = {
           600: "#0A0A0A",
           700: "#101010",
           800: "#1D1D1E",
+        },
+        grey: {
+          100: "#898989",
         },
         dark: {
           100: "#1e1f26", // Navbar fill color / login box fill color
@@ -109,7 +118,7 @@ const config: Config = {
         "dark-200": "#2c303a",
         "dark-300": "#131417",
         "dark-400": "#212734",
-        "dark-500": "#0F1013",
+        "dark-500": "#14161a",
         "light-500": "#7B8EC8",
         "light-700": "#DCE3F1",
         "light-800": "#F4F6F8",

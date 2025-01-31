@@ -1,21 +1,32 @@
 import { Suspense } from "react";
 import SectionWrapper from "@/Components/shared/home/SectionWrapper";
 import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
-import { getAdmins, getCodevs } from "@/lib/server/codev.service";
+import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
 
 import ProfileContainer from "./_components/profile-container";
 import CodevLists from "./_components/profile-lists";
 
 export default async function Profiles() {
-  const [{ data: codevs }, { data: admins }] = await Promise.all([
-    getCodevs("INHOUSE"),
-    getAdmins(),
-  ]);
+  // Define role IDs
+  const adminRoleId = 1; // Replace with the actual role ID for admins
 
-  const filteredCodevs = (codevs as Codev[]).filter(
-    (codev) =>
-      !(admins as Codev[]).some((admin) => admin.user_id === codev.user_id),
+  // Fetch data for Codevs and Admins in parallel
+  const [{ data: allCodevs, error }] = await Promise.all([getCodevs()]);
+
+  if (error) {
+    throw new Error("Failed to fetch profiles data");
+  }
+
+  // Ensure `allCodevs` is an array
+  const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
+
+  // Filter admins and codevs
+  // const adminsArray = codevsArray.filter(
+  //   (codev) => codev.role_id === adminRoleId,
+  // );
+  const filteredCodevs = codevsArray.filter(
+    (codev) => codev.role_id !== adminRoleId,
   );
 
   return (
@@ -25,7 +36,7 @@ export default async function Profiles() {
     >
       <div className="bg-code-pattern absolute inset-0 bg-repeat opacity-5"></div>
       <div className="relative flex flex-col gap-8">
-        <ProfileContainer />
+        <ProfileContainer filteredCodevs={filteredCodevs} />
         <Suspense fallback={<UsersSkeleton />}>
           <CodevLists codevs={filteredCodevs} />
         </Suspense>

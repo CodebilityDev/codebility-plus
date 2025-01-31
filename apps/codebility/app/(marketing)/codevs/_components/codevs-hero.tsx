@@ -2,10 +2,8 @@ import { Rowdies } from "next/font/google";
 import Link from "next/link";
 import { Button } from "@/Components/ui/button";
 import pathsConfig from "@/config/paths.config";
-import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import SideNavMenu from "../../_components/marketing-sidenav-menu";
-import { getApplicationStatus } from "../service";
 import OrbitingCirclesBackground from "./codevs-orbiting-circles-bg";
 
 const rowdies = Rowdies({
@@ -14,14 +12,6 @@ const rowdies = Rowdies({
 });
 
 export default async function Hero() {
-  const user = await getCachedUser();
-
-  let data = null;
-
-  if (user) {
-    data = (await getApplicationStatus(user?.id!)).data;
-  }
-
   return (
     <section
       id="home"
@@ -52,20 +42,14 @@ export default async function Hero() {
           Where Diversity Flourishes and Connections Thrive
         </p>
         <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
-          <Link
-            href={
-              data?.application_status === "ACCEPTED"
-                ? pathsConfig.app.home
-                : pathsConfig.auth.signUp
-            }
-          >
+          <Link href={pathsConfig.auth.signUp}>
             <Button
               variant="purple"
               size="lg"
               rounded="full"
               className="md:w-40"
             >
-              {data?.application_status === "ACCEPTED" ? "Dashboard" : "Join"}
+              Join
             </Button>
           </Link>
           <Link href="#codevs">
@@ -77,9 +61,6 @@ export default async function Hero() {
           </Link>
         </div>
       </div>
-
-      {/* old background */}
-      {/* <div className="hero-gradient absolute -top-80 z-10  h-[400px] w-screen blur-[200px] md:blur-[500px]"></div> */}
 
       <div className="hero-bubble">
         {Array.from({ length: 8 }, (_, index) => (

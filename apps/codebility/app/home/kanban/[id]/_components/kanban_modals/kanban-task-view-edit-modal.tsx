@@ -2,11 +2,11 @@
 
 import { ReactNode } from "react";
 import { useModal } from "@/hooks/use-modal";
-import { Task } from "@/types/home/task";
+import { ExtendedTask } from "@/types/home/codev";
 
 interface Props {
   children: ReactNode;
-  task: Task;
+  task: ExtendedTask;
 }
 
 export default function KanbanTaskViewEditModal({ children, task }: Props) {

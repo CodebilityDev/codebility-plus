@@ -1,20 +1,19 @@
-import { ApplicantsList_Types } from "@/app/home/applicants/_types/applicants";
+import { Codev } from "@/types/home/codev";
 import { create } from "zustand";
 
-export type ModalType = "applicantsAddModal" | "applicantsEditModal";
+export type ModalType = "applicantsEditModal";
 
 interface ModalStore {
-    type: ModalType | null;
-    data?: ApplicantsList_Types;
-    isOpen: boolean;
-    onOpen: (type: ModalType, data?: ApplicantsList_Types) => void;
-    onClose: () => void;
+  type: ModalType | null;
+  data?: Codev;
+  isOpen: boolean;
+  onOpen: (type: ModalType, data?: Codev) => void;
+  onClose: () => void;
 }
 
 export const useModal = create<ModalStore>((set) => ({
-    type: null,
-    isOpen: false,
-    onOpen: (type: ModalType, data?: ApplicantsList_Types) =>
-        set({ isOpen: true, type, data }),
-    onClose: () => set({ type: null, isOpen: false }),
+  type: null,
+  isOpen: false,
+  onOpen: (type: ModalType, data?: Codev) => set({ isOpen: true, type, data }),
+  onClose: () => set({ type: null, isOpen: false }),
 }));

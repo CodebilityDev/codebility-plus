@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { signOut } from "@/app/authv2/actions";
+import { signOut } from "@/app/auth/actions";
 import MobileNav from "@/Components/shared/dashboard/MobileNav";
 import Theme from "@/Components/shared/dashboard/Theme";
 import useAuth from "@/hooks/use-auth";

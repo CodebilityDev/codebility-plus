@@ -32,13 +32,13 @@ const Hero = () => {
               </div>
               <div className="md:mx-auto">
                 <div className="flex w-full flex-col gap-4 md:flex-row">
-                  <Link href="#workwithus">
+                  <Link href="/services">
                     <Button variant="purple" size="lg" rounded="full">
                       Our Portfolio
                     </Button>
                   </Link>
                   <Link href="#features">
-                    <Button variant="outlined" size="lg" rounded="full">
+                    <Button variant="outline" size="lg" rounded="full">
                       Learn more
                     </Button>
                   </Link>
@@ -50,7 +50,8 @@ const Hero = () => {
               alt="Hero Grid Background"
               width={1300}
               height={340}
-              className="absolute -top-[10%] left-1/2 h-[340px] w-[1300px] -translate-x-1/2 transform"
+              className="absolute -top-[10%] left-1/2 -translate-x-1/2 transform"
+              priority
             />
           </div>
 

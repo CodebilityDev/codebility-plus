@@ -10,28 +10,30 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
-  const [mode, setMode] = useState("");
-
-  const handleThemeChange = () => {
-    if (
-      localStorage.theme === "dark" ||
-      (!("theme" in localStorage) &&
-        window.matchMedia("(prefers-color-scheme: dark)").matches)
-    ) {
-      setMode("dark");
-      document.documentElement.classList.add("dark");
-    } else {
-      setMode("light");
-      document.documentElement.classList.remove("dark");
-    }
-  };
+  const [mode, setMode] = useState<string | null>(null);
 
   useEffect(() => {
-    handleThemeChange();
+    // Apply the theme based on localStorage or system preference
+    const savedTheme =
+      localStorage.getItem("theme") ||
+      (window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light");
+
+    setMode(savedTheme);
+    document.documentElement.classList.add(savedTheme);
+  }, []);
+
+  useEffect(() => {
+    if (mode) {
+      document.documentElement.classList.remove("light", "dark");
+      document.documentElement.classList.add(mode);
+      localStorage.setItem("theme", mode);
+    }
   }, [mode]);
 
   return (
-    <ThemeContext.Provider value={{ mode, setMode }}>
+    <ThemeContext.Provider value={{ mode: mode || "light", setMode }}>
       {children}
     </ThemeContext.Provider>
   );
@@ -40,7 +42,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 export function useTheme() {
   const context = useContext(ThemeContext);
 
-  if (context === undefined) {
+  if (!context) {
     throw new Error("useTheme must be used within a ThemeProvider");
   }
 
