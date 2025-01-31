@@ -1,6 +1,7 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
-import { tokenPoints } from "@/app/home/interns/data";
 import Badges from "@/Components/shared/Badges";
 import Box from "@/Components/shared/dashboard/Box";
 import {
@@ -18,6 +19,7 @@ const ProfileModal = () => {
   const { isOpen, type, onClose, data } = useModal();
   const isModalOpen = isOpen && type === "profileModal";
 
+  const codevData = (data as Codev) || {};
   const {
     first_name,
     last_name,
@@ -31,8 +33,9 @@ const ProfileModal = () => {
     display_position,
     internal_status,
     tech_stacks,
-  } = (data as Codev) || {};
+  } = codevData;
 
+  // If you fetch projects in the future, store them in codevData.projects or something
   const projects: any[] = [];
 
   return (
@@ -46,6 +49,8 @@ const ProfileModal = () => {
             User Profile
           </DialogTitle>
         </DialogHeader>
+
+        {/* LEFT COLUMN: Avatar + Basic Info */}
         <Box className="bg-light-700 mx-auto flex w-full flex-col items-center justify-center gap-6 rounded-lg border-none text-center md:w-1/3">
           <div className="from-violet relative size-24 self-center rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover">
             <Image
@@ -56,17 +61,19 @@ const ProfileModal = () => {
               loading="eager"
             />
           </div>
+
           <div className="bg-light-800 dark:bg-dark-400 flex w-full flex-col items-center p-4 py-3">
             <p className="text-2xl font-semibold capitalize">
               {first_name} {last_name}
             </p>
-            {display_position ? null : (
+            {display_position ? (
               <p className="dark:text-lightgray font-extralight capitalize">
                 {display_position}
               </p>
-            )}
+            ) : null}
             <p className="font-normal capitalize">{address}</p>
           </div>
+
           <div className="flex w-full flex-col items-center gap-2 py-1">
             <p className="dark:text-gray">Status</p>
             <p
@@ -83,6 +90,7 @@ const ProfileModal = () => {
                   internal_status.slice(1).toLowerCase()}
             </p>
           </div>
+
           <div className="flex w-full flex-col items-center gap-2 py-6">
             <p className="dark:text-gray">Current Project</p>
             {projects &&
@@ -95,12 +103,16 @@ const ProfileModal = () => {
                 </p>
               ))}
           </div>
+
           <div className="pb-6">
             <p className="dark:text-gray">Badges</p>
             <Badges />
           </div>
         </Box>
+
+        {/* RIGHT COLUMN: Socials, About, Skills, etc. */}
         <Box className="bg-light-700 mx-auto flex w-full flex-col gap-6 rounded-lg border-none pt-6 md:w-2/3">
+          {/* Socials */}
           <div>
             <p className="dark:text-gray pb-2.5">Socials</p>
             <div className="flex items-center gap-2">
@@ -150,32 +162,21 @@ const ProfileModal = () => {
               )}
             </div>
           </div>
+
+          {/* About */}
           <div className="py-4">
             <p className="dark:text-gray pb-2.5">About Me</p>
             {about ? <p className="h-20 overflow-y-auto">{about}</p> : <p></p>}
           </div>
-          <div className="pb-4">
-            <p className="dark:text-gray pb-2.5">Token Points</p>
-            <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-              {tokenPoints &&
-                tokenPoints.map((token, index) => (
-                  <div
-                    key={`${token.points}-${index}`}
-                    className="dark:border-gray flex w-full flex-col items-center rounded-lg border p-4"
-                  >
-                    <p className="text-3xl">{token.points}</p>
-                    <p className=" dark:text-gray">{token.position}</p>
-                  </div>
-                ))}
-            </div>
-          </div>
+
+          {/* Skills */}
           <div className="pb-4">
             <p className="dark:text-gray pb-2.5">Skills</p>
             <div className="flex flex-wrap gap-2">
               {tech_stacks &&
                 tech_stacks.map((name, index) => {
                   const tech = techstacks.find(
-                    (tech) => tech.name.toLowerCase() === name.toLowerCase(),
+                    (t) => t.name.toLowerCase() === name.toLowerCase(),
                   );
                   if (!tech) return null;
                   const { icon: Icon } = tech;
