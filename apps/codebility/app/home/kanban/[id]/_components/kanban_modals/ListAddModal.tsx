@@ -17,7 +17,7 @@ import { Input } from "@codevs/ui/input";
 
 const ColumnAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
-  const isModalOpen = isOpen && type === "columnAddModal";
+  const isModalOpen = isOpen && type === "ColumnAddModal";
 
   const [columnName, setColumnName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
