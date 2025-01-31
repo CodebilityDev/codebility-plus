@@ -28,13 +28,23 @@ const AddRoleModal = () => {
   };
 
   const handleSave = async () => {
-    if (!newRole) return toast.error("Name is Empty");
+    if (!newRole) {
+      toast.error("Name is empty");
+      return;
+    }
 
     try {
-      await createRole({ name: newRole });
-      onClose();
+      const response = await createRole({ name: newRole });
+      if (!response.success) {
+        toast.error(response.error || "Failed to create role");
+        return;
+      }
+
+      toast.success("Role created successfully!");
+      handleClose();
     } catch (error) {
-      console.error("Something went wrong");
+      console.error("Something went wrong", error);
+      toast.error("An unexpected error occurred");
     }
   };
 
@@ -42,16 +52,17 @@ const AddRoleModal = () => {
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent
         aria-describedby={undefined}
-        className=" bg-light-900 flex h-auto w-[95%] max-w-3xl flex-col justify-items-center gap-6 text-stone-900 dark:text-white"
+        className="bg-light-900 flex h-auto w-[95%] max-w-3xl flex-col justify-items-center gap-6 text-stone-900 dark:text-white"
       >
-        <div className="lef-0 border-black-200 absolute right-0 top-0 flex w-[100%] flex-row items-center justify-between gap-2 border-b-[1px] px-10 py-3">
-          <DialogHeader className=" w-full ">
-            <DialogTitle className=" text-left text-lg">
+        <div className="lef-0 border-black-200 absolute right-0 top-0 flex w-full flex-row items-center justify-between gap-2 border-b-[1px] px-10 py-3">
+          <DialogHeader className="w-full">
+            <DialogTitle className="text-left text-lg">
               Add New Role
             </DialogTitle>
           </DialogHeader>
         </div>
-        <div className=" mt-16 flex flex-col  gap-6">
+
+        <div className="mt-16 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <Label htmlFor="title">
               Name<span className="text-red-500">*</span>
@@ -61,7 +72,7 @@ const AddRoleModal = () => {
               value={newRole}
               onChange={(e) => setNewRole(e.target.value)}
               className="dark:bg-dark-200 w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none"
-              placeholder=""
+              placeholder="Role Name"
             />
           </div>
         </div>

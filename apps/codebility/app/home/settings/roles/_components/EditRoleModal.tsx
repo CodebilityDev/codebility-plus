@@ -14,35 +14,53 @@ import Input from "@/Components/ui/forms/input";
 import { useModal } from "@/hooks/use-modal";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+
 import { Label } from "@codevs/ui/label";
+
+interface FormData {
+  name: string;
+}
 
 const EditRoleModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "editRoleModal";
+
+  // If 'data' includes { id, name, ... }, destructure it
+  // and ensure 'id' is a number in your 'Roles' interface.
+  const { id: roleId, name: currentName } = data || {};
 
   const {
     register,
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm({
+  } = useForm<FormData>({
     defaultValues: { name: "" },
   });
 
   useEffect(() => {
+    // On modal open, populate form
     if (isModalOpen && data) {
-      reset({ name: data.name });
+      reset({ name: currentName });
     }
-  }, [isModalOpen, data, reset]);
+  }, [isModalOpen, data, currentName, reset]);
 
-  const handleSave = async (formData: { name: string }) => {
+  const handleSave = async (formData: FormData) => {
+    if (!roleId) {
+      toast.error("Invalid role id");
+      return;
+    }
+
     try {
-      const { id } = data;
-      const { name } = formData;
+      const response = await updateRole(Number(roleId), {
+        name: formData.name,
+      });
+      if (!response.success) {
+        toast.error(response.error || "Failed to update role");
+        return;
+      }
 
-      await updateRole(id, name);
-
-      toast.success(`Role successfully edited!`);
+      toast.success("Role successfully edited!");
       onClose();
     } catch (error) {
       toast.error("An unexpected error occurred.");
@@ -59,15 +77,16 @@ const EditRoleModal = () => {
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent
         aria-describedby={undefined}
-        className=" flex h-auto w-[95%] max-w-3xl flex-col justify-items-center gap-6 "
+        className="flex h-auto w-[95%] max-w-3xl flex-col justify-items-center gap-6"
       >
         <div className="lef-0 border-black-200 absolute right-0 top-0 flex w-[100%] flex-row items-center justify-between gap-2 border-b-[1px] px-10 py-3">
           <DialogHeader className="w-full">
             <DialogTitle className="text-left text-lg">
-              Edit {data?.name}
+              Edit {currentName}
             </DialogTitle>
           </DialogHeader>
         </div>
+
         <div className="mt-16 flex flex-col gap-6">
           <div className="flex flex-col gap-2">
             <Label htmlFor="name">
