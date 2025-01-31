@@ -83,7 +83,18 @@ export interface Codev {
   updated_at?: string;
   years_of_experience?: number;
   role_id?: number;
+  mentor_id?: string;
 }
+
+export type InternalStatus =
+  | "TRAINING"
+  | "GRADUATED"
+  | "BUSY"
+  | "FAILED"
+  | "AVAILABLE"
+  | "DEPLOYED"
+  | "VACATION"
+  | "CLIENTREADY";
 
 export interface Project {
   id: string;
@@ -115,16 +126,6 @@ export interface Education {
   created_at?: string;
   updated_at?: string;
 }
-
-export type InternalStatus =
-  | "TRAINING"
-  | "GRADUATED"
-  | "BUSY"
-  | "FAILED"
-  | "AVAILABLE"
-  | "DEPLOYED"
-  | "VACATION"
-  | "CLIENTREADY";
 
 // New types based on schema
 export interface CodevPoints {
@@ -166,14 +167,37 @@ export interface Client {
   updated_at?: string;
 }
 
+export interface PaymentScedule {
+  weekly: string;
+  biWeekly: string;
+  monthy: string;
+  onCompletion: string;
+}
+export interface ContractType {
+  partTime: string;
+  fullTime: string;
+  freelance: string;
+  projectBased: string;
+}
+export interface PaymentType {
+  hourly: string;
+  monthly: string;
+  fixedPrice: string;
+}
+export interface StatusType {
+  active: string;
+  terminated: string;
+  completed: string;
+  pending: string;
+}
 export interface Contract {
   id: string; // UUID
   codev_id?: string; // UUID
   client_id?: string; // UUID
-  payment_schedule?: string;
-  payment_type?: string;
+  payment_schedule?: PaymentScedule;
+  payment_type?: PaymentType;
   status?: string; // Defaults to 'pending'
-  contract_type?: string;
+  contract_type?: ContractType;
   payment_amount?: number;
   start_date: string;
   end_date?: string;
@@ -223,9 +247,18 @@ export interface ExtendedTask extends Task {
   initialColumnId?: string;
 }
 
+export type RoleName =
+  | "Admin"
+  | "HR"
+  | "Marketing"
+  | "Intern"
+  | "Mentor"
+  | "Guest"
+  | "Applicant";
+
 export interface Roles {
   id: number;
-  name: string;
+  name: RoleName;
   created_at?: string;
   updated_at?: string;
   orgchart?: boolean;
