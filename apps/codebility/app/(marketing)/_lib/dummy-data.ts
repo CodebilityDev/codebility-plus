@@ -90,9 +90,9 @@ export const FeaturedSectiondata: FeaturedSectionData[] = [
     alt: "skills",
   },
   {
-    title: "Join Us",
+    title: "Connect",
     description:
-      "Become part of a dynamic community of future developers and designers. ",
+      "Engage with like-minded peers. Grow your network and collaborate on meaningful projects.",
     src: "/assets/svgs/icon-community-teal.svg",
     alt: "community",
   },
