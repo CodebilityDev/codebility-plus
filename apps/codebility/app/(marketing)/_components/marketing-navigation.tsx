@@ -128,7 +128,7 @@ const UserMenu = ({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
-      <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none">
+      <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none ">
         <div className="hidden flex-col items-end md:flex">
           <p className="capitalize text-white">
             {first_name} {last_name}
@@ -200,6 +200,7 @@ const Navigation = () => {
     const fetchUser = async () => {
       try {
         const { data, error } = await supabase.auth.getUser();
+        console.log("data:", data);
 
         if (error) {
           console.error("Error fetching user:", error.message);

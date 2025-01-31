@@ -1,36 +1,64 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { Roles } from "@/types/home/codev"; // <-- your Roles interface
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import { Role_Type } from "./_types/roles";
-
 const supabase = getSupabaseServerComponentClient();
 
-export async function createRole(roleData: Role_Type) {
+/**
+ * CREATE a new role
+ */
+export async function createRole(roleData: Partial<Roles>) {
   const { data, error } = await supabase
-    .from("user_type")
+    .from("roles") // <-- 'roles' table
     .insert(roleData)
     .select("*");
 
+  if (error) {
+    console.error("Error creating role:", error.message);
+    return { success: false, error: error.message };
+  }
+
   revalidatePath("/home/settings/roles");
   return { success: true, data };
 }
-export async function updateRole(id: string, roleData: string) {
 
+/**
+ * UPDATE an existing role by integer ID
+ */
+export async function updateRole(id: number, roleData: Partial<Roles>) {
   const { data, error } = await supabase
-    .from("user_type")
-    .update({name: roleData}).eq("id", id).select("name").single()
+    .from("roles") // <-- 'roles' table
+    .update(roleData)
+    .eq("id", id)
+    .select("*")
+    .single();
 
+  if (error) {
+    console.error("Error updating role:", error.message);
+    return { success: false, error: error.message };
+  }
 
-  console.log(data);
-  console.log(error);
   revalidatePath("/home/settings/roles");
   return { success: true, data };
 }
-export async function deleteRole(id: string) {
-  const { data } = await supabase.from("user_type").delete().eq("id", id);
+
+/**
+ * DELETE a role by integer ID
+ */
+export async function deleteRole(id: number) {
+  const { data, error } = await supabase
+    .from("roles") // <-- 'roles' table
+    .delete()
+    .eq("id", id);
+
+  if (error) {
+    console.error("Error deleting role:", error.message);
+    return { success: false, error: error.message };
+  }
+
   revalidatePath("/home/settings/roles");
   return { success: true, data };
 }

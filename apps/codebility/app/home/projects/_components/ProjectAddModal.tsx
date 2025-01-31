@@ -17,7 +17,7 @@ import {
 } from "@/Components/ui/dialog";
 import { MemberSelection } from "@/Components/ui/MemberSelection";
 import { useModal } from "@/hooks/use-modal-projects";
-import { Client, Codev, ProjectCategory } from "@/types/home/codev";
+import { Client, Codev, SkillCategory } from "@/types/home/codev";
 import { deleteImage, getImagePath, uploadImage } from "@/utils/uploadImage";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -48,7 +48,7 @@ const ProjectAddModal = () => {
   const [teamLeaderId, setTeamLeaderId] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
-  const [categories, setCategories] = useState<ProjectCategory[]>([]);
+  const [categories, setCategories] = useState<SkillCategory[]>([]);
 
   const {
     register,

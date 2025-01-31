@@ -52,6 +52,24 @@ export type DayOfWeek =
   | "Saturday"
   | "Sunday";
 
+export const DAYS_OF_WEEK: DayOfWeek[] = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+  "Sunday",
+];
+
+export const WEEKDAYS: DayOfWeek[] = [
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+];
+
 export interface Codev {
   id: string;
   first_name: string;
@@ -247,18 +265,9 @@ export interface ExtendedTask extends Task {
   initialColumnId?: string;
 }
 
-export type RoleName =
-  | "Admin"
-  | "HR"
-  | "Marketing"
-  | "Intern"
-  | "Mentor"
-  | "Guest"
-  | "Applicant";
-
 export interface Roles {
   id: number;
-  name: RoleName;
+  name: string;
   created_at?: string;
   updated_at?: string;
   orgchart?: boolean;

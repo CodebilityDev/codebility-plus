@@ -8,7 +8,12 @@ import { Period } from "@/Components/time-picker/time-picker-utils";
 import { Button } from "@/Components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
-import { WorkSchedule } from "@/types/home/codev";
+import {
+  DayOfWeek,
+  DAYS_OF_WEEK,
+  WEEKDAYS,
+  WorkSchedule,
+} from "@/types/home/codev";
 import toast from "react-hot-toast";
 
 import { Checkbox } from "@codevs/ui/checkbox";
@@ -19,23 +24,6 @@ import { updateWorkSchedule } from "../action";
 interface TimeScheduleProps {
   data?: WorkSchedule | null;
 }
-
-const DAYS_OF_WEEK = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-  "Saturday",
-  "Sunday",
-] as const;
-const WEEKDAYS = [
-  "Monday",
-  "Tuesday",
-  "Wednesday",
-  "Thursday",
-  "Friday",
-] as const;
 
 const DEFAULT_START_TIME = "09:00";
 const DEFAULT_END_TIME = "17:00";
@@ -83,14 +71,11 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
     }
   };
 
-  const handleDayToggle = (day: string) => {
+  const handleDayToggle = (day: DayOfWeek) => {
     setSchedule((prev) => {
       const newDays = prev.days_of_week.includes(day)
         ? prev.days_of_week.filter((d) => d !== day)
-        : [...prev.days_of_week, day].sort(
-            (a, b) =>
-              DAYS_OF_WEEK.indexOf(a as any) - DAYS_OF_WEEK.indexOf(b as any),
-          );
+        : [...prev.days_of_week, day];
 
       return {
         ...prev,
