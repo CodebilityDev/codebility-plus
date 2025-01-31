@@ -33,7 +33,7 @@ const About = ({ data }: AboutProps) => {
     formState: { isDirty },
   } = useForm<FormValues>({
     defaultValues: {
-      about: data.about,
+      about: data.about ?? "",
     },
   });
 

@@ -5,10 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getSidebarData, Sidebar, SidebarLink } from "@/constants/sidebar";
-import useAuthCookie from "@/hooks/use-cookie";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
+import { Roles } from "@/types/home/codev";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-// UI components
 import {
   Sheet,
   SheetClose,
@@ -16,7 +16,13 @@ import {
   SheetTrigger,
 } from "@codevs/ui/sheet";
 
-const NavContent = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
+const NavContent = ({
+  sidebarData,
+  userRole,
+}: {
+  sidebarData: Sidebar[];
+  userRole: Roles | null;
+}) => {
   const pathname = usePathname();
 
   return (
@@ -26,35 +32,48 @@ const NavContent = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
           <h4 className="text-gray text-sm uppercase">{item.title}</h4>
           <div className="mt-3">
             {item.links.map((link: SidebarLink) => {
-              // If you want even more route gating logic, do it here:
-              // e.g. let isAllowedRoute = ...
+              const allowedRoutes = ["/settings", "/orgchart"];
+              const isAdminOrUser =
+                userRole?.name === "ADMIN" || userRole?.name === "USER";
+              const isAllowedRoute =
+                isAdminOrUser && allowedRoutes.includes(link.route);
+
+              const hasPermission =
+                link.permission && userRole
+                  ? (userRole[link.permission as keyof Roles] ?? false)
+                  : false;
+
+              const accessRoutes = hasPermission || isAllowedRoute;
               const isActive =
                 (pathname.includes(link.route) && link.route.length > 1) ||
                 pathname === link.route;
 
-              return (
-                <SheetClose asChild key={link.route}>
-                  <Link
-                    href={link.route}
-                    className={`${
-                      isActive
-                        ? "default-color text-light-900 rounded-lg"
-                        : "text-dark300_light900"
-                    } flex items-center justify-start gap-4 bg-transparent p-4`}
-                  >
-                    <Image
-                      src={link.imgURL}
-                      alt={link.label}
-                      width={20}
-                      height={20}
-                      className={`${isActive ? "" : "invert-colors"} h-auto w-auto`}
-                    />
-                    <p className={`${isActive ? "base-normal" : "base-sm"}`}>
-                      {link.label}
-                    </p>
-                  </Link>
-                </SheetClose>
-              );
+              if (accessRoutes) {
+                return (
+                  <SheetClose asChild key={link.route}>
+                    <Link
+                      href={link.route}
+                      className={`${
+                        isActive
+                          ? "default-color text-light-900 rounded-lg"
+                          : "text-dark300_light900"
+                      } flex items-center justify-start gap-4 bg-transparent p-4`}
+                    >
+                      <Image
+                        src={link.imgURL}
+                        alt={link.label}
+                        width={20}
+                        height={20}
+                        className={`${isActive ? "" : "invert-colors"} h-auto w-auto`}
+                      />
+                      <p className={`${isActive ? "base-normal" : "base-sm"}`}>
+                        {link.label}
+                      </p>
+                    </Link>
+                  </SheetClose>
+                );
+              }
+              return null;
             })}
           </div>
         </div>
@@ -65,37 +84,99 @@ const NavContent = ({ sidebarData }: { sidebarData: Sidebar[] }) => {
 
 const MobileNav = () => {
   const { isSheetOpen, setIsSheetOpen } = useHideSidebarOnResize();
-
-  // From your auth cookie
-  const { data: authData } = useAuthCookie();
-  const userType = authData?.userType;
-
-  // We store the fetched sidebar data here
+  const supabase = createClientComponentClient();
   const [sidebarData, setSidebarData] = useState<Sidebar[]>([]);
+  const [userRole, setUserRole] = useState<Roles | null>(null);
 
-  /**
-   * On mount (and whenever userType?.role_id changes),
-   * fetch the user’s sidebar data from Supabase.
-   */
   useEffect(() => {
-    const fetchData = async () => {
-      if (!userType?.role_id) {
-        // If no role_id, we can bail or set empty array
-        setSidebarData([]);
-        return;
-      }
-
+    const fetchUserData = async () => {
       try {
-        const data = await getSidebarData(userType.role_id);
-        setSidebarData(data);
-      } catch (err) {
-        console.error("Error fetching sidebar data:", err);
-        setSidebarData([]);
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+          console.error("Auth error:", authError);
+          return;
+        }
+
+        // Get the user's role from the codev table
+        const { data: userData, error: roleError } = await supabase
+          .from("codev")
+          .select("role_id")
+          .eq("id", user.id)
+          .single();
+
+        if (roleError || !userData) {
+          console.error("Role fetch error:", roleError);
+          return;
+        }
+
+        // Get the complete role details including permissions
+        const { data: roleData, error: roleDetailsError } = await supabase
+          .from("roles")
+          .select(
+            `
+            id,
+            name,
+            orgchart,
+            settings,
+            resume,
+            services,
+            permissions,
+            roles,
+            projects,
+            clients,
+            inhouse,
+            applicants,
+            interns,
+            time_tracker,
+            kanban,
+            dashboard
+          `,
+          )
+          .eq("id", userData.role_id)
+          .single();
+
+        if (roleDetailsError || !roleData) {
+          console.error("Role details error:", roleDetailsError);
+          return;
+        }
+
+        setUserRole(roleData as Roles);
+
+        // Fetch sidebar data with the role
+        const sidebarItems = await getSidebarData(roleData.id);
+        setSidebarData(sidebarItems);
+      } catch (error) {
+        console.error("Unexpected error:", error);
       }
     };
 
-    fetchData();
-  }, [userType?.role_id]);
+    fetchUserData();
+
+    // Set up real-time subscription for role changes
+    const channel = supabase
+      .channel("mobile-role-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "codev",
+          filter: `role_id=eq.${userRole?.id}`,
+        },
+        () => {
+          fetchUserData();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase]);
 
   return (
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
@@ -122,10 +203,8 @@ const MobileNav = () => {
           />
         </Link>
         <div>
-          {/* The entire NavContent is wrapped in SheetClose
-              so that selecting a link closes the side nav */}
           <SheetClose asChild>
-            <NavContent sidebarData={sidebarData} />
+            <NavContent sidebarData={sidebarData} userRole={userRole} />
           </SheetClose>
         </div>
       </SheetContent>
