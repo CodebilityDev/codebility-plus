@@ -1,6 +1,6 @@
 import { useState } from "react";
 import Image from "next/image";
-import { Codev } from "@/types/home/codev";
+import { Codev, InternalStatus } from "@/types/home/codev";
 import { Link2 } from "lucide-react";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
@@ -13,7 +13,7 @@ import {
   TableRow,
 } from "@codevs/ui/table";
 
-import { InternalStatus, StatusBadge } from "../shared/status-badge";
+import { StatusBadge } from "../shared/status-badge";
 import { columns } from "./columns";
 import { EditableRow } from "./editable-row";
 import { TableActions } from "./table-actions";
@@ -40,24 +40,49 @@ export function InHouseTable({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     status: "",
-    type: "",
     position: "",
     project: "",
+    internal_status: "",
+    nda_status: "",
+    display_position: "",
   });
 
   const supabase = useSupabase();
 
   const filteredData = data.filter((item) => {
-    if (filters.status && item.internal_status !== filters.status) return false;
-    if (filters.type && item.type !== filters.type) return false;
-    if (filters.position && item.main_position !== filters.position)
+    // Internal Status Filter
+    if (
+      filters.internal_status &&
+      item.internal_status !== filters.internal_status
+    ) {
       return false;
+    }
+
+    // NDA Status Filter
+    if (
+      filters.nda_status &&
+      String(item.nda_status) !== filters.nda_status.toLowerCase()
+    ) {
+      return false;
+    }
+
+    // Display Position Filter (Extract `name` for comparison)
+    if (
+      filters.display_position &&
+      item.display_position!.toLowerCase() !==
+        filters.display_position.toLowerCase()
+    ) {
+      return false;
+    }
+
+    // Project Filter
     if (
       filters.project &&
       !item.projects?.some((project) => project.id === filters.project)
     ) {
       return false;
     }
+
     return true;
   });
 
@@ -66,7 +91,7 @@ export function InHouseTable({
   };
 
   const capitalize = (str: string) => {
-    return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "";
+    return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
   };
 
   return (
@@ -124,14 +149,17 @@ export function InHouseTable({
                   className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-200"
                 >
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    <Image
-                      src={item.image_url || defaultImage}
-                      alt={`${item.first_name} avatar`}
-                      width={40}
-                      height={40}
-                      className="rounded-full"
-                    />
+                    <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                      <Image
+                        src={item.image_url || defaultImage}
+                        alt={`${item.first_name} avatar`}
+                        width={40}
+                        height={40}
+                        className="h-full w-full object-cover"
+                      />
+                    </div>
                   </TableCell>
+
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
@@ -139,7 +167,7 @@ export function InHouseTable({
                     {capitalize(item.last_name)}
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    {item.email}
+                    {item.email_address}
                   </TableCell>
                   <TableCell>
                     <StatusBadge
@@ -147,11 +175,13 @@ export function InHouseTable({
                     />
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    {capitalize(item.type || "")}
+                    {capitalize(
+                      typeof item.display_position === "string"
+                        ? item.display_position
+                        : "-",
+                    )}
                   </TableCell>
-                  <TableCell className="dark:text-light-900 text-base text-black">
-                    {item.main_position}
-                  </TableCell>
+
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {item.projects?.length ? (
                       <div className="space-y-1">
@@ -164,7 +194,7 @@ export function InHouseTable({
                     )}
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    {item.nda_status ? capitalize(item.nda_status) : "-"}
+                    {item.nda_status ? "Yes" : "No"}
                   </TableCell>
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {item.portfolio_website ? (

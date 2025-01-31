@@ -1,56 +1,43 @@
+import { InternalStatus } from "@/types/home/codev";
+
 import { cn } from "@codevs/ui";
 import { Badge } from "@codevs/ui/badge";
 
-export type InternalStatus =
-  | "AVAILABLE"
-  | "DEPLOYED"
-  | "TRAINING"
-  | "VACATION"
-  | "BUSY"
-  | "CLIENTREADY"
-  | "BLOCKED"
-  | "GRADUATED"
-  | "FAILED";
-
-export const STATUS_CONFIG: Record<
+const STATUS_CONFIG: Record<
   InternalStatus,
   { label: string; className: string }
 > = {
-  AVAILABLE: {
-    label: "Available",
-    className: "bg-codeGreen/20 text-codeGreen border-codeGreen/20",
-  },
-  DEPLOYED: {
-    label: "Deployed",
-    className: "bg-codeViolet/20 text-codeViolet border-codeViolet/20",
-  },
   TRAINING: {
     label: "Training",
-    className: "bg-codeYellow/20 text-codeYellow border-codeYellow/20",
-  },
-  VACATION: {
-    label: "Vacation",
-    className: "bg-codeBlue/20 text-codeBlue border-codeBlue/20",
-  },
-  BUSY: {
-    label: "Busy",
-    className: "bg-codeRed/20 text-codeRed border-codeRed/20",
-  },
-  CLIENTREADY: {
-    label: "Client Ready",
-    className: "bg-codePurple/20 text-codePurple border-codePurple/20",
-  },
-  BLOCKED: {
-    label: "Blocked",
-    className: "bg-gray/20 text-gray border-gray/20",
+    className: "bg-yellow-200 text-yellow-700 border-yellow-200",
   },
   GRADUATED: {
     label: "Graduated",
-    className: "bg-gray/20 text-gray border-gray/20",
+    className: "bg-green-200 text-green-700 border-green-200",
+  },
+  BUSY: {
+    label: "Busy",
+    className: "bg-red-200 text-red-700 border-red-200",
   },
   FAILED: {
     label: "Failed",
-    className: "bg-red-500/20 text-red-500 border-red-500/20",
+    className: "bg-red-200 text-red-700 border-red-200",
+  },
+  AVAILABLE: {
+    label: "Available",
+    className: "bg-green-200 text-green-700 border-green-200",
+  },
+  DEPLOYED: {
+    label: "Deployed",
+    className: "bg-purple-200 text-purple-700 border-purple-200",
+  },
+  VACATION: {
+    label: "Vacation",
+    className: "bg-blue-200 text-blue-700 border-blue-200",
+  },
+  CLIENTREADY: {
+    label: "Client Ready",
+    className: "bg-violet-200 text-violet-700 border-violet-200",
   },
 };
 

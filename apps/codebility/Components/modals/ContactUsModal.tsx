@@ -5,7 +5,6 @@ import Image from "next/image";
 import { Button } from "@/Components/ui/button";
 import { Textarea } from "@/Components/ui/textarea-home";
 import { useModal } from "@/hooks/use-modal";
-import { API } from "@/lib/constants";
 import { contactUsValidation } from "@/lib/validations/contact-us";
 import { IconClose } from "@/public/assets/svgs";
 import { modals_ConactUS } from "@/types/components";
@@ -54,7 +53,7 @@ const ContactUsModal = () => {
     }
 
     try {
-      await axios.post(`${API.USERS}/contact-us`, newMessage);
+      // await axios.post(`${API.USERS}/contact-us`, newMessage);
 
       handleReset();
     } catch (error) {

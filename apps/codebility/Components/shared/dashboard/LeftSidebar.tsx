@@ -1,18 +1,29 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { sidebarData } from "@/constants";
+import { getSidebarData, Sidebar, SidebarLink } from "@/constants/sidebar";
 import useAuthCookie from "@/hooks/use-cookie";
 import { useNavStore } from "@/hooks/use-sidebar";
 
 const LeftSidebar = () => {
   const { data: authData } = useAuthCookie();
   const { userType } = authData || {};
-
   const { isToggleOpen, toggleNav } = useNavStore();
   const pathname = usePathname();
+
+  const [sidebarData, setSidebarData] = useState<Sidebar[]>([]);
+
+  useEffect(() => {
+    const fetchSidebarData = async () => {
+      const data = await getSidebarData(userType?.id || null);
+      setSidebarData(data);
+    };
+
+    fetchSidebarData();
+  }, [userType]);
 
   return (
     <section className="background-navbar sticky left-0 top-0 z-20 flex h-screen flex-col gap-14 overflow-y-auto p-6 shadow-lg max-lg:hidden">
@@ -48,7 +59,7 @@ const LeftSidebar = () => {
         />
       </div>
       <div className="flex flex-1 flex-col gap-2 max-lg:hidden">
-        {sidebarData.map((item) => (
+        {sidebarData.map((item: Sidebar) => (
           <div key={item.id} className={`${!isToggleOpen ? "mt-0" : "mt-5"}`}>
             <h4
               className={`text-gray text-sm uppercase ${!isToggleOpen ? "hidden" : "block"}`}
@@ -56,7 +67,7 @@ const LeftSidebar = () => {
               {item.title}
             </h4>
             <div className="mt-3 flex flex-1 flex-col gap-2 max-lg:hidden">
-              {item.links.map((link) => {
+              {item.links.map((link: SidebarLink) => {
                 const allowedRoutes = ["/settings", "/orgchart"];
                 const isAdminOrUser =
                   userType?.name === "ADMIN" || userType?.name === "USER";

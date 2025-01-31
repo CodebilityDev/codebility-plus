@@ -1,7 +1,6 @@
+import { Client } from "@/types/home/codev";
 import toast from "react-hot-toast";
 import * as XLSX from "xlsx";
-
-import { ClientDetails } from "../_types/clients";
 
 export const copyToClipboard = async (text: string) => {
   try {
@@ -29,7 +28,7 @@ export const convertTime12h = (time: string) => {
   return formattedTime;
 };
 
-export const handleDownload = (clients: ClientDetails[]) => {
+export const handleDownload = (clients: Client[]) => {
   const formattedData = clients.map((appointment) => ({ ...appointment }));
   const worksheet = XLSX.utils.json_to_sheet(formattedData);
   const workbook = XLSX.utils.book_new();

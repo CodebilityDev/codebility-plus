@@ -3,8 +3,8 @@ import { H2, Paragraph, SectionWrapper } from "@/Components/shared/home";
 
 const MissionVision = () => {
   return (
-    <SectionWrapper className="relative">
-      <div className="z-10 flex flex-col gap-12 lg:flex-row lg:gap-6">
+    <SectionWrapper className="relative lg:w-full lg:overflow-hidden">
+      <div className="z-10 flex h-full flex-col gap-12 lg:flex-row lg:gap-6">
         <div className="my-auto flex basis-[50%] flex-col gap-4 text-center lg:basis-[25%] lg:text-end">
           <H2 className="text-primaryColor">Mission</H2>
           <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[400px]">
@@ -18,13 +18,13 @@ const MissionVision = () => {
             path as tomorrow{`'`}s digital architect.
           </Paragraph>
         </div>
-        <div className="hidden items-center justify-center lg:flex lg:basis-[50%]">
+        <div className="relative hidden w-full items-center justify-center lg:flex lg:h-[600px] lg:basis-[50%]">
           <Image
             src="/assets/images/mission-vision-image.png"
             alt="Codebility Devices"
-            width={600}
-            height={399}
-            className="z-10 h-[399px] w-[600px] object-contain"
+            fill
+            sizes="1200px"
+            className="absolute z-10 h-auto bg-center object-contain"
           />
         </div>
         <div className="my-auto flex basis-[50%] flex-col gap-4 text-center lg:basis-[25%] lg:text-start">
@@ -43,7 +43,7 @@ const MissionVision = () => {
 
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute left-[30%] transform-gpu overflow-hidden blur-3xl sm:-top-80"
+        className="pointer-events-none absolute left-[30%] hidden transform-gpu overflow-hidden blur-3xl sm:-top-80 lg:block"
       >
         <div
           style={{

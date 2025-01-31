@@ -1,4 +1,4 @@
-import Image from "next/image";
+import DefaultAvatar from "@/Components/DefaultAvatar";
 import {
   IconPriority1,
   IconPriority2,
@@ -6,16 +6,14 @@ import {
   IconPriority4,
   IconPriority5,
 } from "@/public/assets/svgs";
-import { Task } from "@/types/home/task";
+import { ExtendedTask } from "@/types/home/codev";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
-import { DEFAULT_AVATAR } from "../_lib/constants";
-import { getTaskMembers } from "../../../_lib/get-task-members";
 import KanbanTaskViewEditModal from "./kanban_modals/kanban-task-view-edit-modal";
 
 interface Props {
-  task: Task;
+  task: ExtendedTask;
 }
 
 function KanbanTask({ task }: Props) {
@@ -40,34 +38,21 @@ function KanbanTask({ task }: Props) {
   };
 
   const PriorityIconMap = {
-    CRITICAL: IconPriority1,
-    HIGHEST: IconPriority2,
-    HIGH: IconPriority3,
-    MEDIUM: IconPriority4,
-    LOW: IconPriority5,
+    critical: IconPriority1,
+    highest: IconPriority2,
+    high: IconPriority3,
+    medium: IconPriority4,
+    low: IconPriority5,
   };
 
-  const PriorityIcon = task.priority_level
-    ? PriorityIconMap[task.priority_level as keyof typeof PriorityIconMap]
+  const PriorityIcon = task.priority
+    ? PriorityIconMap[
+        task.priority.toLowerCase() as keyof typeof PriorityIconMap
+      ]
     : IconPriority5;
 
-  if (isDragging) {
-    return (
-      <div
-        ref={setNodeRef}
-        style={style}
-        className="background-lightsmallbox_darksmallbox cursor-grabs relative flex h-auto cursor-pointer flex-col gap-5 rounded-lg p-2.5 text-left opacity-60"
-      >
-        <div className="flex justify-between">
-          {task.title}
-          {<PriorityIcon />}
-        </div>
-        <div className="flex">#{task.number.toString().padStart(2, "0")}</div>
-      </div>
-    );
-  }
-
-  const codevs = getTaskMembers(task.codev_task);
+  // Safely handle sidekicks with proper type checking
+  const sidekicks = task.sidekick_ids ?? [];
 
   return (
     <KanbanTaskViewEditModal task={task}>
@@ -76,7 +61,9 @@ function KanbanTask({ task }: Props) {
         style={style}
         {...attributes}
         {...listeners}
-        className="cursor-grabs ring-violet relative flex h-auto max-w-72 cursor-grab flex-col gap-2 rounded-lg bg-white p-2.5 text-left ring-inset hover:ring-2 dark:bg-[#1E1F26]"
+        className={`ring-violet relative flex h-auto max-w-72 cursor-grab flex-col gap-2 rounded-lg bg-white p-2.5 text-left ring-inset hover:ring-2 dark:bg-[#1E1F26] ${
+          isDragging ? "opacity-60" : ""
+        }`}
       >
         <div className="flex justify-between gap-2 text-xs">
           <p className="line-clamp-6 flex-1 break-words">{task.title}</p>
@@ -84,28 +71,36 @@ function KanbanTask({ task }: Props) {
         </div>
         <div className="relative">
           <div className="float-left flex flex-wrap gap-3 text-sm">
-            #{task.number.toString().padStart(2, "0")}
+            {task.id.slice(0, 8)}
           </div>
-          <div className=" float-right  mb-1 ml-1 flex flex-wrap justify-end gap-1 ">
-            {codevs?.map((member, idx) => {
-              return (
-                <div key={idx} className="h-6 w-6 rounded-full ">
-                  <Image
-                    alt="Avatar"
-                    src={member.image_url || DEFAULT_AVATAR}
-                    width={8}
-                    height={8}
-                    title={` ${member.first_name} ${member.last_name}`}
-                    className="h-full w-full rounded-full bg-cover object-cover"
-                    loading="eager"
-                  />
+          {sidekicks.length > 0 && (
+            <div className="float-right mb-1 ml-1 flex flex-wrap justify-end gap-1">
+              {sidekicks.slice(0, 3).map((sidekickId) => (
+                <div key={sidekickId} className="h-6 w-6 rounded-full">
+                  <DefaultAvatar size={24} />
                 </div>
-              );
-            })}
-          </div>
+              ))}
+              {sidekicks.length > 3 && (
+                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-xs">
+                  +{sidekicks.length - 3}
+                </div>
+              )}
+            </div>
+          )}
         </div>
+        {task.due_date && (
+          <div className="text-xs text-gray-500">
+            Due: {new Date(task.due_date).toLocaleDateString()}
+          </div>
+        )}
+        {task.difficulty && (
+          <div className="text-xs text-gray-500">
+            Difficulty: {task.difficulty}
+          </div>
+        )}
       </div>
     </KanbanTaskViewEditModal>
   );
 }
+
 export default KanbanTask;
