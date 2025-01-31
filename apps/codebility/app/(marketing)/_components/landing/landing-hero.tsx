@@ -32,7 +32,7 @@ const Hero = () => {
               </div>
               <div className="md:mx-auto">
                 <div className="flex w-full flex-col gap-4 md:flex-row">
-                  <Link href="#workwithus">
+                  <Link href="/services">
                     <Button variant="purple" size="lg" rounded="full">
                       Our Portfolio
                     </Button>
