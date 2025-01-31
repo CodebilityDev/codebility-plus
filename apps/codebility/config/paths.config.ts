@@ -22,16 +22,16 @@ const PathsSchema = z.object({
     roles: z.string().min(1),
     services: z.string().min(1),
     permissions: z.string().min(1),
-    resume: z.string().min(1)
+    resume: z.string().min(1),
   }),
 });
 
 const pathsConfig = PathsSchema.parse({
   auth: {
-    signIn: "/authv2/sign-in",
-    signUp: "/authv2/sign-up",
-    callback: "/authv2/callback",
-    passwordReset: "/authv2/password-reset",
+    signIn: "/auth/sign-in",
+    signUp: "/auth/sign-up",
+    callback: "/auth/callback",
+    passwordReset: "/auth/password-reset",
   },
   app: {
     home: "/home",

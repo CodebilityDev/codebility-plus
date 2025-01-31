@@ -1,8 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { passwordChangeSchema } from "@/schema/account-settings-zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -17,38 +16,46 @@ import {
 } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
 
-import { updatePassword } from "../action";
+// Password validation schema
+const passwordChangeSchema = z
+  .object({
+    password: z
+      .string()
+      .min(6, "Password must be at least 6 characters")
+      .regex(/[A-Z]/, "Add at least one uppercase letter")
+      .regex(/[0-9]/, "Add at least one number"),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "Passwords don't match",
+    path: ["confirmPassword"],
+  });
 
-export default function AccountSettingsChangePassword({
-  email,
-}: {
-  email: string;
-}) {
+export default function AccountSettingsChangePassword() {
+  const supabase = createClientComponentClient();
+
   const form = useForm<z.infer<typeof passwordChangeSchema>>({
     resolver: zodResolver(passwordChangeSchema),
     defaultValues: {
-      currentPassword: "",
-      newPassword: "",
+      password: "",
       confirmPassword: "",
     },
     mode: "onChange",
   });
 
   const onSubmit = async (values: z.infer<typeof passwordChangeSchema>) => {
-    const formData = new FormData();
-    formData.append("email", email);
-    formData.append("currentPassword", values.currentPassword);
-    formData.append("newPassword", values.newPassword);
-
     try {
-      const result = await updatePassword(formData);
+      const { error } = await supabase.auth.updateUser({
+        password: values.password,
+      });
 
-      if (result.success) {
-        toast.success("Password updated successfully!");
-        form.reset();
-      } else {
-        toast.error("Failed to update password");
+      if (error) {
+        toast.error(error.message);
+        return;
       }
+
+      toast.success("Password updated successfully!");
+      form.reset();
     } catch (err) {
       toast.error("An unexpected error occurred. Please try again.");
     }
@@ -70,27 +77,7 @@ export default function AccountSettingsChangePassword({
         >
           <FormField
             control={form.control}
-            name="currentPassword"
-            render={({ field }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Current Password"
-                    label="Current Password"
-                    parentClassName="flex gap-2 flex-col"
-                    variant="lightgray"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600" />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="newPassword"
+            name="password"
             render={({ field }) => (
               <FormItem>
                 <FormControl>

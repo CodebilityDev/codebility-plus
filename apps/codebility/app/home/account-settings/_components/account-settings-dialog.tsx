@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { accountSettingsEmailSchema } from "@/schema/account-settings-zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useForm } from "react-hook-form";
+import toast from "react-hot-toast";
 import { z } from "zod";
 
 import { Button } from "@codevs/ui/button";
@@ -28,22 +29,68 @@ import { Input } from "@codevs/ui/input";
 
 import AccountSettingsBackdrop from "./account-settings-backdrop";
 
+const emailChangeSchema = z.object({
+  email: z.string().email("Please enter a valid email address"),
+});
+
 export default function AccountSettingsDialog() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const form = useForm<z.infer<typeof accountSettingsEmailSchema>>({
-    resolver: zodResolver(accountSettingsEmailSchema),
+  const [isLoading, setIsLoading] = useState(false);
+  const supabase = createClientComponentClient();
+
+  const form = useForm<z.infer<typeof emailChangeSchema>>({
+    resolver: zodResolver(emailChangeSchema),
     defaultValues: {
       email: "",
     },
   });
 
-  const onSubmit = async (
-    values: z.infer<typeof accountSettingsEmailSchema>,
-  ) => {
-    console.log(values);
-    form.reset();
-    setIsOpen(false);
+  const onSubmit = async (values: z.infer<typeof emailChangeSchema>) => {
+    try {
+      setIsLoading(true);
+
+      // Get current user
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+
+      if (!user) {
+        toast.error("User not found");
+        return;
+      }
+
+      // Update email in auth
+      const { error: authError } = await supabase.auth.updateUser({
+        email: values.email,
+      });
+
+      if (authError) {
+        toast.error(authError.message);
+        return;
+      }
+
+      // Update email in codev table
+      const { error: dbError } = await supabase
+        .from("codev")
+        .update({ email_address: values.email })
+        .eq("id", user.id);
+
+      if (dbError) {
+        toast.error("Failed to update email in database");
+        return;
+      }
+
+      toast.success("Verification email sent. Please check your inbox.");
+      form.reset();
+      setIsOpen(false);
+    } catch (error) {
+      toast.error("An unexpected error occurred");
+      console.error("Email change error:", error);
+    } finally {
+      setIsLoading(false);
+    }
   };
+
   return (
     <>
       <AccountSettingsBackdrop isOpen={isOpen} />
@@ -82,11 +129,12 @@ export default function AccountSettingsDialog() {
                   <FormItem>
                     <FormControl>
                       <Input
-                        variant={"lightgray"}
+                        variant="lightgray"
                         label="New Email Address"
                         parentClassName="flex flex-col gap-2"
                         {...field}
                         placeholder="Enter new email address"
+                        disabled={isLoading}
                       />
                     </FormControl>
                     <FormMessage className="text-red-600" />
@@ -95,14 +143,16 @@ export default function AccountSettingsDialog() {
               />
               <DialogFooter className="gap-2">
                 <DialogClose asChild>
-                  <Button variant="outline">Cancel</Button>
+                  <Button variant="outline" disabled={isLoading}>
+                    Cancel
+                  </Button>
                 </DialogClose>
                 <Button
                   type="submit"
                   className="text-dark100_light900 bg-blue-200 duration-300 hover:bg-blue-300"
-                  disabled={!form.formState.isValid}
+                  disabled={!form.formState.isValid || isLoading}
                 >
-                  Change Email
+                  {isLoading ? "Updating..." : "Change Email"}
                 </Button>
               </DialogFooter>
             </form>

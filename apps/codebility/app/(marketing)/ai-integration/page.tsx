@@ -14,7 +14,7 @@ import UnparallelDigitalSuccess from "./_components/ai-integration-unparallel-di
 
 const AiIntegration = () => {
   return (
-    <div className="relative mx-auto flex min-h-screen flex-col gap-10 bg-[#030303] text-white">
+    <div className="bg-black-400 relative mx-auto flex min-h-screen flex-col gap-10 text-white">
       <HeroBackground />
       <Navigation />
       <SideNavMenu />

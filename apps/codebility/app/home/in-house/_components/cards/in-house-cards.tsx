@@ -1,8 +1,6 @@
 import { useState } from "react";
 import { Codev } from "@/types/home/codev";
 
-import { Pagination } from "@codevs/ui/pagination";
-
 import { TableFilters } from "../table/table-filters";
 import { CodevCard } from "./codev-card";
 import { EditableCard } from "./editable-card";
@@ -26,9 +24,11 @@ export function InHouseCards({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [filters, setFilters] = useState({
     status: "",
-    type: "",
     position: "",
     project: "",
+    internal_status: "",
+    nda_status: "",
+    display_position: "",
   });
 
   const handleDelete = (deletedId: string) => {
@@ -40,11 +40,8 @@ export function InHouseCards({
     // Status filter
     if (filters.status && item.internal_status !== filters.status) return false;
 
-    // Type filter
-    if (filters.type && item.type !== filters.type) return false;
-
     // Position filter
-    if (filters.position && item.main_position !== filters.position)
+    if (filters.position && item.display_position !== filters.position)
       return false;
 
     // Project filter
@@ -57,10 +54,11 @@ export function InHouseCards({
 
     return true;
   });
+
   return (
-    <div className="space-y-4">
+    <div className="space-y-4 ">
       {/* Count and Filters */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between  ">
         <p className="text-light-900 text-sm">
           {filteredData.length}{" "}
           {filteredData.length === 1 ? "member" : "members"}

@@ -4,166 +4,100 @@ import { revalidatePath } from "next/cache";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
-import { ApplicantsList_Types } from "./_types/applicants";
-
 const supabase = getSupabaseServerActionClient();
 const revalidate = () => revalidatePath("/home/applicants");
 
-const toArray = (str: string) => {
-  return str.split(",").map((item) => item.trim()); // Split by comma and trim spaces
-};
-
 export async function rejectAction(id: string) {
   try {
-    const { data: applicants, error: fetchError } = await supabase
-      .from("applicants")
-      .select("*")
-      .eq("id", id);
-
-    if (fetchError) throw fetchError;
-
-    const applicant = applicants[0];
-
-    const { error: insertError } = await supabase.from("declined_applicants").insert({
-      user_id: applicant.id,
-      first_name: applicant.first_name,
-      last_name: applicant.last_name,
-      email: applicant.email_address,
-      portfolio_website: applicant.portfolio_website,
-      github_link: applicant.github_link,
-      tech_stacks: applicant.tech_stacks,
-      image_url: applicant.image_url
-    });
-
-    if (insertError) throw insertError;
-
-    const { error: updateCodevError } = await supabase
+    // Fetch the applicant's current data
+    const { data: applicant, error: fetchError } = await supabase
       .from("codev")
-      .update({
-        application_status: "DECLINED",
-      })
-      .eq("user_id", id)
-      .single();
-
-    if (updateCodevError) throw updateCodevError;
-
-    const { error: deleteError } = await supabase
-      .from("applicants")
-      .delete()
+      .select("rejected_count")
       .eq("id", id)
       .single();
 
-    if (deleteError) throw deleteError;
+    if (fetchError || !applicant) throw fetchError;
 
+    // Update the applicant's application_status and increment rejected_count
+    const { error: updateError } = await supabase
+      .from("codev")
+      .update({
+        application_status: "rejected",
+        rejected_count: (applicant.rejected_count || 0) + 1,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id);
+
+    if (updateError) throw updateError;
+
+    // Revalidate the cache
     revalidate();
     return { success: true };
   } catch (error) {
-    console.error("Error deleting data:", error);
-    return { success: false, error: error };
+    console.error("Error rejecting applicant:", error);
+    return { success: false, error };
   }
 }
 
 export async function approveAction(id: string) {
   try {
-    const { data: applicants, error: fetchError } = await supabase
-      .from("applicants")
-      .select("*")
-      .eq("id", id);
-
-    if (fetchError) throw fetchError;
-
-    const applicant = applicants[0];
-
-    const { error: insertError } = await supabase.from("interns").insert({
-      user_id: applicant.id,
-      first_name: applicant.first_name,
-      last_name: applicant.last_name,
-      email_address: applicant.email_address,
-      github_link: applicant.github_link,
-      portfolio_website: applicant.portfolio_website,
-      tech_stacks: applicant.tech_stacks,
-    });
-
-    if (insertError) throw insertError;
-
-    const { error: updateCodevError } = await supabase
+    // Update the applicant's application_status to "ACCEPTED"
+    const { error: updateError } = await supabase
       .from("codev")
       .update({
-        application_status: "ACCEPTED",
+        application_status: "passed",
+        role_id: 4,
+        updated_at: new Date().toISOString(),
       })
-      .eq("user_id", id)
-      .single();
+      .eq("id", id);
 
-    if (updateCodevError) throw updateCodevError;
+    if (updateError) throw updateError;
 
-    const { error: deleteError } = await supabase
-      .from("applicants")
-      .delete()
-      .eq("id", id)
-      .single();
-
-    if (deleteError) throw deleteError;
-
+    // Revalidate the cache
     revalidate();
     return { success: true };
   } catch (error) {
-    console.error("Error transferring data:", error);
-    return { success: false, error: error };
-  }
-}
-
-export async function createAction(applicants: ApplicantsList_Types) {
-  try {
-    const { data: applicantExist, error: fetchError } = await supabase
-      .from("applicants")
-      .select("*")
-      .eq("email_address", applicants?.email_address);
-
-    if (fetchError) throw fetchError;
-    if (applicantExist?.length > 0) throw "Email already exist";
-
-    const { error: createError } = await supabase
-      .from("applicants")
-      .insert(applicants);
-
-    if (createError) throw createError;
-
-    revalidate();
-    return { success: true };
-  } catch (error) {
-    console.error("Error creating data:", error);
-    return { success: false, error: error };
+    console.error("Error approving applicant:", error);
+    return { success: false, error };
   }
 }
 
 export async function updateAction(id: string, formData: FormData) {
-  const first_name = formData.get("first_name") as string;
-  const last_name = formData.get("last_name") as string;
-  const email_address = formData.get("email_address") as string;
-  const github_link = formData.get("github_link") as string;
-  const portfolio_website = formData.get("portfolio_website") as string;
-  const tech_stacks = formData.get("tech_stacks") as any;
-
   try {
-    const { error: updateError } = await supabase
-      .from("applicants")
-      .update({
-        first_name: first_name,
-        last_name: last_name,
-        email_address: email_address,
-        github_link: github_link,
-        portfolio_website: portfolio_website,
-        tech_stacks: toArray(tech_stacks),
-      })
-      .eq("id", id)
-      .single();
+    const updateData = {
+      first_name: formData.get("first_name")?.toString().trim(),
+      last_name: formData.get("last_name")?.toString().trim(),
+      email_address: formData.get("email_address")?.toString().trim(),
+      github: formData.get("github_link")?.toString().trim() || null,
+      portfolio_website:
+        formData.get("portfolio_website")?.toString().trim() || null,
+      tech_stacks: formData
+        .get("tech_stacks")
+        ?.toString()
+        .split(",")
+        .map((item) => item.trim()),
+    };
 
-    if (updateError) throw updateError;
+    // Validate required fields
+    if (
+      !updateData.first_name ||
+      !updateData.last_name ||
+      !updateData.email_address
+    ) {
+      throw new Error("Required fields missing");
+    }
 
-    revalidate();
+    const { error } = await supabase
+      .from("codev")
+      .update(updateData)
+      .eq("id", id);
+
+    if (error) throw error;
+
+    revalidatePath("/home/applicants");
     return { success: true };
   } catch (error) {
-    console.error("Error updating data:", error);
-    return { success: false, error: error };
+    console.error("Error updating applicant:", error);
+    return { success: false, error };
   }
 }

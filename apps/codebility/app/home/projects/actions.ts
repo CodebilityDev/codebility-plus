@@ -1,279 +1,342 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { Client, Codev } from "@/types/home/codev";
+import { deleteImage, getImagePath, uploadImage } from "@/utils/uploadImage";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-
-import { Board, List, Member, Project, User } from "./_types/projects";
-
-const deleteImageByPublicUrl = async (publicUrlOrFilePath: string) => {
-  const supabase = getSupabaseServerComponentClient();
-  const filePath = publicUrlOrFilePath?.split("/public/")[2];
-
-  if (filePath) {
-    const { error } = await supabase.storage
-      .from("projects-image")
-      .remove([`public/${filePath}`]);
-
-    if (error) {
-      console.error("Error deleting image:", error.message);
-    }
-  } else {
-    console.error("Failed to extract file path from public URL");
-  }
-};
-
-const uploadProjectImage = async (
-  file: File,
-  folderName: string,
-  bucketName: string,
-): Promise<string | null> => {
-  try {
-    if (!file) {
-      console.error("No file provided for upload");
-      return null;
-    }
-    console.log(
-      "Uploading file:",
-      file.name,
-      "Size:",
-      file.size,
-      "Type:",
-      file.type,
-    );
-
-    const arrayBuffer = await file.arrayBuffer();
-    const buffer = Buffer.from(arrayBuffer);
-
-    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
-    const extension = file.name.split(".").pop();
-    const filename = `${timestamp}.${extension}`;
-
-    const supabase = await getSupabaseServerComponentClient();
-
-    const { data, error } = await supabase.storage
-      .from(bucketName)
-      .upload(`${folderName}/${filename}`, buffer, {
-        contentType: file.type,
-      });
-
-    if (error) {
-      console.error(`Failed to upload ${file.name}:`, error.message);
-      return null;
-    }
-
-    const { data: imageData } = supabase.storage
-      .from("projects-image")
-      .getPublicUrl(`public/${filename}`);
-
-    return imageData?.publicUrl || null;
-  } catch (error) {
-    console.error("Error in upload image:", error);
-    throw error;
-  }
-};
-
-export const createProject = async (
+export async function createProject(
   formData: FormData,
-  members: User[] | any[],
-) => {
-  const thumbnail = formData.get("thumbnail") as File | null;
-  const project_name = formData.get("project_name") as string;
-  const clientId = formData.get("clientId") as string;
-  const team_leader_id = formData.get("team_leader_id") as string;
-  const github_link = formData.get("github_link") as string;
-  const live_link = formData.get("live_link") as string;
-  const figma_link = formData.get("figma_link") as string;
-  const summary = formData.get("summary") as string;
+  selectedMembers: Codev[],
+) {
+  const supabase = createClientComponentClient();
 
-  const supabase = getSupabaseServerComponentClient();
+  try {
+    // Extract member IDs
+    const memberIds = selectedMembers.map((member) => member.id);
 
-  const membersData = members.map((member) => ({
-    id: member.id,
-    first_name: member.first_name,
-    last_name: member.last_name,
-    image_url: member.user.profile.image_url,
-    position: member.main_position,
-  }));
+    // Create project with member IDs
+    const { data: project, error: projectError } = await supabase
+      .from("projects")
+      .insert({
+        name: formData.get("name"),
+        description: formData.get("description"),
+        github_link: formData.get("github_link"),
+        website_url: formData.get("website_url"),
+        figma_link: formData.get("figma_link"),
+        team_leader_id: formData.get("team_leader_id"),
+        client_id: formData.get("client_id"),
+        start_date: formData.get("start_date"),
+        project_category_id: formData.get("project_category_id")
+          ? parseInt(formData.get("project_category_id") as string)
+          : null,
+        main_image: formData.get("main_image"),
+        status: "pending",
+        members: memberIds, // Add members array here
+      })
+      .select()
+      .single();
 
-  let thumbnailPath = null;
-  if (thumbnail) {
-    thumbnailPath = await uploadProjectImage(
-      thumbnail,
-      "public",
-      "projects-image",
-    );
-  }
+    if (projectError) throw projectError;
 
-  const newProject: Project = {
-    name: project_name,
-    summary: summary || null,
-    thumbnail: thumbnailPath,
-    github_link: github_link || null,
-    live_link: live_link || null,
-    figma_link: figma_link || null,
-    team_leader_id,
-    client_id: clientId,
-    members: membersData,
-  };
+    // Create project members in project_members table
+    if (memberIds.length > 0) {
+      const { error: membersError } = await supabase
+        .from("project_members")
+        .insert(
+          memberIds.map((memberId) => ({
+            project_id: project.id,
+            codev_id: memberId,
+            role: "member",
+            joined_at: new Date().toISOString(),
+          })),
+        );
 
-  const { data: projectData, error: projectError } = await supabase
-    .from("project")
-    .insert(newProject)
-    .select();
-
-  if (projectError) {
-    console.error("Error creating project:", projectError.message);
-    return { success: false, error: projectError.message };
-  }
-
-  const project: Project = projectData[0];
-
-  const { data: boardData, error: boardError } = await supabase
-    .from("board")
-    .insert({
-      name: `${project_name} Board`,
-      project_id: project.id as string,
-    })
-    .select();
-
-  if (boardError) {
-    console.error("Error creating board:", boardError.message);
-    return { success: false, error: boardError.message };
-  }
-
-  const board: Board = boardData[0];
-
-  const DEFAULT_LIST = ["pending", "in progress", "for review", "done"];
-  const listsToInsert: List[] = DEFAULT_LIST.map((name) => ({
-    name,
-    board_id: board.id,
-  }));
-
-  const { error: listError } = await supabase
-    .from("list")
-    .insert(listsToInsert);
-
-  if (listError) {
-    console.log("Error creating list: ", listError.message);
-    return { success: false, error: listError.message };
-  }
-
-  revalidatePath("/home/clients");
-  return { success: true, data: projectData };
-};
-
-export const updateProject = async (id: string, formData: FormData) => {
-  const thumbnail = formData.get("thumbnail") as File | null;
-  const project_name = formData.get("project_name") as string;
-  const clientId = formData.get("clientId") as string;
-  const team_leader_id = formData.get("team_leader_id") as string;
-  const github_link = formData.get("github_link") as string;
-  const live_link = formData.get("live_link") as string;
-  const figma_link = formData.get("figma_link") as string;
-  const summary = formData.get("summary") as string;
-  const status = formData.get("status") as string;
-
-  const supabase = getSupabaseServerComponentClient();
-
-  const { data: projectsData, error: projectsError } = await supabase
-    .from("project")
-    .select("*")
-    .eq("id", id)
-    .single();
-
-  if (projectsError) {
-    console.error("Error fetching project data:", projectsError.message);
-    return { success: false, error: projectsError.message };
-  }
-
-  const updateProject = {
-    name: project_name || projectsData.name,
-    summary: summary || projectsData.summary,
-    thumbnail: projectsData.thumbnail,
-    github_link: github_link || projectsData.github_link,
-    live_link: live_link || projectsData.live_link,
-    figma_link: figma_link || projectsData.figma_link,
-    status: status || projectsData.status,
-    team_leader_id: team_leader_id || projectsData.team_leader_id,
-    client_id: clientId || projectsData.client_id,
-    members: projectsData.members,
-  };
-
-  if (thumbnail) {
-    if (projectsData.thumbnail) {
-      await deleteImageByPublicUrl(projectsData.thumbnail);
+      if (membersError) throw membersError;
     }
 
-    updateProject.thumbnail = await uploadProjectImage(
-      thumbnail,
-      "public",
-      "projects-image",
-    );
+    // Create default kanban board
+    const { error: boardError } = await supabase.from("kanban_boards").insert({
+      name: `${project.name} Board`,
+      project_id: project.id,
+      description: `Default board for ${project.name}`,
+    });
+
+    if (boardError) throw boardError;
+
+    revalidatePath("/projects");
+    return { success: true, data: project };
+  } catch (error) {
+    console.error("Error creating project:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to create project",
+    };
   }
+}
 
-  const { data: updateProjectsData, error: updateProjectsError } =
-    await supabase.from("project").update(updateProject).eq("id", id).single();
+export async function updateProject(projectId: string, formData: FormData) {
+  const supabase = createClientComponentClient();
 
-  if (updateProjectsError) {
-    console.error("Error updating project:", updateProjectsError.message);
-    return { success: false, error: updateProjectsError.message };
+  try {
+    // Convert form data to object
+    const updateData: any = {};
+    for (const [key, value] of formData.entries()) {
+      if (key === "members") {
+        // Parse members string back to array
+        updateData[key] = JSON.parse(value as string);
+      } else {
+        updateData[key] = value;
+      }
+    }
+
+    // Ensure members is an array
+    if (!Array.isArray(updateData.members)) {
+      updateData.members = [];
+    }
+
+    const { data, error } = await supabase
+      .from("projects")
+      .update({
+        ...updateData,
+        updated_at: new Date().toISOString(),
+        // Ensure members is cast to uuid[]
+        members: updateData.members || [],
+      })
+      .eq("id", projectId)
+      .select();
+
+    if (error) throw error;
+
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error updating project:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to update project",
+    };
   }
+}
 
-  revalidatePath("/home/projects");
-  return { success: true, data: updateProjectsData };
+export async function deleteProject(projectId: string) {
+  const supabase = createClientComponentClient();
+
+  try {
+    // Get project data first to handle image deletion
+    const { data: project, error: fetchError } = await supabase
+      .from("projects")
+      .select()
+      .eq("id", projectId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    // Delete project image if exists
+    if (project.main_image) {
+      const imagePath = getImagePath(project.main_image);
+      if (imagePath) {
+        await deleteImage(imagePath, "projects");
+      }
+    }
+
+    // Delete project (cascade will handle related records)
+    const { error: deleteError } = await supabase
+      .from("projects")
+      .delete()
+      .eq("id", projectId);
+
+    if (deleteError) throw deleteError;
+
+    revalidatePath("/projects");
+    return { success: true };
+  } catch (error) {
+    console.error("Error deleting project:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to delete project",
+    };
+  }
+}
+
+export const getTeamLead = async (
+  teamLeaderId: string,
+): Promise<{
+  error: any;
+  data: Codev | null;
+}> => {
+  const supabase = createClientComponentClient();
+
+  try {
+    const { data, error } = await supabase
+      .from("codev")
+      .select("*")
+      .eq("id", teamLeaderId)
+      .single();
+
+    if (error) {
+      console.error("Error fetching team lead:", error);
+      return { error, data: null };
+    }
+
+    return { error: null, data: data as Codev };
+  } catch (error) {
+    console.error("Unexpected error fetching team lead:", error);
+    return { error, data: null };
+  }
+};
+
+export const getMembers = async (
+  memberIds: string[],
+): Promise<{
+  error: any;
+  data: Codev[] | null;
+}> => {
+  const supabase = createClientComponentClient();
+
+  try {
+    const { data, error } = await supabase
+      .from("codev")
+      .select(
+        `
+        id,
+        first_name,
+        last_name,
+        email_address,
+        display_position,
+        image_url,
+        positions,
+        tech_stacks,
+        projects (
+          id,
+          name
+        )
+      `,
+      )
+      .in("id", memberIds);
+
+    if (error) {
+      console.error("Error fetching members:", error);
+      return { error, data: null };
+    }
+
+    // Transform the data to match Codev type
+    const transformedData = data?.map((member) => ({
+      ...member,
+      positions: member.positions || [],
+      tech_stacks: member.tech_stacks || [],
+      projects: member.projects || [],
+    }));
+
+    return { error: null, data: transformedData as Codev[] };
+  } catch (error) {
+    console.error("Unexpected error fetching members:", error);
+    return { error, data: null };
+  }
 };
 
 export const updateProjectMembers = async (
   projectId: string,
-  members: Member[],
-) => {
-  const supabase = getSupabaseServerComponentClient();
+  members: Codev[],
+): Promise<{ success: boolean; error?: string }> => {
+  const supabase = createClientComponentClient();
 
-  const { data, error } = await supabase
-    .from("project")
-    .update({ members })
-    .eq("id", projectId)
-    .single();
+  try {
+    // Start a transaction by deleting existing members
+    const { error: deleteError } = await supabase
+      .from("project_members")
+      .delete()
+      .eq("project_id", projectId);
 
-  if (error) {
-    console.error("Error updating project members:", error.message);
-    return { success: false, error: error.message };
+    if (deleteError) throw deleteError;
+
+    // Insert new members with proper role and joined_at
+    const { error: insertError } = await supabase
+      .from("project_members")
+      .insert(
+        members.map((member) => ({
+          project_id: projectId,
+          codev_id: member.id,
+          role: "member",
+          joined_at: new Date().toISOString(),
+        })),
+      );
+
+    if (insertError) throw insertError;
+
+    revalidatePath("/projects");
+    return { success: true };
+  } catch (error) {
+    console.error("Error updating project members:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error occurred",
+    };
   }
-
-  revalidatePath("/home/projects");
-  return { success: true, data };
 };
 
-export const deleteProject = async (projectId: string) => {
-  const supabase = getSupabaseServerComponentClient();
+export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
+  const supabase = createClientComponentClient();
 
-  const { data: projectData, error: projectError } = await supabase
-    .from("project")
-    .select("thumbnail")
-    .eq("id", projectId)
-    .single();
+  let query = supabase.from("codev").select(`
+    id,
+    first_name,
+    last_name,
+    email_address,
+    image_url,
+    positions,
+    tech_stacks,
+    display_position,
+    internal_status,
+    projects (
+      id
+    )
+  `);
 
-  if (projectError) {
-    console.error("Error fetching project data:", projectError.message);
-    return { success: false, error: projectError.message };
-  }
+  Object.entries(filters).forEach(([key, value]) => {
+    if (value !== undefined) {
+      query = query.eq(key, value);
+    }
+  });
 
-  if (projectData.thumbnail) {
-    await deleteImageByPublicUrl(projectData.thumbnail);
-  }
-
-  const { error } = await supabase
-    .from("project")
-    .delete()
-    .eq("id", projectId)
-    .single();
+  const { data, error } = await query;
 
   if (error) {
-    console.error("Error deleting data:", error.message);
-    return { success: false, error: error.message };
+    console.error("Error fetching Codevs:", error);
+    throw new Error("Failed to fetch Codevs");
   }
 
-  revalidatePath("/home/projects");
-  return { success: true };
+  return (data as Codev[]) || [];
+};
+
+export const getProjectClients = async (): Promise<Client[]> => {
+  const supabase = createClientComponentClient();
+
+  const { data, error } = await supabase
+    .from("clients")
+    .select("id, name, company_name, company_logo");
+
+  if (error) {
+    console.error("Error fetching Clients:", error);
+    throw new Error("Failed to fetch Clients");
+  }
+
+  return data || [];
+};
+
+export const getProjectCategories = async () => {
+  const supabase = createClientComponentClient();
+
+  const { data, error } = await supabase
+    .from("projects_category")
+    .select("id, name, description");
+
+  if (error) {
+    console.error("Error fetching categories:", error);
+    throw new Error("Failed to fetch categories");
+  }
+
+  return data || [];
 };

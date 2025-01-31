@@ -5,59 +5,64 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 import Calendly from "../_components/marketing-calendly";
 import Footer from "../_components/marketing-footer";
 import Navigation from "../_components/marketing-navigation";
-import { PoppinFont } from "../_lib/font";
 import Hero from "./_components/services-hero";
 import ServicesTab from "./_components/services-tab";
 
 export default function ServicesPage() {
   const supabase = getSupabaseServerComponentClient();
 
-  const services = use(
-    supabase
-      .from("services")
-      .select("*")
-      .then(({ data, error }) => {
-        if (error) throw error;
-        return data;
-      }),
-  );
-
   const liveProjects = use(
     supabase
-      .from("project")
+      .from("projects")
       .select(
-        `id, name, summary, thumbnail, project_category: project_categories!inner(type)`,
+        `
+        id, 
+        name, 
+        description,
+        website_url,
+        client_id,
+        project_category: projects_category!inner(name)
+      `,
       )
-      .eq("is_displayed", true)
+      .eq("status", "active")
       .then(({ data, error }) => {
         if (error) throw error;
 
-        const formattedData = data.map((item) => ({
+        // Map data to match Project interface
+        return data.map((item) => ({
           id: item.id,
           name: item.name,
-          category: (item.project_category as unknown as { type: string }).type,
-          description: item.summary,
-          mainImage: item.thumbnail,
+          description: item.description || "",
+          main_image: item.website_url || "",
+          github_link: "", // Add other fields from Project if required
+          figma_link: "",
+          start_date: "",
+          end_date: "",
+          project_category_id: 0, // Replace with actual category ID logic
+          client_id: item.client_id,
+          members: [],
+          created_at: "",
+          updated_at: "",
         }));
-
-        return formattedData;
       }),
   );
 
-  // temporary fix to maintain [Web Application, Mobile Application, Product Design] tab order
+  // Find "Codebility" project and filter the rest
   const codebility = liveProjects.find((item) => item.name === "Codebility");
   const rest = liveProjects.filter((item) => item.name !== "Codebility");
 
-  const combinedProjectsAndServices = [codebility, ...rest, ...services];
+  // Filter out undefined and construct final projectsData
+  const projectsData = [codebility, ...rest].filter(
+    (project): project is NonNullable<typeof project> => project !== undefined,
+  );
 
   return (
     <div
-      className={`relative flex w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303] ${PoppinFont.className}`}
+      className={`relative flex w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303] `}
     >
       <Navigation />
       <Hero />
-
-      <ServicesTab servicesData={combinedProjectsAndServices} />
+      <ServicesTab servicesData={projectsData} />
       <Calendly />
       <Footer />
     </div>
