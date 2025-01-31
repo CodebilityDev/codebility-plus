@@ -38,7 +38,7 @@ export default function ProfileContainer({
         </IntroText>
       </motion.div>
       {/* Use admins if needed */}
-      {filteredCodevs.length > 0 && (
+      {/* {filteredCodevs.length > 0 && (
         <div className="flex flex-wrap gap-4">
           {filteredCodevs.map((admin) => (
             <div key={admin.id} className="text-white">
@@ -46,7 +46,7 @@ export default function ProfileContainer({
             </div>
           ))}
         </div>
-      )}
+      )} */}
     </div>
   );
 }
