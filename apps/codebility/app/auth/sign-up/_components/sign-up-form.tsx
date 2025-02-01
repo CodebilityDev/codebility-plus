@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useModal } from "@/hooks/use-modal";
 import { SignUpValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
@@ -27,6 +27,31 @@ const SignUpForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { onOpen } = useModal();
 
+  const form = useForm<SignUpFormInputs>({
+    resolver: zodResolver(SignUpValidation),
+    defaultValues: {
+      first_name: "adrian",
+      last_name: "mores",
+      email_address: "adrian@gmail.com",
+      phone_number: "09278578197",
+      years_of_experience: 1,
+      portfolio_website: "https://portfolio.website",
+      tech_stacks: ["html", "css"],
+      positions: [],
+      facebook: "https://facebook.com",
+      github: "https://github.com",
+      linkedin: "https://linkedin.com",
+      discord: "adrian",
+      password: "P@ssw0rd",
+      confirmPassword: "P@ssw0rd",
+      profileImage: null, // Allow null for profile image
+      about: "lorem ipsum sit dolor amet",
+      application_status: "applying",
+      internal_status: "TRAINING",
+      availability_status: true,
+      role_id: 7,
+    },
+  });
   const {
     register,
     handleSubmit,
@@ -35,31 +60,7 @@ const SignUpForm = () => {
     trigger,
     reset,
     formState: { errors },
-  } = useForm<SignUpFormInputs>({
-    resolver: zodResolver(SignUpValidation),
-    defaultValues: {
-      first_name: "",
-      last_name: "",
-      email_address: "",
-      phone_number: "",
-      years_of_experience: 0,
-      portfolio_website: "",
-      tech_stacks: [],
-      positions: [],
-      facebook: "",
-      github: "",
-      linkedin: "",
-      discord: "",
-      password: "",
-      confirmPassword: "",
-      profileImage: null, // Allow null for profile image
-      about: "",
-      application_status: "applying",
-      internal_status: "TRAINING",
-      availability_status: true,
-      role_id: 7,
-    },
-  });
+  } = form;
 
   const onSubmit = async (data: SignUpFormInputs) => {
     setIsLoading(true);
@@ -108,88 +109,90 @@ const SignUpForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="relative">
-      {/* Profile Image Upload */}
-      <div className="absolute left-4 top-0">
-        <ImageUpload
-          onChange={(file) => setValue("profileImage", file)} // Accepts File or null
-          error={errors.profileImage?.message as string}
-        />
-      </div>
+    <FormProvider {...form}>
+      <form onSubmit={handleSubmit(onSubmit)} className="relative">
+        {/* Profile Image Upload */}
+        <div className="absolute left-4 top-0">
+          <ImageUpload
+            onChange={(file) => setValue("profileImage", file)} // Accepts File or null
+            error={errors.profileImage?.message as string}
+          />
+        </div>
 
-      {/* Form Fields */}
-      <div className="flex w-full flex-col gap-4 p-4 pt-32 md:flex-row md:gap-10">
-        {FORM_STEPS.map((step, stepIndex) => (
-          <div
-            className="flex flex-col gap-4 md:flex-1"
-            key={`step_${stepIndex}`}
-          >
-            {step.map((field, fieldIndex) => (
-              <SignUpInputs
-                key={`field_${stepIndex}_${fieldIndex}`}
-                label={field.label}
-                id={field.id}
-                type={field.type}
-                register={register}
-                errors={errors}
-                required={!field.optional}
-                placeholder={field.placeholder}
-                setValue={setValue}
-                getValues={getValues}
-                trigger={trigger}
-              />
-            ))}
+        {/* Form Fields */}
+        <div className="flex w-full flex-col gap-4 p-4 pt-32 md:flex-row md:gap-10">
+          {FORM_STEPS.map((step, stepIndex) => (
+            <div
+              className="flex flex-col gap-4 md:flex-1"
+              key={`step_${stepIndex}`}
+            >
+              {step.map((field, fieldIndex) => (
+                <SignUpInputs
+                  key={`field_${stepIndex}_${fieldIndex}`}
+                  label={field.label}
+                  id={field.id}
+                  type={field.type}
+                  register={register}
+                  errors={errors}
+                  required={!field.optional}
+                  placeholder={field.placeholder}
+                  setValue={setValue}
+                  getValues={getValues}
+                  trigger={trigger}
+                />
+              ))}
 
-            {/* Privacy Policy and Buttons for last step */}
-            {stepIndex === FORM_STEPS.length - 1 && (
-              <div className="space-y-6">
-                <label className="flex items-center gap-4 text-sm text-white">
-                  <Checkbox required className="border-white" />
-                  <p>
-                    I agree to the{" "}
-                    <span
-                      onClick={() => onOpen("privacyPolicyModal")}
-                      className="cursor-pointer text-blue-100 hover:underline"
-                    >
-                      Privacy Policy
-                    </span>
-                  </p>
-                </label>
-
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full md:w-auto"
-                  >
-                    {isLoading ? (
-                      <span className="flex items-center gap-2">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        Creating account...
+              {/* Privacy Policy and Buttons for last step */}
+              {stepIndex === FORM_STEPS.length - 1 && (
+                <div className="space-y-6">
+                  <label className="flex items-center gap-4 text-sm text-white">
+                    <Checkbox required className="border-white" />
+                    <p>
+                      I agree to the{" "}
+                      <span
+                        onClick={() => onOpen("privacyPolicyModal")}
+                        className="cursor-pointer text-blue-100 hover:underline"
+                      >
+                        Privacy Policy
                       </span>
-                    ) : (
-                      "Apply"
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="link"
-                    disabled={isLoading}
-                    onClick={() => {
-                      reset();
-                      router.push("/");
-                    }}
-                    className="w-full md:w-auto"
-                  >
-                    Cancel
-                  </Button>
+                    </p>
+                  </label>
+
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
+                    <Button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full md:w-auto"
+                    >
+                      {isLoading ? (
+                        <span className="flex items-center gap-2">
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          Creating account...
+                        </span>
+                      ) : (
+                        "Apply"
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="link"
+                      disabled={isLoading}
+                      onClick={() => {
+                        reset();
+                        router.push("/");
+                      }}
+                      className="w-full md:w-auto"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </form>
+              )}
+            </div>
+          ))}
+        </div>
+      </form>
+    </FormProvider>
   );
 };
 
