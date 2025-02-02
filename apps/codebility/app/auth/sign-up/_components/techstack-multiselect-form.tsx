@@ -1,13 +1,12 @@
 "use client";
 
-import { ReactElement, useEffect, useState } from "react";
-import { techstacks } from "@/constants/techstack";
+import { useEffect } from "react";
+import { useModal } from "@/hooks/use-modal";
+import { useTechStackStore } from "@/hooks/use-techstack";
 import { ChevronDown } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 
 import { Button } from "@codevs/ui/button";
-import { Checkbox } from "@codevs/ui/checkbox";
-import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover";
 
 interface TechStackType {
   id: number;
@@ -22,25 +21,45 @@ interface TechStackSelectType {
 }
 
 export function TechStackMultiselectField({ id, error }: TechStackSelectType) {
-  const [techStackOptions, setTechStackOptions] = useState<TechStackType[]>(
-    () =>
-      techstacks.map((item, index) => ({
-        ...item,
-        id: index,
-      })),
-  );
-  const [selectedTechStack, setSelectedTechStack] = useState<string[]>([]);
   const { setValue } = useFormContext();
+  const { onOpen } = useModal();
+  const { stack } = useTechStackStore();
+  // const [techStackOptions, setTechStackOptions] = useState<TechStackType[]>(
+  //   () =>
+  //     techstacks.map((item, index) => ({
+  //       ...item,
+  //       id: index,
+  //     })),
+  // );
+  // const [selectedTechStack, setSelectedTechStack] = useState<string[]>([]);
 
   useEffect(() => {
-    if (!selectedTechStack) return;
-
-    setValue(id, selectedTechStack, {
+    if (!stack) return;
+    setValue(id, stack, {
       shouldValidate: false,
     });
-  }, [selectedTechStack]);
+  }, [stack]);
 
   return (
+    <Button
+      type="button"
+      variant="outline"
+      role="combobox"
+      className={`md:text-md bg-dark-200 text-grey-100 flex justify-between border-b-2 p-2 text-sm font-normal focus:outline-none lg:text-lg ${
+        error ? "border-red-400" : "border-darkgray"
+      }`}
+      onClick={() => onOpen("techStackModal")}
+    >
+      {stack.length > 0
+        ? `${stack.length} tech stack${stack.length > 1 ? "s" : ""} selected`
+        : "Select your tech stack"}
+      <ChevronDown />
+    </Button>
+  );
+}
+
+/*
+return (
     <Popover>
       <PopoverTrigger asChild>
         <Button
@@ -81,4 +100,4 @@ export function TechStackMultiselectField({ id, error }: TechStackSelectType) {
       </PopoverContent>
     </Popover>
   );
-}
+*/

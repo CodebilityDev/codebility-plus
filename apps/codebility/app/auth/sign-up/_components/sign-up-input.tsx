@@ -4,8 +4,10 @@ import { useState } from "react";
 import { useModal } from "@/hooks/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { IconEye, IconEyeClose } from "@/public/assets/svgs";
+import { ChevronDown } from "lucide-react";
 
 import { cn } from "@codevs/ui";
+import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 
 import { PositionMultiselectField } from "./position-multiselect-field";
@@ -47,8 +49,6 @@ const SignUpInputs = ({
   getValues,
   trigger,
 }: SignUpInputsProps) => {
-  const { onOpen } = useModal();
-  const { stack } = useTechStackStore();
   const [showPassword, setShowPassword] = useState(false);
 
   // Common components
@@ -83,6 +83,7 @@ const SignUpInputs = ({
         <ErrorMessage />
       </div>
     );
+
     // return (
     //   <div
     //     className="flex flex-col gap-1"

@@ -64,7 +64,9 @@ export function PositionMultiselectField({ id, error }: PositionSelectProps) {
             error ? "border-red-400" : "border-darkgray"
           }`}
         >
-          Select applicable positions
+          {selectedPositions.length > 0
+            ? `${selectedPositions.length} position${selectedPositions.length > 1 ? "s" : ""} selected`
+            : "Select applicable positions"}
           <ChevronDown />
         </Button>
       </PopoverTrigger>
