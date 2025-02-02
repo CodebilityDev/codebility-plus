@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import TechStackModal from "@/Components/modals/TechStackModal";
+import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { SignUpValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -10,7 +11,6 @@ import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
-import { Button } from "@codevs/ui/button";
 import { Checkbox } from "@codevs/ui/checkbox";
 
 import { signupUser } from "../../actions";
@@ -31,22 +31,22 @@ const SignUpForm = () => {
   const form = useForm<SignUpFormInputs>({
     resolver: zodResolver(SignUpValidation),
     defaultValues: {
-      first_name: "adrian",
-      last_name: "mores",
-      email_address: "adrian@gmail.com",
-      phone_number: "09278578197",
-      years_of_experience: 1,
-      portfolio_website: "https://portfolio.website",
-      tech_stacks: ["html", "css"],
+      first_name: "",
+      last_name: "",
+      email_address: "",
+      phone_number: "",
+      years_of_experience: 0,
+      portfolio_website: "",
+      tech_stacks: [],
       positions: [],
-      facebook: "https://facebook.com",
-      github: "https://github.com",
-      linkedin: "https://linkedin.com",
-      discord: "adrian",
-      password: "P@ssw0rd",
-      confirmPassword: "P@ssw0rd",
+      facebook: "",
+      github: "",
+      linkedin: "",
+      discord: "",
+      password: "",
+      confirmPassword: "",
       profileImage: null, // Allow null for profile image
-      about: "lorem ipsum sit dolor amet",
+      about: "",
       application_status: "applying",
       internal_status: "TRAINING",
       availability_status: true,
@@ -64,8 +64,6 @@ const SignUpForm = () => {
   } = form;
 
   const onSubmit = async (data: SignUpFormInputs) => {
-    // console.log("input data: ", data);
-    // return;
     setIsLoading(true);
     try {
       const formData = new FormData();
@@ -165,6 +163,7 @@ const SignUpForm = () => {
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
                     <Button
                       type="submit"
+                      variant="purple"
                       disabled={isLoading}
                       className="w-full md:w-auto"
                     >
@@ -185,7 +184,7 @@ const SignUpForm = () => {
                         reset();
                         router.push("/");
                       }}
-                      className="w-full md:w-auto"
+                      className="w-full text-white md:w-auto"
                     >
                       Cancel
                     </Button>

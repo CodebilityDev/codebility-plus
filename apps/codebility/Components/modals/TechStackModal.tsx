@@ -43,7 +43,7 @@ const TechStackModal = () => {
           {techstacks?.map((stack, i) => (
             <div
               className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
-                checkArray(stack.name.toLowerCase()) && "bg-blue-100"
+                checkArray(stack.name.toLowerCase()) && "bg-blue-100 text-white"
               }`}
               key={`stack-item-${i}`}
               onClick={() => addRemoveStack(stack.name.toLowerCase())}
