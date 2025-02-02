@@ -17,16 +17,14 @@ export const SignUpValidation = z
       .min(1, "Phone number is required")
       .regex(/^[\d\s\+\-\(\)]+$/, "Please enter a valid phone number"),
 
-    years_of_experience: z
-      .string()
-      .transform((val) => (val ? Number(val) : 0))
-      .pipe(
-        z
-          .number()
-          .int("Must be a whole number")
-          .min(0, "Years must be 0 or greater")
-          .max(50, "Years must be 50 or less"),
-      ),
+    years_of_experience: z.preprocess(
+      (val) => (typeof val === "string" ? Number(val) : val),
+      z
+        .number()
+        .int("Must be a whole number")
+        .min(0, "Years must be 0 or greater")
+        .max(50, "Years must be 50 or less"),
+    ),
 
     portfolio_website: z
       .string()
