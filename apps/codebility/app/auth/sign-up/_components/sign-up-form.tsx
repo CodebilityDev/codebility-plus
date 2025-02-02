@@ -2,14 +2,15 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import TechStackModal from "@/Components/modals/TechStackModal";
+import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { SignUpValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
+import { FormProvider, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
-import { Button } from "@codevs/ui/button";
 import { Checkbox } from "@codevs/ui/checkbox";
 
 import { signupUser } from "../../actions";
@@ -27,15 +28,7 @@ const SignUpForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const { onOpen } = useModal();
 
-  const {
-    register,
-    handleSubmit,
-    setValue,
-    getValues,
-    trigger,
-    reset,
-    formState: { errors },
-  } = useForm<SignUpFormInputs>({
+  const form = useForm<SignUpFormInputs>({
     resolver: zodResolver(SignUpValidation),
     defaultValues: {
       first_name: "",
@@ -60,6 +53,15 @@ const SignUpForm = () => {
       role_id: 7,
     },
   });
+  const {
+    register,
+    handleSubmit,
+    setValue,
+    getValues,
+    trigger,
+    reset,
+    formState: { errors },
+  } = form;
 
   const onSubmit = async (data: SignUpFormInputs) => {
     setIsLoading(true);
@@ -108,88 +110,92 @@ const SignUpForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="relative">
-      {/* Profile Image Upload */}
-      <div className="absolute left-4 top-0">
-        <ImageUpload
-          onChange={(file) => setValue("profileImage", file)} // Accepts File or null
-          error={errors.profileImage?.message as string}
-        />
-      </div>
+    <FormProvider {...form}>
+      <TechStackModal />
+      <form onSubmit={handleSubmit(onSubmit)} className="relative">
+        {/* Profile Image Upload */}
+        <div className="absolute left-4 top-0">
+          <ImageUpload
+            onChange={(file) => setValue("profileImage", file)} // Accepts File or null
+            error={errors.profileImage?.message as string}
+          />
+        </div>
 
-      {/* Form Fields */}
-      <div className="flex w-full flex-col gap-4 p-4 pt-32 md:flex-row md:gap-10">
-        {FORM_STEPS.map((step, stepIndex) => (
-          <div
-            className="flex flex-col gap-4 md:flex-1"
-            key={`step_${stepIndex}`}
-          >
-            {step.map((field, fieldIndex) => (
-              <SignUpInputs
-                key={`field_${stepIndex}_${fieldIndex}`}
-                label={field.label}
-                id={field.id}
-                type={field.type}
-                register={register}
-                errors={errors}
-                required={!field.optional}
-                placeholder={field.placeholder}
-                setValue={setValue}
-                getValues={getValues}
-                trigger={trigger}
-              />
-            ))}
+        {/* Form Fields */}
+        <div className="flex w-full flex-col gap-4 p-4 pt-32 md:flex-row md:gap-10">
+          {FORM_STEPS.map((step, stepIndex) => (
+            <div
+              className="flex flex-col gap-4 md:flex-1"
+              key={`step_${stepIndex}`}
+            >
+              {step.map((field, fieldIndex) => (
+                <SignUpInputs
+                  key={`field_${stepIndex}_${fieldIndex}`}
+                  label={field.label}
+                  id={field.id}
+                  type={field.type}
+                  register={register}
+                  errors={errors}
+                  required={!field.optional}
+                  placeholder={field.placeholder}
+                  setValue={setValue}
+                  getValues={getValues}
+                  trigger={trigger}
+                />
+              ))}
 
-            {/* Privacy Policy and Buttons for last step */}
-            {stepIndex === FORM_STEPS.length - 1 && (
-              <div className="space-y-6">
-                <label className="flex items-center gap-4 text-sm text-white">
-                  <Checkbox required className="border-white" />
-                  <p>
-                    I agree to the{" "}
-                    <span
-                      onClick={() => onOpen("privacyPolicyModal")}
-                      className="cursor-pointer text-blue-100 hover:underline"
-                    >
-                      Privacy Policy
-                    </span>
-                  </p>
-                </label>
-
-                <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
-                  <Button
-                    type="submit"
-                    disabled={isLoading}
-                    className="w-full md:w-auto"
-                  >
-                    {isLoading ? (
-                      <span className="flex items-center gap-2">
-                        <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-                        Creating account...
+              {/* Privacy Policy and Buttons for last step */}
+              {stepIndex === FORM_STEPS.length - 1 && (
+                <div className="space-y-6">
+                  <label className="flex items-center gap-4 text-sm text-white">
+                    <Checkbox required className="border-white" />
+                    <p>
+                      I agree to the{" "}
+                      <span
+                        onClick={() => onOpen("privacyPolicyModal")}
+                        className="cursor-pointer text-blue-100 hover:underline"
+                      >
+                        Privacy Policy
                       </span>
-                    ) : (
-                      "Apply"
-                    )}
-                  </Button>
-                  <Button
-                    type="button"
-                    variant="link"
-                    disabled={isLoading}
-                    onClick={() => {
-                      reset();
-                      router.push("/");
-                    }}
-                    className="w-full md:w-auto"
-                  >
-                    Cancel
-                  </Button>
+                    </p>
+                  </label>
+
+                  <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
+                    <Button
+                      type="submit"
+                      variant="purple"
+                      disabled={isLoading}
+                      className="w-full md:w-auto"
+                    >
+                      {isLoading ? (
+                        <span className="flex items-center gap-2">
+                          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                          Creating account...
+                        </span>
+                      ) : (
+                        "Apply"
+                      )}
+                    </Button>
+                    <Button
+                      type="button"
+                      variant="link"
+                      disabled={isLoading}
+                      onClick={() => {
+                        reset();
+                        router.push("/");
+                      }}
+                      className="w-full text-white md:w-auto"
+                    >
+                      Cancel
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    </form>
+              )}
+            </div>
+          ))}
+        </div>
+      </form>
+    </FormProvider>
   );
 };
 

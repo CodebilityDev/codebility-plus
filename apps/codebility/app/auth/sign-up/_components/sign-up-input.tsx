@@ -4,11 +4,15 @@ import { useState } from "react";
 import { useModal } from "@/hooks/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { IconEye, IconEyeClose } from "@/public/assets/svgs";
+import { ChevronDown } from "lucide-react";
 
 import { cn } from "@codevs/ui";
+import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 
+import { PositionMultiselectField } from "./position-multiselect-field";
 import PositionSelect from "./PositionSelect";
+import { TechStackMultiselectField } from "./techstack-multiselect-form";
 
 interface SignUpInputsProps {
   label: string;
@@ -45,9 +49,6 @@ const SignUpInputs = ({
   getValues,
   trigger,
 }: SignUpInputsProps) => {
-  const { onOpen } = useModal();
-  const { stack } = useTechStackStore();
-
   const [showPassword, setShowPassword] = useState(false);
 
   // Common components
@@ -74,48 +75,66 @@ const SignUpInputs = ({
   );
 
   // Handle modal inputs (techstack and availability)
-  if (id === "techstack") {
-    return (
-      <div
-        className="flex flex-col gap-1"
-        onClick={() => onOpen("techStackModal")}
-      >
-        <InputLabel />
-        <Input
-          {...register(id)}
-          value={stack.join(", ")}
-          className={cn(inputStyles, "cursor-pointer")}
-          readOnly
-          placeholder={placeholder}
-          onChange={(e) => {
-            // This won't actually fire because it's readonly
-            setValue(id, e.target.value, {
-              shouldValidate: true,
-            });
-          }}
-        />
-        <ErrorMessage />
-      </div>
-    );
-  }
-
-  // Handle position select
-  if (type === "select" && id === "position") {
+  if (id === "tech_stacks") {
     return (
       <div className="flex flex-col gap-1">
         <InputLabel />
-        <PositionSelect
-          value={values}
-          onChange={(value) => {
-            setValue(id, value, {
-              shouldValidate: false,
-            });
-          }}
-          error={errors[id]?.message}
-        />
+        <TechStackMultiselectField id={id} error={errors[id]?.message} />
         <ErrorMessage />
       </div>
     );
+
+    // return (
+    //   <div
+    //     className="flex flex-col gap-1"
+    //     onClick={() => {
+    //       onOpen("techStackModal");
+    //       console.log("tech stack clicked");
+    //     }}
+    //   >
+    //     <InputLabel />
+    //     <Input
+    //       {...register(id)}
+    //       value={stack.join(", ")}
+    //       className={cn(inputStyles, "cursor-pointer")}
+    //       readOnly
+    //       placeholder={placeholder}
+    //       onChange={(e) => {
+    //         // This won't actually fire because it's readonly
+    //         setValue(id, e.target.value, {
+    //           shouldValidate: true,
+    //         });
+    //       }}
+    //     />
+    //     <ErrorMessage />
+    //   </div>
+    // );
+  }
+
+  // Handle position select
+  if (id === "positions") {
+    return (
+      <div className="flex flex-col gap-1">
+        <InputLabel />
+        <PositionMultiselectField id={id} error={errors[id]?.message} />
+        <ErrorMessage />
+      </div>
+    );
+    // return (
+    //   <div className="flex flex-col gap-1">
+    //     <InputLabel />
+    //     <PositionSelect
+    //       value={values}
+    //       onChange={(value) => {
+    //         setValue(id, value, {
+    //           shouldValidate: false,
+    //         });
+    //       }}
+    //       error={errors[id]?.message}
+    //     />
+    //     <ErrorMessage />
+    //   </div>
+    // );
   }
 
   if (type === "number") {
