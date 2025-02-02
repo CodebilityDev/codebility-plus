@@ -106,7 +106,7 @@ export const signupUser = async (formData: FormData) => {
       phone_number: formData.get("phone_number") as string,
       address: null,
       about: (formData.get("about") as string) || null,
-      education: [],
+      // education: [], <- check education column on supabase
       positions: positions,
       display_position: positions[0] || "",
       portfolio_website: (formData.get("portfolio_website") as string) || null,
