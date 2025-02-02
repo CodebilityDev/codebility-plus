@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import TechStackModal from "@/Components/modals/TechStackModal";
 import { useModal } from "@/hooks/use-modal";
 import { SignUpValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -63,6 +64,8 @@ const SignUpForm = () => {
   } = form;
 
   const onSubmit = async (data: SignUpFormInputs) => {
+    // console.log("input data: ", data);
+    // return;
     setIsLoading(true);
     try {
       const formData = new FormData();
@@ -110,6 +113,7 @@ const SignUpForm = () => {
 
   return (
     <FormProvider {...form}>
+      <TechStackModal />
       <form onSubmit={handleSubmit(onSubmit)} className="relative">
         {/* Profile Image Upload */}
         <div className="absolute left-4 top-0">
