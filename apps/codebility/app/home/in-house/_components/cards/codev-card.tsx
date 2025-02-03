@@ -33,6 +33,7 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
 
   // Declare an empty variable where the fetched data will be assigned
   let parsedArray: string[] = [];
+  let parsedtechStackArray: string[] = [];
 
   if (typeof data.display_position === "string") {
     // Control flow to check if fetched data is a valid array
@@ -44,7 +45,37 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
     }
   }
 
+  if (Array.isArray(data.tech_stacks)) {
+    try {
+      if (
+        data.tech_stacks.length > 0 &&
+        typeof data.tech_stacks[0] === "string"
+      ) {
+        const firstElement = data.tech_stacks[0].trim();
+
+        if (firstElement.startsWith("[")) {
+          // Parse the data if the string inside the array starts with [
+          parsedtechStackArray = JSON.parse(
+            data.tech_stacks.join(",").replace(/'/g, '"'),
+          ) as string[];
+        } else {
+          // Clean extra quotes if fetched data is already correct
+          parsedtechStackArray = data.tech_stacks.map((item) =>
+            item.replace(/^"|"$/g, ""),
+          );
+        }
+      }
+    } catch (error) {
+      console.error("Error parsing tech_stacks:", error);
+      parsedtechStackArray = data.tech_stacks.map((item) =>
+        item.replace(/^"|"$/g, ""),
+      );
+    }
+  }
+
   const cleanPositionData = parsedArray.join(", ");
+
+  const cleanTechStackData = parsedtechStackArray;
 
   return (
     <Card className="bg-light-300 dark:bg-dark-100 border-light-700 dark:border-dark-200 flex h-full flex-col">
@@ -90,10 +121,10 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
           </div>
         )}
 
-        {data.tech_stacks && data.tech_stacks.length > 0 && (
+        {cleanTechStackData && cleanTechStackData.length > 0 && (
           <div>
             <div className="flex flex-wrap gap-2">
-              {data.tech_stacks.slice(0, 24).map((stack) => (
+              {cleanTechStackData.slice(0, 24).map((stack) => (
                 <Image
                   key={stack}
                   src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
@@ -105,7 +136,7 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
               ))}
               {data.tech_stacks.length > 24 && (
                 <span className="text-gray dark:text-light-500 text-xs">
-                  +{data.tech_stacks.length - 24} more
+                  +{cleanTechStackData.length - 24} more
                 </span>
               )}
             </div>
