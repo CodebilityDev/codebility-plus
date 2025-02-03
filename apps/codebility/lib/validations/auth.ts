@@ -26,11 +26,10 @@ export const SignUpValidation = z
         .max(50, "Years must be 50 or less"),
     ),
 
-    portfolio_website: z
-      .string()
-      .url("Must be a valid URL")
-      .optional()
-      .nullable(),
+    portfolio_website: z.union([
+      z.literal(""),
+      z.string().trim().url("Must be a valid URL"),
+    ]),
 
     // Changed from string to array to match DB
     tech_stacks: z
@@ -48,8 +47,14 @@ export const SignUpValidation = z
       .string()
       .url("Must be a valid URL")
       .min(1, "Facebook link is required"),
-    github: z.string().url("Must be a valid URL").optional().nullable(),
-    linkedin: z.string().url("Must be a valid URL").optional().nullable(),
+    github: z.union([
+      z.literal(""),
+      z.string().trim().url("Must be a valid URL"),
+    ]),
+    linkedin: z.union([
+      z.literal(""),
+      z.string().trim().url("Must be a valid URL"),
+    ]),
     discord: z.string().optional().nullable(),
 
     password: z
