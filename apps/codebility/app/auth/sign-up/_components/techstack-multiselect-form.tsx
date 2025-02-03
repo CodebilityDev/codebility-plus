@@ -50,9 +50,11 @@ export function TechStackMultiselectField({ id, error }: TechStackSelectType) {
       }`}
       onClick={() => onOpen("techStackModal")}
     >
-      {stack.length > 0
-        ? `${stack.length} tech stack${stack.length > 1 ? "s" : ""} selected`
-        : "Select your tech stack"}
+      {stack.includes("none")
+        ? "Non-tech role"
+        : stack.length > 0
+          ? `${stack.length} tech stack${stack.length > 1 ? "s" : ""} selected`
+          : "Select your tech stack"}
       <ChevronDown />
     </Button>
   );
