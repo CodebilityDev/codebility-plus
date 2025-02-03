@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Switch from "@/app/home/settings/permissions/_components/permissions-switch";
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,
@@ -12,9 +13,13 @@ import { useModal } from "@/hooks/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { IconClose } from "@/public/assets/svgs";
 
+import { Checkbox } from "@codevs/ui/checkbox";
+
+import ToggleSwitch from "../ui/switch";
+
 const TechStackModal = () => {
   const { isOpen, onClose, type } = useModal();
-  const { stack, addRemoveStack } = useTechStackStore();
+  const { stack, nonTech, setNonTech, addRemoveStack } = useTechStackStore();
   const checkArray = (objectItem: string) => {
     const isObjectInArray = stack.some((obj) => {
       return JSON.stringify(obj) === JSON.stringify(objectItem);
@@ -44,7 +49,7 @@ const TechStackModal = () => {
             <div
               className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                 checkArray(stack.name.toLowerCase()) && "bg-blue-100 text-white"
-              }`}
+              } ${nonTech && "pointer-events-none saturate-0"}`}
               key={`stack-item-${i}`}
               onClick={() => addRemoveStack(stack.name.toLowerCase())}
             >
@@ -66,7 +71,11 @@ const TechStackModal = () => {
           ))}
         </div>
 
-        <DialogFooter className="mt-4 flex w-full justify-end gap-2">
+        <DialogFooter className="mt-4 flex w-full items-center justify-between gap-2">
+          <div className="flex flex-1 items-center gap-2">
+            <ToggleSwitch enabled={!nonTech} onClick={() => setNonTech()} />
+            <span>I&apos;m applying for a non-tech role. </span>
+          </div>
           <Button
             onClick={() => onClose()}
             variant="default"
