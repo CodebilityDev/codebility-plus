@@ -60,6 +60,7 @@ const SignUpForm = () => {
     getValues,
     trigger,
     reset,
+    watch,
     formState: { errors },
   } = form;
 
