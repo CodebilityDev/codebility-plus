@@ -19,6 +19,33 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
   const capitalize = (str: string | undefined | null) =>
     str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
 
+  // Function to check if fetched data is a valid JSON stringified array
+  const isJSONArray = (str: string) => {
+    try {
+      const parsed = JSON.parse(str);
+
+      // check if the parsed data is an array, should return a boolean
+      return Array.isArray(parsed);
+    } catch {
+      return false;
+    }
+  };
+
+  // Declare an empty variable where the fetched data will be assigned
+  let parsedArray: string[] = [];
+
+  if (typeof data.display_position === "string") {
+    // Control flow to check if fetched data is a valid array
+    if (isJSONArray(data.display_position)) {
+      parsedArray = JSON.parse(data.display_position) as string[];
+    } else {
+      // Treat fetched data as single item array
+      parsedArray = [data.display_position];
+    }
+  }
+
+  const cleanPositionData = parsedArray.join(", ");
+
   return (
     <Card className="bg-light-300 dark:bg-dark-100 border-light-700 dark:border-dark-200 flex h-full flex-col">
       <CardHeader className="text-center">
@@ -43,7 +70,7 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
         <div className="flex justify-between text-sm">
           <span className="text-gray dark:text-light-500">Position:</span>
           <span className="dark:text-light-900 truncate text-black">
-            {data.display_position || "-"}
+            {cleanPositionData || "-"}
           </span>
         </div>
 
