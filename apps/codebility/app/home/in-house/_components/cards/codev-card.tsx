@@ -19,9 +19,6 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
   const capitalize = (str: string | undefined | null) =>
     str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
 
-  //  Check the data type
-  console.log(typeof data.display_position); // string ["Frontend Developer"]
-
   // Function to check if fetched data is a valid JSON stringified array
   const isJSONArray = (str: string) => {
     try {
