@@ -64,6 +64,8 @@ const SignUpForm = () => {
     formState: { errors },
   } = form;
 
+  console.log("watch: ", watch());
+
   const onSubmit = async (data: SignUpFormInputs) => {
     setIsLoading(true);
     try {
