@@ -64,10 +64,12 @@ export default async function CodevBioPage({ params }: Props) {
         ? "Under NDA"
         : "Unavailable";
 
-  const sanitizeUrl = (url: string) =>
-    url
-      .replace("http://localhost:3000", "")
-      .replace("https://localhost:3000", "");
+  const sanitizeUrl = (url: string | undefined): string => {
+    if (!url) return "#";
+    return url
+      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL || "", "")
+      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL || "", "");
+  };
 
   const getRandomBgColor = () => `bg-${getRandomColor()}`;
 
