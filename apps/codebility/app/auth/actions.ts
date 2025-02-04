@@ -54,14 +54,16 @@ export const signupUser = async (formData: FormData) => {
     // Extract form data with proper typing
     const email_address = formData.get("email_address") as string;
     const password = formData.get("password") as string;
-    const tech_stacks =
-      (formData.get("tech_stacks") as string)
-        ?.split(",")
-        .map((item) => item.trim()) || [];
-    const positions =
-      (formData.get("positions") as string)
-        ?.split(",")
-        .map((item) => item.trim()) || [];
+    const tech_stacks = JSON.parse(formData.get("tech_stacks") as string) || [];
+    const positions: { id: number; name: string }[] =
+      (JSON.parse(formData.get("positions") as string) as {
+        id: number;
+        name: string;
+      }[]) || [];
+    const formattedPositions: string[] = positions.map((item) =>
+      JSON.stringify(item),
+    );
+    const display_position: string = positions[0]?.name || "";
     const years_of_experience =
       parseInt(formData.get("years_of_experience") as string) || 0;
     const profileImage = formData.get("profileImage") as File;
@@ -107,10 +109,10 @@ export const signupUser = async (formData: FormData) => {
       address: null,
       about: (formData.get("about") as string) || null,
       // education: [], <- check education column on supabase
-      positions: positions,
-      display_position: positions[0] || "",
+      positions: formattedPositions || [],
+      display_position: display_position || "",
       portfolio_website: (formData.get("portfolio_website") as string) || null,
-      tech_stacks,
+      tech_stacks: tech_stacks as string[],
       image_url,
       availability_status: true,
       nda_status: false,
