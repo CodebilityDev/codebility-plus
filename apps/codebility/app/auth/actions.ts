@@ -54,18 +54,16 @@ export const signupUser = async (formData: FormData) => {
     // Extract form data with proper typing
     const email_address = formData.get("email_address") as string;
     const password = formData.get("password") as string;
-    const tech_stacks =
-      (formData.get("tech_stacks") as string)
-        ?.split(",")
-        .map((item) => item.trim()) || [];
-    const positions =
-      (formData.get("positions") as string)
-        ?.split(",")
-        .map((item) => item.trim()) || [];
+    const tech_stacks = JSON.parse(formData.get("tech_stacks") as string);
+    const positions = formData.getAll("positions") as string[];
     const years_of_experience =
       parseInt(formData.get("years_of_experience") as string) || 0;
     const profileImage = formData.get("profileImage") as File;
 
+    console.log("email address: ", email_address);
+    console.log("tech stacks: ", tech_stacks);
+    console.log("positions: ", positions);
+    return;
     // Check for existing user
     const { data: existingUser } = await supabase
       .from("codev")
