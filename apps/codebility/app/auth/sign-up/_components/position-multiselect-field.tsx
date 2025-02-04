@@ -21,14 +21,13 @@ interface PositionSelectProps {
 
 export function PositionMultiselectField({ id, error }: PositionSelectProps) {
   const [positions, setPositions] = useState<Position[]>([]);
-  const [selectedPositions, setSelectedPositions] = useState<string[]>([]);
+  const [selectedPositions, setSelectedPositions] = useState<Position[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClientComponentClient();
   const { setValue } = useFormContext();
 
   useEffect(() => {
     if (!selectedPositions) return;
-
     setValue(id, selectedPositions, {
       shouldValidate: false,
     });
@@ -83,13 +82,13 @@ export function PositionMultiselectField({ id, error }: PositionSelectProps) {
             >
               <Checkbox
                 className="border-white"
-                value={position.id}
-                checked={selectedPositions.includes(position.name)}
+                value={position.name}
+                checked={selectedPositions.includes(position)}
                 onCheckedChange={(checked) => {
                   setSelectedPositions((prev) =>
                     checked
-                      ? [...prev, position.name]
-                      : prev.filter((item) => item !== position.name),
+                      ? [...prev, position]
+                      : prev.filter((item) => item !== position),
                   );
                 }}
               />
