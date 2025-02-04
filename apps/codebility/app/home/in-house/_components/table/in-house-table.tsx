@@ -1,3 +1,6 @@
+// File: /app/inhouse/_components/table/in-house-table.tsx
+"use client";
+
 import { useState } from "react";
 import Image from "next/image";
 import { Codev, InternalStatus } from "@/types/home/codev";
@@ -47,42 +50,34 @@ export function InHouseTable({
     display_position: "",
   });
 
+  // Get the Supabase client via the hook (no need to pass as prop)
   const supabase = useSupabase();
 
   const filteredData = data.filter((item) => {
-    // Internal Status Filter
-    if (
-      filters.internal_status &&
-      item.internal_status !== filters.internal_status
-    ) {
+    if (filters.status && item.internal_status !== filters.status) {
       return false;
     }
-
-    // NDA Status Filter
-    if (
-      filters.nda_status &&
-      String(item.nda_status) !== filters.nda_status.toLowerCase()
-    ) {
+    if (filters.position && !item.positions?.includes(filters.position)) {
       return false;
     }
-
-    // Display Position Filter (Extract `name` for comparison)
-    if (
-      filters.display_position &&
-      item.display_position!.toLowerCase() !==
-        filters.display_position.toLowerCase()
-    ) {
-      return false;
-    }
-
-    // Project Filter
     if (
       filters.project &&
       !item.projects?.some((project) => project.id === filters.project)
     ) {
       return false;
     }
-
+    if (
+      filters.internal_status &&
+      item.internal_status !== filters.internal_status
+    ) {
+      return false;
+    }
+    if (
+      filters.nda_status &&
+      String(item.nda_status) !== filters.nda_status.toLowerCase()
+    ) {
+      return false;
+    }
     return true;
   });
 
@@ -90,9 +85,8 @@ export function InHouseTable({
     onDataChange(data.filter((item) => item.id !== deletedId));
   };
 
-  const capitalize = (str: string) => {
-    return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
-  };
+  const capitalize = (str: string) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
 
   return (
     <div className="space-y-4">
@@ -159,7 +153,6 @@ export function InHouseTable({
                       />
                     </div>
                   </TableCell>
-
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
@@ -181,7 +174,6 @@ export function InHouseTable({
                         : "-",
                     )}
                   </TableCell>
-
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {item.projects?.length ? (
                       <div className="space-y-1">
@@ -216,7 +208,7 @@ export function InHouseTable({
                       item={item}
                       onEdit={() => setEditingId(item.id)}
                       onDelete={() => handleDelete(item.id)}
-                      supabase={supabase}
+                      // No need to pass supabase since TableActions can use its own hook.
                     />
                   </TableCell>
                 </TableRow>

@@ -1,3 +1,4 @@
+// File: /app/inhouse/_components/cards/CodevCard.tsx
 import Image from "next/image";
 import { Codev } from "@/types/home/codev";
 import { Edit2, Eye, Trash2 } from "lucide-react";
@@ -16,34 +17,28 @@ interface CodevCardProps {
 }
 
 export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
+  // Capitalize a string or return a hyphen if empty
   const capitalize = (str: string | undefined | null) =>
     str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
 
-  // Function to check if fetched data is a valid JSON stringified array
-  const isJSONArray = (str: string) => {
+  // Check if a string is a valid JSON array string
+  const isJSONArray = (str: string): boolean => {
     try {
       const parsed = JSON.parse(str);
-
-      // check if the parsed data is an array, should return a boolean
       return Array.isArray(parsed);
     } catch {
       return false;
     }
   };
 
-  // Declare an empty variable where the fetched data will be assigned
   let parsedArray: string[] = [];
-
   if (typeof data.display_position === "string") {
-    // Control flow to check if fetched data is a valid array
     if (isJSONArray(data.display_position)) {
       parsedArray = JSON.parse(data.display_position) as string[];
     } else {
-      // Treat fetched data as single item array
       parsedArray = [data.display_position];
     }
   }
-
   const cleanPositionData = parsedArray.join(", ");
 
   return (
@@ -59,7 +54,7 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
           />
         </div>
         <div className="space-y-2">
-          <h3 className="dark:text-light-900 truncate text-lg font-semibold text-black">
+          <h3 className=" truncate text-lg font-semibold text-black">
             {capitalize(data.first_name)} {capitalize(data.last_name)}
           </h3>
           <StatusBadge status={data.internal_status || "TRAINING"} />

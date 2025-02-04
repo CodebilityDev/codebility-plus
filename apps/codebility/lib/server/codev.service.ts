@@ -1,6 +1,6 @@
 import "server-only";
 
-import { Client, Codev } from "@/types/home/codev";
+import { Client, Codev, Project } from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -109,4 +109,23 @@ export const getClients = async (): Promise<{
   const { data, error } = await supabase.from("clients").select("*");
 
   return { error, data: data || null };
+};
+
+export const getProjects = async (
+  codevId: string,
+): Promise<{ error: any; data: Project[] | null }> => {
+  const supabase = getSupabaseServerComponentClient();
+
+  // This query checks if the Codev is either the team leader or in the members array.
+  const { data, error } = await supabase
+    .from("projects")
+    .select("id, name")
+    .or(`team_leader_id.eq.${codevId},members.cs.{${codevId}}`);
+
+  if (error) {
+    console.error("Error fetching projects:", error);
+    return { error, data: null };
+  }
+
+  return { error: null, data };
 };
