@@ -6,7 +6,6 @@ import useMediaQuery from "@/hooks/use-media-query";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 import { InHouseCards } from "./cards/in-house-cards";
@@ -17,12 +16,8 @@ interface InHouseViewProps {
 }
 
 export default function InHouseView({ initialData }: InHouseViewProps) {
-  // Ensure we start with an array, even if empty
-  const [data, setData] = useState<Codev[]>(
-    Array.isArray(initialData) ? initialData : [],
-  );
+  const [data, setData] = useState<Codev[]>(initialData);
   const isDesktop = useMediaQuery("(min-width: 768px)");
-  const supabase = useSupabase();
 
   const {
     currentPage,
@@ -36,7 +31,6 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
     data: paginatedData,
     onDataChange: (newData: Codev[]) =>
       setData(Array.isArray(newData) ? newData : []),
-    supabase,
     pagination: {
       currentPage,
       totalPages,
@@ -48,17 +42,14 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4 p-4">
       <H1>In-House Codebility</H1>
-
       <Tabs defaultValue={isDesktop ? "table" : "cards"} className="w-full">
         <TabsList className="grid w-full grid-cols-2">
           <TabsTrigger value="table">Table View</TabsTrigger>
           <TabsTrigger value="cards">Card View</TabsTrigger>
         </TabsList>
-
         <TabsContent value="table" className="space-y-4">
           <InHouseTable {...sharedProps} />
         </TabsContent>
-
         <TabsContent value="cards" className="space-y-4">
           <InHouseCards {...sharedProps} />
         </TabsContent>

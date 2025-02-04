@@ -1,3 +1,4 @@
+// File: /app/inhouse/_components/cards/InHouseCards.tsx
 import { useState } from "react";
 import { Codev } from "@/types/home/codev";
 
@@ -35,30 +36,46 @@ export function InHouseCards({
     onDataChange(data.filter((item) => item.id !== deletedId));
   };
 
-  // Filter data
   const filteredData = data.filter((item) => {
-    // Status filter
+    // Filter by internal status (or status alias)
     if (filters.status && item.internal_status !== filters.status) return false;
-
-    // Position filter
-    if (filters.position && item.display_position !== filters.position)
+    if (
+      filters.internal_status &&
+      item.internal_status !== filters.internal_status
+    )
       return false;
 
-    // Project filter
+    // Filter by positions (from positions array) and display_position string
+    if (filters.position && !item.positions?.includes(filters.position))
+      return false;
+    if (
+      filters.display_position &&
+      item.display_position?.toLowerCase() !==
+        filters.display_position.toLowerCase()
+    )
+      return false;
+
+    // Filter by projects (check if a project with matching id exists)
     if (
       filters.project &&
       !item.projects?.some((project) => project.id === filters.project)
-    ) {
+    )
       return false;
-    }
+
+    // Filter by NDA status
+    if (
+      filters.nda_status &&
+      String(item.nda_status) !== filters.nda_status.toLowerCase()
+    )
+      return false;
 
     return true;
   });
 
   return (
-    <div className="space-y-4 ">
+    <div className="space-y-4">
       {/* Count and Filters */}
-      <div className="flex items-center justify-between  ">
+      <div className="flex items-center justify-between">
         <p className="text-light-900 text-sm">
           {filteredData.length}{" "}
           {filteredData.length === 1 ? "member" : "members"}

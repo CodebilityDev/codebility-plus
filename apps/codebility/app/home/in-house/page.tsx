@@ -1,14 +1,29 @@
-import { getCodevs } from "@/lib/server/codev.service";
+import { getCodevs, getProjects } from "@/lib/server/codev.service";
 
 import InHouseView from "./_components/in-house-view";
 
 export default async function InHousePage() {
+  // Fetch Codev data with the desired filter
   const { data, error } = await getCodevs({
     filters: { application_status: "passed" },
   });
 
-  if (error) throw new Error("Failed to fetch data");
+  // Check for errors or missing data
+  if (error || !data) {
+    throw new Error("Failed to fetch data");
+  }
 
-  // Always pass an array to InHouseView
-  return <InHouseView initialData={Array.isArray(data) ? data : []} />;
+  // For each Codev, fetch projects where they’re involved
+  const codevsWithProjects = await Promise.all(
+    data.map(async (codev) => {
+      const { data: projectsData } = await getProjects(codev.id);
+      return {
+        ...codev,
+        projects: projectsData ?? [],
+      };
+    }),
+  );
+
+  // Pass the fully prepared data to the view
+  return <InHouseView initialData={codevsWithProjects} />;
 }

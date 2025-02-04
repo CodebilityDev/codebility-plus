@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Codev } from "@/types/home/codev";
-import { SupabaseClient } from "@supabase/supabase-js";
 import { Edit2, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
 import {
   DropdownMenu,
@@ -18,17 +18,12 @@ interface TableActionsProps {
   item: Codev;
   onEdit: () => void;
   onDelete?: () => void;
-  supabase: SupabaseClient;
 }
 
-export function TableActions({
-  item,
-  onEdit,
-  onDelete,
-  supabase,
-}: TableActionsProps) {
+export function TableActions({ item, onEdit, onDelete }: TableActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const supabase = useSupabase();
 
   const handleDelete = async () => {
     try {

@@ -1,8 +1,10 @@
 export const INTERNAL_STATUS = {
-  AVAILABLE: "Available",
-  DEPLOYED: "Deployed",
-  TRAINING: "Training",
-  VACATION: "Vacation",
-  BUSY: "Busy",
-  CLIENT_READY: "Client Ready",
+  AVAILABLE: "AVAILABLE",
+  DEPLOYED: "DEPLOYED",
+  TRAINING: "TRAINING",
+  VACATION: "VACATION",
+  BUSY: "BUSY",
+  CLIENT_READY: "CLIENTREADY",
+  GRADUATED: "GRADUATED",
+  FAILED: "FAILED",
 };

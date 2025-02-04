@@ -166,34 +166,6 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
             </SelectContent>
           </Select>
         </div>
-
-        {/* Display Position Filter */}
-        <div className="min-w-[200px] space-y-2">
-          <Label className="dark:text-light-900 text-black">
-            Display Position
-          </Label>
-          <Select
-            value={filters.display_position || "all"}
-            onValueChange={(value) =>
-              onFilterChange("display_position", value === "all" ? "" : value)
-            }
-          >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black">
-              <SelectValue placeholder="Filter by display position" />
-            </SelectTrigger>
-            <SelectContent className="bg-light-800 dark:bg-dark-200">
-              <SelectItem value="all">All Display Positions</SelectItem>
-              {positions.map((position) => (
-                <SelectItem
-                  key={position.id.toString()}
-                  value={position.name || ""}
-                >
-                  {position.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
       </div>
     </Card>
   );
