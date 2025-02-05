@@ -172,24 +172,39 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
       );
     }
 
-    // Handle email input
+    // Handle email input with Controller
     return (
       <div className="flex w-full flex-col gap-2">
         <label htmlFor={id}>{label}</label>
-        <input
-          type="email"
-          id={id}
-          ref={ref}
-          className={cn(
-            "md:text-md w-full bg-muted/50 text-sm disabled:opacity-50 sm:text-sm lg:text-lg",
-            `placeholder-${placeholderColor}`,
-            "rounded-sm p-2 focus:outline-none",
-            inputClassName,
+        <Controller
+          control={control}
+          name={id || "email"} // Ensure this matches your form field name
+          render={({ field: { onChange, onBlur, value }, fieldState }) => (
+            <>
+              <input
+                type="email"
+                id={id}
+                ref={ref}
+                className={cn(
+                  "md:text-md w-full bg-muted/50 text-sm disabled:opacity-50 sm:text-sm lg:text-lg",
+                  `placeholder-${placeholderColor}`,
+                  "rounded-sm p-2 focus:outline-none",
+                  inputClassName,
+                )}
+                placeholder={label}
+                value={value || ""}
+                onChange={onChange}
+                onBlur={onBlur}
+                disabled={disabled}
+              />
+              {(error || fieldState.error?.message) && (
+                <p className="mt-2 text-sm text-red-400">
+                  {error || fieldState.error?.message}
+                </p>
+              )}
+            </>
           )}
-          placeholder={label}
-          disabled={disabled}
         />
-        {error && <p className="mt-2 text-sm text-red-400">{error}</p>}
       </div>
     );
   },

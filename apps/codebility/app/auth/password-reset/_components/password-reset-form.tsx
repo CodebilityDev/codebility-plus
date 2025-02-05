@@ -56,6 +56,7 @@ const PasswordResetForm = () => {
       reset();
     }
   };
+  console.log(errors);
 
   return (
     <div className="flex flex-col gap-4">
@@ -84,6 +85,7 @@ const PasswordResetForm = () => {
               error={errors.email?.message}
               disabled={isLoading}
               inputClassName="bg-gray-50 border-gray-300"
+              name="email"
             />
             <Button
               type="submit"
