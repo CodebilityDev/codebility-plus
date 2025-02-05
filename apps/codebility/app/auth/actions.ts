@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { useUserStore } from "@/store/codev-store";
 import { Codev } from "@/types/home/codev";
 
@@ -51,8 +52,9 @@ export const signupUser = async (formData: FormData) => {
     const supabase = getSupabaseServerActionClient();
     const setUser = useUserStore.getState().setUser;
 
-    // Extract form data with proper typing
-    const email_address = formData.get("email_address") as string;
+    // Extract form data with proper typing and convert email to lowercase
+    const rawEmail = formData.get("email_address") as string;
+    const email_address = rawEmail.toLowerCase(); // Normalize the email to lowercase
     const password = formData.get("password") as string;
     const tech_stacks = JSON.parse(formData.get("tech_stacks") as string) || [];
     const positions: { id: number; name: string }[] =
@@ -68,7 +70,7 @@ export const signupUser = async (formData: FormData) => {
       parseInt(formData.get("years_of_experience") as string) || 0;
     const profileImage = formData.get("profileImage") as File;
 
-    // Check for existing user
+    // Check for an existing user (comparing lowercase email)
     const { data: existingUser } = await supabase
       .from("codev")
       .select("email_address")
@@ -79,7 +81,7 @@ export const signupUser = async (formData: FormData) => {
       return { success: false, error: "Email already exists" };
     }
 
-    // Handle profile image upload
+    // Handle profile image upload if provided
     const image_url = profileImage
       ? await uploadProfileImage(profileImage, "profileImage", "codebility")
       : null;
@@ -99,16 +101,15 @@ export const signupUser = async (formData: FormData) => {
     if (authError) throw authError;
     if (!user) throw new Error("Failed to create user");
 
-    // Prepare user data
+    // Prepare user data for insertion into the "codev" table
     const userData: Codev = {
       id: user.id,
       first_name: formData.get("first_name") as string,
       last_name: formData.get("last_name") as string,
-      email_address,
+      email_address, // already normalized to lowercase
       phone_number: formData.get("phone_number") as string,
       address: null,
       about: (formData.get("about") as string) || null,
-      // education: [], <- check education column on supabase
       positions: formattedPositions || [],
       display_position: display_position || "",
       portfolio_website: (formData.get("portfolio_website") as string) || null,
@@ -131,7 +132,7 @@ export const signupUser = async (formData: FormData) => {
       internal_status: "TRAINING",
     };
 
-    // Insert user data
+    // Insert user data into the "codev" table
     const { error: insertError } = await supabase
       .from("codev")
       .insert([userData]);
@@ -148,14 +149,19 @@ export const signupUser = async (formData: FormData) => {
     };
   }
 };
+
 export const signinUser = async (email: string, password: string) => {
   const supabase = getSupabaseServerActionClient();
   const setUser = useUserStore.getState().setUser;
 
+  // Standardize the email for comparison (assuming emails are stored in lowercase)
+  const normalizedEmail = email.toLowerCase();
+
   try {
+    // Sign in with email and password
     const { data: signInData, error: signInError } =
       await supabase.auth.signInWithPassword({
-        email,
+        email: normalizedEmail,
         password,
       });
 
@@ -165,12 +171,13 @@ export const signinUser = async (email: string, password: string) => {
     const { data: userProfile, error: profileError } = await supabase
       .from("codev")
       .select("*")
-      .eq("email_address", email)
-      .single();
+      .eq("email_address", normalizedEmail)
+      .maybeSingle();
 
     if (profileError) throw profileError;
     if (!userProfile) throw new Error("Account not found");
 
+    // Save the user profile to your store
     setUser(userProfile);
 
     return { success: true, redirectTo: "/home" };
@@ -190,6 +197,8 @@ export const signOut = async (): Promise<void> => {
 
     clearUser();
     console.log("User successfully signed out");
+    // Redirect to the /codev page
+    redirect("/codev");
   } catch (error) {
     console.error("Sign out error:", error);
     throw error;

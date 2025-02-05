@@ -31,8 +31,21 @@ const SignInForm = () => {
     setIsLoading(true);
 
     try {
-      const response = await signinUser(values.email_address, values.password);
+      // Normalize email (if your signup stored lowercase emails)
+      const normalizedEmail = values.email_address.toLowerCase();
+      const response = await signinUser(normalizedEmail, values.password);
+      console.log("response:", response);
 
+      // If the response indicates failure, log and show the error toast
+      if (!response.success) {
+        console.error("Sign in failed:", response.error);
+        toast.error(response.error || "Invalid email or password");
+        // Delay a bit to let the toast show before returning
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        return; // Exit early so no redirect is attempted
+      }
+
+      // Otherwise, handle redirection based on the redirectTo value
       if (response.redirectTo) {
         switch (response.redirectTo) {
           case "auth/waiting":
@@ -45,14 +58,21 @@ const SignInForm = () => {
             toast.success("Welcome back!");
             break;
         }
-
-        router.replace(response.redirectTo);
+        // Delay navigation slightly so the toast can be seen
+        setTimeout(() => {
+          router.replace(response.redirectTo);
+        }, 500);
       }
     } catch (error: any) {
+      console.error("Sign in error:", error);
+
       if (error.message?.includes("verify your email")) {
         toast.error("Please verify your email first");
         router.replace("/verify");
-      } else if (error.message?.includes("Invalid login credentials")) {
+      } else if (
+        error.message?.includes("Invalid login credentials") ||
+        error.message?.includes("Account not found")
+      ) {
         toast.error("Invalid email or password");
       } else {
         toast.error(error.message || "Failed to sign in");
