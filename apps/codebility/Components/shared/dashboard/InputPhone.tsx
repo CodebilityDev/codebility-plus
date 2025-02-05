@@ -186,7 +186,7 @@ const InputField = forwardRef<HTMLInputElement, InputProps>(
                 id={id}
                 ref={ref}
                 className={cn(
-                  "md:text-md w-full bg-muted/50 text-sm disabled:opacity-50 sm:text-sm lg:text-lg",
+                  "md:text-md text-black-500 w-full bg-muted/50 text-sm disabled:opacity-50 sm:text-sm lg:text-lg",
                   `placeholder-${placeholderColor}`,
                   "rounded-sm p-2 focus:outline-none",
                   inputClassName,
