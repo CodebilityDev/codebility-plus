@@ -1,9 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Codev } from "@/types/home/codev";
 
-import { CodevCard } from "./codev-card";
+import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+
+import { CodevCard, Role } from "./codev-card";
 import { EditableCard } from "./editable-card";
 
 interface InHouseCardsProps {
@@ -22,7 +24,26 @@ export function InHouseCards({
   onDataChange,
   pagination,
 }: InHouseCardsProps) {
+  const supabase = useSupabase();
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  // Fetch roles when component mounts
+  useEffect(() => {
+    async function fetchRoles() {
+      const { data: rolesData, error } = await supabase
+        .from("roles")
+        .select("id, name");
+
+      if (error) {
+        console.error("Failed to fetch roles:", error);
+      } else if (rolesData) {
+        setRoles(rolesData);
+      }
+    }
+
+    fetchRoles();
+  }, [supabase]);
 
   const handleDelete = (deletedId: string) => {
     onDataChange(data.filter((item) => item.id !== deletedId));
@@ -44,7 +65,7 @@ export function InHouseCards({
                 setEditingId(null);
               }}
               onCancel={() => setEditingId(null)}
-              roles={[]} // Pass roles as needed
+              roles={roles}
             />
           ) : (
             <CodevCard
@@ -52,7 +73,7 @@ export function InHouseCards({
               data={item}
               onEdit={() => setEditingId(item.id)}
               onDelete={() => handleDelete(item.id)}
-              roles={[]} // Pass roles as needed
+              roles={roles}
             />
           ),
         )}
