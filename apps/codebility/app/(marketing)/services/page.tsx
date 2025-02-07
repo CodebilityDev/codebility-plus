@@ -1,6 +1,7 @@
-import { use } from "react";
+"use client";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { useEffect, useState } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import Calendly from "../_components/marketing-calendly";
 import Footer from "../_components/marketing-footer";
@@ -8,58 +9,108 @@ import Navigation from "../_components/marketing-navigation";
 import Hero from "./_components/services-hero";
 import ServicesTab from "./_components/services-tab";
 
+interface TeamMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  image_url?: string | null;
+}
+
+interface ProjectData {
+  id: string;
+  name: string;
+  description?: string;
+  status?: string;
+  start_date?: string;
+  end_date?: string;
+  github_link?: string;
+  main_image?: string;
+  website_url?: string;
+  figma_link?: string;
+  team_leader?: TeamMember;
+  client_id?: string;
+  members?: TeamMember[];
+  project_category_id?: number;
+  project_category_name?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export default function ServicesPage() {
-  const supabase = getSupabaseServerComponentClient();
+  const [projectsData, setProjectsData] = useState<ProjectData[]>([]);
+  const supabase = createClientComponentClient();
 
-  const liveProjects = use(
-    supabase
-      .from("projects")
-      .select(
-        `
-        id, 
-        name, 
-        description,
-        website_url,
-        client_id,
-        project_category: projects_category!inner(name)
-      `,
-      )
-      .eq("status", "active")
-      .then(({ data, error }) => {
-        if (error) throw error;
+  useEffect(() => {
+    async function fetchProjects() {
+      const { data, error } = await supabase
+        .from("projects")
+        .select(
+          `
+          id, 
+          name, 
+          description,
+          website_url,
+          main_image,
+          github_link,
+          figma_link,
+          start_date,
+          end_date,
+          client_id,
+          project_category_id,
+          team_leader:team_leader_id(
+            id,
+            first_name,
+            last_name,
+            image_url
+          ),
+          project_members!left(
+            codev:codev_id(
+              id,
+              first_name,
+              last_name,
+              image_url
+            )
+          ),
+          projects_category!inner(
+            id,
+            name
+          )
+        `,
+        )
+        .eq("status", "active");
 
-        // Map data to match Project interface
-        return data.map((item) => ({
-          id: item.id,
-          name: item.name,
-          description: item.description || "",
-          main_image: item.website_url || "",
-          github_link: "", // Add other fields from Project if required
-          figma_link: "",
-          start_date: "",
-          end_date: "",
-          project_category_id: 0, // Replace with actual category ID logic
-          client_id: item.client_id,
-          members: [],
-          created_at: "",
-          updated_at: "",
-        }));
-      }),
-  );
+      if (error) {
+        console.error("Error fetching projects:", error);
+        return;
+      }
 
-  // Find "Codebility" project and filter the rest
-  const codebility = liveProjects.find((item) => item.name === "Codebility");
-  const rest = liveProjects.filter((item) => item.name !== "Codebility");
+      const mappedData: ProjectData[] = data.map((item: any) => ({
+        id: item.id,
+        name: item.name,
+        description: item.description || "",
+        main_image: item.main_image || "",
+        website_url: item.website_url || "",
+        github_link: item.github_link || "",
+        figma_link: item.figma_link || "",
+        start_date: item.start_date || "",
+        end_date: item.end_date || "",
+        project_category_id: item.projects_category?.id || 0,
+        project_category_name: item.projects_category?.name || "",
+        client_id: item.client_id,
+        team_leader: item.team_leader,
+        members: item.project_members?.map((pm: any) => pm.codev) || [],
+        created_at: "",
+        updated_at: "",
+      }));
 
-  // Filter out undefined and construct final projectsData
-  const projectsData = [codebility, ...rest].filter(
-    (project): project is NonNullable<typeof project> => project !== undefined,
-  );
+      setProjectsData(mappedData);
+    }
+
+    fetchProjects();
+  }, [supabase]);
 
   return (
-    <div
-      className={`relative flex w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303] `}
-    >
+    <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
       <Navigation />
       <Hero />
       <ServicesTab servicesData={projectsData} />
