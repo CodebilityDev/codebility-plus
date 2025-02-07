@@ -45,11 +45,13 @@ const CATEGORIES = [
   { id: 1, name: "Web Application" },
   { id: 2, name: "Mobile Application" },
   { id: 3, name: "Product Design" },
-];
+] as const;
 
 export default function ServicesTab({ servicesData }: Props) {
   // Initialize with first category
-  const [currentCategory, setCurrentCategory] = useState(CATEGORIES[0].id);
+  const [currentCategory, setCurrentCategory] = useState<number>(
+    CATEGORIES[0].id,
+  );
 
   const [projects, setProjects] = useState(() => {
     return servicesData.filter(
