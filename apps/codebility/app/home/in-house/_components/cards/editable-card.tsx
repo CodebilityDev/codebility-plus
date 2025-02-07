@@ -1,9 +1,6 @@
-import { useEffect, useState } from "react";
-import { INTERNAL_STATUS } from "@/constants/internal_status";
 import { Codev, InternalStatus, Project } from "@/types/home/codev";
 import { Check, Plus, X } from "lucide-react";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
 import { Card, CardContent, CardFooter, CardHeader } from "@codevs/ui/card";
 import { Input } from "@codevs/ui/input";
@@ -19,37 +16,26 @@ import {
 import { useCodevForm } from "../../_hooks/use-codev-form";
 import { StatusBadge } from "../shared/status-badge";
 
-interface EditableCardProps {
-  data: Codev;
-  onSave: (data: Codev) => void;
-  onCancel: () => void;
-}
-
-interface Role {
+export interface Role {
   id: number;
   name: string;
 }
 
-export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
+interface EditableCardProps {
+  data: Codev;
+  onSave: (data: Codev) => void;
+  onCancel: () => void;
+  roles: Role[];
+}
+
+export function EditableCard({
+  data,
+  onSave,
+  onCancel,
+  roles,
+}: EditableCardProps) {
   const { data: formData, handleChange, isSubmitting } = useCodevForm(data);
   const projects: Project[] = formData.projects || [];
-
-  // Fetch roles from the roles table
-  const supabase = useSupabase();
-  const [roles, setRoles] = useState<Role[]>([]);
-  useEffect(() => {
-    async function fetchRoles() {
-      const { data: rolesData, error } = await supabase
-        .from("roles")
-        .select("id, name");
-      if (!error && rolesData) {
-        setRoles(rolesData as Role[]);
-      } else if (error) {
-        console.error("Error fetching roles:", error);
-      }
-    }
-    fetchRoles();
-  }, [supabase]);
 
   return (
     <Card className="w-full max-w-lg p-4">
@@ -76,6 +62,16 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
         </div>
 
         <div>
+          <Label>Email Address</Label>
+          <Input
+            value={formData.email_address}
+            onChange={(e) => handleChange("email_address", e.target.value)}
+            disabled={isSubmitting}
+            placeholder="Email Address"
+          />
+        </div>
+
+        <div>
           <Label>Status</Label>
           <Select
             value={formData.internal_status || ""}
@@ -92,16 +88,26 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(INTERNAL_STATUS).map(([key, label]) => (
+              {Object.entries({
+                TRAINING: "Training",
+                GRADUATED: "Graduated",
+                BUSY: "Busy",
+                FAILED: "Failed",
+                AVAILABLE: "Available",
+                DEPLOYED: "Deployed",
+                VACATION: "Vacation",
+                CLIENTREADY: "Client Ready",
+              }).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
                   <StatusBadge status={key as InternalStatus} />
+                  {label}
                 </SelectItem>
               ))}
             </SelectContent>
           </Select>
         </div>
 
-        {/* New Role Select Field */}
+        {/* Role Select Field */}
         <div>
           <Label>Role</Label>
           <Select
@@ -121,9 +127,7 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
             </SelectContent>
           </Select>
         </div>
-      </CardHeader>
 
-      <CardContent className="space-y-4">
         <div>
           <Label>Display Position</Label>
           <Select
@@ -143,7 +147,9 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
             </SelectContent>
           </Select>
         </div>
+      </CardHeader>
 
+      <CardContent className="space-y-4">
         <div>
           <Label>Projects</Label>
           <div className="space-y-2">
@@ -217,7 +223,6 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
           </Select>
         </div>
 
-        {/* New Availability Toggle Field */}
         <div>
           <Label>Availability</Label>
           <div className="flex items-center space-x-2">

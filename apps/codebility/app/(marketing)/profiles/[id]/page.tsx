@@ -104,7 +104,7 @@ export default async function CodevBioPage({ params }: Props) {
                 </p>
               </div>
             </div>
-            <p className="text-md text-center capitalize lg:text-2xl">
+            <p className="text-md text-center capitalize lg:text-2xl ">
               {first_name || "Unknown"} {last_name || "Unknown"}
             </p>
             {display_position && (

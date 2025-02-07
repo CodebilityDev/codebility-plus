@@ -9,11 +9,11 @@ const STATUS_CONFIG: Record<
 > = {
   TRAINING: {
     label: "Training",
-    className: "bg-yellow-200 text-black border-yellow-200",
+    className: "bg-yellow-800 text-white border-yellow-800",
   },
   GRADUATED: {
     label: "Graduated",
-    className: "bg-green text-black border-green",
+    className: "bg-green text-white border-green",
   },
   BUSY: {
     label: "Busy",

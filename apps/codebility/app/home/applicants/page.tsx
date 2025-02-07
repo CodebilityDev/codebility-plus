@@ -23,7 +23,7 @@ const ApplicantsPage = async () => {
   const safeApplicants = applicants || [];
 
   return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+    <div className="mx-auto flex max-w-screen-xl flex-col gap-4 ">
       <ApplicantsList applicants={safeApplicants} />
     </div>
   );

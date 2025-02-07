@@ -4,6 +4,7 @@ export const columns = [
   { key: "last_name", label: "Last Name" },
   { key: "email_address", label: "Email" },
   { key: "internal_status", label: "Status" },
+  { key: "role_id", label: "Role" },
   { key: "display_position", label: "Position" },
   { key: "projects", label: "Projects" },
   { key: "nda_status", label: "NDA Status" },

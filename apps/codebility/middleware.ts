@@ -20,53 +20,69 @@ const PUBLIC_ROUTES = [
   "/", // Other public pages
 ] as const;
 
+// Map route prefixes to the required permission key.
+const routePermissionMap: Record<string, keyof RolePermissions> = {
+  "/home/interns": "interns",
+  "/home/orgchart": "orgchart",
+  "/home/applicants": "applicants",
+  "/home/in-house": "inhouse",
+  "/home/clients": "clients",
+  "/home/projects": "projects",
+  "/home/settings/permissions": "permissions",
+  "/home/settings/roles": "roles",
+  "/home/settings/resume": "resume",
+  // General fallback: if no more specific key matches, use this one.
+  "/home/settings": "settings",
+};
+
+type RolePermissions = {
+  dashboard: boolean;
+  kanban: boolean;
+  time_tracker: boolean;
+  interns: boolean;
+  applicants: boolean;
+  inhouse: boolean;
+  clients: boolean;
+  projects: boolean;
+  settings: boolean;
+  orgchart: boolean;
+  resume?: boolean;
+  permissions?: boolean;
+  roles?: boolean;
+};
+
 export async function middleware(req: NextRequest) {
-  const { pathname, searchParams } = req.nextUrl;
+  const { pathname } = req.nextUrl;
 
   // Allow public routes
   if (PUBLIC_ROUTES.includes(pathname)) {
-    console.log("[DEBUG] Public route accessed:", pathname);
     return NextResponse.next();
   }
 
   const supabase = getSupabaseServerComponentClient();
-
-  // Check authentication using getUser
   const {
     data: { user },
     error: authError,
   } = await supabase.auth.getUser();
 
   if (authError || !user) {
-    // Prevent redirect loops between sign-in and sign-up
-    if (pathname === "/auth/sign-in" || pathname === "/auth/sign-up") {
-      console.log(
-        "[DEBUG] User is already on a public auth route. Allowing access.",
-      );
-      return NextResponse.next();
-    }
-
-    console.log("[DEBUG] User not authenticated. Redirecting to login.");
     return redirectToLogin(req);
   }
 
   const userId = user.id;
-
-  // Fetch user data from the database
   const { data: userData, error: userError } = await supabase
     .from("codev")
-    .select("id, application_status")
+    .select("id, application_status, role_id")
     .eq("id", userId)
     .single();
 
   if (userError || !userData) {
-    console.log("[DEBUG] Failed to fetch user data. Redirecting to login.");
+    console.error("Failed to fetch user data:", userError);
     return redirectToLogin(req);
   }
 
-  const { application_status } = userData;
+  const { application_status, role_id } = userData;
 
-  // Handle application_status-based redirection
   if (
     application_status === "passed" &&
     [
@@ -77,30 +93,52 @@ export async function middleware(req: NextRequest) {
       "/auth/sign-up",
     ].includes(pathname)
   ) {
-    console.log(
-      "[DEBUG] User with 'passed' status trying to access restricted route.",
-    );
     return redirectTo(req, "/codevs");
   }
-
   if (
     application_status === "failed" &&
     ["/home", "/auth/waiting", "/auth/verify"].includes(pathname)
   ) {
-    console.log(
-      "[DEBUG] User with 'failed' status trying to access restricted route.",
-    );
     return redirectTo(req, "/auth/declined");
   }
-
   if (
     application_status === "applying" &&
     ["/home", "/auth/declined", "/auth/verify"].includes(pathname)
   ) {
-    console.log(
-      "[DEBUG] User with 'applying' status trying to access restricted route.",
-    );
     return redirectTo(req, "/auth/waiting");
+  }
+
+  // Sort keys by descending length to get the most specific match first.
+  const sortedRouteKeys = Object.keys(routePermissionMap).sort(
+    (a, b) => b.length - a.length,
+  );
+  const matchedRoute = sortedRouteKeys.find((routePrefix) =>
+    pathname.startsWith(routePrefix),
+  );
+
+  if (matchedRoute && role_id) {
+    const key = matchedRoute as keyof typeof routePermissionMap;
+    const requiredPermission = routePermissionMap[key]!; // non-null assertion
+
+    const { data: rolePermissions, error: roleError } = await supabase
+      .from("roles")
+      .select(
+        "dashboard, kanban, time_tracker, interns, applicants, inhouse, clients, projects, settings, orgchart, roles, permissions, resume",
+      )
+      .eq("id", role_id)
+      .single();
+
+    if (roleError || !rolePermissions) {
+      console.error("Failed to fetch role permissions:", roleError);
+      return redirectToLogin(req);
+    }
+
+    if (!rolePermissions[requiredPermission]) {
+      console.log(
+        `[DEBUG] User with role ${role_id} does not have permission "${requiredPermission}" for ${pathname}. Redirecting.`,
+      );
+      return redirectTo(req, "/home");
+    }
   }
 
   console.log("[DEBUG] User has permission to access:", pathname);
@@ -110,12 +148,10 @@ export async function middleware(req: NextRequest) {
 function redirectToLogin(req: NextRequest) {
   const redirectUrl = new URL("/auth/sign-in", req.url);
   redirectUrl.searchParams.set("from", req.nextUrl.pathname);
-  console.log("[DEBUG] Redirecting to login:", redirectUrl.toString());
   return NextResponse.redirect(redirectUrl);
 }
 
 function redirectTo(req: NextRequest, path: string) {
   const redirectUrl = new URL(path, req.url);
-  console.log("[DEBUG] Redirecting to:", redirectUrl.toString());
   return NextResponse.redirect(redirectUrl);
 }
