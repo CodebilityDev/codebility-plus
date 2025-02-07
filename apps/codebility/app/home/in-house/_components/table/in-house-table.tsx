@@ -44,6 +44,24 @@ export function InHouseTable({
 
   // For inline editing
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  // Fetch roles when component mounts
+  useEffect(() => {
+    async function fetchRoles() {
+      const { data: rolesData, error } = await supabase
+        .from("roles")
+        .select("id, name");
+
+      if (error) {
+        console.error("Failed to fetch roles:", error);
+      } else if (rolesData) {
+        setRoles(rolesData);
+      }
+    }
+
+    fetchRoles();
+  }, [supabase]);
 
   // Local pagination state:
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,7 +124,7 @@ export function InHouseTable({
                     setEditingId(null);
                   }}
                   onCancel={() => setEditingId(null)}
-                  roles={[]} // You can pass roles here if needed (or fetch them)
+                  roles={roles}
                 />
               ) : (
                 <TableRow
@@ -145,7 +163,10 @@ export function InHouseTable({
 
                   {/* Display the role name – update if you have role data */}
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    {item.role_id ? "-" : "-"}
+                    {item.role_id
+                      ? roles.find((role) => role.id === item.role_id)?.name ||
+                        "-"
+                      : "-"}
                   </TableCell>
 
                   <TableCell className="dark:text-light-900 text-base text-black">

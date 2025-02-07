@@ -180,11 +180,18 @@ export function EditableRow({
             disabled={isSubmitting}
           >
             <SelectTrigger className="border-light-700 bg-light-800 dark:border-dark-200 dark:bg-dark-200">
-              <SelectValue placeholder="Select role" />
+              <SelectValue>
+                {roles.find((role) => role.id === formData.role_id)?.name ||
+                  "Select role"}
+              </SelectValue>
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
               {roles.map((role) => (
-                <SelectItem key={role.id} value={String(role.id)}>
+                <SelectItem
+                  key={role.id}
+                  value={String(role.id)}
+                  className="text-black dark:text-white"
+                >
                   {role.name}
                 </SelectItem>
               ))}
