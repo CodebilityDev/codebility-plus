@@ -19,7 +19,7 @@ export default function HomeLayout({
       <UserProvider>
         <ModalProviderHome />
         <ToastNotification />
-        <main className="background-light850_dark100 relative">
+        <main className="background-light850_dark100 relative ">
           <Navbar />
           <div className="flex">
             <LeftSidebar />
