@@ -77,6 +77,8 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
 
   const cleanTechStackData = parsedtechStackArray;
 
+  console.log("TechStack Data", cleanTechStackData);
+
   return (
     <Card className="bg-light-300 dark:bg-dark-100 border-light-700 dark:border-dark-200 flex h-full flex-col">
       <CardHeader className="text-center">
