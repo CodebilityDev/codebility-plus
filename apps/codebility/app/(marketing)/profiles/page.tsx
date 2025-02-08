@@ -26,7 +26,10 @@ export default async function Profiles() {
   //   (codev) => codev.role_id === adminRoleId,
   // );
   const filteredCodevs = codevsArray.filter(
-    (codev) => codev.role_id !== adminRoleId,
+    (codev) =>
+      codev.role_id !== adminRoleId &&
+      codev.application_status !== "failed" &&
+      codev.application_status !== "applying",
   );
 
   return (

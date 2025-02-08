@@ -1,4 +1,6 @@
-import { useState } from "react";
+"use client";
+
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { Link2 } from "lucide-react";
@@ -15,14 +17,15 @@ import {
 
 import { StatusBadge } from "../shared/status-badge";
 import { columns } from "./columns";
-import { EditableRow } from "./editable-row";
+import { EditableRow, Role } from "./editable-row";
 import { TableActions } from "./table-actions";
-import { TableFilters } from "./table-filters";
+
+// Removed TableFilters import because filters are removed
 
 interface InHouseTableProps {
   data: Codev[];
   onDataChange: (data: Codev[]) => void;
-  pagination?: {
+  pagination: {
     currentPage: number;
     totalPages: number;
     onNextPage: () => void;
@@ -37,80 +40,58 @@ export function InHouseTable({
   onDataChange,
   pagination,
 }: InHouseTableProps) {
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [filters, setFilters] = useState({
-    status: "",
-    position: "",
-    project: "",
-    internal_status: "",
-    nda_status: "",
-    display_position: "",
-  });
-
   const supabase = useSupabase();
 
-  const filteredData = data.filter((item) => {
-    // Internal Status Filter
-    if (
-      filters.internal_status &&
-      item.internal_status !== filters.internal_status
-    ) {
-      return false;
+  // For inline editing
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [roles, setRoles] = useState<Role[]>([]);
+
+  // Fetch roles when component mounts
+  useEffect(() => {
+    async function fetchRoles() {
+      const { data: rolesData, error } = await supabase
+        .from("roles")
+        .select("id, name");
+
+      if (error) {
+        console.error("Failed to fetch roles:", error);
+      } else if (rolesData) {
+        setRoles(rolesData);
+      }
     }
 
-    // NDA Status Filter
-    if (
-      filters.nda_status &&
-      String(item.nda_status) !== filters.nda_status.toLowerCase()
-    ) {
-      return false;
-    }
+    fetchRoles();
+  }, [supabase]);
 
-    // Display Position Filter (Extract `name` for comparison)
-    if (
-      filters.display_position &&
-      item.display_position!.toLowerCase() !==
-        filters.display_position.toLowerCase()
-    ) {
-      return false;
-    }
+  // Local pagination state:
+  const [currentPage, setCurrentPage] = useState(1);
+  const pageSize = 10;
 
-    // Project Filter
-    if (
-      filters.project &&
-      !item.projects?.some((project) => project.id === filters.project)
-    ) {
-      return false;
-    }
+  // When data changes, you may optionally reset the page.
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [data]);
 
-    return true;
-  });
+  // Compute total pages from the full data.
+  const totalPages = Math.ceil(data.length / pageSize);
 
+  // Slice the full data for the current page.
+  const paginatedData = data.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize,
+  );
+
+  // Deleting logic (for local UI state)
   const handleDelete = (deletedId: string) => {
     onDataChange(data.filter((item) => item.id !== deletedId));
   };
 
-  const capitalize = (str: string) => {
-    return str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
-  };
+  // Helper to capitalize names
+  const capitalize = (str: string) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
 
   return (
-    <div className="space-y-4">
-      {/* Count and Filters */}
-      <div className="flex items-center justify-between">
-        <p className="dark:text-light-900 text-sm text-black">
-          {filteredData.length}{" "}
-          {filteredData.length === 1 ? "member" : "members"}
-        </p>
-      </div>
-
-      <TableFilters
-        filters={filters}
-        onFilterChange={(key, value) =>
-          setFilters((prev) => ({ ...prev, [key]: value }))
-        }
-      />
-
+    <div className="mb-4 space-y-4">
       {/* Table */}
       <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 rounded-lg border">
         <Table>
@@ -129,8 +110,9 @@ export function InHouseTable({
               </TableHead>
             </TableRow>
           </TableHeader>
+
           <TableBody>
-            {filteredData.map((item) =>
+            {paginatedData.map((item) =>
               editingId === item.id ? (
                 <EditableRow
                   key={item.id}
@@ -142,6 +124,7 @@ export function InHouseTable({
                     setEditingId(null);
                   }}
                   onCancel={() => setEditingId(null)}
+                  roles={roles}
                 />
               ) : (
                 <TableRow
@@ -163,23 +146,33 @@ export function InHouseTable({
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
+
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {capitalize(item.last_name)}
                   </TableCell>
+
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {item.email_address}
                   </TableCell>
+
                   <TableCell>
                     <StatusBadge
                       status={item.internal_status as InternalStatus}
                     />
                   </TableCell>
+
+                  {/* Display the role name – update if you have role data */}
                   <TableCell className="dark:text-light-900 text-base text-black">
-                    {capitalize(
-                      typeof item.display_position === "string"
-                        ? item.display_position
-                        : "-",
-                    )}
+                    {item.role_id
+                      ? roles.find((role) => role.id === item.role_id)?.name ||
+                        "-"
+                      : "-"}
+                  </TableCell>
+
+                  <TableCell className="dark:text-light-900 text-base text-black">
+                    {typeof item.display_position === "string"
+                      ? capitalize(item.display_position)
+                      : "-"}
                   </TableCell>
 
                   <TableCell className="dark:text-light-900 text-base text-black">
@@ -193,9 +186,11 @@ export function InHouseTable({
                       "-"
                     )}
                   </TableCell>
+
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {item.nda_status ? "Yes" : "No"}
                   </TableCell>
+
                   <TableCell className="dark:text-light-900 text-base text-black">
                     {item.portfolio_website ? (
                       <a
@@ -211,12 +206,12 @@ export function InHouseTable({
                       "-"
                     )}
                   </TableCell>
+
                   <TableCell>
                     <TableActions
                       item={item}
                       onEdit={() => setEditingId(item.id)}
                       onDelete={() => handleDelete(item.id)}
-                      supabase={supabase}
                     />
                   </TableCell>
                 </TableRow>
@@ -226,23 +221,23 @@ export function InHouseTable({
         </Table>
       </div>
 
-      {/* Pagination */}
-      {pagination && filteredData.length > 0 && (
-        <div className="flex items-center justify-between">
+      {/* Pagination Controls */}
+      {pagination && data.length > 0 && (
+        <div className="mt-4 flex items-center justify-end gap-2">
           <button
             onClick={pagination.onPreviousPage}
             disabled={pagination.currentPage === 1}
-            className="dark:text-light-900 dark:hover:text-light-900/80 hover:bg-light-800 dark:hover:bg-dark-200 rounded px-3 py-1 text-sm text-black hover:text-black/80 disabled:opacity-50"
+            className="text-light-900 hover:bg-dark-200 rounded px-4 py-2 text-sm disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="dark:text-light-900 text-sm text-black">
+          <span className="text-light-900 text-sm">
             Page {pagination.currentPage} of {pagination.totalPages}
           </span>
           <button
             onClick={pagination.onNextPage}
             disabled={pagination.currentPage === pagination.totalPages}
-            className="dark:text-light-900 dark:hover:text-light-900/80 hover:bg-light-800 dark:hover:bg-dark-200 rounded px-3 py-1 text-sm text-black hover:text-black/80 disabled:opacity-50"
+            className="text-light-900 hover:bg-dark-200 rounded px-4 py-2 text-sm disabled:opacity-50"
           >
             Next
           </button>

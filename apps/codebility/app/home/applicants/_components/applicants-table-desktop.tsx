@@ -25,47 +25,57 @@ import ApplicantsApprovalButtons from "./applicants-action-buttons";
 
 const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
   return (
-    <Table className="text-dark100_light900 hidden xl:block">
+    <Table className="hidden xl:block">
       <TableHeader>
-        <TableRow>
-          <TableHead className="w-1/12 text-left">Select</TableHead>
-          <TableHead className="w-2/12 text-left">Name</TableHead>
-          <TableHead className="w-2/12 text-center">Gmail</TableHead>
-          <TableHead className="w-2/12 text-center">Github</TableHead>
-          <TableHead className="w-2/12 text-center">Portfolio</TableHead>
-          <TableHead className="w-2/12 text-center">Tech Stack</TableHead>
-          <TableHead className="w-2/12 text-center">Approval</TableHead>
+        <TableRow className="border-b-2 border-gray-800">
+          <TableHead className="w-3/12 py-4 text-left font-medium text-gray-300">
+            Name
+          </TableHead>
+          <TableHead className="w-2/12 py-4 text-center font-medium text-gray-300">
+            Gmail
+          </TableHead>
+          <TableHead className="w-2/12 py-4 text-center font-medium text-gray-300">
+            Github
+          </TableHead>
+          <TableHead className="w-2/12 py-4 text-center font-medium text-gray-300">
+            Portfolio
+          </TableHead>
+          <TableHead className="w-2/12 py-4 text-center font-medium text-gray-300">
+            Tech Stack
+          </TableHead>
+          <TableHead className="w-2/12 py-4 text-center font-medium text-gray-300">
+            Approval
+          </TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
         {applicants.length > 0 ? (
           applicants.map((applicant) => (
-            <TableRow key={applicant.id}>
-              <TableCell className="text-center">
-                <Checkbox />
-              </TableCell>
-              <TableCell>
+            <TableRow
+              key={applicant.id}
+              className="border-b border-gray-800 hover:bg-gray-900/50"
+            >
+              <TableCell className="py-4">
                 <HoverCard>
                   <HoverCardTrigger asChild>
                     <div className="flex cursor-pointer items-center gap-3">
-                      <Avatar>
+                      <Avatar className="h-10 w-10">
                         {applicant.image_url ? (
                           <AvatarImage src={applicant.image_url} />
                         ) : (
                           <DefaultAvatar size={40} />
                         )}
-                        <AvatarFallback>
-                          {applicant.first_name[0]?.toUpperCase()}
-                          {applicant.last_name[0]?.toUpperCase()}
-                        </AvatarFallback>
                       </Avatar>
-                      <p className="truncate capitalize hover:underline">
-                        {applicant.first_name} {applicant.last_name}
+                      <p className="truncate font-medium text-gray-200 hover:underline">
+                        {applicant.first_name.charAt(0).toUpperCase() +
+                          applicant.first_name.slice(1)}{" "}
+                        {applicant.last_name.charAt(0).toUpperCase() +
+                          applicant.last_name.slice(1)}
                       </p>
                     </div>
                   </HoverCardTrigger>
-                  <HoverCardContent>
-                    <div className="flex gap-4 ">
+                  <HoverCardContent className="w-80 border border-gray-700 bg-black p-4 shadow-lg">
+                    <div className="flex gap-4">
                       {applicant.image_url ? (
                         <Image
                           src={applicant.image_url}
@@ -77,58 +87,77 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                       ) : (
                         <DefaultAvatar size={100} className="rounded-md" />
                       )}
-                      <div>
-                        <h4>
-                          {applicant.first_name} {applicant.last_name}
+                      <div className="text-gray-200">
+                        <h4 className="text-lg font-medium">
+                          {applicant.first_name.charAt(0).toUpperCase() +
+                            applicant.first_name.slice(1)}{" "}
+                          {applicant.last_name.charAt(0).toUpperCase() +
+                            applicant.last_name.slice(1)}
                         </h4>
-                        <p>{applicant.email_address}</p>
+                        <p className="text-sm text-gray-400">
+                          {applicant.email_address}
+                        </p>
                       </div>
                     </div>
                   </HoverCardContent>
                 </HoverCard>
               </TableCell>
-              <TableCell className="flex items-center justify-center  text-center">
-                <Link href={`mailto:${applicant.email_address}`}>
-                  <IconEmail />
-                </Link>
-              </TableCell>
-              <TableCell className="items-center justify-center text-center">
-                {applicant.github && (
-                  <Link href={applicant.github}>
-                    <IconGithub />
+              <TableCell className="py-4">
+                <div className="flex justify-center">
+                  <Link
+                    href={`mailto:${applicant.email_address}`}
+                    className="text-gray-400 hover:text-gray-200"
+                  >
+                    <IconEmail />
                   </Link>
-                )}
-              </TableCell>
-              <TableCell className="items-center justify-center text-center">
-                {applicant.portfolio_website && (
-                  <Link href={applicant.portfolio_website}>
-                    <IconLink />
-                  </Link>
-                )}
-              </TableCell>
-              <TableCell className="text-center">
-                <div className="flex flex-wrap justify-center gap-2">
-                  {applicant.tech_stacks &&
-                    applicant.tech_stacks.map((stack) => (
-                      <Image
-                        key={stack}
-                        src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
-                        alt={stack}
-                        width={25}
-                        height={25}
-                        className="h-6 w-6"
-                      />
-                    ))}
                 </div>
               </TableCell>
-              <TableCell className="text-center">
+              <TableCell className="py-4">
+                <div className="flex justify-center">
+                  {applicant.github && (
+                    <Link
+                      href={applicant.github}
+                      className="text-gray-400 hover:text-gray-200"
+                    >
+                      <IconGithub />
+                    </Link>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="py-4">
+                <div className="flex justify-center">
+                  {applicant.portfolio_website && (
+                    <Link
+                      href={applicant.portfolio_website}
+                      className="text-gray-400 hover:text-gray-200"
+                    >
+                      <IconLink />
+                    </Link>
+                  )}
+                </div>
+              </TableCell>
+              <TableCell className="py-4">
+                <div className="flex flex-wrap justify-center gap-2">
+                  {applicant.tech_stacks?.map((stack) => (
+                    <Image
+                      key={stack}
+                      src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                      alt={stack}
+                      width={25}
+                      height={25}
+                      className="h-6 w-6"
+                    />
+                  ))}
+                </div>
+              </TableCell>
+              <TableCell className="py-4 text-center">
                 <ApplicantsApprovalButtons applicant={applicant} />
               </TableCell>
             </TableRow>
           ))
         ) : (
           <TableRow>
-            <TableCell colSpan={7} className="text-center">
+            <TableCell colSpan={7} className="py-8 text-center text-gray-400">
               No applicants found.
             </TableCell>
           </TableRow>
