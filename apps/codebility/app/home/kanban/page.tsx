@@ -156,7 +156,7 @@ export default async function KanbanPage({ searchParams }: PageProps) {
         <TableCell className="text-center md:table-cell">
           <Link href={`${pathsConfig.app.kanban}/${board.id}`}>
             <Button variant="hollow" className="inline-flex items-center gap-2">
-              <IconKanban className="h-4 w-4" />
+              <IconKanban className="invert-colors h-4 w-4" />
               <span className="hidden sm:inline">View Board</span>
             </Button>
           </Link>
