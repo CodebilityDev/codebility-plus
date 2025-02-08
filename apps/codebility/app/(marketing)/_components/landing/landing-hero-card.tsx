@@ -14,7 +14,7 @@ const HeroCard: React.FC<HeroCardProps> = ({
 }) => {
   return (
     <Link href={url} className="hero-card">
-      <div className="border-light-900/5 bg-light-700/10 hover:bg-light-700/30 flex w-full flex-col gap-2 rounded-md border-2 p-8 text-white backdrop-blur-lg duration-300">
+      <div className="border-light-900/5 bg-light-700/10 hover:bg-light-700/30 flex h-40 w-full flex-col gap-2 rounded-md border-2 p-8 text-white backdrop-blur-lg duration-300">
         <div className="flex w-full flex-row items-center justify-between">
           <h3 className="text-2xl font-medium">{title}</h3>
           <span className="hero-change-bg-button flex size-10 flex-col items-center justify-center rounded-full border-2 border-white/5 bg-white/5">

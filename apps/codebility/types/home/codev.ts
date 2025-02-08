@@ -119,7 +119,7 @@ export interface Project {
   name: string;
   description?: string;
   status?: string;
-  start_date: string;
+  start_date?: string;
   end_date?: string;
   github_link?: string;
   main_image?: string;

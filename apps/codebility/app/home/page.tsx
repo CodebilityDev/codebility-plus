@@ -10,7 +10,6 @@ import WeeklyTop from "./(dashboard)/_components/dashboard-weekly-top";
 
 export default function DashboardPage() {
   const { user } = useUserStore();
-  console.log("user:", user);
 
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">

@@ -109,7 +109,7 @@ const ProfileCard = ({ codev, color }: Props) => {
           </div>
         </div>
         <div className="flex flex-col gap-1 text-center">
-          <p className="md:text-md text-sm capitalize text-white lg:text-base">
+          <p className="md:text-md text-sm capitalize  text-white lg:text-base">
             {codev.first_name} {codev.last_name}
           </p>
           {codev.display_position ? (
