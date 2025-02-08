@@ -4,40 +4,68 @@ import { useEffect, useState } from "react";
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
-import { Project } from "@/types/home/codev";
 
 import Container from "../../_components/marketing-container";
 import Section from "../../_components/marketing-section";
 import ServiceCard from "./services-service-card";
 
-interface Props {
-  servicesData: Project[];
+interface TeamMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  image_url?: string | null;
 }
 
+interface ProjectData {
+  id: string;
+  name: string;
+  description?: string;
+  status?: string;
+  start_date?: string;
+  end_date?: string;
+  github_link?: string;
+  main_image?: string;
+  website_url?: string;
+  figma_link?: string;
+  team_leader?: TeamMember;
+  client_id?: string;
+  members?: TeamMember[];
+  project_category_id?: number;
+  project_category_name?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+interface Props {
+  servicesData: ProjectData[];
+}
+
+// Static categories
+const CATEGORIES = [
+  { id: 1, name: "Web Application" },
+  { id: 2, name: "Mobile Application" },
+  { id: 3, name: "Product Design" },
+] as const;
+
 export default function ServicesTab({ servicesData }: Props) {
-  const [projects, setProjects] = useState<Project[]>(servicesData);
-  const [category, setCategory] = useState<number>(0); // Use `project_category_id`
-
-  // Initialize pagination for each category
-  const initialTabPages: Record<number, number> = {};
-  servicesData.forEach((project) => {
-    if (project.project_category_id !== undefined) {
-      initialTabPages[project.project_category_id] = 1;
-    }
-  });
-
-  const [tabPages, setTabPages] =
-    useState<Record<number, number>>(initialTabPages);
-
-  const uniqueCategories = Array.from(
-    new Set(servicesData.map((project) => project.project_category_id)),
+  // Initialize with first category
+  const [currentCategory, setCurrentCategory] = useState<number>(
+    CATEGORIES[0].id,
   );
 
-  const projectTabs = uniqueCategories.map((categoryId, id) => ({
-    id,
-    name: `Category ${categoryId}`,
-    number: categoryId || 0,
-  }));
+  const [projects, setProjects] = useState(() => {
+    return servicesData.filter(
+      (project) => project.project_category_id === CATEGORIES[0].id,
+    );
+  });
+
+  const [tabPages, setTabPages] = useState(() => {
+    const pages: Record<number, number> = {};
+    CATEGORIES.forEach((cat) => {
+      pages[cat.id] = 1;
+    });
+    return pages;
+  });
 
   const {
     paginatedData: paginatedProjects,
@@ -48,62 +76,49 @@ export default function ServicesTab({ servicesData }: Props) {
     setCurrentPage,
   } = usePagination(projects, pageSize.services);
 
+  // Update projects when category changes
   useEffect(() => {
-    const filteredData = servicesData.filter((project) => {
-      return project.project_category_id === category;
-    });
+    const filteredData = servicesData.filter(
+      (project) => project.project_category_id === currentCategory,
+    );
     setProjects(filteredData);
-  }, [category, servicesData]);
+    setCurrentPage(tabPages[currentCategory] || 1);
+  }, [currentCategory, servicesData]);
 
-  useEffect(() => {
-    setCurrentPage(tabPages[category] || 1);
-  }, [category, tabPages, setCurrentPage]);
-
-  const handleTabClick = (tabNumber: number) => {
+  const handleTabClick = (categoryId: number) => {
     setTabPages((prev) => ({
       ...prev,
-      [category]: currentPage,
+      [currentCategory]: currentPage,
     }));
-
-    setCategory(tabNumber);
+    setCurrentCategory(categoryId);
   };
 
   return (
     <Section className="relative">
       <Container className="relative z-10">
         <div className="flex flex-col gap-10">
+          {/* Category Tabs */}
           <div className="mx-auto flex flex-wrap justify-center gap-5 xl:gap-16">
-            {projectTabs.map((tab) => (
+            {CATEGORIES.map((cat) => (
               <p
-                key={tab.id}
-                onClick={() => handleTabClick(tab.number)}
-                className={`cursor-pointer px-2 pb-2 text-base xl:text-xl ${
-                  category === tab.number
+                key={cat.id}
+                onClick={() => handleTabClick(cat.id)}
+                className={`cursor-pointer px-2 pb-2 text-violet-200 xl:text-xl ${
+                  currentCategory === cat.id
                     ? "border-violet text-violet border-b-2"
                     : "text-white"
                 }`}
               >
-                {tab.name}
+                {cat.name}
               </p>
             ))}
           </div>
 
+          {/* Projects Grid */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-            {paginatedProjects.length > 0 ? (
+            {paginatedProjects && paginatedProjects.length > 0 ? (
               paginatedProjects.map((project) => (
-                <ServiceCard
-                  key={project.id}
-                  service={{
-                    id: project.id,
-                    name: project.name,
-                    description: project.description || "",
-                    main_image: project.main_image || "",
-                    github_link: project.github_link,
-                    figma_link: project.figma_link,
-                    start_date: project.start_date,
-                    end_date: project.end_date,
-                  }}
-                />
+                <ServiceCard key={project.id} service={project} />
               ))
             ) : (
               <div className="col-span-full text-center text-white">
@@ -112,8 +127,9 @@ export default function ServicesTab({ servicesData }: Props) {
             )}
           </div>
 
-          <div className="text-white">
-            {projects.length > pageSize.services && (
+          {/* Pagination */}
+          {projects.length > pageSize.services && (
+            <div className="text-white">
               <DefaultPagination
                 currentPage={currentPage}
                 handleNextPage={handleNextPage}
@@ -121,8 +137,8 @@ export default function ServicesTab({ servicesData }: Props) {
                 setCurrentPage={setCurrentPage}
                 totalPages={totalPages}
               />
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </Container>
     </Section>

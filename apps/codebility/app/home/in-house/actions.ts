@@ -21,8 +21,11 @@ export const updateCodev = async (
       "application_status",
       "image_url",
       "email_address",
+      "display_position",
+      "role_id",
+      "level",
+      "tech_stacks",
     ],
-    profile: ["display_position", "role_id", "level", "tech_stacks", "email"],
   };
 
   // Dynamically find the target table
@@ -33,18 +36,15 @@ export const updateCodev = async (
   if (!target) throw new Error(`Invalid codev info: ${key}`);
 
   if (target === "projects") {
-    // Existing project update logic
-    await supabase.from("codev_project").delete().eq("codev_id", codevId);
+    // 1) Delete all existing pivot rows for that codev
+    await supabase.from("project_members").delete().eq("codev_id", codevId);
 
+    // 2) Re-insert the new relationships
     for (let i = 0; i < value.length; i++) {
-      const { id: projectId } = value[i];
-
-      const { error } = await supabase.from("codev_project").insert({
+      await supabase.from("codev_project").insert({
         codev_id: codevId,
-        project_id: projectId,
+        project_id: value[i].id,
       });
-
-      if (error) throw error;
     }
   } else {
     let newValue = value;

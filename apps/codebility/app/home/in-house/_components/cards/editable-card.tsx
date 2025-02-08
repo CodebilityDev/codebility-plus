@@ -1,5 +1,4 @@
-import { INTERNAL_STATUS } from "@/constants/internal_status";
-import { Codev, InternalStatus, Position, Project } from "@/types/home/codev";
+import { Codev, InternalStatus, Project } from "@/types/home/codev";
 import { Check, Plus, X } from "lucide-react";
 
 import { Button } from "@codevs/ui/button";
@@ -17,25 +16,25 @@ import {
 import { useCodevForm } from "../../_hooks/use-codev-form";
 import { StatusBadge } from "../shared/status-badge";
 
+export interface Role {
+  id: number;
+  name: string;
+}
+
 interface EditableCardProps {
   data: Codev;
   onSave: (data: Codev) => void;
   onCancel: () => void;
+  roles: Role[];
 }
 
-export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
+export function EditableCard({
+  data,
+  onSave,
+  onCancel,
+  roles,
+}: EditableCardProps) {
   const { data: formData, handleChange, isSubmitting } = useCodevForm(data);
-
-  // Ensure positions are handled correctly
-  const positions: Position[] = (formData.positions || []).map((pos) => {
-    if (typeof pos === "string") {
-      // Convert string to bigint for id and use the string for name
-      return { id: BigInt(pos), name: pos } as Position;
-    }
-    return pos; // Return as-is if already a Position object
-  });
-
-  // Ensure projects are handled correctly
   const projects: Project[] = formData.projects || [];
 
   return (
@@ -63,10 +62,22 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
         </div>
 
         <div>
+          <Label>Email Address</Label>
+          <Input
+            value={formData.email_address}
+            onChange={(e) => handleChange("email_address", e.target.value)}
+            disabled={isSubmitting}
+            placeholder="Email Address"
+          />
+        </div>
+
+        <div>
           <Label>Status</Label>
           <Select
-            value={formData.internal_status || undefined}
-            onValueChange={(value) => handleChange("internal_status", value)}
+            value={formData.internal_status || ""}
+            onValueChange={(value) =>
+              handleChange("internal_status", value as InternalStatus)
+            }
             disabled={isSubmitting}
           >
             <SelectTrigger className="w-full">
@@ -77,9 +88,60 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
               </SelectValue>
             </SelectTrigger>
             <SelectContent>
-              {Object.entries(INTERNAL_STATUS).map(([key, label]) => (
+              {Object.entries({
+                TRAINING: "Training",
+                GRADUATED: "Graduated",
+                BUSY: "Busy",
+                FAILED: "Failed",
+                AVAILABLE: "Available",
+                DEPLOYED: "Deployed",
+                VACATION: "Vacation",
+                CLIENTREADY: "Client Ready",
+              }).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
                   <StatusBadge status={key as InternalStatus} />
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Role Select Field */}
+        <div>
+          <Label>Role</Label>
+          <Select
+            value={formData.role_id ? String(formData.role_id) : ""}
+            onValueChange={(value) => handleChange("role_id", Number(value))}
+            disabled={isSubmitting}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select role" />
+            </SelectTrigger>
+            <SelectContent>
+              {roles.map((role) => (
+                <SelectItem key={role.id} value={String(role.id)}>
+                  {role.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <Label>Display Position</Label>
+          <Select
+            value={formData.display_position || ""}
+            onValueChange={(value) => handleChange("display_position", value)}
+            disabled={isSubmitting}
+          >
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select position" />
+            </SelectTrigger>
+            <SelectContent>
+              {formData.positions?.map((position) => (
+                <SelectItem key={position} value={position}>
+                  {position}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -89,48 +151,18 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
 
       <CardContent className="space-y-4">
         <div>
-          <Label>Position</Label>
-          <Select
-            value={
-              typeof formData.display_position === "string"
-                ? formData.display_position
-                : undefined
-            }
-            onValueChange={(value) => handleChange("display_position", value)}
-            disabled={isSubmitting}
-          >
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select position" />
-            </SelectTrigger>
-            <SelectContent>
-              {positions.map((position) => (
-                <SelectItem
-                  key={position.id}
-                  value={position.name ?? "Unnamed Position"}
-                >
-                  {position.name || "Unnamed Position"}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-
-        <div>
           <Label>Projects</Label>
           <div className="space-y-2">
             {projects.map((project, index) => (
-              <div
-                key={typeof project === "string" ? project : project.id}
-                className="flex items-center space-x-2"
-              >
+              <div key={project.id} className="flex items-center space-x-2">
                 <Input
-                  value={typeof project === "string" ? project : project.name}
+                  value={project.name}
                   onChange={(e) => {
                     const updatedProjects = [...projects];
                     updatedProjects[index] = {
                       ...project,
                       name: e.target.value,
-                    } as Project;
+                    };
                     handleChange("projects", updatedProjects);
                   }}
                   disabled={isSubmitting}
@@ -155,11 +187,14 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
               variant="outline"
               size="sm"
               onClick={() => {
-                const updatedProjects = [
+                handleChange("projects", [
                   ...projects,
-                  { id: Date.now().toString(), name: "" } as Project,
-                ];
-                handleChange("projects", updatedProjects);
+                  {
+                    id: crypto.randomUUID(),
+                    name: "",
+                    start_date: new Date().toISOString(),
+                  },
+                ]);
               }}
               disabled={isSubmitting}
             >
@@ -172,9 +207,9 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
         <div>
           <Label>NDA Status</Label>
           <Select
-            value={formData.nda_status ? "Received" : "Not Received"}
+            value={formData.nda_status ? "true" : "false"}
             onValueChange={(value) =>
-              handleChange("nda_status", value === "Received")
+              handleChange("nda_status", value === "true")
             }
             disabled={isSubmitting}
           >
@@ -182,10 +217,28 @@ export function EditableCard({ data, onSave, onCancel }: EditableCardProps) {
               <SelectValue placeholder="Select NDA status" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Received">Received</SelectItem>
-              <SelectItem value="Not Received">Not Received</SelectItem>
+              <SelectItem value="true">Signed</SelectItem>
+              <SelectItem value="false">Not Signed</SelectItem>
             </SelectContent>
           </Select>
+        </div>
+
+        <div>
+          <Label>Availability</Label>
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              checked={formData.availability_status || false}
+              onChange={(e) =>
+                handleChange("availability_status", e.target.checked)
+              }
+              disabled={isSubmitting}
+              className="toggle"
+            />
+            <span>
+              {formData.availability_status ? "Available" : "Unavailable"}
+            </span>
+          </div>
         </div>
       </CardContent>
 

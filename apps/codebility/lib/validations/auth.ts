@@ -39,7 +39,7 @@ export const SignUpValidation = z
 
     // Changed from single position to array to match DB
     positions: z
-      .array(z.string())
+      .array(z.object({ id: z.number(), name: z.string() }))
       .min(1, "Please select at least one position")
       .default([]),
 

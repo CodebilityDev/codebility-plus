@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Codev } from "@/types/home/codev";
+import { Codev, InternalStatus } from "@/types/home/codev";
 import { Edit2, Eye, Trash2 } from "lucide-react";
 
 import { Button } from "@codevs/ui/button";
@@ -9,41 +9,45 @@ import { StatusBadge } from "../shared/status-badge";
 
 const defaultImage = "/assets/svgs/icon-codebility-black.svg";
 
+export interface Role {
+  id: number;
+  name: string;
+}
+
 interface CodevCardProps {
   data: Codev;
   onEdit: () => void;
   onDelete: () => void;
+  /** Optional roles array passed from the parent */
+  roles?: Role[];
 }
 
-export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
+export function CodevCard({ data, onEdit, onDelete, roles }: CodevCardProps) {
+  // Capitalize a string or return a hyphen if empty
   const capitalize = (str: string | undefined | null) =>
     str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
 
-  // Function to check if fetched data is a valid JSON stringified array
-  const isJSONArray = (str: string) => {
+  // Check if a string is a valid JSON array string
+  const isJSONArray = (str: string): boolean => {
     try {
       const parsed = JSON.parse(str);
-
-      // check if the parsed data is an array, should return a boolean
       return Array.isArray(parsed);
     } catch {
       return false;
     }
   };
 
-  // Declare an empty variable where the fetched data will be assigned
   let parsedArray: string[] = [];
   let parsedtechStackArray: string[] = [];
 
   if (typeof data.display_position === "string") {
-    // Control flow to check if fetched data is a valid array
     if (isJSONArray(data.display_position)) {
       parsedArray = JSON.parse(data.display_position) as string[];
     } else {
-      // Treat fetched data as single item array
       parsedArray = [data.display_position];
     }
   }
+
 
   if (Array.isArray(data.tech_stacks)) {
     try {
@@ -77,7 +81,14 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
 
   const cleanTechStackData = parsedtechStackArray;
 
-  console.log("TechStack Data", cleanTechStackData);
+
+
+  // Compute role name using the passed roles prop (if available)
+  const roleName =
+    data.role_id && roles
+      ? roles.find((r) => r.id === data.role_id)?.name
+      : "-";
+
 
   return (
     <Card className="bg-light-300 dark:bg-dark-100 border-light-700 dark:border-dark-200 flex h-full flex-col">
@@ -92,14 +103,26 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
           />
         </div>
         <div className="space-y-2">
-          <h3 className="dark:text-light-900 truncate text-lg font-semibold text-black">
+          <h3 className="truncate text-lg font-semibold text-black">
             {capitalize(data.first_name)} {capitalize(data.last_name)}
           </h3>
-          <StatusBadge status={data.internal_status || "TRAINING"} />
+          <StatusBadge status={data.internal_status as InternalStatus} />
         </div>
       </CardHeader>
 
       <CardContent className="flex-grow space-y-4 p-4">
+        <div className="flex justify-between text-sm">
+          <span className="text-gray dark:text-light-500">Email:</span>
+          <span className="dark:text-light-900 truncate text-black">
+            {data.email_address || "-"}
+          </span>
+        </div>
+        <div className="flex justify-between text-sm">
+          <span className="text-gray dark:text-light-500">Role:</span>
+          <span className="dark:text-light-900 truncate text-black">
+            {roleName}
+          </span>
+        </div>
         <div className="flex justify-between text-sm">
           <span className="text-gray dark:text-light-500">Position:</span>
           <span className="dark:text-light-900 truncate text-black">
@@ -144,6 +167,13 @@ export function CodevCard({ data, onEdit, onDelete }: CodevCardProps) {
             </div>
           </div>
         )}
+
+        <div className="flex justify-between text-sm">
+          <span className="text-gray dark:text-light-500">NDA:</span>
+          <span className="dark:text-light-900 text-black">
+            {data.nda_status ? "Signed" : "Not Signed"}
+          </span>
+        </div>
       </CardContent>
 
       <CardFooter className="border-light-700 dark:border-dark-200 flex justify-center gap-2 border-t py-1">

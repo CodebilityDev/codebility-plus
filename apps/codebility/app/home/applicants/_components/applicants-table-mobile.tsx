@@ -45,12 +45,8 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                     ) : (
                       <DefaultAvatar size={40} />
                     )}
-                    <AvatarFallback>
-                      {applicant.first_name[0]?.toUpperCase()}
-                      {applicant.last_name[0]?.toUpperCase()}
-                    </AvatarFallback>
                   </Avatar>
-                  <p className="text-sm capitalize">
+                  <p className="border-2 text-sm capitalize">
                     {applicant.first_name} {applicant.last_name}
                   </p>
                 </div>
