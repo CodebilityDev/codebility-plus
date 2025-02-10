@@ -5,7 +5,7 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 
 export const config = {
   matcher: [
-    "/((?!api|auth/signin|auth/signup|auth/verify|waiting|declined|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|thank-you|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
+    "/((?!api|auth/signin|auth/signup|auth/verify|/auth/password-reset|waiting|declined|privacy-policy|terms|auth/forgot-password|codevs|index|profiles|thank-you|campaign|services|ai-integration|bookacall|_next/static|.*\\..*|_next/image|$).*)",
   ],
 };
 
@@ -17,6 +17,7 @@ const PUBLIC_ROUTES = [
   "/auth/declined",
   "/privacy-policy",
   "/terms",
+  "/auth/password-reset",
   "/", // Other public pages
 ] as const;
 
