@@ -128,23 +128,23 @@ const UserMenu = ({
 
   return (
     <DropdownMenu open={isOpen} onOpenChange={setIsOpen} modal={false}>
-      <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none ">
-        <div className="hidden flex-col items-end md:flex">
+      <DropdownMenuTrigger className="hidden items-center gap-4 focus:outline-none lg:flex">
+        <div className="flex-col items-end lg:flex">
           <p className="capitalize text-white">
             {first_name} {last_name}
           </p>
           <p className="text-gray text-sm">{email}</p>
         </div>
-        <div className="from-violet relative size-[44px] rounded-full bg-gradient-to-b to-blue-500 p-[1.5px]">
+        <div className="from-violet relative overflow-hidden rounded-full bg-gradient-to-b to-blue-500 lg:h-[44px] lg:w-[52px]">
           <Image
             alt="Avatar"
             src={image_url || defaultAvatar}
             fill
-            sizes="44px"
             title={`${first_name}'s Avatar`}
-            className="rounded-full object-cover"
+            className="rounded-full"
           />
         </div>
+
         {isOpen ? (
           <ChevronUp className="h-6 w-6 text-white" />
         ) : (
@@ -200,7 +200,6 @@ const Navigation = () => {
     const fetchUser = async () => {
       try {
         const { data, error } = await supabase.auth.getUser();
-        console.log("data:", data);
 
         if (error) {
           console.error("Error fetching user:", error.message);

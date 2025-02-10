@@ -120,16 +120,18 @@ export default async function KanbanPage({ searchParams }: PageProps) {
     return typedBoards.map((board) => (
       <TableRow key={board.id} className="grid grid-cols-1 md:table-row">
         <TableCell className="md:table-cell">
-          <div className="flex flex-col">
+          <div className="text-dark100_light900 flex flex-col">
             <span className="font-medium">{board.name}</span>
             {board.description && (
-              <span className="text-sm text-gray-500">{board.description}</span>
+              <span className="text-sm">{board.description}</span>
             )}
           </div>
         </TableCell>
 
         <TableCell className="md:table-cell">
-          {board.projects?.name || "No project assigned"}
+          <span className="text-dark100_light900">
+            {board.projects?.name || "No project assigned"}
+          </span>
         </TableCell>
 
         <TableCell className="md:table-cell">
@@ -142,7 +144,7 @@ export default async function KanbanPage({ searchParams }: PageProps) {
                   className="h-8 w-8 rounded-full object-cover"
                 />
               )}
-              <span className="capitalize">
+              <span className="text-dark100_light900 capitalize">
                 {`${board.projects.codev.first_name} ${board.projects.codev.last_name}`}
               </span>
             </div>
@@ -154,7 +156,7 @@ export default async function KanbanPage({ searchParams }: PageProps) {
         <TableCell className="text-center md:table-cell">
           <Link href={`${pathsConfig.app.kanban}/${board.id}`}>
             <Button variant="hollow" className="inline-flex items-center gap-2">
-              <IconKanban className="h-4 w-4" />
+              <IconKanban className="invert-colors h-4 w-4" />
               <span className="hidden sm:inline">View Board</span>
             </Button>
           </Link>
