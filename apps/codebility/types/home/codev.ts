@@ -247,11 +247,10 @@ export interface Task {
   description?: string;
   priority?: string;
   difficulty?: string;
-  status?: string; // Defaults to 'pending'
   type?: string;
   due_date?: string;
   kanban_column_id?: string; // UUID
-  codev_id?: string; // UUID
+  codev_id?: string; // UUID (primary assignee)
   created_by?: string; // UUID
   sidekick_ids?: string[]; // UUID array
   points?: number;
@@ -259,6 +258,7 @@ export interface Task {
   pr_link?: string;
   created_at?: string;
   updated_at?: string;
+  skill_category_id?: string; // NEW: Link to the skill category table
 }
 
 export interface ExtendedTask extends Task {

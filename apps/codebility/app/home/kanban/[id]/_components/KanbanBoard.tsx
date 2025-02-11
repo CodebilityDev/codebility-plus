@@ -4,14 +4,15 @@ import { ArrowRightIcon, IconSearch } from "@/public/assets/svgs";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
 
 import KanbanBoardsSearch from "../../_components/kanban-boards-search";
-import KanbanListAddModal from "./kanban_modals/kanban-list-add-modal";
-import KanbanBoardListContainer from "./kanban-board-list-container";
+import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
+import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
+import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 
-interface Props {
+interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
 }
 
-const KanbanBoard = ({ boardData }: Props) => {
+export default function KanbanBoard({ boardData }: KanbanBoardProps) {
   if (!boardData) {
     return (
       <div className="text-center text-red-500">Board data not found.</div>
@@ -22,7 +23,7 @@ const KanbanBoard = ({ boardData }: Props) => {
     <div className="flex h-full w-full">
       <div className="mx-auto h-full w-[calc(100vw-22rem)] flex-1 flex-col">
         <div className="text-dark100_light900 flex h-full flex-col gap-4">
-          {/* Breadcrumb Navigation */}
+          {/* Breadcrumb */}
           <div className="flex flex-row items-center gap-4 text-sm">
             <Link href={pathsConfig.app.kanban}>
               <span className="dark:text-white/50">Kanban Board</span>
@@ -31,13 +32,13 @@ const KanbanBoard = ({ boardData }: Props) => {
             <span className="font-semibold">{boardData.name}</span>
           </div>
 
-          {/* Board Title and Actions */}
+          {/* Header */}
           <div className="flex flex-col gap-4 md:flex-row md:justify-between">
-            <div className="text-dark100_light900 text-md font-semibold md:text-2xl">
+            <h1 className="text-dark100_light900 text-md font-semibold md:text-2xl">
               {boardData.name}
-            </div>
+            </h1>
+
             <div className="flex flex-col gap-4 md:flex-row">
-              {/* Search Bar */}
               <div className="bg-light-900 flex w-full items-center gap-3 rounded-md border border-zinc-300 p-2 dark:border-zinc-500 dark:bg-[#2C303A]">
                 <label htmlFor="kanbanSearch">
                   <IconSearch />
@@ -49,22 +50,22 @@ const KanbanBoard = ({ boardData }: Props) => {
                 />
               </div>
 
-              {/* Add Column Modal */}
-              <KanbanListAddModal boardId={boardData.id} />
+              <KanbanColumnAddButton boardId={boardData.id} />
             </div>
           </div>
 
-          {/* Board Columns */}
+          {/* Board Content */}
           <div className="text-dark100_light900 flex h-full">
-            <KanbanBoardListContainer
+            <KanbanBoardColumnContainer
               projectId={boardData.id}
               columns={boardData.kanban_columns || []}
             />
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      <KanbanColumnAddModal />
     </div>
   );
-};
-
-export default KanbanBoard;
+}

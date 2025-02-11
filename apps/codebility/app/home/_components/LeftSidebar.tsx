@@ -55,8 +55,6 @@ const LeftSidebar = () => {
     },
   };
 
-  console.log(sidebarData[0]);
-
   return (
     <motion.section
       initial={false}

@@ -1,50 +1,84 @@
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import KanbanBoard from "./_components/kanban-board";
+import KanbanBoard from "./_components/KanbanBoard";
 
-export default async function KanbanPage({
+export default async function KanbanBoardPage({
   params,
   searchParams,
 }: {
   params: { id: string };
-  searchParams: { query: string };
+  searchParams: { query?: string };
 }) {
   const supabase = getSupabaseServerComponentClient();
 
+  // Updated query to join both the primary assignee and skill category details.
   const { data: board, error } = await supabase
-    .from("board")
+    .from("kanban_boards")
     .select(
       `
-    *,
-    list(
-      *,
-      task(
-        *,
-        codev_task(
-          codev(
-            *,
-            user(
-              *,
-              profile(*)
-            )
+      id,
+      name,
+      description,
+      created_at,
+      updated_at,
+      kanban_columns (
+        id,
+        name,
+        position,
+        created_at,
+        updated_at,
+        tasks (
+          id,
+          title,
+          description,
+          priority,
+          difficulty,
+          type,
+          due_date,
+          points,
+          pr_link,
+          sidekick_ids,
+          kanban_column_id,
+          codev!tasks_codev_id_fkey (
+            id,
+            first_name,
+            last_name,
+            image_url
+          ),
+          skill_category!tasks_skill_category_id_fkey (
+            id,
+            name
           )
-        ) 
+        )
       )
-    )  
-  `,
+    `,
     )
     .eq("id", params.id)
     .single();
 
-  if (error) return <div>ERROR</div>;
+  if (error) {
+    console.error("Error fetching board:", error);
+    return <div>Error loading board: {error.message}</div>;
+  }
 
-  const listQuery = searchParams.query;
+  if (!board) {
+    return <div>Board not found</div>;
+  }
 
-  if (listQuery && board?.list) {
-    board.list = board.list.filter((list: { name: string }) =>
-      list.name.toLowerCase().includes(listQuery.toLowerCase()),
+  // Filter columns by search query if provided
+  let filteredColumns = board.kanban_columns;
+  if (searchParams.query) {
+    filteredColumns = board.kanban_columns.filter((column: { name: string }) =>
+      column.name
+        .toLowerCase()
+        .includes(searchParams.query?.toLowerCase() || ""),
     );
   }
 
-  return <KanbanBoard boardData={board} />;
+  const boardData = {
+    ...board,
+    kanban_columns: filteredColumns || [],
+  };
+
+  return <KanbanBoard boardData={boardData} />;
 }

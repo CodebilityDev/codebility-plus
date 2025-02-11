@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import ClientAddModal from "@/app/home/clients/_components/ClientAddModal";
 import ClientEditModal from "@/app/home/clients/_components/ClientEditModal";
 import BoardAddModal from "@/app/home/kanban/_components/BoardAddModal";
-import ColumnAddModal from "@/app/home/kanban/[id]/_components/kanban_modals/ListAddModal";
+import ColumnAddModal from "@/app/home/kanban/[id]/_components/kanban_modals/KanbanColumnAddModal";
 import TaskAddModal from "@/app/home/kanban/[id]/_components/tasks/TaskAddModal";
 import TaskViewModal from "@/app/home/kanban/[id]/_components/tasks/TaskViewModal";
 import ProjectAddModal from "@/app/home/projects/_components/ProjectAddModal";
