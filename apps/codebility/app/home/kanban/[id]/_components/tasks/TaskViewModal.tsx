@@ -1,6 +1,8 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,
@@ -17,7 +19,8 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
-import { Task } from "@/types/home/codev";
+import { SkillCategory, Task } from "@/types/home/codev";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Ellipsis } from "lucide-react";
 
 import {
@@ -29,7 +32,7 @@ import {
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 
-// Constants matching your schema
+// Constants matching your schema (if needed for display)
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
 
@@ -38,11 +41,34 @@ const TaskViewModal = () => {
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task;
 
+  // State to hold the fetched skill category details
+  const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(
+    null,
+  );
+
+  useEffect(() => {
+    async function fetchSkillCategory() {
+      if (task?.skill_category_id) {
+        const supabase = createClientComponentClient();
+        const { data, error } = await supabase
+          .from("skill_category")
+          .select("id, name")
+          .eq("id", task.skill_category_id)
+          .single();
+        if (!error && data) {
+          setSkillCategory(data as SkillCategory);
+        }
+      }
+    }
+    fetchSkillCategory();
+  }, [task?.skill_category_id]);
+
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]">
-        <div className="flex flex-col gap-4">
-          <div className="flex gap-4">
+        <div className="flex flex-col gap-4 p-4">
+          {/* Header */}
+          <div className="flex items-center justify-between">
             <DialogHeader>
               <DialogTitle className="break-words text-left text-lg font-bold">
                 {task?.title}
@@ -69,6 +95,7 @@ const TaskViewModal = () => {
             </DropdownMenu>
           </div>
 
+          {/* Form-like Grid Display */}
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <Input label="Task Title" value={task?.title} disabled />
 
@@ -108,23 +135,34 @@ const TaskViewModal = () => {
               value={task?.pr_link || ""}
               disabled
             />
+
+            {/* Skill Category Badge */}
+            <div>
+              <label>Skill Category</label>
+              {skillCategory ? (
+                <div className="inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
+                  {skillCategory.name}
+                </div>
+              ) : (
+                <div className="text-sm text-gray-500">None</div>
+              )}
+            </div>
           </div>
 
+          {/* Sidekick Avatars */}
           {task?.sidekick_ids && task.sidekick_ids.length > 0 && (
             <div className="flex flex-wrap items-center gap-2">
               {task.sidekick_ids.map((memberId) => (
                 <div key={memberId} className="relative h-12 w-12 rounded-full">
-                  <Image
-                    alt="Member avatar"
-                    src={`/api/placeholder/48/48`} // Replace with your actual member image source
-                    fill
-                    className="rounded-full object-cover"
-                  />
+                  {/* Here we use DefaultAvatar as a placeholder.
+                      You could replace this with actual member image if available. */}
+                  <DefaultAvatar size={48} />
                 </div>
               ))}
             </div>
           )}
 
+          {/* Description */}
           <div>
             <label>Description</label>
             <Textarea

@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import KanbanAddModalMembers from "@/app/home/kanban/[id]/_components/kanban_modals/kanban-add-modal-members";
+import KanbanAddModalMembers from "@/app/home/kanban/[id]/_components/kanban_modals/KanbanAddModalMembers";
 import { createNewTask } from "@/app/home/kanban/[id]/actions";
 import { Button } from "@/Components/ui/button";
 import {
@@ -21,6 +21,8 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
+import { SkillCategory } from "@/types/home/codev"; // Ensure SkillCategory is defined in your types
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
@@ -30,23 +32,55 @@ import { Textarea } from "@codevs/ui/textarea";
 // Constants based on schema
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
-const TASK_TYPES = ["feature", "bug", "improvement", "documentation"];
+const TASK_TYPES = ["feature", "bug", "improvement", "documentation"].map(
+  (type) => type.toUpperCase(),
+);
 
 interface TaskModalData {
   listId: string;
   listName: string;
+  projectId: string;
 }
 
 const TaskAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskAddModal";
   const router = useRouter();
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+
+  // State for the primary assignee (only one allowed)
+  const [mainAssignee, setMainAssignee] = useState<string>("");
+  // State for sidekick helpers (multiple allowed)
+  const [sidekicks, setSidekicks] = useState<string[]>([]);
+  // State for skill categories
+  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
+
+  // Fetch skill categories from Supabase
+  useEffect(() => {
+    async function loadSkillCategories() {
+      const supabase = createClientComponentClient();
+      const { data, error } = await supabase
+        .from("skill_category")
+        .select("id, name");
+      if (error) {
+        console.error("Error fetching skill categories:", error.message);
+      } else if (data) {
+        setSkillCategories(data);
+      }
+    }
+    loadSkillCategories();
+  }, []);
 
   const validateInput = (formData: FormData) => {
     const title = formData.get("title");
     if (!title) {
       throw new Error("Title is required");
+    }
+    if (!mainAssignee) {
+      throw new Error("A primary assignee is required");
+    }
+    const skillCategoryId = formData.get("skill_category_id");
+    if (!skillCategoryId) {
+      throw new Error("Skill category is required");
     }
   };
 
@@ -54,9 +88,12 @@ const TaskAddModal = () => {
     try {
       validateInput(formData);
 
-      // Add selected members to form data
-      if (selectedMembers.length > 0) {
-        formData.append("sidekick_ids", selectedMembers.join(","));
+      // Add primary assignee to form data (stored as "codev_id")
+      formData.append("codev_id", mainAssignee);
+
+      // If there are sidekicks, add them (as comma-separated string)
+      if (sidekicks.length > 0) {
+        formData.append("sidekick_ids", sidekicks.join(","));
       }
 
       const response = await createNewTask(formData);
@@ -176,19 +213,58 @@ const TaskAddModal = () => {
               name="pr_link"
               placeholder="Enter PR link"
             />
+
+            {/* Skill Category Dropdown (Required) */}
+            <div>
+              <label>Skill Category</label>
+              <Select name="skill_category_id" required>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select skill category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {skillCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <KanbanAddModalMembers
-            onMembersChange={(memberIds: string[]) => {
-              setSelectedMembers(memberIds);
-            }}
-          />
+          {/* Primary Assignee: Allow only a single selection */}
+          <div className="mt-4">
+            <Label>Primary Assignee</Label>
+            <KanbanAddModalMembers
+              singleSelection={true}
+              onMembersChange={(memberIds: string[]) => {
+                // With singleSelection enabled, we expect one value only.
+                setMainAssignee(memberIds[0] || "");
+              }}
+              projectId={data?.projectId}
+            />
+          </div>
+
+          {/* Sidekick Helpers: Multiple selection allowed.
+              Disable the primary assignee so they cannot be selected as a sidekick */}
+          <div className="mt-4">
+            <Label>Sidekick Helpers (each gets half the total points)</Label>
+            <KanbanAddModalMembers
+              onMembersChange={(memberIds: string[]) => {
+                setSidekicks(memberIds);
+              }}
+              projectId={data?.projectId}
+              disabledMembers={mainAssignee ? [mainAssignee] : []}
+            />
+          </div>
 
           <div>
             <label>Description</label>
             <Textarea
               name="description"
-              className="h-32 resize-none"
+              className="border-black-800 bg-black-800 h-32 resize-none"
               placeholder="Add task description..."
             />
           </div>

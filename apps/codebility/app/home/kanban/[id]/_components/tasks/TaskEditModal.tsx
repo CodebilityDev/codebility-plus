@@ -1,9 +1,8 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import Image from "next/image";
 import { useRouter } from "next/navigation";
-import KanbanAddModalMembers from "@/app/home/kanban/[id]/_components/kanban_modals/kanban-add-modal-members";
+import KanbanAddModalMembers from "@/app/home/kanban/[id]/_components/kanban_modals/KanbanAddModalMembers";
 import { updateTask } from "@/app/home/kanban/[id]/actions";
 import { Button } from "@/Components/ui/button";
 import {
@@ -22,11 +21,12 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
-import { IconCopy } from "@/public/assets/svgs";
-import { Task } from "@/types/home/codev";
+import { SkillCategory, Task } from "@/types/home/codev";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
+import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 // Define constants based on your schema
@@ -53,8 +53,29 @@ const TaskEditModal = ({ task }: Props) => {
     pr_link: "",
     points: 0,
     sidekick_ids: [],
+    skill_category_id: "", // NEW field
   });
 
+  // State for skill categories
+  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
+
+  // Fetch available skill categories from Supabase
+  useEffect(() => {
+    async function loadSkillCategories() {
+      const supabase = createClientComponentClient();
+      const { data, error } = await supabase
+        .from("skill_category")
+        .select("id, name");
+      if (error) {
+        console.error("Error fetching skill categories:", error.message);
+      } else if (data) {
+        setSkillCategories(data);
+      }
+    }
+    loadSkillCategories();
+  }, []);
+
+  // When the modal opens, initialize the form fields from the passed data
   useEffect(() => {
     if (data && isModalOpen) {
       setTaskData({
@@ -66,14 +87,29 @@ const TaskEditModal = ({ task }: Props) => {
         pr_link: data.pr_link || "",
         points: data.points || 0,
         sidekick_ids: data.sidekick_ids || [],
+        skill_category_id: data.skill_category_id || "", // initialize skill category
       });
     }
   }, [isModalOpen, data]);
+
+  const handleInputChange = (
+    key: keyof Task,
+    value: string | number | string[],
+  ) => {
+    setTaskData((prev) => ({ ...prev, [key]: value }));
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     try {
+      // Validate required fields
+      const title = taskData.title;
+      if (!title) throw new Error("Title is required");
+      if (!taskData.skill_category_id) {
+        throw new Error("Skill category is required");
+      }
+
       const formData = new FormData();
       Object.entries(taskData).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
@@ -94,17 +130,12 @@ const TaskEditModal = ({ task }: Props) => {
       }
     } catch (error) {
       console.error("Error updating task:", error);
-      toast.error("Something went wrong.");
+      toast.error(
+        error instanceof Error ? error.message : "Something went wrong.",
+      );
     } finally {
       onClose();
     }
-  };
-
-  const handleInputChange = (
-    key: keyof Task,
-    value: string | number | string[],
-  ) => {
-    setTaskData((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -183,14 +214,58 @@ const TaskEditModal = ({ task }: Props) => {
               value={taskData.pr_link}
               onChange={(e) => handleInputChange("pr_link", e.target.value)}
             />
+
+            {/* Skill Category Dropdown (Required) */}
+            <div className="flex flex-col gap-2">
+              <label>Skill Category</label>
+              <Select
+                value={taskData.skill_category_id}
+                onValueChange={(value) =>
+                  handleInputChange("skill_category_id", value)
+                }
+                required
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select Skill Category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {skillCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <KanbanAddModalMembers
-            initialSelectedMembers={taskData.sidekick_ids}
-            onMembersChange={(memberIds) =>
-              handleInputChange("sidekick_ids", memberIds)
-            }
-          />
+          {/* Primary Assignee: Allow only a single selection */}
+          <div className="mt-4">
+            <Label>Primary Assignee</Label>
+            <KanbanAddModalMembers
+              singleSelection={true}
+              onMembersChange={(memberIds: string[]) => {
+                // With singleSelection enabled, we expect one value only.
+                handleInputChange("codev_id", memberIds[0] || "");
+              }}
+              projectId={data?.projectId}
+            />
+          </div>
+
+          {/* Sidekick Helpers: Multiple selection allowed. Disable primary assignee */}
+          <div className="mt-4">
+            <Label>Sidekick Helpers (each gets half the total points)</Label>
+            <KanbanAddModalMembers
+              initialSelectedMembers={taskData.sidekick_ids}
+              onMembersChange={(memberIds) =>
+                handleInputChange("sidekick_ids", memberIds)
+              }
+              projectId={data?.projectId}
+              disabledMembers={taskData.codev_id ? [taskData.codev_id] : []}
+            />
+          </div>
 
           <div className="flex flex-col gap-2">
             <label>Description</label>

@@ -1,8 +1,8 @@
-// KanbanAddModalMembers.tsx
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/Components/ui/button";
 import { IconPlus } from "@/public/assets/svgs";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,7 +10,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@radix-ui/react-dropdown-menu";
+} from "@codevs/ui/dropdown-menu";
 
 import { fetchAvailableMembers } from "../../actions";
 
@@ -24,11 +24,19 @@ interface CodevMember {
 interface Props {
   initialSelectedMembers?: string[]; // Array of member IDs
   onMembersChange?: (memberIds: string[]) => void;
+  projectId: string;
+  /** Optional list of member IDs that should be disabled from selection */
+  disabledMembers?: string[];
+  /** If true, only one member can be selected */
+  singleSelection?: boolean;
 }
 
 export default function KanbanAddModalMembers({
   initialSelectedMembers = [],
   onMembersChange,
+  projectId,
+  disabledMembers = [],
+  singleSelection = false,
 }: Props) {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>(
@@ -40,7 +48,7 @@ export default function KanbanAddModalMembers({
   useEffect(() => {
     const loadMembers = async () => {
       try {
-        const members = await fetchAvailableMembers();
+        const members = await fetchAvailableMembers(projectId);
         setAvailableMembers(members);
       } catch (error) {
         console.error("Error loading members:", error);
@@ -50,14 +58,18 @@ export default function KanbanAddModalMembers({
     };
 
     loadMembers();
-  }, []);
+  }, [projectId]);
 
   const selectedMembers = availableMembers.filter((member) =>
     selectedMemberIds.includes(member.id),
   );
 
   const addMember = (memberId: string) => {
-    if (!selectedMemberIds.includes(memberId)) {
+    if (singleSelection) {
+      // In single selection mode, always override the selection
+      setSelectedMemberIds([memberId]);
+      onMembersChange?.([memberId]);
+    } else if (!selectedMemberIds.includes(memberId)) {
       const newSelectedIds = [...selectedMemberIds, memberId];
       setSelectedMemberIds(newSelectedIds);
       onMembersChange?.(newSelectedIds);
@@ -150,31 +162,37 @@ export default function KanbanAddModalMembers({
                 No members found
               </div>
             ) : (
-              filteredMembers.map((member) => (
-                <DropdownMenuItem
-                  key={member.id}
-                  className="flex cursor-pointer items-center gap-2 px-2 py-1"
-                  onClick={() => addMember(member.id)}
-                  disabled={selectedMemberIds.includes(member.id)}
-                >
-                  {member.image_url ? (
-                    <Image
-                      src={member.image_url}
-                      alt={`${member.first_name}'s avatar`}
-                      width={24}
-                      height={24}
-                      className="rounded-full"
-                    />
-                  ) : (
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-sm">
-                      {member.first_name[0]}
-                    </div>
-                  )}
-                  <span className="flex-1 truncate">
-                    {member.first_name} {member.last_name}
-                  </span>
-                </DropdownMenuItem>
-              ))
+              filteredMembers.map((member) => {
+                // Disable if already selected or if present in the disabledMembers prop.
+                const isDisabled =
+                  selectedMemberIds.includes(member.id) ||
+                  disabledMembers.includes(member.id);
+                return (
+                  <DropdownMenuItem
+                    key={member.id}
+                    className="flex cursor-pointer items-center gap-2 px-2 py-1"
+                    onClick={() => addMember(member.id)}
+                    disabled={isDisabled}
+                  >
+                    {member.image_url ? (
+                      <Image
+                        src={member.image_url}
+                        alt={`${member.first_name}'s avatar`}
+                        width={24}
+                        height={24}
+                        className="rounded-full"
+                      />
+                    ) : (
+                      <div className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-200 text-sm">
+                        {member.first_name[0]}
+                      </div>
+                    )}
+                    <span className="flex-1 truncate">
+                      {member.first_name} {member.last_name}
+                    </span>
+                  </DropdownMenuItem>
+                );
+              })
             )}
           </DropdownMenuContent>
         </DropdownMenu>
