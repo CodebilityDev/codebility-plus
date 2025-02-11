@@ -1,6 +1,7 @@
 "use client";
 
 import { FormEvent, useState } from "react";
+import { useRouter } from "next/navigation";
 import { createNewColumn } from "@/app/home/kanban/[id]/actions";
 import { Button } from "@/Components/ui/button";
 import {
@@ -15,17 +16,26 @@ import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 
-const ColumnAddModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
-  const isModalOpen = isOpen && type === "ColumnAddModal";
-
+export default function KanbanColumnAddModal() {
+  const { isOpen, onClose, type, data: boardId } = useModal();
   const [columnName, setColumnName] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+  const isModalOpen = isOpen && type === "ColumnAddModal";
+
+  const validateColumnName = (name: string): boolean => {
+    // Add validation rules based on your database constraints
+    const trimmedName = name.trim();
+    if (!trimmedName) return false;
+    if (trimmedName.length < 1) return false;
+    // Add more validation rules as needed
+    return true;
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if (!columnName) {
+    if (!columnName.trim()) {
       toast.error("Please enter a column name.");
       return;
     }
@@ -33,52 +43,50 @@ const ColumnAddModal = () => {
     setIsLoading(true);
 
     try {
-      const response = await createNewColumn(columnName, data);
+      const response = await createNewColumn(columnName, boardId);
       if (response.success) {
-        toast.success("New column created successfully!");
+        toast.success("Column created successfully!");
+        router.refresh(); // Add this to refresh the page
+        onClose();
+        setColumnName("");
       } else {
-        console.error(response.error);
-        toast.error("Failed to create column.");
+        toast.error(response.error || "Failed to create column");
       }
     } catch (error) {
       console.error("Error creating column:", error);
       toast.error("Something went wrong!");
     } finally {
       setIsLoading(false);
-      onClose();
-      setColumnName("");
     }
   };
-
-  const handleClose = () => {
-    onClose();
-  };
-
   return (
-    <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      <DialogContent aria-describedby={undefined} className="w-[90%] max-w-3xl">
+    <Dialog open={isModalOpen} onOpenChange={onClose}>
+      <DialogContent className="w-[90%] max-w-3xl">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <DialogHeader className="relative">
+          <DialogHeader>
             <DialogTitle className="mb-2 text-left text-lg">
               Add Column
             </DialogTitle>
           </DialogHeader>
+
           <Input
-            id="name"
+            id="columnName"
             type="text"
             label="Column Name"
-            name="name"
             placeholder="Enter Column Name"
             className="dark:bg-dark-200"
             value={columnName}
             onChange={(e) => setColumnName(e.target.value)}
+            disabled={isLoading}
           />
+
           <DialogFooter className="flex flex-col gap-2 lg:flex-row">
             <Button
               type="button"
               variant="hollow"
               className="order-2 w-full sm:order-1 sm:w-[130px]"
-              onClick={handleClose}
+              onClick={onClose}
+              disabled={isLoading}
             >
               Cancel
             </Button>
@@ -88,13 +96,11 @@ const ColumnAddModal = () => {
               className="order-1 w-full sm:order-2 sm:w-[130px]"
               disabled={isLoading}
             >
-              {isLoading ? "Saving..." : "Save"}
+              {isLoading ? "Creating..." : "Create"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
   );
-};
-
-export default ColumnAddModal;
+}

@@ -4,7 +4,13 @@ import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { IconAdd } from "@/public/assets/svgs";
 
-export default function KanbanListAddModal({ boardId }: { boardId: string }) {
+interface KanbanColumnAddButtonProps {
+  boardId: string;
+}
+
+export default function KanbanColumnAddButton({
+  boardId,
+}: KanbanColumnAddButtonProps) {
   const { onOpen } = useModal();
 
   return (
@@ -14,7 +20,7 @@ export default function KanbanListAddModal({ boardId }: { boardId: string }) {
       onClick={() => onOpen("ColumnAddModal", boardId)}
     >
       <IconAdd />
-      <p>Add new list</p>
+      <p>Add column</p>
     </Button>
   );
 }
