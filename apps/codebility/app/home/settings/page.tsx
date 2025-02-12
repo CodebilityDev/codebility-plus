@@ -6,6 +6,7 @@ import SettingsCard from "@/app/home/settings/_components/settings-card";
 import { H1 } from "@/Components/shared/dashboard";
 import { settingsCardData } from "@/constants/settings";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import Loading from "./loading";
 
 type RolePermissions = {
   dashboard: boolean;
@@ -27,7 +28,7 @@ type PermissionKey = keyof RolePermissions;
 
 // Map specific settings routes to their respective permission keys.
 const settingsPermissionMap: Record<string, PermissionKey> = {
-  "/home/settings/resume": "resume",
+  "/home/settings/profile": "resume",
   "/home/settings/permissions": "permissions",
   "/home/settings/roles": "roles",
 };
@@ -75,7 +76,7 @@ const Settings = () => {
   }, [supabase, roleId]);
 
   if (loading) {
-    return <div className="mx-auto p-4">Loading...</div>;
+    return <Loading />;
   }
 
   if (!rolePermissions) {

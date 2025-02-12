@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { H1 } from "@/Components/shared/dashboard";
 import CustomBreadcrumb from "@/Components/shared/dashboard/CustomBreadcrumb";
 import { useUserStore } from "@/store/codev-store";
@@ -16,13 +16,22 @@ import PersonalInfo from "./_components/PersonalInfo";
 import Photo from "./_components/Photo";
 import Skills from "./_components/Skills";
 import TimeSchedule from "./_components/TimeSchedule";
+import Loading from "./loading";
 
 const items = [
   { label: "Settings", href: "/home/settings" },
-  { label: "Resume" },
+  { label: "Profile" },
 ];
 
-const Resume = () => {
+export default function Profile() {
+  return (
+    <Suspense fallback={<Loading />}>
+      <ProfileComponent />
+    </Suspense>
+  );
+}
+
+const ProfileComponent = () => {
   const { user, isLoading: userLoading } = useUserStore();
   const [isLoading, setIsLoading] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -92,11 +101,7 @@ const Resume = () => {
 
   // Show loading during hydration or user loading
   if (!isHydrated || userLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-lg">Loading...</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   // Check authentication
@@ -109,11 +114,7 @@ const Resume = () => {
   }
 
   if (isLoading) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <div className="text-lg">Loading your resume data...</div>
-      </div>
-    );
+    return <Loading />;
   }
 
   if (error) {
@@ -135,7 +136,7 @@ const Resume = () => {
       <CustomBreadcrumb items={items} />
       <Toaster position="top-center" reverseOrder={false} />
       <div className="flex flex-col gap-4 pt-4">
-        <H1>Resume Settings</H1>
+        <H1>Profile Settings</H1>
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8 2xl:basis-[60%]">
             <PersonalInfo data={codevData} />
@@ -168,5 +169,3 @@ const Resume = () => {
     </div>
   );
 };
-
-export default Resume;
