@@ -20,8 +20,13 @@ import {
 import { signOut } from "../../auth/actions";
 import MobileNav from "./MobileNav";
 
-export const menuItems = [
+export const defaultMenuItems = [
+  { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
+];
+
+export const adminMenus = [
   { href: "/home/account-settings", icon: IconProfile, label: "Settings" },
+  { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
 ];
 
 const Navbar = () => {
@@ -38,7 +43,9 @@ const Navbar = () => {
   // // Return null while redirecting to prevent rendering
   if (!user) return null;
 
-  const { first_name, last_name, email_address, image_url } = user;
+  const { first_name, last_name, email_address, image_url, role_id } = user;
+
+  const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
 
   return (
     <nav className="background-navbar fixed top-0 z-10 w-full shadow-sm">
