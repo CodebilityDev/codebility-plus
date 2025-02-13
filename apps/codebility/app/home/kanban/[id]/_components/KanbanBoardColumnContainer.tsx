@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { KanbanColumnType, Task } from "@/types/home/codev";
+import { debounce } from "@/utils/debounce";
 import {
   closestCenter,
   DndContext,
@@ -25,19 +26,6 @@ import toast from "react-hot-toast";
 import { updateColumnPosition } from "../actions";
 import KanbanColumn from "./KanbanColumn";
 
-// ----- Debounce Utility -----
-function debounce<F extends (...args: any[]) => any>(func: F, delay: number) {
-  let timeoutId: NodeJS.Timeout | null = null;
-  return (...args: Parameters<F>) => {
-    if (timeoutId) clearTimeout(timeoutId);
-    timeoutId = setTimeout(() => {
-      func(...args);
-      timeoutId = null;
-    }, delay);
-  };
-}
-
-// ----- Batch Update for Tasks -----
 async function batchUpdateTasks(
   updates: Array<{ taskId: string; newColumnId: string }>,
 ) {
@@ -69,16 +57,11 @@ async function batchUpdateTasks(
   }
 }
 
-// ----- Component Props & DnD Data Interface -----
 interface Props {
   columns: KanbanColumnType[];
   projectId: string;
 }
 
-/**
- * Our custom drag-and-drop data interface.
- * When dragging a task, we attach its originating column via `columnId`.
- */
 interface DnDData {
   type: "Column" | "Task";
   columnId?: string;
@@ -148,10 +131,17 @@ export default function KanbanBoardColumnContainer({
     }
   }, [pendingUpdates, debouncedBatchUpdate]);
 
-  // Set up DnD sensors.
   const sensors = useSensors(
-    useSensor(PointerSensor, { activationConstraint: { distance: 5 } }),
-    useSensor(TouchSensor, { activationConstraint: { distance: 5 } }),
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: {
+        distance: 10,
+      },
+    }),
   );
 
   const handleDragStart = (event: DragStartEvent) => {
@@ -167,20 +157,22 @@ export default function KanbanBoardColumnContainer({
       const { active, over } = event;
       if (!over) return;
 
-      // Cast drag data to our DnDData interface.
       const activeData = active.data.current as DnDData | undefined;
       const overData = over.data.current as DnDData | undefined;
       if (!activeData || !overData) return;
 
-      // -------- Handle Column Drag --------
+      // Column Reordering
       if (activeData.type === "Column" && overData.type === "Column") {
         const oldIndex = boardData.findIndex((col) => col.id === active.id);
         const newIndex = boardData.findIndex((col) => col.id === over.id);
+
         if (oldIndex === -1 || newIndex === -1 || oldIndex === newIndex) return;
 
         const newCols = arrayMove(boardData, oldIndex, newIndex);
+
         setBoardData(newCols);
         setOrderedColumns(newCols);
+
         try {
           await Promise.all(
             newCols.map((column, index) =>
@@ -189,59 +181,64 @@ export default function KanbanBoardColumnContainer({
           );
           router.refresh();
         } catch (error) {
-          console.error("Failed to update column positions", error);
+          console.error("Column reorder error:", error);
           toast.error("Failed to reorder columns");
         }
         return;
       }
 
-      // -------- Handle Task Drag --------
-      if (activeData.type === "Task" && overData.type === "Column") {
-        // Ensure we have a valid column ID
+      // Task Drag
+      if (
+        activeData.type === "Task" &&
+        (overData.type === "Column" || overData.type === "Task")
+      ) {
         const activeColId = activeData.columnId;
-        const overColId = overData.columnId;
+        const overColId =
+          overData.type === "Column" ? overData.columnId : overData.columnId;
+
         if (!activeColId || !overColId) return;
 
-        // Find column indices with type guard
-        const oldColumnIndex = boardData.findIndex(
+        const updatedBoard = structuredClone(boardData);
+        const oldColumnIndex = updatedBoard.findIndex(
           (col) => col.id === activeColId,
         );
-        const newColumnIndex = boardData.findIndex(
+        const newColumnIndex = updatedBoard.findIndex(
           (col) => col.id === overColId,
         );
+
         if (oldColumnIndex === -1 || newColumnIndex === -1) return;
 
-        // Create a mutable copy of boardData
-        const updatedBoard = [...boardData];
+        const oldColumn = updatedBoard[oldColumnIndex];
+        const newColumn = updatedBoard[newColumnIndex];
 
-        // Safely get old and new columns with non-null assertion
-        const oldColumn = updatedBoard[oldColumnIndex]!;
-        const newColumn = updatedBoard[newColumnIndex]!;
+        if (!oldColumn || !newColumn) return;
 
-        // Ensure tasks arrays exist
         oldColumn.tasks = oldColumn.tasks ?? [];
         newColumn.tasks = newColumn.tasks ?? [];
 
-        // Find the task to move
         const activeTaskIndex = oldColumn.tasks.findIndex(
           (t) => t.id === active.id,
         );
         if (activeTaskIndex === -1) return;
 
-        // Safely remove task from old column
-        const [movedTask] = oldColumn.tasks.splice(activeTaskIndex, 1);
+        const movedTask = oldColumn.tasks.splice(activeTaskIndex, 1)[0];
         if (!movedTask) return;
 
-        // Update task's column ID
         movedTask.kanban_column_id = overColId;
 
-        // Add task to new column at the beginning
-        newColumn.tasks.unshift(movedTask);
+        // If dragging over another task, insert at that task's index
+        if (overData.type === "Task") {
+          const overTaskIndex = newColumn.tasks.findIndex(
+            (t) => t.id === over.id,
+          );
+          newColumn.tasks.splice(overTaskIndex, 0, movedTask);
+        } else {
+          // If dragging to column, add to the end
+          newColumn.tasks.push(movedTask);
+        }
 
-        // Update board state
         setBoardData(updatedBoard);
 
-        // Queue DB update
         setPendingUpdates((prev) => [
           ...prev,
           { taskId: movedTask.id, newColumnId: overColId },
