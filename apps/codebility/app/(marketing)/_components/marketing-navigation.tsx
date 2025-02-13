@@ -16,7 +16,8 @@ import {
   IconProfile,
 } from "@/public/assets/svgs";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { Activity, ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
+import applicationStatusIcon from "@/public/assets/svgs/icon-applicant.svg";
 
 import {
   DropdownMenu,
@@ -40,21 +41,23 @@ const NAV_ITEMS = [
   { id: "4", title: "Hire a CoDevs", path: "/codevs" },
 ] as const;
 
-const getMenuItems = (status: string) => {
+const getMenuItems = (status: string, role_id: number) => {
   if (status === "rejected" || status === "applying") {
     return [
       {
         href: status === "rejected" ? "/auth/declined" : "/auth/waiting",
-        icon: Activity,
+        icon: applicationStatusIcon,
         label: "Status",
       },
-      { href: "/profile", icon: IconProfile, label: "Profile" },
+      { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
     ];
   }
-  return [
-    { href: "/home", icon: IconDashboard, label: "Dashboard" },
-    { href: "/home/account-settings", icon: IconProfile, label: "Settings" },
-  ];
+  return role_id === 1
+    ? [
+        { href: "/home", icon: IconDashboard, label: "Dashboard" },
+        { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
+      ]
+    : [{ href: "/home/settings/profile", icon: IconProfile, label: "Profile" }];
 };
 
 const MobileDrawer = ({
@@ -114,6 +117,7 @@ const UserMenu = ({
   email,
   image_url,
   application_status,
+  role_id,
   handleLogout,
 }: {
   first_name: string;
@@ -121,6 +125,7 @@ const UserMenu = ({
   email: string;
   image_url: string;
   application_status: string;
+  role_id: number;
   handleLogout: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -153,7 +158,7 @@ const UserMenu = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="dark:bg-dark-100 bg-dark-100 absolute -left-24 top-3 border-zinc-700 md:w-[200px]">
-        {getMenuItems(application_status).map((item) => (
+        {getMenuItems(application_status, role_id).map((item) => (
           <Link key={item.label} href={item.href}>
             <DropdownMenuItem
               className="flex cursor-pointer items-center gap-6 p-3 px-5"
@@ -224,6 +229,7 @@ const Navigation = () => {
           }
 
           setUserData(userData);
+    
         } else {
           setUserData(null); // Ensure userData is cleared if no session
         }
