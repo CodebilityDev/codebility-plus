@@ -1,11 +1,25 @@
+"use client";
+
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/Components/ui/button";
 import { useUserStore } from "@/store/codev-store";
 import { ExtendedTask } from "@/types/home/codev";
-import { SortableContext, useSortable } from "@dnd-kit/sortable";
+import { useDroppable } from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { Check, MoreHorizontal, Pencil, Trash2, X } from "lucide-react";
+import {
+  Check,
+  GripVertical,
+  MoreHorizontal,
+  Pencil,
+  Trash2,
+  X,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
 import {
@@ -18,7 +32,8 @@ import { Input } from "@codevs/ui/input";
 
 import { deleteColumn, updateColumnName } from "../actions";
 import KanbanTaskAddModal from "./kanban_modals/KanbanTaskAddModal";
-import KanbanTask from "./KanbanTask";
+/** IMPORTANT: This is where you import the sortable task component. */
+import KanbanTask from "./KanbanTask"; // (see #2 below)
 
 interface Props {
   column: {
@@ -26,7 +41,7 @@ interface Props {
     name: string;
   };
   projectId: string;
-  tasks: ExtendedTask[];
+  tasks?: ExtendedTask[]; // Make tasks optional so it can default to an empty array if undefined.
 }
 
 export default function KanbanColumn({ column, projectId, tasks }: Props) {
@@ -35,17 +50,19 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(column.name);
 
-  // Only roles 1 and 5 can modify columns.
+  const safeTasks = tasks ?? [];
+
+  // Example roles that can modify columns:
   const canModifyColumn = user?.role_id === 1 || user?.role_id === 5;
 
-  // Set up the sortable container for the column itself.
+  // 1) Make the whole column "sortable" so we can reorder columns horizontally
   const {
-    setNodeRef,
+    setNodeRef: setColumnRef,
     attributes,
     listeners,
     transform,
     transition,
-    isDragging,
+    isDragging: isColumnDragging,
   } = useSortable({
     id: column.id,
     data: {
@@ -54,21 +71,45 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
     },
   });
 
-  const style = {
+  // 2) Make the column droppable for tasks
+  const { setNodeRef: setDroppableRef, isOver } = useDroppable({
+    id: `column-${column.id}-tasks`,
+    data: {
+      type: "Column",
+      columnId: column.id,
+    },
+  });
+
+  // Apply transform for the column itself
+  const columnStyle = {
     transform: CSS.Transform.toString(transform),
     transition,
+    zIndex: isColumnDragging ? 999 : undefined,
   };
 
-  // Create an array of task IDs for use with SortableContext.
-  const taskIds = useMemo(() => tasks.map((task) => task.id), [tasks]);
+  // Sorted tasks by updated_at (DESC) using safeTasks array
+  const sortedTasks = useMemo(() => {
+    return [...safeTasks].sort((a, b) => {
+      const dateA = a.updated_at ? new Date(a.updated_at).getTime() : 0;
+      const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
+      return dateB - dateA;
+    });
+  }, [safeTasks]);
 
+  // The array of task IDs for our SortableContext
+  const taskIds = useMemo(
+    () => sortedTasks.map((task) => task.id),
+    [sortedTasks],
+  );
+
+  // Handle column deletion
   const handleDelete = async () => {
     if (!canModifyColumn) {
       toast.error("You don't have permission to delete columns");
       return;
     }
 
-    if (tasks.length > 0) {
+    if (safeTasks.length > 0) {
       toast.error("Cannot delete column with tasks");
       return;
     }
@@ -84,6 +125,7 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
     }
   };
 
+  // Handle column rename
   const handleUpdateName = async () => {
     if (!canModifyColumn) {
       toast.error("You don't have permission to edit columns");
@@ -107,15 +149,23 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
 
   return (
     <li
-      ref={setNodeRef}
-      style={style}
-      className={`flex h-full min-w-[18rem] flex-col overflow-hidden rounded-md border-2 ${
-        isDragging
-          ? "border-blue-500 opacity-50"
-          : "border-zinc-200 dark:border-zinc-700"
-      } bg-[#FCFCFC] dark:bg-[#2C303A]`}
+      ref={setColumnRef}
+      style={columnStyle}
+      className={`
+        relative flex h-full w-[400px] min-w-[400px] flex-col overflow-hidden
+        rounded-md border-2
+        ${
+          isColumnDragging
+            ? "border-blue-500 opacity-50 shadow-lg"
+            : isOver
+              ? "border-blue-300 dark:border-blue-500"
+              : "border-zinc-200 dark:border-zinc-700"
+        }
+        bg-[#FCFCFC] transition-all duration-200 dark:bg-[#2C303A]
+      `}
       {...attributes}
     >
+      {/* Column Header (grab handle) */}
       <div
         className="flex items-center justify-between p-3 font-bold dark:bg-[#1E1F26]"
         {...listeners}
@@ -148,14 +198,18 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
             </div>
           ) : (
             <>
+              {/* Drag handle icon */}
+              <GripVertical className="h-4 w-4 text-gray-400" />
               {column.name}
+              {/* Task count */}
               <div className="flex items-center justify-center rounded-full bg-zinc-300 px-3 py-1 text-sm dark:bg-[#1C1C1C]">
-                {tasks.length}
+                {safeTasks.length}
               </div>
             </>
           )}
         </div>
 
+        {/* Column actions */}
         {!isEditing && canModifyColumn && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -174,7 +228,7 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleDelete}
-                disabled={tasks.length > 0}
+                disabled={safeTasks.length > 0}
                 className="text-red-500 focus:text-red-500"
               >
                 <Trash2 className="mr-2 h-3 w-3" />
@@ -185,21 +239,41 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
         )}
       </div>
 
+      {/* Column Body (Droppable + SortableContext for tasks) */}
       <div className="flex flex-grow flex-col px-2 pb-2">
-        {/* Tasks Container: Assign a unique id for droppable detection and remove fixed height/scroll */}
-        <div id={`column-${column.id}-tasks`} className="flex flex-col gap-4">
-          <SortableContext items={taskIds}>
-            {tasks.map((task) => (
-              <KanbanTask key={task.id} task={task} />
-            ))}
+        <div
+          ref={setDroppableRef}
+          role="region"
+          aria-label={`Tasks in ${column.name} column`}
+          className={`
+            flex min-h-[100px] flex-col gap-4 rounded-md p-2
+            transition-colors duration-200
+            ${isOver ? "border-2 border-blue-200 bg-blue-50 dark:bg-blue-900/20" : ""}
+          `}
+        >
+          <SortableContext
+            items={taskIds}
+            strategy={verticalListSortingStrategy}
+          >
+            {sortedTasks.length === 0 ? (
+              <div className="py-4 text-center text-gray-400">
+                No tasks in this column
+              </div>
+            ) : (
+              sortedTasks.map((task) => (
+                <KanbanTask key={task.id} task={task} columnId={column.id} />
+              ))
+            )}
           </SortableContext>
         </div>
+
+        {/* Add new task button/modal */}
         <div className="pt-2">
           <KanbanTaskAddModal
             listId={column.id}
-            totalTask={tasks.length}
             listName={column.name}
             projectId={projectId}
+            totalTask={safeTasks.length}
           />
         </div>
       </div>

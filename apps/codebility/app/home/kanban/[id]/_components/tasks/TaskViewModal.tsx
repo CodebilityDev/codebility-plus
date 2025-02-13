@@ -15,6 +15,7 @@ import {
   Select,
   SelectContent,
   SelectGroup,
+  SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
@@ -30,25 +31,40 @@ import {
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
 import { Input } from "@codevs/ui/input";
+import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
-// Constants matching your schema (if needed for display)
+interface CodevMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  image_url?: string | null;
+}
+
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
+
+// Utility function to capitalize the first letter
+const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 const TaskViewModal = () => {
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task;
 
-  // State to hold the fetched skill category details
+  // State for Skill Category, Sidekick Details, and Primary Assignee
   const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(
     null,
   );
+  const [sidekickDetails, setSidekickDetails] = useState<CodevMember[]>([]);
+  const [primaryAssignee, setPrimaryAssignee] = useState<CodevMember | null>(
+    null,
+  );
 
+  // Set the skill category from the task
   useEffect(() => {
-    async function fetchSkillCategory() {
-      if (task?.skill_category_id) {
+    if (task?.skill_category_id) {
+      const fetchSkillCategory = async () => {
         const supabase = createClientComponentClient();
         const { data, error } = await supabase
           .from("skill_category")
@@ -58,122 +74,258 @@ const TaskViewModal = () => {
         if (!error && data) {
           setSkillCategory(data as SkillCategory);
         }
-      }
+      };
+      fetchSkillCategory();
     }
-    fetchSkillCategory();
   }, [task?.skill_category_id]);
+
+  // Fetch sidekick details to display their images
+  useEffect(() => {
+    const fetchSidekickDetails = async () => {
+      if (task?.sidekick_ids && task.sidekick_ids.length > 0) {
+        const supabase = createClientComponentClient();
+        const { data, error } = await supabase
+          .from("codev")
+          .select("id, first_name, last_name, image_url")
+          .in("id", task.sidekick_ids);
+        if (!error && data) {
+          setSidekickDetails(data as CodevMember[]);
+        }
+      }
+    };
+    fetchSidekickDetails();
+  }, [task?.sidekick_ids]);
+
+  // Fetch primary assignee details using the codev_id field
+  useEffect(() => {
+    const fetchPrimaryAssignee = async () => {
+      if (task?.codev_id) {
+        const supabase = createClientComponentClient();
+        const { data, error } = await supabase
+          .from("codev")
+          .select("id, first_name, last_name, image_url")
+          .eq("id", task.codev_id)
+          .single();
+        if (!error && data) {
+          setPrimaryAssignee(data as CodevMember);
+        }
+      }
+    };
+    fetchPrimaryAssignee();
+  }, [task?.codev_id]);
+
+  if (!isModalOpen) return null;
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]">
-        <div className="flex flex-col gap-4 p-4">
-          {/* Header */}
+      <DialogContent className="h-[90vh] w-[90%] max-w-3xl overflow-y-auto bg-white dark:bg-gray-900 lg:h-auto">
+        <div className="flex flex-col gap-6">
+          {/* Header with Title and Dropdown Menu */}
           <div className="flex items-center justify-between">
             <DialogHeader>
-              <DialogTitle className="break-words text-left text-lg font-bold">
+              <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
                 {task?.title}
               </DialogTitle>
             </DialogHeader>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Ellipsis className="cursor-pointer" />
+                <Ellipsis className="h-5 w-5" />
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start">
-                <DropdownMenuItem
-                  onClick={() => onOpen("taskEditModal", task)}
-                  className="cursor-pointer"
-                >
-                  <span>Edit</span>
+              <DropdownMenuContent align="end" className="w-32">
+                <DropdownMenuItem onClick={() => onOpen("taskEditModal", task)}>
+                  Edit
                 </DropdownMenuItem>
                 <DropdownMenuItem
                   onClick={() => onOpen("taskDeleteModal", task)}
-                  className="cursor-pointer"
+                  className="text-red-500 focus:text-red-500"
                 >
-                  <span>Delete</span>
+                  Delete
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           </div>
 
-          {/* Form-like Grid Display */}
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input label="Task Title" value={task?.title} disabled />
+          {/* Task Details Grid */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* Task Title */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Task Title</Label>
+              <Input
+                value={task?.title}
+                disabled
+                className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+              />
+            </div>
 
-            <Input
-              label="Points"
-              type="number"
-              value={task?.points || 0}
-              disabled
-            />
+            {/* Points */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Points</Label>
+              <Input
+                type="number"
+                value={task?.points || 0}
+                disabled
+                className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+              />
+            </div>
 
-            <div>
-              <label>Priority</label>
+            {/* Priority */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Priority</Label>
               <Select disabled>
-                <SelectTrigger>
+                <SelectTrigger className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue placeholder={task?.priority || "None"} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectGroup />
+                  <SelectGroup>
+                    {PRIORITY_LEVELS.map((level) => (
+                      <SelectItem
+                        key={level}
+                        value={level}
+                        className="capitalize"
+                      >
+                        {level}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
 
-            <div>
-              <label>Difficulty</label>
+            {/* Difficulty (capitalized) */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Difficulty</Label>
               <Select disabled>
-                <SelectTrigger>
-                  <SelectValue placeholder={task?.difficulty || "None"} />
+                <SelectTrigger className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                  <SelectValue
+                    placeholder={
+                      task?.difficulty ? capitalize(task.difficulty) : "None"
+                    }
+                  />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectGroup />
+                  <SelectGroup>
+                    {DIFFICULTY_LEVELS.map((level) => (
+                      <SelectItem
+                        key={level}
+                        value={level}
+                        className="capitalize"
+                      >
+                        {capitalize(level)}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
                 </SelectContent>
               </Select>
             </div>
 
-            <Input
-              label="Pull Request Link"
-              value={task?.pr_link || ""}
-              disabled
-            />
+            {/* Task Type */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Task Type</Label>
+              <Input
+                value={task?.type || "None"}
+                disabled
+                className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+              />
+            </div>
 
-            {/* Skill Category Badge */}
-            <div>
-              <label>Skill Category</label>
+            {/* PR Link */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">PR Link</Label>
+              <Input
+                value={task?.pr_link || ""}
+                disabled
+                className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+              />
+            </div>
+
+            {/* Skill Category */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Skill Category</Label>
               {skillCategory ? (
-                <div className="inline-block rounded-full bg-blue-100 px-2 py-1 text-xs font-semibold text-blue-800">
+                <div className="rounded-md bg-blue-50 p-2 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
                   {skillCategory.name}
                 </div>
               ) : (
-                <div className="text-sm text-gray-500">None</div>
+                <div className="text-sm text-gray-500">None assigned</div>
               )}
+            </div>
+
+            {/* Primary Assignee */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Primary Assignee</Label>
+              <div className="flex items-center gap-2">
+                {primaryAssignee && primaryAssignee.image_url ? (
+                  <Image
+                    src={primaryAssignee.image_url}
+                    alt={`${primaryAssignee.first_name} ${primaryAssignee.last_name}`}
+                    width={32}
+                    height={32}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <DefaultAvatar size={32} />
+                )}
+                <span>
+                  {primaryAssignee
+                    ? `${primaryAssignee.first_name} ${primaryAssignee.last_name}`
+                    : "Unassigned"}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* Sidekick Avatars */}
+          {/* Sidekick Team Members */}
           {task?.sidekick_ids && task.sidekick_ids.length > 0 && (
-            <div className="flex flex-wrap items-center gap-2">
-              {task.sidekick_ids.map((memberId) => (
-                <div key={memberId} className="relative h-12 w-12 rounded-full">
-                  {/* Here we use DefaultAvatar as a placeholder.
-                      You could replace this with actual member image if available. */}
-                  <DefaultAvatar size={48} />
-                </div>
-              ))}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Team Members</Label>
+              <div className="flex -space-x-2">
+                {sidekickDetails.length > 0
+                  ? sidekickDetails.map((member) => (
+                      <div
+                        key={member.id}
+                        className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
+                      >
+                        {member.image_url ? (
+                          <Image
+                            src={member.image_url}
+                            alt={`${member.first_name} ${member.last_name}`}
+                            width={32}
+                            height={32}
+                            className="rounded-full object-cover"
+                          />
+                        ) : (
+                          <DefaultAvatar size={32} />
+                        )}
+                      </div>
+                    ))
+                  : task.sidekick_ids.map((memberId) => (
+                      <div
+                        key={memberId}
+                        className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
+                      >
+                        <DefaultAvatar size={32} />
+                      </div>
+                    ))}
+              </div>
             </div>
           )}
 
           {/* Description */}
-          <div>
-            <label>Description</label>
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Description</Label>
             <Textarea
               value={task?.description || "No description provided"}
-              className="h-32 resize-none"
               disabled
+              className="min-h-[120px] resize-none border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
             />
           </div>
 
           <DialogFooter>
-            <Button onClick={onClose} className="w-full sm:w-auto">
+            <Button
+              variant="outline"
+              onClick={onClose}
+              className="w-full bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 sm:w-auto"
+            >
               Close
             </Button>
           </DialogFooter>

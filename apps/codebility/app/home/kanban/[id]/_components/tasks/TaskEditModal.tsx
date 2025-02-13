@@ -29,10 +29,9 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
-// Define constants based on your schema
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
-const TASK_TYPES = ["feature", "bug", "improvement", "documentation"];
+const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"];
 
 interface Props {
   task?: Task;
@@ -40,10 +39,12 @@ interface Props {
 
 const TaskEditModal = ({ task }: Props) => {
   const { isOpen, onClose, type, data } = useModal();
+
   const isModalOpen = isOpen && type === "taskEditModal";
   const router = useRouter();
 
-  // State based on your Task schema
+  const [loading, setLoading] = useState(false);
+
   const [taskData, setTaskData] = useState<Partial<Task>>({
     title: "",
     description: "",
@@ -53,32 +54,33 @@ const TaskEditModal = ({ task }: Props) => {
     pr_link: "",
     points: 0,
     sidekick_ids: [],
-    skill_category_id: "", // NEW field
+    skill_category_id: "",
+    codev_id: "", // Primary assignee
   });
 
-  // State for skill categories
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
 
-  // Fetch available skill categories from Supabase
+  // Fetch skill categories (same as in TaskAddModal)
   useEffect(() => {
-    async function loadSkillCategories() {
+    const loadSkillCategories = async () => {
       const supabase = createClientComponentClient();
       const { data, error } = await supabase
         .from("skill_category")
-        .select("id, name");
+        .select("id, name")
+        .order("name");
+
       if (error) {
-        console.error("Error fetching skill categories:", error.message);
+        toast.error("Failed to load skill categories");
       } else if (data) {
         setSkillCategories(data);
       }
-    }
+    };
     loadSkillCategories();
   }, []);
 
-  // When the modal opens, initialize the form fields from the passed data
   useEffect(() => {
     if (data && isModalOpen) {
-      setTaskData({
+      const newTaskData = {
         title: data.title || "",
         description: data.description || "",
         priority: data.priority || "",
@@ -87,8 +89,11 @@ const TaskEditModal = ({ task }: Props) => {
         pr_link: data.pr_link || "",
         points: data.points || 0,
         sidekick_ids: data.sidekick_ids || [],
-        skill_category_id: data.skill_category_id || "", // initialize skill category
-      });
+        skill_category_id: data.skill_category?.id || "",
+        codev_id: data.codev?.id || "",
+      };
+      console.log("Initializing taskData with:", newTaskData);
+      setTaskData(newTaskData);
     }
   }, [isModalOpen, data]);
 
@@ -101,14 +106,13 @@ const TaskEditModal = ({ task }: Props) => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     try {
-      // Validate required fields
-      const title = taskData.title;
-      if (!title) throw new Error("Title is required");
-      if (!taskData.skill_category_id) {
+      setLoading(true);
+
+      if (!taskData.title) throw new Error("Title is required");
+      if (!taskData.skill_category_id)
         throw new Error("Skill category is required");
-      }
+      if (!taskData.codev_id) throw new Error("Primary assignee is required");
 
       const formData = new FormData();
       Object.entries(taskData).forEach(([key, value]) => {
@@ -125,50 +129,85 @@ const TaskEditModal = ({ task }: Props) => {
       if (response.success) {
         toast.success("Task updated successfully.");
         router.refresh();
+        onClose();
       } else {
         toast.error(response.error || "Failed to update task.");
       }
     } catch (error) {
-      console.error("Error updating task:", error);
       toast.error(
-        error instanceof Error ? error.message : "Something went wrong.",
+        error instanceof Error ? error.message : "Failed to update task.",
       );
     } finally {
-      onClose();
+      setLoading(false);
     }
   };
 
+  if (!isModalOpen) return null;
+
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-[44rem]">
-        <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+      <DialogContent className="h-[90vh] w-[90%] max-w-3xl overflow-y-auto bg-white dark:bg-gray-900 lg:h-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <DialogHeader>
-            <DialogTitle className="text-left text-lg font-bold">
+            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
               Edit Task: {taskData.title}
             </DialogTitle>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input
-              label="Task Title"
-              value={taskData.title}
-              onChange={(e) => handleInputChange("title", e.target.value)}
-              required
-            />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            {/* Task Title */}
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm font-medium">
+                Task Title
+              </Label>
+              <Input
+                id="title"
+                name="title"
+                placeholder="Enter task title"
+                value={taskData.title}
+                onChange={(e) => handleInputChange("title", e.target.value)}
+                className="border-gray-300 focus:border-blue-500 dark:border-gray-700"
+                required
+              />
+            </div>
 
-            <div className="flex flex-col gap-2">
-              <label>Priority</label>
+            {/* Points */}
+            <div className="space-y-2">
+              <Label htmlFor="points" className="text-sm font-medium">
+                Points
+              </Label>
+              <Input
+                id="points"
+                name="points"
+                type="number"
+                min="0"
+                placeholder="Task points"
+                value={String(taskData.points)}
+                onChange={(e) =>
+                  handleInputChange("points", Number(e.target.value))
+                }
+                className="border-gray-300 focus:border-blue-500 dark:border-gray-700"
+              />
+            </div>
+
+            {/* Priority */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Priority</Label>
               <Select
                 value={taskData.priority}
                 onValueChange={(value) => handleInputChange("priority", value)}
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Priority" />
+                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                  <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     {PRIORITY_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level}>
+                      <SelectItem
+                        key={level}
+                        value={level}
+                        className="capitalize"
+                      >
                         {level}
                       </SelectItem>
                     ))}
@@ -177,21 +216,26 @@ const TaskEditModal = ({ task }: Props) => {
               </Select>
             </div>
 
-            <div className="flex flex-col gap-2">
-              <label>Difficulty</label>
+            {/* Difficulty */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Difficulty</Label>
               <Select
                 value={taskData.difficulty}
                 onValueChange={(value) =>
                   handleInputChange("difficulty", value)
                 }
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Difficulty" />
+                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                  <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     {DIFFICULTY_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level}>
+                      <SelectItem
+                        key={level}
+                        value={level}
+                        className="capitalize"
+                      >
                         {level}
                       </SelectItem>
                     ))}
@@ -200,24 +244,35 @@ const TaskEditModal = ({ task }: Props) => {
               </Select>
             </div>
 
-            <Input
-              type="number"
-              label="Points"
-              value={taskData.points}
-              onChange={(e) =>
-                handleInputChange("points", Number(e.target.value))
-              }
-            />
+            {/* Task Type */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Task Type</Label>
+              <Select
+                value={taskData.type}
+                onValueChange={(value) => handleInputChange("type", value)}
+              >
+                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                  <SelectValue placeholder="Select task type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {TASK_TYPES.map((type) => (
+                      <SelectItem
+                        key={type}
+                        value={type}
+                        className="capitalize"
+                      >
+                        {type.toLowerCase()}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
 
-            <Input
-              label="PR Link"
-              value={taskData.pr_link}
-              onChange={(e) => handleInputChange("pr_link", e.target.value)}
-            />
-
-            {/* Skill Category Dropdown (Required) */}
-            <div className="flex flex-col gap-2">
-              <label>Skill Category</label>
+            {/* Skill Category */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Skill Category</Label>
               <Select
                 value={taskData.skill_category_id}
                 onValueChange={(value) =>
@@ -225,8 +280,8 @@ const TaskEditModal = ({ task }: Props) => {
                 }
                 required
               >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select Skill Category" />
+                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                  <SelectValue placeholder="Select skill category" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -239,24 +294,44 @@ const TaskEditModal = ({ task }: Props) => {
                 </SelectContent>
               </Select>
             </div>
+
+            {/* PR Link */}
+            <div className="space-y-2">
+              <Label htmlFor="pr_link" className="text-sm font-medium">
+                PR Link
+              </Label>
+              <Input
+                id="pr_link"
+                name="pr_link"
+                placeholder="Enter PR link"
+                value={taskData.pr_link}
+                onChange={(e) => handleInputChange("pr_link", e.target.value)}
+                className="border-gray-300 focus:border-blue-500 dark:border-gray-700"
+              />
+            </div>
           </div>
 
-          {/* Primary Assignee: Allow only a single selection */}
-          <div className="mt-4">
-            <Label>Primary Assignee</Label>
+          {/* Primary Assignee */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Primary Assignee</Label>
             <KanbanAddModalMembers
-              singleSelection={true}
-              onMembersChange={(memberIds: string[]) => {
-                // With singleSelection enabled, we expect one value only.
-                handleInputChange("codev_id", memberIds[0] || "");
-              }}
+              singleSelection
+              onMembersChange={(memberIds) =>
+                handleInputChange("codev_id", memberIds[0] || "")
+              }
               projectId={data?.projectId}
+              initialSelectedMembers={
+                taskData.codev_id ? [taskData.codev_id] : []
+              }
             />
           </div>
 
-          {/* Sidekick Helpers: Multiple selection allowed. Disable primary assignee */}
-          <div className="mt-4">
-            <Label>Sidekick Helpers (each gets half the total points)</Label>
+          {/* Sidekick Helpers */}
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">
+              Sidekick Helpers
+              <span className="ml-2 text-xs text-gray-500">(Optional)</span>
+            </Label>
             <KanbanAddModalMembers
               initialSelectedMembers={taskData.sidekick_ids}
               onMembersChange={(memberIds) =>
@@ -267,21 +342,38 @@ const TaskEditModal = ({ task }: Props) => {
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <label>Description</label>
+          {/* Description */}
+          <div className="space-y-2">
+            <Label htmlFor="description" className="text-sm font-medium">
+              Description
+            </Label>
             <Textarea
+              id="description"
+              name="description"
+              placeholder="Add task description..."
               value={taskData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              className="h-32 resize-none"
-              placeholder="Task description..."
+              className="min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700"
             />
           </div>
 
-          <DialogFooter>
-            <Button type="button" onClick={onClose}>
+          <DialogFooter className="gap-2 sm:gap-0">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="w-full sm:w-auto"
+              disabled={loading}
+            >
               Cancel
             </Button>
-            <Button type="submit">Save Changes</Button>
+            <Button
+              type="submit"
+              className="w-full bg-blue-600 hover:bg-blue-700 sm:w-auto"
+              disabled={loading}
+            >
+              {loading ? "Saving..." : "Save Changes"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>
