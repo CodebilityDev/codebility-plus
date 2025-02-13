@@ -73,7 +73,7 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
 
   // 2) Make the column droppable for tasks
   const { setNodeRef: setDroppableRef, isOver } = useDroppable({
-    id: `column-${column.id}-tasks`,
+    id: column.id,
     data: {
       type: "Column",
       columnId: column.id,
