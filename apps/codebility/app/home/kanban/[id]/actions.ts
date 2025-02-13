@@ -15,32 +15,21 @@ export const updateTaskColumnId = async (
 ): Promise<Task> => {
   const supabase = createClientComponentClient();
 
-  const { data, error } = await supabase
-    .from("tasks")
-    .update({ kanban_column_id: newColumnId, updated_at: new Date() })
-    .eq("id", taskId)
-    .select()
-    .single();
-
-  if (error) {
-    throw new Error(error.message || "Failed to update task column ID.");
-  }
-
-  return data as Task;
-};
-
-export const updateTasksQueue = async (tasks: Task[]): Promise<void> => {
-  const supabase = createClientComponentClient();
-
-  for (const task of tasks) {
-    const { error } = await supabase
+  try {
+    const { data, error } = await supabase
       .from("tasks")
-      .update({ updated_at: new Date() })
-      .eq("id", task.id);
+      .update({
+        kanban_column_id: newColumnId,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", taskId)
+      .select("*")
+      .single();
 
-    if (error) {
-      throw new Error(error.message || "Failed to update task.");
-    }
+    if (error) throw error;
+    return data as Task;
+  } catch (error) {
+    throw error;
   }
 };
 
@@ -132,26 +121,6 @@ export const fetchAvailableMembers = async (
 
   // Sort members by first name before returning.
   return members.sort((a, b) => a.first_name.localeCompare(b.first_name));
-};
-
-export const fetchSidekickMembers = async (
-  sidekickIds: string[],
-): Promise<CodevMember[]> => {
-  const supabase = createClientComponentClient();
-
-  if (sidekickIds.length === 0) return [];
-
-  const { data, error } = await supabase
-    .from("codev")
-    .select("id, first_name, last_name, image_url")
-    .in("id", sidekickIds);
-
-  if (error) {
-    console.error("Error fetching sidekick members:", error.message);
-    return [];
-  }
-
-  return data as CodevMember[];
 };
 
 export const createNewTask = async (
@@ -303,8 +272,6 @@ export const createNewColumn = async (
   columnName: string,
   boardId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  "use client";
-
   const supabase = createClientComponentClient();
 
   try {

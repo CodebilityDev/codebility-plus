@@ -27,7 +27,6 @@ export default function TaskCard({ task }: Props) {
     priority,
     points,
     created_at,
-    status,
     type,
     due_date,
     kanban_column,
