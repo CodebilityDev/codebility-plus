@@ -31,7 +31,7 @@ const routePermissionMap: Record<string, keyof RolePermissions> = {
   "/home/projects": "projects",
   "/home/settings/permissions": "permissions",
   "/home/settings/roles": "roles",
-  "/home/settings/resume": "resume",
+  "/home/settings/profile": "resume",
   // General fallback: if no more specific key matches, use this one.
   "/home/settings": "settings",
 };
