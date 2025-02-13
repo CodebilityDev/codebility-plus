@@ -39,6 +39,7 @@ function KanbanTask({ task, columnId }: Props) {
     data: {
       type: "Task",
       task,
+      columnId: columnId,
     },
   });
 
