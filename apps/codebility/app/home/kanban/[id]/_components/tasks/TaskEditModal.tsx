@@ -33,19 +33,20 @@ const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
 const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"];
 
-interface Props {
-  task?: Task;
+interface TaskFormData extends Partial<Task> {
+  projectId?: string;
 }
 
-const TaskEditModal = ({ task }: Props) => {
+const TaskEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
-
   const isModalOpen = isOpen && type === "taskEditModal";
   const router = useRouter();
 
-  const [loading, setLoading] = useState(false);
+  const [boardId, setBoardId] = useState<string>("");
 
-  const [taskData, setTaskData] = useState<Partial<Task>>({
+  const [loading, setLoading] = useState(false);
+  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
+  const [taskData, setTaskData] = useState<TaskFormData>({
     title: "",
     description: "",
     priority: "",
@@ -55,12 +56,11 @@ const TaskEditModal = ({ task }: Props) => {
     points: 0,
     sidekick_ids: [],
     skill_category_id: "",
-    codev_id: "", // Primary assignee
+    codev_id: "",
+    projectId: "",
   });
 
-  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
-
-  // Fetch skill categories (same as in TaskAddModal)
+  // Fetch skill categories
   useEffect(() => {
     const loadSkillCategories = async () => {
       const supabase = createClientComponentClient();
@@ -79,24 +79,53 @@ const TaskEditModal = ({ task }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (data && isModalOpen) {
-      const newTaskData = {
-        title: data.title || "",
-        description: data.description || "",
-        priority: data.priority || "",
-        difficulty: data.difficulty || "",
-        type: data.type || "",
-        pr_link: data.pr_link || "",
-        points: data.points || 0,
-        sidekick_ids: data.sidekick_ids || [],
-        skill_category_id: data.skill_category?.id || "",
-        codev_id: data.codev?.id || "",
+    if (isModalOpen && data) {
+      const fetchProjectData = async () => {
+        try {
+          const supabase = createClientComponentClient();
+
+          // Get board_id from kanban_column
+          const { data: column } = await supabase
+            .from("kanban_columns")
+            .select("board_id")
+            .eq("id", data.kanban_column_id)
+            .single();
+
+          if (column?.board_id) {
+            setBoardId(column.board_id); // Store the board ID
+
+            // Get project_id from kanban_board
+            const { data: board } = await supabase
+              .from("kanban_boards")
+              .select("project_id")
+              .eq("id", column.board_id)
+              .single();
+
+            if (board?.project_id) {
+              setTaskData({
+                title: data.title || "",
+                description: data.description || "",
+                priority: data.priority || "",
+                difficulty: data.difficulty || "",
+                type: data.type || "",
+                pr_link: data.pr_link || "",
+                points: data.points || 0,
+                sidekick_ids: data.sidekick_ids || [],
+                skill_category_id: data.skill_category?.id || "",
+                codev_id: data.codev?.id || "",
+                projectId: board.project_id,
+              });
+            }
+          }
+        } catch (error) {
+          console.error("Error fetching project data:", error);
+          toast.error("Failed to load task data");
+        }
       };
-      console.log("Initializing taskData with:", newTaskData);
-      setTaskData(newTaskData);
+
+      fetchProjectData();
     }
   }, [isModalOpen, data]);
-
   const handleInputChange = (
     key: keyof Task,
     value: string | number | string[],
@@ -115,15 +144,25 @@ const TaskEditModal = ({ task }: Props) => {
       if (!taskData.codev_id) throw new Error("Primary assignee is required");
 
       const formData = new FormData();
-      Object.entries(taskData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          if (Array.isArray(value)) {
-            formData.append(key, value.join(","));
-          } else {
-            formData.append(key, String(value));
-          }
-        }
-      });
+
+      // Explicitly set each field
+      formData.append("title", taskData.title);
+      formData.append("description", taskData.description || "");
+      formData.append("priority", taskData.priority || "");
+      formData.append("difficulty", taskData.difficulty || "");
+      formData.append("type", taskData.type || "");
+      formData.append("pr_link", taskData.pr_link || "");
+      formData.append("points", String(taskData.points || 0));
+      formData.append("skill_category_id", taskData.skill_category_id);
+      formData.append("codev_id", taskData.codev_id);
+
+      // Handle sidekick_ids specifically
+      if (taskData.sidekick_ids && taskData.sidekick_ids.length > 0) {
+        formData.append("sidekick_ids", taskData.sidekick_ids.join(","));
+      } else {
+        // Explicitly set empty array if no sidekicks
+        formData.append("sidekick_ids", "");
+      }
 
       const response = await updateTask(formData, data.id);
       if (response.success) {
@@ -134,6 +173,7 @@ const TaskEditModal = ({ task }: Props) => {
         toast.error(response.error || "Failed to update task.");
       }
     } catch (error) {
+      console.error("Submit error:", error);
       toast.error(
         error instanceof Error ? error.message : "Failed to update task.",
       );
@@ -316,13 +356,11 @@ const TaskEditModal = ({ task }: Props) => {
             <Label className="text-sm font-medium">Primary Assignee</Label>
             <KanbanAddModalMembers
               singleSelection
-              onMembersChange={(memberIds) =>
-                handleInputChange("codev_id", memberIds[0] || "")
-              }
-              projectId={data?.projectId}
-              initialSelectedMembers={
-                taskData.codev_id ? [taskData.codev_id] : []
-              }
+              onMembersChange={(memberIds) => {
+                handleInputChange("codev_id", memberIds[0] || "");
+              }}
+              projectId={boardId}
+              initialSelectedMembers={[data.codev?.id].filter(Boolean)}
             />
           </div>
 
@@ -333,12 +371,12 @@ const TaskEditModal = ({ task }: Props) => {
               <span className="ml-2 text-xs text-gray-500">(Optional)</span>
             </Label>
             <KanbanAddModalMembers
-              initialSelectedMembers={taskData.sidekick_ids}
-              onMembersChange={(memberIds) =>
-                handleInputChange("sidekick_ids", memberIds)
-              }
-              projectId={data?.projectId}
-              disabledMembers={taskData.codev_id ? [taskData.codev_id] : []}
+              initialSelectedMembers={data.sidekick_ids || []}
+              onMembersChange={(memberIds) => {
+                handleInputChange("sidekick_ids", memberIds);
+              }}
+              projectId={boardId}
+              disabledMembers={[data.codev?.id].filter(Boolean)}
             />
           </div>
 

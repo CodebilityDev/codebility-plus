@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -20,9 +21,11 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
+import { useUserStore } from "@/store/codev-store";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Ellipsis } from "lucide-react";
+import toast from "react-hot-toast";
 
 import {
   DropdownMenu,
@@ -51,6 +54,110 @@ const TaskViewModal = () => {
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task;
+  const router = useRouter();
+
+  const user = useUserStore((state) => state.user);
+  const canModifyTask = user?.role_id === 1 || user?.role_id === 5;
+
+  const handleMarkAsDone = async () => {
+    if (!task) return;
+
+    try {
+      const supabase = createClientComponentClient();
+
+      // 1. Get primary assignee points record
+      const { data: existingPoints, error: pointsError } = await supabase
+        .from("codev_points")
+        .select("*")
+        .eq("codev_id", task.codev?.id)
+        .eq("skill_category_id", task.skill_category?.id) // Use the nested object
+        .single();
+
+      // 2. Calculate new points
+      const taskPoints = task.points || 0;
+      const currentPoints = existingPoints?.points || 0;
+      const newPoints = currentPoints + taskPoints;
+
+      // 3. Update or insert points for primary assignee
+      if (existingPoints) {
+        const { error: updateError } = await supabase
+          .from("codev_points")
+          .update({ points: newPoints })
+          .eq("id", existingPoints.id);
+
+        if (updateError) throw updateError;
+      } else {
+        const { error: insertError } = await supabase
+          .from("codev_points")
+          .insert({
+            codev_id: task.codev?.id,
+            skill_category_id: task.skill_category?.id,
+            points: taskPoints,
+          });
+
+        if (insertError) throw insertError;
+      }
+
+      // 4. Handle sidekick points (50% of task points)
+      if (task.sidekick_ids?.length) {
+        const sidekickPoints = Math.floor(taskPoints * 0.5);
+
+        for (const sidekickId of task.sidekick_ids) {
+          const { data: sidekickExistingPoints, error: sidekickError } =
+            await supabase
+              .from("codev_points")
+              .select("*")
+              .eq("codev_id", sidekickId)
+              .eq("skill_category_id", task.skill_category?.id)
+              .single();
+
+          if (sidekickError && sidekickError.code !== "PGRST116") {
+            throw sidekickError;
+          }
+
+          if (sidekickExistingPoints) {
+            const { error: updateError } = await supabase
+              .from("codev_points")
+              .update({
+                points: sidekickExistingPoints.points + sidekickPoints,
+              })
+              .eq("id", sidekickExistingPoints.id);
+
+            if (updateError) throw updateError;
+          } else {
+            const { error: insertError } = await supabase
+              .from("codev_points")
+              .insert({
+                codev_id: sidekickId,
+                skill_category_id: task.skill_category?.id,
+                points: sidekickPoints,
+              });
+
+            if (insertError) throw insertError;
+          }
+        }
+      }
+
+      // 5. Delete the task
+      const { error: deleteError } = await supabase
+        .from("tasks")
+        .delete()
+        .eq("id", task.id);
+
+      if (deleteError) throw deleteError;
+
+      toast.success("Task completed and points awarded!");
+      onClose();
+      router.refresh();
+    } catch (error) {
+      console.error("Error completing task:", error);
+      if (error instanceof Error) {
+        toast.error(`Failed to complete task: ${error.message}`);
+      } else {
+        toast.error("Failed to complete task");
+      }
+    }
+  };
 
   // State for Skill Category, Sidekick Details, and Primary Assignee
   const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(
@@ -96,23 +203,36 @@ const TaskViewModal = () => {
     fetchSidekickDetails();
   }, [task?.sidekick_ids]);
 
-  // Fetch primary assignee details using the codev_id field
   useEffect(() => {
     const fetchPrimaryAssignee = async () => {
-      if (task?.codev_id) {
+      const assigneeId = task?.codev_id || task?.codev?.id;
+
+      if (assigneeId) {
         const supabase = createClientComponentClient();
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")
-          .eq("id", task.codev_id)
+          .eq("id", assigneeId)
           .single();
+
         if (!error && data) {
           setPrimaryAssignee(data as CodevMember);
         }
+      } else if (task?.codev) {
+        // If we have the codev object directly, use that
+        setPrimaryAssignee({
+          id: task.codev.id,
+          first_name: task.codev.first_name,
+          last_name: task.codev.last_name,
+          image_url: task.codev.image_url,
+        });
       }
     };
-    fetchPrimaryAssignee();
-  }, [task?.codev_id]);
+
+    if (task) {
+      fetchPrimaryAssignee();
+    }
+  }, [task]);
 
   if (!isModalOpen) return null;
 
@@ -127,22 +247,26 @@ const TaskViewModal = () => {
                 {task?.title}
               </DialogTitle>
             </DialogHeader>
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Ellipsis className="h-5 w-5" />
-              </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-32">
-                <DropdownMenuItem onClick={() => onOpen("taskEditModal", task)}>
-                  Edit
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  onClick={() => onOpen("taskDeleteModal", task)}
-                  className="text-red-500 focus:text-red-500"
-                >
-                  Delete
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+            {canModifyTask && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Ellipsis className="h-5 w-5 cursor-pointer" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end" className="w-32">
+                  <DropdownMenuItem
+                    onClick={() => onOpen("taskEditModal", task)}
+                  >
+                    Edit
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    onClick={() => onOpen("taskDeleteModal", task)}
+                    className="text-red-500 focus:text-red-500"
+                  >
+                    Delete
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
 
           {/* Task Details Grid */}
@@ -320,14 +444,23 @@ const TaskViewModal = () => {
             />
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="flex gap-2 sm:justify-end">
             <Button
               variant="outline"
               onClick={onClose}
-              className="w-full bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 sm:w-auto"
+              className="w-full hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 sm:w-auto"
             >
               Close
             </Button>
+            {canModifyTask && (
+              <Button
+                variant="default"
+                onClick={handleMarkAsDone}
+                className="w-full bg-green-600 hover:bg-green-700 sm:w-auto"
+              >
+                Mark as Done
+              </Button>
+            )}
           </DialogFooter>
         </div>
       </DialogContent>

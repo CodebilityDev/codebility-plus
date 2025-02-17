@@ -38,61 +38,63 @@ export const fetchAvailableMembers = async (
 ): Promise<CodevMember[]> => {
   const supabase = createClientComponentClient();
 
-  // First, get the project_id from the kanban board.
-  const { data: board } = await supabase
+  // 1. Get the project_id from the kanban board.
+  const { data: board, error: boardError } = await supabase
     .from("kanban_boards")
     .select("project_id")
     .eq("id", boardId)
     .single();
 
-  if (!board?.project_id) {
-    console.log("No project associated with this board");
+  if (boardError || !board?.project_id) {
+    console.error("No project associated with this board");
     return [];
   }
 
-  // Fetch project members (available ones) using the project_id.
-  const { data: projectMembers, error } = await supabase
-    .from("project_members")
-    .select(
-      `
-      codev (
-        id,
-        first_name,
-        last_name,
-        image_url,
-        availability_status
-      )
-    `,
-    )
-    .eq("project_id", board.project_id)
-    .eq("codev.availability_status", true);
-
-  if (error) {
-    console.error("Error fetching project members:", error.message);
-    return [];
-  }
-
-  // Process members from project_members table.
-  const members: CodevMember[] = (projectMembers || [])
-    .filter((pm: any) => pm.codev)
-    .map((pm: any) => ({
-      id: pm.codev.id,
-      first_name: pm.codev.first_name,
-      last_name: pm.codev.last_name,
-      image_url: pm.codev.image_url,
-    }));
-
-  // Now, fetch the project leader from the projects table.
+  // 2. Fetch project details, including team_leader_id and members (assumed to be an array of codev IDs).
   const { data: project, error: projectError } = await supabase
     .from("projects")
-    .select("team_leader_id")
+    .select("team_leader_id, members")
     .eq("id", board.project_id)
     .single();
 
   if (projectError) {
-    console.error("Error fetching project leader:", projectError.message);
-  } else if (project && project.team_leader_id) {
-    // Fetch the project leader's details from the codev table.
+    console.error("Error fetching project details:", projectError.message);
+    return [];
+  }
+
+  // 3. Initialize the array for available members.
+  let members: CodevMember[] = [];
+
+  // Check if the project has a members array and query the codev table for these IDs.
+  if (
+    project.members &&
+    Array.isArray(project.members) &&
+    project.members.length > 0
+  ) {
+    const { data: codevMembers, error: codevError } = await supabase
+      .from("codev")
+      .select("id, first_name, last_name, image_url, availability_status")
+      .in("id", project.members);
+
+    if (codevError) {
+      console.error("Error fetching project members:", codevError.message);
+    } else if (codevMembers) {
+      members = codevMembers
+        .filter((member: any) => member.availability_status === true)
+        .map((member: any) => ({
+          id: member.id,
+          first_name: member.first_name,
+          last_name: member.last_name,
+          image_url: member.image_url,
+        }));
+    }
+  }
+
+  // 4. Ensure the project leader is included if available and not already in the list.
+  if (
+    project.team_leader_id &&
+    !members.some((m) => m.id === project.team_leader_id)
+  ) {
     const { data: leaderData, error: leaderError } = await supabase
       .from("codev")
       .select("id, first_name, last_name, image_url, availability_status")
@@ -105,21 +107,16 @@ export const fetchAvailableMembers = async (
         leaderError.message,
       );
     } else if (leaderData && leaderData.availability_status === true) {
-      // Map the leader to CodevMember.
-      const leaderMember: CodevMember = {
+      members.push({
         id: leaderData.id,
         first_name: leaderData.first_name,
         last_name: leaderData.last_name,
         image_url: leaderData.image_url,
-      };
-      // Add the leader if not already in the members list.
-      if (!members.some((m) => m.id === leaderMember.id)) {
-        members.push(leaderMember);
-      }
+      });
     }
   }
 
-  // Sort members by first name before returning.
+  // 5. Sort members by first name before returning.
   return members.sort((a, b) => a.first_name.localeCompare(b.first_name));
 };
 
@@ -189,54 +186,63 @@ export const updateTask = async (
   const supabase = createClientComponentClient();
 
   try {
-    // Extract data from FormData
-    const title = formData.get("title")?.toString();
-    const description = formData.get("description")?.toString();
-    const priority = formData.get("priority")?.toString();
-    const difficulty = formData.get("difficulty")?.toString();
-    const type = formData.get("type")?.toString();
-    const pr_link = formData.get("pr_link")?.toString();
-    const points = formData.get("points")
-      ? Number(formData.get("points"))
-      : null;
-    const sidekick_ids = formData
-      .get("sidekick_ids")
-      ?.toString()
-      .split(",")
-      .filter(Boolean);
-    const skill_category_id = formData.get("skill_category_id")?.toString(); // NEW field
+    const updateData = {
+      title: formData.get("title")?.toString(),
+      description: formData.get("description")?.toString(),
+      priority: formData.get("priority")?.toString(),
+      difficulty: formData.get("difficulty")?.toString(),
+      type: formData.get("type")?.toString(),
+      pr_link: formData.get("pr_link")?.toString(),
+      points: formData.get("points") ? Number(formData.get("points")) : null,
+      sidekick_ids: formData.get("sidekick_ids")
+        ? formData.get("sidekick_ids")?.toString().split(",").filter(Boolean)
+        : [], // Ensure it's always an array
+      skill_category_id: formData.get("skill_category_id")?.toString(),
+      codev_id: formData.get("codev_id")?.toString(),
+      updated_at: new Date().toISOString(),
+    };
 
-    if (!title) {
-      return { success: false, error: "Title is required" };
+    // First, validate that we can actually read the task
+    const { data: existingTask, error: fetchError } = await supabase
+      .from("tasks")
+      .select("*")
+      .eq("id", taskId)
+      .single();
+
+    if (fetchError) {
+      console.error("Error fetching existing task:", fetchError);
+      return { success: false, error: "Could not find task to update" };
     }
 
-    // Update task in database
-    const { error } = await supabase
+    // Then perform the update
+    const { error: updateError } = await supabase
       .from("tasks")
       .update({
-        title,
-        description,
-        priority,
-        difficulty,
-        type,
-        pr_link,
-        points,
-        sidekick_ids,
-        skill_category_id, // NEW field updated in the DB
-        updated_at: new Date().toISOString(),
+        ...updateData,
+        sidekick_ids: updateData.sidekick_ids, // Explicitly set as array
       })
       .eq("id", taskId);
 
-    if (error) {
-      console.error("Error updating task:", error.message);
-      return { success: false, error: error.message };
+    if (updateError) {
+      console.error("Supabase update error:", updateError);
+      return { success: false, error: updateError.message };
     }
 
-    // Revalidate the path to refresh the data
-    revalidatePath("/home/kanban");
+    // Verify the update
+    const { data: updatedTask, error: verifyError } = await supabase
+      .from("tasks")
+      .select("*")
+      .eq("id", taskId)
+      .single();
+
+    if (verifyError) {
+      console.error("Error verifying update:", verifyError);
+      return { success: false, error: "Could not verify update" };
+    }
+
     return { success: true };
   } catch (error) {
-    console.error("Error updating task:", error);
+    console.error("Update task error:", error);
     return {
       success: false,
       error: error instanceof Error ? error.message : "Failed to update task",

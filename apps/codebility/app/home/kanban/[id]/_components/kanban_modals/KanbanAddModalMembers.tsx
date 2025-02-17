@@ -42,7 +42,9 @@ export default function KanbanAddModalMembers({
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>(
     initialSelectedMembers,
   );
+
   const [availableMembers, setAvailableMembers] = useState<CodevMember[]>([]);
+
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -66,20 +68,20 @@ export default function KanbanAddModalMembers({
 
   const addMember = (memberId: string) => {
     if (singleSelection) {
-      // In single selection mode, always override the selection
-      setSelectedMemberIds([memberId]);
-      onMembersChange?.([memberId]);
+      const newIds = [memberId];
+      setSelectedMemberIds(newIds);
+      onMembersChange?.(newIds);
     } else if (!selectedMemberIds.includes(memberId)) {
-      const newSelectedIds = [...selectedMemberIds, memberId];
-      setSelectedMemberIds(newSelectedIds);
-      onMembersChange?.(newSelectedIds);
+      const newIds = [...selectedMemberIds, memberId];
+      setSelectedMemberIds(newIds);
+      onMembersChange?.(newIds);
     }
   };
 
   const removeMember = (memberId: string) => {
     const newSelectedIds = selectedMemberIds.filter((id) => id !== memberId);
     setSelectedMemberIds(newSelectedIds);
-    onMembersChange?.(newSelectedIds);
+    onMembersChange?.(newSelectedIds); // Ensure this triggers parent update
   };
 
   const filteredMembers = availableMembers.filter((member) =>
