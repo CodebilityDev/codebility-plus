@@ -1,4 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import {
   getProjectClients,
   getProjectCodevs,
@@ -22,6 +23,8 @@ import toast from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
+
+import ImageCrop from "./ImageCrop";
 
 const PROJECT_STATUSES = [
   { id: "pending", value: "pending", label: "Pending" },
@@ -61,6 +64,10 @@ const ProjectEditModal = () => {
   const [selectedStatus, setSelectedStatus] = useState<string>(
     data?.status || "active",
   );
+
+  const [openImageCropper, setOpenImageCropper] = useState(false);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [croppedFile, setCroppedFile] = useState<File | null>(null);
 
   const {
     register,
@@ -138,6 +145,7 @@ const ProjectEditModal = () => {
       setValue("client_id", data.client_id || "");
       setValue("status", data.status || "pending");
       setProjectImage(data.main_image || null);
+      setCroppedImage(data.main_image || null);
       setSelectedStatus(data.status || "pending");
 
       // Set initial members if they exist
@@ -156,36 +164,34 @@ const ProjectEditModal = () => {
     }
   }, [data, setValue, users]);
 
+  /* store image on state */
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
     try {
-      // Create file name but don't pass it as an option
-      const fileNameWithoutSpaces = file.name.replace(/\s+/g, "_");
-      const { publicUrl } = await uploadImage(file, {
-        bucket: "codebility",
-        folder: `projectImage/${Date.now()}_${fileNameWithoutSpaces}`,
-      });
+      const file = e.target.files?.[0];
 
-      setProjectImage(publicUrl);
-      setValue("main_image", publicUrl);
+      if (!file) return;
+
+      // store image in memory
+      setProjectImage(URL.createObjectURL(file));
+      setCroppedImage(URL.createObjectURL(file));
+      setCroppedFile(file);
+
+      setOpenImageCropper(true);
     } catch (error) {
       console.error("Failed to upload image:", error);
       toast.error("Failed to upload image");
     }
   };
 
+  /* removeimage on state */
   const handleRemoveImage = async () => {
-    if (!projectImage) return;
-
     try {
-      const imagePath = getImagePath(projectImage);
-      if (imagePath) {
-        await deleteImage(imagePath, "projectImage");
-      }
+      if (!projectImage) return;
+
       setProjectImage(null);
       setValue("main_image", undefined);
+      setCroppedImage(null);
+      setCroppedFile(null);
     } catch (error) {
       console.error("Failed to remove image:", error);
       toast.error("Failed to remove image");
@@ -201,6 +207,16 @@ const ProjectEditModal = () => {
     setIsLoading(true);
     try {
       const form = new FormData();
+
+      // add image in data if it is changed
+      if (projectImage !== croppedImage) {
+        const { publicUrl } = await uploadImage(croppedFile!, {
+          bucket: "codebility",
+          folder: `projectImage/${Date.now()}_${croppedFile?.name}`,
+        });
+
+        form.append("main_image", publicUrl);
+      }
 
       // Ensure status is included and valid
       const validStatus = PROJECT_STATUSES.map((s) => s.value).includes(
@@ -223,6 +239,10 @@ const ProjectEditModal = () => {
       const memberIds = selectedMembers.map((member) => member.id);
       form.append("members", JSON.stringify(memberIds));
 
+      console.log("form data", formData);
+      console.log("form", form);
+      console.log("find me data.id", data.id);
+
       const response = await updateProject(data.id, form);
 
       if (response.success) {
@@ -241,24 +261,26 @@ const ProjectEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Project</DialogTitle>
         </DialogHeader>
 
-        <div
-          className="overflow-y-auto px-1"
-          style={{ maxHeight: "calc(100vh - 200px)" }}
-        >
+        <div className=" px-1" style={{ maxHeight: "calc(100vh - 200px)" }}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Image Upload Section */}
-            <div className="flex items-center gap-4">
-              <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
-                {projectImage ? (
-                  <img
-                    src={projectImage}
+            <div className="flex flex-col items-center gap-4">
+              <div /* className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md" */
+                className="relative"
+              >
+                {croppedImage ? (
+                  <Image
+                    src={croppedImage}
                     alt="Project"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full cursor-pointer object-cover"
+                    onClick={() => setOpenImageCropper(true)}
+                    width={408} //todo: might need to adjust this
+                    height={192} //todo: might need to adjust this
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gray-100">
@@ -266,7 +288,7 @@ const ProjectEditModal = () => {
                   </div>
                 )}
               </div>
-              <div className="flex flex-col gap-2">
+              <div className="flex flex-row gap-2">
                 <label
                   htmlFor="image-upload"
                   className="cursor-pointer text-sm text-blue-600 hover:text-blue-800"
@@ -280,6 +302,15 @@ const ProjectEditModal = () => {
                   className="hidden"
                   onChange={handleImageChange}
                 />
+
+                <ImageCrop
+                  image={projectImage || ""}
+                  setImage={setCroppedImage}
+                  setFile={setCroppedFile}
+                  open={openImageCropper}
+                  setOpen={setOpenImageCropper}
+                />
+
                 {projectImage && (
                   <button
                     type="button"
@@ -391,26 +422,28 @@ const ProjectEditModal = () => {
               />
             </div>
           </form>
-        </div>
 
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isLoading}
-            onClick={handleSubmit(onSubmit)}
-            className="text-white"
-          >
-            {isLoading ? "Updating..." : "Update Project"}
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="pb-10">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => {
+                onClose();
+              }}
+              className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isLoading}
+              onClick={handleSubmit(onSubmit)}
+              className="text-white"
+            >
+              {isLoading ? "Updating..." : "Update Project"}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
