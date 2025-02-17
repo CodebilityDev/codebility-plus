@@ -84,16 +84,16 @@ const ProjectViewModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">View Project</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-6">
           {/* Project Image */}
-          <div className="dark:bg-dark-100 flex justify-center rounded-lg bg-slate-100 p-6">
+          <div className="dark:bg-dark-100 flex justify-center rounded-lg bg-slate-100 p-0">
             {data?.main_image ? (
-              <div className="relative h-[200px] w-[200px]">
+              <div className="relative w-full h-52">
                 <Image
                   src={data.main_image}
                   alt={data?.name || "Project Image"}
