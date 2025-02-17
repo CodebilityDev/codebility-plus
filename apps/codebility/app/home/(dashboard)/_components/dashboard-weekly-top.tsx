@@ -1,4 +1,3 @@
-// components/WeeklyTop.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -13,25 +12,60 @@ import {
 } from "@/Components/ui/table";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
+interface TopCodev {
+  points: number;
+  codev: {
+    first_name: string;
+  } | null;
+  skill_category: {
+    name: string;
+  } | null;
+}
+
 export default function WeeklyTop() {
-  const [topCodevs, setTopCodevs] = useState<any[]>([]);
+  const [topCodevs, setTopCodevs] = useState<TopCodev[]>([]);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
     const fetchTopCodevs = async () => {
-      const { data, error } = await supabase
-        .from("codev_points")
-        .select(
-          `
-          points,
-          codev:codev_id(first_name),
-          skill_category:skill_category_id(name)
-        `,
-        )
-        .order("points", { ascending: false })
-        .limit(10);
+      try {
+        const { data, error } = await supabase
+          .from("codev_points")
+          .select(
+            `
+            points,
+            codev:codev_id!inner(first_name),
+            skill_category:skill_category_id!inner(name)
+          `,
+          )
+          .order("points", { ascending: false })
+          .limit(10);
 
-      if (!error && data) setTopCodevs(data);
+        if (error) {
+          console.error("Error fetching top codevs:", error);
+          return;
+        }
+
+        if (data) {
+          // Transform the data to match our interface
+          const transformedData: TopCodev[] = data.map((item: any) => ({
+            points: item.points,
+            codev: item.codev ? { first_name: item.codev.first_name } : null,
+            skill_category: item.skill_category
+              ? { name: item.skill_category.name }
+              : null,
+          }));
+
+          // Remove any items with null values
+          const validData = transformedData.filter(
+            (item) => item.codev && item.skill_category,
+          );
+
+          setTopCodevs(validData);
+        }
+      } catch (error) {
+        console.error("Error in fetchTopCodevs:", error);
+      }
     };
 
     fetchTopCodevs();
@@ -54,8 +88,10 @@ export default function WeeklyTop() {
             {topCodevs.map((top, index) => (
               <TableRow key={index} className={getRowStyle(index + 1)}>
                 <TableCell>{index + 1}</TableCell>
-                <TableCell>{top.codev.first_name}</TableCell>
-                <TableCell>{top.skill_category.name}</TableCell>
+                <TableCell>{top.codev?.first_name || "Unknown"}</TableCell>
+                <TableCell>
+                  {top.skill_category?.name || "Uncategorized"}
+                </TableCell>
                 <TableCell>{top.points}</TableCell>
               </TableRow>
             ))}
@@ -71,6 +107,7 @@ const getRowStyle = (rank: number) => {
     1: "bg-gradient-to-r from-[#9c813b] to-[#ecc258] text-white",
     2: "bg-gradient-to-r from-[#464646] to-[#a8a8a8] text-white",
     3: "bg-gradient-to-r from-[#563c1e] to-[#ba8240] text-white",
-  };
+  } as const;
+
   return styles[rank as keyof typeof styles] || "";
 };

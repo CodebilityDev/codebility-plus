@@ -259,6 +259,16 @@ export interface Task {
   created_at?: string;
   updated_at?: string;
   skill_category_id?: string; // NEW: Link to the skill category table
+  codev?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    image_url?: string;
+  };
+  skill_category?: {
+    id: string;
+    name: string;
+  };
 }
 
 export interface ExtendedTask extends Task {

@@ -235,9 +235,6 @@ const ProjectAddModal = () => {
     }
   };
 
-  console.log("cropImage", croppedImage);
-  console.log("cropFile", croppedFile);
-
   return (
     <Dialog open={isModalOpen} onOpenChange={resetForm}>
       <DialogContent className="max-w-2xl overflow-y-auto">

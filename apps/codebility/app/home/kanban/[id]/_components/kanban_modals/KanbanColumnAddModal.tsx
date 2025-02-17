@@ -64,7 +64,7 @@ export default function KanbanColumnAddModal() {
       <DialogContent className="w-[90%] max-w-3xl">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader>
-            <DialogTitle className="mb-2 text-left text-lg">
+            <DialogTitle className="mb-8 text-left text-lg">
               Add Column
             </DialogTitle>
           </DialogHeader>
@@ -74,7 +74,7 @@ export default function KanbanColumnAddModal() {
             type="text"
             label="Column Name"
             placeholder="Enter Column Name"
-            className="dark:bg-dark-200"
+            className="dark:bg-dark-200 mt-2"
             value={columnName}
             onChange={(e) => setColumnName(e.target.value)}
             disabled={isLoading}

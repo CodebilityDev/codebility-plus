@@ -152,8 +152,12 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
       ref={setColumnRef}
       style={columnStyle}
       className={`
-        relative flex h-full w-[400px] min-w-[400px] flex-col overflow-hidden
-        rounded-md border-2
+        relative flex h-full 
+        w-[calc(100vw-2rem)] min-w-[280px] 
+        flex-col overflow-hidden 
+        rounded-md border-2 
+        md:w-[350px] md:min-w-[350px]
+        lg:w-[400px] lg:min-w-[400px]
         ${
           isColumnDragging
             ? "border-blue-500 opacity-50 shadow-lg"
@@ -165,18 +169,18 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
       `}
       {...attributes}
     >
-      {/* Column Header (grab handle) */}
+      {/* Column Header - Update the padding and text sizes */}
       <div
-        className="flex items-center justify-between p-3 font-bold dark:bg-[#1E1F26]"
+        className="flex items-center justify-between p-2 font-bold dark:bg-[#1E1F26] md:p-3"
         {...listeners}
       >
-        <div className="flex items-center gap-3 text-gray-800 dark:text-gray-200">
+        <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 md:gap-3">
           {isEditing ? (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 md:gap-2">
               <Input
                 value={newName}
                 onChange={(e) => setNewName(e.target.value)}
-                className="h-6 w-32 text-sm"
+                className="h-6 w-24 text-xs md:w-32 md:text-sm"
                 autoFocus
               />
               <Button
@@ -198,18 +202,16 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
             </div>
           ) : (
             <>
-              {/* Drag handle icon */}
-              <GripVertical className="h-4 w-4 text-gray-400" />
-              {column.name}
-              {/* Task count */}
-              <div className="flex items-center justify-center rounded-full bg-zinc-300 px-3 py-1 text-sm dark:bg-[#1C1C1C]">
+              <GripVertical className="hidden h-4 w-4 text-gray-400 md:block" />
+              <span className="text-sm md:text-base">{column.name}</span>
+              <div className="flex items-center justify-center rounded-full bg-zinc-300 px-2 py-1 text-xs dark:bg-[#1C1C1C] md:px-3 md:text-sm">
                 {safeTasks.length}
               </div>
             </>
           )}
         </div>
 
-        {/* Column actions */}
+        {/* Column actions - Update button sizes */}
         {!isEditing && canModifyColumn && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
@@ -224,7 +226,7 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
             <DropdownMenuContent align="end" className="w-32">
               <DropdownMenuItem onClick={() => setIsEditing(true)}>
                 <Pencil className="mr-2 h-3 w-3" />
-                Edit name
+                <span className="text-sm">Edit name</span>
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={handleDelete}
@@ -232,22 +234,22 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
                 className="text-red-500 focus:text-red-500"
               >
                 <Trash2 className="mr-2 h-3 w-3" />
-                Delete
+                <span className="text-sm">Delete</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         )}
       </div>
 
-      {/* Column Body (Droppable + SortableContext for tasks) */}
-      <div className="flex flex-grow flex-col px-2 pb-2">
+      {/* Column Body - Update padding and spacing */}
+      <div className="flex flex-grow flex-col px-1 pb-2 md:px-2">
         <div
           ref={setDroppableRef}
           role="region"
           aria-label={`Tasks in ${column.name} column`}
           className={`
-            flex min-h-[100px] flex-col gap-4 rounded-md p-2
-            transition-colors duration-200
+            flex min-h-[100px] flex-col gap-2 rounded-md p-1 transition-colors duration-200
+            md:gap-4 md:p-2
             ${isOver ? "border-2 border-blue-200 bg-blue-50 dark:bg-blue-900/20" : ""}
           `}
         >
@@ -256,7 +258,7 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
             strategy={verticalListSortingStrategy}
           >
             {sortedTasks.length === 0 ? (
-              <div className="py-4 text-center text-gray-400">
+              <div className="py-4 text-center text-xs text-gray-400 md:text-sm">
                 No tasks in this column
               </div>
             ) : (
@@ -268,7 +270,7 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
         </div>
 
         {/* Add new task button/modal */}
-        <div className="pt-2">
+        <div className="pt-1 md:pt-2">
           <KanbanTaskAddModal
             listId={column.id}
             listName={column.name}
