@@ -1,4 +1,5 @@
 import { ChangeEvent, useCallback, useEffect, useMemo, useState } from "react";
+import Image from "next/image";
 import {
   createProject,
   getProjectCategories,
@@ -25,6 +26,8 @@ import toast from "react-hot-toast";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 
+import ImageCrop from "./ImageCrop";
+
 interface ProjectFormData {
   name: string;
   description?: string;
@@ -49,6 +52,10 @@ const ProjectAddModal = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
   const [categories, setCategories] = useState<SkillCategory[]>([]);
+
+  const [openImageCropper, setOpenImageCropper] = useState(false);
+  const [croppedImage, setCroppedImage] = useState<string | null>(null);
+  const [croppedFile, setCroppedFile] = useState<File | null>(null);
 
   const {
     register,
@@ -139,40 +146,39 @@ const ProjectAddModal = () => {
   const resetForm = () => {
     reset();
     setProjectImage(null);
+    setCroppedImage(null);
+    setCroppedFile(null);
     setSelectedMembers([]);
     onClose();
   };
 
+  /* store image in state */
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
     try {
-      // Create file name but don't pass it as an option
-      const fileNameWithoutSpaces = file.name.replace(/\s+/g, "_");
-      const { publicUrl } = await uploadImage(file, {
-        bucket: "codebility",
-        folder: `projectImage/${Date.now()}_${fileNameWithoutSpaces}`, // Include file name in folder path
-      });
+      const file = e.target.files?.[0];
 
-      setProjectImage(publicUrl);
-      setValue("main_image", publicUrl);
+      if (!file) return;
+
+      // store image in memory
+      setProjectImage(URL.createObjectURL(file));
+      setCroppedImage(URL.createObjectURL(file));
+      setCroppedFile(file);
+
+      setOpenImageCropper(true);
     } catch (error) {
       console.error("Failed to upload image:", error);
       toast.error("Failed to upload image");
     }
   };
 
+  /* remove image in state */
   const handleRemoveImage = async () => {
     if (!projectImage) return;
 
     try {
-      const imagePath = getImagePath(projectImage);
-      if (imagePath) {
-        await deleteImage(imagePath, "projectImage");
-      }
       setProjectImage(null);
       setValue("main_image", undefined);
+      setCroppedImage(null);
     } catch (error) {
       console.error("Failed to remove image:", error);
       toast.error("Failed to remove image");
@@ -186,7 +192,27 @@ const ProjectAddModal = () => {
 
     setIsLoading(true);
     try {
+      if (!croppedFile) {
+        throw new Error("Image is required");
+      }
+
+      // upload image to the server
+      const fileNameWithoutSpaces = croppedFile.name.replace(/\s+/g, "_");
+
+      const { publicUrl } = await uploadImage(croppedFile, {
+        bucket: "codebility",
+        folder: `projectImage`, // Include file name in folder path
+      });
+
+      if (!publicUrl) {
+        throw new Error("Failed to upload image");
+      }
+
+      //append image to data
+      data.main_image = publicUrl;
+
       const formData = new FormData();
+
       Object.entries(data).forEach(([key, value]) => {
         if (value !== undefined && value !== null) {
           formData.append(key, value);
@@ -209,9 +235,12 @@ const ProjectAddModal = () => {
     }
   };
 
+  console.log("cropImage", croppedImage);
+  console.log("cropFile", croppedFile);
+
   return (
     <Dialog open={isModalOpen} onOpenChange={resetForm}>
-      <DialogContent className="max-w-2xl">
+      <DialogContent className="max-w-2xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Create New Project</DialogTitle>
           <DialogDescription>
@@ -219,19 +248,22 @@ const ProjectAddModal = () => {
           </DialogDescription>
         </DialogHeader>
 
-        <div
-          className="overflow-y-auto px-1"
-          style={{ maxHeight: "calc(100vh - 200px)" }}
-        >
+        <div className=" px-1" style={{ maxHeight: "calc(100vh - 200px)" }}>
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
             {/* Image Upload Section */}
-            <div className="flex items-center gap-4">
-              <div className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md">
-                {projectImage ? (
-                  <img
-                    src={projectImage}
+            <div className="flex flex-col items-center gap-4">
+              <div /* className="relative h-24 w-24 flex-shrink-0 overflow-hidden rounded-md" */
+                className="relative"
+              >
+                {/* todo */}
+                {croppedImage ? (
+                  <Image
+                    src={croppedImage}
                     alt="Project"
-                    className="h-full w-full object-cover"
+                    className="h-full w-full cursor-pointer object-contain"
+                    onClick={() => setOpenImageCropper(true)}
+                    width={408} //todo: might need to adjust this
+                    height={192} //todo: might need to adjust this
                   />
                 ) : (
                   <div className="flex h-full w-full items-center justify-center bg-gray-100">
@@ -239,7 +271,8 @@ const ProjectAddModal = () => {
                   </div>
                 )}
               </div>
-              <div className="flex flex-col gap-2">
+
+              <div className="flex gap-2">
                 <label
                   htmlFor="image-upload"
                   className="cursor-pointer text-sm"
@@ -253,6 +286,15 @@ const ProjectAddModal = () => {
                   className="hidden"
                   onChange={handleImageChange}
                 />
+                <ImageCrop
+                  image={projectImage || ""}
+                  setImage={setCroppedImage}
+                  setFile={setCroppedFile}
+                  open={openImageCropper}
+                  setOpen={setOpenImageCropper}
+                />
+
+                {/* todo */}
                 {projectImage && (
                   <button
                     type="button"
@@ -378,26 +420,26 @@ const ProjectAddModal = () => {
               />
             </div>
           </form>
-        </div>
 
-        <DialogFooter>
-          <Button
-            type="button"
-            variant="outline"
-            onClick={resetForm}
-            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isLoading || isDataLoading}
-            onClick={handleSubmit(onSubmit)}
-            className=" text-white"
-          >
-            {isLoading ? "Creating..." : "Create Project"}
-          </Button>
-        </DialogFooter>
+          <DialogFooter className="pb-10">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={resetForm}
+              className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+            >
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isLoading || isDataLoading}
+              onClick={handleSubmit(onSubmit)}
+              className=" text-white"
+            >
+              {isLoading ? "Creating..." : "Create Project"}
+            </Button>
+          </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );
