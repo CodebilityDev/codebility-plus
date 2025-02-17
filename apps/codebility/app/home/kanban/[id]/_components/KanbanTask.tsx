@@ -107,7 +107,8 @@ function KanbanTask({ task, columnId }: Props) {
         style={style}
         {...attributes}
         {...listeners}
-        className={`group relative mt-2 flex cursor-grab flex-col gap-3 rounded-lg bg-white p-4 
+        className={`group relative mt-1 flex cursor-grab flex-col gap-2 rounded-lg bg-white 
+          p-2 md:mt-2 md:gap-3 md:p-4 
           ${
             isDragging
               ? "rotate-3 scale-105 shadow-2xl ring-2 ring-blue-500 ring-offset-2"
@@ -121,12 +122,16 @@ function KanbanTask({ task, columnId }: Props) {
 
         {/* Task Header */}
         <div className="flex items-center justify-between">
-          <h3 className="text-base font-bold text-gray-800 transition-colors group-hover:text-blue-600 dark:text-gray-200 dark:group-hover:text-blue-400">
+          <h3
+            className="mr-2 line-clamp-2 flex-1 text-sm font-bold 
+            text-gray-800 transition-colors group-hover:text-blue-600
+            dark:text-gray-200 dark:group-hover:text-blue-400 md:text-base"
+          >
             {task.title}
           </h3>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
             <div
-              className={`flex items-center justify-center rounded-full p-1
+              className={`flex items-center justify-center rounded-full p-0.5 md:p-1
               ${
                 task.priority === "critical"
                   ? "bg-red-100 dark:bg-red-900/30"
@@ -138,7 +143,7 @@ function KanbanTask({ task, columnId }: Props) {
               }`}
             >
               <PriorityIcon
-                className={`h-4 w-4 
+                className={`h-3 w-3 md:h-4 md:w-4 
                 ${
                   task.priority === "critical"
                     ? "text-red-500"
@@ -150,7 +155,10 @@ function KanbanTask({ task, columnId }: Props) {
                 }`}
               />
             </div>
-            <div className="h-8 w-8 overflow-hidden rounded-full border-2 border-white shadow-md transition-colors group-hover:border-blue-200 dark:border-gray-800">
+            <div
+              className="h-6 w-6 overflow-hidden rounded-full border-2 border-white shadow-md transition-colors 
+              group-hover:border-blue-200 dark:border-gray-800 md:h-8 md:w-8"
+            >
               {primaryImage ? (
                 <img
                   src={primaryImage}
@@ -167,26 +175,41 @@ function KanbanTask({ task, columnId }: Props) {
         {/* Skill Category Badge */}
         {(task as any).skill_category && (
           <div>
-            <span className="inline-block rounded-full bg-blue-100 px-3 py-1 text-xs font-semibold text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
+            <span
+              className="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold 
+              text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 md:px-3 md:py-1"
+            >
               {(task as any).skill_category.name}
             </span>
           </div>
         )}
 
         {/* Task Details */}
-        <div className="flex flex-wrap gap-2 text-sm text-gray-600 dark:text-gray-400">
+        <div className="flex flex-wrap gap-1 text-xs text-gray-600 dark:text-gray-400 md:gap-2 md:text-sm">
           {task.difficulty && (
-            <span className="inline-flex items-center rounded-md bg-purple-100 px-2 py-1 text-xs font-medium text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
+            <span
+              className="inline-flex items-center rounded-md bg-purple-100 
+              px-1.5 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 
+              dark:text-purple-300 md:px-2 md:py-1"
+            >
               {task.difficulty}
             </span>
           )}
           {typeof task.points === "number" && (
-            <span className="inline-flex items-center rounded-md bg-green-100 px-2 py-1 text-xs font-medium text-green-700 dark:bg-green-900/30 dark:text-green-300">
+            <span
+              className="inline-flex items-center rounded-md bg-green-100 
+              px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 
+              dark:text-green-300 md:px-2 md:py-1"
+            >
               {task.points} pts
             </span>
           )}
           {task.type && (
-            <span className="inline-flex items-center rounded-md bg-gray-100 px-2 py-1 text-xs font-medium text-gray-700 dark:bg-gray-700 dark:text-gray-300">
+            <span
+              className="inline-flex items-center rounded-md bg-gray-100 
+              px-1.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-700 
+              dark:text-gray-300 md:px-2 md:py-1"
+            >
               {task.type}
             </span>
           )}
@@ -194,13 +217,15 @@ function KanbanTask({ task, columnId }: Props) {
 
         {/* Sidekicks */}
         {sidekicks.length > 0 && (
-          <div className="flex -space-x-2 pt-2">
+          <div className="flex -space-x-1.5 pt-1 md:-space-x-2 md:pt-2">
             {sidekicks.slice(0, 3).map((sidekickId) => {
               const member = sidekickDetails.find((m) => m.id === sidekickId);
               return (
                 <div
                   key={sidekickId}
-                  className="h-7 w-7 overflow-hidden rounded-full border-2 border-white shadow-sm transition-colors group-hover:border-blue-200 dark:border-gray-800"
+                  className="h-5 w-5 overflow-hidden rounded-full border-2 border-white 
+                    shadow-sm transition-colors group-hover:border-blue-200 dark:border-gray-800 
+                    md:h-7 md:w-7"
                 >
                   {member && member.image_url ? (
                     <img
@@ -209,13 +234,19 @@ function KanbanTask({ task, columnId }: Props) {
                       className="h-full w-full object-cover"
                     />
                   ) : (
-                    <DefaultAvatar size={28} />
+                    <>
+                      <DefaultAvatar size={20} className="md:hidden" />
+                      <DefaultAvatar size={28} className="hidden md:block" />
+                    </>
                   )}
                 </div>
               );
             })}
             {sidekicks.length > 3 && (
-              <div className="flex h-7 w-7 items-center justify-center rounded-full bg-gray-200 text-xs font-semibold dark:bg-gray-700">
+              <div
+                className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 
+                text-[10px] font-semibold dark:bg-gray-700 md:h-7 md:w-7 md:text-xs"
+              >
                 +{sidekicks.length - 3}
               </div>
             )}

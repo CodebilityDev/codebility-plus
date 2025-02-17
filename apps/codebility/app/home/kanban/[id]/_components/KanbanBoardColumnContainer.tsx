@@ -264,7 +264,8 @@ export default function KanbanBoardColumnContainer({
           items={columnIds}
           strategy={horizontalListSortingStrategy}
         >
-          <ol className="flex w-full gap-2 p-4">
+          {/* Updated class names for the container */}
+          <ol className="flex min-h-[calc(100vh-12rem)] w-full gap-4 p-2 md:p-4">
             {boardData.map((column) => (
               <KanbanColumn
                 key={column.id}

@@ -1,6 +1,9 @@
+"use client";
+
 import Link from "next/link";
 import pathsConfig from "@/config/paths.config";
 import { ArrowRightIcon, IconSearch } from "@/public/assets/svgs";
+import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
 
 import KanbanBoardsSearch from "../../_components/kanban-boards-search";
@@ -13,6 +16,9 @@ interface KanbanBoardProps {
 }
 
 export default function KanbanBoard({ boardData }: KanbanBoardProps) {
+  const user = useUserStore((state) => state.user);
+  const canAddColumn = user?.role_id === 1 || user?.role_id === 5;
+
   if (!boardData) {
     return (
       <div className="text-center text-red-500">Board data not found.</div>
@@ -50,7 +56,7 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
                 />
               </div>
 
-              <KanbanColumnAddButton boardId={boardData.id} />
+              {canAddColumn && <KanbanColumnAddButton boardId={boardData.id} />}
             </div>
           </div>
 
@@ -65,7 +71,7 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
       </div>
 
       {/* Modal */}
-      <KanbanColumnAddModal />
+      {canAddColumn && <KanbanColumnAddModal />}
     </div>
   );
 }
