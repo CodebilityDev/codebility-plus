@@ -55,7 +55,12 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
           loading="eager"
           priority
         />
-        <div className="absolute right-2 top-2">
+        <div
+          className={`absolute right-2 top-2 flex items-center rounded-xl bg-slate-200 px-2
+               py-1 text-slate-800 transition-all 
+               dark:bg-zinc-700 dark:text-white
+          `}
+        >
           <span
             className={`rounded-full px-3 py-1 text-sm font-medium 
             ${
@@ -148,17 +153,17 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
         <div className="flex items-center gap-3">
           {project.github_link && (
             <Link href={project.github_link} target="_blank" className="group">
-              <IconGithub className="size-5 transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert" />
+              <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
             </Link>
           )}
           {project.website_url && (
             <Link href={project.website_url} target="_blank" className="group">
-              <IconLink className="size-5 transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert" />
+              <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
             </Link>
           )}
           {project.figma_link && (
             <Link href={project.figma_link} target="_blank" className="group">
-              <IconFigma className="size-5 transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert" />
+              <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
             </Link>
           )}
         </div>
@@ -176,7 +181,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
             onClick={() => onOpen("projectEditModal", project)}
             className="flex-1"
           >
-            <span className="text-dark100_light900">Edit Project</span>
+            <span className="">Edit Project</span>
           </Button>
         </div>
       </div>
