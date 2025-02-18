@@ -23,6 +23,7 @@ import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
 import TaskDeleteModal from "../../app/home/kanban/[id]/_components/tasks/TaskDeleteModal";
 import TaskEditModal from "../../app/home/kanban/[id]/_components/tasks/TaskEditModal";
 import DeleteWarningModal from "../modals/DeleteWarningModal";
+import TechStackModal from "../modals/TechStackModal";
 
 export const ModalProviderHome = () => {
   const [isMounted, setIsMounted] = useState(false);
@@ -64,6 +65,8 @@ export const ModalProviderHome = () => {
       <EditRoleModal />
       <DeleteRoleModal />
       <DeleteWarningModal />
+
+      <TechStackModal />
     </>
   );
 };
