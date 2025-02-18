@@ -13,6 +13,7 @@ import toast from "react-hot-toast";
 import { Button } from "@codevs/ui/button";
 
 import { updateCodev } from "../action";
+import UploadPhotoModal from "./UploadPhotoModal";
 
 type PhotoProps = {
   data: {
@@ -25,6 +26,9 @@ const Photo = ({ data }: PhotoProps) => {
   const [isUploading, setIsUploading] = useState(false);
   const { onOpen } = useModal();
 
+  const [croppedAvatar, setCroppedAvatar] = useState<string | null>(null);
+  const [openUploadModal, setOpenUploadModal] = useState(false);
+
   useEffect(() => {
     if (data?.image_url) {
       setAvatar(data.image_url);
@@ -34,27 +38,14 @@ const Photo = ({ data }: PhotoProps) => {
   const handleUploadAvatar = async (
     event: React.ChangeEvent<HTMLInputElement>,
   ) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
-
-    const toastId = toast.loading("Uploading your avatar...");
-    setIsUploading(true);
-
     try {
-      const { publicUrl } = await uploadImage(file, {
-        bucket: "codebility",
-        folder: "profileImage",
-      });
+      const file = event.target.files?.[0];
+      if (!file) return;
 
-      await updateCodev({ image_url: publicUrl });
-
-      setAvatar(publicUrl);
-      toast.success("Avatar uploaded successfully!", { id: toastId });
+      setCroppedAvatar(URL.createObjectURL(file));
+      setOpenUploadModal(true);
     } catch (error) {
       console.error("Error uploading avatar:", error);
-      toast.error("Failed to upload avatar", { id: toastId });
-    } finally {
-      setIsUploading(false);
     }
   };
 
@@ -92,7 +83,7 @@ const Photo = ({ data }: PhotoProps) => {
       <div className="flex gap-4">
         <div className="relative size-[80px]">
           <Image
-            src={typeof avatar === "string" ? avatar : defaultAvatar}
+            src={avatar}
             alt="Avatar"
             fill
             sizes="80px"
@@ -100,8 +91,8 @@ const Photo = ({ data }: PhotoProps) => {
           />
         </div>
         <div className="flex flex-col justify-center gap-2">
-          <div className="flex gap-4">
-            {avatar === defaultAvatar ? (
+          <div className="flex flex-col justify-start gap-2">
+            { avatar === defaultAvatar ? (
               <label htmlFor="image" className="cursor-pointer">
                 <p className="transition duration-300 hover:text-blue-100">
                   {isUploading ? "Uploading..." : "Upload Image"}
@@ -127,6 +118,14 @@ const Photo = ({ data }: PhotoProps) => {
             )}
           </div>
         </div>
+
+        <UploadPhotoModal
+          open={openUploadModal}
+          setOpen={setOpenUploadModal}
+          image={croppedAvatar || ""}
+          setImage={setCroppedAvatar}
+          setAvatar={setAvatar}
+        />
       </div>
     </Box>
   );

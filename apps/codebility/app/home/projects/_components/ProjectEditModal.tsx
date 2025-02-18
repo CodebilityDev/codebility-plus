@@ -239,10 +239,6 @@ const ProjectEditModal = () => {
       const memberIds = selectedMembers.map((member) => member.id);
       form.append("members", JSON.stringify(memberIds));
 
-      console.log("form data", formData);
-      console.log("form", form);
-      console.log("find me data.id", data.id);
-
       const response = await updateProject(data.id, form);
 
       if (response.success) {
@@ -291,7 +287,7 @@ const ProjectEditModal = () => {
               <div className="flex flex-row gap-2">
                 <label
                   htmlFor="image-upload"
-                  className="cursor-pointer text-sm text-blue-600 hover:text-blue-800"
+                  className="cursor-pointer text-sm text-blue-600 hover:text-blue-800 dark:text-white dark:hover:text-blue-100"
                 >
                   Upload Image
                 </label>
