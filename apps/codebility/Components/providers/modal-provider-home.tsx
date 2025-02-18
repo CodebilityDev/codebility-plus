@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import ClientAddModal from "@/app/home/clients/_components/ClientAddModal";
 import ClientEditModal from "@/app/home/clients/_components/ClientEditModal";
+import ProfileModal from "@/app/home/interns/_components/ProfileModal";
 import BoardAddModal from "@/app/home/kanban/_components/BoardAddModal";
 import ColumnAddModal from "@/app/home/kanban/[id]/_components/kanban_modals/KanbanColumnAddModal";
 import TaskAddModal from "@/app/home/kanban/[id]/_components/tasks/TaskAddModal";
@@ -16,7 +17,6 @@ import DeleteRoleModal from "@/app/home/settings/roles/_components/DeleteRoleMod
 import EditRoleModal from "@/app/home/settings/roles/_components/EditRoleModal";
 import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
 import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
-import ProfileModal from "@/Components/modals/ProfileModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
 

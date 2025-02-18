@@ -102,6 +102,7 @@ export interface Codev {
   years_of_experience?: number;
   role_id?: number;
   mentor_id?: string;
+  codev_points?: CodevPoints[];
 }
 
 export type InternalStatus =
@@ -174,7 +175,6 @@ export interface Client {
   email?: string;
   phone_number?: string;
   industry?: string;
-  company_name?: string;
   company_logo?: string;
   website?: string;
   status?: string; // Defaults to 'prospect'

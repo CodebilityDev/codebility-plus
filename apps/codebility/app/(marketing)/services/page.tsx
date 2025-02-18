@@ -77,7 +77,7 @@ export default function ServicesPage() {
           )
         `,
         )
-        .eq("status", "active");
+        .eq("status", "inprogress");
 
       if (error) {
         console.error("Error fetching projects:", error);
