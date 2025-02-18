@@ -54,6 +54,8 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
 
   // Example roles that can modify columns:
   const canModifyColumn = user?.role_id === 1 || user?.role_id === 5;
+  // Example roles that can add tasks:
+  const canAddTask = user?.role_id === 1 || user?.role_id === 5;
 
   // 1) Make the whole column "sortable" so we can reorder columns horizontally
   const {
@@ -270,14 +272,16 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
         </div>
 
         {/* Add new task button/modal */}
-        <div className="pt-1 md:pt-2">
-          <KanbanTaskAddModal
-            listId={column.id}
-            listName={column.name}
-            projectId={projectId}
-            totalTask={safeTasks.length}
-          />
-        </div>
+        {canAddTask && (
+          <div className="pt-1 md:pt-2">
+            <KanbanTaskAddModal
+              listId={column.id}
+              listName={column.name}
+              projectId={projectId}
+              totalTask={safeTasks.length}
+            />
+          </div>
+        )}
       </div>
     </li>
   );
