@@ -1,59 +1,100 @@
 import React, { memo, useState } from "react";
+import { StaticImageData } from "next/image";
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
-  DialogTitle,
 } from "@/Components/ui/dialog";
 import { Slider } from "@/Components/ui/sliders";
 import getCroppedImg from "@/hooks/useImageCrop";
+import { uploadImage } from "@/utils/uploadImage";
+import { DialogTitle } from "@radix-ui/react-dialog";
 import Cropper, { Area, Point } from "react-easy-crop";
+import toast from "react-hot-toast";
 
-export default function ImageCrop({
-  image,
-  setImage,
-  setFile,
+import { cn } from "@codevs/ui";
+
+import { updateCodev } from "../action";
+
+export default function UploadPhotoModal({
   open,
   setOpen,
+  image,
+  setImage,
+  setAvatar,
 }: {
-  image: string;
-  setImage: React.Dispatch<React.SetStateAction<string | null>>;
-  setFile: React.Dispatch<React.SetStateAction<File | null>>;
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  image: string;
+  setImage: React.Dispatch<React.SetStateAction<string | null>>;
+  setAvatar: React.Dispatch<React.SetStateAction<string | StaticImageData>>;
 }) {
   const [crop, setCrop] = useState<Point>({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   };
 
+  const handleReset = () => {
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setCroppedAreaPixels(null);
+    setImage(null);
+  };
+
+  /* 
+    upload photo in server
+  */
   const handleSave = async () => {
+    const toastId = toast.loading("Uploading your avatar...");
+    setIsUploading(true);
+
     try {
       const { url, file } = await getCroppedImg(image, croppedAreaPixels, 0);
 
       if (!url || !file) {
         throw new Error("Failed to crop image");
       }
-      setImage(url);
-      setFile(file);
+
+      const { publicUrl } = await uploadImage(file, {
+        bucket: "codebility",
+        folder: "profileImage",
+      });
+
+      await updateCodev({ image_url: publicUrl });
+
+      setAvatar(publicUrl);
+
+      toast.success("Avatar uploaded successfully!", { id: toastId });
+
       setOpen(false);
     } catch (error) {
       console.error(error);
       setError("Failed to crop image");
+      toast.error((error as Error).message);
+    } finally {
+      setIsUploading(false);
+      handleReset();
     }
+  };
+
+  const handleCancel = () => {
+    handleReset();
+    setError(null);
+    setOpen(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogContent className="max-w-3xl">
         <DialogHeader>
-          <DialogTitle>Crop Image</DialogTitle>
+          <DialogTitle>Upload Photo</DialogTitle>
         </DialogHeader>
 
         <div className="relative h-96 w-full">
@@ -62,7 +103,8 @@ export default function ImageCrop({
             image={image}
             crop={crop}
             zoom={zoom}
-            aspect={21 / 10}
+            aspect={1}
+            cropShape="round"
             restrictPosition={false}
             onCropChange={setCrop}
             onCropComplete={onCropComplete}
@@ -90,18 +132,24 @@ export default function ImageCrop({
 
         <DialogFooter>
           <Button
-            variant="outline"
-            onClick={() => {
-              setOpen(false);
-            }}
+            onClick={handleCancel}
+            disabled={isUploading}
+            className={cn(isUploading && "cursor-not-allowed opacity-80")}
           >
             Cancel
           </Button>
-          <Button onClick={handleSave}>Save</Button>
+
+          <Button
+            onClick={handleSave}
+            disabled={isUploading}
+            className={cn(isUploading && "cursor-not-allowed opacity-80")}
+          >
+            Upload
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 }
 
-memo(ImageCrop);
+memo(UploadPhotoModal);
