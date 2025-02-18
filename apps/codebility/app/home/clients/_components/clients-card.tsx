@@ -16,6 +16,7 @@ import {
   IconMapPin,
   IconTelephone,
 } from "@/public/assets/svgs";
+import { useUserStore } from "@/store/codev-store";
 import { Client } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
@@ -30,6 +31,12 @@ export default function ClientCards({ clients }: Props) {
   const [isLoading, setIsLoading] = useState(false);
   const { onOpen } = useModal();
   const pathname = usePathname();
+  const { user } = useUserStore();
+  const canEditClients =
+    user?.role_id === 1 ||
+    user?.role_id === 2 ||
+    user?.role_id === 3 ||
+    user?.role_id === 5;
 
   const {
     currentPage,
@@ -218,7 +225,7 @@ export default function ClientCards({ clients }: Props) {
                     </div>
 
                     {/* Bottom-right buttons */}
-                    {isActive ? (
+                    {isActive && canEditClients ? (
                       // For active clients: Show "Edit" button
                       <div className="flex justify-end">
                         <Button

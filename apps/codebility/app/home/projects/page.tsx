@@ -4,8 +4,8 @@ import { Project } from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
+import AddProjectButton from "./_components/AddProjectButton";
 import ProjectsCard from "./_components/projects-card";
-import InsertButton from "./_components/projects-insert-button";
 
 const Projects = () => {
   const supabase = getSupabaseServerComponentClient();
@@ -25,7 +25,7 @@ const Projects = () => {
       <div className="flex flex-row justify-between gap-4">
         <H1>Projects</H1>
         <div className="flex items-center gap-4">
-          <InsertButton />
+          <AddProjectButton />
         </div>
       </div>
       {Projects && Projects.length > 0 && (

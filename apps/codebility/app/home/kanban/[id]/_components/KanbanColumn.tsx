@@ -47,15 +47,12 @@ interface Props {
 export default function KanbanColumn({ column, projectId, tasks }: Props) {
   const router = useRouter();
   const { user } = useUserStore();
+  const canModifyColumn = user?.role_id === 1 || user?.role_id === 5;
+  const canAddTask = user?.role_id === 1 || user?.role_id === 5;
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(column.name);
 
   const safeTasks = tasks ?? [];
-
-  // Example roles that can modify columns:
-  const canModifyColumn = user?.role_id === 1 || user?.role_id === 5;
-  // Example roles that can add tasks:
-  const canAddTask = user?.role_id === 1 || user?.role_id === 5;
 
   // 1) Make the whole column "sortable" so we can reorder columns horizontally
   const {
