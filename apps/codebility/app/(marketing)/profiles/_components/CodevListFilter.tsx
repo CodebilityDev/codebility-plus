@@ -8,7 +8,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
-import { Codev } from "@/types/home/codev"; // Ensure this type includes display_position
+import { Codev } from "@/types/home/codev";
 
 import { removeArrayDuplicate } from "../../_lib/util";
 
@@ -18,7 +18,7 @@ interface Props {
   users: Codev[]; // Ensure the users array uses the correct type
 }
 
-const ProfileListsFilter: React.FC<Props> = ({
+const CodevListFilter: React.FC<Props> = ({
   selectedPosition,
   setSelectedPosition,
   users,
@@ -81,4 +81,4 @@ const ProfileListsFilter: React.FC<Props> = ({
   );
 };
 
-export default ProfileListsFilter;
+export default CodevListFilter;

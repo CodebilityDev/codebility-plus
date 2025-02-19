@@ -166,6 +166,45 @@ const config: Config = {
           foreground: "hsl(var(--card-foreground))",
           client: "rgba(var(--card-clients))",
         },
+
+        status: {
+          training: {
+            DEFAULT: "#997000", // yellow-800
+            text: "#FFFFFF",
+          },
+          graduated: {
+            DEFAULT: "#4BCE97", // green
+            text: "#FFFFFF",
+          },
+          busy: {
+            DEFAULT: "#FEE2E2", // red-200
+            text: "#991B1B",
+          },
+          failed: {
+            DEFAULT: "#FEE2E2", // red-200
+            text: "#991B1B",
+          },
+          available: {
+            DEFAULT: "#DCFCE7", // green-200
+            text: "#166534",
+          },
+          deployed: {
+            DEFAULT: "#F3E8FF", // purple-200
+            text: "#6B21A8",
+          },
+          vacation: {
+            DEFAULT: "#DBEAFE", // blue-200
+            text: "#1E40AF",
+          },
+          clientready: {
+            DEFAULT: "#F5F3FF", // violet-200
+            text: "#5B21B6",
+          },
+          availability: {
+            online: "#4BCE97", // green
+            offline: "#D45454", // red-100
+          },
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
