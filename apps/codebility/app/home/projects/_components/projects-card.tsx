@@ -44,7 +44,14 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
   }, [project]);
 
   return (
-    <div className="background-box flex flex-col overflow-hidden rounded-xl border border-zinc-200 transition-all duration-300 hover:shadow-lg dark:border-zinc-700">
+    <div
+      onClick={() => onOpen("projectViewModal", project)}
+      className={`background-box  flex
+        cursor-pointer flex-col overflow-hidden rounded-xl 
+        border border-zinc-200 transition-all
+        hover:shadow-lg dark:border-zinc-700 dark:shadow-slate-700
+        `}
+    >
       {/* Project Image */}
       <div className="relative h-48 w-full">
         <Image
@@ -166,23 +173,6 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
               <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
             </Link>
           )}
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-2">
-          <Button
-            onClick={() => onOpen("projectViewModal", project)}
-            className="flex-1"
-            variant="outline"
-          >
-            <span className="text-dark100_light900">View Details</span>
-          </Button>
-          <Button
-            onClick={() => onOpen("projectEditModal", project)}
-            className="flex-1"
-          >
-            <span className="">Edit Project</span>
-          </Button>
         </div>
       </div>
     </div>
