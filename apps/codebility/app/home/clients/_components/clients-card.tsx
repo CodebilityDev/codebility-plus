@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -18,10 +18,13 @@ import {
 } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { Client } from "@/types/home/codev";
+
 import toast from "react-hot-toast";
+
 
 import { copyToClipboard, handleDownload } from "../_lib/utils";
 import { deleteClientAction, toggleClientStatusAction } from "../action";
+import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 
 interface Props {
   clients: Client[];
@@ -116,21 +119,25 @@ export default function ClientCards({ clients }: Props) {
                 `}
               >
                 {/* Top-right button toggles status */}
-                <button
-                  onClick={() => handleToggleStatus(client.id!)}
-                  className="absolute right-4 top-4 z-10 cursor-pointer text-white"
-                  disabled={isLoading}
-                >
-                  {isActive ? (
-                    <div className="bg-green rounded px-2 py-1 text-xs">
-                      Active
-                    </div>
-                  ) : (
-                    <div className="rounded bg-red-500 px-2 py-1 text-xs">
-                      Inactive
-                    </div>
-                  )}
-                </button>
+                <div className="absolute right-4 top-4 z-10 flex cursor-pointer items-center gap-2 text-white">
+                  <div>
+                    {isActive ? (
+                      <div className="bg-green rounded px-2 py-1 text-xs">
+                        Active
+                      </div>
+                    ) : (
+                      <div className="rounded bg-red-500 px-2 py-1 text-xs">
+                        Inactive
+                      </div>
+                    )}
+                  </div>
+
+                  <SwitchStatusButton
+                    isActive={isActive}
+                    handleSwitch={() => handleToggleStatus(client.id!)}
+                    disabled={isLoading}
+                  />
+                </div>
 
                 <div className="flex h-full flex-col md:flex-row">
                   {/* Left side: image/logo */}
@@ -284,3 +291,4 @@ export default function ClientCards({ clients }: Props) {
     </>
   );
 }
+
