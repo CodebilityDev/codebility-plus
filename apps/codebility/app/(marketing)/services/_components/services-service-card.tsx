@@ -46,14 +46,14 @@ export default function ServiceCard({ service }: Props) {
     <div className="border-light-900/5 bg-light-700/10 flex h-full flex-1 flex-col gap-6 rounded-lg border-2 p-4 text-white">
       {/* Increased container height and gap */}
       <div
-        className="relative w-full overflow-hidden rounded-lg"
-        style={{ aspectRatio: "21/9", minHeight: "400px" }}
+        className="relative h-48 w-full overflow-hidden rounded-lg"
+       /*  style={{ aspectRatio: "21/9", minHeight: "400px" }} */
       >
         <Image
           src={imageUrl}
           alt={name}
           fill
-          sizes="(min-width: 1024px) 960px, (min-width: 640px) 720px, 100vw"
+          /* sizes="(min-width: 1024px) 960px, (min-width: 640px) 720px, 100vw" */
           className="absolute bg-center object-cover"
           priority
           quality={100}
