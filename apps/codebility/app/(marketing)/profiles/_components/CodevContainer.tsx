@@ -7,13 +7,7 @@ import IntroText from "@/Components/shared/home/IntroText";
 import { Codev } from "@/types/home/codev";
 import { motion } from "framer-motion";
 
-interface CodevContainerProps {
-  filteredCodevs: Codev[];
-}
-
-export default function CodevContainer({
-  filteredCodevs,
-}: CodevContainerProps) {
+export default function CodevContainer() {
   return (
     <div className="flex flex-col gap-4">
       <motion.div

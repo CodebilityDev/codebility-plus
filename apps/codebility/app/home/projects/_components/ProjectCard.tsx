@@ -3,18 +3,16 @@
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getMembers, getTeamLead } from "@/app/home/projects/actions";
+import {
+  getMembers,
+  getTeamLead,
+  SimpleMemberData,
+} from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
-import DefaultPagination from "@/Components/ui/pagination";
-import { pageSize } from "@/constants";
-import { ModalType, useModal } from "@/hooks/use-modal-projects";
-import usePagination from "@/hooks/use-pagination";
+import { ModalType } from "@/hooks/use-modal-projects";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
-import { Codev, Project } from "@/types/home/codev";
-
-// Import the ModalType
+import { Project } from "@/types/home/codev";
 
 interface ProjectCardProps {
   project: Project;
@@ -22,20 +20,19 @@ interface ProjectCardProps {
 }
 
 const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
-  const [teamLead, setTeamLead] = useState<Codev | null>(null);
-  const [members, setMembers] = useState<Codev[]>([]);
+  const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
+  const [members, setMembers] = useState<SimpleMemberData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchTeamData = async () => {
-      if (project.team_leader_id) {
-        const { data } = await getTeamLead(project.team_leader_id);
-        if (data) setTeamLead(data);
-      }
+      // Use the project's id to fetch team data
+      if (project.id) {
+        const { data: teamLeadData } = await getTeamLead(project.id);
+        if (teamLeadData) setTeamLead(teamLeadData);
 
-      if (project.members && project.members.length > 0) {
-        const { data } = await getMembers(project.members);
-        if (data) setMembers(data);
+        const { data: membersData } = await getMembers(project.id);
+        if (membersData) setMembers(membersData);
       }
       setIsLoading(false);
     };
@@ -46,11 +43,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
   return (
     <div
       onClick={() => onOpen("projectViewModal", project)}
-      className={`background-box  flex
-        cursor-pointer flex-col overflow-hidden rounded-xl 
-        border border-zinc-200 transition-all
-        hover:shadow-lg dark:border-zinc-700 dark:shadow-slate-700
-        `}
+      className="background-box flex cursor-pointer flex-col overflow-hidden rounded-xl border border-zinc-200 transition-all hover:shadow-lg dark:border-zinc-700 dark:shadow-slate-700"
     >
       {/* Project Image */}
       <div className="relative h-48 w-full">
@@ -62,15 +55,9 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
           loading="eager"
           priority
         />
-        <div
-          className={`absolute right-2 top-2 flex items-center rounded-xl bg-slate-200 px-2
-               py-1 text-slate-800 transition-all 
-               dark:bg-zinc-700 dark:text-white
-          `}
-        >
+        <div className="absolute right-2 top-2 flex items-center rounded-xl bg-slate-200 px-2 py-1 text-slate-800 transition-all dark:bg-zinc-700 dark:text-white">
           <span
-            className={`rounded-full px-3 py-1 text-sm font-medium 
-            ${
+            className={`rounded-full px-3 py-1 text-sm font-medium ${
               project.status === "active"
                 ? "bg-green-500/20 text-green-500"
                 : project.status === "pending"
@@ -179,36 +166,4 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
   );
 };
 
-const ProjectsCard = ({ projects }: { projects: Project[] }) => {
-  const { onOpen } = useModal();
-  const {
-    currentPage,
-    totalPages,
-    paginatedData: paginatedProjects,
-    handleNextPage,
-    handlePreviousPage,
-    setCurrentPage,
-  } = usePagination(projects, pageSize.projects);
-
-  return (
-    <>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {paginatedProjects.map((project: Project) => (
-          <ProjectCard key={project.id} project={project} onOpen={onOpen} />
-        ))}
-      </div>
-
-      {projects && projects.length > pageSize.projects && (
-        <DefaultPagination
-          currentPage={currentPage}
-          handleNextPage={handleNextPage}
-          handlePreviousPage={handlePreviousPage}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-        />
-      )}
-    </>
-  );
-};
-
-export default ProjectsCard;
+export default ProjectCard;

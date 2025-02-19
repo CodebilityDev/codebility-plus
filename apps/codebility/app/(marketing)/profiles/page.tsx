@@ -63,7 +63,7 @@ export default async function Profiles() {
     >
       <div className="bg-code-pattern absolute inset-0 bg-repeat opacity-5"></div>
       <div className="relative flex flex-col gap-8">
-        <CodevContainer filteredCodevs={sortedCodevs} />
+        <CodevContainer />
         <Suspense fallback={<UsersSkeleton />}>
           <CodevList codevs={sortedCodevs} />
         </Suspense>
