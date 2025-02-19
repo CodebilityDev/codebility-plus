@@ -9,35 +9,35 @@ const STATUS_CONFIG: Record<
 > = {
   TRAINING: {
     label: "Training",
-    className: "bg-yellow-800 text-white border-yellow-800",
+    className: "bg-status-training text-status-training-text",
   },
   GRADUATED: {
     label: "Graduated",
-    className: "bg-green text-white border-green",
+    className: "bg-status-graduated text-status-graduated-text",
   },
   BUSY: {
     label: "Busy",
-    className: "bg-red-200 border-red-200",
+    className: "bg-status-busy text-status-busy-text",
   },
   FAILED: {
     label: "Failed",
-    className: "bg-red-200  border-red-200",
+    className: "bg-status-failed text-status-failed-text",
   },
   AVAILABLE: {
     label: "Available",
-    className: "bg-green-200  border-green-200",
+    className: "bg-status-available text-status-available-text",
   },
   DEPLOYED: {
     label: "Deployed",
-    className: "bg-purple-200  border-purple-200",
+    className: "bg-status-deployed text-status-deployed-text",
   },
   VACATION: {
     label: "Vacation",
-    className: "bg-blue-200  border-blue-200",
+    className: "bg-status-vacation text-status-vacation-text",
   },
   CLIENTREADY: {
     label: "Client Ready",
-    className: "bg-violet-200  border-violet-200",
+    className: "bg-status-clientready text-status-clientready-text",
   },
 };
 
