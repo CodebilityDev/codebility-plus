@@ -102,7 +102,7 @@ const ProjectEditModal = () => {
         id: client.id,
         value: client.id,
         label: client.name,
-        subLabel: client.company_name,
+        subLabel: client.name,
         imageUrl: client.company_logo,
       })),
     [clients],
