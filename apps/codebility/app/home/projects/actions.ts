@@ -1,21 +1,52 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { Client, Codev } from "@/types/home/codev";
-import { deleteImage, getImagePath, uploadImage } from "@/utils/uploadImage";
+import { Client, Codev, Project } from "@/types/home/codev";
+import { deleteImage, getImagePath } from "@/utils/uploadImage";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+interface DbProjectMember {
+  project: {
+    id: string;
+    name: string;
+  };
+  role: string;
+  joined_at: string;
+}
+
+export interface SimpleMemberData {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email_address: string;
+  display_position: string | null;
+  image_url: string | null;
+  role?: string;
+  joined_at?: string;
+}
+
+interface DbMemberResponse {
+  role: string;
+  joined_at: string;
+  codev: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email_address: string;
+    display_position: string | null;
+    image_url: string | null;
+  };
+}
 
 export async function createProject(
   formData: FormData,
   selectedMembers: Codev[],
+  teamLeaderId: string,
 ) {
   const supabase = createClientComponentClient();
 
   try {
-    // Extract member IDs
-    const memberIds = selectedMembers.map((member) => member.id);
-
-    // Create project with member IDs
+    // Create project
     const { data: project, error: projectError } = await supabase
       .from("projects")
       .insert({
@@ -24,7 +55,6 @@ export async function createProject(
         github_link: formData.get("github_link"),
         website_url: formData.get("website_url"),
         figma_link: formData.get("figma_link"),
-        team_leader_id: formData.get("team_leader_id"),
         client_id: formData.get("client_id"),
         start_date: formData.get("start_date"),
         project_category_id: formData.get("project_category_id")
@@ -32,28 +62,37 @@ export async function createProject(
           : null,
         main_image: formData.get("main_image"),
         status: "pending",
-        members: memberIds, // Add members array here
       })
       .select()
       .single();
 
     if (projectError) throw projectError;
 
-    // Create project members in project_members table
-    if (memberIds.length > 0) {
-      const { error: membersError } = await supabase
-        .from("project_members")
-        .insert(
-          memberIds.map((memberId) => ({
-            project_id: project.id,
-            codev_id: memberId,
-            role: "member",
-            joined_at: new Date().toISOString(),
-          })),
-        );
+    // Create project members including team leader
+    const memberInserts = [
+      // Add team leader
+      {
+        project_id: project.id,
+        codev_id: teamLeaderId,
+        role: "team_leader",
+        joined_at: new Date().toISOString(),
+      },
+      // Add other members
+      ...selectedMembers
+        .filter((member) => member.id !== teamLeaderId)
+        .map((member) => ({
+          project_id: project.id,
+          codev_id: member.id,
+          role: "member",
+          joined_at: new Date().toISOString(),
+        })),
+    ];
 
-      if (membersError) throw membersError;
-    }
+    const { error: membersError } = await supabase
+      .from("project_members")
+      .insert(memberInserts);
+
+    if (membersError) throw membersError;
 
     // Create default kanban board
     const { error: boardError } = await supabase.from("kanban_boards").insert({
@@ -76,38 +115,50 @@ export async function createProject(
   }
 }
 
-export async function updateProject(projectId: string, formData: FormData) {
+export async function updateProject(
+  projectId: string,
+  formData: FormData,
+  teamLeaderId?: string,
+) {
   const supabase = createClientComponentClient();
 
   try {
-    // Convert form data to object
     const updateData: any = {};
     for (const [key, value] of formData.entries()) {
-      if (key === "members") {
-        // Parse members string back to array
-        updateData[key] = JSON.parse(value as string);
-      } else {
+      if (key !== "members") {
+        // Handle members separately
         updateData[key] = value;
       }
     }
 
-    // Ensure members is an array
-    if (!Array.isArray(updateData.members)) {
-      updateData.members = [];
-    }
-
+    // Update project details
     const { data, error } = await supabase
       .from("projects")
       .update({
         ...updateData,
         updated_at: new Date().toISOString(),
-        // Ensure members is cast to uuid[]
-        members: updateData.members || [],
       })
       .eq("id", projectId)
       .select();
 
     if (error) throw error;
+
+    // Update team leader if provided
+    if (teamLeaderId) {
+      // First, reset any existing team leader
+      await supabase
+        .from("project_members")
+        .update({ role: "member" })
+        .eq("project_id", projectId)
+        .eq("role", "team_leader");
+
+      // Set new team leader
+      await supabase
+        .from("project_members")
+        .update({ role: "team_leader" })
+        .eq("project_id", projectId)
+        .eq("codev_id", teamLeaderId);
+    }
 
     return { success: true, data };
   } catch (error) {
@@ -162,18 +213,32 @@ export async function deleteProject(projectId: string) {
 }
 
 export const getTeamLead = async (
-  teamLeaderId: string,
+  projectId: string,
 ): Promise<{
   error: any;
-  data: Codev | null;
+  data: SimpleMemberData | null;
 }> => {
   const supabase = createClientComponentClient();
 
   try {
     const { data, error } = await supabase
-      .from("codev")
-      .select("*")
-      .eq("id", teamLeaderId)
+      .from("project_members")
+      .select(
+        `
+        role,
+        joined_at,
+        codev:codev_id (
+          id,
+          first_name,
+          last_name,
+          email_address,
+          display_position,
+          image_url
+        )
+      `,
+      )
+      .eq("project_id", projectId)
+      .eq("role", "team_leader")
       .single();
 
     if (error) {
@@ -181,7 +246,30 @@ export const getTeamLead = async (
       return { error, data: null };
     }
 
-    return { error: null, data: data as Codev };
+    if (!data?.codev) {
+      return { error: null, data: null };
+    }
+
+    // If data.codev is an array, take the first element
+    const codevData = Array.isArray(data.codev) ? data.codev[0] : data.codev;
+    if (!codevData) {
+      // In case the array is empty
+      return { error: null, data: null };
+    }
+
+    // Transform to SimpleMemberData
+    const teamLead: SimpleMemberData = {
+      id: codevData.id,
+      first_name: codevData.first_name,
+      last_name: codevData.last_name,
+      email_address: codevData.email_address,
+      display_position: codevData.display_position,
+      image_url: codevData.image_url,
+      role: data.role,
+      joined_at: data.joined_at,
+    };
+
+    return { error: null, data: teamLead };
   } catch (error) {
     console.error("Unexpected error fetching team lead:", error);
     return { error, data: null };
@@ -189,48 +277,61 @@ export const getTeamLead = async (
 };
 
 export const getMembers = async (
-  memberIds: string[],
+  projectId: string,
 ): Promise<{
   error: any;
-  data: Codev[] | null;
+  data: SimpleMemberData[] | null;
 }> => {
   const supabase = createClientComponentClient();
 
   try {
     const { data, error } = await supabase
-      .from("codev")
+      .from("project_members")
       .select(
         `
-        id,
-        first_name,
-        last_name,
-        email_address,
-        display_position,
-        image_url,
-        positions,
-        tech_stacks,
-        projects (
+        role,
+        joined_at,
+        codev:codev_id (
           id,
-          name
+          first_name,
+          last_name,
+          email_address,
+          display_position,
+          image_url
         )
       `,
       )
-      .in("id", memberIds);
+      .eq("project_id", projectId);
 
     if (error) {
       console.error("Error fetching members:", error);
       return { error, data: null };
     }
 
-    // Transform the data to match Codev type
-    const transformedData = data?.map((member) => ({
-      ...member,
-      positions: member.positions || [],
-      tech_stacks: member.tech_stacks || [],
-      projects: member.projects || [],
-    }));
+    // Transform each member while checking for undefined codev data.
+    const members = data
+      .map((member) => {
+        // If codev is returned as an array, take the first element.
+        const codevData = Array.isArray(member.codev)
+          ? member.codev[0]
+          : member.codev;
+        if (!codevData) {
+          return null;
+        }
+        return {
+          id: codevData.id,
+          first_name: codevData.first_name,
+          last_name: codevData.last_name,
+          email_address: codevData.email_address,
+          display_position: codevData.display_position,
+          image_url: codevData.image_url,
+          role: member.role,
+          joined_at: member.joined_at,
+        };
+      })
+      .filter((m) => m !== null) as SimpleMemberData[];
 
-    return { error: null, data: transformedData as Codev[] };
+    return { error: null, data: members };
   } catch (error) {
     console.error("Unexpected error fetching members:", error);
     return { error, data: null };
@@ -240,11 +341,12 @@ export const getMembers = async (
 export const updateProjectMembers = async (
   projectId: string,
   members: Codev[],
+  teamLeaderId: string,
 ): Promise<{ success: boolean; error?: string }> => {
   const supabase = createClientComponentClient();
 
   try {
-    // Start a transaction by deleting existing members
+    // Delete existing members
     const { error: deleteError } = await supabase
       .from("project_members")
       .delete()
@@ -252,17 +354,17 @@ export const updateProjectMembers = async (
 
     if (deleteError) throw deleteError;
 
-    // Insert new members with proper role and joined_at
+    // Insert members with proper roles
+    const memberInserts = members.map((member) => ({
+      project_id: projectId,
+      codev_id: member.id,
+      role: member.id === teamLeaderId ? "team_leader" : "member",
+      joined_at: new Date().toISOString(),
+    }));
+
     const { error: insertError } = await supabase
       .from("project_members")
-      .insert(
-        members.map((member) => ({
-          project_id: projectId,
-          codev_id: member.id,
-          role: "member",
-          joined_at: new Date().toISOString(),
-        })),
-      );
+      .insert(memberInserts);
 
     if (insertError) throw insertError;
 
@@ -290,8 +392,13 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
     tech_stacks,
     display_position,
     internal_status,
-    projects (
-      id
+    project_members!codev_id (
+      project:project_id (
+        id,
+        name
+      ),
+      role,
+      joined_at
     )
   `);
 
@@ -308,7 +415,30 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
     throw new Error("Failed to fetch Codevs");
   }
 
-  return (data as Codev[]) || [];
+  return (
+    data?.map((codev: any) => {
+      // Transform projects array
+      const projects = (codev.project_members || []).map(
+        (pm: DbProjectMember) => {
+          const project: Project & { role: string; joined_at: string } = {
+            id: pm.project.id,
+            name: pm.project.name,
+            role: pm.role,
+            joined_at: pm.joined_at,
+          };
+          return project;
+        },
+      );
+
+      // Transform codev data
+      return {
+        ...codev,
+        positions: codev.positions || [],
+        tech_stacks: codev.tech_stacks || [],
+        projects,
+      } as Codev;
+    }) || []
+  );
 };
 
 export const getProjectClients = async (): Promise<Client[]> => {
@@ -316,7 +446,7 @@ export const getProjectClients = async (): Promise<Client[]> => {
 
   const { data, error } = await supabase
     .from("clients")
-    .select("id, name, company_name, company_logo");
+    .select("id, name, email, company_logo");
 
   if (error) {
     console.error("Error fetching Clients:", error);

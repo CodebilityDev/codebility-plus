@@ -5,16 +5,16 @@ export interface Position {
 }
 
 export interface WorkExperience {
-  id: string; // UUID (required)
-  codev_id: string; // UUID (required)
-  position: string; // (required)
-  description?: string; // optional in DB
-  date_from: string; // Date as string (required)
-  date_to: string | null; // Nullable for "Present"
-  company_name: string; // (required)
-  location: string; // (required)
-  profile_id?: string; // Optional
-  is_present: boolean; // New field we'll add
+  id: string;
+  codev_id: string;
+  position: string;
+  description?: string;
+  date_from: string; // Consider using Date
+  date_to: string | null;
+  company_name: string; // Has DB default
+  location: string; // Has DB default
+  profile_id?: string;
+  is_present: boolean; // Has DB default false
 }
 
 export interface JobStatus {
@@ -22,11 +22,11 @@ export interface JobStatus {
   job_title: string;
   company_name: string;
   employment_type: string;
-  description?: string | null;
-  status?: string;
-  salary_range?: string | null;
-  work_setup: string; // Required in DB
-  shift?: string | null;
+  description: string | null; // Changed to match DB nullability
+  status?: string; // Has DB default 'active'
+  salary_range: string | null; // Changed to match DB nullability
+  work_setup: string; // Removed optional marker
+  shift: string | null;
   codev_id?: string;
   hours_per_week?: number;
   created_at?: string;
@@ -95,7 +95,6 @@ export interface Codev {
   linkedin?: string | null;
   github?: string | null;
   discord?: string | null;
-  projects: Project[];
   work_experience?: WorkExperience[];
   created_at?: string;
   updated_at?: string;
@@ -103,6 +102,9 @@ export interface Codev {
   role_id?: number;
   mentor_id?: string;
   codev_points?: CodevPoints[];
+  projects?: (Project & { role: string; joined_at: string })[];
+  project_members?: ProjectMember[];
+  work_schedules?: WorkSchedule[];
 }
 
 export type InternalStatus =
@@ -114,6 +116,21 @@ export type InternalStatus =
   | "DEPLOYED"
   | "VACATION"
   | "CLIENTREADY";
+
+export interface ProjectMember {
+  id: string;
+  project_id: string;
+  codev_id: string;
+  role: string;
+  joined_at: string;
+  project?: Project;
+  codev?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    image_url?: string;
+  };
+}
 
 export interface Project {
   id: string;
@@ -128,12 +145,13 @@ export interface Project {
   figma_link?: string;
   team_leader_id?: string;
   client_id?: string;
-  members?: string[];
   project_category_id?: number;
   created_at?: string;
   updated_at?: string;
+  role?: string;
+  joined_at?: string;
+  project_members?: ProjectMember[];
 }
-
 export interface Education {
   id: string;
   codev_id?: string;

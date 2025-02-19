@@ -5,7 +5,7 @@ import { Project } from "@/types/home/codev";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import AddProjectButton from "./_components/AddProjectButton";
-import ProjectsCard from "./_components/projects-card";
+import ProjectCardContainer from "./_components/ProjectCardContainer";
 
 const Projects = () => {
   const supabase = getSupabaseServerComponentClient();
@@ -29,7 +29,7 @@ const Projects = () => {
         </div>
       </div>
       {Projects && Projects.length > 0 && (
-        <ProjectsCard projects={Projects as Project[]} />
+        <ProjectCardContainer projects={Projects as Project[]} />
       )}
     </div>
   );

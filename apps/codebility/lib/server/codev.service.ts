@@ -1,6 +1,12 @@
 import "server-only";
 
-import { Client, Codev, Project } from "@/types/home/codev";
+import {
+  Client,
+  Codev,
+  Project,
+  ProjectMember,
+  WorkExperience,
+} from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -15,8 +21,7 @@ export const getCodevs = async ({
 } = {}): Promise<{ error: any; data: Codev[] | null }> => {
   const supabase = getSupabaseServerComponentClient();
 
-  let query = supabase.from("codev").select(
-    `
+  let query = supabase.from("codev").select(`
     id,
     first_name,
     last_name,
@@ -41,37 +46,70 @@ export const getCodevs = async ({
     years_of_experience,
     internal_status,
     role_id,
+    mentor_id,
     created_at,
     updated_at,
     education (
       id,
-      codev_id,
       institution,
       degree,
       start_date,
       end_date,
-      description
+      description,
+      created_at,
+      updated_at
     ),
     work_experience (
       id,
-      codev_id,
       position,
       description,
       date_from,
       date_to,
       company_name,
-      location
+      location,
+      is_present,
+      profile_id
     ),
     work_schedules (
       id,
-      codev_id,
       days_of_week,
       start_time,
-      end_time
+      end_time,
+      created_at,
+      updated_at
     ),
-    projects 
-    `,
-  );
+    project_members (
+      role,
+      joined_at,
+      project: projects (
+        id,
+        name,
+        description,
+        status,
+        start_date,
+        end_date,
+        github_link,
+        main_image,
+        website_url,
+        figma_link,
+        team_leader_id,
+        client_id,
+        project_category_id,
+        created_at,
+        updated_at,
+        project_members (
+          role,
+          joined_at,
+          codev: codev_id (
+            id,
+            first_name,
+            last_name,
+            image_url
+          )
+        )
+      )
+    )
+  `);
 
   // Apply filters dynamically
   Object.entries(filters).forEach(([key, value]) => {
@@ -87,17 +125,27 @@ export const getCodevs = async ({
     return { error, data: null };
   }
 
-  const normalizedData = data.map((codev) => ({
+  // Transform the data to match the Codev interface
+  const normalizedData = data.map((codev: any) => ({
     ...codev,
     education: codev.education || [],
-    work_experience: (codev.work_experience || []).map((exp) => ({
+    work_experience: (codev.work_experience || []).map((exp: any) => ({
       ...exp,
-      is_present: !exp.date_to,
-    })),
+      codev_id: codev.id,
+    })) as WorkExperience[],
     work_schedules: codev.work_schedules || [],
-  }));
+    projects: (codev.project_members || []).map(
+      (member: any) =>
+        ({
+          ...member.project,
+          role: member.role,
+          joined_at: member.joined_at,
+          project_members: member.project?.project_members || [],
+        }) as Project & { role: string; joined_at: string },
+    ),
+  })) as unknown as Codev[];
 
-  return { error: null, data: normalizedData as Codev[] };
+  return { error: null, data: normalizedData };
 };
 
 export const getClients = async (): Promise<{
@@ -105,27 +153,21 @@ export const getClients = async (): Promise<{
   data: Client[] | null;
 }> => {
   const supabase = getSupabaseServerComponentClient();
-
-  const { data, error } = await supabase.from("clients").select("*");
+  const { data, error } = await supabase.from("clients").select(`
+    id,
+    name,
+    email,
+    phone_number,
+    industry,
+    company_logo,
+    website,
+    status,
+    client_type,
+    country,
+    address,
+    created_at,
+    updated_at
+  `);
 
   return { error, data: data || null };
-};
-
-export const getProjects = async (
-  codevId: string,
-): Promise<{ error: any; data: Project[] | null }> => {
-  const supabase = getSupabaseServerComponentClient();
-
-  // This query checks if the Codev is either the team leader or in the members array.
-  const { data, error } = await supabase
-    .from("projects")
-    .select("id, name")
-    .or(`team_leader_id.eq.${codevId},members.cs.{${codevId}}`);
-
-  if (error) {
-    console.error("Error fetching projects:", error);
-    return { error, data: null };
-  }
-
-  return { error: null, data };
 };
