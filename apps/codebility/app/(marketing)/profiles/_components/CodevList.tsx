@@ -7,14 +7,14 @@ import usePagination from "@/hooks/use-pagination";
 import getRandomColor from "@/lib/getRandomColor";
 import { Codev } from "@/types/home/codev";
 
-import ProfileCard from "./profile-card";
-import ProfileListsFilter from "./profile-lists-filter";
+import CodevCard from "./CodevCard";
+import CodevListFilter from "./CodevListFilter";
 
 interface Props {
   codevs: Codev[];
 }
 
-export default function ProfileLists({ codevs }: Props) {
+export default function CodevList({ codevs }: Props) {
   const [toPaginateUser, setToPaginateUser] = useState<Codev[]>([]);
   const [selectedPosition, setSelectedPosition] = useState<string>("");
 
@@ -52,7 +52,7 @@ export default function ProfileLists({ codevs }: Props) {
 
   return (
     <div className="m-auto h-full w-full max-w-6xl">
-      <ProfileListsFilter
+      <CodevListFilter
         selectedPosition={selectedPosition}
         setSelectedPosition={setSelectedPosition}
         users={codevs}
@@ -63,7 +63,7 @@ export default function ProfileLists({ codevs }: Props) {
         }`}
       >
         {paginatedUsers.map((codev) => (
-          <ProfileCard
+          <CodevCard
             color={getRandomColor() || ""}
             key={codev.id}
             codev={codev}

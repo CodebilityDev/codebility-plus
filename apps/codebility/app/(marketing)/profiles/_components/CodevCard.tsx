@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { IconArrowRight } from "@/public/assets/svgs";
-import { Codev } from "@/types/home/codev";
+import { Codev, InternalStatus } from "@/types/home/codev";
 import {
   AnimatePresence,
   motion,
@@ -13,15 +13,55 @@ import {
   useTransform,
 } from "framer-motion";
 
+import { cn } from "@codevs/ui";
+
 interface Props {
   codev: Codev;
   color: string;
 }
 
-const ProfileCard = ({ codev, color }: Props) => {
+const STATUS_CONFIG: Record<
+  InternalStatus,
+  { label: string; className: string }
+> = {
+  TRAINING: {
+    label: "Training",
+    className: "bg-status-training text-status-training-text",
+  },
+  GRADUATED: {
+    label: "Graduated",
+    className: "bg-status-graduated text-status-graduated-text",
+  },
+  BUSY: {
+    label: "Busy",
+    className: "bg-status-busy text-status-busy-text",
+  },
+  FAILED: {
+    label: "Failed",
+    className: "bg-status-failed text-status-failed-text",
+  },
+  AVAILABLE: {
+    label: "Available",
+    className: "bg-status-available text-status-available-text",
+  },
+  DEPLOYED: {
+    label: "Deployed",
+    className: "bg-status-deployed text-status-deployed-text",
+  },
+  VACATION: {
+    label: "Vacation",
+    className: "bg-status-vacation text-status-vacation-text",
+  },
+  CLIENTREADY: {
+    label: "Client Ready",
+    className: "bg-status-clientready text-status-clientready-text",
+  },
+};
+
+const CodevCard = ({ codev, color }: Props) => {
   const [hovered, setHovered] = useState(false);
   const springConfig = { stiffness: 100, damping: 5 };
-  const x = useMotionValue(0); // Used to track mouse position
+  const x = useMotionValue(0);
   const rotate = useSpring(
     useTransform(x, [-100, 100], [-45, 45]),
     springConfig,
@@ -36,14 +76,9 @@ const ProfileCard = ({ codev, color }: Props) => {
     x.set(event.nativeEvent.offsetX - halfWidth);
   };
 
-  const statusStyles = {
-    AVAILABLE: "bg-green",
-    DEPLOYED: "bg-orange-400",
-    TRAINING: "bg-blue-400",
-    BUSY: "bg-gray",
-  };
-
-  const internalStatus = codev.internal_status || "UNKNOWN"; // Fallback for undefined or null
+  const internalStatus = codev.internal_status || "AVAILABLE";
+  const statusConfig =
+    STATUS_CONFIG[internalStatus as InternalStatus] || STATUS_CONFIG.AVAILABLE;
 
   return (
     <Link
@@ -68,7 +103,7 @@ const ProfileCard = ({ codev, color }: Props) => {
             onMouseMove={handleMouseMove}
           />
           <AnimatePresence>
-            {hovered && internalStatus !== "UNKNOWN" && (
+            {hovered && internalStatus && (
               <motion.div
                 initial={{ opacity: 0, y: 20, scale: 0.6 }}
                 animate={{
@@ -87,29 +122,28 @@ const ProfileCard = ({ codev, color }: Props) => {
                   rotate: rotate,
                   whiteSpace: "nowrap",
                 }}
-                className={`absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 transform flex-col items-center justify-center rounded-md px-4 py-2 shadow-xl ${
-                  statusStyles[internalStatus as keyof typeof statusStyles] ||
-                  "bg-gray"
-                }`}
+                className={cn(
+                  "absolute -top-8 left-1/2 z-50 flex -translate-x-1/2 transform flex-col items-center justify-center rounded-md px-4 py-2 shadow-xl",
+                  statusConfig.className,
+                )}
               >
-                <div className="relative z-30 text-base text-white">
-                  {internalStatus.charAt(0) +
-                    internalStatus.slice(1).toLowerCase()}
+                <div className="relative z-30 text-base">
+                  {statusConfig.label}
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
           <div className="absolute bottom-[1px] right-[1px]">
             <p
-              className={`border-black-100 rounded-full border-2 p-2 text-[9px] ${
-                statusStyles[internalStatus as keyof typeof statusStyles] ||
-                "bg-gray"
-              }`}
+              className={cn(
+                "border-black-100 rounded-full border-2 p-2 text-[9px]",
+                codev.availability_status ? "bg-green" : "bg-red-500",
+              )}
             ></p>
           </div>
         </div>
         <div className="flex flex-col gap-1 text-center">
-          <p className="md:text-md text-sm capitalize  text-white lg:text-base">
+          <p className="md:text-md text-sm capitalize text-white lg:text-base">
             {codev.first_name} {codev.last_name}
           </p>
           {codev.display_position ? (
@@ -127,4 +161,4 @@ const ProfileCard = ({ codev, color }: Props) => {
   );
 };
 
-export default ProfileCard;
+export default CodevCard;
