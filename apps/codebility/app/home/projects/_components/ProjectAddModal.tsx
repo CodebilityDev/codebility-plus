@@ -86,7 +86,7 @@ const ProjectAddModal = () => {
         id: client.id,
         value: client.id,
         label: client.name,
-        subLabel: client.company_name,
+        subLabel: client.name,
         imageUrl: client.company_logo || undefined,
       })),
     [clients],
