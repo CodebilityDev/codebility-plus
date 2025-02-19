@@ -1,7 +1,13 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getMembers, getTeamLead } from "@/app/home/projects/actions";
+import {
+  getMembers,
+  getTeamLead,
+  SimpleMemberData,
+} from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -12,9 +18,9 @@ import {
 } from "@/Components/ui/dialog";
 import { useModal } from "@/hooks/use-modal-projects";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
-import { Codev } from "@/types/home/codev";
 import { format, parseISO } from "date-fns";
 
+// Map project category id to a label.
 const PROJECT_CATEGORIES: Record<string, string> = {
   "1": "Web Development",
   "2": "Mobile Development",
@@ -23,21 +29,20 @@ const PROJECT_CATEGORIES: Record<string, string> = {
 
 const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
-
   const isModalOpen = isOpen && type === "projectViewModal";
 
-  const [teamLead, setTeamLead] = useState<Codev | null>(null);
-  const [members, setMembers] = useState<Codev[]>([]);
+  // Using the simplified member type returned by our actions.
+  const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
+  const [members, setMembers] = useState<SimpleMemberData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Format dates if available.
   const startDate = data?.start_date
     ? format(parseISO(data.start_date), "MM/dd/yyyy")
     : null;
-
   const endDate = data?.end_date
     ? format(parseISO(data.end_date), "MM/dd/yyyy")
     : "Ongoing";
-
   const createdAt = data?.created_at
     ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
     : null;
@@ -45,30 +50,21 @@ const ProjectViewModal = () => {
   useEffect(() => {
     const fetchTeamLeadAndMembers = async () => {
       if (!data) return;
-
       setIsLoading(true);
       try {
-        // Fetch team lead
-        if (data.team_leader_id) {
-          const { error: leadError, data: fetchedTeamLead } = await getTeamLead(
-            data.team_leader_id,
-          );
-          if (!leadError && fetchedTeamLead) {
-            setTeamLead(fetchedTeamLead);
-          }
+        // Use the project id (data.id) to fetch team data.
+        const { error: leadError, data: fetchedTeamLead } = await getTeamLead(
+          data.id,
+        );
+        if (!leadError && fetchedTeamLead) {
+          setTeamLead(fetchedTeamLead);
         }
 
-        // Fetch members
-        if (
-          data.members &&
-          Array.isArray(data.members) &&
-          data.members.length > 0
-        ) {
-          const { error: membersError, data: fetchedMembers } =
-            await getMembers(data.members);
-          if (!membersError && fetchedMembers) {
-            setMembers(fetchedMembers);
-          }
+        const { error: membersError, data: fetchedMembers } = await getMembers(
+          data.id,
+        );
+        if (!membersError && fetchedMembers) {
+          setMembers(fetchedMembers);
         }
       } catch (error) {
         console.error("Error fetching team data:", error);
@@ -84,7 +80,7 @@ const ProjectViewModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">View Project</DialogTitle>
         </DialogHeader>
@@ -93,7 +89,7 @@ const ProjectViewModal = () => {
           {/* Project Image */}
           <div className="dark:bg-dark-100 flex justify-center rounded-lg bg-slate-100 p-0">
             {data?.main_image ? (
-              <div className="relative w-full h-52">
+              <div className="relative h-52 w-full">
                 <Image
                   src={data.main_image}
                   alt={data?.name || "Project Image"}

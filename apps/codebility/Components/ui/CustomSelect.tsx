@@ -1,3 +1,4 @@
+import { ChangeEvent, useMemo, useState } from "react";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import {
   Select,
@@ -10,6 +11,7 @@ import {
 
 import { Label } from "@codevs/ui/label";
 
+// Extend your interface to include a "searchable" prop.
 interface Option {
   id: string;
   value: string;
@@ -26,6 +28,7 @@ interface CustomSelectProps {
   placeholder?: string;
   disabled?: boolean;
   variant?: "default" | "simple";
+  searchable?: boolean; // <--- New prop
 }
 
 export const CustomSelect = ({
@@ -36,7 +39,30 @@ export const CustomSelect = ({
   placeholder,
   disabled,
   variant = "default", // Default to showing avatars
+  searchable = false, // <--- Default false
 }: CustomSelectProps) => {
+  // Keep track of the user's search term
+  const [searchTerm, setSearchTerm] = useState("");
+
+  // Filter options based on the search term
+  const filteredOptions = useMemo(() => {
+    if (!searchable) return options;
+    const lowerSearch = searchTerm.toLowerCase();
+    return options.filter((opt) => {
+      const labelMatch = opt.label.toLowerCase().includes(lowerSearch);
+      const subLabelMatch =
+        opt.subLabel?.toLowerCase().includes(lowerSearch) ?? false;
+      return labelMatch || subLabelMatch;
+    });
+  }, [options, searchable, searchTerm]);
+
+  // Handle user typing in the search input
+  const handleSearchChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // Stop event propagation so the dropdown doesn't close
+    e.stopPropagation();
+    setSearchTerm(e.target.value);
+  };
+
   return (
     <div className="space-y-2">
       <Label className="dark:text-light-900 text-black">{label}</Label>
@@ -44,14 +70,28 @@ export const CustomSelect = ({
         <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 w-full text-black">
           <SelectValue placeholder={disabled ? "Loading..." : placeholder} />
         </SelectTrigger>
+
         <SelectContent className="bg-light-800 dark:bg-dark-200">
-          {options.length === 0 ? (
-            <div className="p-2 text-sm text-gray-500">
-              No options available
+          {/** If searchable, show an inline search input */}
+          {searchable && (
+            <div className="p-2">
+              <input
+                type="text"
+                placeholder="Search..."
+                value={searchTerm}
+                onChange={handleSearchChange}
+                onPointerDown={(e) => e.stopPropagation()} // Keep dropdown open
+                onFocus={(e) => e.stopPropagation()} // Keep dropdown open
+                className="dark:bg-dark-100 w-full rounded-md bg-white p-2 text-sm dark:text-white"
+              />
             </div>
+          )}
+
+          {filteredOptions.length === 0 ? (
+            <div className="p-2 text-sm text-gray-500">No options found</div>
           ) : (
             <SelectGroup>
-              {options.map((option) => (
+              {filteredOptions.map((option) => (
                 <SelectItem
                   key={option.id}
                   value={option.value}
