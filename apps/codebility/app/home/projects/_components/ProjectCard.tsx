@@ -26,19 +26,40 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
 
   useEffect(() => {
     const fetchTeamData = async () => {
-      // Use the project's id to fetch team data
-      if (project.id) {
-        const { data: teamLeadData } = await getTeamLead(project.id);
-        if (teamLeadData) setTeamLead(teamLeadData);
+      if (!project.id) return;
 
-        const { data: membersData } = await getMembers(project.id);
-        if (membersData) setMembers(membersData);
+      setIsLoading(true);
+      try {
+        // Fetch both team lead and members in parallel
+        const [teamLeadResult, membersResult] = await Promise.all([
+          getTeamLead(project.id),
+          getMembers(project.id),
+        ]);
+
+        // Handle team lead data
+        if (!teamLeadResult.error && teamLeadResult.data) {
+          setTeamLead(teamLeadResult.data);
+        }
+
+        // Handle members data
+        if (!membersResult.error && membersResult.data) {
+          setMembers(membersResult.data);
+        }
+      } catch (error) {
+        console.error("Error fetching team data:", error);
+      } finally {
+        setIsLoading(false);
       }
-      setIsLoading(false);
     };
 
     fetchTeamData();
-  }, [project]);
+
+    // Cleanup function
+    return () => {
+      setTeamLead(null);
+      setMembers([]);
+    };
+  }, [project.id]); // Add proper dependency
 
   return (
     <div
@@ -87,13 +108,13 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
         {/* Team Section */}
         <div className="space-y-3">
           {/* Team Lead */}
-          {teamLead && (
+          {!isLoading && teamLead && (
             <div className="flex items-center gap-2">
               <div className="relative h-8 w-8">
                 {teamLead.image_url ? (
                   <Image
                     src={teamLead.image_url}
-                    alt={teamLead.first_name}
+                    alt={`${teamLead.first_name} ${teamLead.last_name}`}
                     fill
                     className="rounded-full object-cover"
                   />
@@ -113,7 +134,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
           )}
 
           {/* Team Members */}
-          {members.length > 0 && (
+          {!isLoading && members.length > 0 && (
             <div className="flex -space-x-2">
               {members.slice(0, 4).map((member) => (
                 <div
@@ -123,7 +144,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
                   {member.image_url ? (
                     <Image
                       src={member.image_url}
-                      alt={member.first_name}
+                      alt={`${member.first_name} ${member.last_name}`}
                       fill
                       className="rounded-full object-cover"
                     />
@@ -146,17 +167,32 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
         {/* Links */}
         <div className="flex items-center gap-3">
           {project.github_link && (
-            <Link href={project.github_link} target="_blank" className="group">
+            <Link
+              href={project.github_link}
+              target="_blank"
+              className="group"
+              onClick={(e) => e.stopPropagation()} // Prevent card click when clicking link
+            >
               <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
             </Link>
           )}
           {project.website_url && (
-            <Link href={project.website_url} target="_blank" className="group">
+            <Link
+              href={project.website_url}
+              target="_blank"
+              className="group"
+              onClick={(e) => e.stopPropagation()}
+            >
               <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
             </Link>
           )}
           {project.figma_link && (
-            <Link href={project.figma_link} target="_blank" className="group">
+            <Link
+              href={project.figma_link}
+              target="_blank"
+              className="group"
+              onClick={(e) => e.stopPropagation()}
+            >
               <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
             </Link>
           )}

@@ -9,17 +9,25 @@ import ProjectCardContainer from "./_components/ProjectCardContainer";
 
 const Projects = () => {
   const supabase = getSupabaseServerComponentClient();
-
   const Projects = use(
     supabase
       .from("projects")
-      .select("*")
+      .select(
+        `
+        *,
+        project_members (
+          id,
+          codev_id,
+          role,
+          joined_at
+        )
+      `,
+      )
       .then(({ data, error }) => {
         if (error) throw error;
         return data;
       }),
   );
-
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
       <div className="flex flex-row justify-between gap-4">
@@ -34,5 +42,4 @@ const Projects = () => {
     </div>
   );
 };
-
 export default Projects;
