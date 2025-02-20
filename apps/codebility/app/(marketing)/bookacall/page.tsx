@@ -1,10 +1,10 @@
 import React from "react";
 
-import Container from "../_components/marketing-container";
-import Footer from "../_components/marketing-footer";
-import Navigation from "../_components/marketing-navigation";
-import SideNavMenu from "../_components/marketing-sidenav-menu";
-import BookACallCalendlyWidgetContainer from "./_components/bookacall-calendly-widget-container";
+import Container from "../_components/MarketingContainer";
+import Footer from "../_components/MarketingFooter";
+import Navigation from "../_components/MarketingNavigation";
+import SideNavMenu from "../_components/MarketingSidenavMenu";
+import BookACallCalendlyWidgetContainer from "./_components/BookACallCalendlyWidgetContainer";
 
 export default function BookCallPage() {
   return (

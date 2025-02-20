@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Switch from "@/app/home/settings/permissions/_components/permissions-switch";
+import Switch from "@/app/home/settings/permissions/_components/PermissionsSwitch";
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,

@@ -3,10 +3,10 @@ import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { Card, CardContent, CardFooter } from "@codevs/ui/card";
 import { Separator } from "@codevs/ui/separator";
 
-import AccountSettings2FA from "./_components/account-settings-2FA";
-import AccountSettingsChangePassword from "./_components/account-settings-change-password";
-import AccountSettingsDelete from "./_components/account-settings-delete";
-import AccountSettingsHeader from "./_components/account-settings-header";
+import AccountSettings2FA from "./_components/AccountSettings2FA";
+import AccountSettingsChangePassword from "./_components/AccountSettingsChangePassword";
+import AccountSettingsDelete from "./_components/AccountSettingsDelete";
+import AccountSettingsHeader from "./_components/AccountSettingsHeader";
 
 export default async function AccountSettingsPage() {
   const user = await getCachedUser();
