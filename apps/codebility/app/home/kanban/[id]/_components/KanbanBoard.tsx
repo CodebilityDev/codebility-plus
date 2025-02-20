@@ -6,7 +6,7 @@ import { ArrowRightIcon, IconSearch } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
 
-import KanbanBoardsSearch from "../../_components/kanban-boards-search";
+import KanbanBoardsSearch from "../../_components/KanbanBoardsSearch";
 import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
