@@ -1,4 +1,4 @@
-import ApplicantsList from "@/app/home/applicants/_components/applicants-list";
+import ApplicantsList from "@/app/home/applicants/_components/ApplicantsList";
 import { getCodevs } from "@/lib/server/codev.service";
 
 const ApplicantsPage = async () => {

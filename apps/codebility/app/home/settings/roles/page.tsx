@@ -2,7 +2,7 @@ import { Roles } from "@/types/home/codev"; // Make sure your 'Roles' interface 
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import RoleContainer from "./_components/role-container";
+import RoleContainer from "./_components/RoleContainer";
 
 const RolesPage = async () => {
   const supabase = getSupabaseServerComponentClient();

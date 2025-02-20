@@ -28,7 +28,7 @@ import {
 import { Badge } from "@codevs/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
-import { StatusBadge } from "../../in-house/_components/shared/status-badge";
+import { StatusBadge } from "../../in-house/_components/shared/StatusBadge";
 
 const ProfileModal = () => {
   const { isOpen, type, onClose, data } = useModal();

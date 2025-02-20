@@ -7,7 +7,7 @@ import ReactQueryProvider from "@/hooks/reactQuery";
 import { useUserStore } from "@/store/codev-store";
 import { UserProvider } from "@/store/UserProvider";
 
-import ToastNotification from "./_components/home-toast-notification";
+import ToastNotification from "./_components/HomeToastNotification";
 import LeftSidebar from "./_components/LeftSidebar";
 import Navbar from "./_components/Navbar";
 
