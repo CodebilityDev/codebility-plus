@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import SettingsCard from "@/app/home/settings/_components/settings-card";
+import SettingsCard from "@/app/home/settings/_components/SettingsCard";
 import { H1 } from "@/Components/shared/dashboard";
 import { settingsCardData } from "@/constants/settings";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 import Loading from "./loading";
 
 type RolePermissions = {

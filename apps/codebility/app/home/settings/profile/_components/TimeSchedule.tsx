@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { Box } from "@/Components/shared/dashboard";
 import { Paragraph } from "@/Components/shared/home";
-import { TimePicker12 } from "@/Components/time-picker/time-picker-12hour-demo";
-import { Period } from "@/Components/time-picker/time-picker-utils";
+import { TimePicker12 } from "@/Components/time-picker/TimePicker12hourDemo";
+import { Period } from "@/Components/time-picker/TimePickerUtils";
 import { Button } from "@/Components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";

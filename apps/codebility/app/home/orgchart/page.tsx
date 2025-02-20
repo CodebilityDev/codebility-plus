@@ -1,7 +1,6 @@
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
-import OrgCharts from "./_components/org-chart";
-
+import OrgCharts from "./_components/OrgChart";
 
 const Page = async () => {
   const supabase = getSupabaseServerActionClient();
@@ -13,11 +12,7 @@ const Page = async () => {
 
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
-      {error ? (
-        "error"
-      ) : (
-        <OrgCharts data={orgChartData as any[]} />
-      )}
+      {error ? "error" : <OrgCharts data={orgChartData as any[]} />}
     </div>
   );
 };

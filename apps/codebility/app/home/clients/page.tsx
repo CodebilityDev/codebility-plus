@@ -2,8 +2,8 @@ import H1 from "@/Components/shared/dashboard/H1";
 import { getClients } from "@/lib/server/codev.service";
 import { Client } from "@/types/home/codev";
 
-import ClientButtons from "./_components/clients-button";
-import ClientCards from "./_components/clients-card";
+import ClientButtons from "./_components/ClientsButton";
+import ClientCards from "./_components/ClientsCard";
 
 export default async function Clients() {
   const { data, error } = await getClients();
