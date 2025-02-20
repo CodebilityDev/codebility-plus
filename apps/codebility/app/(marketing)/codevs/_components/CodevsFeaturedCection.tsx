@@ -9,7 +9,7 @@ import SectionWrapper from "@/Components/shared/home/SectionWrapper";
 import { Button } from "@/Components/ui/button";
 import { motion } from "framer-motion";
 
-import { FeaturedSectiondata } from "../../_lib/dummy-data";
+import { FeaturedSectiondata } from "../../../../constants/landing_data";
 import FeaturedCard from "./CodevsFeaturedCard";
 
 const inter = Inter({

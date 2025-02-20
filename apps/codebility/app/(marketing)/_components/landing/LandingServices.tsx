@@ -2,7 +2,7 @@ import React from "react";
 import ServicesCard from "@/app/(marketing)/_components/landing/LandingServicesCard";
 import { Button } from "@/Components/ui/button";
 
-import { ServicesCardData } from "../../_lib/dummy-data";
+import { ServicesCardData } from "../../../../constants/landing_data";
 
 const Services = () => {
   return (
