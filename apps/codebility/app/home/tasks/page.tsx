@@ -6,7 +6,7 @@ import { useUserStore } from "@/store/codev-store";
 import { Task } from "@/types/home/codev";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-import TasksContainer from "./_components/tasks-container";
+import TasksContainer from "./_components/TasksContainer";
 
 export default function TaskPage() {
   const { user, isLoading: userLoading } = useUserStore();
