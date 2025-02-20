@@ -2,7 +2,7 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "@/Components/ui/button";
 
-import { MarketingCardData } from "../../_lib/dummy-data";
+import { MarketingCardData } from "../../../../constants/landing_data";
 import GridBg from "./LandingGridBg";
 import MarketingCard from "./LandingMarketingCard";
 import PurpleBg from "./LandingPurpleBg";
