@@ -143,7 +143,6 @@ export interface Project {
   main_image?: string;
   website_url?: string;
   figma_link?: string;
-  team_leader_id?: string;
   client_id?: string;
   project_category_id?: number;
   created_at?: string;

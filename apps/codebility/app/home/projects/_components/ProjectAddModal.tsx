@@ -38,7 +38,6 @@ export interface ProjectFormData {
   figma_link?: string;
   start_date: string;
   project_category_id?: string;
-  team_leader_id?: string;
   client_id?: string;
   main_image?: string;
 }
@@ -53,15 +52,18 @@ const ProjectAddModal = () => {
   const [users, setUsers] = useState<Codev[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [categories, setCategories] = useState<SkillCategory[]>([]);
+  const [currentTeamLeader, setCurrentTeamLeader] = useState<Codev | null>(
+    null,
+  );
+  const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
+
   // Image states
   const [projectImage, setProjectImage] = useState<string | null>(null);
   const [openImageCropper, setOpenImageCropper] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
-  // Team selection states
-  const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
-  const [teamLeaderId, setTeamLeaderId] = useState<string>("");
 
+  // Loading states
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);
 
@@ -85,6 +87,7 @@ const ProjectAddModal = () => {
       })),
     [users],
   );
+
   const clientOptions = useMemo(
     () =>
       clients.map((client) => ({
@@ -96,6 +99,7 @@ const ProjectAddModal = () => {
       })),
     [clients],
   );
+
   const categoryOptions = useMemo(
     () =>
       categories.map((category) => ({
@@ -110,17 +114,19 @@ const ProjectAddModal = () => {
   // Handler for team leader selection
   const handleTeamLeaderSelect = useCallback(
     (value: string) => {
-      setTeamLeaderId(value);
-      setValue("team_leader_id", value, { shouldValidate: true });
-      // Remove team leader from selected members if present
-      setSelectedMembers((prev) =>
-        prev.filter((member) => member.id !== value),
-      );
+      const leader = users.find((user) => user.id === value);
+      if (leader) {
+        setCurrentTeamLeader(leader);
+        // Remove from selected members if present
+        setSelectedMembers((prev) =>
+          prev.filter((member) => member.id !== value),
+        );
+      }
     },
-    [setValue],
+    [users],
   );
 
-  // Fetch initial data for users, clients, and categories
+  // Fetch initial data
   useEffect(() => {
     const fetchData = async () => {
       if (!isModalOpen) return;
@@ -150,8 +156,124 @@ const ProjectAddModal = () => {
     setCroppedImage(null);
     setCroppedFile(null);
     setSelectedMembers([]);
-    setTeamLeaderId("");
+    setCurrentTeamLeader(null);
     onClose();
+  };
+
+  // Subcomponents remain mostly the same, just update the SelectSection
+  const SelectSection = () => (
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <CustomSelect
+        label="Team Leader"
+        options={userOptions.filter(
+          (user) => !selectedMembers.find((member) => member.id === user.value),
+        )}
+        value={currentTeamLeader?.id || ""}
+        onChange={handleTeamLeaderSelect}
+        placeholder="Select Team Leader"
+        disabled={isDataLoading}
+      />
+      <CustomSelect
+        label="Project Category"
+        options={categoryOptions}
+        onChange={(value) => setValue("project_category_id", value)}
+        placeholder="Select Project Category"
+        variant="simple"
+      />
+      <CustomSelect
+        label="Client"
+        options={clientOptions}
+        onChange={(value) => setValue("client_id", value)}
+        placeholder="Select Client"
+        disabled={isDataLoading}
+      />
+      <MemberSelection
+        users={users.filter((user) => user.id !== currentTeamLeader?.id)}
+        selectedMembers={selectedMembers}
+        onMemberAdd={(member) =>
+          setSelectedMembers((prev) => [...prev, member])
+        }
+        onMemberRemove={(memberId) =>
+          setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
+        }
+        excludeMembers={currentTeamLeader ? [currentTeamLeader.id] : []}
+      />
+    </div>
+  );
+
+  const onSubmit = async (formData: ProjectFormData) => {
+    if (!currentTeamLeader) {
+      toast.error("Team leader is required");
+      return;
+    }
+    if (!formData.client_id) {
+      toast.error("Client is required");
+      return;
+    }
+    if (!formData.project_category_id) {
+      toast.error("Project category is required");
+      return;
+    }
+    if (!croppedFile) {
+      toast.error("Project image is required");
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const form = new FormData();
+
+      // Upload image
+      const { publicUrl } = await uploadImage(croppedFile, {
+        bucket: "codebility",
+        folder: `projectImage/${Date.now()}_${croppedFile.name.replace(/\s+/g, "_")}`,
+      });
+
+      if (!publicUrl) {
+        throw new Error("Failed to upload image");
+      }
+
+      // Add form data
+      Object.entries(formData).forEach(([key, value]) => {
+        if (value !== undefined && value !== null) {
+          form.append(key, value);
+        }
+      });
+      form.append("main_image", publicUrl);
+
+      // Prepare project members with roles
+      const projectMembers = [
+        // Add team leader with team_leader role
+        {
+          codev_id: currentTeamLeader.id,
+          role: "team_leader",
+        },
+        // Add other members with member role
+        ...selectedMembers.map((member) => ({
+          codev_id: member.id,
+          role: "member",
+        })),
+      ];
+
+      form.append("project_members", JSON.stringify(projectMembers));
+
+      const response = await createProject(
+        form,
+        selectedMembers,
+        currentTeamLeader.id,
+      );
+      if (response.success) {
+        toast.success("Project created successfully!");
+        resetForm();
+      } else {
+        toast.error(response.error || "Failed to create project");
+      }
+    } catch (error) {
+      console.error("Error creating project:", error);
+      toast.error("Failed to create project");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   // Subcomponent: ImageUploadSection
@@ -225,7 +347,7 @@ const ProjectAddModal = () => {
     </div>
   );
 
-  // Subcomponent: ProjectDetailsSection (with labels)
+  // Subcomponent: ProjectDetailsSection
   const ProjectDetailsSection = () => (
     <div className="grid gap-4">
       <div className="space-y-2">
@@ -284,9 +406,7 @@ const ProjectAddModal = () => {
           <Input
             type="date"
             placeholder="Select start date"
-            {...register("start_date", {
-              required: "Start date is required",
-            })}
+            {...register("start_date", { required: "Start date is required" })}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
           {errors.start_date && (
@@ -296,100 +416,6 @@ const ProjectAddModal = () => {
       </div>
     </div>
   );
-
-  // Subcomponent: SelectSection (dropdowns and member selection)
-  const SelectSection = () => (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <CustomSelect
-        label="Team Leader"
-        options={userOptions.filter(
-          (user) => !selectedMembers.find((member) => member.id === user.value),
-        )}
-        value={teamLeaderId}
-        onChange={handleTeamLeaderSelect}
-        placeholder="Select Team Leader"
-        disabled={isDataLoading}
-      />
-      <CustomSelect
-        label="Project Category"
-        options={categoryOptions}
-        onChange={(value) => setValue("project_category_id", value)}
-        placeholder="Select Project Category"
-        variant="simple"
-      />
-      <CustomSelect
-        label="Client"
-        options={clientOptions}
-        onChange={(value) => setValue("client_id", value)}
-        placeholder="Select Client"
-        disabled={isDataLoading}
-      />
-      <MemberSelection
-        users={users.filter((user) => user.id !== teamLeaderId)}
-        selectedMembers={selectedMembers}
-        onMemberAdd={(member) =>
-          setSelectedMembers((prev) => [...prev, member])
-        }
-        onMemberRemove={(memberId) =>
-          setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
-        }
-        excludeMembers={teamLeaderId ? [teamLeaderId] : []}
-      />
-    </div>
-  );
-
-  const onSubmit = async (data: ProjectFormData) => {
-    // Validate required fields
-    if (!teamLeaderId) {
-      toast.error("Team leader is required");
-      return;
-    }
-    if (!data.client_id) {
-      toast.error("Client is required");
-      return;
-    }
-    if (!data.project_category_id) {
-      toast.error("Project category is required");
-      return;
-    }
-    setIsLoading(true);
-    try {
-      const form = new FormData();
-      if (!croppedFile) {
-        throw new Error("Image is required");
-      }
-      // Upload image
-      const fileNameWithoutSpaces = croppedFile.name.replace(/\s+/g, "_");
-      const { publicUrl } = await uploadImage(croppedFile, {
-        bucket: "codebility",
-        folder: "projectImage",
-      });
-      if (!publicUrl) {
-        throw new Error("Failed to upload image");
-      }
-      data.main_image = publicUrl;
-      Object.entries(data).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
-          form.append(key, value);
-        }
-      });
-      const memberIds = selectedMembers.map((member) => member.id);
-      form.append("members", JSON.stringify(memberIds));
-      // Pass teamLeaderId as the third argument
-      const response = await createProject(form, selectedMembers, teamLeaderId);
-      if (response.success) {
-        toast.success("Project created successfully!");
-        resetForm();
-      } else {
-        toast.error(response.error || "Failed to create project");
-      }
-    } catch (error) {
-      console.error("Error creating project:", error);
-      toast.error("Failed to create project");
-    } finally {
-      setIsLoading(false);
-    }
-  };
 
   return (
     <Dialog open={isModalOpen} onOpenChange={resetForm}>

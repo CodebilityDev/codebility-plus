@@ -1,4 +1,4 @@
-import { getCodevs, getProjects } from "@/lib/server/codev.service";
+import { getCodevs } from "@/lib/server/codev.service";
 
 import InHouseView from "./_components/InHouseView";
 
@@ -13,17 +13,6 @@ export default async function InHousePage() {
     throw new Error("Failed to fetch data");
   }
 
-  // For each Codev, fetch projects where they’re involved
-  const codevsWithProjects = await Promise.all(
-    data.map(async (codev) => {
-      const { data: projectsData } = await getProjects(codev.id);
-      return {
-        ...codev,
-        projects: projectsData ?? [],
-      };
-    }),
-  );
-
   // Pass the fully prepared data to the view
-  return <InHouseView initialData={codevsWithProjects} />;
+  return <InHouseView initialData={data} />;
 }

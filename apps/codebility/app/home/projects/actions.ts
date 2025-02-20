@@ -14,6 +14,11 @@ interface DbProjectMember {
   joined_at: string;
 }
 
+interface ProjectMemberData {
+  codev_id: string;
+  role: string;
+}
+
 export interface SimpleMemberData {
   id: string;
   first_name: string;
@@ -21,11 +26,24 @@ export interface SimpleMemberData {
   email_address: string;
   display_position: string | null;
   image_url: string | null;
-  role?: string;
-  joined_at?: string;
+  role: string;
+  joined_at: string;
 }
 
-interface DbMemberResponse {
+interface ProjectMemberResponse {
+  role: string;
+  joined_at: string;
+  codev: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email_address: string;
+    display_position: string | null;
+    image_url: string | null;
+  };
+}
+
+interface DbProjectMemberResponse {
   role: string;
   joined_at: string;
   codev: {
@@ -115,24 +133,25 @@ export async function createProject(
   }
 }
 
-export async function updateProject(
-  projectId: string,
-  formData: FormData,
-  teamLeaderId?: string,
-) {
+export async function updateProject(projectId: string, formData: FormData) {
   const supabase = createClientComponentClient();
 
   try {
+    // Parse project members data with type assertion
+    const projectMembersData = formData.get("project_members");
+    const projectMembers = projectMembersData
+      ? (JSON.parse(projectMembersData as string) as ProjectMemberData[])
+      : null;
+
+    // Update project details
     const updateData: any = {};
     for (const [key, value] of formData.entries()) {
-      if (key !== "members") {
-        // Handle members separately
+      if (key !== "project_members") {
         updateData[key] = value;
       }
     }
 
-    // Update project details
-    const { data, error } = await supabase
+    const { data: projectData, error: projectError } = await supabase
       .from("projects")
       .update({
         ...updateData,
@@ -141,26 +160,43 @@ export async function updateProject(
       .eq("id", projectId)
       .select();
 
-    if (error) throw error;
+    if (projectError) throw projectError;
 
-    // Update team leader if provided
-    if (teamLeaderId) {
-      // First, reset any existing team leader
-      await supabase
+    // Handle project members and team leader
+    if (projectMembers && Array.isArray(projectMembers)) {
+      // First, get all current project members to compare
+      const { data: existingMembers, error: membersError } = await supabase
         .from("project_members")
-        .update({ role: "member" })
-        .eq("project_id", projectId)
-        .eq("role", "team_leader");
+        .select("*")
+        .eq("project_id", projectId);
 
-      // Set new team leader
-      await supabase
+      if (membersError) throw membersError;
+
+      // Delete existing members
+      const { error: deleteError } = await supabase
         .from("project_members")
-        .update({ role: "team_leader" })
-        .eq("project_id", projectId)
-        .eq("codev_id", teamLeaderId);
+        .delete()
+        .eq("project_id", projectId);
+
+      if (deleteError) throw deleteError;
+
+      // Insert updated members with proper roles
+      const { error: insertError } = await supabase
+        .from("project_members")
+        .insert(
+          projectMembers.map((member: ProjectMemberData) => ({
+            project_id: projectId,
+            codev_id: member.codev_id,
+            role: member.role,
+            joined_at: new Date().toISOString(),
+          })),
+        );
+
+      if (insertError) throw insertError;
     }
 
-    return { success: true, data };
+    revalidatePath("/projects");
+    return { success: true, data: projectData };
   } catch (error) {
     console.error("Error updating project:", error);
     return {
@@ -170,7 +206,6 @@ export async function updateProject(
     };
   }
 }
-
 export async function deleteProject(projectId: string) {
   const supabase = createClientComponentClient();
 
@@ -221,7 +256,7 @@ export const getTeamLead = async (
   const supabase = createClientComponentClient();
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("project_members")
       .select(
         `
@@ -239,7 +274,7 @@ export const getTeamLead = async (
       )
       .eq("project_id", projectId)
       .eq("role", "team_leader")
-      .single();
+      .single()) as { data: DbProjectMemberResponse | null; error: any };
 
     if (error) {
       console.error("Error fetching team lead:", error);
@@ -250,21 +285,13 @@ export const getTeamLead = async (
       return { error: null, data: null };
     }
 
-    // If data.codev is an array, take the first element
-    const codevData = Array.isArray(data.codev) ? data.codev[0] : data.codev;
-    if (!codevData) {
-      // In case the array is empty
-      return { error: null, data: null };
-    }
-
-    // Transform to SimpleMemberData
     const teamLead: SimpleMemberData = {
-      id: codevData.id,
-      first_name: codevData.first_name,
-      last_name: codevData.last_name,
-      email_address: codevData.email_address,
-      display_position: codevData.display_position,
-      image_url: codevData.image_url,
+      id: data.codev.id,
+      first_name: data.codev.first_name,
+      last_name: data.codev.last_name,
+      email_address: data.codev.email_address,
+      display_position: data.codev.display_position,
+      image_url: data.codev.image_url,
       role: data.role,
       joined_at: data.joined_at,
     };
@@ -285,7 +312,7 @@ export const getMembers = async (
   const supabase = createClientComponentClient();
 
   try {
-    const { data, error } = await supabase
+    const { data, error } = (await supabase
       .from("project_members")
       .select(
         `
@@ -301,35 +328,31 @@ export const getMembers = async (
         )
       `,
       )
-      .eq("project_id", projectId);
+      .eq("project_id", projectId)
+      .eq("role", "member")) as {
+      data: ProjectMemberResponse[] | null;
+      error: any;
+    };
 
     if (error) {
       console.error("Error fetching members:", error);
       return { error, data: null };
     }
 
-    // Transform each member while checking for undefined codev data.
-    const members = data
-      .map((member) => {
-        // If codev is returned as an array, take the first element.
-        const codevData = Array.isArray(member.codev)
-          ? member.codev[0]
-          : member.codev;
-        if (!codevData) {
-          return null;
-        }
-        return {
-          id: codevData.id,
-          first_name: codevData.first_name,
-          last_name: codevData.last_name,
-          email_address: codevData.email_address,
-          display_position: codevData.display_position,
-          image_url: codevData.image_url,
-          role: member.role,
-          joined_at: member.joined_at,
-        };
-      })
-      .filter((m) => m !== null) as SimpleMemberData[];
+    if (!data) {
+      return { error: null, data: null };
+    }
+
+    const members = data.map((member) => ({
+      id: member.codev.id,
+      first_name: member.codev.first_name,
+      last_name: member.codev.last_name,
+      email_address: member.codev.email_address,
+      display_position: member.codev.display_position,
+      image_url: member.codev.image_url,
+      role: member.role,
+      joined_at: member.joined_at,
+    }));
 
     return { error: null, data: members };
   } catch (error) {

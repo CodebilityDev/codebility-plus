@@ -29,6 +29,7 @@ const PROJECT_CATEGORIES: Record<string, string> = {
 
 const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
+  console.log(" dataccc:", data);
   const isModalOpen = isOpen && type === "projectViewModal";
 
   // Using the simplified member type returned by our actions.
@@ -49,22 +50,21 @@ const ProjectViewModal = () => {
 
   useEffect(() => {
     const fetchTeamLeadAndMembers = async () => {
-      if (!data) return;
+      if (!data?.id) return;
       setIsLoading(true);
       try {
-        // Use the project id (data.id) to fetch team data.
-        const { error: leadError, data: fetchedTeamLead } = await getTeamLead(
-          data.id,
-        );
-        if (!leadError && fetchedTeamLead) {
-          setTeamLead(fetchedTeamLead);
+        // Fetch both team lead and members in parallel
+        const [teamLeadResult, membersResult] = await Promise.all([
+          getTeamLead(data.id),
+          getMembers(data.id),
+        ]);
+
+        if (!teamLeadResult.error && teamLeadResult.data) {
+          setTeamLead(teamLeadResult.data);
         }
 
-        const { error: membersError, data: fetchedMembers } = await getMembers(
-          data.id,
-        );
-        if (!membersError && fetchedMembers) {
-          setMembers(fetchedMembers);
+        if (!membersResult.error && membersResult.data) {
+          setMembers(membersResult.data);
         }
       } catch (error) {
         console.error("Error fetching team data:", error);
@@ -75,6 +75,10 @@ const ProjectViewModal = () => {
 
     if (isModalOpen) {
       fetchTeamLeadAndMembers();
+    } else {
+      // Reset states when modal closes
+      setTeamLead(null);
+      setMembers([]);
     }
   }, [isModalOpen, data]);
 
