@@ -13,7 +13,7 @@ import {
 import { Badge } from "@codevs/ui/badge";
 import { Button } from "@codevs/ui/button";
 
-import { StatusBadge } from "../../in-house/_components/shared/status-badge";
+import { StatusBadge } from "../../in-house/_components/shared/StatusBadge";
 
 interface CodevCardProps {
   codev: Codev;

@@ -17,7 +17,7 @@ import { IconKanban } from "@/public/assets/svgs";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import KanbanBoardsSearch from "./_components/kanban-boards-search";
+import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
 
 // Types
 interface SearchParams {

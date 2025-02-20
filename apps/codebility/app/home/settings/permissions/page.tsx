@@ -4,7 +4,7 @@ import { ArrowRightIcon } from "@/public/assets/svgs";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import PermissionsTable from "./_components/permissions-table";
+import PermissionsTable from "./_components/PermissionsTable";
 import { permissions_TableRowProps as TableRowProps } from "./_types/permissions";
 
 const PermissionSettings = async () => {
@@ -12,7 +12,7 @@ const PermissionSettings = async () => {
   const { data: Roles, error } = await supabase.from("user_type").select("*");
 
   return (
-    <div className="flex max-w-screen-xl mx-auto flex-col gap-6 overflow-x-auto">
+    <div className="mx-auto flex max-w-screen-xl flex-col gap-6 overflow-x-auto">
       <div className="text-dark100_light900 flex flex-col gap-4 ">
         <div className="flex flex-row items-center gap-4 text-sm">
           <Link href={"/home/settings"}>

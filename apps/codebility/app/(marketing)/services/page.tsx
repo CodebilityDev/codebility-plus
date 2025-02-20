@@ -3,11 +3,11 @@
 import { useEffect, useState } from "react";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-import Calendly from "../_components/marketing-calendly";
-import Footer from "../_components/marketing-footer";
-import Navigation from "../_components/marketing-navigation";
-import Hero from "./_components/services-hero";
-import ServicesTab from "./_components/services-tab";
+import Calendly from "../_components/MarketingCalendly";
+import Footer from "../_components/MarketingFooter";
+import Navigation from "../_components/MarketingNavigation";
+import Hero from "./_components/ServicesHero";
+import ServicesTab from "./_components/ServicesTab";
 
 interface TeamMember {
   id: string;

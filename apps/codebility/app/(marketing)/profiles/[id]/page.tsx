@@ -17,7 +17,7 @@ import {
 } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 
-import ProfileCloseButton from "./_components/profile-close-button";
+import ProfileCloseButton from "./_components/ProfileCloseButton";
 
 interface Props {
   params: { id: string };

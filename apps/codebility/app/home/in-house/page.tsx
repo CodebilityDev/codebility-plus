@@ -1,6 +1,6 @@
 import { getCodevs, getProjects } from "@/lib/server/codev.service";
 
-import InHouseView from "./_components/in-house-view";
+import InHouseView from "./_components/InHouseView";
 
 export default async function InHousePage() {
   // Fetch Codev data with the desired filter
