@@ -1,4 +1,4 @@
-import { services } from "../../_lib/dummy-data";
+import { services } from "../../../../constants/landing_data";
 import Diamond from "./LandingDiamond";
 import Marquee from "./LandingMarquee";
 
