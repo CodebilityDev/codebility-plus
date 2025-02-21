@@ -29,7 +29,6 @@ const PROJECT_CATEGORIES: Record<string, string> = {
 
 const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
-  console.log(" dataccc:", data);
   const isModalOpen = isOpen && type === "projectViewModal";
 
   // Using the simplified member type returned by our actions.

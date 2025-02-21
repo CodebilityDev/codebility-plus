@@ -37,6 +37,8 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
+import { completeTask } from "../../actions";
+
 interface CodevMember {
   id: string;
   first_name: string;
@@ -50,7 +52,11 @@ const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
 // Utility function to capitalize the first letter
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-const TaskViewModal = () => {
+const TaskViewModal = ({
+  onComplete,
+}: {
+  onComplete?: (taskId: string) => void;
+}) => {
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task;
@@ -63,99 +69,23 @@ const TaskViewModal = () => {
     if (!task) return;
 
     try {
-      const supabase = createClientComponentClient();
+      const result = await completeTask(task);
 
-      // 1. Get primary assignee points record
-      const { data: existingPoints, error: pointsError } = await supabase
-        .from("codev_points")
-        .select("*")
-        .eq("codev_id", task.codev?.id)
-        .eq("skill_category_id", task.skill_category?.id) // Use the nested object
-        .single();
-
-      // 2. Calculate new points
-      const taskPoints = task.points || 0;
-      const currentPoints = existingPoints?.points || 0;
-      const newPoints = currentPoints + taskPoints;
-
-      // 3. Update or insert points for primary assignee
-      if (existingPoints) {
-        const { error: updateError } = await supabase
-          .from("codev_points")
-          .update({ points: newPoints })
-          .eq("id", existingPoints.id);
-
-        if (updateError) throw updateError;
-      } else {
-        const { error: insertError } = await supabase
-          .from("codev_points")
-          .insert({
-            codev_id: task.codev?.id,
-            skill_category_id: task.skill_category?.id,
-            points: taskPoints,
-          });
-
-        if (insertError) throw insertError;
-      }
-
-      // 4. Handle sidekick points (50% of task points)
-      if (task.sidekick_ids?.length) {
-        const sidekickPoints = Math.floor(taskPoints * 0.5);
-
-        for (const sidekickId of task.sidekick_ids) {
-          const { data: sidekickExistingPoints, error: sidekickError } =
-            await supabase
-              .from("codev_points")
-              .select("*")
-              .eq("codev_id", sidekickId)
-              .eq("skill_category_id", task.skill_category?.id)
-              .single();
-
-          if (sidekickError && sidekickError.code !== "PGRST116") {
-            throw sidekickError;
-          }
-
-          if (sidekickExistingPoints) {
-            const { error: updateError } = await supabase
-              .from("codev_points")
-              .update({
-                points: sidekickExistingPoints.points + sidekickPoints,
-              })
-              .eq("id", sidekickExistingPoints.id);
-
-            if (updateError) throw updateError;
-          } else {
-            const { error: insertError } = await supabase
-              .from("codev_points")
-              .insert({
-                codev_id: sidekickId,
-                skill_category_id: task.skill_category?.id,
-                points: sidekickPoints,
-              });
-
-            if (insertError) throw insertError;
-          }
+      if (result.success) {
+        toast.success("Task completed and points awarded!");
+        // Call the onComplete callback before closing the modal
+        if (onComplete) {
+          onComplete(task.id);
         }
+        onClose();
+        // Still refresh the router but the UI will update immediately
+        router.refresh();
+      } else {
+        toast.error(result.error || "Failed to complete task");
       }
-
-      // 5. Delete the task
-      const { error: deleteError } = await supabase
-        .from("tasks")
-        .delete()
-        .eq("id", task.id);
-
-      if (deleteError) throw deleteError;
-
-      toast.success("Task completed and points awarded!");
-      onClose();
-      router.refresh();
     } catch (error) {
       console.error("Error completing task:", error);
-      if (error instanceof Error) {
-        toast.error(`Failed to complete task: ${error.message}`);
-      } else {
-        toast.error("Failed to complete task");
-      }
+      toast.error("Failed to complete task");
     }
   };
 
