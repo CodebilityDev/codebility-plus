@@ -28,15 +28,11 @@ export function TableActions({ item, onEdit, onDelete }: TableActionsProps) {
   const handleDelete = async () => {
     try {
       setIsDeleting(true);
-
       const { error } = await supabase.from("codev").delete().eq("id", item.id);
 
       if (error) throw error;
 
-      if (onDelete) {
-        onDelete();
-      }
-
+      onDelete?.(); // notify parent
       toast.success("Member deleted successfully");
     } catch (error) {
       console.error("Error deleting member:", error);
@@ -52,10 +48,21 @@ export function TableActions({ item, onEdit, onDelete }: TableActionsProps) {
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" size="sm">
-            <MoreHorizontal className="h-4 w-4" />
+            <MoreHorizontal className="h-4 w-4  dark:text-white" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
+        <DropdownMenuContent
+          align="end"
+          className="
+    dark:bg-dark-200 
+    dark:border-dark-300 
+    border 
+    border-gray-200
+    bg-white 
+    text-black 
+    dark:text-white
+  "
+        >
           <DropdownMenuItem onClick={onEdit}>
             <Edit2 className="mr-2 h-4 w-4" />
             Edit

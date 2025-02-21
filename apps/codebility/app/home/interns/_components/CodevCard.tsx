@@ -2,15 +2,11 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import CodevBadge from "@/Components/CodevBadge";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import Box from "@/Components/shared/dashboard/Box";
 import { useModal } from "@/hooks/use-modal-users";
-import {
-  Codev,
-  CodevPoints,
-  InternalStatus,
-  Project,
-} from "@/types/home/codev";
+import { Codev, CodevPoints, InternalStatus } from "@/types/home/codev";
 import {
   AnimatePresence,
   motion,
@@ -19,7 +15,6 @@ import {
   useTransform,
 } from "framer-motion";
 
-import web from "@codevs/tailwind-config/web";
 import { cn } from "@codevs/ui";
 import { Badge } from "@codevs/ui/badge";
 
@@ -110,7 +105,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
         <div className="flex h-full flex-col justify-start pt-2">
           {/* Header Section */}
           <div className="relative flex items-start justify-start gap-4 px-4 text-center">
-            <div className="border-green relative rounded-full border-2">
+            <div className=" relative rounded-full border-2">
               {codev.image_url ? (
                 <div className="relative h-24 w-24">
                   <img
@@ -181,6 +176,12 @@ export default function CodevCard({ codev }: CodevCardProps) {
                   {codev.years_of_experience}{" "}
                   {codev.years_of_experience === 1 ? "year" : "years"} of
                   experience
+                </div>
+              )}
+              {/* Add CodevBadge here */}
+              {codev.level && Object.keys(codev.level).length > 0 && (
+                <div className="mt-1">
+                  <CodevBadge level={codev.level} size={24} />
                 </div>
               )}
             </div>
