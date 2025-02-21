@@ -64,7 +64,6 @@ const ProjectEditModal = () => {
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
   // Member selection state
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
-  console.log(" selectedMembers:", selectedMembers);
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
   const [isDataLoading, setIsDataLoading] = useState(true);

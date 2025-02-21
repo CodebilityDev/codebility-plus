@@ -1,5 +1,7 @@
+"use client";
+
 import { useEffect, useState } from "react";
-import { Project } from "@/types/home/codev";
+import { Project } from "@/types/home/codev"; // Ensure Project is typed with { id: string; name: string; ... }
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Badge } from "@codevs/ui/badge";
@@ -27,16 +29,16 @@ export function ProjectSelect({
 
   useEffect(() => {
     async function fetchProjects() {
-      const { data: projects } = await supabase
-        .from("project")
+      // Make sure your table name is correct:
+      const { data: projects, error } = await supabase
+        .from("projects") // "projects", not "project", unless your DB table is singular
         .select("*")
         .order("name");
 
-      if (projects) {
+      if (!error && projects) {
         setAvailableProjects(projects);
       }
     }
-
     fetchProjects();
   }, [supabase]);
 
@@ -45,18 +47,18 @@ export function ProjectSelect({
     if (!project) return;
 
     const isSelected = value.some((p) => p.id === projectId);
-
     const newProjects = isSelected
-      ? value.filter((p) => p.id !== projectId)
-      : [...value, project];
+      ? value.filter((p) => p.id !== projectId) // remove
+      : [...value, project]; // add
 
     onChange(newProjects);
   };
 
   return (
     <div className="space-y-2">
+      {/* Dropdown for selecting more projects */}
       <Select onValueChange={handleProjectChange} disabled={disabled}>
-        <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 w-full">
+        <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-200 w-full">
           <SelectValue placeholder="Select a project" />
         </SelectTrigger>
         <SelectContent className="bg-light-800 dark:bg-dark-200">
@@ -72,7 +74,7 @@ export function ProjectSelect({
         </SelectContent>
       </Select>
 
-      {/* Selected Projects */}
+      {/* Show selected projects as badges */}
       {value.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {value.map((project) => (

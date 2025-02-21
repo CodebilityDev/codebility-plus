@@ -1,0 +1,112 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+interface SkillCategory {
+  id: string;
+  name: string;
+  badge_prefix?: string;
+}
+
+interface CodevLevelData {
+  [key: string]: number;
+}
+
+interface CodevBadgeProps {
+  level: CodevLevelData;
+  size?: number;
+  className?: string;
+}
+
+// Helper function to get badge prefix from skill category name
+function getBadgePrefix(name: string): string {
+  const lowerName = name.toLowerCase();
+  if (lowerName.includes("frontend")) return "fe";
+  if (lowerName.includes("backend")) return "be";
+  if (lowerName.includes("mobile")) return "md";
+  if (lowerName.includes("ui") || lowerName.includes("ux")) return "uiux";
+  return name.substring(0, 2).toLowerCase();
+}
+
+export default function CodevBadge({
+  level,
+  size = 24,
+  className = "",
+}: CodevBadgeProps) {
+  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSkillCategories = async () => {
+      const supabase = createClientComponentClient();
+
+      try {
+        const { data, error } = await supabase
+          .from("skill_category")
+          .select("id, name");
+
+        if (error) throw error;
+
+        if (data) {
+          const categoriesWithPrefix = data.map((category) => ({
+            ...category,
+            badge_prefix: getBadgePrefix(category.name),
+          }));
+          setSkillCategories(categoriesWithPrefix);
+        }
+      } catch (err) {
+        console.error("Error fetching skill categories:", err);
+        setError("Failed to load badges");
+      }
+    };
+
+    fetchSkillCategories();
+  }, []);
+
+  if (error) {
+    return <div className="text-sm text-red-500">{error}</div>;
+  }
+
+  if (!level || Object.keys(level).length === 0) {
+    return null;
+  }
+
+  return (
+    <div className={`flex flex-wrap gap-2 ${className}`}>
+      {Object.entries(level).map(([categoryId, levelNumber]) => {
+        const category = skillCategories.find((cat) => cat.id === categoryId);
+        if (!category) return null;
+
+        const prefix = category.badge_prefix;
+        const badgeName =
+          levelNumber >= 6
+            ? `${prefix}-tier-champion.svg`
+            : `${prefix}-tier-${levelNumber}.svg`;
+
+        return (
+          <div
+            key={categoryId}
+            className="group relative cursor-pointer"
+            title={`${category.name} - Level ${levelNumber}`} // Basic browser tooltip
+          >
+            <img
+              src={`/assets/svgs/badges/${badgeName}`}
+              alt={`${category.name} Level ${levelNumber} Badge`}
+              width={size}
+              height={size}
+              className="object-contain transition-transform duration-200 group-hover:scale-110"
+              onError={(e) => {
+                e.currentTarget.src = "/assets/svgs/badges/default-badge.svg";
+              }}
+            />
+            {/* Optional: Custom hover tooltip */}
+            <div className="pointer-events-none absolute bottom-full left-1/2 mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-800 px-2 py-1 text-xs text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+              {category.name} - Level {levelNumber}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
