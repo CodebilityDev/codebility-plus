@@ -405,3 +405,184 @@ export const updateColumnName = async (
     };
   }
 };
+
+const updateDeveloperLevels = async (codevId?: string) => {
+  if (!codevId) return;
+
+  const supabase = createClientComponentClient();
+
+  // 1. Get all points for this developer across skill categories
+  const { data: pointsData, error: pointsError } = await supabase
+    .from("codev_points")
+    .select("skill_category_id, points");
+
+  if (pointsError) {
+    console.error("Error fetching points:", pointsError);
+    return;
+  }
+
+  // 2. Prepare levels object
+  const levels: Record<string, number> = {};
+
+  // 3. For each skill category, determine the level
+  for (const pointRecord of pointsData) {
+    const { data: levelData, error: levelError } = await supabase
+      .from("levels")
+      .select("*")
+      .eq("skill_category_id", pointRecord.skill_category_id)
+      .lte("min_points", pointRecord.points)
+      .order("level", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (levelError) {
+      console.error("Error finding level:", levelError);
+      continue;
+    }
+
+    if (levelData) {
+      levels[pointRecord.skill_category_id] = levelData.level;
+    }
+  }
+
+  // 4. Update codev table's level column
+  const { error: updateError } = await supabase
+    .from("codev")
+    .update({ level: levels })
+    .eq("id", codevId);
+
+  if (updateError) {
+    console.error("Error updating levels:", updateError);
+  }
+};
+
+export const completeTask = async (
+  task: Task,
+): Promise<{ success: boolean; error?: string }> => {
+  const supabase = createClientComponentClient();
+
+  try {
+    // 1. Get primary assignee points record
+    const { data: existingPoints, error: pointsError } = await supabase
+      .from("codev_points")
+      .select("*")
+      .eq("codev_id", task.codev?.id)
+      .eq("skill_category_id", task.skill_category?.id)
+      .single();
+
+    // 2. Calculate new points
+    const taskPoints = task.points || 0;
+    const currentPoints = existingPoints?.points || 0;
+    const newPoints = currentPoints + taskPoints;
+
+    // 3. Update or insert points for primary assignee
+    if (existingPoints) {
+      const { error: updateError } = await supabase
+        .from("codev_points")
+        .update({ points: newPoints })
+        .eq("id", existingPoints.id);
+
+      if (updateError) throw updateError;
+    } else {
+      const { error: insertError } = await supabase
+        .from("codev_points")
+        .insert({
+          codev_id: task.codev?.id,
+          skill_category_id: task.skill_category?.id,
+          points: taskPoints,
+        });
+
+      if (insertError) throw insertError;
+    }
+
+    // 4. Handle sidekick points (50% of task points)
+    if (task.sidekick_ids?.length) {
+      const sidekickPoints = Math.floor(taskPoints * 0.5);
+
+      for (const sidekickId of task.sidekick_ids) {
+        const { data: sidekickExistingPoints, error: sidekickError } =
+          await supabase
+            .from("codev_points")
+            .select("*")
+            .eq("codev_id", sidekickId)
+            .eq("skill_category_id", task.skill_category?.id)
+            .single();
+
+        if (sidekickError && sidekickError.code !== "PGRST116") {
+          throw sidekickError;
+        }
+
+        if (sidekickExistingPoints) {
+          const { error: updateError } = await supabase
+            .from("codev_points")
+            .update({
+              points: sidekickExistingPoints.points + sidekickPoints,
+            })
+            .eq("id", sidekickExistingPoints.id);
+
+          if (updateError) throw updateError;
+        } else {
+          const { error: insertError } = await supabase
+            .from("codev_points")
+            .insert({
+              codev_id: sidekickId,
+              skill_category_id: task.skill_category?.id,
+              points: sidekickPoints,
+            });
+
+          if (insertError) throw insertError;
+        }
+      }
+    }
+
+    // 5. Update developer levels
+    await updateDeveloperLevels(task.codev?.id);
+
+    // 6. Delete the task
+    const { error: deleteError } = await supabase
+      .from("tasks")
+      .delete()
+      .eq("id", task.id);
+
+    if (deleteError) throw deleteError;
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error completing task:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to complete task",
+    };
+  }
+};
+
+export async function batchUpdateTasks(
+  updates: Array<{ taskId: string; newColumnId: string }>,
+) {
+  const supabase = createClientComponentClient();
+  try {
+    const updatePromises = updates.map(async (update) => {
+      const { error } = await supabase
+        .from("tasks")
+        .update({
+          kanban_column_id: update.newColumnId,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", update.taskId);
+      return error;
+    });
+    const errors = await Promise.all(updatePromises);
+    return {
+      success: !errors.some((error) => error !== null),
+      error: errors.some((error) => error !== null)
+        ? "Some updates failed"
+        : undefined,
+    };
+  } catch (error) {
+    console.error("Batch update error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Batch update failed",
+    };
+  }
+}

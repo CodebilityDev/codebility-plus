@@ -41,10 +41,16 @@ interface Props {
     name: string;
   };
   projectId: string;
-  tasks?: ExtendedTask[]; // Make tasks optional so it can default to an empty array if undefined.
+  tasks?: ExtendedTask[];
+  onTaskComplete: (taskId: string) => void;
 }
 
-export default function KanbanColumn({ column, projectId, tasks }: Props) {
+export default function KanbanColumn({
+  column,
+  projectId,
+  tasks,
+  onTaskComplete,
+}: Props) {
   const router = useRouter();
   const { user } = useUserStore();
   const canModifyColumn = user?.role_id === 1 || user?.role_id === 5;
@@ -262,7 +268,12 @@ export default function KanbanColumn({ column, projectId, tasks }: Props) {
               </div>
             ) : (
               sortedTasks.map((task) => (
-                <KanbanTask key={task.id} task={task} columnId={column.id} />
+                <KanbanTask
+                  key={task.id}
+                  task={task}
+                  columnId={column.id}
+                  onComplete={onTaskComplete}
+                />
               ))
             )}
           </SortableContext>
