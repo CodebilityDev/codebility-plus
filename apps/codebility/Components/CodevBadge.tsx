@@ -31,7 +31,7 @@ function getBadgePrefix(name: string): string {
 
 export default function CodevBadge({
   level,
-  size = 24,
+  size = 36,
   className = "",
 }: CodevBadgeProps) {
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
@@ -73,7 +73,7 @@ export default function CodevBadge({
   }
 
   return (
-    <div className={`flex flex-wrap gap-2 ${className}`}>
+    <div className={`flex   ${className}`}>
       {Object.entries(level).map(([categoryId, levelNumber]) => {
         const category = skillCategories.find((cat) => cat.id === categoryId);
         if (!category) return null;
