@@ -124,7 +124,6 @@ export const signupUser = async (formData: FormData) => {
       linkedin: (formData.get("linkedin") as string) || null,
       github: (formData.get("github") as string) || null,
       discord: (formData.get("discord") as string) || null,
-      projects: [],
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
       years_of_experience,
