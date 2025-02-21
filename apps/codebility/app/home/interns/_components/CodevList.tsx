@@ -67,7 +67,7 @@ export default function CodevList({ data, filters }: CodevListProps) {
   return (
     <div className="space-y-6">
       {paginatedData.length > 0 ? (
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
           {paginatedData.map((codev) => (
             <CodevCard key={codev.id} codev={codev} />
           ))}
