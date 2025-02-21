@@ -1,14 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { H1 } from "@/Components/shared/home";
-import useMediaQuery from "@/hooks/use-media-query";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
-
-import { InHouseCards } from "./cards/InHouseCards";
 import { InHouseTable } from "./table/InHouseTable";
 import { TableFilters } from "./table/table-filters";
 
@@ -18,22 +14,8 @@ interface InHouseViewProps {
 
 export default function InHouseView({ initialData }: InHouseViewProps) {
   const [data, setData] = useState<Codev[]>(initialData);
-  const isDesktop = useMediaQuery("(min-width: 768px)");
 
-  // Get the saved view preference or default to desktop preference
-  const [activeView, setActiveView] = useState(() => {
-    if (typeof window !== "undefined") {
-      const savedView = localStorage.getItem("inhouse-view-preference");
-      return savedView || (isDesktop ? "table" : "cards");
-    }
-    return isDesktop ? "table" : "cards";
-  });
-
-  // Save preference whenever it changes
-  useEffect(() => {
-    localStorage.setItem("inhouse-view-preference", activeView);
-  }, [activeView]);
-
+  // Filters
   const [filters, setFilters] = useState({
     status: "",
     position: "",
@@ -44,6 +26,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
     role: "",
   });
 
+  // Filtering logic
   const filteredData = data.filter((item) => {
     if (filters.status && item.internal_status !== filters.status) return false;
     if (filters.position && !item.positions?.includes(filters.position))
@@ -72,13 +55,14 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
     return true;
   });
 
+  // Pagination
   const {
     currentPage,
     totalPages,
     paginatedData,
     handleNextPage,
     handlePreviousPage,
-  } = usePagination(filteredData, 10);
+  } = usePagination(filteredData, 15);
 
   const sharedProps = {
     data: paginatedData,
@@ -95,32 +79,23 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
   return (
     <div className="max-w-screen-4xl mx-auto flex flex-col gap-4 p-4">
       <H1>In-House Codebility</H1>
+
       <div className="flex items-center justify-between">
         <p className="text-light-900 text-sm">
           {data.length} {data.length === 1 ? "member" : "members"}
         </p>
       </div>
 
-      <Tabs value={activeView} onValueChange={setActiveView} className="w-full">
-        <TabsList className="mb-4 grid w-full grid-cols-2">
-          <TabsTrigger value="table">Table View</TabsTrigger>
-          <TabsTrigger value="cards">Card View</TabsTrigger>
-        </TabsList>
+      {/* Table filters */}
+      <TableFilters
+        filters={filters}
+        onFilterChange={(key, value) =>
+          setFilters((prev) => ({ ...prev, [key]: value }))
+        }
+      />
 
-        <TableFilters
-          filters={filters}
-          onFilterChange={(key, value) =>
-            setFilters((prev) => ({ ...prev, [key]: value }))
-          }
-        />
-
-        <TabsContent value="table" className="space-y-4">
-          <InHouseTable {...sharedProps} />
-        </TabsContent>
-        <TabsContent value="cards" className="space-y-4">
-          <InHouseCards {...sharedProps} />
-        </TabsContent>
-      </Tabs>
+      {/* Table view only */}
+      <InHouseTable {...sharedProps} />
     </div>
   );
 }

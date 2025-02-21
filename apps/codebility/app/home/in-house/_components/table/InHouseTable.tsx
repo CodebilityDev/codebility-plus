@@ -20,8 +20,6 @@ import { columns } from "./columns";
 import { EditableRow, Role } from "./EditableRow";
 import { TableActions } from "./TableActions";
 
-// Removed TableFilters import because filters are removed
-
 interface InHouseTableProps {
   data: Codev[];
   onDataChange: (data: Codev[]) => void;
@@ -63,25 +61,7 @@ export function InHouseTable({
     fetchRoles();
   }, [supabase]);
 
-  // Local pagination state:
-  const [currentPage, setCurrentPage] = useState(1);
-  const pageSize = 10;
-
-  // When data changes, you may optionally reset the page.
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [data]);
-
-  // Compute total pages from the full data.
-  const totalPages = Math.ceil(data.length / pageSize);
-
-  // Slice the full data for the current page.
-  const paginatedData = data.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize,
-  );
-
-  // Deleting logic (for local UI state)
+  // Helper to handle item deletion in local state
   const handleDelete = (deletedId: string) => {
     onDataChange(data.filter((item) => item.id !== deletedId));
   };
@@ -92,34 +72,39 @@ export function InHouseTable({
 
   return (
     <div className="mb-4 space-y-4">
-      {/* Table */}
+      {/* Table Container */}
       <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 rounded-lg border">
         <Table>
+          {/* Table Header */}
           <TableHeader>
-            <TableRow className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-200">
+            <TableRow className="border-light-700 dark:border-dark-200 bg-light-200 dark:bg-dark-300 border-b">
               {columns.map((column) => (
                 <TableHead
                   key={column.key}
-                  className="dark:text-light-900 text-base font-semibold text-black"
+                  className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black"
                 >
                   {column.label}
                 </TableHead>
               ))}
-              <TableHead className="dark:text-light-900 text-base font-semibold text-black">
+              <TableHead className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black">
                 Actions
               </TableHead>
             </TableRow>
           </TableHeader>
 
+          {/* Table Body */}
           <TableBody>
-            {paginatedData.map((item) =>
+            {data.map((item) =>
               editingId === item.id ? (
                 <EditableRow
                   key={item.id}
                   data={item}
-                  onSave={(updated) => {
+                  onSave={(updatedItem) => {
+                    // Update local data
                     onDataChange(
-                      data.map((d) => (d.id === updated.id ? updated : d)),
+                      data.map((d) =>
+                        d.id === updatedItem.id ? updatedItem : d,
+                      ),
                     );
                     setEditingId(null);
                   }}
@@ -129,9 +114,9 @@ export function InHouseTable({
               ) : (
                 <TableRow
                   key={item.id}
-                  className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-200"
+                  className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 border-b"
                 >
-                  <TableCell className="dark:text-light-900 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                       <Image
                         src={item.image_url || defaultImage}
@@ -143,39 +128,38 @@ export function InHouseTable({
                     </div>
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {capitalize(item.last_name)}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {item.email_address}
                   </TableCell>
 
-                  <TableCell>
+                  <TableCell className="px-2 py-2">
                     <StatusBadge
                       status={item.internal_status as InternalStatus}
                     />
                   </TableCell>
 
-                  {/* Display the role name – update if you have role data */}
-                  <TableCell className="dark:text-light-900 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {item.role_id
                       ? roles.find((role) => role.id === item.role_id)?.name ||
                         "-"
                       : "-"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {typeof item.display_position === "string"
                       ? capitalize(item.display_position)
                       : "-"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {item.projects?.length ? (
                       <div className="space-y-1">
                         {item.projects.map((project) => (
@@ -187,17 +171,17 @@ export function InHouseTable({
                     )}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {item.nda_status ? "Yes" : "No"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {item.portfolio_website ? (
                       <a
                         href={item.portfolio_website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-blue-100 hover:text-blue-200"
+                        className="inline-flex items-center text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
                       >
                         <Link2 className="mr-1 h-4 w-4" />
                         Portfolio
@@ -207,7 +191,7 @@ export function InHouseTable({
                     )}
                   </TableCell>
 
-                  <TableCell>
+                  <TableCell className="px-2 py-2">
                     <TableActions
                       item={item}
                       onEdit={() => setEditingId(item.id)}
@@ -223,21 +207,21 @@ export function InHouseTable({
 
       {/* Pagination Controls */}
       {pagination && data.length > 0 && (
-        <div className="mt-4 flex items-center justify-end gap-2">
+        <div className="flex items-center justify-end gap-2">
           <button
             onClick={pagination.onPreviousPage}
             disabled={pagination.currentPage === 1}
-            className="text-light-900 hover:bg-dark-200 rounded px-4 py-2 text-sm disabled:opacity-50"
+            className="hover:bg-light-200 dark:text-light-900 dark:hover:bg-dark-300 rounded px-4 py-2 text-sm text-black disabled:opacity-50"
           >
             Previous
           </button>
-          <span className="text-light-900 text-sm">
+          <span className="dark:text-light-900 text-sm text-black">
             Page {pagination.currentPage} of {pagination.totalPages}
           </span>
           <button
             onClick={pagination.onNextPage}
             disabled={pagination.currentPage === pagination.totalPages}
-            className="text-light-900 hover:bg-dark-200 rounded px-4 py-2 text-sm disabled:opacity-50"
+            className="hover:bg-light-200 dark:text-light-900 dark:hover:bg-dark-300 rounded px-4 py-2 text-sm text-black disabled:opacity-50"
           >
             Next
           </button>

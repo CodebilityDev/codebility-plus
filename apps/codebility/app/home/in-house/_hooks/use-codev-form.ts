@@ -106,6 +106,7 @@ export function useCodevForm(initialData: Codev) {
   return {
     data,
     isSubmitting,
+    setIsSubmitting, // <-- Expose setIsSubmitting if needed by the parent
     handleChange,
     handleBulkChange,
   };
