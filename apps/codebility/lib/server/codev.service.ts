@@ -92,7 +92,6 @@ export const getCodevs = async ({
         main_image,
         website_url,
         figma_link,
-        team_leader_id,
         client_id,
         project_category_id,
         created_at,
