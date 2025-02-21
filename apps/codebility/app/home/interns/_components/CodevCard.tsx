@@ -1,5 +1,7 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import Box from "@/Components/shared/dashboard/Box";
 import { useModal } from "@/hooks/use-modal-users";
@@ -9,15 +11,59 @@ import {
   InternalStatus,
   Project,
 } from "@/types/home/codev";
+import {
+  AnimatePresence,
+  motion,
+  useMotionValue,
+  useSpring,
+  useTransform,
+} from "framer-motion";
 
+import web from "@codevs/tailwind-config/web";
+import { cn } from "@codevs/ui";
 import { Badge } from "@codevs/ui/badge";
-import { Button } from "@codevs/ui/button";
-
-import { StatusBadge } from "../../in-house/_components/shared/StatusBadge";
 
 interface CodevCardProps {
   codev: Codev;
 }
+
+const STATUS_CONFIG: Record<
+  InternalStatus,
+  { label: string; className: string }
+> = {
+  TRAINING: {
+    label: "Training",
+    className: "bg-status-training text-status-training-text",
+  },
+  GRADUATED: {
+    label: "Graduated",
+    className: "bg-status-graduated text-status-graduated-text",
+  },
+  BUSY: {
+    label: "Busy",
+    className: "bg-status-busy text-status-busy-text",
+  },
+  FAILED: {
+    label: "Failed",
+    className: "bg-status-failed text-status-failed-text",
+  },
+  AVAILABLE: {
+    label: "Available",
+    className: "bg-status-available text-status-available-text",
+  },
+  DEPLOYED: {
+    label: "Deployed",
+    className: "bg-status-deployed text-status-deployed-text",
+  },
+  VACATION: {
+    label: "Vacation",
+    className: "bg-status-vacation text-status-vacation-text",
+  },
+  CLIENTREADY: {
+    label: "Client Ready",
+    className: "bg-status-clientready text-status-clientready-text",
+  },
+};
 
 export default function CodevCard({ codev }: CodevCardProps) {
   const { onOpen } = useModal();
@@ -27,121 +73,230 @@ export default function CodevCard({ codev }: CodevCardProps) {
     return Array.isArray(arr) && arr.length > 0;
   };
 
+  const [hovered, setHovered] = useState(false);
+  const springConfig = { stiffness: 100, damping: 5 };
+  const x = useMotionValue(0);
+  const rotate = useSpring(
+    useTransform(x, [-100, 100], [-45, 45]),
+    springConfig,
+  );
+  const translateX = useSpring(
+    useTransform(x, [-100, 100], [-50, 50]),
+    springConfig,
+  );
+
+  const handleMouseMove = (event: React.MouseEvent) => {
+    const halfWidth = (event.target as HTMLElement).offsetWidth / 2;
+    x.set(event.nativeEvent.offsetX - halfWidth);
+  };
+
+  const internalStatus = codev.internal_status || "AVAILABLE";
+  const statusConfig =
+    STATUS_CONFIG[internalStatus as InternalStatus] || STATUS_CONFIG.AVAILABLE;
+
   return (
-    <Box className="h-full w-full rounded-lg border-none px-0 transition-all hover:shadow-lg">
-      <div className="flex h-full flex-col">
-        {/* Header Section */}
-        <div className="relative p-4 text-center">
-          <div className="relative mx-auto">
-            {codev.image_url ? (
-              <div className="relative mx-auto h-24 w-24">
-                <img
-                  src={codev.image_url}
-                  alt={`${codev.first_name}'s avatar`}
-                  className="h-full w-full rounded-full object-cover"
-                />
-              </div>
-            ) : (
-              <DefaultAvatar size={96} className="mx-auto" />
-            )}
-          </div>
+    <div
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <Box
+        className={`
+      h-full w-full cursor-pointer rounded-lg border-none px-0 
+      py-2 transition-all hover:shadow-lg
+      dark:shadow-slate-700
+      `}
+        onClick={() => onOpen("profileModal", codev)}
+      >
+        <div className="flex h-full flex-col justify-start pt-2">
+          {/* Header Section */}
+          <div className="relative flex items-start justify-start gap-4 px-4 text-center">
+            <div className="border-green relative rounded-full border-2">
+              {codev.image_url ? (
+                <div className="relative h-24 w-24">
+                  <img
+                    src={codev.image_url}
+                    alt={`${codev.first_name}'s avatar`}
+                    className="h-full w-full rounded-full object-cover"
+                  />
+                </div>
+              ) : (
+                <DefaultAvatar size={96} className="mx-auto" />
+              )}
 
-          <div className="mt-4 space-y-2">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              {codev.first_name} {codev.last_name}
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {codev.display_position || "No Position"}
-            </p>
-            <StatusBadge
-              status={(codev.internal_status as InternalStatus) || "AVAILABLE"}
-              className="mx-auto"
-            />
-          </div>
-        </div>
-
-        {/* Content Section */}
-        <div className="flex-1 space-y-4 bg-gray-50 p-4 dark:bg-gray-800">
-          {/* Tech Stack */}
-          {hasItems(codev.tech_stacks) && (
-            <div>
-              <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Tech Stack
-              </h4>
-              <div className="flex flex-wrap gap-1">
-                {codev.tech_stacks.map((tech) => (
-                  <Badge
-                    key={tech}
-                    variant="outline"
-                    className="text-xs capitalize"
+              <AnimatePresence>
+                {hovered && internalStatus && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 20, scale: 0.6 }}
+                    animate={{
+                      opacity: 1,
+                      y: 0,
+                      scale: 1,
+                      transition: {
+                        type: "spring",
+                        stiffness: 260,
+                        damping: 10,
+                      },
+                    }}
+                    exit={{ opacity: 0, y: 20, scale: 0.6 }}
+                    style={{
+                      translateX: translateX,
+                      rotate: rotate,
+                      whiteSpace: "nowrap",
+                    }}
+                    className={cn(
+                      `border-l-1 absolute -top-8 left-1/2 z-50 flex -translate-x-1/2
+                       transform flex-col items-center justify-center rounded-md border-b-2 border-blue-400
+                        bg-blue-500 px-4
+                        py-2 text-white shadow-xl 
+                       `,
+                    )}
                   >
-                    {tech}
-                  </Badge>
-                ))}
+                    <div className="relative z-30 text-base">
+                      {statusConfig.label}
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              <div className="absolute bottom-[1px] right-[1px]">
+                <p
+                  className={cn(
+                    "rounded-full p-[0.7rem] text-[9px]",
+                    codev.availability_status ? "bg-green" : "bg-red-500",
+                  )}
+                ></p>
               </div>
             </div>
-          )}
 
-          {/* Projects */}
-          <div>
-            <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-              Projects
-            </h4>
-            <div className="flex flex-wrap gap-1">
+            <div className="flex flex-col items-start justify-start gap-1">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                {codev.first_name} {codev.last_name}
+              </h3>
+              <p className="text-gray-600 dark:text-gray-400">
+                {codev.display_position || "No Position"}
+              </p>
+              {/* Years of Experience */}
+              {codev.years_of_experience !== undefined && (
+                <div className="text-sm text-gray-600 dark:text-gray-400">
+                  {codev.years_of_experience}{" "}
+                  {codev.years_of_experience === 1 ? "year" : "years"} of
+                  experience
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Content Section */}
+          <div className="flex-1 space-y-4 bg-gray-50 p-4 dark:bg-gray-800">
+            {/* points */}
+            <div className="flex flex-col gap-2">
+              <SkillPoints points={codev.codev_points ?? []} />
+            </div>
+
+            {/* Tech Stacks */}
+            {hasItems(codev.tech_stacks) && (
+              <div>
+                <div className="flex flex-wrap gap-2">
+                  {codev.tech_stacks.slice(0, 10).map((tech, index) =>
+                    tech ? (
+                      <div
+                        key={`${tech}-${index}`}
+                        className="flex items-center"
+                      >
+                        <Image
+                          src={`/assets/svgs/icon-${tech.toLowerCase()}.svg`}
+                          alt={`${tech} icon`}
+                          width={20}
+                          height={20}
+                          title={tech}
+                          className="h-[20px] w-[20px] object-contain transition duration-300 hover:-translate-y-0.5"
+                        />
+                      </div>
+                    ) : null,
+                  )}
+                  {codev.tech_stacks.length > 10 && (
+                    <div className="text-sm text-gray-600 dark:text-gray-400">
+                      +{codev.tech_stacks.length - 10} more
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Projects */}
+
+            <div className="flex flex-wrap justify-end gap-1">
               {hasItems(codev.projects) ? (
                 codev.projects.map((project) => (
                   <Badge
+                    variant="info"
                     key={project.id}
-                    className="bg-blue-100 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                    className="bg-blue-50 text-xs text-blue-800 transition duration-300
+                    hover:bg-blue-300 hover:text-white dark:bg-blue-500 dark:text-white
+                  "
                   >
                     {project.name}
                   </Badge>
                 ))
               ) : (
-                <Badge variant="outline" className="text-xs">
+                <Badge
+                  variant="info"
+                  className={`
+                  bg-gray-50 text-gray-800 dark:bg-slate-700 dark:text-slate-200
+                `}
+                >
                   Available for Projects
                 </Badge>
               )}
             </div>
           </div>
-
-          {/* Skill Points */}
-          {hasItems(codev.codev_points) && (
-            <div>
-              <h4 className="mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">
-                Skill Points
-              </h4>
-              <div className="flex flex-wrap gap-1">
-                {codev.codev_points.map((point) => (
-                  <Badge
-                    key={point.skill_category_id}
-                    variant="outline"
-                    className="text-xs font-medium"
-                  >
-                    {point.points} pts
-                  </Badge>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {/* Years of Experience */}
-          {codev.years_of_experience !== undefined && (
-            <div className="text-sm text-gray-600 dark:text-gray-400">
-              {codev.years_of_experience}{" "}
-              {codev.years_of_experience === 1 ? "year" : "years"} of experience
-            </div>
-          )}
         </div>
+      </Box>
+    </div>
+  );
+}
 
-        {/* Footer */}
-        <Button
-          onClick={() => onOpen("profileModal", codev)}
-          className="mt-auto w-full rounded-t-none bg-blue-600 text-white hover:bg-blue-700"
-        >
-          View Profile
-        </Button>
-      </div>
-    </Box>
+function SkillPoints({ points }: { points: CodevPoints[] }) {
+  const matcher: { [key: string]: string } = {
+    "059261f5-be65-4872-beaf-0c09524c98eb": "UI/UX",
+    "0dde069d-71fd-4240-b38e-d7c197b4bf1b": "Backend",
+    "13bf852a-9bca-411f-8643-fbac8b8dd533": "Mobile",
+    "27dbaa4f-d5f1-41c0-898a-ba19cfe06367": "QA",
+    "96da3c02-a270-4fe7-b079-72642ff9e93e": "Frontend",
+  };
+
+  return (
+    <div
+      className="flex gap-2 overflow-auto"
+      style={{
+        scrollbarWidth: "none",
+      }}
+    >
+      {Object.keys(matcher).map((categoryId) => {
+        const point = points.find((p) => p.skill_category_id === categoryId);
+        return (
+          <div
+            key={categoryId}
+            className={`dark:bg-black-200 flex h-14 w-16 flex-col items-center
+          justify-center gap-1 rounded-md
+          bg-slate-100 p-1
+          `}
+          >
+            {/* skill points */}
+            <p
+              className={`text-center text-xs font-semibold text-gray-700 dark:text-gray-300
+          `}
+            >
+              {point ? point.points : 0}
+            </p>
+
+            {/* skill category */}
+            <p className="text-center text-xs text-gray-600 dark:text-gray-400">
+              {matcher[categoryId] ?? "Unknown"}
+            </p>
+          </div>
+        );
+      })}
+    </div>
   );
 }
