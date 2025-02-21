@@ -107,6 +107,11 @@ export const getCodevs = async ({
           )
         )
       )
+    ),
+    codev_points (
+      id,
+      skill_category_id,
+      points
     )
   `);
 
@@ -118,6 +123,7 @@ export const getCodevs = async ({
   });
 
   const { data, error } = await query;
+
 
   if (error) {
     console.error("Error fetching Codev data:", error);
