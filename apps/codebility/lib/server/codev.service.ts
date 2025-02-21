@@ -92,7 +92,6 @@ export const getCodevs = async ({
         main_image,
         website_url,
         figma_link,
-        team_leader_id,
         client_id,
         project_category_id,
         created_at,
@@ -108,6 +107,11 @@ export const getCodevs = async ({
           )
         )
       )
+    ),
+    codev_points (
+      id,
+      skill_category_id,
+      points
     )
   `);
 
@@ -119,6 +123,7 @@ export const getCodevs = async ({
   });
 
   const { data, error } = await query;
+
 
   if (error) {
     console.error("Error fetching Codev data:", error);
