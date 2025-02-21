@@ -24,10 +24,32 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
     nda_status: "",
     display_position: "",
     role: "",
+    search: "", // NEW
   });
 
   // Filtering logic
   const filteredData = data.filter((item) => {
+    // 1) Search filter (case-insensitive)
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      // Combine fields you want to match against
+      const combinedFields = [
+        item.first_name,
+        item.last_name,
+        item.email_address,
+        item.display_position,
+        item.phone_number,
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase();
+
+      if (!combinedFields.includes(searchLower)) {
+        return false;
+      }
+    }
+
+    // 2) Other filters...
     if (filters.status && item.internal_status !== filters.status) return false;
     if (filters.position && !item.positions?.includes(filters.position))
       return false;
@@ -52,6 +74,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
     )
       return false;
     if (filters.role && String(item.role_id) !== filters.role) return false;
+
     return true;
   });
 
@@ -86,7 +109,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
         </p>
       </div>
 
-      {/* Table filters */}
+      {/* Table Filters */}
       <TableFilters
         filters={filters}
         onFilterChange={(key, value) =>
@@ -94,7 +117,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
         }
       />
 
-      {/* Table view only */}
+      {/* Table View Only */}
       <InHouseTable {...sharedProps} />
     </div>
   );
