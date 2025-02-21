@@ -20,43 +20,18 @@ import {
   horizontalListSortingStrategy,
   SortableContext,
 } from "@dnd-kit/sortable";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import toast from "react-hot-toast";
 
-import { updateColumnPosition } from "../actions";
+import { batchUpdateTasks, updateColumnPosition } from "../actions";
 import KanbanColumn from "./KanbanColumn";
 
-async function batchUpdateTasks(
-  updates: Array<{ taskId: string; newColumnId: string }>,
-) {
-  const supabase = createClientComponentClient();
-  try {
-    const updatePromises = updates.map(async (update) => {
-      const { error } = await supabase
-        .from("tasks")
-        .update({
-          kanban_column_id: update.newColumnId,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", update.taskId);
-      return error;
-    });
-    const errors = await Promise.all(updatePromises);
-    return {
-      success: !errors.some((error) => error !== null),
-      error: errors.some((error) => error !== null)
-        ? "Some updates failed"
-        : undefined,
-    };
-  } catch (error) {
-    console.error("Batch update error:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Batch update failed",
-    };
-  }
-}
+// Styles
+const styles = {
+  container: "overflow-x-auto overflow-y-hidden",
+  columnList: "flex min-h-[calc(100vh-12rem)] w-full gap-4 p-2 md:p-4",
+} as const;
 
+// Types
 interface Props {
   columns: KanbanColumnType[];
   projectId: string;
@@ -65,6 +40,31 @@ interface Props {
 interface DnDData {
   type: "Column" | "Task";
   columnId?: string;
+}
+
+interface DragAndDropHandlers {
+  onDragEnd: (event: DragEndEvent) => void | Promise<void>;
+  onDragStart: (event: DragStartEvent) => void;
+  onDragOver: (event: DragOverEvent) => void;
+}
+
+// Custom Hook with proper types
+function useDragAndDrop(handlers: DragAndDropHandlers) {
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 10 },
+    }),
+    useSensor(TouchSensor, {
+      activationConstraint: { distance: 10 },
+    }),
+  );
+
+  return {
+    sensors,
+    handleDragEnd: handlers.onDragEnd,
+    handleDragStart: handlers.onDragStart,
+    handleDragOver: handlers.onDragOver,
+  };
 }
 
 export default function KanbanBoardColumnContainer({
@@ -92,7 +92,7 @@ export default function KanbanBoardColumnContainer({
     return dateB - dateA;
   };
 
-  // Initialize board data from orderedColumns, ensuring tasks is never undefined.
+  // Initialize board data from orderedColumns
   useEffect(() => {
     setBoardData(
       orderedColumns.map((col) => ({
@@ -102,7 +102,7 @@ export default function KanbanBoardColumnContainer({
     );
   }, [orderedColumns]);
 
-  // Debounced batch update call for tasks.
+  // Debounced batch update call for tasks
   const debouncedBatchUpdate = useMemo(
     () =>
       debounce(
@@ -131,26 +131,13 @@ export default function KanbanBoardColumnContainer({
     }
   }, [pendingUpdates, debouncedBatchUpdate]);
 
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 10,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        distance: 10,
-      },
-    }),
-  );
-
-  const handleDragStart = (event: DragStartEvent) => {
+  const handleDragStart = useCallback((event: DragStartEvent) => {
     // Optional: set active item state for custom drag overlays.
-  };
+  }, []);
 
-  const handleDragOver = (event: DragOverEvent) => {
+  const handleDragOver = useCallback((event: DragOverEvent) => {
     // Optional: implement live feedback if needed.
-  };
+  }, []);
 
   const handleDragEnd = useCallback(
     async (event: DragEndEvent) => {
@@ -188,13 +175,16 @@ export default function KanbanBoardColumnContainer({
       }
 
       // Task Drag
+      // Task Drag
       if (
         activeData.type === "Task" &&
         (overData.type === "Column" || overData.type === "Task")
       ) {
         const activeColId = activeData.columnId;
-        const overColId =
-          overData.type === "Column" ? overData.columnId : overData.columnId;
+        // Convert overColId to string
+        const overColId = String(
+          overData.type === "Column" ? over.id : overData.columnId,
+        );
 
         if (!activeColId || !overColId) return;
 
@@ -248,11 +238,28 @@ export default function KanbanBoardColumnContainer({
     [boardData, router],
   );
 
-  // IDs for the SortableContext for columns.
+  const { sensors } = useDragAndDrop({
+    onDragEnd: handleDragEnd,
+    onDragStart: handleDragStart,
+    onDragOver: handleDragOver,
+  });
+
+  // Handle task completion
+  const handleTaskComplete = useCallback((completedTaskId: string) => {
+    setBoardData((prevData) =>
+      prevData.map((column) => ({
+        ...column,
+        tasks:
+          column.tasks?.filter((task) => task.id !== completedTaskId) || [],
+      })),
+    );
+  }, []);
+
+  // IDs for the SortableContext for columns
   const columnIds = boardData.map((col) => col.id);
 
   return (
-    <div className="overflow-x-auto overflow-y-hidden">
+    <div className={styles.container}>
       <DndContext
         sensors={sensors}
         collisionDetection={closestCenter}
@@ -264,14 +271,14 @@ export default function KanbanBoardColumnContainer({
           items={columnIds}
           strategy={horizontalListSortingStrategy}
         >
-          {/* Updated class names for the container */}
-          <ol className="flex min-h-[calc(100vh-12rem)] w-full gap-4 p-2 md:p-4">
+          <ol className={styles.columnList}>
             {boardData.map((column) => (
               <KanbanColumn
                 key={column.id}
                 column={{ id: column.id, name: column.name }}
                 projectId={projectId}
                 tasks={column.tasks ?? []}
+                onTaskComplete={handleTaskComplete}
               />
             ))}
           </ol>

@@ -24,9 +24,10 @@ interface CodevMember {
 interface Props {
   task: Task;
   columnId?: string;
+  onComplete?: (taskId: string) => void;
 }
 
-function KanbanTask({ task, columnId }: Props) {
+function KanbanTask({ task, columnId, onComplete }: Props) {
   const {
     setNodeRef,
     attributes,
@@ -101,7 +102,7 @@ function KanbanTask({ task, columnId }: Props) {
   }, [sidekicks]);
 
   return (
-    <KanbanTaskViewEditModal task={task}>
+    <KanbanTaskViewEditModal task={task} onComplete={onComplete}>
       <div
         ref={setNodeRef}
         style={style}
