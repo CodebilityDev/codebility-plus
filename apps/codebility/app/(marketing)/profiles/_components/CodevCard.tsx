@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import CodevBadge from "@/Components/CodevBadge";
 import { IconArrowRight } from "@/public/assets/svgs";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import {
@@ -142,17 +143,28 @@ const CodevCard = ({ codev, color }: Props) => {
             ></p>
           </div>
         </div>
-        <div className="flex flex-col gap-1 text-center">
-          <p className="md:text-md text-sm capitalize text-white lg:text-base">
-            {codev.first_name} {codev.last_name}
-          </p>
-          {codev.display_position ? (
-            <p className="text-gray text-sm">{codev.display_position}</p>
-          ) : (
-            <div className="text-sm lg:text-base">&nbsp;</div>
+        <div className="flex flex-col items-center gap-2">
+          <div className="flex flex-col gap-1 text-center">
+            <p className="md:text-md text-sm capitalize text-white lg:text-base">
+              {codev.first_name} {codev.last_name}
+            </p>
+            {codev.display_position ? (
+              <p className="text-gray text-sm">{codev.display_position}</p>
+            ) : (
+              <div className="text-sm lg:text-base">&nbsp;</div>
+            )}
+          </div>
+          {/* Add CodevBadge here */}
+          {codev.level && Object.keys(codev.level).length > 0 && (
+            <div className="flex ">
+              <CodevBadge
+                level={codev.level}
+                className=" transition-transform group-hover:scale-100"
+              />
+            </div>
           )}
         </div>
-        <div className="mt-2 flex items-center gap-2 text-blue-100 duration-300 hover:ml-4">
+        <div className=" flex items-center gap-2 text-blue-100 duration-300 hover:ml-4">
           Read Bio
           <IconArrowRight />
         </div>
