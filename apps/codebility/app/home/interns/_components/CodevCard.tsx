@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import CodevBadge from "@/Components/CodevBadge";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import Box from "@/Components/shared/dashboard/Box";
@@ -17,6 +16,8 @@ import {
 
 import { cn } from "@codevs/ui";
 import { Badge } from "@codevs/ui/badge";
+
+import TechStacks from "./TechStacks";
 
 interface CodevCardProps {
   codev: Codev;
@@ -96,15 +97,17 @@ export default function CodevCard({ codev }: CodevCardProps) {
     >
       <Box
         className={`
-      h-full w-full cursor-pointer rounded-lg border-none px-0 
+      h-full w-full rounded-lg border-none px-0 
       py-2 transition-all hover:shadow-lg
       dark:shadow-slate-700
       `}
-        onClick={() => onOpen("profileModal", codev)}
       >
         <div className="flex h-full flex-col justify-start pt-2">
           {/* Header Section */}
-          <div className="relative flex items-start justify-start gap-4 px-4 text-center">
+          <div
+            className="relative flex cursor-pointer items-start justify-start gap-4 px-4 text-center "
+            onClick={() => onOpen("profileModal", codev)}
+          >
             <div className=" relative rounded-full border-2">
               {codev.image_url ? (
                 <div className="relative h-24 w-24">
@@ -197,30 +200,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
             {/* Tech Stacks */}
             {hasItems(codev.tech_stacks) && (
               <div>
-                <div className="flex flex-wrap gap-2">
-                  {codev.tech_stacks.slice(0, 10).map((tech, index) =>
-                    tech ? (
-                      <div
-                        key={`${tech}-${index}`}
-                        className="flex items-center"
-                      >
-                        <Image
-                          src={`/assets/svgs/icon-${tech.toLowerCase()}.svg`}
-                          alt={`${tech} icon`}
-                          width={20}
-                          height={20}
-                          title={tech}
-                          className="h-[20px] w-[20px] object-contain transition duration-300 hover:-translate-y-0.5"
-                        />
-                      </div>
-                    ) : null,
-                  )}
-                  {codev.tech_stacks.length > 10 && (
-                    <div className="text-sm text-gray-600 dark:text-gray-400">
-                      +{codev.tech_stacks.length - 10} more
-                    </div>
-                  )}
-                </div>
+                <TechStacks techStacks={codev.tech_stacks} />
               </div>
             )}
 
