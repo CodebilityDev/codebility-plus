@@ -95,7 +95,6 @@
     --muted-figma: 252, 252, 252, 100%;
     --card-clients: 246, 246, 246, 100%;
 
-
     --violet-color: theme("colors.violet.500");
 
     --teal-color: theme("colors.teal");
@@ -112,7 +111,7 @@
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
-    --primary: 2, 255, 226, 100%;
+    --primary: 2, 255, 226, 100%; /* Please check, not sure if this is for hsl or rgba */
     --primary-foreground: 144.9 80.4% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;

@@ -71,7 +71,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                       </p>
                     </div>
                   </HoverCardTrigger>
-                  <HoverCardContent className="w-80 border border-gray-700 bg-black p-4 shadow-lg">
+                  <HoverCardContent className="background-box w-96 border border-gray-700 p-4 shadow-lg">
                     <div className="flex gap-4">
                       {applicant.image_url ? (
                         <Image
