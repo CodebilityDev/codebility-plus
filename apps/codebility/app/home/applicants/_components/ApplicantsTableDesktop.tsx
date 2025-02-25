@@ -4,7 +4,6 @@ import DefaultAvatar from "@/Components/DefaultAvatar";
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -13,8 +12,7 @@ import {
 import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@codevs/ui/avatar";
-import { Checkbox } from "@codevs/ui/checkbox";
+import { Avatar, AvatarImage } from "@codevs/ui/avatar";
 import {
   HoverCard,
   HoverCardContent,

@@ -18,7 +18,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@codevs/ui/accordion";
-import { Avatar, AvatarFallback, AvatarImage } from "@codevs/ui/avatar";
+import { Avatar, AvatarImage } from "@codevs/ui/avatar";
 
 const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
   const applicantsLen = applicants?.length || 0;
