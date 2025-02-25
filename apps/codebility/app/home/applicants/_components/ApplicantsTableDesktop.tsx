@@ -105,7 +105,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                     href={`mailto:${applicant.email_address}`}
                     className="text-gray-400 hover:text-gray-200"
                   >
-                    <IconEmail />
+                    <IconEmail className="h-[18px] w-[18px] invert dark:invert-0" />
                   </Link>
                 </div>
               </TableCell>
