@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import ApplicantsActionButtons from "@/app/home/applicants/_components/ApplicantsActionButtons";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import {
   Table,

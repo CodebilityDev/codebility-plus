@@ -21,11 +21,9 @@ import {
 import { Avatar, AvatarImage } from "@codevs/ui/avatar";
 
 const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
-  const applicantsLen = applicants?.length || 0;
-
   return (
     <div className="block xl:hidden">
-      {applicantsLen > 0 &&
+      {applicants.length > 0 &&
         applicants.map((applicant) => (
           <Accordion
             key={applicant.id}
@@ -46,12 +44,9 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                       <DefaultAvatar size={40} />
                     )}
                   </Avatar>
-                  <p className="border-2 text-sm capitalize">
+                  <p className="text-sm capitalize">
                     {applicant.first_name} {applicant.last_name}
                   </p>
-                </div>
-                <div className="hidden w-1/2 justify-end pr-4 md:flex md:pr-8">
-                  <ApplicantsActionButtons applicant={applicant} />
                 </div>
               </AccordionTrigger>
               <AccordionContent className="p-4">
@@ -92,18 +87,17 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                       <TableCell className="text-sm">Tech Stack</TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-2">
-                          {applicant.tech_stacks &&
-                            applicant.tech_stacks.map((stack, i) => (
-                              <Image
-                                key={i}
-                                src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
-                                alt={`${stack} icon`}
-                                width={25}
-                                height={25}
-                                title={stack}
-                                className="h-[25px] w-[25px] transition duration-300 hover:-translate-y-0.5"
-                              />
-                            ))}
+                          {applicant.tech_stacks.map((stack, i) => (
+                            <Image
+                              key={i}
+                              src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                              alt={`${stack} icon`}
+                              width={25}
+                              height={25}
+                              title={stack}
+                              className="h-[25px] w-[25px] transition duration-300 hover:-translate-y-0.5"
+                            />
+                          ))}
                         </div>
                       </TableCell>
                     </TableRow>
