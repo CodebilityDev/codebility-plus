@@ -13,7 +13,6 @@ interface Filters {
   positions: string[];
   projectStatus: string[];
   availability: string[];
-  skillCategories: string[];
 }
 
 interface FilterCodevsProps {
@@ -63,7 +62,6 @@ export default function FilterCodevs({
       positions: [],
       projectStatus: [],
       availability: [],
-      skillCategories: [],
     });
 
   const handleCheckedChange = (key: keyof Filters, value: string) => {
@@ -96,18 +94,17 @@ export default function FilterCodevs({
           <h3 className="font-semibold">Filters</h3>
           <button
             onClick={clearFilter}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
           >
             Clear all
           </button>
         </div>
 
         <Tabs defaultValue="position" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="position">Position</TabsTrigger>
             <TabsTrigger value="status">Status</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
-            <TabsTrigger value="skills">Skills</TabsTrigger>
           </TabsList>
 
           <TabsContent value="position" className="mt-4 space-y-2">
@@ -165,26 +162,6 @@ export default function FilterCodevs({
                 />
                 <label htmlFor={`project-${status}`} className="text-sm">
                   {status}
-                </label>
-              </div>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="skills" className="mt-4 space-y-2">
-            {skillCategories.map((category) => (
-              <div
-                key={category.id}
-                className="flex items-center space-x-2 p-2 hover:bg-gray-50"
-              >
-                <Checkbox
-                  id={`skill-${category.id}`}
-                  checked={filters.skillCategories.includes(category.id)}
-                  onCheckedChange={() =>
-                    handleCheckedChange("skillCategories", category.id)
-                  }
-                />
-                <label htmlFor={`skill-${category.id}`} className="text-sm">
-                  {category.name}
                 </label>
               </div>
             ))}

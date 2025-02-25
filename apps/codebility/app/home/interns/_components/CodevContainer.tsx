@@ -13,7 +13,6 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
     positions: [] as string[],
     projectStatus: [] as string[],
     availability: [] as string[],
-    skillCategories: [] as string[],
   });
 
   const [codevs, setCodevs] = useState<Codev[]>(data);
