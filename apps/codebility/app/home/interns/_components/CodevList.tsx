@@ -14,7 +14,6 @@ interface CodevListProps {
     positions: string[];
     projectStatus: string[];
     availability: string[];
-    skillCategories: string[];
   };
 }
 
@@ -38,20 +37,7 @@ export default function CodevList({ data, filters }: CodevListProps) {
         (filters.projectStatus.includes("Multiple Projects") &&
           (codev.projects?.length || 0) > 1);
 
-      const matchesSkills =
-        filters.skillCategories.length === 0 ||
-        filters.skillCategories.some((catId) =>
-          codev.codev_points?.some(
-            (point: CodevPoints) => point.skill_category_id === catId,
-          ),
-        );
-
-      return (
-        matchesPosition &&
-        matchesAvailability &&
-        matchesProject &&
-        matchesSkills
-      );
+      return matchesPosition && matchesAvailability && matchesProject;
     });
   }, [data, filters]);
 
