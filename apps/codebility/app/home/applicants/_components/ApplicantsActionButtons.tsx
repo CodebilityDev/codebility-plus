@@ -1,14 +1,11 @@
 import { useState } from "react";
 import { approveAction, rejectAction } from "@/app/home/applicants/action";
-import { useModal } from "@/hooks/use-modal-applicants";
 import { Codev } from "@/types/home/codev";
-import { Edit2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 const ApplicantsApprovalButtons = ({ applicant }: { applicant: Codev }) => {
   const [isAcceptLoading, setIsAcceptLoading] = useState(false);
   const [isDenyLoading, setIsDenyLoading] = useState(false);
-  const { onOpen } = useModal();
 
   const handleAccept = async (id: string) => {
     setIsAcceptLoading(true);
@@ -72,14 +69,6 @@ const ApplicantsApprovalButtons = ({ applicant }: { applicant: Codev }) => {
         onClick={() => handleDeny(applicant.id)}
       >
         {isDenyLoading ? "..." : "Deny"}
-      </button>
-
-      <button
-        className="rounded-md p-1.5 text-gray-500 transition-all hover:bg-gray-100 hover:text-gray-700 active:scale-95"
-        disabled={isAcceptLoading || isDenyLoading}
-        onClick={() => onOpen("applicantsEditModal", applicant)}
-      >
-        <Edit2 className="h-4 w-4" />
       </button>
     </div>
   );
