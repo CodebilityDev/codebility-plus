@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import ApplicantsActionButtons from "@/app/home/applicants/_components/ApplicantsActionButtons";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import {
   Table,
@@ -18,8 +19,6 @@ import {
   HoverCardContent,
   HoverCardTrigger,
 } from "@codevs/ui/hover-card";
-
-import ApplicantsApprovalButtons from "./ApplicantsActionButtons";
 
 const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
   return (
@@ -149,7 +148,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                 </div>
               </TableCell>
               <TableCell className="py-4 text-center">
-                <ApplicantsApprovalButtons applicant={applicant} />
+                <ApplicantsActionButtons applicant={applicant} />
               </TableCell>
             </TableRow>
           ))
