@@ -71,7 +71,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                       </p>
                     </div>
                   </HoverCardTrigger>
-                  <HoverCardContent className="w-80 border border-gray-700 bg-black p-4 shadow-lg">
+                  <HoverCardContent className="background-box w-96 border border-gray-700 p-4 shadow-lg">
                     <div className="flex gap-4">
                       {applicant.image_url ? (
                         <Image
@@ -105,7 +105,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                     href={`mailto:${applicant.email_address}`}
                     className="text-gray-400 hover:text-gray-200"
                   >
-                    <IconEmail />
+                    <IconEmail className="h-[18px] w-[18px] invert dark:invert-0" />
                   </Link>
                 </div>
               </TableCell>
@@ -116,7 +116,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                       href={applicant.github}
                       className="text-gray-400 hover:text-gray-200"
                     >
-                      <IconGithub />
+                      <IconGithub className="h-[18px] w-[18px] invert dark:invert-0" />
                     </Link>
                   )}
                 </div>
@@ -128,7 +128,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                       href={applicant.portfolio_website}
                       className="text-gray-400 hover:text-gray-200"
                     >
-                      <IconLink />
+                      <IconLink className="h-[18px] w-[18px] invert dark:invert-0" />
                     </Link>
                   )}
                 </div>
