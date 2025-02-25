@@ -20,8 +20,6 @@ import {
   HoverCardTrigger,
 } from "@codevs/ui/hover-card";
 
-import ApplicantsApprovalButtons from "./ApplicantsActionButtons";
-
 const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
   return (
     <Table className="hidden xl:block">
@@ -150,7 +148,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                 </div>
               </TableCell>
               <TableCell className="py-4 text-center">
-                <ApplicantsApprovalButtons applicant={applicant} />
+                <ApplicantsActionButtons applicant={applicant} />
               </TableCell>
             </TableRow>
           ))
