@@ -116,7 +116,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                       href={applicant.github}
                       className="text-gray-400 hover:text-gray-200"
                     >
-                      <IconGithub />
+                      <IconGithub className="h-[18px] w-[18px] invert dark:invert-0" />
                     </Link>
                   )}
                 </div>
@@ -128,7 +128,7 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                       href={applicant.portfolio_website}
                       className="text-gray-400 hover:text-gray-200"
                     >
-                      <IconLink />
+                      <IconLink className="h-[18px] w-[18px] invert dark:invert-0" />
                     </Link>
                   )}
                 </div>
