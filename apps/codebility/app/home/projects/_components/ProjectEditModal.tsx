@@ -8,7 +8,7 @@ import {
   getProjectCodevs,
   updateProject,
 } from "@/app/home/projects/actions";
-import DefaultAvatar from "@/Components/DefaultAvatar";
+import ProjectAvatar from "@/Components/ProjectAvatar";
 import { CustomSelect } from "@/Components/ui/CustomSelect";
 import {
   Dialog,
@@ -252,7 +252,7 @@ const ProjectEditModal = () => {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-100">
-            <DefaultAvatar size={64} />
+            <ProjectAvatar size={64} />
           </div>
         )}
       </div>
