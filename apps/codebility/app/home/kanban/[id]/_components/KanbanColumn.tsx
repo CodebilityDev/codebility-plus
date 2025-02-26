@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/Components/ui/button";
+import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
 import { ExtendedTask } from "@/types/home/codev";
 import { useDroppable } from "@dnd-kit/core";
@@ -108,27 +109,32 @@ export default function KanbanColumn({
   );
 
   // Handle column deletion
-  const handleDelete = async () => {
+  const { onOpen } = useModal();
+
+  const confirmDelete = async () => {
+    const response = await deleteColumn(column.id);
+    if (response.success) {
+      toast.success("Column deleted successfully");
+      window.location.reload();
+    } else {
+      toast.error(response.error || "Failed to delete column");
+    }
+  };
+
+  const handleDelete = () => {
     if (!canModifyColumn) {
       toast.error("You don't have permission to delete columns");
       return;
     }
-
+  
     if (safeTasks.length > 0) {
       toast.error("Cannot delete column with tasks");
       return;
     }
-
-    if (confirm("Are you sure you want to delete this column?")) {
-      const response = await deleteColumn(column.id);
-      if (response.success) {
-        toast.success("Column deleted successfully");
-        router.refresh();
-      } else {
-        toast.error(response.error || "Failed to delete column");
-      }
-    }
+  
+    onOpen("deleteWarningModal", {}, {}, () => confirmDelete());
   };
+  
 
   // Handle column rename
   const handleUpdateName = async () => {
