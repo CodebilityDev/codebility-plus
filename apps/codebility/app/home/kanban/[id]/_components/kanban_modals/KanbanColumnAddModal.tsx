@@ -46,7 +46,7 @@ export default function KanbanColumnAddModal() {
       const response = await createNewColumn(columnName, boardId);
       if (response.success) {
         toast.success("Column created successfully!");
-        router.refresh(); // Add this to refresh the page
+        window.location.reload();
         onClose();
         setColumnName("");
       } else {

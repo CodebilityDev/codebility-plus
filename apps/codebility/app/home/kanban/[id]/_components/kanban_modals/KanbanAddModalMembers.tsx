@@ -47,26 +47,50 @@ export default function KanbanAddModalMembers({
 
   const [isLoading, setIsLoading] = useState(true);
 
+  // useEffect(() => {
+  //   const loadMembers = async () => {
+  //     try {
+  //       const members = await fetchAvailableMembers(projectId);
+  //       setAvailableMembers(members);
+  //     } catch (error) {
+  //       console.error("Error loading members:", error);
+  //     } finally {
+  //       setIsLoading(false);
+  //     }
+  //   };
+
+  //   loadMembers();
+  // }, [projectId]);
+  
   useEffect(() => {
     const loadMembers = async () => {
       try {
+        console.log("Fetching members for project ID:", projectId);
         const members = await fetchAvailableMembers(projectId);
-        setAvailableMembers(members);
+        console.log("Fetched members:", members); // Debugging log
+  
+        if (Array.isArray(members)) {
+          setAvailableMembers(members);
+        } else {
+          console.error("Expected an array but got:", members);
+        }
       } catch (error) {
         console.error("Error loading members:", error);
       } finally {
         setIsLoading(false);
       }
     };
-
-    loadMembers();
+  
+    if (projectId) {
+      loadMembers();
+    }
   }, [projectId]);
 
   const selectedMembers = availableMembers.filter((member) =>
     selectedMemberIds.includes(member.id),
   );
 
-  const addMember = (memberId: string) => {
+  const addMember =  (memberId: string) => {
     if (singleSelection) {
       const newIds = [memberId];
       setSelectedMemberIds(newIds);
@@ -149,7 +173,7 @@ export default function KanbanAddModalMembers({
                 placeholder="Search members..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 dark:bg-dark-200"
               />
             </div>
 
