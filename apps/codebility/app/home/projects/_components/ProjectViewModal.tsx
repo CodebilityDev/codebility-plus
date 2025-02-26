@@ -16,6 +16,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { format, parseISO } from "date-fns";
@@ -166,7 +167,11 @@ const ProjectViewModal = () => {
               <div className="grid gap-2">
                 <div>
                   <h4 className="text-sm text-gray-500">Current Status</h4>
-                  <p className="capitalize text-orange-400">{data?.status}</p>
+                  <p className="capitalize text-orange-400">
+                    {data?.status === "inprogress"
+                      ? "in progress"
+                      : data?.status}
+                  </p>
                 </div>
 
                 <div>
@@ -197,9 +202,12 @@ const ProjectViewModal = () => {
             <h3 className="text-lg font-semibold">Team Information</h3>
 
             {isLoading ? (
-              <div className="text-sm text-gray-500">
-                Loading team information...
-              </div>
+              <>
+                <h4 className="text-sm text-gray-500">Team Lead</h4>
+                <Skeleton className="h-10 w-48 rounded-lg" />
+                <h4 className="text-sm text-gray-500">Team Members</h4>
+                <Skeleton className="h-10 w-48 rounded-lg" />
+              </>
             ) : (
               <>
                 {/* Team Lead */}
