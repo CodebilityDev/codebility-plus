@@ -3,7 +3,7 @@ import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 
 export default function ApplicantsLoading() {
   return (
-    <div className="mx-auto grid max-w-screen-xl grid-cols-1">
+    <div className="mx-auto grid w-full max-w-screen-xl grid-cols-1">
       <H1>Applicants List</H1>
       <Box className="mt-6">
         <div className="hidden lg:grid">
