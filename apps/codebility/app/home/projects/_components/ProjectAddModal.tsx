@@ -8,7 +8,7 @@ import {
   getProjectClients,
   getProjectCodevs,
 } from "@/app/home/projects/actions";
-import DefaultAvatar from "@/Components/DefaultAvatar";
+import ProjectAvatar from "@/Components/ProjectAvatar";
 import { CustomSelect } from "@/Components/ui/CustomSelect";
 import {
   Dialog,
@@ -291,7 +291,7 @@ const ProjectAddModal = () => {
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-100">
-            <DefaultAvatar size={64} />
+            <ProjectAvatar size={64} />
           </div>
         )}
       </div>
@@ -367,9 +367,14 @@ const ProjectAddModal = () => {
         <Input
           type="text"
           placeholder="Enter project description"
-          {...register("description")}
+          {...register("description", {
+            required: "Project description is required",
+          })}
           className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
         />
+        {errors.description && (
+          <p className="text-sm text-red-500">{errors.description.message}</p>
+        )}
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
@@ -377,18 +382,28 @@ const ProjectAddModal = () => {
           <Input
             type="text"
             placeholder="Enter GitHub link"
-            {...register("github_link")}
+            {...register("github_link", {
+              required: "GitHub link is required",
+            })}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
+          {errors.github_link && (
+            <p className="text-sm text-red-500">{errors.github_link.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Website URL</label>
           <Input
             type="text"
             placeholder="Enter website URL"
-            {...register("website_url")}
+            {...register("website_url", {
+              required: "Website URL is required",
+            })}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
+          {errors.website_url && (
+            <p className="text-sm text-red-500">{errors.website_url.message}</p>
+          )}
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -397,9 +412,14 @@ const ProjectAddModal = () => {
           <Input
             type="text"
             placeholder="Enter Figma link"
-            {...register("figma_link")}
+            {...register("figma_link", {
+              required: "Figma link is required",
+            })}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
+          {errors.figma_link && (
+            <p className="text-sm text-red-500">{errors.figma_link.message}</p>
+          )}
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Start Date</label>
