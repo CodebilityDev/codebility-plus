@@ -140,7 +140,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
           {isLoading ? (
             <>
               <Skeleton className="h-8 w-48 rounded-lg" />
-              <Skeleton className="h-8 w-48 rounded-lg" />
+              <Skeleton className="h-8 w-40 rounded-lg" />
             </>
           ) : (
             members.length > 0 && (
