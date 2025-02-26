@@ -11,9 +11,9 @@ import FilterCodevs from "./FilterCodevs";
 export default function CodevContainer({ data }: { data: Codev[] }) {
   const [filters, setFilters] = useState({
     positions: [] as string[],
-    projectStatus: [] as string[],
+    projects: [] as string[],
     availability: [] as string[],
-    skillCategories: [] as string[],
+
   });
 
   const [codevs, setCodevs] = useState<Codev[]>(data);
