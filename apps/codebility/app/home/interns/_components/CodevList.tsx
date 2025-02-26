@@ -12,9 +12,8 @@ interface CodevListProps {
   data: Codev[];
   filters: {
     positions: string[];
-    projectStatus: string[];
+    projects: string[];
     availability: string[];
-    skillCategories: string[];
   };
 }
 
@@ -27,31 +26,18 @@ export default function CodevList({ data, filters }: CodevListProps) {
 
       const matchesAvailability =
         filters.availability.length === 0 ||
-        filters.availability.includes(codev.internal_status || "");
+        filters.availability
+          .map((status) => status.toUpperCase())
+          .includes(codev.internal_status || "");
 
       const matchesProject =
-        filters.projectStatus.length === 0 ||
-        (filters.projectStatus.includes("No Project") &&
-          !codev.projects?.length) ||
-        (filters.projectStatus.includes("Active Project") &&
-          codev.projects?.length === 1) ||
-        (filters.projectStatus.includes("Multiple Projects") &&
-          (codev.projects?.length || 0) > 1);
+        filters.projects.length === 0 ||
+        codev.projects?.some((project) =>
+          filters.projects.includes(project.id),
+        ) ||
+        false;
 
-      const matchesSkills =
-        filters.skillCategories.length === 0 ||
-        filters.skillCategories.some((catId) =>
-          codev.codev_points?.some(
-            (point: CodevPoints) => point.skill_category_id === catId,
-          ),
-        );
-
-      return (
-        matchesPosition &&
-        matchesAvailability &&
-        matchesProject &&
-        matchesSkills
-      );
+      return matchesPosition && matchesAvailability && matchesProject;
     });
   }, [data, filters]);
 

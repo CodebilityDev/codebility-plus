@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Box } from "@/Components/shared/dashboard";
 import { Button } from "@/Components/ui/button";
-import { Position, SkillCategory } from "@/types/home/codev";
+import { Position, Project, SkillCategory } from "@/types/home/codev";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import { Checkbox } from "@codevs/ui/checkbox";
@@ -11,9 +11,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 interface Filters {
   positions: string[];
-  projectStatus: string[];
+  projects: string[];
   availability: string[];
-  skillCategories: string[];
 }
 
 interface FilterCodevsProps {
@@ -21,9 +20,14 @@ interface FilterCodevsProps {
   setFilters: React.Dispatch<React.SetStateAction<Filters>>;
 }
 
-const AVAILABILITY_STATUS = ["Available", "Deployed", "Training", "Vacation"];
-
-const PROJECT_STATUS = ["No Project", "Active Project", "Multiple Projects"];
+const AVAILABILITY_STATUS = [
+  "Available",
+  "Deployed",
+  "Training",
+  "Vacation",
+  "Busy",
+  "Client Ready",
+];
 
 export default function FilterCodevs({
   filters,
@@ -31,22 +35,24 @@ export default function FilterCodevs({
 }: FilterCodevsProps) {
   const [showFilter, setShowFilter] = useState(false);
   const [positions, setPositions] = useState<Position[]>([]);
-  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
+  const [projects, setProjects] = useState<Project[]>([]);
+
   const supabase = createClientComponentClient();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [positionsRes, categoriesRes] = await Promise.all([
+        const [positionsRes, projectsRes] = await Promise.all([
           supabase.from("positions").select("*"),
-          supabase.from("skill_category").select("*"),
+          supabase.from("projects").select("*"),
         ]);
 
         if (positionsRes.data) {
           setPositions(positionsRes.data.filter((p) => p.name));
         }
-        if (categoriesRes.data) {
-          setSkillCategories(categoriesRes.data);
+
+        if (projectsRes.data) {
+          setProjects(projectsRes.data.filter((p) => p.name));
         }
       } catch (err) {
         console.error("Error fetching filter data:", err);
@@ -61,9 +67,8 @@ export default function FilterCodevs({
   const clearFilter = () =>
     setFilters({
       positions: [],
-      projectStatus: [],
+      projects: [],
       availability: [],
-      skillCategories: [],
     });
 
   const handleCheckedChange = (key: keyof Filters, value: string) => {
@@ -96,18 +101,17 @@ export default function FilterCodevs({
           <h3 className="font-semibold">Filters</h3>
           <button
             onClick={clearFilter}
-            className="text-sm text-blue-600 hover:text-blue-800"
+            className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
           >
             Clear all
           </button>
         </div>
 
         <Tabs defaultValue="position" className="w-full">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="position">Position</TabsTrigger>
             <TabsTrigger value="status">Status</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
-            <TabsTrigger value="skills">Skills</TabsTrigger>
           </TabsList>
 
           <TabsContent value="position" className="mt-4 space-y-2">
@@ -151,40 +155,20 @@ export default function FilterCodevs({
           </TabsContent>
 
           <TabsContent value="projects" className="mt-4 space-y-2">
-            {PROJECT_STATUS.map((status) => (
+            {projects.map((project) => (
               <div
-                key={status}
+                key={project.id}
                 className="flex items-center space-x-2 p-2 hover:bg-gray-50"
               >
                 <Checkbox
-                  id={`project-${status}`}
-                  checked={filters.projectStatus.includes(status)}
+                  id={project.id}
+                  checked={filters.projects.includes(project.id)}
                   onCheckedChange={() =>
-                    handleCheckedChange("projectStatus", status)
+                    handleCheckedChange("projects", project.id)
                   }
                 />
-                <label htmlFor={`project-${status}`} className="text-sm">
-                  {status}
-                </label>
-              </div>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="skills" className="mt-4 space-y-2">
-            {skillCategories.map((category) => (
-              <div
-                key={category.id}
-                className="flex items-center space-x-2 p-2 hover:bg-gray-50"
-              >
-                <Checkbox
-                  id={`skill-${category.id}`}
-                  checked={filters.skillCategories.includes(category.id)}
-                  onCheckedChange={() =>
-                    handleCheckedChange("skillCategories", category.id)
-                  }
-                />
-                <label htmlFor={`skill-${category.id}`} className="text-sm">
-                  {category.name}
+                <label htmlFor={project.name} className="text-sm">
+                  {project.name}
                 </label>
               </div>
             ))}
