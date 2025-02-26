@@ -33,12 +33,14 @@ export const updateTaskColumnId = async (
   }
 };
 
+
+
 export const fetchAvailableMembers = async (
   boardId: string,
 ): Promise<CodevMember[]> => {
   const supabase = createClientComponentClient();
 
-  // 1. Get the project_id from the kanban board.
+  // 1. Get the project_id from the kanban_boards table.
   const { data: board, error: boardError } = await supabase
     .from("kanban_boards")
     .select("project_id")
@@ -50,73 +52,60 @@ export const fetchAvailableMembers = async (
     return [];
   }
 
-  // 2. Fetch project details, including team_leader_id and members (assumed to be an array of codev IDs).
-  const { data: project, error: projectError } = await supabase
-    .from("projects")
-    .select("team_leader_id, members")
-    .eq("id", board.project_id)
-    .single();
+  // 2. Get all project members from project_members table.
+  const { data: projectMembers, error: projectMembersError } = await supabase
+    .from("project_members")
+    .select("codev_id, role")
+    .eq("project_id", board.project_id);
 
-  if (projectError) {
-    console.error("Error fetching project details:", projectError.message);
+  if (projectMembersError || !projectMembers?.length) {
+    console.error("Error fetching project members:", projectMembersError?.message);
     return [];
   }
 
-  // 3. Initialize the array for available members.
+  // 3. Separate team leader and members
+  let teamLeaderId: string | null = null;
+  let memberIds: string[] = [];
+
+  projectMembers.forEach((member) => {
+    if (member.role === "team_leader") {
+      teamLeaderId = member.codev_id;
+    } else {
+      memberIds.push(member.codev_id);
+    }
+  });
+
+  // 4. Fetch team members' details from the codev table
   let members: CodevMember[] = [];
 
-  // Check if the project has a members array and query the codev table for these IDs.
-  if (
-    project.members &&
-    Array.isArray(project.members) &&
-    project.members.length > 0
-  ) {
+  if (memberIds.length > 0) {
     const { data: codevMembers, error: codevError } = await supabase
       .from("codev")
       .select("id, first_name, last_name, image_url, availability_status")
-      .in("id", project.members);
+      .in("id", memberIds);
 
     if (codevError) {
       console.error("Error fetching project members:", codevError.message);
-    } else if (codevMembers) {
-      members = codevMembers
-        .filter((member: any) => member.availability_status === true)
-        .map((member: any) => ({
-          id: member.id,
-          first_name: member.first_name,
-          last_name: member.last_name,
-          image_url: member.image_url,
-        }));
+    } else {
+      members = codevMembers.filter((member) => member.availability_status === true);
     }
   }
 
-  // 4. Ensure the project leader is included if available and not already in the list.
-  if (
-    project.team_leader_id &&
-    !members.some((m) => m.id === project.team_leader_id)
-  ) {
+  // 5. Fetch the team leader details (if exists)
+  if (teamLeaderId) {
     const { data: leaderData, error: leaderError } = await supabase
       .from("codev")
       .select("id, first_name, last_name, image_url, availability_status")
-      .eq("id", project.team_leader_id)
+      .eq("id", teamLeaderId)
       .single();
 
     if (leaderError) {
-      console.error(
-        "Error fetching project leader details:",
-        leaderError.message,
-      );
-    } else if (leaderData && leaderData.availability_status === true) {
-      members.push({
-        id: leaderData.id,
-        first_name: leaderData.first_name,
-        last_name: leaderData.last_name,
-        image_url: leaderData.image_url,
-      });
+      console.error("Error fetching project leader:", leaderError.message);
+    } else if (leaderData.availability_status === true) {
+      members.unshift(leaderData); // Add leader to the beginning of the list
     }
   }
 
-  // 5. Sort members by first name before returning.
   return members.sort((a, b) => a.first_name.localeCompare(b.first_name));
 };
 
