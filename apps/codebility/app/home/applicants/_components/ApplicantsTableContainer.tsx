@@ -1,11 +1,18 @@
-import { Suspense } from "react";
-import ApplicantsTableDesktop from "@/app/home/applicants/_components/ApplicantsTableDesktop";
-import ApplicantsTableMobile from "@/app/home/applicants/_components/ApplicantsTableMobile";
+import dynamic from "next/dynamic";
 import ApplicantsLoading from "@/app/home/applicants/loading";
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
+
+const ApplicantsTableDesktop = dynamic(
+  () => import("@/app/home/applicants/_components/ApplicantsTableDesktop"),
+  { loading: () => <ApplicantsLoading /> },
+);
+const ApplicantsTableMobile = dynamic(
+  () => import("@/app/home/applicants/_components/ApplicantsTableMobile"),
+  { loading: () => <ApplicantsLoading /> },
+);
 
 const ApplicantsTableContainer = ({ applicants }: { applicants: Codev[] }) => {
   const {
@@ -19,10 +26,9 @@ const ApplicantsTableContainer = ({ applicants }: { applicants: Codev[] }) => {
 
   return (
     <>
-      <Suspense fallback={<ApplicantsLoading />}>
-        <ApplicantsTableDesktop applicants={paginatedApplicants} />
-        <ApplicantsTableMobile applicants={paginatedApplicants} />
-      </Suspense>
+      <ApplicantsTableDesktop applicants={paginatedApplicants} />
+      <ApplicantsTableMobile applicants={paginatedApplicants} />
+
       <div className="relative w-full">
         {applicants.length > pageSize.applicants && (
           <DefaultPagination
