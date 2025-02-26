@@ -22,7 +22,7 @@ import { Avatar, AvatarImage } from "@codevs/ui/avatar";
 
 const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
   return (
-    <div className="block xl:hidden">
+    <>
       {applicants.length > 0 &&
         applicants.map((applicant) => (
           <Accordion
@@ -114,7 +114,7 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
             </AccordionItem>
           </Accordion>
         ))}
-    </div>
+    </>
   );
 };
 

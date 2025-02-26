@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getCodevs } from "@/lib/server/codev.service";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
@@ -99,5 +100,18 @@ export async function updateAction(id: string, formData: FormData) {
   } catch (error) {
     console.error("Error updating applicant:", error);
     return { success: false, error };
+  }
+}
+
+export async function fetchApplicants() {
+  try {
+    const { data, error } = await getCodevs({
+      filters: { role_id: 7, application_status: "applying" },
+    });
+
+    if (error) throw new Error(error);
+    return { applicants: data || [], error: null };
+  } catch (err) {
+    return { applicants: [], error: "Unable to fetch applicants" };
   }
 }

@@ -1,18 +1,8 @@
 import dynamic from "next/dynamic";
-import ApplicantsLoading from "@/app/home/applicants/loading";
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
-
-const ApplicantsTableDesktop = dynamic(
-  () => import("@/app/home/applicants/_components/ApplicantsTableDesktop"),
-  { loading: () => <ApplicantsLoading /> },
-);
-const ApplicantsTableMobile = dynamic(
-  () => import("@/app/home/applicants/_components/ApplicantsTableMobile"),
-  { loading: () => <ApplicantsLoading /> },
-);
 
 const ApplicantsTableContainer = ({ applicants }: { applicants: Codev[] }) => {
   const {
@@ -24,11 +14,22 @@ const ApplicantsTableContainer = ({ applicants }: { applicants: Codev[] }) => {
     setCurrentPage,
   } = usePagination(applicants || [], pageSize.applicants);
 
+  const ApplicantsTableDesktop = dynamic(
+    () => import("@/app/home/applicants/_components/ApplicantsTableDesktop"),
+  );
+
+  const ApplicantsTableMobile = dynamic(
+    () => import("@/app/home/applicants/_components/ApplicantsTableMobile"),
+  );
+
   return (
     <>
-      <ApplicantsTableDesktop applicants={paginatedApplicants} />
-      <ApplicantsTableMobile applicants={paginatedApplicants} />
-
+      <div className="hidden xl:block">
+        <ApplicantsTableDesktop applicants={paginatedApplicants} />
+      </div>
+      <div className="block xl:hidden">
+        <ApplicantsTableMobile applicants={paginatedApplicants} />
+      </div>
       <div className="relative w-full">
         {applicants.length > pageSize.applicants && (
           <DefaultPagination
