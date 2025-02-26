@@ -76,7 +76,7 @@ const TaskAddModal = () => {
       const response = await createNewTask(formData);
       if (response.success) {
         toast.success("Task created successfully");
-        router.refresh();
+        window.location.reload();
         onClose();
       } else {
         toast.error(response.error || "Failed to create task");
@@ -121,7 +121,7 @@ const TaskAddModal = () => {
                 id="title"
                 name="title"
                 placeholder="Enter task title"
-                className="border-gray-300 focus:border-blue-500 dark:border-gray-700"
+                className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:bg-dark-200 dark:text-light-900 "
                 required
               />
             </div>
@@ -135,7 +135,7 @@ const TaskAddModal = () => {
                 name="points"
                 type="number"
                 min="0"
-                className="border-gray-300 focus:border-blue-500 dark:border-gray-700"
+                className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:bg-dark-200 dark:text-light-900 "
                 placeholder="Task points"
               />
             </div>
@@ -143,7 +143,7 @@ const TaskAddModal = () => {
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority</Label>
               <Select name="priority">
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -165,7 +165,7 @@ const TaskAddModal = () => {
             <div className="space-y-2">
               <Label className="text-sm font-medium">Difficulty</Label>
               <Select name="difficulty">
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
                 <SelectContent>
@@ -187,7 +187,7 @@ const TaskAddModal = () => {
             <div className="space-y-2">
               <Label className="text-sm font-medium">Task Type</Label>
               <Select name="type">
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -209,7 +209,7 @@ const TaskAddModal = () => {
             <div className="space-y-2">
               <Label className="text-sm font-medium">Skill Category</Label>
               <Select name="skill_category_id" required>
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select skill category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -232,7 +232,7 @@ const TaskAddModal = () => {
                 id="pr_link"
                 name="pr_link"
                 placeholder="Enter PR link"
-                className="border-gray-300 focus:border-blue-500 dark:border-gray-700"
+                className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:bg-dark-200 dark:text-light-900  "
               />
             </div>
           </div>
@@ -266,7 +266,7 @@ const TaskAddModal = () => {
               <Textarea
                 id="description"
                 name="description"
-                className="min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700"
+                className="min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700 dark:bg-dark-200"
                 placeholder="Add task description..."
               />
             </div>
