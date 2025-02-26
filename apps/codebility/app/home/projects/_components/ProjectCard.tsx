@@ -9,6 +9,7 @@ import {
   SimpleMemberData,
 } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { ModalType } from "@/hooks/use-modal-projects";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
@@ -88,7 +89,9 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
                     : "bg-gray-500/20 text-gray-500"
             }`}
           >
-            {project.status || "Unknown"}
+            {project.status === "inprogress"
+              ? "In Progress"
+              : project.status || "Unknown"}
           </span>
         </div>
       </div>
@@ -134,33 +137,40 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
           )}
 
           {/* Team Members */}
-          {!isLoading && members.length > 0 && (
-            <div className="flex -space-x-2">
-              {members.slice(0, 4).map((member) => (
-                <div
-                  key={member.id}
-                  className="relative h-8 w-8 rounded-full ring-2 ring-white dark:ring-zinc-900"
-                >
-                  {member.image_url ? (
-                    <Image
-                      src={member.image_url}
-                      alt={`${member.first_name} ${member.last_name}`}
-                      fill
-                      className="rounded-full object-cover"
-                    />
-                  ) : (
-                    <DefaultAvatar size={32} />
-                  )}
-                </div>
-              ))}
-              {members.length > 4 && (
-                <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-2 ring-white dark:bg-gray-800 dark:ring-zinc-900">
-                  <span className="text-xs font-medium">
-                    +{members.length - 4}
-                  </span>
-                </div>
-              )}
-            </div>
+          {isLoading ? (
+            <>
+              <Skeleton className="h-8 w-48 rounded-lg" />
+              <Skeleton className="h-8 w-48 rounded-lg" />
+            </>
+          ) : (
+            members.length > 0 && (
+              <div className="flex -space-x-2">
+                {members.slice(0, 4).map((member) => (
+                  <div
+                    key={member.id}
+                    className="relative h-8 w-8 rounded-full ring-2 ring-white dark:ring-zinc-900"
+                  >
+                    {member.image_url ? (
+                      <Image
+                        src={member.image_url}
+                        alt={`${member.first_name} ${member.last_name}`}
+                        fill
+                        className="rounded-full object-cover"
+                      />
+                    ) : (
+                      <DefaultAvatar size={32} />
+                    )}
+                  </div>
+                ))}
+                {members.length > 4 && (
+                  <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-2 ring-white dark:bg-gray-800 dark:ring-zinc-900">
+                    <span className="text-xs font-medium">
+                      +{members.length - 4}
+                    </span>
+                  </div>
+                )}
+              </div>
+            )
           )}
         </div>
 
