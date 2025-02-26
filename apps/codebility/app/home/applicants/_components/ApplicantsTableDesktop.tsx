@@ -22,7 +22,7 @@ import {
 
 const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
   return (
-    <Table className="hidden xl:block">
+    <Table>
       <TableHeader>
         <TableRow className="border-b-2 border-gray-800">
           <TableHead className="w-3/12 py-4 text-left font-medium text-gray-300">

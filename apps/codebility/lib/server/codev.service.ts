@@ -1,12 +1,6 @@
 import "server-only";
 
-import {
-  Client,
-  Codev,
-  Project,
-  ProjectMember,
-  WorkExperience,
-} from "@/types/home/codev";
+import { Client, Codev, Project, WorkExperience } from "@/types/home/codev";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
@@ -123,7 +117,6 @@ export const getCodevs = async ({
   });
 
   const { data, error } = await query;
-
 
   if (error) {
     console.error("Error fetching Codev data:", error);
