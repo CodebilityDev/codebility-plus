@@ -18,7 +18,7 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
   const hiddenTech = techStacks.slice(10);
 
   return (
-    <Collapsible open={isOpen} onOpenChange={setIsOpen}>
+    <Collapsible open={isOpen}>
       {/* First 10 tech skills */}
       <div className="flex flex-wrap gap-2">
         {visibleTech.map((tech, idx) =>
@@ -36,7 +36,12 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
           ) : null,
         )}
         {!isOpen && hiddenTech.length > 0 && (
-          <CollapsibleTrigger asChild>
+          <CollapsibleTrigger asChild
+            onClick={(e) => {
+              e.stopPropagation();
+              setIsOpen(true);
+            }}
+          >
             <div className="flex cursor-pointer items-center gap-1 text-sm text-gray-600 hover:underline dark:text-gray-400">
               +{hiddenTech.length} more
             </div>
@@ -70,7 +75,12 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
                 ))}
 
                 {/* Trigger moved to the last index when expanded.*/}
-                <CollapsibleTrigger asChild>
+                <CollapsibleTrigger asChild
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsOpen(false);
+                  }}
+                >
                   <div className="flex cursor-pointer items-center gap-1 text-sm text-gray-600 hover:underline dark:text-gray-400">
                     Show less
                   </div>
