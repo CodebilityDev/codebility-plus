@@ -102,12 +102,12 @@ export default function CodevCard({ codev }: CodevCardProps) {
       dark:shadow-slate-700
       `}
       >
-        <div className="flex h-full flex-col justify-start pt-2">
+        <div
+          className="flex h-full cursor-pointer flex-col justify-start gap-4 px-4 py-2"
+          onClick={() => onOpen("profileModal", codev)}
+        >
           {/* Header Section */}
-          <div
-            className="relative flex cursor-pointer items-start justify-start gap-4 px-4 text-center "
-            onClick={() => onOpen("profileModal", codev)}
-          >
+          <div className="relative flex items-start justify-start gap-4 text-center ">
             <div className=" relative rounded-full border-2">
               {codev.image_url ? (
                 <div className="relative h-24 w-24">
@@ -142,10 +142,9 @@ export default function CodevCard({ codev }: CodevCardProps) {
                       whiteSpace: "nowrap",
                     }}
                     className={cn(
-                      `border-l-1 absolute -top-8 left-1/2 z-50 flex -translate-x-1/2
-                       transform flex-col items-center justify-center rounded-md border-b-2 border-blue-400
-                        bg-blue-500 px-4
-                        py-2 text-white shadow-xl 
+                      `absolute -top-8 left-1/2 z-50 flex -translate-x-1/2
+                       transform flex-col items-center justify-center rounded-md p-2 shadow-xl 
+                        ${statusConfig.className}
                        `,
                     )}
                   >
@@ -167,7 +166,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
             </div>
 
             <div className="flex flex-col items-start justify-start gap-1">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h3 className="text-start text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {codev.first_name} {codev.last_name}
               </h3>
               <p className="text-gray-600 dark:text-gray-400">
@@ -191,7 +190,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
           </div>
 
           {/* Content Section */}
-          <div className="flex-1 space-y-4 bg-gray-50 p-4 dark:bg-gray-800">
+          <div className="flex flex-col gap-4 bg-gray-50 dark:bg-gray-800">
             {/* points */}
             <div className="flex flex-col gap-2">
               <SkillPoints points={codev.codev_points ?? []} />
@@ -203,33 +202,32 @@ export default function CodevCard({ codev }: CodevCardProps) {
                 <TechStacks techStacks={codev.tech_stacks} />
               </div>
             )}
+          </div>
 
-            {/* Projects */}
-
-            <div className="flex flex-wrap justify-end gap-1">
-              {hasItems(codev.projects) ? (
-                codev.projects.map((project) => (
-                  <Badge
-                    variant="info"
-                    key={project.id}
-                    className="bg-blue-50 text-xs text-blue-800 transition duration-300
-                    hover:bg-blue-300 hover:text-white dark:bg-blue-500 dark:text-white
-                  "
-                  >
-                    {project.name}
-                  </Badge>
-                ))
-              ) : (
+          {/* Projects */}
+          <div className="mt-auto flex flex-wrap justify-end gap-1">
+            {hasItems(codev.projects) ? (
+              codev.projects.map((project) => (
                 <Badge
                   variant="info"
-                  className={`
+                  key={project.id}
+                  className="bg-blue-50 text-xs text-blue-800 transition duration-300
+                    hover:bg-blue-300 hover:text-white dark:bg-blue-500 dark:text-white
+                  "
+                >
+                  {project.name}
+                </Badge>
+              ))
+            ) : (
+              <Badge
+                variant="info"
+                className={`
                   bg-gray-50 text-gray-800 dark:bg-slate-700 dark:text-slate-200
                 `}
-                >
-                  Available for Projects
-                </Badge>
-              )}
-            </div>
+              >
+                Available for Projects
+              </Badge>
+            )}
           </div>
         </div>
       </Box>
@@ -247,18 +245,13 @@ function SkillPoints({ points }: { points: CodevPoints[] }) {
   };
 
   return (
-    <div
-      className="flex gap-2 overflow-auto"
-      style={{
-        scrollbarWidth: "none",
-      }}
-    >
+    <div className="flex flex-wrap gap-2">
       {Object.keys(matcher).map((categoryId) => {
         const point = points.find((p) => p.skill_category_id === categoryId);
         return (
           <div
             key={categoryId}
-            className={`dark:bg-black-200 flex h-14 w-16 flex-col items-center
+            className={`dark:bg-black-200 flex h-14 w-14 flex-col items-center
           justify-center gap-1 rounded-md
           bg-slate-100 p-1
           `}
