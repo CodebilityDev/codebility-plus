@@ -203,3 +203,28 @@ export const deleteClientAction = async (id: string) => {
   revalidatePath("/home/clients");
   return { success: true };
 };
+
+// Fetch country list
+interface Country {
+  cca2: string;
+  name: { common: string };
+}
+export const fetchCountry = async () => {
+  try {
+    const res = await fetch("https://restcountries.com/v3.1/all", {
+      cache: "force-cache",
+    });
+    const countryData = (await res.json()) as Country[];
+
+    return countryData
+      .map((country: { cca2: string; name: { common: string } }) => ({
+        value: country.cca2.toLowerCase(),
+        label: country.name.common,
+      }))
+      .sort((a: { label: string }, b: { label: string }) =>
+        a.label.localeCompare(b.label),
+      );
+  } catch (err) {
+    console.log("Error fetching countries. ", err);
+  }
+};

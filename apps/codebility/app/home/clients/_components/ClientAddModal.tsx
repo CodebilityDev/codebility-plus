@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema";
-import { createClientAction } from "@/app/home/clients/action";
+import { createClientAction, fetchCountry } from "@/app/home/clients/action";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -42,7 +42,9 @@ type FormItems = {
   options?: { value: string; label: string }[];
 };
 
-const formItemLabels: FormItems[] = [
+const getFormItemLabels = (
+  country: { value: string; label: string }[],
+): FormItems[] => [
   {
     labelText: "Name",
     placeHolderText: "Enter Company Name",
@@ -62,6 +64,12 @@ const formItemLabels: FormItems[] = [
     formDefaultValue: "address",
   },
   {
+    labelText: "Website",
+    placeHolderText: "https://example.com",
+    inputType: "url",
+    formDefaultValue: "website",
+  },
+  {
     labelText: "Client Type",
     placeHolderText: "Select client type",
     formDefaultValue: "client_type",
@@ -71,22 +79,16 @@ const formItemLabels: FormItems[] = [
     ],
   },
   {
+    labelText: "Country",
+    placeHolderText: "Select a country",
+    formDefaultValue: "country",
+    options: country, // Pass the latest country data
+  },
+  {
     labelText: "Phone Number",
     placeHolderText: "Enter Company Phone Number",
     inputType: "tel",
     formDefaultValue: "phone_number",
-  },
-  {
-    labelText: "Website",
-    placeHolderText: "https://example.com",
-    inputType: "url",
-    formDefaultValue: "website",
-  },
-  {
-    labelText: "Country",
-    placeHolderText: "Select a country",
-    formDefaultValue: "country",
-    options: [{ value: "philippines", label: "Philippines" }],
   },
 ];
 
@@ -96,6 +98,35 @@ export default function ClientAddModal() {
 
   const [isLoading, setIsLoading] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  const [country, setCountry] = useState<{ value: string; label: string }[]>(
+    [],
+  );
+
+  useEffect(() => {
+    const getCountries = async () => {
+      try {
+        const countryList = (await fetchCountry()) ?? []; // Already { value: string; label: string }[]
+
+        if (!countryList.length) {
+          console.warn("Country list is empty or undefined.");
+          return;
+        }
+
+        setCountry(countryList); // No need to map again
+      } catch (error) {
+        console.error("Failed to fetch countries:", error);
+      }
+    };
+
+    if (isModalOpen) {
+      getCountries();
+    }
+
+    return () => {
+      setCountry([]);
+    };
+  }, [isModalOpen]);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
@@ -224,64 +255,68 @@ export default function ClientAddModal() {
                 </div>
               </div>
             </div>
-            {formItemLabels.map(
-              (
-                {
-                  labelText,
-                  placeHolderText,
-                  inputType,
-                  formDefaultValue,
-                  options,
-                },
-                idx,
-              ) => (
-                <FormField
-                  key={idx}
-                  control={form.control}
-                  name={formDefaultValue as keyof ClientFormValues}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>{labelText}</FormLabel>
-                      <FormControl>
-                        {options ? (
-                          <Select
-                            onValueChange={field.onChange}
-                            defaultValue={String(field.value)}
-                          >
-                            <SelectTrigger className="w-full rounded-md border border-input bg-background text-foreground focus:ring-2 focus:ring-ring">
-                              <SelectValue className="text-emerald-400">
-                                {field.value ? undefined : placeHolderText}
-                              </SelectValue>
-                            </SelectTrigger>
-                            <SelectContent>
-                              {options.map(({ value, label }) => (
-                                <SelectItem key={value} value={value}>
-                                  {label}
-                                </SelectItem>
-                              ))}
-                            </SelectContent>
-                          </Select>
-                        ) : (
-                          <Input
-                            placeholder={placeHolderText}
-                            type={inputType}
-                            {...field}
-                            value={field.value as string}
-                            className={`
-                              ${
-                                form.formState.errors.name
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {getFormItemLabels(country).map(
+                (
+                  {
+                    labelText,
+                    placeHolderText,
+                    inputType,
+                    formDefaultValue,
+                    options,
+                  },
+                  idx,
+                ) => (
+                  <FormField
+                    key={idx}
+                    control={form.control}
+                    name={formDefaultValue as keyof ClientFormValues}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{labelText}</FormLabel>
+                        <FormControl>
+                          {options ? (
+                            <Select
+                              onValueChange={field.onChange}
+                              defaultValue={String(field.value)}
+                            >
+                              <SelectTrigger className="focus:ring-inherit">
+                                <SelectValue placeholder={placeHolderText}>
+                                  {options.find(
+                                    (opt) => opt.value === field.value,
+                                  )?.label || placeHolderText}
+                                </SelectValue>
+                              </SelectTrigger>
+                              <SelectContent className="background-lightbox_darkbox">
+                                {options.map(({ value, label }) => (
+                                  <SelectItem key={value} value={value}>
+                                    {label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input
+                              placeholder={placeHolderText}
+                              type={inputType}
+                              {...field}
+                              value={field.value as string}
+                              className={`${
+                                form.formState.errors[
+                                  formDefaultValue as keyof ClientFormValues
+                                ]
                                   ? "border border-red-500 focus:outline-none"
                                   : ""
-                              }
-                            `}
-                          />
-                        )}
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              ),
-            )}
+                              }`}
+                            />
+                          )}
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                ),
+              )}
+            </div>
 
             <DialogFooter className="mt-8 flex flex-col gap-2 lg:flex-row">
               <Button
