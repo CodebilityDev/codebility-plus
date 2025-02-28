@@ -249,7 +249,9 @@ export default function ClientAddModal() {
                             defaultValue={String(field.value)}
                           >
                             <SelectTrigger className="w-full rounded-md border border-input bg-background text-foreground focus:ring-2 focus:ring-ring">
-                              <SelectValue placeholder={"placeHolderText"} />
+                              <SelectValue className="text-emerald-400">
+                                {field.value ? undefined : placeHolderText}
+                              </SelectValue>
                             </SelectTrigger>
                             <SelectContent>
                               {options.map(({ value, label }) => (
