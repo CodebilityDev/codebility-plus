@@ -29,9 +29,7 @@ import { Input } from "@codevs/ui/input";
 import {
   Select,
   SelectContent,
-  SelectGroup,
   SelectItem,
-  SelectLabel,
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
@@ -39,7 +37,7 @@ import {
 type FormItems = {
   labelText: string;
   placeHolderText: string;
-  inputType: string;
+  inputType?: string;
   formDefaultValue: string;
   options?: { value: string; label: string }[];
 };
@@ -66,8 +64,7 @@ const formItemLabels: FormItems[] = [
   {
     labelText: "Client Type",
     placeHolderText: "Select client type",
-    inputType: "",
-    formDefaultValue: "organization",
+    formDefaultValue: "client_type",
     options: [
       { value: "individual", label: "Individual" },
       { value: "organization", label: "Organization" },
@@ -88,7 +85,6 @@ const formItemLabels: FormItems[] = [
   {
     labelText: "Country",
     placeHolderText: "Select a country",
-    inputType: "",
     formDefaultValue: "country",
     options: [{ value: "philippines", label: "Philippines" }],
   },
@@ -174,7 +170,10 @@ export default function ClientAddModal() {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(handleCreateClient)}>
+          <form
+            onSubmit={form.handleSubmit(handleCreateClient)}
+            className="space-y-4"
+          >
             <div className="flex flex-col gap-4">
               <div className="flex justify-center md:justify-start">
                 <label className="md:text-md text-sm lg:text-lg">Logo</label>
@@ -244,21 +243,13 @@ export default function ClientAddModal() {
                     <FormItem>
                       <FormLabel>{labelText}</FormLabel>
                       <FormControl>
-                        {inputType === "file" ? (
-                          <Input
-                            type="file"
-                            accept="image/*"
-                            onChange={(e) =>
-                              field.onChange(e.target.files?.[0] || null)
-                            }
-                          />
-                        ) : options ? (
+                        {options ? (
                           <Select
                             onValueChange={field.onChange}
                             defaultValue={String(field.value)}
                           >
-                            <SelectTrigger className="bg-background">
-                              <SelectValue placeholder={placeHolderText} />
+                            <SelectTrigger className="w-full rounded-md border border-input bg-background text-foreground focus:ring-2 focus:ring-ring">
+                              <SelectValue placeholder={"placeHolderText"} />
                             </SelectTrigger>
                             <SelectContent>
                               {options.map(({ value, label }) => (
@@ -274,11 +265,13 @@ export default function ClientAddModal() {
                             type={inputType}
                             {...field}
                             value={field.value as string}
-                            className={
-                              form.formState.errors.name
-                                ? "border border-red-500 focus:outline-none"
-                                : ""
-                            }
+                            className={`
+                              ${
+                                form.formState.errors.name
+                                  ? "border border-red-500 focus:outline-none"
+                                  : ""
+                              }
+                            `}
                           />
                         )}
                       </FormControl>
