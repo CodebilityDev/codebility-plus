@@ -3,6 +3,7 @@
 import { formatToUnix } from "@/lib/format-date-time";
 
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+import { z } from "zod";
 
 export const updateUserSchedule = async (
   {
@@ -109,4 +110,52 @@ export const updateUserTaskOnHand = async (codevId: string, taskId: string) => {
     .eq("id", codevId);
 
   if (error) throw error;
+};
+
+
+export const updateUserAvailabilityStatus = async ({
+  userId,
+  status
+}: {
+  userId: string,
+  status: boolean
+}
+) => {
+  try {
+    const supabase = getSupabaseServerActionClient();
+
+    const { error } = await supabase
+      .from("codev")
+      .update({
+        availability_status: status,
+      })
+      .eq("id", userId);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+export const fetchUserAvailabilityStatus = async (userId: string) => {
+  try {
+    const supabase = getSupabaseServerActionClient();
+
+    const { data, error } = await supabase
+      .from("codev")
+      .select("availability_status")
+      .eq("id", userId)
+      .single();
+
+    if (error) throw error;
+
+    const status = z.boolean().safeParse(data?.availability_status);
+
+    if (status.error) throw status.error;
+
+    return status.data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };

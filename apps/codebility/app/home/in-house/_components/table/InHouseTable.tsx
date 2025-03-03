@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { Link2 } from "lucide-react";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+
 import {
   Table,
   TableBody,
@@ -189,6 +191,14 @@ export function InHouseTable({
                     ) : (
                       "-"
                     )}
+                  </TableCell>
+
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                    <SwitchStatusButton
+                      disabled={false}
+                      handleSwitch={() => {}}
+                      isActive={item.availability_status ?? false}
+                    />
                   </TableCell>
 
                   <TableCell className="px-2 py-2">
