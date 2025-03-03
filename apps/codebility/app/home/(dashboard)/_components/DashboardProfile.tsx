@@ -1,16 +1,64 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Badges from "@/Components/shared/Badges";
 import Box from "@/Components/shared/dashboard/Box";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 
+import { cn } from "@codevs/ui";
+import { Badge } from "@codevs/ui/badge";
+
+import {
+  fetchUserAvailabilityStatus,
+  updateUserAvailabilityStatus,
+} from "../actions";
+
 export default function DashboardProfile() {
   const { user } = useUserStore();
-
   const isLoading = !user;
+
+  const [active, setActive] = useState<boolean>(false);
+  const [activeloading, setActiveLoading] = useState<boolean>(false);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const fetchStatus = async () => {
+      try {
+        const res = await fetchUserAvailabilityStatus(user?.id);
+
+        setActive(res);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    fetchStatus();
+  }, [user]);
+
+  const handleStatusSwitch = async () => {
+    if (!user) return;
+
+    setActiveLoading(true);
+
+    try {
+
+      await updateUserAvailabilityStatus({
+        userId: user?.id,
+        status: !active,
+      });
+
+      setActive((prev) => !prev);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setActiveLoading(false);
+    }
+  };
 
   return (
     <>
@@ -32,6 +80,23 @@ export default function DashboardProfile() {
             <p className="text-md">{user?.display_position}</p>
 
             <Badges />
+          </div>
+
+          {/* status switch */}
+          <div
+            className="absolute right-4 top-4 flex items-center justify-center gap-2
+          lg:flex-col-reverse xl:flex-row
+          "
+          >
+            <Badge className={cn(active ? "bg-green" : "bg-red-500")}>
+              {active ? "Active" : "Inactive"}
+            </Badge>
+
+            <SwitchStatusButton
+              isActive={active}
+              disabled={activeloading}
+              handleSwitch={handleStatusSwitch}
+            />
           </div>
         </Box>
       ) : (

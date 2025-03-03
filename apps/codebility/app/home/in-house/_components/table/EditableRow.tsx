@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
 import {
   Codev,
@@ -340,6 +341,20 @@ export function EditableRow({
           </Select>
         );
 
+      case "availability_status":
+        return (
+          <SwitchStatusButton
+            isActive={editForm.availability_status ?? false}
+            handleSwitch={() =>
+              handleLocalChange(
+                "availability_status",
+                !editForm.availability_status,
+              )
+            }
+            disabled={isSubmitting || isUploading}
+          />
+        );
+
       default:
         // For example: first_name, last_name, portfolio_website, etc.
         return (
@@ -356,15 +371,18 @@ export function EditableRow({
   return (
     <TableRow className="bg-light-200 dark:bg-dark-200 hover:bg-light-300 dark:hover:bg-dark-300">
       <TableCell className="p-2">{renderCell("image_url")}</TableCell>
-      <TableCell className="p-2">{renderCell("first_name")}</TableCell>
-      <TableCell className="p-2">{renderCell("last_name")}</TableCell>
-      <TableCell className="p-2">{renderCell("email_address")}</TableCell>
+      <TableCell className="p-2 pb-6">{renderCell("first_name")}</TableCell>
+      <TableCell className="p-2 pb-6">{renderCell("last_name")}</TableCell>
+      <TableCell className="p-2 pb-6">{renderCell("email_address")}</TableCell>
       <TableCell className="p-2">{renderCell("internal_status")}</TableCell>
       <TableCell className="p-2">{renderCell("role_id")}</TableCell>
       <TableCell className="p-2">{renderCell("display_position")}</TableCell>
       <TableCell className="p-2">{renderCell("projects")}</TableCell>
       <TableCell className="p-2">{renderCell("nda_status")}</TableCell>
-      <TableCell className="p-2">{renderCell("portfolio_website")}</TableCell>
+      <TableCell className="p-2 pb-6">
+        {renderCell("portfolio_website")}
+      </TableCell>
+      <TableCell className="p-2">{renderCell("availability_status")}</TableCell>
 
       <TableCell className="p-2">
         <div className="flex space-x-2">
