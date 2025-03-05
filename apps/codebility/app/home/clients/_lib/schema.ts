@@ -12,7 +12,7 @@ export const clientSchema = z.object({
   address: z.string().optional(),
   website: z.union([z.string().url("Invalid URL"), z.literal("")]).optional(),
   company_logo: z.union([fileSchema, z.string()]).optional(),
-  status: z.string().optional(),
+  status: z.enum(["active", "inactive"]).default("active"),
   industry: z.string().optional(),
   client_type: z.string().optional(),
   country: z.string().optional(),
