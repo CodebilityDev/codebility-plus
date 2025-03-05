@@ -94,9 +94,6 @@ export default function ClientEditModal() {
     formState: { errors, isValid },
   } = form;
 
-  console.log("IsValid: ", isValid);
-  console.log("errors: ", errors);
-
   // We'll watch the `status` field to show on the UI
   const currentStatus = watch("status");
 
@@ -111,6 +108,8 @@ export default function ClientEditModal() {
       setValue("phone_number", data.phone_number || "");
       setValue("address", data.address || "");
       setValue("website", data.website || "");
+      setValue("client_type", data.client_type || "");
+      setValue("country", data.country || "");
 
       // If the DB client is "active", set form to "active", else "inactive"
       setValue("status", data.status === "active" ? "active" : "inactive");
@@ -192,6 +191,9 @@ export default function ClientEditModal() {
       if (formData.address) dataToSend.append("address", formData.address);
       if (formData.website) dataToSend.append("website", formData.website);
 
+      dataToSend.append("client_type", formData.client_type ?? "");
+      dataToSend.append("country", formData.country?.toUpperCase() ?? "");
+
       // Include the status in a single "save" operation
       dataToSend.append("status", formData.status);
 
@@ -215,6 +217,8 @@ export default function ClientEditModal() {
       setIsLoading(false);
     }
   };
+
+  console.table(data);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
@@ -337,8 +341,14 @@ export default function ClientEditModal() {
                         <FormControl>
                           {options ? (
                             <Select
-                              onValueChange={field.onChange}
-                              defaultValue={String(field.value) ?? ""}
+                              onValueChange={(value) => {
+                                console.log(
+                                  `Updated ${formDefaultValue}:`,
+                                  value,
+                                ); // Debugging
+                                field.onChange(value);
+                              }}
+                              value={String(field.value) ?? ""}
                             >
                               <SelectTrigger className="focus:ring-inherit">
                                 <SelectValue placeholder={placeHolderText} />
