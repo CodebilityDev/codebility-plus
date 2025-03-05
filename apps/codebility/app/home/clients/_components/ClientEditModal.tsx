@@ -20,6 +20,13 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@codevs/ui/select";
 
 // Your action that updates a client's fields
 import { updateClientAction } from "../action";
@@ -221,7 +228,7 @@ export default function ClientEditModal() {
               Current:{" "}
               <span
                 className={
-                  currentStatus === "active" ? "text-green-600" : "text-red-600"
+                  currentStatus === "active" ? "text-green" : "text-red-600"
                 }
               >
                 {currentStatus}
@@ -229,17 +236,21 @@ export default function ClientEditModal() {
             </p>
 
             {/* A dropdown for "active" / "inactive" */}
-            <select
+            <Select
               value={currentStatus}
-              onChange={(e) =>
-                setValue("status", e.target.value as "active" | "inactive")
+              onValueChange={(value) =>
+                setValue("status", value as "active" | "inactive")
               }
               disabled={isLoading}
-              className="cursor-pointer rounded border px-2 py-1"
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+              <SelectTrigger className="focus:ring-inherit">
+                <SelectValue placeholder="status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
