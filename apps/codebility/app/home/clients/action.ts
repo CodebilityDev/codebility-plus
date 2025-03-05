@@ -17,6 +17,9 @@ export const createClientAction = async (formData: FormData) => {
   const phone_number = formData.get("phone_number") as string;
   const address = formData.get("address") as string;
   const status = formData.get("status") as string; // e.g. 'prospect' | 'active' | 'inactive'
+  const website = formData.get("website") as string | null;
+  const client_type = formData.get("client_type") as string;
+  const country = formData.get("country") as string;
   const logoFile = formData.get("logo") as File | null; // This will be uploaded
 
   const supabase = await getSupabaseServerActionClient();
@@ -40,6 +43,9 @@ export const createClientAction = async (formData: FormData) => {
       address: address || null,
       company_logo,
       status: status || "prospect",
+      website: website || null,
+      client_type,
+      country,
     })
     .single();
 
