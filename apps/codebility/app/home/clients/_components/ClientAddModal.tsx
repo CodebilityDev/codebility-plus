@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ClientFormValues, clientSchema, FormItems } from "@/app/home/clients/_lib/schema";
+import { ClientFormValues, clientSchema, FormItems, getFormItemLabels } from "@/app/home/clients/_lib/schema";
 import { createClientAction, fetchCountry } from "@/app/home/clients/action";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
@@ -36,55 +36,7 @@ import {
 
 
 
-const getFormItemLabels = (
-  country: { value: string; label: string }[],
-): FormItems[] => [
-  {
-    labelText: "Name",
-    placeHolderText: "Enter Company Name",
-    inputType: "text",
-    formDefaultValue: "name",
-  },
-  {
-    labelText: "Email",
-    placeHolderText: "Enter Company Email Address",
-    inputType: "email",
-    formDefaultValue: "email",
-  },
-  {
-    labelText: "Address",
-    placeHolderText: "Enter Company Address",
-    inputType: "text",
-    formDefaultValue: "address",
-  },
-  {
-    labelText: "Website",
-    placeHolderText: "https://example.com",
-    inputType: "url",
-    formDefaultValue: "website",
-  },
-  {
-    labelText: "Client Type",
-    placeHolderText: "Select client type",
-    formDefaultValue: "client_type",
-    options: [
-      { value: "individual", label: "Individual" },
-      { value: "organization", label: "Organization" },
-    ],
-  },
-  {
-    labelText: "Country",
-    placeHolderText: "Select a country",
-    formDefaultValue: "country",
-    options: country, // Pass the latest country data
-  },
-  {
-    labelText: "Phone Number",
-    placeHolderText: "Enter Company Phone Number",
-    inputType: "tel",
-    formDefaultValue: "phone_number",
-  },
-];
+
 
 export default function ClientAddModal() {
   const { isOpen, onClose, type } = useModal();
