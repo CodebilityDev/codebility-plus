@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 // Import your types + form schema
-import { ClientFormValues, clientSchema, ClientWithStatusFormValues } from "@/app/home/clients/_lib/schema";
+import {
+  ClientFormValues,
+  clientSchema,
+  ClientWithStatusFormValues,
+} from "@/app/home/clients/_lib/schema";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -29,14 +33,13 @@ import {
 } from "@codevs/ui/select";
 
 // Your action that updates a client's fields
-import { updateClientAction } from "../action";
+import { fetchCountry, updateClientAction } from "../action";
 
 /**
  * Extend your form type to include `status`.
  * Alternatively, define `status` directly inside your Zod schema
  * if you prefer.
  */
-
 
 export default function ClientEditModal() {
   const { isOpen, onClose, type, data } = useModal();
@@ -46,8 +49,12 @@ export default function ClientEditModal() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [country, setCountry] = useState<{ value: string; label: string }[]>(
+    [],
+  );
+
   // React Hook Form
-  const {
+  /* const {
     register,
     handleSubmit,
     reset,
@@ -57,7 +64,15 @@ export default function ClientEditModal() {
   } = useForm<ClientWithStatusFormValues>({
     resolver: zodResolver(clientSchema),
     mode: "onBlur",
+  }); */
+  const form = useForm<ClientWithStatusFormValues>({
+    resolver: zodResolver(clientSchema),
+    mode: "onBlur",
   });
+
+  const { register, handleSubmit, reset, setValue, watch, formState } = form;
+
+  const { errors, isValid } = formState;
 
   // We'll watch the `status` field to show on the UI
   const currentStatus = watch("status");
@@ -81,7 +96,26 @@ export default function ClientEditModal() {
         setLogoPreview(data.company_logo);
       }
     }
-  }, [data, setValue]);
+
+    const getCountries = async () => {
+      try {
+        const countryList = (await fetchCountry()) ?? [];
+
+        if (!countryList.length) {
+          console.warn("Country list is empty or undefined.");
+          return;
+        }
+
+        setCountry(countryList);
+      } catch (error) {
+        console.error("Failed to fetch countries:", error);
+      }
+    };
+
+    if (isModalOpen) {
+      getCountries();
+    }
+  }, [data, form.setValue, isModalOpen]);
 
   /**
    * On close, reset the form + local states
@@ -99,6 +133,7 @@ export default function ClientEditModal() {
    */
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       setValue("company_logo", file);
       setLogoPreview(URL.createObjectURL(file));
