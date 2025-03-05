@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema";
+import { ClientFormValues, clientSchema, FormItems } from "@/app/home/clients/_lib/schema";
 import { createClientAction, fetchCountry } from "@/app/home/clients/action";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
@@ -34,13 +34,7 @@ import {
   SelectValue,
 } from "@codevs/ui/select";
 
-type FormItems = {
-  labelText: string;
-  placeHolderText: string;
-  inputType?: string;
-  formDefaultValue: string;
-  options?: { value: string; label: string }[];
-};
+
 
 const getFormItemLabels = (
   country: { value: string; label: string }[],
@@ -106,14 +100,14 @@ export default function ClientAddModal() {
   useEffect(() => {
     const getCountries = async () => {
       try {
-        const countryList = (await fetchCountry()) ?? []; // Already { value: string; label: string }[]
+        const countryList = (await fetchCountry()) ?? [];
 
         if (!countryList.length) {
           console.warn("Country list is empty or undefined.");
           return;
         }
 
-        setCountry(countryList); // No need to map again
+        setCountry(countryList);
       } catch (error) {
         console.error("Failed to fetch countries:", error);
       }
@@ -122,16 +116,21 @@ export default function ClientAddModal() {
     if (isModalOpen) {
       getCountries();
     }
-
-    return () => {
-      setCountry([]);
-    };
   }, [isModalOpen]);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
-    defaultValues: {},
-    mode: "onChange",
+    defaultValues: {
+      name: "",
+      email: "",
+      address: "",
+      website: "",
+      client_type: "",
+      country: "",
+      phone_number: "",
+      company_logo: undefined,
+    },
+    mode: "onBlur",
   });
 
   const handleDialogChange = (open: boolean) => {
@@ -278,7 +277,7 @@ export default function ClientAddModal() {
                           {options ? (
                             <Select
                               onValueChange={field.onChange}
-                              defaultValue={String(field.value)}
+                              defaultValue={String(field.value) ?? ""}
                             >
                               <SelectTrigger className="focus:ring-inherit">
                                 <SelectValue placeholder={placeHolderText}>
