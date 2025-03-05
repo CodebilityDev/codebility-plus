@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ClientFormValues, clientSchema, FormItems, getFormItemLabels } from "@/app/home/clients/_lib/schema";
+import {
+  ClientFormValues,
+  clientSchema,
+  FormItems,
+  getFormItemLabels,
+} from "@/app/home/clients/_lib/schema";
 import { createClientAction, fetchCountry } from "@/app/home/clients/action";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
@@ -33,10 +38,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
-
-
-
-
 
 export default function ClientAddModal() {
   const { isOpen, onClose, type } = useModal();
@@ -119,6 +120,9 @@ export default function ClientAddModal() {
       if (data.phone_number) formData.append("phone_number", data.phone_number);
       if (data.address) formData.append("address", data.address);
       if (data.website) formData.append("website", data.website);
+
+      formData.append("client_type", data.client_type ?? "");
+      formData.append("country", data.country?.toUpperCase() ?? "");
 
       // File upload
       if (data.company_logo) {
