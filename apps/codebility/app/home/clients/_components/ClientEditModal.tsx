@@ -218,8 +218,6 @@ export default function ClientEditModal() {
     }
   };
 
-  console.table(data);
-
   return (
     <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
       <DialogContent
@@ -342,10 +340,6 @@ export default function ClientEditModal() {
                           {options ? (
                             <Select
                               onValueChange={(value) => {
-                                console.log(
-                                  `Updated ${formDefaultValue}:`,
-                                  value,
-                                ); // Debugging
                                 field.onChange(value);
                               }}
                               value={String(field.value) ?? ""}
