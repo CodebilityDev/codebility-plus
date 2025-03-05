@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 // Import your types + form schema
-import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema";
+import { ClientFormValues, clientSchema, ClientWithStatusFormValues } from "@/app/home/clients/_lib/schema";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -36,9 +36,7 @@ import { updateClientAction } from "../action";
  * Alternatively, define `status` directly inside your Zod schema
  * if you prefer.
  */
-type ClientWithStatusFormValues = ClientFormValues & {
-  status: "active" | "inactive";
-};
+
 
 export default function ClientEditModal() {
   const { isOpen, onClose, type, data } = useModal();
@@ -58,7 +56,7 @@ export default function ClientEditModal() {
     formState: { errors, isValid },
   } = useForm<ClientWithStatusFormValues>({
     resolver: zodResolver(clientSchema),
-    mode: "onChange",
+    mode: "onBlur",
   });
 
   // We'll watch the `status` field to show on the UI
@@ -221,11 +219,10 @@ export default function ClientEditModal() {
         </div>
 
         {/* STATUS FIELD (SIMPLE SELECT) */}
-        <div className="flex items-center justify-between border-b pb-3">
-          <span className="font-medium">Status</span>
-          <div className="flex items-center gap-4">
-            <p className="text-sm">
-              Current:{" "}
+        <div className="flex items-center justify-end border-b pb-3">
+          <div className="flex gap-4">
+            <p className="w-auto text-sm">
+              Status:{" "}
               <span
                 className={
                   currentStatus === "active" ? "text-green" : "text-red-600"

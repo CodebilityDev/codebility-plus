@@ -19,3 +19,15 @@ export const clientSchema = z.object({
 });
 
 export type ClientFormValues = z.infer<typeof clientSchema>;
+
+export type ClientWithStatusFormValues = ClientFormValues & {
+  status: "active" | "inactive";
+};
+
+export type FormItems = {
+  labelText: string;
+  placeHolderText: string;
+  inputType?: string;
+  formDefaultValue: string;
+  options?: { value: string; label: string }[];
+};
