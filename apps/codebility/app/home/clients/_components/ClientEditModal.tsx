@@ -7,6 +7,7 @@ import {
   ClientFormValues,
   clientSchema,
   ClientWithStatusFormValues,
+  getFormItemLabels,
 } from "@/app/home/clients/_lib/schema";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
@@ -67,6 +68,15 @@ export default function ClientEditModal() {
   }); */
   const form = useForm<ClientWithStatusFormValues>({
     resolver: zodResolver(clientSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      address: "",
+      website: "",
+      client_type: "",
+      country: "",
+      phone_number: "",
+    },
     mode: "onBlur",
   });
 
@@ -116,6 +126,8 @@ export default function ClientEditModal() {
       getCountries();
     }
   }, [data, form.setValue, isModalOpen]);
+
+  const formFields = getFormItemLabels(country); // To be used in shadcn <Form>
 
   /**
    * On close, reset the form + local states
