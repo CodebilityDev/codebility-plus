@@ -37,7 +37,8 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
-import { completeTask } from "../../actions";
+import { completeTask, updateTaskPRLink } from "../../actions";
+import { set } from "date-fns";
 
 interface CodevMember {
   id: string;
@@ -58,28 +59,61 @@ const TaskViewModal = ({
   onComplete?: (taskId: string) => void;
 }) => {
   const { isOpen, onOpen, onClose, type, data } = useModal();
+  const [isLoading, setIsLoading] = useState(false);
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task;
   const router = useRouter();
 
   const user = useUserStore((state) => state.user);
   const canModifyTask = user?.role_id === 1 || user?.role_id === 5;
+  const [prLink, setPrLink] = useState(task?.pr_link || "");
+
+  //  handle PR link update
+
+  const handleUpdate = async () => {
+    if (!prLink.trim()) {
+      toast.error("PR Link cannot be empty");
+      return;
+    }
+  
+    const response = await updateTaskPRLink(task.id, prLink);
+  
+    if (response.success) {
+      toast.success("PR Link updated successfully");
+  
+      // ✅ Manually update state so UI updates immediately
+      setPrLink(prLink);
+      task.pr_link = prLink;
+  
+      // ✅ Delay refresh to ensure the update syncs
+      setTimeout(() => {
+        router.refresh();
+      }, 500);
+    } else {
+      toast.error(response.error || "Failed to update PR Link");
+    }
+  };
+  
 
   const handleMarkAsDone = async () => {
     if (!task) return;
-
+  
     try {
       const result = await completeTask(task);
-
+  
       if (result.success) {
         toast.success("Task completed and points awarded!");
-        // Call the onComplete callback before closing the modal
+  
+        // ✅ Manually update local state (UI update)
         if (onComplete) {
+          console.log(`✅ Calling onComplete for: ${task.id}`);
           onComplete(task.id);
         }
-        onClose();
-        // Still refresh the router but the UI will update immediately
-        router.refresh();
+  
+        // ✅ Close modal before refreshing
+        onClose(); 
+  
+        window.location.href = window.location.pathname + "?t=" + Date.now();
       } else {
         toast.error(result.error || "Failed to complete task");
       }
@@ -88,8 +122,10 @@ const TaskViewModal = ({
       toast.error("Failed to complete task");
     }
   };
+  
 
   // State for Skill Category, Sidekick Details, and Primary Assignee
+
   const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(
     null,
   );
@@ -164,6 +200,13 @@ const TaskViewModal = ({
     }
   }, [task]);
 
+  // Return previous PR link when leaving the input field empty
+  useEffect(() => {
+    setPrLink(task?.pr_link || ""); // Reset PR link when task changes
+  }, [task?.id]); // Runs when a new task is selected
+
+ 
+
   if (!isModalOpen) return null;
 
   return (
@@ -207,7 +250,7 @@ const TaskViewModal = ({
               <Input
                 value={task?.title}
                 disabled
-                className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+                className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800 "
               />
             </div>
 
@@ -218,7 +261,7 @@ const TaskViewModal = ({
                 type="number"
                 value={task?.points || 0}
                 disabled
-                className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+                className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
               />
             </div>
 
@@ -226,7 +269,7 @@ const TaskViewModal = ({
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority</Label>
               <Select disabled>
-                <SelectTrigger className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300  dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue placeholder={task?.priority || "None"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -249,7 +292,7 @@ const TaskViewModal = ({
             <div className="space-y-2">
               <Label className="text-sm font-medium">Difficulty</Label>
               <Select disabled>
-                <SelectTrigger className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800">
+                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300 dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue
                     placeholder={
                       task?.difficulty ? capitalize(task.difficulty) : "None"
@@ -278,18 +321,34 @@ const TaskViewModal = ({
               <Input
                 value={task?.type || "None"}
                 disabled
-                className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+                className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300 dark:border-gray-700 dark:bg-gray-800"
               />
             </div>
 
             {/* PR Link */}
-            <div className="space-y-2">
+            <div className="space-y-2 ">
               <Label className="text-sm font-medium">PR Link</Label>
-              <Input
-                value={task?.pr_link || ""}
-                disabled
-                className="border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
-              />
+              <div className="flex items-center space-x-2">
+                <Input
+                  value={prLink}
+                  onChange={(e) => setPrLink(e.target.value)} 
+                  onBlur={() => {
+                    if (!prLink.trim()) {
+                      setPrLink(task.pr_link || ""); // Restore previous value if empty
+                    }
+                  }}
+                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500"
+                  required
+                  placeholder="Enter PR Link..."
+                />
+                <Button
+                  variant="outline"
+                  onClick={handleUpdate}
+                  className="text-grey-100 bg-light-900 mt-4 w-full border-2 border-gray-300 bg-green-600 py-4 text-black hover:bg-green-700 sm:w-auto"
+                >
+                  Update
+                </Button>
+              </div>
             </div>
 
             {/* Skill Category */}
@@ -370,7 +429,7 @@ const TaskViewModal = ({
             <Textarea
               value={task?.description || "No description provided"}
               disabled
-              className="min-h-[120px] resize-none border-gray-300 bg-gray-50 dark:border-gray-700 dark:bg-gray-800"
+              className="text-grey-100 bg-light-900 min-h-[120px] resize-none border border-gray-300  dark:border-gray-700 dark:bg-gray-800"
             />
           </div>
 
@@ -378,15 +437,15 @@ const TaskViewModal = ({
             <Button
               variant="outline"
               onClick={onClose}
-              className="w-full hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 sm:w-auto"
+              className=" bg-light-900 w-full border-2 border-gray-300 bg-green-600 text-black hover:bg-green-700 sm:w-auto"
             >
               Close
             </Button>
-            {canModifyTask && (
+            {canModifyTask && task?.pr_link && (
               <Button
                 variant="default"
                 onClick={handleMarkAsDone}
-                className="w-full bg-green-600 hover:bg-green-700 sm:w-auto"
+                className="bg-light-900 w-full border-2 border-gray-300 bg-green-600 text-black hover:bg-green-700 sm:w-auto"
               >
                 Mark as Done
               </Button>
