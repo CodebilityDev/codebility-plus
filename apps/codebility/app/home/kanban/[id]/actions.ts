@@ -1,3 +1,5 @@
+"use server"
+
 import { revalidatePath } from "next/cache";
 import { Task } from "@/types/home/codev";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
@@ -545,6 +547,8 @@ export const completeTask = async (
   }
 };
 
+
+
 export async function batchUpdateTasks(
   updates: Array<{ taskId: string; newColumnId: string }>,
 ) {
@@ -575,3 +579,31 @@ export async function batchUpdateTasks(
     };
   }
 }
+
+// for updating the pr_link
+export async function updateTaskPRLink(taskId: string, prLink: string) {
+  const supabase = createClientComponentClient();
+  try {
+    const { error } = await supabase
+      .from("tasks")
+      .update({ pr_link: prLink, updated_at: new Date().toISOString() })
+      .eq("id", taskId);
+
+    if (error) {
+      console.error("Error updating PR link:", error);
+      return { success: false, error: error.message };
+    }
+
+    // ✅ Revalidate the cache after updating
+    revalidatePath("/home/kanban");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Update error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Update failed",
+    };
+  }
+}
+
