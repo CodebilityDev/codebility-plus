@@ -335,20 +335,7 @@ const TaskEditModal = () => {
               </Select>
             </div>
 
-            {/* PR Link */}
-            <div className="space-y-2">
-              <Label htmlFor="pr_link" className="text-sm font-medium">
-                PR Link
-              </Label>
-              <Input
-                id="pr_link"
-                name="pr_link"
-                placeholder="Enter PR link"
-                value={taskData.pr_link}
-                onChange={(e) => handleInputChange("pr_link", e.target.value)}
-                className="border-gray-300 focus:border-blue-500 dark:border-gray-700"
-              />
-            </div>
+           
           </div>
 
           {/* Primary Assignee */}
