@@ -3,7 +3,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 // Import your types + form schema
-import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema";
+import {
+  clientSchema,
+  ClientWithStatusFormValues,
+  getFormItemLabels,
+} from "@/app/home/clients/_lib/schema";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -19,19 +23,30 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+} from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@codevs/ui/select";
 
 // Your action that updates a client's fields
-import { updateClientAction } from "../action";
+import { fetchCountry, updateClientAction } from "../action";
 
 /**
  * Extend your form type to include `status`.
  * Alternatively, define `status` directly inside your Zod schema
  * if you prefer.
  */
-type ClientWithStatusFormValues = ClientFormValues & {
-  status: "active" | "inactive";
-};
 
 export default function ClientEditModal() {
   const { isOpen, onClose, type, data } = useModal();
@@ -41,8 +56,12 @@ export default function ClientEditModal() {
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
+  const [country, setCountry] = useState<{ value: string; label: string }[]>(
+    [],
+  );
+
   // React Hook Form
-  const {
+  /* const {
     register,
     handleSubmit,
     reset,
@@ -51,8 +70,29 @@ export default function ClientEditModal() {
     formState: { errors, isValid },
   } = useForm<ClientWithStatusFormValues>({
     resolver: zodResolver(clientSchema),
+    mode: "onBlur",
+  }); */
+  const form = useForm<ClientWithStatusFormValues>({
+    resolver: zodResolver(clientSchema),
+    defaultValues: {
+      name: "",
+      email: "",
+      address: "",
+      website: "",
+      client_type: "",
+      country: "",
+      phone_number: "",
+    },
     mode: "onChange",
   });
+
+  const {
+    handleSubmit,
+    reset,
+    setValue,
+    watch,
+    formState: { errors, isValid },
+  } = form;
 
   // We'll watch the `status` field to show on the UI
   const currentStatus = watch("status");
@@ -68,6 +108,8 @@ export default function ClientEditModal() {
       setValue("phone_number", data.phone_number || "");
       setValue("address", data.address || "");
       setValue("website", data.website || "");
+      setValue("client_type", data.client_type || "");
+      setValue("country", data.country || "");
 
       // If the DB client is "active", set form to "active", else "inactive"
       setValue("status", data.status === "active" ? "active" : "inactive");
@@ -76,7 +118,28 @@ export default function ClientEditModal() {
         setLogoPreview(data.company_logo);
       }
     }
-  }, [data, setValue]);
+
+    const getCountries = async () => {
+      try {
+        const countryList = (await fetchCountry()) ?? [];
+
+        if (!countryList.length) {
+          console.warn("Country list is empty or undefined.");
+          return;
+        }
+
+        setCountry(countryList);
+      } catch (error) {
+        console.error("Failed to fetch countries:", error);
+      }
+    };
+
+    if (isModalOpen) {
+      getCountries();
+    }
+  }, [data, form.setValue, isModalOpen]);
+
+  const formFields = getFormItemLabels(country); // To be used in shadcn <Form>
 
   /**
    * On close, reset the form + local states
@@ -94,6 +157,7 @@ export default function ClientEditModal() {
    */
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+
     if (file) {
       setValue("company_logo", file);
       setLogoPreview(URL.createObjectURL(file));
@@ -115,6 +179,7 @@ export default function ClientEditModal() {
     }
 
     setIsLoading(true);
+
     try {
       // We'll send everything as FormData to your existing action
       const dataToSend = new FormData();
@@ -125,6 +190,9 @@ export default function ClientEditModal() {
         dataToSend.append("phone_number", formData.phone_number);
       if (formData.address) dataToSend.append("address", formData.address);
       if (formData.website) dataToSend.append("website", formData.website);
+
+      dataToSend.append("client_type", formData.client_type ?? "");
+      dataToSend.append("country", formData.country?.toUpperCase() ?? "");
 
       // Include the status in a single "save" operation
       dataToSend.append("status", formData.status);
@@ -192,7 +260,7 @@ export default function ClientEditModal() {
                     </p>
                   </label>
                 )}
-                <input
+                <Input
                   id="edit_company_logo"
                   type="file"
                   accept="image/*"
@@ -214,14 +282,13 @@ export default function ClientEditModal() {
         </div>
 
         {/* STATUS FIELD (SIMPLE SELECT) */}
-        <div className="flex items-center justify-between border-b pb-3">
-          <span className="font-medium">Status</span>
-          <div className="flex items-center gap-4">
-            <p className="text-sm">
-              Current:{" "}
+        <div className="flex items-center justify-end border-b pb-3">
+          <div className="flex gap-4">
+            <p className="w-auto text-sm">
+              Status:{" "}
               <span
                 className={
-                  currentStatus === "active" ? "text-green-600" : "text-red-600"
+                  currentStatus === "active" ? "text-green" : "text-red-600"
                 }
               >
                 {currentStatus}
@@ -229,131 +296,125 @@ export default function ClientEditModal() {
             </p>
 
             {/* A dropdown for "active" / "inactive" */}
-            <select
+            <Select
               value={currentStatus}
-              onChange={(e) =>
-                setValue("status", e.target.value as "active" | "inactive")
+              onValueChange={(value) =>
+                setValue("status", value as "active" | "inactive")
               }
               disabled={isLoading}
-              className="cursor-pointer rounded border px-2 py-1"
             >
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
+              <SelectTrigger className="focus:ring-inherit">
+                <SelectValue placeholder="status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="active">Active</SelectItem>
+                <SelectItem value="inactive">Inactive</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
         </div>
 
         {/* MAIN FORM FIELDS */}
-        <form onSubmit={handleSubmit(handleUpdateClient)}>
-          <div className="flex flex-col gap-8 lg:flex-row">
-            <div className="flex flex-1 flex-col gap-4">
-              <Input
-                variant="lightgray"
-                label="Name"
-                placeholder="Enter Company Name"
-                {...register("name")}
-                className={
-                  errors.name ? "border border-red-500 focus:outline-none" : ""
-                }
-              />
-              {errors.name && (
-                <span className="text-sm text-red-400">
-                  {errors.name.message}
-                </span>
-              )}
-
-              <Input
-                variant="lightgray"
-                label="Email"
-                placeholder="Enter Company Email Address"
-                type="email"
-                {...register("email")}
-                className={
-                  errors.email ? "border border-red-500 focus:outline-none" : ""
-                }
-              />
-              {errors.email && (
-                <span className="text-sm text-red-400">
-                  {errors.email.message}
-                </span>
-              )}
-
-              <Input
-                variant="lightgray"
-                label="Address"
-                placeholder="Enter Company Address"
-                {...register("address")}
-                className={
-                  errors.address
-                    ? "border border-red-500 focus:outline-none"
-                    : ""
-                }
-              />
-              {errors.address && (
-                <span className="text-sm text-red-400">
-                  {errors.address.message}
-                </span>
-              )}
-            </div>
-
-            <div className="flex flex-1 flex-col gap-4">
-              <Input
-                variant="lightgray"
-                label="Phone Number"
-                placeholder="Enter Company Phone Number"
-                type="tel"
-                {...register("phone_number")}
-                className={
-                  errors.phone_number
-                    ? "border border-red-500 focus:outline-none"
-                    : ""
-                }
-              />
-              {errors.phone_number && (
-                <span className="text-sm text-red-400">
-                  {errors.phone_number.message}
-                </span>
-              )}
-
-              <Input
-                variant="lightgray"
-                label="Website"
-                placeholder="https://example.com"
-                {...register("website")}
-                className={
-                  errors.website
-                    ? "border border-red-500 focus:outline-none"
-                    : ""
-                }
-              />
-              {errors.website && (
-                <span className="text-sm text-red-400">
-                  {errors.website.message}
-                </span>
+        <Form {...form}>
+          <form onSubmit={handleSubmit(handleUpdateClient)}>
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+              {formFields.map(
+                (
+                  {
+                    labelText,
+                    placeHolderText,
+                    inputType,
+                    formDefaultValue,
+                    options,
+                  },
+                  idx,
+                ) => (
+                  <FormField
+                    key={idx}
+                    control={form.control}
+                    name={formDefaultValue as keyof ClientWithStatusFormValues}
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>{labelText}</FormLabel>
+                        <FormControl>
+                          {options ? (
+                            <Select
+                              onValueChange={(value) => {
+                                field.onChange(value);
+                              }}
+                              value={String(field.value) ?? ""}
+                            >
+                              <SelectTrigger className="focus:ring-inherit">
+                                <SelectValue placeholder={placeHolderText} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                {options.map((option) => (
+                                  <SelectItem
+                                    key={option.value}
+                                    value={option.value}
+                                  >
+                                    {option.label}
+                                  </SelectItem>
+                                ))}
+                              </SelectContent>
+                            </Select>
+                          ) : (
+                            <Input
+                              type={inputType || "text"}
+                              placeholder={placeHolderText}
+                              {...field}
+                              className={`${
+                                errors[
+                                  formDefaultValue as keyof ClientWithStatusFormValues
+                                ]
+                                  ? "border border-red-500 focus:outline-none"
+                                  : ""
+                              }`}
+                              value={field.value as string}
+                              onBlur={(e) => {
+                                const value = e.target.value
+                                  .trim()
+                                  .toLowerCase();
+                                if (
+                                  formDefaultValue === "website" &&
+                                  value &&
+                                  !value.startsWith("http://") &&
+                                  !value.startsWith("https://")
+                                ) {
+                                  field.onChange(`https://${value}`);
+                                }
+                              }}
+                            />
+                          )}
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+                ),
               )}
             </div>
-          </div>
 
-          {/* FOOTER BUTTONS */}
-          <DialogFooter className="mt-8 flex flex-col gap-2 lg:flex-row">
-            <Button
-              type="button"
-              variant="hollow"
-              className="order-2 w-full sm:order-1 sm:w-[130px]"
-              onClick={() => handleDialogChange(false)}
-              disabled={isLoading}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              className="order-1 w-full sm:order-2 sm:w-[130px]"
-              disabled={isLoading || !isValid}
-            >
-              Save
-            </Button>
-          </DialogFooter>
-        </form>
+            {/* FOOTER BUTTONS */}
+            <DialogFooter className="mt-8 flex flex-col gap-2 lg:flex-row">
+              <Button
+                type="button"
+                variant="hollow"
+                className="order-2 w-full sm:order-1 sm:w-[130px]"
+                onClick={() => handleDialogChange(false)}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                className="order-1 w-full sm:order-2 sm:w-[130px]"
+                disabled={isLoading || !isValid}
+              >
+                Save
+              </Button>
+            </DialogFooter>
+          </form>
+        </Form>
       </DialogContent>
     </Dialog>
   );
