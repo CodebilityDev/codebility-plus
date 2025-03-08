@@ -17,6 +17,9 @@ export const createClientAction = async (formData: FormData) => {
   const phone_number = formData.get("phone_number") as string;
   const address = formData.get("address") as string;
   const status = formData.get("status") as string; // e.g. 'prospect' | 'active' | 'inactive'
+  const website = formData.get("website") as string | null;
+  const client_type = formData.get("client_type") as string;
+  const country = formData.get("country") as string;
   const logoFile = formData.get("logo") as File | null; // This will be uploaded
 
   const supabase = await getSupabaseServerActionClient();
@@ -40,6 +43,9 @@ export const createClientAction = async (formData: FormData) => {
       address: address || null,
       company_logo,
       status: status || "prospect",
+      website: website || null,
+      client_type,
+      country,
     })
     .single();
 
@@ -63,11 +69,14 @@ export const updateClientAction = async (
   clientId: string, // UUID from your table
   formData: FormData,
 ) => {
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const phone_number = formData.get("phone_number") as string;
-  const address = formData.get("address") as string;
-  const status = formData.get("status") as string;
+  const name = formData.get("name") as string | null;
+  const email = formData.get("email") as string | null;
+  const phone_number = formData.get("phone_number") as string | null;
+  const address = formData.get("address") as string | null;
+  const status = formData.get("status") as string | null;
+  const website = formData.get("website") as string | null;
+  const client_type = formData.get("client_type") as string | null;
+  const country = formData.get("country") as string | null;
   const logoFile = formData.get("logo") as File | null;
 
   const supabase = await getSupabaseServerActionClient();
@@ -81,7 +90,7 @@ export const updateClientAction = async (
 
   if (fetchError || !clientData) {
     console.error("Error fetching client:", fetchError?.message);
-    return { success: false, error: fetchError?.message };
+    return { success: false, error: fetchError?.message || "Client not found" };
   }
 
   // Current value of company_logo in the DB (a string)
@@ -108,6 +117,9 @@ export const updateClientAction = async (
     address: address || clientData.address,
     status: status || clientData.status,
     company_logo,
+    website: website || clientData.website,
+    client_type: client_type || clientData.client_type,
+    country: country || clientData.country,
   };
 
   // Update row

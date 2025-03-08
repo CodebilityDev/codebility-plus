@@ -2,7 +2,12 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { ClientFormValues, clientSchema } from "@/app/home/clients/_lib/schema";
+import {
+  ClientFormValues,
+  clientSchema,
+  FormItems,
+  getFormItemLabels,
+} from "@/app/home/clients/_lib/schema";
 import { createClientAction, fetchCountry } from "@/app/home/clients/action";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
@@ -34,64 +39,6 @@ import {
   SelectValue,
 } from "@codevs/ui/select";
 
-type FormItems = {
-  labelText: string;
-  placeHolderText: string;
-  inputType?: string;
-  formDefaultValue: string;
-  options?: { value: string; label: string }[];
-};
-
-const getFormItemLabels = (
-  country: { value: string; label: string }[],
-): FormItems[] => [
-  {
-    labelText: "Name",
-    placeHolderText: "Enter Company Name",
-    inputType: "text",
-    formDefaultValue: "name",
-  },
-  {
-    labelText: "Email",
-    placeHolderText: "Enter Company Email Address",
-    inputType: "email",
-    formDefaultValue: "email",
-  },
-  {
-    labelText: "Address",
-    placeHolderText: "Enter Company Address",
-    inputType: "text",
-    formDefaultValue: "address",
-  },
-  {
-    labelText: "Website",
-    placeHolderText: "https://example.com",
-    inputType: "url",
-    formDefaultValue: "website",
-  },
-  {
-    labelText: "Client Type",
-    placeHolderText: "Select client type",
-    formDefaultValue: "client_type",
-    options: [
-      { value: "individual", label: "Individual" },
-      { value: "organization", label: "Organization" },
-    ],
-  },
-  {
-    labelText: "Country",
-    placeHolderText: "Select a country",
-    formDefaultValue: "country",
-    options: country, // Pass the latest country data
-  },
-  {
-    labelText: "Phone Number",
-    placeHolderText: "Enter Company Phone Number",
-    inputType: "tel",
-    formDefaultValue: "phone_number",
-  },
-];
-
 export default function ClientAddModal() {
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "clientAddModal";
@@ -106,14 +53,14 @@ export default function ClientAddModal() {
   useEffect(() => {
     const getCountries = async () => {
       try {
-        const countryList = (await fetchCountry()) ?? []; // Already { value: string; label: string }[]
+        const countryList = (await fetchCountry()) ?? [];
 
         if (!countryList.length) {
           console.warn("Country list is empty or undefined.");
           return;
         }
 
-        setCountry(countryList); // No need to map again
+        setCountry(countryList);
       } catch (error) {
         console.error("Failed to fetch countries:", error);
       }
@@ -122,16 +69,21 @@ export default function ClientAddModal() {
     if (isModalOpen) {
       getCountries();
     }
-
-    return () => {
-      setCountry([]);
-    };
   }, [isModalOpen]);
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
-    defaultValues: {},
-    mode: "onChange",
+    defaultValues: {
+      name: "",
+      email: "",
+      address: "",
+      website: "",
+      client_type: "",
+      country: "",
+      phone_number: "",
+      company_logo: undefined,
+    },
+    mode: "onBlur",
   });
 
   const handleDialogChange = (open: boolean) => {
@@ -168,6 +120,9 @@ export default function ClientAddModal() {
       if (data.phone_number) formData.append("phone_number", data.phone_number);
       if (data.address) formData.append("address", data.address);
       if (data.website) formData.append("website", data.website);
+
+      formData.append("client_type", data.client_type ?? "");
+      formData.append("country", data.country?.toUpperCase() ?? "");
 
       // File upload
       if (data.company_logo) {
@@ -278,7 +233,7 @@ export default function ClientAddModal() {
                           {options ? (
                             <Select
                               onValueChange={field.onChange}
-                              defaultValue={String(field.value)}
+                              defaultValue={String(field.value) ?? ""}
                             >
                               <SelectTrigger className="focus:ring-inherit">
                                 <SelectValue placeholder={placeHolderText}>
