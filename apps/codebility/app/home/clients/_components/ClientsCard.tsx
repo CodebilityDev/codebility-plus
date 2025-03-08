@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import DefaultPagination from "@/Components/ui/pagination";
+import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { pageSize } from "@/constants";
 import { useModal } from "@/hooks/use-modal-clients";
 import usePagination from "@/hooks/use-pagination";
@@ -18,13 +19,10 @@ import {
 } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { Client } from "@/types/home/codev";
-
 import toast from "react-hot-toast";
-
 
 import { copyToClipboard, handleDownload } from "../_lib/utils";
 import { deleteClientAction, toggleClientStatusAction } from "../action";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 
 interface Props {
   clients: Client[];
@@ -102,7 +100,7 @@ export default function ClientCards({ clients }: Props) {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
+      <article className="grid grid-cols-1 gap-6 xl:grid-cols-2">
         {clients?.length > 0 ? (
           paginatedClients?.map((client) => {
             const isActive = client.status === "active";
@@ -276,7 +274,7 @@ export default function ClientCards({ clients }: Props) {
             {pathname === "/home/clients" ? "No clients" : "No data"}
           </p>
         )}
-      </div>
+      </article>
 
       {/* Pagination */}
       {clients.length > pageSize.clients && (
@@ -291,4 +289,3 @@ export default function ClientCards({ clients }: Props) {
     </>
   );
 }
-
