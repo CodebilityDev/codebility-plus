@@ -28,6 +28,7 @@ const AdminCard = ({ admin, color }: { admin: Codev; color: string }) => {
             onError={(e) => {
               e.currentTarget.src = defaultImage;
             }}
+            unoptimized={true}
           />
         </div>
         <div className="flex w-full flex-col gap-1">
