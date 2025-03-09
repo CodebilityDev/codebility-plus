@@ -94,7 +94,9 @@ const CodevCard = ({ codev, color }: Props) => {
           <Image
             alt={`${codev.first_name} Avatar`}
             src={
-              codev.image_url && codev.image_url.startsWith("http")
+              codev.image_url &&
+              (codev.image_url.startsWith("http") ||
+                codev.image_url.startsWith("/"))
                 ? codev.image_url
                 : "/assets/svgs/icon-codebility-black.svg"
             }
@@ -102,6 +104,12 @@ const CodevCard = ({ codev, color }: Props) => {
             height={70}
             className={`${color} h-[70px] w-[70px] rounded-full bg-cover object-cover p-0.5`}
             onMouseMove={handleMouseMove}
+            onError={(e) => {
+              console.error(
+                `Failed to load image for ${codev.first_name}: ${codev.image_url}`,
+              );
+              e.currentTarget.src = "/assets/svgs/icon-codebility-black.svg";
+            }}
           />
           <AnimatePresence>
             {hovered && internalStatus && (
