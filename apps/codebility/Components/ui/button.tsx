@@ -11,6 +11,8 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: "bg-blue-100 text-white hover:bg-blue-200",
+        ghost:
+          "hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-50",
         hollow:
           "border border border-[#8e8e8e] bg-white hover:opacity-80 dark:border dark:border-[#8e8e8e] dark:bg-[#444857] dark:text-white",
         link: "text-dark-100 hover:text-blue-100 dark:text-white  hover:dark:text-blue-100",

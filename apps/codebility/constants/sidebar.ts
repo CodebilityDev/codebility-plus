@@ -105,7 +105,7 @@ export const getSidebarData = async (
         {
           route: pathsConfig.app.interns,
           imgURL: "/assets/svgs/icon-interns.svg",
-          label: "Interns",
+          label: "Codevs",
           permission: "interns" as PermissionKey,
         },
         {

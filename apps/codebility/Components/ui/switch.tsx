@@ -30,7 +30,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
       }`}
     >
       <motion.div
-        className={`absolute h-4 w-4 rounded-full ${settingEnabled ? "dark:bg-light-800 bg-slate-600" : "dark:bg-teal bg-violet"}`}
+        className={`absolute h-4 w-4 rounded-full ${settingEnabled ? "dark:bg-light-800 bg-slate-600" : "dark:bg-teal bg-blue-100"}`}
         animate={{ marginLeft: settingEnabled ? "-10%" : "34%" }}
         transition={{ type: "spring", stiffness: 700, damping: 60 }}
       />

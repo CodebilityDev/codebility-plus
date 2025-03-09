@@ -1,7 +1,13 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getMembers, getTeamLead } from "@/app/home/projects/actions";
+import {
+  getMembers,
+  getTeamLead,
+  SimpleMemberData,
+} from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -10,11 +16,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
-import { Codev } from "@/types/home/codev";
 import { format, parseISO } from "date-fns";
 
+// Map project category id to a label.
 const PROJECT_CATEGORIES: Record<string, string> = {
   "1": "Web Development",
   "2": "Mobile Development",
@@ -23,52 +30,41 @@ const PROJECT_CATEGORIES: Record<string, string> = {
 
 const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
-
   const isModalOpen = isOpen && type === "projectViewModal";
 
-  const [teamLead, setTeamLead] = useState<Codev | null>(null);
-  const [members, setMembers] = useState<Codev[]>([]);
+  // Using the simplified member type returned by our actions.
+  const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
+  const [members, setMembers] = useState<SimpleMemberData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Format dates if available.
   const startDate = data?.start_date
     ? format(parseISO(data.start_date), "MM/dd/yyyy")
     : null;
-
   const endDate = data?.end_date
     ? format(parseISO(data.end_date), "MM/dd/yyyy")
     : "Ongoing";
-
   const createdAt = data?.created_at
     ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
     : null;
 
   useEffect(() => {
     const fetchTeamLeadAndMembers = async () => {
-      if (!data) return;
-
+      if (!data?.id) return;
       setIsLoading(true);
       try {
-        // Fetch team lead
-        if (data.team_leader_id) {
-          const { error: leadError, data: fetchedTeamLead } = await getTeamLead(
-            data.team_leader_id,
-          );
-          if (!leadError && fetchedTeamLead) {
-            setTeamLead(fetchedTeamLead);
-          }
+        // Fetch both team lead and members in parallel
+        const [teamLeadResult, membersResult] = await Promise.all([
+          getTeamLead(data.id),
+          getMembers(data.id),
+        ]);
+
+        if (!teamLeadResult.error && teamLeadResult.data) {
+          setTeamLead(teamLeadResult.data);
         }
 
-        // Fetch members
-        if (
-          data.members &&
-          Array.isArray(data.members) &&
-          data.members.length > 0
-        ) {
-          const { error: membersError, data: fetchedMembers } =
-            await getMembers(data.members);
-          if (!membersError && fetchedMembers) {
-            setMembers(fetchedMembers);
-          }
+        if (!membersResult.error && membersResult.data) {
+          setMembers(membersResult.data);
         }
       } catch (error) {
         console.error("Error fetching team data:", error);
@@ -79,21 +75,25 @@ const ProjectViewModal = () => {
 
     if (isModalOpen) {
       fetchTeamLeadAndMembers();
+    } else {
+      // Reset states when modal closes
+      setTeamLead(null);
+      setMembers([]);
     }
   }, [isModalOpen, data]);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-xl">View Project</DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col gap-6">
           {/* Project Image */}
-          <div className="dark:bg-dark-100 flex justify-center rounded-lg bg-slate-100 p-6">
+          <div className="dark:bg-dark-100 flex justify-center rounded-lg bg-slate-100 p-0">
             {data?.main_image ? (
-              <div className="relative h-[200px] w-[200px]">
+              <div className="relative h-52 w-full">
                 <Image
                   src={data.main_image}
                   alt={data?.name || "Project Image"}
@@ -167,7 +167,11 @@ const ProjectViewModal = () => {
               <div className="grid gap-2">
                 <div>
                   <h4 className="text-sm text-gray-500">Current Status</h4>
-                  <p className="capitalize text-orange-400">{data?.status}</p>
+                  <p className="capitalize text-orange-400">
+                    {data?.status === "inprogress"
+                      ? "in progress"
+                      : data?.status}
+                  </p>
                 </div>
 
                 <div>
@@ -198,9 +202,12 @@ const ProjectViewModal = () => {
             <h3 className="text-lg font-semibold">Team Information</h3>
 
             {isLoading ? (
-              <div className="text-sm text-gray-500">
-                Loading team information...
-              </div>
+              <>
+                <h4 className="text-sm text-gray-500">Team Lead</h4>
+                <Skeleton className="h-10 w-48 rounded-lg" />
+                <h4 className="text-sm text-gray-500">Team Members</h4>
+                <Skeleton className="h-10 w-48 rounded-lg" />
+              </>
             ) : (
               <>
                 {/* Team Lead */}

@@ -142,3 +142,13 @@ export { default as IconArrowUpRight } from "./icon-arrow-up-right.svg";
 export { default as IconFourDotsMenu } from "./icon-four-dots-menu.svg";
 export { default as IconArrowR } from "./icon-arrow-r.svg";
 export { default as IconArrowL } from "./icon-arrow-l.svg";
+
+export { default as IconDocker } from "./icon-docker.svg";
+export { default as IconExpressJs } from "./icon-expressjs.svg";
+export { default as IconFlutter } from "./icon-flutter.svg";
+export { default as IconGraphQL } from "./icon-graphql.svg";
+export { default as IconJoomla } from "./icon-joomla.svg";
+export { default as IconRust } from "./icon-rust.svg";
+export { default as IconShopify } from "./icon-shopify.svg";
+export { default as IconSvelte } from "./icon-svelte.svg";
+export { default as IconWordPress } from "./icon-wordpress.svg";

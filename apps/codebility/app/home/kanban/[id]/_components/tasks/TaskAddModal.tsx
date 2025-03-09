@@ -1,131 +1,132 @@
-"use client";
+"use client"
 
-import { useState } from "react";
-import { useRouter } from "next/navigation";
-import KanbanAddModalMembers from "@/app/home/kanban/[id]/_components/kanban_modals/kanban-add-modal-members";
-import { createNewTask } from "@/app/home/kanban/[id]/actions";
-import { Button } from "@/Components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/Components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/Components/ui/select";
-import { useModal } from "@/hooks/use-modal";
-import toast from "react-hot-toast";
+import { useEffect, useState, useTransition } from "react"
+import { Button } from "@/Components/ui/button"
+import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/Components/ui/dialog"
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
+import { useModal } from "@/hooks/use-modal"
+import type { SkillCategory } from "@/types/home/codev"
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
+import toast from "react-hot-toast"
 
-import { Input } from "@codevs/ui/input";
-import { Label } from "@codevs/ui/label";
-import { Textarea } from "@codevs/ui/textarea";
+import { Input } from "@codevs/ui/input"
+import { Label } from "@codevs/ui/label"
+import { Textarea } from "@codevs/ui/textarea"
 
-// Constants based on schema
-const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
-const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
-const TASK_TYPES = ["feature", "bug", "improvement", "documentation"];
+import { createNewTask } from "../../actions"
+import KanbanAddModalMembers from "../kanban_modals/KanbanAddModalMembers"
 
-interface TaskModalData {
-  listId: string;
-  listName: string;
-}
+const PRIORITY_LEVELS = ["critical", "high", "medium", "low"]
+const DIFFICULTY_LEVELS = ["easy", "medium", "hard"]
+const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"]
 
 const TaskAddModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
-  const isModalOpen = isOpen && type === "taskAddModal";
-  const router = useRouter();
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const { isOpen, onClose, type, data } = useModal()
+  const isModalOpen = isOpen && type === "taskAddModal"
+  const [mainAssignee, setMainAssignee] = useState<string>("")
+  const [sidekicks, setSidekicks] = useState<string[]>([])
+  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([])
+  const [loading, setLoading] = useState(false)
+  const [isPending, startTransition] = useTransition()
 
-  const validateInput = (formData: FormData) => {
-    const title = formData.get("title");
-    if (!title) {
-      throw new Error("Title is required");
+  useEffect(() => {
+    const loadSkillCategories = async () => {
+      const supabase = createClientComponentClient()
+      const { data, error } = await supabase.from("skill_category").select("id, name").order("name")
+
+      if (error) {
+        toast.error("Failed to load skill categories")
+      } else if (data) {
+        setSkillCategories(data)
+      }
     }
-  };
+    loadSkillCategories()
+  }, [])
 
   const handleSubmit = async (formData: FormData) => {
     try {
-      validateInput(formData);
+      setLoading(true)
 
-      // Add selected members to form data
-      if (selectedMembers.length > 0) {
-        formData.append("sidekick_ids", selectedMembers.join(","));
-      }
+      if (!formData.get("title")) throw new Error("Title is required")
+      if (!mainAssignee) throw new Error("Primary assignee is required")
+      if (!formData.get("skill_category_id")) throw new Error("Skill category is required")
 
-      const response = await createNewTask(formData);
+      formData.append("codev_id", mainAssignee)
+      if (sidekicks.length) formData.append("sidekick_ids", sidekicks.join(","))
 
+      const response = await createNewTask(formData)
       if (response.success) {
-        toast.success("Task created successfully");
-        router.refresh();
-        onClose();
+        toast.success("Task created successfully")
+        onClose()
+
+        // More aggressive approach - force a complete page reload
+        window.location.href = window.location.pathname + "?t=" + Date.now()
       } else {
-        toast.error(response.error || "Failed to create task");
+        toast.error(response.error || "Failed to create task")
       }
     } catch (error) {
-      console.error("Error creating task:", error);
-      toast.error(
-        error instanceof Error ? error.message : "Something went wrong",
-      );
+      toast.error(error instanceof Error ? error.message : "Failed to create task")
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
-  if (!isModalOpen) return null;
+  if (!isModalOpen) return null
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[32rem] w-[90%] max-w-3xl overflow-y-auto lg:h-auto">
-        <form action={handleSubmit} className="flex flex-col gap-4">
+      <DialogContent className="h-[90vh] w-[90%] max-w-3xl overflow-y-auto bg-white dark:bg-gray-900 lg:h-auto">
+        <form action={handleSubmit} className="flex flex-col gap-6">
           <DialogHeader>
-            <DialogTitle className="text-left text-lg">
-              Add New Task
-            </DialogTitle>
+            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">Add New Task</DialogTitle>
           </DialogHeader>
 
           {data?.listName && (
-            <Label>
-              List:{" "}
-              <span className="text-yellow-500 underline">{data.listName}</span>
-            </Label>
+            <div className="rounded-md bg-blue-50 p-2 dark:bg-blue-900/20">
+              <Label className="text-sm text-blue-700 dark:text-blue-300">Adding to: {data.listName}</Label>
+            </div>
           )}
 
           <input type="hidden" name="kanban_column_id" value={data?.listId} />
 
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Input
-              id="title"
-              type="text"
-              label="Task Title"
-              name="title"
-              placeholder="Enter task title"
-              required
-            />
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm font-medium">
+                Task Title
+              </Label>
+              <Input
+                id="title"
+                name="title"
+                placeholder="Enter task title"
+                className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:bg-dark-200 dark:text-light-900 "
+                required
+              />
+            </div>
 
-            <Input
-              id="points"
-              type="number"
-              label="Points"
-              name="points"
-              min="0"
-              placeholder="Enter points"
-            />
+            <div className="space-y-2">
+              <Label htmlFor="points" className="text-sm font-medium">
+                Points
+              </Label>
+              <Input
+                id="points"
+                name="points"
+                type="number"
+                min="0"
+                className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:bg-dark-200 dark:text-light-900 "
+                placeholder="Task points"
+              />
+            </div>
 
-            <div>
-              <label>Priority Level</label>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Priority</Label>
               <Select name="priority">
-                <SelectTrigger>
+                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     {PRIORITY_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level}>
+                      <SelectItem key={level} value={level} className="capitalize">
                         {level}
                       </SelectItem>
                     ))}
@@ -134,16 +135,16 @@ const TaskAddModal = () => {
               </Select>
             </div>
 
-            <div>
-              <label>Difficulty</label>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Difficulty</Label>
               <Select name="difficulty">
-                <SelectTrigger>
+                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     {DIFFICULTY_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level}>
+                      <SelectItem key={level} value={level} className="capitalize">
                         {level}
                       </SelectItem>
                     ))}
@@ -152,17 +153,17 @@ const TaskAddModal = () => {
               </Select>
             </div>
 
-            <div>
-              <label>Task Type</label>
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Task Type</Label>
               <Select name="type">
-                <SelectTrigger>
+                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
                     {TASK_TYPES.map((type) => (
-                      <SelectItem key={type} value={type}>
-                        {type}
+                      <SelectItem key={type} value={type} className="capitalize">
+                        {type.toLowerCase()}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -170,49 +171,83 @@ const TaskAddModal = () => {
               </Select>
             </div>
 
-            <Input
-              id="pr_link"
-              label="PR Link"
-              name="pr_link"
-              placeholder="Enter PR link"
-            />
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Skill Category</Label>
+              <Select name="skill_category_id" required>
+                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                  <SelectValue placeholder="Select skill category" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectGroup>
+                    {skillCategories.map((cat) => (
+                      <SelectItem key={cat.id} value={cat.id}>
+                        {cat.name}
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
-          <KanbanAddModalMembers
-            onMembersChange={(memberIds: string[]) => {
-              setSelectedMembers(memberIds);
-            }}
-          />
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Primary Assignee</Label>
+              <KanbanAddModalMembers
+                singleSelection
+                onMembersChange={(ids) => setMainAssignee(ids[0] || "")}
+                projectId={data?.projectId}
+              />
+            </div>
 
-          <div>
-            <label>Description</label>
-            <Textarea
-              name="description"
-              className="h-32 resize-none"
-              placeholder="Add task description..."
-            />
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">
+                Sidekick Helpers
+                <span className="ml-2 text-xs text-gray-500">(Optional)</span>
+              </Label>
+              <KanbanAddModalMembers
+                onMembersChange={setSidekicks}
+                projectId={data?.projectId}
+                disabledMembers={[mainAssignee]}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm font-medium">
+                Description
+              </Label>
+              <Textarea
+                id="description"
+                name="description"
+                className="min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700 dark:bg-dark-200"
+                placeholder="Add task description..."
+              />
+            </div>
           </div>
 
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               type="button"
+              variant="outline"
               onClick={onClose}
               className="w-full sm:w-auto"
+              disabled={loading || isPending}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              variant="default"
-              className="w-full sm:w-auto"
+              className="w-full bg-blue-600 hover:bg-blue-700 sm:w-auto"
+              disabled={loading || isPending}
             >
-              Create Task
+              {loading || isPending ? "Creating..." : "Create Task"}
             </Button>
           </DialogFooter>
         </form>
       </DialogContent>
     </Dialog>
-  );
-};
+  )
+}
 
-export default TaskAddModal;
+export default TaskAddModal
+

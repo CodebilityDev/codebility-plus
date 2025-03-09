@@ -1,12 +1,12 @@
-import Footer from "../_components/marketing-footer";
-import Navigation from "../_components/marketing-navigation";
+import Footer from "../_components/MarketingFooter";
+import Navigation from "../_components/MarketingNavigation";
 import Profiles from "../profiles/page";
-import CTA from "./_components/codevs-cta";
-import FeaturedSection from "./_components/codevs-featured-section";
-import Hero from "./_components/codevs-hero";
-import MissionVision from "./_components/codevs-mission-vision";
-import Project from "./_components/codevs-project";
-import Roadmap from "./_components/codevs-roadmap";
+import CTA from "./_components/CodevsCta";
+import FeaturedSection from "./_components/CodevsFeaturedCection";
+import Hero from "./_components/CodevsHero";
+import MissionVision from "./_components/CodevsMissionVision";
+import Project from "./_components/CodevsProject";
+import Roadmap from "./_components/CodevsRoadmap";
 
 const Codevs = () => {
   return (

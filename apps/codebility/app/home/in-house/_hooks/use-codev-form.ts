@@ -4,19 +4,6 @@ import toast from "react-hot-toast";
 
 import { updateCodev } from "../actions";
 
-type UpdateableKeys = {
-  projects: ["projects"];
-  codev: [
-    "internal_status",
-    "nda_status",
-    "availability_status",
-    "application_status",
-    "image_url",
-    "email_address",
-  ];
-  profile: ["display_position", "role_id", "level", "tech_stacks", "email"];
-};
-
 export function useCodevForm(initialData: Codev) {
   const [data, setData] = useState<Codev>(initialData);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -119,6 +106,7 @@ export function useCodevForm(initialData: Codev) {
   return {
     data,
     isSubmitting,
+    setIsSubmitting, // <-- Expose setIsSubmitting if needed by the parent
     handleChange,
     handleBulkChange,
   };

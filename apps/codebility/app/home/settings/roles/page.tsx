@@ -1,8 +1,8 @@
-import { Roles } from "@/types/home/codev";
+import { Roles } from "@/types/home/codev"; // Make sure your 'Roles' interface matches the DB columns
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import RoleContainer from "./_components/role-container";
+import RoleContainer from "./_components/RoleContainer";
 
 const RolesPage = async () => {
   const supabase = getSupabaseServerComponentClient();
@@ -11,8 +11,8 @@ const RolesPage = async () => {
   const { data, error } = await supabase.from("roles").select("*");
 
   if (error) {
-    // Handle error (optional)
     console.error("Error fetching roles:", error);
+    return <div>Error loading roles</div>;
   }
 
   const roles = data || [];
