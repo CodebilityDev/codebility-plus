@@ -59,6 +59,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                   alt="Project Image"
                   width={1000}
                   height={500}
+                  unoptimized={true}
                   className={`${
                     index === activeIndex
                       ? "lg:h-[35rem]"
@@ -79,6 +80,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
             width={5}
             height={5}
             className="border-light-900/15 bg-light-900/15 hover:bg-light-900/5 size-8 rounded-full  border-2 p-2 text-white"
+            unoptimized={true}
           />
         </PrevButton>
         <div className=" text-white">Slide to see more</div>
@@ -89,6 +91,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
             width={5}
             height={5}
             className="border-light-900/15 bg-light-900/15 hover:bg-light-900/5 size-8 rounded-full border-2 p-2 text-white"
+            unoptimized={true}
           />
         </NextButton>
       </div>
