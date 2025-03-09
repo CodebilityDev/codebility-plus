@@ -110,6 +110,7 @@ const CodevCard = ({ codev, color }: Props) => {
               );
               e.currentTarget.src = "/assets/svgs/icon-codebility-black.svg";
             }}
+            unoptimized={true}
           />
           <AnimatePresence>
             {hovered && internalStatus && (
