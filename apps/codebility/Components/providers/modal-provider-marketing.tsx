@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import FaqsModal from "@/app/(marketing)/_components/marketing_modals/marketing-faqs-modal";
-import PrivacyPolicyModalHome from "@/app/(marketing)/_components/marketing_modals/marketing-privacy-policy-modal";
-import TermsAndConditionModal from "@/app/(marketing)/_components/marketing_modals/marketing-terms-and-condition-modal";
+import FaqsModal from "@/app/(marketing)/_components/marketing_modals/MarketingFaqsModal";
+import PrivacyPolicyModalHome from "@/app/(marketing)/_components/marketing_modals/MarketingPrivacyPolicyModal";
+import TermsAndConditionModal from "@/app/(marketing)/_components/marketing_modals/MarketingTermsAndConditionModal";
 import ContactUsModal from "@/Components/modals/ContactUsModal";
 
 import AvailableTimeModal from "../modals/AvailableTimeModal";

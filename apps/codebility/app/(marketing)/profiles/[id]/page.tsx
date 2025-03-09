@@ -17,7 +17,7 @@ import {
 } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 
-import ProfileCloseButton from "./_components/profile-close-button";
+import ProfileCloseButton from "./_components/ProfileCloseButton";
 
 interface Props {
   params: { id: string };
@@ -64,10 +64,12 @@ export default async function CodevBioPage({ params }: Props) {
         ? "Under NDA"
         : "Unavailable";
 
-  const sanitizeUrl = (url: string) =>
-    url
-      .replace("http://localhost:3000", "")
-      .replace("https://localhost:3000", "");
+  const sanitizeUrl = (url: string | undefined): string => {
+    if (!url) return "#";
+    return url
+      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL || "", "")
+      .replace(process.env.NEXT_PUBLIC_APP_BASE_URL || "", "");
+  };
 
   const getRandomBgColor = () => `bg-${getRandomColor()}`;
 
@@ -102,7 +104,7 @@ export default async function CodevBioPage({ params }: Props) {
                 </p>
               </div>
             </div>
-            <p className="text-md text-center capitalize lg:text-2xl">
+            <p className="text-md text-center capitalize lg:text-2xl ">
               {first_name || "Unknown"} {last_name || "Unknown"}
             </p>
             {display_position && (

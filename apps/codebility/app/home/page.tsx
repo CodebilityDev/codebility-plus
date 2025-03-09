@@ -3,14 +3,13 @@
 import H1 from "@/Components/shared/dashboard/H1";
 import { useUserStore } from "@/store/codev-store";
 
-import Profile from "./(dashboard)/_components/dashboard-profile";
-import TimeTracker from "./(dashboard)/_components/dashboard-time-tracker";
-import TokenPoints from "./(dashboard)/_components/dashboard-token-points";
-import WeeklyTop from "./(dashboard)/_components/dashboard-weekly-top";
+import Profile from "./(dashboard)/_components/DashboardProfile";
+import TimeTracker from "./(dashboard)/_components/DashboardTimeTracker";
+import TokenPoints from "./(dashboard)/_components/DashboardTokenPoints";
+import WeeklyTop from "./(dashboard)/_components/DashboardWeeklyTop";
 
 export default function DashboardPage() {
   const { user } = useUserStore();
-  console.log("user:", user);
 
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">

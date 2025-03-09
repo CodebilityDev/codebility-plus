@@ -8,13 +8,6 @@ type SettingsCardDataProps = {
 
 export const settingsCardData: SettingsCardDataProps[] = [
   {
-    path: "/home/settings/resume",
-    imageName: "icon-resume",
-    imageAlt: "Icon Resume",
-    title: "Resume",
-    description: "Review and manage your experience and contact info.",
-  },
-  {
     path: "/home/settings/roles",
     imageName: "icon-roles",
     imageAlt: "Icon Roles",
@@ -28,4 +21,11 @@ export const settingsCardData: SettingsCardDataProps[] = [
     title: "Permissions",
     description: "Setup a permission to roles.",
   },
+  {
+    path: "/home/settings/account-settings",
+    imageName: "icon-cog",
+    imageAlt: "Icon Account",
+    title: "Account Settings",
+    description: "Update your account information.",
+  }
 ];

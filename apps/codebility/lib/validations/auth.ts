@@ -17,22 +17,19 @@ export const SignUpValidation = z
       .min(1, "Phone number is required")
       .regex(/^[\d\s\+\-\(\)]+$/, "Please enter a valid phone number"),
 
-    years_of_experience: z
-      .string()
-      .transform((val) => (val ? Number(val) : 0))
-      .pipe(
-        z
-          .number()
-          .int("Must be a whole number")
-          .min(0, "Years must be 0 or greater")
-          .max(50, "Years must be 50 or less"),
-      ),
+    years_of_experience: z.preprocess(
+      (val) => (typeof val === "string" ? Number(val) : val),
+      z
+        .number()
+        .int("Must be a whole number")
+        .min(0, "Years must be 0 or greater")
+        .max(50, "Years must be 50 or less"),
+    ),
 
-    portfolio_website: z
-      .string()
-      .url("Must be a valid URL")
-      .optional()
-      .nullable(),
+    portfolio_website: z.union([
+      z.literal(""),
+      z.string().trim().url("Must be a valid URL"),
+    ]),
 
     // Changed from string to array to match DB
     tech_stacks: z
@@ -42,7 +39,7 @@ export const SignUpValidation = z
 
     // Changed from single position to array to match DB
     positions: z
-      .array(z.string())
+      .array(z.object({ id: z.number(), name: z.string() }))
       .min(1, "Please select at least one position")
       .default([]),
 
@@ -50,8 +47,14 @@ export const SignUpValidation = z
       .string()
       .url("Must be a valid URL")
       .min(1, "Facebook link is required"),
-    github: z.string().url("Must be a valid URL").optional().nullable(),
-    linkedin: z.string().url("Must be a valid URL").optional().nullable(),
+    github: z.union([
+      z.literal(""),
+      z.string().trim().url("Must be a valid URL"),
+    ]),
+    linkedin: z.union([
+      z.literal(""),
+      z.string().trim().url("Must be a valid URL"),
+    ]),
     discord: z.string().optional().nullable(),
 
     password: z

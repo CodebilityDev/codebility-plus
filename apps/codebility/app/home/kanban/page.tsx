@@ -17,7 +17,7 @@ import { IconKanban } from "@/public/assets/svgs";
 
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-import KanbanBoardsSearch from "./_components/kanban-boards-search";
+import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
 
 // Types
 interface SearchParams {
@@ -31,10 +31,17 @@ interface CodevData {
   image_url?: string | null;
 }
 
+interface ProjectMemberData {
+  codev?: CodevData;
+  role?: string;
+}
+
 interface ProjectData {
   id: string;
   name: string;
-  team_leader_id: string;
+  client_id?: string;
+  team_leader_id?: string;
+  project_members?: ProjectMemberData[];
   codev?: CodevData;
 }
 
@@ -44,6 +51,7 @@ interface KanbanBoardData {
   description?: string | null;
   created_at?: string;
   updated_at?: string;
+  project_id?: string;
   projects?: ProjectData | null;
 }
 
@@ -54,32 +62,62 @@ interface PageProps {
 export default async function KanbanPage({ searchParams }: PageProps) {
   const supabase = getSupabaseServerComponentClient();
 
+  // Construct the initial board query
   let boardQuery = supabase.from("kanban_boards").select(`
     id,
     name,
     description,
     created_at,
     updated_at,
-    projects!kanban_boards_project_id_fkey (
+    project_id,
+    projects (
       id,
       name,
-      codev!projects_team_leader_id_fkey (
-        id,
-        first_name,
-        last_name,
-        image_url
+      client_id,
+      project_members (
+        role,
+        codev (
+          id,
+          first_name,
+          last_name,
+          image_url
+          
+        )
       )
     )
   `);
 
+  // Apply search filter if query exists
   if (searchParams.query) {
     boardQuery = boardQuery.ilike("name", `%${searchParams.query}%`);
   }
 
+  // Execute the query
   const { data: boards, error } = await boardQuery;
   const typedBoards = boards as KanbanBoardData[] | null;
 
+  // Fetch team leads for each board
+  const boardsWithTeamLeads = (typedBoards || []).map((board) => {
+    if (board.projects?.project_members) {
+      // Find the team leader from project members
+      const teamLeader = board.projects.project_members.find(
+        (member) => member.role === "team_leader" && member.codev,
+      );
+
+      return {
+        ...board,
+        projects: {
+          ...board.projects,
+          codev: teamLeader?.codev || null,
+        },
+      };
+    }
+    return board;
+  });
+
+  // Render table content
   const renderTableContent = () => {
+    // Error handling
     if (error) {
       return (
         <TableRow>
@@ -90,6 +128,7 @@ export default async function KanbanPage({ searchParams }: PageProps) {
       );
     }
 
+    // Loading state
     if (!typedBoards) {
       return Array.from({ length: 3 }).map((_, index) => (
         <TableRow key={`loading-${index}`}>
@@ -104,6 +143,7 @@ export default async function KanbanPage({ searchParams }: PageProps) {
       ));
     }
 
+    // Empty state
     if (typedBoards.length === 0) {
       return (
         <TableRow>
@@ -117,21 +157,27 @@ export default async function KanbanPage({ searchParams }: PageProps) {
       );
     }
 
-    return typedBoards.map((board) => (
+    // Render boards
+    return boardsWithTeamLeads.map((board) => (
       <TableRow key={board.id} className="grid grid-cols-1 md:table-row">
+        {/* Board Name */}
         <TableCell className="md:table-cell">
-          <div className="flex flex-col">
+          <div className="text-dark100_light900 flex flex-col">
             <span className="font-medium">{board.name}</span>
             {board.description && (
-              <span className="text-sm text-gray-500">{board.description}</span>
+              <span className="text-sm">{board.description}</span>
             )}
           </div>
         </TableCell>
 
+        {/* Project Name */}
         <TableCell className="md:table-cell">
-          {board.projects?.name || "No project assigned"}
+          <span className="text-dark100_light900">
+            {board.projects?.name || "No project assigned"}
+          </span>
         </TableCell>
 
+        {/* Team Lead */}
         <TableCell className="md:table-cell">
           {board.projects?.codev ? (
             <div className="flex items-center gap-2">
@@ -142,7 +188,7 @@ export default async function KanbanPage({ searchParams }: PageProps) {
                   className="h-8 w-8 rounded-full object-cover"
                 />
               )}
-              <span className="capitalize">
+              <span className="text-dark100_light900 capitalize">
                 {`${board.projects.codev.first_name} ${board.projects.codev.last_name}`}
               </span>
             </div>
@@ -151,10 +197,11 @@ export default async function KanbanPage({ searchParams }: PageProps) {
           )}
         </TableCell>
 
+        {/* Actions */}
         <TableCell className="text-center md:table-cell">
           <Link href={`${pathsConfig.app.kanban}/${board.id}`}>
             <Button variant="hollow" className="inline-flex items-center gap-2">
-              <IconKanban className="h-4 w-4" />
+              <IconKanban className="invert-colors h-4 w-4" />
               <span className="hidden sm:inline">View Board</span>
             </Button>
           </Link>
@@ -163,6 +210,7 @@ export default async function KanbanPage({ searchParams }: PageProps) {
     ));
   };
 
+  // Render the full page
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">

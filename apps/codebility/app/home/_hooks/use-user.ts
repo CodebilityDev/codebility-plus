@@ -2,7 +2,7 @@
 
 import { useContext } from "react";
 
-import { UserContext } from "../_components/user-provider";
+import { UserContext } from "../_components/UserProvider";
 
 export default function useUser() {
   const user = useContext(UserContext);

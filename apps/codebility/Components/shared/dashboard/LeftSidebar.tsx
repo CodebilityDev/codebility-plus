@@ -5,25 +5,107 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getSidebarData, Sidebar, SidebarLink } from "@/constants/sidebar";
-import useAuthCookie from "@/hooks/use-cookie";
 import { useNavStore } from "@/hooks/use-sidebar";
+import { Roles } from "@/types/home/codev";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 const LeftSidebar = () => {
-  const { data: authData } = useAuthCookie();
-  const { userType } = authData || {};
+  const supabase = createClientComponentClient();
   const { isToggleOpen, toggleNav } = useNavStore();
   const pathname = usePathname();
 
   const [sidebarData, setSidebarData] = useState<Sidebar[]>([]);
+  const [userRole, setUserRole] = useState<Roles | null>(null);
 
   useEffect(() => {
-    const fetchSidebarData = async () => {
-      const data = await getSidebarData(userType?.id || null);
-      setSidebarData(data);
+    const fetchUserData = async () => {
+      try {
+        const {
+          data: { user },
+          error: authError,
+        } = await supabase.auth.getUser();
+
+        if (authError || !user) {
+          console.error("Auth error:", authError);
+          return;
+        }
+
+        // Get the user's role from the codev table
+        const { data: userData, error: roleError } = await supabase
+          .from("codev")
+          .select("role_id")
+          .eq("id", user.id)
+          .single();
+
+        if (roleError || !userData) {
+          console.error("Role fetch error:", roleError);
+          return;
+        }
+
+        // Get the complete role details including permissions
+        const { data: roleData, error: roleDetailsError } = await supabase
+          .from("roles")
+          .select(
+            `
+            id,
+            name,
+            orgchart,
+            settings,
+            resume,
+            services,
+            permissions,
+            roles,
+            projects,
+            clients,
+            inhouse,
+            applicants,
+            interns,
+            time_tracker,
+            kanban,
+            dashboard
+          `,
+          )
+          .eq("id", userData.role_id)
+          .single();
+
+        if (roleDetailsError || !roleData) {
+          console.error("Role details error:", roleDetailsError);
+          return;
+        }
+
+        setUserRole(roleData as Roles);
+
+        // Fetch sidebar data with the role
+        const sidebarItems = await getSidebarData(roleData.id);
+        setSidebarData(sidebarItems);
+      } catch (error) {
+        console.error("Unexpected error:", error);
+      }
     };
 
-    fetchSidebarData();
-  }, [userType]);
+    fetchUserData();
+
+    // Set up real-time subscription for role changes
+    const channel = supabase
+      .channel("role-changes")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "codev",
+          filter: `role_id=eq.${userRole?.id}`,
+        },
+        () => {
+          fetchUserData();
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [supabase]);
 
   return (
     <section className="background-navbar sticky left-0 top-0 z-20 flex h-screen flex-col gap-14 overflow-y-auto p-6 shadow-lg max-lg:hidden">
@@ -50,7 +132,7 @@ const LeftSidebar = () => {
         </div>
 
         <Image
-          onClick={() => toggleNav()}
+          onClick={toggleNav}
           src="/assets/svgs/icon-codebility.svg"
           width={30}
           height={40}
@@ -70,11 +152,17 @@ const LeftSidebar = () => {
               {item.links.map((link: SidebarLink) => {
                 const allowedRoutes = ["/settings", "/orgchart"];
                 const isAdminOrUser =
-                  userType?.name === "ADMIN" || userType?.name === "USER";
+                  userRole?.name === "ADMIN" || userRole?.name === "USER";
                 const isAllowedRoute =
                   isAdminOrUser && allowedRoutes.includes(link.route);
-                const accessRoutes =
-                  userType?.[link.permission] || isAllowedRoute;
+
+                // Check if the permission exists in the role
+                const hasPermission =
+                  link.permission && userRole
+                    ? (userRole[link.permission as keyof Roles] ?? false)
+                    : false;
+
+                const accessRoutes = hasPermission || isAllowedRoute;
                 const isActive =
                   (pathname.includes(link.route) && link.route.length > 1) ||
                   pathname === link.route;
@@ -103,6 +191,7 @@ const LeftSidebar = () => {
                     </Link>
                   );
                 }
+                return null;
               })}
             </div>
           </div>
@@ -111,4 +200,5 @@ const LeftSidebar = () => {
     </section>
   );
 };
+
 export default LeftSidebar;

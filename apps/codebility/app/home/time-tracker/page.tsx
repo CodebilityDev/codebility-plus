@@ -1,4 +1,4 @@
-import TimeTrackerTable from "@/app/home/time-tracker/_components/time-tracker-table";
+import TimeTrackerTable from "@/app/home/time-tracker/_components/TimeTrackerTable";
 import Box from "@/Components/shared/dashboard/Box";
 import H1 from "@/Components/shared/dashboard/H1";
 import { formatToLocaleTime } from "@/lib/format-date-time";
