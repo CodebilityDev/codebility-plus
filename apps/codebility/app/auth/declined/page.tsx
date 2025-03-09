@@ -6,8 +6,8 @@ import { useRouter } from "next/navigation";
 import Logo from "@/Components/shared/Logo";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
-import { DeclinedButtons } from "./_components/declined-buttons";
-import { DeclinedCountdown } from "./_components/declined-countdown";
+import { DeclinedButtons } from "./_components/DeclinedButtons";
+import { DeclinedCountdown } from "./_components/DeclinedCountdown";
 
 const DeclinedPage = () => {
   const [userData, setUserData] = useState(null);

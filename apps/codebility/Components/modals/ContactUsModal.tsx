@@ -7,8 +7,6 @@ import { Textarea } from "@/Components/ui/textarea-home";
 import { useModal } from "@/hooks/use-modal";
 import { contactUsValidation } from "@/lib/validations/contact-us";
 import { IconClose } from "@/public/assets/svgs";
-import { modals_ConactUS } from "@/types/components";
-import axios from "axios";
 
 import { Dialog, DialogContent, DialogFooter } from "@codevs/ui/dialog";
 import { Input } from "@codevs/ui/input";
@@ -19,7 +17,7 @@ const ContactUsModal = () => {
   const [email, setEmail] = useState("");
   const [telephone, setTelephone] = useState("");
   const [message, setMessage] = useState("");
-  const [validationErrors, setValidationErrors] = useState<modals_ConactUS>({
+  const [validationErrors, setValidationErrors] = useState({
     name: "",
     telephone: "",
     email: "",

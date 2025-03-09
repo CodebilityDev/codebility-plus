@@ -4,7 +4,7 @@ import {
   IconHuman,
 } from "@/public/assets/svgs";
 
-import InquiryForm from "./_components/contact-inquiry-inform";
+import InquiryForm from "./_components/ContactInquiryInform";
 
 // import ShortSurvey from "./_components/contact-short-survey"
 // import Appointment from "./_components/contact-appointment"

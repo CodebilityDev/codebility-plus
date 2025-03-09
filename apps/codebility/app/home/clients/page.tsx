@@ -2,18 +2,14 @@ import H1 from "@/Components/shared/dashboard/H1";
 import { getClients } from "@/lib/server/codev.service";
 import { Client } from "@/types/home/codev";
 
-import ClientButtons from "./_components/clients-button";
-import ClientCards from "./_components/clients-card";
+import ClientButtons from "./_components/ClientsButton";
+import ClientCards from "./_components/ClientsCard";
 
 export default async function Clients() {
-  // Fetch clients data
   const { data, error } = await getClients();
 
-  // If 'data' is nullish, fallback to an empty array
   let clients: Client[] = data ?? [];
 
-  // Sort so 'active' clients come first, and 'inactive' clients come last
-  // If you have more statuses, extend this logic
   clients.sort((a, b) => {
     if (a.status === b.status) return 0;
     if (a.status === "active") return -1;

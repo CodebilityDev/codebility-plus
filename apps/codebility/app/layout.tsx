@@ -26,17 +26,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={outfit.className}>
       <head>
-        {/* Set initial theme based on localStorage or system preference */}
         <script
           dangerouslySetInnerHTML={{
             __html: `
-            (function() {
-              const savedTheme = localStorage.getItem('theme');
-              const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-              const theme = savedTheme || (systemPrefersDark ? 'dark' : 'light');
-              document.documentElement.classList.add(theme);
-            })();
-          `,
+        (function() {
+          const savedTheme = localStorage.getItem('theme');
+          // Use dark as default if no theme is saved
+          const theme = savedTheme || 'dark';
+          document.documentElement.classList.add(theme);
+          if (!savedTheme) {
+            localStorage.setItem('theme', 'dark');
+          }
+        })();
+      `,
           }}
         />
       </head>

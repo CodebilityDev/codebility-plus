@@ -2,10 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
-import { Position, Project } from "@/types/home/codev";
+import { Project } from "@/types/home/codev";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Card } from "@codevs/ui/card";
+import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import {
   Select,
@@ -15,14 +16,20 @@ import {
   SelectValue,
 } from "@codevs/ui/select";
 
+interface Role {
+  id: number;
+  name: string;
+}
+
 interface TableFiltersProps {
   filters: {
     status: string;
-    position: string;
     project: string;
     internal_status: string;
     nda_status: string;
     display_position: string;
+    role: string;
+    search: string; // <-- search field
   };
   onFilterChange: (
     key: keyof TableFiltersProps["filters"],
@@ -32,59 +39,104 @@ interface TableFiltersProps {
 
 export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
   const [projects, setProjects] = useState<Project[]>([]);
-  const [positions, setPositions] = useState<Position[]>([]);
+  const [displayPositions, setDisplayPositions] = useState<string[]>([]);
+  const [roles, setRoles] = useState<Role[]>([]);
   const supabase = useSupabase();
 
   useEffect(() => {
     async function fetchProjects() {
       const { data, error } = await supabase
         .from("projects")
-        .select("id, name, start_date"); // Align with `Project` type
+        .select("id, name, start_date");
+
       if (error) {
         console.error("Failed to fetch projects:", error);
       } else if (data) {
         setProjects(
-          data.map((project) => ({
-            ...project,
-            start_date: project.start_date || "", // Ensure required fields have default values
+          data.map((proj) => ({
+            ...proj,
+            start_date: proj.start_date || "",
           })) as Project[],
         );
       }
     }
 
-    async function fetchPositions() {
+    async function fetchDisplayPositions() {
       const { data, error } = await supabase
-        .from("positions")
-        .select("id, name");
+        .from("codev")
+        .select("display_position");
+
       if (error) {
-        console.error("Failed to fetch positions:", error);
+        console.error("Failed to fetch display positions:", error);
       } else if (data) {
-        setPositions(
-          data.map((position) => ({
-            ...position,
-            name: position.name || "Unknown", // Ensure `name` is a string
-          })) as Position[],
-        );
+        const distinctPositions = Array.from(
+          new Set(
+            data
+              .map((row) => row.display_position)
+              .filter((pos) => pos !== null && pos !== ""),
+          ),
+        ) as string[];
+        setDisplayPositions(distinctPositions);
+      }
+    }
+
+    async function fetchRoles() {
+      const { data, error } = await supabase.from("roles").select("id, name");
+      if (error) {
+        console.error("Failed to fetch roles:", error);
+      } else if (data) {
+        setRoles(data as Role[]);
       }
     }
 
     fetchProjects();
-    fetchPositions();
+    fetchDisplayPositions();
+    fetchRoles();
   }, [supabase]);
 
   return (
-    <Card className="bg-light-300 dark:bg-dark-100 border-light-700 dark:border-dark-200 space-y-4 p-4">
+    <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 space-y-4 p-4">
+      <div className="max-w-[300px]">
+        <Label className="dark:text-light-900 text-black">Search</Label>
+        <Input
+          placeholder="Name, Email..."
+          value={filters.search}
+          onChange={(e) => onFilterChange("search", e.target.value)}
+          /**
+           * Replicate the same classes used by your SelectTrigger:
+           * Example: h-10, border, background, text color, etc.
+           */
+          className="
+              border-light-700 bg-light-800 dark:border-dark-200
+              dark:bg-dark-200 dark:text-light-900
+              h-10 w-full
+              rounded-md
+              border px-3
+              text-black
+              
+            "
+        />
+      </div>
       <div className="flex flex-wrap gap-4">
         {/* Status Filter */}
         <div className="min-w-[200px] space-y-2">
           <Label className="dark:text-light-900 text-black">Status</Label>
           <Select
             value={filters.status || "all"}
-            onValueChange={(value) =>
-              onFilterChange("status", value === "all" ? "" : value)
+            onValueChange={(val) =>
+              onFilterChange("status", val === "all" ? "" : val)
             }
           >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black">
+            <SelectTrigger
+              className="
+                border-light-700 bg-light-800 dark:border-dark-200
+                dark:bg-dark-200 dark:text-light-900
+                h-10 w-full
+                rounded-md
+                border px-3
+                text-black
+              "
+            >
               <SelectValue placeholder="Filter by status" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
@@ -98,26 +150,34 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           </Select>
         </div>
 
-        {/* Position Filter */}
+        {/* Display Position Filter */}
         <div className="min-w-[200px] space-y-2">
-          <Label className="dark:text-light-900 text-black">Position</Label>
+          <Label className="dark:text-light-900 text-black">
+            Display Position
+          </Label>
           <Select
-            value={filters.position || "all"}
-            onValueChange={(value) =>
-              onFilterChange("position", value === "all" ? "" : value)
+            value={filters.display_position || "all"}
+            onValueChange={(val) =>
+              onFilterChange("display_position", val === "all" ? "" : val)
             }
           >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black">
-              <SelectValue placeholder="Filter by position" />
+            <SelectTrigger
+              className="
+                border-light-700 bg-light-800 dark:border-dark-200
+                dark:bg-dark-200 dark:text-light-900
+                h-10 w-full
+                rounded-md
+                border px-3
+                text-black
+              "
+            >
+              <SelectValue placeholder="Filter by display position" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
-              <SelectItem value="all">All Positions</SelectItem>
-              {positions.map((position) => (
-                <SelectItem
-                  key={position.id.toString()}
-                  value={position.name || ""}
-                >
-                  {position.name}
+              <SelectItem value="all">All Display Positions</SelectItem>
+              {displayPositions.map((pos, i) => (
+                <SelectItem key={i} value={pos}>
+                  {pos}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -129,11 +189,20 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           <Label className="dark:text-light-900 text-black">Project</Label>
           <Select
             value={filters.project || "all"}
-            onValueChange={(value) =>
-              onFilterChange("project", value === "all" ? "" : value)
+            onValueChange={(val) =>
+              onFilterChange("project", val === "all" ? "" : val)
             }
           >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black">
+            <SelectTrigger
+              className="
+                border-light-700 bg-light-800 dark:border-dark-200
+                dark:bg-dark-200 dark:text-light-900
+                h-10 w-full
+                rounded-md
+                border px-3
+                text-black
+              "
+            >
               <SelectValue placeholder="Filter by project" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
@@ -152,11 +221,20 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           <Label className="dark:text-light-900 text-black">NDA Status</Label>
           <Select
             value={filters.nda_status || "all"}
-            onValueChange={(value) =>
-              onFilterChange("nda_status", value === "all" ? "" : value)
+            onValueChange={(val) =>
+              onFilterChange("nda_status", val === "all" ? "" : val)
             }
           >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black">
+            <SelectTrigger
+              className="
+                border-light-700 bg-light-800 dark:border-dark-200
+                dark:bg-dark-200 dark:text-light-900
+                h-10 w-full
+                rounded-md
+                border px-3
+                text-black
+              "
+            >
               <SelectValue placeholder="Filter by NDA status" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
@@ -167,28 +245,32 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           </Select>
         </div>
 
-        {/* Display Position Filter */}
+        {/* Role Filter */}
         <div className="min-w-[200px] space-y-2">
-          <Label className="dark:text-light-900 text-black">
-            Display Position
-          </Label>
+          <Label className="dark:text-light-900 text-black">Role</Label>
           <Select
-            value={filters.display_position || "all"}
-            onValueChange={(value) =>
-              onFilterChange("display_position", value === "all" ? "" : value)
+            value={filters.role || "all"}
+            onValueChange={(val) =>
+              onFilterChange("role", val === "all" ? "" : val)
             }
           >
-            <SelectTrigger className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black">
-              <SelectValue placeholder="Filter by display position" />
+            <SelectTrigger
+              className="
+                border-light-700 bg-light-800 dark:border-dark-200
+                dark:bg-dark-200 dark:text-light-900
+                h-10 w-full
+                rounded-md
+                border px-3
+                text-black
+              "
+            >
+              <SelectValue placeholder="Filter by role" />
             </SelectTrigger>
             <SelectContent className="bg-light-800 dark:bg-dark-200">
-              <SelectItem value="all">All Display Positions</SelectItem>
-              {positions.map((position) => (
-                <SelectItem
-                  key={position.id.toString()}
-                  value={position.name || ""}
-                >
-                  {position.name}
+              <SelectItem value="all">All Roles</SelectItem>
+              {roles.map((role) => (
+                <SelectItem key={role.id} value={String(role.id)}>
+                  {role.name}
                 </SelectItem>
               ))}
             </SelectContent>
