@@ -129,11 +129,7 @@ export default function CodevBadge({
         const hasError = badgeErrors[categoryId];
 
         return (
-          <div
-            key={categoryId}
-            className="group relative cursor-pointer"
-            title={`${category.name} - Level ${levelNumber}`}
-          >
+          <div key={categoryId} className="group relative cursor-pointer">
             {hasError ? (
               <FallbackBadge
                 categoryName={category.name}
