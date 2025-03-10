@@ -15,9 +15,9 @@ import {
   IconLogout,
   IconProfile,
 } from "@/public/assets/svgs";
+import applicationStatusIcon from "@/public/assets/svgs/icon-applicant.svg";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { ChevronDown, ChevronUp } from "lucide-react";
-import applicationStatusIcon from "@/public/assets/svgs/icon-applicant.svg";
 
 import {
   DropdownMenu,
@@ -146,6 +146,7 @@ const UserMenu = ({
             src={image_url || defaultAvatar}
             fill
             title={`${first_name}'s Avatar`}
+            unoptimized={true}
             className="rounded-full"
           />
         </div>
@@ -229,7 +230,6 @@ const Navigation = () => {
           }
 
           setUserData(userData);
-    
         } else {
           setUserData(null); // Ensure userData is cleared if no session
         }
