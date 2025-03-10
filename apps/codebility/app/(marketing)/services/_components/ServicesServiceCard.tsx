@@ -47,12 +47,13 @@ export default function ServiceCard({ service }: Props) {
       {/* Increased container height and gap */}
       <div
         className="relative h-48 w-full overflow-hidden rounded-lg"
-       /*  style={{ aspectRatio: "21/9", minHeight: "400px" }} */
+        /*  style={{ aspectRatio: "21/9", minHeight: "400px" }} */
       >
         <Image
           src={imageUrl}
           alt={name}
           fill
+          unoptimized={true}
           /* sizes="(min-width: 1024px) 960px, (min-width: 640px) 720px, 100vw" */
           className="absolute bg-center object-cover"
           priority
@@ -79,6 +80,7 @@ export default function ServiceCard({ service }: Props) {
                       src={team_leader.image_url}
                       alt={`${team_leader.first_name} ${team_leader.last_name}`}
                       fill
+                      unoptimized={true}
                       className="object-cover"
                     />
                   ) : (
@@ -106,6 +108,7 @@ export default function ServiceCard({ service }: Props) {
                             alt={`${member.first_name} ${member.last_name}`}
                             width={48}
                             height={48}
+                            unoptimized={true}
                             className="h-full w-full rounded-full object-cover"
                           />
                         </div>
