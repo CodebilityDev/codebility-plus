@@ -57,7 +57,7 @@ const CodevListFilter: React.FC<Props> = ({
                 <SelectItem
                   key={i}
                   value={position}
-                  className="cursor-pointer dark:text-red-100"
+                  className="cursor-pointer text-primary dark:text-white"
                 >
                   {position}
                 </SelectItem>
