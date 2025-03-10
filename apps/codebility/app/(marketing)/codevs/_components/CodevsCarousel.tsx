@@ -59,6 +59,7 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                   alt="Project Image"
                   width={1000}
                   height={500}
+                  unoptimized={true}
                   className={`${
                     index === activeIndex
                       ? "lg:h-[35rem]"

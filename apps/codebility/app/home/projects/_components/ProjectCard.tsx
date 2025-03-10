@@ -73,6 +73,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
           alt={`${project.name} image`}
           src={project.main_image || defaultAvatar}
           fill
+          unoptimized={true}
           className="object-cover"
           loading="eager"
           priority
@@ -119,6 +120,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
                     src={teamLead.image_url}
                     alt={`${teamLead.first_name} ${teamLead.last_name}`}
                     fill
+                    unoptimized={true}
                     className="rounded-full object-cover"
                   />
                 ) : (
@@ -155,6 +157,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
                         src={member.image_url}
                         alt={`${member.first_name} ${member.last_name}`}
                         fill
+                        unoptimized={true}
                         className="rounded-full object-cover"
                       />
                     ) : (

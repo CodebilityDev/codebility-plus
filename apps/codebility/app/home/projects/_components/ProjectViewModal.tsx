@@ -98,6 +98,7 @@ const ProjectViewModal = () => {
                   src={data.main_image}
                   alt={data?.name || "Project Image"}
                   fill
+                  unoptimized={true}
                   className="rounded-lg object-cover"
                   priority
                 />
@@ -221,6 +222,7 @@ const ProjectViewModal = () => {
                             src={teamLead.image_url}
                             alt={`${teamLead.first_name} ${teamLead.last_name}`}
                             fill
+                            unoptimized={true}
                             className="rounded-full object-cover"
                           />
                         </div>
@@ -255,6 +257,7 @@ const ProjectViewModal = () => {
                                 src={member.image_url}
                                 alt={`${member.first_name} ${member.last_name}`}
                                 fill
+                                unoptimized={true}
                                 className="rounded-full object-cover"
                               />
                             </div>
