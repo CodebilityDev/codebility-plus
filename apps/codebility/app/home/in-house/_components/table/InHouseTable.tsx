@@ -7,7 +7,6 @@ import { Codev, InternalStatus } from "@/types/home/codev";
 import { Link2 } from "lucide-react";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
-
 import {
   Table,
   TableBody,
@@ -125,6 +124,7 @@ export function InHouseTable({
                         alt={`${item.first_name} avatar`}
                         width={40}
                         height={40}
+                        unoptimized={true}
                         className="h-full w-full object-cover"
                       />
                     </div>
