@@ -41,7 +41,7 @@ export const ImageUpload = ({ onChange, value, error }: ImageUploadProps) => {
         onClick={handleClick}
         className={cn(
           "relative h-24 w-24 cursor-pointer rounded-full",
-          "border-2 border-dashed",
+          "border-full border-2",
           error ? "border-red-400" : "border-darkgray",
           "transition-all hover:opacity-80",
         )}
