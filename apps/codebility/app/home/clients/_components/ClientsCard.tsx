@@ -148,6 +148,7 @@ export default function ClientCards({ clients }: Props) {
                           fill
                           loading="eager"
                           priority
+                          unoptimized={true}
                           className="h-auto w-auto rounded-full bg-cover object-cover"
                         />
                       ) : (
