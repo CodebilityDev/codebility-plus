@@ -32,7 +32,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 import { StatusBadge } from "../../in-house/_components/shared/StatusBadge";
 import SkillPoints from "./SkillPoints";
 
-const ProfileModal = ({ user }: { user: Codev | null }) => {
+const ProfileModal = ({ user }: { user?: Codev | null }) => {
   const { isOpen, type, onClose, data } = useModal();
   const isModalOpen = isOpen && type === "profileModal";
   const codev = data as Codev;
