@@ -46,7 +46,6 @@ export default function DashboardProfile() {
     setActiveLoading(true);
 
     try {
-
       await updateUserAvailabilityStatus({
         userId: user?.id,
         status: !active,
@@ -75,6 +74,7 @@ export default function DashboardProfile() {
               width={100}
               height={100}
               title={`${user?.first_name}'s Avatar`}
+              unoptimized={true}
               className="from-violet h-[100px] w-[100px] rounded-lg bg-gradient-to-b to-blue-500 bg-cover object-cover"
             />
             <p className="text-md">{user?.display_position}</p>
