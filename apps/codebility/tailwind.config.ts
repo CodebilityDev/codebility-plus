@@ -55,7 +55,7 @@ const config: Config = {
         laptop: { max: "1024px" },
         desktop: { max: "1280px" },
         xl3: { min: "1600px" },
-        mobile:{ min: "300px", max: "639px" },
+        mobile: { min: "300px", max: "639px" },
       },
       boxShadow: {
         stiglitz:
