@@ -11,7 +11,19 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import Link from "next/link";
+import { startOfMonth, startOfWeek, subDays } from "date-fns";
+import { Skeleton } from "@codevs/ui/skeleton";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@codevs/ui/select";
+import { Tabs, TabsList, TabsTrigger } from "@codevs/ui/tabs";
+
+type TimePeriod = "all" | "weekly" | "monthly";
 
 interface TopCodev {
   points: number;
@@ -23,24 +35,100 @@ interface TopCodev {
   } | null;
 }
 
+interface CategoryData {
+  [key: string]: TopCodev[];
+}
+
+const LoadingTable = () => {
+  return (
+    <Table>
+      <TableHeader className="bg-[#1e1f26]">
+        <TableRow>
+          <TableHead>Rank</TableHead>
+          <TableHead>Name</TableHead>
+          <TableHead>Points</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {[...Array(10)].map((_, index) => (
+          <TableRow key={index} className={getRowStyle(index + 1)}>
+            <TableCell>{index + 1}</TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-24" />
+            </TableCell>
+            <TableCell>
+              <Skeleton className="h-4 w-12" />
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+};
+
 export default function WeeklyTop() {
-  const [topCodevs, setTopCodevs] = useState<TopCodev[]>([]);
+  const [categoryData, setCategoryData] = useState<CategoryData>({});
+  const [allCategories, setAllCategories] = useState<string[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<string>("");
+  const [timePeriod, setTimePeriod] = useState<TimePeriod>("all");
+  const [isLoading, setIsLoading] = useState(true);
   const supabase = createClientComponentClient();
 
   useEffect(() => {
-    const fetchTopCodevs = async () => {
+    const fetchCategories = async () => {
       try {
         const { data, error } = await supabase
+          .from("skill_category")
+          .select("name")
+          .order("name");
+
+        if (error) {
+          console.error("Error fetching categories:", error);
+          return;
+        }
+
+        if (data) {
+          const categories = data.map((cat) => cat.name);
+          setAllCategories(categories);
+          if (!selectedCategory && categories.length > 0) {
+            setSelectedCategory(categories[0]);
+          }
+        }
+      } catch (error) {
+        console.error("Error in fetchCategories:", error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  useEffect(() => {
+    const fetchTopCodevs = async () => {
+      setIsLoading(true);
+      try {
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        let query = supabase
           .from("codev_points")
           .select(
             `
             points,
             codev:codev_id!inner(first_name),
-            skill_category:skill_category_id!inner(name)
+            skill_category:skill_category_id!inner(name),
+            created_at
           `,
           )
-          .order("points", { ascending: false })
-          .limit(10);
+          .order("points", { ascending: false });
+
+        if (timePeriod === "weekly") {
+          const weekStart = startOfWeek(new Date());
+          query = query.gte("created_at", weekStart.toISOString());
+        } else if (timePeriod === "monthly") {
+          const monthStart = startOfMonth(new Date());
+          query = query.gte("created_at", monthStart.toISOString());
+        }
+
+        const { data, error } = await query;
 
         if (error) {
           console.error("Error fetching top codevs:", error);
@@ -48,61 +136,129 @@ export default function WeeklyTop() {
         }
 
         if (data) {
-          // Transform the data to match our interface
-          const transformedData: TopCodev[] = data.map((item: any) => ({
-            points: item.points,
-            codev: item.codev ? { first_name: item.codev.first_name } : null,
-            skill_category: item.skill_category
-              ? { name: item.skill_category.name }
-              : null,
-          }));
+          const groupedData: CategoryData = {};
 
-          // Remove any items with null values
-          const validData = transformedData.filter(
-            (item) => item.codev && item.skill_category,
-          );
+          allCategories.forEach((category) => {
+            groupedData[category] = [];
+          });
 
-          setTopCodevs(validData);
+          data.forEach((item: any) => {
+            const category = item.skill_category?.name || "Uncategorized";
+            if (groupedData[category] && groupedData[category].length < 10) {
+              groupedData[category].push({
+                points: item.points,
+                codev: item.codev,
+                skill_category: item.skill_category,
+              });
+            }
+          });
+
+          setCategoryData(groupedData);
         }
       } catch (error) {
         console.error("Error in fetchTopCodevs:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchTopCodevs();
-  }, [supabase]);
+  }, [supabase, timePeriod, allCategories]);
+
+  const generateTableRows = (category: string) => {
+    const rows = [];
+    for (let i = 0; i < 10; i++) {
+      const data = categoryData[category]?.[i];
+      rows.push(
+        <TableRow key={i} className={getRowStyle(i + 1)}>
+          <TableCell>{i + 1}</TableCell>
+          <TableCell>
+            {data && data.points > 0
+              ? data.codev?.first_name || "Unknown"
+              : "-"}
+          </TableCell>
+          <TableCell>{data?.points || 0}</TableCell>
+        </TableRow>,
+      );
+    }
+    return rows;
+  };
+
+  const getCategoryInitial = (category: string): string => {
+    switch (category) {
+      case "UI/UX Designer":
+        return "UI/UX";
+      case "Backend Developer":
+        return "BE";
+      case "Mobile Developer":
+        return "MD";
+      case "QA Engineer":
+        return "QA";
+      case "Frontend Developer":
+        return "FE";
+      default:
+        return category.substring(0, 2);
+    }
+  };
 
   return (
     <Box>
       <div className="flex flex-col gap-6">
-      <div className="flex">
-        <p className="text-2xl">Weekly Top 10</p>
-        <Link href="home/categories" className="ml-auto items-center my-auto px-4 py-2 border-2 dark:bg-[#1e1f26] hover:bg-[#2a2b33] hover:text-light-900 rounded-md transition-colors">
-          View All
-        </Link>
-      </div>
-        <Table>
-          <TableHeader className="bg-[#1e1f26]">
-            <TableRow>
-              <TableHead>Rank</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Category</TableHead>
-              <TableHead>Points</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {topCodevs.map((top, index) => (
-              <TableRow key={index} className={getRowStyle(index + 1)}>
-                <TableCell>{index + 1}</TableCell>
-                <TableCell>{top.codev?.first_name || "Unknown"}</TableCell>
-                <TableCell>
-                  {top.skill_category?.name || "Uncategorized"}
-                </TableCell>
-                <TableCell>{top.points}</TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+        <div className="flex items-center justify-between">
+          <p className="text-2xl">Leaderboard</p>
+        </div>
+        <div className="flex gap-4">
+          <Select
+            value={timePeriod}
+            onValueChange={(value: TimePeriod) => setTimePeriod(value)}
+          >
+            <SelectTrigger className="w-[120px]">
+              <SelectValue placeholder="Time period" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Time</SelectItem>
+              <SelectItem value="weekly">Weekly</SelectItem>
+              <SelectItem value="monthly">Monthly</SelectItem>
+            </SelectContent>
+          </Select>
+          <Tabs
+            value={selectedCategory}
+            onValueChange={setSelectedCategory}
+            className="w-fit"
+          >
+            <TabsList className="grid h-10 grid-cols-5">
+              {allCategories.map((category) => (
+                <TabsTrigger
+                  key={category}
+                  value={category}
+                  className="px-3 data-[state=active]:bg-[#1e1f26]"
+                  title={category}
+                >
+                  {getCategoryInitial(category)}
+                </TabsTrigger>
+              ))}
+            </TabsList>
+          </Tabs>
+        </div>
+
+        {selectedCategory && (
+          <>
+            {isLoading ? (
+              <LoadingTable />
+            ) : (
+              <Table>
+                <TableHeader className="bg-[#1e1f26]">
+                  <TableRow>
+                    <TableHead>Rank</TableHead>
+                    <TableHead>Name</TableHead>
+                    <TableHead>Points</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>{generateTableRows(selectedCategory)}</TableBody>
+              </Table>
+            )}
+          </>
+        )}
       </div>
     </Box>
   );
