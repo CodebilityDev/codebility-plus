@@ -93,7 +93,6 @@ const CodevCard = ({ codev, color }: Props) => {
         <div className="relative">
           <Image
             alt={`${codev.first_name} Avatar`}
-            unoptimized={true}
             src={
               codev.image_url &&
               (codev.image_url.startsWith("http") ||
