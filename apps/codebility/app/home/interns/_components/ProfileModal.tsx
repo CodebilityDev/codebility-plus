@@ -160,14 +160,6 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
             </div>
 
             <div className="mobile:flex-col-reverse absolute right-4 top-12 flex items-center gap-4">
-              {/* status switch */}
-              {user?.id === codev.id && (
-                <SwitchStatusButton
-                  isActive={codev.availability_status || false}
-                  handleSwitch={() => {}}
-                  disabled
-                />
-              )}
               <div>
                 {codev.availability_status ? (
                   <div className="bg-green rounded px-2 py-1 text-xs">
