@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import Link from "next/link";
 
 interface TopCodev {
   points: number;
@@ -74,7 +75,12 @@ export default function WeeklyTop() {
   return (
     <Box>
       <div className="flex flex-col gap-6">
+      <div className="flex">
         <p className="text-2xl">Weekly Top 10</p>
+        <Link href="home/categories" className="ml-auto items-center my-auto px-4 py-2 border-2 dark:bg-[#1e1f26] hover:bg-[#2a2b33] hover:text-light-900 rounded-md transition-colors">
+          View All
+        </Link>
+      </div>
         <Table>
           <TableHeader className="bg-[#1e1f26]">
             <TableRow>
