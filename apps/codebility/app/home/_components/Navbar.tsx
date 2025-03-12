@@ -66,6 +66,7 @@ const Navbar = () => {
                   alt="Avatar"
                   src={image_url || defaultAvatar}
                   fill
+                  unoptimized={true}
                   className="h-auto w-full rounded-full object-cover"
                   title={`${first_name}'s Avatar`}
                 />
