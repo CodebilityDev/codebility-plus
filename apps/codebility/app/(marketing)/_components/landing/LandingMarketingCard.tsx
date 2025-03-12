@@ -32,7 +32,7 @@ const MarketingCard: React.FC<MarketingCardProps> = ({
                 width={15}
                 height={15}
                 alt="arrow up"
-                unoptimized
+                unoptimized={true}
               />
             </span>
           </div>
