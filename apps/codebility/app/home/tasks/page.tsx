@@ -31,7 +31,6 @@ export default function TaskPage() {
             id,
             title,
             description,
-            status,
             priority,
             difficulty,
             type,
@@ -84,10 +83,16 @@ export default function TaskPage() {
             };
           }
 
-          // If project is an array, grab the first element
-          const project = Array.isArray(board.project)
-            ? board.project[0]
-            : board.project;
+          // Safely check if board has project property
+          const hasProject =
+            board && typeof board === "object" && "project" in board;
+
+          // If it has project property, normalize it
+          const project = hasProject
+            ? Array.isArray(board.project)
+              ? board.project[0]
+              : board.project
+            : undefined;
 
           return {
             ...task,
