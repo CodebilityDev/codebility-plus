@@ -13,8 +13,8 @@ const outfit = Outfit({
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
-    title: "Your App",
-    description: "Your app description here",
+    title: "Codebility",
+    description: "Everyone has the ability to code",
   };
 }
 
