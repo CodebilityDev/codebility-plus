@@ -8,17 +8,23 @@ export const config = {
 };
 
 const PUBLIC_ROUTES = [
-  "/auth/verify",
-  "/auth/waiting",
-  "/auth/declined",
   "/privacy-policy",
   "/terms",
   "/auth/password-reset",
   "/codevs",
+  "/services",
   "/",
 ] as const;
 
+// Routes that should be public with wildcard support (e.g., /profiles/*)
+const PUBLIC_ROUTE_PREFIXES = ["/profiles/"] as const;
+
 const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up"] as const;
+
+// Authentication status routes
+const EMAIL_VERIFICATION_ROUTE = "/auth/verify";
+const WAITING_APPROVAL_ROUTE = "/auth/waiting";
+const APPLICATION_DECLINED_ROUTE = "/auth/declined";
 
 const routePermissionMap: Record<string, keyof RolePermissions> = {
   "/home/interns": "interns",
@@ -52,36 +58,73 @@ type RolePermissions = {
 export async function middleware(req: NextRequest) {
   try {
     const { pathname } = req.nextUrl;
-    const supabase = getSupabaseServerComponentClient();
 
-    // Check auth status
+    // 1. Check if the route is public - allow access without any auth checks
+    if (PUBLIC_ROUTES.includes(pathname as any)) {
+      return NextResponse.next();
+    }
+
+    // Check for wildcard public routes (e.g., /profiles/*)
+    const isPublicPrefix = PUBLIC_ROUTE_PREFIXES.some((prefix) =>
+      pathname.startsWith(prefix),
+    );
+
+    if (isPublicPrefix) {
+      return NextResponse.next();
+    }
+
+    // 2. Special handling for auth routes
+    if (AUTH_ROUTES.includes(pathname as any)) {
+      // We need to check if user is logged in, but handle "no token" gracefully
+      const supabase = getSupabaseServerComponentClient();
+      const {
+        data: { user },
+        error,
+      } = await supabase.auth.getUser();
+
+      // If error is related to missing refresh token, ignore it for auth routes
+      if (user) {
+        // Redirect to home if user is already logged in
+        return redirectTo(req, "/home");
+      }
+
+      // Allow access to auth pages if not logged in, regardless of error
+      return NextResponse.next();
+    }
+
+    // From this point on, we need authenticated users
+    const supabase = getSupabaseServerComponentClient();
     const {
       data: { user },
       error: authError,
     } = await supabase.auth.getUser();
 
-    // Special handling for auth routes
-    if (AUTH_ROUTES.includes(pathname as any)) {
-      if (user) {
-        // Redirect to home if user is already logged in
-        return redirectTo(req, "/home");
-      }
-      // Allow access to auth pages if not logged in
+    // Handle email verification route separately
+    if (pathname === EMAIL_VERIFICATION_ROUTE) {
+      // Allow access to verification page regardless of auth status
       return NextResponse.next();
     }
 
-    // Allow access to public routes
-    if (PUBLIC_ROUTES.includes(pathname as any)) {
-      return NextResponse.next();
-    }
-
-    // Handle non-authenticated users
+    // Handle non-authenticated users for protected routes
     if (authError || !user) {
-      // Store the original URL for later redirect
       return redirectToLogin(req);
     }
 
-    // Fetch user data
+    // Check if email is verified
+    const {
+      data: { user: authUser },
+      error: verificationError,
+    } = await supabase.auth.getUser();
+
+    if (
+      !authUser?.email_confirmed_at &&
+      pathname !== EMAIL_VERIFICATION_ROUTE
+    ) {
+      // If email not verified, redirect to verification page
+      return redirectTo(req, EMAIL_VERIFICATION_ROUTE);
+    }
+
+    // 3. Fetch user data now that we know the user is authenticated
     const { data: userData, error: userError } = await supabase
       .from("codev")
       .select("id, application_status, role_id")
@@ -95,24 +138,40 @@ export async function middleware(req: NextRequest) {
 
     const { application_status, role_id } = userData;
 
-    // Handle application status redirects
-    if (application_status === "passed" && pathname.startsWith("/auth/")) {
-      return redirectTo(req, "/codevs");
-    }
-    if (
-      application_status === "failed" &&
-      ["/home", "/auth/waiting", "/auth/verify"].includes(pathname)
+    // 4. Handle application status redirects
+    if (application_status === "passed") {
+      // If user is approved, they shouldn't access application-related routes
+      if (
+        [
+          WAITING_APPROVAL_ROUTE,
+          APPLICATION_DECLINED_ROUTE,
+          EMAIL_VERIFICATION_ROUTE,
+        ].includes(pathname)
+      ) {
+        return redirectTo(req, "/home");
+      }
+    } else if (application_status === "failed") {
+      // If application is rejected, only allow access to declined page
+      if (pathname !== APPLICATION_DECLINED_ROUTE) {
+        return redirectTo(req, APPLICATION_DECLINED_ROUTE);
+      } else {
+        return NextResponse.next();
+      }
+    } else if (
+      application_status === "applying" ||
+      application_status === "pending"
     ) {
-      return redirectTo(req, "/auth/declined");
-    }
-    if (
-      application_status === "applying" &&
-      ["/home", "/auth/declined", "/auth/verify"].includes(pathname)
-    ) {
-      return redirectTo(req, "/auth/waiting");
+      // If application is pending, only allow access to waiting page
+      if (pathname !== WAITING_APPROVAL_ROUTE) {
+        return redirectTo(req, WAITING_APPROVAL_ROUTE);
+      } else {
+        return NextResponse.next();
+      }
     }
 
-    // Check route permissions
+    // If we reach here, the user is approved and accessing a protected route
+
+    // 5. Check role-based permissions for protected routes
     const sortedRouteKeys = Object.keys(routePermissionMap).sort(
       (a, b) => b.length - a.length,
     );
@@ -172,6 +231,7 @@ export async function middleware(req: NextRequest) {
       }
     }
 
+    // All checks passed, allow access to the requested route
     return NextResponse.next();
   } catch (error) {
     console.error("Middleware error:", error);
