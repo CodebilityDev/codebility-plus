@@ -28,9 +28,8 @@ export default async function ProjectSection() {
   const { data: activeProjects, error } = await supabase
     .from("projects")
     .select("id, name, description, main_image, status")
+    .eq("status", "active") // Add filter for active projects
     .order("created_at", { ascending: false });
-
-  // Log first few projects to check their structure
 
   const OPTIONS: EmblaOptionsType = {
     loop: true,
@@ -38,29 +37,31 @@ export default async function ProjectSection() {
     containScroll: "trimSnaps",
   };
 
-  // Process the main_image URLs and log the process
+  // Process the main_image URLs and create slides array
   const slides = [];
-  if (activeProjects) {
+  const projectsWithImages = [];
+
+  if (activeProjects && activeProjects.length > 0) {
     for (const project of activeProjects) {
       if (project.main_image) {
         let imageUrl = project.main_image;
 
-        // Check if URL needs to be transformed
+        // Transform URL if needed
         if (imageUrl.startsWith("public")) {
           imageUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/services-image/${imageUrl}`;
-          console.log(`Transformed URL for ${project.name}: ${imageUrl}`);
-        } else {
-          console.log(`Using original URL for ${project.name}: ${imageUrl}`);
         }
 
+        // Store both the image URL and project data
+        projectsWithImages.push({
+          ...project,
+          imageUrl,
+        });
+
+        // Add to slides for the carousel
         slides.push(imageUrl);
-      } else {
-        console.log(`No main_image for project: ${project.name}`);
       }
     }
   }
-
-  console.log("Final slides count:", slides.length);
 
   if (error) {
     console.error("Error loading projects:", error);
