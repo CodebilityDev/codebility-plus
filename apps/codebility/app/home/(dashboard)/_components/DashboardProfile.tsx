@@ -16,12 +16,13 @@ import {
   fetchUserAvailabilityStatus,
   updateUserAvailabilityStatus,
 } from "../actions";
+import DashboardCurrentProject from "./DashboardCurrentProject";
 
 export default function DashboardProfile() {
   const { user } = useUserStore();
   const isLoading = !user;
 
-  const [active, setActive] = useState<boolean>(false);
+  const [active, setActive] = useState<boolean | null>(null);
   const [activeloading, setActiveLoading] = useState<boolean>(false);
 
   useEffect(() => {
@@ -30,7 +31,6 @@ export default function DashboardProfile() {
     const fetchStatus = async () => {
       try {
         const res = await fetchUserAvailabilityStatus(user?.id);
-
         setActive(res);
       } catch (error) {
         console.error(error);
@@ -82,21 +82,26 @@ export default function DashboardProfile() {
             <Badges />
           </div>
 
-          {/* status switch */}
-          <div
-            className="absolute right-4 top-4 flex items-center justify-center gap-2
-          lg:flex-col-reverse xl:flex-row
-          "
-          >
-            <Badge className={cn(active ? "bg-green" : "bg-red-500")}>
-              {active ? "Active" : "Inactive"}
-            </Badge>
+          {/* current project */}
+          <DashboardCurrentProject />
 
-            <SwitchStatusButton
-              isActive={active}
-              disabled={activeloading}
-              handleSwitch={handleStatusSwitch}
-            />
+          {/* status switch */}
+          <div className="w-1/3 absolute right-4 top-4 flex flex-col items-center justify-center gap-2 lg:flex-col-reverse xl:flex-col">
+            {active !== null && (
+              <div className="flex gap-2 ml-auto">
+                <Badge className={cn(active ? "bg-green" : "bg-red-500")}>
+                  {active ? "Active" : "Inactive"}
+                </Badge>
+
+                <SwitchStatusButton
+                  isActive={active}
+                  disabled={activeloading}
+                  handleSwitch={handleStatusSwitch}
+                />
+              </div>
+            )}
+            
+        
           </div>
         </Box>
       ) : (
