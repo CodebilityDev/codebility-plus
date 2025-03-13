@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { revalidatePath } from "next/cache";
 import { Task } from "@/types/home/codev";
@@ -35,8 +35,6 @@ export const updateTaskColumnId = async (
   }
 };
 
-
-
 export const fetchAvailableMembers = async (
   boardId: string,
 ): Promise<CodevMember[]> => {
@@ -61,7 +59,10 @@ export const fetchAvailableMembers = async (
     .eq("project_id", board.project_id);
 
   if (projectMembersError || !projectMembers?.length) {
-    console.error("Error fetching project members:", projectMembersError?.message);
+    console.error(
+      "Error fetching project members:",
+      projectMembersError?.message,
+    );
     return [];
   }
 
@@ -89,7 +90,9 @@ export const fetchAvailableMembers = async (
     if (codevError) {
       console.error("Error fetching project members:", codevError.message);
     } else {
-      members = codevMembers.filter((member) => member.availability_status === true);
+      members = codevMembers.filter(
+        (member) => member.availability_status === true,
+      );
     }
   }
 
@@ -470,7 +473,10 @@ export const completeTask = async (
     if (existingPoints) {
       const { error: updateError } = await supabase
         .from("codev_points")
-        .update({ points: newPoints })
+        .update({
+          points: newPoints,
+          updated_at: new Date().toISOString(),
+        })
         .eq("id", existingPoints.id);
 
       if (updateError) throw updateError;
@@ -481,6 +487,8 @@ export const completeTask = async (
           codev_id: task.codev?.id,
           skill_category_id: task.skill_category?.id,
           points: taskPoints,
+          updated_at: new Date().toISOString(),
+          created_at: new Date().toISOString(),
         });
 
       if (insertError) throw insertError;
@@ -508,6 +516,7 @@ export const completeTask = async (
             .from("codev_points")
             .update({
               points: sidekickExistingPoints.points + sidekickPoints,
+              updated_at: new Date().toISOString(),
             })
             .eq("id", sidekickExistingPoints.id);
 
@@ -519,6 +528,8 @@ export const completeTask = async (
               codev_id: sidekickId,
               skill_category_id: task.skill_category?.id,
               points: sidekickPoints,
+              updated_at: new Date().toISOString(),
+              created_at: new Date().toISOString(),
             });
 
           if (insertError) throw insertError;
@@ -546,8 +557,6 @@ export const completeTask = async (
     };
   }
 };
-
-
 
 export async function batchUpdateTasks(
   updates: Array<{ taskId: string; newColumnId: string }>,
@@ -606,4 +615,3 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
     };
   }
 }
-
