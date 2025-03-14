@@ -4,8 +4,9 @@ import { useMemo } from "react";
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
-import { Codev, CodevPoints } from "@/types/home/codev";
+import { Codev } from "@/types/home/codev";
 
+import { prioritizeCodevs } from "../_lib/codevpriority";
 import CodevCard from "./CodevCard";
 
 interface CodevListProps {
@@ -18,8 +19,10 @@ interface CodevListProps {
 }
 
 export default function CodevList({ data, filters }: CodevListProps) {
+  const prioritizedCodevs = useMemo(() => prioritizeCodevs(data), [data]);
+
   const filteredCodevs = useMemo(() => {
-    return data.filter((codev) => {
+    return prioritizedCodevs.filter((codev) => {
       const matchesPosition =
         filters.positions.length === 0 ||
         filters.positions.includes(codev.display_position || "");
@@ -39,7 +42,7 @@ export default function CodevList({ data, filters }: CodevListProps) {
 
       return matchesPosition && matchesAvailability && matchesProject;
     });
-  }, [data, filters]);
+  }, [prioritizedCodevs, filters]);
 
   const {
     currentPage,
