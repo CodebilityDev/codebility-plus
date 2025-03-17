@@ -13,9 +13,9 @@ const Codevs = () => {
     <div className="bg-black-400 relative flex w-full flex-col">
       <Navigation />
       <Hero />
+      <Profiles />
       <FeaturedSection />
       <Project />
-      <Profiles />
       <Roadmap />
       <MissionVision />
       <CTA />
