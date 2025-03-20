@@ -14,6 +14,7 @@ export default async function CTA() {
         width={100}
         height={100}
         className="z-10 h-[200px] w-[200px] object-contain"
+        unoptimized={true}
       />
       <H2 className="text-primaryColor capitalize">
         Become A <span className="text-violet-300">Codev!</span>
