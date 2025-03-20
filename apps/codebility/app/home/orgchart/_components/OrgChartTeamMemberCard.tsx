@@ -6,16 +6,13 @@ import { Card, CardContent } from "@codevs/ui/card";
 import { TeamMemberCardProps } from "../_types/org-chart";
 
 export const TeamMemberCard = ({
-  profile_id,
+  first_name,
+  last_name,
+  display_position,
+  image_url,
 }: TeamMemberCardProps) => {
-  if (!profile_id) {
-    return null;
-  }
-
-  const { first_name, last_name, main_position, image_url } = profile_id;
-
   return (
-    <Card className="w-48 shadow-lg">
+    <Card className="dark:bg-black-200 h-48 w-52 shadow-lg">
       <CardContent className="flex flex-col items-center gap-2 p-4">
         <Image
           src={image_url || defaultAvatar}
@@ -23,12 +20,13 @@ export const TeamMemberCard = ({
           width={80}
           height={80}
           priority
-          className="rounded-full object-cover"
+          className="h-20 w-20 rounded-full object-cover"
         />
         <h3 className="text-center font-semibold capitalize">{`${first_name} ${last_name}`}</h3>
         <p className="text-center text-sm text-muted-foreground">
-          {main_position}
+          {display_position}
         </p>
       </CardContent>
     </Card>
-  )}
+  );
+};
