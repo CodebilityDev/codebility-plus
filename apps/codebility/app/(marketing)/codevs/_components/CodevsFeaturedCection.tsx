@@ -24,8 +24,8 @@ const outfit = Outfit({
 
 const FeaturedSection = () => {
   return (
-    <SectionWrapper id="whoweare" className="relative">
-      <div className="relative flex flex-col gap-8">
+    <SectionWrapper id="whoweare" className="relative ">
+      <div className="relative flex flex-col gap-4 ">
         <div className="flex flex-col">
           <motion.div
             variants={fadeInOutDownToUp}
@@ -58,7 +58,7 @@ const FeaturedSection = () => {
             />
           ))}
         </div>
-        <Link href="#roadmap" className="mx-auto mt-20">
+        <Link href="#roadmap" className="mx-auto mt-10">
           <Button variant="purple" size="lg" rounded="full">
             See how we started
           </Button>
