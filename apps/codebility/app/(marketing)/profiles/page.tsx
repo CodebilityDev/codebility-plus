@@ -80,7 +80,7 @@ export default async function Profiles() {
   return (
     <SectionWrapper
       id="codevs"
-      className="from-black-500 relative w-full bg-gradient-to-b"
+      className="from-black-500 relative w-full  bg-gradient-to-b"
     >
       <div className="bg-code-pattern absolute inset-0 bg-repeat opacity-5"></div>
       <div className="relative flex flex-col gap-8">

@@ -25,6 +25,7 @@ const MissionVision = () => {
             fill
             sizes="1200px"
             className="absolute z-10 h-auto bg-center object-contain"
+            unoptimized={true}
           />
         </div>
         <div className="my-auto flex basis-[50%] flex-col gap-4 text-center lg:basis-[25%] lg:text-start">
