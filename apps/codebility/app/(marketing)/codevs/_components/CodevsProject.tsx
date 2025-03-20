@@ -66,7 +66,7 @@ export default async function ProjectSection() {
   if (error) {
     console.error("Error loading projects:", error);
     return (
-      <section className="bg-black-400 relative flex min-h-screen w-full flex-col justify-center text-center">
+      <section className="bg-black-400 relative flex min-h-screen w-full flex-col justify-center text-center ">
         <div className="mb-10 space-y-2">
           <h1 className="text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
             Our Featured
@@ -84,7 +84,7 @@ export default async function ProjectSection() {
   }
 
   return (
-    <section className="bg-black-400 relative flex min-h-screen w-full flex-col justify-center text-center">
+    <section className="bg-black-400 relative mt-10 flex  w-full flex-col justify-center text-center ">
       <div className="mb-10 space-y-2">
         <h1 className="text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
           Our Featured
