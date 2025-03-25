@@ -20,6 +20,11 @@ import { StatusBadge } from "../shared/StatusBadge";
 import { columns } from "./columns";
 import { EditableRow, Role } from "./EditableRow";
 import { TableActions } from "./TableActions";
+import SendNdaButton from "../SendNdaButton";
+import ApplicantDocumentStatus from "./ApplicantDocumentStatus";
+
+
+
 
 interface InHouseTableProps {
   data: Codev[];
@@ -33,6 +38,12 @@ interface InHouseTableProps {
 }
 
 const defaultImage = "/assets/svgs/icon-codebility-black.svg";
+
+// Add this function before the InHouseTable component
+const getNdaStatusColor = (status: boolean | null | undefined) => {
+  if (status === true) return "text-green-600 dark:text-green-400";
+  return "text-red-600 dark:text-red-400";
+};
 
 export function InHouseTable({
   data,
@@ -174,7 +185,27 @@ export function InHouseTable({
                   </TableCell>
 
                   <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
-                    {item.nda_status ? "Yes" : "No"}
+                    <div className="flex items-center gap-2">
+                      {/* Existing NDA status display */}
+                      <span className={`${getNdaStatusColor(item.nda_status)}`}>
+                        {item.nda_status ? "Yes" : "No"}
+                      </span>
+                      
+                      {/* Add ApplicantDocumentStatus component */}
+                      <ApplicantDocumentStatus applicantId={item.id} />
+                      
+                      {/* Add Send NDA button if not signed */}
+                      {!item.nda_status && (
+                        <SendNdaButton
+                          applicantEmail={item.email_address} 
+                          applicantName={`${item.first_name} ${item.last_name}`}
+                          applicantId={item.id}
+                          onSuccess={() => {
+                            // Optionally refresh data after sending NDA
+                          }}
+                        />
+                      )}
+                    </div>
                   </TableCell>
 
                   <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
