@@ -12,7 +12,6 @@ import {
 } from "@/Components/ui/table";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { startOfMonth, startOfWeek, subDays } from "date-fns";
-import { Skeleton } from "@codevs/ui/skeleton";
 
 import {
   Select,
@@ -21,6 +20,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
+import { Skeleton } from "@codevs/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 type TimePeriod = "all" | "weekly" | "monthly";
@@ -89,9 +89,21 @@ export default function WeeklyTop() {
 
         if (data) {
           const categories = data.map((cat) => cat.name);
-          setAllCategories(categories);
-          if (!selectedCategory && categories.length > 0) {
-            setSelectedCategory(categories[0]);
+          
+          // Reorder categories to put Frontend Developer first
+          const reorderedCategories = [...categories];
+          const feIndex = reorderedCategories.findIndex(cat => cat === "Frontend Developer");
+          
+          if (feIndex !== -1) {
+           
+            const [frontendDev] = reorderedCategories.splice(feIndex, 1);
+       
+            reorderedCategories.unshift(frontendDev);
+          }
+          
+          setAllCategories(reorderedCategories);
+          if (!selectedCategory && reorderedCategories.length > 0) {
+            setSelectedCategory(reorderedCategories[0]);
           }
         }
       } catch (error) {
@@ -106,8 +118,7 @@ export default function WeeklyTop() {
     const fetchTopCodevs = async () => {
       setIsLoading(true);
       try {
-
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        await new Promise((resolve) => setTimeout(resolve, 1000));
         let query = supabase
           .from("codev_points")
           .select(
@@ -188,14 +199,14 @@ export default function WeeklyTop() {
     switch (category) {
       case "UI/UX Designer":
         return "UI/UX";
+      case "Frontend Developer":
+        return "FE";
       case "Backend Developer":
         return "BE";
       case "Mobile Developer":
         return "MD";
       case "QA Engineer":
         return "QA";
-      case "Frontend Developer":
-        return "FE";
       default:
         return category.substring(0, 2);
     }
