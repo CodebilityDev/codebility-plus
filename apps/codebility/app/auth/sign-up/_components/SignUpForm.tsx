@@ -17,6 +17,7 @@ import { signupUser } from "../../actions";
 import { FORM_STEPS } from "./form-steps";
 import { ImageUpload } from "./ImageUpload";
 import SignUpInputs from "./SignUpInput";
+import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
 
 // Define the form type explicitly
 interface SignUpFormInputs extends z.infer<typeof SignUpValidation> {
@@ -193,6 +194,8 @@ const SignUpForm = () => {
               )}
             </div>
           ))}
+
+          <PrivacyPolicyModal />
         </div>
       </form>
     </FormProvider>
