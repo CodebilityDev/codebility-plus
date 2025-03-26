@@ -28,7 +28,6 @@ export default async function ProjectSection() {
   const { data: activeProjects, error } = await supabase
     .from("projects")
     .select("id, name, description, main_image, status")
-    .eq("status", "active") // Add filter for active projects
     .order("created_at", { ascending: false });
 
   const OPTIONS: EmblaOptionsType = {
