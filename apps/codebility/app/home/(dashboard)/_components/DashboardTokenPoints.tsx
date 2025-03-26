@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Box } from "@/Components/shared/dashboard";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { CodevPoints, Level, SkillCategory } from "@/types/home/codev";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
@@ -105,7 +106,18 @@ export default function TokenPoints() {
   }, [supabase]);
 
   if (loading) {
-    return <p>Loading token points...</p>;
+    return (
+      <Box className="flex w-full flex-1 flex-col gap-4">
+        <p className="text-2xl">Token Points</p>
+        <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
+          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
+          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
+          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
+          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
+          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
+        </div>
+      </Box>
+    );
   }
 
   if (error) {
