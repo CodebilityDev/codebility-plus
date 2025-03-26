@@ -157,7 +157,7 @@ const TaskAddModal = () => {
                         value={level}
                         className="capitalize"
                       >
-                        {level}
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -179,7 +179,7 @@ const TaskAddModal = () => {
                         value={level}
                         className="capitalize"
                       >
-                        {level}
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -201,7 +201,8 @@ const TaskAddModal = () => {
                         value={type}
                         className="capitalize"
                       >
-                        {type.toLowerCase()}
+                        {type.charAt(0).toUpperCase() +
+                          type.slice(1).toLowerCase()}
                       </SelectItem>
                     ))}
                   </SelectGroup>
