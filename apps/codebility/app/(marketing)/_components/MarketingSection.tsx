@@ -8,8 +8,10 @@ interface SectionProps {
 
 const Section: React.FC<SectionProps> = ({ children, className = "", id }) => {
   return (
-    <section id={id} className={`mx-auto py-10 lg:py-20 ${className}`}>
-      {children}
+    <section id={id} className={`mx-auto py-8 lg:py-16 ${className}`}>
+      <div className="flex flex-col items-center justify-center space-y-16">
+        {children}
+      </div>
     </section>
   );
 };
