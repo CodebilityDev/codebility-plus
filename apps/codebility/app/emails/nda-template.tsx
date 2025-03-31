@@ -19,7 +19,6 @@ interface NdaEmailProps {
   ndaLink: string;
 }
 
-// Use a single export method - using named export
 export const NdaEmailTemplate = ({ firstName, ndaLink }: NdaEmailProps) => {
   return (
     <Html>
@@ -39,7 +38,6 @@ export const NdaEmailTemplate = ({ firstName, ndaLink }: NdaEmailProps) => {
           borderRadius: '5px',
           boxShadow: '0 2px 5px rgba(0, 0, 0, 0.05)',
         }}>
-          {/* Add logo at the top of the email */}
           <Section style={{ textAlign: 'center', marginBottom: '30px', backgroundColor: 'black', padding: '20px 0 20px 0' }}>
             <Img
               src="https://codebility.tech/assets/images/codebility.png"
@@ -101,5 +99,3 @@ export const NdaEmailTemplate = ({ firstName, ndaLink }: NdaEmailProps) => {
     </Html>
   );
 };
-
-// Remove the default export to avoid confusion
