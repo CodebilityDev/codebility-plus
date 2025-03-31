@@ -70,6 +70,7 @@ export const WEEKDAYS: DayOfWeek[] = [
   "Friday",
 ];
 
+// Add the nda_request_sent property to your Codev interface
 export interface Codev {
   id: string;
   first_name: string;
@@ -88,6 +89,10 @@ export interface Codev {
   internal_status?: InternalStatus;
   availability_status?: boolean;
   nda_status?: boolean;
+  nda_signature?: string;
+  nda_document?: string;
+  nda_signed_at?: string;
+  nda_request_sent?: boolean;
   level?: Record<string, any>;
   application_status?: string;
   rejected_count?: number;
