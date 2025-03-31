@@ -500,14 +500,14 @@ export default function NdaSigningPage() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col p-4 md:p-8">
+    <div className="bg-backgroundColor text-primaryColor flex h-screen w-screen items-center justify-center overflow-hidden">
       <div className="mx-auto w-full max-w-3xl">
         <div className="mb-6 text-center">
           <Image
-            src="/assets/svgs/icon-codebility-black.svg"
+            src="/assets/svgs/logos/codebility-light.svg"
             alt="Codebility Plus"
-            width={120}
-            height={40}
+            width={270}
+            height={60}
             className="mx-auto mb-4"
           />
           <h1 className="text-2xl font-bold">
@@ -519,7 +519,7 @@ export default function NdaSigningPage() {
           </p>
         </div>
 
-        <div className="mb-8 rounded-lg border p-6 shadow-md">
+        <div className="mb-8 rounded-lg border p-6 shadow-md h-[70vh] bg-light-900 text-black-200 overflow-y-scroll">
           <div className="mb-6 space-y-4 text-sm">
             <h2 className="mb-4 text-xl font-bold">COMPANY NDA</h2>
 
@@ -630,7 +630,7 @@ export default function NdaSigningPage() {
               <SignaturePad
                 ref={signatureRef}
                 canvasProps={{
-                  width: 600,
+                  width: 710,
                   height: 100,
                   className: "signature-canvas",
                 }}
