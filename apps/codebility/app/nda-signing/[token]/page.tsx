@@ -2,12 +2,13 @@
 
 import React, { forwardRef, useEffect, useRef, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
+import Logo from "@/Components/shared/Logo";
+import { toast } from "react-hot-toast";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
-
-import { toast } from "../../../Components/ui/use-toast";
 
 // First, let's create a type for the SignatureCanvas component
 type SignatureCanvasRef = {
@@ -117,20 +118,12 @@ export default function NdaSigningPage() {
   const handleSignNda = async () => {
     try {
       if (!signatureRef.current) {
-        toast({
-          title: "Error",
-          description: "Signature pad not initialized",
-          variant: "destructive",
-        });
+        toast.error("Signature pad not initialized");
         return;
       }
 
       if (signatureRef.current.isEmpty()) {
-        toast({
-          title: "Error",
-          description: "Please sign the document before submitting",
-          variant: "destructive",
-        });
+        toast.error("Please sign the document before submitting");
         return;
       }
 
@@ -141,9 +134,81 @@ export default function NdaSigningPage() {
 
       // Generate PDF with jsPDF
       const { jsPDF } = await import("jspdf");
+      // After creating the jsPDF instance
       const doc = new jsPDF();
+      
+      // Set the font to Times Roman for a more formal document look
+      doc.setFont("times", "normal");
+      
+      // Define page dimensions that will be used throughout
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const lineWidth = 150; // Define lineWidth for signature lines
+      
+      // Define totalPages before using it in addFooter
+      const totalPages = 4; // We know we'll have 4 pages
+      
+      // Create a function to get the logo as base64
+      const getLogoAsBase64 = async () => {
+        try {
+          // Try to load the PNG version instead of SVG
+          const response = await fetch("/assets/images/svgs/codebility-dark.png");
+          if (!response.ok) {
+            console.error("Failed to load logo image");
+            return null;
+          }
+          
+          const blob = await response.blob();
+          return new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+          });
+        } catch (error) {
+          console.error("Error loading logo:", error);
+          return null;
+        }
+      };
+      
+      // Get the logo before generating the PDF
+      const logoBase64 = await getLogoAsBase64();
+      
+      // Footer function to add consistent footers to all pages
+      const addFooter = (doc: any, pageNumber: number) => {
+        const pageWidth = doc.internal.pageSize.getWidth();
+        const pageHeight = doc.internal.pageSize.getHeight();
+        
+        // Add page number
+        doc.setFontSize(8);
+        doc.setTextColor(0, 0, 0);
+        doc.text(`${pageNumber} / ${totalPages}`, pageWidth - 20, pageHeight - 10);
+        
+        // Add "Privacy Policy" text on the left with italic style
+        doc.setFont("times", "italic"); // Use setFont instead of setFontStyle
+        doc.text("Privacy Policy", 20, pageHeight - 10);
+        doc.setFont("times", "normal"); // Reset font style
+        
+        // Try to add logo if available, otherwise use text - position on right side
+        if (logoBase64) {
+          // Add logo on the right side of footer (before page number)
+          try {
+            doc.addImage(logoBase64, 'PNG', pageWidth - 60, pageHeight - 15, 30, 8);
+          } catch (e) {
+            console.error("Error adding logo to footer:", e);
+            // Fallback to text
+            doc.setFontSize(10);
+            doc.text("CODEBILITY", pageWidth - 60, pageHeight - 10);
+          }
+        } else {
+          // Use text fallback
+          doc.setFontSize(10);
+          doc.text("CODEBILITY", pageWidth - 60, pageHeight - 10);
+        }
+      };
 
-      // Add NDA content based on the actual document
+      const formattedDate = ndaRequest?.created_at 
+      ? new Date(ndaRequest.created_at).toLocaleDateString()
+      : new Date().toLocaleDateString();
+    
       doc.setFontSize(16);
       doc.text("COMPANY NDA", 20, 20);
       doc.setFontSize(14);
@@ -156,7 +221,7 @@ export default function NdaSigningPage() {
       doc.text("TERMS OF AGREEMENT", 20, 55);
       doc.setFontSize(10);
       doc.text(
-        "This agreement is created on [March 21], 2025 and remains in effect indefinitely. The",
+        `This agreement is created on ${formattedDate}, 2025 and remains in effect indefinitely. The`,
         20,
         65,
       );
@@ -211,7 +276,11 @@ export default function NdaSigningPage() {
         20,
         185,
       );
+      // After all the content for page 1
       doc.text("be expected to cause harm to Codebility.", 20, 195);
+      
+      // Add footer to first page
+      addFooter(doc, 1);
 
       // Add second page
       doc.addPage();
@@ -296,6 +365,9 @@ export default function NdaSigningPage() {
       );
       doc.text("Agreement.", 20, 190);
 
+      // Add footer to second page
+      addFooter(doc, 2);
+
       // Add third page
       doc.addPage();
 
@@ -340,32 +412,52 @@ export default function NdaSigningPage() {
       );
       doc.text("Agreement as of the Effective Date.", 20, 135);
 
-      doc.text("Signed by Agreement:", 20, 155);
-      doc.text(`[March 21] 2025 Date`, 20, 170);
-
-      doc.text(`INTERN [${codev.first_name} ${codev.last_name}]`, 20, 185);
-      doc.text("Signature over Printed Name", 20, 195);
 
       // Add fourth page with signatures
       doc.addPage();
-
-      doc.text("CEO/FOUNDER of Codebility", 105, 40, { align: "center" });
-      doc.text("JZEFF KENDREW F SOMERA", 105, 70, { align: "center" });
-      doc.text("Signature over Printed Name", 105, 80, { align: "center" });
-      doc.text("[March 21], 2025", 105, 95, { align: "center" });
-      doc.text("Date", 105, 105, { align: "center" });
-
+      
+      // Create CEO signature line (centered)
+      const ceoLineY = 70;
+      doc.setDrawColor(0, 0, 0);
+      doc.setLineWidth(0.5);
+      doc.line((pageWidth - lineWidth) / 2, ceoLineY, (pageWidth - lineWidth) / 2 + lineWidth, ceoLineY);
+      
+      // Add CEO signature text
+      doc.text("CEO/FOUNDER of Codebility", pageWidth / 2, ceoLineY - 30, { align: "center" });
+      doc.text("JZEFF KENDREW F SOMERA", pageWidth / 2, ceoLineY + 15, { align: "center" });
+      doc.text("Signature over Printed Name", pageWidth / 2, ceoLineY + 25, { align: "center" });
+      doc.text(`${formattedDate}`, pageWidth / 2, ceoLineY + 35, { align: "center" });
+      doc.text("Date", pageWidth / 2, ceoLineY + 45, { align: "center" });
+      
+      // Add the contract effective date text
       doc.text(
-        "This Internship Contract/Agreement is effective as of [March 21], 2025",
-        105,
+       ` This Internship Contract/Agreement is effective as of ${formattedDate}`,
+        pageWidth / 2,
         125,
         { align: "center" },
       );
 
       // Add signature on the appropriate page
-      doc.setPage(2); // Go to page 3 (index 2)
-      doc.addImage(signatureData, "PNG", 20, 210, 70, 30);
-      doc.text(`Date: ${new Date().toLocaleDateString()}`, 100, 225);
+      doc.setPage(3); // Go to page 3 (index 2)
+      
+      // Use the already defined pageWidth variable instead of declaring it again
+      const signatureWidth = 70;
+      const signatureX = (pageWidth - signatureWidth) / 2;
+      
+      // Add signature image centered
+      doc.addImage(signatureData, "PNG", signatureX, 210, signatureWidth, 30);
+      
+      // Add underline below signature
+      doc.setDrawColor(0, 0, 0); // Black color
+      doc.setLineWidth(0.5);
+      const underlineY = 245;
+      doc.line(signatureX, underlineY, signatureX + signatureWidth, underlineY);
+      
+      // Stack the text elements with proper spacing
+      doc.text(`INTERN [${codev.first_name} ${codev.last_name}]`, pageWidth / 2, 260, { align: "center" });
+      doc.text("Signature over Printed Name", pageWidth / 2, 270, { align: "center" });
+      // Add date text centered below
+      doc.text(`Date: ${formattedDate}`, pageWidth / 2, 280, { align: "center" });
 
       // Save PDF as base64
       const pdfData = doc.output("datauristring");
@@ -399,22 +491,17 @@ export default function NdaSigningPage() {
           nda_signature: signatureData,
           nda_document: pdfData,
           nda_signed_at: new Date().toISOString(),
-          nda_request_sent: true, // Also update this field to indicate the process is complete
+          nda_request_sent: true,
         })
         .eq("id", codev.id);
 
       if (codevUpdateError) {
         console.error("Error updating codev record:", codevUpdateError);
-        // Even if there's an error, we'll continue with the process
       } else {
         console.log("Successfully updated codev record with NDA information");
       }
 
-      toast({
-        title: "NDA Signed",
-        description: "Your NDA has been successfully signed and recorded.",
-        variant: "default",
-      });
+      toast.success("Your NDA has been successfully signed and recorded.");
 
       try {
         const emailResponse = await fetch("/api/send-email", {
@@ -448,11 +535,7 @@ export default function NdaSigningPage() {
       router.push("/nda-signing/success");
     } catch (error) {
       console.error("Error signing NDA:", error);
-      toast({
-        title: "Error",
-        description: "Failed to sign NDA. Please try again or contact support.",
-        variant: "destructive",
-      });
+      toast.error("Failed to sign NDA. Please try again or contact support.");
     } finally {
       setSigning(false);
     }
@@ -460,10 +543,12 @@ export default function NdaSigningPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center p-4">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-blue-300 p-4">
         <div className="text-center">
-          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-blue-500"></div>
-          <p className="text-lg">Loading NDA signing page...</p>
+          <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-white"></div>
+          <p className="text-lg font-bold text-white">
+            Loading NDA signing page...
+          </p>
         </div>
       </div>
     );
@@ -471,33 +556,39 @@ export default function NdaSigningPage() {
 
   if (error) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center p-4">
-        <div className="max-w-md rounded-lg border p-6 shadow-lg">
-          <div className="mb-4 text-center text-red-500">
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              className="mx-auto h-12 w-12"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
+      <div className="bg-backgroundColor text-primaryColor flex h-screen w-screen items-center justify-center overflow-hidden">
+        <div className="flex flex-col items-center gap-8 text-center lg:gap-10">
+          <Logo />
+          <div>
+            <p className="mb-2 text-lg md:text-lg lg:text-3xl">Error!</p>
+            <p className="text-gray mx-auto text-xs md:text-lg lg:max-w-[500px] lg:text-lg">
+              {error}
+            </p>
           </div>
-          <h1 className="mb-4 text-center text-xl font-bold">Error</h1>
-          <p className="mb-6 text-center">{error}</p>
-          <div className="text-center">
-            <Button onClick={() => router.push("/")}>Return to Homepage</Button>
+          <Link href="/">
+            <Button className="from-teal to-violet h-10 w-32 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
+              <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full text-lg text-white lg:text-lg">
+                Go to Home
+              </span>
+            </Button>
+          </Link>
+
+          <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
+
+          <div className="hero-bubble">
+            {Array.from({ length: 4 }, (_, index) => (
+              <div key={index} />
+            ))}
           </div>
         </div>
       </div>
     );
   }
+
+  // formattedDate
+  const formattedDate = ndaRequest?.created_at 
+    ? new Date(ndaRequest.created_at).toLocaleDateString()
+    : new Date().toLocaleDateString();
 
   return (
     <div className="bg-backgroundColor text-primaryColor flex h-screen w-screen items-center justify-center overflow-hidden">
@@ -519,7 +610,7 @@ export default function NdaSigningPage() {
           </p>
         </div>
 
-        <div className="mb-8 rounded-lg border p-6 shadow-md h-[70vh] bg-light-900 text-black-200 overflow-y-scroll">
+        <div className="bg-light-900 text-black-400 z-[100] mb-8 h-[70vh] overflow-y-scroll rounded-lg border p-6 shadow-md">
           <div className="mb-6 space-y-4 text-sm">
             <h2 className="mb-4 text-xl font-bold">COMPANY NDA</h2>
 
@@ -531,8 +622,8 @@ export default function NdaSigningPage() {
 
             <h3 className="mt-6 font-bold">TERMS OF AGREEMENT</h3>
             <p>
-              This agreement is created on [March 21], 2025 and remains in
-              effect indefinitely. The Intern has the flexibility to conclude
+              This agreement is created on {formattedDate} and remains in effect indefinitely. The
+              Intern has the flexibility to conclude
               their tenure at any point, subject to the conditions outlined in
               Termination of Agreement.
             </p>
@@ -618,9 +709,10 @@ export default function NdaSigningPage() {
 
             <br />
 
-            <p>IN WITNESS WHEREOF, the parties hereto have executed this Independent Contractor
-            Agreement as of the Effective Date. </p>
-
+            <p>
+              IN WITNESS WHEREOF, the parties hereto have executed this
+              Independent Contractor Agreement as of the Effective Date.{" "}
+            </p>
           </div>
 
           <div className="mb-6">
@@ -638,21 +730,36 @@ export default function NdaSigningPage() {
               />
             </div>
             <div className="mt-2 text-right">
-              <Button variant="outline" onClick={clearSignature} size="sm">
+              <Button variant="destructive" onClick={clearSignature} size="sm">
                 Clear
               </Button>
             </div>
           </div>
 
-
-
-          <div className="flex justify-end">
-            <Button onClick={handleSignNda} disabled={signing} className="dark:bg-blue-100">
+          <div className="flex justify-end gap-4">
+           
+            <Button
+              onClick={handleSignNda}
+              disabled={signing}
+              className="text-md flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-2 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
+            >
               {signing ? "Processing..." : "Sign NDA"}
             </Button>
           </div>
         </div>
       </div>
+      {/* Background gradient */}
+      <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
+      {/* Bubbles */}
+      <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
+
+      <div className="hero-bubble">
+        {Array.from({ length: 2 }, (_, index) => (
+          <div key={index} />
+        ))}
+      </div>
     </div>
   );
+
+  
 }
