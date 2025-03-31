@@ -10,33 +10,28 @@ import { toast } from "react-hot-toast";
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
 
-// First, let's create a type for the SignatureCanvas component
 type SignatureCanvasRef = {
   clear: () => void;
   isEmpty: () => boolean;
   toDataURL: (type?: string, encoderOptions?: number) => string;
 };
 
-// Define props interface for our wrapper component
 interface SignaturePadProps {
   canvasProps?: React.CanvasHTMLAttributes<HTMLCanvasElement>;
   backgroundColor?: string;
   [key: string]: any;
 }
 
-// Fix the SignaturePad component implementation
 const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
   (props, ref) => {
     const [SignatureComponent, setSignatureComponent] = useState<any>(null);
 
     useEffect(() => {
-      // Dynamically import the component only on the client side
       import("react-signature-canvas").then((mod) => {
         setSignatureComponent(() => mod.default);
       });
     }, []);
 
-    // Don't render anything until the component is loaded
     if (!SignatureComponent) {
       return (
         <div className="flex h-[200px] items-center justify-center border border-gray-300 bg-white">
@@ -45,7 +40,6 @@ const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
       );
     }
 
-    // Now render the actual component with the forwarded ref
     return <SignatureComponent {...props} ref={ref} />;
   },
 );
@@ -70,7 +64,6 @@ export default function NdaSigningPage() {
         setLoading(true);
         const token = params.token as string;
 
-        // Fetch the NDA request
         const { data: requestData, error: requestError } = await supabase
           .from("nda_requests")
           .select("*, codev:codev_id(*)")
@@ -84,13 +77,11 @@ export default function NdaSigningPage() {
           return;
         }
 
-        // Check if the request is expired
         if (new Date(requestData.expires_at) < new Date()) {
           setError("This NDA signing link has expired");
           return;
         }
 
-        // Check if the request is already completed
         if (requestData.status === "completed") {
           setError("This NDA has already been signed");
           return;
@@ -129,28 +120,20 @@ export default function NdaSigningPage() {
 
       setSigning(true);
 
-      // Get the signature as a data URL
       const signatureData = signatureRef.current.toDataURL("image/png");
 
-      // Generate PDF with jsPDF
       const { jsPDF } = await import("jspdf");
-      // After creating the jsPDF instance
       const doc = new jsPDF();
       
-      // Set the font to Times Roman for a more formal document look
       doc.setFont("times", "normal");
       
-      // Define page dimensions that will be used throughout
       const pageWidth = doc.internal.pageSize.getWidth();
-      const lineWidth = 150; // Define lineWidth for signature lines
+      const lineWidth = 150;
       
-      // Define totalPages before using it in addFooter
-      const totalPages = 4; // We know we'll have 4 pages
+      const totalPages = 4;
       
-      // Create a function to get the logo as base64
       const getLogoAsBase64 = async () => {
         try {
-          // Try to load the PNG version instead of SVG
           const response = await fetch("/assets/images/svgs/codebility-dark.png");
           if (!response.ok) {
             console.error("Failed to load logo image");
@@ -169,37 +152,29 @@ export default function NdaSigningPage() {
         }
       };
       
-      // Get the logo before generating the PDF
       const logoBase64 = await getLogoAsBase64();
       
-      // Footer function to add consistent footers to all pages
       const addFooter = (doc: any, pageNumber: number) => {
         const pageWidth = doc.internal.pageSize.getWidth();
         const pageHeight = doc.internal.pageSize.getHeight();
         
-        // Add page number
         doc.setFontSize(8);
         doc.setTextColor(0, 0, 0);
         doc.text(`${pageNumber} / ${totalPages}`, pageWidth - 20, pageHeight - 10);
         
-        // Add "Privacy Policy" text on the left with italic style
-        doc.setFont("times", "italic"); // Use setFont instead of setFontStyle
+        doc.setFont("times", "italic");
         doc.text("Privacy Policy", 20, pageHeight - 10);
-        doc.setFont("times", "normal"); // Reset font style
+        doc.setFont("times", "normal");
         
-        // Try to add logo if available, otherwise use text - position on right side
         if (logoBase64) {
-          // Add logo on the right side of footer (before page number)
           try {
             doc.addImage(logoBase64, 'PNG', pageWidth - 60, pageHeight - 15, 30, 8);
           } catch (e) {
             console.error("Error adding logo to footer:", e);
-            // Fallback to text
             doc.setFontSize(10);
             doc.text("CODEBILITY", pageWidth - 60, pageHeight - 10);
           }
         } else {
-          // Use text fallback
           doc.setFontSize(10);
           doc.text("CODEBILITY", pageWidth - 60, pageHeight - 10);
         }
@@ -212,10 +187,10 @@ export default function NdaSigningPage() {
       doc.setFontSize(16);
       doc.text("COMPANY NDA", 20, 20);
       doc.setFontSize(14);
-      doc.setTextColor(0, 128, 0); // Green color for CODEBILITY
+      doc.setTextColor(0, 128, 0);
       doc.text("CODEBILITY NDA", 20, 30);
       doc.text("CODEBILITY", 20, 40);
-      doc.setTextColor(0, 0, 0); // Reset to black
+      doc.setTextColor(0, 0, 0);
 
       doc.setFontSize(14);
       doc.text("TERMS OF AGREEMENT", 20, 55);
@@ -267,7 +242,7 @@ export default function NdaSigningPage() {
       );
 
       doc.text(
-        "B. 'Confidential Information' refers to any data or information relating to the business",
+        "B. Confidential Information refers to any data or information relating to the business",
         20,
         175,
       );
@@ -276,13 +251,10 @@ export default function NdaSigningPage() {
         20,
         185,
       );
-      // After all the content for page 1
       doc.text("be expected to cause harm to Codebility.", 20, 195);
       
-      // Add footer to first page
       addFooter(doc, 1);
 
-      // Add second page
       doc.addPage();
 
       doc.setFontSize(14);
@@ -365,10 +337,8 @@ export default function NdaSigningPage() {
       );
       doc.text("Agreement.", 20, 190);
 
-      // Add footer to second page
       addFooter(doc, 2);
 
-      // Add third page
       doc.addPage();
 
       doc.setFontSize(14);
@@ -413,53 +383,42 @@ export default function NdaSigningPage() {
       doc.text("Agreement as of the Effective Date.", 20, 135);
 
 
-      // Add fourth page with signatures
       doc.addPage();
       
-      // Create CEO signature line (centered)
       const ceoLineY = 70;
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.5);
       doc.line((pageWidth - lineWidth) / 2, ceoLineY, (pageWidth - lineWidth) / 2 + lineWidth, ceoLineY);
       
-      // Add CEO signature text
       doc.text("CEO/FOUNDER of Codebility", pageWidth / 2, ceoLineY - 30, { align: "center" });
       doc.text("JZEFF KENDREW F SOMERA", pageWidth / 2, ceoLineY + 15, { align: "center" });
       doc.text("Signature over Printed Name", pageWidth / 2, ceoLineY + 25, { align: "center" });
       doc.text(`${formattedDate}`, pageWidth / 2, ceoLineY + 35, { align: "center" });
       doc.text("Date", pageWidth / 2, ceoLineY + 45, { align: "center" });
       
-      // Add the contract effective date text
       doc.text(
-       ` This Internship Contract/Agreement is effective as of ${formattedDate}`,
+       `This Internship Contract/Agreement is effective as of ${formattedDate}`,
         pageWidth / 2,
         125,
         { align: "center" },
       );
 
-      // Add signature on the appropriate page
-      doc.setPage(3); // Go to page 3 (index 2)
+      doc.setPage(3);
       
-      // Use the already defined pageWidth variable instead of declaring it again
       const signatureWidth = 70;
       const signatureX = (pageWidth - signatureWidth) / 2;
       
-      // Add signature image centered
       doc.addImage(signatureData, "PNG", signatureX, 210, signatureWidth, 30);
       
-      // Add underline below signature
-      doc.setDrawColor(0, 0, 0); // Black color
+      doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.5);
       const underlineY = 245;
       doc.line(signatureX, underlineY, signatureX + signatureWidth, underlineY);
       
-      // Stack the text elements with proper spacing
       doc.text(`INTERN [${codev.first_name} ${codev.last_name}]`, pageWidth / 2, 260, { align: "center" });
       doc.text("Signature over Printed Name", pageWidth / 2, 270, { align: "center" });
-      // Add date text centered below
       doc.text(`Date: ${formattedDate}`, pageWidth / 2, 280, { align: "center" });
 
-      // Save PDF as base64
       const pdfData = doc.output("datauristring");
 
       console.log("Codev object:", codev);
@@ -483,7 +442,6 @@ export default function NdaSigningPage() {
         console.error("Exception during NDA request update:", updateError);
       }
 
-      // Update the codev record with all NDA information
       const { error: codevUpdateError } = await supabase
         .from("codev")
         .update({
@@ -531,7 +489,6 @@ export default function NdaSigningPage() {
         console.error("Error sending NDA email:", emailError);
       }
 
-      // Redirect to success page
       router.push("/nda-signing/success");
     } catch (error) {
       console.error("Error signing NDA:", error);
@@ -585,7 +542,6 @@ export default function NdaSigningPage() {
     );
   }
 
-  // formattedDate
   const formattedDate = ndaRequest?.created_at 
     ? new Date(ndaRequest.created_at).toLocaleDateString()
     : new Date().toLocaleDateString();
@@ -627,8 +583,6 @@ export default function NdaSigningPage() {
               their tenure at any point, subject to the conditions outlined in
               Termination of Agreement.
             </p>
-
-            {/* Rest of the NDA content */}
 
             <h3 className="mt-6 font-bold">
               CONFIDENTIALITY AND NON-DISCLOSURE AGREEMENT (NDA):
@@ -711,7 +665,7 @@ export default function NdaSigningPage() {
 
             <p>
               IN WITNESS WHEREOF, the parties hereto have executed this
-              Independent Contractor Agreement as of the Effective Date.{" "}
+              Independent Contractor Agreement as of the Effective Date.
             </p>
           </div>
 
@@ -748,9 +702,7 @@ export default function NdaSigningPage() {
           </div>
         </div>
       </div>
-      {/* Background gradient */}
       <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
-      {/* Bubbles */}
       <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
 
       <div className="hero-bubble">
