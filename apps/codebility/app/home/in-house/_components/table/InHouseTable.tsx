@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@codevs/ui/table";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@codevs/ui/dialog";
+
 import { Button } from "@codevs/ui/button";
 
 
@@ -23,10 +23,7 @@ import { StatusBadge } from "../shared/StatusBadge";
 import { columns } from "./columns";
 import { EditableRow, Role } from "./EditableRow";
 import { TableActions } from "./TableActions";
-import { Toast } from "@codevs/ui/toast";
-import { toast } from "@/Components/ui/use-toast";
-
-// Fix: Add proper TypeScript interface for NdaEmailDialog props
+import { toast } from "react-hot-toast";
 import { Download } from "lucide-react";
 
 interface NdaEmailDialogProps {
@@ -66,17 +63,10 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
       
       await onSendNdaEmail(codev.id, codev.email_address, subject, message);
       
-      toast({
-        title: "Email Sent",
-        description: `NDA signing request sent to ${codev.email_address}`,
-      });
+      toast.success(`NDA signing request sent to ${codev.email_address}`);
     } catch (error) {
       console.error("Error sending NDA email:", error);
-      toast({
-        title: "Error",
-        description: "Failed to send NDA email. Please try again.",
-        variant: "destructive",
-      });
+      toast.error('Failed to send NDA email. Please try again.');
     } finally {
       setIsSending(false);
     }
@@ -156,9 +146,7 @@ export function InHouseTable({
       // Generate the NDA signing link
       const signingLink = `${window.location.origin}/nda-signing/${token}`;
       
-      // Replace the placeholder with the actual link
-      const emailBody = message.replace('[NDA_LINK]', signingLink);
-      
+     
       // Find the codev from the data array using codevId
       const codevData = data.find(item => item.id === codevId);
       
@@ -218,17 +206,10 @@ export function InHouseTable({
       link.click();
       document.body.removeChild(link);
       
-      toast({
-        title: "Success",
-        description: "NDA document downloaded successfully",
-      });
+     toast.success('NDA document downloaded successfully')
     } catch (error) {
       console.error("Error downloading NDA:", error);
-      toast({
-        title: "Error",
-        description: "Failed to download NDA document",
-        variant: "destructive",
-      });
+      toast.error('Failed to download NDA document');
     }
   };
 

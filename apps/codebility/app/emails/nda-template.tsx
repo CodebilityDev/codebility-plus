@@ -44,7 +44,7 @@ export const NdaEmailTemplate = ({ firstName, ndaLink }: NdaEmailProps) => {
             <Img
               src="https://codebility.tech/assets/images/codebility.png"
               alt="Codebility Plus Logo"
-              width="230"
+              width="200"
               height="auto"
               style={{ margin: '0 auto', }}
             />
