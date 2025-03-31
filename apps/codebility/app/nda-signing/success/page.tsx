@@ -1,41 +1,37 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import Image from "next/image";
+import Link from "next/link";
+import Logo from "@/Components/shared/Logo";
+
 import { Button } from "@codevs/ui/button";
 
 export default function NdaSuccessPage() {
-  const router = useRouter();
-  
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center p-4">
-      <div className="max-w-md rounded-lg border p-8 shadow-lg">
-        <div className="mb-6 text-center">
-          <Image 
-            src="/assets/svgs/icon-codebility-black.svg" 
-            alt="Codebility Plus" 
-            width={120} 
-            height={40} 
-            className="mx-auto mb-4"
-          />
-          <div className="mb-4 text-green-500">
-            <svg xmlns="http://www.w3.org/2000/svg" className="mx-auto h-16 w-16" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-            </svg>
-          </div>
-          <h1 className="mb-2 text-2xl font-bold">NDA Signed Successfully</h1>
-          <p className="text-gray-600">
-            Thank you for signing the Non-Disclosure Agreement. Your signature has been recorded.
+    <div className="bg-backgroundColor text-primaryColor flex h-screen w-screen items-center justify-center overflow-hidden">
+      <div className="flex flex-col items-center gap-8 text-center lg:gap-10">
+        <Logo />
+        <div>
+          <p className="mb-2 text-lg md:text-lg lg:text-3xl">
+            Your NDA application has been submitted successfully.
+          </p>
+          <p className="text-gray mx-auto text-xs md:text-lg lg:max-w-[500px] lg:text-lg">
+            We will notify you once we have reviewed your application.
           </p>
         </div>
-        
-        <div className="text-center">
-          <p className="mb-4 text-sm text-gray-500">
-            You may close this window now.
-          </p>
-          <Button onClick={() => router.push('/')}>
-            Return to Homepage
+        <Link href="/">
+          <Button className="from-teal to-violet h-10 w-32 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
+            <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full text-lg text-white lg:text-lg">
+              Go to Home
+            </span>
           </Button>
+        </Link>
+
+        <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
+
+        <div className="hero-bubble">
+          {Array.from({ length: 4 }, (_, index) => (
+            <div key={index} />
+          ))}
         </div>
       </div>
     </div>
