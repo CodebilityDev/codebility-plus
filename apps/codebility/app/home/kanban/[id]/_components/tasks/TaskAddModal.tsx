@@ -64,11 +64,13 @@ const TaskAddModal = () => {
       setLoading(true);
 
       if (!formData.get("title")) throw new Error("Title is required");
-      if (!mainAssignee) throw new Error("Primary assignee is required");
       if (!formData.get("skill_category_id"))
         throw new Error("Skill category is required");
 
-      formData.append("codev_id", mainAssignee);
+      if (mainAssignee) {
+        formData.append("codev_id", mainAssignee);
+      }
+
       if (sidekicks.length)
         formData.append("sidekick_ids", sidekicks.join(","));
 
@@ -229,7 +231,10 @@ const TaskAddModal = () => {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Primary Assignee</Label>
+              <Label className="text-sm font-medium">
+                Primary Assignee
+                <span className="ml-2 text-xs text-gray-500">(Optional)</span>
+              </Label>
               <KanbanAddModalMembers
                 singleSelection
                 onMembersChange={(ids) => setMainAssignee(ids[0] || "")}
