@@ -221,7 +221,7 @@ export default function NdaSigningPage() {
         120,
       );
       doc.text(
-        "disclosed to the Intern by Codebility because of this Agreement. The Intern's obligations",
+        "disclosed to the Intern by Codebility because of this Agreement. The Intern&apos;s obligations",
         20,
         130,
       );
@@ -591,7 +591,7 @@ export default function NdaSigningPage() {
               A. The Intern agrees not to disclose, divulge, reveal, report or
               use, for any purpose, any confidential information of Codebility,
               which the Intern has obtained, or which was disclosed to the
-              Intern by Codebility because of this Agreement. The Intern's
+              Intern by Codebility because of this Agreement. The Intern&apos;s
               obligations under this Agreement will continue after termination
               of this Agreement and will be binding until the Confidential
               Information becomes public or until Codebility sends the Intern
@@ -600,7 +600,7 @@ export default function NdaSigningPage() {
             </p>
             <br />
             <p>
-              B. “Confidential Information” refers to any data or information,
+              B. &quot;Confidential Information&quot; refers to any data or information,
               oral or written, disclosed by Codebility that is not generally
               known to the public and where the release of that Confidential
               Information could reasonably be expected to cause harm to

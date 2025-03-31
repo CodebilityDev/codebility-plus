@@ -12,10 +12,10 @@ export default function NdaSuccessPage() {
         <Logo />
         <div>
           <p className="mb-2 text-lg md:text-lg lg:text-3xl">
-            Your NDA application has been submitted successfully.
+            Your NDA has been signed successfully.
           </p>
           <p className="text-gray mx-auto text-xs md:text-lg lg:max-w-[500px] lg:text-lg">
-            We will notify you once we have reviewed your application.
+            Thank you for completing this important step. You can now proceed with your Codebility journey.
           </p>
         </div>
         <Link href="/">
