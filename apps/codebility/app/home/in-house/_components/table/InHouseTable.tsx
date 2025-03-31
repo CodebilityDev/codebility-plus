@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { Codev, InternalStatus } from "@/types/home/codev";
-import { Link2 } from "lucide-react";
+import { Link2, Mail } from "lucide-react";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import {
@@ -16,10 +16,20 @@ import {
   TableRow,
 } from "@codevs/ui/table";
 
+import { Button } from "@codevs/ui/button";
+
+
 import { StatusBadge } from "../shared/StatusBadge";
 import { columns } from "./columns";
 import { EditableRow, Role } from "./EditableRow";
 import { TableActions } from "./TableActions";
+import { toast } from "react-hot-toast";
+import { Download } from "lucide-react";
+
+interface NdaEmailDialogProps {
+  codev: Codev;
+  onSendNdaEmail: (codevId: string, email: string, subject: string, message: string) => Promise<void>;
+}
 
 interface InHouseTableProps {
   data: Codev[];
@@ -33,6 +43,48 @@ interface InHouseTableProps {
 }
 
 const defaultImage = "/assets/svgs/icon-codebility-black.svg";
+
+// Add this function before the InHouseTable component
+const getNdaStatusColor = (status: boolean | null | undefined) => {
+  if (status === true) return "text-green-600 dark:text-green-400";
+  return "text-red-600 dark:text-red-400";
+};
+
+// NDA Email Dialog Component
+// Replace the NdaEmailDialog component with this SendNdaButton component
+const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
+  const [isSending, setIsSending] = useState(false);
+  
+  const handleSendEmail = async () => {
+    try {
+      setIsSending(true);
+      const subject = `NDA Signing Request - Codebility Plus`;
+      const message = `Dear ${codev.first_name},\n\nPlease sign the Non-Disclosure Agreement by clicking on the link below:\n\n[NDA_LINK]\n\nThank you,\nCodebility Plus Team`;
+      
+      await onSendNdaEmail(codev.id, codev.email_address, subject, message);
+      
+      toast.success(`NDA signing request sent to ${codev.email_address}`);
+    } catch (error) {
+      console.error("Error sending NDA email:", error);
+      toast.error('Failed to send NDA email. Please try again.');
+    } finally {
+      setIsSending(false);
+    }
+  };
+
+  return (
+    <Button 
+      variant="outline" 
+      size="sm" 
+      className="ml-2 text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+      onClick={handleSendEmail}
+      disabled={isSending}
+    >
+      <Mail className="mr-1 h-4 w-4" />
+      {isSending ? "Sending..." : "Send NDA"}
+    </Button>
+  );
+};
 
 export function InHouseTable({
   data,
@@ -70,6 +122,96 @@ export function InHouseTable({
   // Helper to capitalize names
   const capitalize = (str: string) =>
     str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
+
+  // Add this function to handle sending NDA email
+  const handleSendNdaEmail = async (codevId: string, email: string, subject: string, message: string) => {
+    try {
+      // Generate a unique token for this NDA request
+      const token = crypto.randomUUID();
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7); // Token expires in 7 days
+      
+      // Save the NDA request to the database
+      const { error: dbError } = await supabase
+        .from('nda_requests')
+        .insert({
+          codev_id: codevId,
+          token: token,
+          expires_at: expiresAt.toISOString(),
+          status: 'pending'
+        });
+        
+      if (dbError) throw dbError;
+      
+      // Generate the NDA signing link
+      const signingLink = `${window.location.origin}/nda-signing/${token}`;
+      
+     
+      // Find the codev from the data array using codevId
+      const codevData = data.find(item => item.id === codevId);
+      
+      // Use the local API route instead of Supabase Edge Function
+      const emailResponse = await fetch('/api/send-email', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          recipient: email,
+          subject: subject,
+          content: message,
+          firstName: codevData?.first_name || '',
+          ndaLink: signingLink,
+          isNdaEmail: true
+        })
+      });
+      
+      if (!emailResponse.ok) {
+        throw new Error(await emailResponse.text());
+      }
+      
+      // Update the codev's status in the local state
+      onDataChange(
+        data.map(item => 
+          item.id === codevId 
+            ? { ...item, nda_request_sent: true } as Codev 
+            : item
+        )
+      );
+      
+    } catch (error) {
+      console.error('Error sending NDA email:', error);
+      throw error;
+    }
+  };
+
+  // Add this function to handle downloading NDA document
+  const handleDownloadNda = async (codevId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("codev")
+        .select("nda_document, first_name, last_name")
+        .eq("id", codevId)
+        .single();
+
+      if (error || !data || !data.nda_document) {
+        throw new Error("Failed to fetch NDA document");
+      }
+
+      // Create a link element to download the PDF
+      const link = document.createElement("a");
+      link.href = data.nda_document;
+      link.download = `NDA_${data.first_name}_${data.last_name}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+     toast.success('NDA document downloaded successfully')
+    } catch (error) {
+      console.error("Error downloading NDA:", error);
+      toast.error('Failed to download NDA document');
+    }
+  };
 
   return (
     <div className="mb-4 space-y-4">
@@ -174,7 +316,43 @@ export function InHouseTable({
                   </TableCell>
 
                   <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
-                    {item.nda_status ? "Yes" : "No"}
+                    <div className="flex items-center gap-2">
+                      {/* NDA status display */}
+                      <span className={`${getNdaStatusColor(item.nda_status)}`}>
+                        {item.nda_status ? "Yes" : "No"}
+                      </span>
+                      
+                      {/* Conditional buttons based on NDA status */}
+                      {item.nda_status ? (
+                        // If NDA is signed, show download button
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="ml-2 text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
+                          onClick={() => handleDownloadNda(item.id)}
+                        >
+                          <Download className="mr-1 h-4 w-4" />
+                          Download
+                        </Button>
+                      ) : item.nda_request_sent ? (
+                        // If NDA request is sent but not signed yet, show pending button
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          className="ml-2 text-yellow-500 dark:text-yellow-200"
+                          disabled
+                        >
+                          <span className="mr-1">⏳</span>
+                          Pending
+                        </Button>
+                      ) : (
+                        // If no NDA request sent, show send button
+                        <SendNdaButton 
+                          codev={item} 
+                          onSendNdaEmail={handleSendNdaEmail} 
+                        />
+                      )}
+                     </div>
                   </TableCell>
 
                   <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
