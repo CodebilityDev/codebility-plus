@@ -5,12 +5,12 @@ import Link from "next/link";
 import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer";
 import H2 from "@/Components/shared/home/H2";
 import Heading3 from "@/Components/shared/home/Heading3";
-import SectionWrapper from "@/Components/shared/home/SectionWrapper";
 import { Button } from "@/Components/ui/button";
 import { motion } from "framer-motion";
 
 import { FeaturedSectiondata } from "../../../../constants/landing_data";
 import FeaturedCard from "./CodevsFeaturedCard";
+import Section from "./CodevsSection";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -24,7 +24,7 @@ const outfit = Outfit({
 
 const FeaturedSection = () => {
   return (
-    <SectionWrapper id="whoweare" className="relative ">
+    <Section id="whoweare" className="relative mx-0">
       <div className="relative flex flex-col gap-4 ">
         <div className="flex flex-col">
           <motion.div
@@ -78,7 +78,7 @@ const FeaturedSection = () => {
           className="aspect-[855/678] w-[40rem] bg-blue-100 opacity-15 sm:w-[72.1875rem]"
         />
       </div>
-    </SectionWrapper>
+    </Section>
   );
 };
 
