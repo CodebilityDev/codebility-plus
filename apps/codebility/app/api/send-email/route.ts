@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { Resend } from "resend";
 import { render } from "@react-email/render";
+// Try a different import approach
 import { NdaEmailTemplate } from "../../emails/nda-template";
+// Or alternatively:
+// const { NdaEmailTemplate } = require("../../emails/nda-template");
 
 // Define a type for the email request
 interface EmailRequest {
