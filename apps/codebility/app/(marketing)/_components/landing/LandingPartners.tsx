@@ -21,6 +21,7 @@ export default function Partners() {
       name: "Federal PLANS",
       logo: "/assets/images/partners/federal-plans.png",
     },
+    { name: "Web Divine", logo: "/assets/images/partners/web-divine.png" },
   ];
 
   return (
