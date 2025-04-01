@@ -168,7 +168,7 @@ export default function NdaSigningPage() {
         
         if (logoBase64) {
           try {
-            doc.addImage(logoBase64, 'PNG', pageWidth - 60, pageHeight - 15, 30, 8);
+            doc.addImage(logoBase64, "PNG", pageWidth - 60, pageHeight - 15, 30, 8);
           } catch (e) {
             console.error("Error adding logo to footer:", e);
             doc.setFontSize(10);
