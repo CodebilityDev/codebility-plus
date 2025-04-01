@@ -7,7 +7,7 @@ import FeaturesCard from "./LandingFeaturesCard";
 
 const Features = () => {
   return (
-    <Section id="features" className="relative">
+    <Section id="features" className="relative w-full pt-10 text-white">
       <Container className="flex flex-col gap-10 text-white">
         <div className="flex max-w-[650px] flex-col gap-3">
           <p className="text-violet text-left text-lg md:text-2xl">

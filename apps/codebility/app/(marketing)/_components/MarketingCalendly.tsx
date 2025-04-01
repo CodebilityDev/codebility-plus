@@ -8,7 +8,7 @@ import Section from "./MarketingSection";
 
 const Calendly = () => {
   return (
-    <Section id="book" className="relative">
+    <Section id="book" className="relative w-full pt-10 text-white">
       <Container className="relative z-10 flex flex-col gap-6 text-white lg:flex-row lg:gap-10">
         <div className="flex w-full flex-1 flex-col justify-center gap-2 text-center lg:text-left">
           <h2 className="text-3xl font-bold uppercase md:text-5xl">
