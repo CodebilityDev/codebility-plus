@@ -58,7 +58,7 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
   const handleSendEmail = async () => {
     try {
       setIsSending(true);
-      const subject = `NDA Signing Request - Codebility Plus`;
+      const subject = "NDA Signing Request - Codebility Plus";
       const message = `Dear ${codev.first_name},\n\nPlease sign the Non-Disclosure Agreement by clicking on the link below:\n\n[NDA_LINK]\n\nThank you,\nCodebility Plus Team`;
       
       await onSendNdaEmail(codev.id, codev.email_address, subject, message);
@@ -66,7 +66,7 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
       toast.success(`NDA signing request sent to ${codev.email_address}`);
     } catch (error) {
       console.error("Error sending NDA email:", error);
-      toast.error('Failed to send NDA email. Please try again.');
+      toast.error("Failed to send NDA email. Please try again.");
     } finally {
       setIsSending(false);
     }
@@ -133,12 +133,12 @@ export function InHouseTable({
       
       // Save the NDA request to the database
       const { error: dbError } = await supabase
-        .from('nda_requests')
+        .from("nda_requests")
         .insert({
           codev_id: codevId,
           token: token,
           expires_at: expiresAt.toISOString(),
-          status: 'pending'
+          status: "pending"
         });
         
       if (dbError) throw dbError;
@@ -151,16 +151,16 @@ export function InHouseTable({
       const codevData = data.find(item => item.id === codevId);
       
       // Use the local API route instead of Supabase Edge Function
-      const emailResponse = await fetch('/api/send-email', {
-        method: 'POST',
+      const emailResponse = await fetch("/api/send-email", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
         body: JSON.stringify({
           recipient: email,
           subject: subject,
           content: message,
-          firstName: codevData?.first_name || '',
+          firstName: codevData?.first_name || "",
           ndaLink: signingLink,
           isNdaEmail: true
         })
@@ -180,7 +180,7 @@ export function InHouseTable({
       );
       
     } catch (error) {
-      console.error('Error sending NDA email:', error);
+      console.error("Error sending NDA email:", error);
       throw error;
     }
   };
@@ -206,10 +206,10 @@ export function InHouseTable({
       link.click();
       document.body.removeChild(link);
       
-     toast.success('NDA document downloaded successfully')
+     toast.success("NDA document downloaded successfully")
     } catch (error) {
       console.error("Error downloading NDA:", error);
-      toast.error('Failed to download NDA document');
+      toast.error("Failed to download NDA document");
     }
   };
 
