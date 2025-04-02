@@ -1,9 +1,9 @@
 import { Suspense } from "react";
-import SectionWrapper from "@/Components/shared/home/SectionWrapper";
 import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
 import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
 
+import Section from "../codevs/_components/CodevsSection";
 import CodevContainer from "./_components/CodevContainer";
 import CodevList from "./_components/CodevList";
 
@@ -78,7 +78,7 @@ export default async function Profiles() {
   });
 
   return (
-    <SectionWrapper
+    <Section
       id="codevs"
       className="from-black-500 relative w-full  bg-gradient-to-b"
     >
@@ -89,6 +89,6 @@ export default async function Profiles() {
           <CodevList codevs={sortedCodevs} />
         </Suspense>
       </div>
-    </SectionWrapper>
+    </Section>
   );
 }
