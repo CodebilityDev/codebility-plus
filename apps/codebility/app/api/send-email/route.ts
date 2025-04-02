@@ -1,7 +1,10 @@
-import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import { render } from '@react-email/render';
-import { NdaEmailTemplate } from '../../emails/nda-template';
+import { NextResponse } from "next/server";
+import { Resend } from "resend";
+import { render } from "@react-email/render";
+// Try a different import approach
+import { NdaEmailTemplate } from "../../emails/nda-template";
+// Or alternatively:
+// const { NdaEmailTemplate } = require("../../emails/nda-template");
 
 // Define a type for the email request
 interface EmailRequest {
@@ -22,9 +25,9 @@ export async function POST(request: Request) {
     const { recipient, subject, content, firstName, ndaLink, isNdaEmail } = await request.json() as EmailRequest;
     
     // Log the email details
-    console.log('Email request received:');
-    console.log('To:', recipient);
-    console.log('Subject:', subject);
+    console.log("Email request received:");
+    console.log("To:", recipient);
+    console.log("Subject:", subject);
     
     let html = content;
     
@@ -36,14 +39,14 @@ export async function POST(request: Request) {
     
     // Send the email using Resend
     const { data, error } = await resend.emails.send({
-      from: 'Codebility Plus <onboarding@resend.dev>', // You can change this to your verified domain later
+      from: "Codebility Plus <marco@codebility.tech>", // You can change this to your verified domain later
       to: [recipient],
       subject: subject,
       html: html,
     });
     
     if (error) {
-      console.error('Resend API error:', error);
+      console.error("Resend API error:", error);
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
     
@@ -55,8 +58,8 @@ export async function POST(request: Request) {
     });
   } catch (error: unknown) {
     // Properly type the error
-    const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-    console.error('Error in email service:', errorMessage);
+    const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
+    console.error("Error in email service:", errorMessage);
     return NextResponse.json({ error: errorMessage }, { status: 500 });
   }
 }
