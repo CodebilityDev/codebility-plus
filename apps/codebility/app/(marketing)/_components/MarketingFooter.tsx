@@ -13,7 +13,7 @@ const Footer = () => {
   const { onOpen } = useModal();
 
   return (
-    <section className="w-full xl:mb-10">
+    <section className="w-full xl:mb-6">
       <Container className="bg-black-600 mx-auto flex flex-col gap-2 text-white xl:rounded-3xl">
         <div className="flex flex-col gap-4 md:p-8 lg:flex-row lg:gap-6">
           <div className="flex basis-[25%] flex-col gap-2">

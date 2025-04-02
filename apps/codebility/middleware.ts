@@ -12,6 +12,7 @@ const PUBLIC_ROUTES = [
   "/terms",
   "/auth/password-reset",
   "/codevs",
+  "/bookacall",
   "/services",
   "/",
 ] as const;
