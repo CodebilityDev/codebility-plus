@@ -86,12 +86,22 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
   );
 };
 
+// Add this right after the component declaration
 export function InHouseTable({
   data,
   onDataChange,
   pagination,
 }: InHouseTableProps) {
   const supabase = useSupabase();
+  
+  // Debug log to check nda_request_sent values
+  useEffect(() => {
+    console.log("Data received in InHouseTable:", data.map(item => ({
+      id: item.id,
+      name: `${item.first_name} ${item.last_name}`,
+      nda_request_sent: item.nda_request_sent
+    })));
+  }, [data]);
 
   // For inline editing
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -131,6 +141,8 @@ export function InHouseTable({
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7); // Token expires in 7 days
       
+      console.log("Sending NDA email to:", email, "for codev ID:", codevId);
+      
       // Save the NDA request to the database
       const { error: dbError } = await supabase
         .from("nda_requests")
@@ -141,12 +153,14 @@ export function InHouseTable({
           status: "pending"
         });
         
-      if (dbError) throw dbError;
+      if (dbError) {
+        console.error("Error inserting NDA request:", dbError);
+        throw dbError;
+      }
       
       // Generate the NDA signing link
       const signingLink = `${window.location.origin}/nda-signing/${token}`;
       
-     
       // Find the codev from the data array using codevId
       const codevData = data.find(item => item.id === codevId);
       
@@ -167,18 +181,44 @@ export function InHouseTable({
       });
       
       if (!emailResponse.ok) {
-        throw new Error(await emailResponse.text());
+        const errorText = await emailResponse.text();
+        console.error("Email API error:", errorText);
+        throw new Error(errorText);
       }
       
-      // Update the codev's status in the local state
-      onDataChange(
-        data.map(item => 
-          item.id === codevId 
-            ? { ...item, nda_request_sent: true } as Codev 
-            : item
-        )
-      );
+      console.log("Email sent successfully, updating codev record");
       
+      // Update the codev record in the database to mark NDA request as sent
+      const { data: updateData, error: updateError } = await supabase
+        .from("codev")
+        .update({ nda_request_sent: true })
+        .eq("id", codevId)
+        .select();
+        
+      if (updateError) {
+        console.error("Error updating codev record:", updateError);
+        throw updateError;
+      }
+      
+      console.log("Codev record updated:", updateData);
+      
+      // Create a new array with the updated item
+      const updatedData = data.map(item => {
+        if (item.id === codevId) {
+          // Create a new object with all existing properties plus the updated one
+          return {
+            ...item,
+            nda_request_sent: true
+          };
+        }
+        return item;
+      });
+      
+      // Update the state with the new array
+      onDataChange(updatedData);
+      
+      // Force a re-render by logging the updated data
+      console.log("Updated local state:", updatedData.find(item => item.id === codevId));
     } catch (error) {
       console.error("Error sending NDA email:", error);
       throw error;
@@ -334,23 +374,25 @@ export function InHouseTable({
                           <Download className="mr-1 h-4 w-4" />
                           Download
                         </Button>
-                      ) : item.nda_request_sent ? (
-                        // If NDA request is sent but not signed yet, show pending button
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
-                          className="ml-2 text-yellow-500 dark:text-yellow-200"
-                          disabled
-                        >
-                          <span className="mr-1">⏳</span>
-                          Pending
-                        </Button>
                       ) : (
-                        // If no NDA request sent, show send button
-                        <SendNdaButton 
-                          codev={item} 
-                          onSendNdaEmail={handleSendNdaEmail} 
-                        />
+                        // Check if nda_request_sent is true, otherwise show send button
+                        // Add a check for undefined and default to false
+                        (item.nda_request_sent === true) ? (
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            className="ml-2 text-yellow-500 dark:text-yellow-200"
+                            disabled
+                          >
+                            <span className="mr-1">⏳</span>
+                            Pending
+                          </Button>
+                        ) : (
+                          <SendNdaButton 
+                            codev={item} 
+                            onSendNdaEmail={handleSendNdaEmail} 
+                          />
+                        )
                       )}
                      </div>
                   </TableCell>
