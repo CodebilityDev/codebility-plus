@@ -39,7 +39,7 @@ export async function POST(request: Request) {
     
     // Send the email using Resend
     const { data, error } = await resend.emails.send({
-      from: "Codebility Plus <onboarding@resend.dev>", // You can change this to your verified domain later
+      from: "Codebility Plus <marco@codebility.tech>", // You can change this to your verified domain later
       to: [recipient],
       subject: subject,
       html: html,
