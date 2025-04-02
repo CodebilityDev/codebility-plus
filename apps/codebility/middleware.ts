@@ -19,7 +19,7 @@ const PUBLIC_ROUTES = [
 // Routes that should be public with wildcard support (e.g., /profiles/*)
 const PUBLIC_ROUTE_PREFIXES = ["/profiles/"] as const;
 
-const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up"] as const;
+const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up", "/auth/onboarding"] as const;
 
 // Authentication status routes
 const EMAIL_VERIFICATION_ROUTE = "/auth/verify";
