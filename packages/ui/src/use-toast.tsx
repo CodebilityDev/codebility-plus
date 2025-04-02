@@ -52,6 +52,9 @@ interface State {
   toasts: ToasterToast[];
 }
 
+// If you're compiling for the browser only, you could do:
+// const toastTimeouts = new Map<string, number>();
+// For broader compatibility (Node/SSR + browser), keep ReturnType<typeof setTimeout>
 const toastTimeouts = new Map<string, ReturnType<typeof setTimeout>>();
 
 const reducer = (state: State, action: Action): State => {
@@ -66,7 +69,7 @@ const reducer = (state: State, action: Action): State => {
       return {
         ...state,
         toasts: state.toasts.map((t) =>
-          t.id === action.toast.id ? { ...t, ...action.toast } : t
+          t.id === action.toast.id ? { ...t, ...action.toast } : t,
         ),
       };
 
@@ -74,11 +77,12 @@ const reducer = (state: State, action: Action): State => {
       const { toastId } = action;
 
       if (toastId) {
-        toastTimeouts.forEach((_, id) => {
-          if (id === toastId) {
-            toastTimeouts.delete(id);
-          }
-        });
+        // Remove the timer for this toast from the map
+        const existingTimeout = toastTimeouts.get(toastId);
+        if (existingTimeout) {
+          clearTimeout(existingTimeout);
+          toastTimeouts.delete(toastId);
+        }
 
         return {
           ...state,
@@ -88,11 +92,12 @@ const reducer = (state: State, action: Action): State => {
                   ...t,
                   open: false,
                 }
-              : t
+              : t,
           ),
         };
       }
 
+      // Dismiss all toasts if no toastId is provided
       return {
         ...state,
         toasts: state.toasts.map((t) => ({
@@ -101,6 +106,7 @@ const reducer = (state: State, action: Action): State => {
         })),
       };
     }
+
     case actionTypes.REMOVE_TOAST:
       if (action.toastId) {
         return {
@@ -112,6 +118,7 @@ const reducer = (state: State, action: Action): State => {
         ...state,
         toasts: [],
       };
+
     default:
       return state;
   }
@@ -119,12 +126,18 @@ const reducer = (state: State, action: Action): State => {
 
 const ToastContext = React.createContext<{
   toasts: ToasterToast[];
-  toast: (props: Omit<ToasterToast, "id">) => void;
+  toast: (props: Omit<ToasterToast, "id">) => {
+    id: string;
+    dismiss: () => void;
+    update: (props: Partial<ToasterToast>) => void;
+  };
   dismiss: (toastId?: string) => void;
   remove: (toastId?: string) => void;
 }>({
   toasts: [],
-  toast: () => {},
+  toast: () => {
+    return { id: "", dismiss: () => {}, update: () => {} };
+  },
   dismiss: () => {},
   remove: () => {},
 });
@@ -136,13 +149,14 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
     (props: Omit<ToasterToast, "id">) => {
       const id = genId();
 
-      const update = (props: Partial<ToasterToast>) =>
+      const update = (updatedProps: Partial<ToasterToast>) =>
         dispatch({
           type: actionTypes.UPDATE_TOAST,
-          toast: { ...props, id },
+          toast: { ...updatedProps, id },
         });
 
-      const dismiss = () => dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
+      const dismiss = () =>
+        dispatch({ type: actionTypes.DISMISS_TOAST, toastId: id });
 
       dispatch({
         type: actionTypes.ADD_TOAST,
@@ -162,37 +176,42 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
         update,
       };
     },
-    [dispatch]
+    [dispatch],
   );
 
   const dismiss = React.useCallback(
     (toastId?: string) => {
       dispatch({ type: actionTypes.DISMISS_TOAST, toastId });
     },
-    [dispatch]
+    [dispatch],
   );
 
   const remove = React.useCallback(
     (toastId?: string) => {
       dispatch({ type: actionTypes.REMOVE_TOAST, toastId });
     },
-    [dispatch]
+    [dispatch],
   );
 
   React.useEffect(() => {
     state.toasts.forEach((toast) => {
+      // If a toast is open, set a timer to dismiss it
       if (toast.open) {
         toastTimeouts.set(
           toast.id,
           setTimeout(() => {
             dispatch({ type: actionTypes.DISMISS_TOAST, toastId: toast.id });
-          }, 5000)
+          }, 5000),
         );
       }
 
+      // If a toast has been closed, clear any existing timer and remove it later
       if (!toast.open && toastTimeouts.has(toast.id)) {
-        clearTimeout(toastTimeouts.get(toast.id));
-        toastTimeouts.delete(toast.id);
+        const timeoutId = toastTimeouts.get(toast.id);
+        if (timeoutId) {
+          clearTimeout(timeoutId);
+          toastTimeouts.delete(toast.id);
+        }
 
         setTimeout(() => {
           dispatch({ type: actionTypes.REMOVE_TOAST, toastId: toast.id });
@@ -202,7 +221,9 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
   }, [state.toasts, dispatch]);
 
   return (
-    <ToastContext.Provider value={{ toasts: state.toasts, toast, dismiss, remove }}>
+    <ToastContext.Provider
+      value={{ toasts: state.toasts, toast, dismiss, remove }}
+    >
       {children}
     </ToastContext.Provider>
   );
