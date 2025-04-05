@@ -1,5 +1,6 @@
 "use client";
 
+import { get } from "http";
 import { useState } from "react";
 import Link from "next/link";
 import InputField from "@/Components/shared/dashboard/InputPhone";
@@ -16,6 +17,18 @@ const EmailValidation = z.object({
 });
 
 type Inputs = z.infer<typeof EmailValidation>;
+
+const getURL = () => {
+  let url =
+    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
+    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
+    "http://localhost:3000/";
+  // Make sure to include `https://` when not localhost.
+  url = url.startsWith("http") ? url : `https://${url}`;
+  // Make sure to include a trailing `/`.
+  url = url.endsWith("/") ? url : `${url}/`;
+  return url;
+};
 
 const PasswordResetForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +55,9 @@ const PasswordResetForm = () => {
       const { email } = data;
 
       // Basic reset without custom redirect
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${getURL}home/settings/account-settings`,
+      });
 
       if (error) {
         console.error("Error resetting password:", error);

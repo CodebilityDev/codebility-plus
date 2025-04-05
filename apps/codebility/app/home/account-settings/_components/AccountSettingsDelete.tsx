@@ -130,7 +130,7 @@ export default function AccountSettingsDelete() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Alert className="background-box mb-4 border border-red-600 text-red-600">
+          <Alert className="background-box mb-4 pt-0 text-red-600 shadow-lg border-none">
             <AlertCircle className="h-4 w-4" color="red" />
             <AlertTitle>Warning</AlertTitle>
             <AlertDescription className="text-xs sm:text-sm">
