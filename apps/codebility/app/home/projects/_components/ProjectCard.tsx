@@ -62,10 +62,14 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
     };
   }, [project.id]); // Add proper dependency
 
+  const projectStatus = project.status && project.status.charAt(0).toUpperCase() + project.status.slice(1);
+  // const bgProjectStatus = project.status === "pending" || project.status === "completed" || project.status === "active" ? "" : "dark:bg-zinc-700";
+  const bgProjectStatus = project.status === "pending" ? "bg-orange-500/80" : project.status === "completed" ? "bg-green-500/80" : project.status === "active" ? "bg-blue-500/80" : "dark:bg-zinc-700";
+
   return (
     <div
       onClick={() => onOpen("projectViewModal", project)}
-      className="background-box flex cursor-pointer flex-col overflow-hidden rounded-xl border border-zinc-200 transition-all hover:shadow-lg dark:border-zinc-700 dark:shadow-slate-700"
+      className="background-box flex cursor-pointer flex-col overflow-hidden rounded-xl border border-zinc-200 transition-all hover:shadow-lg dark:border-zinc-700 dark:shadow-slate-700 "
     >
       {/* Project Image */}
       <div className="relative h-48 w-full">
@@ -78,21 +82,21 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
           loading="eager"
           priority
         />
-        <div className="absolute right-2 top-2 flex items-center rounded-xl bg-slate-200 px-2 py-1 text-slate-800 transition-all dark:bg-zinc-700 dark:text-white">
+        <div className={`absolute right-2 top-2 flex items-center rounded-xl   text-slate-800 transition-all ${bgProjectStatus} dark:text-white`}>
           <span
-            className={`rounded-full px-3 py-1 text-sm font-medium ${
+            className={`rounded-full px-4 py-2 text-sm font-medium ${
               project.status === "active"
-                ? "bg-green-500/20 text-green-500"
+                ? "bg-green-500/80 text-white-500"
                 : project.status === "pending"
-                  ? "bg-orange-500/20 text-orange-500"
+                  ? "bg-orange-500/80 text-white-500"
                   : project.status === "completed"
-                    ? "bg-blue-500/20 text-blue-500"
-                    : "bg-gray-500/20 text-gray-500"
+                    ? "bg-blue-500/80 text-white-500"
+                    : "bg-gray-500/80 text-white-500"
             }`}
           >
             {project.status === "inprogress"
               ? "In Progress"
-              : project.status || "Unknown"}
+              : projectStatus || "Unknown"}
           </span>
         </div>
       </div>
@@ -150,7 +154,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
                 {members.slice(0, 4).map((member) => (
                   <div
                     key={member.id}
-                    className="relative h-8 w-8 rounded-full ring-2 ring-white dark:ring-zinc-900"
+                    className="relative h-8 w-8 rounded-full"
                   >
                     {member.image_url ? (
                       <Image
@@ -166,8 +170,8 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
                   </div>
                 ))}
                 {members.length > 4 && (
-                  <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full bg-gray-100 ring-2 ring-white dark:bg-gray-800 dark:ring-zinc-900">
-                    <span className="text-xs font-medium">
+                  <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full dark:bg-zinc-700 dark:bg-gray-800">
+                    <span className="text-xs font-medium ">
                       +{members.length - 4}
                     </span>
                   </div>
