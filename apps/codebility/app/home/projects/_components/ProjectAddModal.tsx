@@ -172,6 +172,7 @@ const ProjectAddModal = () => {
         onChange={handleTeamLeaderSelect}
         placeholder="Select Team Leader"
         disabled={isDataLoading}
+        searchable
       />
       <CustomSelect
         label="Project Category"
@@ -179,6 +180,7 @@ const ProjectAddModal = () => {
         onChange={(value) => setValue("project_category_id", value)}
         placeholder="Select Project Category"
         variant="simple"
+        searchable
       />
       <CustomSelect
         label="Client"
@@ -186,6 +188,7 @@ const ProjectAddModal = () => {
         onChange={(value) => setValue("client_id", value)}
         placeholder="Select Client"
         disabled={isDataLoading}
+        searchable
       />
       <MemberSelection
         users={users.filter((user) => user.id !== currentTeamLeader?.id)}
@@ -427,7 +430,7 @@ const ProjectAddModal = () => {
             type="date"
             placeholder="Select start date"
             {...register("start_date", { required: "Start date is required" })}
-            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-white"
           />
           {errors.start_date && (
             <p className="text-sm text-red-500">{errors.start_date.message}</p>
