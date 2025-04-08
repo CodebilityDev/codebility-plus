@@ -3,6 +3,7 @@
 import H1 from "@/Components/shared/dashboard/H1";
 import { useUserStore } from "@/store/codev-store";
 
+import DashboardCurrentProject from "./(dashboard)/_components/DashboardCurrentProject";
 import Profile from "./(dashboard)/_components/DashboardProfile";
 import TimeTracker from "./(dashboard)/_components/DashboardTimeTracker";
 import TokenPoints from "./(dashboard)/_components/DashboardTokenPoints";
@@ -21,6 +22,7 @@ export default function DashboardPage() {
               <Profile />
               {/* <TimeTracker /> */}
             </div>
+            <DashboardCurrentProject />
             <TokenPoints />
           </div>
         </div>
