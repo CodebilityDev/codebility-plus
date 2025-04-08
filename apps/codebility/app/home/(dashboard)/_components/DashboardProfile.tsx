@@ -16,7 +16,6 @@ import {
   fetchUserAvailabilityStatus,
   updateUserAvailabilityStatus,
 } from "../actions";
-import DashboardCurrentProject from "./DashboardCurrentProject";
 
 export default function DashboardProfile() {
   const { user } = useUserStore();
