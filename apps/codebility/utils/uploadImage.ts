@@ -1,4 +1,4 @@
-import { getSupabaseBrowserClient } from "@codevs/supabase/browser-client";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 interface UploadImageOptions {
   bucket?: string;
@@ -18,7 +18,7 @@ export async function uploadImage(
   file: File,
   options: UploadImageOptions = defaultOptions,
 ) {
-  const supabase = getSupabaseBrowserClient();
+  const supabase = createClientComponentClient();
   try {
     const { bucket = "codebility", folder = "profileImage" } = options;
 
@@ -58,7 +58,7 @@ export async function deleteImage(
   filePath: string,
   bucket: string = "codebility",
 ) {
-  const supabase = getSupabaseBrowserClient();
+  const supabase = createClientComponentClient();
   try {
     const { error } = await supabase.storage.from(bucket).remove([filePath]);
     if (error) {
