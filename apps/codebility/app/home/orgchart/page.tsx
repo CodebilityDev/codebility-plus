@@ -6,7 +6,7 @@ const Page = async () => {
   const supabase = getSupabaseServerActionClient();
   const { data: orgChartData, error } = await supabase
     .from("codev")
-    .select("id, first_name, last_name, display_position, image_url");
+    .select("id, first_name, last_name, display_position, image_url, application_status");
 
   if (error) {
     return <div>Error loading organization chart</div>;
@@ -34,3 +34,5 @@ const Page = async () => {
 };
 
 export default Page;
+
+
