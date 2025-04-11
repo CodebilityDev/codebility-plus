@@ -1,7 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
 import ApplicantsActionButtons from "@/app/home/applicants/_components/ApplicantsActionButtons";
-import { createAssessmentEmailLink } from "@/app/home/applicants/_components/email-templates";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -13,6 +12,7 @@ import {
 } from "@/Components/ui/table";
 import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
+import { CheckCircle } from "lucide-react";
 
 import {
   Accordion,
@@ -28,10 +28,32 @@ import {
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
 
-const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
+import { createAssessmentEmailLink } from "./email-templates";
+
+const ApplicantsTableMobile = ({
+  applicants,
+  trackAssessmentSent,
+  sentAssessments,
+}: {
+  applicants: Codev[];
+  trackAssessmentSent?: (applicantId: string) => void;
+  sentAssessments?: Record<string, boolean>;
+}) => {
   // Helper function to create Google Mail link
   const createGmailLink = (email: string) => {
     return `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`;
+  };
+
+  // Handle when an assessment is sent
+  const handleAssessmentSent = (applicantId: string, role: string) => {
+    if (trackAssessmentSent) {
+      trackAssessmentSent(applicantId);
+    }
+  };
+
+  // Check if assessment has been sent
+  const hasAssessmentBeenSent = (applicantId: string) => {
+    return sentAssessments ? !!sentAssessments[applicantId] : false;
   };
 
   return (
@@ -58,12 +80,24 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                     )}
                   </Avatar>
                   <div className="flex flex-col items-start">
-                    <p className="text-sm capitalize">
-                      {applicant.first_name} {applicant.last_name}
-                    </p>
+                    <div className="flex items-center gap-2">
+                      <p className="text-sm capitalize">
+                        {applicant.first_name} {applicant.last_name}
+                      </p>
+                      {hasAssessmentBeenSent(applicant.id) && (
+                        <CheckCircle className="h-3.5 w-3.5 text-green-400" />
+                      )}
+                    </div>
                     <p className="text-xs text-gray-400">
                       {applicant.display_position || "Not specified"}
                     </p>
+                    {applicant.years_of_experience !== undefined && (
+                      <p className="text-xs text-gray-400">
+                        {applicant.years_of_experience}{" "}
+                        {applicant.years_of_experience === 1 ? "year" : "years"}{" "}
+                        experience
+                      </p>
+                    )}
                   </div>
                 </div>
               </AccordionTrigger>
@@ -90,9 +124,20 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                               <Button
                                 variant="outline"
                                 size="sm"
-                                className="h-7 w-full border-gray-700 bg-transparent text-xs text-gray-300 hover:bg-gray-800"
+                                className={`h-7 w-full border-gray-700 bg-transparent text-xs ${
+                                  hasAssessmentBeenSent(applicant.id)
+                                    ? "border-green-700 text-green-400"
+                                    : "text-gray-300"
+                                }`}
                               >
-                                Send Assessment
+                                {hasAssessmentBeenSent(applicant.id) ? (
+                                  <div className="flex items-center justify-center gap-1">
+                                    <CheckCircle className="h-3.5 w-3.5" />
+                                    <span>Assessment Sent</span>
+                                  </div>
+                                ) : (
+                                  "Send Assessment"
+                                )}
                               </Button>
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-48 border border-gray-700 bg-gray-900">
@@ -108,6 +153,12 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                                   )}
                                   target="_blank"
                                   className="cursor-pointer text-gray-200 hover:text-white"
+                                  onClick={() =>
+                                    handleAssessmentSent(
+                                      applicant.id,
+                                      "frontend",
+                                    )
+                                  }
                                 >
                                   Frontend Assessment
                                 </Link>
@@ -124,6 +175,12 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                                   )}
                                   target="_blank"
                                   className="cursor-pointer text-gray-200 hover:text-white"
+                                  onClick={() =>
+                                    handleAssessmentSent(
+                                      applicant.id,
+                                      "backend",
+                                    )
+                                  }
                                 >
                                   Backend Assessment
                                 </Link>
@@ -140,6 +197,9 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                                   )}
                                   target="_blank"
                                   className="cursor-pointer text-gray-200 hover:text-white"
+                                  onClick={() =>
+                                    handleAssessmentSent(applicant.id, "mobile")
+                                  }
                                 >
                                   Mobile Assessment
                                 </Link>
@@ -156,6 +216,12 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                                   )}
                                   target="_blank"
                                   className="cursor-pointer text-gray-200 hover:text-white"
+                                  onClick={() =>
+                                    handleAssessmentSent(
+                                      applicant.id,
+                                      "designer",
+                                    )
+                                  }
                                 >
                                   Designer Assessment
                                 </Link>
@@ -163,18 +229,6 @@ const ApplicantsTableMobile = ({ applicants }: { applicants: Codev[] }) => {
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </div>
-                      </TableCell>
-                    </TableRow>
-                    <TableRow className="grid grid-cols-2 p-2">
-                      <TableCell className="text-sm">Experience</TableCell>
-                      <TableCell>
-                        {applicant.years_of_experience !== undefined
-                          ? `${applicant.years_of_experience} ${
-                              applicant.years_of_experience === 1
-                                ? "year"
-                                : "years"
-                            }`
-                          : "N/A"}
                       </TableCell>
                     </TableRow>
                     <TableRow className="grid grid-cols-2 p-2">
