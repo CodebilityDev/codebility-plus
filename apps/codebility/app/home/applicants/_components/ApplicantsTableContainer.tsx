@@ -4,7 +4,15 @@ import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
 
-const ApplicantsTableContainer = ({ applicants }: { applicants: Codev[] }) => {
+const ApplicantsTableContainer = ({
+  applicants,
+  trackAssessmentSent,
+  sentAssessments,
+}: {
+  applicants: Codev[];
+  trackAssessmentSent?: (applicantId: string) => void;
+  sentAssessments?: Record<string, boolean>;
+}) => {
   const {
     currentPage,
     totalPages,
@@ -25,10 +33,18 @@ const ApplicantsTableContainer = ({ applicants }: { applicants: Codev[] }) => {
   return (
     <>
       <div className="hidden xl:block">
-        <ApplicantsTableDesktop applicants={paginatedApplicants} />
+        <ApplicantsTableDesktop
+          applicants={paginatedApplicants}
+          trackAssessmentSent={trackAssessmentSent}
+          sentAssessments={sentAssessments}
+        />
       </div>
       <div className="block xl:hidden">
-        <ApplicantsTableMobile applicants={paginatedApplicants} />
+        <ApplicantsTableMobile
+          applicants={paginatedApplicants}
+          trackAssessmentSent={trackAssessmentSent}
+          sentAssessments={sentAssessments}
+        />
       </div>
       <div className="relative w-full">
         {applicants.length > pageSize.applicants && (

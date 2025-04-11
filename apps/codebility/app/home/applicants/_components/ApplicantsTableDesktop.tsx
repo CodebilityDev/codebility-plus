@@ -14,6 +14,7 @@ import {
 } from "@/Components/ui/table";
 import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
+import { CheckCircle } from "lucide-react";
 
 import { Avatar, AvatarImage } from "@codevs/ui/avatar";
 import {
@@ -30,10 +31,30 @@ import {
 
 import { createAssessmentEmailLink } from "./email-templates";
 
-const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
+const ApplicantsTableDesktop = ({
+  applicants,
+  trackAssessmentSent,
+  sentAssessments,
+}: {
+  applicants: Codev[];
+  trackAssessmentSent?: (applicantId: string) => void;
+  sentAssessments?: Record<string, boolean>;
+}) => {
   // Helper function to create Google Mail link
   const createGmailLink = (email: string) => {
     return `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`;
+  };
+
+  // Handle when an assessment is sent
+  const handleAssessmentSent = (applicantId: string, role: string) => {
+    if (trackAssessmentSent) {
+      trackAssessmentSent(applicantId);
+    }
+  };
+
+  // Check if assessment has been sent
+  const hasAssessmentBeenSent = (applicantId: string) => {
+    return sentAssessments ? !!sentAssessments[applicantId] : false;
   };
 
   return (
@@ -125,6 +146,12 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                             {applicant.display_position}
                           </p>
                         )}
+                        {hasAssessmentBeenSent(applicant.id) && (
+                          <div className="mt-2 flex items-center gap-1 text-xs text-green-400">
+                            <CheckCircle className="h-3.5 w-3.5" />
+                            <span>Assessment sent</span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </HoverCardContent>
@@ -204,9 +231,20 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                       <Button
                         variant="outline"
                         size="sm"
-                        className="h-6 border-gray-700 bg-transparent px-2 py-0 text-xs text-xs text-gray-300 hover:bg-gray-800"
+                        className={`h-6 border-gray-700 bg-transparent px-2 py-0 text-xs ${
+                          hasAssessmentBeenSent(applicant.id)
+                            ? "border-green-700 text-green-400"
+                            : "text-gray-300"
+                        }`}
                       >
-                        Send Assessment
+                        {hasAssessmentBeenSent(applicant.id) ? (
+                          <div className="flex items-center gap-1">
+                            <CheckCircle className="h-3 w-3" />
+                            <span>Sent</span>
+                          </div>
+                        ) : (
+                          "Send Assessment"
+                        )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="w-48 border border-gray-700 bg-gray-900">
@@ -222,6 +260,9 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                           )}
                           target="_blank"
                           className="cursor-pointer text-gray-200 hover:text-white"
+                          onClick={() =>
+                            handleAssessmentSent(applicant.id, "frontend")
+                          }
                         >
                           Frontend Assessment
                         </Link>
@@ -238,6 +279,9 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                           )}
                           target="_blank"
                           className="cursor-pointer text-gray-200 hover:text-white"
+                          onClick={() =>
+                            handleAssessmentSent(applicant.id, "backend")
+                          }
                         >
                           Backend Assessment
                         </Link>
@@ -254,6 +298,9 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                           )}
                           target="_blank"
                           className="cursor-pointer text-gray-200 hover:text-white"
+                          onClick={() =>
+                            handleAssessmentSent(applicant.id, "mobile")
+                          }
                         >
                           Mobile Assessment
                         </Link>
@@ -270,6 +317,9 @@ const ApplicantsTableDesktop = ({ applicants }: { applicants: Codev[] }) => {
                           )}
                           target="_blank"
                           className="cursor-pointer text-gray-200 hover:text-white"
+                          onClick={() =>
+                            handleAssessmentSent(applicant.id, "designer")
+                          }
                         >
                           Designer Assessment
                         </Link>
