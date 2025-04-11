@@ -25,6 +25,7 @@ export default function OrgChart({ data }: OrgChartProps) {
       roleOrder.indexOf(a.display_position) -
       roleOrder.indexOf(b.display_position),
   );
+  
 
   const ceo = sortedData.find(
     (member) => member.display_position === "CEO / Founder",
@@ -68,7 +69,6 @@ export default function OrgChart({ data }: OrgChartProps) {
           a.first_name.localeCompare(b.first_name),
       ),
   };
-
   return (
     <Box className="mx-auto w-full rounded-lg bg-white p-8 shadow-xl dark:bg-gray-800">
       <CardHeader className="mb-8 text-center">
@@ -117,6 +117,7 @@ export default function OrgChart({ data }: OrgChartProps) {
             <div className="mb-4 h-8 w-1 bg-border"></div>
             <div className="flex flex-col gap-4">
               {members.map((member) => (
+                member.application_status === "passed" &&
                 <TeamMemberCard key={member.id} {...member} />
               ))}
             </div>
