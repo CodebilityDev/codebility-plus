@@ -11,24 +11,14 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
+import { resetUserPassword } from "../action";
+
 // Define the schema for email validation
 const EmailValidation = z.object({
   email: z.string().email("Invalid email address"),
 });
 
 type Inputs = z.infer<typeof EmailValidation>;
-
-const getURL = () => {
-  let url =
-    process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
-    process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
-    "http://localhost:3000/";
-  // Make sure to include `https://` when not localhost.
-  url = url.startsWith("http") ? url : `https://${url}`;
-  // Make sure to include a trailing `/`.
-  url = url.endsWith("/") ? url : `${url}/`;
-  return url;
-};
 
 const PasswordResetForm = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -54,18 +44,11 @@ const PasswordResetForm = () => {
     try {
       const { email } = data;
 
-      // Basic reset without custom redirect
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
-        redirectTo: `${getURL}home/settings/account-settings`,
-      });
+      // call resetUserPassword function
+      await resetUserPassword(email);
 
-      if (error) {
-        console.error("Error resetting password:", error);
-        toast.error(error.message || "Failed to send reset email");
-      } else {
-        toast.success("Password reset email sent successfully.");
-        setIsSubmitted(true);
-      }
+      toast.success("Password reset email sent successfully.");
+      setIsSubmitted(true);
     } catch (error: any) {
       console.error("Unexpected error:", error);
       toast.error("Something went wrong");

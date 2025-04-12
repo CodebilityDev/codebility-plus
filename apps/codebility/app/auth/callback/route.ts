@@ -7,6 +7,20 @@ export const dynamic = "force-dynamic";
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
   const code = requestUrl.searchParams.get("code");
+  const origin = requestUrl.origin;
+  const redirectTo = requestUrl.searchParams.get("redirect_to")?.toString();
+  const tokenHash = requestUrl.searchParams.get("token_hash");
+
+  if (tokenHash) {
+    const cookieStore = cookies();
+    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+
+    await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "email" });
+
+    if (redirectTo) {
+      return NextResponse.redirect(`${origin}${redirectTo}`);
+    }
+  }
 
   if (code) {
     const cookieStore = cookies();
@@ -59,6 +73,7 @@ export async function GET(request: Request) {
       return NextResponse.redirect(new URL("/auth/sign-in", requestUrl.origin));
     }
   }
+
 
   // No code present, redirect to sign-in
   return NextResponse.redirect(new URL("/auth/sign-in", requestUrl.origin));

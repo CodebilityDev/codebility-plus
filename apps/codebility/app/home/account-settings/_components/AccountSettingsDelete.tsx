@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { AlertCircle, Trash2 } from "lucide-react";
+import { AlertCircle, HelpCircleIcon, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -36,6 +36,7 @@ import {
   FormMessage,
 } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover";
 
 import AccountSettingsBackdrop from "./AccountSettingsBackDrop";
 
@@ -123,21 +124,47 @@ export default function AccountSettingsDelete() {
       <Card className="background-box text-dark100_light900 w-full border border-red-600">
         <CardHeader>
           <CardTitle className="flex items-center text-base text-red-600 sm:text-2xl">
-            <Trash2 className="mr-2" /> Delete Account
+            <div className="flex w-full items-center justify-between">
+              <h1 className="flex items-center">
+                <Trash2 className="mr-2" /> Delete Account
+              </h1>
+
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button variant="ghost" size="icon" className="h-8 w-8">
+                    <HelpCircleIcon className="h-4 w-4" />
+                    <span className="sr-only">Help</span>
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-80" align="end">
+                  <div className="space-y-2">
+                    <h4 className="font-medium">About account deletion</h4>
+                    <p className="text-sm text-muted-foreground">
+                      When you delete your account, all your data is permanently
+                      removed from our systems. This includes your profile,
+                      content, and activity history.
+                    </p>
+                    <p className="text-sm text-muted-foreground">
+                      If you're having issues with our service, consider
+                      contacting support before deletion.
+                    </p>
+                  </div>
+                </PopoverContent>
+              </Popover>
+            </div>
           </CardTitle>
           <CardDescription className="text-xs sm:text-sm">
             Permanently delete your account and all associated data.
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Alert className="background-box mb-4 pt-0 text-red-600 shadow-lg border-none">
-            <AlertCircle className="h-4 w-4" color="red" />
+           {/* {  <Alert className="background-box mb-4 p-0 border-none pt-0 text-red-600">
             <AlertTitle>Warning</AlertTitle>
             <AlertDescription className="text-xs sm:text-sm">
               This action is irreversible. All your data will be permanently
               deleted.
             </AlertDescription>
-          </Alert>
+          </Alert>} */}
           <Form {...form}>
             <Dialog
               open={isOpen}
