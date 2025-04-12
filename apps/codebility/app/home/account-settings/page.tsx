@@ -18,11 +18,11 @@ export default async function AccountSettingsPage() {
       </h1>
       <Card className="bg-light-900 dark:bg-dark-100 space-y-8 ">
         <CardContent className="space-y-6 p-4">
-          <AccountSettingsHeader email={user?.email as string} />
-          <Separator />
+          {/* <AccountSettingsHeader email={user?.email as string} />
+          <Separator /> */}
           <AccountSettingsChangePassword />
           <Separator />
-          <AccountSettings2FA />
+         {/*  <AccountSettings2FA /> */}
         </CardContent>
         <CardFooter className="px-3">
           <AccountSettingsDelete />
