@@ -62,9 +62,18 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
     };
   }, [project.id]); // Add proper dependency
 
-  const projectStatus = project.status && project.status.charAt(0).toUpperCase() + project.status.slice(1);
+  const projectStatus =
+    project.status &&
+    project.status.charAt(0).toUpperCase() + project.status.slice(1);
   // const bgProjectStatus = project.status === "pending" || project.status === "completed" || project.status === "active" ? "" : "dark:bg-zinc-700";
-  const bgProjectStatus = project.status === "pending" ? "bg-orange-500/80" : project.status === "completed" ? "bg-green-500/80" : project.status === "active" ? "bg-blue-500/80" : "dark:bg-zinc-700";
+  const bgProjectStatus =
+    project.status === "pending"
+      ? "bg-orange-500/80"
+      : project.status === "completed"
+        ? "bg-green-500/80"
+        : project.status === "active"
+          ? "bg-blue-500/80"
+          : "dark:bg-zinc-700";
 
   return (
     <div
@@ -82,16 +91,18 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
           loading="eager"
           priority
         />
-        <div className={`absolute right-2 top-2 flex items-center rounded-xl   text-slate-800 transition-all ${bgProjectStatus} dark:text-white`}>
+        <div
+          className={`absolute right-2 top-2 flex items-center rounded-xl   text-slate-800 transition-all ${bgProjectStatus} dark:text-white`}
+        >
           <span
             className={`rounded-full px-4 py-2 text-sm font-medium ${
               project.status === "active"
-                ? "bg-green-500/80 text-white-500"
+                ? "text-white-500 bg-green-500/80"
                 : project.status === "pending"
-                  ? "bg-orange-500/80 text-white-500"
+                  ? "text-white-500 bg-orange-500/80"
                   : project.status === "completed"
-                    ? "bg-blue-500/80 text-white-500"
-                    : "bg-gray-500/80 text-white-500"
+                    ? "text-white-500 bg-blue-500/80"
+                    : "text-white-500 bg-gray-500/80"
             }`}
           >
             {project.status === "inprogress"
@@ -108,9 +119,11 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
           <h3 className="text-dark100_light900 line-clamp-1 text-xl font-semibold">
             {project.name}
           </h3>
-          <p className="text-dark100_light900 line-clamp-2 text-sm">
-            {project.description || "No description provided"}
-          </p>
+          <div className="p-1 h-12">
+            <p className="text-dark100_light900 line-clamp-2 text-sm">
+              {project.description || "No description provided"}
+            </p>
+          </div>
         </div>
 
         {/* Team Section */}
@@ -148,36 +161,37 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
               <Skeleton className="h-8 w-48 rounded-lg" />
               <Skeleton className="h-8 w-40 rounded-lg" />
             </>
+          ) : members.length > 0 ? (
+            <div className="flex -space-x-2">
+              {members.slice(0, 4).map((member) => (
+                <div key={member.id} className="relative h-8 w-8 rounded-full">
+                  {member.image_url ? (
+                    <Image
+                      src={member.image_url}
+                      alt={`${member.first_name} ${member.last_name}`}
+                      fill
+                      unoptimized={true}
+                      className="rounded-full object-cover"
+                    />
+                  ) : (
+                    <DefaultAvatar size={32} />
+                  )}
+                </div>
+              ))}
+              {members.length > 4 && (
+                <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full dark:bg-gray-800 dark:bg-zinc-700">
+                  <span className="text-xs font-medium ">
+                    +{members.length - 4}
+                  </span>
+                </div>
+              )}
+            </div>
           ) : (
-            members.length > 0 && (
-              <div className="flex -space-x-2">
-                {members.slice(0, 4).map((member) => (
-                  <div
-                    key={member.id}
-                    className="relative h-8 w-8 rounded-full"
-                  >
-                    {member.image_url ? (
-                      <Image
-                        src={member.image_url}
-                        alt={`${member.first_name} ${member.last_name}`}
-                        fill
-                        unoptimized={true}
-                        className="rounded-full object-cover"
-                      />
-                    ) : (
-                      <DefaultAvatar size={32} />
-                    )}
-                  </div>
-                ))}
-                {members.length > 4 && (
-                  <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full dark:bg-zinc-700 dark:bg-gray-800">
-                    <span className="text-xs font-medium ">
-                      +{members.length - 4}
-                    </span>
-                  </div>
-                )}
+            <div className="flex -space-x-2">
+              <div className="relative flex h-8 w-full rounded-full text-gray">
+                No Members
               </div>
-            )
+            </div>
           )}
         </div>
 
