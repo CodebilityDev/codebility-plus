@@ -79,9 +79,9 @@ const DashboardCurrentProject = () => {
       <Box className="flex w-full flex-1 flex-col gap-4">
         <p className="text-2xl">Current Projects</p>
         <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
-          <Skeleton className="h-12 max-w-[300px] flex-1 rounded-md p-2" />
-          <Skeleton className="h-12 max-w-[300px] flex-1 rounded-md p-2" />
-          <Skeleton className="h-12 max-w-[300px] flex-1 rounded-md p-2" />
+          <Skeleton className="flex h-12 w-64 gap-2 rounded-md p-2"></Skeleton>
+          <Skeleton className="flex h-12 w-64 gap-2 rounded-md p-2"></Skeleton>
+          <Skeleton className="flex h-12 w-64 gap-2 rounded-md p-2"></Skeleton>
         </div>
       </Box>
     );
