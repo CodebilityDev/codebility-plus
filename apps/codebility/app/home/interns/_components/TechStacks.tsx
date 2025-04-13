@@ -36,7 +36,8 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
           ) : null,
         )}
         {!isOpen && hiddenTech.length > 0 && (
-          <CollapsibleTrigger asChild
+          <CollapsibleTrigger
+            asChild
             onClick={(e) => {
               e.stopPropagation();
               setIsOpen(true);
@@ -75,7 +76,8 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
                 ))}
 
                 {/* Trigger moved to the last index when expanded.*/}
-                <CollapsibleTrigger asChild
+                <CollapsibleTrigger
+                  asChild
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsOpen(false);
