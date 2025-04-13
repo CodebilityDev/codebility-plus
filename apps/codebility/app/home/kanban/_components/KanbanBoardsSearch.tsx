@@ -31,7 +31,7 @@ export default function KanbanBoardsSearch({
       placeholder={placeholder}
       onChange={(e) => handleSearch(e.target.value)}
       defaultValue={searchParams.get("query")?.toString()}
-      className={className}
+      className={`${className} text-dark-400 dark:text-light-700`}
       id={id} // Assigning the optional id
     />
   );
