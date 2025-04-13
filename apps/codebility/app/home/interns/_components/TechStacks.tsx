@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { AnimatePresence, motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 
 import {
   Collapsible,
@@ -12,6 +13,27 @@ type TechStacksProps = {
   techStacks: string[];
 };
 
+function TechIcon({ tech }: { tech: string }) {
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  return (
+    <div className="relative flex h-[20px] w-[20px] items-center justify-center">
+      {!isLoaded && (
+        <Loader2 className="absolute h-4 w-4 animate-spin text-gray-400" />
+      )}
+      <Image
+        src={`/assets/svgs/icon-${tech.toLowerCase()}.svg`}
+        alt={`${tech} icon`}
+        width={20}
+        height={20}
+        title={tech}
+        className={`h-[20px] w-[20px] object-contain transition duration-300 hover:-translate-y-0.5 ${isLoaded ? "opacity-100" : "opacity-0"}`}
+        onLoad={() => setIsLoaded(true)}
+      />
+    </div>
+  );
+}
+
 export default function TechStacks({ techStacks }: TechStacksProps) {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const visibleTech = techStacks.slice(0, 10);
@@ -19,24 +41,13 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
 
   return (
     <Collapsible open={isOpen}>
-      {/* First 10 tech skills */}
       <div className="flex flex-wrap gap-2">
         {visibleTech.map((tech, idx) =>
-          tech ? (
-            <div className="flex items-center" key={`${tech}-${idx}`}>
-              <Image
-                src={`/assets/svgs/icon-${tech.toLowerCase()}.svg`}
-                alt={`${tech} icon`}
-                width={20}
-                height={20}
-                title={tech}
-                className="h-[20px] w-[20px] object-contain transition duration-300 hover:-translate-y-0.5"
-              />
-            </div>
-          ) : null,
+          tech ? <TechIcon tech={tech} key={`${tech}-${idx}`} /> : null,
         )}
         {!isOpen && hiddenTech.length > 0 && (
-          <CollapsibleTrigger asChild
+          <CollapsibleTrigger
+            asChild
             onClick={(e) => {
               e.stopPropagation();
               setIsOpen(true);
@@ -49,7 +60,6 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
         )}
       </div>
       <AnimatePresence>
-        {/* Show +number more if there are more than 10 tech stacks */}
         {isOpen && (
           <CollapsibleContent asChild forceMount>
             <motion.div
@@ -60,22 +70,11 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
               className="overflow-hidden"
             >
               <div className="mt-2 flex flex-wrap gap-2">
-                {/* Hidden tech stacks (only shown when expanded) */}
                 {hiddenTech.map((tech, idx) => (
-                  <div className="flex items-center" key={`${tech}-${idx}`}>
-                    <Image
-                      src={`/assets/svgs/icon-${tech.toLowerCase()}.svg`}
-                      alt={`${tech} icon`}
-                      width={20}
-                      height={20}
-                      title={tech}
-                      className="h-[20px] w-[20px] object-contain transition duration-300 hover:-translate-y-0.5"
-                    />
-                  </div>
+                  <TechIcon tech={tech} key={`${tech}-${idx}`} />
                 ))}
-
-                {/* Trigger moved to the last index when expanded.*/}
-                <CollapsibleTrigger asChild
+                <CollapsibleTrigger
+                  asChild
                   onClick={(e) => {
                     e.stopPropagation();
                     setIsOpen(false);
