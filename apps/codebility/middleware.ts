@@ -15,6 +15,7 @@ const PUBLIC_ROUTES = [
   "/bookacall",
   "/services",
   "/",
+  "/auth/callback",
 ] as const;
 
 // Routes that should be public with wildcard support (e.g., /profiles/*)

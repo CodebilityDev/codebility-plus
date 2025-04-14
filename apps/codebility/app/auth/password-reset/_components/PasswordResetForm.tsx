@@ -10,6 +10,8 @@ import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
+import { resetUserPassword } from "../action";
+
 // Define the schema for email validation
 const EmailValidation = z.object({
   email: z.string().email("Invalid email address"),
@@ -41,16 +43,11 @@ const PasswordResetForm = () => {
     try {
       const { email } = data;
 
-      // Basic reset without custom redirect
-      const { error } = await supabase.auth.resetPasswordForEmail(email);
+      // call resetUserPassword function
+      await resetUserPassword(email);
 
-      if (error) {
-        console.error("Error resetting password:", error);
-        toast.error(error.message || "Failed to send reset email");
-      } else {
-        toast.success("Password reset email sent successfully.");
-        setIsSubmitted(true);
-      }
+      toast.success("Password reset email sent successfully.");
+      setIsSubmitted(true);
     } catch (error: any) {
       console.error("Unexpected error:", error);
       toast.error("Something went wrong");
