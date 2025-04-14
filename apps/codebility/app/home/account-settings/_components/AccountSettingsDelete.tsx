@@ -145,7 +145,7 @@ export default function AccountSettingsDelete() {
                       content, and activity history.
                     </p>
                     <p className="text-sm text-muted-foreground">
-                      If you're having issues with our service, consider
+                      If you&apos;re having issues with our service, consider
                       contacting support before deletion.
                     </p>
                   </div>
