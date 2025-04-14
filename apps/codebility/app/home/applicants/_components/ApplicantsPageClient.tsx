@@ -2,25 +2,14 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import dynamic from "next/dynamic";
+import ApplicantsFilterBadges from "@/app/home/applicants/_components/ApplicantsFilterBadges";
+import ApplicantsFilteringHeader from "@/app/home/applicants/_components/ApplicantsFilteringHeader";
+import ApplicantsTabs from "@/app/home/applicants/_components/ApplicantsTabs";
 import { fetchApplicants } from "@/app/home/applicants/action";
 import ApplicantsLoading from "@/app/home/applicants/loading";
 import { Box, H1 } from "@/Components/shared/dashboard";
-import Search from "@/Components/shared/dashboard/Search";
-import { Button } from "@/Components/ui/button";
 import { Codev } from "@/types/home/codev";
-import { ChevronDown, Filter, SortDesc, X } from "lucide-react";
 import { Toaster } from "react-hot-toast";
-
-import { Badge } from "@codevs/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
 
 const ApplicantsList = dynamic(
   () => import("@/app/home/applicants/_components/ApplicantsList"),
@@ -28,13 +17,13 @@ const ApplicantsList = dynamic(
 );
 
 // Define filter types
-type ExperienceRanges = {
+export type ExperienceRanges = {
   novice: boolean; // 0-2 years
   intermediate: boolean; // 3-5 years
   expert: boolean; // 5+ years
 };
 
-type Filters = {
+export type Filters = {
   hasPortfolio: boolean;
   noPortfolio: boolean;
   hasGithub: boolean;
@@ -45,11 +34,21 @@ type Filters = {
   positions: Record<string, boolean>;
 };
 
+export type ApplicantStatus =
+  | "applying" // Initial application
+  | "testing" // Taking assessment test
+  | "onboarding" // Passed assessment, in interview/onboarding process
+  | "denied" // Application denied
+  | "passed" // Final acceptance (becomes CODEV)
+  | "rejected"; // Rejected (counts in rejected_count)
+
 const ApplicantsPageClient = () => {
   // Data loading state
   const [isLoading, setIsLoading] = useState<boolean>(true);
   const [applicants, setApplicants] = useState<Codev[]>([]);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<ApplicantStatus>("applying");
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
 
   // Filtering and sorting state
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -85,6 +84,47 @@ const ApplicantsPageClient = () => {
     ];
   }, [applicants]);
 
+  // Group applicants by their status
+  const applicantsByStatus = useMemo(() => {
+    const grouped: Record<ApplicantStatus, Codev[]> = {
+      applying: [],
+      testing: [],
+      onboarding: [],
+      denied: [],
+      passed: [],
+      rejected: [],
+    };
+
+    applicants.forEach((applicant) => {
+      const status =
+        (applicant.application_status as ApplicantStatus) || "applying";
+      if (grouped[status]) {
+        grouped[status].push(applicant);
+      } else {
+        grouped.applying.push(applicant);
+      }
+    });
+
+    return grouped;
+  }, [applicants]);
+
+  // Get counts for each tab
+  const tabCounts = useMemo(() => {
+    return {
+      applying: applicantsByStatus.applying?.length || 0,
+      testing: applicantsByStatus.testing?.length || 0,
+      onboarding: applicantsByStatus.onboarding?.length || 0,
+      denied: applicantsByStatus.denied?.length || 0,
+      passed: applicantsByStatus.passed?.length || 0,
+      rejected: applicantsByStatus.rejected?.length || 0,
+    };
+  }, [applicantsByStatus]);
+
+  // Function to refresh data
+  const refreshData = useCallback(() => {
+    setRefreshTrigger((prev) => prev + 1);
+  }, []);
+
   // Load applicants data
   useEffect(() => {
     const getApplicants = async () => {
@@ -97,7 +137,6 @@ const ApplicantsPageClient = () => {
           setError(fetchError);
         } else {
           setApplicants(fetchedApplicants);
-          setFilteredApplicants(fetchedApplicants);
         }
       } catch (err) {
         setError("Unable to fetch applicants");
@@ -107,7 +146,7 @@ const ApplicantsPageClient = () => {
     };
 
     getApplicants();
-  }, []);
+  }, [refreshTrigger]); // Add refreshTrigger to dependency array
 
   // Load saved assessment data
   useEffect(() => {
@@ -176,8 +215,11 @@ const ApplicantsPageClient = () => {
       } catch (error) {
         console.error("Error saving sent assessments:", error);
       }
+
+      // Refresh data to reflect status changes
+      refreshData();
     },
-    [sentAssessments],
+    [sentAssessments, refreshData],
   );
 
   // Reset all filters
@@ -246,14 +288,18 @@ const ApplicantsPageClient = () => {
 
   // Apply filters and sorting
   useEffect(() => {
-    if (!applicants || applicants.length === 0) {
+    if (
+      !applicantsByStatus[activeTab] ||
+      applicantsByStatus[activeTab].length === 0
+    ) {
       setFilteredApplicants([]);
       return;
     }
 
-    // Filter applicants
-    let results = [...applicants];
+    // Start with the correct tab's applicants
+    let results = [...applicantsByStatus[activeTab]];
 
+    // Filter applicants
     // Search term filter
     if (searchTerm) {
       const search = searchTerm.toLowerCase();
@@ -362,7 +408,8 @@ const ApplicantsPageClient = () => {
 
     setFilteredApplicants(results);
   }, [
-    applicants,
+    applicantsByStatus,
+    activeTab,
     searchTerm,
     filters,
     sortField,
@@ -375,6 +422,24 @@ const ApplicantsPageClient = () => {
     setSearchTerm(term);
   }, []);
 
+  // Handle tab change
+  const handleTabChange = useCallback((value: ApplicantStatus) => {
+    setActiveTab(value);
+    // Reset some filters when changing tabs
+    setSearchTerm("");
+  }, []);
+
+  // Handle filter changes
+  const handleFilterChange = useCallback((newFilters: Filters) => {
+    setFilters(newFilters);
+  }, []);
+
+  // Handle status change
+  const handleStatusChange = useCallback(() => {
+    // Refresh data when status changes
+    refreshData();
+  }, [refreshData]);
+
   if (isLoading) return <ApplicantsLoading />;
   if (error) return <div className="text-red-500">ERROR: {error}</div>;
 
@@ -383,463 +448,61 @@ const ApplicantsPageClient = () => {
       <div className="flex flex-col gap-4">
         <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
-            <H1>Applicants List</H1>
-            {applicants?.length > 0 && (
-              <Badge className="bg-light-800 text-black-500 dark:bg-dark-300 dark:text-light-800">
-                {applicants.length}
-              </Badge>
-            )}
+            <H1>Applicants Management</H1>
           </div>
-          <div className="flex flex-col gap-2 sm:flex-row">
-            <div className="flex gap-2">
-              {/* Sort Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="dark:bg-dark-200 dark:border-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1 border-gray-300 bg-white"
-                  >
-                    <SortDesc className="h-4 w-4" />
-                    <span>Sort</span>
-                    {sortField && <ChevronDown className="ml-1 h-3 w-3" />}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="dark:bg-dark-200 dark:border-dark-400 min-w-[140px] border border-gray-300 bg-white">
-                  <DropdownMenuLabel className="text-black-500 dark:text-light-800">
-                    Sort by
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-                  <DropdownMenuItem
-                    className={`flex justify-between ${sortField === "name" ? "text-blue-500 dark:text-blue-300" : "text-black-500 dark:text-light-800"}`}
-                    onClick={() => toggleSort("name")}
-                  >
-                    Name
-                    {sortField === "name" && (
-                      <span>{sortDirection === "asc" ? "↑" : "↓"}</span>
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className={`flex justify-between ${sortField === "position" ? "text-blue-500 dark:text-blue-300" : "text-black-500 dark:text-light-800"}`}
-                    onClick={() => toggleSort("position")}
-                  >
-                    Position
-                    {sortField === "position" && (
-                      <span>{sortDirection === "asc" ? "↑" : "↓"}</span>
-                    )}
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className={`flex justify-between ${sortField === "experience" ? "text-blue-500 dark:text-blue-300" : "text-black-500 dark:text-light-800"}`}
-                    onClick={() => toggleSort("experience")}
-                  >
-                    Experience
-                    {sortField === "experience" && (
-                      <span>{sortDirection === "asc" ? "↑" : "↓"}</span>
-                    )}
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
 
-              {/* Filter Dropdown */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="dark:bg-dark-200 dark:border-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1 border-gray-300 bg-white"
-                  >
-                    <Filter className="h-4 w-4" />
-                    <span>Filters</span>
-                    {activeFilterCount > 0 && (
-                      <Badge className="ml-1 flex h-5 w-5 items-center justify-center bg-blue-500 p-0 text-white">
-                        {activeFilterCount}
-                      </Badge>
-                    )}
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent className="dark:bg-dark-200 dark:border-dark-400 border border-gray-300 bg-white">
-                  <DropdownMenuLabel className="text-black-500 dark:text-light-800">
-                    Filter applicants
-                  </DropdownMenuLabel>
-                  <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-
-                  <DropdownMenuLabel className="text-black-300 dark:text-light-500 text-xs">
-                    Portfolio
-                  </DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={filters.hasPortfolio}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        hasPortfolio: !!checked,
-                      }))
-                    }
-                    className="text-black-500 dark:text-light-800"
-                  >
-                    Has portfolio
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filters.noPortfolio}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        noPortfolio: !!checked,
-                      }))
-                    }
-                    className="text-black-500 dark:text-light-800"
-                  >
-                    No portfolio
-                  </DropdownMenuCheckboxItem>
-
-                  <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-                  <DropdownMenuLabel className="text-black-300 dark:text-light-500 text-xs">
-                    GitHub
-                  </DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={filters.hasGithub}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({ ...prev, hasGithub: !!checked }))
-                    }
-                    className="text-black-500 dark:text-light-800"
-                  >
-                    Has GitHub
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filters.noGithub}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({ ...prev, noGithub: !!checked }))
-                    }
-                    className="text-black-500 dark:text-light-800"
-                  >
-                    No GitHub
-                  </DropdownMenuCheckboxItem>
-
-                  <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-                  <DropdownMenuLabel className="text-black-300 dark:text-light-500 text-xs">
-                    Assessment
-                  </DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={filters.assessmentSent}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        assessmentSent: !!checked,
-                      }))
-                    }
-                    className="text-black-500 dark:text-light-800"
-                  >
-                    Assessment sent
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filters.assessmentNotSent}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        assessmentNotSent: !!checked,
-                      }))
-                    }
-                    className="text-black-500 dark:text-light-800"
-                  >
-                    Assessment not sent
-                  </DropdownMenuCheckboxItem>
-
-                  <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-                  <DropdownMenuLabel className="text-black-300 dark:text-light-500 text-xs">
-                    Experience
-                  </DropdownMenuLabel>
-                  <DropdownMenuCheckboxItem
-                    checked={filters.experienceRanges.novice}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        experienceRanges: {
-                          ...prev.experienceRanges,
-                          novice: !!checked,
-                        },
-                      }))
-                    }
-                    className="text-black-500 dark:text-light-800"
-                  >
-                    0-2 years
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filters.experienceRanges.intermediate}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        experienceRanges: {
-                          ...prev.experienceRanges,
-                          intermediate: !!checked,
-                        },
-                      }))
-                    }
-                    className="text-black-500 dark:text-light-800"
-                  >
-                    3-5 years
-                  </DropdownMenuCheckboxItem>
-                  <DropdownMenuCheckboxItem
-                    checked={filters.experienceRanges.expert}
-                    onCheckedChange={(checked) =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        experienceRanges: {
-                          ...prev.experienceRanges,
-                          expert: !!checked,
-                        },
-                      }))
-                    }
-                    className="text-black-500 dark:text-light-800"
-                  >
-                    5+ years
-                  </DropdownMenuCheckboxItem>
-
-                  {uniquePositions.length > 0 &&
-                    Object.keys(filters.positions).length > 0 && (
-                      <>
-                        <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-                        <DropdownMenuLabel className="text-black-300 dark:text-light-500 text-xs">
-                          Position
-                        </DropdownMenuLabel>
-                        {uniquePositions.map(
-                          (position) =>
-                            position && (
-                              <DropdownMenuCheckboxItem
-                                key={position}
-                                checked={filters.positions[position] || false}
-                                onCheckedChange={(checked) =>
-                                  setFilters((prev) => ({
-                                    ...prev,
-                                    positions: {
-                                      ...prev.positions,
-                                      [position]: !!checked,
-                                    },
-                                  }))
-                                }
-                                className="text-black-500 dark:text-light-800"
-                              >
-                                {position}
-                              </DropdownMenuCheckboxItem>
-                            ),
-                        )}
-                      </>
-                    )}
-
-                  {activeFilterCount > 0 && (
-                    <>
-                      <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        className="w-full justify-center text-xs text-red-100 hover:bg-red-100/10 hover:text-red-200 dark:text-red-100"
-                        onClick={resetFilters}
-                      >
-                        <X className="mr-1 h-3 w-3" />
-                        Reset filters
-                      </Button>
-                    </>
-                  )}
-                </DropdownMenuContent>
-              </DropdownMenu>
-            </div>
-
-            <Search onSubmit={handleSearch} placeholder="Search applicants" />
-          </div>
+          {/* Filtering header component */}
+          <ApplicantsFilteringHeader
+            applicants={applicants}
+            searchTerm={searchTerm}
+            filters={filters}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            activeFilterCount={activeFilterCount}
+            onSearch={handleSearch}
+            onFilterChange={handleFilterChange}
+            onToggleSort={toggleSort}
+            onResetFilters={resetFilters}
+            uniquePositions={uniquePositions}
+          />
         </div>
 
         {/* Filter badges summary */}
         {activeFilterCount > 0 && (
-          <div className="flex flex-wrap gap-2">
-            {sortField && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                Sort: {sortField} {sortDirection === "asc" ? "↑" : "↓"}
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() => setSortField(null)}
-                />
-              </Badge>
-            )}
-
-            {filters.hasPortfolio && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                Has portfolio
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() =>
-                    setFilters((prev) => ({ ...prev, hasPortfolio: false }))
-                  }
-                />
-              </Badge>
-            )}
-
-            {filters.noPortfolio && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                No portfolio
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() =>
-                    setFilters((prev) => ({ ...prev, noPortfolio: false }))
-                  }
-                />
-              </Badge>
-            )}
-
-            {/* More filter badges... */}
-            {/* GitHub filters */}
-            {filters.hasGithub && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                Has GitHub
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() =>
-                    setFilters((prev) => ({ ...prev, hasGithub: false }))
-                  }
-                />
-              </Badge>
-            )}
-
-            {filters.noGithub && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                No GitHub
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() =>
-                    setFilters((prev) => ({ ...prev, noGithub: false }))
-                  }
-                />
-              </Badge>
-            )}
-
-            {/* Assessment filters */}
-            {filters.assessmentSent && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                Assessment sent
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() =>
-                    setFilters((prev) => ({ ...prev, assessmentSent: false }))
-                  }
-                />
-              </Badge>
-            )}
-
-            {filters.assessmentNotSent && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                Assessment not sent
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      assessmentNotSent: false,
-                    }))
-                  }
-                />
-              </Badge>
-            )}
-
-            {/* Experience filters */}
-            {filters.experienceRanges.novice && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                0-2 years
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      experienceRanges: {
-                        ...prev.experienceRanges,
-                        novice: false,
-                      },
-                    }))
-                  }
-                />
-              </Badge>
-            )}
-
-            {filters.experienceRanges.intermediate && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                3-5 years
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      experienceRanges: {
-                        ...prev.experienceRanges,
-                        intermediate: false,
-                      },
-                    }))
-                  }
-                />
-              </Badge>
-            )}
-
-            {filters.experienceRanges.expert && (
-              <Badge className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1">
-                5+ years
-                <X
-                  className="ml-1 h-3 w-3 cursor-pointer"
-                  onClick={() =>
-                    setFilters((prev) => ({
-                      ...prev,
-                      experienceRanges: {
-                        ...prev.experienceRanges,
-                        expert: false,
-                      },
-                    }))
-                  }
-                />
-              </Badge>
-            )}
-
-            {/* Position filters */}
-            {Object.entries(filters.positions || {})
-              .filter(([_, isSelected]) => isSelected)
-              .map(([position]) => (
-                <Badge
-                  key={position}
-                  className="bg-light-800 dark:bg-dark-300 text-black-500 dark:text-light-800 flex items-center gap-1"
-                >
-                  {position}
-                  <X
-                    className="ml-1 h-3 w-3 cursor-pointer"
-                    onClick={() =>
-                      setFilters((prev) => ({
-                        ...prev,
-                        positions: { ...prev.positions, [position]: false },
-                      }))
-                    }
-                  />
-                </Badge>
-              ))}
-
-            {activeFilterCount > 1 && (
-              <Button
-                variant="ghost"
-                size="sm"
-                className="h-6 px-2 py-0 text-xs text-red-100 hover:text-red-200 dark:text-red-100"
-                onClick={resetFilters}
-              >
-                Clear all
-              </Button>
-            )}
-          </div>
-        )}
-      </div>
-
-      <Box>
-        {filteredApplicants.length === 0 ? (
-          <div className="p-8 text-center text-gray-400 dark:text-gray-500">
-            No applicants found matching your criteria.
-          </div>
-        ) : (
-          <ApplicantsList
-            applicants={filteredApplicants}
-            trackAssessmentSent={trackAssessmentSent}
-            sentAssessments={sentAssessments}
+          <ApplicantsFilterBadges
+            filters={filters}
+            sortField={sortField}
+            sortDirection={sortDirection}
+            onFilterChange={handleFilterChange}
+            onToggleSort={toggleSort}
+            setSortField={setSortField}
           />
         )}
-      </Box>
+
+        {/* Tabs for applicant stages */}
+        <ApplicantsTabs
+          activeTab={activeTab}
+          tabCounts={tabCounts}
+          onTabChange={handleTabChange}
+        >
+          {/* Tab content */}
+          <Box>
+            {filteredApplicants.length === 0 ? (
+              <div className="p-8 text-center text-gray-400 dark:text-gray-500">
+                No applicants found matching your criteria.
+              </div>
+            ) : (
+              <ApplicantsList
+                applicants={filteredApplicants}
+                trackAssessmentSent={trackAssessmentSent}
+                sentAssessments={sentAssessments}
+                activeTab={activeTab}
+                onStatusChange={handleStatusChange}
+              />
+            )}
+          </Box>
+        </ApplicantsTabs>
+      </div>
       <Toaster position="top-center" reverseOrder={false} />
     </div>
   );
