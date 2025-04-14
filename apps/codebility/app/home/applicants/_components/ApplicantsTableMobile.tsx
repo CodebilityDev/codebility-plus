@@ -1,6 +1,9 @@
+"use client";
+
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import ApplicantsActionButtons from "@/app/home/applicants/_components/ApplicantsActionButtons";
+import { moveToTestingAction } from "@/app/home/applicants/action";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -12,7 +15,8 @@ import {
 } from "@/Components/ui/table";
 import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
-import { CheckCircle } from "lucide-react";
+import { CheckCircle, Loader2 } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 import {
   Accordion,
@@ -28,26 +32,57 @@ import {
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
 
+import ApplicantStatusButtons from "./ApplicantsStatusButtons";
 import { createAssessmentEmailLink } from "./email-templates";
+
+interface ApplicantsTableMobileProps {
+  applicants: Codev[];
+  trackAssessmentSent?: (applicantId: string) => void;
+  sentAssessments?: Record<string, boolean>;
+  onStatusChange?: () => void;
+}
 
 const ApplicantsTableMobile = ({
   applicants,
   trackAssessmentSent,
   sentAssessments,
-}: {
-  applicants: Codev[];
-  trackAssessmentSent?: (applicantId: string) => void;
-  sentAssessments?: Record<string, boolean>;
-}) => {
+  onStatusChange,
+}: ApplicantsTableMobileProps) => {
+  const [sendingAssessment, setSendingAssessment] = useState<
+    Record<string, boolean>
+  >({});
+
   // Helper function to create Google Mail link
   const createGmailLink = (email: string) => {
     return `https://mail.google.com/mail/?view=cm&fs=1&to=${email}`;
   };
 
-  // Handle when an assessment is sent
-  const handleAssessmentSent = (applicantId: string, role: string) => {
-    if (trackAssessmentSent) {
-      trackAssessmentSent(applicantId);
+  // Handle when an assessment is sent and move to testing phase
+  const handleAssessmentSent = async (applicantId: string, role: string) => {
+    setSendingAssessment((prev) => ({ ...prev, [applicantId]: true }));
+
+    try {
+      // Track that assessment was sent
+      if (trackAssessmentSent) {
+        trackAssessmentSent(applicantId);
+      }
+
+      // Move applicant to testing phase
+      const result = await moveToTestingAction(applicantId);
+
+      if (result.success) {
+        toast.success("Applicant moved to testing phase");
+        if (onStatusChange) {
+          onStatusChange();
+        }
+      } else {
+        toast.error("Failed to update status");
+      }
+    } catch (error) {
+      console.error("Error in assessment process:", error);
+      toast.error("An error occurred while processing");
+    } finally {
+      setSendingAssessment((prev) => ({ ...prev, [applicantId]: false }));
     }
   };
 
@@ -104,6 +139,7 @@ const ApplicantsTableMobile = ({
               <AccordionContent className="p-4">
                 <Table className="text-dark100_light900">
                   <TableHeader>
+                    {/* Email Row */}
                     <TableRow className="grid grid-cols-2 p-2">
                       <TableCell className="text-sm">Email</TableCell>
                       <TableCell>
@@ -119,118 +155,137 @@ const ApplicantsTableMobile = ({
                               {applicant.email_address}
                             </span>
                           </div>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className={`h-7 w-full border-gray-700 bg-transparent text-xs ${
-                                  hasAssessmentBeenSent(applicant.id)
-                                    ? "border-green-700 text-green-400"
-                                    : "text-gray-300"
-                                }`}
-                              >
-                                {hasAssessmentBeenSent(applicant.id) ? (
-                                  <div className="flex items-center justify-center gap-1">
-                                    <CheckCircle className="h-3.5 w-3.5" />
-                                    <span>Assessment Sent</span>
-                                  </div>
-                                ) : (
-                                  "Send Assessment"
-                                )}
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent className="w-48 border border-gray-700 bg-gray-900">
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  href={createAssessmentEmailLink(
-                                    applicant.email_address,
-                                    applicant.first_name,
-                                    applicant.last_name,
-                                    applicant.display_position,
-                                    applicant.years_of_experience,
-                                    "frontend",
+
+                          {/* Only show assessment button for applying status */}
+                          {(applicant.application_status === "applying" ||
+                            !applicant.application_status) && (
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  disabled={
+                                    sendingAssessment[applicant.id] ||
+                                    hasAssessmentBeenSent(applicant.id)
+                                  }
+                                  className={`h-7 w-full border-gray-700 bg-transparent text-xs ${
+                                    hasAssessmentBeenSent(applicant.id)
+                                      ? "border-green-700 text-green-400"
+                                      : "text-gray-300"
+                                  }`}
+                                >
+                                  {sendingAssessment[applicant.id] ? (
+                                    <div className="flex items-center justify-center gap-1">
+                                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                                      <span>Sending...</span>
+                                    </div>
+                                  ) : hasAssessmentBeenSent(applicant.id) ? (
+                                    <div className="flex items-center justify-center gap-1">
+                                      <CheckCircle className="h-3.5 w-3.5" />
+                                      <span>Assessment Sent</span>
+                                    </div>
+                                  ) : (
+                                    "Send Assessment"
                                   )}
-                                  target="_blank"
-                                  className="cursor-pointer text-gray-200 hover:text-white"
-                                  onClick={() =>
-                                    handleAssessmentSent(
-                                      applicant.id,
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent className="w-48 border border-gray-700 bg-gray-900">
+                                <DropdownMenuItem asChild>
+                                  <Link
+                                    href={createAssessmentEmailLink(
+                                      applicant.email_address,
+                                      applicant.first_name,
+                                      applicant.last_name,
+                                      applicant.display_position,
+                                      applicant.years_of_experience,
                                       "frontend",
-                                    )
-                                  }
-                                >
-                                  Frontend Assessment
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  href={createAssessmentEmailLink(
-                                    applicant.email_address,
-                                    applicant.first_name,
-                                    applicant.last_name,
-                                    applicant.display_position,
-                                    applicant.years_of_experience,
-                                    "backend",
-                                  )}
-                                  target="_blank"
-                                  className="cursor-pointer text-gray-200 hover:text-white"
-                                  onClick={() =>
-                                    handleAssessmentSent(
-                                      applicant.id,
+                                    )}
+                                    target="_blank"
+                                    className="cursor-pointer text-gray-200 hover:text-white"
+                                    onClick={() =>
+                                      handleAssessmentSent(
+                                        applicant.id,
+                                        "frontend",
+                                      )
+                                    }
+                                  >
+                                    Frontend Assessment
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                  <Link
+                                    href={createAssessmentEmailLink(
+                                      applicant.email_address,
+                                      applicant.first_name,
+                                      applicant.last_name,
+                                      applicant.display_position,
+                                      applicant.years_of_experience,
                                       "backend",
-                                    )
-                                  }
-                                >
-                                  Backend Assessment
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  href={createAssessmentEmailLink(
-                                    applicant.email_address,
-                                    applicant.first_name,
-                                    applicant.last_name,
-                                    applicant.display_position,
-                                    applicant.years_of_experience,
-                                    "mobile",
-                                  )}
-                                  target="_blank"
-                                  className="cursor-pointer text-gray-200 hover:text-white"
-                                  onClick={() =>
-                                    handleAssessmentSent(applicant.id, "mobile")
-                                  }
-                                >
-                                  Mobile Assessment
-                                </Link>
-                              </DropdownMenuItem>
-                              <DropdownMenuItem asChild>
-                                <Link
-                                  href={createAssessmentEmailLink(
-                                    applicant.email_address,
-                                    applicant.first_name,
-                                    applicant.last_name,
-                                    applicant.display_position,
-                                    applicant.years_of_experience,
-                                    "designer",
-                                  )}
-                                  target="_blank"
-                                  className="cursor-pointer text-gray-200 hover:text-white"
-                                  onClick={() =>
-                                    handleAssessmentSent(
-                                      applicant.id,
+                                    )}
+                                    target="_blank"
+                                    className="cursor-pointer text-gray-200 hover:text-white"
+                                    onClick={() =>
+                                      handleAssessmentSent(
+                                        applicant.id,
+                                        "backend",
+                                      )
+                                    }
+                                  >
+                                    Backend Assessment
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                  <Link
+                                    href={createAssessmentEmailLink(
+                                      applicant.email_address,
+                                      applicant.first_name,
+                                      applicant.last_name,
+                                      applicant.display_position,
+                                      applicant.years_of_experience,
+                                      "mobile",
+                                    )}
+                                    target="_blank"
+                                    className="cursor-pointer text-gray-200 hover:text-white"
+                                    onClick={() =>
+                                      handleAssessmentSent(
+                                        applicant.id,
+                                        "mobile",
+                                      )
+                                    }
+                                  >
+                                    Mobile Assessment
+                                  </Link>
+                                </DropdownMenuItem>
+                                <DropdownMenuItem asChild>
+                                  <Link
+                                    href={createAssessmentEmailLink(
+                                      applicant.email_address,
+                                      applicant.first_name,
+                                      applicant.last_name,
+                                      applicant.display_position,
+                                      applicant.years_of_experience,
                                       "designer",
-                                    )
-                                  }
-                                >
-                                  Designer Assessment
-                                </Link>
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
+                                    )}
+                                    target="_blank"
+                                    className="cursor-pointer text-gray-200 hover:text-white"
+                                    onClick={() =>
+                                      handleAssessmentSent(
+                                        applicant.id,
+                                        "designer",
+                                      )
+                                    }
+                                  >
+                                    Designer Assessment
+                                  </Link>
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          )}
                         </div>
                       </TableCell>
                     </TableRow>
+
+                    {/* GitHub Row */}
                     <TableRow className="grid grid-cols-2 p-2">
                       <TableCell className="text-sm">Github</TableCell>
                       <TableCell>
@@ -243,6 +298,8 @@ const ApplicantsTableMobile = ({
                         )}
                       </TableCell>
                     </TableRow>
+
+                    {/* Portfolio Row */}
                     <TableRow className="grid grid-cols-2 p-2">
                       <TableCell className="text-sm">Portfolio</TableCell>
                       <TableCell>
@@ -258,6 +315,8 @@ const ApplicantsTableMobile = ({
                         )}
                       </TableCell>
                     </TableRow>
+
+                    {/* Tech Stack Row */}
                     <TableRow className="grid grid-cols-2 p-2">
                       <TableCell className="text-sm">Tech Stack</TableCell>
                       <TableCell>
@@ -281,13 +340,22 @@ const ApplicantsTableMobile = ({
                         </div>
                       </TableCell>
                     </TableRow>
+
+                    {/* Status Actions Row - only show for non-applying stages */}
+                    {applicant.application_status !== "applying" && (
+                      <TableRow className="grid grid-cols-2 p-2">
+                        <TableCell className="text-sm">Actions</TableCell>
+                        <TableCell>
+                          <ApplicantStatusButtons
+                            applicant={applicant}
+                            onStatusChange={onStatusChange}
+                          />
+                        </TableCell>
+                      </TableRow>
+                    )}
                   </TableHeader>
                   <TableBody>
-                    <TableRow>
-                      <TableCell>
-                        <ApplicantsActionButtons applicant={applicant} />
-                      </TableCell>
-                    </TableRow>
+                    {/* No longer need this row as actions are moved into the table header */}
                   </TableBody>
                 </Table>
               </AccordionContent>
