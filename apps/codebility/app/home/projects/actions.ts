@@ -133,6 +133,34 @@ export async function createProject(
   }
 }
 
+/**
+* DOCU: This function is used to update the projects active switch. <br>
+* This is being called on ProjectCard. <br>
+* Last Updated Date: April 17, 2025 <br>
+* @function
+* @param {boolean} activeSwitch
+* @param {string} projectId
+* @author Kas
+*/
+export async function updateProjectsSwitch(
+  activeSwitch: boolean,
+  projectId: string,
+) {
+
+  const supabase = createClientComponentClient();    
+  const { error: projectError } = await supabase
+    .from("projects")
+    .update({
+      active_switch: activeSwitch,
+    })
+    .eq("id", projectId)
+    .select();
+
+  if(projectError) console.error("Error in updating projects and kanban board:", projectError);
+
+  return { success: true, projectId, activeSwitch };
+}
+
 export async function updateProject(projectId: string, formData: FormData) {
   const supabase = createClientComponentClient();
 
