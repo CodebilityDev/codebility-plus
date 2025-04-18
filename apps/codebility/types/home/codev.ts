@@ -163,7 +163,7 @@ export interface Project {
   role?: string;
   joined_at?: string;
   project_members?: ProjectMember[];
-  active_switch: boolean;
+  kanban_display: boolean;
 }
 export interface Education {
   id: string;
