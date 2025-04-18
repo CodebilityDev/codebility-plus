@@ -9,6 +9,7 @@ interface DbProjectMember {
   project: {
     id: string;
     name: string;
+    active_switch: boolean;
   };
   role: string;
   joined_at: string;
@@ -476,6 +477,7 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
             name: pm.project.name,
             role: pm.role,
             joined_at: pm.joined_at,
+            active_switch: pm.project.active_switch
           };
           return project;
         },
