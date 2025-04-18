@@ -152,7 +152,7 @@ export async function updateProjectsSwitch(
   const { error: projectError } = await supabase
     .from("projects")
     .update({
-      active_switch: activeSwitch,
+      kanban_display: activeSwitch,
     })
     .eq("id", projectId)
     .select();
@@ -477,7 +477,7 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
             name: pm.project.name,
             role: pm.role,
             joined_at: pm.joined_at,
-            active_switch: pm.project.active_switch
+            kanban_display: pm.project.active_switch
           };
           return project;
         },

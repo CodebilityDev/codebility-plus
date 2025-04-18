@@ -43,7 +43,7 @@ interface ProjectData {
   team_leader_id?: string;
   project_members?: ProjectMemberData[];
   codev?: CodevData;
-  active_switch?: boolean;
+  kanban_display: boolean;
 }
 
 interface KanbanBoardData {
@@ -75,7 +75,7 @@ export default async function KanbanPage({ searchParams }: PageProps) {
       id,
       name,
       client_id,
-      active_switch,
+      kanban_display,
       project_members (
         role,
         codev (
@@ -162,7 +162,7 @@ export default async function KanbanPage({ searchParams }: PageProps) {
     // Render boards
     return boardsWithTeamLeads.map((board) => (
       <TableRow key={board.id} className="grid grid-cols-1 md:table-row">
-        {board.projects?.active_switch && (
+        {board.projects?.kanban_display && (
           <>
           {/* Board Name */}
         <TableCell className="md:table-cell">
