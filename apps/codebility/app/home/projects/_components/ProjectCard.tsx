@@ -26,7 +26,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
   const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
   const [members, setMembers] = useState<SimpleMemberData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [activeSwitch, setActiveSwitch] = useState(project.active_switch);
+  const [activeSwitch, setActiveSwitch] = useState(project.kanban_display);
 
   useEffect(() => {
     const fetchTeamData = async () => {
