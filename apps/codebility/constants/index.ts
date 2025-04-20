@@ -20,3 +20,9 @@ export const projects = [
     link: "https://tapup.vercel.app/",
   },
 ];
+
+export const CATEGORIES = [
+  { id: 1, name: "Web Application" },
+  { id: 2, name: "Mobile Application" },
+  { id: 3, name: "Product Design" },
+] as const;
