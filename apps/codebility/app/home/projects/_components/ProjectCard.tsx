@@ -7,8 +7,10 @@ import {
   getMembers,
   getTeamLead,
   SimpleMemberData,
+  updateProjectsSwitch,
 } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
+import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { ModalType } from "@/hooks/use-modal-projects";
 import { defaultAvatar } from "@/public/assets/images";
@@ -24,6 +26,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
   const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
   const [members, setMembers] = useState<SimpleMemberData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeSwitch, setActiveSwitch] = useState(project.kanban_display);
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -65,7 +68,6 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
   const projectStatus =
     project.status &&
     project.status.charAt(0).toUpperCase() + project.status.slice(1);
-  // const bgProjectStatus = project.status === "pending" || project.status === "completed" || project.status === "active" ? "" : "dark:bg-zinc-700";
   const bgProjectStatus =
     project.status === "pending"
       ? "bg-orange-500/80"
@@ -74,6 +76,14 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
         : project.status === "active"
           ? "bg-blue-500/80"
           : "dark:bg-zinc-700";
+
+  const handleSwitchBtn = async(e: React.MouseEvent) : Promise<void> => {
+    const { id } = e.currentTarget
+    e.stopPropagation();
+    setActiveSwitch(!activeSwitch);
+    
+    await updateProjectsSwitch(!activeSwitch, id)
+  };
 
   return (
     <div
@@ -116,10 +126,22 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
       <div className="flex flex-1 flex-col gap-4 p-6">
         {/* Project Name & Description */}
         <div className="space-y-2">
-          <h3 className="text-dark100_light900 line-clamp-1 text-xl font-semibold">
-            {project.name}
-          </h3>
-          <div className="p-1 h-12">
+          <div className="flex px-1">
+            <div className="w-1/2">
+              <h3 className="text-dark100_light900 line-clamp-1 text-xl font-semibold">
+                {project.name}
+              </h3>
+            </div>
+            <div className="flex w-1/2 justify-end">
+              <SwitchStatusButton
+                disabled={false}
+                handleSwitch={handleSwitchBtn}
+                isActive={activeSwitch}
+                id={project.id}
+              />
+            </div>
+          </div>
+          <div className="h-12 p-1">
             <p className="text-dark100_light900 line-clamp-2 text-sm">
               {project.description || "No description provided"}
             </p>
@@ -188,7 +210,7 @@ const ProjectCard = ({ project, onOpen }: ProjectCardProps) => {
             </div>
           ) : (
             <div className="flex -space-x-2">
-              <div className="relative flex h-8 w-full rounded-full text-gray">
+              <div className="text-gray relative flex h-8 w-full rounded-full">
                 No Members
               </div>
             </div>

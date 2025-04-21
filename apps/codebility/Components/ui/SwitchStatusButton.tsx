@@ -7,10 +7,12 @@ export default function SwitchStatusButton({
   isActive,
   handleSwitch,
   disabled,
+  id = ""
 }: {
   isActive: boolean;
-  handleSwitch: () => void;
+  handleSwitch: (e: React.MouseEvent) => void;
   disabled: boolean;
+  id: string;
 }) {
   return (
     <div className="flex items-center justify-center">
@@ -25,6 +27,7 @@ export default function SwitchStatusButton({
           backgroundColor: isActive ? "#22c55e" : "#d1d5db",
         }}
         disabled={disabled}
+        id={id}
       >
         <motion.div
           className="h-5 w-5 rounded-full bg-white shadow-md"
