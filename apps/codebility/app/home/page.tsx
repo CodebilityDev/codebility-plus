@@ -5,6 +5,7 @@ import { useUserStore } from "@/store/codev-store";
 
 import DashboardCurrentProject from "./(dashboard)/_components/DashboardCurrentProject";
 import Profile from "./(dashboard)/_components/DashboardProfile";
+import DashboardRoadmap from "./(dashboard)/_components/DashboardRoadmap";
 import TimeTracker from "./(dashboard)/_components/DashboardTimeTracker";
 import TokenPoints from "./(dashboard)/_components/DashboardTokenPoints";
 import WeeklyTop from "./(dashboard)/_components/DashboardWeeklyTop";
@@ -24,6 +25,7 @@ export default function DashboardPage() {
             </div>
             <DashboardCurrentProject />
             <TokenPoints />
+            <DashboardRoadmap />
           </div>
         </div>
         <div className="md:basis-[50%] xl:basis-[40%]">

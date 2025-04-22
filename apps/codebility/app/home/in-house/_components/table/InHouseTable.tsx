@@ -317,6 +317,7 @@ export function InHouseTable({
                     {item.email_address}
                   </TableCell>
 
+                  {/* Available only on xs, sm, md screens  */}
                   <TableCell className="dark:text-light-900 flex items-start justify-start px-2 py-2 text-base text-black 2xl:hidden">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>

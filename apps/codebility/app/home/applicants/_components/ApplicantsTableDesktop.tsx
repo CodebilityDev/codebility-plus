@@ -277,17 +277,17 @@ const ApplicantsTableDesktop = ({
                             }
                             className={
                               hasAssessmentBeenSent(applicant.id)
-                                ? "h-6 border-green-700 bg-green-600 px-2 py-0 text-xs text-white hover:bg-green-700"
-                                : "dark:bg-dark-200 text-black-500 dark:text-light-800 dark:border-dark-300 h-6 border-gray-300 bg-white px-2 py-0 text-xs"
+                                ? "flex h-6 items-center justify-center border-green-700 bg-green-600 px-2 py-0 text-xs text-white hover:bg-green-700"
+                                : "dark:bg-dark-200 text-black-500 dark:text-light-800 dark:border-dark-300 flex h-6 items-center justify-center border-gray-300 bg-white px-2 py-0 text-xs"
                             }
                           >
                             {sendingAssessment[applicant.id] ? (
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-center gap-1">
                                 <Loader2 className="h-3 w-3 animate-spin" />
                                 <span>Sending...</span>
                               </div>
                             ) : hasAssessmentBeenSent(applicant.id) ? (
-                              <div className="flex items-center gap-1">
+                              <div className="flex items-center justify-center gap-1">
                                 <CheckCircle className="h-3 w-3" />
                                 <span>Sent</span>
                               </div>
@@ -355,6 +355,25 @@ const ApplicantsTableDesktop = ({
                               }
                             >
                               Mobile Assessment
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link
+                              href={createAssessmentEmailLink(
+                                applicant.email_address,
+                                applicant.first_name,
+                                applicant.last_name,
+                                applicant.display_position,
+                                applicant.years_of_experience,
+                                "fullstack",
+                              )}
+                              target="_blank"
+                              className="text-black-500 hover:text-black-300 cursor-pointer dark:text-gray-200 dark:hover:text-white"
+                              onClick={() =>
+                                handleAssessmentSent(applicant.id, "fullstack")
+                              }
+                            >
+                              Fullstack Assessment
                             </Link>
                           </DropdownMenuItem>
                           <DropdownMenuItem asChild>
