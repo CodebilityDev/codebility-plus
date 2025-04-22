@@ -161,7 +161,8 @@ export async function middleware(req: NextRequest) {
       }
     } else if (
       application_status === "applying" ||
-      application_status === "pending"
+      application_status === "pending" ||
+      application_status === "testing"
     ) {
       // If application is pending, only allow access to waiting page
       if (pathname !== WAITING_APPROVAL_ROUTE) {
