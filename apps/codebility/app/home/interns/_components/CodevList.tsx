@@ -5,8 +5,8 @@ import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
+import { getPrioritizedAndFilteredCodevs } from "@/utils/codev-priority"; // Import the utility
 
-import { prioritizeCodevs } from "../_lib/codevpriority";
 import CodevCard from "./CodevCard";
 
 interface CodevListProps {
@@ -19,30 +19,11 @@ interface CodevListProps {
 }
 
 export default function CodevList({ data, filters }: CodevListProps) {
-  const prioritizedCodevs = useMemo(() => prioritizeCodevs(data), [data]);
-
-  const filteredCodevs = useMemo(() => {
-    return prioritizedCodevs.filter((codev) => {
-      const matchesPosition =
-        filters.positions.length === 0 ||
-        filters.positions.includes(codev.display_position || "");
-
-      const matchesAvailability =
-        filters.availability.length === 0 ||
-        filters.availability
-          .map((status) => status.toUpperCase())
-          .includes(codev.internal_status || "");
-
-      const matchesProject =
-        filters.projects.length === 0 ||
-        codev.projects?.some((project) =>
-          filters.projects.includes(project.id),
-        ) ||
-        false;
-
-      return matchesPosition && matchesAvailability && matchesProject;
-    });
-  }, [prioritizedCodevs, filters]);
+  // Use the new utility function to get prioritized and filtered codevs
+  const filteredCodevs = useMemo(
+    () => getPrioritizedAndFilteredCodevs(data, filters),
+    [data, filters],
+  );
 
   const {
     currentPage,
