@@ -159,3 +159,27 @@ export const fetchUserAvailabilityStatus = async (userId: string) => {
     throw error;
   }
 };
+
+export const fetchUserInternalStatus = async (userID: string) => {
+  try {
+    const supabase = getSupabaseServerActionClient();
+
+    const { data, error } = await supabase
+      .from("codev")
+      .select("internal_status")
+      .eq("id", userID)
+      .single();
+
+    if (error) throw error;
+
+    const statusSchema = z.enum(["TRAINING", "GRADUATED", "WORKING"]);
+    const parsed = statusSchema.safeParse(data?.internal_status);
+
+    if (!parsed.success) throw parsed.error;
+
+    return parsed.data; 
+  } catch (error) {
+    console.error("Error in fetchUserInternalStatus:", error);
+    throw error;
+  }
+};
