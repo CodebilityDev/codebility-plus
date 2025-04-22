@@ -42,7 +42,7 @@ const NAV_ITEMS = [
 ] as const;
 
 const getMenuItems = (status: string, role_id: number) => {
-  if (status === "rejected" || status === "applying") {
+  if (status === "rejected" || status === "applying" || status === "testing") {
     return [
       {
         href: status === "rejected" ? "/auth/declined" : "/auth/waiting",
