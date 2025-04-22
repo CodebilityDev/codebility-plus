@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import DefaultPagination from "@/Components/ui/pagination";
-import { pageSize } from "@/constants";
+import { pageSize, CATEGORIES } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 
 import Container from "../../_components/MarketingContainer";
@@ -39,13 +39,6 @@ interface ProjectData {
 interface Props {
   servicesData: ProjectData[];
 }
-
-// Static categories
-const CATEGORIES = [
-  { id: 1, name: "Web Application" },
-  { id: 2, name: "Mobile Application" },
-  { id: 3, name: "Product Design" },
-] as const;
 
 export default function ServicesTab({ servicesData }: Props) {
   // Initialize with first category
@@ -91,7 +84,7 @@ export default function ServicesTab({ servicesData }: Props) {
       [currentCategory]: currentPage,
     }));
     setCurrentCategory(categoryId);
-  };
+  };  
 
   return (
     <Section className="relative">
