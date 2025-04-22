@@ -112,13 +112,12 @@ export interface Codev {
   work_schedules?: WorkSchedule[];
 }
 
-type ApplicantStatus =
+export type ApplicantStatus =
   | "applying" // Initial application
   | "testing" // Taking assessment test
   | "onboarding" // Passed assessment, in interview/onboarding process
   | "denied" // Application denied
-  | "passed" // Final acceptance (becomes CODEV)
-  | "rejected"; // Rejected (counts in rejected_count)
+  | "passed"; // Final acceptance (becomes CODEV)
 
 export type InternalStatus =
   | "TRAINING"

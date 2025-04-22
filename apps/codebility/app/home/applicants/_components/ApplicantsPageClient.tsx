@@ -8,7 +8,8 @@ import ApplicantsTabs from "@/app/home/applicants/_components/ApplicantsTabs";
 import { fetchApplicants } from "@/app/home/applicants/action";
 import ApplicantsLoading from "@/app/home/applicants/loading";
 import { Box, H1 } from "@/Components/shared/dashboard";
-import { Codev } from "@/types/home/codev";
+import { ApplicantStatus, Codev } from "@/types/home/codev";
+import { prioritizeCodevs } from "@/utils/codev-priority"; // Import the utility
 import { Toaster } from "react-hot-toast";
 
 const ApplicantsList = dynamic(
@@ -33,14 +34,6 @@ export type Filters = {
   experienceRanges: ExperienceRanges;
   positions: Record<string, boolean>;
 };
-
-export type ApplicantStatus =
-  | "applying" // Initial application
-  | "testing" // Taking assessment test
-  | "onboarding" // Passed assessment, in interview/onboarding process
-  | "denied" // Application denied
-  | "passed" // Final acceptance (becomes CODEV)
-  | "rejected"; // Rejected (counts in rejected_count)
 
 const ApplicantsPageClient = () => {
   // Data loading state
@@ -84,6 +77,11 @@ const ApplicantsPageClient = () => {
     ];
   }, [applicants]);
 
+  // Use the prioritizeCodevs utility to sort applicants
+  const prioritizedApplicants = useMemo(() => {
+    return prioritizeCodevs(applicants, false);
+  }, [applicants]);
+
   // Group applicants by their status
   const applicantsByStatus = useMemo(() => {
     const grouped: Record<ApplicantStatus, Codev[]> = {
@@ -92,10 +90,10 @@ const ApplicantsPageClient = () => {
       onboarding: [],
       denied: [],
       passed: [],
-      rejected: [],
     };
 
-    applicants.forEach((applicant) => {
+    // Use the prioritized applicants instead of raw applicants
+    prioritizedApplicants.forEach((applicant) => {
       const status =
         (applicant.application_status as ApplicantStatus) || "applying";
       if (grouped[status]) {
@@ -106,7 +104,7 @@ const ApplicantsPageClient = () => {
     });
 
     return grouped;
-  }, [applicants]);
+  }, [prioritizedApplicants]);
 
   // Get counts for each tab
   const tabCounts = useMemo(() => {
@@ -116,7 +114,6 @@ const ApplicantsPageClient = () => {
       onboarding: applicantsByStatus.onboarding?.length || 0,
       denied: applicantsByStatus.denied?.length || 0,
       passed: applicantsByStatus.passed?.length || 0,
-      rejected: applicantsByStatus.rejected?.length || 0,
     };
   }, [applicantsByStatus]);
 

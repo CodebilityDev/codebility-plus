@@ -1,11 +1,10 @@
 "use client";
 
 import { ReactNode } from "react";
+import { ApplicantStatus } from "@/types/home/codev";
 
 import { Badge } from "@codevs/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
-
-import { ApplicantStatus } from "./ApplicantsPageClient";
 
 interface ApplicantsTabsProps {
   activeTab: ApplicantStatus;

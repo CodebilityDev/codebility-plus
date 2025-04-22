@@ -1,9 +1,7 @@
 "use client";
 
 import ApplicantsTableContainer from "@/app/home/applicants/_components/ApplicantsTableContainer";
-import { Codev } from "@/types/home/codev";
-
-import { ApplicantStatus } from "./ApplicantsPageClient";
+import { ApplicantStatus, Codev } from "@/types/home/codev";
 
 interface ApplicantsListProps {
   applicants: Codev[];
