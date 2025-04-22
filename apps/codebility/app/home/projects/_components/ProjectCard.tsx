@@ -7,8 +7,10 @@ import {
   getMembers,
   getTeamLead,
   SimpleMemberData,
+  updateProjectsSwitch,
 } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
+import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { ModalType } from "@/hooks/use-modal-projects";
@@ -26,6 +28,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
   const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
   const [members, setMembers] = useState<SimpleMemberData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [activeSwitch, setActiveSwitch] = useState(project.kanban_display);
 
   useEffect(() => {
     const fetchTeamData = async () => {
@@ -67,7 +70,6 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
   const projectStatus =
     project.status &&
     project.status.charAt(0).toUpperCase() + project.status.slice(1);
-  // const bgProjectStatus = project.status === "pending" || project.status === "completed" || project.status === "active" ? "" : "dark:bg-zinc-700";
   const bgProjectStatus =
     project.status === "pending"
       ? "bg-orange-500/80"
@@ -122,7 +124,6 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                   : projectStatus || "Unknown"}
               </span>
             </div>
-          </div>
 
           {/* Content */}
           <div className="flex flex-1 flex-col gap-4 p-6">
