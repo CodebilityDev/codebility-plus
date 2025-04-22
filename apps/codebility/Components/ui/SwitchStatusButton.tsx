@@ -1,4 +1,3 @@
-
 import { motion } from "framer-motion";
 
 import { cn } from "@codevs/ui";
@@ -7,12 +6,12 @@ export default function SwitchStatusButton({
   isActive,
   handleSwitch,
   disabled,
-  id = ""
+  id = "",
 }: {
   isActive: boolean;
   handleSwitch: (e: React.MouseEvent) => void;
   disabled: boolean;
-  id: string;
+  id?: string;
 }) {
   return (
     <div className="flex items-center justify-center">
