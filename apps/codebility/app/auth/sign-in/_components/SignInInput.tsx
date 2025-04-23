@@ -4,6 +4,7 @@ import { useState } from "react";
 import { SignInValidation } from "@/lib/validations/auth";
 import { IconEye, IconEyeClose } from "@/public/assets/svgs";
 import clsx from "clsx";
+import { EyeIcon, EyeOffIcon } from "lucide-react";
 import { FieldErrors, UseFormRegister } from "react-hook-form";
 import { z } from "zod";
 
@@ -70,14 +71,14 @@ const SignInInputs = ({
         {type === "password" && (
           <div className="absolute right-4 top-[50%] z-20 w-6 -translate-y-[50%] cursor-pointer sm:right-2 sm:w-8">
             {showPassword ? (
-              <IconEyeClose
+              <EyeOffIcon
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="text-xl text-white"
+                className="text-xl text-purple-500"
               />
             ) : (
-              <IconEye
+              <EyeIcon
                 onClick={() => setShowPassword((prev) => !prev)}
-                className="text-xl text-white"
+                className="text-xl text-purple-500"
               />
             )}
           </div>
