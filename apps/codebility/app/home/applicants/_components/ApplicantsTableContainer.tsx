@@ -5,9 +5,7 @@ import dynamic from "next/dynamic";
 import DefaultPagination from "@/Components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
-import { Codev } from "@/types/home/codev";
-
-import { ApplicantStatus } from "./ApplicantsPageClient";
+import { ApplicantStatus, Codev } from "@/types/home/codev";
 
 interface ApplicantsTableContainerProps {
   applicants: Codev[];
