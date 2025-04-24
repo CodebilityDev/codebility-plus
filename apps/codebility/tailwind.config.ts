@@ -178,15 +178,11 @@ const config: Config = {
             DEFAULT: "#4BCE97", // green
             text: "#FFFFFF",
           },
-          busy: {
+          inactive: {
             DEFAULT: "#FEE2E2", // red-200
             text: "#991B1B",
           },
-          failed: {
-            DEFAULT: "#FEE2E2", // red-200
-            text: "#991B1B",
-          },
-          available: {
+          admin: {
             DEFAULT: "#DCFCE7", // green-200
             text: "#166534",
           },
@@ -194,11 +190,7 @@ const config: Config = {
             DEFAULT: "#F3E8FF", // purple-200
             text: "#6B21A8",
           },
-          vacation: {
-            DEFAULT: "#DBEAFE", // blue-200
-            text: "#1E40AF",
-          },
-          clientready: {
+          mentor: {
             DEFAULT: "#F5F3FF", // violet-200
             text: "#5B21B6",
           },

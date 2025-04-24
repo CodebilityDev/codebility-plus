@@ -13,7 +13,7 @@ export default function DashboardRoadmap() {
   const [activeStep, setActiveStep] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  const steps = ["TRAINING", "GRADUATED", "WORKING"];
+  const steps = ["TRAINING", "GRADUATED", "DEPLOYED"];
 
   useEffect(() => {
     if (!user?.id) return;
