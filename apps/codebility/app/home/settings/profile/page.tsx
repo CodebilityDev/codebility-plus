@@ -133,7 +133,10 @@ const ProfileComponent = () => {
 
   return (
     <div className="mx-auto max-w-screen-xl">
-      <CustomBreadcrumb items={items} />
+      {user.application_status === "passed" && (
+        <CustomBreadcrumb items={items} />
+      )}
+
       <Toaster position="top-center" reverseOrder={false} />
       <div className="flex flex-col gap-4 pt-4">
         <H1>Profile Settings</H1>
