@@ -172,7 +172,7 @@ export const fetchUserInternalStatus = async (userID: string) => {
 
     if (error) throw error;
 
-    const statusSchema = z.enum(["TRAINING", "GRADUATED", "WORKING"]);
+    const statusSchema = z.enum(["TRAINING", "GRADUATED", "DEPLOYED", "INACTIVE", "MENTOR", "ADMIN"]);
     const parsed = statusSchema.safeParse(data?.internal_status);
 
     if (!parsed.success) throw parsed.error;
