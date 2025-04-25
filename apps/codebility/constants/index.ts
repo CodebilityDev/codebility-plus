@@ -1,13 +1,13 @@
 export const pageSize = {
   codevsList: 16,
   applicants: 10,
-  clients: 6,
+  clients: 12,
   clientsArchive: 6,
   interns: 8,
   tasks: 9,
   weeklyTop: 10,
-  projects: 6,
-  services: 6,
+  projects: 12,
+  services: 9,
 } as const;
 
 export const projects = [

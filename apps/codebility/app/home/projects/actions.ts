@@ -135,20 +135,19 @@ export async function createProject(
 }
 
 /**
-* DOCU: This function is used to update the projects active switch. <br>
-* This is being called on ProjectCard. <br>
-* Last Updated Date: April 17, 2025 <br>
-* @function
-* @param {boolean} activeSwitch
-* @param {string} projectId
-* @author Kas
-*/
+ * DOCU: This function is used to update the projects active switch. <br>
+ * This is being called on ProjectCard. <br>
+ * Last Updated Date: April 17, 2025 <br>
+ * @function
+ * @param {boolean} activeSwitch
+ * @param {string} projectId
+ * @author Kas
+ */
 export async function updateProjectsSwitch(
   activeSwitch: boolean,
   projectId: string,
 ) {
-
-  const supabase = createClientComponentClient();    
+  const supabase = createClientComponentClient();
   const { error: projectError } = await supabase
     .from("projects")
     .update({
@@ -157,7 +156,8 @@ export async function updateProjectsSwitch(
     .eq("id", projectId)
     .select();
 
-  if(projectError) console.error("Error in updating projects and kanban board:", projectError);
+  if (projectError)
+    console.error("Error in updating projects and kanban board:", projectError);
 
   return { success: true, projectId, activeSwitch };
 }
@@ -176,8 +176,20 @@ export async function updateProject(projectId: string, formData: FormData) {
     const updateData: any = {};
     for (const [key, value] of formData.entries()) {
       if (key !== "project_members") {
+        // Log the key-value pairs to debug
+        console.log(`Processing form field: ${key} = ${value}`);
         updateData[key] = value;
       }
+    }
+
+    // Log the final update data before sending to Supabase
+    console.log("Final update data:", JSON.stringify(updateData, null, 2));
+
+    // Make sure main_image is included in the update if it exists
+    if (updateData.main_image) {
+      console.log("Updating main_image to:", updateData.main_image);
+    } else {
+      console.log("No main_image found in update data");
     }
 
     const { data: projectData, error: projectError } = await supabase
@@ -189,7 +201,10 @@ export async function updateProject(projectId: string, formData: FormData) {
       .eq("id", projectId)
       .select();
 
-    if (projectError) throw projectError;
+    if (projectError) {
+      console.error("Supabase error updating project:", projectError);
+      throw projectError;
+    }
 
     // Handle project members and team leader
     if (projectMembers && Array.isArray(projectMembers)) {
@@ -223,6 +238,9 @@ export async function updateProject(projectId: string, formData: FormData) {
 
       if (insertError) throw insertError;
     }
+
+    // Log success with the returned project data
+    console.log("Project updated successfully:", projectData);
 
     revalidatePath("/projects");
     return { success: true, data: projectData };
@@ -477,7 +495,7 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
             name: pm.project.name,
             role: pm.role,
             joined_at: pm.joined_at,
-            kanban_display: pm.project.active_switch
+            kanban_display: pm.project.active_switch,
           };
           return project;
         },

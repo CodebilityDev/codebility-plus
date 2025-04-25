@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -16,60 +16,51 @@ import { ModalType } from "@/hooks/use-modal-projects";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Project } from "@/types/home/codev";
+import { useQuery } from "@tanstack/react-query";
 
 interface ProjectCardProps {
   project: Project;
   onOpen: (type: ModalType, data: Project) => void;
-  categoryId: number;
+  categoryId: number | undefined;
 }
 
 const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
-  const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
-  const [members, setMembers] = useState<SimpleMemberData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [activeSwitch, setActiveSwitch] = useState<boolean>(project.kanban_display);
+  const [activeSwitch, setActiveSwitch] = useState<boolean>(
+    project.kanban_display,
+  );
 
-  useEffect(() => {
-    const fetchTeamData = async () => {
-      if (!project.id) return;
+  // Use React Query to fetch and cache team lead data
+  const { data: teamLead, isLoading: isTeamLeadLoading } = useQuery({
+    queryKey: ["teamLead", project.id],
+    queryFn: async () => {
+      const result = await getTeamLead(project.id);
+      return result.data;
+    },
+    // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
+    // Don't refetch on window focus
+    refetchOnWindowFocus: false,
+  });
 
-      setIsLoading(true);
-      try {
-        // Fetch both team lead and members in parallel
-        const [teamLeadResult, membersResult] = await Promise.all([
-          getTeamLead(project.id),
-          getMembers(project.id),
-        ]);
+  // Use React Query to fetch and cache members data
+  const { data: members = [], isLoading: isMembersLoading } = useQuery({
+    queryKey: ["members", project.id],
+    queryFn: async () => {
+      const result = await getMembers(project.id);
+      return result.data || [];
+    },
+    // Cache for 5 minutes
+    staleTime: 5 * 60 * 1000,
+    // Don't refetch on window focus
+    refetchOnWindowFocus: false,
+  });
 
-        // Handle team lead data
-        if (!teamLeadResult.error && teamLeadResult.data) {
-          setTeamLead(teamLeadResult.data);
-        }
-
-        // Handle members data
-        if (!membersResult.error && membersResult.data) {
-          setMembers(membersResult.data);
-        }
-      } catch (error) {
-        console.error("Error fetching team data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchTeamData();
-
-    // Cleanup function
-    return () => {
-      setTeamLead(null);
-      setMembers([]);
-    };
-  }, [project.id]); // Add proper dependency
+  const isLoading = isTeamLeadLoading || isMembersLoading;
 
   const projectStatus =
     project.status &&
     project.status.charAt(0).toUpperCase() + project.status.slice(1);
-    
+
   const bgProjectStatus =
     project.status === "pending"
       ? "bg-orange-500/80"
@@ -95,18 +86,19 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
           className="background-box flex cursor-pointer flex-col overflow-hidden rounded-xl border border-zinc-200 transition-all hover:shadow-lg dark:border-zinc-700 dark:shadow-slate-700 "
         >
           {/* Project Image */}
-          <div className="relative h-48 w-full">
+          <div className="relative aspect-video w-full overflow-hidden">
             <Image
               alt={`${project.name} image`}
               src={project.main_image || defaultAvatar}
               fill
+              sizes="(max-width: 768px) 100vw, 33vw"
               unoptimized={true}
               className="object-cover"
               loading="eager"
               priority
             />
             <div
-              className={`absolute right-2 top-2 flex items-center rounded-xl   text-slate-800 transition-all ${bgProjectStatus} dark:text-white`}
+              className={`absolute right-2 top-2 flex items-center rounded-xl text-slate-800 transition-all ${bgProjectStatus} dark:text-white`}
             >
               <span
                 className={`rounded-full px-4 py-2 text-sm font-medium ${
@@ -155,7 +147,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
             {/* Team Section */}
             <div className="space-y-3">
               {/* Team Lead */}
-              {!isLoading && teamLead && (
+              {!isTeamLeadLoading && teamLead && (
                 <div className="flex items-center gap-2">
                   <div className="relative h-8 w-8">
                     {teamLead.image_url ? (

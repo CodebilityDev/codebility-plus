@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import DefaultPagination from "@/Components/ui/pagination";
-import { pageSize, CATEGORIES } from "@/constants";
+import { CATEGORIES, pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 
 import Container from "../../_components/MarketingContainer";
@@ -40,20 +40,23 @@ interface Props {
   servicesData: ProjectData[];
 }
 
+// Define a special ID for the "All" category
+const ALL_CATEGORY_ID = 0;
+
 export default function ServicesTab({ servicesData }: Props) {
-  // Initialize with first category
-  const [currentCategory, setCurrentCategory] = useState<number>(
-    CATEGORIES[0].id,
-  );
+  // Initialize with "All" category
+  const [currentCategory, setCurrentCategory] =
+    useState<number>(ALL_CATEGORY_ID);
 
   const [projects, setProjects] = useState(() => {
-    return servicesData.filter(
-      (project) => project.project_category_id === CATEGORIES[0].id,
-    );
+    // Start with all projects for the "All" category
+    return servicesData;
   });
 
   const [tabPages, setTabPages] = useState(() => {
-    const pages: Record<number, number> = {};
+    const pages: Record<number, number> = {
+      [ALL_CATEGORY_ID]: 1, // Add "All" category to tracked pages
+    };
     CATEGORIES.forEach((cat) => {
       pages[cat.id] = 1;
     });
@@ -71,9 +74,15 @@ export default function ServicesTab({ servicesData }: Props) {
 
   // Update projects when category changes
   useEffect(() => {
-    const filteredData = servicesData.filter(
-      (project) => project.project_category_id === currentCategory,
-    );
+    // If "All" category is selected, show all projects
+    // Otherwise, filter by the selected category
+    const filteredData =
+      currentCategory === ALL_CATEGORY_ID
+        ? servicesData
+        : servicesData.filter(
+            (project) => project.project_category_id === currentCategory,
+          );
+
     setProjects(filteredData);
     setCurrentPage(tabPages[currentCategory] || 1);
   }, [currentCategory, servicesData]);
@@ -84,14 +93,24 @@ export default function ServicesTab({ servicesData }: Props) {
       [currentCategory]: currentPage,
     }));
     setCurrentCategory(categoryId);
-  };  
+  };
 
   return (
     <Section className="relative">
-      <Container className="relative z-10">
+      <Container className="relative z-0">
         <div className="flex flex-col gap-10">
-          {/* Category Tabs */}
+          {/* Category Tabs with "All" option */}
           <div className="mx-auto flex flex-wrap justify-center gap-5 xl:gap-16">
+            <p
+              onClick={() => handleTabClick(ALL_CATEGORY_ID)}
+              className={`cursor-pointer px-2 pb-2 text-violet-200 xl:text-xl ${
+                currentCategory === ALL_CATEGORY_ID
+                  ? "border-violet text-violet border-b-2"
+                  : "text-white"
+              }`}
+            >
+              All
+            </p>
             {CATEGORIES.map((cat) => (
               <p
                 key={cat.id}
