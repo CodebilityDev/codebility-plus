@@ -20,10 +20,14 @@ const EnhancedSearch = ({
     setIsSearching(initialValue);
   }, [initialValue]);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    onSubmit(isSearching);
-  };
+  // Debounce search
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      onSubmit(isSearching);
+    }, 500);
+
+    return () => clearTimeout(delayDebounce); // Cleanup previous timeout
+  }, [isSearching, onSubmit]);
 
   // Handle immediate search as user types (optional)
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -35,7 +39,7 @@ const EnhancedSearch = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="w-full">
+    <form onSubmit={(e) => e.preventDefault()} className="w-full">
       <input
         type="text"
         value={isSearching}
