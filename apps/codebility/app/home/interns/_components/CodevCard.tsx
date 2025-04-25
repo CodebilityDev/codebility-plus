@@ -35,27 +35,19 @@ const STATUS_CONFIG: Record<
     label: "Graduated",
     className: "bg-status-graduated text-status-graduated-text",
   },
-  BUSY: {
+  INACTIVE: {
     label: "Busy",
     className: "bg-status-busy text-status-busy-text",
   },
-  FAILED: {
-    label: "Failed",
-    className: "bg-status-failed text-status-failed-text",
-  },
-  AVAILABLE: {
+  MENTOR: {
     label: "Available",
     className: "bg-status-available text-status-available-text",
   },
-  DEPLOYED: {
+  ADMIN: {
     label: "Deployed",
     className: "bg-status-deployed text-status-deployed-text",
   },
-  VACATION: {
-    label: "Vacation",
-    className: "bg-status-vacation text-status-vacation-text",
-  },
-  CLIENTREADY: {
+  DEPLOYED: {
     label: "Client Ready",
     className: "bg-status-clientready text-status-clientready-text",
   },
@@ -87,8 +79,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
   };
 
   const internalStatus = codev.internal_status || "AVAILABLE";
-  const statusConfig =
-    STATUS_CONFIG[internalStatus as InternalStatus] || STATUS_CONFIG.AVAILABLE;
+  const statusConfig = STATUS_CONFIG[internalStatus as InternalStatus];
 
   return (
     <div
