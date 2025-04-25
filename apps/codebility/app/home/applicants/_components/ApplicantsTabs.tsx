@@ -33,7 +33,7 @@ const ApplicantsTabs = ({
       onValueChange={(value) => onTabChange(value as ApplicantStatus)}
       className="w-full"
     >
-      <TabsList className="grid w-full grid-cols-4">
+      <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
         <TabsTrigger value="applying" className="relative">
           <span>Applicants</span>
           {tabCounts.applying > 0 && (
@@ -69,7 +69,7 @@ const ApplicantsTabs = ({
       </TabsList>
 
       {visibleTabs.map((tab) => (
-        <TabsContent key={tab} value={tab} className="mt-4">
+        <TabsContent key={tab} value={tab} className="mt-10 md:mt-4">
           {activeTab === tab && children}
         </TabsContent>
       ))}
