@@ -122,12 +122,10 @@ export type ApplicantStatus =
 export type InternalStatus =
   | "TRAINING"
   | "GRADUATED"
-  | "BUSY"
-  | "FAILED"
-  | "AVAILABLE"
+  | "INACTIVE"
+  | "MENTOR"
+  | "ADMIN"
   | "DEPLOYED"
-  | "VACATION"
-  | "CLIENTREADY";
 
 export interface ProjectMember {
   id: string;
