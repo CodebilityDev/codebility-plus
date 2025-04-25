@@ -1,6 +1,7 @@
 "use client";
 
 import { ChangeEvent, useEffect, useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import Image from "next/image";
 import {
   getProjectCategories,
@@ -18,16 +19,22 @@ import {
   DialogTitle,
 } from "@/Components/ui/dialog";
 import { MemberSelection } from "@/Components/ui/MemberSelection";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { Client, Codev, Project, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 
-import ImageCrop from "./ImageCrop";
+// Dynamically import the ImageCrop component with no SSR
+const ImageCrop = dynamic(() => import("./ImageCrop"), {
+  ssr: false,
+  loading: () => <Skeleton className="h-48 w-full rounded-lg" />,
+});
 
 // Define the available project statuses.
 const PROJECT_STATUSES = [
@@ -52,21 +59,24 @@ export interface ProjectFormData {
 const ProjectEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "projectEditModal";
+  const queryClient = useQueryClient();
 
   // Data states
-  const [users, setUsers] = useState<Codev[]>([]);
-  const [clients, setClients] = useState<Client[]>([]);
-  const [categories, setCategories] = useState<SkillCategory[]>([]);
-  // Image states
+  const [currentTeamLeader, setCurrentTeamLeader] = useState<Codev | null>(
+    null,
+  );
+  const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
+
+  // Image states with optimized loading
   const [projectImage, setProjectImage] = useState<string | null>(null);
   const [openImageCropper, setOpenImageCropper] = useState(false);
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
-  // Member selection state
-  const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
+  const [imageLoaded, setImageLoaded] = useState(false);
+
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
-  const [isDataLoading, setIsDataLoading] = useState(true);
+
   // Controlled status state
   const [selectedStatus, setSelectedStatus] = useState<string>(
     data?.status || "pending",
@@ -76,23 +86,56 @@ const ProjectEditModal = () => {
     register,
     handleSubmit,
     setValue,
-    watch,
     reset,
     formState: { errors },
   } = useForm<ProjectFormData>({ mode: "onChange" });
 
-  // Use the controlled value for team leader (and others) via watch.
-  const [currentTeamLeader, setCurrentTeamLeader] = useState<Codev | null>(
-    null,
-  );
+  // Fetch users data with React Query
+  const { data: users = [], isLoading: isUsersLoading } = useQuery({
+    queryKey: ["projectCodevs"],
+    queryFn: async () => {
+      const result = await getProjectCodevs();
+      return result || [];
+    },
+    enabled: isModalOpen,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
 
-  // Prepare select options using useMemo.
+  // Fetch clients data with React Query
+  const { data: clients = [], isLoading: isClientsLoading } = useQuery({
+    queryKey: ["projectClients"],
+    queryFn: async () => {
+      const result = await getProjectClients();
+      return result || [];
+    },
+    enabled: isModalOpen,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  // Fetch categories data with React Query
+  const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
+    queryKey: ["projectCategories"],
+    queryFn: async () => {
+      const result = await getProjectCategories();
+      return result || [];
+    },
+    enabled: isModalOpen,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const isDataLoading =
+    isUsersLoading || isClientsLoading || isCategoriesLoading;
+
+  // Prepare select options using useMemo
   const userOptions = useMemo(
     () =>
       users.map((user) => ({
         id: user.id,
         value: user.id,
-        label: `${user.first_name} ${user.last_name}`, // Fixed template literal
+        label: `${user.first_name} ${user.last_name}`,
         subLabel: user.display_position,
         imageUrl: user.image_url,
       })),
@@ -122,34 +165,13 @@ const ProjectEditModal = () => {
     [categories],
   );
 
-  // Fetch initial data for users, clients, and categories.
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!isModalOpen) return;
-      setIsDataLoading(true);
-      try {
-        const [codevsRes, clientsRes, categoriesRes] = await Promise.all([
-          getProjectCodevs(),
-          getProjectClients(),
-          getProjectCategories(),
-        ]);
-        if (codevsRes) setUsers(codevsRes);
-        if (clientsRes) setClients(clientsRes);
-        if (categoriesRes) setCategories(categoriesRes);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        toast.error("Failed to fetch data");
-      } finally {
-        setIsDataLoading(false);
-      }
-    };
-    fetchData();
-  }, [isModalOpen]);
-
-  // When project data is available, set initial form values.
+  // When project data is available, set initial form values
   useEffect(() => {
     if (data && users.length > 0) {
-      // Check if both data and users are available
+      // Reset image loading state
+      setImageLoaded(false);
+
+      // Set form values
       setValue("name", data.name);
       setValue("description", data.description || "");
       setValue("github_link", data.github_link || "");
@@ -195,12 +217,16 @@ const ProjectEditModal = () => {
         setSelectedMembers(memberCodevs);
       }
     }
-  }, [data, setValue, users]); // Keep all dependencies
-  // Handler for image change.
+  }, [data, setValue, users]);
+
+  // Handler for image change with optimized loading
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
     try {
+      setImageLoaded(false);
       const file = e.target.files?.[0];
       if (!file) return;
+
+      // Use createObjectURL for faster preview
       const objectUrl = URL.createObjectURL(file);
       setProjectImage(objectUrl);
       setCroppedImage(objectUrl);
@@ -212,18 +238,13 @@ const ProjectEditModal = () => {
     }
   };
 
-  // Handler for image removal.
-  const handleRemoveImage = async () => {
-    try {
-      if (!projectImage) return;
-      setProjectImage(null);
-      setValue("main_image", undefined);
-      setCroppedImage(null);
-      setCroppedFile(null);
-    } catch (error) {
-      console.error("Failed to remove image:", error);
-      toast.error("Failed to remove image");
-    }
+  // Handler for image removal
+  const handleRemoveImage = () => {
+    setProjectImage(null);
+    setValue("main_image", undefined);
+    setCroppedImage(null);
+    setCroppedFile(null);
+    setImageLoaded(false);
   };
 
   const resetForm = () => {
@@ -232,24 +253,34 @@ const ProjectEditModal = () => {
     setCroppedImage(null);
     setCroppedFile(null);
     setSelectedMembers([]);
+    setCurrentTeamLeader(null);
+    setImageLoaded(false);
     onClose();
   };
 
-  // --- Subcomponents ---
-
-  // ImageUploadSection: Handles image upload, cropping and removal.
+  // Subcomponent: ImageUploadSection with optimized loading
   const ImageUploadSection = () => (
     <div className="flex flex-col items-center gap-4">
-      <div className="relative">
+      <div className="relative h-48 w-full overflow-hidden rounded-lg">
         {croppedImage ? (
-          <Image
-            src={croppedImage}
-            alt="Project"
-            className="h-full w-full cursor-pointer object-cover"
-            onClick={() => setOpenImageCropper(true)}
-            width={408}
-            height={192}
-          />
+          <>
+            {!imageLoaded && (
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+                <Skeleton className="h-full w-full" />
+              </div>
+            )}
+            <Image
+              src={croppedImage}
+              alt="Project"
+              className={`h-full w-full cursor-pointer object-cover transition-opacity duration-300 ${
+                imageLoaded ? "opacity-100" : "opacity-0"
+              }`}
+              onClick={() => setOpenImageCropper(true)}
+              width={408}
+              height={192}
+              onLoad={() => setImageLoaded(true)}
+            />
+          </>
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-100">
             <ProjectAvatar size={64} />
@@ -270,13 +301,15 @@ const ProjectEditModal = () => {
           className="hidden"
           onChange={handleImageChange}
         />
-        <ImageCrop
-          image={projectImage || ""}
-          setImage={setCroppedImage}
-          setFile={setCroppedFile}
-          open={openImageCropper}
-          setOpen={setOpenImageCropper}
-        />
+        {openImageCropper && (
+          <ImageCrop
+            image={projectImage || ""}
+            setImage={setCroppedImage}
+            setFile={setCroppedFile}
+            open={openImageCropper}
+            setOpen={setOpenImageCropper}
+          />
+        )}
         {projectImage && (
           <button
             type="button"
@@ -290,7 +323,7 @@ const ProjectEditModal = () => {
     </div>
   );
 
-  // ProjectDetailsSection: Renders text inputs with labels.
+  // Subcomponent: ProjectDetailsSection
   const ProjectDetailsSection = () => (
     <div className="grid gap-4">
       <div className="space-y-2">
@@ -316,7 +349,7 @@ const ProjectEditModal = () => {
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <label className="text-sm font-medium">GitHub Link</label>
+          <label className="text-sm font-medium">GitHub Link (optional)</label>
           <Input
             type="text"
             placeholder="Enter GitHub link"
@@ -325,7 +358,7 @@ const ProjectEditModal = () => {
           />
         </div>
         <div className="space-y-2">
-          <label className="text-sm font-medium">Website URL</label>
+          <label className="text-sm font-medium">Website URL (optional)</label>
           <Input
             type="text"
             placeholder="Enter website URL"
@@ -336,7 +369,7 @@ const ProjectEditModal = () => {
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
         <div className="space-y-2">
-          <label className="text-sm font-medium">Figma Link</label>
+          <label className="text-sm font-medium">Figma Link (optional)</label>
           <Input
             type="text"
             placeholder="Enter Figma link"
@@ -360,7 +393,7 @@ const ProjectEditModal = () => {
     </div>
   );
 
-  // SelectSection: Renders dropdowns and member selection.
+  // Subcomponent: SelectSection
   const SelectSection = () => (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       <CustomSelect
@@ -377,18 +410,45 @@ const ProjectEditModal = () => {
         disabled={isDataLoading}
         searchable
       />
-      {/* ... other select components ... */}
-      <MemberSelection
-        users={users.filter((user) => user.id !== currentTeamLeader?.id)}
-        selectedMembers={selectedMembers}
-        onMemberAdd={(member) =>
-          setSelectedMembers((prev) => [...prev, member])
-        }
-        onMemberRemove={(memberId) =>
-          setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
-        }
-        excludeMembers={currentTeamLeader ? [currentTeamLeader.id] : []}
+      <CustomSelect
+        label="Project Category"
+        options={categoryOptions}
+        onChange={(value) => setValue("project_category_id", value)}
+        value={data?.project_category_id?.toString() || ""}
+        placeholder="Select Project Category"
+        variant="simple"
+        searchable
       />
+      <CustomSelect
+        label="Client"
+        options={clientOptions}
+        onChange={(value) => setValue("client_id", value)}
+        value={data?.client_id || ""}
+        placeholder="Select Client"
+        disabled={isDataLoading}
+        searchable
+      />
+      <CustomSelect
+        label="Status"
+        options={PROJECT_STATUSES}
+        value={selectedStatus}
+        onChange={(value) => setSelectedStatus(value)}
+        placeholder="Select Status"
+        variant="simple"
+      />
+      <div className="md:col-span-2">
+        <MemberSelection
+          users={users.filter((user) => user.id !== currentTeamLeader?.id)}
+          selectedMembers={selectedMembers}
+          onMemberAdd={(member) =>
+            setSelectedMembers((prev) => [...prev, member])
+          }
+          onMemberRemove={(memberId) =>
+            setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
+          }
+          excludeMembers={currentTeamLeader ? [currentTeamLeader.id] : []}
+        />
+      </div>
     </div>
   );
 
@@ -417,18 +477,30 @@ const ProjectEditModal = () => {
     try {
       const form = new FormData();
 
-      // Handle image upload if changed
-      if (projectImage !== croppedImage && croppedFile) {
+      // Handle image upload if there's a new cropped file
+      if (croppedFile) {
+        console.log("Uploading new image");
         const { publicUrl } = await uploadImage(croppedFile, {
           bucket: "codebility",
-          folder: `projectImage/${Date.now()}_${croppedFile.name}`,
+          folder: `projectImage/${Date.now()}_${croppedFile.name.replace(/\s+/g, "_")}`,
         });
+
+        if (!publicUrl) {
+          throw new Error("Failed to upload image");
+        }
+
+        // Set the new image URL
+        console.log("Setting new main_image:", publicUrl);
         form.append("main_image", publicUrl);
+      } else if (data.main_image && croppedImage) {
+        // If using existing image without changes
+        console.log("Keeping existing image:", data.main_image);
+        form.append("main_image", data.main_image);
       }
 
-      // Add form data
+      // Add form data - make sure we add all fields
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
+        if (value !== undefined && value !== null && key !== "main_image") {
           form.append(key, value);
         }
       });
@@ -452,8 +524,18 @@ const ProjectEditModal = () => {
 
       form.append("project_members", JSON.stringify(projectMembers));
 
+      console.log("Form data before submission:");
+      // Log the form data to verify all fields are included
+      for (let [key, value] of form.entries()) {
+        console.log(`${key}: ${value}`);
+      }
+
       const response = await updateProject(data.id, form);
       if (response.success) {
+        // Invalidate queries to refresh data across components
+        queryClient.invalidateQueries({ queryKey: ["teamLead", data.id] });
+        queryClient.invalidateQueries({ queryKey: ["members", data.id] });
+
         toast.success("Project updated successfully!");
         onClose();
       } else {
@@ -474,11 +556,23 @@ const ProjectEditModal = () => {
           <DialogTitle>Edit Project</DialogTitle>
         </DialogHeader>
         <div className="px-1" style={{ maxHeight: "calc(100vh - 200px)" }}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-            <ImageUploadSection />
-            <ProjectDetailsSection />
-            <SelectSection />
-          </form>
+          {isDataLoading ? (
+            <div className="space-y-4 py-4">
+              <Skeleton className="h-48 w-full rounded-lg" />
+              <Skeleton className="h-10 w-full rounded-lg" />
+              <Skeleton className="h-10 w-full rounded-lg" />
+              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                <Skeleton className="h-10 w-full rounded-lg" />
+                <Skeleton className="h-10 w-full rounded-lg" />
+              </div>
+            </div>
+          ) : (
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <ImageUploadSection />
+              <ProjectDetailsSection />
+              <SelectSection />
+            </form>
+          )}
           <DialogFooter className="pb-10">
             <Button
               type="button"
@@ -490,7 +584,7 @@ const ProjectEditModal = () => {
             </Button>
             <Button
               type="submit"
-              disabled={isLoading}
+              disabled={isLoading || isDataLoading}
               onClick={handleSubmit(onSubmit)}
               className="text-white"
             >

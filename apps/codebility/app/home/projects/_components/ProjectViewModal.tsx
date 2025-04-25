@@ -19,6 +19,7 @@ import {
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
+import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 
 // Map project category id to a label.
@@ -32,10 +33,33 @@ const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
   const isModalOpen = isOpen && type === "projectViewModal";
 
-  // Using the simplified member type returned by our actions.
-  const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
-  const [members, setMembers] = useState<SimpleMemberData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  // Using React Query to fetch team lead data
+  const { data: teamLead, isLoading: isTeamLeadLoading } = useQuery({
+    queryKey: ["teamLead", data?.id],
+    queryFn: async () => {
+      if (!data?.id) return null;
+      const result = await getTeamLead(data.id);
+      return result.data;
+    },
+    enabled: !!data?.id && isModalOpen,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  // Using React Query to fetch members data
+  const { data: members = [], isLoading: isMembersLoading } = useQuery({
+    queryKey: ["members", data?.id],
+    queryFn: async () => {
+      if (!data?.id) return [];
+      const result = await getMembers(data.id);
+      return result.data || [];
+    },
+    enabled: !!data?.id && isModalOpen,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
+
+  const isLoading = isTeamLeadLoading || isMembersLoading;
 
   // Format dates if available.
   const startDate = data?.start_date
@@ -48,39 +72,8 @@ const ProjectViewModal = () => {
     ? format(parseISO(data.created_at), "MM/dd/yyyy hh:mm:ss a")
     : null;
 
-  useEffect(() => {
-    const fetchTeamLeadAndMembers = async () => {
-      if (!data?.id) return;
-      setIsLoading(true);
-      try {
-        // Fetch both team lead and members in parallel
-        const [teamLeadResult, membersResult] = await Promise.all([
-          getTeamLead(data.id),
-          getMembers(data.id),
-        ]);
-
-        if (!teamLeadResult.error && teamLeadResult.data) {
-          setTeamLead(teamLeadResult.data);
-        }
-
-        if (!membersResult.error && membersResult.data) {
-          setMembers(membersResult.data);
-        }
-      } catch (error) {
-        console.error("Error fetching team data:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (isModalOpen) {
-      fetchTeamLeadAndMembers();
-    } else {
-      // Reset states when modal closes
-      setTeamLead(null);
-      setMembers([]);
-    }
-  }, [isModalOpen, data]);
+  // Image loading optimization
+  const [imageLoaded, setImageLoaded] = useState(false);
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -90,17 +83,26 @@ const ProjectViewModal = () => {
         </DialogHeader>
 
         <div className="flex flex-col gap-6">
-          {/* Project Image */}
+          {/* Project Image with optimized loading */}
           <div className="dark:bg-dark-100 flex justify-center rounded-lg bg-slate-100 p-0">
             {data?.main_image ? (
               <div className="relative h-52 w-full">
+                {!imageLoaded && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+                    <Skeleton className="h-full w-full rounded-lg" />
+                  </div>
+                )}
                 <Image
                   src={data.main_image}
                   alt={data?.name || "Project Image"}
                   fill
-                  unoptimized={true}
-                  className="rounded-lg object-cover"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+                  className={`rounded-lg object-cover transition-opacity duration-300 ${
+                    imageLoaded ? "opacity-100" : "opacity-0"
+                  }`}
                   priority
+                  onLoad={() => setImageLoaded(true)}
+                  unoptimized={true}
                 />
               </div>
             ) : (
@@ -224,6 +226,7 @@ const ProjectViewModal = () => {
                             fill
                             unoptimized={true}
                             className="rounded-full object-cover"
+                            loading="lazy"
                           />
                         </div>
                       ) : (
@@ -259,6 +262,7 @@ const ProjectViewModal = () => {
                                 fill
                                 unoptimized={true}
                                 className="rounded-full object-cover"
+                                loading="lazy"
                               />
                             </div>
                           ) : (
