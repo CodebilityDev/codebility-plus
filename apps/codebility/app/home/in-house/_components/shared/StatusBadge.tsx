@@ -15,29 +15,21 @@ const STATUS_CONFIG: Record<
     label: "Graduated",
     className: "bg-status-graduated text-status-graduated-text",
   },
-  BUSY: {
-    label: "Busy",
-    className: "bg-status-busy text-status-busy-text",
+  INACTIVE: {
+    label: "Inactive",
+    className: "bg-status-inactive text-status-inactive-text",
   },
-  FAILED: {
-    label: "Failed",
-    className: "bg-status-failed text-status-failed-text",
+  MENTOR: {
+    label: "Mentor",
+    className: "bg-status-mentor text-status-mentor-text",
   },
-  AVAILABLE: {
-    label: "Available",
-    className: "bg-status-available text-status-available-text",
+  ADMIN: {
+    label: "Admin",
+    className: "bg-status-admin text-status-admin-text",
   },
   DEPLOYED: {
     label: "Deployed",
     className: "bg-status-deployed text-status-deployed-text",
-  },
-  VACATION: {
-    label: "Vacation",
-    className: "bg-status-vacation text-status-vacation-text",
-  },
-  CLIENTREADY: {
-    label: "Client Ready",
-    className: "bg-status-clientready text-status-clientready-text",
   },
 };
 
@@ -47,7 +39,7 @@ interface StatusBadgeProps {
 }
 
 export function StatusBadge({ status, className }: StatusBadgeProps) {
-  const config = STATUS_CONFIG[status] || STATUS_CONFIG.AVAILABLE;
+  const config = STATUS_CONFIG[status] || STATUS_CONFIG.MENTOR;
 
   return (
     <Badge
