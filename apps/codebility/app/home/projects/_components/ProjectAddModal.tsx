@@ -41,6 +41,7 @@ export interface ProjectFormData {
   client_id?: string;
   main_image?: string;
 }
+
 const PROJECT_ADD_MODAL_TITLE = "Create New Project";
 
 const ProjectAddModal = () => {

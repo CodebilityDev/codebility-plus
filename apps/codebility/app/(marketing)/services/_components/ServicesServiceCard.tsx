@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { IconLink } from "@/public/assets/svgs";
-import { FaCrown } from "react-icons/fa";
+import { Crown } from "lucide-react";
 
 interface TeamMember {
   id: string;
@@ -136,7 +136,7 @@ export default function ServiceCard({ service }: Props) {
                         <DefaultAvatar size={56} className="h-full w-full" />
                       )}
                     </div>
-                    <FaCrown className="absolute -right-2 -top-2 h-4 w-6 rotate-45 text-yellow-400 drop-shadow-lg" />
+                    <Crown className="absolute -right-2 -top-2 h-4 w-6 rotate-45 text-yellow-400 drop-shadow-lg" />
                     <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs opacity-0 transition-opacity group-hover:opacity-100">
                       {teamLeader.first_name} {teamLeader.last_name} (Lead)
                     </div>
