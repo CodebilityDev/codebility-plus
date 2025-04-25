@@ -91,12 +91,10 @@ export function EditableCard({
               {Object.entries({
                 TRAINING: "Training",
                 GRADUATED: "Graduated",
-                BUSY: "Busy",
-                FAILED: "Failed",
-                AVAILABLE: "Available",
+                INACTIVE: "Inactive",
+                MENTOR: "Mentor",
+                ADMIN: "Admin",
                 DEPLOYED: "Deployed",
-                VACATION: "Vacation",
-                CLIENTREADY: "Client Ready",
               }).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
                   <StatusBadge status={key as InternalStatus} />
