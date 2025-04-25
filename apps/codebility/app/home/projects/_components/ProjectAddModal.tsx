@@ -41,7 +41,6 @@ export interface ProjectFormData {
   client_id?: string;
   main_image?: string;
 }
-
 const PROJECT_ADD_MODAL_TITLE = "Create New Project";
 
 const ProjectAddModal = () => {
@@ -384,29 +383,19 @@ const ProjectAddModal = () => {
           <label className="text-sm font-medium">GitHub Link</label>
           <Input
             type="text"
-            placeholder="Enter GitHub link"
-            {...register("github_link", {
-              required: "GitHub link is required",
-            })}
+            placeholder="Enter GitHub link (optional)"
+            {...register("github_link")}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
-          {errors.github_link && (
-            <p className="text-sm text-red-500">{errors.github_link.message}</p>
-          )}
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Website URL</label>
           <Input
             type="text"
-            placeholder="Enter website URL"
-            {...register("website_url", {
-              required: "Website URL is required",
-            })}
+            placeholder="Enter website URL (optional)"
+            {...register("website_url")}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
-          {errors.website_url && (
-            <p className="text-sm text-red-500">{errors.website_url.message}</p>
-          )}
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -414,15 +403,10 @@ const ProjectAddModal = () => {
           <label className="text-sm font-medium">Figma Link</label>
           <Input
             type="text"
-            placeholder="Enter Figma link"
-            {...register("figma_link", {
-              required: "Figma link is required",
-            })}
+            placeholder="Enter Figma link (optional)"
+            {...register("figma_link")}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
-          {errors.figma_link && (
-            <p className="text-sm text-red-500">{errors.figma_link.message}</p>
-          )}
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Start Date</label>

@@ -1,6 +1,9 @@
+import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Codev } from "@/types/home/codev";
+import { IconLink } from "@/public/assets/svgs";
+import { FaCrown } from "react-icons/fa";
 
 interface TeamMember {
   id: string;
@@ -18,7 +21,6 @@ interface ServiceProject {
   figma_link?: string;
   start_date?: string;
   end_date?: string;
-  team_leader?: TeamMember;
   members?: TeamMember[];
   project_category_id?: number;
   project_category_name?: string;
@@ -33,95 +35,143 @@ interface Props {
 }
 
 export default function ServiceCard({ service }: Props) {
-  const { name, main_image, description, team_leader, members } = service;
+  const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
-  // Resolve the correct project image URL
+  const {
+    name,
+    main_image,
+    description,
+    members = [],
+    website_url,
+    project_category_name,
+  } = service;
+
   const imageUrl = main_image
     ? main_image.startsWith("public")
       ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/services-image/${main_image}`
       : main_image
     : "https://codebility-cdn.pages.dev/assets/images/default-avatar-1248x845.jpg";
 
+  const hasValidWebsite =
+    website_url &&
+    website_url !== "" &&
+    website_url.toLowerCase() !== "n/a" &&
+    website_url !== ".";
+
+  const teamLeader = members.length > 0 ? members[0] : null;
+  const teamMembers = members.length > 1 ? members.slice(1) : [];
+  const isDescriptionLong = description && description.length > 120;
+
   return (
-    <div className="border-light-900/5 bg-light-700/10 flex h-full flex-1 flex-col gap-6 rounded-lg border-2 p-4 text-white">
-      {/* Increased container height and gap */}
-      <div
-        className="relative h-48 w-full overflow-hidden rounded-lg"
-        /*  style={{ aspectRatio: "21/9", minHeight: "400px" }} */
-      >
+    <div className="border-light-900/5 bg-light-700/10 flex h-full flex-1 flex-col rounded-lg border-2 p-4 text-white">
+      <div className="relative aspect-video w-full overflow-hidden rounded-lg">
         <Image
           src={imageUrl}
           alt={name}
           fill
           unoptimized={true}
-          /* sizes="(min-width: 1024px) 960px, (min-width: 640px) 720px, 100vw" */
-          className="absolute bg-center object-cover"
+          sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
+          className="object-cover"
           priority
-          quality={100}
+          quality={90}
         />
+        {project_category_name && (
+          <div className="absolute left-2 top-2 rounded-md bg-blue-600/80 px-2 py-1 text-xs text-white">
+            {project_category_name}
+          </div>
+        )}
       </div>
 
-      <div className="flex flex-1 flex-col gap-4">
-        <h3 className="line-clamp-1 text-lg font-medium lg:text-2xl">{name}</h3>
-        <p className="text-gray  text-ellipsis text-sm">
-          {description || "No description available."}
-        </p>
+      <div className="flex flex-1 flex-col pt-4">
+        <h3 className="mb-3 line-clamp-1 text-lg font-medium lg:text-2xl">
+          {name}
+        </h3>
 
-        {/* Team Section */}
-        <div className="mt-auto space-y-4">
-          {/* Team Leader */}
-          {team_leader && (
-            <div>
-              <p className="text-sm text-gray-400">Team Leader</p>
-              <div className="mt-2 flex items-center gap-3">
-                <div className="relative h-12 w-12 overflow-hidden rounded-full border border-gray-700">
-                  {team_leader.image_url ? (
-                    <Image
-                      src={team_leader.image_url}
-                      alt={`${team_leader.first_name} ${team_leader.last_name}`}
-                      fill
-                      unoptimized={true}
-                      className="object-cover"
-                    />
-                  ) : (
-                    <DefaultAvatar className="h-12 w-12" />
-                  )}
-                </div>
-                <span className="text-base">
-                  {team_leader.first_name} {team_leader.last_name}
-                </span>
-              </div>
-            </div>
+        <div className="mb-4 min-h-[4.5rem]">
+          <p
+            className={`text-gray text-sm ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
+          >
+            {description || "No description available."}
+          </p>
+          {isDescriptionLong && (
+            <button
+              onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+              className="mt-1 text-xs text-blue-400 hover:text-blue-300"
+            >
+              {isDescriptionExpanded ? "Show less" : "Read more"}
+            </button>
           )}
-          {/* Team Members */}
-          {members && members.length > 0 && (
+        </div>
+
+        <div className="mb-4 h-10">
+          {hasValidWebsite && (
+            <Link
+              href={website_url!}
+              target="_blank"
+              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm transition-colors hover:bg-blue-700"
+            >
+              <IconLink className="size-4" />
+              <span>View Website</span>
+            </Link>
+          )}
+        </div>
+
+        <div className="mt-auto min-h-[80px]">
+          {members.length > 0 ? (
             <div>
-              <p className="mb-2 text-sm text-gray-400">Team Members</p>
-              <div className="flex flex-wrap gap-2">
-                {members.map((member) => (
-                  <div key={member.id} className="group relative">
-                    <div className="relative h-12 w-12 overflow-hidden rounded-full ">
-                      {member.image_url ? (
-                        <div className="h-full w-full">
-                          <Image
-                            src={member.image_url}
-                            alt={`${member.first_name} ${member.last_name}`}
-                            width={48}
-                            height={48}
-                            unoptimized={true}
-                            className="h-full w-full rounded-full object-cover"
-                          />
-                        </div>
+              <p className="mb-2 text-sm text-gray-400">Team</p>
+              <div className="flex flex-wrap items-end">
+                {teamLeader && (
+                  <div className="group relative mb-2 mr-4">
+                    <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-blue-500">
+                      {teamLeader.image_url ? (
+                        <Image
+                          src={teamLeader.image_url}
+                          alt={`${teamLeader.first_name} ${teamLeader.last_name}`}
+                          fill
+                          unoptimized={true}
+                          className="object-cover"
+                        />
                       ) : (
-                        <DefaultAvatar size={48} className="h-full w-full" />
+                        <DefaultAvatar size={56} className="h-full w-full" />
                       )}
                     </div>
-                    <div className="absolute -top-10 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs opacity-0 transition-opacity group-hover:opacity-100">
+                    <FaCrown className="absolute -right-2 -top-2 h-4 w-6 rotate-45 text-yellow-400 drop-shadow-lg" />
+                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs opacity-0 transition-opacity group-hover:opacity-100">
+                      {teamLeader.first_name} {teamLeader.last_name} (Lead)
+                    </div>
+                  </div>
+                )}
+
+                {teamMembers.map((member, index) => (
+                  <div
+                    key={member.id}
+                    className="group relative mb-2 mr-2"
+                    style={{ zIndex: teamMembers.length - index }}
+                  >
+                    <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-gray-700">
+                      {member.image_url ? (
+                        <Image
+                          src={member.image_url}
+                          alt={`${member.first_name} ${member.last_name}`}
+                          fill
+                          unoptimized={true}
+                          className="object-cover"
+                        />
+                      ) : (
+                        <DefaultAvatar size={40} className="h-full w-full" />
+                      )}
+                    </div>
+                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs opacity-0 transition-opacity group-hover:opacity-100">
                       {member.first_name} {member.last_name}
                     </div>
                   </div>
                 ))}
               </div>
+            </div>
+          ) : (
+            <div className="flex items-end">
+              <p className="text-sm text-gray-400">No team members assigned</p>
             </div>
           )}
         </div>
