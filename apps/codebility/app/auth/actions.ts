@@ -129,6 +129,7 @@ export const signupUser = async (formData: FormData) => {
       years_of_experience,
       role_id: 7,
       internal_status: "TRAINING",
+      date_applied: new Date().toISOString(),
     };
 
     // Insert user data into the "codev" table
