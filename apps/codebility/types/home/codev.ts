@@ -110,6 +110,7 @@ export interface Codev {
   projects?: (Project & { role: string; joined_at: string })[];
   project_members?: ProjectMember[];
   work_schedules?: WorkSchedule[];
+  date_applied?: string;
 }
 
 export type ApplicantStatus =
