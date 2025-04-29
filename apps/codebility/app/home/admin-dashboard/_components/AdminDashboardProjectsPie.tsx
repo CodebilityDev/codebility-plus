@@ -15,16 +15,16 @@ import {
 } from "@/Components/ui/chart";
 import { Pie, PieChart } from "recharts";
 
-interface ApplicantStatusCounts extends Record<string, number> {}
+interface ProjectCategoryCounts extends Record<string, number> {}
 
-interface AdminDashboardApplicantStatusPieProps {
-  data?: ApplicantStatusCounts;
+interface AdminDashboardProjectsPieProps {
+  data?: ProjectCategoryCounts;
 }
 
-export default function AdminDashboardApplicantStatusPie({
+export default function AdminDashboardProjectsPie({
   data,
-}: AdminDashboardApplicantStatusPieProps) {
-  const title = "Total Applicant Status";
+}: AdminDashboardProjectsPieProps) {
+  const title = "Projects";
   if (!data)
     return (
       <Card className="flex h-full flex-col bg-black">
@@ -34,23 +34,28 @@ export default function AdminDashboardApplicantStatusPie({
       </Card>
     );
 
-  const chartData = Object.keys(data || {}).map((status) => ({
-    status,
-    applicants: data[status],
-    fill: `var(--color-${status})`, // Assuming your color variable names match the status
-  }));
+  const formatKey = (key: string) => key.toLowerCase().replace(/\s+/g, "_");
 
-  const chartConfig = Object.keys(data || {}).reduce(
-    (config, status) => {
-      const capitalizedLabel = status.charAt(0).toUpperCase() + status.slice(1); // Capitalize the first letter
-      config[status] = {
-        label: capitalizedLabel,
-        color: `hsl(var(--chart-${Object.keys(config).length + 1}))`, // Generate color based on index
-      };
-      return config;
-    },
-    {} as Record<string, { label: string; color: string }>,
-  );
+  const chartData = Object.entries(data).map(([key, value]) => {
+    const formattedKey = formatKey(key);
+
+    return {
+      category: formattedKey,
+      projects: value,
+      fill: `var(--color-${formattedKey})`,
+    };
+  });
+
+  const chartConfig = Object.keys(data).reduce((acc, key, index) => {
+    const formattedKey = formatKey(key);
+
+    acc[formattedKey] = {
+      label: key,
+      color: `hsl(var(--chart-${index + 1}))`,
+    };
+
+    return acc;
+  }, {} as ChartConfig);
 
   return (
     <Card className="flex h-full flex-col bg-black">
@@ -64,9 +69,9 @@ export default function AdminDashboardApplicantStatusPie({
           className="mx-auto aspect-square max-h-[300px]"
         >
           <PieChart>
-            <Pie data={chartData} dataKey="applicants" />
+            <Pie data={chartData} dataKey="projects" />
             <ChartLegend
-              content={<ChartLegendContent nameKey="status" />}
+              content={<ChartLegendContent nameKey="category" />}
               className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"
             />
           </PieChart>
