@@ -1,26 +1,29 @@
 "use client";
 
 import { Card, CardContent, CardHeader } from "@/Components/ui/card";
-import { UserCheck } from "lucide-react";
+import { UserCog } from "lucide-react";
 
-const totalAcceptedApplicants = 200;
+interface AdminDashboardTotalAdminProps {
+  count?: number;
+}
 
-export default function AdminDashboardTotalAccepted() {
+export default function AdminDashboardTotalAdmin({
+  count,
+}: AdminDashboardTotalAdminProps) {
   return (
     <Card className="flex h-full flex-col bg-black">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <p className="text-sm font-medium text-muted-foreground">
-          Total Accepted Applicants
+          Total Admins
         </p>
         <span>
-          <UserCheck />
+          <UserCog />
         </span>
       </CardHeader>
       <CardContent>
-        <div className="text-2xl font-bold">{totalAcceptedApplicants}</div>
-        <p className="text-xs text-muted-foreground">
-          Total accepted applicants to date
-        </p>
+        <div className="text-2xl font-bold">
+          {count !== undefined ? count : "N/A"}
+        </div>
       </CardContent>
     </Card>
   );
