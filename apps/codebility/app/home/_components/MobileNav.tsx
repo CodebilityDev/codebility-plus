@@ -72,7 +72,7 @@ const NavContent = () => {
                       alt={link.label}
                       width={20}
                       height={20}
-                      className={`${isActive ? "" : "invert-colors"} h-auto w-auto`}
+                      className={`${isActive ? "" : "invert-colors"} h-5 w-5 object-contain`}
                     />
                     <p className={`${isActive ? "base-normal" : "base-sm"}`}>
                       {link.label}
