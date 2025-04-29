@@ -6,7 +6,13 @@ import { useFadeAnimation } from "@/hooks/useFadeAnimation";
 
 import { cn } from "@codevs/ui";
 const { backgroundFade, fadeIn, timing } = useFadeAnimation()
-const Onboarding1 = ({ className }: { className?: string }) => {
+
+interface Onboarding1Props {
+  onNext: () => void;
+  className?: string;
+}
+
+const Onboarding1: React.FC<Onboarding1Props> = ({ className, onNext }) => {
   return (
     <>
       <div className="bg-black-400 relative w-screen h-screen overflow-hidden">

@@ -40,12 +40,14 @@ const OnboardingPage = () => {
       <div className="absolute bottom-0 left-0 w-full z-20 p-4">
         <div className="w-full px-8 py-4">
           <Stepper
-            activeStep={activeStep}
-            isLastStep={(value) => setIsLastStep(value)}
-            isFirstStep={(value) => setIsFirstStep(value)}
-            lineClassName="bg-white/30 h-[0.009rem] opacity-40 "
-            activeLineClassName="bg-white opacity-30"
-            placeholder={undefined}
+             activeStep={activeStep}
+             isLastStep={(value) => setIsLastStep(value)}
+             isFirstStep={(value) => setIsFirstStep(value)}
+             lineClassName="bg-white/30 h-[0.009rem] opacity-40 "
+             activeLineClassName="bg-white opacity-30"
+             placeholder={undefined}
+             onPointerEnterCapture={() => {}}
+             onPointerLeaveCapture={() => {}}
           >
             <Step 
               onClick={() => handleStepClick(0)} 
