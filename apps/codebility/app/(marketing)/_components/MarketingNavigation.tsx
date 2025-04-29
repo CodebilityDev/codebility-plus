@@ -10,6 +10,7 @@ import { Button } from "@/Components/ui/button";
 import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
 import { defaultAvatar } from "@/public/assets/images";
 import {
+  IconCog,
   IconDashboard,
   IconFourDotsMenu,
   IconLogout,
@@ -17,7 +18,7 @@ import {
 } from "@/public/assets/svgs";
 import applicationStatusIcon from "@/public/assets/svgs/icon-applicant.svg";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { ChevronDown, ChevronUp } from "lucide-react";
+import { ChevronDown, ChevronUp, SettingsIcon } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -42,14 +43,27 @@ const NAV_ITEMS = [
 ] as const;
 
 const getMenuItems = (status: string, role_id: number) => {
-  if (status === "rejected" || status === "applying") {
+  if (
+    status === "rejected" ||
+    status === "applying" ||
+    status === "testing" ||
+    status === "denied"
+  ) {
     return [
       {
-        href: status === "rejected" ? "/auth/declined" : "/auth/waiting",
+        href:
+          status === "rejected" || status === "denied"
+            ? "/auth/declined"
+            : "/auth/waiting",
         icon: applicationStatusIcon,
         label: "Status",
       },
-      { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
+      {
+        href: "/applicant/account-settings",
+        icon: IconCog,
+        label: "Settings",
+      },
+      { href: "/applicant/profile", icon: IconProfile, label: "Profile" },
     ];
   }
   return role_id === 1

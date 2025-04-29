@@ -4,9 +4,25 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { Codev, InternalStatus } from "@/types/home/codev";
-import { Link2, Mail } from "lucide-react";
+import { Download, Link2, Mail } from "lucide-react";
+import { toast } from "react-hot-toast";
 
 import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { Button } from "@codevs/ui/button";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuShortcut,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+} from "@codevs/ui/dropdown-menu";
 import {
   Table,
   TableBody,
@@ -16,19 +32,19 @@ import {
   TableRow,
 } from "@codevs/ui/table";
 
-import { Button } from "@codevs/ui/button";
-
-
 import { StatusBadge } from "../shared/StatusBadge";
 import { columns } from "./columns";
 import { EditableRow, Role } from "./EditableRow";
 import { TableActions } from "./TableActions";
-import { toast } from "react-hot-toast";
-import { Download } from "lucide-react";
 
 interface NdaEmailDialogProps {
   codev: Codev;
-  onSendNdaEmail: (codevId: string, email: string, subject: string, message: string) => Promise<void>;
+  onSendNdaEmail: (
+    codevId: string,
+    email: string,
+    subject: string,
+    message: string,
+  ) => Promise<void>;
 }
 
 interface InHouseTableProps {
@@ -54,15 +70,15 @@ const getNdaStatusColor = (status: boolean | null | undefined) => {
 // Replace the NdaEmailDialog component with this SendNdaButton component
 const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
   const [isSending, setIsSending] = useState(false);
-  
+
   const handleSendEmail = async () => {
     try {
       setIsSending(true);
       const subject = "NDA Signing Request - Codebility Plus";
       const message = `Dear ${codev.first_name},\n\nPlease sign the Non-Disclosure Agreement by clicking on the link below:\n\n[NDA_LINK]\n\nThank you,\nCodebility Plus Team`;
-      
+
       await onSendNdaEmail(codev.id, codev.email_address, subject, message);
-      
+
       toast.success(`NDA signing request sent to ${codev.email_address}`);
     } catch (error) {
       console.error("Error sending NDA email:", error);
@@ -73,9 +89,9 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
   };
 
   return (
-    <Button 
-      variant="outline" 
-      size="sm" 
+    <Button
+      variant="outline"
+      size="sm"
       className="ml-2 text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
       onClick={handleSendEmail}
       disabled={isSending}
@@ -134,12 +150,18 @@ export function InHouseTable({
     str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
 
   // Add this function to handle sending NDA email
-  const handleSendNdaEmail = async (codevId: string, email: string, subject: string, message: string) => {
+  const handleSendNdaEmail = async (
+    codevId: string,
+    email: string,
+    subject: string,
+    message: string,
+  ) => {
     try {
       // Generate a unique token for this NDA request
       const token = crypto.randomUUID();
       const expiresAt = new Date();
       expiresAt.setDate(expiresAt.getDate() + 7); // Token expires in 7 days
+
       
       console.log("Sending NDA email to:", email, "for codev ID:", codevId);
       
@@ -161,9 +183,25 @@ export function InHouseTable({
       // Generate the NDA signing link
       const signingLink = `${window.location.origin}/nda-signing/${token}`;
       
+
+
+      // Save the NDA request to the database
+      const { error: dbError } = await supabase.from("nda_requests").insert({
+        codev_id: codevId,
+        token: token,
+        expires_at: expiresAt.toISOString(),
+        status: "pending",
+      });
+
+      if (dbError) throw dbError;
+
+      // Generate the NDA signing link
+      const signingLink = `${window.location.origin}/nda-signing/${token}`;
+
+
       // Find the codev from the data array using codevId
-      const codevData = data.find(item => item.id === codevId);
-      
+      const codevData = data.find((item) => item.id === codevId);
+
       // Use the local API route instead of Supabase Edge Function
       const emailResponse = await fetch("/api/send-email", {
         method: "POST",
@@ -176,10 +214,10 @@ export function InHouseTable({
           content: message,
           firstName: codevData?.first_name || "",
           ndaLink: signingLink,
-          isNdaEmail: true
-        })
+          isNdaEmail: true,
+        }),
       });
-      
+
       if (!emailResponse.ok) {
         const errorText = await emailResponse.text();
         console.error("Email API error:", errorText);
@@ -199,6 +237,7 @@ export function InHouseTable({
         console.error("Error updating codev record:", updateError);
         throw updateError;
       }
+
       
       console.log("Codev record updated:", updateData);
       
@@ -219,6 +258,17 @@ export function InHouseTable({
       
       // Force a re-render by logging the updated data
       console.log("Updated local state:", updatedData.find(item => item.id === codevId));
+
+
+      // Update the codev's status in the local state
+      onDataChange(
+        data.map((item) =>
+          item.id === codevId
+            ? ({ ...item, nda_request_sent: true } as Codev)
+            : item,
+        ),
+      );
+
     } catch (error) {
       console.error("Error sending NDA email:", error);
       throw error;
@@ -245,8 +295,8 @@ export function InHouseTable({
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      
-     toast.success("NDA document downloaded successfully")
+
+      toast.success("NDA document downloaded successfully");
     } catch (error) {
       console.error("Error downloading NDA:", error);
       toast.error("Failed to download NDA document");
@@ -261,14 +311,30 @@ export function InHouseTable({
           {/* Table Header */}
           <TableHeader>
             <TableRow className="border-light-700 dark:border-dark-200 bg-light-200 dark:bg-dark-300 border-b">
-              {columns.map((column) => (
-                <TableHead
-                  key={column.key}
-                  className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black"
-                >
-                  {column.label}
-                </TableHead>
-              ))}
+              {columns.map((column) =>
+                column.key === "image_url" ||
+                column.key === "first_name" ||
+                column.key === "last_name" ||
+                column.key === "email_address" ? (
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black"
+                  >
+                    {column.label}
+                  </TableHead>
+                ) : (
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 hidden px-2 py-3 text-sm font-semibold text-black 2xl:table-cell"
+                  >
+                    {column.label}
+                  </TableHead>
+                ),
+              )}
+
+              <TableHead className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black 2xl:hidden">
+                Info
+              </TableHead>
               <TableHead className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black">
                 Actions
               </TableHead>
@@ -324,26 +390,169 @@ export function InHouseTable({
                     {item.email_address}
                   </TableCell>
 
-                  <TableCell className="px-2 py-2">
+                  {/* Available only on xs, sm, md screens  */}
+                  <TableCell className="dark:text-light-900 flex items-start justify-start px-2 py-2 text-base text-black 2xl:hidden">
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <span>...</span>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent className="w-56">
+                        <DropdownMenuLabel>Users Info</DropdownMenuLabel>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem>
+                            Role
+                            <DropdownMenuShortcut>
+                              {item.role_id
+                                ? roles.find((role) => role.id === item.role_id)
+                                    ?.name || "-"
+                                : "-"}
+                            </DropdownMenuShortcut>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            Position
+                            <DropdownMenuShortcut>
+                              {typeof item.display_position === "string"
+                                ? capitalize(item.display_position)
+                                : "-"}
+                            </DropdownMenuShortcut>
+                          </DropdownMenuItem>
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                              Projects
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent>
+                                {item.projects?.length ? (
+                                  <DropdownMenuItem className="space-y-1">
+                                    {item.projects.map((project) => (
+                                      <div key={project.id}>{project.name}</div>
+                                    ))}
+                                  </DropdownMenuItem>
+                                ) : (
+                                  <DropdownMenuItem>-</DropdownMenuItem>
+                                )}
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                              NDA Status
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent>
+                                <DropdownMenuItem className="flex items-center gap-2">
+                                  {/* NDA status display */}
+                                  <span
+                                    className={`${getNdaStatusColor(item.nda_status)}`}
+                                  >
+                                    {item.nda_status ? "Yes" : "No"}
+                                  </span>
+
+                                  {/* Conditional buttons based on NDA status */}
+                                  {item.nda_status ? (
+                                    // If NDA is signed, show download button
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="ml-2 text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
+                                      onClick={() => handleDownloadNda(item.id)}
+                                    >
+                                      <Download className="mr-1 h-4 w-4" />
+                                      Download
+                                    </Button>
+                                  ) : item.nda_request_sent ? (
+                                    // If NDA request is sent but not signed yet, show pending button
+                                    <Button
+                                      variant="outline"
+                                      size="sm"
+                                      className="ml-2 text-yellow-500 dark:text-yellow-200"
+                                      disabled
+                                    >
+                                      <span className="mr-1">⏳</span>
+                                      Pending
+                                    </Button>
+                                  ) : (
+                                    // If no NDA request sent, show send button
+                                    <SendNdaButton
+                                      codev={item}
+                                      onSendNdaEmail={handleSendNdaEmail}
+                                    />
+                                  )}
+                                </DropdownMenuItem>
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                          <DropdownMenuSub>
+                            <DropdownMenuSubTrigger>
+                              Portfolio
+                            </DropdownMenuSubTrigger>
+                            <DropdownMenuPortal>
+                              <DropdownMenuSubContent>
+                                <DropdownMenuItem>
+                                  {item.portfolio_website ? (
+                                    <a
+                                      href={item.portfolio_website}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                                    >
+                                      <Link2 className="mr-1 h-4 w-4" />
+                                      Portfolio
+                                    </a>
+                                  ) : (
+                                    "-"
+                                  )}
+                                </DropdownMenuItem>
+                              </DropdownMenuSubContent>
+                            </DropdownMenuPortal>
+                          </DropdownMenuSub>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuGroup>
+                          <DropdownMenuItem>
+                            Status
+                            <DropdownMenuShortcut>
+                              <StatusBadge
+                                status={item.internal_status as InternalStatus}
+                              />
+                            </DropdownMenuShortcut>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
+                            Availability Status
+                            <DropdownMenuShortcut>
+                              <SwitchStatusButton
+                                disabled={false}
+                                handleSwitch={() => {}}
+                                isActive={item.availability_status ?? false}
+                              />
+                            </DropdownMenuShortcut>
+                          </DropdownMenuItem>
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </TableCell>
+
+                  <TableCell className="hidden px-2 py-2 2xl:table-cell">
                     <StatusBadge
                       status={item.internal_status as InternalStatus}
                     />
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     {item.role_id
                       ? roles.find((role) => role.id === item.role_id)?.name ||
                         "-"
                       : "-"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     {typeof item.display_position === "string"
                       ? capitalize(item.display_position)
                       : "-"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     {item.projects?.length ? (
                       <div className="space-y-1">
                         {item.projects.map((project) => (
@@ -355,25 +564,26 @@ export function InHouseTable({
                     )}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     <div className="flex items-center gap-2">
                       {/* NDA status display */}
                       <span className={`${getNdaStatusColor(item.nda_status)}`}>
                         {item.nda_status ? "Yes" : "No"}
                       </span>
-                      
+
                       {/* Conditional buttons based on NDA status */}
                       {item.nda_status ? (
                         // If NDA is signed, show download button
-                        <Button 
-                          variant="outline" 
-                          size="sm" 
+                        <Button
+                          variant="outline"
+                          size="sm"
                           className="ml-2 text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
                           onClick={() => handleDownloadNda(item.id)}
                         >
                           <Download className="mr-1 h-4 w-4" />
                           Download
                         </Button>
+
                       ) : (
                         // Check if nda_request_sent is true, otherwise show send button
                         // Add a check for undefined and default to false
@@ -393,11 +603,30 @@ export function InHouseTable({
                             onSendNdaEmail={handleSendNdaEmail} 
                           />
                         )
+
+                      ) : item.nda_request_sent ? (
+                        // If NDA request is sent but not signed yet, show pending button
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="ml-2 text-yellow-500 dark:text-yellow-200"
+                          disabled
+                        >
+                          <span className="mr-1">⏳</span>
+                          Pending
+                        </Button>
+                      ) : (
+                        // If no NDA request sent, show send button
+                        <SendNdaButton
+                          codev={item}
+                          onSendNdaEmail={handleSendNdaEmail}
+                        />
+
                       )}
-                     </div>
+                    </div>
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     {item.portfolio_website ? (
                       <a
                         href={item.portfolio_website}
@@ -413,7 +642,7 @@ export function InHouseTable({
                     )}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     <SwitchStatusButton
                       disabled={false}
                       handleSwitch={() => {}}

@@ -4,6 +4,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { EmblaOptionsType } from "embla-carousel";
 
 import EmblaCarousel from "./CodevsCarousel";
+import Section from "./CodevsSection";
 
 interface Project {
   id: string;
@@ -28,7 +29,6 @@ export default async function ProjectSection() {
   const { data: activeProjects, error } = await supabase
     .from("projects")
     .select("id, name, description, main_image, status")
-    .eq("status", "active") // Add filter for active projects
     .order("created_at", { ascending: false });
 
   const OPTIONS: EmblaOptionsType = {
@@ -84,7 +84,7 @@ export default async function ProjectSection() {
   }
 
   return (
-    <section className="bg-black-400 relative mt-10 flex  w-full flex-col justify-center text-center ">
+    <Section className="bg-black-400 relative mt-10 flex  w-full flex-col justify-center text-center ">
       <div className="mb-10 space-y-2">
         <h1 className="text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
           Our Featured
@@ -106,6 +106,6 @@ export default async function ProjectSection() {
           </p>
         </div>
       )}
-    </section>
+    </Section>
   );
 }

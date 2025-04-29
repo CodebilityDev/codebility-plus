@@ -15,6 +15,33 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: "Codebility",
     description: "Everyone has the ability to code",
+    icons: {
+      icon: [
+        { url: "/favicon.ico" },
+        { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
+        { url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" },
+      ],
+      apple: [{ url: "/apple-touch-icon.png", sizes: "180x180" }],
+      other: [
+        { rel: "mask-icon", url: "/safari-pinned-tab.svg", color: "#5bbad5" },
+      ],
+    },
+    manifest: "/site.webmanifest",
+    openGraph: {
+      title: "Codebility",
+      description: "Everyone has the ability to code",
+      url: "https://www.codebility.tech/",
+      siteName: "Codebility",
+      images: [
+        {
+          url: "/og-image.jpg",
+          width: 1200,
+          height: 630,
+          alt: "Codebility Logo",
+        },
+      ],
+      type: "website",
+    },
   };
 }
 
@@ -29,16 +56,16 @@ export default function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html: `
-        (function() {
-          const savedTheme = localStorage.getItem('theme');
-          // Use dark as default if no theme is saved
-          const theme = savedTheme || 'dark';
-          document.documentElement.classList.add(theme);
-          if (!savedTheme) {
-            localStorage.setItem('theme', 'dark');
-          }
-        })();
-      `,
+              (function() {
+                const savedTheme = localStorage.getItem('theme');
+                // Use dark as default if no theme is saved
+                const theme = savedTheme || 'dark';
+                document.documentElement.classList.add(theme);
+                if (!savedTheme) {
+                  localStorage.setItem('theme', 'dark');
+                }
+              })();
+            `,
           }}
         />
       </head>

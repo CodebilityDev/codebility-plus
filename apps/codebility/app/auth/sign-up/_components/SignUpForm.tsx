@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
 import TechStackModal from "@/Components/modals/TechStackModal";
 import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
@@ -160,11 +161,12 @@ const SignUpForm = () => {
       <TechStackModal />
       <form onSubmit={handleSubmit(onSubmit)} className="relative">
         {/* Profile Image Upload */}
-        <div className="absolute left-4 top-0">
+        <div className="absolute left-4 top-0 flex flex-col items-center justify-center gap-1">
           <ImageUpload
             onChange={(file) => setValue("profileImage", file)} // Accepts File or null
             error={errors.profileImage?.message as string}
           />
+          <div className="text-xs">Upload picture</div>
         </div>
 
         {/* Form Fields */}
@@ -281,6 +283,8 @@ const SignUpForm = () => {
               )}
             </div>
           ))}
+
+          <PrivacyPolicyModal />
         </div>
       </form>
     </FormProvider>

@@ -1,20 +1,58 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import DefaultPagination from "@/Components/ui/pagination";
-import { pageSize } from "@/constants";
+import { CATEGORIES, pageSize } from "@/constants";
 import { useModal } from "@/hooks/use-modal-projects";
 import usePagination from "@/hooks/use-pagination";
 import { Project } from "@/types/home/codev";
 
+import Container from "../../../(marketing)/_components/MarketingContainer";
+import Section from "../../../(marketing)/_components/MarketingSection";
 import ProjectCard from "./ProjectCard";
 
 interface ProjectCardContainerProps {
   projects: Project[];
 }
 
+// Define a special ID for the "All" category
+const ALL_CATEGORY_ID = 0;
+
 const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
+  // Initialize with "All" category
+  const [currentCategory, setCurrentCategory] =
+    useState<number>(ALL_CATEGORY_ID);
+
+  // Filter projects by current category
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
+
+  // Track current page for each tab
+  const [tabPages, setTabPages] = useState(() => {
+    const pages: Record<number, number> = {
+      [ALL_CATEGORY_ID]: 1, // Add "All" category to tracked pages
+    };
+    CATEGORIES.forEach((cat) => {
+      pages[cat.id] = 1;
+    });
+    return pages;
+  });
+
   const { onOpen } = useModal();
+
+  // First filter by category, then apply pagination
+  useEffect(() => {
+    // If "All" category is selected, show all projects
+    // Otherwise, filter by the selected category
+    const filtered =
+      currentCategory === ALL_CATEGORY_ID
+        ? projects
+        : projects.filter(
+            (project) => project.project_category_id === currentCategory,
+          );
+
+    setFilteredProjects(filtered);
+  }, [currentCategory, projects]);
+
   const {
     currentPage,
     totalPages,
@@ -22,26 +60,87 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
     handleNextPage,
     handlePreviousPage,
     setCurrentPage,
-  } = usePagination(projects, pageSize.projects);
+  } = usePagination(filteredProjects, pageSize.projects);
+
+  // Update current page when switching tabs
+  useEffect(() => {
+    setCurrentPage(tabPages[currentCategory] || 1);
+  }, [currentCategory, tabPages]);
+
+  const handleTabClick = (categoryId: number) => {
+    // Save current page for the current tab before switching
+    setTabPages((prev) => ({
+      ...prev,
+      [currentCategory]: currentPage,
+    }));
+    setCurrentCategory(categoryId);
+  };
 
   return (
-    <>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-        {paginatedProjects.map((project: Project) => (
-          <ProjectCard key={project.id} project={project} onOpen={onOpen} />
-        ))}
-      </div>
+    <Section>
+      <Container className="relative z-0">
+        <div className="flex flex-col gap-10">
+          {/* Category Tabs - Added "All" category */}
+          <div className="mx-auto flex flex-wrap justify-center gap-5 xl:gap-16 ">
+            <p
+              onClick={() => handleTabClick(ALL_CATEGORY_ID)}
+              className={`cursor-pointer px-2 pb-2 text-violet-200 xl:text-xl ${
+                currentCategory === ALL_CATEGORY_ID
+                  ? "border-violet text-violet border-b-2"
+                  : "text-white"
+              }`}
+            >
+              All
+            </p>
+            {CATEGORIES.map((category) => (
+              <p
+                key={category.id}
+                onClick={() => handleTabClick(category.id)}
+                className={`cursor-pointer px-2 pb-2 text-violet-200 xl:text-xl ${
+                  currentCategory === category.id
+                    ? "border-violet text-violet border-b-2"
+                    : "text-white"
+                }`}
+              >
+                {category.name}
+              </p>
+            ))}
+          </div>
 
-      {projects.length > pageSize.projects && (
-        <DefaultPagination
-          currentPage={currentPage}
-          handleNextPage={handleNextPage}
-          handlePreviousPage={handlePreviousPage}
-          setCurrentPage={setCurrentPage}
-          totalPages={totalPages}
-        />
-      )}
-    </>
+          {/* Projects Grid */}
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+            {paginatedProjects && paginatedProjects.length > 0 ? (
+              paginatedProjects.map((project) => (
+                <ProjectCard
+                  key={project.id}
+                  project={project}
+                  onOpen={onOpen}
+                  categoryId={
+                    currentCategory === ALL_CATEGORY_ID
+                      ? project.project_category_id
+                      : currentCategory
+                  }
+                />
+              ))
+            ) : (
+              <div className="col-span-full text-center text-white">
+                No projects available for this category
+              </div>
+            )}
+          </div>
+
+          {filteredProjects.length > pageSize.projects && (
+            <DefaultPagination
+              currentPage={currentPage}
+              handleNextPage={handleNextPage}
+              handlePreviousPage={handlePreviousPage}
+              setCurrentPage={setCurrentPage}
+              totalPages={totalPages}
+            />
+          )}
+        </div>
+      </Container>
+    </Section>
   );
 };
 

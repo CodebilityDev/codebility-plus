@@ -11,7 +11,7 @@ const WorkWithUs = () => {
       id="workwithus"
       className="border-light-900/5 bg-light-900/5 relative w-full border-y-4"
     >
-      <Container className="relative z-10 mx-auto text-white">
+      <Container className="relative z-10 mx-auto max-w-[1100px] px-4 text-white">
         <div className="flex flex-col gap-6 md:gap-10">
           <h2 className="text-center text-xl md:text-3xl">Work With Us</h2>
 

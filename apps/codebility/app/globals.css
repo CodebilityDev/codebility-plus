@@ -118,6 +118,12 @@
     --blue-500: theme("colors.blue.500");
     --blue-100: theme("colors.blue.100");
     --white: theme("colors.white");
+
+    --chart-1: 221.2 83.2% 53.3%;
+    --chart-2: 212 95% 68%;
+    --chart-3: 216 92% 60%;
+    --chart-4: 210 98% 78%;
+    --chart-5: 212 97% 87%;
   }
 
   .dark {
@@ -146,6 +152,12 @@
     --text-color-4: 266, 100%, 64%;
     --muted-figma: 24, 24, 24, 25%;
     --card-clients: 19, 19, 19, 100%;
+
+    --chart-1: 221.2 83.2% 53.3%;
+    --chart-2: 212 95% 68%;
+    --chart-3: 216 92% 60%;
+    --chart-4: 210 98% 78%;
+    --chart-5: 212 97% 87%;
   }
 }
 

@@ -138,7 +138,7 @@ export const createNewTask = async (
       .filter(Boolean);
     const skill_category_id = formData.get("skill_category_id")?.toString(); // NEW field
 
-    if (!title || !kanban_column_id || !codev_id) {
+    if (!title || !kanban_column_id) {
       return { success: false, error: "Required fields are missing" };
     }
 

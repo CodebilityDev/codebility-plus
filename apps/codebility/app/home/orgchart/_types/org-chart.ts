@@ -4,6 +4,7 @@ export type TeamMemberCardProps = {
   last_name: string;
   display_position: string;
   image_url: string;
+  application_status: string;
 };
 
 export type OrgChartProps = {

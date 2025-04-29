@@ -1,30 +1,54 @@
-"use client"
-import React, { useState } from "react"
+"use client";
+
+import React, { useEffect, useState } from "react";
 
 type SearchProps = {
-  onSubmit: (search: string) => void
-  placeholder?: string
-}
+  onSubmit: (search: string) => void;
+  placeholder?: string;
+  initialValue?: string; // New prop to initialize the search input
+};
 
-const Search = ({ onSubmit, placeholder = "Search" }: SearchProps) => {
-  const [isSearching, setIsSearching] = useState<string>("")
+const EnhancedSearch = ({
+  onSubmit,
+  placeholder = "Search",
+  initialValue = "",
+}: SearchProps) => {
+  const [isSearching, setIsSearching] = useState<string>(initialValue);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
-    onSubmit(isSearching)
-  }
+  // Update the input when initialValue changes
+  useEffect(() => {
+    setIsSearching(initialValue);
+  }, [initialValue]);
+
+  // Debounce search
+  useEffect(() => {
+    const delayDebounce = setTimeout(() => {
+      onSubmit(isSearching);
+    }, 500);
+
+    return () => clearTimeout(delayDebounce); // Cleanup previous timeout
+  }, [isSearching, onSubmit]);
+
+  // Handle immediate search as user types (optional)
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setIsSearching(value);
+
+    // Uncomment the following line if you want to search as the user types
+    // onSubmit(value);
+  };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={(e) => e.preventDefault()} className="w-full">
       <input
         type="text"
         value={isSearching}
         placeholder={placeholder}
-        onChange={(e) => setIsSearching(e.target.value)}
-        className="text-black h-10 w-full rounded-full border border-gray border-opacity-50 bg-inherit px-5 focus:outline-none dark:text-white md:w-80"
+        onChange={handleChange}
+        className="border-gray h-10 w-full rounded-full border border-opacity-50 bg-inherit px-5 text-black focus:outline-none dark:text-white md:w-80"
       />
     </form>
-  )
-}
+  );
+};
 
-export default Search
+export default EnhancedSearch;

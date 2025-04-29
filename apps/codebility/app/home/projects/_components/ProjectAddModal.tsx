@@ -172,6 +172,7 @@ const ProjectAddModal = () => {
         onChange={handleTeamLeaderSelect}
         placeholder="Select Team Leader"
         disabled={isDataLoading}
+        searchable
       />
       <CustomSelect
         label="Project Category"
@@ -179,6 +180,7 @@ const ProjectAddModal = () => {
         onChange={(value) => setValue("project_category_id", value)}
         placeholder="Select Project Category"
         variant="simple"
+        searchable
       />
       <CustomSelect
         label="Client"
@@ -186,6 +188,7 @@ const ProjectAddModal = () => {
         onChange={(value) => setValue("client_id", value)}
         placeholder="Select Client"
         disabled={isDataLoading}
+        searchable
       />
       <MemberSelection
         users={users.filter((user) => user.id !== currentTeamLeader?.id)}
@@ -381,29 +384,19 @@ const ProjectAddModal = () => {
           <label className="text-sm font-medium">GitHub Link</label>
           <Input
             type="text"
-            placeholder="Enter GitHub link"
-            {...register("github_link", {
-              required: "GitHub link is required",
-            })}
+            placeholder="Enter GitHub link (optional)"
+            {...register("github_link")}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
-          {errors.github_link && (
-            <p className="text-sm text-red-500">{errors.github_link.message}</p>
-          )}
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Website URL</label>
           <Input
             type="text"
-            placeholder="Enter website URL"
-            {...register("website_url", {
-              required: "Website URL is required",
-            })}
+            placeholder="Enter website URL (optional)"
+            {...register("website_url")}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
-          {errors.website_url && (
-            <p className="text-sm text-red-500">{errors.website_url.message}</p>
-          )}
         </div>
       </div>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -411,15 +404,10 @@ const ProjectAddModal = () => {
           <label className="text-sm font-medium">Figma Link</label>
           <Input
             type="text"
-            placeholder="Enter Figma link"
-            {...register("figma_link", {
-              required: "Figma link is required",
-            })}
+            placeholder="Enter Figma link (optional)"
+            {...register("figma_link")}
             className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
           />
-          {errors.figma_link && (
-            <p className="text-sm text-red-500">{errors.figma_link.message}</p>
-          )}
         </div>
         <div className="space-y-2">
           <label className="text-sm font-medium">Start Date</label>
@@ -427,7 +415,7 @@ const ProjectAddModal = () => {
             type="date"
             placeholder="Select start date"
             {...register("start_date", { required: "Start date is required" })}
-            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-white"
           />
           {errors.start_date && (
             <p className="text-sm text-red-500">{errors.start_date.message}</p>

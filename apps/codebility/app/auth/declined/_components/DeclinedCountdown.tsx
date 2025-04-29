@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+
+import { getReApplyDate } from "../_service/util";
 
 export const DeclinedCountdown = ({ userData }: { userData: any }) => {
-  const createdAt = new Date(userData?.updated_at);
-  const [reapplyDate] = useState(() => {
-    const createdAt = new Date(userData?.updated_at);
-    const reapplyDate = new Date(createdAt);
-    reapplyDate.setMonth(reapplyDate.getMonth() + 3);
-    return reapplyDate;
-  });
+
+  const reapplyDate = useMemo(
+    () => getReApplyDate(userData?.date_applied),
+    [userData?.date_applied],
+  );
 
   const [timeLeft, setTimeLeft] = useState(() => {
     const now = new Date();

@@ -1,89 +1,115 @@
-"use client"
+"use client";
 
-import { useEffect, useState, useTransition } from "react"
-import { Button } from "@/Components/ui/button"
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/Components/ui/dialog"
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/Components/ui/select"
-import { useModal } from "@/hooks/use-modal"
-import type { SkillCategory } from "@/types/home/codev"
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs"
-import toast from "react-hot-toast"
+import type { SkillCategory } from "@/types/home/codev";
+import { useEffect, useState, useTransition } from "react";
+import { Button } from "@/Components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/Components/ui/select";
+import { useModal } from "@/hooks/use-modal";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import toast from "react-hot-toast";
 
-import { Input } from "@codevs/ui/input"
-import { Label } from "@codevs/ui/label"
-import { Textarea } from "@codevs/ui/textarea"
+import { Input } from "@codevs/ui/input";
+import { Label } from "@codevs/ui/label";
+import { Textarea } from "@codevs/ui/textarea";
 
-import { createNewTask } from "../../actions"
-import KanbanAddModalMembers from "../kanban_modals/KanbanAddModalMembers"
+import { createNewTask } from "../../actions";
+import KanbanAddModalMembers from "../kanban_modals/KanbanAddModalMembers";
 
-const PRIORITY_LEVELS = ["critical", "high", "medium", "low"]
-const DIFFICULTY_LEVELS = ["easy", "medium", "hard"]
-const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"]
+const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
+const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
+const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"];
 
 const TaskAddModal = () => {
-  const { isOpen, onClose, type, data } = useModal()
-  const isModalOpen = isOpen && type === "taskAddModal"
-  const [mainAssignee, setMainAssignee] = useState<string>("")
-  const [sidekicks, setSidekicks] = useState<string[]>([])
-  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([])
-  const [loading, setLoading] = useState(false)
-  const [isPending, startTransition] = useTransition()
+  const { isOpen, onClose, type, data } = useModal();
+  const isModalOpen = isOpen && type === "taskAddModal";
+  const [mainAssignee, setMainAssignee] = useState<string>("");
+  const [sidekicks, setSidekicks] = useState<string[]>([]);
+  const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [isPending, startTransition] = useTransition();
 
   useEffect(() => {
     const loadSkillCategories = async () => {
-      const supabase = createClientComponentClient()
-      const { data, error } = await supabase.from("skill_category").select("id, name").order("name")
+      const supabase = createClientComponentClient();
+      const { data, error } = await supabase
+        .from("skill_category")
+        .select("id, name")
+        .order("name");
 
       if (error) {
-        toast.error("Failed to load skill categories")
+        toast.error("Failed to load skill categories");
       } else if (data) {
-        setSkillCategories(data)
+        setSkillCategories(data);
       }
-    }
-    loadSkillCategories()
-  }, [])
+    };
+    loadSkillCategories();
+  }, []);
 
   const handleSubmit = async (formData: FormData) => {
     try {
-      setLoading(true)
+      setLoading(true);
 
-      if (!formData.get("title")) throw new Error("Title is required")
-      if (!mainAssignee) throw new Error("Primary assignee is required")
-      if (!formData.get("skill_category_id")) throw new Error("Skill category is required")
+      if (!formData.get("title")) throw new Error("Title is required");
+      if (!formData.get("skill_category_id"))
+        throw new Error("Skill category is required");
 
-      formData.append("codev_id", mainAssignee)
-      if (sidekicks.length) formData.append("sidekick_ids", sidekicks.join(","))
+      if (mainAssignee) {
+        formData.append("codev_id", mainAssignee);
+      }
 
-      const response = await createNewTask(formData)
+      if (sidekicks.length)
+        formData.append("sidekick_ids", sidekicks.join(","));
+
+      const response = await createNewTask(formData);
       if (response.success) {
-        toast.success("Task created successfully")
-        onClose()
+        toast.success("Task created successfully");
+        onClose();
 
         // More aggressive approach - force a complete page reload
-        window.location.href = window.location.pathname + "?t=" + Date.now()
+        window.location.href = window.location.pathname + "?t=" + Date.now();
       } else {
-        toast.error(response.error || "Failed to create task")
+        toast.error(response.error || "Failed to create task");
       }
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : "Failed to create task")
+      toast.error(
+        error instanceof Error ? error.message : "Failed to create task",
+      );
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  if (!isModalOpen) return null
+  if (!isModalOpen) return null;
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[90vh] w-[90%] max-w-3xl overflow-y-auto bg-white dark:bg-gray-900 lg:h-auto">
+      <DialogContent className="h-[95vh] w-[95vw] max-h-[900px] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900 phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px]">
         <form action={handleSubmit} className="flex flex-col gap-6">
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">Add New Task</DialogTitle>
+            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+              Add New Task
+            </DialogTitle>
           </DialogHeader>
 
           {data?.listName && (
             <div className="rounded-md bg-blue-50 p-2 dark:bg-blue-900/20">
-              <Label className="text-sm text-blue-700 dark:text-blue-300">Adding to: {data.listName}</Label>
+              <Label className="text-sm text-blue-700 dark:text-blue-300">
+                Adding to: {data.listName}
+              </Label>
             </div>
           )}
 
@@ -98,7 +124,7 @@ const TaskAddModal = () => {
                 id="title"
                 name="title"
                 placeholder="Enter task title"
-                className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:bg-dark-200 dark:text-light-900 "
+                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500 "
                 required
               />
             </div>
@@ -112,7 +138,7 @@ const TaskAddModal = () => {
                 name="points"
                 type="number"
                 min="0"
-                className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:bg-dark-200 dark:text-light-900 "
+                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500 "
                 placeholder="Task points"
               />
             </div>
@@ -126,8 +152,12 @@ const TaskAddModal = () => {
                 <SelectContent>
                   <SelectGroup>
                     {PRIORITY_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level} className="capitalize">
-                        {level}
+                      <SelectItem
+                        key={level}
+                        value={level}
+                        className="capitalize"
+                      >
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -144,8 +174,12 @@ const TaskAddModal = () => {
                 <SelectContent>
                   <SelectGroup>
                     {DIFFICULTY_LEVELS.map((level) => (
-                      <SelectItem key={level} value={level} className="capitalize">
-                        {level}
+                      <SelectItem
+                        key={level}
+                        value={level}
+                        className="capitalize"
+                      >
+                        {level.charAt(0).toUpperCase() + level.slice(1)}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -162,8 +196,13 @@ const TaskAddModal = () => {
                 <SelectContent>
                   <SelectGroup>
                     {TASK_TYPES.map((type) => (
-                      <SelectItem key={type} value={type} className="capitalize">
-                        {type.toLowerCase()}
+                      <SelectItem
+                        key={type}
+                        value={type}
+                        className="capitalize"
+                      >
+                        {type.charAt(0).toUpperCase() +
+                          type.slice(1).toLowerCase()}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -192,7 +231,10 @@ const TaskAddModal = () => {
 
           <div className="space-y-4">
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Primary Assignee</Label>
+              <Label className="text-sm font-medium">
+                Primary Assignee
+                <span className="ml-2 text-xs text-gray-500">(Optional)</span>
+              </Label>
               <KanbanAddModalMembers
                 singleSelection
                 onMembersChange={(ids) => setMainAssignee(ids[0] || "")}
@@ -219,7 +261,7 @@ const TaskAddModal = () => {
               <Textarea
                 id="description"
                 name="description"
-                className="min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700 dark:bg-dark-200"
+                className="dark:bg-dark-200 min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700"
                 placeholder="Add task description..."
               />
             </div>
@@ -230,14 +272,14 @@ const TaskAddModal = () => {
               type="button"
               variant="outline"
               onClick={onClose}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-3 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
               disabled={loading || isPending}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 sm:w-auto"
+              className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-1 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
               disabled={loading || isPending}
             >
               {loading || isPending ? "Creating..." : "Create Task"}
@@ -246,8 +288,7 @@ const TaskAddModal = () => {
         </form>
       </DialogContent>
     </Dialog>
-  )
-}
+  );
+};
 
-export default TaskAddModal
-
+export default TaskAddModal;

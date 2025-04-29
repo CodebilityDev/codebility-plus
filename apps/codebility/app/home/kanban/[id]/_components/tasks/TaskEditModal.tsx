@@ -186,7 +186,7 @@ const TaskEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[90vh] w-[90%] max-w-3xl overflow-y-auto bg-white dark:bg-gray-900 lg:h-auto">
+      <DialogContent className="h-[95vh] w-[95vw] max-h-[900px] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900 phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px]">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
@@ -378,7 +378,7 @@ const TaskEditModal = () => {
               placeholder="Add task description..."
               value={taskData.description}
               onChange={(e) => handleInputChange("description", e.target.value)}
-              className="min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700"
+              className="min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700 dark:bg-dark-200"
             />
           </div>
 
@@ -387,14 +387,14 @@ const TaskEditModal = () => {
               type="button"
               variant="outline"
               onClick={onClose}
-              className="w-full sm:w-auto"
+              className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-1 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
               disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 sm:w-auto"
+              className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-1 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
               disabled={loading}
             >
               {loading ? "Saving..." : "Save Changes"}

@@ -13,9 +13,14 @@ const PUBLIC_ROUTES = [
   "/terms",
   "/auth/password-reset",
   "/codevs",
+  "/bookacall",
   "/services",
   "/",
+
   "/nda-signing/public"
+
+  "/auth/callback",
+
 ] as const;
 
 // Routes that should be public with wildcard support (e.g., /profiles/*)
@@ -27,6 +32,7 @@ const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up", "/auth/onboarding"] as co
 const EMAIL_VERIFICATION_ROUTE = "/auth/verify";
 const WAITING_APPROVAL_ROUTE = "/auth/waiting";
 const APPLICATION_DECLINED_ROUTE = "/auth/declined";
+const APPLICANT_ROUTE = "/applicant"
 
 const routePermissionMap: Record<string, keyof RolePermissions> = {
   "/home/interns": "interns",
@@ -148,26 +154,28 @@ export async function middleware(req: NextRequest) {
           WAITING_APPROVAL_ROUTE,
           APPLICATION_DECLINED_ROUTE,
           EMAIL_VERIFICATION_ROUTE,
+          APPLICANT_ROUTE,
         ].includes(pathname)
       ) {
         return redirectTo(req, "/home");
       }
-    } else if (application_status === "failed") {
+    } else if (application_status === "failed" || application_status === "denied") {
       // If application is rejected, only allow access to declined page
-      if (pathname !== APPLICATION_DECLINED_ROUTE) {
-        return redirectTo(req, APPLICATION_DECLINED_ROUTE);
-      } else {
+      if (pathname.includes(APPLICATION_DECLINED_ROUTE) || pathname.includes(APPLICANT_ROUTE)) {
         return NextResponse.next();
+      } else {
+        return redirectTo(req, APPLICATION_DECLINED_ROUTE);
       }
     } else if (
       application_status === "applying" ||
-      application_status === "pending"
+      application_status === "pending" ||
+      application_status === "testing"
     ) {
       // If application is pending, only allow access to waiting page
-      if (pathname !== WAITING_APPROVAL_ROUTE) {
-        return redirectTo(req, WAITING_APPROVAL_ROUTE);
-      } else {
+      if (pathname.includes(WAITING_APPROVAL_ROUTE) || pathname.includes(APPLICANT_ROUTE)) {
         return NextResponse.next();
+      } else {
+        return redirectTo(req, WAITING_APPROVAL_ROUTE);
       }
     }
 

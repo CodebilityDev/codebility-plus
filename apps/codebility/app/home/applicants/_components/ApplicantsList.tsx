@@ -1,80 +1,32 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import ApplicantsTableContainer from "@/app/home/applicants/_components/ApplicantsTableContainer";
-import { Box, H1 } from "@/Components/shared/dashboard";
-import Search from "@/Components/shared/dashboard/Search";
-import { Codev } from "@/types/home/codev";
-import { Toaster } from "react-hot-toast";
+import { ApplicantStatus, Codev } from "@/types/home/codev";
 
-const ApplicantsList = ({ applicants }: { applicants: Codev[] }) => {
-  const [filteredApplicants, setFilteredApplicants] = useState<Codev[] | []>(
-    [],
-  );
-  const [isDataFound, setIsDataFound] = useState<boolean>(false);
-  const [searchTerm, setSearchTerm] = useState<string>("");
+interface ApplicantsListProps {
+  applicants: Codev[];
+  trackAssessmentSent?: (applicantId: string) => void;
+  sentAssessments?: Record<string, boolean>;
+  activeTab: ApplicantStatus;
+  onStatusChange?: () => void; // Add onStatusChange prop
+}
 
-  const handleSubmit = useCallback(
-    (search: string) => {
-      if (search.trim() === "") {
-        setFilteredApplicants(applicants);
-        setIsDataFound(false);
-      } else {
-        const searchLowerCase = search.toLowerCase();
-        const results = applicants.filter((applicant) => {
-          const fullName =
-            `${applicant.first_name} ${applicant.last_name}`.toLowerCase();
-          const email = applicant.email_address.toLowerCase();
-          const portfolio = applicant.portfolio_website?.toLowerCase() || "";
-          const github = applicant.github?.toLowerCase() || "";
-          return (
-            fullName.includes(searchLowerCase) ||
-            email.includes(searchLowerCase) ||
-            portfolio.includes(searchLowerCase) ||
-            github.includes(searchLowerCase)
-          );
-        });
-
-        setFilteredApplicants(results);
-        setIsDataFound(results.length === 0);
-      }
-    },
-    [applicants],
-  );
-
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      handleSubmit(searchTerm);
-    }, 300);
-
-    return () => clearTimeout(timeoutId);
-  }, [searchTerm, handleSubmit]);
-
-  useEffect(() => {
-    setFilteredApplicants(applicants);
-  }, [applicants]);
-
-  const applicantsList =
-    filteredApplicants.length > 0 ? filteredApplicants : applicants;
-
+const ApplicantsList = ({
+  applicants,
+  trackAssessmentSent,
+  sentAssessments,
+  activeTab,
+  onStatusChange,
+}: ApplicantsListProps) => {
+  // All filtering and sorting is now handled in the parent component
   return (
-    <>
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <H1>Applicants List</H1>
-        <Search
-          onSubmit={(value) => setSearchTerm(value)}
-          placeholder="Search applicants"
-        />
-      </div>
-      <Box>
-        {isDataFound || applicantsList.length === 0 ? (
-          <div>No applicants found. The list is empty at this time.</div>
-        ) : (
-          <ApplicantsTableContainer applicants={applicantsList} />
-        )}
-      </Box>
-      <Toaster position="top-center" reverseOrder={false} />
-    </>
+    <ApplicantsTableContainer
+      applicants={applicants}
+      trackAssessmentSent={trackAssessmentSent}
+      sentAssessments={sentAssessments}
+      activeTab={activeTab}
+      onStatusChange={onStatusChange} // Pass onStatusChange to container
+    />
   );
 };
 

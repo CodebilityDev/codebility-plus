@@ -25,6 +25,10 @@ const PathsSchema = z.object({
     permissions: z.string().min(1),
     resume: z.string().min(1),
 
+
+
+    admin_dashboard: z.string().min(1),
+
   }),
 });
 
@@ -52,6 +56,7 @@ const pathsConfig = PathsSchema.parse({
     services: "/home/settings/services",
     permissions: "/home/settings/permissions",
     resume: "/home/settings/resume",
+    admin_dashboard: "/home/admin-dashboard",
   },
 } satisfies z.infer<typeof PathsSchema>);
 

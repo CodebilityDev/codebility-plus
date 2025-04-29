@@ -110,17 +110,23 @@ export interface Codev {
   projects?: (Project & { role: string; joined_at: string })[];
   project_members?: ProjectMember[];
   work_schedules?: WorkSchedule[];
+  date_applied?: string;
 }
+
+export type ApplicantStatus =
+  | "applying" // Initial application
+  | "testing" // Taking assessment test
+  | "onboarding" // Passed assessment, in interview/onboarding process
+  | "denied" // Application denied
+  | "passed"; // Final acceptance (becomes CODEV)
 
 export type InternalStatus =
   | "TRAINING"
   | "GRADUATED"
-  | "BUSY"
-  | "FAILED"
-  | "AVAILABLE"
+  | "INACTIVE"
+  | "MENTOR"
+  | "ADMIN"
   | "DEPLOYED"
-  | "VACATION"
-  | "CLIENTREADY";
 
 export interface ProjectMember {
   id: string;
@@ -155,6 +161,7 @@ export interface Project {
   role?: string;
   joined_at?: string;
   project_members?: ProjectMember[];
+  kanban_display: boolean;
 }
 export interface Education {
   id: string;

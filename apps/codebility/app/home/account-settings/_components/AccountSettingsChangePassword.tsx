@@ -107,6 +107,7 @@ export default function AccountSettingsChangePassword() {
                     label="Confirm Password"
                     parentClassName="flex gap-2 flex-col"
                     variant="lightgray"
+                    className="mb-4"
                     {...field}
                   />
                 </FormControl>

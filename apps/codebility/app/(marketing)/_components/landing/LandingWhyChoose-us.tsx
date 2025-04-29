@@ -5,7 +5,7 @@ import Section from "../MarketingSection";
 
 const WhyChooseUs = () => {
   return (
-    <Section id="whychooseus">
+    <Section id="whychooseus" className="relative w-full pt-10 text-white">
       <Container className="text-white">
         <div className="flex flex-col gap-6 md:gap-10">
           <h2 className="text-center text-xl md:text-3xl lg:text-left">

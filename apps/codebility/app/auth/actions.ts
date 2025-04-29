@@ -129,6 +129,7 @@ export const signupUser = async (formData: FormData) => {
       years_of_experience,
       role_id: 7,
       internal_status: "TRAINING",
+
       // --- NDA fields ---
       nda_signature:
         typeof formData.get("ndaSignature") === "string"
@@ -138,6 +139,9 @@ export const signupUser = async (formData: FormData) => {
         typeof formData.get("ndaSignedAt") === "string"
           ? (formData.get("ndaSignedAt") as string)
           : undefined,
+
+      date_applied: new Date().toISOString(),
+
     };
 
     // Insert user data into the "codev" table

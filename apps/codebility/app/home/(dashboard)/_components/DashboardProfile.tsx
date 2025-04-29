@@ -16,7 +16,6 @@ import {
   fetchUserAvailabilityStatus,
   updateUserAvailabilityStatus,
 } from "../actions";
-import DashboardCurrentProject from "./DashboardCurrentProject";
 
 export default function DashboardProfile() {
   const { user } = useUserStore();
@@ -64,7 +63,7 @@ export default function DashboardProfile() {
       {!isLoading ? (
         <Box className="relative flex-1">
           <div className="mx-auto flex flex-col items-center gap-3">
-            <p className="text-2xl font-semibold capitalize">
+            <p className="mt-4 text-2xl font-semibold capitalize md:mt-0">
               Hello, {user?.first_name ?? ""}!
             </p>
 
@@ -82,13 +81,10 @@ export default function DashboardProfile() {
             <Badges />
           </div>
 
-          {/* current project */}
-          <DashboardCurrentProject />
-
           {/* status switch */}
-          <div className="w-1/3 absolute right-4 top-4 flex flex-col items-center justify-center gap-2 lg:flex-col-reverse xl:flex-col">
+          <div className="absolute right-4 top-4 flex w-1/3 flex-col items-center justify-center gap-2 lg:flex-col-reverse xl:flex-col">
             {active !== null && (
-              <div className="flex gap-2 ml-auto">
+              <div className="ml-auto flex gap-2">
                 <Badge className={cn(active ? "bg-green" : "bg-red-500")}>
                   {active ? "Active" : "Inactive"}
                 </Badge>
@@ -100,8 +96,6 @@ export default function DashboardProfile() {
                 />
               </div>
             )}
-            
-        
           </div>
         </Box>
       ) : (

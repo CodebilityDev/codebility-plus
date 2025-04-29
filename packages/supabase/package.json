@@ -11,7 +11,6 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    "./browser-client": "./src/clients/browser.client.ts",
     "./middleware-client": "./src/clients/middleware.client.ts",
     "./route-handler-client": "./src/clients/route-handler.client.ts",
     "./server-actions-client": "./src/clients/server-actions.client.ts",

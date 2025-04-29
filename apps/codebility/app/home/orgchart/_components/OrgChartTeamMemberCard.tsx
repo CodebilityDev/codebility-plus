@@ -12,7 +12,7 @@ export const TeamMemberCard = ({
   image_url,
 }: TeamMemberCardProps) => {
   return (
-    <Card className="dark:bg-black-200 h-48 w-52 shadow-lg">
+    <div className="h-48 w-52 dark:bg-transparent">
       <CardContent className="flex flex-col items-center gap-2 p-4">
         <Image
           src={image_url || defaultAvatar}
@@ -20,6 +20,7 @@ export const TeamMemberCard = ({
           width={80}
           height={80}
           priority
+          unoptimized={true}
           className="h-20 w-20 rounded-full object-cover"
         />
         <h3 className="text-center font-semibold capitalize">{`${first_name} ${last_name}`}</h3>
@@ -27,6 +28,6 @@ export const TeamMemberCard = ({
           {display_position}
         </p>
       </CardContent>
-    </Card>
+    </div>
   );
 };

@@ -29,6 +29,9 @@ export default function ImageCrop({
   const [croppedAreaPixels, setCroppedAreaPixels] = useState<Area | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  // Set aspect ratio to 16/9 to match aspect-video used in the card display
+  const aspectRatio = 16 / 9;
+
   const onCropComplete = (croppedArea: Area, croppedAreaPixels: Area) => {
     setCroppedAreaPixels(croppedAreaPixels);
   };
@@ -62,7 +65,7 @@ export default function ImageCrop({
             image={image}
             crop={crop}
             zoom={zoom}
-            aspect={21 / 10}
+            aspect={aspectRatio}
             restrictPosition={false}
             onCropChange={setCrop}
             onCropComplete={onCropComplete}
@@ -104,4 +107,4 @@ export default function ImageCrop({
   );
 }
 
-memo(ImageCrop);
+export const MemoizedImageCrop = memo(ImageCrop);

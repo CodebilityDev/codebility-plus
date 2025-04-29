@@ -28,7 +28,8 @@ import KanbanColumn from "./KanbanColumn";
 // Styles
 const styles = {
   container: "overflow-x-auto overflow-y-hidden",
-  columnList: "flex min-h-[calc(100vh-12rem)] w-full gap-4 p-2 md:p-4",
+  columnList:
+    "flex flex-wrap min-h-[calc(100vh-12rem)] w-full gap-4 p-2 md:p-4",
 } as const;
 
 // Types
@@ -102,11 +103,11 @@ export default function KanbanBoardColumnContainer({
           (task) =>
             !activeFilter ||
             task.codev?.id === activeFilter ||
-            task.sidekick_ids?.includes(activeFilter)
+            task.sidekick_ids?.includes(activeFilter),
         )
         .sort(sortByUpdatedAtDesc);
     },
-    [activeFilter]
+    [activeFilter],
   );
 
   // Initialize board data from orderedColumns
@@ -115,7 +116,7 @@ export default function KanbanBoardColumnContainer({
       orderedColumns.map((col) => ({
         ...col,
         tasks: filterAndSortTasks(col.tasks),
-      }))
+      })),
     );
   }, [orderedColumns, activeFilter, filterAndSortTasks]);
 
@@ -137,9 +138,9 @@ export default function KanbanBoardColumnContainer({
             toast.error("Failed to update tasks");
           }
         },
-        1000
+        1000,
       ),
-    [router]
+    [router],
   );
 
   useEffect(() => {
@@ -180,8 +181,8 @@ export default function KanbanBoardColumnContainer({
         try {
           await Promise.all(
             newCols.map((column, index) =>
-              updateColumnPosition(column.id, index)
-            )
+              updateColumnPosition(column.id, index),
+            ),
           );
           router.refresh();
         } catch (error) {
@@ -198,17 +199,17 @@ export default function KanbanBoardColumnContainer({
       ) {
         const activeColId = activeData.columnId;
         const overColId = String(
-          overData.type === "Column" ? over.id : overData.columnId
+          overData.type === "Column" ? over.id : overData.columnId,
         );
 
         if (!activeColId || !overColId) return;
 
         const updatedBoard = structuredClone(boardData);
         const oldColumnIndex = updatedBoard.findIndex(
-          (col) => col.id === activeColId
+          (col) => col.id === activeColId,
         );
         const newColumnIndex = updatedBoard.findIndex(
-          (col) => col.id === overColId
+          (col) => col.id === overColId,
         );
 
         if (oldColumnIndex === -1 || newColumnIndex === -1) return;
@@ -222,7 +223,7 @@ export default function KanbanBoardColumnContainer({
         newColumn.tasks = newColumn.tasks ?? [];
 
         const activeTaskIndex = oldColumn.tasks.findIndex(
-          (t) => t.id === active.id
+          (t) => t.id === active.id,
         );
         if (activeTaskIndex === -1) return;
 
@@ -234,7 +235,7 @@ export default function KanbanBoardColumnContainer({
         // If dragging over another task, insert at that task's index
         if (overData.type === "Task") {
           const overTaskIndex = newColumn.tasks.findIndex(
-            (t) => t.id === over.id
+            (t) => t.id === over.id,
           );
           newColumn.tasks.splice(overTaskIndex, 0, movedTask);
         } else {
@@ -250,7 +251,7 @@ export default function KanbanBoardColumnContainer({
         ]);
       }
     },
-    [boardData, router]
+    [boardData, router],
   );
 
   const { sensors } = useDragAndDrop({
@@ -266,7 +267,7 @@ export default function KanbanBoardColumnContainer({
         ...column,
         tasks:
           column.tasks?.filter((task) => task.id !== completedTaskId) || [],
-      }))
+      })),
     );
   }, []);
 
