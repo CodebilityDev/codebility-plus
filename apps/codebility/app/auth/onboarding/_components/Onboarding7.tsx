@@ -1,6 +1,7 @@
 import { cn } from '@codevs/ui'
 import React from 'react'
 import Link from 'next/link'
+import Image from 'next/image';
 
 interface Onboarding1Props {
   onPrev: () => void;
@@ -37,7 +38,7 @@ const Onboarding7: React.FC<Onboarding1Props> = ({ className, onPrev }) => {
         </div>
         
         <div className="z-[-12] absolute mt-28 left-0 ml-[-30px] top-1/2 transform -translate-y-1/2 rotate-[120deg] w-1/3 md:w-1/4 lg:w-[800px]">
-          <img 
+          <Image 
             src="/assets/images/onboarding/key.png" 
             alt="Key" 
             className="w-full h-auto"

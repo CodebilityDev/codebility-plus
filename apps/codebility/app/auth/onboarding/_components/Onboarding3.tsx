@@ -1,4 +1,5 @@
 import { cn } from '@codevs/ui'
+import Image from 'next/image';
 import React from 'react'
 
 interface Onboarding1Props {
@@ -32,7 +33,7 @@ const Onboarding3: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
         </div>
         
         <div className="z-10 absolute right-0 top-1/2 transform -translate-y-1/2 w-1/3 md:w-2/5 lg:w-2/2 opacity-90">
-          <img 
+          <Image
             src="/assets/images/onboarding/hourglass.png" 
             alt="Hourglass" 
             className="w-full h-auto"

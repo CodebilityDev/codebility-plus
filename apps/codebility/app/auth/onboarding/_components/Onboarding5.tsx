@@ -1,6 +1,7 @@
 import React from "react";
 
 import { cn } from "@codevs/ui";
+import Image from "next/image";
 
 
 interface Onboarding1Props {
@@ -69,7 +70,7 @@ const Onboarding5: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
 
         </div>
           <div className="absolute bottom-20 right-[34%] w-1/3 translate-x-2/4 translate-y-1/4 transform opacity-80 mb-12">
-            <img
+            <Image
               src="/assets/images/onboarding/envelop.png"
               alt="Purple folder"
               className="h-auto w-full"

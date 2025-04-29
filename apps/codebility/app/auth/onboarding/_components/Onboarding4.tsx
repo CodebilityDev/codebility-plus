@@ -1,4 +1,6 @@
 import { cn } from '@codevs/ui'
+import Image from 'next/image';
+
 import React from 'react'
 
 interface Onboarding1Props {
@@ -32,7 +34,7 @@ const Onboarding4: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
         </div>
         
         <div className="z-[-12] absolute ml-[-10%] left-0 top-1/2 transform -translate-y-1/2 w-1/3 md:w-2/5 lg:w-3/3 opacity-90">
-          <img 
+          <Image
             src="/assets/images/onboarding/gear.png" 
             alt="Gear" 
             className="w-full h-auto"
