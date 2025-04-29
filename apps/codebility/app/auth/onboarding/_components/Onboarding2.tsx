@@ -1,12 +1,13 @@
 import { cn } from '@codevs/ui'
 import React from 'react'
 
-interface Onboarding1Props {
+interface Onboarding2Props {
   onNext: () => void;
+  onPrev: () => void;
   className?: string;
 }
 
-const Onboarding2: React.FC<Onboarding1Props> = ({ className, onNext }) => {
+const Onboarding2: React.FC<Onboarding2Props> = ({ className, onNext, onPrev }) => {
   return (
     <>
       <div className="bg-black-400 relative w-screen h-screen overflow-hidden">

@@ -537,7 +537,7 @@ export default function PublicNdaSigningPage() {
             </p>
             <br />
             <p>
-              B. "Confidential Information" refers to any data or information
+              B. &quot;Confidential Information&quot; refers to any data or information
               relating to the business by Codebility that is not generally known
               to the public and that, if disclosed, could reasonably be expected
               to cause harm to Codebility.
