@@ -14,7 +14,6 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/Components/ui/chart";
-import { TrendingUp } from "lucide-react";
 import {
   CartesianGrid,
   Line,
@@ -23,39 +22,62 @@ import {
   XAxis,
 } from "recharts";
 
-const chartData = [
-  { month: "October", applicants: 186 },
-  { month: "November", applicants: 305 },
-  { month: "December", applicants: 237 },
-  { month: "January", applicants: 73 },
-  { month: "February", applicants: 209 },
-  { month: "March", applicants: 214 },
-];
+interface AdminDashboardMonthlyApplicantsLineChartProp {
+  dateApplied?: string[];
+}
 
-const chartConfig = {
-  applicants: {
-    label: "applicants",
-    color: "hsl(var(--chart-1))",
-  },
-} satisfies ChartConfig;
+export default function AdminDashboardMonthlyApplicantsLineChart({
+  dateApplied = [],
+}: AdminDashboardMonthlyApplicantsLineChartProp) {
+  // Get current and previous 5 months
+  const getLastSixMonths = () => {
+    const now = new Date();
+    const months: { month: string; year: number }[] = [];
 
-const getSixMonthRange = () => {
-  const now = new Date();
-  const start = new Date(now.getFullYear(), now.getMonth() - 6, 1);
-  const end = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date(now.getFullYear(), now.getMonth() - i, 1);
+      months.push({
+        month: date.toLocaleString("default", { month: "long" }),
+        year: date.getFullYear(),
+      });
+    }
 
-  const formatMonthYear = (date: Date) =>
-    date.toLocaleString("default", { month: "long", year: "numeric" });
+    return months;
+  };
 
-  return `${formatMonthYear(start)} - ${formatMonthYear(end)}`;
-};
+  const monthsData = getLastSixMonths();
 
-export default function AdminDashboardMonthlyApplicantsLineChart() {
+  const chartData = monthsData.map(({ month, year }) => {
+    const count = dateApplied.filter((dateStr) => {
+      const d = new Date(dateStr);
+      return (
+        d.getMonth() === new Date(`${month} 1, ${year}`).getMonth() &&
+        d.getFullYear() === year
+      );
+    }).length;
+
+    return { month, year, applicants: count };
+  });
+
+  let description = "";
+  if (chartData.length > 0) {
+    const first = chartData[0]!;
+    const last = chartData[chartData.length - 1]!;
+    description = `${first.month} ${first.year} - ${last.month} ${last.year}`;
+  }
+
+  const chartConfig = {
+    applicants: {
+      label: "applicants",
+      color: "hsl(var(--chart-1))",
+    },
+  } satisfies ChartConfig;
+
   return (
     <Card className="bg-black">
       <CardHeader>
         <CardTitle>Monthly Applicants</CardTitle>
-        <CardDescription>{getSixMonthRange()}</CardDescription>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
       <CardContent className="h-64">
         <ResponsiveContainer width="100%" height="100%">
@@ -63,10 +85,7 @@ export default function AdminDashboardMonthlyApplicantsLineChart() {
             <LineChart
               accessibilityLayer
               data={chartData}
-              margin={{
-                left: 12,
-                right: 12,
-              }}
+              margin={{ left: 12, right: 12 }}
             >
               <CartesianGrid vertical={false} />
               <XAxis
@@ -93,7 +112,7 @@ export default function AdminDashboardMonthlyApplicantsLineChart() {
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
-          Showing monthly applicants for the last 6 months
+          Showing monthly applicants for the current and previous 5 months
         </div>
       </CardFooter>
     </Card>
