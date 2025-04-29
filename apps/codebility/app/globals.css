@@ -4,6 +4,22 @@
 
 @import url("../styles/theme.css");
 
+@font-face {
+  font-family: 'Open Sauce Sans';
+  src: url('/fonts/OpenSauceOne-Regular.ttf') format('ttf');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Open Sauce Sans';
+  src: url('/fonts/open-sauce/OpenSauceTwo-ExtraBold.ttf') format('ttf');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @layer utilities {
   .flex-center {
     @apply flex items-center justify-center;

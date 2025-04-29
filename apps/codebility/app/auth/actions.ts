@@ -116,7 +116,7 @@ export const signupUser = async (formData: FormData) => {
       tech_stacks: tech_stacks as string[],
       image_url,
       availability_status: true,
-      nda_status: false,
+      nda_status: !!formData.get("ndaSigned"),
       level: {},
       application_status: "applying", // Matches DB constraint
       rejected_count: 0,
@@ -129,6 +129,15 @@ export const signupUser = async (formData: FormData) => {
       years_of_experience,
       role_id: 7,
       internal_status: "TRAINING",
+      // --- NDA fields ---
+      nda_signature:
+        typeof formData.get("ndaSignature") === "string"
+          ? (formData.get("ndaSignature") as string)
+          : undefined,
+      nda_signed_at:
+        typeof formData.get("ndaSignedAt") === "string"
+          ? (formData.get("ndaSignedAt") as string)
+          : undefined,
     };
 
     // Insert user data into the "codev" table

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import TechStackModal from "@/Components/modals/TechStackModal";
 import { Button } from "@/Components/ui/button";
@@ -26,6 +26,7 @@ interface SignUpFormInputs extends z.infer<typeof SignUpValidation> {
 const SignUpForm = () => {
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [ndaSigned, setNdaSigned] = useState(false);
   const { onOpen } = useModal();
 
   const form = useForm<SignUpFormInputs>({
@@ -86,9 +87,29 @@ const SignUpForm = () => {
         formData.append("profileImage", data.profileImage);
       }
 
+      // Get NDA signature from localStorage if available
+      const ndaSignature = localStorage.getItem("ndaSignature");
+      const ndaSigned = localStorage.getItem("ndaSigned");
+      const ndaSignedAt = localStorage.getItem("ndaSignedAt");
+
+      if (ndaSignature && ndaSigned) {
+        formData.append("ndaSignature", ndaSignature);
+        formData.append("ndaSigned", ndaSigned);
+        if (ndaSignedAt) {
+          formData.append("ndaSignedAt", ndaSignedAt);
+        }
+      }
+
       const response = await signupUser(formData);
 
       if (response.success) {
+        // Clear NDA signature data from localStorage
+        localStorage.removeItem("ndaSignature");
+        localStorage.removeItem("ndaSigned");
+        localStorage.removeItem("ndaSignedAt");
+        localStorage.removeItem("ndaUserFirstName");
+        localStorage.removeItem("ndaUserLastName");
+        localStorage.removeItem("ndaDocument");
         toast.success("Account created! Please verify your email.");
         router.push("/auth/verify");
         reset();
@@ -108,6 +129,31 @@ const SignUpForm = () => {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    // Check if NDA is already signed in localStorage
+    const ndaSignedFlag = localStorage.getItem("ndaSigned") === "true";
+    setNdaSigned(ndaSignedFlag);
+    if (ndaSignedFlag) {
+      setValue("nda_signed", true);
+    }
+
+    // Listen for NDA signed message
+    const handleMessage = (event: MessageEvent) => {
+      console.log("Received message:", event.data);
+      if (event.data?.type === "NDA_SIGNED" && event.data?.signed) {
+        setNdaSigned(true);
+        setValue("nda_signed", true);
+        localStorage.setItem("ndaSigned", "true");
+      }
+    };
+
+    window.addEventListener("message", handleMessage); // <-- Add this line
+
+    return () => {
+      window.removeEventListener("message", handleMessage);
+    };
+  }, [setValue]);
 
   return (
     <FormProvider {...form}>
@@ -159,12 +205,54 @@ const SignUpForm = () => {
                       </span>
                     </p>
                   </label>
+                  <label className="flex items-center gap-4 text-sm text-white">
+                    <Checkbox
+                      required
+                      className="border-white"
+                      id="ndaCheckbox"
+                      checked={ndaSigned}
+                      disabled={!ndaSigned}
+                      {...register("nda_signed")}
+                      onChange={() => {}} // Prevent manual checking
+                    />
+                    <p>
+                      I agree to the{" "}
+                      <span
+                        onClick={() =>
+                          window.open(
+                            "/nda-signing/public",
+                            "_blank",
+                            "width=800,height=600",
+                          )
+                        }
+                        className="cursor-pointer text-blue-100 hover:underline"
+                        style={{ textDecoration: "underline" }}
+                        role="button"
+                        tabIndex={0}
+                        onKeyPress={(e) => {
+                          if (e.key === "Enter" || e.key === " ")
+                            window.open(
+                              "/nda-signing/public",
+                              "_blank",
+                              "width=800,height=600",
+                            );
+                        }}
+                      >
+                        Non-Disclosure Agreement
+                      </span>
+                      {!ndaSigned && (
+                        <span className="ml-2 text-xs text-yellow-300">
+                          (Please sign the NDA first)
+                        </span>
+                      )}
+                    </p>
+                  </label>
 
                   <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-center">
                     <Button
                       type="submit"
                       variant="purple"
-                      disabled={isLoading}
+                      disabled={isLoading || !ndaSigned}
                       className="w-full md:w-auto"
                     >
                       {isLoading ? (

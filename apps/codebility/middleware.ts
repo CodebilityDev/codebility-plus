@@ -9,15 +9,17 @@ export const config = {
 
 const PUBLIC_ROUTES = [
   "/privacy-policy",
+  "/standalone",
   "/terms",
   "/auth/password-reset",
   "/codevs",
   "/services",
   "/",
+  "/nda-signing/public"
 ] as const;
 
 // Routes that should be public with wildcard support (e.g., /profiles/*)
-const PUBLIC_ROUTE_PREFIXES = ["/profiles/"] as const;
+const PUBLIC_ROUTE_PREFIXES = ["/profiles/", "/nda-signing/"] as const;
 
 const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up", "/auth/onboarding"] as const;
 
