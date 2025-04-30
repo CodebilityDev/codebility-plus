@@ -15,7 +15,7 @@ export default function DashboardPage() {
 
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
-      <H1>Dashboard</H1>
+      <H1>Home</H1>
       <div className="flex flex-col gap-4 lg:flex-row">
         <div className=" md:basis-[50%] xl:basis-[60%]">
           <div className="flex flex-col gap-4">
