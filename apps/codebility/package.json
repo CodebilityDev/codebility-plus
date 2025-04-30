@@ -73,6 +73,7 @@
     "react-hook-form": "^7.49.3",
     "react-hot-toast": "^2.4.1",
     "react-intersection-observer": "^9.5.3",
+    "react-quill": "^2.0.0",
     "react-signature-canvas": "1.1.0-alpha.1",
     "react-timeit": "^1.2.12",
     "reactflow": "^11.11.4",

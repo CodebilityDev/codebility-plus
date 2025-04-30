@@ -24,10 +24,13 @@ import { useModal } from "@/hooks/use-modal";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import toast from "react-hot-toast";
+import ReactQuill from "react-quill";
 
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
+
+import "react-quill/dist/quill.snow.css";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
@@ -186,7 +189,7 @@ const TaskEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[95vh] w-[95vw] max-h-[900px] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900 phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px]">
+      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px] h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
@@ -334,37 +337,37 @@ const TaskEditModal = () => {
                 </SelectContent>
               </Select>
             </div>
-
-           
           </div>
 
           {/* Primary Assignee */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Primary Assignee</Label>
-            <KanbanAddModalMembers
-              singleSelection
-              onMembersChange={(memberIds) => {
-                handleInputChange("codev_id", memberIds[0] || "");
-              }}
-              projectId={boardId}
-              initialSelectedMembers={[data.codev?.id].filter(Boolean)}
-            />
-          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Primary Assignee</Label>
+              <KanbanAddModalMembers
+                singleSelection
+                onMembersChange={(memberIds) => {
+                  handleInputChange("codev_id", memberIds[0] || "");
+                }}
+                projectId={boardId}
+                initialSelectedMembers={[data.codev?.id].filter(Boolean)}
+              />
+            </div>
 
-          {/* Sidekick Helpers */}
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">
-              Sidekick Helpers
-              <span className="ml-2 text-xs text-gray-500">(Optional)</span>
-            </Label>
-            <KanbanAddModalMembers
-              initialSelectedMembers={data.sidekick_ids || []}
-              onMembersChange={(memberIds) => {
-                handleInputChange("sidekick_ids", memberIds);
-              }}
-              projectId={boardId}
-              disabledMembers={[data.codev?.id].filter(Boolean)}
-            />
+            {/* Sidekick Helpers */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">
+                Sidekick Helpers
+                <span className="ml-2 text-xs text-gray-500">(Optional)</span>
+              </Label>
+              <KanbanAddModalMembers
+                initialSelectedMembers={data.sidekick_ids || []}
+                onMembersChange={(memberIds) => {
+                  handleInputChange("sidekick_ids", memberIds);
+                }}
+                projectId={boardId}
+                disabledMembers={[data.codev?.id].filter(Boolean)}
+              />
+            </div>
           </div>
 
           {/* Description */}
@@ -372,13 +375,9 @@ const TaskEditModal = () => {
             <Label htmlFor="description" className="text-sm font-medium">
               Description
             </Label>
-            <Textarea
-              id="description"
-              name="description"
-              placeholder="Add task description..."
-              value={taskData.description}
-              onChange={(e) => handleInputChange("description", e.target.value)}
-              className="min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700 dark:bg-dark-200"
+            <ReactQuill
+              value={taskData.description || ""}
+              onChange={(value) => handleInputChange("description", value)}
             />
           </div>
 
@@ -387,14 +386,14 @@ const TaskEditModal = () => {
               type="button"
               variant="outline"
               onClick={onClose}
-              className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-1 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
+              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-1 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
+              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading}
             >
               {loading ? "Saving..." : "Save Changes"}

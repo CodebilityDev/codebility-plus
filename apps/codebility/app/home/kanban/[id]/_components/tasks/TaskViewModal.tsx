@@ -24,6 +24,7 @@ import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { set } from "date-fns";
 import { Ellipsis } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -38,7 +39,6 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { completeTask, updateTaskPRLink } from "../../actions";
-import { set } from "date-fns";
 
 interface CodevMember {
   id: string;
@@ -75,16 +75,16 @@ const TaskViewModal = ({
       toast.error("PR Link cannot be empty");
       return;
     }
-  
+
     const response = await updateTaskPRLink(task.id, prLink);
-  
+
     if (response.success) {
       toast.success("PR Link updated successfully");
-  
+
       // ✅ Manually update state so UI updates immediately
       setPrLink(prLink);
       task.pr_link = prLink;
-  
+
       // ✅ Delay refresh to ensure the update syncs
       setTimeout(() => {
         router.refresh();
@@ -93,26 +93,25 @@ const TaskViewModal = ({
       toast.error(response.error || "Failed to update PR Link");
     }
   };
-  
 
   const handleMarkAsDone = async () => {
     if (!task) return;
-  
+
     try {
       const result = await completeTask(task);
-  
+
       if (result.success) {
         toast.success("Task completed and points awarded!");
-  
+
         // ✅ Manually update local state (UI update)
         if (onComplete) {
           console.log(`✅ Calling onComplete for: ${task.id}`);
           onComplete(task.id);
         }
-  
+
         // ✅ Close modal before refreshing
-        onClose(); 
-  
+        onClose();
+
         window.location.href = window.location.pathname + "?t=" + Date.now();
       } else {
         toast.error(result.error || "Failed to complete task");
@@ -122,7 +121,6 @@ const TaskViewModal = ({
       toast.error("Failed to complete task");
     }
   };
-  
 
   // State for Skill Category, Sidekick Details, and Primary Assignee
 
@@ -205,13 +203,11 @@ const TaskViewModal = ({
     setPrLink(task?.pr_link || ""); // Reset PR link when task changes
   }, [task?.id]); // Runs when a new task is selected
 
- 
-
   if (!isModalOpen) return null;
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[95vh] w-[95vw] max-h-[900px] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900 phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px]">
+      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px] h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <div className="flex flex-col gap-6">
           {/* Header with Title and Dropdown Menu */}
           <div className="flex items-center justify-between">
@@ -329,9 +325,9 @@ const TaskViewModal = ({
             <div className="space-y-2 ">
               <Label className="text-sm font-medium">PR Link</Label>
               <div className="flex items-center space-x-2">
-              <Input
+                <Input
                   value={prLink}
-                  onChange={(e) => setPrLink(e.target.value)} 
+                  onChange={(e) => setPrLink(e.target.value)}
                   onBlur={() => {
                     if (!prLink.trim()) {
                       setPrLink(task.pr_link || "");
@@ -345,8 +341,8 @@ const TaskViewModal = ({
                   variant="outline"
                   onClick={handleUpdate}
                   className={
-                    prLink.trim() !== (task?.pr_link || "") 
-                      ? "mt-4 text-md justify-center whitespace-nowrap rounded-md px-6 py-2 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex w-max items-center gap-2"
+                    prLink.trim() !== (task?.pr_link || "")
+                      ? "text-md mt-4 flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-2 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
                       : "text-grey-100 bg-light-900 mt-4 w-full border-2 border-gray-300 bg-green-600 py-4 text-black hover:bg-green-700 sm:w-auto"
                   }
                 >
@@ -430,10 +426,11 @@ const TaskViewModal = ({
           {/* Description */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Description</Label>
-            <Textarea
-              value={task?.description || "No description provided"}
-              disabled
-              className="text-grey-100 bg-light-900 min-h-[120px] resize-none border border-gray-300  dark:border-gray-700 dark:bg-gray-800"
+            <div
+              className="text-black-100 min-h-[120px] resize-none dark:text-white"
+              dangerouslySetInnerHTML={{
+                __html: task?.description || "No description provided",
+              }}
             />
           </div>
 
@@ -441,7 +438,7 @@ const TaskViewModal = ({
             <Button
               variant="outline"
               onClick={onClose}
-              className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-1 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
+              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
             >
               Close
             </Button>
@@ -449,7 +446,7 @@ const TaskViewModal = ({
               <Button
                 variant="default"
                 onClick={handleMarkAsDone}
-                className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-1 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
+                className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               >
                 Mark as Done
               </Button>
