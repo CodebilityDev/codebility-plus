@@ -6,7 +6,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Theme from "@/Components/shared/dashboard/Theme";
 import { defaultAvatar } from "@/public/assets/images";
-import { IconDropdown, IconLogout, IconProfile } from "@/public/assets/svgs";
+import {
+  IconCog,
+  IconDropdown,
+  IconLogout,
+  IconProfile,
+} from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 
 import {
@@ -25,7 +30,7 @@ export const defaultMenuItems = [
 ];
 
 export const adminMenus = [
-  { href: "/home/account-settings", icon: IconProfile, label: "Settings" },
+  { href: "/home/account-settings", icon: IconCog, label: "Settings" },
   { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
 ];
 

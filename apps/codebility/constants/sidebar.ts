@@ -75,7 +75,7 @@ export const getSidebarData = async (
         {
           route: pathsConfig.app.home,
           imgURL: "/assets/svgs/icon-dashboard.svg",
-          label: "Dashboard",
+          label: "Home",
           permission: "dashboard" as PermissionKey,
         },
         {
