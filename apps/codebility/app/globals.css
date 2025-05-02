@@ -448,3 +448,48 @@ html body[data-scroll-locked] {
   overflow: visible !important;
   margin-right: 0 !important;
 }
+
+
+/* Kanban Rich Text Editor Custom Color */
+.ql-toolbar.ql-snow {
+  background-color: white;
+  color: black;
+}
+
+.dark .ql-toolbar.ql-snow {
+  background-color: #1f2937; 
+  color: white;
+  border-color: #374151; 
+}
+
+.dark .ql-toolbar.ql-snow .ql-picker,
+.dark .ql-toolbar.ql-snow .ql-stroke {
+  color: white;
+  stroke: white;
+}
+
+.dark .ql-toolbar.ql-snow .ql-fill {
+  fill: white;
+}
+
+.dark .ql-editor.ql-blank::before {
+  color: #9ca3af;
+}
+
+/* Dropdown background and text for dark mode */
+.dark .ql-toolbar .ql-picker-options {
+  background-color: #1f2937; 
+  color: white;
+  border: 1px solid #374151; 
+}
+
+/* Dropdown options hover effect */
+.dark .ql-toolbar .ql-picker-options .ql-picker-item:hover {
+  background-color: #374151; 
+  color: white;
+}
+
+/* Selected option */
+.dark .ql-toolbar .ql-picker-label {
+  color: white;
+}
