@@ -21,7 +21,7 @@ const KanbanRichTextEditor: FC<RichTextEditorProps> = ({ value, onChange }) => {
         onChange={onChange}
         theme="snow"
         className="bg-white text-black dark:bg-transparent dark:text-white"
-        placeholder="Start typing here..."
+        placeholder="Start typing here...."
       />
     </div>
   );
