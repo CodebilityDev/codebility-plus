@@ -9,7 +9,9 @@ import CodevContainer from "./_components/CodevContainer";
 import CodevList from "./_components/CodevList";
 
 export default async function Profiles() {
-  const [{ data: allCodevs, error }] = await Promise.all([getCodevs()]);
+  const [{ data: allCodevs, error }] = await Promise.all([
+    getCodevs({ filters: { role_id: 4 } }),
+  ]);
 
   if (error) {
     throw new Error("Failed to fetch profiles data");
