@@ -49,7 +49,8 @@ interface NdaEmailDialogProps {
 
 interface InHouseTableProps {
   data: Codev[];
-  onDataChange: (data: Codev[]) => void;
+  onDataChange: (updatedItem: Codev) => void;
+  onDelete: (deletedId: string) => void;
   pagination: {
     currentPage: number;
     totalPages: number;
@@ -106,6 +107,7 @@ export function InHouseTable({
   data,
   onDataChange,
   pagination,
+  onDelete,
 }: InHouseTableProps) {
   const supabase = useSupabase();
 
@@ -132,7 +134,7 @@ export function InHouseTable({
 
   // Helper to handle item deletion in local state
   const handleDelete = (deletedId: string) => {
-    onDataChange(data.filter((item) => item.id !== deletedId));
+    onDelete(deletedId);
   };
 
   // Helper to capitalize names
@@ -189,13 +191,11 @@ export function InHouseTable({
       }
 
       // Update the codev's status in the local state
-      onDataChange(
-        data.map((item) =>
-          item.id === codevId
-            ? ({ ...item, nda_request_sent: true } as Codev)
-            : item,
-        ),
-      );
+      const updatedRow = {
+        ...codevData!,
+        nda_request_sent: true,
+      };
+      onDataChange(updatedRow);
     } catch (error) {
       console.error("Error sending NDA email:", error);
       throw error;
@@ -277,11 +277,7 @@ export function InHouseTable({
                   data={item}
                   onSave={(updatedItem) => {
                     // Update local data
-                    onDataChange(
-                      data.map((d) =>
-                        d.id === updatedItem.id ? updatedItem : d,
-                      ),
-                    );
+                    onDataChange(updatedItem);
                     setEditingId(null);
                   }}
                   onCancel={() => setEditingId(null)}

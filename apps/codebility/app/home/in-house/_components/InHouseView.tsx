@@ -118,7 +118,25 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
       />
 
       {/* Table View Only */}
-      <InHouseTable {...sharedProps} />
+      <InHouseTable
+        // pass only the paginated subset in:
+        data={paginatedData}
+        // but merge edits into the **full** data array here:
+        onDataChange={(updatedItem: Codev) => {
+          setData((prev) =>
+            prev.map((d) => (d.id === updatedItem.id ? updatedItem : d)),
+          );
+        }}
+        onDelete={(deletedId: string) => {
+          setData((prev) => prev.filter((d) => d.id !== deletedId));
+        }}
+        pagination={{
+          currentPage,
+          totalPages,
+          onNextPage: handleNextPage,
+          onPreviousPage: handlePreviousPage,
+        }}
+      />
     </div>
   );
 }

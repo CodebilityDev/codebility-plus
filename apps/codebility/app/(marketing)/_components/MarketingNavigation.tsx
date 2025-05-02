@@ -217,43 +217,44 @@ const Navigation = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
+    async function fetchUser() {
       try {
-        const { data, error } = await supabase.auth.getUser();
+        const {
+          data: { session },
+          error: authError,
+        } = await supabase.auth.getSession();
 
-        if (error) {
-          console.error("Error fetching user:", error.message);
-          setUserData(null); // Ensure userData is cleared if there is an error
+        if (authError) {
+          console.error("Auth error:", authError.message);
+          setUserData(null);
           return;
         }
 
-        if (data?.user) {
-          const { data: userData, error: fetchError } = await supabase
-            .from("codev")
-            .select("*")
-            .eq("id", data.user.id)
-            .single();
-
-          if (fetchError) {
-            console.error(
-              "Error fetching user data from 'codev':",
-              fetchError.message,
-            );
-            setUserData(null); // Clear userData on error
-            return;
-          }
-
-          setUserData(userData);
-        } else {
-          setUserData(null); // Ensure userData is cleared if no session
+        if (!session) {
+          // not logged in → silent
+          setUserData(null);
+          return;
         }
-      } catch (error) {
-        console.error("Unexpected error fetching user data:", error);
-        setUserData(null); // Ensure userData is cleared on unexpected error
+
+        const { data: userRow, error: fetchError } = await supabase
+          .from("codev")
+          .select("*")
+          .eq("id", session.user.id)
+          .single();
+
+        if (fetchError) {
+          console.error("Error fetching codev:", fetchError.message);
+          setUserData(null);
+        } else {
+          setUserData(userRow);
+        }
+      } catch (err) {
+        console.error("Unexpected error fetching user data:", err);
+        setUserData(null);
       } finally {
         setIsLoading(false);
       }
-    };
+    }
 
     fetchUser();
   }, [supabase]);
