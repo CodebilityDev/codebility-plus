@@ -28,6 +28,7 @@ import { Textarea } from "@codevs/ui/textarea";
 
 import { createNewTask } from "../../actions";
 import KanbanAddModalMembers from "../kanban_modals/KanbanAddModalMembers";
+import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
@@ -41,6 +42,11 @@ const TaskAddModal = () => {
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
   const [loading, setLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
+  const [description, setDescription] = useState("");
+
+  const onChange = (value: string) => {
+    setDescription(value);
+  };
 
   useEffect(() => {
     const loadSkillCategories = async () => {
@@ -66,6 +72,16 @@ const TaskAddModal = () => {
       if (!formData.get("title")) throw new Error("Title is required");
       if (!formData.get("skill_category_id"))
         throw new Error("Skill category is required");
+
+      formData.append(
+        "description",
+        description.trim() || "<p>No description provided</p>",
+      );
+
+      const image = formData.get("image");
+      if (image && image instanceof File) {
+        formData.append("image", image);
+      }
 
       if (mainAssignee) {
         formData.append("codev_id", mainAssignee);
@@ -97,7 +113,7 @@ const TaskAddModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[95vh] w-[95vw] max-h-[900px] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900 phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px]">
+      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px] h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <form action={handleSubmit} className="flex flex-col gap-6">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
@@ -230,40 +246,37 @@ const TaskAddModal = () => {
           </div>
 
           <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Primary Assignee
-                <span className="ml-2 text-xs text-gray-500">(Optional)</span>
-              </Label>
-              <KanbanAddModalMembers
-                singleSelection
-                onMembersChange={(ids) => setMainAssignee(ids[0] || "")}
-                projectId={data?.projectId}
-              />
-            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2">
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">
+                  Primary Assignee
+                  <span className="ml-2 text-xs text-gray-500">(Optional)</span>
+                </Label>
+                <KanbanAddModalMembers
+                  singleSelection
+                  onMembersChange={(ids) => setMainAssignee(ids[0] || "")}
+                  projectId={data?.projectId}
+                />
+              </div>
 
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">
-                Sidekick Helpers
-                <span className="ml-2 text-xs text-gray-500">(Optional)</span>
-              </Label>
-              <KanbanAddModalMembers
-                onMembersChange={setSidekicks}
-                projectId={data?.projectId}
-                disabledMembers={[mainAssignee]}
-              />
+              <div className="space-y-2">
+                <Label className="text-sm font-medium">
+                  Sidekick Helpers
+                  <span className="ml-2 text-xs text-gray-500">(Optional)</span>
+                </Label>
+                <KanbanAddModalMembers
+                  onMembersChange={setSidekicks}
+                  projectId={data?.projectId}
+                  disabledMembers={[mainAssignee]}
+                />
+              </div>
             </div>
 
             <div className="space-y-2">
               <Label htmlFor="description" className="text-sm font-medium">
                 Description
               </Label>
-              <Textarea
-                id="description"
-                name="description"
-                className="dark:bg-dark-200 min-h-[120px] border-gray-300 focus:border-blue-500 dark:border-gray-700"
-                placeholder="Add task description..."
-              />
+              <KanbanRichTextEditor value={description} onChange={onChange} />
             </div>
           </div>
 
@@ -272,14 +285,14 @@ const TaskAddModal = () => {
               type="button"
               variant="outline"
               onClick={onClose}
-              className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-3 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
+              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-3 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading || isPending}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="w-full sm:w-auto text-md justify-center whitespace-nowrap rounded-md px-6 py-1 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg bg-blue-100 text-white hover:bg-blue-200 h-10 flex items-center gap-2"
+              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading || isPending}
             >
               {loading || isPending ? "Creating..." : "Create Task"}
