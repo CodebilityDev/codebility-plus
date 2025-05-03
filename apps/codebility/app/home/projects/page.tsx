@@ -6,9 +6,18 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 
 import AddProjectButton from "./_components/AddProjectButton";
 import ProjectCardContainer from "./_components/ProjectCardContainer";
+import ProjectFilterButton from "./_components/ProjectFilterButton";
 
-const Projects = () => {
+type PageProps = {
+  searchParams: {
+    filter?: string;
+  };
+};
+
+const Projects = ({ searchParams }: PageProps) => {
   const supabase = getSupabaseServerComponentClient();
+  const filter = searchParams.filter;
+
   const Projects = use(
     supabase
       .from("projects")
@@ -25,6 +34,12 @@ const Projects = () => {
       )
       .then(({ data, error }) => {
         if (error) throw error;
+
+        if (filter && filter !== "all") {
+          return data?.filter(
+            (project) => project.status?.toLowerCase() === filter.toLowerCase(),
+          );
+        }
         return data;
       }),
   );
@@ -33,6 +48,7 @@ const Projects = () => {
       <div className="flex flex-row justify-between gap-4">
         <H1>Projects</H1>
         <div className="flex items-center gap-4">
+          <ProjectFilterButton />
           <AddProjectButton />
         </div>
       </div>
