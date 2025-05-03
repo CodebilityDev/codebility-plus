@@ -25,7 +25,7 @@ export default function DashboardPage() {
             </div>
             <DashboardCurrentProject />
             <TokenPoints />
-            <DashboardRoadmap />
+            {/* <DashboardRoadmap /> Hide Temporarily */}
           </div>
         </div>
         <div className="md:basis-[50%] xl:basis-[40%]">
