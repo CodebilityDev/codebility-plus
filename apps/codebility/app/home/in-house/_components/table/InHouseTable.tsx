@@ -180,18 +180,14 @@ export function InHouseTable({
         throw dbError;
       }
       
-      // Generate the NDA signing link
-      const signingLink = `${window.location.origin}/nda-signing/${token}`;
-      
-
-
+    
       // Save the NDA request to the database
-      const { error: dbError } = await supabase.from("nda_requests").insert({
-        codev_id: codevId,
-        token: token,
-        expires_at: expiresAt.toISOString(),
-        status: "pending",
-      });
+      // const { error: dbError } = await supabase.from("nda_requests").insert({
+      //   codev_id: codevId,
+      //   token: token,
+      //   expires_at: expiresAt.toISOString(),
+      //   status: "pending",
+      // });
 
       if (dbError) throw dbError;
 

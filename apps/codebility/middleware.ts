@@ -17,7 +17,7 @@ const PUBLIC_ROUTES = [
   "/services",
   "/",
 
-  "/nda-signing/public"
+  "/nda-signing/public",
 
   "/auth/callback",
 
