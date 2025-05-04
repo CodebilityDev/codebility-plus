@@ -55,7 +55,8 @@ const Onboarding6: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
           <Image 
             src="/assets/images/onboarding/asterisk.png" 
             alt="Asterisk" 
-            className="w-full h-auto"
+            height={900}
+            width={700}
           />
         </div>
       </div>

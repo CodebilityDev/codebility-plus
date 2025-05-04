@@ -73,7 +73,8 @@ const Onboarding5: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
             <Image
               src="/assets/images/onboarding/envelop.png"
               alt="Purple folder"
-              className="h-auto w-full"
+              height={900}
+              width={700}
             />
           </div>
       </div>

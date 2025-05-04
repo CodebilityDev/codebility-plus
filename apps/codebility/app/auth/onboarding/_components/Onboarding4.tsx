@@ -37,7 +37,8 @@ const Onboarding4: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
           <Image
             src="/assets/images/onboarding/gear.png" 
             alt="Gear" 
-            className="w-full h-auto"
+            height={900}
+            width={700}
           />
         </div>
       </div>

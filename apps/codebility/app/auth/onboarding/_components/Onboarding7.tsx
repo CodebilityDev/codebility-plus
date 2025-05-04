@@ -41,7 +41,8 @@ const Onboarding7: React.FC<Onboarding1Props> = ({ className, onPrev }) => {
           <Image 
             src="/assets/images/onboarding/key.png" 
             alt="Key" 
-            className="w-full h-auto"
+            height={900}
+            width={700}
           />
         </div>
       </div>
