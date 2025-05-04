@@ -448,3 +448,25 @@ html body[data-scroll-locked] {
   overflow: visible !important;
   margin-right: 0 !important;
 }
+
+.tiptap-editor h1{
+  font-size:x-large
+}
+
+.tiptap-editor h2{
+  font-size:larger
+}
+
+.tiptap-editor h3{
+  font-size:large
+}
+
+.tiptap-editor * {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.tiptap-description {
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
