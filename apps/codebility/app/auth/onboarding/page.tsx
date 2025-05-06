@@ -50,6 +50,8 @@ const OnboardingPage = () => {
             placeholder={undefined}
             onPointerEnterCapture={() => {}}
             onPointerLeaveCapture={() => {}}
+            onResize={() => {}} // Add this line
+            onResizeCapture={() => {}} // Add this line
           >
             <Step
               onClick={() => handleStepClick(0)}
@@ -59,6 +61,8 @@ const OnboardingPage = () => {
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
+              onResize={() => {}} // Add this line
+  onResizeCapture={() => {}} // Add this line
             >
               1
             </Step>
@@ -70,6 +74,8 @@ const OnboardingPage = () => {
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
+              onResize={() => {}} // Add this line
+  onResizeCapture={() => {}} // Add this line
             >
               2
             </Step>
@@ -81,6 +87,8 @@ const OnboardingPage = () => {
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
+              onResize={() => {}} // Add this line
+  onResizeCapture={() => {}} // Add this line
             >
               3
             </Step>
@@ -92,6 +100,8 @@ const OnboardingPage = () => {
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
+              onResize={() => {}} // Add this line
+  onResizeCapture={() => {}} // Add this line
             >
               4
             </Step>
@@ -103,6 +113,8 @@ const OnboardingPage = () => {
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
+              onResize={() => {}} // Add this line
+  onResizeCapture={() => {}} // Add this line
             >
               5
             </Step>
@@ -114,6 +126,8 @@ const OnboardingPage = () => {
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
+              onResize={() => {}} // Add this line
+  onResizeCapture={() => {}} // Add this line
             >
               6
             </Step>
@@ -125,6 +139,8 @@ const OnboardingPage = () => {
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
+              onResize={() => {}} // Add this line
+  onResizeCapture={() => {}} // Add this line
             >
               7
             </Step>

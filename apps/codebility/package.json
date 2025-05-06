@@ -30,12 +30,9 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@hookform/resolvers": "^3.3.4",
-
     "@material-tailwind/react": "^2.1.10",
-
     "@mui/material": "^7.0.2",
     "@mui/material-nextjs": "^7.0.2",
-
     "@next/bundle-analyzer": "^14.0.3",
     "@radix-ui/react-dialog": "^1.0.5",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
@@ -102,6 +99,7 @@
     "@total-typescript/ts-reset": "^0.5.1",
     "@types/globalize": "^1.5.5",
     "@types/hellosign-sdk": "^1.6.15",
+    "@types/jspdf": "^2.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-big-calendar": "^1.8.7",
