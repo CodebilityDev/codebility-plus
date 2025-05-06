@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import DashboardCurrentProjectModal from "@/app/home/(dashboard)/_components/DashboardCurrentProjectModal";
 import ClientAddModal from "@/app/home/clients/_components/ClientAddModal";
 import ClientEditModal from "@/app/home/clients/_components/ClientEditModal";
 import ProfileModal from "@/app/home/interns/_components/ProfileModal";
@@ -67,6 +68,8 @@ export const ModalProviderHome = () => {
       <DeleteWarningModal />
 
       <TechStackModal />
+
+      <DashboardCurrentProjectModal />
     </>
   );
 };
