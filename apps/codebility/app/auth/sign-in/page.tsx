@@ -24,7 +24,7 @@ const SignIn = () => {
           <p className="md:text-md text-md text-center">
             Don{`'`}t have an account?{" "}
             <Link
-              href={pathsConfig.auth.signUp}
+              href={pathsConfig.auth.onboarding}
               className="text-blue-100 hover:underline"
             >
               Register Now
