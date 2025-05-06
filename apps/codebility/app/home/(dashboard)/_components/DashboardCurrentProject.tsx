@@ -91,6 +91,19 @@ const DashboardCurrentProject = () => {
     );
   }
 
+  function getStatusClass(status: string | undefined) {
+    switch (status) {
+      case "pending":
+        return "text-white bg-orange-500/80";
+      case "completed":
+        return "text-white bg-blue-500/80";
+      case "active":
+        return "text-white bg-green-500/80";
+      default:
+        return "text-white bg-black-500/80";
+    }
+  }
+
   return (
     <Box className="flex w-full flex-1 flex-col gap-4">
       <p className="text-2xl">Current Projects</p>
@@ -101,14 +114,14 @@ const DashboardCurrentProject = () => {
               key={involvement.project.id}
               projectId={involvement.project.id}
             >
-              <div className="rounded-md border border-zinc-200 p-2 transition hover:bg-muted/40 dark:border-zinc-700">
+              <div className="border-teal hover:bg-teal hover:text-black-100 rounded-md border p-2">
                 <div className="flex items-center gap-2">
                   {involvement.project.main_image && (
                     <Image
                       src={involvement.project.main_image}
                       alt={involvement.project.name}
-                      width={52}
-                      height={52}
+                      width={32}
+                      height={32}
                       className="rounded"
                     />
                   )}
@@ -118,17 +131,21 @@ const DashboardCurrentProject = () => {
                         {involvement.project.name}
                       </p>
                       <p className="text-start text-xs text-muted-foreground">
-                        {involvement.role}
+                        {involvement.role === "member"
+                          ? "Member"
+                          : involvement.role}
                       </p>
                     </div>
-
                     <Badge
                       variant="outline"
-                      className="ml-2 shrink-0 whitespace-nowrap text-xs"
+                      className={`ml-2 shrink-0 whitespace-nowrap text-xs  ${getStatusClass(involvement.project.status)}`}
                     >
                       {involvement.project.status === "inprogress"
                         ? "In Progress"
-                        : involvement.project.status || "Unknown"}
+                        : involvement.project.status
+                          ? involvement.project.status.charAt(0).toUpperCase() +
+                            involvement.project.status.slice(1)
+                          : "Unknown"}
                     </Badge>
                   </div>
                 </div>
