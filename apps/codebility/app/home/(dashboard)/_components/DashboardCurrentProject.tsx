@@ -7,12 +7,15 @@ import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import { Badge } from "@codevs/ui/badge";
 
+import DashboardCurrentProjectButton from "./DashboardCurrentProjectButton";
+
 interface ProjectInvolvement {
   project: {
     id: string;
     name: string;
     status: string;
     main_image: string | null;
+    kanban_display?: boolean;
   };
   role: string;
   joined_at: string;
@@ -40,7 +43,8 @@ const DashboardCurrentProject = () => {
                 id,
                 name,
                 status,
-                main_image
+                main_image,
+                kanban_display
               )
             `,
           )
@@ -59,6 +63,7 @@ const DashboardCurrentProject = () => {
                 name: item.projects.name,
                 status: item.projects.status,
                 main_image: item.projects.main_image,
+                kanban_display: item.projects.kanban_display,
               },
             }),
           );
@@ -79,9 +84,8 @@ const DashboardCurrentProject = () => {
       <Box className="flex w-full flex-1 flex-col gap-4">
         <p className="text-2xl">Current Projects</p>
         <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
-          <Skeleton className="flex h-12 w-64 gap-2 rounded-md p-2"></Skeleton>
-          <Skeleton className="flex h-12 w-64 gap-2 rounded-md p-2"></Skeleton>
-          <Skeleton className="flex h-12 w-64 gap-2 rounded-md p-2"></Skeleton>
+          <Skeleton className="flex h-12 w-full gap-2 rounded-md p-2"></Skeleton>
+          <Skeleton className="flex h-12 w-full gap-2 rounded-md p-2"></Skeleton>
         </div>
       </Box>
     );
@@ -90,45 +94,53 @@ const DashboardCurrentProject = () => {
   return (
     <Box className="flex w-full flex-1 flex-col gap-4">
       <p className="text-2xl">Current Projects</p>
-      <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
-        {projects.length > 0 ? (
-          <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
-            {projects.map((involvement) => (
-              <div
-                key={involvement.project.id}
-                className="flex items-center gap-2 rounded-md p-2"
-              >
-                {involvement.project.main_image && (
-                  <Image
-                    src={involvement.project.main_image}
-                    alt={involvement.project.name}
-                    width={32}
-                    height={32}
-                    className="rounded"
-                  />
-                )}
-                <div className="flex min-w-0 flex-col">
-                  <p className="truncate text-sm font-medium">
-                    {involvement.project.name}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {involvement.role}
-                  </p>
+      {projects.length > 0 ? (
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+          {projects.map((involvement) => (
+            <DashboardCurrentProjectButton
+              key={involvement.project.id}
+              projectId={involvement.project.id}
+            >
+              <div className="rounded-md border border-zinc-200 p-2 transition hover:bg-muted/40 dark:border-zinc-700">
+                <div className="flex items-center gap-2">
+                  {involvement.project.main_image && (
+                    <Image
+                      src={involvement.project.main_image}
+                      alt={involvement.project.name}
+                      width={52}
+                      height={52}
+                      className="rounded"
+                    />
+                  )}
+                  <div className="flex min-w-0 flex-1 items-center justify-between">
+                    <div className="flex min-w-0 flex-col ">
+                      <p className="truncate text-sm font-medium">
+                        {involvement.project.name}
+                      </p>
+                      <p className="text-start text-xs text-muted-foreground">
+                        {involvement.role}
+                      </p>
+                    </div>
+
+                    <Badge
+                      variant="outline"
+                      className="ml-2 shrink-0 whitespace-nowrap text-xs"
+                    >
+                      {involvement.project.status === "inprogress"
+                        ? "In Progress"
+                        : involvement.project.status || "Unknown"}
+                    </Badge>
+                  </div>
                 </div>
-                <Badge variant="outline" className="ml-auto shrink-0 text-xs">
-                  {involvement.project.status === "inprogress"
-                    ? "In Progress"
-                    : involvement.project.status || "Unknown"}
-                </Badge>
               </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground">
-            No project involvements yet
-          </p>
-        )}
-      </div>
+            </DashboardCurrentProjectButton>
+          ))}
+        </div>
+      ) : (
+        <p className="text-sm text-muted-foreground">
+          No project involvements yet
+        </p>
+      )}
     </Box>
   );
 };

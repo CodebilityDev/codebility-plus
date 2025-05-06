@@ -23,7 +23,8 @@ export type ModalType =
   | "addRoleModal"
   | "editRoleModal"
   | "deleteRoleModal"
-  | "deleteWarningModal";
+  | "deleteWarningModal"
+  | "dashboardCurrentProjectModal";
 
 interface ModalStore {
   type: ModalType | null;
