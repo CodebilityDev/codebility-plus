@@ -1,7 +1,7 @@
 
 export function getTestDate(dateApplied: Date): Date {
     const testDate = new Date(dateApplied);
-    testDate.setDate(testDate.getDate() + 4);
+    testDate.setDate(testDate.getDate() + 5);
     return testDate;
 }
 
