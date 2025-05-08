@@ -58,7 +58,7 @@ export default function DashboardCurrentProjectButton({
       type="button"
       onClick={handleClick}
       disabled={isDisabled}
-      className={`shrink-0 text-xs transition-opacity  ${
+      className={` transition-opacity  ${
         isDisabled ? "cursor-not-allowed" : ""
       }`}
     >
