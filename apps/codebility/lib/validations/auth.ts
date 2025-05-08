@@ -86,6 +86,9 @@ export const SignUpValidation = z
     internal_status: z.enum(["TRAINING"]).default("TRAINING"),
     availability_status: z.boolean().default(true),
     role_id: z.number().int().default(7),
+    nda_signed: z.literal(true, {
+      errorMap: () => ({ message: "You must sign the NDA to proceed" }),
+    }),
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",

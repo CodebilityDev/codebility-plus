@@ -166,7 +166,7 @@ export default function DashboardCurrentProjectModal() {
             tasks.map((tasked) => (
               <div
                 key={tasked.id}
-                className="bg-black-100 relative mt-1 flex flex-col gap-2 rounded-lg p-2 md:mt-2 md:gap-3 md:p-4"
+                className="bg-lightgray dark:bg-black-100 relative mt-1 flex flex-col gap-2 rounded-lg p-2 md:mt-2 md:gap-3 md:p-4"
               >
                 <div className="flex items-center justify-between">
                   <h3
