@@ -15,7 +15,7 @@ export default async function ApplicantWaitingPage() {
   }
 
   return (
-    <section className=" text-primaryColor flex h-screen w-screen flex-col items-center justify-center overflow-hidden">
+    <section className=" text-primaryColor flex h-screen w-screen max-w-full max-h-full flex-col items-center justify-center overflow-hidden">
       <div className="flex w-full flex-col items-center text-center ">
         <Suspense fallback={<Loading />}>
           <ApplicationSteps user={user} applicantData={applicantData} />
