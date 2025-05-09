@@ -62,7 +62,9 @@ export default function TestInstruction({
                       https://github.com/Zeff01/codebility-assessment
                     </a>
                   </li>
-                  <li>Click the "Fork" button in the upper right corner</li>
+                  <li>
+                    Click the &quot;Fork&quot; button in the upper right corner
+                  </li>
                   <li>
                     This creates your own copy of the repository under your
                     GitHub account
@@ -73,8 +75,8 @@ export default function TestInstruction({
               <TabsContent value="step2" className="space-y-4">
                 <h3 className="text-lg font-semibold">Select Your Category</h3>
                 <p>
-                  You'll find separate README files for each experience level in
-                  the frontend, backend, mobile, and fullstack folders:
+                  You&apos;ll find separate README files for each experience
+                  level in the frontend, backend, mobile, and fullstack folders:
                 </p>
 
                 <div className="space-y-4">
@@ -111,8 +113,8 @@ export default function TestInstruction({
 
                 <p className="pt-2">
                   Please pick the README that corresponds to your experience
-                  level (or the position you're applying for), then follow the
-                  instructions inside it.
+                  level (or the position you&apos;re applying for), then follow
+                  the instructions inside it.
                 </p>
               </TabsContent>
 
@@ -144,8 +146,8 @@ export default function TestInstruction({
                     in your PR description.
                   </li>
                   <li>
-                    Once you're done, please submit your forked repository URL
-                    to us.
+                    Once you&apos;re done, please submit your forked repository
+                    URL to us.
                   </li>
                 </ul>
                 <p className="pt-2">

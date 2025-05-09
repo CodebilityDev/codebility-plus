@@ -51,6 +51,7 @@ const getMenuItems = (
     status === "rejected" ||
     status === "applying" ||
     status === "testing" ||
+    status === "onboarding" ||
     status === "denied"
   ) {
     return [
