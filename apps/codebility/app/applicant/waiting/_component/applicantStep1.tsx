@@ -21,7 +21,7 @@ export default function ApplicantStep1({
           Take the test to procced to the next step
         </p>
         <p className="text-gray mx-auto text-xs md:text-lg lg:max-w-[500px] lg:text-lg">
-          Hello {user.first_name}, thank you for applying to Codebility. We're
+          Hello {user.first_name}, thank you for applying to Codebility. We&apos;re
           excited to move forward with your application and would like to invite
           you to complete our coding assessment.
         </p>
