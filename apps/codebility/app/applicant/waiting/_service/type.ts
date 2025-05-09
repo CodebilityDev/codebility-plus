@@ -4,7 +4,6 @@ export const applicantSchema = z.object({
     id: z.string(),
     test_taken: z.string().datetime({ offset: true }).nullable(),
     fork_url: z.string().nullable(),
-    test_status: z.enum(["pending", "passed", "failed"]).nullable(),
     created_at: z.string().datetime({ offset: true }),
     updated_at: z.string().datetime({ offset: true }),
 })

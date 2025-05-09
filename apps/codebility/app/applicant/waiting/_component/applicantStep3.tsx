@@ -26,21 +26,35 @@ export default function ApplicantStep3({
           test. For now join the Waiting List in order to get updates on your
           application status.
         </p>
+
+        <p className="text-gray mx-auto text-xs md:text-lg lg:max-w-[500px] lg:text-lg">
+          Join also our Discord server. Once you joined, check the #lobby and
+          messege us your
+          <span className="block">
+            full-name - position - years of exp - Onboarding
+          </span>
+          <span className="block">
+            i.e. Juan Dela Cruz - Frontend - 2.4 - Onboarding
+          </span>
+        </p>
       </div>
 
-      <div className="flex gap-4">
-        <Link href="/">
-          <Button className="from-teal to-violet h-10 w-32 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
-            <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full text-lg text-white lg:text-lg">
-              Go to Home
+      <div className="flex flex-col gap-6 sm:flex-row sm:gap-4">
+        <Link
+          href={process.env.NEXT_PUBLIC_MESSENGER_WAITLIST || ""}
+          target="_blank"
+        >
+          <Button className="from-teal to-violet h-10  rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+            <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
+              Join Waiting List
             </span>
           </Button>
         </Link>
 
-        <Link href="https://m.me/j/AbbZvEkMrT8a5Ob7/" target="_blank">
+        <Link href={process.env.NEXT_PUBLIC_DISCORD_LINK || ""} target="_blank">
           <Button className="from-teal to-violet h-10  rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
             <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
-              Join Waiting List
+              Join Discord Server
             </span>
           </Button>
         </Link>
