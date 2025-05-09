@@ -8,6 +8,11 @@ import Loading from "./loading";
 
 export default async function ApplicantWaitingPage() {
   const user = await getUserData();
+
+  if (!user) {
+    redirect("/auth/waiting");
+  }
+
   const applicantData = await getApplicantData(user.applicant_id);
 
   if (!applicantData) {
@@ -15,7 +20,7 @@ export default async function ApplicantWaitingPage() {
   }
 
   return (
-    <section className=" text-primaryColor flex h-screen w-screen max-w-full max-h-full flex-col items-center justify-center overflow-hidden">
+    <section className=" text-primaryColor flex h-screen max-h-full w-screen max-w-full flex-col items-center justify-center overflow-hidden">
       <div className="flex w-full flex-col items-center text-center ">
         <Suspense fallback={<Loading />}>
           <ApplicationSteps user={user} applicantData={applicantData} />
