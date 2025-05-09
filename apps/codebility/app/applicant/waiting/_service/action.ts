@@ -10,6 +10,11 @@ export async function getApplicantData(applicantId: string): Promise<ApplicantTy
     try {
         const supabase = getSupabaseServerActionClient();
 
+        if (!applicantId) {
+            console.error("Applicant ID is required");
+            return undefined;
+        }
+
         const { data, error } = await supabase
             .from("applicant")
             .select("*")
