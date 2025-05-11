@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import { getUserData } from "@/app/auth/declined/_service/actions";
 
 import ApplicationSteps from "./_component/applicationSteps";
-import { getApplicantData } from "./_service/action";
+import { applicantSchema } from "./_service/type";
 import Loading from "./loading";
 
 export default async function ApplicantWaitingPage() {
@@ -13,9 +13,9 @@ export default async function ApplicantWaitingPage() {
     redirect("/auth/waiting");
   }
 
-  const applicantData = await getApplicantData(user.applicant_id);
+  const applicantData = applicantSchema.safeParse(user.applicant);
 
-  if (!applicantData) {
+  if (applicantData.error) {
     redirect("/auth/waiting");
   }
 
@@ -23,7 +23,7 @@ export default async function ApplicantWaitingPage() {
     <section className=" text-primaryColor flex h-screen max-h-full w-screen max-w-full flex-col items-center justify-center overflow-hidden">
       <div className="flex w-full flex-col items-center text-center ">
         <Suspense fallback={<Loading />}>
-          <ApplicationSteps user={user} applicantData={applicantData} />
+          <ApplicationSteps user={user} applicantData={applicantData.data} />
         </Suspense>
 
         <div className="hero-bubble">

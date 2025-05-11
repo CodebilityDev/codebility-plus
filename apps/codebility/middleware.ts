@@ -176,7 +176,7 @@ export async function middleware(req: NextRequest) {
       if (pathname.includes(WAITING_APPROVAL_ROUTE) || pathname.includes(APPLICANT_ROUTE)) {
         return NextResponse.next();
       } else {
-        return redirectTo(req, WAITING_APPROVAL_ROUTE);
+        return redirectTo(req, 'applicant/waiting');
       }
     }
 
