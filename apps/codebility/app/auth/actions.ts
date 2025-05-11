@@ -139,6 +139,19 @@ export const signupUser = async (formData: FormData) => {
 
     if (insertError) throw insertError;
 
+    // create applicant entry
+    const { error } = await supabase
+      .from("applicant")
+      .insert(
+        {
+          codev_id: user.id
+        }
+      )
+
+    if (error) {
+      throw error
+    }
+
     setUser(userData);
     return { success: true, data: user };
   } catch (error: any) {
