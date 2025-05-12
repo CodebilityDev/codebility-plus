@@ -42,11 +42,19 @@ const NAV_ITEMS = [
   { id: "4", title: "Hire a CoDevs", path: "/codevs" },
 ] as const;
 
-const getMenuItems = (status: string, role_id: number) => {
+const getMenuItems = (
+  status: string,
+  role_id: number,
+  applicant: {
+    id: string;
+    codev_id: string;
+  } | null,
+) => {
   if (
     status === "rejected" ||
     status === "applying" ||
     status === "testing" ||
+    status === "onboarding" ||
     status === "denied"
   ) {
     return [
@@ -54,7 +62,9 @@ const getMenuItems = (status: string, role_id: number) => {
         href:
           status === "rejected" || status === "denied"
             ? "/auth/declined"
-            : "/auth/waiting",
+            : applicant?.id
+              ? "/applicant/waiting"
+              : "/auth/waiting",
         icon: applicationStatusIcon,
         label: "Status",
       },
@@ -132,6 +142,7 @@ const UserMenu = ({
   image_url,
   application_status,
   role_id,
+  applicant,
   handleLogout,
 }: {
   first_name: string;
@@ -140,6 +151,10 @@ const UserMenu = ({
   image_url: string;
   application_status: string;
   role_id: number;
+  applicant: {
+    id: string;
+    codev_id: string;
+  } | null;
   handleLogout: () => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -173,7 +188,7 @@ const UserMenu = ({
       </DropdownMenuTrigger>
 
       <DropdownMenuContent className="dark:bg-dark-100 bg-dark-100 absolute -left-24 top-3 border-zinc-700 md:w-[200px]">
-        {getMenuItems(application_status, role_id).map((item) => (
+        {getMenuItems(application_status, role_id, applicant).map((item) => (
           <Link key={item.label} href={item.href}>
             <DropdownMenuItem
               className="flex cursor-pointer items-center gap-6 p-3 px-5"
@@ -238,9 +253,11 @@ const Navigation = () => {
 
         const { data: userRow, error: fetchError } = await supabase
           .from("codev")
-          .select("*")
+          .select(`*, applicant (id, codev_id)`)
           .eq("id", session.user.id)
           .single();
+
+        console.log("User Row:", userRow);
 
         if (fetchError) {
           console.error("Error fetching codev:", fetchError.message);
