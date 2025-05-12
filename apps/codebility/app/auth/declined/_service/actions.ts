@@ -16,7 +16,9 @@ export async function getUserData(): Promise<any> {
 
         const { data } = await supabase
             .from("codev")
-            .select("*")
+            .select(`*,
+                    applicant (*)
+                `)
             .eq("id", session.user.id)
             .single();
 
