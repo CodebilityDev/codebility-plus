@@ -391,9 +391,9 @@ export function EditableRow({
             size="sm"
             onClick={handleSave}
             disabled={isSubmitting || isUploading}
-            className="bg-green-500 text-white hover:bg-green-600 dark:hover:bg-green-600"
+            className="hover:bg-green dark:hover:bg-green bg-white text-white dark:bg-transparent"
           >
-            <Check className="h-4 w-4" />
+            <Check className="text-black-100 h-4 w-4 dark:text-white" />
           </Button>
           {/* Cancel button -> reverts changes (via parent) */}
           <Button
@@ -403,7 +403,7 @@ export function EditableRow({
             disabled={isSubmitting || isUploading}
             className="hover:bg-red-500/20 hover:text-red-500"
           >
-            <X className="h-4 w-4" />
+            <X className="h-4 w-4 dark:text-white" />
           </Button>
         </div>
       </TableCell>
