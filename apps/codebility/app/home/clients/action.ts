@@ -33,7 +33,7 @@ export const createClientAction = async (formData: FormData) => {
     });
     company_logo = publicUrl;
   }
-
+  test;
   const { data: newClient, error: createError } = await supabase
     .from("clients")
     .insert({
