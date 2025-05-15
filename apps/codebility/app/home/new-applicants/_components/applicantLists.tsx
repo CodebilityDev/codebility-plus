@@ -1,13 +1,9 @@
 "use client";
 
 import React from "react";
-import { H1 } from "@/Components/shared/dashboard";
-
 import { Badge } from "@codevs/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
-
 import { NewApplicantType } from "../_service/types";
-import ApplicantsFilteringHeader from "../../applicants/_components/ApplicantsFilteringHeader";
 import { ApplicantDataTable } from "./_table/applicantDataTable";
 import { applicantsTestingColumns } from "./_table/applicantTestingColumns";
 import { applicantsColumns } from "./_table/appplicantColumns";
@@ -19,6 +15,7 @@ export default function ApplicantLists({
   applicants: NewApplicantType[];
 }) {
   const [applicants, setApplicants] = React.useState(data);
+  const [currentTab, setCurrentTab] = React.useState("applying");
 
   const applicantsApplying = applicants.filter(
     (applicant) => applicant.application_status === "applying",
@@ -38,9 +35,19 @@ export default function ApplicantLists({
 
   return (
     <div className="mx-auto flex max-w-screen-2xl flex-col gap-4">
-      <ApplicantFilterHeaders applicants={data} setApplicants={setApplicants} />
-
-      <Tabs defaultValue="applying" className="w-full">
+      <ApplicantFilterHeaders
+        applicants={data}
+        setApplicants={setApplicants}
+        setCurrentTab={setCurrentTab}
+      />
+      <Tabs
+        defaultValue={currentTab}
+        value={currentTab}
+        onValueChange={(value) => {
+          setCurrentTab(value);
+        }}
+        className="w-full"
+      >
         <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
           <TabsTrigger value="applying" className="relative">
             <span>Applicants</span>
@@ -99,7 +106,6 @@ export default function ApplicantLists({
             columns={applicantsColumns}
           />
         </TabsContent>
-        s
       </Tabs>
     </div>
   );
