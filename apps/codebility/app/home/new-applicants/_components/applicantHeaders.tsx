@@ -30,17 +30,44 @@ export type ApplicantFilters = {
 export default function ApplicantFilterHeaders({
   applicants,
   setApplicants,
+  setCurrentTab,
 }: {
   applicants: NewApplicantType[];
   setApplicants: React.Dispatch<React.SetStateAction<NewApplicantType[]>>;
+  setCurrentTab: React.Dispatch<React.SetStateAction<string>>;
 }) {
   const [searchTerm, setSearchTerm] = React.useState("");
   const onSearch = (value: string) => {
     setSearchTerm(value);
-    const filteredApplicants = applicants.filter((applicant) =>
-      applicant.first_name.toLowerCase().includes(value.toLowerCase()),
-    );
+
+    const filteredApplicants = applicants.filter((applicant) => {
+      const fullName = `${applicant.first_name} ${applicant.last_name}`;
+      const email = applicant.email_address;
+
+      return (
+        fullName.toLowerCase().includes(value.toLowerCase()) ||
+        email.toLowerCase().includes(value.toLowerCase())
+      );
+    });
     setApplicants(filteredApplicants);
+
+    switch (filteredApplicants[0]?.application_status) {
+      case "applying":
+        setCurrentTab("applying");
+        break;
+      case "testing":
+        setCurrentTab("testing");
+        break;
+      case "onboarding":
+        setCurrentTab("onboarding");
+        break;
+      case "denied":
+        setCurrentTab("denied");
+        break;
+      default:
+        setCurrentTab("applying");
+        break;
+    }
   };
 
   // Update a specific filter // Update a specific filter
