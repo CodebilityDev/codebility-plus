@@ -153,11 +153,18 @@ const TaskEditModal = () => {
         throw new Error("Skill category is required");
       if (!taskData.codev_id) throw new Error("Primary assignee is required");
 
+      const descriptionToSave =
+        !taskData.description ||
+        taskData.description.trim() === "" ||
+        taskData.description === "<p></p>"
+          ? "No description provided"
+          : taskData.description;
+
       const formData = new FormData();
 
       // Explicitly set each field
       formData.append("title", taskData.title);
-      formData.append("description", taskData.description || "");
+      formData.append("description", descriptionToSave);
       formData.append("priority", taskData.priority || "");
       formData.append("difficulty", taskData.difficulty || "");
       formData.append("type", taskData.type || "");
@@ -385,11 +392,7 @@ const TaskEditModal = () => {
             <KanbanRichTextEditor
               value={taskData.description || ""}
               onChange={(content) => {
-                const fallback =
-                  content.trim() === "" || content === "<p></p>"
-                    ? "No description provided"
-                    : content;
-                handleInputChange("description", fallback);
+                handleInputChange("description", content);
               }}
             />
           </div>
