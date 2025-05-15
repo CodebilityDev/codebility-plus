@@ -45,6 +45,7 @@
     "@react-email/render": "^1.0.5",
     "@t3-oss/env-nextjs": "^0.7.1",
     "@tanstack/react-query": "^5.28.9",
+    "@tanstack/react-table": "^8.20.5",
     "@tiptap/extension-highlight": "^2.11.9",
     "@tiptap/extension-image": "^2.11.9",
     "@tiptap/extension-text-align": "^2.11.9",
