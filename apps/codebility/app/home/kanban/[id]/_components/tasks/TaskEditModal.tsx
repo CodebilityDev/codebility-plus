@@ -23,14 +23,13 @@ import {
 import { useModal } from "@/hooks/use-modal";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { EditorContent, useEditor } from "@tiptap/react";
+import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-import { Kanban } from "lucide-react";
+
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { Textarea } from "@codevs/ui/textarea";
 
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
 
@@ -151,7 +150,7 @@ const TaskEditModal = () => {
       if (!taskData.title) throw new Error("Title is required");
       if (!taskData.skill_category_id)
         throw new Error("Skill category is required");
-      if (!taskData.codev_id) throw new Error("Primary assignee is required");
+      // if (!taskData.codev_id) throw new Error("Primary assignee is required");
 
       const descriptionToSave =
         !taskData.description ||
@@ -171,7 +170,7 @@ const TaskEditModal = () => {
       formData.append("pr_link", taskData.pr_link || "");
       formData.append("points", String(taskData.points || 0));
       formData.append("skill_category_id", taskData.skill_category_id);
-      formData.append("codev_id", taskData.codev_id);
+      formData.append("codev_id", taskData.codev_id ?? "null");
 
       // Handle sidekick_ids specifically
       if (taskData.sidekick_ids && taskData.sidekick_ids.length > 0) {
