@@ -1,12 +1,16 @@
+"use server";
+
 import React, { Suspense } from "react";
-import { NewApplicantType } from "./_service/types";
+
 import ApplicantLists from "./_components/applicantLists";
 import getNewApplicants from "./_service/query";
+import { NewApplicantType } from "./_service/types";
+import ApplicantsLoading from "./loading";
 
 export default async function NewApplicants() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-        <NewApplicantFetchComp />
+    <Suspense fallback={<ApplicantsLoading />}>
+      <NewApplicantFetchComp />
     </Suspense>
   );
 }
