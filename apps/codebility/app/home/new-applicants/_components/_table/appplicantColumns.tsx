@@ -343,14 +343,6 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
 
       return (
         <div className="flex items-center justify-start gap-2 px-3 py-3">
-          {row.original.application_status === "onboarding" && (
-            <div className="flex w-full items-center justify-center gap-2">
-              <Button>Accept</Button>
-
-              <Button variant={"destructive"}>Deny</Button>
-            </div>
-          )}
-
           <ApplicantActionButton applicant={applicant} />
         </div>
       );
