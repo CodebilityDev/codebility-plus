@@ -7,9 +7,19 @@ import { getTestDate } from "@/app/applicant/waiting/_service/util";
 import ApplicantStatusButtons from "@/app/home/applicants/_components/ApplicantsStatusButtons";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/Components/ui/dialog";
 import { IconGithub, IconLink } from "@/public/assets/svgs";
 import { ColumnDef } from "@tanstack/react-table";
-import { ArrowUpDown } from "lucide-react";
+import { ArrowUpDown, CheckCircle2Icon, Loader2Icon } from "lucide-react";
+import toast from "react-hot-toast";
 
 import { Avatar, AvatarImage } from "@codevs/ui/avatar";
 import { Checkbox } from "@codevs/ui/checkbox";
@@ -19,6 +29,10 @@ import {
   HoverCardTrigger,
 } from "@codevs/ui/hover-card";
 
+import {
+  denyApplicantAction,
+  passApplicantTestAction,
+} from "../../_service/action";
 import { NewApplicantType } from "../../_service/types";
 import ApplicantActionButton from "./applicantActionButton";
 
@@ -367,10 +381,6 @@ export const applicantsTestingColumns: ColumnDef<NewApplicantType>[] = [
 
       return (
         <div className="flex items-center justify-center gap-2 px-3 py-3">
-          <Button>Pass</Button>
-
-          <Button variant={"destructive"}>Fail</Button>
-
           <ApplicantActionButton applicant={applicant} />
         </div>
       );

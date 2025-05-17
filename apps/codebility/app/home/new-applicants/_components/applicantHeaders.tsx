@@ -1,7 +1,9 @@
+import { stat } from "fs";
 import React, { useEffect, useMemo, useState } from "react";
 import { H1 } from "@/Components/shared/dashboard";
 import { Button } from "@/Components/ui/button";
 import { Filter, X } from "lucide-react";
+import { move } from "react-big-calendar";
 
 import { Badge } from "@codevs/ui/badge";
 import {
@@ -50,8 +52,11 @@ export default function ApplicantFilterHeaders({
       );
     });
     setApplicants(filteredApplicants);
+    moveTab(filteredApplicants[0]?.application_status || "applying");
+  };
 
-    switch (filteredApplicants[0]?.application_status) {
+  const moveTab = (status: string) => {
+    switch (status) {
       case "applying":
         setCurrentTab("applying");
         break;
@@ -86,6 +91,18 @@ export default function ApplicantFilterHeaders({
 
   useEffect(() => {
     const filteredApplicants = applicants.filter((applicant) => {
+      if (searchTerm) {
+        const fullName = `${applicant.first_name} ${applicant.last_name}`;
+        const email = applicant.email_address;
+
+        if (
+          !fullName.toLowerCase().includes(searchTerm.toLowerCase()) &&
+          !email.toLowerCase().includes(searchTerm.toLowerCase())
+        ) {
+          return false;
+        }
+      }
+
       // Filter by portfolio
       if (filters.hasPortfolio && !applicant.portfolio_website) return false;
       if (filters.noPortfolio && applicant.portfolio_website) return false;
@@ -124,6 +141,7 @@ export default function ApplicantFilterHeaders({
       return true;
     });
     setApplicants(filteredApplicants);
+    moveTab(filteredApplicants[0]?.application_status || "applying");
   }, [filters, applicants]);
 
   const activeFilterCount = useMemo(() => {

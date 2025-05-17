@@ -1,8 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { memo } from "react";
+
 import { Badge } from "@codevs/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
+
 import { NewApplicantType } from "../_service/types";
 import { ApplicantDataTable } from "./_table/applicantDataTable";
 import { applicantsTestingColumns } from "./_table/applicantTestingColumns";
@@ -17,20 +19,36 @@ export default function ApplicantLists({
   const [applicants, setApplicants] = React.useState(data);
   const [currentTab, setCurrentTab] = React.useState("applying");
 
-  const applicantsApplying = applicants.filter(
-    (applicant) => applicant.application_status === "applying",
+  const applicantsApplying = React.useMemo(
+    () =>
+      applicants.filter(
+        (applicant) => applicant.application_status === "applying",
+      ),
+    [applicants],
   );
 
-  const applicantsTesting = applicants.filter(
-    (applicant) => applicant.application_status === "testing",
+  const applicantsTesting = React.useMemo(
+    () =>
+      applicants.filter(
+        (applicant) => applicant.application_status === "testing",
+      ),
+    [applicants],
   );
 
-  const applicantsOnboarding = applicants.filter(
-    (applicant) => applicant.application_status === "onboarding",
+  const applicantsOnboarding = React.useMemo(
+    () =>
+      applicants.filter(
+        (applicant) => applicant.application_status === "onboarding",
+      ),
+    [applicants],
   );
 
-  const applicantsDenied = applicants.filter(
-    (applicant) => applicant.application_status === "denied",
+  const applicantsDenied = React.useMemo(
+    () =>
+      applicants.filter(
+        (applicant) => applicant.application_status === "denied",
+      ),
+    [applicants],
   );
 
   return (
@@ -110,3 +128,5 @@ export default function ApplicantLists({
     </div>
   );
 }
+
+memo(ApplicantLists);
