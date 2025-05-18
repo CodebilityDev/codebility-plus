@@ -148,27 +148,40 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
           })()}
 
           {/* Team Members */}
-          {project.project_members!?.length > 0 ? (
+          {project.project_members?.some(
+            (member) => member.role === "member",
+          ) ? (
             <div className="flex -space-x-2">
-              {project.project_members!.slice(0, 4).map((member) => (
-                <div key={member.id} className="relative h-8 w-8 rounded-full">
-                  {member.codev!.image_url ? (
-                    <Image
-                      src={member.codev!.image_url}
-                      alt={`${member.codev!.first_name} ${member.codev!.last_name}`}
-                      fill
-                      unoptimized={true}
-                      className="rounded-full object-cover"
-                    />
-                  ) : (
-                    <DefaultAvatar size={32} />
-                  )}
-                </div>
-              ))}
-              {project.project_members!.length > 4 && (
+              {project.project_members
+                .filter((member) => member.role === "member")
+                .slice(0, 4)
+                .map((member) => (
+                  <div
+                    key={member.id}
+                    className="relative h-8 w-8 rounded-full"
+                  >
+                    {member.codev?.image_url ? (
+                      <Image
+                        src={member.codev.image_url}
+                        alt={`${member.codev.first_name} ${member.codev.last_name}`}
+                        fill
+                        unoptimized={true}
+                        className="rounded-full object-cover"
+                      />
+                    ) : (
+                      <DefaultAvatar size={32} />
+                    )}
+                  </div>
+                ))}
+              {project.project_members.filter(
+                (member) => member.role === "member",
+              ).length > 4 && (
                 <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full dark:bg-gray-800 dark:bg-zinc-700">
                   <span className="text-xs font-medium">
-                    +{project.project_members!.length - 4}
+                    +
+                    {project.project_members.filter(
+                      (member) => member.role === "member",
+                    ).length - 4}
                   </span>
                 </div>
               )}
