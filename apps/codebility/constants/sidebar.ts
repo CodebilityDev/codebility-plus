@@ -109,6 +109,12 @@ export const getSidebarData = async (
           permission: "interns" as PermissionKey,
         },
         {
+          route: pathsConfig.app.my_team,
+          imgURL: "/assets/svgs/icon-org-chart.svg", // Replace with your icon path
+          label: "My Team",
+          permission: "interns" as PermissionKey, // Using "interns" permission for now
+        },
+        {
           route: pathsConfig.app.orgchart,
           imgURL: "/assets/svgs/icon-org-chart.svg",
           label: "Org Chart",
