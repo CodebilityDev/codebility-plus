@@ -22,6 +22,7 @@ import {
   getSortedRowModel,
   SortingState,
   useReactTable,
+  VisibilityState,
 } from "@tanstack/react-table";
 
 import { NewApplicantType } from "../../_service/types";
@@ -39,6 +40,8 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
   const [rowSelection, setRowSelection] = React.useState({});
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
 
   const table = useReactTable({
     data,
@@ -48,6 +51,7 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
     onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
     onRowSelectionChange: setRowSelection,
+    onColumnVisibilityChange: setColumnVisibility,
     state: {
       sorting,
       rowSelection,
@@ -55,6 +59,17 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
     initialState: {
       pagination: {
         pageSize: pageSize.applicants,
+      },
+      columnVisibility: {
+        github: data[0]?.application_status === "testing" ? false : true,
+        portfolio_website:
+          data[0]?.application_status === "testing" ? false : true,
+        tech_stacks: data[0]?.application_status === "testing" ? false : true,
+        test_taken: data[0]?.application_status === "testing" ? true : false,
+        test_time_remaining:
+          data[0]?.application_status === "testing" ? true : false,
+        fork_url: data[0]?.application_status === "testing" ? true : false,
+        reapply: data[0]?.application_status === "denied" ? true : false,
       },
     },
   });

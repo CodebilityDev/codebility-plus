@@ -127,9 +127,7 @@ export default function ApplicantRowActionButton({
   const handleDeleteAll = async () => {
     setLoading(true);
     try {
-      await multipleDeleteApplicantAction(
-        applicants.map((applicant) => applicant.id),
-      );
+      await multipleDeleteApplicantAction(applicants);
       setOpen(false);
     } catch (error) {
       console.error(error);

@@ -84,13 +84,11 @@ export default function ApplicantMobileTable<TData extends NewApplicantType>({
                 {row
                   .getVisibleCells()
                   .slice(1, 2)
-                  .map((cell, index) => (
+                  .map((cell) => (
                     <TableCell
                       key={cell.id}
                       className={cn(
                         (cell.column.columnDef.meta as any)?.className,
-                        "content-start",
-                        index !== 0 && "w-full",
                       )}
                     >
                       {flexRender(
