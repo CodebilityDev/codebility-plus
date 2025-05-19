@@ -1,24 +1,12 @@
-import { stat } from "fs";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { H1 } from "@/Components/shared/dashboard";
-import { Button } from "@/Components/ui/button";
-import { Filter, X } from "lucide-react";
-import { move } from "react-big-calendar";
-
-import { Badge } from "@codevs/ui/badge";
-import {
-  DropdownMenu,
-  DropdownMenuCheckboxItem,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
 
 import { NewApplicantType } from "../_service/types";
 import { ExperienceRanges } from "../../applicants/_components/ApplicantsPageClient";
+import ApplicantFilters from "./applicantFilters";
+import ApplicantFiltersComponent from "./applicantFilters";
 import ApplicantFiltersBadge from "./applicantFiltersBadge";
+import ApplicantSorters from "./applicantSorters";
 
 export type ApplicantFilters = {
   hasPortfolio: boolean;
@@ -54,6 +42,22 @@ export default function ApplicantFilterHeaders({
     setApplicants(filteredApplicants);
     moveTab(filteredApplicants[0]?.application_status || "applying");
   };
+
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+
+  // Toggle sort
+  const toggleSort = useCallback(
+    (field: string) => {
+      if (sortField === field) {
+        setSortDirection((prev) => (prev === "asc" ? "desc" : "asc"));
+      } else {
+        setSortField(field);
+        setSortDirection("desc");
+      }
+    },
+    [sortField],
+  );
 
   const moveTab = (status: string) => {
     switch (status) {
@@ -140,12 +144,48 @@ export default function ApplicantFilterHeaders({
       }
       return true;
     });
-    setApplicants(filteredApplicants);
 
+    // Apply sorting
+    if (sortField) {
+      filteredApplicants.sort((a, b) => {
+        let valueA: any, valueB: any;
+
+        switch (sortField) {
+          case "name":
+            valueA = `${a.first_name || ""} ${a.last_name || ""}`.toLowerCase();
+            valueB = `${b.first_name || ""} ${b.last_name || ""}`.toLowerCase();
+            break;
+          case "position":
+            valueA = (a.display_position || "").toLowerCase();
+            valueB = (b.display_position || "").toLowerCase();
+            break;
+          case "experience":
+            valueA = a.years_of_experience || 0;
+            valueB = b.years_of_experience || 0;
+            break;
+          default:
+            return 0;
+        }
+
+        // For numeric values
+        if (typeof valueA === "number" && typeof valueB === "number") {
+          return sortDirection === "asc" ? valueA - valueB : valueB - valueA;
+        }
+
+        // For string values
+        if (valueA < valueB) return sortDirection === "asc" ? -1 : 1;
+        if (valueA > valueB) return sortDirection === "asc" ? 1 : -1;
+        return 0;
+      });
+    }
+
+    // Update the applicants state with the filtered and sorted applicants
     if (searchTerm.length > 0) {
       moveTab(filteredApplicants[0]?.application_status || "applying");
     }
-  }, [filters, applicants]);
+
+    setApplicants(filteredApplicants);
+  }, [filters, sortField, sortDirection, searchTerm, applicants]);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -226,158 +266,41 @@ export default function ApplicantFilterHeaders({
       },
       positions: {},
     });
-
     setApplicants(applicants);
   };
+
+  const resetSort = () => {
+    setSortField(null);
+    setSortDirection("desc");
+  }
 
   return (
     <div className="flex flex-col gap-2 ">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
         <H1>Applicants Management</H1>
         <div className="flex flex-col items-center gap-2 sm:flex-row">
-          {/* Filter Dropdown */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                className="text-black-500 dark:border-dark-300 dark:bg-dark-200 dark:text-light-800 flex w-full items-center gap-1 border-gray-300 bg-white sm:w-fit"
-              >
-                <Filter className="h-4 w-4" />
-                <span>Filters</span>
-                {activeFilterCount > 0 && (
-                  <Badge className="ml-1 flex h-5 w-5 items-center justify-center bg-blue-500 p-0 text-white">
-                    {activeFilterCount}
-                  </Badge>
-                )}
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="dark:border-dark-400 dark:bg-dark-200 border border-gray-300 bg-white">
-              <DropdownMenuLabel className="text-black-500 dark:text-light-800">
-                Filter applicants
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
+          <div className="flex w-full items-center gap-2">
+            {/* Sort Dropdown */}
+            <ApplicantSorters
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onToggleSort={toggleSort}
+              resetSort={resetSort}
+            />
 
-              {/* Portfolio Filters */}
-              <DropdownMenuLabel className="text-black-300 dark:text-light-500 text-xs">
-                Portfolio
-              </DropdownMenuLabel>
-              <DropdownMenuCheckboxItem
-                checked={filters.hasPortfolio}
-                onCheckedChange={(checked) =>
-                  updateFilter("hasPortfolio", !!checked)
-                }
-                className="text-black-500 dark:text-light-800"
-              >
-                Has portfolio
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={filters.noPortfolio}
-                onCheckedChange={(checked) =>
-                  updateFilter("noPortfolio", !!checked)
-                }
-                className="text-black-500 dark:text-light-800"
-              >
-                No portfolio
-              </DropdownMenuCheckboxItem>
+            {/* Filter Dropdown */}
+            <ApplicantFiltersComponent
+              activeFilterCount={activeFilterCount}
+              filters={filters}
+              onResetFilters={onResetFilters}
+              uniquePositions={uniquePositions}
+              updateExperienceFilter={updateExperienceFilter}
+              updateFilter={updateFilter}
+              updatePositionFilter={updatePositionFilter}
+            />
+          </div>
 
-              {/* GitHub Filters */}
-              <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-              <DropdownMenuLabel className="text-black-300 dark:text-light-500 text-xs">
-                GitHub
-              </DropdownMenuLabel>
-              <DropdownMenuCheckboxItem
-                checked={filters.hasGithub}
-                onCheckedChange={(checked) =>
-                  updateFilter("hasGithub", !!checked)
-                }
-                className="text-black-500 dark:text-light-800"
-              >
-                Has GitHub
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={filters.noGithub}
-                onCheckedChange={(checked) =>
-                  updateFilter("noGithub", !!checked)
-                }
-                className="text-black-500 dark:text-light-800"
-              >
-                No GitHub
-              </DropdownMenuCheckboxItem>
-              {/* Experience Filters */}
-              <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-              <DropdownMenuLabel className="text-black-300 dark:text-light-500 text-xs">
-                Experience
-              </DropdownMenuLabel>
-              <DropdownMenuCheckboxItem
-                checked={filters.experienceRanges.novice}
-                onCheckedChange={(checked) =>
-                  updateExperienceFilter("novice", !!checked)
-                }
-                className="text-black-500 dark:text-light-800"
-              >
-                0-2 years
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={filters.experienceRanges.intermediate}
-                onCheckedChange={(checked) =>
-                  updateExperienceFilter("intermediate", !!checked)
-                }
-                className="text-black-500 dark:text-light-800"
-              >
-                3-5 years
-              </DropdownMenuCheckboxItem>
-              <DropdownMenuCheckboxItem
-                checked={filters.experienceRanges.expert}
-                onCheckedChange={(checked) =>
-                  updateExperienceFilter("expert", !!checked)
-                }
-                className="text-black-500 dark:text-light-800"
-              >
-                5+ years
-              </DropdownMenuCheckboxItem>
-              {/* Position Filters */}
-              {uniquePositions.length > 0 && (
-                <>
-                  <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-                  <DropdownMenuLabel className="text-black-300 dark:text-light-500 text-xs">
-                    Position
-                  </DropdownMenuLabel>
-                  {uniquePositions.map(
-                    (position) =>
-                      position && (
-                        <DropdownMenuCheckboxItem
-                          key={position}
-                          checked={filters.positions[position] || false}
-                          onCheckedChange={(checked) =>
-                            updatePositionFilter(position, !!checked)
-                          }
-                          className="text-black-500 dark:text-light-800"
-                        >
-                          {position}
-                        </DropdownMenuCheckboxItem>
-                      ),
-                  )}
-                </>
-              )}
-              {/* Reset Filters Button */}
-              {activeFilterCount > 0 && (
-                <>
-                  <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="w-full justify-center text-xs text-red-100 hover:bg-red-100/10 hover:text-red-200 dark:text-red-100"
-                    onClick={onResetFilters}
-                  >
-                    <X className="mr-1 h-3 w-3" />
-                    Reset filters
-                  </Button>
-                </>
-              )}
-            </DropdownMenuContent>
-          </DropdownMenu>
-
+          {/* search bar */}
           <input
             type="text"
             placeholder="Search applicants"
@@ -396,3 +319,5 @@ export default function ApplicantFilterHeaders({
     </div>
   );
 }
+
+memo(ApplicantFilterHeaders);

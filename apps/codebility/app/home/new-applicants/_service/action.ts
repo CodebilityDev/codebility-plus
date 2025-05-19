@@ -3,16 +3,25 @@
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { revalidatePath } from "next/cache";
 import { NewApplicantType } from "./types";
+import { createAdminClient } from "@/utils/supabase/adminClient";
 
-export async function deleteApplicantAction(applicantId: string) {
+export async function deleteApplicantAction(applicant: NewApplicantType) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createAdminClient();
+
+        // safety measures
+        if (!applicant.id) {
+            throw new Error("Applicant ID is required");
+        }
+        if (applicant.application_status === "passed") {
+            throw new Error("Cannot delete an applicant who has passed status");
+        }
 
         // delete from codev table
         const { error } = await supabase
             .from("codev")
             .delete()
-            .eq("id", applicantId);
+            .eq("id", applicant.id);
 
         if (error) {
             console.error("Error deleting applicant from codev:", error);
@@ -20,12 +29,12 @@ export async function deleteApplicantAction(applicantId: string) {
         }
 
         //delete from auth
-        /* const { error: authError } = await supabase.auth.admin.deleteUser(applicantId);
+        const { error: authError } = await supabase.auth.admin.deleteUser(applicant.id);
 
         if (authError) {
             console.error("Error deleting applicant from auth:", authError);
             throw new Error("Failed to delete applicant from auth");
-        } */
+        }
 
         //revalidate the cache
         revalidatePath("/home/new-applicants");
@@ -35,15 +44,23 @@ export async function deleteApplicantAction(applicantId: string) {
     }
 }
 
-export async function multipleDeleteApplicantAction(applicantIds: string[]) {
+export async function multipleDeleteApplicantAction(applicant: NewApplicantType[]) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createAdminClient();
+
+        // safety measures
+        if (!applicant.length) {
+            throw new Error("Applicant IDs are required");
+        }
+        if (applicant.some(app => app.application_status === "passed")) {
+            throw new Error("Cannot delete applicants who have passed status");
+        }
 
         // delete from codev table
         const { error } = await supabase
             .from("codev")
             .delete()
-            .in("id", applicantIds);
+            .in("id", applicant.map(app => app.id));
 
         if (error) {
             console.error("Error deleting applicants from codev:", error);
@@ -52,8 +69,13 @@ export async function multipleDeleteApplicantAction(applicantIds: string[]) {
 
         //delete from auth
         // Using Promise.all to handle multiple user deletions
-        /* const authResults = await Promise.all(
-            applicantIds.map(id => supabase.auth.admin.deleteUser(id))
+        const authResults = await Promise.all(
+            applicant.map(async (applicant) => {
+                if (!applicant.id) {
+                    throw new Error("Applicant ID is required");
+                }
+                return supabase.auth.admin.deleteUser(applicant.id);
+            })
         );
 
         // Check if any of the deletions failed
@@ -62,7 +84,7 @@ export async function multipleDeleteApplicantAction(applicantIds: string[]) {
         if (authError) {
             console.error("Error deleting applicants from auth:", authError);
             throw new Error("Failed to delete applicants from auth");
-        } */
+        }
 
         revalidatePath("/home/new-applicants");
     } catch (error) {

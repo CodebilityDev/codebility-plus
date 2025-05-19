@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DefaultAvatar from "@/Components/DefaultAvatar";
@@ -95,7 +95,16 @@ export default function ApplicantProfileColSec({
       </div>
 
       {/* Mobile View */}
-      <div className="w-full xl:hidden">
+      <div className="flex w-full items-start justify-start gap-2 xl:hidden">
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(value) => row.toggleSelected(!!value)}
+          aria-label="Select row"
+          onClick={(event) => {
+            event.stopPropagation();
+          }}
+          className="mr-2 mt-8 dark:border-none dark:ring-1 dark:ring-white"
+        />
         <Accordion
           key={applicant.id}
           type="single"
@@ -104,19 +113,10 @@ export default function ApplicantProfileColSec({
         >
           <AccordionItem
             value={applicant.last_name}
-            className="w-full min-w-full border-b-0 border-zinc-300 dark:border-zinc-800"
+            className="w-full min-w-full border-b-0"
           >
             <AccordionTrigger className="flex w-full min-w-full pr-2 text-base hover:bg-muted/50 md:text-lg">
               <div className="flex w-full max-w-full items-center justify-start gap-3 ">
-                <Checkbox
-                  checked={row.getIsSelected()}
-                  onCheckedChange={(value) => row.toggleSelected(!!value)}
-                  aria-label="Select row"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                  }}
-                  className="mr-2 mt-2 px-2 dark:border-none dark:ring-1 dark:ring-white xl:mt-2"
-                />
                 <Avatar>
                   {applicant.image_url ? (
                     <AvatarImage src={applicant.image_url} />
@@ -203,7 +203,7 @@ export default function ApplicantProfileColSec({
                     <TableCell>
                       <div className="flex flex-wrap gap-2">
                         {applicant.tech_stacks &&
-                        applicant.tech_stacks.length > 0 ? (
+                        applicant.tech_stacks.length > 0 && !applicant.tech_stacks.includes("none") ? (
                           applicant.tech_stacks.map((stack, i) => (
                             <Image
                               key={i}
@@ -238,3 +238,5 @@ export default function ApplicantProfileColSec({
     </div>
   );
 }
+
+memo(ApplicantProfileColSec);

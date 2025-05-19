@@ -1,21 +1,28 @@
 "use client";
 
-import React, { memo } from "react";
+import React, { memo, useMemo } from "react";
 
 import { Badge } from "@codevs/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 import { NewApplicantType } from "../_service/types";
 import { ApplicantDataTable } from "./_table/applicantDataTable";
-import { applicantsTestingColumns } from "./_table/applicantTestingColumns";
+
 import { applicantsColumns } from "./_table/appplicantColumns";
 import ApplicantFilterHeaders from "./applicantHeaders";
+import { prioritizeCodevs } from "@/utils/codev-priority";
+import { Codev } from "@/types/home/codev";
 
 export default function ApplicantLists({
   applicants: data,
 }: {
   applicants: NewApplicantType[];
 }) {
+
+  const prioritizedApplicants = useMemo(() => {
+      return prioritizeCodevs(data as Codev[], false);
+    }, [data]);
+
   const [applicants, setApplicants] = React.useState(data);
   const [currentTab, setCurrentTab] = React.useState("applying");
 
@@ -109,7 +116,7 @@ export default function ApplicantLists({
         <TabsContent value="testing" className="mt-10 md:mt-4">
           <ApplicantDataTable
             data={applicantsTesting}
-            columns={applicantsTestingColumns}
+            columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="onboarding" className="mt-10 md:mt-4">
