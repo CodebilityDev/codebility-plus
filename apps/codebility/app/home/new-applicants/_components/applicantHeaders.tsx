@@ -141,7 +141,10 @@ export default function ApplicantFilterHeaders({
       return true;
     });
     setApplicants(filteredApplicants);
-    moveTab(filteredApplicants[0]?.application_status || "applying");
+
+    if (searchTerm.length > 0) {
+      moveTab(filteredApplicants[0]?.application_status || "applying");
+    }
   }, [filters, applicants]);
 
   const activeFilterCount = useMemo(() => {
@@ -230,17 +233,15 @@ export default function ApplicantFilterHeaders({
   return (
     <div className="flex flex-col gap-2 ">
       <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <div className="flex items-center gap-2">
-          <H1>Applicants Management</H1>
-        </div>
-        <div className="flex items-center justify-center gap-2">
+        <H1>Applicants Management</H1>
+        <div className="flex flex-col items-center gap-2 sm:flex-row">
           {/* Filter Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="text-black-500 dark:border-dark-300 dark:bg-dark-200 dark:text-light-800 flex items-center gap-1 border-gray-300 bg-white"
+                className="text-black-500 dark:border-dark-300 dark:bg-dark-200 dark:text-light-800 flex w-full items-center gap-1 border-gray-300 bg-white sm:w-fit"
               >
                 <Filter className="h-4 w-4" />
                 <span>Filters</span>
@@ -377,17 +378,16 @@ export default function ApplicantFilterHeaders({
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <div>
-            <input
-              type="text"
-              placeholder="Search applicants"
-              value={searchTerm}
-              onChange={(e) => onSearch(e.target.value)}
-              className="border-gray h-10 w-full rounded-full border border-opacity-50 bg-inherit px-5 text-black focus:outline-none dark:text-white md:w-80"
-            />
-          </div>
+          <input
+            type="text"
+            placeholder="Search applicants"
+            value={searchTerm}
+            onChange={(e) => onSearch(e.target.value)}
+            className="border-gray h-10 w-full rounded-full border border-opacity-50 bg-inherit px-5 text-black focus:outline-none dark:text-white md:w-80"
+          />
         </div>
       </div>
+
       <ApplicantFiltersBadge
         filters={filters}
         setFilter={setFilters}
