@@ -52,7 +52,7 @@ export default function ApplicantLists({
   );
 
   return (
-    <div className="mx-auto flex max-w-screen-2xl flex-col gap-4">
+    <div className="mx-auto flex max-w-screen-xl flex-col gap-4 sm:max-w-screen-2xl">
       <ApplicantFilterHeaders
         applicants={data}
         setApplicants={setApplicants}

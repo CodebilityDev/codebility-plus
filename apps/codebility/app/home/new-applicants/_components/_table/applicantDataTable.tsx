@@ -25,6 +25,7 @@ import {
 } from "@tanstack/react-table";
 
 import { NewApplicantType } from "../../_service/types";
+import ApplicantMobileTable from "./applicantMobileTable";
 import ApplicantRowActionButton from "./applicantRowActionButton";
 
 interface DataTableProps<TData extends NewApplicantType, TValue> {
@@ -63,11 +64,11 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
 
   return (
     <div className="rounded-md border">
-      <Box>
+      <Box className="p-1 py-2 sm:p-4 sm:py-4">
         {/* if rows selected */}
 
         <div className="w-1/2">
-          <div className="flex w-full items-center gap-4 px-2 pb-2">
+          <div className="hidden w-full items-center gap-4 px-2 pb-2 xl:flex">
             <p className="text-sm text-gray-500">
               {Object.keys(rowSelection).length} selected
             </p>
@@ -80,7 +81,8 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
           </div>
         </div>
 
-        <Table>
+        {/* Table for larger screens */}
+        <Table className="hidden xl:table">
           {/* Table header */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -140,6 +142,9 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
             )}
           </TableBody>
         </Table>
+
+        {/* Table for smaller screens */}
+        <ApplicantMobileTable table={table} />
 
         {/* Table pagination integrated with DefaultPagination component */}
         <div className="relative w-full">
