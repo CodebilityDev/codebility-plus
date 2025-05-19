@@ -1,26 +1,18 @@
 "use client";
 
-import React, { useEffect, useMemo, useState } from "react";
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { getTestDate } from "@/app/applicant/waiting/_service/util";
-import ApplicantStatusButtons from "@/app/home/applicants/_components/ApplicantsStatusButtons";
-import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import { IconGithub, IconLink } from "@/public/assets/svgs";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 
-import { Avatar, AvatarImage } from "@codevs/ui/avatar";
 import { Checkbox } from "@codevs/ui/checkbox";
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from "@codevs/ui/hover-card";
 
 import { NewApplicantType } from "../../_service/types";
 import ApplicantActionButton from "./applicantActionButton";
+import ApplicantProfileColSec from "./applicantProfileColSec";
 
 export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
   {
@@ -33,6 +25,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
+        className="dark:border-none dark:ring-1 dark:ring-white"
       />
     ),
     cell: ({ row }) => (
@@ -40,6 +33,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
+        className="mx-0 mt-8 px-0 dark:border-none dark:ring-1 dark:ring-white xl:mt-2"
       />
     ),
     enableSorting: false,
@@ -65,67 +59,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
 
       return (
         <>
-          <HoverCard>
-            <HoverCardTrigger asChild>
-              <div className="flex items-start gap-2">
-                <Avatar className="mt-1 h-8 w-8">
-                  {applicant.image_url ? (
-                    <AvatarImage src={applicant.image_url} />
-                  ) : (
-                    <DefaultAvatar size={32} />
-                  )}
-                </Avatar>
-                <div className="flex flex-col">
-                  <p className="cursor-pointer text-sm font-medium text-gray-200 hover:underline">
-                    {applicant.first_name.charAt(0).toUpperCase() +
-                      applicant.first_name.slice(1)}{" "}
-                    {applicant.last_name.charAt(0).toUpperCase() +
-                      applicant.last_name.slice(1)}
-                  </p>
-                  <p className="max-w-[170px] truncate text-xs text-gray-400">
-                    {applicant.email_address}
-                  </p>
-                </div>
-              </div>
-            </HoverCardTrigger>
-            <HoverCardContent className="background-box w-80 border border-gray-700 p-4 shadow-lg">
-              <div className="flex gap-4">
-                {applicant.image_url ? (
-                  <Image
-                    src={applicant.image_url}
-                    alt={`${applicant.first_name} avatar`}
-                    width={80}
-                    height={80}
-                    className="rounded-md"
-                  />
-                ) : (
-                  <DefaultAvatar size={80} className="rounded-md" />
-                )}
-                <div className="text-gray-200">
-                  <h4 className="text-base font-medium">
-                    {applicant.first_name.charAt(0).toUpperCase() +
-                      applicant.first_name.slice(1)}{" "}
-                    {applicant.last_name.charAt(0).toUpperCase() +
-                      applicant.last_name.slice(1)}
-                  </h4>
-                  <p className="text-sm text-gray-400">
-                    {applicant.email_address}
-                  </p>
-                  {applicant.display_position && (
-                    <p className="text-sm text-gray-400">
-                      {applicant.display_position}
-                    </p>
-                  )}
-                  {/* {hasAssessmentBeenSent(applicant.id) && (
-                    <div className="mt-2 flex items-center gap-1 text-xs text-green-400">
-                      <CheckCircle className="h-3.5 w-3.5" />
-                      <span>Assessment sent</span>
-                    </div>
-                  )} */}
-                </div>
-              </div>
-            </HoverCardContent>
-          </HoverCard>
+          <ApplicantProfileColSec applicant={applicant} row={row} />
         </>
       );
     },

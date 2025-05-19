@@ -157,11 +157,11 @@ export default function ApplicantActionButton({
   };
 
   return (
-    <>
+    <div className="flex flex-wrap items-center gap-3">
       {applicant.application_status === "testing" && (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
           <Button
-            className="h-fit py-1 lg:text-base"
+            className="h-fit py-1 text-sm lg:text-base"
             onClick={() => {
               setDialogState("pass");
               setIsOpen(true);
@@ -171,7 +171,7 @@ export default function ApplicantActionButton({
           </Button>
           <Button
             variant={"destructive"}
-            className="h-fit py-1 lg:text-base"
+            className="h-fit py-1 text-sm lg:text-base"
             onClick={() => {
               setDialogState("fail");
               setIsOpen(true);
@@ -183,9 +183,9 @@ export default function ApplicantActionButton({
       )}
 
       {applicant.application_status === "onboarding" && (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-center gap-3">
           <Button
-            className="h-fit py-1 lg:text-base"
+            className="h-fit py-1 text-sm lg:text-base"
             onClick={() => {
               setDialogState("accept");
               setIsOpen(true);
@@ -195,7 +195,7 @@ export default function ApplicantActionButton({
           </Button>
           <Button
             variant={"destructive"}
-            className="h-fit py-1 lg:text-base"
+            className="h-fit py-1 text-sm lg:text-base"
             onClick={() => {
               setDialogState("deny");
               setIsOpen(true);
@@ -527,6 +527,6 @@ export default function ApplicantActionButton({
           </DialogContent>
         )}
       </Dialog>
-    </>
+    </div>
   );
 }

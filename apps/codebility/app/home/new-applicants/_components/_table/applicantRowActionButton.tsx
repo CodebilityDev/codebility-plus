@@ -17,6 +17,7 @@ import {
 
 import {
   multipleAcceptApplicantAction,
+  multipleDeleteApplicantAction,
   multipleDenyApplicantAction,
   multipleMoveApplicantToApplyingAction,
   multipleMoveApplicantToOnboardingAction,
@@ -123,69 +124,84 @@ export default function ApplicantRowActionButton({
     setLoading(false);
   };
 
+  const handleDeleteAll = async () => {
+    setLoading(true);
+    try {
+      await multipleDeleteApplicantAction(
+        applicants.map((applicant) => applicant.id),
+      );
+      setOpen(false);
+    } catch (error) {
+      console.error(error);
+    }
+    setLoading(false);
+  };
+
   return (
     <div className="flex items-center justify-center gap-3">
-      {(applicants[0]?.application_status === "applying" ||
-        applicants[0]?.application_status === "denied") && (
-        <Button
-          variant="destructive"
-          className="h-fit py-1 lg:text-base"
-          onClick={() => {
-            setDialogState("delete");
-            setOpen(true);
-          }}
-        >
-          Delete All
-        </Button>
-      )}
+      <div className="hidden sm:flex">
+        {(applicants[0]?.application_status === "applying" ||
+          applicants[0]?.application_status === "denied") && (
+          <Button
+            variant="destructive"
+            className="h-fit py-1 text-sm lg:text-base"
+            onClick={() => {
+              setDialogState("delete");
+              setOpen(true);
+            }}
+          >
+            Delete All
+          </Button>
+        )}
 
-      {applicants[0]?.application_status === "testing" && (
-        <div className="flex items-center gap-3">
-          <Button
-            className="h-fit py-1 lg:text-base"
-            onClick={() => {
-              setDialogState("pass");
-              setOpen(true);
-            }}
-          >
-            Pass All
-          </Button>
-          <Button
-            variant={"destructive"}
-            className="h-fit py-1 lg:text-base"
-            onClick={() => {
-              setDialogState("fail");
-              setOpen(true);
-            }}
-          >
-            Fail All
-          </Button>
-        </div>
-      )}
+        {applicants[0]?.application_status === "testing" && (
+          <div className="flex items-center gap-3">
+            <Button
+              className="h-fit py-1 text-sm lg:text-base"
+              onClick={() => {
+                setDialogState("pass");
+                setOpen(true);
+              }}
+            >
+              Pass All
+            </Button>
+            <Button
+              variant={"destructive"}
+              className="h-fit py-1 text-sm lg:text-base"
+              onClick={() => {
+                setDialogState("fail");
+                setOpen(true);
+              }}
+            >
+              Fail All
+            </Button>
+          </div>
+        )}
 
-      {applicants[0]?.application_status === "onboarding" && (
-        <div className="flex items-center gap-3">
-          <Button
-            className="h-fit py-1 lg:text-base"
-            onClick={() => {
-              setDialogState("accept");
-              setOpen(true);
-            }}
-          >
-            Accept All
-          </Button>
-          <Button
-            variant={"destructive"}
-            className="h-fit py-1 lg:text-base"
-            onClick={() => {
-              setDialogState("deny");
-              setOpen(true);
-            }}
-          >
-            Deny All
-          </Button>
-        </div>
-      )}
+        {applicants[0]?.application_status === "onboarding" && (
+          <div className="flex items-center gap-3">
+            <Button
+              className="h-fit py-1 text-sm lg:text-base"
+              onClick={() => {
+                setDialogState("accept");
+                setOpen(true);
+              }}
+            >
+              Accept All
+            </Button>
+            <Button
+              variant={"destructive"}
+              className="h-fit py-1 text-sm lg:text-base"
+              onClick={() => {
+                setDialogState("deny");
+                setOpen(true);
+              }}
+            >
+              Deny All
+            </Button>
+          </div>
+        )}
+      </div>
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DropdownMenu>
@@ -240,7 +256,6 @@ export default function ApplicantRowActionButton({
                 Move All to Onboarding
               </DropdownMenuItem>
             )}
-            <DropdownMenuSeparator />
             {applicants[0]?.application_status !== "denied" && (
               <DropdownMenuItem
                 className="cursor-pointer text-red-500"
@@ -252,6 +267,63 @@ export default function ApplicantRowActionButton({
                 Move All to Denied
               </DropdownMenuItem>
             )}
+
+            <DropdownMenuSeparator />
+            {applicants[0]?.application_status === "testing" && (
+              <div className="block cursor-pointer sm:hidden">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setDialogState("pass");
+                    setOpen(true);
+                  }}
+                >
+                  Pass All
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  className="cursor-pointer text-red-500"
+                  onClick={() => {
+                    setDialogState("fail");
+                    setOpen(true);
+                  }}
+                >
+                  Fail All
+                </DropdownMenuItem>
+              </div>
+            )}
+
+            {applicants[0]?.application_status === "onboarding" && (
+              <div className="block cursor-pointer sm:hidden">
+                <DropdownMenuItem
+                  onClick={() => {
+                    setDialogState("accept");
+                    setOpen(true);
+                  }}
+                >
+                  Accept All
+                </DropdownMenuItem>
+
+                <DropdownMenuItem
+                  className="cursor-pointer text-red-500"
+                  onClick={() => {
+                    setDialogState("deny");
+                    setOpen(true);
+                  }}
+                >
+                  Deny All
+                </DropdownMenuItem>
+              </div>
+            )}
+
+            <DropdownMenuItem
+              className="cursor-pointer text-red-500"
+              onClick={() => {
+                setDialogState("delete");
+                setOpen(true);
+              }}
+            >
+              Delete All
+            </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -432,6 +504,30 @@ export default function ApplicantRowActionButton({
                     <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
                   )}
                   Deny
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+
+        {dialogState === "delete" && (
+          <DialogContent>
+            <div className="flex flex-col gap-4">
+              <h2 className="text-lg font-semibold">Deny All</h2>
+              <p>Are you sure you want to delete all selected applicants?</p>
+              <div className="flex justify-end gap-4">
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleDeleteAll}
+                  disabled={loading}
+                  variant="destructive"
+                >
+                  {loading && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Delete
                 </Button>
               </div>
             </div>
