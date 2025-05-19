@@ -104,7 +104,7 @@ export default function ApplicantActionButton({
   const handleDeleteApplicant = async () => {
     setIsLoading(true);
     try {
-      await deleteApplicantAction(applicant.id);
+      await deleteApplicantAction(applicant);
       setIsOpen(false);
     } catch (error) {
       console.error("Error deleting applicant:", error);
