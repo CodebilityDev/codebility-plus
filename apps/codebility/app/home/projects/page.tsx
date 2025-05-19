@@ -23,13 +23,18 @@ const Projects = ({ searchParams }: PageProps) => {
       .from("projects")
       .select(
         `
-        *,
-        project_members (
-          id,
-          codev_id,
-          role,
-          joined_at
+      *,
+      project_members (
+        id,
+        codev_id,
+        role,
+        joined_at,
+        codev (
+          first_name,
+          last_name,
+          image_url
         )
+      )
       `,
       )
       .then(({ data, error }) => {
