@@ -132,29 +132,19 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
           </h3>
           <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
             <div
-              className={`flex items-center justify-center rounded-full p-0.5 md:p-1
-              ${
-                task.priority === "critical"
-                  ? "bg-red-100 dark:bg-red-900/30"
-                  : task.priority === "high"
-                    ? "bg-orange-100 dark:bg-orange-900/30"
-                    : task.priority === "medium"
-                      ? "bg-yellow-100 dark:bg-yellow-900/30"
-                      : "bg-green-100 dark:bg-green-900/30"
-              }`}
+              className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium md:text-sm
+    ${
+      task.priority === "critical"
+        ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
+        : task.priority === "high"
+          ? "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400"
+          : task.priority === "medium"
+            ? "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400"
+            : "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+    }`}
             >
-              <PriorityIcon
-                className={`h-3 w-3 md:h-4 md:w-4 
-                ${
-                  task.priority === "critical"
-                    ? "text-red-500"
-                    : task.priority === "high"
-                      ? "text-orange-500"
-                      : task.priority === "medium"
-                        ? "text-yellow-500"
-                        : "text-green-500"
-                }`}
-              />
+              <span className="capitalize">{task.priority ?? "Low"}</span>
+              <PriorityIcon className="h-3 w-3 md:h-4 md:w-4" />
             </div>
             <div
               className="h-6 w-6 overflow-hidden rounded-full border-2 border-white shadow-md transition-colors 
