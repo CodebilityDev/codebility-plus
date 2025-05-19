@@ -23,6 +23,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
     internal_status: "",
     nda_status: "",
     display_position: "",
+    availability_status: "",
     role: "",
     search: "", // NEW
   });
@@ -38,6 +39,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
         item.last_name,
         item.email_address,
         item.display_position,
+        item.availability_status,
         item.phone_number,
       ]
         .filter(Boolean)
@@ -71,6 +73,11 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
     if (
       filters.display_position &&
       item.display_position !== filters.display_position
+    )
+      return false;
+    if (
+      filters.availability_status &&
+      String(item.availability_status) !== filters.availability_status
     )
       return false;
     if (filters.role && String(item.role_id) !== filters.role) return false;
