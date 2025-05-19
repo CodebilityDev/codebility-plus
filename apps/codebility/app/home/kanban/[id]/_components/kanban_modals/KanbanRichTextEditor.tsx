@@ -46,7 +46,7 @@ export default function RichTextEditor({
     editorProps: {
       attributes: {
         class:
-          "min-h-[156px] bg-transparent py-2 px-3 break-words overflow-hidden whitespace-pre-wrap w-full",
+          "min-h-[156px] bg-transparent py-2 px-3 break-words overflow-hidden w-full",
       },
       handlePaste(view, event) {
         const items = Array.from(event.clipboardData?.items || []);
@@ -75,18 +75,13 @@ export default function RichTextEditor({
   });
 
   useEffect(() => {
-    if (editor && !didInit.current) {
-      // Set the content on initial load
-      if (editor.getHTML() !== value) {
-        editor.commands.setContent(value, false); // Only set if different
-      }
-      didInit.current = true;
+    if (editor && editor.getHTML() !== value) {
+      editor.commands.setContent(value, false);
     }
   }, [value, editor]);
 
   useEffect(() => {
-    if (editor) {
-      // Ensure the editor content is updated when the parent component passes a new value
+    if (editor && editor.isEmpty && value) {
       editor.commands.setContent(value, false);
     }
   }, [value, editor]);
