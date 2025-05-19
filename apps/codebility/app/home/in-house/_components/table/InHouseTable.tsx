@@ -286,7 +286,7 @@ export function InHouseTable({
               ) : (
                 <TableRow
                   key={item.id}
-                  className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 border-b"
+                  className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b"
                 >
                   <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
