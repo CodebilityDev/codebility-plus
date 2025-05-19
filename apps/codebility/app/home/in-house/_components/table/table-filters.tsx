@@ -28,6 +28,7 @@ interface TableFiltersProps {
     internal_status: string;
     nda_status: string;
     display_position: string;
+    availability_status: string;
     role: string;
     search: string; // <-- search field
   };
@@ -93,6 +94,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
     fetchDisplayPositions();
     fetchRoles();
   }, [supabase]);
+  console.log("Filtering by availability status:", filters.availability_status);
 
   return (
     <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 space-y-4 p-4">
@@ -273,6 +275,36 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
                   {role.name}
                 </SelectItem>
               ))}
+            </SelectContent>
+          </Select>
+        </div>
+        {/* Availability Status Filter */}
+        <div className="min-w-[200px] space-y-2">
+          <Label className="dark:text-light-900 text-black">
+            Availability Status
+          </Label>
+          <Select
+            value={filters.availability_status || "all"}
+            onValueChange={(val) =>
+              onFilterChange("availability_status", val === "all" ? "" : val)
+            }
+          >
+            <SelectTrigger
+              className="
+                border-light-700 bg-light-800 dark:border-dark-200
+                dark:bg-dark-200 dark:text-light-900
+                h-10 w-full
+                rounded-md
+                border px-3
+                text-black
+              "
+            >
+              <SelectValue placeholder="Filter by Availabiity Status" />
+            </SelectTrigger>
+            <SelectContent className="bg-light-800 dark:bg-dark-200">
+              <SelectItem value="all">All Availability Status</SelectItem>
+              <SelectItem value="true">Active</SelectItem>
+              <SelectItem value="false">Inactive</SelectItem>
             </SelectContent>
           </Select>
         </div>
