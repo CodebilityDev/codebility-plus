@@ -9,7 +9,7 @@ export async function getOrSetCache<T>(
     const cached = await redis.get(key);
     if (cached) {
       try {
-        console.log(`Getting data from cache [${key}]`);
+        // console.log(`Getting data from cache [${key}]`);
         return JSON.parse(cached) as T;
       } catch (e) {
         console.warn(`Redis cache parse error for key "${key}"`, e);
@@ -26,7 +26,7 @@ export async function getOrSetCache<T>(
   // Try to set the new cache value
   try {
     await redis.set(key, JSON.stringify(data), 'EX', ttlSeconds);
-    console.log(`Setting new cache [${key}]`);
+    // console.log(`Setting new cache [${key}]`);
   } catch (err) {
     console.warn(`Redis SET error for key "${key}"`, err);
   }
