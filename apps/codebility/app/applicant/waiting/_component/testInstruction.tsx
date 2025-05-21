@@ -17,6 +17,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 import { applicantTakeTest } from "../_service/action";
 import { ApplicantType } from "../_service/type";
+import { useRouter } from 'next/navigation'
 
 export default function TestInstruction({
   children,
@@ -25,6 +26,9 @@ export default function TestInstruction({
   children: React.ReactNode;
   applicantData: ApplicantType;
 }) {
+  const router = useRouter();
+
+  
   return (
     <>
       <Dialog>
@@ -120,11 +124,11 @@ export default function TestInstruction({
 
               <TabsContent value="step3" className="space-y-4">
                 <h3 className="text-lg font-semibold">
-                  Complete the Assessment Within 3-4 days
+                  Complete the Assessment Within 5 days
                 </h3>
                 <ul className="list-disc space-y-2 pl-5">
                   <li>
-                    We ask that you finish within <strong>3-4 days</strong>.
+                    We ask that you finish within <strong>5 days</strong>.
                   </li>
                   <li>
                     If you need an extension, or run into any issues, just let
@@ -172,12 +176,8 @@ export default function TestInstruction({
                 </Button>
               ) : (
                 <Button
-                  onClick={async () => {
-                    try {
-                      await applicantTakeTest(applicantData.id);
-                    } catch (error) {
-                      console.error("Error starting test:", error);
-                    }
+                  onClick={() => {
+                    router.refresh();
                   }}
                   className="from-teal to-violet bg-gradient-to-r p-0.5 hover:bg-gradient-to-br"
                 >

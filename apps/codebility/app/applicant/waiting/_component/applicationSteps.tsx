@@ -38,12 +38,12 @@ export default function ApplicationSteps({
   ];
 
   const getCurrentStep = (): number => {
-    if (
-      applicantData?.test_taken &&
-      user.application_status === "onboarding"
-    ) {
+    if (applicantData?.test_taken && user.application_status === "onboarding") {
       return 2;
-    } else if (applicantData?.test_taken) {
+    } else if (
+      applicantData?.test_taken &&
+      user.application_status === "testing"
+    ) {
       return 1;
     } else if (!applicantData?.test_taken) {
       return 0;
