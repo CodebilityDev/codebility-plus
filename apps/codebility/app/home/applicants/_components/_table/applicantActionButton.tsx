@@ -503,7 +503,7 @@ export default function ApplicantActionButton({
             <DialogHeader>
               <DialogTitle>Deny Applicant</DialogTitle>
               <DialogDescription>
-                This will deny the applicant's current application, but they can
+                This will deny the applicant&apos;s current application, but they can
                 reapply after 3 months. Are you sure?
               </DialogDescription>
             </DialogHeader>

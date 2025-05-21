@@ -1,8 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { H1 } from "@/Components/shared/dashboard";
 
-import { NewApplicantType } from "../_service/types";
-import { ExperienceRanges } from "../../applicants/_components/ApplicantsPageClient";
+import { ExperienceRanges, NewApplicantType } from "../_service/types";
 import ApplicantFilters from "./applicantFilters";
 import ApplicantFiltersComponent from "./applicantFilters";
 import ApplicantFiltersBadge from "./applicantFiltersBadge";
@@ -272,7 +271,7 @@ export default function ApplicantFilterHeaders({
   const resetSort = () => {
     setSortField(null);
     setSortDirection("desc");
-  }
+  };
 
   return (
     <div className="flex flex-col gap-2 ">
