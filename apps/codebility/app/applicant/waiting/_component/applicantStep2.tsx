@@ -3,6 +3,7 @@
 import React from "react";
 import { Button } from "@/Components/ui/button";
 import { Input } from "@mui/material";
+import { Loader2Icon } from "lucide-react";
 import { useForm } from "react-hook-form";
 
 import { applicantSubmitTest, applicantTakeTest } from "../_service/action";
@@ -45,6 +46,8 @@ function PreReadInstructions({
   applicantData: ApplicantType;
   user: any;
 }) {
+  const [loading, setLoading] = React.useState(false);
+
   return (
     <>
       <div className="flex flex-col items-center gap-4">
@@ -66,7 +69,23 @@ function PreReadInstructions({
       <div className="flex gap-4">
         {user?.display_position.includes("UI/UX Designer") ? (
           <TestQAInstruction applicantData={applicantData}>
-            <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+            <Button
+              className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  await applicantTakeTest({
+                    applicantId: applicantData.id,
+                    codevId: applicantData.codev_id,
+                  });
+                } catch (error) {
+                  console.error("Error message:", error);
+                }
+                setLoading(false);
+              }}
+              disabled={loading}
+            >
+              {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
               <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
                 Read Instructions
               </span>
@@ -74,7 +93,23 @@ function PreReadInstructions({
           </TestQAInstruction>
         ) : (
           <TestInstruction applicantData={applicantData}>
-            <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+            <Button
+              className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
+              onClick={async () => {
+                setLoading(true);
+                try {
+                  await applicantTakeTest({
+                    applicantId: applicantData.id,
+                    codevId: applicantData.codev_id,
+                  });
+                } catch (error) {
+                  console.error("Error message:", error);
+                }
+                setLoading(false);
+              }}
+              disabled={loading}
+            >
+              {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
               <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
                 Read Instructions
               </span>
@@ -124,12 +159,9 @@ function PostReadInstructions({
     <>
       <div className="flex flex-col items-center gap-4">
         <p className="mb-2 text-lg md:text-lg lg:text-2xl">
-          {
-            user?.display_position.includes("UI/UX Designer")
-              ? "Submit your the Figma File Url before deadline"
-              : "Submit your fork of the repository before deadline"
-          }
-          
+          {user?.display_position.includes("UI/UX Designer")
+            ? "Submit your the Figma File Url before deadline"
+            : "Submit your fork of the repository before deadline"}
         </p>
 
         <TestCountdown applicantData={applicantData} />
