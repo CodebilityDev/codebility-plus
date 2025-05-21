@@ -1,5 +1,4 @@
 import z from 'zod';
-import { applicantsSchema } from '../../applicants/_lib/applicants-schema';
 
 export const newApplicantsSchema = z.object({
     id: z.string(),
@@ -45,3 +44,9 @@ export const newApplicantsSchema = z.object({
 })
 
 export type NewApplicantType = z.infer<typeof newApplicantsSchema>
+
+export type ExperienceRanges = {
+  novice: boolean; // 0-2 years
+  intermediate: boolean; // 3-5 years
+  expert: boolean; // 5+ years
+};

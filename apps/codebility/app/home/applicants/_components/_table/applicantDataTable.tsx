@@ -166,7 +166,11 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
           {data.length > pageSize.applicants && (
             <DefaultPagination
               currentPage={table.getState().pagination.pageIndex + 1}
-              handleNextPage={() => table.nextPage()}
+              handleNextPage={() => {
+                if (table.getState().pagination.pageIndex < totalPages - 1) {
+                  table.nextPage();
+                }
+              }}
               handlePreviousPage={() => table.previousPage()}
               setCurrentPage={(pageOrFunction) => {
                 const page =
