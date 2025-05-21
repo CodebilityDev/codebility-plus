@@ -13,41 +13,40 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
-import { ExperienceRanges } from "../../applicants/_components/ApplicantsPageClient";
+
+import { ExperienceRanges } from "../_service/types";
 import { ApplicantFilters } from "./applicantHeaders";
 
-export default function ApplicantFiltersComponent(
-    {
-        activeFilterCount,
-        filters,
-        uniquePositions,
-        updateFilter,
-        updateExperienceFilter,
-        updatePositionFilter,
-        onResetFilters,
-    }: {
-        activeFilterCount: number;
-        filters: {
-            hasPortfolio: boolean;
-            noPortfolio: boolean;
-            hasGithub: boolean;
-            noGithub: boolean;
-            experienceRanges: {
-                novice: boolean;
-                intermediate: boolean;
-                expert: boolean;
-            };
-            positions: {
-                [key: string]: boolean;
-            };
-        };
-        uniquePositions: string[];
-        updateFilter: (key: keyof ApplicantFilters, value: boolean) => void
-        updateExperienceFilter: (key: keyof ExperienceRanges, value: boolean) => void
-        updatePositionFilter: (key: string, value: boolean) => void;
-        onResetFilters: () => void;
-    }
-) {
+export default function ApplicantFiltersComponent({
+  activeFilterCount,
+  filters,
+  uniquePositions,
+  updateFilter,
+  updateExperienceFilter,
+  updatePositionFilter,
+  onResetFilters,
+}: {
+  activeFilterCount: number;
+  filters: {
+    hasPortfolio: boolean;
+    noPortfolio: boolean;
+    hasGithub: boolean;
+    noGithub: boolean;
+    experienceRanges: {
+      novice: boolean;
+      intermediate: boolean;
+      expert: boolean;
+    };
+    positions: {
+      [key: string]: boolean;
+    };
+  };
+  uniquePositions: string[];
+  updateFilter: (key: keyof ApplicantFilters, value: boolean) => void;
+  updateExperienceFilter: (key: keyof ExperienceRanges, value: boolean) => void;
+  updatePositionFilter: (key: string, value: boolean) => void;
+  onResetFilters: () => void;
+}) {
   return (
     <>
       <DropdownMenu>

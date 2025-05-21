@@ -1,7 +1,14 @@
-import ApplicantsPageClient from "./_components/ApplicantsPageClient";
+"use server";
 
-const ApplicantsPage = async () => {
-  return <ApplicantsPageClient />;
-};
+import React, { Suspense } from "react";
 
-export default ApplicantsPage;
+import NewApplicantFetchComp from "./_components/applicantFetchComp";
+import ApplicantsLoading from "./loading";
+
+export default async function NewApplicants() {
+  return (
+    <Suspense fallback={<ApplicantsLoading />}>
+      <NewApplicantFetchComp />
+    </Suspense>
+  );
+}
