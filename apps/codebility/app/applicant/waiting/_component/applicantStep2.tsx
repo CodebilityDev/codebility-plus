@@ -9,6 +9,7 @@ import { applicantSubmitTest, applicantTakeTest } from "../_service/action";
 import { ApplicantType } from "../_service/type";
 import { TestCountdown } from "./testCountDown";
 import TestInstruction from "./testInstruction";
+import TestQAInstruction from "./testQAInstruction";
 
 export default function ApplicantStep2({
   setActiveStep,
@@ -25,11 +26,11 @@ export default function ApplicantStep2({
   return (
     <div className="my-20 flex flex-col items-center gap-8 text-center lg:gap-10">
       {takenTest && !submittedTest && (
-        <PostReadInstructions applicantData={applicantData} />
+        <PostReadInstructions applicantData={applicantData} user={user} />
       )}
 
       {!takenTest && !submittedTest && (
-        <PreReadInstructions applicantData={applicantData} />
+        <PreReadInstructions applicantData={applicantData} user={user} />
       )}
 
       {submittedTest && <PostSubmitted applicantData={applicantData} />}
@@ -39,8 +40,10 @@ export default function ApplicantStep2({
 
 function PreReadInstructions({
   applicantData,
+  user,
 }: {
   applicantData: ApplicantType;
+  user: any;
 }) {
   return (
     <>
@@ -61,13 +64,23 @@ function PreReadInstructions({
       </div>
 
       <div className="flex gap-4">
-        <TestInstruction applicantData={applicantData}>
-          <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
-            <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
-              Read Instructions
-            </span>
-          </Button>
-        </TestInstruction>
+        {user?.display_position.includes("UI/UX Designer") ? (
+          <TestQAInstruction applicantData={applicantData}>
+            <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+              <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
+                Read Instructions
+              </span>
+            </Button>
+          </TestQAInstruction>
+        ) : (
+          <TestInstruction applicantData={applicantData}>
+            <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+              <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
+                Read Instructions
+              </span>
+            </Button>
+          </TestInstruction>
+        )}
       </div>
     </>
   );
@@ -75,8 +88,10 @@ function PreReadInstructions({
 
 function PostReadInstructions({
   applicantData,
+  user,
 }: {
   applicantData: ApplicantType;
+  user: any;
 }) {
   const {
     register,
@@ -109,7 +124,12 @@ function PostReadInstructions({
     <>
       <div className="flex flex-col items-center gap-4">
         <p className="mb-2 text-lg md:text-lg lg:text-2xl">
-          Submit your fork of the repository before deadline
+          {
+            user?.display_position.includes("UI/UX Designer")
+              ? "Submit your the Figma File Url before deadline"
+              : "Submit your fork of the repository before deadline"
+          }
+          
         </p>
 
         <TestCountdown applicantData={applicantData} />
@@ -121,7 +141,11 @@ function PostReadInstructions({
                 required: "This field is required",
               })}
               type="text"
-              placeholder="Enter your GitHub repository link"
+              placeholder={
+                user?.display_position.includes("UI/UX Designer")
+                  ? "Enter your Figma File link"
+                  : "Enter your GitHub repository link"
+              }
               className="w-full rounded-md border border-gray-300 p-2 text-sm dark:bg-gray-800 dark:text-white"
             />
 
@@ -132,13 +156,23 @@ function PostReadInstructions({
             )}
 
             <div className="flex gap-4">
-              <TestInstruction applicantData={applicantData}>
-                <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
-                  <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
-                    Read Instructions
-                  </span>
-                </Button>
-              </TestInstruction>
+              {user?.display_position.includes("UI/UX Designer") ? (
+                <TestQAInstruction applicantData={applicantData}>
+                  <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+                    <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
+                      Read Instructions
+                    </span>
+                  </Button>
+                </TestQAInstruction>
+              ) : (
+                <TestInstruction applicantData={applicantData}>
+                  <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+                    <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
+                      Read Instructions
+                    </span>
+                  </Button>
+                </TestInstruction>
+              )}
 
               <Button
                 disabled={isSubmitting}
