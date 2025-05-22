@@ -4,7 +4,14 @@
 import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 import { revalidatePath } from "next/cache";
 
-export async function applicantTakeTest(applicantId: string) {
+
+export async function applicantTakeTest({
+    applicantId,
+    codevId,
+}: {
+    applicantId: string;
+    codevId: string;
+}) {
     try {
         const supabase = getSupabaseServerActionClient();
 
@@ -18,6 +25,47 @@ export async function applicantTakeTest(applicantId: string) {
 
         if (error) {
             console.error("Error updating applicant test:", error);
+            return undefined;
+        }
+
+
+        const { data: codevData, error: codevError } = await supabase
+            .from("codev")
+            .update({
+                application_status: "testing",
+                updated_at: new Date(),
+            })
+            .eq("id", codevId);
+
+        if (codevError) {
+            console.error("Error updating codev test:", codevError);
+            return undefined;
+        }
+
+        /*         revalidatePath("/applicant/waiting"); */
+    } catch (error) {
+        console.error("Error taking test:", error);
+    }
+}
+
+export async function applicantMoveToOnboard({
+    codevId,
+}: {
+    codevId: string;
+}) {
+    try {
+        const supabase = getSupabaseServerActionClient();
+
+        const { data: codevData, error: codevError } = await supabase
+            .from("codev")
+            .update({
+                application_status: "onboarding",
+                updated_at: new Date(),
+            })
+            .eq("id", codevId);
+
+        if (codevError) {
+            console.error("Error updating codev test:", codevError);
             return undefined;
         }
 
