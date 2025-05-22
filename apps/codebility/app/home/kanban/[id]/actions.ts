@@ -163,7 +163,11 @@ export const createNewTask = async (
       return { success: false, error: error.message };
     }
 
+
+    revalidatePath("/home/kanban/*");
+
     return { success: true };
+
   } catch (error) {
     console.error("Error creating task:", error);
     return {
@@ -196,7 +200,7 @@ export const updateTask = async (
         ? formData.get("sidekick_ids")?.toString().split(",").filter(Boolean)
         : [], // Ensure it's always an array
       skill_category_id: formData.get("skill_category_id")?.toString(),
-     codev_id: codev_id,
+      codev_id: codev_id,
       updated_at: new Date().toISOString(),
     };
 
@@ -551,6 +555,8 @@ export const completeTask = async (
       .eq("id", task.id);
 
     if (deleteError) throw deleteError;
+
+    revalidatePath("/home/kanban/*");
 
     return { success: true };
   } catch (error) {
