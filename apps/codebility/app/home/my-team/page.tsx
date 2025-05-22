@@ -12,7 +12,7 @@ import {
   TableRow,
 } from "@/Components/ui/table";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-import { IconKanban } from "@/public/assets/svgs"; // Optional, for consistency with "View Board" buttons
+import { IconKanban } from "@/public/assets/svgs"; // Optional, for consistency
 
 // Types
 interface CodevData {
@@ -30,7 +30,16 @@ interface ProjectMemberData {
 interface ProjectData {
   id: string;
   name: string;
-  team_leader_id?: string;
+  description?: string | null;
+  status?: string | null;
+  start_date: string;
+  end_date?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  github_link?: string | null;
+  website_url?: string | null;
+  figma_link?: string | null;
+  client_id?: string | null;
   project_members?: ProjectMemberData[];
 }
 
@@ -43,7 +52,16 @@ export default async function MyTeamPage() {
     .select(`
       id,
       name,
-      team_leader_id,
+      description,
+      status,
+      start_date,
+      end_date,
+      created_at,
+      updated_at,
+      github_link,
+      website_url,
+      figma_link,
+      client_id,
       project_members (
         role,
         codev (
@@ -89,11 +107,14 @@ export default async function MyTeamPage() {
       (member) => member.role !== "team_leader" && member.codev,
     ) || [];
 
-    // Combine team leader and members for the table
-    const teamData = [
-      { ...teamLeader, role: "Team Leader" },
-      ...teamMembers.map((member) => ({ ...member.codev, role: member.role || "Member" })),
+    // Explicitly type the intermediate array and handle null/undefined
+    const intermediateTeamData: (CodevData & { role: string } | undefined)[] = [
+      teamLeader ? { ...teamLeader, role: "Team Leader" } : undefined,
+      ...teamMembers.map((member) => member.codev ? { ...member.codev, role: member.role || "Member" } : undefined),
     ];
+
+    // Filter out undefined values with a corrected type predicate
+    const teamData = intermediateTeamData.filter((member): member is CodevData & { role: string } => member !== undefined);
 
     if (teamData.length === 0) {
       return (
