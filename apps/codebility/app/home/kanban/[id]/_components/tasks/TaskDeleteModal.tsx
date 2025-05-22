@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/Components/ui/button";
 import {
@@ -10,6 +11,7 @@ import {
 } from "@/Components/ui/dialog";
 import { useModal } from "@/hooks/use-modal";
 import { Task } from "@/types/home/codev";
+import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { deleteTask } from "../../actions";
@@ -18,6 +20,7 @@ const TaskDeleteModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskDeleteModal";
   const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const task = data as Task;
 
@@ -28,6 +31,8 @@ const TaskDeleteModal = () => {
       toast.error("Task ID is required");
       return;
     }
+
+    setIsLoading(true);
 
     try {
       const response = await deleteTask(task.id);
@@ -45,6 +50,8 @@ const TaskDeleteModal = () => {
         error instanceof Error ? error.message : "Something went wrong",
       );
     }
+
+    setIsLoading(false);
   };
 
   if (!isModalOpen) return null;
@@ -77,7 +84,11 @@ const TaskDeleteModal = () => {
               type="submit"
               variant="destructive"
               className="w-full sm:w-auto"
+              disabled={isLoading}
             >
+              {isLoading && (
+                <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+              )}
               Delete Task
             </Button>
           </div>
