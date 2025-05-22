@@ -4,7 +4,8 @@ import H1 from "@/Components/shared/dashboard/H1";
 import { Button } from "@/Components/ui/button";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-import TeamMemberCard from "@/Components/TeamMemberCard";;
+import TeamMemberCard from "@/Components/TeamMemberCard";
+
 // Types
 interface CodevData {
   id: string;
