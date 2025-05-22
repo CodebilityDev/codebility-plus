@@ -1,9 +1,11 @@
+// apps/codebility/app/home/my-team/page.tsx
 import Link from "next/link";
 import { Box } from "@/Components/shared/dashboard";
 import H1 from "@/Components/shared/dashboard/H1";
 import { Button } from "@/Components/ui/button";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import TeamLeaderCard from "@/Components/TeamMemberCard";
 import TeamMemberCard from "@/Components/TeamMemberCard";
 
 // Types
@@ -12,27 +14,6 @@ interface CodevData {
   first_name: string;
   last_name: string;
   image_url?: string | null;
-}
-
-interface ProjectMemberData {
-  codev?: CodevData;
-  role?: string;
-}
-
-interface ProjectData {
-  id: string;
-  name: string;
-  description?: string | null;
-  status?: string | null;
-  start_date: string;
-  end_date?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-  github_link?: string | null;
-  website_url?: string | null;
-  figma_link?: string | null;
-  client_id?: string | null;
-  project_members?: ProjectMemberData[];
 }
 
 export default async function MyTeamPage() {
@@ -44,16 +25,6 @@ export default async function MyTeamPage() {
     .select(`
       id,
       name,
-      description,
-      status,
-      start_date,
-      end_date,
-      created_at,
-      updated_at,
-      github_link,
-      website_url,
-      figma_link,
-      client_id,
       project_members (
         role,
         codev (
@@ -70,77 +41,48 @@ export default async function MyTeamPage() {
   const renderCardContent = () => {
     if (error) {
       return (
-        <div className="col-span-full text-center text-red-500">
+        <div className="text-center text-red-500">
           {error.message || "Error loading team"}
         </div>
       );
     }
 
     if (!projects) {
-      return Array.from({ length: 3 }).map((_, index) => (
-        <div key={`loading-${index}`} className="flex flex-col gap-3">
-          <Skeleton className="h-16 w-full rounded-lg" />
-        </div>
+      return Array.from({ length: 4 }).map((_, index) => (
+        <Skeleton key={index} className="h-16 w-full rounded-lg mb-4" />
       ));
     }
 
     const teamLeader = projects.project_members?.find(
-      (member) => member.role === "team_leader" && member.codev,
+      (member) => member.role === "team_leader" && member.codev
     )?.codev;
 
-    const teamMembers = projects.project_members?.filter(
-      (member) => member.role !== "team_leader" && member.codev,
-    ) || [];
+    const teamMembers = projects.project_members
+      ?.filter((member) => member.role !== "team_leader" && member.codev)
+      .map((member) => member.codev);
 
-    const isCodevData = (codev: any): codev is CodevData => {
+    if (!teamLeader) {
       return (
-        codev &&
-        typeof codev === "object" &&
-        "id" in codev &&
-        "first_name" in codev &&
-        "last_name" in codev &&
-        typeof codev.id === "string" &&
-        typeof codev.first_name === "string" &&
-        typeof codev.last_name === "string"
-      );
-    };
-
-    const intermediateTeamData: (CodevData & { role: string })[] = [
-      ...(teamLeader && isCodevData(teamLeader)
-        ? [{ ...teamLeader, role: "Team Leader" }]
-        : []),
-      ...teamMembers.map((member) => {
-        if (!member.codev || !isCodevData(member.codev)) {
-          throw new Error("Invalid member data");
-        }
-        return {
-          ...member.codev,
-          role: member.role ?? "Member",
-        };
-      }),
-    ];
-
-    if (intermediateTeamData.length === 0) {
-      return (
-        <div className="col-span-full text-center py-8 text-dark100_light900">
-          No team members available.
+        <div className="text-center py-8 text-gray-700">
+          No team leader available.
         </div>
       );
     }
 
-    return intermediateTeamData.map((member, index) => (
-      <TeamMemberCard key={index} member={member} />
-    ));
+    return (
+      <TeamMemberCard
+        teamLeader={teamLeader}
+        teamMembers={teamMembers}
+      />
+    );
   };
 
   return (
     <div className="mx-auto max-w-4xl flex flex-col gap-6 p-6">
       <H1>My Team</H1>
 
-      {/* Grid Layout */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {renderCardContent()}
-      </div>
+      {/* Single Column Layout */}
+      {renderCardContent()}
     </div>
   );
 }
