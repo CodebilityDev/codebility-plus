@@ -5,7 +5,7 @@ import H1 from "@/Components/shared/dashboard/H1";
 import { Button } from "@/Components/ui/button";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-import TeamLeaderCard from "@/Components/TeamLeaderCard"; // ✅ Import correct component
+import TeamLeaderCard from "@/Components/TeamLeaderCard";
 
 // Types
 interface CodevData {
@@ -37,6 +37,8 @@ export default async function MyTeamPage() {
     .eq("name", "My Team")
     .single(); // Assuming only one "My Team" project
 
+  console.log("Raw Project Data:", projects); // Debugging
+
   const renderCardContent = () => {
     if (error) {
       return (
@@ -56,9 +58,12 @@ export default async function MyTeamPage() {
       (member) => member.role === "team_leader" && member.codev
     )?.codev;
 
-    const teamMembers = projects.project_members
-      ?.filter((member) => member.role !== "team_leader" && member.codev)
+    const teamMembers = (projects.project_members ?? [])
+      .filter((member) => member.role !== "team_leader" && member.codev)
       .map((member) => member.codev);
+
+    console.log("Team Leader:", teamLeader); // Debugging
+    console.log("Team Members:", teamMembers); // Debugging
 
     if (!teamLeader) {
       return (
