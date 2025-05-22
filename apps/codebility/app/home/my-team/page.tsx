@@ -107,10 +107,16 @@ export default async function MyTeamPage() {
       (member) => member.role !== "team_leader" && member.codev,
     ) || [];
 
-    // Explicitly type the intermediate array and handle null/undefined
+    // Explicitly type and filter teamMembers to ensure codev exists
     const intermediateTeamData: (CodevData & { role: string } | undefined)[] = [
       teamLeader ? { ...teamLeader, role: "Team Leader" } : undefined,
-      ...teamMembers.map((member) => member.codev ? { ...member.codev, role: member.role || "Member" } : undefined),
+      ...teamMembers.map((member) => {
+        if (!member.codev) return undefined;
+        return {
+          ...member.codev,
+          role: member.role ? String(member.role) : "Member", // Ensure role is a string
+        } as CodevData & { role: string };
+      }),
     ];
 
     // Filter out undefined values with a corrected type predicate
