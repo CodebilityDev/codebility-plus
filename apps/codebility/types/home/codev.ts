@@ -324,3 +324,18 @@ export interface Roles {
   kanban?: boolean;
   dashboard?: boolean;
 }
+
+
+export interface CertificateProps {
+  background: string;
+  logo: string;
+  name: string;
+  course: string;
+  date_from: string;
+  date_to: string;
+  description: string;
+  key_projects: string[];
+  signature: string;
+  signature_name: string;
+  signature_title: string;
+}
