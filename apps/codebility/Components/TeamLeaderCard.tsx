@@ -10,6 +10,7 @@ interface TeamLeaderCardProps {
 export default function TeamLeaderCard({ teamLeader, teamMembers }: TeamLeaderCardProps) {
   return (
     <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow p-4 border border-gray-200">
+      {/* Team Leader Section */}
       <div className="flex items-center gap-4">
         <img
           src={teamLeader.image_url || "/assets/placeholder-avatar.png"}
