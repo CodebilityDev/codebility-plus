@@ -1,3 +1,4 @@
+// apps/codebility/app/home/my-team/page.tsx
 import Link from "next/link";
 import H1 from "@/Components/shared/dashboard/H1";
 import { Button } from "@/Components/ui/button";
@@ -12,6 +13,7 @@ interface CodevData {
   first_name: string;
   last_name: string;
   image_url?: string | null;
+  is_online?: boolean; // New field to track online status
 }
 
 interface ProjectMemberData {
@@ -60,7 +62,8 @@ export default async function MyTeamPage() {
           id,
           first_name,
           last_name,
-          image_url
+          image_url,
+          is_online
         )
       )
     `)
@@ -85,14 +88,20 @@ export default async function MyTeamPage() {
   const teamLeaders = projects && !error
     ? projects.project_members
         ?.filter(
-          (member) => member.role === "team_leader" && member.codev && isCodevData(member.codev),
+          (member) =>
+            member.role === "team_leader" &&
+            member.codev &&
+            isCodevData(member.codev),
         )
         .map((member) => member.codev) || []
     : [];
   const teamMembers = projects && !error
     ? projects.project_members
         ?.filter(
-          (member) => member.role !== "team_leader" && member.codev && isCodevData(member.codev),
+          (member) =>
+            member.role !== "team_leader" &&
+            member.codev &&
+            isCodevData(member.codev),
         )
         .map((member) => member.codev) || []
     : [];

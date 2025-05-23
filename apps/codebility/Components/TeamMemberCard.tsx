@@ -1,3 +1,4 @@
+// apps/codebility/app/components/TeamMemberCard.tsx
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { CodevData } from "@/types/home/codev";
 
@@ -11,10 +12,15 @@ const TeamMemberCard = ({ member }: Props) => {
 
   return (
     <div className="flex items-center gap-3 p-2 bg-gray-800 rounded-md shadow-sm transition-transform hover:scale-105">
-      <Avatar className="h-10 w-10 border border-gray-700">
-        <AvatarImage src={member.image_url || ""} alt={fullName} />
-        <AvatarFallback className="bg-gray-700 text-white text-sm">{initials}</AvatarFallback>
-      </Avatar>
+      <div className="relative">
+        <Avatar className="h-10 w-10 border border-gray-700">
+          <AvatarImage src={member.image_url || ""} alt={fullName} />
+          <AvatarFallback className="bg-gray-700 text-white text-sm">{initials}</AvatarFallback>
+        </Avatar>
+        {member.is_online && (
+          <div className="absolute bottom-0 right-0 bg-green-500 h-2 w-2 rounded-full border-2 border-white"></div>
+        )}
+      </div>
       <div>
         <p className="text-sm text-gray-100">{fullName}</p>
         <p className="text-xs text-gray-400">Member</p>
