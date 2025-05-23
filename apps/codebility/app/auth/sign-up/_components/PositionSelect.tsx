@@ -9,7 +9,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/Components/ui/select";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface Position {
   id: string;
@@ -29,7 +29,7 @@ export const PositionSelect = ({
 }: PositionSelectProps) => {
   const [positions, setPositions] = useState<Position[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   useEffect(() => {
     const fetchPositions = async () => {

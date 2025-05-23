@@ -1,9 +1,12 @@
 "use server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
 import { revalidatePath } from "next/cache";
 import { NewApplicantType } from "./types";
-import { createAdminClient } from "@/utils/supabase/adminClient";
+import { createAdminClient } from "@/utils/supabase/admin";
+import { createCell } from "@tanstack/react-table";
+import { createClientServerComponent } from "@/utils/supabase/server";
+
 
 export async function deleteApplicantAction(applicant: NewApplicantType) {
     try {
@@ -95,7 +98,7 @@ export async function multipleDeleteApplicantAction(applicant: NewApplicantType[
 
 export async function passApplicantTestAction(applicantId: string) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         // update codev table
         const { error } = await supabase
@@ -120,7 +123,7 @@ export async function passApplicantTestAction(applicantId: string) {
 
 export async function denyApplicantAction(applicantId: string) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         // update codev table
         const { error } = await supabase
@@ -167,7 +170,7 @@ export async function denyApplicantAction(applicantId: string) {
 
 export async function multiplePassApplicantTestAction(applicantIds: string[]) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         // update codev table
         const { error } = await supabase
@@ -192,7 +195,7 @@ export async function multiplePassApplicantTestAction(applicantIds: string[]) {
 
 export async function multipleDenyApplicantAction(applicantIds: string[]) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         // update codev table
         const { error } = await supabase
@@ -247,7 +250,7 @@ export async function multipleDenyApplicantAction(applicantIds: string[]) {
 
 export async function acceptApplicantAction(applicantId: string) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         // update codev table
         const { error } = await supabase
@@ -273,7 +276,7 @@ export async function acceptApplicantAction(applicantId: string) {
 
 export async function multipleAcceptApplicantAction(applicantIds: string[]) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         // update codev table
         const { error } = await supabase
@@ -299,7 +302,7 @@ export async function multipleAcceptApplicantAction(applicantIds: string[]) {
 
 export async function moveApplicantToApplyingAction(applicantId: string) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         const { error } = await supabase
             .from("applicant")
@@ -338,7 +341,7 @@ export async function moveApplicantToApplyingAction(applicantId: string) {
 
 export async function multipleMoveApplicantToApplyingAction(applicantIds: string[]) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         const { error } = await supabase
             .from("applicant")
@@ -377,7 +380,7 @@ export async function multipleMoveApplicantToApplyingAction(applicantIds: string
 
 export async function moveApplicantToTestingAction(applicantId: string) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         const { error } = await supabase
             .from("applicant")
@@ -416,7 +419,7 @@ export async function moveApplicantToTestingAction(applicantId: string) {
 
 export async function multipleMoveApplicantToTestingAction(applicantIds: string[]) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();;
 
         const { error } = await supabase
             .from("applicant")
@@ -455,7 +458,7 @@ export async function multipleMoveApplicantToTestingAction(applicantIds: string[
 
 export async function moveApplicantToOnboardingAction(applicantId: string) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         // update codev table
         const { error } = await supabase
@@ -480,7 +483,7 @@ export async function moveApplicantToOnboardingAction(applicantId: string) {
 
 export async function multipleMoveApplicantToOnboardingAction(applicantIds: string[]) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         // update codev table
         const { error } = await supabase

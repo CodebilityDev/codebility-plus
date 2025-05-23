@@ -1,7 +1,8 @@
 import "server-only";
 import { cookies } from "next/headers";
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
 import z from "zod";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 const UserSchema = z.object({
     id: z.string(),
@@ -11,7 +12,7 @@ const UserSchema = z.object({
 type User = z.infer<typeof UserSchema>;
 
 export async function cachedUser(): Promise<User | null> {
-    const supabase = getSupabaseServerActionClient();
+    const supabase = await createClientServerComponent();
     const cookieStore = cookies();
     const supabaseUser = cookieStore.get("supabase-user");
 

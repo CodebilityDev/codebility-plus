@@ -15,7 +15,6 @@ import { uploadImage } from "@/utils/uploadImage";
 import { Check, Plus, Upload, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import {
@@ -28,6 +27,7 @@ import {
 import { TableCell, TableRow } from "@codevs/ui/table";
 
 import { ProjectSelect } from "../shared/ProjectSelect";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 // If you have a separate "Role" interface:
 export interface Role {
@@ -48,7 +48,7 @@ export function EditableRow({
   onCancel,
   roles,
 }: EditableRowProps) {
-  const supabase = useSupabase();
+  const supabase = createClientClientComponent();
 
   // --- 1) LOCAL EDIT STATE ---
   // We'll clone the incoming "data" into our own local "editForm"

@@ -1,8 +1,9 @@
 import { KanbanBoardType, KanbanColumnType, Task } from "@/types/home/codev";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+
 
 import KanbanBoard from "./_components/KanbanBoard";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 interface KanbanBoardPageProps {
   params: { id: string };
@@ -47,8 +48,7 @@ export default async function KanbanBoardPage({
   params,
   searchParams,
 }: KanbanBoardPageProps) {
-  const supabase = getSupabaseServerComponentClient();
-
+  const supabase = await createClientServerComponent();
   // Query the board with nested columns and tasks
   const { data: board, error } = await supabase
     .from("kanban_boards")

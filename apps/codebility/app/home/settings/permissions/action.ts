@@ -1,11 +1,12 @@
 "use server"
 
-import { getSupabaseServerComponentClient } from '@codevs/supabase/server-component-client';
+import { createClientServerComponent } from "@/utils/supabase/server"
 
-const supabase = getSupabaseServerComponentClient();
+
 
 
 export const updateBooleanField = async (id: string | undefined, name: string, newState: boolean) => {
+  const supabase = await createClientServerComponent()
   const { data, error } = await supabase
     .from('user_type') 
     .update({ [name]: newState })

@@ -1,8 +1,9 @@
 "use server";
 
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
 
 interface CreateBoardResult {
   success: boolean;
@@ -13,7 +14,7 @@ interface CreateBoardResult {
 export const createNewBoard = async (
   formData: FormData,
 ): Promise<CreateBoardResult> => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
   const name = formData.get("name")?.toString();
   const description = formData.get("description")?.toString();

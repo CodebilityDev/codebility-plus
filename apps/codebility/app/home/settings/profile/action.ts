@@ -8,14 +8,14 @@ import {
   WorkExperience,
   WorkSchedule,
 } from "@/types/home/codev";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-
-const supabase = getSupabaseServerComponentClient();
 
 // Codev profile functions
 export async function updateCodev(updatedData: Partial<Codev>) {
   try {
+    const supabase = await createClientServerComponent();
+
     const user = await cachedUser();
     if (!user?.id) throw new Error("User not found");
 
@@ -44,6 +44,7 @@ export async function updateSocialLinks(socialData: {
   portfolio_website?: string;
 }) {
   try {
+    const supabase = await createClientServerComponent();
     const user = await cachedUser();
     if (!user?.id) throw new Error("User not found");
 
@@ -69,6 +70,7 @@ export async function createWorkExperience(
   workExp: Omit<WorkExperience, "id">,
 ) {
   try {
+    const supabase = await createClientServerComponent();
     const user = await cachedUser();
     if (!user?.id) throw new Error("User not found");
 
@@ -93,6 +95,7 @@ export async function updateWorkExperience(
   expData: Partial<WorkExperience>,
 ) {
   try {
+    const supabase = await createClientServerComponent();
     const user = await cachedUser();
     if (!user?.id) throw new Error("User not found");
 
@@ -113,6 +116,7 @@ export async function updateWorkExperience(
 
 export async function deleteWorkExperience(id: string) {
   try {
+    const supabase = await createClientServerComponent();
     const user = await cachedUser();
     if (!user?.id) throw new Error("User not found");
 
@@ -133,10 +137,11 @@ export async function updateWorkSchedule(
   schedule: Omit<WorkSchedule, "id" | "created_at" | "updated_at">,
 ) {
   try {
+    const supabase = await createClientServerComponent();
     const user = await cachedUser();
     if (!user?.id) throw new Error("User not found");
 
-    const supabase = getSupabaseServerComponentClient();
+
 
     const validDays = [
       "Monday",
@@ -208,7 +213,7 @@ export async function updateWorkSchedule(
 
 export async function getWorkSchedule(codevId: string) {
   try {
-    const supabase = getSupabaseServerComponentClient();
+    const supabase = await createClientServerComponent();
 
     const { data, error } = await supabase
       .from("work_schedules")
@@ -226,6 +231,7 @@ export async function getWorkSchedule(codevId: string) {
 
 export async function createJobStatus(jobStatus: Omit<JobStatus, "id">) {
   try {
+    const supabase = await createClientServerComponent();
     const user = await cachedUser();
     if (!user?.id) throw new Error("User not found");
 
@@ -254,6 +260,7 @@ export async function updateJobStatus(
   jobStatusData: Partial<JobStatus>,
 ) {
   try {
+    const supabase = await createClientServerComponent();
     const user = await cachedUser();
     if (!user?.id) throw new Error("User not found");
 
@@ -277,6 +284,7 @@ export async function updateJobStatus(
 
 export async function deleteJobStatus(id: string) {
   try {
+    const supabase = await createClientServerComponent();
     const user = await cachedUser();
     if (!user?.id) throw new Error("User not found");
 
@@ -295,6 +303,7 @@ export async function deleteJobStatus(id: string) {
 
 export async function getJobStatuses(codevId: string) {
   try {
+    const supabase = await createClientServerComponent();
     const { data, error } = await supabase
       .from("job_status")
       .select("*")
@@ -312,7 +321,7 @@ export const getPositions = async (): Promise<{
   error: any;
   data: Position[] | null;
 }> => {
-  const supabase = getSupabaseServerComponentClient();
+  const supabase = await createClientServerComponent();
 
   const { data, error } = await supabase.from("positions").select("*");
   if (error) {

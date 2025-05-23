@@ -10,9 +10,10 @@ import {
 import { Task } from "@/types/home/codev";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 
 import KanbanTaskViewEditModal from "./kanban_modals/KanbanTaskViewEditModal";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface CodevMember {
   id: string;
@@ -87,7 +88,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
   useEffect(() => {
     async function fetchSidekickDetails() {
       if (sidekicks.length === 0) return;
-      const supabase = createClientComponentClient();
+      const supabase = createClientClientComponent();
       const { data, error } = await supabase
         .from("codev")
         .select("id, first_name, last_name, image_url")

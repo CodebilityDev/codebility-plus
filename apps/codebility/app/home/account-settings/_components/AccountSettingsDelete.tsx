@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 import { AlertCircle, HelpCircleIcon, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -39,6 +39,7 @@ import { Input } from "@codevs/ui/input";
 
 import AccountSettingsBackdrop from "./AccountSettingsBackDrop";
 import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const userDeletionSchema = z.object({
   confirmation: z.string().refine((val) => val === "DELETE", {
@@ -58,7 +59,7 @@ export default function AccountSettingsDelete() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   const form = useForm<UserDeletionFormValues>({
     resolver: zodResolver(userDeletionSchema),

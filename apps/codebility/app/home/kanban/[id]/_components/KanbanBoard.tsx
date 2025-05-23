@@ -6,13 +6,14 @@ import pathsConfig from "@/config/paths.config";
 import { ArrowRightIcon, IconSearch } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 
 import KanbanBoardsSearch from "../../_components/KanbanBoardsSearch";
 import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 import UserTaskFilter from "./UserTaskFilter";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
@@ -45,7 +46,7 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
       });
 
       if (uniqueUsers.size > 0) {
-        const supabase = createClientComponentClient();
+        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")

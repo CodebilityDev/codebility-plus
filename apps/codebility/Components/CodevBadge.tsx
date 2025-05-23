@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface SkillCategory {
   id: string;
@@ -40,7 +40,7 @@ export default function CodevBadge({
 
   useEffect(() => {
     const fetchSkillCategories = async () => {
-      const supabase = createClientComponentClient();
+      const supabase = createClientClientComponent();
 
       try {
         const { data, error } = await supabase
