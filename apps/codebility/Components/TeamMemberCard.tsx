@@ -1,5 +1,4 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
-import { Card, CardContent } from "@/Components/ui/card";
 import { CodevData } from "@/types/home/codev";
 
 interface Props {
@@ -11,17 +10,16 @@ const TeamMemberCard = ({ member }: Props) => {
   const initials = `${member.first_name.charAt(0)}${member.last_name.charAt(0)}`;
 
   return (
-    <Card className="w-full max-w-xs">
-      <CardContent className="flex flex-col items-center gap-2 p-4">
-        <Avatar className="h-12 w-12">
-          <AvatarImage src={member.image_url || ""} alt={fullName} />
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
-        <div className="text-center">
-          <p className="text-sm font-medium">{fullName}</p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="flex items-center gap-3 p-2 bg-gray-800 rounded-md shadow-sm transition-transform hover:scale-105">
+      <Avatar className="h-10 w-10 border border-gray-700">
+        <AvatarImage src={member.image_url || ""} alt={fullName} />
+        <AvatarFallback className="bg-gray-700 text-white text-sm">{initials}</AvatarFallback>
+      </Avatar>
+      <div>
+        <p className="text-sm text-gray-100">{fullName}</p>
+        <p className="text-xs text-gray-400">Member</p>
+      </div>
+    </div>
   );
 };
 
