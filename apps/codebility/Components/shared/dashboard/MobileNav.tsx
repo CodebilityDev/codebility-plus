@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { getSidebarData, Sidebar, SidebarLink } from "@/constants/sidebar";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
 import { Roles } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 
 import {
   Sheet,
@@ -15,6 +15,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@codevs/ui/sheet";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const NavContent = ({
   sidebarData,
@@ -84,7 +85,7 @@ const NavContent = ({
 
 const MobileNav = () => {
   const { isSheetOpen, setIsSheetOpen } = useHideSidebarOnResize();
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
   const [sidebarData, setSidebarData] = useState<Sidebar[]>([]);
   const [userRole, setUserRole] = useState<Roles | null>(null);
 

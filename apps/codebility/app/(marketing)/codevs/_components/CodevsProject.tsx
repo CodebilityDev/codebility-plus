@@ -1,10 +1,10 @@
 import React from "react";
 import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
 import { EmblaOptionsType } from "embla-carousel";
 
 import EmblaCarousel from "./CodevsCarousel";
 import Section from "./CodevsSection";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 interface Project {
   id: string;
@@ -16,7 +16,7 @@ interface Project {
 }
 
 export default async function ProjectSection() {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = await createClientServerComponent();
 
   // First, check if we can get ANY projects (without filters)
   const { data: allProjects, error: allProjectsError } = await supabase

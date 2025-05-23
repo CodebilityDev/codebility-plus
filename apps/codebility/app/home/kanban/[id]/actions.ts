@@ -2,7 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { Task } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientServerComponent } from "@/utils/supabase/server";
+
 
 interface CodevMember {
   id: string;
@@ -15,7 +16,7 @@ export const updateTaskColumnId = async (
   taskId: string,
   newColumnId: string,
 ): Promise<Task> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     const { data, error } = await supabase
@@ -38,7 +39,7 @@ export const updateTaskColumnId = async (
 export const fetchAvailableMembers = async (
   boardId: string,
 ): Promise<CodevMember[]> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   // 1. Get the project_id from the kanban_boards table.
   const { data: board, error: boardError } = await supabase
@@ -117,7 +118,7 @@ export const fetchAvailableMembers = async (
 export const createNewTask = async (
   formData: FormData,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     const title = formData.get("title")?.toString();
@@ -181,7 +182,7 @@ export const updateTask = async (
   formData: FormData,
   taskId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     // handles codev.id being null
@@ -255,7 +256,7 @@ export const updateTask = async (
 export const deleteTask = async (
   taskId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     const { error } = await supabase.from("tasks").delete().eq("id", taskId);
@@ -280,8 +281,7 @@ export const createNewColumn = async (
   columnName: string,
   boardId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
-
+  const supabase = await createClientServerComponent();
   try {
     // Fix the type for the select query
     const { data: existingColumns, error: queryError } = await supabase
@@ -327,7 +327,7 @@ export const updateColumnPosition = async (
   columnId: string,
   newPosition: number,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     const { error } = await supabase
@@ -358,8 +358,7 @@ export const updateColumnPosition = async (
 export const deleteColumn = async (
   columnId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
-
+  const supabase = await createClientServerComponent();
   try {
     const { error } = await supabase
       .from("kanban_columns")
@@ -383,7 +382,7 @@ export const updateColumnName = async (
   columnId: string,
   newName: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     const { error } = await supabase
@@ -411,7 +410,7 @@ export const updateColumnName = async (
 const updateDeveloperLevels = async (codevId?: string) => {
   if (!codevId) return;
 
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   // 1. Get all points for this developer across skill categories
   const { data: pointsData, error: pointsError } = await supabase
@@ -461,7 +460,7 @@ const updateDeveloperLevels = async (codevId?: string) => {
 export const completeTask = async (
   task: Task,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     // 1. Get primary assignee points record
@@ -571,7 +570,7 @@ export const completeTask = async (
 export async function batchUpdateTasks(
   updates: Array<{ taskId: string; newColumnId: string }>,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
   try {
     const updatePromises = updates.map(async (update) => {
       const { error } = await supabase
@@ -601,7 +600,7 @@ export async function batchUpdateTasks(
 
 // for updating the pr_link
 export async function updateTaskPRLink(taskId: string, prLink: string) {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
   try {
     const { error } = await supabase
       .from("tasks")

@@ -3,7 +3,7 @@ import Image from "next/image";
 import { Box } from "@/Components/shared/dashboard";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import { Badge } from "@codevs/ui/badge";
 
@@ -25,7 +25,7 @@ const DashboardCurrentProject = () => {
   const { user } = useUserStore();
   const [projects, setProjects] = useState<ProjectInvolvement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   useEffect(() => {
     const fetchProjects = async () => {

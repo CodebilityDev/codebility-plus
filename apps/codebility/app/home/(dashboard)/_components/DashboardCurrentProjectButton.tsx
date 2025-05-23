@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { useModal } from "@/hooks/use-modal";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface Props {
   projectId: string;
@@ -24,7 +24,7 @@ export default function DashboardCurrentProjectButton({
 
   useEffect(() => {
     const fetchKanbanDisplay = async () => {
-      const supabase = createClientComponentClient();
+      const supabase = createClientClientComponent();
       const {
         data: { user },
         error: userError,
