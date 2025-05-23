@@ -23,7 +23,6 @@ import {
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
 import { SkillCategory, Task } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { set } from "date-fns";
 import { Ellipsis, Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -39,6 +38,7 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { completeTask, updateTaskPRLink } from "../../actions";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface CodevMember {
   id: string;
@@ -145,7 +145,7 @@ const TaskViewModal = ({
   useEffect(() => {
     if (task?.skill_category_id) {
       const fetchSkillCategory = async () => {
-        const supabase = createClientComponentClient();
+        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("skill_category")
           .select("id, name")
@@ -163,7 +163,7 @@ const TaskViewModal = ({
   useEffect(() => {
     const fetchSidekickDetails = async () => {
       if (task?.sidekick_ids && task.sidekick_ids.length > 0) {
-        const supabase = createClientComponentClient();
+        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")
@@ -181,7 +181,7 @@ const TaskViewModal = ({
       const assigneeId = task?.codev_id || task?.codev?.id;
 
       if (assigneeId) {
-        const supabase = createClientComponentClient();
+        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")

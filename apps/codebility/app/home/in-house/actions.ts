@@ -1,15 +1,16 @@
 "use server";
 
 import { Codev } from "@/types/home/codev";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
 
 export const updateCodev = async (
   key: keyof Codev,
   value: any,
   { codevId }: { codevId: string },
 ) => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
   // Define keys and their corresponding target tables
   const keys = {

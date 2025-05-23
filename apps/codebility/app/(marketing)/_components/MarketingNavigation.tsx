@@ -17,7 +17,7 @@ import {
   IconProfile,
 } from "@/public/assets/svgs";
 import applicationStatusIcon from "@/public/assets/svgs/icon-applicant.svg";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { ChevronDown, ChevronUp, SettingsIcon } from "lucide-react";
 
 import {
@@ -224,7 +224,7 @@ const UserMenu = ({
 };
 
 const Navigation = () => {
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
   const { color } = useChangeBgNavigation();
   const pathname = usePathname();
   const [openSheet, setOpenSheet] = useState(false);

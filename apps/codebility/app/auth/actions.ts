@@ -3,8 +3,9 @@
 import { redirect } from "next/navigation";
 import { useUserStore } from "@/store/codev-store";
 import { Codev } from "@/types/home/codev";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
 
 const uploadProfileImage = async (
   file: File,
@@ -23,7 +24,7 @@ const uploadProfileImage = async (
     const extension = file.name.split(".").pop() || "jpg";
     const filename = `${timestamp}.${extension}`;
 
-    const supabase = await getSupabaseServerActionClient();
+    const supabase = await createClientServerComponent();
 
     const { data: uploadData, error: uploadError } = await supabase.storage
       .from(bucketName)
@@ -49,7 +50,7 @@ const uploadProfileImage = async (
 
 export const signupUser = async (formData: FormData) => {
   try {
-    const supabase = getSupabaseServerActionClient();
+    const supabase = await createClientServerComponent();
     const setUser = useUserStore.getState().setUser;
 
     // Extract form data with proper typing and convert email to lowercase
@@ -164,7 +165,7 @@ export const signupUser = async (formData: FormData) => {
 };
 
 export const signinUser = async (email: string, password: string) => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
   const setUser = useUserStore.getState().setUser;
 
   // Standardize the email for comparison (assuming emails are stored in lowercase)
@@ -202,7 +203,7 @@ export const signinUser = async (email: string, password: string) => {
 
 export const signOut = async (): Promise<void> => {
   try {
-    const supabase = getSupabaseServerActionClient();
+    const supabase = await createClientServerComponent();
     const clearUser = useUserStore.getState().clearUser;
 
     const { error } = await supabase.auth.signOut();

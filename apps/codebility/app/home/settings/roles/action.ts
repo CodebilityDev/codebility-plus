@@ -2,15 +2,17 @@
 
 import { revalidatePath } from "next/cache";
 import { Roles } from "@/types/home/codev"; // <-- your Roles interface
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
-const supabase = getSupabaseServerComponentClient();
+
+
 
 /**
  * CREATE a new role
  */
 export async function createRole(roleData: Partial<Roles>) {
+  const supabase = await createClientServerComponent();
   const { data, error } = await supabase
     .from("roles") // <-- 'roles' table
     .insert(roleData)
@@ -29,6 +31,7 @@ export async function createRole(roleData: Partial<Roles>) {
  * UPDATE an existing role by integer ID
  */
 export async function updateRole(id: number, roleData: Partial<Roles>) {
+  const supabase = await createClientServerComponent();
   const { data, error } = await supabase
     .from("roles") // <-- 'roles' table
     .update(roleData)
@@ -49,6 +52,7 @@ export async function updateRole(id: number, roleData: Partial<Roles>) {
  * DELETE a role by integer ID
  */
 export async function deleteRole(id: number) {
+  const supabase = await createClientServerComponent();
   const { data, error } = await supabase
     .from("roles") // <-- 'roles' table
     .delete()

@@ -15,9 +15,10 @@ import {
 import pathsConfig from "@/config/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+
 
 import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 // Types
 interface SearchParams {
@@ -61,7 +62,7 @@ interface PageProps {
 }
 
 export default async function KanbanPage({ searchParams }: PageProps) {
-  const supabase = getSupabaseServerComponentClient();
+  const supabase = await createClientServerComponent();
 
   // Construct the initial board query
   let boardQuery = supabase.from("kanban_boards").select(`

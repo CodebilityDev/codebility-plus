@@ -8,7 +8,6 @@ import MobileNav from "@/Components/shared/dashboard/MobileNav";
 import Theme from "@/Components/shared/dashboard/Theme";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconDropdown, IconLogout, IconProfile } from "@/public/assets/svgs";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import {
   DropdownMenu,
@@ -17,13 +16,14 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 export const menuItems = [
   { href: "/settings", icon: IconProfile, label: "Settings" },
 ];
 
 const Navbar = () => {
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
