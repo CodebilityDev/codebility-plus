@@ -14,11 +14,11 @@ const TeamMemberCard = ({ member }: Props) => {
     <div className="flex items-center gap-3 p-2 bg-gray-800 rounded-md shadow-sm transition-transform hover:scale-105">
       <div className="relative">
         <Avatar className="h-10 w-10 border border-gray-700">
-          <AvatarImage src={member.image_url || ""} alt={fullName} />
+          <AvatarImage src={member.image_url || "/assets/placeholder-avatar.png"} alt={fullName} />
           <AvatarFallback className="bg-gray-700 text-white text-sm">{initials}</AvatarFallback>
         </Avatar>
         {member.is_online && (
-          <div className="absolute bottom-0 right-0 bg-green-500 h-2 w-2 rounded-full border-2 border-white"></div>
+          <div className="absolute bottom-0 right-0 h-2 w-2 bg-green-500 rounded-full border-2 border-white"></div>
         )}
       </div>
       <div>
