@@ -13,28 +13,12 @@ interface CodevData {
   first_name: string;
   last_name: string;
   image_url?: string | null;
-  is_online?: boolean; // New field to track online status
+  is_online?: boolean; // Simulated property for now
 }
 
 interface ProjectMemberData {
   codev?: CodevData;
   role?: string;
-}
-
-interface ProjectData {
-  id: string;
-  name: string;
-  description?: string | null;
-  status?: string | null;
-  start_date: string;
-  end_date?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-  github_link?: string | null;
-  website_url?: string | null;
-  figma_link?: string | null;
-  client_id?: string | null;
-  project_members?: ProjectMemberData[];
 }
 
 export default async function MyTeamPage() {
@@ -62,15 +46,14 @@ export default async function MyTeamPage() {
           id,
           first_name,
           last_name,
-          image_url,
-          is_online
+          image_url
         )
       )
     `)
     .eq("name", "My Team")
     .single();
 
-  // Type guard for CodevData
+  // Type guard to validate CodevData
   const isCodevData = (codev: any): codev is CodevData => {
     return (
       codev &&
@@ -84,7 +67,7 @@ export default async function MyTeamPage() {
     );
   };
 
-  // Compute teamLeaders and teamMembers
+  // Compute teamLeaders and teamMembers with dummy is_online field
   const teamLeaders = projects && !error
     ? projects.project_members
         ?.filter(
@@ -93,8 +76,12 @@ export default async function MyTeamPage() {
             member.codev &&
             isCodevData(member.codev),
         )
-        .map((member) => member.codev) || []
+        .map((member) => ({
+          ...member.codev,
+          is_online: Math.random() > 0.5, // Simulate online status
+        })) || []
     : [];
+
   const teamMembers = projects && !error
     ? projects.project_members
         ?.filter(
@@ -103,7 +90,10 @@ export default async function MyTeamPage() {
             member.codev &&
             isCodevData(member.codev),
         )
-        .map((member) => member.codev) || []
+        .map((member) => ({
+          ...member.codev,
+          is_online: Math.random() > 0.5, // Simulate online status
+        })) || []
     : [];
 
   if (error) {
@@ -153,7 +143,7 @@ export default async function MyTeamPage() {
         <div className="mt-8">
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {teamLeaders.map((leader, index) => (
-              leader && isCodevData(leader) && (
+              leader && (
                 <TeamLeaderCard key={index} teamLeader={leader} />
               )
             ))}
@@ -167,7 +157,7 @@ export default async function MyTeamPage() {
           <p className="text-sm font-medium text-gray-500 mb-2">Team Members</p>
           <div className="space-y-2">
             {teamMembers.map((member, index) => (
-              member && isCodevData(member) && (
+              member && (
                 <TeamMemberCard key={index} member={member} />
               )
             ))}
