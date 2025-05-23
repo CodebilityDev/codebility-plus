@@ -1,4 +1,3 @@
-// apps/codebility/app/components/TeamMemberCard.tsx
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { CodevData } from "@/types/home/codev";
 
@@ -11,19 +10,19 @@ const TeamMemberCard = ({ member }: Props) => {
   const initials = `${member.first_name.charAt(0)}${member.last_name.charAt(0)}`;
 
   return (
-    <div className="flex items-center gap-3 p-2 bg-gray-800 rounded-md shadow-sm transition-transform hover:scale-105">
+    <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-md shadow-md transition-transform hover:scale-102 hover:shadow-lg">
       <div className="relative">
-        <Avatar className="h-10 w-10 border border-gray-700">
+        <Avatar className="h-10 w-10 border border-gray-600">
           <AvatarImage src={member.image_url || "/assets/placeholder-avatar.png"} alt={fullName} />
           <AvatarFallback className="bg-gray-700 text-white text-sm">{initials}</AvatarFallback>
         </Avatar>
         {member.is_online && (
-          <div className="absolute bottom-0 right-0 h-2 w-2 bg-green-500 rounded-full border-2 border-white"></div>
+          <div className="absolute bottom-0 right-0 h-4 w-4 bg-green-500 rounded-full border-2 border-gray-900"></div>
         )}
       </div>
       <div>
-        <p className="text-sm text-gray-100">{fullName}</p>
-        <p className="text-xs text-gray-400">Member</p>
+        <p className="text-sm font-medium text-white">{fullName}</p>
+        <p className="text-xs text-white opacity-75">Member</p>
       </div>
     </div>
   );
