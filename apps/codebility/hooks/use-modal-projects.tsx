@@ -5,7 +5,8 @@ export type ModalType =
   | "projectAddModal"
   | "projectEditModal"
   | "projectViewModal"
-  | "projectDeleteModal";
+  | "projectDeleteModal"
+  | "KanbanAddMembersModal";
 
 interface ModalStore {
   type: ModalType | null;
