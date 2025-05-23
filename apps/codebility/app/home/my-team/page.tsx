@@ -1,4 +1,3 @@
-// apps/codebility/app/home/my-team/page.tsx
 import Link from "next/link";
 import H1 from "@/Components/shared/dashboard/H1";
 import { Button } from "@/Components/ui/button";
@@ -13,12 +12,28 @@ interface CodevData {
   first_name: string;
   last_name: string;
   image_url?: string | null;
-  is_online?: boolean; // Simulated property for now
+  is_online?: boolean; // Simulated property for online status
 }
 
 interface ProjectMemberData {
   codev?: CodevData;
   role?: string;
+}
+
+interface ProjectData {
+  id: string;
+  name: string;
+  description?: string | null;
+  status?: string | null;
+  start_date: string;
+  end_date?: string | null;
+  created_at?: string | null;
+  updated_at?: string | null;
+  github_link?: string | null;
+  website_url?: string | null;
+  figma_link?: string | null;
+  client_id?: string | null;
+  project_members?: ProjectMemberData[];
 }
 
 export default async function MyTeamPage() {
@@ -98,8 +113,8 @@ export default async function MyTeamPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-6">
-        <H1 className="text-3xl font-semibold text-gray-100 text-center">My Team</H1>
+      <div className="min-h-screen bg-gray-900 text-white px-6 pt-12 pb-8">
+        <H1 className="text-4xl font-bold text-white text-center">My Team</H1>
         <p className="text-center text-red-400 mt-4">{error.message || "Error loading team"}</p>
       </div>
     );
@@ -107,20 +122,20 @@ export default async function MyTeamPage() {
 
   if (!projects) {
     return (
-      <div className="min-h-screen bg-gray-900 text-white p-6">
-        <H1 className="text-3xl font-semibold text-gray-100 text-center">My Team</H1>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
+      <div className="min-h-screen bg-gray-900 text-white px-6 pt-12 pb-8">
+        <H1 className="text-4xl font-bold text-white text-center">My Team</H1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-10">
           {Array.from({ length: 4 }).map((_, index) => (
             <div key={index} className="bg-gray-800 rounded-lg shadow-md p-4">
-              <Skeleton className="h-20 w-20 mx-auto mb-2 rounded-full bg-gray-700" />
+              <Skeleton className="h-20 w-20 mx-auto mb-3 rounded-full bg-gray-700" />
               <Skeleton className="h-4 w-24 mx-auto bg-gray-700" />
               <Skeleton className="h-3 w-20 mx-auto mt-1 bg-gray-700" />
             </div>
           ))}
         </div>
-        <div className="mt-8 space-y-2">
+        <div className="mt-10 space-y-3">
           {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="flex items-center gap-3 p-2 bg-gray-800 rounded-md shadow-sm">
+            <div key={index} className="flex items-center gap-3 p-3 bg-gray-800 rounded-md shadow-md">
               <Skeleton className="h-10 w-10 rounded-full bg-gray-700" />
               <div>
                 <Skeleton className="h-3 w-20 bg-gray-700" />
@@ -129,18 +144,19 @@ export default async function MyTeamPage() {
             </div>
           ))}
         </div>
-        <Skeleton className="h-10 w-28 mt-8 bg-gray-700" />
+        <Skeleton className="h-10 w-32 mt-10 bg-gray-700" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white p-6">
-      <H1 className="text-3xl font-semibold text-gray-100 text-center">My Team</H1>
+    <div className="min-h-screen bg-gray-900 text-white px-6 pt-12 pb-8">
+      <H1 className="text-4xl font-bold text-white text-center">My Team</H1>
 
       {/* Team Leaders Grid */}
       {teamLeaders.length > 0 && (
-        <div className="mt-8">
+        <div className="mt-10">
+          <p className="text-lg font-medium text-white mb-4">Team Leaders</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {teamLeaders.map((leader, index) => (
               leader && (
@@ -153,9 +169,9 @@ export default async function MyTeamPage() {
 
       {/* Team Members List */}
       {teamMembers.length > 0 && (
-        <div className="mt-8">
-          <p className="text-sm font-medium text-gray-500 mb-2">Team Members</p>
-          <div className="space-y-2">
+        <div className="mt-10">
+          <p className="text-lg font-medium text-white mb-4">Team Members</p>
+          <div className="space-y-3">
             {teamMembers.map((member, index) => (
               member && (
                 <TeamMemberCard key={index} member={member} />
@@ -166,10 +182,10 @@ export default async function MyTeamPage() {
       )}
 
       {/* Projects Button (Left-aligned) */}
-      <div className="mt-8 flex justify-start">
+      <div className="mt-10 flex justify-start">
         <Link href="/home/projects">
-          <Button className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">
-            Projects
+          <Button className="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-md shadow-md transition-all hover:shadow-lg">
+            View Projects
           </Button>
         </Link>
       </div>
