@@ -1,20 +1,10 @@
 import Link from "next/link";
-import { Box } from "@/Components/shared/dashboard";
 import H1 from "@/Components/shared/dashboard/H1";
 import { Button } from "@/Components/ui/button";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/Components/ui/table";
 import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-import { IconKanban } from "@/public/assets/svgs";
 import TeamLeaderCard from "@/Components/TeamLeaderCard";
-import TeamMemberCard from "@/Components/TeamMemberCard"; // New import
+import TeamMemberCard from "@/Components/TeamMemberCard";
 
 // Types
 interface CodevData {
@@ -91,89 +81,98 @@ export default async function MyTeamPage() {
     );
   };
 
-  // Compute teamLeader and teamMembers
-  const teamLeader = projects && !error
-    ? projects.project_members?.find(
-        (member) => member.role === "team_leader" && member.codev && isCodevData(member.codev),
-      )?.codev
-    : undefined;
+  // Compute teamLeaders and teamMembers
+  const teamLeaders = projects && !error
+    ? projects.project_members
+        ?.filter(
+          (member) => member.role === "team_leader" && member.codev && isCodevData(member.codev),
+        )
+        .map((member) => member.codev) || []
+    : [];
   const teamMembers = projects && !error
     ? projects.project_members
         ?.filter(
           (member) => member.role !== "team_leader" && member.codev && isCodevData(member.codev),
         )
-        .map((member) => member.codev)
-        .slice(0, 3) || []
+        .map((member) => member.codev) || []
     : [];
 
   if (error) {
     return (
-      <div className="mx-auto max-w-7xl p-4">
-        <H1>My Team</H1>
-        <p className="text-center text-red-500">{error.message || "Error loading team"}</p>
+      <div className="min-h-screen bg-gray-900 text-white p-6">
+        <H1 className="text-3xl font-semibold text-gray-100 text-center">My Team</H1>
+        <p className="text-center text-red-400 mt-4">{error.message || "Error loading team"}</p>
       </div>
     );
   }
 
   if (!projects) {
     return (
-      <div className="mx-auto max-w-7xl p-4">
-        <H1>My Team</H1>
-        <div className="flex flex-col gap-4">
-          <Box>
-            <Skeleton className="h-24 w-full" />
-          </Box>
-          <div className="flex gap-4">
-            {Array.from({ length: 3 }).map((_, index) => (
-              <Box key={index}>
-                <Skeleton className="h-24 w-24" />
-              </Box>
-            ))}
-          </div>
-          <Box>
-            <Skeleton className="h-12 w-32" />
-          </Box>
+      <div className="min-h-screen bg-gray-900 text-white p-6">
+        <H1 className="text-3xl font-semibold text-gray-100 text-center">My Team</H1>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-8">
+          {Array.from({ length: 4 }).map((_, index) => (
+            <div key={index} className="bg-gray-800 rounded-lg shadow-md p-4">
+              <Skeleton className="h-20 w-20 mx-auto mb-2 rounded-full bg-gray-700" />
+              <Skeleton className="h-4 w-24 mx-auto bg-gray-700" />
+              <Skeleton className="h-3 w-20 mx-auto mt-1 bg-gray-700" />
+            </div>
+          ))}
         </div>
+        <div className="mt-8 space-y-2">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="flex items-center gap-3 p-2 bg-gray-800 rounded-md shadow-sm">
+              <Skeleton className="h-10 w-10 rounded-full bg-gray-700" />
+              <div>
+                <Skeleton className="h-3 w-20 bg-gray-700" />
+                <Skeleton className="h-2 w-16 mt-1 bg-gray-700" />
+              </div>
+            </div>
+          ))}
+        </div>
+        <Skeleton className="h-10 w-28 mt-8 bg-gray-700" />
       </div>
     );
   }
 
   return (
-    <div className="mx-auto max-w-7xl p-4">
-      <H1>My Team</H1>
-      <div className="flex flex-col gap-6">
-        {/* Team Leader Section */}
-        {teamLeader && isCodevData(teamLeader) && (
-          <div className="flex items-center gap-4">
-            <div className="w-16 h-16">
-              <TeamLeaderCard teamLeader={teamLeader} />
-            </div>
-            <div>
-              <p className="text-lg font-semibold">{`${teamLeader.first_name} ${teamLeader.last_name}`}</p>
-              <p className="text-sm text-gray-500">Team Leader</p>
-            </div>
-          </div>
-        )}
+    <div className="min-h-screen bg-gray-900 text-white p-6">
+      <H1 className="text-3xl font-semibold text-gray-100 text-center">My Team</H1>
 
-        {/* Team Members Section */}
-        <div>
-          <p className="mb-2 text-sm font-medium">TeamMembers:</p>
-          <div className="flex gap-4">
-            {teamMembers.slice(0, 3).map((member, index) => (
-              member && isCodevData(member) && (
-                <div key={index} className="flex flex-col items-center">
-                  <TeamMemberCard member={member} />
-                  <p className="text-sm mt-2">name:</p>
-                </div>
+      {/* Team Leaders Grid */}
+      {teamLeaders.length > 0 && (
+        <div className="mt-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+            {teamLeaders.map((leader, index) => (
+              leader && isCodevData(leader) && (
+                <TeamLeaderCard key={index} teamLeader={leader} />
               )
             ))}
           </div>
         </div>
+      )}
 
-        {/* Button Section */}
-        <div className="mt-4">
-          <Button className="w-full max-w-xs">Button</Button>
+      {/* Team Members List */}
+      {teamMembers.length > 0 && (
+        <div className="mt-8">
+          <p className="text-sm font-medium text-gray-500 mb-2">Team Members</p>
+          <div className="space-y-2">
+            {teamMembers.map((member, index) => (
+              member && isCodevData(member) && (
+                <TeamMemberCard key={index} member={member} />
+              )
+            ))}
+          </div>
         </div>
+      )}
+
+      {/* Projects Button (Left-aligned) */}
+      <div className="mt-8 flex justify-start">
+        <Link href="/home/projects">
+          <Button className="bg-blue-600 text-white hover:bg-blue-700 px-4 py-2 rounded-md">
+            Projects
+          </Button>
+        </Link>
       </div>
     </div>
   );
