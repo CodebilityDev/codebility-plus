@@ -138,7 +138,13 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
                 target="_blank"
                 className="text-gray-400 hover:text-gray-200"
               >
-                <IconGithub className="h-5 w-5 invert dark:invert-0" />
+                <Image
+                  src={IconGithub}
+                  alt="GitHub"
+                  width={18}
+                  height={18}
+                  className="invert dark:invert-0"
+                />
               </Link>
             ) : (
               <span className="text-sm text-gray-500">None</span>
@@ -168,7 +174,13 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
                 target="_blank"
                 className="text-gray-400 hover:text-gray-200"
               >
-                <IconLink className="h-5 w-5 invert dark:invert-0" />
+                <Image
+                  src={IconLink}
+                  alt="Portfolio"
+                  width={18}
+                  height={18}
+                  className="invert dark:invert-0"
+                />
               </Link>
             ) : (
               <span className="text-sm text-gray-500">None</span>
@@ -310,9 +322,15 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
             <Link
               href={applicant.applicant.fork_url}
               target="_blank"
-              rel="noopener noreferrer"
+              className="text-gray-400 hover:text-gray-200"
             >
-              <IconLink className="h-4 w-4 text-gray-200" />
+              <Image
+                src={IconLink}
+                alt="Fork URL"
+                width={18}
+                height={18}
+                className="invert dark:invert-0"
+              />
             </Link>
           ) : (
             <span className="text-sm text-gray-500">N/A</span>

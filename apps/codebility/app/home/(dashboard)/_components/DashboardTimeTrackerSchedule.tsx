@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { Button } from "@/Components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { useSchedule } from "@/hooks/use-timeavail";
@@ -9,6 +10,7 @@ import { IconEdit } from "@/public/assets/svgs";
 
 import { formatLocaleTime } from "../_lib/util";
 import { updateUserSchedule } from "../actions";
+import React from "react";
 
 interface Props {
   startTime: number;
@@ -70,7 +72,13 @@ export default function TimeTrackerSchedule({
           <p className="text-md">{`${formatLocaleTime(currentStartTime)} - ${formatLocaleTime(currentEndTime)}`}</p>
           <div>
             <Button variant="link" onClick={() => onOpen("scheduleModal")}>
-              <IconEdit className="invert dark:invert-0" />
+              <Image
+                src={IconEdit}
+                alt="Edit schedule"
+                className="invert dark:invert-0"
+                width={16}
+                height={16}
+              />
             </Button>
           </div>
         </>

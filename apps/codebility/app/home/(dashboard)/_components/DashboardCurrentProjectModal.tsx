@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import {
   Dialog,
@@ -20,7 +21,7 @@ import {
 } from "@/public/assets/svgs";
 import { Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
-
+import React from "react";
 
 export default function DashboardCurrentProjectModal() {
   const { isOpen, onClose, type, data } = useModal();
@@ -190,15 +191,45 @@ export default function DashboardCurrentProjectModal() {
                       }`}
                     >
                       {tasked.priority === "critical" ? (
-                        <IconPriority1 className="h-5 w-5 text-red-500" />
+                        <Image
+                          src={IconPriority1}
+                          alt="Critical Priority"
+                          width={20}
+                          height={20}
+                          className="text-red-500"
+                        />
                       ) : tasked.priority === "high" ? (
-                        <IconPriority2 className="h-5 w-5 text-orange-500" />
+                        <Image
+                          src={IconPriority2}
+                          alt="High Priority"
+                          width={20}
+                          height={20}
+                          className="text-orange-500"
+                        />
                       ) : tasked.priority === "medium" ? (
-                        <IconPriority3 className="h-5 w-5 text-yellow-500" />
+                        <Image
+                          src={IconPriority3}
+                          alt="Medium Priority"
+                          width={20}
+                          height={20}
+                          className="text-yellow-500"
+                        />
                       ) : tasked.priority === "low" ? (
-                        <IconPriority4 className="h-5 w-5 text-green-500" />
+                        <Image
+                          src={IconPriority4}
+                          alt="Low Priority"
+                          width={20}
+                          height={20}
+                          className="text-green-500"
+                        />
                       ) : (
-                        <IconPriority5 className="h-5 w-5 text-gray-500" />
+                        <Image
+                          src={IconPriority5}
+                          alt="Lowest Priority"
+                          width={20}
+                          height={20}
+                          className="text-gray-500"
+                        />
                       )}
                     </div>
                   </div>

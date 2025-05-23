@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -97,7 +97,14 @@ const MobileDrawer = ({
 }) => (
   <Sheet open={openSheet} onOpenChange={setOpenSheet}>
     <SheetTrigger>
-      <IconFourDotsMenu className="lg:hidden" />
+      <Image
+        src={IconFourDotsMenu}
+        alt="Menu"
+        width={24}
+        height={24}
+        onClick={() => setOpenSheet(true)}
+        className="cursor-pointer lg:hidden"
+      />
     </SheetTrigger>
     <SheetContent
       side="left"
@@ -191,16 +198,20 @@ const UserMenu = ({
         {getMenuItems(application_status, role_id, applicant).map((item) => (
           <Link key={item.label} href={item.href}>
             <DropdownMenuItem
-              className="flex cursor-pointer items-center gap-6 p-3 px-5"
+              className="flex cursor-pointer items-center gap-6 p-3 px-5 text-white"
               style={{
                 backgroundColor:
                   isHovered === item.label ? "#292524" : "transparent",
-                color: "#ffffff",
               }}
               onMouseEnter={() => setIsHovered(item.label)}
               onMouseLeave={() => setIsHovered(null)}
             >
-              <item.icon style={{ color: "#ffffff" }} />
+              <Image
+                src={typeof item.icon === "string" ? item.icon : item.icon}
+                alt={item.label}
+                width={16}
+                height={16}
+              />
               {item.label}
             </DropdownMenuItem>
           </Link>
@@ -215,7 +226,7 @@ const UserMenu = ({
           onMouseEnter={() => setIsHovered("logout")}
           onMouseLeave={() => setIsHovered(null)}
         >
-          <IconLogout className="text-white" />
+          <Image src={IconLogout} alt="Logout" width={16} height={16} />
           Logout
         </DropdownMenuItem>
       </DropdownMenuContent>

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/Components/ui/button";
 import { IconPlus } from "@/public/assets/svgs";
@@ -61,14 +61,14 @@ export default function KanbanAddModalMembers({
 
   //   loadMembers();
   // }, [projectId]);
-  
+
   useEffect(() => {
     const loadMembers = async () => {
       try {
         console.log("Fetching members for project ID:", projectId);
         const members = await fetchAvailableMembers(projectId);
         console.log("Fetched members:", members); // Debugging log
-  
+
         if (Array.isArray(members)) {
           setAvailableMembers(members);
         } else {
@@ -80,7 +80,7 @@ export default function KanbanAddModalMembers({
         setIsLoading(false);
       }
     };
-  
+
     if (projectId) {
       loadMembers();
     }
@@ -90,7 +90,7 @@ export default function KanbanAddModalMembers({
     selectedMemberIds.includes(member.id),
   );
 
-  const addMember =  (memberId: string) => {
+  const addMember = (memberId: string) => {
     if (singleSelection) {
       const newIds = [memberId];
       setSelectedMemberIds(newIds);
@@ -152,13 +152,23 @@ export default function KanbanAddModalMembers({
 
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button
-              variant="default"
-              className="h-10 w-10 rounded-full p-0"
-              disabled={isLoading}
+            <div
+              className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-full bg-violet-600 text-white hover:bg-violet-700 disabled:opacity-50"
+              role="button"
+              aria-label="Add team members"
+              style={{
+                opacity: isLoading ? 0.5 : 1,
+                pointerEvents: isLoading ? "none" : "auto",
+              }}
             >
-              <IconPlus className="h-4 w-4" />
-            </Button>
+              <Image
+                src={IconPlus}
+                alt="Add member"
+                width={16}
+                height={16}
+                className="h-4 w-4"
+              />
+            </div>
           </DropdownMenuTrigger>
 
           <DropdownMenuContent
@@ -173,7 +183,7 @@ export default function KanbanAddModalMembers({
                 placeholder="Search members..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 dark:bg-dark-200"
+                className="dark:bg-dark-200 w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               />
             </div>
 

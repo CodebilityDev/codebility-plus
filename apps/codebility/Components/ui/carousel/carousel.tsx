@@ -2,8 +2,10 @@
 
 import type { UseEmblaCarouselType } from "embla-carousel-react";
 import * as React from "react";
+import Image from "next/image";
 import { IconChevronLeft, IconChevronRight } from "@/public/assets/svgs";
 import useEmblaCarousel from "embla-carousel-react";
+import { Icon } from "lucide-react";
 
 import { cn } from "@codevs/ui";
 import { Button } from "@codevs/ui/button";
@@ -216,7 +218,7 @@ const CarouselPrevious = React.forwardRef<
       onClick={scrollPrev}
       {...props}
     >
-      <IconChevronLeft className="h-8 w-8" />
+      <Image src={IconChevronLeft} alt="Previous slide" className="h-8 w-8" />
       <span className="sr-only">Previous slide</span>
     </Button>
   );
@@ -245,7 +247,7 @@ const CarouselNext = React.forwardRef<
       onClick={scrollNext}
       {...props}
     >
-      <IconChevronRight className="h-8 w-8" />
+      <Image src={IconChevronRight} alt="Next slide" className="h-8 w-8" />
       <span className="sr-only">Next slide</span>
     </Button>
   );

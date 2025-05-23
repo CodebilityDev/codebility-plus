@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
+import Image from "next/image";
 import Box from "@/Components/shared/dashboard/Box";
 import { Button } from "@/Components/ui/button";
 import { IconDelete, IconEdit } from "@/public/assets/svgs";
@@ -225,20 +226,29 @@ const ExperienceForm = ({
   return (
     <div className="dark:bg-dark-500 mt-8 flex w-full flex-col rounded-md bg-slate-50 px-[24px] py-[29px]">
       <div className="flex w-full items-end justify-end gap-2">
-        <IconDelete
+        <Image
+          src="/assets/svgs/icon-delete.svg"
+          alt="Delete"
+          width={20}
+          height={20}
+          className="cursor-pointer text-red-500 invert dark:invert-0"
           onClick={() => {
             if (!isLoadingMain) {
               handleDeleteExperience(itemNo, experience.id);
             }
           }}
-          className="cursor-pointer text-red-500 invert dark:invert-0"
         />
+
         {!editMode && (
-          <IconEdit
+          <Image
+            src={IconEdit}
+            alt="Edit"
+            width={20}
+            height={20}
+            className="cursor-pointer invert dark:invert-0"
             onClick={() => {
               if (!isLoadingMain) setEditMode(true);
             }}
-            className="cursor-pointer invert dark:invert-0"
           />
         )}
       </div>

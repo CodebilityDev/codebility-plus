@@ -167,7 +167,7 @@ const CodevCard = ({ codev, color }: Props) => {
         </div>
         <div className=" flex items-center gap-2 text-blue-100 duration-300 hover:ml-4">
           Read Bio
-          <IconArrowRight />
+          <Image src={IconArrowRight} alt="arrow" width={20} height={20} />
         </div>
       </div>
     </Link>

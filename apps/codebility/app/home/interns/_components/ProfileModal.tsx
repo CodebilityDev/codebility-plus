@@ -299,9 +299,15 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                             href={project.github_link}
                             target="_blank"
                             className="group"
-                            onClick={(e) => e.stopPropagation()} // Prevent card click when clicking link
+                            onClick={(e) => e.stopPropagation()}
                           >
-                            <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+                            <Image
+                              src={IconGithub}
+                              alt="GitHub"
+                              width={20}
+                              height={20}
+                              className="invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0"
+                            />
                           </Link>
                         )}
                         {project.website_url && (
@@ -311,7 +317,13 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                             className="group"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+                            <Image
+                              src={IconLink}
+                              alt="Website"
+                              width={20}
+                              height={20}
+                              className="invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0"
+                            />
                           </Link>
                         )}
                         {project.figma_link && (
@@ -321,7 +333,13 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                             className="group"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+                            <Image
+                              src={IconFigma}
+                              alt="Figma"
+                              width={20}
+                              height={20}
+                              className="invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0"
+                            />
                           </Link>
                         )}
                       </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Box from "@/Components/shared/dashboard/Box";
 import { Button } from "@/Components/ui/button";
 import {
@@ -104,12 +105,15 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
-      <IconEdit
+      <Image
+        src={IconEdit}
+        alt="Edit"
         className={`${
           isEditMode ? "hidden" : "h-15 w-15 dark:invert-0"
         } absolute right-6 top-6 cursor-pointer invert`}
         onClick={() => setIsEditMode(true)}
       />
+
       <p className="text-lg">Personal Information</p>
       <div className="flex flex-col gap-6 px-2">
         <form onSubmit={handleSubmit(onSubmit)}>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import Box from "@/Components/shared/dashboard/Box";
 import { Button } from "@/Components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
@@ -63,13 +64,15 @@ const About = ({ data }: AboutProps) => {
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
-      <IconEdit
+      <Image
+        src={IconEdit}
+        alt="Edit"
         className={`${
           isEditMode
-            ? "hidden"
-            : "h-15 w-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+            ? "h-15 w-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+            : "hidden"
         }`}
-        onClick={() => setIsEditMode(true)}
+        onClick={() => setIsEditMode(false)}
       />
 
       <p className="text-lg">About</p>

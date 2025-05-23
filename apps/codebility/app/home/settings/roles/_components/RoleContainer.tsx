@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
 import RoleListsTable from "@/app/home/settings/roles/_components/RoleListTable";
 import { H1 } from "@/Components/shared/dashboard";
@@ -24,7 +25,12 @@ export default function RoleContainer({ data }: { data: Roles[] }) {
           <Link href={"/home/settings"}>
             <span className="dark:text-white/50">Settings</span>
           </Link>
-          <ArrowRightIcon />
+          <Image
+            src={ArrowRightIcon}
+            alt="Arrow right"
+            width={16}
+            height={16}
+          />
           <span>Roles</span>
         </div>
       </div>
@@ -37,7 +43,13 @@ export default function RoleContainer({ data }: { data: Roles[] }) {
           size="default"
           onClick={() => onOpen("addRoleModal")}
         >
-          <IconAdd className="mr-2 h-2 w-2" />
+          <Image
+            src={IconAdd}
+            alt="Add"
+            width={16}
+            height={16}
+            className="mr-2 h-4 w-4"
+          />
           <span>Add New Role</span>
         </Button>
       </div>

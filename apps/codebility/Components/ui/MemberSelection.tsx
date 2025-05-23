@@ -1,7 +1,9 @@
 import { useState } from "react";
+import Image from "next/image";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { IconPlus } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
+import { Icon } from "lucide-react";
 
 import { Button } from "@codevs/ui/button";
 import {
@@ -70,7 +72,13 @@ export const MemberSelection = ({
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="h-12 w-12 rounded-full p-0">
-              <IconPlus className="h-6 w-6" />
+              <Image
+                src={IconPlus}
+                alt="Add"
+                className="h-6 w-6"
+                width={24}
+                height={24}
+              />
             </Button>
           </DropdownMenuTrigger>
 

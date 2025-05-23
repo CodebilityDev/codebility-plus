@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+import Image from "next/image";
 import {
   Table,
   TableBody,
@@ -11,6 +13,7 @@ import {
 import { useModal } from "@/hooks/use-modal";
 import { IconDelete, IconEditFillNone } from "@/public/assets/svgs";
 import { Roles } from "@/types/home/codev";
+import { Icon } from "lucide-react";
 
 export default function RoleListsTableDesktop({ roles }: { roles: Roles[] }) {
   const { onOpen } = useModal();
@@ -37,12 +40,25 @@ export default function RoleListsTableDesktop({ roles }: { roles: Roles[] }) {
             </TableCell>
             <TableCell className="hover:text-black-200 basis-[10%] cursor-pointer items-center justify-center text-blue-600">
               <button onClick={() => onOpen("editRoleModal", role)}>
-                <IconEditFillNone className="text-black-400 hover:text-black-500 dark:text-white hover:dark:text-white" />
+                =
+                <Image
+                  src={IconEditFillNone}
+                  alt="Edit"
+                  width={16}
+                  height={16}
+                  className="text-black-400 hover:text-black-500 dark:text-white hover:dark:text-white"
+                />
               </button>
             </TableCell>
             <TableCell className="hover:text-black-200 basis-[10%] cursor-pointer items-center justify-center">
               <button onClick={() => onOpen("deleteRoleModal", role)}>
-                <IconDelete className="text-red-600 hover:text-red-500" />
+                <Image
+                  src={IconDelete}
+                  alt="Delete"
+                  width={16}
+                  height={16}
+                  className="text-red-600 hover:text-red-500"
+                />
               </button>
             </TableCell>
           </TableRow>

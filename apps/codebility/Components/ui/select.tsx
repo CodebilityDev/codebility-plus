@@ -6,6 +6,7 @@ import * as SelectPrimitive from "@radix-ui/react-select";
 import { Check, ChevronDown, ChevronUp } from "lucide-react";
 
 import { cn } from "@codevs/ui";
+import Image from "next/image";
 
 const Select = SelectPrimitive.Root;
 
@@ -29,8 +30,12 @@ const SelectTrigger = React.forwardRef<
   >
     {children}
     {isArrow && (
-      <SelectPrimitive.Icon asChild>
-        <IconDropdown className="h-4 w-4 opacity-50" />
+      <SelectPrimitive.Icon>
+        <Image
+          src={IconDropdown}
+          alt="dropdown icon"
+          className="h-4 w-4 opacity-50"
+        />
       </SelectPrimitive.Icon>
     )}
   </SelectPrimitive.Trigger>

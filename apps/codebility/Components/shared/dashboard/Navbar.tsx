@@ -8,6 +8,7 @@ import MobileNav from "@/Components/shared/dashboard/MobileNav";
 import Theme from "@/Components/shared/dashboard/Theme";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconDropdown, IconLogout, IconProfile } from "@/public/assets/svgs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import {
   DropdownMenu,
@@ -16,7 +17,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 export const menuItems = [
   { href: "/settings", icon: IconProfile, label: "Settings" },
@@ -113,14 +113,24 @@ const Navbar = () => {
                   className="rounded-full object-cover"
                 />
               </div>
-              <IconDropdown className="hidden invert dark:invert-0 md:block" />
+              <Image
+                src={IconDropdown}
+                alt="dropdown icon"
+                className="h-5 invert dark:invert-0"
+              />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]">
               {menuItems.map((item) => (
                 <Link href={item.href} key={item.label}>
                   <DropdownMenuItem className="flex cursor-pointer items-center gap-6 p-3 px-5">
-                    <item.icon className="invert dark:invert-0" />
+                    <Image
+                      src={item.icon}
+                      alt={`${item.label} icon`}
+                      width={20}
+                      height={20}
+                      className="invert dark:invert-0"
+                    />
                     {item.label}
                   </DropdownMenuItem>
                 </Link>
@@ -135,7 +145,14 @@ const Navbar = () => {
                 }}
                 className="flex cursor-pointer items-center gap-6 p-3 px-5"
               >
-                <IconLogout className="invert dark:invert-0" /> Logout
+                <Image
+                  src={IconLogout}
+                  alt="Logout icon"
+                  className="invert dark:invert-0"
+                  width={20}
+                  height={20}
+                />
+                Logout
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

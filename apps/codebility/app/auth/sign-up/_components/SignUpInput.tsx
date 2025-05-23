@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import { useModal } from "@/hooks/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { IconEye, IconEyeClose } from "@/public/assets/svgs";
@@ -184,9 +185,15 @@ const SignUpInputs = ({
             className="absolute right-4 top-[65%] -translate-y-1/2 cursor-pointer sm:right-1"
           >
             {showPassword ? (
-              <IconEyeClose className="text-blue-100" />
+              <Image
+                src={IconEyeClose}
+                alt="Hide password"
+                width={20}
+                height={20}
+                className="text-blue-100"
+              />
             ) : (
-              <IconEye />
+              <Image src={IconEye} alt="Show password" width={20} height={20} />
             )}
           </button>
         )}

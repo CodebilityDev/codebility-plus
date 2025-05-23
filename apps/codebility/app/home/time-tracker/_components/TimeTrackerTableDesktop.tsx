@@ -1,3 +1,5 @@
+import React from "react";
+import Image from "next/image";
 import {
   Table,
   TableBody,
@@ -59,7 +61,7 @@ export default function TimeTrackerTableDesktop({ timeLog }: Props) {
                     {log.task.project.name}
                   </TableCell>
                   <TableCell className="flex justify-center">
-                    <IconEdit />
+                    <Image src={IconEdit} alt="Edit" width={16} height={16} />
                   </TableCell>
                 </TableRow>
               );

@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+import Image from "next/image";
 import { Table, TableBody, TableCell, TableRow } from "@/Components/ui/table";
 import { useModal } from "@/hooks/use-modal";
 import { IconDelete, IconEdit } from "@/public/assets/svgs";
@@ -23,10 +25,16 @@ export default function RoleListsTableMobile({ roles }: { roles: Roles[] }) {
             <TableRow>
               <TableCell className="flex cursor-pointer flex-row justify-end gap-5">
                 <button onClick={() => onOpen("editRoleModal", role)}>
-                  <IconEdit />
+                  <Image src={IconEdit} alt="Edit" width={16} height={16} />
                 </button>
                 <button onClick={() => onOpen("deleteRoleModal", role)}>
-                  <IconDelete className="text-blue-100 hover:text-blue-200" />
+                  <Image
+                    src={IconDelete}
+                    alt="Delete"
+                    width={16}
+                    height={16}
+                    className="text-blue-100 hover:text-blue-200"
+                  />
                 </button>
               </TableCell>
             </TableRow>

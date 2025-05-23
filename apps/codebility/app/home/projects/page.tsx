@@ -8,12 +8,13 @@ import ProjectFilterButton from "./_components/ProjectFilterButton";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 type PageProps = {
-  searchParams: {
+  searchParams: Promise<{
     filter?: string;
-  };
+  }>;
 };
 
-const Projects = async ({ searchParams }: PageProps) => {
+const Projects = async (props: PageProps) => {
+  const searchParams = await props.searchParams;
   const supabase = await createClientServerComponent();
   const filter = searchParams.filter;
 

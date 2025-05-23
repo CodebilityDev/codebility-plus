@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
+import Image from "next/image";
 import Box from "@/Components/shared/dashboard/Box";
 import InputField from "@/Components/shared/dashboard/InputPhone";
 import { Button } from "@/Components/ui/button";
@@ -81,14 +82,17 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-6">
-      <IconEdit
+      <Image
+        src={IconEdit}
+        alt="Edit"
         className={`${
           isEditMode
-            ? "hidden"
-            : "h-15 w-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+            ? "h-15 w-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
+            : "hidden"
         }`}
-        onClick={() => setIsEditMode(true)}
+        onClick={() => setIsEditMode(false)}
       />
+
       <form className="px-2" onSubmit={handleSubmit(onSubmit)}>
         <p className="text-lg">Contact Info</p>
 

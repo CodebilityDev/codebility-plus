@@ -10,6 +10,7 @@ import { IconClose } from "@/public/assets/svgs";
 
 import { Dialog, DialogContent, DialogFooter } from "@codevs/ui/dialog";
 import { Input } from "@codevs/ui/input";
+import React from "react";
 
 const ContactUsModal = () => {
   const { isOpen, onClose, type } = useModal();
@@ -170,9 +171,15 @@ const ContactUsModal = () => {
           </DialogFooter>
         </div>
         <div>
-          <button onClick={() => onClose()} className="absolute right-4 top-4">
-            <IconClose />
-          </button>
+            <button onClick={() => onClose()} className="absolute right-4 top-4">
+            <Image 
+              src={IconClose} 
+              alt="Close" 
+              width={24} 
+              height={24}
+              priority
+            />
+            </button>
         </div>
       </DialogContent>
     </Dialog>

@@ -53,21 +53,26 @@ export default function RootLayout({
   return (
     <html lang="en" className={outfit.className}>
       <head>
-        <script
+        {/*  <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                const savedTheme = localStorage.getItem('theme');
-                // Use dark as default if no theme is saved
-                const theme = savedTheme || 'dark';
-                document.documentElement.classList.add(theme);
-                if (!savedTheme) {
-                  localStorage.setItem('theme', 'dark');
+                try {
+                  const savedTheme = localStorage.getItem('theme');
+                  // Use dark as default if no theme is saved
+                  const theme = savedTheme || 'dark';
+                  document.documentElement.classList.add(theme);
+                  if (!savedTheme) {
+                    localStorage.setItem('theme', 'dark');
+                  }
+                } catch (e) {
+                  // Fall back to dark theme if localStorage is not available
+                  document.documentElement.classList.add('dark');
                 }
               })();
             `,
           }}
-        />
+        /> */}
       </head>
       <body>
         <ReactQueryProvider>

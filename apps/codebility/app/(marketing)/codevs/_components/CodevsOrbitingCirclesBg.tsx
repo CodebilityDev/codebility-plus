@@ -1,3 +1,4 @@
+import Image from "next/image";
 import {
   IconNextJS,
   IconNodeJS,
@@ -17,7 +18,14 @@ const OrbitingCirclesBackground = () => {
         delay={30}
         radius={150}
       >
-        <IconTailwind className="h-full w-full" />
+        <div className="relative h-full w-full">
+          <Image
+            src={IconTailwind}
+            alt="Tailwind CSS"
+            fill
+            className="object-contain"
+          />
+        </div>
       </OrbitingCircles>
       <OrbitingCircles
         className="h-[50px] w-[50px]"
@@ -25,7 +33,14 @@ const OrbitingCirclesBackground = () => {
         delay={20}
         radius={150}
       >
-        <IconNodeJS className="h-full w-full" />
+        <div className="relative h-full w-full">
+          <Image
+            src={IconNodeJS}
+            alt="Tailwind CSS"
+            fill
+            className="object-contain"
+          />
+        </div>
       </OrbitingCircles>
 
       {/* Outer Circles (reverse) */}
@@ -36,7 +51,14 @@ const OrbitingCirclesBackground = () => {
         delay={30}
         reverse
       >
-        <IconNextJS className="h-full w-full" />
+        <div className="relative h-full w-full">
+          <Image
+            src={IconNextJS}
+            alt="Tailwind CSS"
+            fill
+            className="object-contain"
+          />
+        </div>
       </OrbitingCircles>
       <OrbitingCircles
         className="h-[50px] w-[50px]"
@@ -45,7 +67,14 @@ const OrbitingCirclesBackground = () => {
         delay={20}
         reverse
       >
-        <IconReact className="h-full w-full" />
+        <div className="relative h-full w-full">
+          <Image
+            src={IconReact}
+            alt="Tailwind CSS"
+            fill
+            className="object-contain"
+          />
+        </div>
       </OrbitingCircles>
     </div>
   );

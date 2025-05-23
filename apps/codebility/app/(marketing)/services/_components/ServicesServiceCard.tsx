@@ -110,7 +110,7 @@ export default function ServiceCard({ service }: Props) {
               target="_blank"
               className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm transition-colors hover:bg-blue-700"
             >
-              <IconLink className="size-4" />
+              <Image src={IconLink} alt="Link icon" width={16} height={16} />
               <span>View Website</span>
             </Link>
           )}

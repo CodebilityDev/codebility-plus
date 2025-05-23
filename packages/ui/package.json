@@ -35,7 +35,8 @@
     "@codevs/tsconfig": "workspace:*",
     "prettier": "^3.3.3",
     "tailwindcss": "^3.4.10",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "@types/react": "19.1.5"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.9.0",
@@ -76,14 +77,16 @@
     "date-fns": "^3.6.0",
     "input-otp": "^1.2.4",
     "lucide-react": "^0.427.0",
-    "react-hook-form": "^7.53.0",
+    "react-hook-form": "^7.56.2",
     "react-day-picker": "8.10.1",
     "react-resizable-panels": "^2.1.2",
     "sonner": "^1.5.0",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.23.8",
-    "vaul": "^0.9.1"
+    "vaul": "^0.9.1",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
   },
   "eslintConfig": {
     "root": true,

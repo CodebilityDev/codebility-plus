@@ -1,3 +1,5 @@
+import React from "react";
+import Image from "next/image";
 import { Table, TableBody, TableCell, TableRow } from "@/Components/ui/table";
 import { IconEdit } from "@/public/assets/svgs";
 
@@ -28,17 +30,21 @@ const TimeTrackerTableMobile = ({ timeLog }: Props) => {
                 <TableCell>Points: {0}</TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Rendered Hours: {convertHoursToHMS(log.worked_hours)}</TableCell>
+                <TableCell>
+                  Rendered Hours: {convertHoursToHMS(log.worked_hours)}
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell>Duration Hours: {convertHoursToHMS(log.task.duration)}</TableCell>
+                <TableCell>
+                  Duration Hours: {convertHoursToHMS(log.task.duration)}
+                </TableCell>
               </TableRow>
               <TableRow>
                 <TableCell>Project: {log.task.project.name}</TableCell>
               </TableRow>
               <TableRow>
                 <TableCell className="flex cursor-pointer justify-end">
-                  <IconEdit />
+                  <Image src={IconEdit} alt="Edit" width={16} height={16} />
                 </TableCell>
               </TableRow>
             </TableBody>

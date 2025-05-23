@@ -6,6 +6,8 @@ import { footerLinks } from "@/constants/links";
 import { ModalType, useModal } from "@/hooks/use-modal";
 import { IconFacebookWhite } from "@/public/assets/svgs";
 
+import { cn } from "@codevs/ui";
+
 import { aboutUsData, connectUsData } from "../../../constants/landing_data";
 import Container from "./MarketingContainer";
 
@@ -51,20 +53,23 @@ const Footer = () => {
             <div className="text-gray flex flex-1 flex-col gap-2">
               <h4 className="pb-1 text-lg text-white">Connect Us</h4>
               <div className="flex items-center gap-4">
-                {connectUsData.map((social) => {
-                  const IconComponent = social.icon;
-                  return (
-                    <Link key={social.id} href={social.href} target="_blank">
+              {connectUsData.map((social) => {
+                const IconComponent = social.icon;
+                return (
+                  <Link key={social.id} href={social.href} target="_blank">
+                    {IconComponent && typeof IconComponent === 'function' ? (
                       <IconComponent
-                        className={`${
-                          IconComponent === IconFacebookWhite
-                            ? "h-[25px] w-[25px]"
-                            : "h-[32px] w-[32px]"
-                        }`}
+                        className={cn(
+                          "h-[25px] w-[25px] text-white",
+                          social.id === "facebook" && "h-[32px] w-[32px]",
+                        )}
                       />
-                    </Link>
-                  );
-                })}
+                    ) : (
+                      <span className="h-[25px] w-[25px]"></span>
+                    )}
+                  </Link>
+                );
+              })}
               </div>
             </div>
           </div>

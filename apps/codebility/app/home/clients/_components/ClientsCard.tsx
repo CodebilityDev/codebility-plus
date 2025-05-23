@@ -164,7 +164,11 @@ export default function ClientCards({ clients }: Props) {
                       <div className="flex flex-col gap-3">
                         {/* Address */}
                         <div className="text-gray flex items-center gap-4">
-                          <IconMapPin className="h-6 min-w-6 invert dark:invert-0" />
+                          <Image
+                            src={IconMapPin}
+                            alt="Map Pin"
+                            className="h-6 min-w-6 invert dark:invert-0"
+                          />
                           {client.address ? (
                             <Link
                               href={`https://www.google.com/maps/search/${encodeURIComponent(
@@ -181,7 +185,11 @@ export default function ClientCards({ clients }: Props) {
                         </div>
                         {/* Email */}
                         <div className="text-gray flex items-center gap-4">
-                          <IconMail className="h-6 min-w-6 invert dark:invert-0" />
+                          <Image
+                            src={IconMail}
+                            alt="Mail"
+                            className="h-6 min-w-6 invert dark:invert-0"
+                          />
                           {client.email ? (
                             <>
                               <Link
@@ -196,7 +204,11 @@ export default function ClientCards({ clients }: Props) {
                                 }
                                 className="hover:opacity-75"
                               >
-                                <IconCopy className="h-4 min-w-4 invert dark:invert-0" />
+                                <Image
+                                  src={IconCopy}
+                                  alt="Copy"
+                                  className="h-4 min-w-4 invert dark:invert-0"
+                                />
                               </button>
                             </>
                           ) : (
@@ -205,7 +217,11 @@ export default function ClientCards({ clients }: Props) {
                         </div>
                         {/* Phone Number */}
                         <div className="text-gray flex items-center gap-4">
-                          <IconTelephone className="h-6 min-w-6 invert dark:invert-0" />
+                          <Image
+                            src={IconTelephone}
+                            alt="Phone"
+                            className="h-6 min-w-6 invert dark:invert-0"
+                          />
                           {client.phone_number ? (
                             <>
                               <Link
@@ -220,7 +236,11 @@ export default function ClientCards({ clients }: Props) {
                                 }
                                 className="hover:opacity-75"
                               >
-                                <IconCopy className="h-4 min-w-4 invert dark:invert-0" />
+                                <Image
+                                  src={IconCopy}
+                                  alt="Copy"
+                                  className="h-4 min-w-4 invert dark:invert-0"
+                                />
                               </button>
                             </>
                           ) : (

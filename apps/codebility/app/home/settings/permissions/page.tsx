@@ -1,11 +1,11 @@
+import Image from "next/image";
 import Link from "next/link";
 import { Box, H1 } from "@/Components/shared/dashboard";
 import { ArrowRightIcon } from "@/public/assets/svgs";
-
-
+import { createClientServerComponent } from "@/utils/supabase/server";
+import React from "react";
 import PermissionsTable from "./_components/PermissionsTable";
 import { permissions_TableRowProps as TableRowProps } from "./_types/permissions";
-import { createClientServerComponent } from "@/utils/supabase/server";
 
 const PermissionSettings = async () => {
   const supabase = await createClientServerComponent();
@@ -18,7 +18,12 @@ const PermissionSettings = async () => {
           <Link href={"/home/settings"}>
             <span className="dark:text-white/50">Settings</span>
           </Link>
-          <ArrowRightIcon />
+          <Image
+            src={ArrowRightIcon}
+            alt="Arrow right"
+            width={16}
+            height={16}
+          />
           <span>Permissions</span>
         </div>
       </div>

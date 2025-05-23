@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import Box from "@/Components/shared/dashboard/Box";
 import { Button } from "@/Components/ui/button";
 import {
@@ -205,13 +206,17 @@ const JobStatusForm = ({
   return (
     <div className="dark:bg-dark-500 mt-8 flex w-full flex-col gap-4 rounded-md bg-slate-50 px-[24px] py-[29px]">
       <div className="flex w-full items-end justify-end gap-2">
-        <IconDelete
+        <Image
+          src={IconDelete}
+          alt="Delete"
           onClick={() => {
             if (!isLoadingMain) handleDeleteJobStatus(itemNo, jobStatus.id);
           }}
-          className="cursor-pointer text-red-500 invert dark:invert-0"
+          className="h-15 w-15 cursor-pointer text-red-500 invert dark:invert-0"
         />
-        <IconEdit
+        <Image
+          src={IconEdit}
+          alt="Edit"
           onClick={() => handleEditModePerItem(itemNo, true)}
           className="cursor-pointer invert dark:invert-0"
         />

@@ -1,12 +1,10 @@
 
 import { createClientServerComponent } from "@/utils/supabase/server";
-import { cookies } from "next/headers";
+
 import { NextRequest, NextResponse } from "next/server";
 
-export async function GET(
-  request: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
+  const params = await props.params;
   try {
     const supabase = await createClientServerComponent();
     

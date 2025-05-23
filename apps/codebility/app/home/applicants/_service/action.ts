@@ -4,7 +4,6 @@
 import { revalidatePath } from "next/cache";
 import { NewApplicantType } from "./types";
 import { createAdminClient } from "@/utils/supabase/admin";
-import { createCell } from "@tanstack/react-table";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 

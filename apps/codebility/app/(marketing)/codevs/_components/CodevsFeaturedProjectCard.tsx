@@ -1,3 +1,4 @@
+import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Heading3 } from "@/Components/shared/home";
@@ -38,7 +39,8 @@ const FeaturedProjectCard: React.FC<FeaturedProjectCardProps> = ({
             target="_blank"
             className="mb-2 flex items-center gap-2 text-blue-100 duration-300 hover:ml-4"
           >
-            Explore <IconArrowRight />
+            Explore{" "}
+            <Image src={IconArrowRight} alt="arrow" width={20} height={20} />
           </Link>
         )}
       </div>

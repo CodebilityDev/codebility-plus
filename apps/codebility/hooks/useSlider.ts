@@ -1,7 +1,7 @@
 import { RefObject, useEffect } from "react";
 
 const useSlider = (
-  scrollableDiv: RefObject<HTMLDivElement>,
+  scrollableDiv: RefObject<HTMLDivElement | null>,
   isLoading: boolean,
 ) => {
   useEffect(() => {

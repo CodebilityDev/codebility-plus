@@ -1,3 +1,5 @@
+"use client";
+
 import { Rowdies } from "next/font/google";
 import Link from "next/link";
 import { Button } from "@/Components/ui/button";
@@ -11,7 +13,7 @@ const rowdies = Rowdies({
   subsets: ["latin"],
 });
 
-export default async function Hero() {
+export default function Hero() {
   return (
     <section
       id="home"

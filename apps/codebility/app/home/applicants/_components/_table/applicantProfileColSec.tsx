@@ -152,12 +152,6 @@ export default function ApplicantProfileColSec({
                     <TableCell>
                       <div className="flex flex-col space-y-2">
                         <div className="flex items-center gap-2">
-                          {/*  <Link
-                              href={createGmailLink(applicant.email_address)}
-                              target="_blank"
-                            >
-                              <IconEmail className="h-[18px] w-[18px] invert dark:invert-0" />
-                            </Link> */}
                           <span className="max-w-[150px] truncate text-xs">
                             {applicant.email_address}
                           </span>
@@ -172,7 +166,13 @@ export default function ApplicantProfileColSec({
                     <TableCell>
                       {applicant.github ? (
                         <Link href={applicant.github} target="_blank">
-                          <IconGithub className="h-[18px] w-[18px] invert dark:invert-0" />
+                          <Image
+                            src={IconGithub}
+                            alt="GitHub"
+                            width={18}
+                            height={18}
+                            className="invert dark:invert-0"
+                          />
                         </Link>
                       ) : (
                         <span className="text-xs text-gray-500">None</span>
@@ -189,7 +189,13 @@ export default function ApplicantProfileColSec({
                           href={applicant.portfolio_website}
                           target="_blank"
                         >
-                          <IconLink className="h-[18px] w-[18px] invert dark:invert-0" />
+                          <Image
+                            src={IconLink}
+                            alt="Portfolio"
+                            width={18}
+                            height={18}
+                            className="invert dark:invert-0"
+                          />
                         </Link>
                       ) : (
                         <span className="text-xs text-gray-500">None</span>
@@ -203,7 +209,8 @@ export default function ApplicantProfileColSec({
                     <TableCell>
                       <div className="flex flex-wrap gap-2">
                         {applicant.tech_stacks &&
-                        applicant.tech_stacks.length > 0 && !applicant.tech_stacks.includes("none") ? (
+                        applicant.tech_stacks.length > 0 &&
+                        !applicant.tech_stacks.includes("none") ? (
                           applicant.tech_stacks.map((stack, i) => (
                             <Image
                               key={i}

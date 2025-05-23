@@ -1,5 +1,7 @@
 "use client";
 
+import React from "react";
+import Image from "next/image";
 import { Button } from "@/Components/ui/button";
 import Input from "@/Components/ui/forms/input";
 import { services } from "@/constants/services";
@@ -16,7 +18,7 @@ import {
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
-const ShortSurvey = () => {
+export default function ShortSurvey() {
   return (
     <div className="relative mx-auto flex w-screen max-w-xl flex-col gap-10 text-pretty rounded-lg border border-white/5 bg-white/5 px-5 py-10 text-white lg:py-14 xl:px-20">
       <div className="flex flex-col gap-1">
@@ -38,7 +40,11 @@ const ShortSurvey = () => {
               <SelectValue placeholder="Select Services" className="text-sm">
                 Test
               </SelectValue>
-              <IconDropdown className="h-5 invert dark:invert-0" />
+              <Image
+                src={IconDropdown}
+                alt="dropdown icon"
+                className="h-5 invert dark:invert-0"
+              />
             </SelectTrigger>
 
             <SelectContent
@@ -102,6 +108,4 @@ const ShortSurvey = () => {
       </div>
     </div>
   );
-};
-
-export default ShortSurvey;
+}

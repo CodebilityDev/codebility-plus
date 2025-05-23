@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import Image from "next/image";
 import { Box } from "@/Components/shared/dashboard";
 import { Paragraph } from "@/Components/shared/home";
 import { TimePicker12 } from "@/Components/time-picker/TimePicker12hourDemo";
@@ -162,7 +163,9 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
-      <IconEdit
+      <Image
+        src={IconEdit}
+        alt="Edit"
         className={`$
           {isEditMode
             ? "hidden"

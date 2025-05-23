@@ -80,7 +80,9 @@ const Skills = ({ data }: SkillsProps) => {
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative">
       {!isEditMode && (
-        <IconEdit
+        <Image
+          src={IconEdit}
+          alt="Edit"
           className="h-15 w-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
           onClick={handleEditMode}
         />

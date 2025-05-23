@@ -14,6 +14,7 @@ import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 import UserTaskFilter from "./UserTaskFilter";
 import { createClientClientComponent } from "@/utils/supabase/client";
+import Image from "next/image";
 
 interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
@@ -85,7 +86,12 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
             <Link href={pathsConfig.app.kanban}>
               <span className="dark:text-white/50">Kanban Board</span>
             </Link>
-            <ArrowRightIcon />
+            <Image 
+              src={ArrowRightIcon} 
+              alt="Arrow right" 
+              width={16} 
+              height={16} 
+            />
             <span className="font-semibold">{boardData.name}</span>
           </div>
 
@@ -105,9 +111,14 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
                 </div>
 
                 <div className="bg-light-900 flex w-[280px] items-center gap-3 rounded-md border border-zinc-300 p-2 dark:border-zinc-500 dark:bg-[#2C303A]">
-                  <label htmlFor="kanbanSearch">
-                    <IconSearch />
-                  </label>
+                    <label htmlFor="kanbanSearch" className="flex items-center">
+                    <Image 
+                      src={IconSearch} 
+                      alt="Search icon" 
+                      width={16} 
+                      height={16}
+                    />
+                    </label>
                   <KanbanBoardsSearch
                     className="w-full bg-transparent outline-none"
                     placeholder="Search"

@@ -12,6 +12,7 @@ import { techstacks } from "@/constants/techstack";
 import { useModal } from "@/hooks/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { IconClose } from "@/public/assets/svgs";
+import React from "react";
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
@@ -44,7 +45,13 @@ const TechStackModal = () => {
         className="bg-light-900 dark:bg-dark-100 h-auto w-[90%] max-w-md overflow-y-auto py-8 sm:max-w-2xl sm:px-12 sm:py-16"
       >
         <button onClick={onClose} className="absolute right-4 top-4">
-          <IconClose />
+          <Image 
+            src={IconClose}
+            alt="Close"
+            width={24}
+            height={24}
+            className="object-contain"
+          />
         </button>
         <DialogHeader>
           <DialogTitle className="text-md mb-4 text-center text-black dark:text-white md:text-xl">

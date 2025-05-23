@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -136,7 +136,13 @@ const ProjectViewModal = () => {
                     target="_blank"
                     className="flex items-center gap-2 hover:text-blue-500"
                   >
-                    <IconGithub className="h-5 w-5 invert dark:invert-0" />
+                    <Image
+                      src={IconGithub}
+                      alt="GitHub"
+                      width={20}
+                      height={20}
+                      className="invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0"
+                    />
                     <span className="text-sm">GitHub</span>
                   </Link>
                 )}
@@ -146,7 +152,13 @@ const ProjectViewModal = () => {
                     target="_blank"
                     className="flex items-center gap-2 hover:text-blue-500"
                   >
-                    <IconLink className="h-5 w-5 invert dark:invert-0" />
+                    <Image
+                      src={IconLink}
+                      alt="Website"
+                      width={20}
+                      height={20}
+                      className="invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0"
+                    />
                     <span className="text-sm">Website</span>
                   </Link>
                 )}
@@ -156,7 +168,13 @@ const ProjectViewModal = () => {
                     target="_blank"
                     className="flex items-center gap-2 hover:text-blue-500"
                   >
-                    <IconFigma className="h-5 w-5 invert dark:invert-0" />
+                    <Image
+                      src={IconFigma}
+                      alt="Figma"
+                      width={20}
+                      height={20}
+                      className="h-5 w-5 invert dark:invert-0"
+                    />
                     <span className="text-sm">Figma</span>
                   </Link>
                 )}

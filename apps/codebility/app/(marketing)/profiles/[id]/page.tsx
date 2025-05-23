@@ -20,10 +20,11 @@ import { Codev } from "@/types/home/codev";
 import ProfileCloseButton from "./_components/ProfileCloseButton";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default async function CodevBioPage({ params }: Props) {
+export default async function CodevBioPage(props: Props) {
+  const params = await props.params;
   const id = params.id;
 
   // Fetch data for the profile
@@ -121,7 +122,13 @@ export default async function CodevBioPage({ params }: Props) {
                   target="_blank"
                   className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
                 >
-                  <IconFacebook className="text-2xl" />
+                  <Image
+                    src={IconFacebook}
+                    alt="Facebook"
+                    width={24}
+                    height={24}
+                    className="h-6 w-6"
+                  />
                 </Link>
               )}
               {linkedin && (
@@ -130,7 +137,13 @@ export default async function CodevBioPage({ params }: Props) {
                   target="_blank"
                   className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
                 >
-                  <IconLinkedIn className="text-2xl" />
+                  <Image
+                    src={IconLinkedIn}
+                    alt="LinkedIn"
+                    width={24}
+                    height={24}
+                    className="h-6 w-6"
+                  />
                 </Link>
               )}
               {github && (
@@ -139,7 +152,13 @@ export default async function CodevBioPage({ params }: Props) {
                   target="_blank"
                   className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
                 >
-                  <IconGithub className="text-2xl" />
+                  <Image
+                    src={IconGithub}
+                    alt="GitHub"
+                    width={24}
+                    height={24}
+                    className="h-6 w-6"
+                  />
                 </Link>
               )}
               {portfolio_website && (
@@ -148,14 +167,26 @@ export default async function CodevBioPage({ params }: Props) {
                   target="_blank"
                   className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
                 >
-                  <IconLink className="text-2xl" />
+                  <Image
+                    src={IconLink}
+                    alt="Portfolio"
+                    width={24}
+                    height={24}
+                    className="h-6 w-6"
+                  />
                 </Link>
               )}
             </div>
             {tech_stacks && tech_stacks.length > 0 && (
               <div className="mt-4">
                 <div className="mb-4 flex items-center gap-2">
-                  <IconSkills className="text-2xl" />
+                  <Image
+                    src={IconSkills}
+                    alt="Facebook"
+                    width={24}
+                    height={24}
+                    className="h-6 w-6"
+                  />
                   <h3 className="text-md font-semibold lg:text-2xl">Skills</h3>
                 </div>
                 <div className="mt-2 flex flex-wrap gap-4">
@@ -179,7 +210,13 @@ export default async function CodevBioPage({ params }: Props) {
             {about && (
               <div>
                 <div className="mb-4 flex items-center gap-2">
-                  <IconAbout className="text-2xl" />
+                  <Image
+                    src={IconAbout}
+                    alt="Facebook"
+                    width={24}
+                    height={24}
+                    className="h-6 w-6"
+                  />
                   <h3 className="text-md font-semibold lg:text-2xl">About</h3>
                 </div>
                 <p className="text-md text-gray lg:text-lg">{about}</p>

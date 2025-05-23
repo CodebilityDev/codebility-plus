@@ -37,12 +37,6 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
         <p className="text-center text-base font-normal md:h-20">
           {description.substring(0, 100)}...
         </p>
-        {/* <button
-          onClick={() => openModal({ main_image, name, description })}
-          className="mb-2 flex items-center gap-2 text-blue-100 duration-300 hover:ml-4"
-        >
-          Read More <IconArrowRight />
-        </button> */}
       </div>
     </motion.div>
   );

@@ -76,30 +76,47 @@ const Navbar = () => {
                   title={`${first_name}'s Avatar`}
                 />
               </div>
-              <IconDropdown className="hidden invert dark:invert-0 md:block" />
+              <Image
+                src={IconDropdown}
+                alt="dropdown icon"
+                className="h-5 invert dark:invert-0"
+              />
             </DropdownMenuTrigger>
 
             <DropdownMenuContent className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]">
               {menuItems.map((item) => (
                 <Link href={item.href} key={item.label}>
-                  <DropdownMenuItem className="flex cursor-pointer items-center gap-6 p-3 px-5">
-                    <item.icon className="invert dark:invert-0" />
+                    <DropdownMenuItem className="flex cursor-pointer items-center gap-6 p-3 px-5">
+                    <Image
+                      src={item.icon}
+                      alt={`${item.label} icon`}
+                      className="invert dark:invert-0"
+                      width={20}
+                      height={20}
+                    />
                     {item.label}
-                  </DropdownMenuItem>
+                    </DropdownMenuItem>
                 </Link>
               ))}
 
               <DropdownMenuSeparator />
 
-              <DropdownMenuItem
+                <DropdownMenuItem
                 onClick={async (e) => {
                   e.stopPropagation();
                   await signOut();
                 }}
                 className="flex cursor-pointer items-center gap-6 p-3 px-5"
-              >
-                <IconLogout className="invert dark:invert-0" /> Logout
-              </DropdownMenuItem>
+                >
+                <Image
+                  src={IconLogout}
+                  alt="Logout icon"
+                  className="invert dark:invert-0"
+                  width={20}
+                  height={20}
+                />
+                Logout
+                </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
           <MobileNav />
