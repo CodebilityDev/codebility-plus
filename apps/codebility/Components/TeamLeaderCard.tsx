@@ -1,5 +1,4 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar"; // Updated to local path
-import { Card, CardContent } from "@/Components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { CodevData } from "@/types/home/codev";
 
 interface Props {
@@ -11,18 +10,14 @@ const TeamLeaderCard = ({ teamLeader }: Props) => {
   const initials = `${teamLeader.first_name.charAt(0)}${teamLeader.last_name.charAt(0)}`;
 
   return (
-    <Card className="w-full max-w-md">
-      <CardContent className="flex items-center gap-4 p-4">
-        <Avatar className="h-12 w-12">
-          <AvatarImage src={teamLeader.image_url || ""} alt={fullName} />
-          <AvatarFallback>{initials}</AvatarFallback>
-        </Avatar>
-        <div>
-          <h2 className="text-lg font-semibold">{fullName}</h2>
-          <p className="text-sm text-gray-500">Team Leader</p>
-        </div>
-      </CardContent>
-    </Card>
+    <div className="bg-gray-800 rounded-lg shadow-md p-4 text-center transition-transform hover:scale-105">
+      <Avatar className="h-20 w-20 mx-auto mb-2 border-2 border-gray-700">
+        <AvatarImage src={teamLeader.image_url || ""} alt={fullName} />
+        <AvatarFallback className="bg-gray-700 text-white text-lg">{initials}</AvatarFallback>
+      </Avatar>
+      <h3 className="text-lg font-semibold text-gray-100">{fullName}</h3>
+      <p className="text-sm text-gray-400">Team Leader</p>
+    </div>
   );
 };
 
