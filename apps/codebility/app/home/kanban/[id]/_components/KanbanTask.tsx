@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import {
   IconPriority1,
@@ -8,9 +9,9 @@ import {
   IconPriority5,
 } from "@/public/assets/svgs";
 import { Task } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 
 import KanbanTaskViewEditModal from "./kanban_modals/KanbanTaskViewEditModal";
 
@@ -87,7 +88,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
   useEffect(() => {
     async function fetchSidekickDetails() {
       if (sidekicks.length === 0) return;
-      const supabase = createClientComponentClient();
+      const supabase = createClientClientComponent();
       const { data, error } = await supabase
         .from("codev")
         .select("id, first_name, last_name, image_url")
@@ -144,6 +145,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
     }`}
             >
               <span className="capitalize">{task.priority ?? "Low"}</span>
+
               <PriorityIcon className="h-3 w-3 md:h-4 md:w-4" />
             </div>
             <div

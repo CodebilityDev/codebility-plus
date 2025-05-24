@@ -2,14 +2,10 @@
 
 import React, { useState } from "react";
 import { useUserStore } from "@/store/codev-store";
-import { createClient } from "@supabase/supabase-js";
 import toast from "react-hot-toast";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 // Initialize Supabase client
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 const Status = ({
   jobStatusType,
@@ -29,6 +25,8 @@ const Status = ({
 
   const updateSupabaseField = async (field: string, value: any) => {
     try {
+      const supabase = createClientClientComponent();
+
       setIsLoading(true);
       const { error } = await supabase
         .from("codev")

@@ -51,27 +51,37 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={outfit.className}>
+    <html lang="en" className={outfit.className} suppressHydrationWarning>
       <head>
-        <script
+        {/*  <script
           dangerouslySetInnerHTML={{
             __html: `
               (function() {
-                const savedTheme = localStorage.getItem('theme');
-                // Use dark as default if no theme is saved
-                const theme = savedTheme || 'dark';
-                document.documentElement.classList.add(theme);
-                if (!savedTheme) {
-                  localStorage.setItem('theme', 'dark');
+                try {
+                  const savedTheme = localStorage.getItem('theme');
+                  // Use dark as default if no theme is saved
+                  const theme = savedTheme || 'dark';
+                  document.documentElement.classList.add(theme);
+                  if (!savedTheme) {
+                    localStorage.setItem('theme', 'dark');
+                  }
+                } catch (e) {
+                  // Fall back to dark theme if localStorage is not available
+                  document.documentElement.classList.add('dark');
                 }
               })();
             `,
           }}
-        />
+        /> */}
       </head>
       <body>
         <ReactQueryProvider>
-          <ThemeProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             <ToasterContext />
             {children}
           </ThemeProvider>

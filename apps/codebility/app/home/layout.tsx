@@ -1,10 +1,10 @@
-"use client";
+"use server";
 
-import React, { useEffect } from "react";
+import React from "react";
 import { ModalProviderHome } from "@/Components/providers/modal-provider-home";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import ReactQueryProvider from "@/hooks/reactQuery";
-import { useUserStore } from "@/store/codev-store";
+
 import { UserProvider } from "@/store/UserProvider";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 
@@ -13,17 +13,11 @@ import LeftSidebar from "./_components/LeftSidebar";
 import Navbar from "./_components/Navbar";
 import { MuiStyleRoot } from "./(dashboard)/_components/DashboardRoadmapStyleRoot";
 
-export default function HomeLayout({
+export default async function HomeLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  const { hydrate } = useUserStore();
-
-  useEffect(() => {
-    hydrate();
-  }, [hydrate]);
-
   return (
     <ReactQueryProvider>
       <UserProvider>

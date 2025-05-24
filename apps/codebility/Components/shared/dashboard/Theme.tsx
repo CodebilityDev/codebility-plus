@@ -2,15 +2,16 @@
 
 import React from "react";
 import Image from "next/image";
-import { useTheme } from "@/context/ThemeProvider";
+
 import { motion } from "framer-motion";
+import { useTheme } from "next-themes";
 
 const Theme = () => {
-  const { mode, setMode } = useTheme();
+  const { theme, setTheme  } = useTheme();
 
   const toggleTheme = () => {
-    const newMode = mode === "light" ? "dark" : "light";
-    setMode(newMode);
+    const newMode = theme === "light" ? "dark" : "light";
+    setTheme(newMode);
     localStorage.theme = newMode;
   };
 
@@ -19,11 +20,11 @@ const Theme = () => {
       <div
         onClick={toggleTheme}
         className={`w-18 flex h-8 cursor-pointer items-center gap-4 rounded-full border-black bg-zinc-200 p-2 dark:bg-blue-100 ${
-          mode === "dark" ? "justify-end" : "justify-start"
+          theme === "dark" ? "justify-end" : "justify-start"
         }`}
       >
         <motion.div
-          className={`absolute h-5 w-5 rounded-full  ${mode === "dark" ? "bg-light-800" : "bg-dark-200"}`}
+          className={`absolute h-5 w-5 rounded-full  ${theme === "dark" ? "bg-light-800" : "bg-dark-200"}`}
           layout
           transition={{
             type: "spring",
@@ -43,7 +44,7 @@ const Theme = () => {
           alt="Sun"
           width={20}
           height={20}
-          className={`active p-0.5 ${mode === "dark" ? "none" : "invert"} `}
+          className={`active p-0.5 ${theme === "dark" ? "none" : "invert"} `}
         />
       </div>
     </div>
