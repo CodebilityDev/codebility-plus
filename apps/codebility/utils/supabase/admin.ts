@@ -3,14 +3,14 @@ import { cookies } from "next/headers";
 
 export const createAdminClient = async () => {
   const cookieStore = await cookies();
-
+  const cookieStoreKeys = cookieStore.getAll();
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SERVICE_ROLE!,
     {
       cookies: {
         getAll() {
-          return cookieStore.getAll();
+          return cookieStoreKeys;
         },
         setAll(cookiesToSet) {
           try {
