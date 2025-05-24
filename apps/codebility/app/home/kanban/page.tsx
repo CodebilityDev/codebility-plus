@@ -1,4 +1,6 @@
 // page.tsx
+import React from "react";
+import Image from "next/image";
 import Link from "next/link";
 import { Box } from "@/Components/shared/dashboard";
 import H1 from "@/Components/shared/dashboard/H1";
@@ -14,11 +16,9 @@ import {
 } from "@/Components/ui/table";
 import pathsConfig from "@/config/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
-
-
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
-import { createClientServerComponent } from "@/utils/supabase/server";
 
 // Types
 interface SearchParams {
@@ -58,10 +58,11 @@ interface KanbanBoardData {
 }
 
 interface PageProps {
-  searchParams: SearchParams;
+  searchParams: Promise<SearchParams>;
 }
 
-export default async function KanbanPage({ searchParams }: PageProps) {
+export default async function KanbanPage(props: PageProps) {
+  const searchParams = await props.searchParams;
   const supabase = await createClientServerComponent();
 
   // Construct the initial board query
@@ -165,53 +166,56 @@ export default async function KanbanPage({ searchParams }: PageProps) {
       <TableRow key={board.id} className="grid grid-cols-1 md:table-row">
         {board.projects?.kanban_display && (
           <>
-          {/* Board Name */}
-        <TableCell className="md:table-cell">
-        <div className="text-dark100_light900 flex flex-col">
-          <span className="font-medium">{board.name}</span>
-          {board.description && (
-            <span className="text-sm">{board.description}</span>
-          )}
-        </div>
-      </TableCell>
+            {/* Board Name */}
+            <TableCell className="md:table-cell">
+              <div className="text-dark100_light900 flex flex-col">
+                <span className="font-medium">{board.name}</span>
+                {board.description && (
+                  <span className="text-sm">{board.description}</span>
+                )}
+              </div>
+            </TableCell>
 
-      {/* Project Name */}
-      <TableCell className="md:table-cell">
-        <span className="text-dark100_light900">
-          {board.projects?.name || "No project assigned"}
-        </span>
-      </TableCell>
+            {/* Project Name */}
+            <TableCell className="md:table-cell">
+              <span className="text-dark100_light900">
+                {board.projects?.name || "No project assigned"}
+              </span>
+            </TableCell>
 
-      {/* Team Lead */}
-      <TableCell className="md:table-cell">
-        {board.projects?.codev ? (
-          <div className="flex items-center gap-2">
-            {board.projects.codev.image_url && (
-              <img
-                src={board.projects.codev.image_url}
-                alt={`${board.projects.codev.first_name}'s avatar`}
-                className="h-8 w-8 rounded-full object-cover"
-              />
-            )}
-            <span className="text-dark100_light900 capitalize">
-              {`${board.projects.codev.first_name} ${board.projects.codev.last_name}`}
-            </span>
-          </div>
-        ) : (
-          "No team lead assigned"
-        )}
-      </TableCell>
+            {/* Team Lead */}
+            <TableCell className="md:table-cell">
+              {board.projects?.codev ? (
+                <div className="flex items-center gap-2">
+                  {board.projects.codev.image_url && (
+                    <img
+                      src={board.projects.codev.image_url}
+                      alt={`${board.projects.codev.first_name}'s avatar`}
+                      className="h-8 w-8 rounded-full object-cover"
+                    />
+                  )}
+                  <span className="text-dark100_light900 capitalize">
+                    {`${board.projects.codev.first_name} ${board.projects.codev.last_name}`}
+                  </span>
+                </div>
+              ) : (
+                "No team lead assigned"
+              )}
+            </TableCell>
 
-      {/* Actions */}
-      <TableCell className="text-center md:table-cell">
-        <Link href={`${pathsConfig.app.kanban}/${board.id}`}>
-          <Button variant="hollow" className="inline-flex items-center gap-2">
-            <IconKanban className="invert-colors h-4 w-4" />
-            <span className="hidden sm:inline">View Board</span>
-          </Button>
-        </Link>
-      </TableCell>
-      </>
+            {/* Actions */}
+            <TableCell className="text-center md:table-cell">
+              <Link href={`${pathsConfig.app.kanban}/${board.id}`}>
+                <Button
+                  variant="hollow"
+                  className="inline-flex items-center gap-2"
+                >
+                  <IconKanban className="invert-colors h-4 w-4" />
+                  <span className="hidden sm:inline">View Board</span>
+                </Button>
+              </Link>
+            </TableCell>
+          </>
         )}
       </TableRow>
     ));

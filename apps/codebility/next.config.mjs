@@ -8,8 +8,7 @@ import { env } from "./env.mjs";
  */
 const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
   reactStrictMode: true,
-  experimental: { instrumentationHook: true },
-
+  /* experimental: { instrumentationHook: true }, */
   images: {
     remotePatterns: [
       {
@@ -25,7 +24,9 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
         hostname: "qwmazrujcjuhhdipnywa.supabase.co",
       },
       {
-        hostname: "hibnlysaokybrsufrdwp.supabase.co",
+        hostname:
+          process.env.NEXT_PUBLIC_SUPBASE_HOST ??
+          "kdkuljweiqtiveqvqirw.supabase.co",
       },
       {
         hostname: "res.cloudinary.com",

@@ -12,15 +12,18 @@ import { FeaturedSectiondata } from "../../../../constants/landing_data";
 import FeaturedCard from "./CodevsFeaturedCard";
 import Section from "./CodevsSection";
 
-const inter = Inter({
-  subsets: ["latin"],
-  display: "swap",
-});
+/*  const inter = Inter({
+    subsets: ["latin"],
+    display: "swap",
+  });
 
-const outfit = Outfit({
-  subsets: ["latin"],
-  display: "swap",
-});
+  const outfit = Outfit({
+    subsets: ["latin"],
+    display: "swap",
+  }); */
+
+export const inter = { className: "font-sans" };
+export const outfit = { className: "font-sans" };
 
 const FeaturedSection = () => {
   return (
