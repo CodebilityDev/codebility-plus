@@ -19,7 +19,8 @@ import {
   IconPriority5,
 } from "@/public/assets/svgs";
 import { Task } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
+
 
 export default function DashboardCurrentProjectModal() {
   const { isOpen, onClose, type, data } = useModal();
@@ -29,7 +30,7 @@ export default function DashboardCurrentProjectModal() {
   const [isLoading, setIsLoading] = useState(true);
 
   const isModalOpen = isOpen && type === "dashboardCurrentProjectModal";
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
   const router = useRouter();
 
   const projectId = data?.projectId;

@@ -8,7 +8,7 @@ import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
 export const handleDownload = async (
-  certRef: RefObject<HTMLDivElement>,
+  certRef: RefObject<HTMLDivElement | null>,
   name: string,
 ) => {
   if (!certRef.current) return;

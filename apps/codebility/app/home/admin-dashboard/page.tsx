@@ -1,6 +1,5 @@
 import H1 from "@/Components/shared/dashboard/H1";
-
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 import AdminDashboardApplicantStatusPie from "./_components/AdminDashboardApplicantStatusPie";
 import AdminDashboardMonthlyApplicantsLineChart from "./_components/AdminDashboardMonthlyApplicantsLineChart";
@@ -12,8 +11,7 @@ import AdminDashboardTotalMentor from "./_components/AdminDashboardTotalMentor";
 import AdminDashboardTotalProjects from "./_components/AdminDashboardTotalProject";
 
 async function getDashboardData() {
-  const supabase = getSupabaseServerComponentClient();
-
+  const supabase = await createClientServerComponent();
   const { data: codev, error: codevError } = await supabase
     .from("codev")
     .select("internal_status, role_id, application_status, date_applied");

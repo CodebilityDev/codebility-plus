@@ -1,27 +1,25 @@
 "use client";
 
 import React, { memo, useMemo } from "react";
+import { Codev } from "@/types/home/codev";
+import { prioritizeCodevs } from "@/utils/codev-priority";
 
 import { Badge } from "@codevs/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 import { NewApplicantType } from "../_service/types";
 import { ApplicantDataTable } from "./_table/applicantDataTable";
-
 import { applicantsColumns } from "./_table/appplicantColumns";
 import ApplicantFilterHeaders from "./applicantHeaders";
-import { prioritizeCodevs } from "@/utils/codev-priority";
-import { Codev } from "@/types/home/codev";
 
 export default function ApplicantLists({
   applicants: data,
 }: {
   applicants: NewApplicantType[];
 }) {
-
   const prioritizedApplicants = useMemo(() => {
-      return prioritizeCodevs(data as Codev[], false);
-    }, [data]);
+    return prioritizeCodevs(data as Codev[], false);
+  }, [data]);
 
   const [applicants, setApplicants] = React.useState(data);
   const [currentTab, setCurrentTab] = React.useState("applying");
