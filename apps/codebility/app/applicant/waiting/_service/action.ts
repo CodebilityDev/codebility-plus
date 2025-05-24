@@ -1,7 +1,8 @@
 
 "use server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 
@@ -13,7 +14,7 @@ export async function applicantTakeTest({
     codevId: string;
 }) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         const { data, error } = await supabase
             .from("applicant")
@@ -54,7 +55,7 @@ export async function applicantMoveToOnboard({
     codevId: string;
 }) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         const { data: codevData, error: codevError } = await supabase
             .from("codev")
@@ -83,7 +84,7 @@ export async function applicantSubmitTest({
     forkUrl: string;
 }) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         const { data, error } = await supabase
             .from("applicant")

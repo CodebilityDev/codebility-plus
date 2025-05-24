@@ -20,7 +20,6 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -31,6 +30,7 @@ import { Textarea } from "@codevs/ui/textarea";
 import { createNewTask } from "../../actions";
 import KanbanAddModalMembers from "../kanban_modals/KanbanAddModalMembers";
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
@@ -54,7 +54,7 @@ const TaskAddModal = () => {
 
   useEffect(() => {
     const loadSkillCategories = async () => {
-      const supabase = createClientComponentClient();
+      const supabase = createClientClientComponent();
       const { data, error } = await supabase
         .from("skill_category")
         .select("id, name")

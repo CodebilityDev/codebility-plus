@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Codev } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 import { Edit2, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -13,6 +13,7 @@ import {
 } from "@codevs/ui/dropdown-menu";
 
 import { DeleteDialog } from "../shared/DeleteDialog";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface TableActionsProps {
   item: Codev;
@@ -23,7 +24,7 @@ interface TableActionsProps {
 export function TableActions({ item, onEdit, onDelete }: TableActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   const handleDelete = async () => {
     try {

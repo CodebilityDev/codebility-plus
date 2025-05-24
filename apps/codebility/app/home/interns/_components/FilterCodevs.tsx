@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { Box } from "@/Components/shared/dashboard";
 import { Button } from "@/Components/ui/button";
 import { Position, Project, SkillCategory } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface Filters {
   positions: string[];
@@ -37,7 +38,7 @@ export default function FilterCodevs({
   const [positions, setPositions] = useState<Position[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
 
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   useEffect(() => {
     const fetchData = async () => {
