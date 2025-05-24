@@ -51,7 +51,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={outfit.className}>
+    <html lang="en" className={outfit.className} suppressHydrationWarning>
       <head>
         {/*  <script
           dangerouslySetInnerHTML={{
@@ -76,7 +76,12 @@ export default function RootLayout({
       </head>
       <body>
         <ReactQueryProvider>
-          <ThemeProvider>
+          <ThemeProvider
+            attribute="class"
+            defaultTheme="system"
+            enableSystem
+            disableTransitionOnChange
+          >
             <ToasterContext />
             {children}
           </ThemeProvider>
