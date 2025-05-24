@@ -13,7 +13,7 @@ export async function GET(request: Request) {
   const tokenHash = requestUrl.searchParams.get("token_hash");
 
   if (tokenHash) {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = await createClientServerComponent();
 
     await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "email" });
@@ -24,7 +24,7 @@ export async function GET(request: Request) {
   }
 
   if (code) {
-    const cookieStore = cookies();
+    const cookieStore = await cookies();
     const supabase = await createClientServerComponent();
 
     try {

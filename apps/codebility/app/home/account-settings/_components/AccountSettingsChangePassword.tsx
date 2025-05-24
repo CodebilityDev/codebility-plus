@@ -78,7 +78,7 @@ export default function AccountSettingsChangePassword() {
           <FormField
             control={form.control}
             name="password"
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <FormItem>
                 <FormControl>
                   <Input
@@ -98,7 +98,7 @@ export default function AccountSettingsChangePassword() {
           <FormField
             control={form.control}
             name="confirmPassword"
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <FormItem>
                 <FormControl>
                   <Input
