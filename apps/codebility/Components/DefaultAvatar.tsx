@@ -6,11 +6,11 @@ interface DefaultAvatarProps {
 }
 
 const DefaultAvatar = ({ className = "", size = 40 }: DefaultAvatarProps) => {
-  const bgColor = getRandomColor();
+  /* const bgColor = getRandomColor(); */
 
   return (
     <div
-      className={`${bgColor} flex items-center justify-center rounded-full ${className}`}
+      className={`flex items-center justify-center rounded-full ${className}`}
       style={{ width: size, height: size }}
     >
       <img
