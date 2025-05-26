@@ -20,6 +20,8 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
+import { useUserStore } from "@/store/codev-store";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -30,7 +32,6 @@ import { Textarea } from "@codevs/ui/textarea";
 import { createNewTask } from "../../actions";
 import KanbanAddModalMembers from "../kanban_modals/KanbanAddModalMembers";
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
@@ -45,6 +46,7 @@ const TaskAddModal = () => {
   const [loading, setLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [description, setDescription] = useState("");
+  const user = useUserStore((state) => state.user);
 
   const router = useRouter();
 
@@ -165,7 +167,12 @@ const TaskAddModal = () => {
                 type="number"
                 min="0"
                 className="bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500 "
-                placeholder="Task points"
+                placeholder={
+                  user?.role_id === 4
+                    ? "Only lead can input points"
+                    : "Enter points"
+                }
+                disabled={user?.role_id === 4}
               />
             </div>
 

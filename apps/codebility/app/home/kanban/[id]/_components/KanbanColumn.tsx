@@ -55,7 +55,7 @@ export default function KanbanColumn({
   const router = useRouter();
   const { user } = useUserStore();
   const canModifyColumn = user?.role_id === 1 || user?.role_id === 5;
-  const canAddTask = user?.role_id === 1 || user?.role_id === 5;
+  const canAddTask = user?.role_id === 1 || user?.role_id === 5 || user?.role_id === 4;
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(column.name);
 
