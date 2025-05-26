@@ -1,30 +1,21 @@
-"use client";
-
+import React from "react";
 import { X } from "lucide-react";
 
 import { Badge } from "@codevs/ui/badge";
 
-import { ExperienceRanges, Filters } from "./ApplicantsPageClient";
+import { ApplicantFilters } from "./applicantHeaders";
+import { ExperienceRanges } from "../_service/types";
 
-interface ApplicantsFilterBadgesProps {
-  filters: Filters;
-  sortField: string | null;
-  sortDirection: "asc" | "desc";
-  onFilterChange: (filters: Filters) => void;
-  onToggleSort: (field: string) => void;
-  setSortField: (field: string | null) => void;
-}
-
-const ApplicantsFilterBadges = ({
+export default function ApplicantFiltersBadge({
   filters,
-  sortField,
-  sortDirection,
+  setFilter,
   onFilterChange,
-  onToggleSort,
-  setSortField,
-}: ApplicantsFilterBadgesProps) => {
+}: {
+  filters: ApplicantFilters;
+  setFilter: React.Dispatch<React.SetStateAction<ApplicantFilters>>;
+  onFilterChange: (filters: ApplicantFilters) => void;}) {
   // Update a specific filter
-  const updateFilter = (key: keyof Filters, value: boolean) => {
+  const updateFilter = (key: keyof ApplicantFilters, value: boolean) => {
     onFilterChange({
       ...filters,
       [key]: value,
@@ -58,17 +49,6 @@ const ApplicantsFilterBadges = ({
 
   return (
     <div className="flex flex-wrap gap-2">
-      {/* Sort Badge */}
-      {sortField && (
-        <Badge className="bg-light-800 text-black-500 dark:bg-dark-300 dark:text-light-800 flex items-center gap-1">
-          Sort: {sortField} {sortDirection === "asc" ? "↑" : "↓"}
-          <X
-            className="ml-1 h-3 w-3 cursor-pointer"
-            onClick={() => setSortField(null)}
-          />
-        </Badge>
-      )}
-
       {/* Portfolio Badges */}
       {filters.hasPortfolio && (
         <Badge className="bg-light-800 text-black-500 dark:bg-dark-300 dark:text-light-800 flex items-center gap-1">
@@ -105,26 +85,6 @@ const ApplicantsFilterBadges = ({
           <X
             className="ml-1 h-3 w-3 cursor-pointer"
             onClick={() => updateFilter("noGithub", false)}
-          />
-        </Badge>
-      )}
-
-      {/* Assessment Badges */}
-      {filters.assessmentSent && (
-        <Badge className="bg-light-800 text-black-500 dark:bg-dark-300 dark:text-light-800 flex items-center gap-1">
-          Assessment Sent
-          <X
-            className="ml-1 h-3 w-3 cursor-pointer"
-            onClick={() => updateFilter("assessmentSent", false)}
-          />
-        </Badge>
-      )}
-      {filters.assessmentNotSent && (
-        <Badge className="bg-light-800 text-black-500 dark:bg-dark-300 dark:text-light-800 flex items-center gap-1">
-          Assessment Not Sent
-          <X
-            className="ml-1 h-3 w-3 cursor-pointer"
-            onClick={() => updateFilter("assessmentNotSent", false)}
           />
         </Badge>
       )}
@@ -176,6 +136,4 @@ const ApplicantsFilterBadges = ({
       )}
     </div>
   );
-};
-
-export default ApplicantsFilterBadges;
+}

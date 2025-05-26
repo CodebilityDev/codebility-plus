@@ -110,6 +110,14 @@ export default function KanbanBoardColumnContainer({
     [activeFilter],
   );
 
+  // Update orderedColumns when columns change
+  useEffect(() => {
+    const sortedColumns = [...columns].sort(
+      (a, b) => (a.position ?? 0) - (b.position ?? 0),
+    );
+    setOrderedColumns(sortedColumns);
+  }, [columns]);
+
   // Initialize board data from orderedColumns
   useEffect(() => {
     setBoardData(

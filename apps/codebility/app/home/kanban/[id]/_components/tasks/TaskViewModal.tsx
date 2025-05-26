@@ -23,9 +23,8 @@ import {
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
 import { SkillCategory, Task } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { set } from "date-fns";
-import { Ellipsis } from "lucide-react";
+import { Ellipsis, Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 
 import {
@@ -39,6 +38,7 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { completeTask, updateTaskPRLink } from "../../actions";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface CodevMember {
   id: string;
@@ -60,6 +60,7 @@ const TaskViewModal = ({
 }) => {
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const [isLoading, setIsLoading] = useState(false);
+  const [updateLoading, setUpdateLoading] = useState(false);
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task;
   const router = useRouter();
@@ -76,6 +77,8 @@ const TaskViewModal = ({
       return;
     }
 
+    setUpdateLoading(true);
+
     const response = await updateTaskPRLink(task.id, prLink);
 
     if (response.success) {
@@ -86,16 +89,20 @@ const TaskViewModal = ({
       task.pr_link = prLink;
 
       // ✅ Delay refresh to ensure the update syncs
-      setTimeout(() => {
+      /* setTimeout(() => {
         router.refresh();
-      }, 500);
+      }, 500); */
     } else {
       toast.error(response.error || "Failed to update PR Link");
     }
+
+    setUpdateLoading(false);
   };
 
   const handleMarkAsDone = async () => {
     if (!task) return;
+
+    setIsLoading(true);
 
     try {
       const result = await completeTask(task);
@@ -105,14 +112,14 @@ const TaskViewModal = ({
 
         // ✅ Manually update local state (UI update)
         if (onComplete) {
-          console.log(`✅ Calling onComplete for: ${task.id}`);
           onComplete(task.id);
         }
 
         // ✅ Close modal before refreshing
         onClose();
 
-        window.location.href = window.location.pathname + "?t=" + Date.now();
+        //remove refreshing the page, should be handled in action and on should revalidate
+        /*  window.location.href = window.location.pathname + "?t=" + Date.now(); */
       } else {
         toast.error(result.error || "Failed to complete task");
       }
@@ -120,6 +127,8 @@ const TaskViewModal = ({
       console.error("Error completing task:", error);
       toast.error("Failed to complete task");
     }
+
+    setIsLoading(false);
   };
 
   // State for Skill Category, Sidekick Details, and Primary Assignee
@@ -136,7 +145,7 @@ const TaskViewModal = ({
   useEffect(() => {
     if (task?.skill_category_id) {
       const fetchSkillCategory = async () => {
-        const supabase = createClientComponentClient();
+        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("skill_category")
           .select("id, name")
@@ -154,7 +163,7 @@ const TaskViewModal = ({
   useEffect(() => {
     const fetchSidekickDetails = async () => {
       if (task?.sidekick_ids && task.sidekick_ids.length > 0) {
-        const supabase = createClientComponentClient();
+        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")
@@ -172,7 +181,7 @@ const TaskViewModal = ({
       const assigneeId = task?.codev_id || task?.codev?.id;
 
       if (assigneeId) {
-        const supabase = createClientComponentClient();
+        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")
@@ -345,7 +354,13 @@ const TaskViewModal = ({
                       ? "text-md mt-4 flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-2 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
                       : "text-grey-100 bg-light-900 mt-4 w-full border-2 border-gray-300 bg-green-600 py-4 text-black hover:bg-green-700 sm:w-auto"
                   }
+                  disabled={
+                    updateLoading || prLink.trim() === (task?.pr_link || "")
+                  }
                 >
+                  {updateLoading && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
                   Update
                 </Button>
               </div>
@@ -446,8 +461,12 @@ const TaskViewModal = ({
               <Button
                 variant="default"
                 onClick={handleMarkAsDone}
+                disabled={isLoading}
                 className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               >
+                {isLoading && (
+                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Mark as Done
               </Button>
             )}

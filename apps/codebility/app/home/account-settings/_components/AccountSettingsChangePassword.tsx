@@ -1,7 +1,7 @@
 "use client";
 
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -32,7 +32,7 @@ const passwordChangeSchema = z
   });
 
 export default function AccountSettingsChangePassword() {
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   const form = useForm<z.infer<typeof passwordChangeSchema>>({
     resolver: zodResolver(passwordChangeSchema),
@@ -78,7 +78,7 @@ export default function AccountSettingsChangePassword() {
           <FormField
             control={form.control}
             name="password"
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <FormItem>
                 <FormControl>
                   <Input
@@ -98,7 +98,7 @@ export default function AccountSettingsChangePassword() {
           <FormField
             control={form.control}
             name="confirmPassword"
-            render={({ field }) => (
+            render={({ field }: { field: any }) => (
               <FormItem>
                 <FormControl>
                   <Input
