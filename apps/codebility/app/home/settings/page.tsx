@@ -5,10 +5,12 @@ import Link from "next/link";
 import SettingsCard from "@/app/home/settings/_components/SettingsCard";
 import { H1 } from "@/Components/shared/dashboard";
 import { settingsCardData } from "@/constants/settings";
-
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import Loading from "./loading";
-import { createClientClientComponent } from "@/utils/supabase/client";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type RolePermissions = {
   dashboard: boolean;

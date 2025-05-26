@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import H1 from "@/Components/shared/dashboard/H1";
 import { useUserStore } from "@/store/codev-store";
 import { Task } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import TasksContainer from "./_components/TasksContainer";
-import { createClientClientComponent } from "@/utils/supabase/client";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default function TaskPage() {
   const { user, isLoading: userLoading } = useUserStore();
