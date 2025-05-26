@@ -2,6 +2,9 @@ import Link from "next/link";
 import Logo from "@/Components/shared/Logo";
 import { Button } from "@/Components/ui/button";
 
+// Add this line to prevent static generation
+export const dynamic = 'force-dynamic';
+
 const WaitingPage = () => {
   return (
     <section className="bg-backgroundColor text-primaryColor flex h-screen w-screen items-center justify-center overflow-hidden">
