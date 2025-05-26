@@ -6,10 +6,10 @@ export const createAdminClient = async () => {
   const cookieStoreKeys = cookieStore.getAll();
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.SERVICE_ROLE;
+  const serviceRoleKey = process.env.DB_SERVICE_ROLE;
 
   if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error("Supabase environment variables are not set");
+    throw new Error("Supabase environment variables are not set in admin client creation.");
   }
 
   return createServerClient(
