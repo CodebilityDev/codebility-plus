@@ -10,6 +10,7 @@ import Hero from "./_components/ServicesHero";
 import ServicesTab from "./_components/ServicesTab";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
+
 interface TeamMember {
   id: string;
   first_name: string;
