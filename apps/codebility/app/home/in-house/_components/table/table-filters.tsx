@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
 import { Project } from "@/types/home/codev";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+
 import { Card } from "@codevs/ui/card";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
@@ -15,6 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface Role {
   id: number;
@@ -42,7 +43,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [displayPositions, setDisplayPositions] = useState<string[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
-  const supabase = useSupabase();
+  const supabase = createClientClientComponent();
 
   useEffect(() => {
     async function fetchProjects() {

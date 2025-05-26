@@ -1,15 +1,10 @@
-import dynamic from "next/dynamic";
+
 
 import { TimeLog } from "../_types/time-log";
+import TimeTrackerTableDesktop from "./TimeTrackerTableDesktop";
+import TimeTrackerTableMobile from "./TimeTrackerTableMobile";
 
-const TimeTrackerTableDesktop = dynamic(
-  () => import("./TimeTrackerTableDesktop"),
-  { ssr: false },
-);
-const TimeTrackerTableMobile = dynamic(
-  () => import("./TimeTrackerTableMobile"),
-  { ssr: false },
-);
+
 
 interface Props {
   timeLog: TimeLog[];

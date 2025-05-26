@@ -8,6 +8,9 @@ import Section from "../codevs/_components/CodevsSection";
 import CodevContainer from "./_components/CodevContainer";
 import CodevList from "./_components/CodevList";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function Profiles() {
   const [{ data: allCodevs, error }] = await Promise.all([
     getCodevs({ filters: { role_id: 4 } }),

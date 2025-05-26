@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { ChevronDown } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 
 import { Button } from "@codevs/ui/button";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface Position {
   id: string;
@@ -23,7 +23,7 @@ export function PositionMultiselectField({ id, error }: PositionSelectProps) {
   const [positions, setPositions] = useState<Position[]>([]);
   const [selectedPositions, setSelectedPositions] = useState<Position[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
   const { setValue } = useFormContext();
 
   useEffect(() => {

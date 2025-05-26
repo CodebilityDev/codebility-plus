@@ -7,8 +7,8 @@ import { useParams, useRouter } from "next/navigation";
 import Logo from "@/Components/shared/Logo";
 import { toast } from "react-hot-toast";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 type SignatureCanvasRef = {
   clear: () => void;
@@ -49,7 +49,7 @@ SignaturePad.displayName = "SignaturePad";
 export default function NdaSigningPage() {
   const params = useParams();
   const router = useRouter();
-  const supabase = useSupabase();
+  const supabase = createClientClientComponent();
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
 
   const [loading, setLoading] = useState(true);

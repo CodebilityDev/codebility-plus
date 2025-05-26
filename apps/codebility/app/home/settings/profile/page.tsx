@@ -5,7 +5,6 @@ import { H1 } from "@/Components/shared/dashboard";
 import CustomBreadcrumb from "@/Components/shared/dashboard/CustomBreadcrumb";
 import { useUserStore } from "@/store/codev-store";
 import { JobStatus, WorkExperience, WorkSchedule } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { Toaster } from "react-hot-toast";
 
 import About from "./_components/About";
@@ -17,6 +16,7 @@ import Photo from "./_components/Photo";
 import Skills from "./_components/Skills";
 import TimeSchedule from "./_components/TimeSchedule";
 import Loading from "./loading";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const items = [
   { label: "Settings", href: "/home/settings" },
@@ -58,7 +58,7 @@ const ProfileComponent = () => {
       if (!user?.id || !isHydrated) return;
 
       try {
-        const supabase = createClientComponentClient();
+        const supabase = createClientClientComponent();
         const [
           { data: education, error: educationError },
           { data: workExperience, error: experienceError },

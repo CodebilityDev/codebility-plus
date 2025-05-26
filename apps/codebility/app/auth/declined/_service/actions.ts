@@ -1,11 +1,12 @@
 "use server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
 export async function getUserData(): Promise<any> {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         const {
             data: { session },
@@ -34,7 +35,7 @@ export async function getUserData(): Promise<any> {
 
 export async function reApplyAction({ user }: { user: any }) {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         const { error } = await supabase
             .from("codev")

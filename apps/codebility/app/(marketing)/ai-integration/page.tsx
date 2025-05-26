@@ -12,6 +12,9 @@ import PartnerReactFlow from "./_components/AiIntegrationPartnerReactFlow";
 import AISolutions from "./_components/AiIntegrationSolutions";
 import UnparallelDigitalSuccess from "./_components/AiIntegrationUnparallelDigitalSuccess";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const AiIntegration = () => {
   return (
     <div className="bg-black-400 relative mx-auto flex min-h-screen flex-col gap-10 text-white">

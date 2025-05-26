@@ -1,12 +1,13 @@
 import { KanbanBoardType, KanbanColumnType, Task } from "@/types/home/codev";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+
 
 import KanbanBoard from "./_components/KanbanBoard";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 interface KanbanBoardPageProps {
-  params: { id: string };
-  searchParams: { query?: string };
+  params: Promise<{ id: string }>;
+  searchParams: Promise<{ query?: string }>;
 }
 
 // Mapping functions to convert raw data into our expected types.
@@ -43,12 +44,10 @@ const mapColumn = (column: any): KanbanColumnType => ({
   tasks: Array.isArray(column.tasks) ? column.tasks.map(mapTask) : [],
 });
 
-export default async function KanbanBoardPage({
-  params,
-  searchParams,
-}: KanbanBoardPageProps) {
-  const supabase = getSupabaseServerComponentClient();
-
+export default async function KanbanBoardPage(props: KanbanBoardPageProps) {
+  const searchParams = await props.searchParams;
+  const params = await props.params;
+  const supabase = await createClientServerComponent();
   // Query the board with nested columns and tasks
   const { data: board, error } = await supabase
     .from("kanban_boards")
