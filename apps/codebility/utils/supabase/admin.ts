@@ -1,24 +1,17 @@
+"use server";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
 export const createAdminClient = async () => {
   const cookieStore = await cookies();
-  const cookieStoreKeys = cookieStore.getAll();
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceRoleKey = process.env.DB_SERVICE_ROLE;
-
-  if (!supabaseUrl || !serviceRoleKey) {
-    throw new Error("Supabase environment variables are not set in admin client creation.");
-  }
 
   return createServerClient(
-    supabaseUrl,
-    serviceRoleKey,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.DB_SERVICE_ROLE!,
     {
       cookies: {
         getAll() {
-          return cookieStoreKeys;
+          return cookieStore.getAll();
         },
         setAll(cookiesToSet) {
           try {
