@@ -12,7 +12,7 @@ export const createClientServerComponent = async () => {
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
   
   if (!supabaseUrl || !supabaseKey) {
-    throw new Error("Supabase environment variables are not set");
+    throw new Error("Supabase environment variables are not set in server component creation.");
   }
 
   return createServerClient(
