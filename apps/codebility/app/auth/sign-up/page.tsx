@@ -3,6 +3,9 @@ import Link from "next/link";
 
 import SignUpForm from "./_components/SignUpForm";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const SignUpPage = () => {
   return (
     <div className="bg-black-500 flex min-h-screen items-center justify-center text-white md:px-4">
