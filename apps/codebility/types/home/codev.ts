@@ -270,6 +270,17 @@ export interface KanbanColumnType {
   tasks?: Task[];
 }
 
+export interface KanbanSprintType {
+  id: string; // UUID
+  board_id?: string; // UUID
+  project_id?: string; // UUID
+  name: string;
+  start_at: string;
+  end_at: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
 export interface Task {
   id: string; // UUID
   title: string;
