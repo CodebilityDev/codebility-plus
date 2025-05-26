@@ -1,11 +1,14 @@
 import { use } from "react";
 import H1 from "@/Components/shared/dashboard/H1";
 import { Project } from "@/types/home/codev";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 import AddProjectButton from "./_components/AddProjectButton";
 import ProjectCardContainer from "./_components/ProjectCardContainer";
 import ProjectFilterButton from "./_components/ProjectFilterButton";
-import { createClientServerComponent } from "@/utils/supabase/server";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type PageProps = {
   searchParams: Promise<{

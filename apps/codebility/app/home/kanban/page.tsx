@@ -20,6 +20,8 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 
 import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 // Types
 interface SearchParams {
   query?: string;
