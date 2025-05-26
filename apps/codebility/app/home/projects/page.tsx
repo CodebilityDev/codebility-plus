@@ -1,14 +1,19 @@
-import { use } from "react";
 import H1 from "@/Components/shared/dashboard/H1";
+import getProjects from "@/lib/server/project.service";
+import { getOrSetCache } from "@/lib/server/redis-cache";
+import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { Project } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 import AddProjectButton from "./_components/AddProjectButton";
 import ProjectCardContainer from "./_components/ProjectCardContainer";
 import ProjectFilterButton from "./_components/ProjectFilterButton";
+<<<<<<< HEAD
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
+=======
+>>>>>>> 29c0d54e (implement cache in projects and services page. Change services page to server component)
 
 type PageProps = {
   searchParams: Promise<{
@@ -21,34 +26,16 @@ const Projects = async (props: PageProps) => {
   const supabase = await createClientServerComponent();
   const filter = searchParams.filter;
 
-  const Projects = await supabase
-    .from("projects")
-    .select(
-      `
-      *,
-      project_members (
-        id,
-        codev_id,
-        role,
-        joined_at,
-        codev (
-          first_name,
-          last_name,
-          image_url
-        )
-      )
-      `,
-    )
-    .then(({ data, error }) => {
-      if (error) throw error;
+  const allProjects = await getOrSetCache(cacheKeys.projects.all, () =>
+    getProjects(),
+  );
 
-      if (filter && filter !== "all") {
-        return data?.filter(
+  const Projects =
+    filter && filter !== "all"
+      ? allProjects?.filter(
           (project) => project.status?.toLowerCase() === filter.toLowerCase(),
-        );
-      }
-      return data;
-    });
+        )
+      : allProjects;
 
   if (!Projects) {
     return (
