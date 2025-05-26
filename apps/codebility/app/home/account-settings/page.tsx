@@ -20,10 +20,23 @@ interface User {
 export default function AccountSettingsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [supabase, setSupabase] = useState<any>(null);
   const router = useRouter();
-  const supabase = createClientClientComponent();
+
+  // Initialize Supabase client safely on the client side
+  useEffect(() => {
+    try {
+      const client = createClientClientComponent();
+      setSupabase(client);
+    } catch (error) {
+      console.error("Failed to initialize Supabase client:", error);
+      router.push("/auth/login");
+    }
+  }, [router]);
 
   useEffect(() => {
+    if (!supabase) return;
+
     async function getUser() {
       try {
         const {
@@ -49,7 +62,7 @@ export default function AccountSettingsPage() {
     }
 
     getUser();
-  }, [router, supabase.auth]);
+  }, [router, supabase]);
 
   if (loading) {
     return (
