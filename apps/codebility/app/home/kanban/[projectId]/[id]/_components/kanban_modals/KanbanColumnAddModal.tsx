@@ -2,7 +2,7 @@
 
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createNewColumn } from "@/app/home/kanban/[id]/actions";
+import { createNewColumn } from "@/app/home/kanban/[projectId]/[id]/actions";
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,

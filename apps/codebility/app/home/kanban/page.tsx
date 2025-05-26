@@ -205,19 +205,16 @@ export default async function KanbanPage(props: PageProps) {
               )}
             </TableCell>
 
-            {/* Actions */}
-            <TableCell className="text-center md:table-cell">
-              <Link href={`${pathsConfig.app.kanban}/${board.id}`}>
-                <Button
-                  variant="hollow"
-                  className="inline-flex items-center gap-2"
-                >
-                  <IconKanban className="invert-colors h-4 w-4" />
-                  <span className="hidden sm:inline">View Board</span>
-                </Button>
-              </Link>
-            </TableCell>
-          </>
+      {/* Actions */}
+      <TableCell className="text-center md:table-cell">
+        <Link href={`${pathsConfig.app.kanban}/${board.projects.id}`}>
+          <Button variant="hollow" className="inline-flex items-center gap-2">
+            <IconKanban className="invert-colors h-4 w-4" />
+            <span className="hidden sm:inline">View Sprint</span>
+          </Button>
+        </Link>
+      </TableCell>
+      </>
         )}
       </TableRow>
     ));
@@ -227,7 +224,7 @@ export default async function KanbanPage(props: PageProps) {
   return (
     <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <H1>Kanban Boards</H1>
+        <H1>Kanban Projects</H1>
         <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
           <KanbanBoardsSearch
             className="h-10 w-full rounded-full border border-gray-200 bg-transparent px-5 text-sm focus:outline-none dark:border-gray-700 md:w-80"
