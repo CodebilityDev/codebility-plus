@@ -2,6 +2,7 @@
 
 import type { SkillCategory } from "@/types/home/codev";
 import { useEffect, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,
@@ -19,7 +20,7 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
@@ -29,6 +30,7 @@ import { Textarea } from "@codevs/ui/textarea";
 import { createNewTask } from "../../actions";
 import KanbanAddModalMembers from "../kanban_modals/KanbanAddModalMembers";
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
@@ -44,13 +46,15 @@ const TaskAddModal = () => {
   const [isPending, startTransition] = useTransition();
   const [description, setDescription] = useState("");
 
+  const router = useRouter();
+
   const onChange = (value: string) => {
     setDescription(value);
   };
 
   useEffect(() => {
     const loadSkillCategories = async () => {
-      const supabase = createClientComponentClient();
+      const supabase = createClientClientComponent();
       const { data, error } = await supabase
         .from("skill_category")
         .select("id, name")
@@ -95,8 +99,7 @@ const TaskAddModal = () => {
         toast.success("Task created successfully");
         onClose();
 
-        // More aggressive approach - force a complete page reload
-        window.location.href = window.location.pathname + "?t=" + Date.now();
+        router.refresh();
       } else {
         toast.error(response.error || "Failed to create task");
       }
@@ -114,7 +117,14 @@ const TaskAddModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px] h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
-        <form action={handleSubmit} className="flex flex-col gap-6">
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const formData = new FormData(e.currentTarget);
+            startTransition(() => handleSubmit(formData));
+          }}
+          className="flex flex-col gap-6"
+        >
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
               Add New Task
@@ -295,6 +305,7 @@ const TaskAddModal = () => {
               className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading || isPending}
             >
+              {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
               {loading || isPending ? "Creating..." : "Create Task"}
             </Button>
           </DialogFooter>

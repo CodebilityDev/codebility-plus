@@ -2,13 +2,13 @@ import Link from "next/link";
 import { Box, H1 } from "@/Components/shared/dashboard";
 import { ArrowRightIcon } from "@/public/assets/svgs";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 import PermissionsTable from "./_components/PermissionsTable";
 import { permissions_TableRowProps as TableRowProps } from "./_types/permissions";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 const PermissionSettings = async () => {
-  const supabase = getSupabaseServerComponentClient();
+  const supabase = await createClientServerComponent();
   const { data: Roles, error } = await supabase.from("user_type").select("*");
 
   return (

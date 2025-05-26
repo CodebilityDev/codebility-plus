@@ -1,9 +1,9 @@
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
+import { createClientServerComponent } from "@/utils/supabase/server";
 import OrgCharts from "./_components/OrgChart";
 
 const Page = async () => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
   const { data: orgChartData, error } = await supabase
     .from("codev")
     .select("id, first_name, last_name, display_position, image_url, application_status");

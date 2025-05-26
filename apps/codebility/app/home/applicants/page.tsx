@@ -1,7 +1,14 @@
-import ApplicantsPageClient from "./_components/ApplicantsPageClient";
+import React, { Suspense } from "react";
 
-const ApplicantsPage = async () => {
-  return <ApplicantsPageClient />;
-};
+import NewApplicantFetchComp from "./_components/applicantFetchComp";
+import ApplicantsLoading from "./loading";
 
-export default ApplicantsPage;
+export const dynamic = "force-dynamic";
+
+export default async function NewApplicants() {
+  return (
+    <Suspense fallback={<ApplicantsLoading />}>
+      <NewApplicantFetchComp />
+    </Suspense>
+  );
+}

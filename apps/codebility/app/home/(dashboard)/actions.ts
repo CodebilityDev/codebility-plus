@@ -1,8 +1,9 @@
 "use server";
 
 import { formatToUnix } from "@/lib/format-date-time";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
 import { z } from "zod";
 
 export const updateUserSchedule = async (
@@ -15,7 +16,7 @@ export const updateUserSchedule = async (
   },
   codevId: string,
 ) => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
   const { error } = await supabase
     .from("codev")
     .update({
@@ -28,7 +29,7 @@ export const updateUserSchedule = async (
 };
 
 export const startUserTimer = async (codevId: string) => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
   const currentDate = new Date();
 
   const { error } = await supabase
@@ -43,7 +44,7 @@ export const startUserTimer = async (codevId: string) => {
 };
 
 const stopUserTimer = async (codevId: string) => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
   const { error } = await supabase
     .from("codev")
@@ -56,7 +57,7 @@ const stopUserTimer = async (codevId: string) => {
 };
 
 export const logUserTime = async (formData: FormData) => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
   const codevId = formData.get("codevId") as string;
   const taskId = formData.get("taskId");
@@ -94,7 +95,7 @@ export const logUserTime = async (formData: FormData) => {
 };
 
 export const updateUserTaskOnHand = async (codevId: string, taskId: string) => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
   const formData = new FormData();
   formData.append("codevId", codevId);
@@ -122,7 +123,7 @@ export const updateUserAvailabilityStatus = async ({
 }
 ) => {
   try {
-    const supabase = getSupabaseServerActionClient();
+    const supabase = await createClientServerComponent();
 
     const { error } = await supabase
       .from("codev")
@@ -139,7 +140,7 @@ export const updateUserAvailabilityStatus = async ({
 
 export const fetchUserAvailabilityStatus = async (userId: string) => {
   try {
-    const supabase = getSupabaseServerActionClient();
+    const supabase = await createClientServerComponent();
 
     const { data, error } = await supabase
       .from("codev")
@@ -162,7 +163,7 @@ export const fetchUserAvailabilityStatus = async (userId: string) => {
 
 export const fetchUserInternalStatus = async (userID: string) => {
   try {
-    const supabase = getSupabaseServerActionClient();
+    const supabase = await createClientServerComponent();
 
     const { data, error } = await supabase
       .from("codev")

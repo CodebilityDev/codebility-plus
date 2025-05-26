@@ -10,7 +10,6 @@ import {
   TableHeader,
   TableRow,
 } from "@/Components/ui/table";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { startOfMonth, startOfWeek, subDays } from "date-fns";
 
 import {
@@ -22,6 +21,7 @@ import {
 } from "@codevs/ui/select";
 import { Skeleton } from "@codevs/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger } from "@codevs/ui/tabs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 type TimePeriod = "all" | "weekly" | "monthly";
 
@@ -72,7 +72,7 @@ export default function WeeklyTop() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("all");
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   useEffect(() => {
     const fetchCategories = async () => {
