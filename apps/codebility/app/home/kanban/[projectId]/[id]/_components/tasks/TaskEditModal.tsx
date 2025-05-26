@@ -2,8 +2,8 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import KanbanAddModalMembers from "@/app/home/kanban/[id]/_components/kanban_modals/KanbanAddModalMembers";
-import { updateTask } from "@/app/home/kanban/[id]/actions";
+import KanbanAddModalMembers from "@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddModalMembers";
+import { updateTask } from "@/app/home/kanban/[projectId]/[id]/actions";
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,
