@@ -1,3 +1,6 @@
+export const dynamic = "force-dynamic";
+
+
 import { getCachedUser } from "@/lib/server/supabase-server-comp";
 
 import { Card, CardContent, CardFooter } from "@codevs/ui/card";
