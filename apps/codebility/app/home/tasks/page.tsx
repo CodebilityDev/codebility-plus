@@ -4,9 +4,12 @@ import { useEffect, useState } from "react";
 import H1 from "@/Components/shared/dashboard/H1";
 import { useUserStore } from "@/store/codev-store";
 import { Task } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import TasksContainer from "./_components/TasksContainer";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default function TaskPage() {
   const { user, isLoading: userLoading } = useUserStore();
@@ -22,7 +25,7 @@ export default function TaskPage() {
       setError(null);
 
       try {
-        const supabase = createClientComponentClient();
+        const supabase = createClientClientComponent();
 
         const { data, error } = await supabase
           .from("tasks")

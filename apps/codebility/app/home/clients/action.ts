@@ -2,8 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { deleteImage, uploadImage } from "@/utils/uploadImage";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
 /**
  * CREATE CLIENT ACTION
@@ -22,7 +22,7 @@ export const createClientAction = async (formData: FormData) => {
   const country = formData.get("country") as string;
   const logoFile = formData.get("logo") as File | null; // This will be uploaded
 
-  const supabase = await getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
   let company_logo: string | null = null;
   if (logoFile) {
@@ -79,7 +79,7 @@ export const updateClientAction = async (
   const country = formData.get("country") as string | null;
   const logoFile = formData.get("logo") as File | null;
 
-  const supabase = await getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
   // Fetch existing client row
   const { data: clientData, error: fetchError } = await supabase
@@ -144,7 +144,7 @@ export const updateClientAction = async (
  * If a client is 'inactive', set them 'active'; otherwise, set them 'inactive'.
  */
 export const toggleClientStatusAction = async (clientId: string) => {
-  const supabase = await getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
   const { data: client, error: fetchError } = await supabase
     .from("clients")
@@ -181,7 +181,7 @@ export const toggleClientStatusAction = async (clientId: string) => {
  * Removes a client row by ID. Also deletes its associated image from storage if present.
  */
 export const deleteClientAction = async (id: string) => {
-  const supabase = await getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
   // 1. Fetch the client’s existing company_logo, if any
   const { data: clientData, error: getClientError } = await supabase

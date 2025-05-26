@@ -1,13 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import Calendly from "../_components/MarketingCalendly";
 import Footer from "../_components/MarketingFooter";
 import Navigation from "../_components/MarketingNavigation";
 import Hero from "./_components/ServicesHero";
 import ServicesTab from "./_components/ServicesTab";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface TeamMember {
   id: string;
@@ -39,7 +42,7 @@ export default function ServicesPage() {
   const [projectsData, setProjectsData] = useState<ProjectData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   useEffect(() => {
     async function fetchProjects() {

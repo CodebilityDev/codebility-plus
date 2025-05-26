@@ -1,5 +1,6 @@
 import pathsConfig from "@/config/paths.config";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
+
 
 export type SidebarLink = {
   route: string;
@@ -36,7 +37,7 @@ export const getSidebarData = async (
     return [];
   }
 
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   // Fetch role permissions
   const { data: rolePermissions, error } = await supabase
