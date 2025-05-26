@@ -9,6 +9,5 @@ export const cacheKeys = {
     },
     projects: {
         all: 'cache:projects:all',
-        portfolio: 'cache:projects:portfolio'
     },
 }
