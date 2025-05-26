@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 import { z } from "zod";
 
 import { resetUserPassword } from "../action";
-import { createClientClientComponent } from "@/utils/supabase/client";
+/* import { createClientClientComponent } from "@/utils/supabase/client"; */
 
 // Define the schema for email validation
 const EmailValidation = z.object({
@@ -24,8 +24,8 @@ const PasswordResetForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const supabase = createClientClientComponent(); // Initialize Supabase client
-
+/*   const supabase = createClientClientComponent(); // Initialize Supabase client
+ */
   const {
     control,
     handleSubmit,
