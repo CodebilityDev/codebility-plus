@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { Button } from "@/Components/ui/button";
+import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { IconPlus } from "@/public/assets/svgs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
+import { cn } from "@codevs/ui";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -42,6 +45,7 @@ export default function KanbanAddModalMembers({
   const [selectedMemberIds, setSelectedMemberIds] = useState<string[]>(
     initialSelectedMembers,
   );
+  const [user, setUser] = useState<any | null>(null);
 
   const [availableMembers, setAvailableMembers] = useState<CodevMember[]>([]);
 
@@ -61,26 +65,31 @@ export default function KanbanAddModalMembers({
 
   //   loadMembers();
   // }, [projectId]);
-  
+
   useEffect(() => {
     const loadMembers = async () => {
       try {
+        const supabase = createClientClientComponent();
         console.log("Fetching members for project ID:", projectId);
         const members = await fetchAvailableMembers(projectId);
         console.log("Fetched members:", members); // Debugging log
-  
+        const user = await supabase.auth.getUser();
+        console.log("Current user:", user); // Debugging logi
+
         if (Array.isArray(members)) {
           setAvailableMembers(members);
         } else {
           console.error("Expected an array but got:", members);
         }
+
+        setUser(user.data.user);
       } catch (error) {
         console.error("Error loading members:", error);
       } finally {
         setIsLoading(false);
       }
     };
-  
+
     if (projectId) {
       loadMembers();
     }
@@ -90,7 +99,7 @@ export default function KanbanAddModalMembers({
     selectedMemberIds.includes(member.id),
   );
 
-  const addMember =  (memberId: string) => {
+  const addMember = (memberId: string) => {
     if (singleSelection) {
       const newIds = [memberId];
       setSelectedMemberIds(newIds);
@@ -108,6 +117,14 @@ export default function KanbanAddModalMembers({
     onMembersChange?.(newSelectedIds); // Ensure this triggers parent update
   };
 
+  const handleSelfAssign = () => {
+    if (user && !selectedMemberIds.includes(user.id)) {
+      const newSelectedIds = [...selectedMemberIds, user.id];
+      setSelectedMemberIds(newSelectedIds);
+      onMembersChange?.(newSelectedIds);
+    }
+  };
+
   const filteredMembers = availableMembers.filter((member) =>
     `${member.first_name} ${member.last_name}`
       .toLowerCase()
@@ -116,9 +133,9 @@ export default function KanbanAddModalMembers({
 
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor="members" className="text-sm font-medium">
+      {/*  <label htmlFor="members" className="text-sm font-medium">
         Team Members
-      </label>
+      </label> */}
       <input
         type="hidden"
         name="membersId"
@@ -173,7 +190,7 @@ export default function KanbanAddModalMembers({
                 placeholder="Search members..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500 dark:bg-dark-200"
+                className="dark:bg-dark-200 w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
               />
             </div>
 
@@ -222,6 +239,24 @@ export default function KanbanAddModalMembers({
             )}
           </DropdownMenuContent>
         </DropdownMenu>
+
+        {/* self assign */}
+        <div
+          className={cn(
+            "flex items-center justify-center",
+            !selectedMemberIds.includes(user?.id) ? "flex" : "hidden",
+          )}
+        >
+          <Button
+            onClick={handleSelfAssign}
+            disabled={isLoading}
+            variant={"ghost"}
+            type="button"
+            className="w-fit cursor-pointer hover:text-blue-300 dark:hover:text-blue-100"
+          >
+            self assign
+          </Button>
+        </div>
       </div>
     </div>
   );
