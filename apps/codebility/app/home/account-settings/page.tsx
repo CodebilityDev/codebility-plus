@@ -21,7 +21,7 @@ export default function AccountSettingsPage() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   useEffect(() => {
     async function getUser() {
