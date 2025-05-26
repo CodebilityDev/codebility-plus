@@ -22,7 +22,7 @@ import {
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { SkillCategory, Task } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 
@@ -32,6 +32,7 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
@@ -72,7 +73,7 @@ const TaskEditModal = () => {
   // Fetch skill categories
   useEffect(() => {
     const loadSkillCategories = async () => {
-      const supabase = createClientComponentClient();
+      const supabase = createClientClientComponent();
       const { data, error } = await supabase
         .from("skill_category")
         .select("id, name")
@@ -91,7 +92,7 @@ const TaskEditModal = () => {
     if (isModalOpen && data) {
       const fetchProjectData = async () => {
         try {
-          const supabase = createClientComponentClient();
+          const supabase = createClientClientComponent();
 
           // Get board_id from kanban_column
           const { data: column } = await supabase

@@ -6,7 +6,7 @@ const PathsSchema = z.object({
     signUp: z.string().min(1),
     callback: z.string().min(1),
     passwordReset: z.string().min(1),
-    onboarding: z.string().min(1), 
+    onboarding: z.string().min(1),
   }),
   app: z.object({
     home: z.string().min(1),
@@ -15,6 +15,7 @@ const PathsSchema = z.object({
     in_hose: z.string().min(1),
     interns: z.string().min(1),
     kanban: z.string().min(1),
+    feeds: z.string().min(1),
     orgchart: z.string().min(1),
     projects: z.string().min(1),
     tasks: z.string().min(1),
@@ -24,11 +25,8 @@ const PathsSchema = z.object({
     services: z.string().min(1),
     permissions: z.string().min(1),
     resume: z.string().min(1),
-
-
-
+    my_team: z.string().min(1),
     admin_dashboard: z.string().min(1),
-
   }),
 });
 
@@ -47,6 +45,8 @@ const pathsConfig = PathsSchema.parse({
     in_hose: "/home/in-house",
     interns: "/home/interns",
     kanban: "/home/kanban",
+    feeds: "/home/feeds",
+    my_team: "/home/my-team",
     orgchart: "/home/orgchart",
     projects: "/home/projects",
     tasks: "/home/tasks",

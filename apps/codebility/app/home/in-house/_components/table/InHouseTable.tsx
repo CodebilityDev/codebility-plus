@@ -7,7 +7,7 @@ import { Codev, InternalStatus } from "@/types/home/codev";
 import { Download, Link2, Mail } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+
 import { Button } from "@codevs/ui/button";
 import {
   DropdownMenu,
@@ -36,6 +36,7 @@ import { StatusBadge } from "../shared/StatusBadge";
 import { columns } from "./columns";
 import { EditableRow, Role } from "./EditableRow";
 import { TableActions } from "./TableActions";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface NdaEmailDialogProps {
   codev: Codev;
@@ -109,7 +110,7 @@ export function InHouseTable({
   pagination,
   onDelete,
 }: InHouseTableProps) {
-  const supabase = useSupabase();
+  const supabase = createClientClientComponent();
 
   // For inline editing
   const [editingId, setEditingId] = useState<string | null>(null);

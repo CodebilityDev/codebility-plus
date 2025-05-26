@@ -20,10 +20,11 @@ import { Codev } from "@/types/home/codev";
 import ProfileCloseButton from "./_components/ProfileCloseButton";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
-export default async function CodevBioPage({ params }: Props) {
+export default async function CodevBioPage(props: Props) {
+  const params = await props.params;
   const id = params.id;
 
   // Fetch data for the profile
@@ -122,6 +123,7 @@ export default async function CodevBioPage({ params }: Props) {
                   className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
                 >
                   <IconFacebook className="text-2xl" />
+
                 </Link>
               )}
               {linkedin && (
@@ -148,7 +150,7 @@ export default async function CodevBioPage({ params }: Props) {
                   target="_blank"
                   className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300"
                 >
-                  <IconLink className="text-2xl" />
+                 <IconLink className="text-2xl" />
                 </Link>
               )}
             </div>

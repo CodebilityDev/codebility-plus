@@ -1,5 +1,6 @@
 import pathsConfig from "@/config/paths.config";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
+
 
 export type SidebarLink = {
   route: string;
@@ -36,7 +37,7 @@ export const getSidebarData = async (
     return [];
   }
 
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   // Fetch role permissions
   const { data: rolePermissions, error } = await supabase
@@ -107,6 +108,12 @@ export const getSidebarData = async (
           imgURL: "/assets/svgs/icon-interns.svg",
           label: "Codevs",
           permission: "interns" as PermissionKey,
+        },
+        {
+          route: pathsConfig.app.my_team,
+          imgURL: "/assets/svgs/icon-my-team-white.svg", // Replace with your icon path
+          label: "My Team",
+          permission: "interns" as PermissionKey, // Using "interns" permission for now
         },
         {
           route: pathsConfig.app.orgchart,

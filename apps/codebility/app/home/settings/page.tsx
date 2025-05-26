@@ -5,9 +5,10 @@ import Link from "next/link";
 import SettingsCard from "@/app/home/settings/_components/SettingsCard";
 import { H1 } from "@/Components/shared/dashboard";
 import { settingsCardData } from "@/constants/settings";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 
 import Loading from "./loading";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 type RolePermissions = {
   dashboard: boolean;
@@ -35,7 +36,7 @@ const settingsPermissionMap: Record<string, PermissionKey> = {
 };
 
 const Settings = () => {
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   // Instead of using useUser, assume roleId is known (e.g. passed as a prop or hardcoded)
   const roleId = 2; // Replace with actual logic to obtain the user's roleId

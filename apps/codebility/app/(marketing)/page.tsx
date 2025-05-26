@@ -1,3 +1,5 @@
+"use server";
+
 import Admins from "./_components/landing/LandingAdmins";
 import Features from "./_components/landing/LandingFeatures";
 import Hero from "./_components/landing/LandingHero";
@@ -9,7 +11,7 @@ import Calendly from "./_components/MarketingCalendly";
 import Footer from "./_components/MarketingFooter";
 import Navigation from "./_components/MarketingNavigation";
 
-const Index = () => {
+export default async function Index() {
   return (
     <div
       className={`bg-black-400 relative flex w-full flex-col overflow-x-hidden overflow-y-hidden `}
@@ -26,6 +28,4 @@ const Index = () => {
       <Footer />
     </div>
   );
-};
-
-export default Index;
+}

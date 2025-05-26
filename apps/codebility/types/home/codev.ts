@@ -325,7 +325,6 @@ export interface Roles {
   dashboard?: boolean;
 }
 
-
 export interface CertificateProps {
   background: string;
   logo: string;

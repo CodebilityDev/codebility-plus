@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
+/* import {
   ApplicantsFormValues,
   applicantsSchema,
 } from "@/app/home/applicants/_lib/applicants-schema";
-import { updateAction } from "@/app/home/applicants/action";
+import { updateAction } from "@/app/home/applicants/action"; */
 import { Button } from "@/Components/ui/button";
 import {
   Dialog,
@@ -24,7 +24,9 @@ import toast from "react-hot-toast";
 import { Input } from "@codevs/ui/input";
 
 const ApplicantsEditModal = () => {
-  const { isOpen, onClose, type, data } = useModal();
+  return <></>;
+
+  /*  const { isOpen, onClose, type, data } = useModal();
   const { onOpen: onOpenTechkStack } = useModalTechkStack();
   const { stack, clearStack, setStack } = useTechStackStore();
   const isModalOpen = isOpen && type === "applicantsEditModal";
@@ -238,7 +240,7 @@ const ApplicantsEditModal = () => {
         </form>
       </DialogContent>
     </Dialog>
-  );
+  ); */
 };
 
 export default ApplicantsEditModal;
