@@ -1,12 +1,12 @@
 "use server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { headers } from "next/headers";
 
 export const resetUserPassword = async (email: string) => {
     try {
 
-        const supabase = getSupabaseServerActionClient();
+        const supabase =  await createClientServerComponent();
         const origin = (await headers()).get("origin");
 
         // check the user of the email

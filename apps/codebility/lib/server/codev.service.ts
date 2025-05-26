@@ -1,8 +1,9 @@
 import "server-only";
 
 import { Client, Codev, Project, WorkExperience } from "@/types/home/codev";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+
 
 export const getCodevs = async ({
   filters = {},
@@ -13,8 +14,7 @@ export const getCodevs = async ({
     application_status?: string;
   };
 } = {}): Promise<{ error: any; data: Codev[] | null }> => {
-  const supabase = getSupabaseServerComponentClient();
-
+   const supabase = await createClientServerComponent();
   let query = supabase.from("codev").select(`
     id,
     first_name,
@@ -150,7 +150,7 @@ export const getClients = async (): Promise<{
   error: any;
   data: Client[] | null;
 }> => {
-  const supabase = getSupabaseServerComponentClient();
+   const supabase = await createClientServerComponent();
   const { data, error } = await supabase.from("clients").select(`
     id,
     name,

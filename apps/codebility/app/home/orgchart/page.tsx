@@ -1,12 +1,17 @@
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 import OrgCharts from "./_components/OrgChart";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 const Page = async () => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
   const { data: orgChartData, error } = await supabase
     .from("codev")
-    .select("id, first_name, last_name, display_position, image_url, application_status");
+    .select(
+      "id, first_name, last_name, display_position, image_url, application_status",
+    );
 
   if (error) {
     return <div>Error loading organization chart</div>;
@@ -34,5 +39,3 @@ const Page = async () => {
 };
 
 export default Page;
-
-

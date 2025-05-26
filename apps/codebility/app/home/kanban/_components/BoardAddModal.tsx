@@ -21,13 +21,14 @@ import {
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { Project } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const BoardAddModal = () => {
-  const supabase = createClientComponentClient();
+  const supabase = createClientClientComponent();
 
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "boardAddModal";

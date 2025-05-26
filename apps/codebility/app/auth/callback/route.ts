@@ -1,6 +1,7 @@
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
+
 
 export const dynamic = "force-dynamic";
 
@@ -12,8 +13,8 @@ export async function GET(request: Request) {
   const tokenHash = requestUrl.searchParams.get("token_hash");
 
   if (tokenHash) {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const cookieStore = await cookies();
+    const supabase = await createClientServerComponent();
 
     await supabase.auth.verifyOtp({ token_hash: tokenHash, type: "email" });
 
@@ -23,8 +24,8 @@ export async function GET(request: Request) {
   }
 
   if (code) {
-    const cookieStore = cookies();
-    const supabase = createRouteHandlerClient({ cookies: () => cookieStore });
+    const cookieStore = await cookies();
+    const supabase = await createClientServerComponent();
 
     try {
       // Fetch the role ID for "Applicant" from the roles table

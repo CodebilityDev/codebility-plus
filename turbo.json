@@ -8,6 +8,11 @@
       "dependsOn": ["^build"],
       "outputs": [".next/**", "dist/**"]
     },
+    "start": {
+      "dependsOn": ["^start"],
+      "persistent": true,
+      "cache": false
+    },
     "dev": {
       "cache": false,
       "persistent": false
