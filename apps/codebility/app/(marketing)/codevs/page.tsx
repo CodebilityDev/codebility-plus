@@ -8,18 +8,12 @@ import MissionVision from "./_components/CodevsMissionVision";
 import Project from "./_components/CodevsProject";
 import Roadmap from "./_components/CodevsRoadmap";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default function Codevs() {
   return (
     <div className="bg-black-400 relative flex w-full flex-col">
-      {/* <Navigation />
-      <Hero />
-      <Profiles />
-      <FeaturedSection />
-      <Project />
-      <Roadmap />
-      <MissionVision />
-      <CTA />
-      <Footer /> */}
       <Navigation />
       <Hero />
       <Profiles />

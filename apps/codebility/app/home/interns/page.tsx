@@ -1,5 +1,3 @@
-"use server";
-
 import { getCodevs } from "@/lib/server/codev.service";
 
 import CodevContainer from "./_components/CodevContainer";
