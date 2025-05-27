@@ -9,6 +9,9 @@ import Navigation from "../_components/MarketingNavigation";
 import Hero from "./_components/ServicesHero";
 import ServicesTab from "./_components/ServicesTab";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 interface TeamMember {
   id: string;
   first_name: string;
