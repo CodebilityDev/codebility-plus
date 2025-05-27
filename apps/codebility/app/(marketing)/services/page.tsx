@@ -9,8 +9,9 @@ import Navigation from "../_components/MarketingNavigation";
 import Hero from "./_components/ServicesHero";
 import ServicesTab from "./_components/ServicesTab";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// REMOVED: These exports are not allowed in client components
+// export const dynamic = "force-dynamic";
+// export const revalidate = 0;
 
 interface TeamMember {
   id: string;
@@ -42,9 +43,17 @@ export default function ServicesPage() {
   const [projectsData, setProjectsData] = useState<ProjectData[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  // Initialize Supabase client safely on the client side
+  useEffect(() => {
+    const client = createClientClientComponent();
+    setSupabase(client);
+  }, []);
 
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchProjects() {
       setIsLoading(true);
       try {
@@ -76,6 +85,7 @@ export default function ServicesPage() {
             )
           `,
         ); // Removed status filter to see if any projects exist
+
         if (error) {
           console.error("Error fetching projects:", error);
           setError(error.message);
