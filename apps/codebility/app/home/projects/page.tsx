@@ -8,12 +8,9 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 import AddProjectButton from "./_components/AddProjectButton";
 import ProjectCardContainer from "./_components/ProjectCardContainer";
 import ProjectFilterButton from "./_components/ProjectFilterButton";
-<<<<<<< HEAD
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
-=======
->>>>>>> 29c0d54e (implement cache in projects and services page. Change services page to server component)
 
 type PageProps = {
   searchParams: Promise<{
