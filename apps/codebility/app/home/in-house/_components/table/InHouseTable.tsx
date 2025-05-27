@@ -4,9 +4,9 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { Codev, InternalStatus } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { Download, Link2, Mail } from "lucide-react";
 import { toast } from "react-hot-toast";
-
 
 import { Button } from "@codevs/ui/button";
 import {
@@ -36,7 +36,6 @@ import { StatusBadge } from "../shared/StatusBadge";
 import { columns } from "./columns";
 import { EditableRow, Role } from "./EditableRow";
 import { TableActions } from "./TableActions";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface NdaEmailDialogProps {
   codev: Codev;
@@ -110,7 +109,12 @@ export function InHouseTable({
   pagination,
   onDelete,
 }: InHouseTableProps) {
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   // For inline editing
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -118,6 +122,8 @@ export function InHouseTable({
 
   // Fetch roles when component mounts
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchRoles() {
       const { data: rolesData, error } = await supabase
         .from("roles")

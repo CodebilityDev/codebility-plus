@@ -11,6 +11,7 @@ import {
   Project,
   WorkExperience,
 } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { uploadImage } from "@/utils/uploadImage";
 import { Check, Plus, Upload, X } from "lucide-react";
 import { toast } from "react-hot-toast";
@@ -27,7 +28,6 @@ import {
 import { TableCell, TableRow } from "@codevs/ui/table";
 
 import { ProjectSelect } from "../shared/ProjectSelect";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 // If you have a separate "Role" interface:
 export interface Role {
@@ -48,7 +48,12 @@ export function EditableRow({
   onCancel,
   roles,
 }: EditableRowProps) {
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   // --- 1) LOCAL EDIT STATE ---
   // We'll clone the incoming "data" into our own local "editForm"
@@ -65,6 +70,8 @@ export function EditableRow({
 
   // --- 2) FETCH POSITIONS (once) ---
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchPositions() {
       const { data: positionsData, error } = await supabase
         .from("positions")

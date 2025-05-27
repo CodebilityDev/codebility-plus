@@ -29,9 +29,16 @@ export const PositionSelect = ({
 }: PositionSelectProps) => {
   const [positions, setPositions] = useState<Position[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientClientComponent();
+
+  const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
     const fetchPositions = async () => {
       try {
         const { data, error } = await supabase
@@ -49,7 +56,7 @@ export const PositionSelect = ({
     };
 
     fetchPositions();
-  }, []);
+  }, [supabase]);
 
   return (
     <Select value={value} onValueChange={onChange} disabled={isLoading}>

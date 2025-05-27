@@ -13,8 +13,15 @@ export default function TaskPage() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isTaskLoading, setIsTaskLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [supabase, setSupabase] = useState<any>(null);
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchTasks() {
       if (!user) return;
 
@@ -22,7 +29,6 @@ export default function TaskPage() {
       setError(null);
 
       try {
-        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("tasks")
           .select(
@@ -58,7 +64,7 @@ export default function TaskPage() {
         if (error) throw error;
 
         // Normalize any array responses to single objects
-        const fetchedTasks: Task[] = (data || []).map((task) => {
+        const fetchedTasks: Task[] = (data || []).map((task: any) => {
           // If kanban_column is an array, grab the first element
           const column = Array.isArray(task.kanban_column)
             ? task.kanban_column[0]
@@ -115,7 +121,7 @@ export default function TaskPage() {
     }
 
     fetchTasks();
-  }, [user]);
+  }, [user, supabase]);
 
   // Loading state
   if (userLoading || isTaskLoading) {

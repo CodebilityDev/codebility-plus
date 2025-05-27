@@ -10,7 +10,13 @@ import { Roles } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 const LeftSidebar = () => {
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   const { isToggleOpen, toggleNav } = useNavStore();
   const pathname = usePathname();
 
@@ -18,6 +24,7 @@ const LeftSidebar = () => {
   const [userRole, setUserRole] = useState<Roles | null>(null);
 
   useEffect(() => {
+    if (!supabase) return;
     const fetchUserData = async () => {
       try {
         const {

@@ -1,3 +1,5 @@
+"use client";
+
 import { Lock } from "lucide-react";
 
 import { CardDescription, CardHeader, CardTitle } from "@codevs/ui/card";
@@ -5,7 +7,7 @@ import { Input } from "@codevs/ui/input";
 
 import AccountSettingsDialog from "./AccountSettingsDialog";
 
-export default async function AccountSettingsHeader({
+export default function AccountSettingsHeader({
   email,
 }: {
   email: string;

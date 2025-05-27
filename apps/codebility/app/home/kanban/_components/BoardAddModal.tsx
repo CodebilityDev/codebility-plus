@@ -21,14 +21,18 @@ import {
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { Project } from "@/types/home/codev";
-
+import { createClientClientComponent } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 const BoardAddModal = () => {
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   const { isOpen, onClose, type } = useModal();
   const isModalOpen = isOpen && type === "boardAddModal";
@@ -38,6 +42,7 @@ const BoardAddModal = () => {
   const [name, setName] = useState("");
 
   useEffect(() => {
+    if (!supabase) return;
     const fetchProjects = async () => {
       const { data, error } = await supabase.from("project").select();
 
@@ -52,7 +57,7 @@ const BoardAddModal = () => {
     if (isModalOpen) {
       fetchProjects();
     }
-  }, [isModalOpen]);
+  }, [isModalOpen, supabase]);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
