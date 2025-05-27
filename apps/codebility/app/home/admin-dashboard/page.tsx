@@ -10,6 +10,9 @@ import AdminDashboardTotalInactiveIntern from "./_components/AdminDashboardTotal
 import AdminDashboardTotalMentor from "./_components/AdminDashboardTotalMentor";
 import AdminDashboardTotalProjects from "./_components/AdminDashboardTotalProject";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 async function getDashboardData() {
   const supabase = await createClientServerComponent();
   const { data: codev, error: codevError } = await supabase
