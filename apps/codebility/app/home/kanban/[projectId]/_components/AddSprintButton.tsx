@@ -16,8 +16,7 @@ export default function AddSprintButton({ projectId }: AddSprintButtonProps) {
     user?.role_id === 1 ||
     user?.role_id === 2 ||
     user?.role_id === 3 ||
-    user?.role_id === 5 ||
-    user?.role_id === 4; // FIXME: Temporary role for intern
+    user?.role_id === 5;
 
   return (
     <>

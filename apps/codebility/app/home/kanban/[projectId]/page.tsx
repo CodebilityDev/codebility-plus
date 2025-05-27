@@ -19,7 +19,6 @@ import { getSupabaseServerComponentClient } from "@codevs/supabase/server-compon
 import { KanbanBoardType, KanbanSprintType } from "@/types/home/codev";
 import { format } from "date-fns";
 import AddSprintButton from "./_components/AddSprintButton";
-import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
 
 // Types
 interface Params {
@@ -44,7 +43,6 @@ interface KanbanProjectWithSprintsData {
 
 interface PageProps {
   params: Params;
-  searchParams: SearchParams;
 }
 
 const mapSprint = (sprint: any): KanbanSprintData => {
@@ -74,7 +72,6 @@ function formatDateRange(startDate: string | null, endDate: string | null): stri
 
 export default async function KanbanSprintPage({
   params,
-  searchParams,
 }: PageProps) {
   const supabase = getSupabaseServerComponentClient();
 
@@ -109,6 +106,7 @@ export default async function KanbanSprintPage({
       `)
       .eq("id", params.projectId)
       .single();
+
 
     // Execute the query
     const { data, error } = await projectWithSprintsQuery;
@@ -212,10 +210,6 @@ export default async function KanbanSprintPage({
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <H1>Kanban Sprints - {project?.name || "Loading..."}</H1>
           <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
-            <KanbanBoardsSearch
-              className="h-10 w-full rounded-full border border-gray-200 bg-transparent px-5 text-sm focus:outline-none dark:border-gray-700 md:w-80"
-              placeholder="Search sprints..."
-            />
             <AddSprintButton projectId={params.projectId} />
           </div>
         </div>
