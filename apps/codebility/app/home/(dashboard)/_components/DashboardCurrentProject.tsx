@@ -25,9 +25,17 @@ const DashboardCurrentProject = () => {
   const { user } = useUserStore();
   const [projects, setProjects] = useState<ProjectInvolvement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  // Initialize Supabase client safely
+  useEffect(() => {
+    const client = createClientClientComponent();
+    setSupabase(client);
+  }, []);
 
   useEffect(() => {
+    if (!supabase) return;
+
     const fetchProjects = async () => {
       setIsLoading(true);
       if (!user?.id) return;
