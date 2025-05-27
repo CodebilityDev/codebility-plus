@@ -23,7 +23,6 @@ export default function TaskPage() {
 
       try {
         const supabase = createClientClientComponent();
-
         const { data, error } = await supabase
           .from("tasks")
           .select(
