@@ -13,9 +13,6 @@ import ProjectAddModal from "@/app/home/projects/_components/ProjectAddModal";
 import ProjectDeleteModal from "@/app/home/projects/_components/ProjectDeleteModal";
 import ProjectEditModal from "@/app/home/projects/_components/ProjectEditModal";
 import ProjectViewModal from "@/app/home/projects/_components/ProjectViewModal";
-import AddRoleModal from "@/app/home/settings/roles/_components/AddRoleModal";
-import DeleteRoleModal from "@/app/home/settings/roles/_components/DeleteRoleModal";
-import EditRoleModal from "@/app/home/settings/roles/_components/EditRoleModal";
 import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
 import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
@@ -62,9 +59,6 @@ export const ModalProviderHome = () => {
 
       <TimeTrackerModal />
 
-      <AddRoleModal />
-      <EditRoleModal />
-      <DeleteRoleModal />
       <DeleteWarningModal />
 
       <TechStackModal />
