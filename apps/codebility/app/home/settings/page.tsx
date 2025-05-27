@@ -35,7 +35,8 @@ const settingsPermissionMap: Record<string, PermissionKey> = {
 };
 
 const Settings = () => {
-  const supabase = createClientClientComponent();
+  // Move Supabase client initialization to state and useEffect
+  const [supabase, setSupabase] = useState<any>(null);
 
   // Instead of using useUser, assume roleId is known (e.g. passed as a prop or hardcoded)
   const roleId = 2; // Replace with actual logic to obtain the user's roleId
@@ -44,12 +45,20 @@ const Settings = () => {
     useState<RolePermissions | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
+  // Initialize Supabase client safely
+  useEffect(() => {
+    const client = createClientClientComponent();
+    setSupabase(client);
+  }, []);
+
   // Helper function to check a permission
   const hasPermission = (permission: PermissionKey): boolean => {
     return !!rolePermissions?.[permission];
   };
 
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchRolePermissions() {
       try {
         // Fetch the role permissions from the "roles" table.
