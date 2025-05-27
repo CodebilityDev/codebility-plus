@@ -8,9 +8,6 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 
 import TasksContainer from "./_components/TasksContainer";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 export default function TaskPage() {
   const { user, isLoading: userLoading } = useUserStore();
   const [tasks, setTasks] = useState<Task[]>([]);
