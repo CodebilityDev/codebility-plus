@@ -1,6 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Codev } from "@/types/home/codev";
-
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { Edit2, Eye, MoreHorizontal, Trash2 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -13,7 +13,6 @@ import {
 } from "@codevs/ui/dropdown-menu";
 
 import { DeleteDialog } from "../shared/DeleteDialog";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface TableActionsProps {
   item: Codev;
@@ -24,7 +23,12 @@ interface TableActionsProps {
 export function TableActions({ item, onEdit, onDelete }: TableActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   const handleDelete = async () => {
     try {

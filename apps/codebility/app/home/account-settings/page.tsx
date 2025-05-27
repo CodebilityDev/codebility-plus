@@ -23,8 +23,13 @@ export default function AccountSettingsPage() {
   const [supabase, setSupabase] = useState<any>(null);
   const router = useRouter();
 
-  // Initialize Supabase client safely on the client side
   useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
+  // Initialize Supabase client safely on the client side
+  /* useEffect(() => {
     try {
       const client = createClientClientComponent();
       setSupabase(client);
@@ -32,7 +37,7 @@ export default function AccountSettingsPage() {
       console.error("Failed to initialize Supabase client:", error);
       router.push("/auth/login");
     }
-  }, [router]);
+  }, [router]); */
 
   useEffect(() => {
     if (!supabase) return;

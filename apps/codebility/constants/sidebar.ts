@@ -1,5 +1,8 @@
+"use server";
+
 import pathsConfig from "@/config/paths.config";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { createClientServerComponent } from "@/utils/supabase/server";
+
 
 
 export type SidebarLink = {
@@ -37,7 +40,14 @@ export const getSidebarData = async (
     return [];
   }
 
-  const supabase = createClientClientComponent();
+  /* const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+ */
+  const supabase = await createClientServerComponent();
 
   // Fetch role permissions
   const { data: rolePermissions, error } = await supabase

@@ -22,17 +22,15 @@ import {
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { SkillCategory, Task } from "@/types/home/codev";
-
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
-
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
@@ -45,6 +43,8 @@ interface TaskFormData extends Partial<Task> {
 const TaskEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskEditModal";
+  const [supabase, setSupabase] = useState<any>(null);
+
   const router = useRouter();
 
   const [boardId, setBoardId] = useState<string>("");
@@ -69,11 +69,16 @@ const TaskEditModal = () => {
     extensions: [StarterKit],
     content: taskData.description || "",
   });
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   // Fetch skill categories
   useEffect(() => {
+    if (!supabase) return;
+
     const loadSkillCategories = async () => {
-      const supabase = createClientClientComponent();
       const { data, error } = await supabase
         .from("skill_category")
         .select("id, name")
@@ -89,10 +94,11 @@ const TaskEditModal = () => {
   }, []);
 
   useEffect(() => {
+    if (!supabase) return;
+
     if (isModalOpen && data) {
       const fetchProjectData = async () => {
         try {
-          const supabase = createClientClientComponent();
 
           // Get board_id from kanban_column
           const { data: column } = await supabase
@@ -135,7 +141,7 @@ const TaskEditModal = () => {
 
       fetchProjectData();
     }
-  }, [isModalOpen, data]);
+  }, [isModalOpen, data, supabase]);
   const handleInputChange = (
     key: keyof Task,
     value: string | number | string[],

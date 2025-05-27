@@ -23,6 +23,7 @@ import {
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
 import { SkillCategory, Task } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { set } from "date-fns";
 import { Ellipsis, Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -38,7 +39,6 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { completeTask, updateTaskPRLink } from "../../actions";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface CodevMember {
   id: string;
@@ -140,12 +140,17 @@ const TaskViewModal = ({
   const [primaryAssignee, setPrimaryAssignee] = useState<CodevMember | null>(
     null,
   );
-
+  const [supabase, setSupabase] = useState<any>(null);
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
   // Set the skill category from the task
   useEffect(() => {
+    if (!supabase) return;
+
     if (task?.skill_category_id) {
       const fetchSkillCategory = async () => {
-        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("skill_category")
           .select("id, name")
@@ -157,13 +162,16 @@ const TaskViewModal = ({
       };
       fetchSkillCategory();
     }
-  }, [task?.skill_category_id]);
+  }, [task?.skill_category_id, supabase]);
 
   // Fetch sidekick details to display their images
   useEffect(() => {
+    if (!supabase) return;
+
     const fetchSidekickDetails = async () => {
       if (task?.sidekick_ids && task.sidekick_ids.length > 0) {
-        const supabase = createClientClientComponent();
+       
+
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")
@@ -174,14 +182,15 @@ const TaskViewModal = ({
       }
     };
     fetchSidekickDetails();
-  }, [task?.sidekick_ids]);
+  }, [task?.sidekick_ids, supabase]);
 
   useEffect(() => {
+    if (!supabase) return;
     const fetchPrimaryAssignee = async () => {
       const assigneeId = task?.codev_id || task?.codev?.id;
 
       if (assigneeId) {
-        const supabase = createClientClientComponent();
+
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")
@@ -205,7 +214,7 @@ const TaskViewModal = ({
     if (task) {
       fetchPrimaryAssignee();
     }
-  }, [task]);
+  }, [task, supabase]);
 
   // Return previous PR link when leaving the input field empty
   useEffect(() => {

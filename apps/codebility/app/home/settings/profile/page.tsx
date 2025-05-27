@@ -5,6 +5,7 @@ import { H1 } from "@/Components/shared/dashboard";
 import CustomBreadcrumb from "@/Components/shared/dashboard/CustomBreadcrumb";
 import { useUserStore } from "@/store/codev-store";
 import { JobStatus, WorkExperience, WorkSchedule } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { Toaster } from "react-hot-toast";
 
 import About from "./_components/About";
@@ -16,7 +17,6 @@ import Photo from "./_components/Photo";
 import Skills from "./_components/Skills";
 import TimeSchedule from "./_components/TimeSchedule";
 import Loading from "./loading";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 const items = [
   { label: "Settings", href: "/home/settings" },
@@ -47,10 +47,15 @@ const ProfileComponent = () => {
     jobStatuses: [],
   });
   const [error, setError] = useState<string | null>(null);
+  const [supabase, setSupabase] = useState<any>(null);
 
   // Handle hydration
   useEffect(() => {
     setIsHydrated(true);
+  }, []);
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
   }, []);
 
   useEffect(() => {
@@ -58,7 +63,6 @@ const ProfileComponent = () => {
       if (!user?.id || !isHydrated) return;
 
       try {
-        const supabase = createClientClientComponent();
         const [
           { data: education, error: educationError },
           { data: workExperience, error: experienceError },
@@ -97,7 +101,7 @@ const ProfileComponent = () => {
     if (user?.id && isHydrated) {
       fetchData();
     }
-  }, [user?.id, isHydrated]);
+  }, [user?.id, isHydrated, supabase]);
 
   // Show loading during hydration or user loading
   if (!isHydrated || userLoading) {

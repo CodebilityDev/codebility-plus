@@ -1,10 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogClose } from "@radix-ui/react-dialog";
-
 import { AlertCircle, HelpCircleIcon, Trash2 } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -36,10 +36,9 @@ import {
   FormMessage,
 } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
+import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover";
 
 import AccountSettingsBackdrop from "./AccountSettingsBackDrop";
-import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 const userDeletionSchema = z.object({
   confirmation: z.string().refine((val) => val === "DELETE", {
@@ -59,7 +58,12 @@ export default function AccountSettingsDelete() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   const form = useForm<UserDeletionFormValues>({
     resolver: zodResolver(userDeletionSchema),
@@ -125,7 +129,7 @@ export default function AccountSettingsDelete() {
       <Card className="background-box text-dark100_light900 w-full border border-red-600">
         <CardHeader>
           <CardTitle className="flex items-center text-base text-red-600 sm:text-2xl">
-          <div className="flex w-full items-center justify-between">
+            <div className="flex w-full items-center justify-between">
               <h1 className="flex items-center">
                 <Trash2 className="mr-2" /> Delete Account
               </h1>
@@ -159,7 +163,7 @@ export default function AccountSettingsDelete() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-         {/*  <Alert className="background-box mb-4 border border-red-600 text-red-600">
+          {/*  <Alert className="background-box mb-4 border border-red-600 text-red-600">
             <AlertCircle className="h-4 w-4" color="red" />
             <AlertTitle>Warning</AlertTitle>
             <AlertDescription className="text-xs sm:text-sm">

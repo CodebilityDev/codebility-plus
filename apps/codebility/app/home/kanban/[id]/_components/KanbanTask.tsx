@@ -67,7 +67,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
     : IconPriority5;
 
   const [sidekickDetails, setSidekickDetails] = useState<CodevMember[]>([]);
-
+  const [supabase, setSupabase] = useState<any>(null);
   // Get priority-based styles
   const getPriorityStyles = () => {
     const baseClasses = "absolute top-0 left-0 w-1 h-full rounded-l-lg";
@@ -84,11 +84,17 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         return `${baseClasses} bg-gray-500`;
     }
   };
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchSidekickDetails() {
       if (sidekicks.length === 0) return;
-      const supabase = createClientClientComponent();
+
       const { data, error } = await supabase
         .from("codev")
         .select("id, first_name, last_name, image_url")
@@ -100,7 +106,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
       }
     }
     fetchSidekickDetails();
-  }, [sidekicks]);
+  }, [sidekicks, supabase]);
 
   return (
     <KanbanTaskViewEditModal task={task} onComplete={onComplete}>

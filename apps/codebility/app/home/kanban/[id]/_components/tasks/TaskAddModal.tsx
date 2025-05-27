@@ -47,6 +47,7 @@ const TaskAddModal = () => {
   const [isPending, startTransition] = useTransition();
   const [description, setDescription] = useState("");
   const user = useUserStore((state) => state.user);
+  const [supabase, setSupabase] = useState<any>(null);
 
   const router = useRouter();
 
@@ -55,8 +56,14 @@ const TaskAddModal = () => {
   };
 
   useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+
     const loadSkillCategories = async () => {
-      const supabase = createClientClientComponent();
       const { data, error } = await supabase
         .from("skill_category")
         .select("id, name")
@@ -69,7 +76,7 @@ const TaskAddModal = () => {
       }
     };
     loadSkillCategories();
-  }, []);
+  }, [supabase]);
 
   const handleSubmit = async (formData: FormData) => {
     try {

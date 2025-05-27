@@ -20,6 +20,12 @@ export const useUserStore = create<UserState>((set) => ({
     try {
       set({ isLoading: true });
       const supabase = createClientClientComponent();
+      
+      if (!supabase) {
+        console.error("Supabase client is not initialized.");
+        set({ user: null, isLoading: false });
+        return;
+      }
 
       // First check if we have a session
       const {

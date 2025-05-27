@@ -50,6 +50,7 @@ export default function KanbanAddModalMembers({
   const [availableMembers, setAvailableMembers] = useState<CodevMember[]>([]);
 
   const [isLoading, setIsLoading] = useState(true);
+  const [supabase, setSupabase] = useState<any>(null);
 
   // useEffect(() => {
   //   const loadMembers = async () => {
@@ -65,11 +66,16 @@ export default function KanbanAddModalMembers({
 
   //   loadMembers();
   // }, [projectId]);
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   useEffect(() => {
+    if (!supabase) return;
+
     const loadMembers = async () => {
       try {
-        const supabase = createClientClientComponent();
         console.log("Fetching members for project ID:", projectId);
         const members = await fetchAvailableMembers(projectId);
         console.log("Fetched members:", members); // Debugging log
@@ -93,7 +99,7 @@ export default function KanbanAddModalMembers({
     if (projectId) {
       loadMembers();
     }
-  }, [projectId]);
+  }, [projectId, supabase]);
 
   const selectedMembers = availableMembers.filter((member) =>
     selectedMemberIds.includes(member.id),

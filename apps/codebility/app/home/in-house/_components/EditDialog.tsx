@@ -39,10 +39,18 @@ export function EditDialog({ isOpen, onClose, data, onSave }: EditDialogProps) {
   const [formData, setFormData] = useState<Codev>(data);
   const [availableProjects, setAvailableProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createClientClientComponent();
+   const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
 
   // Fetch available projects
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchProjects() {
       const { data: projects, error } = await supabase
         .from("project")

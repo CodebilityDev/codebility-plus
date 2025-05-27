@@ -2,12 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Codev } from "@/types/home/codev";
-
-
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import { CodevCard, Role } from "./CodevCard";
 import { EditableCard } from "./EditableCard";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface InHouseCardsProps {
   data: Codev[];
@@ -25,12 +23,20 @@ export function InHouseCards({
   onDataChange,
   pagination,
 }: InHouseCardsProps) {
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   const [editingId, setEditingId] = useState<string | null>(null);
   const [roles, setRoles] = useState<Role[]>([]);
 
   // Fetch roles when component mounts
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchRoles() {
       const { data: rolesData, error } = await supabase
         .from("roles")
