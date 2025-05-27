@@ -49,7 +49,13 @@ SignaturePad.displayName = "SignaturePad";
 export default function NdaSigningPage() {
   const params = useParams();
   const router = useRouter();
-  const supabase = createClientClientComponent();
+   const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
 
   const [loading, setLoading] = useState(true);
@@ -59,6 +65,8 @@ export default function NdaSigningPage() {
   const [ndaRequest, setNdaRequest] = useState<any>(null);
 
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchNdaRequest() {
       try {
         setLoading(true);

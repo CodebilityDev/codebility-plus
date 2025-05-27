@@ -24,8 +24,6 @@ const PasswordResetForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-/*   const supabase = createClientClientComponent(); // Initialize Supabase client
- */
   const {
     control,
     handleSubmit,

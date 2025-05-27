@@ -6,14 +6,13 @@ import pathsConfig from "@/config/paths.config";
 import { ArrowRightIcon, IconSearch } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
-
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import KanbanBoardsSearch from "../../_components/KanbanBoardsSearch";
 import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 import UserTaskFilter from "./UserTaskFilter";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
@@ -31,8 +30,16 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
       isActive: boolean;
     }>
   >([]);
+  const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+
     const fetchMembers = async () => {
       const uniqueUsers = new Set<string>();
 
@@ -46,7 +53,6 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
       });
 
       if (uniqueUsers.size > 0) {
-        const supabase = createClientClientComponent();
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")
@@ -65,7 +71,7 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
     };
 
     fetchMembers();
-  }, [boardData, activeFilter]);
+  }, [boardData, activeFilter, supabase]);
 
   const handleFilterClick = (userId: string) => {
     setActiveFilter(activeFilter === userId ? null : userId);

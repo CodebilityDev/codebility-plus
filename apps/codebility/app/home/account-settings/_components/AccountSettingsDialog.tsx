@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useForm } from "react-hook-form";
@@ -37,7 +37,13 @@ const emailChangeSchema = z.object({
 export default function AccountSettingsDialog() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createClientClientComponent();
+   const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
 
   const form = useForm<z.infer<typeof emailChangeSchema>>({
     resolver: zodResolver(emailChangeSchema),

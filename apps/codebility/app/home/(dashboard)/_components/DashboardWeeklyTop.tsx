@@ -187,7 +187,7 @@ export default function WeeklyTop() {
   }, [supabase, timePeriod, allCategories]);
 
   const generateTableRows = (category: string) => {
-    const rows = [];
+    const rows: React.ReactNode[] = [];
     for (let i = 0; i < 10; i++) {
       const data = categoryData[category]?.[i];
       rows.push(

@@ -59,8 +59,8 @@ export default async function ProjectSection() {
   };
 
   // Process the main_image URLs and create slides array
-  const slides = [];
-  const projectsWithImages = [];
+  const slides: string[] = [];
+  const projectsWithImages: (Project & { imageUrl: string })[] = [];
 
   if (activeProjects && activeProjects.length > 0) {
     for (const project of activeProjects) {

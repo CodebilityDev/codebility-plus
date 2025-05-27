@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { ChevronDown } from "lucide-react";
 import { useFormContext } from "react-hook-form";
 
 import { Button } from "@codevs/ui/button";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Popover, PopoverContent, PopoverTrigger } from "@codevs/ui/popover";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface Position {
   id: string;
@@ -23,8 +23,14 @@ export function PositionMultiselectField({ id, error }: PositionSelectProps) {
   const [positions, setPositions] = useState<Position[]>([]);
   const [selectedPositions, setSelectedPositions] = useState<Position[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientClientComponent();
   const { setValue } = useFormContext();
+
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   useEffect(() => {
     if (!selectedPositions) return;
@@ -34,6 +40,7 @@ export function PositionMultiselectField({ id, error }: PositionSelectProps) {
   }, [selectedPositions]);
 
   useEffect(() => {
+    if (!supabase) return;
     const fetchPositions = async () => {
       try {
         const { data, error } = await supabase
@@ -51,7 +58,7 @@ export function PositionMultiselectField({ id, error }: PositionSelectProps) {
     };
 
     fetchPositions();
-  }, []);
+  }, [supabase]);
 
   return (
     <Popover>

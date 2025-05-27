@@ -8,6 +8,7 @@ import MobileNav from "@/Components/shared/dashboard/MobileNav";
 import Theme from "@/Components/shared/dashboard/Theme";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconDropdown, IconLogout, IconProfile } from "@/public/assets/svgs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import {
   DropdownMenu,
@@ -16,18 +17,25 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 export const menuItems = [
   { href: "/settings", icon: IconProfile, label: "Settings" },
 ];
 
 const Navbar = () => {
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!supabase) return;
+
     const fetchUser = async () => {
       try {
         const {
@@ -74,7 +82,7 @@ const Navbar = () => {
           table: "codev",
           filter: `id=eq.${userData?.id}`,
         },
-        (payload) => {
+        (payload: any) => {
           setUserData(payload.new);
         },
       )

@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useUserStore } from "@/store/codev-store";
-import toast from "react-hot-toast";
 import { createClientClientComponent } from "@/utils/supabase/client";
+import toast from "react-hot-toast";
 
 // Initialize Supabase client
 
@@ -19,14 +19,18 @@ const Status = ({
   const { user } = useUserStore();
   const [isChecked, setIsChecked] = useState(availabilityStatus);
   const [isLoading, setIsLoading] = useState(false);
+  const [supabase, setSupabase] = useState<any>(null);
 
   let statusText;
   let statusColor;
 
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   const updateSupabaseField = async (field: string, value: any) => {
     try {
-      const supabase = createClientClientComponent();
-
       setIsLoading(true);
       const { error } = await supabase
         .from("codev")

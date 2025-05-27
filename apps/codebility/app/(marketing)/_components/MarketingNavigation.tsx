@@ -224,14 +224,22 @@ const UserMenu = ({
 };
 
 const Navigation = () => {
-  const supabase = createClientClientComponent();
+  /*  const supabase = createClientClientComponent(); */
   const { color } = useChangeBgNavigation();
   const pathname = usePathname();
   const [openSheet, setOpenSheet] = useState(false);
   const [userData, setUserData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+
     async function fetchUser() {
       try {
         const {

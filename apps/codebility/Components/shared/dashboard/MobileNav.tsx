@@ -7,7 +7,7 @@ import { usePathname } from "next/navigation";
 import { getSidebarData, Sidebar, SidebarLink } from "@/constants/sidebar";
 import useHideSidebarOnResize from "@/hooks/useHideSidebarOnResize";
 import { Roles } from "@/types/home/codev";
-
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 import {
   Sheet,
@@ -15,7 +15,6 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@codevs/ui/sheet";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 const NavContent = ({
   sidebarData,
@@ -85,11 +84,19 @@ const NavContent = ({
 
 const MobileNav = () => {
   const { isSheetOpen, setIsSheetOpen } = useHideSidebarOnResize();
-  const supabase = createClientClientComponent();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   const [sidebarData, setSidebarData] = useState<Sidebar[]>([]);
   const [userRole, setUserRole] = useState<Roles | null>(null);
 
   useEffect(() => {
+    if (!supabase) return;
+
     const fetchUserData = async () => {
       try {
         const {
