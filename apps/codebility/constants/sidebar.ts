@@ -92,6 +92,12 @@ export const getSidebarData = async (
           permission: "kanban" as PermissionKey,
         },
         {
+          route: pathsConfig.app.feeds,
+          imgURL: "/assets/svgs/icon-feed.svg",
+          label: "Feeds",
+          permission: "interns" as PermissionKey,
+        },
+        {
           route: pathsConfig.app.time_tracker,
           imgURL: "/assets/svgs/icon-time-tracker.svg",
           label: "Time Tracker",
