@@ -6,6 +6,9 @@ import Navigation from "../_components/MarketingNavigation";
 import SideNavMenu from "../_components/MarketingSidenavMenu";
 import BookACallCalendlyWidgetContainer from "./_components/BookACallCalendlyWidgetContainer";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default function BookCallPage() {
   return (
     <div
