@@ -96,7 +96,7 @@ export default function WeeklyTop() {
         }
 
         if (data) {
-          const categories = data.map((cat) => cat.name);
+          const categories = data.map((cat: { name: string }) => cat.name);
 
           // Reorder categories to put Frontend Developer first
           const reorderedCategories = [...categories];
