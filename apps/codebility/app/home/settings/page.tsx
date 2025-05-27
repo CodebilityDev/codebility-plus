@@ -9,9 +9,6 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 
 import Loading from "./loading";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
-
 type RolePermissions = {
   dashboard: boolean;
   kanban: boolean;

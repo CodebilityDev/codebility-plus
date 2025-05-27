@@ -1,5 +1,3 @@
-"use server";
-
 import Admins from "./_components/landing/LandingAdmins";
 import Features from "./_components/landing/LandingFeatures";
 import Hero from "./_components/landing/LandingHero";
@@ -10,6 +8,9 @@ import WorkWithUs from "./_components/landing/LandingWorkWithUs";
 import Calendly from "./_components/MarketingCalendly";
 import Footer from "./_components/MarketingFooter";
 import Navigation from "./_components/MarketingNavigation";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function Index() {
   return (
