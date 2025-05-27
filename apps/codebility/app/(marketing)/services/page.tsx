@@ -9,10 +9,6 @@ import Navigation from "../_components/MarketingNavigation";
 import Hero from "./_components/ServicesHero";
 import ServicesTab from "./_components/ServicesTab";
 
-// REMOVED: These exports are not allowed in client components
-// export const dynamic = "force-dynamic";
-// export const revalidate = 0;
-
 interface TeamMember {
   id: string;
   first_name: string;
@@ -44,15 +40,29 @@ export default function ServicesPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [supabase, setSupabase] = useState<any>(null);
+  const [isClient, setIsClient] = useState(false);
 
-  // Initialize Supabase client safely on the client side
+  // Ensure we're on the client side before doing anything
   useEffect(() => {
-    const client = createClientClientComponent();
-    setSupabase(client);
+    setIsClient(true);
   }, []);
 
+  // Initialize Supabase client only after confirming we're on client side
   useEffect(() => {
-    if (!supabase) return;
+    if (!isClient) return;
+
+    try {
+      const client = createClientClientComponent();
+      setSupabase(client);
+    } catch (error) {
+      console.error("Failed to initialize Supabase client:", error);
+      setError("Failed to initialize database connection");
+      setIsLoading(false);
+    }
+  }, [isClient]);
+
+  useEffect(() => {
+    if (!supabase || !isClient) return;
 
     async function fetchProjects() {
       setIsLoading(true);
@@ -84,7 +94,7 @@ export default function ServicesPage() {
               name
             )
           `,
-        ); // Removed status filter to see if any projects exist
+        );
 
         if (error) {
           console.error("Error fetching projects:", error);
@@ -121,7 +131,12 @@ export default function ServicesPage() {
     }
 
     fetchProjects();
-  }, [supabase]);
+  }, [supabase, isClient]);
+
+  // Don't render anything until we're sure we're on the client
+  if (!isClient) {
+    return null;
+  }
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
