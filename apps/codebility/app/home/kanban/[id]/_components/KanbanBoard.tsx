@@ -9,6 +9,7 @@ import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 import KanbanBoardsSearch from "../../_components/KanbanBoardsSearch";
+import KanbanAddMembersButton from "./kanban_modals/KanbanAddMembersButton";
 import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
@@ -21,6 +22,7 @@ interface KanbanBoardProps {
 export default function KanbanBoard({ boardData }: KanbanBoardProps) {
   const user = useUserStore((state) => state.user);
   const canAddColumn = user?.role_id === 1 || user?.role_id === 5;
+  const canAddMember = canAddColumn;
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [members, setMembers] = useState<
     Array<{
@@ -121,8 +123,8 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
                   />
                 </div>
               </div>
-
               {canAddColumn && <KanbanColumnAddButton boardId={boardData.id} />}
+              {canAddMember && <KanbanAddMembersButton />}
             </div>
           </div>
 
