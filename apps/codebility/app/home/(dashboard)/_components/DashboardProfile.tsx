@@ -63,7 +63,7 @@ export default function DashboardProfile() {
     <>
       {!isLoading ? (
         <Box className="relative flex-1">
-          {user && <DashboardCertificate user={user} />}
+          {/* {user && <DashboardCertificate user={user} />} */}
           <div className="mx-auto flex flex-col items-center gap-3">
             <p className="mt-4 text-2xl font-semibold capitalize md:mt-0">
               Hello, {user?.first_name ?? ""}!
