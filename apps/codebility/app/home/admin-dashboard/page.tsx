@@ -1,4 +1,6 @@
 import H1 from "@/Components/shared/dashboard/H1";
+import { getOrSetCache } from "@/lib/server/redis-cache";
+import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 import AdminDashboardApplicantStatusPie from "./_components/AdminDashboardApplicantStatusPie";
@@ -109,7 +111,9 @@ async function getDashboardData() {
 }
 
 export default async function AdminDashboard() {
-  const dashboardData = await getDashboardData();
+  const dashboardData = await getOrSetCache(cacheKeys.dashboard.admin, () =>
+    getDashboardData(),
+  );
 
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
