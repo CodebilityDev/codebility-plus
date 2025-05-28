@@ -8,12 +8,12 @@ import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
-import KanbanBoardsSearch from "../../_components/KanbanBoardsSearch";
 import KanbanAddMembersButton from "./kanban_modals/KanbanAddMembersButton";
 import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 import UserTaskFilter from "./UserTaskFilter";
+import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
 
 interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };

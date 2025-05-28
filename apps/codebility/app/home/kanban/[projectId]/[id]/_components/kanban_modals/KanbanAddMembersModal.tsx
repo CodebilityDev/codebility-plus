@@ -24,7 +24,7 @@ import {
   getTeamLead,
   SimpleMemberData,
   updateProjectMembers,
-} from "../../../../projects/actions";
+} from "@/app/home/projects/actions";
 
 export default function KanbanAddMembersModal() {
   const { isOpen, onClose, type, data } = useModal();
