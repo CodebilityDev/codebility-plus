@@ -2,7 +2,12 @@
 
 import { useState } from "react";
 import { Button } from "@/Components/ui/button";
-import { Dialog, DialogContent } from "@/Components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { Loader2Icon, MoreHorizontalIcon } from "lucide-react";
 
@@ -327,22 +332,24 @@ export default function ApplicantRowActionButton({
 
         {dialogState === "applying" && (
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Move All to Applying</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Move All to Applying</h2>
               <p>
-                Are you sure you want to move all selected applicants to
-                applying?
+          Are you sure you want to move all selected applicants to
+          applying?
               </p>
               <div className="flex justify-end gap-4">
-                <Button variant="outline" onClick={() => setOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleMoveAllToApplying} disabled={loading}>
-                  {loading && (
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Move
-                </Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleMoveAllToApplying} disabled={loading}>
+            {loading && (
+              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Move
+          </Button>
               </div>
             </div>
           </DialogContent>
@@ -350,22 +357,24 @@ export default function ApplicantRowActionButton({
 
         {dialogState === "testing" && (
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Move All to Testing</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Move All to Testing</h2>
               <p>
-                Are you sure you want to move all selected applicants to
-                testing?
+          Are you sure you want to move all selected applicants to
+          testing?
               </p>
               <div className="flex justify-end gap-4">
-                <Button variant="outline" onClick={() => setOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleMoveAllToTesting} disabled={loading}>
-                  {loading && (
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Move
-                </Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleMoveAllToTesting} disabled={loading}>
+            {loading && (
+              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Move
+          </Button>
               </div>
             </div>
           </DialogContent>
@@ -373,22 +382,24 @@ export default function ApplicantRowActionButton({
 
         {dialogState === "onboarding" && (
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Move to Onboarding</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Move to Onboarding</h2>
               <p>
-                Are you sure you want to move all selected applicants to
-                Onboarding?
+          Are you sure you want to move all selected applicants to
+          Onboarding?
               </p>
               <div className="flex justify-end gap-4">
-                <Button variant="outline" onClick={() => setOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={handleMoveAllToOnboarding} disabled={loading}>
-                  {loading && (
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Move
-                </Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={handleMoveAllToOnboarding} disabled={loading}>
+            {loading && (
+              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Move
+          </Button>
               </div>
             </div>
           </DialogContent>
@@ -396,25 +407,27 @@ export default function ApplicantRowActionButton({
 
         {dialogState === "denied" && (
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Move to Denied</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Move to Denied</h2>
               <p>
-                Are you sure you want to move all selected applicants to Denied?
+          Are you sure you want to move all selected applicants to Denied?
               </p>
               <div className="flex justify-end gap-4">
-                <Button variant="outline" onClick={() => setOpen(false)}>
-                  Cancel
-                </Button>
-                <Button
-                  onClick={handleDenyAll}
-                  disabled={loading}
-                  variant="destructive"
-                >
-                  {loading && (
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Move
-                </Button>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            onClick={handleDenyAll}
+            disabled={loading}
+            variant="destructive"
+          >
+            {loading && (
+              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+            )}
+            Move
+          </Button>
               </div>
             </div>
           </DialogContent>
@@ -422,8 +435,10 @@ export default function ApplicantRowActionButton({
 
         {dialogState === "pass" && (
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Pass All</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Pass All</h2>
               <p>Are you sure you want to pass all selected applicants?</p>
               <div className="flex justify-end gap-4">
                 <Button variant="outline" onClick={() => setOpen(false)}>
@@ -442,8 +457,10 @@ export default function ApplicantRowActionButton({
 
         {dialogState === "fail" && (
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Fail All</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Fail All</h2>
               <p>Are you sure you want to fail all selected applicants?</p>
               <div className="flex justify-end gap-4">
                 <Button variant="outline" onClick={() => setOpen(false)}>
@@ -466,8 +483,10 @@ export default function ApplicantRowActionButton({
 
         {dialogState === "accept" && (
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Accept All</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Accept All</h2>
               <p>Are you sure you want to accept all selected applicants?</p>
               <div className="flex justify-end gap-4">
                 <Button variant="outline" onClick={() => setOpen(false)}>
@@ -486,8 +505,10 @@ export default function ApplicantRowActionButton({
 
         {dialogState === "deny" && (
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Deny All</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Deny All</h2>
               <p>Are you sure you want to deny all selected applicants?</p>
               <div className="flex justify-end gap-4">
                 <Button variant="outline" onClick={() => setOpen(false)}>
@@ -510,8 +531,10 @@ export default function ApplicantRowActionButton({
 
         {dialogState === "delete" && (
           <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Delete All</DialogTitle>
+            </DialogHeader>
             <div className="flex flex-col gap-4">
-              <h2 className="text-lg font-semibold">Deny All</h2>
               <p>Are you sure you want to delete all selected applicants?</p>
               <div className="flex justify-end gap-4">
                 <Button variant="outline" onClick={() => setOpen(false)}>
