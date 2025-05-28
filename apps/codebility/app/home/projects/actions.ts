@@ -539,3 +539,26 @@ export const getProjectCategories = async () => {
 
   return data || [];
 };
+
+// Get all projects with kanban_display set to true
+export async function getAllProjects() {
+  const supabase = createClientComponentClient();
+  try {
+    const { data, error } = await supabase
+      .from("projects")
+      .select(`*`)
+      .eq("kanban_display", true);
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching projects:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to fetch projects",
+    };
+  }
+}
+
