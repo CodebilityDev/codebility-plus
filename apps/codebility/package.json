@@ -66,6 +66,7 @@
     "hellosign-sdk": "^2.1.0",
     "html2canvas": "^1.4.1",
     "invariant": "^2.2.4",
+    "ioredis": "^5.6.1",
     "jose": "^5.2.3",
     "jspdf": "^3.0.1",
     "jwt-decode": "^4.0.0",
