@@ -542,7 +542,7 @@ export const getProjectCategories = async () => {
 
 // Get all projects with kanban_display set to true
 export async function getAllProjects() {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
   try {
     const { data, error } = await supabase
       .from("projects")
