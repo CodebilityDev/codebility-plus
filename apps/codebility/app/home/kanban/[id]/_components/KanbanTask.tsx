@@ -84,6 +84,43 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         return `${baseClasses} bg-gray-500`;
     }
   };
+  // Get skill category color
+  const getSkillCategoryColor = (category: string): string => {
+    const colorMap: Record<string, string> = {
+      "UI/UX Designer":
+        "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
+      "Backend Developer":
+        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+      "Mobile Developer":
+        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+      "QA Engineer":
+        "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+      "Frontend Developer":
+        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+    };
+
+    return (
+      colorMap[category] ||
+      "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
+    );
+  };
+  // Get task type color
+  const getTaskTypeColor = (type: string): string => {
+    const typeColorMap: Record<string, string> = {
+      BUG: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
+      FEATURE: "bg-green text-white dark:bg-green-900/30 dark:text-green-300",
+      IMPROVEMENT:
+        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+      DOCUMENTATION:
+        "bg-gray text-white dark:bg-gray-200/20 dark:text-gray-200",
+    };
+
+    return (
+      typeColorMap[type] ||
+      "bg-gray text-white dark:bg-gray-700 dark:text-gray-300"
+    );
+  };
+
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
     setSupabase(supabaseClient);
@@ -175,8 +212,9 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         {(task as any).skill_category && (
           <div>
             <span
-              className="inline-block rounded-full bg-blue-100 px-2 py-0.5 text-xs font-semibold 
-              text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 md:px-3 md:py-1"
+              className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold md:px-3 md:py-1 ${getSkillCategoryColor(
+                (task as any).skill_category.name,
+              )}`}
             >
               {(task as any).skill_category.name}
             </span>
@@ -205,9 +243,9 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
           )}
           {task.type && (
             <span
-              className="inline-flex items-center rounded-md bg-gray-100 
-              px-1.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-700 
-              dark:text-gray-300 md:px-2 md:py-1"
+              className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium md:px-2 md:py-1 ${getTaskTypeColor(
+                task.type.toUpperCase(),
+              )}`}
             >
               {task.type}
             </span>
