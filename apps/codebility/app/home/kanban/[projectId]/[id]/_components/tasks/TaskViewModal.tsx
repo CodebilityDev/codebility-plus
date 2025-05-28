@@ -62,16 +62,16 @@ const TaskViewModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
   const isModalOpen = isOpen && type === "taskViewModal";
-  const task = data as Task;
-  const router = useRouter();
-
+  const task = data as Task | null;
   const user = useUserStore((state) => state.user);
-  const canModifyTask = user?.role_id === 1 || user?.role_id === 5;
+  const canModifyTask =
+    user?.role_id === 1 || user?.role_id === 5 || user?.role_id === 4;
   const [prLink, setPrLink] = useState(task?.pr_link || "");
 
   //  handle PR link update
-
   const handleUpdate = async () => {
+    if (!task) return;
+
     if (!prLink.trim()) {
       toast.error("PR Link cannot be empty");
       return;
@@ -145,6 +145,7 @@ const TaskViewModal = ({
     const supabaseClient = createClientClientComponent();
     setSupabase(supabaseClient);
   }, []);
+
   // Set the skill category from the task
   useEffect(() => {
     if (!supabase) return;
@@ -170,8 +171,6 @@ const TaskViewModal = ({
 
     const fetchSidekickDetails = async () => {
       if (task?.sidekick_ids && task.sidekick_ids.length > 0) {
-       
-
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")
@@ -182,15 +181,16 @@ const TaskViewModal = ({
       }
     };
     fetchSidekickDetails();
-  }, [task?.sidekick_ids, supabase]);
+  }, [task?.sidekick_ids, supabase, data]);
 
   useEffect(() => {
     if (!supabase) return;
+
     const fetchPrimaryAssignee = async () => {
       const assigneeId = task?.codev_id || task?.codev?.id;
+      setPrimaryAssignee(null); // Reset primary assignee
 
       if (assigneeId) {
-
         const { data, error } = await supabase
           .from("codev")
           .select("id, first_name, last_name, image_url")
@@ -199,6 +199,8 @@ const TaskViewModal = ({
 
         if (!error && data) {
           setPrimaryAssignee(data as CodevMember);
+        } else {
+          setPrimaryAssignee(null);
         }
       } else if (task?.codev) {
         // If we have the codev object directly, use that
@@ -214,7 +216,7 @@ const TaskViewModal = ({
     if (task) {
       fetchPrimaryAssignee();
     }
-  }, [task, supabase]);
+  }, [task, supabase, data]);
 
   // Return previous PR link when leaving the input field empty
   useEffect(() => {
@@ -245,12 +247,15 @@ const TaskViewModal = ({
                   >
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    onClick={() => onOpen("taskDeleteModal", task)}
-                    className="text-red-500 focus:text-red-500"
-                  >
-                    Delete
-                  </DropdownMenuItem>
+
+                  {user?.role_id !== 4 && (
+                    <DropdownMenuItem
+                      onClick={() => onOpen("taskDeleteModal", task)}
+                      className="text-red-500 focus:text-red-500"
+                    >
+                      Delete
+                    </DropdownMenuItem>
+                  )}
                 </DropdownMenuContent>
               </DropdownMenu>
             )}
@@ -347,7 +352,7 @@ const TaskViewModal = ({
                   value={prLink}
                   onChange={(e) => setPrLink(e.target.value)}
                   onBlur={() => {
-                    if (!prLink.trim()) {
+                    if (!prLink.trim() && task?.pr_link) {
                       setPrLink(task.pr_link || "");
                     }
                   }}
@@ -403,7 +408,7 @@ const TaskViewModal = ({
                   <DefaultAvatar size={32} />
                 )}
                 <span>
-                  {primaryAssignee
+                  {primaryAssignee && task
                     ? `${primaryAssignee.first_name} ${primaryAssignee.last_name}`
                     : "Unassigned"}
                 </span>
