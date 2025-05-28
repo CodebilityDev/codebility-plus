@@ -253,15 +253,14 @@ export default function KanbanAddModalMembers({
             !selectedMemberIds.includes(user?.id) ? "flex" : "hidden",
           )}
         >
-          <Button
+          <button
             onClick={handleSelfAssign}
             disabled={isLoading}
-            variant={"ghost"}
             type="button"
-            className="w-fit cursor-pointer hover:text-blue-300 dark:hover:text-blue-100"
+            className="text-black-200 w-fit cursor-pointer text-xs font-light ml-2 hover:text-blue-300 dark:text-slate-300 dark:hover:text-blue-100"
           >
-            self assign
-          </Button>
+            Assign to me
+          </button>
         </div>
       </div>
     </div>
