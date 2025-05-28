@@ -14,21 +14,13 @@ import pathsConfig from "@/config/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
 import Link from "next/link";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 import { KanbanBoardType, KanbanSprintType } from "@/types/home/codev";
 import { format } from "date-fns";
 import AddSprintButton from "./_components/AddSprintButton";
 
 // Types
-interface Params {
-  projectId: string;
-}
-
-interface SearchParams {
-  query?: string;
-}
-
 interface KanbanSprintData extends KanbanSprintType {
   kanban_board: KanbanBoardType | null;
 }
@@ -42,7 +34,7 @@ interface KanbanProjectWithSprintsData {
 }
 
 interface PageProps {
-  params: Params;
+  params: Promise<{ projectId: string }>;
 }
 
 const mapSprint = (sprint: any): KanbanSprintData => {
@@ -70,10 +62,9 @@ function formatDateRange(startDate: string | null, endDate: string | null): stri
   }
 }
 
-export default async function KanbanSprintPage({
-  params,
-}: PageProps) {
-  const supabase = getSupabaseServerComponentClient();
+export default async function KanbanSprintPage(props: PageProps) {
+  const params = await props.params;
+  const supabase = await createClientServerComponent();
 
   if (!params?.projectId) {
     return (

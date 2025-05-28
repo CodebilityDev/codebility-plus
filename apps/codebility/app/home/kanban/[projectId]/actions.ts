@@ -1,10 +1,10 @@
 "use server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
 export async function createNewSprint(formData: FormData) {
-	const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
 
 	const projectId = formData.get("projectId") as string;
 	const sprintStartAt = formData.get("sprint.startAt") as string;
