@@ -21,12 +21,14 @@ import {
   SelectValue,
 } from "@/Components/ui/select";
 import { useModal } from "@/hooks/use-modal";
+import { useUserStore } from "@/store/codev-store";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { useEditor } from "@tiptap/react";
 import StarterKit from "@tiptap/starter-kit";
 import toast from "react-hot-toast";
 
+import { cn } from "@codevs/ui";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
@@ -43,6 +45,7 @@ interface TaskFormData extends Partial<Task> {
 const TaskEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskEditModal";
+  const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
 
   const router = useRouter();
@@ -91,7 +94,7 @@ const TaskEditModal = () => {
       }
     };
     loadSkillCategories();
-  }, []);
+  }, [supabase]);
 
   useEffect(() => {
     if (!supabase) return;
@@ -99,7 +102,6 @@ const TaskEditModal = () => {
     if (isModalOpen && data) {
       const fetchProjectData = async () => {
         try {
-
           // Get board_id from kanban_column
           const { data: column } = await supabase
             .from("kanban_columns")
@@ -238,6 +240,11 @@ const TaskEditModal = () => {
             <div className="space-y-2">
               <Label htmlFor="points" className="text-sm font-medium">
                 Points
+                {user?.role_id === 4 && (
+                  <span className="ml-2 text-xs text-gray-500">
+                    (Only lead can edit points)
+                  </span>
+                )}
               </Label>
               <Input
                 id="points"
@@ -249,7 +256,13 @@ const TaskEditModal = () => {
                 onChange={(e) =>
                   handleInputChange("points", Number(e.target.value))
                 }
-                className="border-gray-300 focus:border-blue-500 dark:border-gray-700"
+                disabled={user?.role_id === 4}
+                className={cn(
+                  `border-gray-300 focus:border-blue-500 dark:border-gray-700`,
+                  user?.role_id === 4
+                    ? "cursor-not-allowed bg-gray-100 opacity-60 dark:bg-gray-800"
+                    : "",
+                )}
               />
             </div>
 
