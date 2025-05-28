@@ -64,9 +64,6 @@ export const ModalProviderHome = () => {
 
       <SprintAddModal />
 
-      <AddRoleModal />
-      <EditRoleModal />
-      <DeleteRoleModal />
       <DeleteWarningModal />
 
       <TechStackModal />
