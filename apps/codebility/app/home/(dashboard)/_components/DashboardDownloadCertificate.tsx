@@ -59,13 +59,7 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
       >
         <div className="flex h-full w-full flex-col justify-between px-40 py-10 text-center">
           <div>
-            <Image
-              className="mx-auto"
-              src={logo}
-              width={150}
-              height={150}
-              alt="logo"
-            />
+            <img className="mx-auto w-60" src={logo} alt="logo" />
             <h1 className="mt-3 leading-tight">
               <span className="my-5 text-5xl font-bold">CERTIFICATE</span>
             </h1>
@@ -116,12 +110,10 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
                   {signature_title}
                 </span>
               </p>
-              <Image
+              <img
                 src={signature}
-                width={150}
-                height={100}
                 alt="signature"
-                className="pointer-events-none absolute -top-8 left-1/2 -translate-x-1/2 opacity-90"
+                className="pointer-events-none absolute -top-8 left-1/2 w-60 -translate-x-1/2 opacity-90"
               />
             </div>
           </div>
