@@ -6,6 +6,7 @@ import ClientAddModal from "@/app/home/clients/_components/ClientAddModal";
 import ClientEditModal from "@/app/home/clients/_components/ClientEditModal";
 import ProfileModal from "@/app/home/interns/_components/ProfileModal";
 import BoardAddModal from "@/app/home/kanban/_components/BoardAddModal";
+import KanbanAddMembersModal from "@/app/home/kanban/[id]/_components/kanban_modals/KanbanAddMembersModal";
 import ColumnAddModal from "@/app/home/kanban/[id]/_components/kanban_modals/KanbanColumnAddModal";
 import TaskAddModal from "@/app/home/kanban/[id]/_components/tasks/TaskAddModal";
 import TaskViewModal from "@/app/home/kanban/[id]/_components/tasks/TaskViewModal";
@@ -42,6 +43,8 @@ export const ModalProviderHome = () => {
       <BoardAddModal />
       <BoardAddModal />
       <ColumnAddModal />
+
+      <KanbanAddMembersModal />
 
       <ProjectAddModal />
       <ProjectEditModal />
