@@ -18,11 +18,12 @@ import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
 import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
 import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
 
-import TaskDeleteModal from "../../app/home/kanban/[projectId]/[id]/_components/tasks/TaskDeleteModal";
-import TaskEditModal from "../../app/home/kanban/[projectId]/[id]/_components/tasks/TaskEditModal";
-import DeleteWarningModal from "../modals/DeleteWarningModal";
-import TechStackModal from "../modals/TechStackModal";
+import TaskDeleteModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskDeleteModal";
+import TaskEditModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskEditModal";
+import DeleteWarningModal from "@/Components/modals/DeleteWarningModal";
+import TechStackModal from "@/Components/modals/TechStackModal";
 import SprintAddModal from "@/app/home/kanban/[projectId]/_components/SprintAddModal";
+import KanbanAddMembersModal from "@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddMembersModal";
 
 export const ModalProviderHome = () => {
   const [isMounted, setIsMounted] = useState(false);
