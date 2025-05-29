@@ -540,18 +540,32 @@ export const getProjectCategories = async () => {
   return data || [];
 };
 
-// Get all projects with kanban_display set to true
-export async function getAllProjects() {
+// Get all projects with kanban boards display is true
+export async function getAllProjects(kanbanBoardId?: string) {
   const supabase = await createClientServerComponent();
+
   try {
-    const { data, error } = await supabase
-      .from("projects")
-      .select(`*`)
-      .eq("kanban_display", true);
+    let query = supabase
+      .from("kanban_boards")
+      .select("id, name, project_id, projects (id, name, main_image)")
+      .eq("projects.kanban_display", true);
+
+    if (kanbanBoardId) {
+      query = query.eq("id", kanbanBoardId);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 
-    return data;
+    // Flatten project info
+    const flattenedProjects = data.map((item: any) => ({
+      ...item.projects,
+      kanban_board_id: item.id,
+      kanban_board_name: item.name,
+    }));
+
+    return flattenedProjects;
   } catch (error) {
     console.error("Error fetching projects:", error);
     return {
