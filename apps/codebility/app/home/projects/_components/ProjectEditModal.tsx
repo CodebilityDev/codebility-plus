@@ -480,7 +480,7 @@ const ProjectEditModal = () => {
       // Handle image upload if there's a new cropped file
       if (croppedFile) {
         console.log("Uploading new image");
-        const { publicUrl } = await uploadImage(croppedFile, {
+        const publicUrl = await uploadImage(croppedFile, {
           bucket: "codebility",
           folder: `projectImage/${Date.now()}_${croppedFile.name.replace(/\s+/g, "_")}`,
         });

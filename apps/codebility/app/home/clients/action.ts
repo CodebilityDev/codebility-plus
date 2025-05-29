@@ -27,7 +27,7 @@ export const createClientAction = async (formData: FormData) => {
   let company_logo: string | null = null;
   if (logoFile) {
     // Upload the file and retrieve the publicUrl string
-    const { publicUrl } = await uploadImage(logoFile, {
+    const publicUrl = await uploadImage(logoFile, {
       bucket: "codebility",
       folder: "clientImage",
     });
@@ -103,7 +103,7 @@ export const updateClientAction = async (
       await deleteImage(company_logo);
     }
     // Upload the new file -> publicUrl
-    const { publicUrl } = await uploadImage(logoFile, {
+    const publicUrl = await uploadImage(logoFile, {
       bucket: "codebility",
       folder: "clientImage",
     });
