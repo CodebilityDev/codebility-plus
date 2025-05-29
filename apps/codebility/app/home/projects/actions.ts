@@ -526,6 +526,22 @@ export const getProjectClients = async (): Promise<Client[]> => {
   return data || [];
 };
 
+export async function getTotalProjectsCount(): Promise<number> {
+  const supabase = await createClientServerComponent();
+  try {
+    const { count, error } = await supabase
+      .from("projects")
+      .select("*", { count: "exact", head: true }); // Use count option to get total rows
+
+    if (error) throw error;
+
+    return count || 0;
+  } catch (error) {
+    console.error("Error fetching total projects count:", error);
+    return 0;
+  }
+}
+
 export const getProjectCategories = async () => {
   const supabase = await createClientServerComponent();
   const { data, error } = await supabase
