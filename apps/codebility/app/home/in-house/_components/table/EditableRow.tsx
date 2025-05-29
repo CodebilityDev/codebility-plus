@@ -106,7 +106,7 @@ export function EditableRow({
       reader.readAsDataURL(file);
 
       // Upload to your Supabase bucket
-      const { publicUrl } = await uploadImage(file, {
+      const  publicUrl = await uploadImage(file, {
         bucket: "codebility",
         folder: "profileImage",
       });
