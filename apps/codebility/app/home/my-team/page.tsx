@@ -1,157 +1,95 @@
-import Link from "next/link";
-import H1 from "@/Components/shared/dashboard/H1";
-import { Button } from "@/Components/ui/button";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
-import TeamLeaderCard from "@/Components/TeamLeaderCard";
-import TeamMemberCard from "@/Components/TeamMemberCard";
+import { revalidatePath } from "next/cache";
+import Image from "next/image";
 
-// Types
-interface CodevData {
-  id: string;
-  first_name: string;
-  last_name: string;
-  image_url?: string | null;
-  is_online?: boolean;
-  mentor_id?: string | null;
-}
+import { Client, Codev, Project } from "@/types/home/codev";
 
-interface ProjectMemberData {
-  codev?: CodevData;
-  role?: string;
-}
+import { getAllProjects, getTeamLead, getMembers } from "../projects/actions";
 
-interface ProjectData {
-  id: string;
-  name: string;
-  description?: string | null;
-  status?: string | null;
-  start_date: string;
-  end_date?: string | null;
-  created_at?: string | null;
-  updated_at?: string | null;
-  github_link?: string | null;
-  project_members?: ProjectMemberData[];
-}
+const MyTeamPage = async () => {
+  const allProjects = await getAllProjects();
 
-export default async function MyTeamPage() {
-  const supabase = getSupabaseServerComponentClient();
-
-  const { data: project, error } = await supabase
-    .from("projects")
-    .select(`
-      id, name, description, status, start_date, end_date, created_at, updated_at,
-      project_members (
-        role,
-        codev (
-          id, first_name, last_name, image_url, mentor_id
-        )
-      )
-    `)
-    .eq("name", "My Team")
-    .single();
-
-  const isCodevData = (codev: any): codev is CodevData => {
-    return (
-      codev &&
-      typeof codev === "object" &&
-      "id" in codev &&
-      "first_name" in codev &&
-      "last_name" in codev &&
-      typeof codev.id === "string" &&
-      typeof codev.first_name === "string" &&
-      typeof codev.last_name === "string"
-    );
-  };
-
-  const teamLeaders = project && !error
-    ? project.project_members
-        ?.filter((member) => member.role === "team_leader" && member.codev && isCodevData(member.codev))
-        .map((member) => ({ ...member.codev, is_online: Math.random() > 0.5 }))
-        .slice(0, 1) || []
-    : [];
-
-  const teamMembers = project && !error
-    ? project.project_members
-        ?.filter((member) => member.role !== "team_leader" && member.codev && isCodevData(member.codev))
-        .map((member) => ({ ...member.codev, is_online: Math.random() > 0.5 }))
-        .slice(0, 5) || []
-    : [];
-
-  const mentor = teamLeaders.length > 0 && teamLeaders[0].mentor_id
-    ? teamMembers.find((member) => member.id === teamLeaders[0].mentor_id) || null
-    : null;
-
-  if (error) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white px-6 py-12">
-        <H1 className="text-4xl font-bold text-white text-center">My Team</H1>
-        <p className="text-center text-red-400 mt-4">{error.message || "Error loading team"}</p>
-      </div>
-    );
-  }
-
-  if (!project) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-white px-6 py-12">
-        <H1 className="text-4xl font-bold text-white text-center">My Team</H1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-8">
-          <Skeleton className="h-32 w-full bg-gray-800 rounded-lg" />
-        </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4 mt-8">
-          {Array.from({ length: 5 }).map((_, index) => (
-            <Skeleton key={index} className="h-20 w-20 bg-gray-800 rounded-full" />
-          ))}
-        </div>
-        <Skeleton className="h-10 w-32 mt-8 bg-gray-700" />
-      </div>
-    );
-  }
+  // Fetch team leads and members for each project
+  const projectDataPromises = allProjects.map(async (project) => {
+    const teamLead = await getTeamLead(project.id);
+    const members = await getMembers(project.id);
+    return { project, teamLead, members };
+  });
+  const projectData = await Promise.all(projectDataPromises);
 
   return (
-    <div className="min-h-screen bg-gray-900 text-white px-6 py-12">
-      <H1 className="text-4xl font-bold text-white text-center mb-8">My Team</H1>
-
-      {/* Mentor Section */}
-      {mentor && (
-        <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8 transition-transform hover:scale-105">
-          <h2 className="text-2xl font-semibold text-white mb-2">Mentor</h2>
-          <TeamLeaderCard teamLeader={mentor} />
-        </div>
-      )}
-
-      {/* Team Leaders Section */}
-      {teamLeaders.length > 0 && (
-        <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8 transition-transform hover:scale-105">
-          <h2 className="text-2xl font-semibold text-white mb-4">Team Leader</h2>
-          <div className="grid grid-cols-1 gap-4">
-            {teamLeaders.map((leader, index) => (
-              <TeamLeaderCard key={index} teamLeader={leader} />
-            ))}
+    <div className="p-6 bg-gray-900 rounded-xl min-h-screen">
+      <h1 className="text-3xl font-extrabold text-white mb-8">My Team Projects</h1>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {projectData.map(({ project, teamLead, members }) => (
+          <div
+            key={project.id}
+            className="bg-gray-800 p-5 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300 border border-gray-700"
+          >
+            <h2 className="text-xl font-bold text-white mb-3 truncate">
+              {project.name}
+            </h2>
+            {/* Team Lead Section */}
+            {teamLead.data && (
+              <div className="flex items-center gap-3 mb-3">
+                <Image
+                  src={teamLead.data.image_url || "/default-avatar.png"}
+                  alt={`${teamLead.data.first_name} ${teamLead.data.last_name}`}
+                  width={40}
+                  height={40}
+                  className="rounded-full border-2 border-gray-300"
+                />
+                <div>
+                  <p className="text-xs text-gray-400 uppercase tracking-wide">Team Lead</p>
+                  <p className="text-sm font-medium text-white">
+                    {teamLead.data.first_name} {teamLead.data.last_name}
+                  </p>
+                </div>
+              </div>
+            )}
+            {teamLead.error && (
+              <p className="text-xs text-red-400">
+                Error: {teamLead.error.message || "Failed to fetch team lead"}
+              </p>
+            )}
+            {/* Team Members Section */}
+            {members.data && members.data.length > 0 && (
+              <div className="mt-3 flex items-center">
+                {members.data.slice(0, 3).map((member) => (
+                  <Image
+                    key={member.id}
+                    src={member.image_url || "/default-avatar.png"}
+                    alt={`${member.first_name} ${member.last_name}`}
+                    width={36}
+                    height={36}
+                    className="rounded-full border-2 border-gray-300 -ml-3 first:ml-0"
+                  />
+                ))}
+                {members.data.length > 3 && (
+                  <div className="w-9 h-9 rounded-full bg-gray-600 flex items-center justify-center text-xs font-medium text-white -ml-3">
+                    +{members.data.length - 3}
+                  </div>
+                )}
+              </div>
+            )}
+            {members.error && (
+              <p className="text-xs text-red-400 mt-2">
+                Error: {members.error.message || "Failed to fetch members"}
+              </p>
+            )}
+            {/* Additional Project Details (e.g., status) */}
+            {project.status && (
+              <p className="text-xs text-gray-400 mt-3 capitalize">
+                Status: <span className="text-gray-300">{project.status}</span>
+              </p>
+            )}
           </div>
-        </div>
-      )}
-
-      {/* Team Members Grid */}
-      {teamMembers.length > 0 && (
-        <div className="bg-gray-800 rounded-lg shadow-lg p-6 mb-8">
-          <h2 className="text-2xl font-semibold text-white mb-4">Team Members</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-4">
-            {teamMembers.map((member, index) => (
-              <TeamMemberCard key={index} member={member} />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Projects Button */}
-      <div className="flex justify-center md:justify-start">
-        <Link href="/home/projects/task-buddy">
-          <Button className="bg-blue-600 text-white hover:bg-blue-700 px-6 py-2 rounded-md shadow-md transition-all hover:shadow-lg">
-            View Task Buddy Project
-          </Button>
-        </Link>
+        ))}
+        {(!allProjects || allProjects.length === 0) && (
+          <p className="text-sm text-red-400 mt-4">No projects found</p>
+        )}
       </div>
     </div>
   );
-}
+};
+
+export default MyTeamPage;
