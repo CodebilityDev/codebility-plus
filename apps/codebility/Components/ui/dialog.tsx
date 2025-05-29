@@ -6,7 +6,10 @@ import { X } from "lucide-react";
 
 import { cn } from "@codevs/ui";
 
-const Dialog = DialogPrimitive.Root;
+const Dialog = ({ modal = false, ...props }: DialogPrimitive.DialogProps) => (
+  <DialogPrimitive.Root modal={modal} {...props} />
+);
+Dialog.displayName = DialogPrimitive.Root.displayName;
 
 const DialogTrigger = DialogPrimitive.Trigger;
 
@@ -47,6 +50,9 @@ const DialogContent = React.forwardRef<
     <DialogOverlay />
     <DialogPrimitive.Content
       ref={ref}
+      onPointerDownOutside={(e) => {
+        e.preventDefault();
+      }}
       className={cn(
         "background-lightbox_darkbox text-dark100_light900 fixed left-[50%] top-[50%] z-50 grid w-full max-w-lg translate-x-[-50%] translate-y-[-50%] gap-4 border border-zinc-600 bg-background p-6 shadow-lg duration-200 dark:border-zinc-700 sm:rounded-lg md:p-10",
         "data-[state=open]:animate-in data-[state=closed]:animate-out",

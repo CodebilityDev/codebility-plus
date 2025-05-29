@@ -7,10 +7,16 @@ import { usePathname } from "next/navigation";
 import { getSidebarData, Sidebar, SidebarLink } from "@/constants/sidebar";
 import { useNavStore } from "@/hooks/use-sidebar";
 import { Roles } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const LeftSidebar = () => {
-  const supabase = createClientComponentClient();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   const { isToggleOpen, toggleNav } = useNavStore();
   const pathname = usePathname();
 
@@ -18,6 +24,7 @@ const LeftSidebar = () => {
   const [userRole, setUserRole] = useState<Roles | null>(null);
 
   useEffect(() => {
+    if (!supabase) return;
     const fetchUserData = async () => {
       try {
         const {

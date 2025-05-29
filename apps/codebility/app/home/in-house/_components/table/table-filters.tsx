@@ -3,8 +3,8 @@
 import { useEffect, useState } from "react";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
 import { Project } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Card } from "@codevs/ui/card";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
@@ -42,9 +42,16 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
   const [projects, setProjects] = useState<Project[]>([]);
   const [displayPositions, setDisplayPositions] = useState<string[]>([]);
   const [roles, setRoles] = useState<Role[]>([]);
-  const supabase = useSupabase();
+  const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+
     async function fetchProjects() {
       const { data, error } = await supabase
         .from("projects")
@@ -54,7 +61,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         console.error("Failed to fetch projects:", error);
       } else if (data) {
         setProjects(
-          data.map((proj) => ({
+          data.map((proj: any) => ({
             ...proj,
             start_date: proj.start_date || "",
           })) as Project[],
@@ -73,8 +80,8 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         const distinctPositions = Array.from(
           new Set(
             data
-              .map((row) => row.display_position)
-              .filter((pos) => pos !== null && pos !== ""),
+              .map((row: any) => row.display_position)
+              .filter((pos: any) => pos !== null && pos !== ""),
           ),
         ) as string[];
         setDisplayPositions(distinctPositions);

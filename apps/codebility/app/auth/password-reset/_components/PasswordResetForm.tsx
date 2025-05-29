@@ -5,12 +5,13 @@ import Link from "next/link";
 import InputField from "@/Components/shared/dashboard/InputPhone";
 import { Button } from "@/Components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
 import { resetUserPassword } from "../action";
+/* import { createClientClientComponent } from "@/utils/supabase/client"; */
 
 // Define the schema for email validation
 const EmailValidation = z.object({
@@ -22,8 +23,6 @@ type Inputs = z.infer<typeof EmailValidation>;
 const PasswordResetForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
-
-  const supabase = createClientComponentClient(); // Initialize Supabase client
 
   const {
     control,

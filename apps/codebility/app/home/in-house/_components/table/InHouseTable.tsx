@@ -4,10 +4,10 @@ import { useEffect, useState } from "react";
 import Image from "next/image";
 import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { Codev, InternalStatus } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { Download, Link2, Mail } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
 import {
   DropdownMenu,
@@ -109,7 +109,12 @@ export function InHouseTable({
   pagination,
   onDelete,
 }: InHouseTableProps) {
-  const supabase = useSupabase();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   // For inline editing
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -117,6 +122,8 @@ export function InHouseTable({
 
   // Fetch roles when component mounts
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchRoles() {
       const { data: rolesData, error } = await supabase
         .from("roles")

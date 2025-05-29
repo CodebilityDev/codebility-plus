@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import { Project } from "@/types/home/codev"; // Ensure Project is typed with { id: string; name: string; ... }
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
+import { createClientClientComponent } from "@/utils/supabase/client";
+
 import { Badge } from "@codevs/ui/badge";
 import {
   Select,
@@ -25,9 +26,16 @@ export function ProjectSelect({
   disabled,
 }: ProjectSelectProps) {
   const [availableProjects, setAvailableProjects] = useState<Project[]>([]);
-  const supabase = useSupabase();
+  const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+
     async function fetchProjects() {
       // Make sure your table name is correct:
       const { data: projects, error } = await supabase

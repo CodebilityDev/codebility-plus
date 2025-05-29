@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { Codev, Project } from "@/types/home/codev";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
 import {
   Dialog,
@@ -18,6 +17,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface EditDialogProps {
   isOpen: boolean;
@@ -39,10 +39,18 @@ export function EditDialog({ isOpen, onClose, data, onSave }: EditDialogProps) {
   const [formData, setFormData] = useState<Codev>(data);
   const [availableProjects, setAvailableProjects] = useState<Project[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = useSupabase();
+   const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
 
   // Fetch available projects
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchProjects() {
       const { data: projects, error } = await supabase
         .from("project")

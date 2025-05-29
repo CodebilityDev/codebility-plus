@@ -1,10 +1,15 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 
 export function useFetchEnum(schema_name: string, enum_name: string) {
-  const client = createClientComponentClient();
+  const client = createClientClientComponent();
 
   const queryFn = async () => {
+    if (!client) {
+      throw new Error("Supabase client is not initialized");
+    }
+    
     const { data, error } = await client.rpc("get_enum_values", {
       schema_name,
       enum_name,
