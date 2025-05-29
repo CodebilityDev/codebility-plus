@@ -268,7 +268,7 @@ export async function deleteProject(projectId: string) {
 
     // Delete project image if exists
     if (project.main_image) {
-      const imagePath = getImagePath(project.main_image);
+      const imagePath = await getImagePath(project.main_image);
       if (imagePath) {
         await deleteImage(imagePath, "projects");
       }
