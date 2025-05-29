@@ -1,13 +1,16 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import getProjects from "@/lib/server/project.service";
+import { getOrSetCache } from "@/lib/server/redis-cache";
+import { cacheKeys } from "@/lib/server/redis-cache-keys";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 import Calendly from "../_components/MarketingCalendly";
 import Footer from "../_components/MarketingFooter";
 import Navigation from "../_components/MarketingNavigation";
 import Hero from "./_components/ServicesHero";
 import ServicesTab from "./_components/ServicesTab";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 interface TeamMember {
   id: string;
@@ -35,98 +38,36 @@ interface ProjectData {
   updated_at?: string;
 }
 
-export default function ServicesPage() {
-  const [projectsData, setProjectsData] = useState<ProjectData[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+const ServicesPage = async () => {
+  const supabase = await createClientServerComponent();
 
-  useEffect(() => {
-    async function fetchProjects() {
-      setIsLoading(true);
-      try {
-        // Modified query to remove the team_leader_id reference that doesn't exist
-        const { data, error } = await supabase.from("projects").select(
-          `
-            id, 
-            name, 
-            description,
-            website_url,
-            main_image,
-            github_link,
-            figma_link,
-            start_date,
-            end_date,
-            client_id,
-            project_category_id,
-            project_members!left(
-              codev:codev_id(
-                id,
-                first_name,
-                last_name,
-                image_url
-              )
-            ),
-            projects_category(
-              id,
-              name
-            )
-          `,
-        ); // Removed status filter to see if any projects exist
-        if (error) {
-          console.error("Error fetching projects:", error);
-          setError(error.message);
-          return;
-        }
+  const data = await getOrSetCache(cacheKeys.projects.all, () => getProjects());
 
-        const mappedData: ProjectData[] = data.map((item: any) => ({
-          id: item.id,
-          name: item.name,
-          description: item.description || "",
-          main_image: item.main_image || "",
-          website_url: item.website_url || "",
-          github_link: item.github_link || "",
-          figma_link: item.figma_link || "",
-          start_date: item.start_date || "",
-          end_date: item.end_date || "",
-          project_category_id: item.projects_category?.id || 0,
-          project_category_name: item.projects_category?.name || "",
-          client_id: item.client_id,
-          members:
-            item.project_members?.map((pm: any) => pm.codev).filter(Boolean) ||
-            [],
-        }));
-
-        console.log("Fetched projects data:", mappedData);
-        setProjectsData(mappedData);
-      } catch (err) {
-        console.error("Unexpected error:", err);
-        setError("An unexpected error occurred while fetching projects");
-      } finally {
-        setIsLoading(false);
-      }
-    }
-
-    fetchProjects();
-  }, [supabase]);
+  const mappedData: ProjectData[] = data.map((item: any) => ({
+    id: item.id,
+    name: item.name,
+    description: item.description || "",
+    main_image: item.main_image || "",
+    website_url: item.website_url || "",
+    github_link: item.github_link || "",
+    figma_link: item.figma_link || "",
+    start_date: item.start_date || "",
+    end_date: item.end_date || "",
+    project_category_id: item.projects_category?.id || 0,
+    project_category_name: item.projects_category?.name || "",
+    client_id: item.client_id,
+    members:
+      item.project_members?.map((pm: any) => pm.codev).filter(Boolean) || [],
+  }));
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
       <Navigation />
       <Hero />
-      {isLoading ? (
-        <div className="flex items-center justify-center py-12">
-          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-white"></div>
-        </div>
-      ) : error ? (
-        <div className="px-6 py-12 text-center text-red-500">
-          <p>Error loading projects: {error}</p>
-        </div>
-      ) : (
-        <ServicesTab servicesData={projectsData} />
-      )}
+      <ServicesTab servicesData={mappedData} />
       <Calendly />
       <Footer />
     </div>
   );
-}
+};
+export default ServicesPage;

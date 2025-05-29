@@ -1,6 +1,7 @@
 import H1 from "@/Components/shared/dashboard/H1";
-
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { getOrSetCache } from "@/lib/server/redis-cache";
+import { cacheKeys } from "@/lib/server/redis-cache-keys";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 import AdminDashboardApplicantStatusPie from "./_components/AdminDashboardApplicantStatusPie";
 import AdminDashboardMonthlyApplicantsLineChart from "./_components/AdminDashboardMonthlyApplicantsLineChart";
@@ -11,9 +12,11 @@ import AdminDashboardTotalInactiveIntern from "./_components/AdminDashboardTotal
 import AdminDashboardTotalMentor from "./_components/AdminDashboardTotalMentor";
 import AdminDashboardTotalProjects from "./_components/AdminDashboardTotalProject";
 
-async function getDashboardData() {
-  const supabase = getSupabaseServerComponentClient();
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
+async function getDashboardData() {
+  const supabase = await createClientServerComponent();
   const { data: codev, error: codevError } = await supabase
     .from("codev")
     .select("internal_status, role_id, application_status, date_applied");
@@ -108,7 +111,9 @@ async function getDashboardData() {
 }
 
 export default async function AdminDashboard() {
-  const dashboardData = await getDashboardData();
+  const dashboardData = await getOrSetCache(cacheKeys.dashboard.admin, () =>
+    getDashboardData(),
+  );
 
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">

@@ -1,4 +1,5 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientServerComponent } from "./supabase/server";
+
 
 export function debounce<F extends (...args: any[]) => any>(
   func: F,
@@ -26,7 +27,7 @@ export const batchUpdateTasks = async (
     // Add any other updatable fields
   }>,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     const updatePromises = updates.map(async (update) => {

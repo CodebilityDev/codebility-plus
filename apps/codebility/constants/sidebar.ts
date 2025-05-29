@@ -1,5 +1,9 @@
+"use server";
+
 import pathsConfig from "@/config/paths.config";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientServerComponent } from "@/utils/supabase/server";
+
+
 
 export type SidebarLink = {
   route: string;
@@ -36,7 +40,14 @@ export const getSidebarData = async (
     return [];
   }
 
-  const supabase = createClientComponentClient();
+  /* const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+ */
+  const supabase = await createClientServerComponent();
 
   // Fetch role permissions
   const { data: rolePermissions, error } = await supabase
@@ -89,6 +100,12 @@ export const getSidebarData = async (
           imgURL: "/assets/svgs/icon-kanban.svg",
           label: "Kanban",
           permission: "kanban" as PermissionKey,
+        },
+        {
+          route: pathsConfig.app.feeds,
+          imgURL: "/assets/svgs/icon-feed.svg",
+          label: "Feeds",
+          permission: "interns" as PermissionKey,
         },
         {
           route: pathsConfig.app.time_tracker,

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { Client, Codev, Project } from "@/types/home/codev";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 interface DbProjectMember {
   project: {
@@ -62,7 +62,7 @@ export async function createProject(
   selectedMembers: Codev[],
   teamLeaderId: string,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     // Create project
@@ -147,7 +147,7 @@ export async function updateProjectsSwitch(
   activeSwitch: boolean,
   projectId: string,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
   const { error: projectError } = await supabase
     .from("projects")
     .update({
@@ -163,7 +163,7 @@ export async function updateProjectsSwitch(
 }
 
 export async function updateProject(projectId: string, formData: FormData) {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     // Parse project members data with type assertion
@@ -254,7 +254,7 @@ export async function updateProject(projectId: string, formData: FormData) {
   }
 }
 export async function deleteProject(projectId: string) {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     // Get project data first to handle image deletion
@@ -268,7 +268,7 @@ export async function deleteProject(projectId: string) {
 
     // Delete project image if exists
     if (project.main_image) {
-      const imagePath = getImagePath(project.main_image);
+      const imagePath = await getImagePath(project.main_image);
       if (imagePath) {
         await deleteImage(imagePath, "projects");
       }
@@ -300,7 +300,7 @@ export const getTeamLead = async (
   error: any;
   data: SimpleMemberData | null;
 }> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     const { data, error } = (await supabase
@@ -356,8 +356,7 @@ export const getMembers = async (
   error: any;
   data: SimpleMemberData[] | null;
 }> => {
-  const supabase = createClientComponentClient();
-
+  const supabase = await createClientServerComponent();
   try {
     const { data, error } = (await supabase
       .from("project_members")
@@ -377,9 +376,9 @@ export const getMembers = async (
       )
       .eq("project_id", projectId)
       .eq("role", "member")) as {
-      data: ProjectMemberResponse[] | null;
-      error: any;
-    };
+        data: ProjectMemberResponse[] | null;
+        error: any;
+      };
 
     if (error) {
       console.error("Error fetching members:", error);
@@ -413,7 +412,7 @@ export const updateProjectMembers = async (
   members: Codev[],
   teamLeaderId: string,
 ): Promise<{ success: boolean; error?: string }> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   try {
     // Delete existing members
@@ -450,7 +449,7 @@ export const updateProjectMembers = async (
 };
 
 export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   let query = supabase.from("codev").select(`
     id,
@@ -513,7 +512,7 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
 };
 
 export const getProjectClients = async (): Promise<Client[]> => {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
 
   const { data, error } = await supabase
     .from("clients")
@@ -528,8 +527,7 @@ export const getProjectClients = async (): Promise<Client[]> => {
 };
 
 export const getProjectCategories = async () => {
-  const supabase = createClientComponentClient();
-
+  const supabase = await createClientServerComponent();
   const { data, error } = await supabase
     .from("projects_category")
     .select("id, name, description");
@@ -541,3 +539,26 @@ export const getProjectCategories = async () => {
 
   return data || [];
 };
+
+// Get all projects with kanban_display set to true
+export async function getAllProjects() {
+  const supabase = await createClientServerComponent();
+  try {
+    const { data, error } = await supabase
+      .from("projects")
+      .select(`*`)
+      .eq("kanban_display", true);
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    console.error("Error fetching projects:", error);
+    return {
+      success: false,
+      error:
+        error instanceof Error ? error.message : "Failed to fetch projects",
+    };
+  }
+}
+

@@ -14,7 +14,7 @@ const UserSchema = z.object({
 type User = z.infer<typeof UserSchema>;
 
 export async function getCachedUser(): Promise<User | null> {
-  const supabaseUser = cookies().get("supabase-user");
+  const supabaseUser = (await cookies()).get("supabase-user");
   let parsedSuccess = false;
 
   if (supabaseUser && supabaseUser.value) {

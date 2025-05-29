@@ -20,9 +20,6 @@ export type ModalType =
   | "homeTermsAndConditionModal"
   | "homeFAQSModal"
   | "homePrivacyPolicyModal"
-  | "addRoleModal"
-  | "editRoleModal"
-  | "deleteRoleModal"
   | "deleteWarningModal"
   | "dashboardCurrentProjectModal";
 

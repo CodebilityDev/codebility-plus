@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
+import { createClientServerComponent } from "./utils/supabase/server";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
 
 export const config = {
   matcher: ["/((?!api|_next/static|.*\\..*|_next/image|favicon.ico).*)"],
@@ -84,7 +84,7 @@ export async function middleware(req: NextRequest) {
     // 2. Special handling for auth routes
     if (AUTH_ROUTES.includes(pathname as any)) {
       // We need to check if user is logged in, but handle "no token" gracefully
-      const supabase = getSupabaseServerComponentClient();
+      const supabase = await createClientServerComponent();
       const {
         data: { user },
         error,
@@ -101,7 +101,7 @@ export async function middleware(req: NextRequest) {
     }
 
     // From this point on, we need authenticated users
-    const supabase = getSupabaseServerComponentClient();
+     const supabase = await createClientServerComponent();
     const {
       data: { user },
       error: authError,

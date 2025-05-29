@@ -2,7 +2,7 @@
 
 import { ReactNode, useEffect, useState } from "react";
 import { useModal } from "@/hooks/use-modal";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface Props {
   projectId: string;
@@ -15,6 +15,8 @@ export default function DashboardCurrentProjectButton({
 }: Props) {
   const { onOpen } = useModal();
   const [isDisabled, setIsDisabled] = useState(true);
+  const [supabase, setSupabase] = useState<any>(null);
+
 
   const handleClick = () => {
     if (!isDisabled) {
@@ -22,9 +24,16 @@ export default function DashboardCurrentProjectButton({
     }
   };
 
+  
   useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+
     const fetchKanbanDisplay = async () => {
-      const supabase = createClientComponentClient();
       const {
         data: { user },
         error: userError,
@@ -51,7 +60,7 @@ export default function DashboardCurrentProjectButton({
     };
 
     fetchKanbanDisplay();
-  }, [projectId]);
+  }, [projectId, supabase]);
 
   return (
     <button

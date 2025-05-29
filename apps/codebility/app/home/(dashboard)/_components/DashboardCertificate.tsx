@@ -45,19 +45,20 @@ const DashboardCertificate = ({ user }: Props) => {
             width: "1000px",
             height: "700px",
             overflow: "hidden",
+            zIndex: -1,
           }}
         >
           <Certificate {...certDummyData} ref={certRef} />
         </div>
         <Button
-          className="w-auto p-2"
+          className="md:p-15 md:w-15 h-6 w-10 p-2"
           onClick={() => handleDownload(certRef, certDummyData.name)}
         >
           <Image
             alt="Certificate"
             src={"/assets/images/certificate.png"}
-            width={40}
-            height={40}
+            width={20}
+            height={20}
           />
         </Button>
       </div>

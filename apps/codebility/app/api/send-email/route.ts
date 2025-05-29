@@ -18,19 +18,20 @@ interface EmailRequest {
   isNdaEmail?: boolean;
 }
 
-// Initialize Resend with your API key
-const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
+    // Initialize Resend with your API key
+    const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+
     // Parse and type the request body
     const { recipient, subject, content, firstName, ndaLink, isNdaEmail } =
       (await request.json()) as EmailRequest;
 
     // Log the email details
-    console.log("Email request received:");
+/*     console.log("Email request received:");
     console.log("To:", recipient);
-    console.log("Subject:", subject);
+    console.log("Subject:", subject); */
 
     let html = content;
 
