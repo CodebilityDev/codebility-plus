@@ -1,4 +1,8 @@
+"use server";
+
+import { updateCodev } from "@/app/home/settings/profile/action";
 import { createClientServerComponent } from "./supabase/server";
+import { revalidatePath } from "next/cache";
 
 
 interface UploadImageOptions {
@@ -45,10 +49,16 @@ export async function uploadImage(
       throw new Error("Failed to get public URL");
     }
 
-    return {
-      filePath,
-      publicUrl: publicUrlData.publicUrl,
-    };
+    // Return only primitive values/plain objects
+    /* return {
+      filePath: filePath,
+      publicUrl: String(publicUrlData.publicUrl),
+    }; */
+
+    await updateCodev({ image_url: publicUrlData.publicUrl });
+
+    return publicUrlData.publicUrl.toString();
+
   } catch (error) {
     console.error("Image upload failed:", error);
     throw error;
@@ -72,7 +82,7 @@ export async function deleteImage(
   }
 }
 
-export function getImagePath(url: string): string | null {
+export async function getImagePath(url: string): Promise<string | null> {
   try {
     const urlObj = new URL(url);
     const pathParts = urlObj.pathname.split("/");
