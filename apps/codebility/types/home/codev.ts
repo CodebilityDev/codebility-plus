@@ -7,6 +7,7 @@ export interface Position {
 // apps/codebility/types/codev.ts
 
 export interface CodevData {
+  is_online: any;
   id: string;
   first_name: string;
   last_name: string;

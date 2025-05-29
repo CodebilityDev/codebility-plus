@@ -1,5 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/Components/ui/avatar";
 import { CodevData } from "@/types/home/codev";
+import Link from "next/link";
 
 interface Props {
   member: CodevData;
@@ -10,21 +11,20 @@ const TeamMemberCard = ({ member }: Props) => {
   const initials = `${member.first_name.charAt(0)}${member.last_name.charAt(0)}`;
 
   return (
-    <div className="flex items-center gap-3 p-3 bg-gray-800 rounded-md shadow-md transition-transform hover:scale-102 hover:shadow-lg">
-      <div className="relative">
-        <Avatar className="h-10 w-10 border border-gray-600">
-          <AvatarImage src={member.image_url || "/assets/placeholder-avatar.png"} alt={fullName} />
-          <AvatarFallback className="bg-gray-700 text-white text-sm">{initials}</AvatarFallback>
-        </Avatar>
-        {member.is_online && (
-          <div className="absolute bottom-0 right-0 h-4 w-4 bg-green-500 rounded-full border-2 border-gray-900"></div>
-        )}
+    <Link href={`/home/profile/${member.id}`} className="block">
+      <div className="bg-gray-700 rounded-full h-20 w-20 flex items-center justify-center shadow-md transition-all hover:bg-gray-600">
+        <div className="relative">
+          <Avatar className="h-16 w-16">
+            <AvatarImage src={member.image_url || "/assets/placeholder-avatar.png"} alt={fullName} />
+            <AvatarFallback className="bg-gray-800 text-white text-sm">{initials}</AvatarFallback>
+          </Avatar>
+          {member.is_online && (
+            <div className="absolute bottom-0 right-0 h-2.5 w-2.5 bg-green-500 rounded-full border border-gray-900"></div>
+          )}
+        </div>
+        <span className="sr-only">{fullName}</span> {/* Screen reader only */}
       </div>
-      <div>
-        <p className="text-sm font-medium text-white">{fullName}</p>
-        <p className="text-xs text-white opacity-75">Member</p>
-      </div>
-    </div>
+    </Link>
   );
 };
 
