@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface SkillCategory {
   id: string;
@@ -37,11 +37,18 @@ export default function CodevBadge({
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [badgeErrors, setBadgeErrors] = useState<Record<string, boolean>>({});
+  const [supabase, setSupabase] = useState<any>(null);
+
+  // Initialize Supabase client safely
+  useEffect(() => {
+    const client = createClientClientComponent();
+    setSupabase(client);
+  }, []);
 
   useEffect(() => {
-    const fetchSkillCategories = async () => {
-      const supabase = createClientComponentClient();
+    if (!supabase) return; // Add null check
 
+    const fetchSkillCategories = async () => {
       try {
         const { data, error } = await supabase
           .from("skill_category")
@@ -50,10 +57,12 @@ export default function CodevBadge({
         if (error) throw error;
 
         if (data) {
-          const categoriesWithPrefix = data.map((category) => ({
-            ...category,
-            badge_prefix: getBadgePrefix(category.name),
-          }));
+          const categoriesWithPrefix = data.map(
+            (category: { id: string; name: string }) => ({
+              ...category,
+              badge_prefix: getBadgePrefix(category.name),
+            }),
+          );
           setSkillCategories(categoriesWithPrefix);
         }
       } catch (err) {
@@ -63,7 +72,7 @@ export default function CodevBadge({
     };
 
     fetchSkillCategories();
-  }, []);
+  }, [supabase]); // Add supabase as dependency
 
   // Create a fallback badge for when images fail to load
   const FallbackBadge = ({
@@ -148,9 +157,6 @@ export default function CodevBadge({
                     ...prev,
                     [categoryId]: true,
                   }));
-
-                  // We no longer need this since we'll render the fallback component
-                  // e.currentTarget.src = "/assets/svgs/badges/default-badge.svg";
 
                   // Log the error for debugging
                   console.log(

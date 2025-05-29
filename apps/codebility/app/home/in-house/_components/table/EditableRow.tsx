@@ -11,11 +11,11 @@ import {
   Project,
   WorkExperience,
 } from "@/types/home/codev";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { uploadImage } from "@/utils/uploadImage";
 import { Check, Plus, Upload, X } from "lucide-react";
 import { toast } from "react-hot-toast";
 
-import { useSupabase } from "@codevs/supabase/hooks/use-supabase";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import {
@@ -48,7 +48,12 @@ export function EditableRow({
   onCancel,
   roles,
 }: EditableRowProps) {
-  const supabase = useSupabase();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
 
   // --- 1) LOCAL EDIT STATE ---
   // We'll clone the incoming "data" into our own local "editForm"
@@ -65,6 +70,8 @@ export function EditableRow({
 
   // --- 2) FETCH POSITIONS (once) ---
   useEffect(() => {
+    if (!supabase) return;
+
     async function fetchPositions() {
       const { data: positionsData, error } = await supabase
         .from("positions")
@@ -99,7 +106,7 @@ export function EditableRow({
       reader.readAsDataURL(file);
 
       // Upload to your Supabase bucket
-      const { publicUrl } = await uploadImage(file, {
+      const  publicUrl = await uploadImage(file, {
         bucket: "codebility",
         folder: "profileImage",
       });

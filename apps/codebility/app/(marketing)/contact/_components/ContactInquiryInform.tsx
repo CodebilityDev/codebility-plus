@@ -5,7 +5,7 @@ import Input from "@/Components/ui/forms/input";
 
 import { Label } from "@codevs/ui/label";
 
-const InquiryForm = () => {
+export default function InquiryForm() {
   return (
     <div className="relative mx-auto flex w-screen max-w-xl flex-col gap-10 text-pretty rounded-lg border border-white/5 bg-white/5 px-10 py-10 text-white ">
       <div className="flex flex-col gap-1">
@@ -54,6 +54,4 @@ const InquiryForm = () => {
       </Button>
     </div>
   );
-};
-
-export default InquiryForm;
+}

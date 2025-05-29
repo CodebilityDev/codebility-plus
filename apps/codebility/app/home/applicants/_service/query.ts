@@ -1,9 +1,10 @@
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { newApplicantsSchema, NewApplicantType } from "./types";
 
 export default async function getNewApplicants(): Promise<NewApplicantType[]> {
     try {
-        const supabase = getSupabaseServerActionClient();
+        const supabase = await createClientServerComponent();
 
         const { data: newApplicants, error } = await supabase
             .from("codev")

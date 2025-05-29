@@ -1,5 +1,6 @@
 import { Codev } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
+
 import { create } from "zustand";
 
 interface UserState {
@@ -18,7 +19,13 @@ export const useUserStore = create<UserState>((set) => ({
   hydrate: async () => {
     try {
       set({ isLoading: true });
-      const supabase = createClientComponentClient();
+      const supabase = createClientClientComponent();
+      
+      if (!supabase) {
+        console.error("Supabase client is not initialized.");
+        set({ user: null, isLoading: false });
+        return;
+      }
 
       // First check if we have a session
       const {

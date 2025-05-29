@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
@@ -28,6 +28,7 @@ import {
 import { Input } from "@codevs/ui/input";
 
 import AccountSettingsBackdrop from "./AccountSettingsBackDrop";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const emailChangeSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -36,7 +37,13 @@ const emailChangeSchema = z.object({
 export default function AccountSettingsDialog() {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isLoading, setIsLoading] = useState(false);
-  const supabase = createClientComponentClient();
+   const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
 
   const form = useForm<z.infer<typeof emailChangeSchema>>({
     resolver: zodResolver(emailChangeSchema),

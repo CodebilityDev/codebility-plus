@@ -9,7 +9,10 @@ import Calendly from "./_components/MarketingCalendly";
 import Footer from "./_components/MarketingFooter";
 import Navigation from "./_components/MarketingNavigation";
 
-const Index = () => {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default async function Index() {
   return (
     <div
       className={`bg-black-400 relative flex w-full flex-col overflow-x-hidden overflow-y-hidden `}
@@ -26,6 +29,4 @@ const Index = () => {
       <Footer />
     </div>
   );
-};
-
-export default Index;
+}

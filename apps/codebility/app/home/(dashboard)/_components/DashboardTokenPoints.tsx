@@ -4,16 +4,24 @@ import { useEffect, useState } from "react";
 import { Box } from "@/Components/shared/dashboard";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { CodevPoints, Level, SkillCategory } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 export default function TokenPoints() {
   const [points, setPoints] = useState<Record<string, number>>({});
   const [levels, setLevels] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const supabase = createClientComponentClient();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  // Initialize Supabase client safely
+  useEffect(() => {
+    const client = createClientClientComponent();
+    setSupabase(client);
+  }, []);
 
   useEffect(() => {
+    if (!supabase) return;
+
     const fetchPointsAndCategories = async () => {
       setLoading(true);
       setError(null);

@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/Components/ui/table";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { startOfMonth, startOfWeek, subDays } from "date-fns";
 
 import {
@@ -72,9 +72,17 @@ export default function WeeklyTop() {
   const [selectedCategory, setSelectedCategory] = useState<string>("");
   const [timePeriod, setTimePeriod] = useState<TimePeriod>("all");
   const [isLoading, setIsLoading] = useState(true);
-  const supabase = createClientComponentClient();
+  const [supabase, setSupabase] = useState<any>(null);
+
+  // Initialize Supabase client safely
+  useEffect(() => {
+    const client = createClientClientComponent();
+    setSupabase(client);
+  }, []);
 
   useEffect(() => {
+    if (!supabase) return;
+
     const fetchCategories = async () => {
       try {
         const { data, error } = await supabase
@@ -88,19 +96,19 @@ export default function WeeklyTop() {
         }
 
         if (data) {
-          const categories = data.map((cat) => cat.name);
-          
+          const categories = data.map((cat: { name: string }) => cat.name);
+
           // Reorder categories to put Frontend Developer first
           const reorderedCategories = [...categories];
-          const feIndex = reorderedCategories.findIndex(cat => cat === "Frontend Developer");
-          
+          const feIndex = reorderedCategories.findIndex(
+            (cat) => cat === "Frontend Developer",
+          );
+
           if (feIndex !== -1) {
-           
             const [frontendDev] = reorderedCategories.splice(feIndex, 1);
-       
             reorderedCategories.unshift(frontendDev);
           }
-          
+
           setAllCategories(reorderedCategories);
           if (!selectedCategory && reorderedCategories.length > 0) {
             setSelectedCategory(reorderedCategories[0]);
@@ -112,9 +120,11 @@ export default function WeeklyTop() {
     };
 
     fetchCategories();
-  }, []);
+  }, [supabase, selectedCategory]);
 
   useEffect(() => {
+    if (!supabase || allCategories.length === 0) return;
+
     const fetchTopCodevs = async () => {
       setIsLoading(true);
       try {
@@ -177,7 +187,7 @@ export default function WeeklyTop() {
   }, [supabase, timePeriod, allCategories]);
 
   const generateTableRows = (category: string) => {
-    const rows = [];
+    const rows: React.ReactNode[] = [];
     for (let i = 0; i < 10; i++) {
       const data = categoryData[category]?.[i];
       rows.push(

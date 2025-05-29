@@ -1,17 +1,34 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import H1 from "@/Components/shared/dashboard/H1";
 import { useUserStore } from "@/store/codev-store";
 
 import DashboardCurrentProject from "./(dashboard)/_components/DashboardCurrentProject";
 import Profile from "./(dashboard)/_components/DashboardProfile";
-import DashboardRoadmap from "./(dashboard)/_components/DashboardRoadmap";
-import TimeTracker from "./(dashboard)/_components/DashboardTimeTracker";
 import TokenPoints from "./(dashboard)/_components/DashboardTokenPoints";
 import WeeklyTop from "./(dashboard)/_components/DashboardWeeklyTop";
 
 export default function DashboardPage() {
   const { user } = useUserStore();
+  const [isClient, setIsClient] = useState(false);
+
+  // Ensure we're on the client side before rendering components that might use Supabase
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Don't render until we're sure we're on the client
+  if (!isClient) {
+    return (
+      <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+        <H1>Home</H1>
+        <div className="flex items-center justify-center py-12">
+          <div className="h-8 w-8 animate-spin rounded-full border-b-2 border-t-2 border-primary"></div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="mx-auto flex max-w-screen-xl flex-col gap-4">

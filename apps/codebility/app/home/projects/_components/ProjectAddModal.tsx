@@ -227,7 +227,7 @@ const ProjectAddModal = () => {
       const form = new FormData();
 
       // Upload image
-      const { publicUrl } = await uploadImage(croppedFile, {
+      const publicUrl = await uploadImage(croppedFile, {
         bucket: "codebility",
         folder: `projectImage/${Date.now()}_${croppedFile.name.replace(/\s+/g, "_")}`,
       });

@@ -19,7 +19,7 @@ import {
   IconPriority5,
 } from "@/public/assets/svgs";
 import { Task } from "@/types/home/codev";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 export default function DashboardCurrentProjectModal() {
   const { isOpen, onClose, type, data } = useModal();
@@ -27,9 +27,15 @@ export default function DashboardCurrentProjectModal() {
   const [error] = useState<string | null>(null);
   const [kanbanBoardId, setKanbanBoardId] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [supabase, setSupabase] = useState<any>(null);
 
   const isModalOpen = isOpen && type === "dashboardCurrentProjectModal";
-  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   const router = useRouter();
 
   const projectId = data?.projectId;
@@ -42,6 +48,7 @@ export default function DashboardCurrentProjectModal() {
   };
 
   useEffect(() => {
+    if (!supabase) return;
     const fetchUserTasks = async () => {
       if (!isModalOpen || !projectId) return;
 
@@ -68,7 +75,7 @@ export default function DashboardCurrentProjectModal() {
           return;
         }
 
-        const projectIds = projectMemberships.map((pm) => pm.project_id);
+        const projectIds = projectMemberships.map((pm: any) => pm.project_id);
 
         if (!projectIds.includes(projectId)) {
           console.log("User is not a member of this project.");
@@ -110,7 +117,7 @@ export default function DashboardCurrentProjectModal() {
           return;
         }
 
-        const filteredTasks = (rawTasks || []).filter((task) => {
+        const filteredTasks = (rawTasks || []).filter((task: any) => {
           return task.kanban_columns?.kanban_boards?.project_id === projectId;
         });
 
@@ -123,7 +130,7 @@ export default function DashboardCurrentProjectModal() {
     };
 
     fetchUserTasks();
-  }, [isModalOpen, projectId]);
+  }, [isModalOpen, projectId, supabase]);
 
   if (isLoading) {
     return (

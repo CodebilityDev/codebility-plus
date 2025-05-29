@@ -1,4 +1,9 @@
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+"use server";
+
+import { updateCodev } from "@/app/home/settings/profile/action";
+import { createClientServerComponent } from "./supabase/server";
+import { revalidatePath } from "next/cache";
+
 
 interface UploadImageOptions {
   bucket?: string;
@@ -18,7 +23,7 @@ export async function uploadImage(
   file: File,
   options: UploadImageOptions = defaultOptions,
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
   try {
     const { bucket = "codebility", folder = "profileImage" } = options;
 
@@ -44,10 +49,16 @@ export async function uploadImage(
       throw new Error("Failed to get public URL");
     }
 
-    return {
-      filePath,
-      publicUrl: publicUrlData.publicUrl,
-    };
+    // Return only primitive values/plain objects
+    /* return {
+      filePath: filePath,
+      publicUrl: String(publicUrlData.publicUrl),
+    }; */
+
+    await updateCodev({ image_url: publicUrlData.publicUrl });
+
+    return publicUrlData.publicUrl.toString();
+
   } catch (error) {
     console.error("Image upload failed:", error);
     throw error;
@@ -58,7 +69,7 @@ export async function deleteImage(
   filePath: string,
   bucket: string = "codebility",
 ) {
-  const supabase = createClientComponentClient();
+  const supabase = await createClientServerComponent();
   try {
     const { error } = await supabase.storage.from(bucket).remove([filePath]);
     if (error) {
@@ -71,7 +82,7 @@ export async function deleteImage(
   }
 }
 
-export function getImagePath(url: string): string | null {
+export async function getImagePath(url: string): Promise<string | null> {
   try {
     const urlObj = new URL(url);
     const pathParts = urlObj.pathname.split("/");

@@ -3,13 +3,15 @@ import Box from "@/Components/shared/dashboard/Box";
 import H1 from "@/Components/shared/dashboard/H1";
 import { formatToLocaleTime } from "@/lib/format-date-time";
 import { getCachedUser } from "@/lib/server/supabase-server-comp";
-
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 import { TimeLog } from "./_types/time-log";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function TimeTracker() {
-  const supabase = getSupabaseServerComponentClient();
+  const supabase = await createClientServerComponent();
   const user = await getCachedUser();
 
   const { data, error } = await supabase

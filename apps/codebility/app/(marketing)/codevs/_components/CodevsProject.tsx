@@ -1,6 +1,7 @@
+"use server";
+
 import React from "react";
-import { cookies } from "next/headers";
-import { createServerComponentClient } from "@supabase/auth-helpers-nextjs";
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { EmblaOptionsType } from "embla-carousel";
 
 import EmblaCarousel from "./CodevsCarousel";
@@ -16,7 +17,7 @@ interface Project {
 }
 
 export default async function ProjectSection() {
-  const supabase = createServerComponentClient({ cookies });
+  const supabase = await createClientServerComponent();
 
   // First, check if we can get ANY projects (without filters)
   const { data: allProjects, error: allProjectsError } = await supabase
@@ -31,6 +32,26 @@ export default async function ProjectSection() {
     .select("id, name, description, main_image, status")
     .order("created_at", { ascending: false });
 
+  if (error || allProjectsError || !activeProjects || !allProjects) {
+    console.error("Error loading projects:", error);
+    return (
+      <section className="bg-black-400 relative flex min-h-screen w-full flex-col justify-center text-center ">
+        <div className="mb-10 space-y-2">
+          <h1 className="text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
+            Our Featured
+          </h1>
+          <p className="text-teal text-lg font-bold lg:text-2xl">internal</p>
+          <h1 className="text-3xl font-normal uppercase -tracking-widest text-white lg:text-5xl">
+            Projects
+          </h1>
+        </div>
+        <div className="text-center text-white">
+          Error loading projects. Please try again.
+        </div>
+      </section>
+    );
+  }
+
   const OPTIONS: EmblaOptionsType = {
     loop: true,
     align: "center",
@@ -38,8 +59,8 @@ export default async function ProjectSection() {
   };
 
   // Process the main_image URLs and create slides array
-  const slides = [];
-  const projectsWithImages = [];
+  const slides: string[] = [];
+  const projectsWithImages: (Project & { imageUrl: string })[] = [];
 
   if (activeProjects && activeProjects.length > 0) {
     for (const project of activeProjects) {
@@ -61,26 +82,6 @@ export default async function ProjectSection() {
         slides.push(imageUrl);
       }
     }
-  }
-
-  if (error) {
-    console.error("Error loading projects:", error);
-    return (
-      <section className="bg-black-400 relative flex min-h-screen w-full flex-col justify-center text-center ">
-        <div className="mb-10 space-y-2">
-          <h1 className="text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
-            Our Featured
-          </h1>
-          <p className="text-teal text-lg font-bold lg:text-2xl">internal</p>
-          <h1 className="text-3xl font-normal uppercase -tracking-widest text-white lg:text-5xl">
-            Projects
-          </h1>
-        </div>
-        <div className="text-center text-white">
-          Error loading projects. Please try again.
-        </div>
-      </section>
-    );
   }
 
   return (

@@ -14,15 +14,16 @@ export default function ApplicantTechStack({
     ? applicant.tech_stacks
     : applicant.tech_stacks?.slice(0, 5);
 
-  const hasMoreStacks = applicant.tech_stacks?.length > 5;
+  const hasMoreStacks = (applicant.tech_stacks?.length || 0) > 5;
 
   return (
     <div className="px-3 py-3 text-sm">
       <div className="flex w-40 flex-wrap justify-center gap-2 text-sm">
-        {applicant.tech_stacks?.length > 0 &&
+        {applicant.tech_stacks &&
+        applicant.tech_stacks.length > 0 &&
         !applicant.tech_stacks.includes("none") ? (
           <div className="flex flex-wrap gap-2 text-sm">
-            {displayStacks.map((stack) => (
+            {displayStacks?.map((stack) => (
               <Image
                 key={stack}
                 src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
