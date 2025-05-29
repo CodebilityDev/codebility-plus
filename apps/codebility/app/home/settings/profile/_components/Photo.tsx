@@ -54,7 +54,7 @@ const Photo = ({ data }: PhotoProps) => {
 
     const toastId = toast.loading("Removing your avatar...");
     try {
-      const filePath = getImagePath(avatar as string);
+      const filePath = await getImagePath(avatar as string);
       if (filePath) {
         await deleteImage(filePath);
       }
