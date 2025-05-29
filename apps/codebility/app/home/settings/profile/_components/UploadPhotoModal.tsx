@@ -1,3 +1,5 @@
+"use client";
+
 import React, { memo, useState } from "react";
 import { StaticImageData } from "next/image";
 import { Button } from "@/Components/ui/button";
@@ -15,8 +17,6 @@ import Cropper, { Area, Point } from "react-easy-crop";
 import toast from "react-hot-toast";
 
 import { cn } from "@codevs/ui";
-
-import { updateCodev } from "../action";
 
 export default function UploadPhotoModal({
   open,
@@ -62,12 +62,10 @@ export default function UploadPhotoModal({
         throw new Error("Failed to crop image");
       }
 
-      const { publicUrl } = await uploadImage(file, {
+      const publicUrl = await uploadImage(file, {
         bucket: "codebility",
         folder: "profileImage",
       });
-
-      await updateCodev({ image_url: publicUrl });
 
       setAvatar(publicUrl);
 
