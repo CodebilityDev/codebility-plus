@@ -122,7 +122,7 @@ const DashboardCurrentProject = () => {
               key={involvement.project.id}
               projectId={involvement.project.id}
             >
-              <div className="border-teal hover:bg-teal hover:text-black-100 rounded-md border p-2">
+              <div className="p-[1px]-100 rounded-md bg-gradient-to-r from-purple-200 via-blue-50 to-sky-300 dark:from-purple-800 dark:via-blue-300 dark:to-sky-950  p-2 hover:shadow-lg hover:shadow-blue-500/50 dark:hover:shadow-blue-400/50">
                 <div className="flex items-center gap-2">
                   {involvement.project.main_image && (
                     <Image
