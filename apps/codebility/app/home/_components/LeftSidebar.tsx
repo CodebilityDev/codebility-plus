@@ -116,62 +116,64 @@ const LeftSidebar = () => {
       </div>
 
       {/* Sidebar Links */}
-      {sidebarData.map((section: SidebarSection) => (
-        <div key={section.id} className="mt-4">
-          <AnimatePresence>
-            {isToggleOpen ? (
-              <motion.h4
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-                className="text-gray ml-2 text-sm uppercase"
-              >
-                {section.title}
-              </motion.h4>
-            ) : (
-              <div className="bg-dark300_light900 my-3 border-2" />
-            )}
-          </AnimatePresence>
-
-          <div className="mt-3 flex flex-col gap-2">
-            {section.links.map((link: SidebarLink) => {
-              const isActive = pathname === link.route;
-              return (
-                <Link
-                  key={link.route}
-                  href={link.route}
-                  className={`${
-                    isActive
-                      ? "primary-gradient text-light-900 rounded-lg"
-                      : "text-dark300_light900"
-                  } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] dark:hover:bg-[#131417]`}
+      <div className="flex flex-col overflow-y-auto">
+        {sidebarData.map((section: SidebarSection) => (
+          <div key={section.id} className="mt-4">
+            <AnimatePresence>
+              {isToggleOpen ? (
+                <motion.h4
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -20 }}
+                  transition={{ duration: 0.3 }}
+                  className="text-gray ml-2 text-sm uppercase"
                 >
-                  <div
-                    className="flex items-center justify-center"
-                    style={{ width: "18px", height: "18px" }}
-                  >
-                    <Image
-                      src={link.imgURL}
-                      alt={link.label}
-                      width={28}
-                      height={28}
-                      className={`${isActive ? "" : "invert-colors"} h-full w-full`}
-                    />
-                  </div>
-                  <span
+                  {section.title}
+                </motion.h4>
+              ) : (
+                <div className="bg-dark300_light900 my-3 border-2" />
+              )}
+            </AnimatePresence>
+
+            <div className="mt-3 flex flex-col gap-2">
+              {section.links.map((link: SidebarLink) => {
+                const isActive = pathname === link.route;
+                return (
+                  <Link
+                    key={link.route}
+                    href={link.route}
                     className={`${
-                      isToggleOpen ? "block" : "hidden"
-                    } transition-opacity duration-300`}
+                      isActive
+                        ? "primary-gradient text-light-900 rounded-lg"
+                        : "text-dark300_light900"
+                    } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] dark:hover:bg-[#131417]`}
                   >
-                    {link.label}
-                  </span>
-                </Link>
-              );
-            })}
+                    <div
+                      className="flex items-center justify-center"
+                      style={{ width: "18px", height: "18px" }}
+                    >
+                      <Image
+                        src={link.imgURL}
+                        alt={link.label}
+                        width={28}
+                        height={28}
+                        className={`${isActive ? "" : "invert-colors"} h-full w-full`}
+                      />
+                    </div>
+                    <span
+                      className={`${
+                        isToggleOpen ? "block" : "hidden"
+                      } transition-opacity duration-300`}
+                    >
+                      {link.label}
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </motion.section>
   );
 };

@@ -1,9 +1,17 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { FormEvent, useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import {
+  getAllProjects,
+  getMembers,
+  getProjectCodevs,
+  getTeamLead,
+  SimpleMemberData,
+  updateProjectMembers,
+} from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
-import { CustomSelect } from "@/Components/ui/CustomSelect";
 import {
   Dialog,
   DialogContent,
@@ -17,15 +25,6 @@ import { useModal } from "@/hooks/use-modal-projects";
 import { Codev } from "@/types/home/codev";
 import toast from "react-hot-toast";
 
-import {
-  getAllProjects,
-  getMembers,
-  getProjectCodevs,
-  getTeamLead,
-  SimpleMemberData,
-  updateProjectMembers,
-} from "@/app/home/projects/actions";
-
 export default function KanbanAddMembersModal() {
   const { isOpen, onClose, type, data } = useModal();
   const [isLoading, setIsLoading] = useState(false);
@@ -35,68 +34,89 @@ export default function KanbanAddMembersModal() {
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
   const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
   const [allUsers, setAllUsers] = useState<Codev[]>([]);
+  const pathname = usePathname();
+  const kanbanBoardIdFromUrl = pathname?.split("/").pop() || null;
 
   useEffect(() => {
+    if (!isModalOpen) return;
+
+    setIsLoading(true);
+
+    const targetProjectId = selectedProject || kanbanBoardIdFromUrl;
+
+    if (!targetProjectId) {
+      setIsLoading(false);
+      return;
+    }
+
     const fetchData = async () => {
-      if (!isModalOpen) return;
-
-      if (selectedProject) {
-        setIsLoading(true);
-      }
-
       try {
-        const result = await getAllProjects();
-        if (Array.isArray(result)) {
+        setIsLoading(true);
+
+        // Fetch project linked to the kanbanBoardId from URL
+        const result = await getAllProjects(kanbanBoardIdFromUrl ?? undefined);
+
+        if (Array.isArray(result) && result.length > 0) {
           setProjects(result);
+
+          // Use fetched project ID as selected project
+          const firstProject = result[0] as { id: string };
+          setSelectedProject(firstProject.id); // this is the project.id
         } else if (result && typeof result === "object" && "error" in result) {
-          toast.error(result.error || "Failed to fetch projects");
-        } else {
-          toast.error("Failed to fetch projects");
+          toast.error(result.error || "Failed to fetch project");
+          return;
         }
-      } catch {
-        toast.error("Something went wrong while fetching projects.");
-      }
 
-      if (selectedProject) {
-        try {
-          const [membersResult, users, teamLeadResult] = await Promise.all([
-            getMembers(selectedProject),
-            getProjectCodevs(),
-            getTeamLead(selectedProject),
-          ]);
+        const targetProjectId =
+          result &&
+          Array.isArray(result) &&
+          result[0] &&
+          typeof result[0] === "object" &&
+          "id" in result[0]
+            ? (result[0] as { id: string }).id
+            : undefined;
 
-          if (membersResult && Array.isArray(membersResult.data)) {
-            setSelectedMembers(
-              membersResult.data.map((member: any) => ({
-                ...member,
-                positions: member.positions ?? [],
-                tech_stacks: member.tech_stacks ?? [],
-              })),
-            );
-          } else {
-            setSelectedMembers([]);
-          }
-
-          setAllUsers(users);
-          if (teamLeadResult?.data) {
-            setTeamLead({
-              ...(teamLeadResult.data as SimpleMemberData),
-              display_position: teamLeadResult.data.display_position,
-              role: teamLeadResult.data.role,
-            });
-          } else {
-            setTeamLead(null);
-          }
-        } catch {
-          toast.error("Failed to load members or team lead.");
-        } finally {
-          setIsLoading(false);
+        if (!targetProjectId) {
+          toast.error("No valid project ID found.");
+          return;
         }
+
+        const [membersResult, users, teamLeadResult] = await Promise.all([
+          getMembers(targetProjectId),
+          getProjectCodevs(),
+          getTeamLead(targetProjectId),
+        ]);
+        setSelectedMembers(
+          Array.isArray(membersResult?.data)
+            ? membersResult.data.map((m: any) => ({
+                ...m,
+                positions: m.positions ?? [],
+                tech_stacks: m.tech_stacks ?? [],
+              }))
+            : [],
+        );
+
+        setAllUsers(users || []);
+
+        setTeamLead(
+          teamLeadResult?.data
+            ? {
+                ...(teamLeadResult.data as SimpleMemberData),
+                display_position: teamLeadResult.data.display_position,
+                role: teamLeadResult.data.role,
+              }
+            : null,
+        );
+      } catch (error) {
+        toast.error("Failed to load members or team lead.");
+        console.error(error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchData();
-  }, [isModalOpen, selectedProject]);
+  }, [isModalOpen, selectedProject, kanbanBoardIdFromUrl]);
 
   const handleAddMember = (member: Codev) => {
     setSelectedMembers((prev) => [...prev, member]);
@@ -105,17 +125,6 @@ export default function KanbanAddMembersModal() {
   const handleRemoveMember = (memberId: string) => {
     setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId));
   };
-
-  const projectsOptions = useMemo(
-    () =>
-      projects.map((project) => ({
-        id: project.id,
-        value: project.id,
-        label: project.name,
-        imageUrl: project.main_image,
-      })),
-    [projects],
-  );
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -179,19 +188,15 @@ export default function KanbanAddMembersModal() {
               Add Members
             </DialogTitle>
           </DialogHeader>
-          <CustomSelect
-            options={projectsOptions}
-            value={selectedProject ?? undefined}
-            onChange={(value) => setSelectedProject(value)}
-            placeholder="Choose a project"
-            label={"Select Project"}
-            disabled={isLoading}
-            searchable
-          />
           {selectedProject && (
             <div className="flex max-w-full flex-wrap gap-2">
-              {isLoading ? (
+              {isLoading || !teamLead ? (
+                // Show skeleton for whole block OR for teamLead specifically
                 <div className="flex flex-col">
+                  <label className="dark:text-light-900 text-black">
+                    Project Name
+                  </label>
+                  <Skeleton className="h-12 w-96 rounded-md" />
                   <label className="dark:text-light-900 text-black">
                     Team Leader
                   </label>
@@ -207,32 +212,59 @@ export default function KanbanAddMembersModal() {
                 </div>
               ) : (
                 <>
-                  {teamLead && (
-                    <div className="mb-4 w-full">
-                      <label className="dark:text-light-900 block font-medium text-gray-700">
-                        Team Leader
-                      </label>
-                      <div className="mt-1 flex items-center gap-3">
-                        {teamLead.image_url ? (
-                          <img
-                            src={teamLead.image_url}
-                            alt={`${teamLead.first_name} ${teamLead.last_name}`}
-                            className="h-10 w-10 rounded-full object-cover"
-                          />
-                        ) : (
-                          <DefaultAvatar size={48} />
+                  {/* Project Name */}
+                  <div className="flex flex-col gap-2">
+                    <label className="dark:text-light-900 text-black">
+                      Project Name
+                    </label>
+                    <div className="mb-4 flex items-center gap-3">
+                      {projects.find((p) => p.id === selectedProject)
+                        ?.main_image ? (
+                        <img
+                          src={
+                            projects.find((p) => p.id === selectedProject)
+                              ?.main_image
+                          }
+                          alt="Project"
+                          className="h-10 w-10 rounded object-cover"
+                        />
+                      ) : (
+                        <div className="h-10 w-10 rounded bg-gray-300 dark:bg-gray-700" />
+                      )}
+                      <p className="dark:text-light-900 text-lg text-gray-800">
+                        {projects.find((p) => p.id === selectedProject)?.name ??
+                          "Unnamed Project"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Team Lead */}
+                  <div className="mb-4 w-full">
+                    <label className="dark:text-light-900 block text-gray-700">
+                      Team Leader
+                    </label>
+                    <div className="mt-1 flex items-center gap-3">
+                      {teamLead.image_url ? (
+                        <img
+                          src={teamLead.image_url}
+                          alt={`${teamLead.first_name} ${teamLead.last_name}`}
+                          className="h-10 w-10 rounded-full object-cover"
+                        />
+                      ) : (
+                        <DefaultAvatar size={48} />
+                      )}
+                      <div>
+                        <p className="font-semibold">{`${teamLead.first_name} ${teamLead.last_name}`}</p>
+                        {teamLead.display_position && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            {teamLead.display_position}
+                          </p>
                         )}
-                        <div>
-                          <p className="font-semibold">{`${teamLead.first_name} ${teamLead.last_name}`}</p>
-                          {teamLead.display_position && (
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {teamLead.display_position}
-                            </p>
-                          )}
-                        </div>
                       </div>
                     </div>
-                  )}
+                  </div>
+
+                  {/* MemberSelection */}
                   <MemberSelection
                     users={allUsers}
                     selectedMembers={selectedMembers}
