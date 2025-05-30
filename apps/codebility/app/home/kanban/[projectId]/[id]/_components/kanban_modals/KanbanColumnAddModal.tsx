@@ -60,7 +60,7 @@ export default function KanbanColumnAddModal() {
     }
   };
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose}>
+    <Dialog open={isModalOpen} onOpenChange={onClose} modal={true}>
       <DialogContent className="w-[90%] max-w-3xl">
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <DialogHeader>
