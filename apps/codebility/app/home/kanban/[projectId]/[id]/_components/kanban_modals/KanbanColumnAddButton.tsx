@@ -16,7 +16,7 @@ export default function KanbanColumnAddButton({
   return (
     <Button
       variant="default"
-      className="flex w-max items-center gap-2"
+      className="flex w-max items-center gap-2 text-sm md:text-base"
       onClick={() => onOpen("ColumnAddModal", boardId)}
     >
       <IconAdd />
