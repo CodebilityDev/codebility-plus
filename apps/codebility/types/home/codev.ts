@@ -346,6 +346,6 @@ export interface CertificateProps {
   description: string;
   key_projects: string[];
   signature: string;
-  signature_name: string;
-  signature_title: string;
+  // signature_name: string;
+  // signature_title: string;
 }
