@@ -8,7 +8,7 @@ import { samplePosts } from "./SampleData";
 
 export default function Feed() {
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 5;
+  const postsPerPage = 6;
 
   const totalPages = Math.ceil(samplePosts.length / postsPerPage);
   const startIndex = (currentPage - 1) * postsPerPage;
@@ -27,19 +27,21 @@ export default function Feed() {
   };
 
   return (
-    <div className="flex flex-col">
-      {currentPosts.map((post) => (
-        <Post
-          key={post.id}
-          user={post.user}
-          userImage={post.userImage}
-          content={post.content}
-          timestamp={post.timestamp}
-          images={post.images}
-          reactions={post.reactions}
-        />
-      ))}
-
+    <>
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+        {currentPosts.map((post) => (
+          <Post
+            key={post.id}
+            user={post.user}
+            userImage={post.userImage}
+            content={post.content}
+            timestamp={post.timestamp}
+            image={post.image}
+            reactions={post.reactions}
+            postUrl={post.postUrl}
+          />
+        ))}
+      </div>
       <DefaultPagination
         totalPages={totalPages}
         currentPage={currentPage}
@@ -47,6 +49,6 @@ export default function Feed() {
         handlePreviousPage={handlePreviousPage}
         setCurrentPage={setCurrentPage}
       />
-    </div>
+    </>
   );
 }
