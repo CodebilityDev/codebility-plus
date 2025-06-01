@@ -3,13 +3,26 @@ import Image from "next/image";
 
 import { Client, Codev, Project } from "@/types/home/codev";
 
-import { getAllProjects, getTeamLead, getMembers } from "../projects/actions";
+import { getUserProjects, getTeamLead, getMembers } from "../projects/actions";
 
 const MyTeamPage = async () => {
-  const allProjects = await getAllProjects();
+  const userProjectsResponse = await getUserProjects();
 
-  // Fetch team leads and members for each project
-  const projectDataPromises = allProjects.map(async (project) => {
+  if (userProjectsResponse.error || !userProjectsResponse.data) {
+    return (
+      <div className="p-6 bg-gray-900 rounded-xl min-h-screen">
+        <h1 className="text-3xl font-extrabold text-white mb-8">My Team Projects</h1>
+        <p className="text-sm text-red-400">
+          {userProjectsResponse.error?.message || "No projects found for your user"}
+        </p>
+      </div>
+    );
+  }
+
+  const userProjects = userProjectsResponse.data;
+
+  // Fetch team leads and members for each project the user is part of
+  const projectDataPromises = userProjects.map(async ({ project }) => {
     const teamLead = await getTeamLead(project.id);
     const members = await getMembers(project.id);
     return { project, teamLead, members };
@@ -28,19 +41,36 @@ const MyTeamPage = async () => {
             <h2 className="text-xl font-bold text-white mb-3 truncate">
               {project.name}
             </h2>
-            {/* Team Lead Section */}
+            {/* Team Lead Section - Redesigned */}
             {teamLead.data && (
-              <div className="flex items-center gap-3 mb-3">
-                <Image
-                  src={teamLead.data.image_url || "/default-avatar.png"}
-                  alt={`${teamLead.data.first_name} ${teamLead.data.last_name}`}
-                  width={40}
-                  height={40}
-                  className="rounded-full border-2 border-gray-300"
-                />
+              <div className="flex items-center gap-4 mb-4">
+                <div className="relative">
+                  <Image
+                    src={teamLead.data.image_url || "/default-avatar.png"}
+                    alt={`${teamLead.data.first_name} ${teamLead.data.last_name}`}
+                    width={36}
+                    height={36}
+                    className="rounded-full border-2 border-blue-500 shadow-sm"
+                  />
+                  <span className="absolute -bottom-0.5 -right-0.5 bg-green-500 rounded-full w-5 h-5 flex items-center justify-center border-2 border-gray-800">
+                    <svg
+                      className="w-3 h-3 text-white"
+                      fill="currentColor"
+                      viewBox="0 0 20 20"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </span>
+                </div>
                 <div>
-                  <p className="text-xs text-gray-400 uppercase tracking-wide">Team Lead</p>
-                  <p className="text-sm font-medium text-white">
+                  <p className="text-xs text-gray-300 font-semibold uppercase tracking-wider">
+                    Team Lead
+                  </p>
+                  <p className="text-sm font-medium text-white leading-tight">
                     {teamLead.data.first_name} {teamLead.data.last_name}
                   </p>
                 </div>
@@ -84,8 +114,10 @@ const MyTeamPage = async () => {
             )}
           </div>
         ))}
-        {(!allProjects || allProjects.length === 0) && (
-          <p className="text-sm text-red-400 mt-4">No projects found</p>
+        {projectData.length === 0 && (
+          <p className="text-sm text-red-400 mt-4">
+            You are not assigned to any projects
+          </p>
         )}
       </div>
     </div>
