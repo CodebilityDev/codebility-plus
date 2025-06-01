@@ -57,6 +57,74 @@ interface DbProjectMemberResponse {
   };
 }
 
+export async function getUserProjects(): Promise<{
+  error: any;
+  data: { project: Project; role: string }[] | null;
+}> {
+  const supabase = await createClientServerComponent();
+  try {
+    // Get the current logged-in user
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.error("Error fetching user:", userError);
+      return { error: { message: "User not authenticated" }, data: null };
+    }
+
+    // Assume codev_id is linked to the user (you may need to adjust based on your schema)
+    const { data: codevData, error: codevError } = await supabase
+      .from("codev")
+      .select("id")
+      .eq("email_address", user.email)
+      .single();
+
+    if (codevError || !codevData) {
+      console.error("Error fetching codev_id:", codevError);
+      return { error: { message: "User profile not found" }, data: null };
+    }
+
+    const userCodevId = codevData.id;
+
+    // Fetch projects where the user is either a team leader or member
+    const { data: projectMembers, error: projectMembersError } = await supabase
+      .from("project_members")
+      .select(
+        `
+        project_id,
+        role,
+        project:project_id (
+          id,
+          name,
+          status
+        )
+      `,
+      )
+      .eq("codev_id", userCodevId)
+      .in("role", ["team_leader", "member"]);
+
+    if (projectMembersError) {
+      console.error("Error fetching user projects:", projectMembersError);
+      return { error: { message: "Failed to fetch user projects" }, data: null };
+    }
+
+    if (!projectMembers || projectMembers.length === 0) {
+      return { error: null, data: null };
+    }
+
+    const userProjects = projectMembers.map((pm) => ({
+      project: pm.project as Project,
+      role: pm.role,
+    }));
+
+    return { error: null, data: userProjects };
+  } catch (error) {
+    console.error("Unexpected error fetching user projects:", error);
+    return { error: { message: "Unexpected error occurred" }, data: null };
+  }
+}
+
 export async function createProject(
   formData: FormData,
   selectedMembers: Codev[],
