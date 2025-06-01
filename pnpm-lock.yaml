@@ -11060,112 +11060,182 @@ packages:
     resolution: {integrity: sha512-WmoN8qaIAo7WTYWbAZuG8PYEhn5fkz7dZrqTBZ7dtt//lL2Gwms1IcnQ5yHqjDfX8Ft5j4YzDM23f87zBfDe9g==}
     dev: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-darwin-arm64@1.7.8:
     resolution: {integrity: sha512-rsRK8T7yxraNRDmpFLZCWqpea6OlXPNRRCjWMx24O1V86KFol7u2gj9zJCv6zB1oJjtnzWceuqdnCgOipFcJPA==}
+=======
+  /@unrs/resolver-binding-darwin-arm64@1.7.4:
+    resolution: {integrity: sha512-cyUy4VQpN9R9gEKbDfsErjDopQumQzKH75Rh171JoHeFUVOk1r2QcwvNXu+S2BPsM6gSdwtTEWBjPQv+crqr9Q==}
+>>>>>>> origin/dev
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-darwin-x64@1.7.8:
     resolution: {integrity: sha512-16yEMWa+Olqkk8Kl6Bu0ltT5OgEedkSAsxcz1B3yEctrDYp3EMBu/5PPAGhWVGnwhtf3hNe3y15gfYBAjOv5tQ==}
+=======
+  /@unrs/resolver-binding-darwin-x64@1.7.4:
+    resolution: {integrity: sha512-di1PSrdokgVsTQYI6eJEGywyj1k47JQPAWavqIYbwLfgvLit9w/EvUB2eV9vg9i8x8M13ZC2hjTumK5XtlP32A==}
+>>>>>>> origin/dev
     cpu: [x64]
     os: [darwin]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-freebsd-x64@1.7.8:
     resolution: {integrity: sha512-ST4uqF6FmdZQgv+Q73FU1uHzppeT4mhX3IIEmHlLObrv5Ep50olWRz0iQ4PWovadjHMTAmpuJAGaAuCZYb7UAQ==}
+=======
+  /@unrs/resolver-binding-freebsd-x64@1.7.4:
+    resolution: {integrity: sha512-F/actecQkYrRYvjcn9yH+Gjd0LMLP7P2y12nYjQS4WwuxpZ6IDXIc5eRQO0Omj4/a0BSlI4VcvswUzWGVJVr3A==}
+>>>>>>> origin/dev
     cpu: [x64]
     os: [freebsd]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-arm-gnueabihf@1.7.8:
     resolution: {integrity: sha512-Z/A/4Rm2VWku2g25C3tVb986fY6unx5jaaCFpx1pbAj0OKkyuJ5wcQLHvNbIcJ9qhiYwXfrkB7JNlxrAbg7YFg==}
+=======
+  /@unrs/resolver-binding-linux-arm-gnueabihf@1.7.4:
+    resolution: {integrity: sha512-+ttV8G5PFz8WJVrGPjQpy9kHh3/b6TT75Ckxt1iPD0eiUM1WaDvaH0E7IG7Z5s/vLls9HqwDjnrNGik6JQVz0w==}
+>>>>>>> origin/dev
     cpu: [arm]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-arm-musleabihf@1.7.8:
     resolution: {integrity: sha512-HN0p7o38qKmDo3bZUiQa6gP7Qhf0sKgJZtRfSHi6JL2Gi4NaUVF0EO1sQ1RHbeQ4VvfjUGMh3QE5dxEh06BgQQ==}
+=======
+  /@unrs/resolver-binding-linux-arm-musleabihf@1.7.4:
+    resolution: {integrity: sha512-0EZ/4CAaItMY95HgM/SGLpejJZmw1eI8V/V3pVdXt0WcpAKfKQistO8AEEPfcXGZJNJ08TX/OgqwFgCnZBG2+A==}
+>>>>>>> origin/dev
     cpu: [arm]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-arm64-gnu@1.7.8:
     resolution: {integrity: sha512-HsoVqDBt9G69AN0KWeDNJW+7i8KFlwxrbbnJffgTGpiZd6Jw+Q95sqkXp8y458KhKduKLmXfVZGnKBTNxAgPjw==}
+=======
+  /@unrs/resolver-binding-linux-arm64-gnu@1.7.4:
+    resolution: {integrity: sha512-Sft3f7z2sUxgo+WaR/EdHwPAqCyZfzbXP25GBbSZLLRFkFe+9eR+J1NvuxcxUCUXqhptURYHcBkoEsuHAcyjqg==}
+>>>>>>> origin/dev
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-arm64-musl@1.7.8:
     resolution: {integrity: sha512-VfR2yTDUbUvn+e/Aw22CC9fQg9zdShHAfwWctNBdOk7w9CHWl2OtYlcMvjzMAns8QxoHQoqn3/CEnZ4Ts7hfrA==}
+=======
+  /@unrs/resolver-binding-linux-arm64-musl@1.7.4:
+    resolution: {integrity: sha512-PeaiFDCEJLQFcF0LvNZizjzoUm1vxsFmrwxJ0W0lREhEPrgrsy3wZIPItMR1UJJPg9AbDpHqLDo95pyTY9vXow==}
+>>>>>>> origin/dev
     cpu: [arm64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-ppc64-gnu@1.7.8:
     resolution: {integrity: sha512-xUauVQNz4uDgs4UJJiUAwMe3N0PA0wvtImh7V0IFu++UKZJhssXbKHBRR4ecUJpUHCX2bc4Wc8sGsB6P+7BANg==}
+=======
+  /@unrs/resolver-binding-linux-ppc64-gnu@1.7.4:
+    resolution: {integrity: sha512-Nodq6VAFRW0yFqknizLgZsKHCdmI+L0utUSFoggCb66PAAPo+GzDYbt4h1eI1hA7oXzksN5rCRWxi2hEVTNxyg==}
+>>>>>>> origin/dev
     cpu: [ppc64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-riscv64-gnu@1.7.8:
     resolution: {integrity: sha512-GqyIB+CuSHGhhc8ph5RrurtNetYJjb6SctSHafqmdGcRuGi6uyTMR8l18hMEhZFsXdFMc/MpInPLvmNV22xn+A==}
+=======
+  /@unrs/resolver-binding-linux-riscv64-gnu@1.7.4:
+    resolution: {integrity: sha512-d1HN0cTUG8eRUIR8HSrH98rdVLJIIx3TCn5+naiPXV0IiQ+DslhAAXAaUOu1md5jjEzQzOYrxDmqcB7fQ9FzpQ==}
+>>>>>>> origin/dev
     cpu: [riscv64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-riscv64-musl@1.7.8:
     resolution: {integrity: sha512-eEU3rWIFRv60xaAbtsgwHNWRZGD7cqkpCvNtio/f1TjEE3HfKLzPNB24fA9X/8ZXQrGldE65b7UKK3PmO4eWIQ==}
+=======
+  /@unrs/resolver-binding-linux-riscv64-musl@1.7.4:
+    resolution: {integrity: sha512-JRN7y1x7NltIMtCtRroVj/9S0KsSNmvcmNiQ3MlBAV4TIG3jgRCeD9mDa+uKLBYWP1oOAMPkTG5j0Jy0ol6v/Q==}
+>>>>>>> origin/dev
     cpu: [riscv64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-s390x-gnu@1.7.8:
     resolution: {integrity: sha512-GVLI0f4I4TlLqEUoOFvTWedLsJEdvsD0+sxhdvQ5s+N+m2DSynTs8h9jxR0qQbKlpHWpc2Ortz3z48NHRT4l+w==}
+=======
+  /@unrs/resolver-binding-linux-s390x-gnu@1.7.4:
+    resolution: {integrity: sha512-QjznjkmS0zy+utl/aH1cH15QySQ9YCs2OuVrL9wEqdZY53/6wySgSheB9Nykk5eG7H60qriFMhYWH3tYLf+Gqw==}
+>>>>>>> origin/dev
     cpu: [s390x]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-x64-gnu@1.7.8:
     resolution: {integrity: sha512-GX1pZ/4ncUreB0Rlp1l7bhKAZ8ZmvDIgXdeb5V2iK0eRRF332+6gRfR/r5LK88xfbtOpsmRHU6mQ4N8ZnwvGEA==}
+=======
+  /@unrs/resolver-binding-linux-x64-gnu@1.7.4:
+    resolution: {integrity: sha512-nZkINWJ7lBg5BRtY2CwPs80GSbGdJLYseweXJJxD2lisR0xkIk2ao3b3wQuVQ/nho+DCyxSo+DGXrY/gaROZdA==}
+>>>>>>> origin/dev
     cpu: [x64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-linux-x64-musl@1.7.8:
     resolution: {integrity: sha512-n1N84MnsvDupzVuYqJGj+2pb9s8BI1A5RgXHvtVFHedGZVBCFjDpQVRlmsFMt6xZiKwDPaqsM16O/1isCUGt7w==}
+=======
+  /@unrs/resolver-binding-linux-x64-musl@1.7.4:
+    resolution: {integrity: sha512-00YaOvTCoVwef87i/ouTwYCRUVMXajTe79POa/vjBYedtO7ta1KidP4r9CjW0ie4no4au9wCn61dPHL8DZRLbw==}
+>>>>>>> origin/dev
     cpu: [x64]
     os: [linux]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-wasm32-wasi@1.7.8:
     resolution: {integrity: sha512-x94WnaU5g+pCPDVedfnXzoG6lCOF2xFGebNwhtbJCWfceE94Zj8aysSxdxotlrZrxnz5D3ijtyFUYtpz04n39Q==}
+=======
+  /@unrs/resolver-binding-wasm32-wasi@1.7.4:
+    resolution: {integrity: sha512-8a9+bokNHo3tOHSlRAR1Q5lwRCGOoKsch6LUbyHLwemg04CVDl1KRlqg/LJ+CvOKxoMj/8jAX2Or94jvWskmFg==}
+>>>>>>> origin/dev
     engines: {node: '>=14.0.0'}
     cpu: [wasm32]
     requiresBuild: true
@@ -11174,24 +11244,39 @@ packages:
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-win32-arm64-msvc@1.7.8:
     resolution: {integrity: sha512-vst2u8EJZ5L6jhJ6iLis3w9rg16aYqRxQuBAMYQRVrPMI43693hLP7DuqyOBRKgsQXy9/jgh204k0ViHkqQgdg==}
+=======
+  /@unrs/resolver-binding-win32-arm64-msvc@1.7.4:
+    resolution: {integrity: sha512-qP8j+fKfkMkUskDU4BG3tG7rl9vUoKRrHm6TtkdID6PdBBsn3vgqzEHvrH8y5sT4jnj4ewqmtcaUkFwv2/XtIw==}
+>>>>>>> origin/dev
     cpu: [arm64]
     os: [win32]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-win32-ia32-msvc@1.7.8:
     resolution: {integrity: sha512-yb3LZOLMFqnA+/ShlE1E5bpYPGDsA590VHHJPB+efnyowT776GJXBoh82em6O9WmYBUq57YblGTcMYAFBm72HA==}
+=======
+  /@unrs/resolver-binding-win32-ia32-msvc@1.7.4:
+    resolution: {integrity: sha512-ExEnp2Yio6cfnTrwLffLjYAOvZJ9ktLivs5CWrbIYeyh/wP46NiGYtZhs+WVYpOdmwX2M32QRCw12nh/M+ViXw==}
+>>>>>>> origin/dev
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
     dev: true
     optional: true
 
+<<<<<<< HEAD
   /@unrs/resolver-binding-win32-x64-msvc@1.7.8:
     resolution: {integrity: sha512-hHKFx+opG5BA3/owMXon8ypwSotBGTdblG6oda/iOu9+OEYnk0cxD2uIcGyGT8jCK578kV+xMrNxqbn8Zjlpgw==}
+=======
+  /@unrs/resolver-binding-win32-x64-msvc@1.7.4:
+    resolution: {integrity: sha512-+ebP/XNaMKCdrNNbxzbjZ2H8umZOybfL7FC/YAStsPNUJn0O3Tvm2I/vVhz1UrNCT+Ec/xHUX7t02CHQVPtwwQ==}
+>>>>>>> origin/dev
     cpu: [x64]
     os: [win32]
     requiresBuild: true
@@ -14373,7 +14458,11 @@ packages:
       is-bun-module: 2.0.0
       stable-hash: 0.0.5
       tinyglobby: 0.2.14
+<<<<<<< HEAD
       unrs-resolver: 1.7.8
+=======
+      unrs-resolver: 1.7.4
+>>>>>>> origin/dev
     transitivePeerDependencies:
       - supports-color
     dev: true
@@ -24274,12 +24363,18 @@ packages:
       webpack-virtual-modules: 0.6.2
     dev: true
 
+<<<<<<< HEAD
   /unrs-resolver@1.7.8:
     resolution: {integrity: sha512-2zsXwyOXmCX9nGz4vhtZRYhe30V78heAv+KDc21A/KMdovGHbZcixeD5JHEF0DrFXzdytwuzYclcPbvp8A3Jlw==}
+=======
+  /unrs-resolver@1.7.4:
+    resolution: {integrity: sha512-rpd1iZ7usb6pa41f9OnPpGxb6CasomiVg4XCXV6QS8s66jnvDJnUNG27h+siYeHFt7Gu/DKO225w2RC2/7Edkw==}
+>>>>>>> origin/dev
     requiresBuild: true
     dependencies:
       napi-postinstall: 0.2.4
     optionalDependencies:
+<<<<<<< HEAD
       '@unrs/resolver-binding-darwin-arm64': 1.7.8
       '@unrs/resolver-binding-darwin-x64': 1.7.8
       '@unrs/resolver-binding-freebsd-x64': 1.7.8
@@ -24297,6 +24392,25 @@ packages:
       '@unrs/resolver-binding-win32-arm64-msvc': 1.7.8
       '@unrs/resolver-binding-win32-ia32-msvc': 1.7.8
       '@unrs/resolver-binding-win32-x64-msvc': 1.7.8
+=======
+      '@unrs/resolver-binding-darwin-arm64': 1.7.4
+      '@unrs/resolver-binding-darwin-x64': 1.7.4
+      '@unrs/resolver-binding-freebsd-x64': 1.7.4
+      '@unrs/resolver-binding-linux-arm-gnueabihf': 1.7.4
+      '@unrs/resolver-binding-linux-arm-musleabihf': 1.7.4
+      '@unrs/resolver-binding-linux-arm64-gnu': 1.7.4
+      '@unrs/resolver-binding-linux-arm64-musl': 1.7.4
+      '@unrs/resolver-binding-linux-ppc64-gnu': 1.7.4
+      '@unrs/resolver-binding-linux-riscv64-gnu': 1.7.4
+      '@unrs/resolver-binding-linux-riscv64-musl': 1.7.4
+      '@unrs/resolver-binding-linux-s390x-gnu': 1.7.4
+      '@unrs/resolver-binding-linux-x64-gnu': 1.7.4
+      '@unrs/resolver-binding-linux-x64-musl': 1.7.4
+      '@unrs/resolver-binding-wasm32-wasi': 1.7.4
+      '@unrs/resolver-binding-win32-arm64-msvc': 1.7.4
+      '@unrs/resolver-binding-win32-ia32-msvc': 1.7.4
+      '@unrs/resolver-binding-win32-x64-msvc': 1.7.4
+>>>>>>> origin/dev
     dev: true
 
   /update-browserslist-db@1.1.3(browserslist@4.25.0):

@@ -645,4 +645,3 @@ export async function getAllProjects() {
     };
   }
 }
-
