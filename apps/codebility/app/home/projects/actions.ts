@@ -114,7 +114,7 @@ export async function getUserProjects(): Promise<{
     }
 
     const userProjects = projectMembers.map((pm) => ({
-      project: pm.project as Project,
+      project: pm.project as unknown as Project,
       role: pm.role,
     }));
 
