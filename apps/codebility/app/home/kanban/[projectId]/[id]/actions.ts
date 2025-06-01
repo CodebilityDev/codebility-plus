@@ -266,7 +266,7 @@ export const deleteTask = async (
       return { success: false, error: error.message };
     }
 
-    revalidatePath("/home/kanban");
+    revalidatePath("/home/kanban/*");
     return { success: true };
   } catch (error) {
     console.error("Error deleting task:", error);
