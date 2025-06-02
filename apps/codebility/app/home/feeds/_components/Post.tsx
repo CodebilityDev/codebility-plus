@@ -12,6 +12,7 @@ interface PostProps {
     likes: number;
   };
   postUrl: string;
+  isMentor?: boolean;
 }
 
 export default function Post({
@@ -22,11 +23,20 @@ export default function Post({
   image,
   reactions,
   postUrl,
+  isMentor,
 }: PostProps) {
   return (
     <Box className="group flex h-[350px] flex-col justify-between p-3">
       <div className="flex items-center justify-between">
         <div className="flex items-center">
+          {isMentor && (
+            <button
+              className="invisible group-hover:visible"
+              onClick={() => console.log(`Delete post with ID: ${user}`)}
+            >
+              ✕
+            </button>
+          )}
           <Image
             src={userImage}
             alt={`${user}'s profile`}
@@ -48,7 +58,7 @@ export default function Post({
           href={postUrl}
           target="_blank"
           rel="noopener noreferrer"
-          className="bg-black-300 invisible rounded-sm py-1 text-[10px] text-white hover:text-blue-700 group-hover:visible dark:bg-white dark:text-blue-400 dark:hover:text-blue-600"
+          className="bg-black-300 invisible rounded-sm py-1 text-[10px] text-white hover:text-slate-200 group-hover:visible dark:bg-white dark:text-blue-400 dark:hover:text-blue-600"
         >
           Read Post
         </a>

@@ -5,7 +5,7 @@ export const samplePosts = [
     userImage: "/assets/images/bg-certificate.png",
     content:
       "This is hello world post. Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    timestamp: "6h ago",
+    timestamp: "4h ago",
     image: "/assets/images/bg-certificate.png",
     reactions: { likes: 7 },
     postUrl: "https://example.com/posts/1",
@@ -26,7 +26,7 @@ export const samplePosts = [
     userImage: "/assets/images/bg-certificate.png",
     content: "Loving this platform!",
     timestamp: "1d ago",
-    image: "/assets/images/bg-certificate.png", // Single image
+    image: "/assets/images/bg-certificate.png",
     reactions: { likes: 20 },
     postUrl: "https://example.com/posts/3",
   },
@@ -36,7 +36,7 @@ export const samplePosts = [
     userImage: "/assets/images/bg-certificate.png",
     content: "Check out these amazing photos!",
     timestamp: "2d ago",
-    image: "/assets/images/bg-certificate.png", // Single image
+    image: "/assets/images/bg-certificate.png",
     reactions: { likes: 50 },
     postUrl: "https://example.com/posts/4",
   },
@@ -46,7 +46,7 @@ export const samplePosts = [
     userImage: "/assets/images/bg-certificate.png",
     content: "What a beautiful day!",
     timestamp: "3d ago",
-    image: "/assets/images/bg-certificate.png", // Single image
+    image: "/assets/images/bg-certificate.png",
     reactions: { likes: 10 },
     postUrl: "https://example.com/posts/5",
   },
