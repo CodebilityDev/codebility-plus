@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import DefaultPagination from "@/Components/ui/pagination"; // Adjust the import path as needed
+import DefaultPagination from "@/Components/ui/pagination";
 
 import Post from "./Post";
 import { samplePosts } from "./SampleData";
 
-export default function Feed() {
+export default function Feed({ isMentor }) {
   const [currentPage, setCurrentPage] = useState(1);
   const postsPerPage = 6;
 
@@ -39,6 +39,7 @@ export default function Feed() {
             image={post.image}
             reactions={post.reactions}
             postUrl={post.postUrl}
+            isMentor={isMentor}
           />
         ))}
       </div>
