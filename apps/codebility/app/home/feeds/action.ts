@@ -1,4 +1,5 @@
-import { createClientClientComponent } from "@/utils/supabase/client";
+"use server";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 
 export const getUserRole = async (userId: Number | null): Promise<string | null> => {
@@ -6,9 +7,8 @@ export const getUserRole = async (userId: Number | null): Promise<string | null>
     return null;
   }
 
-  const supabase = createClientClientComponent();
+  const supabase = await createClientServerComponent();
 
-   
   const { data: userRole, error } = await supabase
     .from("roles")
     .select("id")
