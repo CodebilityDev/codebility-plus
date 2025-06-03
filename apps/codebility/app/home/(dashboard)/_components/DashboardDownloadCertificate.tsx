@@ -43,8 +43,8 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
       description,
       key_projects,
       signature,
-      signature_name,
-      signature_title,
+      // signature_name,
+      // signature_title,
     } = props;
 
     return (
@@ -101,20 +101,21 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
           </div>
 
           {/* Signature */}
-          <div className="mt-2">
-            <div className="relative mx-auto mt-4 w-fit">
-              <p className="text-center text-sm">
-                {signature_name}
-                <br />
-                <span className="text-sm" style={{ color: "cyan" }}>
-                  {signature_title}
-                </span>
-              </p>
+          <div className="mt-10">
+            <div className="relative mx-auto w-fit">
               <img
                 src={signature}
                 alt="signature"
-                className="pointer-events-none absolute -top-8 left-1/2 w-60 -translate-x-1/2 opacity-90"
+                className="pointer-events-none mx-auto w-60 opacity-90"
               />
+              <p className="mt-2 text-center text-sm">
+                {/* Uncomment and use these if needed */}
+                {/* {signature_name} */}
+                {/* <br /> */}
+                {/* <span className="text-sm" style={{ color: "cyan" }}> */}
+                {/* {signature_title} */}
+                {/* </span> */}
+              </p>
             </div>
           </div>
         </div>
