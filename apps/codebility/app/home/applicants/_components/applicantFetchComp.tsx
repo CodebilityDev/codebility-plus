@@ -8,15 +8,11 @@ import { NewApplicantType } from "../_service/types";
 import ApplicantLists from "./applicantLists";
 
 export default async function NewApplicantFetchComp() {
-  /* 
-    todo: fix revalidation issue with redis cache
-  */
-  /* const applicant: NewApplicantType[] = await getOrSetCache(
+  const applicant: NewApplicantType[] = await getOrSetCache(
     cacheKeys.codevs.applicants,
     () => getNewApplicants(),
+    30,
   );
- */
-  const applicant: NewApplicantType[] = await getNewApplicants();
 
   return (
     <div>
