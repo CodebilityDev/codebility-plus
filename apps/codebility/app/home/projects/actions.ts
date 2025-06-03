@@ -57,6 +57,95 @@ interface DbProjectMemberResponse {
   };
 }
 
+export async function getUserProjects(): Promise<{
+  error: any;
+  data: { project: Project; role: string }[] | null;
+}> {
+  const supabase = await createClientServerComponent();
+  try {
+    // Get the current logged-in user
+    const {
+      data: { user },
+      error: userError,
+    } = await supabase.auth.getUser();
+    if (userError || !user) {
+      console.error("Error fetching user:", userError);
+      return { error: { message: "User not authenticated" }, data: null };
+    }
+
+    // Fetch the user's codev_id based on their email
+    const { data: codevData, error: codevError } = await supabase
+      .from("codev")
+      .select("id")
+      .eq("email_address", user.email)
+      .single();
+
+    if (codevError || !codevData) {
+      console.error("Error fetching codev_id:", codevError);
+      return { error: { message: "User profile not found" }, data: null };
+    }
+
+    const userCodevId = codevData.id;
+
+    // Define the shape of the project data returned by Supabase
+    interface DbProject {
+      id: string;
+      name: string;
+      status: string | null;
+      kanban_display: boolean | null; // Add kanban_display to match Project type
+    }
+
+    interface ProjectMember {
+      project_id: string;
+      role: string;
+      project: DbProject;
+    }
+
+    // Fetch projects where the user is either a team leader or member
+    const { data: projectMembers, error: projectMembersError } = await supabase
+      .from("project_members")
+      .select(
+        `
+        project_id,
+        role,
+        project:project_id (
+          id,
+          name,
+          status,
+          kanban_display
+        )
+      `,
+      )
+      .eq("codev_id", userCodevId)
+      .in("role", ["team_leader", "member"]) as { data: ProjectMember[] | null; error: any };
+
+    if (projectMembersError) {
+      console.error("Error fetching user projects:", projectMembersError);
+      return { error: { message: "Failed to fetch user projects" }, data: null };
+    }
+
+    if (!projectMembers || projectMembers.length === 0) {
+      return { error: null, data: null };
+    }
+
+    // Map the project members to the expected return type
+    const userProjects = projectMembers.map((pm) => ({
+      project: {
+        id: pm.project.id,
+        name: pm.project.name,
+        status: pm.project.status || "pending", // Default status if null
+        kanban_display: pm.project.kanban_display ?? false, // Default value if null
+      } as Project, // Cast to Project type with defaults
+      role: pm.role,
+    }));
+
+    return { error: null, data: userProjects };
+  } catch (error) {
+    console.error("Unexpected error fetching user projects:", error);
+    return { error: { message: "Unexpected error occurred" }, data: null };
+  }
+}
+
 export async function createProject(
   formData: FormData,
   selectedMembers: Codev[],
@@ -575,4 +664,3 @@ export async function getAllProjects(kanbanBoardId?: string) {
     };
   }
 }
-
