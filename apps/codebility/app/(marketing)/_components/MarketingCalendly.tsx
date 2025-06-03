@@ -11,17 +11,16 @@ const Calendly = () => {
     <Section id="book" className="relative w-full pt-10 text-white">
       <Container className="relative z-10 flex flex-col gap-6 text-white lg:flex-row lg:gap-10">
         <div className="flex w-full flex-1 flex-col justify-center gap-2 text-center lg:text-left">
-          <h2 className="text-3xl font-bold uppercase md:text-5xl">
-            Book a meeting!
+          <h2 className="text-3xl font-bold md:text-5xl">
+            Let&apos;s Connect
           </h2>
           <p className="text-md lg:text-lg">
-            Schedule a meeting with us to discuss your needs and find tailored
-            solutions.
+            Schedule a meeting with us to discuss your needs and have solutions. 
           </p>
         </div>
 
         <div className="calendly-widget-container w-full flex-1 justify-center lg:w-1/2">
-          <InlineWidget url="https://calendly.com/codebility-dev/30min" />
+          <InlineWidget styles={{ borderRadius: '0.5rem' }} url="https://calendly.com/codebility-dev/30min" />
         </div>
       </Container>
       <div

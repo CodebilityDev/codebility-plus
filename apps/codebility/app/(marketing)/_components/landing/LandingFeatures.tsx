@@ -1,6 +1,6 @@
 import { Button } from "@/Components/ui/button";
 
-import { ServicesCardData } from "../../../../constants/landing_data";
+import { ServicesCardData } from "@/constants/landing_data";
 import Container from "../MarketingContainer";
 import Section from "../MarketingSection";
 import FeaturesCard from "./LandingFeaturesCard";
@@ -11,14 +11,14 @@ const Features = () => {
       <Container className="flex flex-col gap-10 text-white">
         <div className="flex max-w-[650px] flex-col gap-3">
           <p className="text-violet text-left text-lg md:text-2xl">
-            In the tech industry
+            In the Tech Industry
           </p>
           <h2 className="text-left text-xl md:text-3xl">
-            Codebility sparks for a passion for{" "}
-            <strong>technology and innovation.</strong>
+            Codebility sparks a passion for{" "}
+            <strong>Technology and Innovation.</strong>
           </h2>
           <p className="text-gray">
-            Our programs go beyond skill acquisition, because acquisition,
+            Our programs go beyond skill acquisition, 
             because we believe in the trans-formative power of coding
           </p>
         </div>
