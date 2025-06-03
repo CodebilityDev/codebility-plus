@@ -17,9 +17,10 @@ import UserTaskFilter from "./UserTaskFilter";
 
 interface KanbanBoardProps {
 	boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
+  projectId: string;
 }
 
-export default function KanbanBoard({ boardData }: KanbanBoardProps) {
+export default function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
 	const user = useUserStore((state) => state.user);
 	const canAddColumn =
 		user?.role_id === 1 || user?.role_id === 5;
@@ -92,7 +93,11 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
 				<div className="text-dark100_light900 flex h-full flex-col gap-4 ">
 					<div className="flex flex-row items-center gap-4 text-sm">
 						<Link href={pathsConfig.app.kanban}>
-							<span className="dark:text-white/50">Kanban Board</span>
+							<span className="dark:text-white/50">Kanban Projects</span>
+						</Link>
+						<ArrowRightIcon />
+						<Link href={`${pathsConfig.app.kanban}/${projectId}`}>
+							<span className="dark:text-white/50">Kanban Sprints</span>
 						</Link>
 						<ArrowRightIcon />
 						<span className="font-semibold">{boardData.name}</span>
