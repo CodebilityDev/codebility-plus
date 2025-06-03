@@ -6,7 +6,7 @@ import KanbanBoard from "./_components/KanbanBoard";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 interface KanbanBoardPageProps {
-  params: Promise<{ id: string }>;
+  params: Promise<{ id: string, projectId: string }>;
   searchParams: Promise<{ query?: string }>;
 }
 
@@ -126,5 +126,5 @@ export default async function KanbanBoardPage(props: KanbanBoardPageProps) {
     kanban_columns: filteredColumns,
   };
 
-  return <KanbanBoard boardData={boardData} />;
+  return <KanbanBoard projectId={params.projectId} boardData={boardData} />;
 }
