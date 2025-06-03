@@ -2,6 +2,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/Components/ui/button";
 import { CertificateProps } from "@/types/home/codev";
+import { BookDown } from "lucide-react";
 
 import Certificate, { handleDownload } from "./DashboardDownloadCertificate";
 
@@ -30,9 +31,9 @@ const DashboardCertificate = ({ user }: Props) => {
       "Responsive Deadpool and Wolverine Website",
       "E-commerce Storefront",
     ],
-    signature: "/assets/images/signature.png",
-    signature_name: "James Anthony Capucion",
-    signature_title: "Frontend Developer",
+    signature: "/assets/images/signature1.png",
+    // signature_name: "Jzeff Kendrew Somera",
+    // signature_title: "C.E.O / Founder of Codebility",
   };
   return (
     <>
@@ -54,12 +55,7 @@ const DashboardCertificate = ({ user }: Props) => {
           className="md:p-15 md:w-15 h-6 w-10 p-2"
           onClick={() => handleDownload(certRef, certDummyData.name)}
         >
-          <Image
-            alt="Certificate"
-            src={"/assets/images/certificate.png"}
-            width={20}
-            height={20}
-          />
+          <BookDown />
         </Button>
       </div>
     </>

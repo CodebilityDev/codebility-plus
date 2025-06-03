@@ -73,7 +73,7 @@ export async function getUserProjects(): Promise<{
       return { error: { message: "User not authenticated" }, data: null };
     }
 
-    // Assume codev_id is linked to the user (you may need to adjust based on your schema)
+    // Fetch the user's codev_id based on their email
     const { data: codevData, error: codevError } = await supabase
       .from("codev")
       .select("id")
@@ -87,6 +87,20 @@ export async function getUserProjects(): Promise<{
 
     const userCodevId = codevData.id;
 
+    // Define the shape of the project data returned by Supabase
+    interface DbProject {
+      id: string;
+      name: string;
+      status: string | null;
+      kanban_display: boolean | null; // Add kanban_display to match Project type
+    }
+
+    interface ProjectMember {
+      project_id: string;
+      role: string;
+      project: DbProject;
+    }
+
     // Fetch projects where the user is either a team leader or member
     const { data: projectMembers, error: projectMembersError } = await supabase
       .from("project_members")
@@ -97,12 +111,13 @@ export async function getUserProjects(): Promise<{
         project:project_id (
           id,
           name,
-          status
+          status,
+          kanban_display
         )
       `,
       )
       .eq("codev_id", userCodevId)
-      .in("role", ["team_leader", "member"]);
+      .in("role", ["team_leader", "member"]) as { data: ProjectMember[] | null; error: any };
 
     if (projectMembersError) {
       console.error("Error fetching user projects:", projectMembersError);
@@ -113,8 +128,14 @@ export async function getUserProjects(): Promise<{
       return { error: null, data: null };
     }
 
+    // Map the project members to the expected return type
     const userProjects = projectMembers.map((pm) => ({
-      project: pm.project as unknown as Project,
+      project: {
+        id: pm.project.id,
+        name: pm.project.name,
+        status: pm.project.status || "pending", // Default status if null
+        kanban_display: pm.project.kanban_display ?? false, // Default value if null
+      } as Project, // Cast to Project type with defaults
       role: pm.role,
     }));
 
@@ -594,22 +615,6 @@ export const getProjectClients = async (): Promise<Client[]> => {
   return data || [];
 };
 
-export async function getTotalProjectsCount(): Promise<number> {
-  const supabase = await createClientServerComponent();
-  try {
-    const { count, error } = await supabase
-      .from("projects")
-      .select("*", { count: "exact", head: true }); // Use count option to get total rows
-
-    if (error) throw error;
-
-    return count || 0;
-  } catch (error) {
-    console.error("Error fetching total projects count:", error);
-    return 0;
-  }
-}
-
 export const getProjectCategories = async () => {
   const supabase = await createClientServerComponent();
   const { data, error } = await supabase
@@ -624,18 +629,32 @@ export const getProjectCategories = async () => {
   return data || [];
 };
 
-// Get all projects with kanban_display set to true
-export async function getAllProjects() {
+// Get all projects with kanban boards display is true
+export async function getAllProjects(kanbanBoardId?: string) {
   const supabase = await createClientServerComponent();
+
   try {
-    const { data, error } = await supabase
-      .from("projects")
-      .select(`*`)
-      .eq("kanban_display", true);
+    let query = supabase
+      .from("kanban_boards")
+      .select("id, name, project_id, projects (id, name, main_image)")
+      .eq("projects.kanban_display", true);
+
+    if (kanbanBoardId) {
+      query = query.eq("id", kanbanBoardId);
+    }
+
+    const { data, error } = await query;
 
     if (error) throw error;
 
-    return data;
+    // Flatten project info
+    const flattenedProjects = data.map((item: any) => ({
+      ...item.projects,
+      kanban_board_id: item.id,
+      kanban_board_name: item.name,
+    }));
+
+    return flattenedProjects;
   } catch (error) {
     console.error("Error fetching projects:", error);
     return {

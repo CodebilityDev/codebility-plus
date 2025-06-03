@@ -1,9 +1,32 @@
-import { Box } from "@/Components/shared/dashboard";
+"use client";
 
-import CreatePost from "./_components/CreatePost";
+import { useEffect, useState } from "react";
+import CreateFeedModal from "@/Components/modals/CreateFeedModal";
+import { Button } from "@/Components/ui/button";
+import { useUserStore } from "@/store/codev-store";
+
 import Feed from "./_components/Feed";
+import { getUserRole } from "./action";
 
 export default function FeedsPage() {
+  const [isMentor, setIsMentor] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const { user } = useUserStore();
+
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!user) return;
+      const role = await getUserRole(user.role_id ?? null);
+      setIsMentor(role === "Mentor");
+    };
+
+    if (user) {
+      fetchRole();
+    }
+  }, [user]);
+
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   return (
     <>
       <div className="text-black-800 dark:text-white">
@@ -13,12 +36,16 @@ export default function FeedsPage() {
           Codebility community.
         </p>
       </div>
-      <Box className="text-black-800 min-h-screen dark:text-white">
-        <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
-          <div className="mb-6"></div>
-          <Feed />
-        </div>
-      </Box>
+      <div className="container mx-auto px-4 py-6 sm:px-6 lg:px-8">
+        {isMentor && (
+          <Button className="mb-4 w-auto" onClick={openModal}>
+            Create Feeds
+          </Button>
+        )}
+        <Feed isMentor={isMentor} />
+      </div>
+
+      <CreateFeedModal isOpen={isModalOpen} onClose={closeModal} />
     </>
   );
 }
