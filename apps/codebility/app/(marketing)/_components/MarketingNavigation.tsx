@@ -309,17 +309,6 @@ const Navigation = () => {
         <div className="flex items-center gap-2">
           {!userData ? (
             <>
-              <Link href="/bookacall">
-                <Button
-                  variant="purple"
-                  rounded="full"
-                  size="lg"
-                  className="hidden lg:block"
-                >
-                  Let&apos;s Connect
-                </Button>
-              </Link>
-
               {pathname === "/codevs" && (
                 <Link href="/auth/sign-in">
                   <Button
