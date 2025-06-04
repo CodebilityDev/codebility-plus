@@ -33,19 +33,18 @@ const Hero = () => {
               </div>
               <div className="md:mx-auto">
                 <div className="flex w-full flex-col items-center gap-4 md:flex-row">
+                  <Link href="/services">
+                    <Button variant="purple" size="lg" rounded="full" className="">
+                      Our Portfolio
+                    </Button>
+                  </Link>
                   <Link href="/bookacall">
                     <Button
-                      variant="purple"
+                      variant="outline"
                       rounded="full"
                       size="lg"
                     >
                       Let&apos;s Connect
-                    </Button>
-                  </Link>
-
-                  <Link href="/services">
-                    <Button variant="outline" size="lg" rounded="full" className="">
-                      Our Portfolio
                     </Button>
                   </Link>
                 </div>
