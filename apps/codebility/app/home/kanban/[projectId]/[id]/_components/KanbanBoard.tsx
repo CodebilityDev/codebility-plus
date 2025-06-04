@@ -97,12 +97,12 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
             <span className="font-semibold">{boardData.name}</span>
           </div>
 
-          <div className="flex flex-col gap-4 md:flex-row md:justify-between">
+          <div className="flex flex-col gap-4 md:justify-between lg:flex-row">
             <h1 className="text-dark100_light900 text-md font-semibold md:text-2xl">
               {boardData.name}
             </h1>
 
-            <div className="flex flex-col gap-4 md:flex-row">
+            <div className="flex flex-col gap-4 xl:flex-row">
               <div className="flex items-center gap-6">
                 {/* Added fixed height and overflow visible */}
                 <div className="h-10 overflow-visible">
@@ -123,8 +123,13 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
                   />
                 </div>
               </div>
-              {canAddColumn && <KanbanColumnAddButton boardId={boardData.id} />}
-              {canAddMember && <KanbanAddMembersButton />}
+
+              <div className="flex items-center justify-center gap-2 md:justify-start">
+                {canAddColumn && (
+                  <KanbanColumnAddButton boardId={boardData.id} />
+                )}
+                {canAddMember && <KanbanAddMembersButton />}
+              </div>
             </div>
           </div>
 
