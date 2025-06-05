@@ -31,8 +31,6 @@ jobs:
       REDIS_URL: ${{ secrets.REDIS_URL }}
       REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
       DB_SERVICE_ROLE: ${{ secrets.DB_SERVICE_ROLE }}
-      EMAIL_USER: ${{ secrets.EMAIL_USER }}
-      EMAIL_APP_PASSWORD: ${{ secrets.EMAIL_APP_PASSWORD }}
 
     steps:
       - name: Checkout repository
@@ -42,8 +40,6 @@ jobs:
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: 9
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
