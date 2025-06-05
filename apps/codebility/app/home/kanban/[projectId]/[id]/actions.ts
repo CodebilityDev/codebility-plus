@@ -137,7 +137,8 @@ export const createNewTask = async (
       ?.toString()
       .split(",")
       .filter(Boolean);
-    const skill_category_id = formData.get("skill_category_id")?.toString(); // NEW field
+    const skill_category_id = formData.get("skill_category_id")?.toString();
+    const created_by = formData.get("created_by")?.toString();
 
     if (!title || !kanban_column_id) {
       return { success: false, error: "Required fields are missing" };
@@ -155,7 +156,8 @@ export const createNewTask = async (
         kanban_column_id,
         codev_id,
         sidekick_ids,
-        skill_category_id, // NEW field inserted into the DB
+        skill_category_id,
+        created_by,
       },
     ]);
 

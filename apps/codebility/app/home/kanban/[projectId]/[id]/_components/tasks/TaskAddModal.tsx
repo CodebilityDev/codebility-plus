@@ -102,6 +102,8 @@ const TaskAddModal = () => {
 
       if (sidekicks.length)
         formData.append("sidekick_ids", sidekicks.join(","));
+    
+      formData.append("created_by", user?.id as string);
 
       const response = await createNewTask(formData);
       if (response.success) {
