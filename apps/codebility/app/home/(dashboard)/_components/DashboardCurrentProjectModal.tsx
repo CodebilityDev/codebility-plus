@@ -43,7 +43,7 @@ export default function DashboardCurrentProjectModal() {
   const handleGoToKanban = () => {
     if (kanbanBoardId) {
       onClose();
-      router.push(`/home/kanban/${kanbanBoardId}`);
+      router.push(`/home/kanban/project/${kanbanBoardId}`);
     }
   };
 
