@@ -1,8 +1,8 @@
 "use client";
 
 import React from "react";
+import { getTestDate } from "@/app/applicant/waiting/_service/util";
 import { Box } from "@/Components/shared/dashboard";
-import { Button } from "@/Components/ui/button";
 import DefaultPagination from "@/Components/ui/pagination";
 import {
   Table,
@@ -28,6 +28,7 @@ import {
 import { NewApplicantType } from "../../_service/types";
 import ApplicantMobileTable from "./applicantMobileTable";
 import ApplicantRowActionButton from "./applicantRowActionButton";
+import ApplicantEmailAction from "../applicantEmailAction";
 
 interface DataTableProps<TData extends NewApplicantType, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -77,12 +78,28 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
   // Calculate total pages
   const totalPages = Math.ceil(data.length / pageSize.applicants);
 
+  const toBeFailed = (
+    testTaken: string | null | undefined,
+    forkUrl: string | null | undefined,
+  ): Boolean => {
+    if (!testTaken) return false;
+    if (forkUrl) return false;
+
+    const currentDate = new Date();
+
+    const testTakenDate = getTestDate(new Date(testTaken || "") || new Date());
+
+    const difference = testTakenDate.getTime() - currentDate.getTime();
+
+    return difference <= 0;
+  };
+
   return (
     <div className="rounded-md border">
       <Box className="p-1 py-2 sm:p-4 sm:py-4">
         {/* if rows selected */}
 
-        <div className="w-1/2">
+        <div className="flex w-full items-center justify-betwee">
           <div className="hidden w-full items-center gap-4 px-2 pb-2 xl:flex">
             <p className="text-sm text-gray-500">
               {Object.keys(rowSelection).length} selected
@@ -92,6 +109,13 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
               applicants={table
                 .getFilteredSelectedRowModel()
                 .rows.map((row) => row.original)}
+            />
+          </div>
+
+          <div>
+            {/* email sending */}
+            <ApplicantEmailAction
+              applicants={data}
             />
           </div>
         </div>
@@ -129,6 +153,17 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
                 <TableRow
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
+                  className={cn(
+                    row.original.application_status === "testing" &&
+                      row.original.applicant?.fork_url &&
+                      "bg-green bg-opacity-5",
+                    row.original.application_status === "testing" &&
+                      toBeFailed(
+                        row.original.applicant?.test_taken,
+                        row.original.applicant?.fork_url,
+                      ) &&
+                      "bg-red-100 bg-opacity-5",
+                  )}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
