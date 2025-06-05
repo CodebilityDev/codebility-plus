@@ -36,7 +36,7 @@ export default async function Admins() {
 
         // If both have images or both don't have images, maintain original order
         return 0;
-      })
+      }).filter((admin) => !admin.display_position?.includes("Developer"))
     : [];
 
   const sortedMentors = mentors
@@ -106,7 +106,7 @@ export default async function Admins() {
             <div className="grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4">
               {sortedAdmins.map((admin: Codev) => (
                 <AdminCard
-                  color={getRandomColor() || ""}
+                  color={getRandomColor() as string}
                   key={admin.id}
                   admin={{
                     ...admin,
