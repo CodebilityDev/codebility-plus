@@ -1,4 +1,4 @@
-name: CI for Monorepo with Turbo and Changed Files Detection
+name: CI for Codebility
 
 on:
   push:
@@ -51,6 +51,19 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
+      # Enhanced caching strategy
+      - name: Cache node_modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+            apps/*/node_modules
+            packages/*/node_modules
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-
+
       - name: Cache Turbo output
         uses: actions/cache@v4
         with:
@@ -62,18 +75,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      # - name: Build changed packages comment out if packages are properly fixed
-      #   run: pnpm dlx turbo@latest run build --filter=...[HEAD~1]
-
-      # - name: Run linting for changed packages comment out if packages are properly fixed
-      #   run: pnpm dlx turbo@latest run lint --filter=...[HEAD~1]
-
       - name: Build Codebility
         run: pnpm run codebility:build
-
-      # Uncomment when ready for tests
-      # - name: Run tests for changed packages
-      #   run: pnpm dlx turbo@latest run test --filter=...[HEAD~1]
 
       # Trigger Vercel deployment using deploy hook
       - name: Deploy to Vercel
