@@ -75,6 +75,7 @@ export default async function KanbanBoardPage(props: KanbanBoardPageProps) {
           points,
           pr_link,
           sidekick_ids,
+          created_by,
           kanban_column_id,
           codev!tasks_codev_id_fkey (
             id,

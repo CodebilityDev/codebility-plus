@@ -140,6 +140,8 @@ const TaskViewModal = ({
   const [primaryAssignee, setPrimaryAssignee] = useState<CodevMember | null>(
     null,
   );
+  const [createdBy, setCreatedBy] = useState<CodevMember | null>(null);
+
   const [supabase, setSupabase] = useState<any>(null);
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -217,6 +219,30 @@ const TaskViewModal = ({
       fetchPrimaryAssignee();
     }
   }, [task, supabase, data]);
+
+  useEffect(() => {
+    if (!supabase) return;
+
+    const fetchCreatedBy = async () => {
+      const createdById = task?.created_by;
+      setCreatedBy(null); // Reset created by
+
+      if (createdById) {
+        const { data, error } = await supabase
+          .from("codev")
+          .select("id, first_name, last_name, image_url")
+          .eq("id", createdById)
+          .single();
+
+        if (!error && data) {
+          setCreatedBy(data as CodevMember);
+        } else {
+            setCreatedBy(null);
+        }
+      }
+    };
+    fetchCreatedBy();
+  }, [task?.created_by, supabase, data]);
 
   // Return previous PR link when leaving the input field empty
   useEffect(() => {
@@ -456,11 +482,33 @@ const TaskViewModal = ({
           <div className="space-y-2">
             <Label className="text-sm font-medium">Description</Label>
             <div
-              className="text-black-100 overflow-wrap tiptap-description min-h-[120px] resize-none whitespace-pre-wrap break-words dark:text-white"
+              className="text-black-100 overflow-wrap tiptap-description resize-none whitespace-pre-wrap break-words dark:text-white"
               dangerouslySetInnerHTML={{
                 __html: task?.description || "No description provided",
               }}
             />
+          </div>
+
+          <div className="space-y-2">
+            <Label className="text-sm font-medium">Created By</Label>
+            <div className="flex items-center gap-2">
+              {createdBy && createdBy.image_url ? (
+                <Image
+                  src={createdBy.image_url}
+                  alt={`${createdBy.first_name} ${createdBy.last_name}`}
+                  width={32}
+                  height={32}
+                  className="rounded-full"
+                />
+              ) : (
+                <DefaultAvatar size={32} />
+              )}
+              <span>
+                {createdBy && task
+                  ? `${createdBy.first_name} ${createdBy.last_name}`
+                  : "Unassigned"}
+              </span>
+            </div>
           </div>
 
           <DialogFooter className="flex gap-2 sm:justify-end">
