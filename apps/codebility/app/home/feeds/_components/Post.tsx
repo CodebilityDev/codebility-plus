@@ -1,15 +1,18 @@
 import Image from "next/image";
+import { Box } from "@/Components/shared/dashboard";
+import { ArrowBigUp } from "lucide-react";
 
 interface PostProps {
   user: string;
   userImage: string;
   content: string;
   timestamp: string;
-  images?: string[];
+  image: string;
   reactions: {
     likes: number;
-    comments: number;
   };
+  postUrl: string;
+  isMentor?: boolean;
 }
 
 export default function Post({
@@ -17,82 +20,72 @@ export default function Post({
   userImage,
   content,
   timestamp,
-  images = [],
+  image,
   reactions,
+  postUrl,
+  isMentor,
 }: PostProps) {
   return (
-    <div className="dark:text-black-800 border-b bg-white p-4 shadow-lg ">
-      {/* Header */}
-      <div className="flex items-center">
-        <Image
-          src={userImage}
-          alt={`${user}'s profile`}
-          className="mr-4 h-10 w-10 rounded-full object-cover"
-          width={40}
-          height={40}
-        />
-        <div className="flex-1">
-          <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-            {user}
-          </h2>
-          <span className="text-sm text-gray-500 dark:text-gray-400">
-            {timestamp}
-          </span>
-        </div>
-      </div>
-
-      {/* Content */}
-      <p className="mt-2 text-gray-700 dark:text-gray-300">{content}</p>
-
-      {/* Images */}
-      {images.length > 0 && (
-        <div className={`mt-4 grid gap-2 ${getGridClass(images.length)}`}>
-          {images.map((image, index) => (
-            <div
-              key={index}
-              className="relative h-48 w-full overflow-hidden rounded-lg"
+    <Box className="group flex h-[350px] flex-col justify-between p-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center">
+          {isMentor && (
+            <button
+              className="invisible group-hover:visible"
+              onClick={() => console.log(`Delete post with ID: ${user}`)}
             >
-              <Image
-                src={image}
-                alt={`Post image ${index + 1}`}
-                className="object-cover"
-                fill
-              />
-            </div>
-          ))}
+              ✕
+            </button>
+          )}
+          <Image
+            src={userImage}
+            alt={`${user}'s profile`}
+            className="mr-4 h-10 w-10 rounded-full object-cover"
+            width={40}
+            height={40}
+          />
+          <div className="flex-1">
+            <h2 className="font-semibold text-gray-800 dark:text-gray-100">
+              {user}
+            </h2>
+            <span className="text-sm text-gray-500 dark:text-gray-400">
+              {timestamp}
+            </span>
+          </div>
         </div>
-      )}
-
+        {/* Read Post Button */}
+        <a
+          href={postUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="bg-black-300 invisible rounded-sm py-1 text-[10px] text-white hover:text-slate-200 group-hover:visible dark:bg-white dark:text-blue-400 dark:hover:text-blue-600"
+        >
+          Read Post
+        </a>
+      </div>
+      {/* Content */}
+      <div className="flex-grow">
+        <p className="mt-2 line-clamp-2 text-gray-700 dark:text-gray-300">
+          {content}
+        </p>
+      </div>
+      {/* Image */}
+      <div className="mt-4 h-40 w-full overflow-hidden rounded-sm">
+        <img
+          src={image}
+          alt="Post image"
+          className="h-40 w-full object-cover"
+        />
+      </div>
       {/* Reactions */}
       <div className="mt-4 flex items-center space-x-4 text-gray-600 dark:text-gray-400">
         <button className="flex items-center space-x-1 hover:text-blue-500 dark:hover:text-blue-400">
-          <span>❤️</span>
+          <span>
+            <ArrowBigUp />
+          </span>
           <span>{reactions.likes}</span>
         </button>
-        {/* <button className="flex items-center space-x-1 hover:text-blue-500 dark:hover:text-blue-400">
-          <span>💬</span>
-          <span>{reactions.comments}</span>
-        </button> */}
-        {/* optional */}
       </div>
-    </div>
+    </Box>
   );
-}
-
-/**
- * Returns the appropriate Tailwind grid class based on the number of images.
- */
-function getGridClass(imageCount: number): string {
-  switch (imageCount) {
-    case 1:
-      return "grid-cols-1";
-    case 2:
-      return "grid-cols-2";
-    case 3:
-      return "grid-cols-3";
-    case 4:
-      return "grid-cols-2";
-    default:
-      return "";
-  }
 }
