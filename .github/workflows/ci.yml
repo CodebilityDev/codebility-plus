@@ -1,4 +1,4 @@
-name: CI for Monorepo with Turbo and Changed Files Detection
+name: CI for Codebility
 
 on:
   push:
@@ -13,25 +13,33 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      NEXT_PUBLIC_PRODUCT_NAME: "ClapUp"
-      NEXT_PUBLIC_SITE_TITLE: "Clapper Digital Business Card"
-      NEXT_PUBLIC_SITE_DESCRIPTION: "App"
-      NEXT_PUBLIC_SITE_URL: "https://localhost:3000"
+      # Non-sensitive environment variables
+      NEXT_PUBLIC_SITE_TITLE: "Codebility"
       NEXT_PUBLIC_DEFAULT_LOCALE: "en"
-      NEXT_PUBLIC_DEFAULT_THEME_MODE: "light"
-      NEXT_PUBLIC_THEME_COLOR: "#22C55E"
-      NEXT_PUBLIC_THEME_COLOR_DARK: "#1e1e1e"
-      NEXT_PUBLIC_SUPABASE_URL: "supabaseurl"
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: "supabaseanonkey"
+      NEXT_PUBLIC_DEFAULT_THEME_MODE: "system"
+      NEXT_PUBLIC_THEME_COLOR: "purple"
+      NEXT_PUBLIC_THEME_COLOR_DARK: "black"
+      NEXT_PUBLIC_APP_BASE_URL: "http://localhost:3000"
+      
+      # Sensitive variables from repository secrets
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+      NEXT_PUBLIC_FOUNDER_USER_ID: ${{ secrets.NEXT_PUBLIC_FOUNDER_USER_ID }}
+      NEXT_PUBLIC_RESEND_API_KEY: ${{ secrets.NEXT_PUBLIC_RESEND_API_KEY }}
+      NEXT_PUBLIC_MESSENGER_WAITLIST: ${{ secrets.NEXT_PUBLIC_MESSENGER_WAITLIST }}
+      NEXT_PUBLIC_DISCORD_LINK: ${{ secrets.NEXT_PUBLIC_DISCORD_LINK }}
+      REDIS_URL: ${{ secrets.REDIS_URL }}
+      REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }}
+      DB_SERVICE_ROLE: ${{ secrets.DB_SERVICE_ROLE }}
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Setup pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 8
+        uses: pnpm/action-setup@v4
 
       - name: Setup Node.js environment
         uses: actions/setup-node@v4
@@ -39,38 +47,34 @@ jobs:
           node-version: 20
           cache: 'pnpm'
 
-      - name: Cache node_modules and Turbo output
-        uses: actions/cache@v2
+      # Enhanced caching strategy
+      - name: Cache node_modules
+        uses: actions/cache@v4
         with:
           path: |
+            ~/.pnpm-store
             node_modules
-            .turbo
+            apps/*/node_modules
             packages/*/node_modules
-          key: ${{ runner.os }}-node-${{ hashFiles('**/pnpm-lock.yaml') }}
+          key: ${{ runner.os }}-pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
           restore-keys: |
-            ${{ runner.os }}-node-
+            ${{ runner.os }}-pnpm-
 
-      - name: Cache pnpm dependencies
-        uses: actions/cache@v2
+      - name: Cache Turbo output
+        uses: actions/cache@v4
         with:
-          path: ~/.pnpm-store
-          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          path: .turbo
+          key: ${{ runner.os }}-turbo-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-pnpm-store-
+            ${{ runner.os }}-turbo-
 
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Fetch dev branch
-        run: git fetch origin dev
-
-      - name: Build changed packages
-        run: pnpm dlx turbo@latest run build --filter=...[origin/dev]
-
-      # Uncomment when ready for tests
-      # - name: Run tests for changed packages
-      #   run: pnpm dlx turbo@latest run test --filter=...[origin/dev]
+      - name: Build Codebility
+        run: pnpm run codebility:build
 
       # Trigger Vercel deployment using deploy hook
       - name: Deploy to Vercel
-        run: curl -X POST "https://api.vercel.com/v1/integrations/deploy/prj_9kHRoASFcMABb4SuIcPINlnyH3tR/2azM3yQP4t"
+        if: github.ref == 'refs/heads/dev' && github.event_name == 'push'
+        run: curl -X POST "${{ secrets.VERCEL_DEPLOY_HOOK }}"

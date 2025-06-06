@@ -2,6 +2,11 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DefaultAvatar from "@/Components/DefaultAvatar";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/Components/ui/tooltip";
 import { IconLink } from "@/public/assets/svgs";
 import { Crown } from "lucide-react";
 
@@ -122,50 +127,65 @@ export default function ServiceCard({ service }: Props) {
               <p className="mb-2 text-sm text-gray-400">Team</p>
               <div className="flex flex-wrap items-end">
                 {teamLeader && (
-                  <div className="group relative mb-2 mr-4">
-                    <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-blue-500">
-                      {teamLeader.image_url ? (
-                        <Image
-                          src={teamLeader.image_url}
-                          alt={`${teamLeader.first_name} ${teamLeader.last_name}`}
-                          fill
-                          unoptimized={true}
-                          className="object-cover"
-                        />
-                      ) : (
-                        <DefaultAvatar size={56} className="h-full w-full" />
-                      )}
-                    </div>
-                    <Crown className="absolute -right-2 -top-2 h-4 w-6 rotate-45 text-yellow-400 drop-shadow-lg" />
-                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs opacity-0 transition-opacity group-hover:opacity-100">
-                      {teamLeader.first_name} {teamLeader.last_name} (Lead)
-                    </div>
-                  </div>
+                  <Tooltip>
+                    <TooltipTrigger>
+                      <div className="relative mb-2 mr-4">
+                        <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-blue-500">
+                          {teamLeader.image_url ? (
+                            <Image
+                              src={teamLeader.image_url}
+                              alt={`${teamLeader.first_name} ${teamLeader.last_name}`}
+                              fill
+                              unoptimized={true}
+                              className="object-cover"
+                            />
+                          ) : (
+                            <DefaultAvatar
+                              size={56}
+                              className="h-full w-full"
+                            />
+                          )}
+                        </div>
+                        <Crown className="absolute -right-2 -top-2 h-4 w-6 rotate-45 text-yellow-400 drop-shadow-lg" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <p>
+                        {teamLeader.first_name} {teamLeader.last_name} (Lead)
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 )}
 
                 {teamMembers.map((member, index) => (
-                  <div
-                    key={member.id}
-                    className="group relative mb-2 mr-2"
-                    style={{ zIndex: teamMembers.length - index }}
-                  >
-                    <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-gray-700">
-                      {member.image_url ? (
-                        <Image
-                          src={member.image_url}
-                          alt={`${member.first_name} ${member.last_name}`}
-                          fill
-                          unoptimized={true}
-                          className="object-cover"
-                        />
-                      ) : (
-                        <DefaultAvatar size={40} className="h-full w-full" />
-                      )}
-                    </div>
-                    <div className="absolute -top-10 left-1/2 z-10 -translate-x-1/2 whitespace-nowrap rounded bg-gray-900 px-2 py-1 text-xs opacity-0 transition-opacity group-hover:opacity-100">
-                      {member.first_name} {member.last_name}
-                    </div>
-                  </div>
+                  <Tooltip key={`${member.id}${index}`}>
+                    <TooltipTrigger>
+                      <div className="mb-2 mr-2">
+                        <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-gray-700">
+                          {member.image_url ? (
+                            <Image
+                              src={member.image_url}
+                              alt={`${member.first_name} ${member.last_name}`}
+                              fill
+                              unoptimized={true}
+                              className="object-cover"
+                            />
+                          ) : (
+                            <DefaultAvatar
+                              size={40}
+                              className="h-full w-full"
+                            />
+                          )}
+                        </div>
+                      </div>
+                    </TooltipTrigger>
+
+                    <TooltipContent>
+                      <p>
+                        {member.first_name} {member.last_name}
+                      </p>
+                    </TooltipContent>
+                  </Tooltip>
                 ))}
               </div>
             </div>

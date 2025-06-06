@@ -7,6 +7,7 @@ import Container from "../MarketingContainer";
 import SideNavMenu from "../MarketingSidenavMenu";
 import HeroBackground from "./LandingHeroBg";
 import HeroCard from "./LandingHeroCard";
+import { ArrowRightIcon } from "lucide-react";
 
 const Hero = () => {
   return (
@@ -17,7 +18,7 @@ const Hero = () => {
 
       <section className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-cover bg-no-repeat text-white">
         <SideNavMenu />
-        <Container className="flex flex-col gap-10 lg:gap-20">
+        <Container className="flex flex-col gap-10 lg:gap-20 mt-12">
           <div className="relative">
             <div className="relative z-10 flex flex-col gap-8 pt-20 text-center lg:pt-0">
               <div className="flex flex-col gap-4">
@@ -25,21 +26,25 @@ const Hero = () => {
                   Codebility
                 </p>
                 <h1 className="flex flex-col gap-1 text-4xl font-semibold md:text-6xl">
-                  <span>We lead in digital</span>
-                  <span>innovation & design</span>
+                  <span>We Lead in Digital</span>
+                  <span>Innovation & Design</span>
                 </h1>
-                <h2 className="text-2xl">Helping you achieve impact results</h2>
+                <h2 className="text-2xl">Helping you achieve impactful results</h2>
               </div>
               <div className="md:mx-auto">
-                <div className="flex w-full flex-col gap-4 md:flex-row">
+                <div className="flex w-full flex-col items-center gap-4 md:flex-row">
                   <Link href="/services">
-                    <Button variant="purple" size="lg" rounded="full">
+                    <Button variant="purple" size="lg" rounded="full" className="">
                       Our Portfolio
                     </Button>
                   </Link>
-                  <Link href="#features">
-                    <Button variant="outline" size="lg" rounded="full">
-                      Learn more
+                  <Link href="/bookacall">
+                    <Button
+                      variant="outline"
+                      rounded="full"
+                      size="lg"
+                    >
+                      Let&apos;s Connect
                     </Button>
                   </Link>
                 </div>

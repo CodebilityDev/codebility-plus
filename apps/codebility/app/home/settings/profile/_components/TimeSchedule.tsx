@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Box } from "@/Components/shared/dashboard";
 import { Paragraph } from "@/Components/shared/home";
 import { TimePicker12 } from "@/Components/time-picker/TimePicker12hourDemo";
@@ -14,12 +13,14 @@ import {
   WEEKDAYS,
   WorkSchedule,
 } from "@/types/home/codev";
+import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
 
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Label } from "@codevs/ui/label";
 
 import { updateWorkSchedule } from "../action";
+import { cn } from "@codevs/ui";
 
 interface TimeScheduleProps {
   data?: WorkSchedule | null;
@@ -163,11 +164,10 @@ const TimeSchedule = ({ data }: TimeScheduleProps) => {
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <IconEdit
-        className={`$
-          {isEditMode
-            ? "hidden"
-            : "h-15 w-15 dark:invert-0" } absolute right-6 top-6 cursor-pointer
-        invert`}
+        className={cn(
+          "absolute right-6 top-6 cursor-pointer invert",
+          isEditMode ? "hidden" : "h-15 w-15 dark:invert-0",
+        )}
         onClick={() => setIsEditMode(true)}
       />
 
