@@ -33,37 +33,44 @@ export const getUserRole = async (userId: Number | null): Promise<string | null>
   return role.name;
 };
 
-export const addPost = async () => {
+export const addPost = async ( title, content, author_id?, image_url?) => {
   try {
     const supabase = await createClientServerComponent();
 
-    console.log("TEST 1");
-  
-    const { data: posts, error } = await supabase
-    .from("posts")
-    .select(`
-      *,
-      author_id(
-        first_name,
-        last_name,
-        image_url
-      )
-      `).order('created_at', { ascending: false });
-
+    const { data: newPost, error } = await supabase
+      .from("posts")
+      .insert([
+        {
+          title,
+          content,
+          ...(author_id !== undefined && { author_id }),
+          ...(image_url !== undefined && { image_url }),
+        }
+      ])
+      .select();
     if (error) throw error;
 
-    // console.log("Fetched posts:", posts);
-
-    return posts;
+    return newPost;
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export type addPostType = {
-  title: string;
-  content: string;
-  author_id?: string;
-  image_url?: string;
+export const deletePost = async (post_id: number) => {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { data, error } = await supabase
+      .from("posts")
+      .delete()
+      .eq("id", post_id);
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
