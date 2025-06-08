@@ -1,7 +1,9 @@
 import { useState } from "react";
 import { Input } from "@/Components/shared/dashboard/input";
 import { Button } from "@/Components/ui/button";
+import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
+import { uploadImageOther } from "@/utils/uploadImage";
 import toast from "react-hot-toast";
 
 import { Textarea } from "@codevs/ui/textarea";
@@ -18,6 +20,7 @@ const CreatePostForm = ({
   const [image, setImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
+  const { user } = useUserStore();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -34,14 +37,14 @@ const CreatePostForm = ({
 
       let image_url;
 
-      // If you implement image upload:
-      // if (imageFile) {
-      //   image_url = await uploadImage(imageFile);
-      // }
+      if (imageFile) {
+        image_url = await uploadImageOther(imageFile, {
+          bucket: "codebility",
+          folder: "postImage",
+        });
+      }
 
-      image_url = undefined;
-
-      const newPost = await addPost(title, content);
+      const newPost = await addPost(title, content, user?.id, image_url!);
 
       // Refresh Posts
       await fetchPosts();
@@ -81,7 +84,7 @@ const CreatePostForm = ({
         className="h-[600px] w-full"
       />
       {/* Optional image input */}
-      {/*
+
       <Input
         type="file"
         accept="image/*"
@@ -93,7 +96,6 @@ const CreatePostForm = ({
           }
         }}
       />
-      */}
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : "Create Feed"}
