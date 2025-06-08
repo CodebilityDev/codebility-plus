@@ -3,28 +3,47 @@ import { Box } from "@/Components/shared/dashboard";
 import { defaultAvatar } from "@/public/assets/images";
 import { format } from "date-fns";
 import { ArrowBigUp } from "lucide-react";
+import toast from "react-hot-toast";
 
+import { deletePost } from "../_services/action";
 import { PostType } from "../_services/query";
 
 interface PostProps {
   post: PostType;
   isMentor?: boolean;
+  onDelete?: (deletedPostId: string | number) => void;
 }
 
-export default function Post({ post, isMentor }: PostProps) {
+export default function Post({ post, isMentor, onDelete }: PostProps) {
+  const handleDelete = async () => {
+    try {
+      await deletePost(post.id);
+      toast.success("Post deleted successfully!");
+
+      if (onDelete) {
+        onDelete(post.id);
+      }
+    } catch (error) {
+      toast.error("Failed to delete post.");
+      console.error("Failed to delete post:", error);
+    }
+  };
   return (
-    <Box className="group flex h-[400px] flex-col justify-between p-3">
+    <Box className="group relative flex h-[400px] flex-col justify-between p-3">
+      {/* Delete Button in top-right */}
+      {isMentor && (
+        <button
+          className="invisible absolute right-2 top-2 rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600 group-hover:visible"
+          onClick={handleDelete}
+          aria-label="Delete post"
+        >
+          ✕
+        </button>
+      )}
+
       <div className="mx-4 mt-2 h-[200px]">
         <div className="flex items-center justify-between">
           <div className="mb-2 flex items-center">
-            {isMentor && (
-              <button
-                className="invisible group-hover:visible"
-                onClick={() => console.log(`Delete post`)}
-              >
-                ✕
-              </button>
-            )}
             {/* Author Image */}
             <Image
               src={post.author_id?.image_url || defaultAvatar}

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CreateFeedModal from "@/Components/modals/CreateFeedModal";
+import CreateFeedModal from "@/Components/modals/CreatePostModal";
 import { Button } from "@/Components/ui/button";
 import { useUserStore } from "@/store/codev-store";
 
