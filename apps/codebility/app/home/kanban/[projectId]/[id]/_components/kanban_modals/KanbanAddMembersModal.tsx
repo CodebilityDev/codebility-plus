@@ -196,11 +196,11 @@ export default function KanbanAddMembersModal() {
                   <label className="dark:text-light-900 text-black">
                     Project Name
                   </label>
-                  <Skeleton className="h-12 w-96 rounded-md" />
+                  <Skeleton className="h-12 w-full rounded-md" />
                   <label className="dark:text-light-900 text-black">
                     Team Leader
                   </label>
-                  <Skeleton className="h-12 w-96 rounded-md" />
+                  <Skeleton className="h-12 w-full rounded-md" />
                   <label className="dark:text-light-900 text-black">
                     Team Members
                   </label>
