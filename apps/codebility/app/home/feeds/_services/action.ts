@@ -1,5 +1,6 @@
 "use server";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { deleteImage, getImagePath } from "@/utils/uploadImage";
 
 
 export const getUserRole = async (userId: Number | null): Promise<string | null> => {
@@ -60,6 +61,21 @@ export const addPost = async ( title, content, author_id?, image_url?) => {
 export const deletePost = async (post_id: number) => {
   try {
     const supabase = await createClientServerComponent();
+
+    const { data: postData, error: fetchError } = await supabase
+      .from("posts")
+      .select("image_url")
+      .eq("id", post_id)
+      .single();  // single() because we expect only one row
+
+    if (fetchError) throw fetchError;
+    if (!postData) throw new Error("Post not found");
+
+    const imageUrl = postData.image_url;
+
+    const imagePath = await getImagePath(imageUrl);
+
+    deleteImage(imagePath!);
 
     const { data, error } = await supabase
       .from("posts")
