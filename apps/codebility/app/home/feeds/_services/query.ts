@@ -5,8 +5,6 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 export const getPosts = async () => {
   try {
     const supabase = await createClientServerComponent();
-
-    console.log("TEST 1");
   
     const { data: posts, error } = await supabase
     .from("posts")
