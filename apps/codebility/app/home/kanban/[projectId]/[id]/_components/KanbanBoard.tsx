@@ -17,8 +17,8 @@ import UserTaskFilter from "./UserTaskFilter";
 
 interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
+  projectId: string;
 }
-
 export default function KanbanBoard({ boardData }: KanbanBoardProps) {
   const user = useUserStore((state) => state.user);
   const canAddColumn = user?.role_id === 1 || user?.role_id === 5;

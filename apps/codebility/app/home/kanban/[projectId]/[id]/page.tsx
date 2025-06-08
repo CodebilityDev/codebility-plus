@@ -1,12 +1,10 @@
 import { KanbanBoardType, KanbanColumnType, Task } from "@/types/home/codev";
-
-
-
-import KanbanBoard from "./_components/KanbanBoard";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
+import KanbanBoard from "./_components/KanbanBoard";
+
 interface KanbanBoardPageProps {
-  params: Promise<{ id: string, projectId: string }>;
+  params: Promise<{ id: string; projectId: string }>;
   searchParams: Promise<{ query?: string }>;
 }
 
