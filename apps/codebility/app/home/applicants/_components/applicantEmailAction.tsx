@@ -9,6 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
+import { useToast } from "@/Components/ui/use-toast";
+import { set } from "date-fns";
 import { Loader2Icon, MailIcon } from "lucide-react";
 
 import {
@@ -18,32 +20,80 @@ import {
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
 
-import { sendMultipleTestReminderEmail } from "../_service/emailAction";
+import {
+  sendMultipleOnboardingReminder,
+  sendMultipleTestReminderEmail,
+} from "../_service/emailAction";
 import { NewApplicantType } from "../_service/types";
-import { set } from "date-fns";
 
 export default function ApplicantEmailAction({
   applicants,
 }: {
   applicants: NewApplicantType[];
 }) {
-  const [dialogState, setDialogState] = React.useState<string | null>(null);
+  const { toast } = useToast();
+
+  const [dialogState, setDialogState] = React.useState<
+    "remindToTakeTest" | "remindToOnboard" | null
+  >(null);
   const [dialogOpen, setDialogOpen] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
   const handleRemindAllApplicants = async () => {
     setIsLoading(true);
     try {
-      await sendMultipleTestReminderEmail(["test-3e807c@test.mailgenius.com"]);
+      //fitter those who already submitted the test
+      const applicantsToRemind = applicants.filter(
+        (applicant) => !applicant.applicant?.fork_url,
+      );
+
+      await sendMultipleTestReminderEmail(
+        applicantsToRemind.map((applicant) => applicant.email_address),
+      );
 
       setDialogOpen(false);
       setDialogState(null);
+
+      toast({
+        title: "Reminder Emails Sent",
+        description: "All applicants have been reminded to take the test.",
+      });
     } catch (error) {
       console.error("Error sending reminder emails:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send reminder emails. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
 
+  // Handle remind to onboard
+  const handleRemindToOnboard = async () => {
+    setIsLoading(true);
+    try {
+      await sendMultipleOnboardingReminder(
+        applicants.map((applicants) => applicants.email_address),
+      );
+
+      setDialogOpen(false);
+      setDialogState(null);
+
+      toast({
+        title: "Reminder Emails Sent",
+        description: "All applicants have been reminded to onboard.",
+      });
+    } catch (error) {
+      console.error("Error sending reminder emails:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send reminder emails. Please try again later.",
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
+  };
   return (
     <div className="mr-14">
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -53,24 +103,32 @@ export default function ApplicantEmailAction({
           </DropdownMenuTrigger>
 
           <DropdownMenuContent className="w-56 gap-2">
-            <DropdownMenuItem
-              className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-              onClick={() => {
-                setDialogState("remindToTakeTest");
-                setDialogOpen(true);
-              }}
-            >
-              Remind All Applicants to Take the Test
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
-              onClick={() => {
-                setDialogState("remindToFinishTest");
-                setDialogOpen(true);
-              }}
-            >
-              Remind All Applicants to Finish the Test
-            </DropdownMenuItem>
+            {/* remind to take test */}
+            {(applicants[0]?.application_status === "testing" ||
+              applicants[0]?.application_status === "applying") && (
+              <DropdownMenuItem
+                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                onClick={() => {
+                  setDialogState("remindToTakeTest");
+                  setDialogOpen(true);
+                }}
+              >
+                Remind All Applicants to Take the Test
+              </DropdownMenuItem>
+            )}
+
+            {/* remind to onboard */}
+            {applicants[0]?.application_status === "onboarding" && (
+              <DropdownMenuItem
+                className="cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800"
+                onClick={() => {
+                  setDialogState("remindToOnboard");
+                  setDialogOpen(true);
+                }}
+              >
+                Remind All Applicants to Onboard
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
 
@@ -80,8 +138,6 @@ export default function ApplicantEmailAction({
               <DialogTitle>Remind All Applicant to Take the Test</DialogTitle>
               <DialogDescription>
                 Are you sure you want to remind all applicants to take the test?
-                This will send a reminder email to all applicants who have not
-                yet taken the test.
               </DialogDescription>
             </DialogHeader>
             <DialogFooter className="flex flex-row justify-end gap-2">
@@ -89,6 +145,30 @@ export default function ApplicantEmailAction({
                 <Button variant="outline">Cancel</Button>
               </DialogClose>
               <Button onClick={handleRemindAllApplicants} disabled={isLoading}>
+                {isLoading ? (
+                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <MailIcon className="mr-2 h-4 w-4" />
+                )}
+                Confirm
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
+
+        {dialogState === "remindToOnboard" && (
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Remind All Applicant to Onboard</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to remind all applicants to onboard?
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter className="flex flex-row justify-end gap-2">
+              <DialogClose asChild>
+                <Button variant="outline">Cancel</Button>
+              </DialogClose>
+              <Button onClick={handleRemindToOnboard} disabled={isLoading}>
                 {isLoading ? (
                   <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
                 ) : (
