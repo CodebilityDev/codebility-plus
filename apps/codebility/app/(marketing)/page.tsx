@@ -8,7 +8,7 @@ import WorkWithUs from "./_components/landing/LandingWorkWithUs";
 import Calendly from "./_components/MarketingCalendly";
 import Footer from "./_components/MarketingFooter";
 import Navigation from "./_components/MarketingNavigation";
-import TestimonialsSection from "./_components/testimonial/Testimonials";
+import Testimonials from "./_components/testimonial/Testimonials";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -26,7 +26,7 @@ export default async function Index() {
       <WorkWithUs />
       <Admins />
       <Partners />
-      <TestimonialsSection />
+      <Testimonials />
       <Calendly />
       <Footer />
     </div>
