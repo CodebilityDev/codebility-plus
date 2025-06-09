@@ -87,7 +87,7 @@ export async function getImagePath(url: string): Promise<string | null> {
     const urlObj = new URL(url);
     const pathParts = urlObj.pathname.split("/");
     // Remove the bucket name and 'object' from the path
-    return pathParts.slice(2).join("/");
+    return pathParts.slice(6).join("/");
   } catch {
     return null;
   }
