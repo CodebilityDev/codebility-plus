@@ -155,10 +155,6 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
     cell: ({ row }) => {
       const applicant = row.original;
 
-      if (applicant.application_status === "testing") {
-        return null;
-      }
-
       return (
         <div className="px-3 py-3">
           <div className="flex justify-center">
