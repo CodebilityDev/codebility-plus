@@ -112,10 +112,9 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
 
           <div>
             {/* email sending */}
-            {/* to be implemented */}
-            {/* {data[0]?.application_status !== "denied" && (
+            {data[0]?.application_status !== "denied" && (
               <ApplicantEmailAction applicants={data} />
-            )} */}
+            )}
           </div>
         </div>
 
