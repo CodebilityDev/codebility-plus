@@ -10,7 +10,8 @@ import {
 } from "@/Components/ui/dialog";
 import { useToast } from "@/Components/ui/use-toast";
 import { cn } from "@/lib/utils";
-import { Loader2Icon, MoreHorizontalIcon } from "lucide-react";
+import { set } from "date-fns";
+import { Loader2Icon, MailIcon, MoreHorizontalIcon } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -30,7 +31,12 @@ import {
   multipleMoveApplicantToTestingAction,
   multiplePassApplicantTestAction,
 } from "../../_service/action";
-import { sendMultipleDenyEmail, sendMultiplePassedTestEmail } from "../../_service/emailAction";
+import {
+  sendMultipleDenyEmail,
+  sendMultipleOnboardingReminder,
+  sendMultiplePassedTestEmail,
+  sendMultipleTestReminderEmail,
+} from "../../_service/emailAction";
 import { NewApplicantType } from "../../_service/types";
 
 export default function ApplicantRowActionButton({
@@ -51,6 +57,8 @@ export default function ApplicantRowActionButton({
     | "fail"
     | "accept"
     | "deny"
+    | "remindToTakeTest"
+    | "remindToOnboarding"
     | null
   >(null);
 
@@ -154,7 +162,7 @@ export default function ApplicantRowActionButton({
           email: applicant.email_address,
           name: `${applicant.first_name} ${applicant.last_name}`,
         })),
-      )
+      );
       setOpen(false);
       toast({
         title: "Applicants passed",
@@ -191,6 +199,56 @@ export default function ApplicantRowActionButton({
       setOpen(false);
     } catch (error) {
       console.error(error);
+    }
+    setLoading(false);
+  };
+
+  const handleRemindToTakeTest = async () => {
+    setLoading(true);
+    try {
+      await sendMultipleTestReminderEmail(
+        applicants.map((applicant) => applicant.email_address),
+      );
+
+      setOpen(false);
+
+      toast({
+        title: "Reminder sent",
+        description:
+          "All selected applicants have been reminded to take the test.",
+      });
+    } catch (error) {
+      console.error("Error sending reminder emails:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send reminder emails.",
+        variant: "destructive",
+      });
+    }
+    setLoading(false);
+  };
+
+  const handleRemindToOnboarding = async () => {
+    setLoading(true);
+    try {
+      await sendMultipleOnboardingReminder(
+        applicants.map((applicant) => applicant.email_address),
+      );
+
+      setOpen(false);
+
+      toast({
+        title: "Reminder sent",
+        description:
+          "All selected applicants have been reminded to complete onboarding.",
+      });
+    } catch (error) {
+      console.error("Error sending onboarding reminder emails:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send onboarding reminder emails.",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   };
@@ -326,6 +384,35 @@ export default function ApplicantRowActionButton({
               </DropdownMenuItem>
             )}
 
+            <DropdownMenuSeparator />
+            {/* remind all to take test */}
+            {(applicants[0]?.application_status === "testing" ||
+              applicants[0]?.application_status === "applying") && (
+              <DropdownMenuItem
+                className="text-black-500 dark:text-light-800 cursor-pointer"
+                onClick={() => {
+                  setDialogState("remindToTakeTest");
+                  setOpen(true);
+                }}
+              >
+                <MailIcon className="mr-2 h-4 w-4" />
+                Remind All to Take Test
+              </DropdownMenuItem>
+            )}
+
+            {/* remind all to onboarding */}
+            {applicants[0]?.application_status === "onboarding" && (
+              <DropdownMenuItem
+                className="text-black-500 dark:text-light-800 cursor-pointer"
+                onClick={() => {
+                  setDialogState("remindToOnboarding");
+                  setOpen(true);
+                }}
+              >
+                <MailIcon className="mr-2 h-4 w-4" />
+                Remind All to Onboarding
+              </DropdownMenuItem>
+            )}
             <DropdownMenuSeparator />
             {applicants[0]?.application_status === "testing" && (
               <div className="block cursor-pointer sm:hidden">
@@ -609,6 +696,58 @@ export default function ApplicantRowActionButton({
             </div>
           </DialogContent>
         )}
+
+        {dialogState === "remindToTakeTest" && (
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Remind All to Take the Test</DialogTitle>
+            </DialogHeader>
+            <div className="flex flex-col gap-4">
+              <p>
+                Are you sure you want to remind all selected applicants to take
+                the test?
+              </p>
+              <div className="flex justify-end gap-4">
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleRemindToTakeTest} disabled={loading}>
+                  {loading && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Remind
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        )}
+
+        {
+          dialogState === "remindToOnboarding" && (
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Remind All to Onboarding</DialogTitle>
+              </DialogHeader>
+              <div className="flex flex-col gap-4">
+                <p>
+                  Are you sure you want to remind all selected applicants to
+                  complete onboarding?
+                </p>
+                <div className="flex justify-end gap-4">
+                  <Button variant="outline" onClick={() => setOpen(false)}>
+                    Cancel
+                  </Button>
+                  <Button onClick={handleRemindToOnboarding} disabled={loading}>
+                    {loading && (
+                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Remind
+                  </Button>
+                </div>
+              </div>
+            </DialogContent>
+          )
+        }
       </Dialog>
     </div>
   );
