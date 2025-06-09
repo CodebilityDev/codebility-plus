@@ -77,8 +77,18 @@ export default function ApplicantActionButton({
     try {
       await moveApplicantToApplyingAction(applicant.id);
       setIsOpen(false);
+
+      toast({
+        title: "Applicant Moved",
+        description: `${applicant.first_name} ${applicant.last_name} has been moved to applying.`,
+      });
     } catch (error) {
       console.error("Error moving applicant to applying:", error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicant to applying. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
@@ -88,8 +98,17 @@ export default function ApplicantActionButton({
     try {
       await moveApplicantToTestingAction(applicant.id);
       setIsOpen(false);
+      toast({
+        title: "Applicant Moved",
+        description: `${applicant.first_name} ${applicant.last_name} has been moved to testing.`,
+      });
     } catch (error) {
       console.error("Error moving applicant to Testing:", error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicant to testing. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
@@ -99,8 +118,17 @@ export default function ApplicantActionButton({
     try {
       await moveApplicantToOnboardingAction(applicant.id);
       setIsOpen(false);
+      toast({
+        title: "Applicant Moved",
+        description: `${applicant.first_name} ${applicant.last_name} has been moved to onboarding.`,
+      });
     } catch (error) {
       console.error("Error moving applicant to onboarding:", error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicant to onboarding. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
@@ -110,8 +138,17 @@ export default function ApplicantActionButton({
     try {
       await denyApplicantAction(applicant.id);
       setIsOpen(false);
+      toast({
+        title: "Applicant Moved",
+        description: `${applicant.first_name} ${applicant.last_name} has been moved to denied.`,
+      });
     } catch (error) {
       console.error("Error moving applicant to denied:", error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicant to denied. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
@@ -121,8 +158,17 @@ export default function ApplicantActionButton({
     try {
       await deleteApplicantAction(applicant);
       setIsOpen(false);
+      toast({
+        title: "Applicant Deleted",
+        description: `${applicant.first_name} ${applicant.last_name} has been deleted.`,
+      });
     } catch (error) {
       console.error("Error deleting applicant:", error);
+      toast({
+        title: "Error",
+        description: "Failed to delete applicant. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
@@ -144,6 +190,11 @@ export default function ApplicantActionButton({
       setIsOpen(false);
     } catch (error) {
       console.error("Error passing all applicants:", error);
+      toast({
+        title: "Error",
+        description: "Failed to pass applicant. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
@@ -157,8 +208,17 @@ export default function ApplicantActionButton({
         name: `${applicant.first_name} ${applicant.last_name}`,
       });
       setIsOpen(false);
+      toast({
+        title: "Applicant Failed",
+        description: `${applicant.first_name} ${applicant.last_name} has been marked as failed.`,
+      });
     } catch (error) {
       console.error("Error failing all applicants:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fail applicant. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
@@ -168,8 +228,17 @@ export default function ApplicantActionButton({
     try {
       await acceptApplicantAction(applicant.id);
       setIsOpen(false);
+      toast({
+        title: "Applicant Accepted",
+        description: `${applicant.first_name} ${applicant.last_name} has been accepted.`,
+      });
     } catch (error) {
       console.error("Error accepting all applicants:", error);
+      toast({
+        title: "Error",
+        description: "Failed to accept applicant. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
@@ -183,8 +252,17 @@ export default function ApplicantActionButton({
         name: `${applicant.first_name} ${applicant.last_name}`,
       });
       setIsOpen(false);
+      toast({
+        title: "Applicant Denied",
+        description: `${applicant.first_name} ${applicant.last_name} has been denied.`,
+      });
     } catch (error) {
       console.error("Error denying all applicants:", error);
+      toast({
+        title: "Error",
+        description: "Failed to deny applicant. Please try again later.",
+        variant: "destructive",
+      });
     }
     setIsLoading(false);
   };
