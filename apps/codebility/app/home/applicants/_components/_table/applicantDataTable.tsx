@@ -26,9 +26,9 @@ import {
 } from "@tanstack/react-table";
 
 import { NewApplicantType } from "../../_service/types";
+import ApplicantEmailAction from "../applicantEmailAction";
 import ApplicantMobileTable from "./applicantMobileTable";
 import ApplicantRowActionButton from "./applicantRowActionButton";
-import ApplicantEmailAction from "../applicantEmailAction";
 
 interface DataTableProps<TData extends NewApplicantType, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -63,8 +63,6 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
       },
       columnVisibility: {
         github: data[0]?.application_status === "testing" ? false : true,
-        portfolio_website:
-          data[0]?.application_status === "testing" ? false : true,
         tech_stacks: data[0]?.application_status === "testing" ? false : true,
         test_taken: data[0]?.application_status === "testing" ? true : false,
         test_time_remaining:
@@ -99,7 +97,7 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
       <Box className="p-1 py-2 sm:p-4 sm:py-4">
         {/* if rows selected */}
 
-        <div className="flex w-full items-center justify-betwee">
+        <div className="justify-betwee flex w-full items-center">
           <div className="hidden w-full items-center gap-4 px-2 pb-2 xl:flex">
             <p className="text-sm text-gray-500">
               {Object.keys(rowSelection).length} selected
@@ -114,9 +112,10 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
 
           <div>
             {/* email sending */}
-            <ApplicantEmailAction
-              applicants={data}
-            />
+            {/* to be implemented */}
+            {/* {data[0]?.application_status !== "denied" && (
+              <ApplicantEmailAction applicants={data} />
+            )} */}
           </div>
         </div>
 
