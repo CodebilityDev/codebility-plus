@@ -8,6 +8,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
+import { useToast } from "@/Components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { Loader2Icon, MoreHorizontalIcon } from "lucide-react";
 
@@ -29,6 +30,7 @@ import {
   multipleMoveApplicantToTestingAction,
   multiplePassApplicantTestAction,
 } from "../../_service/action";
+import { sendMultipleDenyEmail, sendMultiplePassedTestEmail } from "../../_service/emailAction";
 import { NewApplicantType } from "../../_service/types";
 
 export default function ApplicantRowActionButton({
@@ -36,6 +38,7 @@ export default function ApplicantRowActionButton({
 }: {
   applicants: NewApplicantType[];
 }) {
+  const { toast } = useToast();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dialogState, setDialogState] = useState<
@@ -58,8 +61,17 @@ export default function ApplicantRowActionButton({
         applicants.map((applicant) => applicant.id),
       );
       setOpen(false);
+      toast({
+        title: "Applicants moved to applying",
+        description: "All selected applicants have been moved to applying.",
+      });
     } catch (error) {
       console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicants to applying.",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   };
@@ -70,8 +82,17 @@ export default function ApplicantRowActionButton({
       await multipleMoveApplicantToTestingAction(
         applicants.map((applicant) => applicant.id),
       );
+      toast({
+        title: "Applicants moved to testing",
+        description: "All selected applicants have been moved to testing.",
+      });
       setOpen(false);
     } catch (error) {
+      toast({
+        title: "Error",
+        description: "Failed to move applicants to testing.",
+        variant: "destructive",
+      });
       console.error(error);
     }
     setLoading(false);
@@ -84,8 +105,17 @@ export default function ApplicantRowActionButton({
         applicants.map((applicant) => applicant.id),
       );
       setOpen(false);
+      toast({
+        title: "Applicants moved to onboarding",
+        description: "All selected applicants have been moved to onboarding.",
+      });
     } catch (error) {
       console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicants to onboarding.",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   };
@@ -96,7 +126,17 @@ export default function ApplicantRowActionButton({
       await multipleDenyApplicantAction(
         applicants.map((applicant) => applicant.id),
       );
+      await sendMultipleDenyEmail(
+        applicants.map((applicant) => ({
+          email: applicant.email_address,
+          name: `${applicant.first_name} ${applicant.last_name}`,
+        })),
+      );
       setOpen(false);
+      toast({
+        title: "Applicants denied",
+        description: "All selected applicants have been denied.",
+      });
     } catch (error) {
       console.error(error);
     }
@@ -109,9 +149,24 @@ export default function ApplicantRowActionButton({
       await multiplePassApplicantTestAction(
         applicants.map((applicant) => applicant.id),
       );
+      await sendMultiplePassedTestEmail(
+        applicants.map((applicant) => ({
+          email: applicant.email_address,
+          name: `${applicant.first_name} ${applicant.last_name}`,
+        })),
+      )
       setOpen(false);
+      toast({
+        title: "Applicants passed",
+        description: "All selected applicants have passed the test.",
+      });
     } catch (error) {
       console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to pass applicants.",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   };
@@ -337,19 +392,19 @@ export default function ApplicantRowActionButton({
             </DialogHeader>
             <div className="flex flex-col gap-4">
               <p>
-          Are you sure you want to move all selected applicants to
-          applying?
+                Are you sure you want to move all selected applicants to
+                applying?
               </p>
               <div className="flex justify-end gap-4">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleMoveAllToApplying} disabled={loading}>
-            {loading && (
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Move
-          </Button>
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleMoveAllToApplying} disabled={loading}>
+                  {loading && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Move
+                </Button>
               </div>
             </div>
           </DialogContent>
@@ -362,19 +417,19 @@ export default function ApplicantRowActionButton({
             </DialogHeader>
             <div className="flex flex-col gap-4">
               <p>
-          Are you sure you want to move all selected applicants to
-          testing?
+                Are you sure you want to move all selected applicants to
+                testing?
               </p>
               <div className="flex justify-end gap-4">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleMoveAllToTesting} disabled={loading}>
-            {loading && (
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Move
-          </Button>
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleMoveAllToTesting} disabled={loading}>
+                  {loading && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Move
+                </Button>
               </div>
             </div>
           </DialogContent>
@@ -387,19 +442,19 @@ export default function ApplicantRowActionButton({
             </DialogHeader>
             <div className="flex flex-col gap-4">
               <p>
-          Are you sure you want to move all selected applicants to
-          Onboarding?
+                Are you sure you want to move all selected applicants to
+                Onboarding?
               </p>
               <div className="flex justify-end gap-4">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button onClick={handleMoveAllToOnboarding} disabled={loading}>
-            {loading && (
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Move
-          </Button>
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button onClick={handleMoveAllToOnboarding} disabled={loading}>
+                  {loading && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Move
+                </Button>
               </div>
             </div>
           </DialogContent>
@@ -412,22 +467,22 @@ export default function ApplicantRowActionButton({
             </DialogHeader>
             <div className="flex flex-col gap-4">
               <p>
-          Are you sure you want to move all selected applicants to Denied?
+                Are you sure you want to move all selected applicants to Denied?
               </p>
               <div className="flex justify-end gap-4">
-          <Button variant="outline" onClick={() => setOpen(false)}>
-            Cancel
-          </Button>
-          <Button
-            onClick={handleDenyAll}
-            disabled={loading}
-            variant="destructive"
-          >
-            {loading && (
-              <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-            )}
-            Move
-          </Button>
+                <Button variant="outline" onClick={() => setOpen(false)}>
+                  Cancel
+                </Button>
+                <Button
+                  onClick={handleDenyAll}
+                  disabled={loading}
+                  variant="destructive"
+                >
+                  {loading && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Move
+                </Button>
               </div>
             </div>
           </DialogContent>
