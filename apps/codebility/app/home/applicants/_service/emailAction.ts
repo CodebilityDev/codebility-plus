@@ -1,33 +1,16 @@
 "use server";
 
-import { createClientServerComponent } from "@/utils/supabase/server";
-import nodemailer from "nodemailer";
-
-const transporter = nodemailer.createTransport({
-    host: "smtp.gmail.com",
-    port: 465,
-    service: "gmail",
-    secure: true, // true for port 465, false for other ports
-    auth: {
-        user: process.env.EMAIL_USER, // Move credentials to environment variables
-        pass: process.env.EMAIL_APP_PASSWORD, // Use App Password, not regular password
-    },
-});
+import { Resend } from "resend";
 
 export const sendMultipleTestReminderEmail = async (emails: string[]) => {
     try {
-        // Send individual emails instead of bulk to avoid spam detection
-        const mailOptions = {
-            from: "Codebility Team",
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+
+        const { data, error } = await resend.emails.send({
+            from: "Codebility Team <Codebility.dev@codebility.tech>",
             bcc: emails, // Use BCC for mass sending
-            replyTo: 'Codebility.dev@gmail.com',
-            headers: {
-                'X-Priority': '3',
-                'X-MSMail-Priority': 'Normal',
-                'X-Mailer': 'Codebility Application System',
-            },
+            to: "Codebility.dev@gmail.com", // Use BCC for mass sending
             subject: "Application Reminder - Codebility",
-            // Plain text version (important for spam filters)
             text: `
             Dear Applicant,
 
@@ -156,11 +139,14 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
             </body>
             </html>
             `,
-        };
+        })
 
-        await transporter.sendMail(mailOptions);
+        if (error) {
+            console.error("Resend API error:", error);
+            throw new Error("Failed to send emails");
+        }
 
-        console.log("All emails sent successfully to:", emails);
+
     } catch (error) {
         console.error("Error sending emails:", error);
         throw new Error("Failed to send emails");
@@ -170,8 +156,11 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
 
 export const sendTestReminder = async ({ email, name }: { email: string, name: string }) => {
     try {
-        const mailOptions = {
-            from: "Codebility Team",
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+
+
+        const { data, error } = await resend.emails.send({
+            from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
@@ -307,10 +296,12 @@ export const sendTestReminder = async ({ email, name }: { email: string, name: s
                   </body>
                   </html>
                   `,
-        }
+        })
 
-        await transporter.sendMail(mailOptions);
-        console.log(`Test reminder email sent successfully to: ${email}`);
+        if (error) {
+            console.error("Resend API error:", error);
+            throw new Error("Failed to send test reminder");
+        }
     } catch (error) {
         console.error("Error sending test reminder:", error);
         throw new Error("Failed to send test reminder");
@@ -322,10 +313,13 @@ export const sendMultipleOnboardingReminder = async (emails: string[]) => {
     try {
         const waitListLink = process.env.NEXT_PUBLIC_MESSENGER_WAITLIST
         const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
-        const mailOptions = {
-            from: "Codebility Team",
+
+        const { data, error } = await resend.emails.send({
+            from: "Codebility Team <Codebility.dev@codebility.tech>",
             bcc: emails, // Use BCC for mass sending
+            to: "Codebility.dev@gmail.com", // Use BCC for mass sending
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
                 'X-Priority': '3',
@@ -469,10 +463,9 @@ export const sendMultipleOnboardingReminder = async (emails: string[]) => {
             </body>
             </html>
             `,
-        }
+        })
 
-        await transporter.sendMail(mailOptions);
-        console.log("Onboarding reminder emails sent successfully to:", emails);
+
     } catch (error) {
         console.error("Error sending onboarding reminder emails:", error);
         throw new Error("Failed to send onboarding reminder emails");
@@ -484,8 +477,11 @@ export const sendOnboardingReminder = async ({ email, name }: { email: string, n
         const waitListLink = process.env.NEXT_PUBLIC_MESSENGER_WAITLIST
         const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK
 
-        const mailOptions = {
-            from: "Codebility Team",
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+
+
+        const { data, error } = await resend.emails.send({
+            from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
@@ -630,10 +626,12 @@ export const sendOnboardingReminder = async ({ email, name }: { email: string, n
             </body>
             </html>
             `,
-        }
+        })
 
-        await transporter.sendMail(mailOptions);
-        console.log(`Onboarding reminder email sent successfully to: ${email}`);
+        if (error) {
+            console.error("Resend API error:", error);
+            throw new Error("Failed to send onboarding reminder");
+        }
     } catch (error) {
         console.error("Error sending onboarding reminder email:", error);
         throw new Error("Failed to send onboarding reminder email");
@@ -642,14 +640,16 @@ export const sendOnboardingReminder = async ({ email, name }: { email: string, n
 
 export const sendMultiplePassedTestEmail = async (Applicant: { email: string, name: string }[]) => {
     try {
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+
         for (const applicant of Applicant) {
             const { email, name } = applicant;
 
             const waitListLink = process.env.NEXT_PUBLIC_MESSENGER_WAITLIST
             const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK
 
-            const mailOptions = {
-                from: "Codebility Team",
+            const { data, error } = await resend.emails.send({
+                from: "Codebility Team <Codebility.dev@codebility.tech>",
                 to: email, // Single recipient
                 replyTo: 'Codebility.dev@gmail.com',
                 headers: {
@@ -795,10 +795,12 @@ export const sendMultiplePassedTestEmail = async (Applicant: { email: string, na
             </body>
             </html>
             `,
-            }
-            await transporter.sendMail(mailOptions);
+            })
 
-            console.log(`Passed test email sent successfully to: ${email}`);
+            if (error) {
+                console.error(`Resend API error for ${name} (${email}):`, error);
+                throw new Error(`Failed to send email to ${name}`);
+            }
         }
     } catch (error) {
         console.error("Error sending multiple passed test emails:", error);
@@ -808,12 +810,13 @@ export const sendMultiplePassedTestEmail = async (Applicant: { email: string, na
 
 export const sendPassedTestEmail = async ({ email, name }: { email: string, name: string }) => {
     try {
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
 
         const waitListLink = process.env.NEXT_PUBLIC_MESSENGER_WAITLIST
         const discordLink = process.env.NEXT_PUBLIC_DISCORD_LINK
 
-        const mailOptions = {
-            from: "Codebility Team",
+        const { data, error } = await resend.emails.send({
+            from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
@@ -959,11 +962,12 @@ export const sendPassedTestEmail = async ({ email, name }: { email: string, name
             </body>
             </html>
             `,
+        })
+
+        if (error) {
+            console.error(`Resend API error for ${name} (${email}):`, error);
+            throw new Error(`Failed to send email to ${name}`);
         }
-
-        await transporter.sendMail(mailOptions);
-        console.log(`Passed test email sent successfully to: ${email}`);
-
     } catch (error) {
         console.error("Error sending passed test email:", error);
         throw new Error("Failed to send passed test email");
@@ -972,11 +976,13 @@ export const sendPassedTestEmail = async ({ email, name }: { email: string, name
 
 export const sendMultipleFailedTestEmail = async (Applicant: { email: string, name: string }[]) => {
     try {
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+
         for (const applicant of Applicant) {
             const { email, name } = applicant;
 
-            const mailOptions = {
-                from: "Codebility Team",
+            const { data, error } = await resend.emails.send({
+                from: "Codebility Team <Codebility.dev@codebility.tech>",
                 to: email, // Single recipient
                 replyTo: 'Codebility.dev@gmail.com',
                 headers: {
@@ -1097,10 +1103,12 @@ export const sendMultipleFailedTestEmail = async (Applicant: { email: string, na
             </body>
             </html>
             `,
-            }
+            })
 
-            await transporter.sendMail(mailOptions);
-            console.log(`Failed test email sent successfully to: ${email}`);
+            if (error) {
+                console.error(`Resend API error for ${name} (${email}):`, error);
+                throw new Error(`Failed to send email to ${name}`);
+            }
         }
     } catch (error) {
         console.error("Error sending multiple failed test emails:", error);
@@ -1110,8 +1118,10 @@ export const sendMultipleFailedTestEmail = async (Applicant: { email: string, na
 
 export const sendFailedTestEmail = async ({ email, name }: { email: string, name: string }) => {
     try {
-        const mailOptions = {
-            from: "Codebility Team",
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+
+        const { data, error } = await resend.emails.send({
+            from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
@@ -1232,9 +1242,11 @@ export const sendFailedTestEmail = async ({ email, name }: { email: string, name
             </body>
             </html>
             `,
+        })
+        if (error) {
+            console.error(`Resend API error for ${name} (${email}):`, error);
+            throw new Error(`Failed to send email to ${name}`);
         }
-
-        await transporter.sendMail(mailOptions);
 
     } catch (error) {
         console.error("Error sending failed test email:", error);
@@ -1244,11 +1256,13 @@ export const sendFailedTestEmail = async ({ email, name }: { email: string, name
 
 export const sendMultipleDenyEmail = async (Applicant: { email: string, name: string }[]) => {
     try {
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+
         for (const applicant of Applicant) {
             const { email, name } = applicant;
 
-            const mailOptions = {
-                from: "Codebility Team",
+            const { data, error } = await resend.emails.send({
+                from: "Codebility Team <Codebility.dev@codebility.tech>",
                 to: email, // Single recipient
                 replyTo: 'Codebility.dev@gmail.com',
                 headers: {
@@ -1363,9 +1377,12 @@ export const sendMultipleDenyEmail = async (Applicant: { email: string, name: st
             </body>
             </html>
             `,
+            })
+
+            if (error) {
+                console.error(`Resend API error for ${name} (${email}):`, error);
+                throw new Error(`Failed to send email to ${name}`);
             }
-            await transporter.sendMail(mailOptions);
-            console.log(`Deny email sent successfully to: ${email}`);
         }
     } catch (error) {
         console.error("Error sending multiple deny emails:", error);
@@ -1375,8 +1392,10 @@ export const sendMultipleDenyEmail = async (Applicant: { email: string, name: st
 
 export const sendDenyEmail = async ({ email, name }: { email: string, name: string }) => {
     try {
-        const mailOptions = {
-            from: "Codebility Team",
+        const resend = new Resend(process.env.NEXT_PUBLIC_RESEND_API_KEY);
+
+        const { data, error } = await resend.emails.send({
+            from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
@@ -1491,9 +1510,12 @@ export const sendDenyEmail = async ({ email, name }: { email: string, name: stri
             </body>
             </html>
             `,
-        }
+        })
 
-        await transporter.sendMail(mailOptions);
+        if (error) {
+            console.error(`Resend API error for ${name} (${email}):`, error);
+            throw new Error(`Failed to send email to ${name}`);
+        }
     } catch (error) {
         console.error("Error sending deny email:", error);
         throw new Error("Failed to send deny email");
