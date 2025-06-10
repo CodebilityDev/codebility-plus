@@ -15,6 +15,11 @@ export default function ApplicantTestTimeRemaining({
     [applicantData?.test_taken],
   );
 
+  const isSubmitted = useMemo(
+    () => applicantData?.fork_url !== null,
+    [applicantData?.fork_url],  
+  )
+
   const [timeLeft, setTimeLeft] = useState(() => {
     const now = new Date();
     const difference = reapplyDate.getTime() - now.getTime();
@@ -75,7 +80,11 @@ export default function ApplicantTestTimeRemaining({
           )}
         </>
       ) : (
-        <span className="text-sm text-gray-500">Expired</span>
+        <span className="text-sm text-gray-500">
+          {isSubmitted
+            ? "Submitted test"
+            : "Expired"}
+        </span>
       )}
     </div>
   );
