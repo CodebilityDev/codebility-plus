@@ -307,6 +307,7 @@ export async function moveApplicantToApplyingAction(applicantId: string) {
             .from("applicant")
             .update({
                 test_taken: null,
+                fork_url: null,
                 updated_at: new Date().toISOString()
             })
             .eq("codev_id", applicantId);

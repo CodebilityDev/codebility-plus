@@ -5,7 +5,6 @@ import { redirect } from "next/navigation";
 import { getUserData } from "@/app/auth/declined/_service/actions";
 
 import { applicantSchema } from "../_service/type";
-
 import ApplicationSteps from "./applicationSteps";
 
 export default async function ApplicantFetchComp() {
@@ -13,6 +12,10 @@ export default async function ApplicantFetchComp() {
 
   if (!user) {
     redirect("/auth/waiting");
+  }
+
+  if (user.application_status === "denied") {
+    redirect("/auth/declined");
   }
 
   const applicantData = applicantSchema.safeParse(user.applicant);

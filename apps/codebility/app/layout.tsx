@@ -3,6 +3,7 @@ import "@/app/globals.css";
 import React from "react";
 import { Metadata } from "next";
 import { Outfit } from "next/font/google";
+import { Toaster } from "@/Components/ui/toaster";
 import { ThemeProvider } from "@/context/ThemeProvider";
 import ToasterContext from "@/context/ToasterProvider";
 import ReactQueryProvider from "@/hooks/reactQuery";
@@ -82,6 +83,7 @@ export default function RootLayout({
             enableSystem
             disableTransitionOnChange
           >
+            <Toaster />
             <ToasterContext />
             {children}
           </ThemeProvider>

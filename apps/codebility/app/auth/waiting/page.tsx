@@ -1,12 +1,16 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import Logo from "@/Components/shared/Logo";
 import { Button } from "@/Components/ui/button";
 
 // Add this line to prevent static generation
-export const dynamic = 'force-dynamic';
+export const dynamic = "force-dynamic";
 
 const WaitingPage = () => {
-  return (
+  /* redirect to new page*/
+  return redirect("/applicant/waiting");
+
+  /* return (
     <section className="bg-backgroundColor text-primaryColor flex h-screen w-screen items-center justify-center overflow-hidden">
       <div className="flex flex-col items-center gap-8 text-center lg:gap-10">
         <Logo />
@@ -36,7 +40,7 @@ const WaitingPage = () => {
         </div>
       </div>
     </section>
-  );
+  ); */
 };
 
 export default WaitingPage;

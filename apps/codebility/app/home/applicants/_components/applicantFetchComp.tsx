@@ -8,12 +8,14 @@ import { NewApplicantType } from "../_service/types";
 import ApplicantLists from "./applicantLists";
 
 export default async function NewApplicantFetchComp() {
-  const applicant: NewApplicantType[] = await getOrSetCache(
+  /* const applicant: NewApplicantType[] = await getOrSetCache(
     cacheKeys.codevs.applicants,
     () => getNewApplicants(),
     30,
-  );
+  ); */
 
+
+  const applicant: NewApplicantType[] = await getNewApplicants();
   return (
     <div>
       <ApplicantLists applicants={applicant} />
