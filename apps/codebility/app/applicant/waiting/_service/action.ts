@@ -104,3 +104,32 @@ export async function applicantSubmitTest({
         console.error("Error submitting test:", error);
     }
 }
+
+export async function applicantUpdateTestSubmission({
+    applicantId,
+    forkUrl,
+}: {
+    applicantId: string;
+    forkUrl: string;
+}) {
+    try {
+        const supabase = await createClientServerComponent();
+
+        const { data, error } = await supabase
+            .from("applicant")
+            .update({
+                fork_url: forkUrl,
+                updated_at: new Date(),
+            })
+            .eq("id", applicantId);
+
+        if (error) {
+            console.error("Error updating applicant test submission:", error);
+            return undefined;
+        }
+
+        revalidatePath("/applicant/waiting");
+    } catch (error) {
+        console.error("Error updating test submission:", error);
+    }
+}
