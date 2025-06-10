@@ -81,7 +81,7 @@ const CodevCard = ({ codev, color }: Props) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="bg-black-500 flex h-full w-full flex-col items-center justify-between gap-4 rounded-lg p-4 shadow-2xl lg:py-6">
+      <div className="bg-black-500 flex h-full w-full flex-col items-center justify-between gap-4 rounded-lg p-4 shadow-2xl lg:py-6 hover:bg-black-800">
         <div className="relative">
           <Image
             alt={`${codev.first_name} Avatar`}
