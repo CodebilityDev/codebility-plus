@@ -155,6 +155,9 @@ export async function middleware(req: NextRequest) {
           APPLICATION_DECLINED_ROUTE,
           EMAIL_VERIFICATION_ROUTE,
           APPLICANT_ROUTE,
+          "/applicant/waiting",
+          "/applicant/profile",
+          "/applicant/account-settings"
         ].includes(pathname)
       ) {
         return redirectTo(req, "/home");
