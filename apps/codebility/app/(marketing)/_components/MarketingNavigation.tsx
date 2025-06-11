@@ -76,12 +76,10 @@ const getMenuItems = (
       { href: "/applicant/profile", icon: IconProfile, label: "Profile" },
     ];
   }
-  return role_id === 1
-    ? [
-        { href: "/home", icon: IconDashboard, label: "Dashboard" },
-        { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
-      ]
-    : [{ href: "/home/settings/profile", icon: IconProfile, label: "Profile" }];
+  return [
+    { href: "/home", icon: IconDashboard, label: "Dashboard" },
+    { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
+  ];
 };
 
 const MobileDrawer = ({
