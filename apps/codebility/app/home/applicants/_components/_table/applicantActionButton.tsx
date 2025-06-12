@@ -86,7 +86,8 @@ export default function ApplicantActionButton({
       console.error("Error moving applicant to applying:", error);
       toast({
         title: "Error",
-        description: "Failed to move applicant to applying. Please try again later.",
+        description:
+          "Failed to move applicant to applying. Please try again later.",
         variant: "destructive",
       });
     }
@@ -106,7 +107,8 @@ export default function ApplicantActionButton({
       console.error("Error moving applicant to Testing:", error);
       toast({
         title: "Error",
-        description: "Failed to move applicant to testing. Please try again later.",
+        description:
+          "Failed to move applicant to testing. Please try again later.",
         variant: "destructive",
       });
     }
@@ -126,7 +128,8 @@ export default function ApplicantActionButton({
       console.error("Error moving applicant to onboarding:", error);
       toast({
         title: "Error",
-        description: "Failed to move applicant to onboarding. Please try again later.",
+        description:
+          "Failed to move applicant to onboarding. Please try again later.",
         variant: "destructive",
       });
     }
@@ -137,6 +140,10 @@ export default function ApplicantActionButton({
     setIsLoading(true);
     try {
       await denyApplicantAction(applicant.id);
+      await sendDenyEmail({
+        email: applicant.email_address,
+        name: `${applicant.first_name} ${applicant.last_name}`,
+      });
       setIsOpen(false);
       toast({
         title: "Applicant Moved",
@@ -146,7 +153,8 @@ export default function ApplicantActionButton({
       console.error("Error moving applicant to denied:", error);
       toast({
         title: "Error",
-        description: "Failed to move applicant to denied. Please try again later.",
+        description:
+          "Failed to move applicant to denied. Please try again later.",
         variant: "destructive",
       });
     }

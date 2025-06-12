@@ -9,6 +9,7 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             bcc: emails, // Use BCC for mass sending
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
             to: "Codebility.dev@gmail.com", // Use BCC for mass sending
             subject: "Application Reminder - Codebility",
             text: `
@@ -19,8 +20,8 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
             This is a friendly reminder to complete your application process with Codebility.
 
             Steps to complete your application:
-            1. Visit our website: https://www.codebility.tech/
-            2. Click on "Status" in the navigation menu
+            1. Visit and Sign In to our and website: https://www.codebility.tech/careers
+            2. Once Signed In, Click on "Status" in the navigation menu
             3. Click "Take the Test" button
             4. Read the instructions carefully
             5. Complete and submit your test
@@ -111,8 +112,8 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
                 <div class="steps">
                 <h3>Steps to complete your application:</h3>
                 <ol>
-                    <li>Visit our website: <a href="https://www.codebility.tech/">https://www.codebility.tech/</a></li>
-                    <li>Click on "Status" in the navigation menu</li>
+                    <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+                    <li>Once Signed In, Click on "Status" in the navigation menu</li>
                     <li>Click "Take the Test" button</li>
                     <li>Read the instructions carefully</li>
                     <li>Complete and submit your test</li>
@@ -162,6 +163,7 @@ export const sendTestReminder = async ({ email, name }: { email: string, name: s
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
                 'X-Priority': '3',
@@ -177,8 +179,8 @@ export const sendTestReminder = async ({ email, name }: { email: string, name: s
                 This is a friendly reminder to complete your application process with Codebility.
 
                 Steps to complete your application:
-                1. Visit our website: https://www.codebility.tech/
-                2. Click on "Status" in the navigation menu
+                1. Visit and Sign in to our and website: https://www.codebility.tech/careers
+                2. Once Sign in, Click on "Status" in the navigation menu
                 3. Click "Take the Test" button
                 4. Read the instructions carefully
                 5. Complete and submit your test
@@ -268,8 +270,8 @@ export const sendTestReminder = async ({ email, name }: { email: string, name: s
                           <div class="steps">
                               <h3>Steps to complete your application:</h3>
                               <ol>
-                                  <li>Visit our website: <a href="https://www.codebility.tech/">https://www.codebility.tech/</a></li>
-                                  <li>Click on "Status" in the navigation menu</li>
+                                  <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+                                  <li>Once Signed, In Click on "Status" in the navigation menu</li>
                                   <li>Click "Take the Test" button</li>
                                   <li>Read the instructions carefully</li>
                                   <li>Complete and submit your test</li>
@@ -319,6 +321,7 @@ export const sendMultipleOnboardingReminder = async (emails: string[]) => {
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             bcc: emails, // Use BCC for mass sending
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
             to: "Codebility.dev@gmail.com", // Use BCC for mass sending
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
@@ -334,8 +337,8 @@ export const sendMultipleOnboardingReminder = async (emails: string[]) => {
             This is a friendly reminder to complete your onboarding process with Codebility.
 
             Steps to complete your onboarding:
-            1. Visit our website: https://www.codebility.tech/
-            2. Click on "Status" in the navigation menu
+            1. Visit and Sign in to our and website: https://www.codebility.tech/careers
+            2. Once Sign in, Click on "Status" in the navigation menu
             3. Click the Join Waiting List and Join Discord Server
             
             or 
@@ -430,8 +433,8 @@ export const sendMultipleOnboardingReminder = async (emails: string[]) => {
             <div class="steps">
             <h3>Steps to complete your onboarding:</h3>
             <ol>
-                <li>Visit our website: <a href="https://www.codebility.tech/">https://www.codebility.tech/</a></li>
-                <li>Click on "Status" in the navigation menu</li>
+                <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+                <li>Once Signed In, Click on "Status" in the navigation menu</li>
                 <li>Click the Join Waiting List and Join Discord Server</li>
             </ol>
             
@@ -483,6 +486,7 @@ export const sendOnboardingReminder = async ({ email, name }: { email: string, n
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
                 'X-Priority': '3',
@@ -497,8 +501,8 @@ export const sendOnboardingReminder = async ({ email, name }: { email: string, n
             This is a friendly reminder to complete your onboarding process with Codebility.
 
             Steps to complete your onboarding:
-            1. Visit our website: https://www.codebility.tech/
-            2. Click on "Status" in the navigation menu
+            1. Visit and Sign in to our and website: https://www.codebility.tech/careers
+            2. Once Sign in, Click on "Status" in the navigation menu
             3. Click the Join Waiting List and Join Discord Server
             
             or 
@@ -593,8 +597,8 @@ export const sendOnboardingReminder = async ({ email, name }: { email: string, n
             <div class="steps">
             <h3>Steps to complete your onboarding:</h3>
             <ol>
-                <li>Visit our website: <a href="https://www.codebility.tech/">https://www.codebility.tech/</a></li>
-                <li>Click on "Status" in the navigation menu</li>
+                <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+                <li>Once Signed In, Click on "Status" in the navigation menu</li>
                 <li>Click the Join Waiting List and Join Discord Server</li>
             </ol>
             
@@ -651,6 +655,7 @@ export const sendMultiplePassedTestEmail = async (Applicant: { email: string, na
             const { data, error } = await resend.emails.send({
                 from: "Codebility Team <Codebility.dev@codebility.tech>",
                 to: email, // Single recipient
+                cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
                 replyTo: 'Codebility.dev@gmail.com',
                 headers: {
                     'X-Priority': '3',
@@ -666,8 +671,8 @@ export const sendMultiplePassedTestEmail = async (Applicant: { email: string, na
             For now, please visit our website and check the status of your application.
 
             Steps to check your application status:
-            1. Visit our website: https://www.codebility.tech/
-            2. Click on "Status" in the navigation menu
+            1. Visit and Sign in to our website: https://www.codebility.tech/careers
+            2. Once Signed In, Click on "Status" in the navigation menu
             3. Click the Join Waiting List and Join Discord Server
 
             or 
@@ -762,8 +767,8 @@ export const sendMultiplePassedTestEmail = async (Applicant: { email: string, na
             <div class="steps">
             <h3>Steps to check your application status:</h3>
             <ol>
-            <li>Visit our website: <a href="https://www.codebility.tech/">https://www.codebility.tech/</a></li>
-            <li>Click on "Status" in the navigation menu</li>
+            <li>Visit and Sign In our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+            <li>Once Signed In, Click on "Status" in the navigation menu</li>
             <li>Click the Join Waiting List and Join Discord Server</li>
             </ol>
             
@@ -818,6 +823,7 @@ export const sendPassedTestEmail = async ({ email, name }: { email: string, name
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
                 'X-Priority': '3',
@@ -833,8 +839,8 @@ export const sendPassedTestEmail = async ({ email, name }: { email: string, name
             For now, please visit our website and check the status of your application.
 
             Steps to check your application status:
-            1. Visit our website: https://www.codebility.tech/
-            2. Click on "Status" in the navigation menu
+            1. Visit and Sign In our website: https://www.codebility.tech/careers
+            2. Once Signed In, Click on "Status" in the navigation menu
             3. Click the Join Waiting List and Join Discord Server
 
             or 
@@ -929,8 +935,8 @@ export const sendPassedTestEmail = async ({ email, name }: { email: string, name
             <div class="steps">
             <h3>Steps to check your application status:</h3>
             <ol>
-            <li>Visit our website: <a href="https://www.codebility.tech/">https://www.codebility.tech/</a></li>
-            <li>Click on "Status" in the navigation menu</li>
+            <li>Visit and Sign In our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+            <li>Once Signed In, Click on "Status" in the navigation menu</li>
             <li>Click the Join Waiting List and Join Discord Server</li>
             </ol>
             
@@ -985,6 +991,7 @@ export const sendMultipleFailedTestEmail = async (Applicant: { email: string, na
                 from: "Codebility Team <Codebility.dev@codebility.tech>",
                 to: email, // Single recipient
                 replyTo: 'Codebility.dev@gmail.com',
+                cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
                 headers: {
                     'X-Priority': '3',
                     'X-MSMail-Priority': 'Normal',
@@ -1124,6 +1131,7 @@ export const sendFailedTestEmail = async ({ email, name }: { email: string, name
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
             replyTo: 'Codebility.dev@gmail.com',
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
             headers: {
                 'X-Priority': '3',
                 'X-MSMail-Priority': 'Normal',
@@ -1265,6 +1273,7 @@ export const sendMultipleDenyEmail = async (Applicant: { email: string, name: st
                 from: "Codebility Team <Codebility.dev@codebility.tech>",
                 to: email, // Single recipient
                 replyTo: 'Codebility.dev@gmail.com',
+                cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
                 headers: {
                     'X-Priority': '3',
                     'X-MSMail-Priority': 'Normal',
@@ -1397,6 +1406,7 @@ export const sendDenyEmail = async ({ email, name }: { email: string, name: stri
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
                 'X-Priority': '3',
