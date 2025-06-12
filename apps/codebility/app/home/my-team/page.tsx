@@ -1,10 +1,11 @@
+// my-team/page.tsx - Updated to match Kanban patterns
 import { getMembers, getTeamLead, getUserProjects } from "../projects/actions";
 import MyTeamPage from "./MyTeamPage";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-// Enhanced error component for better UX
+// Enhanced error component matching Kanban style
 const ErrorDisplay = ({ 
   message, 
   suggestion 
@@ -41,19 +42,9 @@ const ErrorDisplay = ({
   </div>
 );
 
-// Enhanced loading component (if needed for streaming)
-const LoadingDisplay = () => (
-  <div className="flex min-h-screen items-center justify-center rounded-xl bg-white dark:bg-gray-900 p-6">
-    <div className="text-center">
-      <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-      <p className="text-gray-600 dark:text-gray-400">Loading your team...</p>
-    </div>
-  </div>
-);
-
 const MyTeamServerPage = async () => {
   try {
-    // Fetch user projects with error handling
+    // Fetch user projects with error handling - matching Kanban pattern
     const userProjectsResponse = await getUserProjects();
 
     if (userProjectsResponse.error || !userProjectsResponse.data) {
@@ -67,7 +58,7 @@ const MyTeamServerPage = async () => {
 
     const userProjects = userProjectsResponse.data;
 
-    // Enhanced: Check for empty projects array
+    // Enhanced: Check for empty projects array - matching Kanban validation
     if (userProjects.length === 0) {
       return (
         <ErrorDisplay 
@@ -78,6 +69,7 @@ const MyTeamServerPage = async () => {
     }
 
     // Fetch team leads and members for each project with enhanced error handling
+    // Using the same pattern as Kanban modal
     const projectDataPromises = userProjects.map(async ({ project }) => {
       try {
         const [teamLead, members] = await Promise.all([
@@ -89,15 +81,13 @@ const MyTeamServerPage = async () => {
           project, 
           teamLead, 
           members,
-          // Add metadata for debugging/monitoring
           fetchedAt: new Date().toISOString()
         };
       } catch (error) {
         console.error(`Failed to fetch data for project ${project.id}:`, error);
-        // Return partial data structure to prevent complete failure
         return {
           project,
-          teamLead: { error: 'Failed to load team lead' },
+          teamLead: { error: 'Failed to load team lead', data: null },
           members: { error: 'Failed to load members', data: [] },
           fetchedAt: new Date().toISOString()
         };
@@ -106,7 +96,7 @@ const MyTeamServerPage = async () => {
     
     const projectData = await Promise.all(projectDataPromises);
 
-    // Enhanced: Filter out projects with critical errors (optional)
+    // Enhanced: Filter out projects with critical errors - matching Kanban error handling
     const validProjectData = projectData.filter(data => 
       !data.teamLead.error && !data.members.error
     );
@@ -120,11 +110,15 @@ const MyTeamServerPage = async () => {
       );
     }
 
-    // Pass enhanced data structure to client component
-    return <MyTeamPage projectData={validProjectData as any} />;
+    // Pass data to client component - matching Kanban data flow
+    return (
+      <MyTeamPage 
+        projectData={validProjectData as any}
+      />
+    );
 
   } catch (error) {
-    // Top-level error handling
+    // Top-level error handling - matching Kanban error pattern
     console.error('MyTeamServerPage error:', error);
     
     return (
