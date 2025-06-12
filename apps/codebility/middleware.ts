@@ -16,7 +16,7 @@ const PUBLIC_ROUTES = [
   "/bookacall",
   "/services",
   "/",
-
+  "/careers",
   "/nda-signing/public",
 
   "/auth/callback",
