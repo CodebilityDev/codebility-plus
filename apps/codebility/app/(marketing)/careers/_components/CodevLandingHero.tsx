@@ -13,23 +13,22 @@ const rowdies = Rowdies({
   subsets: ["latin"],
 });
 
-export default function Hero() {
+export default function CodevLandingHero() {
   return (
     <section
       id="home"
-      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-cover bg-no-repeat"
+      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden"
     >
-      <SideNavMenu />
-      <div
+      {/*  <div
         className="absolute left-1/2 top-1/2 h-[1100px] w-96 -translate-x-1/2 -translate-y-1/2 blur-3xl md:w-full xl:-left-10 xl:-top-96 xl:h-[1562.01px] xl:w-[1044.36px] xl:-translate-x-0 xl:-translate-y-0"
         style={{
           background:
             "radial-gradient(50% 50% at 50% 50%, rgba(151, 71, 255, 0.3) 0%, rgba(3, 3, 3, 0.3) 100%)",
         }}
-      ></div>
+      ></div> */}
       <OrbitingCirclesBackground />
       <div className="z-10 flex w-full flex-col gap-3 p-4 text-center text-white">
-        <p className="text-sm lg:text-xl">Find Your Next Developer</p>
+        <p className="text-sm lg:text-xl">Be part of our Community</p>
         <div className="relative">
           <h1
             className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
@@ -37,18 +36,21 @@ export default function Hero() {
             Codebility
           </h1>
           <h2 className="text-xl font-semibold lg:text-5xl">
-            Hire Talented Codevs
+            Join Our Inclusive Community{" "}
           </h2>
         </div>
         <p className="text-xs md:text-sm lg:text-2xl">
-          Connect with skilled developers ready to bring your projects to life
+          Where Diversity Flourishes and Connections Thrive
         </p>
-        <div className="mx-auto mt-6 flex w-full justify-center">
-          <Link href="#codevs">
-            <Button className="from-teal to-violet h-12 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
-              <span className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
-                Hire Codevs
-              </span>
+        <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
+          <Link href={"/careers"}>
+            <Button
+              variant="purple"
+              size="lg"
+              rounded="full"
+              className="md:w-40"
+            >
+              Careers
             </Button>
           </Link>
         </div>
