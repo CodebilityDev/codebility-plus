@@ -307,7 +307,7 @@ const Navigation = () => {
         <div className="flex items-center gap-2">
           {!userData ? (
             <>
-              {pathname === "/codevs" && (
+              {pathname === "/careers" && (
                 <Link href="/auth/sign-in">
                   <Button
                     variant="default"

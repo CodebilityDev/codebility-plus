@@ -13,7 +13,7 @@ const rowdies = Rowdies({
   subsets: ["latin"],
 });
 
-export default function Hero() {
+export default function CodevHero() {
   return (
     <section
       id="home"
@@ -29,7 +29,7 @@ export default function Hero() {
       ></div>
       <OrbitingCirclesBackground />
       <div className="z-10 flex w-full flex-col gap-3 p-4 text-center text-white">
-        <p className="text-sm lg:text-xl">Find Your Next Developer</p>
+        <p className="text-sm lg:text-xl">Be part of our Community</p>
         <div className="relative">
           <h1
             className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
@@ -37,18 +37,21 @@ export default function Hero() {
             Codebility
           </h1>
           <h2 className="text-xl font-semibold lg:text-5xl">
-            Hire Talented Codevs
+            Join Our Inclusive Community{" "}
           </h2>
         </div>
         <p className="text-xs md:text-sm lg:text-2xl">
-          Connect with skilled developers ready to bring your projects to life
+          Where Diversity Flourishes and Connections Thrive
         </p>
-        <div className="mx-auto mt-6 flex w-full justify-center">
-          <Link href="#codevs">
-            <Button className="from-teal to-violet h-12 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
-              <span className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
-                Hire Codevs
-              </span>
+        <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
+          <Link href={pathsConfig.auth.onboarding}>
+            <Button
+              variant="purple"
+              size="lg"
+              rounded="full"
+              className="md:w-40"
+            >
+              Join
             </Button>
           </Link>
         </div>

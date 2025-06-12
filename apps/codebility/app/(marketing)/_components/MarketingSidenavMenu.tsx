@@ -9,6 +9,7 @@ const links = [
   { href: "/#whychooseus", label: "About Us" },
   { href: "/bookacall", label: "Book a Call" },
   { href: "/codevs", label: "Hire Codevs" },
+  { href: "/careers", label: "Careers" },
 ];
 
 const SideNavMenu = () => {
