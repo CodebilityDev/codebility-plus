@@ -1,215 +1,309 @@
-// apps/codebility/app/home/my-team/MyTeamPage.tsx
+// my-team/MyTeamPage.tsx - Updated to use Kanban API patterns
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
-import { Users } from "lucide-react";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { toast } from "react-hot-toast";
+import { 
+  getMembers, 
+  getProjectCodevs, 
+  getTeamLead, 
+  updateProjectMembers,
+  SimpleMemberData 
+} from "@/app/home/projects/actions";
+import { Codev } from "@/types/home/codev";
+import AddMembersModal from "./AddMembersModal";
 
+// Use imported SimpleMemberData type instead of declaring locally
 interface ProjectData {
   project: {
     id: string;
     name: string;
-    description?: string;
-    status?: string;
-    start_date?: string;
-    end_date?: string;
   };
   teamLead: {
-    error?: any;
-    data: SimpleMemberData | null;
+    data: SimpleMemberData;
   };
   members: {
-    error?: any;
-    data: SimpleMemberData[] | null;
+    data: SimpleMemberData[];
   };
-  fetchedAt: string;
 }
 
-// Member avatar component with consistent sizing
-const MemberAvatar = ({ member }: { member: SimpleMemberData }) => (
-  <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
-    {member.image_url ? (
-      <Image
-        src={member.image_url}
-        alt={`${member.first_name} ${member.last_name}`}
-        fill
-        unoptimized={true}
-        className="rounded-full object-cover"
-        loading="lazy"
-      />
-    ) : (
-      <DefaultAvatar size={48} />
-    )}
-  </div>
-);
+interface MyTeamPageProps {
+  projectData: ProjectData[];
+}
 
-// Member name component with consistent formatting
-const MemberName = ({ member }: { member: SimpleMemberData }) => (
-  <div className="min-w-0 flex-1">
-    <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white truncate">
-      {member.first_name} {member.last_name}
-    </p>
-    {member.display_position && (
-      <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
-        {member.display_position}
-      </p>
-    )}
-  </div>
-);
+// Single utility function for name formatting
+const formatName = (firstName: string, lastName: string): string => 
+  `${firstName.charAt(0).toUpperCase()}${firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}${lastName.slice(1).toLowerCase()}`;
 
-// Individual member display component
-const MemberDisplay = ({ member }: { member: SimpleMemberData }) => (
-  <div className="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
-    <MemberAvatar member={member} />
-    <MemberName member={member} />
-  </div>
-);
-
-// Team members section with grid layout
-const TeamMembersSection = ({ members }: { members: SimpleMemberData[] }) => (
-  <div className="space-y-2">
-    {members.map((member) => (
-      <MemberDisplay key={member.id} member={member} />
-    ))}
-  </div>
-);
-
-// Project card component
-const ProjectCard = ({ project, teamLead, members }: ProjectData) => {
-  const memberCount = members.data?.length || 0;
-  const totalTeamSize = (teamLead.data ? 1 : 0) + memberCount;
+// Consolidated member display component
+const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLead?: boolean }) => {
+  const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
+  const displayName = formatName(member.first_name, member.last_name);
+  
+  if (isLead) {
+    return (
+      <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
+        <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
+          <Image
+            src={imageUrl}
+            alt={displayName}
+            width={48}
+            height={48}
+            className="rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 transition-colors duration-200"
+            style={{
+              position: "absolute",
+              height: "100%",
+              width: "100%",
+              inset: "0px",
+              color: "transparent",
+            }}
+          />
+        </div>
+        <div className="flex flex-col min-w-0 flex-1">
+          <span className="text-xs sm:text-sm font-semibold uppercase tracking-wide text-gray-500 dark:text-white transition-colors duration-200">
+            Team Lead
+          </span>
+          <span className="text-sm sm:text-base md:text-lg font-medium text-gray-900 dark:text-white transition-colors duration-200">
+            {displayName}
+          </span>
+          {member.display_position && (
+            <span className="text-xs text-gray-600 dark:text-gray-400">
+              {member.display_position}
+            </span>
+          )}
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 sm:p-6 transition-colors duration-200">
-      {/* Project Header */}
-      <div className="mb-4 sm:mb-6">
-        <div className="flex items-start justify-between gap-4">
-          <div className="min-w-0 flex-1">
-            <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white truncate mb-2">
-              {project.name}
-            </h2>
-            {project.description && (
-              <p className="text-sm text-gray-600 dark:text-gray-400 line-clamp-2">
-                {project.description}
-              </p>
-            )}
-          </div>
-          <div className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400">
-            <Users className="h-4 w-4" />
-            <span>{totalTeamSize} member{totalTeamSize !== 1 ? 's' : ''}</span>
-          </div>
-        </div>
-        
-        {/* Project Status */}
-        {project.status && (
-          <div className="mt-3 flex items-center gap-2 text-sm">
-            <div className="h-2 w-2 rounded-full bg-green-500"></div>
-            <span className="text-gray-600 dark:text-gray-400">
-              Status: <span className="font-medium text-gray-900 dark:text-white">{project.status}</span>
-            </span>
-          </div>
-        )}
+    <div className="flex flex-col items-center gap-1 sm:gap-2">
+      <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
+        <Image
+          src={imageUrl}
+          alt={displayName}
+          width={48}
+          height={48}
+          className="rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 transition-colors duration-200"
+          style={{
+            position: "absolute",
+            height: "100%",
+            width: "100%",
+            inset: "0px",
+            color: "transparent",
+          }}
+        />
       </div>
-
-      {/* Team Information */}
-      <div className="space-y-4">
-        {/* Team Lead Section */}
-        {teamLead.data && (
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              Team Lead
-            </h4>
-            <div className="flex items-center gap-3 p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-              <MemberAvatar member={teamLead.data} />
-              <div className="min-w-0 flex-1">
-                <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white truncate">
-                  {teamLead.data.first_name} {teamLead.data.last_name}
-                </p>
-                {teamLead.data.display_position && (
-                  <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 truncate">
-                    {teamLead.data.display_position}
-                  </p>
-                )}
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Team Members Section */}
-        {members.data && members.data.length > 0 && (
-          <div className="space-y-2">
-            <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              Team Members ({members.data.length})
-            </h4>
-            <div className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-3 space-y-1">
-              <TeamMembersSection members={members.data} />
-            </div>
-          </div>
-        )}
-
-        {/* Error Messages */}
-        {teamLead.error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-600 dark:text-red-400">
-              Error: {teamLead.error.message || "Failed to fetch team lead"}
-            </p>
-          </div>
-        )}
-        
-        {members.error && (
-          <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
-            <p className="text-sm text-red-600 dark:text-red-400">
-              Error: {members.error.message || "Failed to fetch members"}
-            </p>
-          </div>
-        )}
-      </div>
+      <span className="text-[10px] sm:text-xs text-gray-700 dark:text-white text-center leading-tight block px-1 transition-colors duration-200">
+        {displayName}
+      </span>
+      {member.display_position && (
+        <span className="text-[8px] sm:text-[10px] text-gray-500 dark:text-gray-400 text-center">
+          {member.display_position}
+        </span>
+      )}
     </div>
   );
 };
 
-// Main page component
-const MyTeamPage = ({ projectData }: { projectData: ProjectData[] }) => {
-  return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 lg:py-8">
-        {/* Header Section */}
-        <div className="mb-6 lg:mb-8">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-            My Team
-          </h1>
+// Main component
+const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
+  const [projects, setProjects] = useState(projectData);
+  const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [availableMembers, setAvailableMembers] = useState<Codev[]>([]);
+  const [isLoadingMembers, setIsLoadingMembers] = useState(false);
+
+  const handleOpenAddModal = async (project: ProjectData) => {
+    setSelectedProject(project);
+    setIsLoadingMembers(true);
+    
+    try {
+      // Fetch available members using Kanban pattern
+      const users = await getProjectCodevs();
+      setAvailableMembers(users || []);
+      setShowAddModal(true);
+    } catch (error) {
+      console.error('Failed to fetch available members:', error);
+      toast.error('Failed to load available members');
+    } finally {
+      setIsLoadingMembers(false);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setShowAddModal(false);
+    setSelectedProject(null);
+    setAvailableMembers([]);
+  };
+
+  const handleUpdateMembers = async (selectedMembers: Codev[]) => {
+    if (!selectedProject) return;
+
+    try {
+      // Get current team lead
+      const teamLeadResult = await getTeamLead(selectedProject.project.id);
+      const teamLead = teamLeadResult.data;
+      
+      if (!teamLead) {
+        throw new Error('Team leader not found');
+      }
+
+      // Prepare updated members array using Kanban pattern
+      const updatedMembers = [
+        {
+          ...teamLead,
+          positions: [],
+          tech_stacks: [],
+          display_position: teamLead.display_position ?? undefined,
+        },
+        ...selectedMembers
+          .filter((member) => member.id !== teamLead.id)
+          .map((member) => ({
+            ...member,
+            display_position: member.display_position ?? undefined,
+          })),
+      ];
+
+      // Update using the same function as Kanban
+      const result = await updateProjectMembers(
+        selectedProject.project.id,
+        updatedMembers,
+        teamLead.id,
+      );
+
+      if (result.success) {
+        toast.success("Project members updated successfully.");
+        
+        // Update local state - convert Codev[] to SimpleMemberData[]
+        const updatedProjectMembers: SimpleMemberData[] = selectedMembers
+          .filter(member => member.id !== teamLead.id)
+          .map(member => ({
+            id: member.id,
+            first_name: member.first_name,
+            last_name: member.last_name,
+            email_address: member.email_address,
+            image_url: member.image_url ?? null, // Convert undefined to null
+            role: 'member',
+            display_position: member.display_position ?? null, // Convert undefined to null
+            joined_at: new Date().toISOString(),
+          }));
+
+        setProjects(prev => prev.map(p => 
+          p.project.id === selectedProject.project.id 
+            ? { ...p, members: { data: updatedProjectMembers } }
+            : p
+        ));
+        
+        handleCloseModal();
+      } else {
+        toast.error(result.error || "Failed to update project members.");
+      }
+    } catch (error) {
+      console.error('Failed to update members:', error);
+      toast.error("An unexpected error occurred.");
+    }
+  };
+
+  if (!projects?.length) {
+    return (
+      <div className="flex min-h-screen items-center justify-center rounded-xl bg-white dark:bg-gray-900 p-6">
+        <div className="text-center max-w-md">
           <p className="text-gray-600 dark:text-gray-400">
-            View your project teams and collaborate with your colleagues
+            You are not assigned to any projects yet
+          </p>
+          <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+            Contact your project manager to get assigned to a team.
           </p>
         </div>
-        
-        {/* Projects Grid */}
-        <div className="w-full">
-          {projectData.length > 0 ? (
-            <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
-              {projectData.map((data) => (
-                <ProjectCard key={data.project.id} {...data} />
-              ))}
-            </div>
-          ) : (
-            /* Empty State */
-            <div className="flex min-h-[400px] w-full items-center justify-center rounded-xl border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-100 dark:bg-gray-800">
-              <div className="text-center p-8">
-                <Users className="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500 mb-4" />
-                <p className="text-xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                  No projects assigned
-                </p>
-                <p className="text-base text-gray-500 dark:text-gray-400 max-w-md mx-auto">
-                  You are not currently assigned to any projects. Check back later or contact your team lead.
-                </p>
-              </div>
-            </div>
-          )}
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+          <div className="mb-2">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight transition-colors duration-200">
+              Codebility Portal
+            </h1>
+          </div>
+
+          <div className="grid grid-cols-1 2xl:grid-cols-2 gap-4 2xl:gap-6">
+            {projects.map((projectItem) => {
+              const { project, teamLead, members } = projectItem;
+              
+              return (
+                <div
+                  key={project.id}
+                  className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-dark-200 p-3 sm:p-4 md:p-5 lg:p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 h-full"
+                >
+                  <div className="space-y-4 sm:space-y-5 md:space-y-6">
+                    
+                    {/* Project Header */}
+                    <div>
+                      <div className="flex items-center justify-between mb-2">
+                        <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-gray-900 dark:text-white transition-colors duration-200">
+                          {project.name}
+                        </h2>
+                        <button
+                          onClick={() => handleOpenAddModal(projectItem)}
+                          disabled={isLoadingMembers}
+                          className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium border border-blue-300 dark:border-blue-500 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {isLoadingMembers ? 'Loading...' : 'Add Members'}
+                        </button>
+                      </div>
+                      <p className="text-sm text-gray-600 dark:text-white mb-4 sm:mb-5 md:mb-6 transition-colors duration-200">
+                        {members.data.length} member{members.data.length !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+
+                    {/* Team Lead */}
+                    {teamLead.data && (
+                      <div className="space-y-2 sm:space-y-3">
+                        <MemberCard member={teamLead.data} isLead />
+                      </div>
+                    )}
+
+                    {/* Team Members */}
+                    <div>
+                      <h3 className="text-base sm:text-lg font-semibold text-gray-900 dark:text-white mb-3 sm:mb-4 transition-colors duration-200">
+                        Team Members
+                      </h3>
+                      <div className="space-y-2 sm:space-y-3">
+                        <div className="grid grid-cols-4 gap-2 sm:gap-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
+                          {members.data.map((member) => (
+                            <MemberCard key={member.id} member={member} />
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Add Members Modal using Kanban pattern */}
+      {selectedProject && (
+        <AddMembersModal
+          isOpen={showAddModal}
+          projectData={selectedProject}
+          availableMembers={availableMembers}
+          onClose={handleCloseModal}
+          onUpdate={handleUpdateMembers}
+        />
+      )}
+    </>
   );
 };
 
 export default MyTeamPage;
+
+// Export types for reusability
+export type { ProjectData };
