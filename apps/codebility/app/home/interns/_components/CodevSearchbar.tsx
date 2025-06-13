@@ -31,7 +31,7 @@ export default function CodevSearchbar({
   return (
     <div className="relative flex items-center">
       <input
-        className="w-full rounded-full border border-gray-300 py-2 pl-10 pr-3"
+        className="text-dark100_light900 w-full rounded-full border border-gray-300 py-2 pl-10 pr-3 "
         type="text"
         placeholder="Search for a codev"
         value={searchValue}
