@@ -12,8 +12,7 @@ import {
   SimpleMemberData 
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
-// Temporarily comment out the modal import to fix the error
-// import AddMembersModal from "./AddMembersModal";
+import AddMembersModal from "./AddMembersModal";
 
 // Use imported SimpleMemberData type instead of declaring locally
 interface ProjectData {
@@ -39,7 +38,7 @@ const formatName = (firstName: string, lastName: string): string =>
 
 // Consolidated member display component
 const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLead?: boolean }) => {
-  const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg"; // Use local image instead
+  const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
   const displayName = formatName(member.first_name, member.last_name);
   
   if (isLead) {
@@ -290,8 +289,7 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
         </div>
       </div>
 
-      {/* Add Members Modal using Kanban pattern - Temporarily disabled */}
-      {/* 
+      {/* Add Members Modal using Kanban pattern */}
       {selectedProject && (
         <AddMembersModal
           isOpen={showAddModal}
@@ -301,7 +299,6 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
           onUpdate={handleUpdateMembers}
         />
       )}
-      */}
     </>
   );
 };
