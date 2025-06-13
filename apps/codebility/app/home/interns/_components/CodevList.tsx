@@ -43,7 +43,9 @@ export default function CodevList({ data, filters }: CodevListProps) {
           ))}
         </div>
       ) : (
-        <p className="text-center text-xl text-gray-500">No codevs found</p>
+        <p className="text-dark100_light900 text-center text-xl">
+          No codevs found
+        </p>
       )}
 
       {filteredCodevs.length > pageSize.codevsList && (
