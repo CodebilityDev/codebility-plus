@@ -1,65 +1,164 @@
-// app/home/my-team/AddMembersModal.tsx
+// apps/codebility/app/home/my-team/AddMembersModal.tsx
 "use client";
 
 import { useState, useEffect } from "react";
 import Image from "next/image";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { 
+  getTeamLead, 
+  getMembers, 
+  getProjectCodevs, 
+  updateProjectMembers,
+  SimpleMemberData 
+} from "@/app/home/projects/actions";
+import DefaultAvatar from "@/Components/DefaultAvatar";
+import { Button } from "@/Components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/Components/ui/dialog";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { Codev } from "@/types/home/codev";
-
-// Types matching your MyTeamPage
-interface ProjectData {
-  project: {
-    id: string;
-    name: string;
-  };
-  teamLead: {
-    data: SimpleMemberData;
-  };
-  members: {
-    data: SimpleMemberData[];
-  };
-}
+import { Search, X, Plus, Minus } from "lucide-react";
+import toast from "react-hot-toast";
 
 interface AddMembersModalProps {
   isOpen: boolean;
-  projectData: ProjectData;
-  availableMembers: Codev[];
   onClose: () => void;
-  onUpdate: (selectedMembers: Codev[]) => Promise<void>;
+  projectId: string;
+  projectName: string;
+  onUpdate?: () => void;
 }
 
-// Name formatting utility matching your existing code
-const formatName = (firstName: string, lastName: string): string => 
-  `${firstName.charAt(0).toUpperCase()}${firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}${lastName.slice(1).toLowerCase()}`;
+// Member card component for selection
+const MemberCard = ({ 
+  member, 
+  isSelected, 
+  onToggle 
+}: { 
+  member: Codev; 
+  isSelected: boolean; 
+  onToggle: (member: Codev) => void;
+}) => (
+  <div 
+    className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-all ${
+      isSelected 
+        ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800' 
+        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700'
+    }`}
+    onClick={() => onToggle(member)}
+  >
+    <div className="relative h-12 w-12 flex-shrink-0">
+      {member.image_url ? (
+        <Image
+          src={member.image_url}
+          alt={`${member.first_name} ${member.last_name}`}
+          fill
+          unoptimized={true}
+          className="rounded-full object-cover"
+          loading="lazy"
+        />
+      ) : (
+        <DefaultAvatar size={48} />
+      )}
+    </div>
+    
+    <div className="flex-1 min-w-0">
+      <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
+        {member.first_name} {member.last_name}
+      </p>
+      {member.display_position && (
+        <p className="text-xs text-gray-500 dark:text-gray-400 truncate">
+          {member.display_position}
+        </p>
+      )}
+    </div>
+    
+    <div className="flex-shrink-0">
+      {isSelected ? (
+        <div className="h-6 w-6 bg-blue-500 rounded-full flex items-center justify-center">
+          <Minus className="h-4 w-4 text-white" />
+        </div>
+      ) : (
+        <div className="h-6 w-6 bg-gray-200 dark:bg-gray-600 rounded-full flex items-center justify-center">
+          <Plus className="h-4 w-4 text-gray-600 dark:text-gray-400" />
+        </div>
+      )}
+    </div>
+  </div>
+);
 
-const AddMembersModal = ({ isOpen, projectData, availableMembers, onClose, onUpdate }: AddMembersModalProps) => {
+const AddMembersModal = ({ 
+  isOpen, 
+  onClose, 
+  projectId, 
+  projectName, 
+  onUpdate 
+}: AddMembersModalProps) => {
+  const [currentMembers, setCurrentMembers] = useState<SimpleMemberData[]>([]);
+  const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
+  const [availableUsers, setAvailableUsers] = useState<Codev[]>([]);
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Initialize selected members when modal opens
+  // Load data when modal opens
   useEffect(() => {
-    if (isOpen && projectData.members.data && availableMembers.length > 0) {
-      // Find current members in availableMembers to get full Codev objects
-      const currentMembers: Codev[] = projectData.members.data
-        .map(member => {
-          const fullMember = availableMembers.find(am => am.id === member.id);
-          return fullMember || null;
-        })
-        .filter((member): member is Codev => member !== null);
-      
-      setSelectedMembers(currentMembers);
-      setSearchQuery("");
+    if (!isOpen || !projectId) return;
+
+    const loadData = async () => {
+      setIsLoading(true);
+      try {
+        const [membersResult, teamLeadResult, usersResult] = await Promise.all([
+          getMembers(projectId),
+          getTeamLead(projectId),
+          getProjectCodevs()
+        ]);
+
+        setCurrentMembers(membersResult.data || []);
+        setTeamLead(teamLeadResult.data);
+        setAvailableUsers(usersResult || []);
+        
+        // Pre-select current members
+        if (membersResult.data) {
+          const currentMemberIds = membersResult.data.map(m => m.id);
+          const preSelected = (usersResult || []).filter(user => 
+            currentMemberIds.includes(user.id)
+          );
+          setSelectedMembers(preSelected);
+        }
+      } catch (error) {
+        console.error("Error loading data:", error);
+        toast.error("Failed to load team data");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadData();
+  }, [isOpen, projectId]);
+
+  // Filter available users (exclude team lead and search)
+  const filteredUsers = availableUsers.filter(user => {
+    if (teamLead && user.id === teamLead.id) return false;
+    
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        user.first_name.toLowerCase().includes(query) ||
+        user.last_name.toLowerCase().includes(query) ||
+        (user.display_position && user.display_position.toLowerCase().includes(query))
+      );
     }
-  }, [isOpen, projectData.members.data, availableMembers]);
+    
+    return true;
+  });
 
-  // Filter available members based on search
-  const filteredMembers = availableMembers.filter(member =>
-    formatName(member.first_name, member.last_name).toLowerCase().includes(searchQuery.toLowerCase()) ||
-    (member.display_position && member.display_position.toLowerCase().includes(searchQuery.toLowerCase()))
-  );
-
-  const toggleMemberSelection = (member: Codev) => {
+  // Toggle member selection
+  const toggleMember = (member: Codev) => {
     setSelectedMembers(prev => {
       const isSelected = prev.some(m => m.id === member.id);
       if (isSelected) {
@@ -70,227 +169,156 @@ const AddMembersModal = ({ isOpen, projectData, availableMembers, onClose, onUpd
     });
   };
 
-  const isSelected = (memberId: string) => {
-    return selectedMembers.some(m => m.id === memberId);
-  };
+  // Handle form submission
+  const handleSubmit = async () => {
+    if (!teamLead) {
+      toast.error("Team leader is required");
+      return;
+    }
 
-  const handleUpdate = async () => {
     setIsUpdating(true);
     try {
-      await onUpdate(selectedMembers);
+      await updateProjectMembers(projectId, selectedMembers, teamLead.id);
+      toast.success("Team members updated successfully");
+      onUpdate?.();
+      onClose();
     } catch (error) {
-      console.error('Failed to update members:', error);
+      console.error("Error updating members:", error);
+      toast.error("Failed to update team members");
     } finally {
       setIsUpdating(false);
     }
   };
 
-  const handleClose = () => {
-    setSearchQuery("");
-    onClose();
-  };
-
-  if (!isOpen) return null;
+  // Reset state when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+      setSelectedMembers([]);
+      setCurrentMembers([]);
+      setTeamLead(null);
+      setAvailableUsers([]);
+    }
+  }, [isOpen]);
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-      <div className="bg-gray-800 rounded-xl w-full max-w-5xl max-h-[90vh] flex overflow-hidden">
-        
-        {/* Left Panel - Project Info & Selected Members */}
-        <div className="w-1/2 p-6 border-r border-gray-700 flex flex-col">
-          
-          {/* Project Name */}
-          <div className="mb-6">
-            <h3 className="text-gray-400 text-sm mb-2">Project Name</h3>
-            <div className="flex items-center gap-3">
-              <div className="w-12 h-12 bg-gray-600 rounded-lg flex items-center justify-center">
-                <span className="text-white text-lg font-bold">
-                  {projectData.project.name.charAt(0)}
-                </span>
-              </div>
-              <h2 className="text-white text-xl font-semibold">{projectData.project.name}</h2>
-            </div>
-          </div>
+    <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-4xl max-h-[90vh] overflow-hidden">
+        <DialogHeader>
+          <DialogTitle className="text-xl">
+            Add Members to {projectName}
+          </DialogTitle>
+        </DialogHeader>
 
-          {/* Team Leader */}
-          {projectData.teamLead.data && (
-            <div className="mb-6">
-              <h3 className="text-gray-400 text-sm mb-3">Team Leader</h3>
+        <div className="flex flex-col gap-6 overflow-hidden">
+          {/* Team Lead Display */}
+          {teamLead && (
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg border border-blue-200 dark:border-blue-800">
+              <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 mb-2">
+                TEAM LEAD
+              </h3>
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-600 flex items-center justify-center flex-shrink-0">
-                  {projectData.teamLead.data.image_url ? (
+                <div className="relative h-12 w-12">
+                  {teamLead.image_url ? (
                     <Image
-                      src={projectData.teamLead.data.image_url}
-                      alt={formatName(projectData.teamLead.data.first_name, projectData.teamLead.data.last_name)}
-                      width={48}
-                      height={48}
-                      className="w-full h-full object-cover"
+                      src={teamLead.image_url}
+                      alt={`${teamLead.first_name} ${teamLead.last_name}`}
+                      fill
+                      unoptimized={true}
+                      className="rounded-full object-cover"
+                      loading="lazy"
                     />
                   ) : (
-                    <span className="text-white text-sm font-bold">
-                      {projectData.teamLead.data.first_name.charAt(0).toUpperCase()}
-                      {projectData.teamLead.data.last_name.charAt(0).toUpperCase()}
-                    </span>
+                    <DefaultAvatar size={48} />
                   )}
                 </div>
                 <div>
-                  <div className="text-white font-medium">
-                    {formatName(projectData.teamLead.data.first_name, projectData.teamLead.data.last_name)}
-                  </div>
-                  <div className="text-gray-400 text-sm">
-                    {projectData.teamLead.data.display_position || 'Team Leader'}
-                  </div>
+                  <p className="font-medium text-gray-900 dark:text-white">
+                    {teamLead.first_name} {teamLead.last_name}
+                  </p>
+                  {teamLead.display_position && (
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      {teamLead.display_position}
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
           )}
 
-          {/* Team Members */}
-          <div className="flex-1">
-            <h3 className="text-gray-400 text-sm mb-3">Team Members</h3>
-            <div className="grid grid-cols-4 gap-2 mb-4 max-h-48 overflow-y-auto">
-              {selectedMembers.slice(0, 8).map(member => (
-                <div key={member.id} className="relative">
-                  <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-600 flex items-center justify-center border-2 border-blue-500">
-                    {member.image_url ? (
-                      <Image
-                        src={member.image_url}
-                        alt={formatName(member.first_name, member.last_name)}
-                        width={64}
-                        height={64}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-white text-sm font-bold">
-                        {member.first_name.charAt(0).toUpperCase()}
-                        {member.last_name.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="absolute -top-1 -right-1 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                      <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                </div>
-              ))}
-              {selectedMembers.length > 8 && (
-                <div className="w-16 h-16 bg-gray-600 rounded-full flex items-center justify-center">
-                  <span className="text-white text-lg font-bold">+{selectedMembers.length - 8}</span>
-                </div>
-              )}
-            </div>
-            <p className="text-gray-400 text-sm">{selectedMembers.length} members selected</p>
-          </div>
-        </div>
-
-        {/* Right Panel - Available Members */}
-        <div className="w-1/2 p-6 flex flex-col">
-          
-          {/* Header */}
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-white text-xl font-semibold">Add Members</h2>
-            <button 
-              onClick={handleClose} 
-              className="text-gray-400 hover:text-white transition-colors"
-            >
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
-          </div>
-
-          {/* Search Input */}
-          <div className="relative mb-6">
-            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+          {/* Search Bar */}
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
+              placeholder="Search team members..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search members..."
-              className="w-full pl-10 pr-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full pl-10 pr-4 py-3 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
 
-          {/* Available Members List */}
-          <div className="mb-4">
-            <h3 className="text-gray-400 text-sm mb-3">Available Members</h3>
-          </div>
+          {/* Members List */}
+          <div className="flex-1 overflow-hidden">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                Available Members
+              </h3>
+              <span className="text-sm text-gray-500 dark:text-gray-400">
+                {selectedMembers.length} selected
+              </span>
+            </div>
 
-          <div className="flex-1 space-y-1 overflow-y-auto pr-2">
-            {filteredMembers.map(member => {
-              const memberIsSelected = isSelected(member.id);
-              
-              return (
-                <div 
-                  key={member.id}
-                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-gray-700 cursor-pointer transition-colors"
-                  onClick={() => toggleMemberSelection(member)}
-                >
-                  <div className="w-12 h-12 rounded-full overflow-hidden bg-gray-600 flex items-center justify-center flex-shrink-0">
-                    {member.image_url ? (
-                      <Image
-                        src={member.image_url}
-                        alt={formatName(member.first_name, member.last_name)}
-                        width={48}
-                        height={48}
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <span className="text-white text-sm font-bold">
-                        {member.first_name.charAt(0).toUpperCase()}
-                        {member.last_name.charAt(0).toUpperCase()}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <div className="text-white font-medium truncate">
-                      {formatName(member.first_name, member.last_name)}
-                    </div>
-                    <div className="text-gray-400 text-sm truncate">
-                      {member.display_position || 'Team Member'}
+            {isLoading ? (
+              <div className="space-y-3">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="flex items-center gap-3 p-3">
+                    <Skeleton className="h-12 w-12 rounded-full" />
+                    <div className="flex-1">
+                      <Skeleton className="h-4 w-32 mb-2" />
+                      <Skeleton className="h-3 w-24" />
                     </div>
                   </div>
-                  <div className={`w-5 h-5 border-2 rounded transition-colors ${
-                    memberIsSelected 
-                      ? 'bg-blue-600 border-blue-600' 
-                      : 'border-gray-400 hover:border-gray-300'
-                  }`}>
-                    {memberIsSelected && (
-                      <svg className="w-full h-full text-white" fill="currentColor" viewBox="0 0 20 20">
-                        <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                      </svg>
-                    )}
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-2 max-h-96 overflow-y-auto pr-2">
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map(user => (
+                    <MemberCard
+                      key={user.id}
+                      member={user}
+                      isSelected={selectedMembers.some(m => m.id === user.id)}
+                      onToggle={toggleMember}
+                    />
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                    {searchQuery ? "No members found matching your search" : "No available members"}
                   </div>
-                </div>
-              );
-            })}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex gap-3 mt-6 pt-6 border-t border-gray-700">
-            <button 
-              onClick={handleClose}
-              disabled={isUpdating}
-              className="flex-1 px-4 py-2 text-gray-400 border border-gray-600 rounded-lg hover:text-white hover:border-gray-500 transition-colors disabled:opacity-50"
-            >
-              Cancel
-            </button>
-            <button 
-              onClick={handleUpdate}
-              disabled={isUpdating}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isUpdating ? 'Updating...' : 'Update'}
-            </button>
+                )}
+              </div>
+            )}
           </div>
         </div>
-      </div>
-    </div>
+
+        <DialogFooter>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isUpdating}
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={isLoading || isUpdating}
+          >
+            {isUpdating ? "Updating..." : "Update Members"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 };
 
