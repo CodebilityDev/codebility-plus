@@ -1,14 +1,8 @@
 // apps/codebility/app/home/my-team/AddMembersModal.tsx
 "use client";
 
-import { useState, useEffect } from "react";
-import { 
-  getTeamLead, 
-  getMembers, 
-  getProjectCodevs, 
-  updateProjectMembers,
-  SimpleMemberData 
-} from "@/app/home/projects/actions";
+import { useState, useEffect, useMemo } from "react";
+import { SimpleMemberData } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Button } from "@/Components/ui/button";
 import {
@@ -17,80 +11,163 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { Codev } from "@/types/home/codev";
-import { Search, X, Check } from "lucide-react";
+import { Search, X, Check, Users, Plus } from "lucide-react";
 import toast from "react-hot-toast";
+import Image from "next/image";
 
 interface AddMembersModalProps {
   isOpen: boolean;
   onClose: () => void;
-  projectId: string;
-  projectName: string;
-  onUpdate?: () => void;
+  projectData: {
+    project: { id: string; name: string };
+    teamLead: { data: SimpleMemberData };
+    members: { data: SimpleMemberData[] };
+  };
+  availableMembers: Codev[];
+  onUpdate: (selectedMembers: Codev[]) => void;
 }
+
+// Member Avatar Component - Matches your existing design
+const MemberAvatar = ({ 
+  imageUrl, 
+  name, 
+  size = 48 
+}: { 
+  imageUrl?: string | null; 
+  name: string; 
+  size?: number;
+}) => (
+  <div 
+    className="relative flex-shrink-0 rounded-full overflow-hidden"
+    style={{ width: size, height: size }}
+  >
+    <Image
+      src={
+        imageUrl ||
+        "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
+      }
+      alt={name}
+      width={size}
+      height={size}
+      className="rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 transition-colors duration-200"
+      style={{
+        position: "absolute",
+        height: "100%",
+        width: "100%",
+        inset: "0px",
+        color: "transparent",
+      }}
+    />
+  </div>
+);
+
+// Search Input Component
+const SearchInput = ({ 
+  value, 
+  onChange, 
+  placeholder = "Search members..." 
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  placeholder?: string;
+}) => (
+  <div className="relative">
+    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+    <input
+      type="text"
+      placeholder={placeholder}
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
+      className="w-full pl-10 pr-4 py-3 bg-gray-800 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
+);
+
+// Project Preview Component - Matches your left panel design
+const ProjectPreview = ({ 
+  projectName, 
+  teamLead, 
+  currentMembers 
+}: { 
+  projectName: string; 
+  teamLead: SimpleMemberData | null;
+  currentMembers: SimpleMemberData[];
+}) => (
+  <div className="space-y-6">
+    {/* Project Info */}
+    <div>
+      <h3 className="text-lg font-semibold text-white mb-3">Project Name</h3>
+      <div className="flex items-center gap-3">
+        <div className="w-12 h-12 bg-gray-700 rounded-lg flex items-center justify-center">
+          <div className="w-6 h-6 bg-blue-500 rounded"></div>
+        </div>
+        <span className="text-white text-lg">{projectName}</span>
+      </div>
+    </div>
+    
+    {/* Team Leader */}
+    <div>
+      <h4 className="text-lg font-semibold text-white mb-3">Team Leader</h4>
+      {teamLead ? (
+        <div className="flex items-center gap-3">
+          <MemberAvatar
+            imageUrl={teamLead.image_url}
+            name={`${teamLead.first_name} ${teamLead.last_name}`}
+            size={48}
+          />
+          <div>
+            <div className="text-white font-medium">
+              {teamLead.first_name} {teamLead.last_name}
+            </div>
+            <div className="text-gray-400 text-sm">
+              {teamLead.display_position || teamLead.role || 'CEO / Founder'}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="text-gray-400">No team leader assigned</div>
+      )}
+    </div>
+    
+    {/* Current Team Members */}
+    <div>
+      <h4 className="text-lg font-semibold text-white mb-3">Team Members</h4>
+      <div className="flex items-center gap-2">
+        {currentMembers.slice(0, 3).map((member) => (
+          <MemberAvatar
+            key={member.id}
+            imageUrl={member.image_url}
+            name={`${member.first_name} ${member.last_name}`}
+            size={48}
+          />
+        ))}
+        <div className="w-12 h-12 bg-gray-700 rounded-full flex items-center justify-center border-2 border-dashed border-gray-500">
+          <Plus className="w-5 h-5 text-gray-400" />
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 const AddMembersModal = ({ 
   isOpen, 
   onClose, 
-  projectId, 
-  projectName, 
+  projectData,
+  availableMembers,
   onUpdate 
 }: AddMembersModalProps) => {
-  const [currentMembers, setCurrentMembers] = useState<SimpleMemberData[]>([]);
-  const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
-  const [availableUsers, setAvailableUsers] = useState<Codev[]>([]);
+  // Extract data from props
+  const { project, teamLead, members } = projectData;
+  const teamLeadData = teamLead.data;
+  const currentMembers = members.data;
+
+  // State management
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
 
-  // Load data when modal opens
-  useEffect(() => {
-    if (!isOpen || !projectId) return;
-
-    const loadData = async () => {
-      setIsLoading(true);
-      try {
-        const [membersResult, teamLeadResult, usersResult] = await Promise.all([
-          getMembers(projectId),
-          getTeamLead(projectId),
-          getProjectCodevs()
-        ]);
-
-        setCurrentMembers(membersResult.data || []);
-        setTeamLead(teamLeadResult.data);
-        setAvailableUsers(usersResult || []);
-        
-        // Pre-select current members
-        if (membersResult.data) {
-          const currentMemberIds = membersResult.data.map(m => m.id);
-          const preSelected = (usersResult || []).filter(user => 
-            currentMemberIds.includes(user.id)
-          );
-          setSelectedMembers(preSelected);
-        }
-      } catch (error) {
-        console.error("Error loading data:", error);
-        toast.error("Failed to load team data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadData();
-  }, [isOpen, projectId]);
-
-  // Filter available users (exclude team lead and search)
-  const filteredUsers = availableUsers.filter(user => {
-    const isTeamLead = teamLead?.id === user.id;
-    const matchesSearch = searchQuery.trim() === "" || 
-      `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (user.display_position?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
-    
-    return !isTeamLead && matchesSearch;
-  });
-
+  // Toggle member selection
   const toggleMember = (member: Codev) => {
     setSelectedMembers(prev => {
       const isSelected = prev.some(m => m.id === member.id);
@@ -100,25 +177,54 @@ const AddMembersModal = ({
     });
   };
 
-  const handleSubmit = async () => {
-    if (!teamLead) return;
+  // Check if member is selected
+  const isSelected = (userId: string) => selectedMembers.some(m => m.id === userId);
+
+  // Initialize selected members when modal opens
+  useEffect(() => {
+    if (isOpen && currentMembers && availableMembers) {
+      const currentMemberIds = currentMembers.map(m => m.id);
+      const preSelected = availableMembers.filter(user => 
+        currentMemberIds.includes(user.id)
+      );
+      setSelectedMembers(preSelected);
+    }
+  }, [isOpen, currentMembers, availableMembers]);
+
+  // Filter available users
+  const filteredUsers = useMemo(() => {
+    if (!availableMembers || availableMembers.length === 0) {
+      return [];
+    }
     
+    return availableMembers.filter(user => {
+      // Ensure user has required properties
+      if (!user || !user.id || !user.first_name || !user.last_name) {
+        return false;
+      }
+      
+      const isTeamLead = teamLeadData?.id === user.id;
+      const matchesSearch = searchQuery.trim() === "" || 
+        `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (user.display_position?.toLowerCase().includes(searchQuery.toLowerCase()) ?? false);
+      
+      return !isTeamLead && matchesSearch;
+    });
+  }, [availableMembers, teamLeadData, searchQuery]);
+
+  // Clean up on close
+  useEffect(() => {
+    if (!isOpen) {
+      setSearchQuery("");
+      setSelectedMembers([]);
+    }
+  }, [isOpen]);
+
+  // Submit handler
+  const handleSubmit = async () => {
     setIsUpdating(true);
     try {
-      // updateProjectMembers expects Codev[], not SimpleMemberData[]
-      const result = await updateProjectMembers(
-        projectId,
-        selectedMembers, // Pass selectedMembers directly as Codev[]
-        teamLead.id
-      );
-
-      if (result.success) {
-        toast.success("Team members updated successfully");
-        onUpdate?.();
-        onClose();
-      } else {
-        toast.error(result.error || "Failed to update team members");
-      }
+      await onUpdate(selectedMembers);
     } catch (error) {
       console.error("Update error:", error);
       toast.error("An unexpected error occurred");
@@ -127,12 +233,10 @@ const AddMembersModal = ({
     }
   };
 
-  const isSelected = (userId: string) => selectedMembers.some(m => m.id === userId);
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-4xl h-[600px] p-0">
-        {/* Header */}
+        {/* Header Section */}
         <DialogHeader className="p-6 pb-0">
           <div className="flex items-center justify-between">
             <DialogTitle className="text-xl font-semibold text-white">
@@ -148,164 +252,53 @@ const AddMembersModal = ({
         </DialogHeader>
 
         <div className="flex h-full">
-          {/* Left Panel - Project Info */}
+          {/* Left Panel - Project Preview */}
           <div className="w-1/2 p-6 border-r border-gray-700">
-            {isLoading ? (
-              <div className="space-y-6">
-                <div>
-                  <label className="text-gray-400 text-sm font-medium">Project Name</label>
-                  <Skeleton className="h-12 w-full mt-2" />
-                </div>
-                <div>
-                  <label className="text-gray-400 text-sm font-medium">Team Leader</label>
-                  <Skeleton className="h-16 w-full mt-2" />
-                </div>
-                <div>
-                  <label className="text-gray-400 text-sm font-medium">Team Members</label>
-                  <div className="grid grid-cols-4 gap-2 mt-2">
-                    {Array.from({ length: 8 }).map((_, i) => (
-                      <Skeleton key={i} className="h-12 w-12 rounded-full" />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-6">
-                {/* Project Name */}
-                <div>
-                  <label className="text-gray-400 text-sm font-medium block mb-2">
-                    Project Name
-                  </label>
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gray-600 rounded flex-shrink-0"></div>
-                    <span className="text-white text-lg font-medium">{projectName}</span>
-                  </div>
-                </div>
-
-                {/* Team Leader */}
-                <div>
-                  <label className="text-gray-400 text-sm font-medium block mb-2">
-                    Team Leader
-                  </label>
-                  {teamLead && (
-                    <div className="flex items-center gap-3">
-                      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                        {teamLead.image_url ? (
-                          <img
-                            src={teamLead.image_url}
-                            alt={`${teamLead.first_name} ${teamLead.last_name}`}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <DefaultAvatar size={48} />
-                        )}
-                      </div>
-                      <div>
-                        <div className="text-white font-medium">
-                          {teamLead.first_name} {teamLead.last_name}
-                        </div>
-                        {teamLead.display_position && (
-                          <div className="text-gray-400 text-sm">
-                            {teamLead.display_position}
-                          </div>
-                        )}
-                      </div>
-                    </div>
-                  )}
-                </div>
-
-                {/* Team Members Grid */}
-                <div>
-                  <label className="text-gray-400 text-sm font-medium block mb-2">
-                    Team Members
-                  </label>
-                  <div className="space-y-3">
-                    {/* Selected Members Grid */}
-                    <div className="grid grid-cols-6 gap-1">
-                      {selectedMembers.slice(0, 12).map((member) => (
-                        <div key={member.id} className="relative">
-                          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-blue-500">
-                            {member.image_url ? (
-                              <img
-                                src={member.image_url}
-                                alt={`${member.first_name} ${member.last_name}`}
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <DefaultAvatar size={48} />
-                            )}
-                          </div>
-                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Check className="w-3 h-3 text-white" />
-                          </div>
-                        </div>
-                      ))}
-                      {/* Plus indicator for more */}
-                      {selectedMembers.length > 12 && (
-                        <div className="w-12 h-12 rounded-full bg-gray-600 flex items-center justify-center">
-                          <span className="text-white text-lg">+</span>
-                        </div>
-                      )}
-                    </div>
-                    
-                    {/* Member count */}
-                    <div className="text-gray-400 text-sm">
-                      {selectedMembers.length} member{selectedMembers.length !== 1 ? 's' : ''} selected
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+            <ProjectPreview 
+              projectName={project.name}
+              teamLead={teamLeadData}
+              currentMembers={currentMembers}
+            />
           </div>
 
-          {/* Right Panel - Available Members */}
+          {/* Right Panel - Member Selection */}
           <div className="w-1/2 p-6 flex flex-col">
-            {/* Search */}
-            <div className="relative mb-6">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-4 h-4" />
-              <input
-                type="text"
-                placeholder="Search members..."
+            <div className="mb-4">
+              <h3 className="text-lg font-semibold text-white mb-3 flex items-center gap-2">
+                <Users className="h-5 w-5" />
+                Team Members ({selectedMembers.length} selected)
+              </h3>
+              
+              <SearchInput
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full pl-10 pr-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                onChange={setSearchQuery}
+                placeholder="Search members..."
               />
             </div>
 
-            {/* Available Members List */}
+            {/* Member Selection List */}
             <div className="flex-1 overflow-y-auto">
-              <h3 className="text-gray-400 text-sm font-medium mb-4">Available Members</h3>
-              
-              {isLoading ? (
-                <div className="space-y-3">
-                  {Array.from({ length: 6 }).map((_, i) => (
-                    <div key={i} className="flex items-center gap-3 p-3">
-                      <Skeleton className="h-12 w-12 rounded-full" />
-                      <div className="flex-1">
-                        <Skeleton className="h-4 w-32 mb-1" />
-                        <Skeleton className="h-3 w-24" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  {filteredUsers.map((user) => (
+              <div className="space-y-2">
+                {filteredUsers.length > 0 ? (
+                  filteredUsers.map((user) => (
                     <div
                       key={user.id}
-                      className="flex items-center gap-3 p-3 hover:bg-gray-700 rounded-lg cursor-pointer transition-colors"
                       onClick={() => toggleMember(user)}
+                      className="flex items-center gap-3 p-3 hover:bg-gray-700 rounded-lg cursor-pointer transition-colors"
                     >
-                      <div className="w-12 h-12 rounded-full overflow-hidden flex-shrink-0">
-                        {user.image_url ? (
-                          <img
-                            src={user.image_url}
-                            alt={`${user.first_name} ${user.last_name}`}
-                            className="w-full h-full object-cover"
-                          />
-                        ) : (
-                          <DefaultAvatar size={48} />
-                        )}
+                      {/* Inline Avatar */}
+                      <div 
+                        className="relative flex-shrink-0 rounded-full overflow-hidden"
+                        style={{ width: 40, height: 40 }}
+                      >
+                        <img
+                          src={
+                            user.image_url ||
+                            "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
+                          }
+                          alt={`${user.first_name} ${user.last_name}`}
+                          className="w-full h-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 transition-colors duration-200"
+                        />
                       </div>
                       
                       <div className="flex-1 min-w-0">
@@ -331,15 +324,17 @@ const AddMembersModal = ({
                         </div>
                       </div>
                     </div>
-                  ))}
-                  
-                  {filteredUsers.length === 0 && (
-                    <div className="text-center py-8 text-gray-400">
-                      {searchQuery ? "No members found matching your search" : "No available members"}
-                    </div>
-                  )}
-                </div>
-              )}
+                  ))
+                ) : (
+                  <div className="text-center py-8 text-gray-400">
+                    {availableMembers.length === 0 
+                      ? "No members available" 
+                      : searchQuery 
+                        ? "No members found matching your search" 
+                        : "No available members"}
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Footer Buttons */}
@@ -354,7 +349,7 @@ const AddMembersModal = ({
               </Button>
               <Button
                 onClick={handleSubmit}
-                disabled={isLoading || isUpdating}
+                disabled={isUpdating}
                 className="flex-1 bg-blue-600 hover:bg-blue-700"
               >
                 {isUpdating ? "Updating..." : "Update"}
