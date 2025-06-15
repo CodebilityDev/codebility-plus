@@ -27,7 +27,7 @@ export const getPosts = async () => {
 };
 
 export type PostType = {
-  id: number;
+  id: string;
   created_at: string;
   title: string;
   content: string;
