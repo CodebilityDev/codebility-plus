@@ -79,7 +79,7 @@ export default function PostPage() {
 
   if (!post) {
     return (
-      <div className="mx-auto flex w-[50%] max-w-screen-lg flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-screen-lg flex-col gap-4">
         <Box className="mx-auto w-full rounded-lg bg-white p-8 shadow-xl dark:bg-gray-800">
           <Skeleton className="h-40 w-full rounded-lg" />
         </Box>
@@ -92,7 +92,7 @@ export default function PostPage() {
 
   return (
     <>
-      <div className="mx-auto flex w-[50%] max-w-screen-lg flex-col gap-4">
+      <div className="mx-auto flex w-full max-w-[50rem] flex-col gap-4">
         <Box className="mx-auto w-full rounded-lg bg-white p-8 shadow-xl dark:bg-gray-800">
           <div className="container mx-auto flex flex-col gap-4 px-4 py-6 sm:px-6 lg:px-8">
             <h1 className="text-3xl font-bold">{post.title}</h1>
