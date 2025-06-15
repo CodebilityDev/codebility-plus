@@ -65,6 +65,51 @@ export async function uploadImage(
   }
 }
 
+export async function uploadImageOther(
+  file: File,
+  options: UploadImageOptions = defaultOptions,
+) {
+  const supabase = await createClientServerComponent();
+  try {
+    const { bucket, folder} = options;
+
+    // Generate a cleaner file path
+    const fileExtension = file.name.split(".").pop() || "";
+    const fileName = `${Date.now()}.${fileExtension}`;
+    const filePath = `${folder}/${fileName}`; // Simpler path structure
+
+    const { error: uploadError } = await supabase.storage
+      .from(bucket!)
+      .upload(filePath, file, {
+        cacheControl: options.cacheControl || "3600",
+        upsert: options.upsert ?? true,
+      });
+
+    if (uploadError) throw uploadError;
+
+    const { data: publicUrlData } = supabase.storage
+      .from(bucket!)
+      .getPublicUrl(filePath);
+
+    if (!publicUrlData?.publicUrl) {
+      throw new Error("Failed to get public URL");
+    }
+
+    // Return only primitive values/plain objects
+    /* return {
+      filePath: filePath,
+      publicUrl: String(publicUrlData.publicUrl),
+    }; */
+
+
+    return publicUrlData.publicUrl.toString();
+
+  } catch (error) {
+    console.error("Image upload failed:", error);
+    throw error;
+  }
+}
+
 export async function deleteImage(
   filePath: string,
   bucket: string = "codebility",

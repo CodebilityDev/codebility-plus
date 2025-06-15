@@ -1,29 +1,43 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import DefaultPagination from "@/Components/ui/pagination";
+import { useFeedsStore } from "@/store/feeds-store"; // Adjust path as needed
 
 import Post from "./Post";
-import { samplePosts } from "./SampleData";
 
-export default function Feed({ isMentor }) {
+interface FeedProp {
+  isMentor: boolean;
+  onCreatePost?: () => void;
+}
+
+export default function Feed({ isMentor }: FeedProp) {
+  const posts = useFeedsStore((state) => state.posts);
+  const fetchPosts = useFeedsStore((state) => state.fetchPosts);
+
   const [currentPage, setCurrentPage] = useState(1);
-  const postsPerPage = 6;
 
-  const totalPages = Math.ceil(samplePosts.length / postsPerPage);
+  const postsPerPage = 6;
+  const totalPages = Math.ceil(posts.length / postsPerPage);
   const startIndex = (currentPage - 1) * postsPerPage;
-  const currentPosts = samplePosts.slice(startIndex, startIndex + postsPerPage);
+  const currentPosts = posts.slice(startIndex, startIndex + postsPerPage);
+
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
+
+  const handleDeletePost = (deletedPostId: string | number) => {
+    useFeedsStore.setState((state) => ({
+      posts: state.posts.filter((post) => post.id !== deletedPostId),
+    }));
+  };
 
   const handleNextPage = () => {
-    if (currentPage < totalPages) {
-      setCurrentPage((prev) => prev + 1);
-    }
+    if (currentPage < totalPages) setCurrentPage((p) => p + 1);
   };
 
   const handlePreviousPage = () => {
-    if (currentPage > 1) {
-      setCurrentPage((prev) => prev - 1);
-    }
+    if (currentPage > 1) setCurrentPage((p) => p - 1);
   };
 
   return (
@@ -32,14 +46,9 @@ export default function Feed({ isMentor }) {
         {currentPosts.map((post) => (
           <Post
             key={post.id}
-            user={post.user}
-            userImage={post.userImage}
-            content={post.content}
-            timestamp={post.timestamp}
-            image={post.image}
-            reactions={post.reactions}
-            postUrl={post.postUrl}
+            post={post}
             isMentor={isMentor}
+            onDelete={handleDeletePost}
           />
         ))}
       </div>
