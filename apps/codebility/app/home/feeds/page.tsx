@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CreateFeedModal from "@/Components/modals/CreatePostModal";
+import CreatePostModal from "@/Components/modals/CreatePostModal";
 import { Button } from "@/Components/ui/button";
 import { useUserStore } from "@/store/codev-store";
 
@@ -13,17 +13,17 @@ export default function FeedsPage() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useUserStore();
 
-  // useEffect(() => {
-  //   const fetchRole = async () => {
-  //     if (!user) return;
-  //     const role = await getUserRole(user.role_id ?? null);
-  //     setIsMentor(role === "Mentor");
-  //   };
+  useEffect(() => {
+    const fetchRole = async () => {
+      if (!user) return;
+      const role = await getUserRole(user.role_id ?? null);
+      setIsMentor(role === "Mentor" || role === "Admin");
+    };
 
-  //   if (user) {
-  //     fetchRole();
-  //   }
-  // }, [user]);
+    if (user) {
+      fetchRole();
+    }
+  }, [user]);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -45,7 +45,7 @@ export default function FeedsPage() {
         <Feed isMentor={isMentor} />
       </div>
 
-      <CreateFeedModal isOpen={isModalOpen} onClose={closeModal} />
+      <CreatePostModal isOpen={isModalOpen} onClose={closeModal} />
     </>
   );
 }

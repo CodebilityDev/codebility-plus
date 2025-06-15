@@ -90,3 +90,50 @@ export const deletePost = async (post_id: number) => {
     throw error;
   }
 };
+
+export const editPost = async (
+  id: number,
+  title?: string,
+  content?: string,
+  image_url?: string,
+  author_id?: number,
+) => {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { data: post, error } = await supabase
+      .from("posts")
+      .select("image_url")
+      .eq("id", id)
+      .single();
+
+    if (error) throw error;
+
+    const updates: Record<string, any> = {};
+    if (title !== undefined) updates.title = title;
+    if (content !== undefined) updates.content = content;
+    if (author_id !== undefined) updates.author_id = author_id;
+    if (image_url !== undefined) updates.image_url = image_url;
+
+    const { data: updatedPost, error: editError } = await supabase
+      .from("posts")
+      .update(updates)
+      .eq("id", id)
+      .select();
+
+    if (editError) throw editError;
+
+    // Delete previous image from bucket
+    if (image_url) {
+      const imagePath = await getImagePath(post.image_url);
+
+    deleteImage(imagePath!);
+
+    }
+
+    return updatedPost;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
