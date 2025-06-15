@@ -44,13 +44,10 @@ const EditPostForm = ({
       let image_url;
 
       if (imageFile) {
-        console.log("Image file: ", imageFile);
-        console.log("uploading inmage ...");
         image_url = await uploadImageOther(imageFile, {
           bucket: "codebility",
           folder: "postImage",
         });
-        console.log("Image url: ", image_url);
       }
 
       const newPost = await editPost(post.id, title, content, image_url!);
