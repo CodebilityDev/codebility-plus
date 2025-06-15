@@ -13,7 +13,7 @@ interface CreatePostModalProps {
   onClose: () => void;
 }
 
-const CreateFeedModal: React.FC<CreatePostModalProps> = ({
+const CreatePostModal: React.FC<CreatePostModalProps> = ({
   isOpen,
   onClose,
 }) => {
@@ -34,4 +34,4 @@ const CreateFeedModal: React.FC<CreatePostModalProps> = ({
   );
 };
 
-export default CreateFeedModal;
+export default CreatePostModal;

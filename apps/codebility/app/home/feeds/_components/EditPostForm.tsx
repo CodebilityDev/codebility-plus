@@ -8,19 +8,25 @@ import toast from "react-hot-toast";
 
 import { Textarea } from "@codevs/ui/textarea";
 
-import { addPost } from "../_services/action";
+import { addPost, editPost } from "../_services/action";
+import { PostType } from "../_services/query";
 
-const CreatePostForm = ({
+const EditPostForm = ({
+  post,
   className,
   onSuccess,
+  onPostUpdated,
 }: {
+  post: PostType;
   className?: string;
   onSuccess?: () => void;
+  onPostUpdated: () => void;
 }) => {
   const [image, setImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fetchPosts = useFeedsStore((state) => state.fetchPosts);
   const { user } = useUserStore();
+  const [title, setTitle] = useState(post.title);
+  const [content, setContent] = useState(post.content);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -38,29 +44,32 @@ const CreatePostForm = ({
       let image_url;
 
       if (imageFile) {
+        console.log("Image file: ", imageFile);
+        console.log("uploading inmage ...");
         image_url = await uploadImageOther(imageFile, {
           bucket: "codebility",
           folder: "postImage",
         });
+        console.log("Image url: ", image_url);
       }
 
-      const newPost = await addPost(title, content, user?.id, image_url!);
-
-      // Refresh Posts
-      await fetchPosts();
+      const newPost = await editPost(post.id, title, content, image_url!);
 
       // Notify
-      toast.success("Post created successfully!");
+      toast.success("Post edited successfully!");
 
       // Close modal on success
       if (onSuccess) onSuccess();
+
+      //Refresh post
+      onPostUpdated();
 
       // Reset form
       form.reset();
       setImage(null);
     } catch (error) {
-      console.error("Error creating post:", error);
-      toast.error("Failed to create post.");
+      console.error("Error editing post:", error);
+      toast.error("Failed to edit post.");
     } finally {
       setIsSubmitting(false);
     }
@@ -76,12 +85,17 @@ const CreatePostForm = ({
         placeholder="Enter title"
         required
         className="w-full"
+        value={title}
+        onChange={(e) => setTitle(e.target.value)}
       />
+
       <Textarea
         name="content"
         placeholder="Enter content"
         required
         className="h-[600px] w-full"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
       />
       {/* Optional image input */}
 
@@ -98,10 +112,10 @@ const CreatePostForm = ({
       />
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
-        {isSubmitting ? "Creating..." : "Create Post"}
+        {isSubmitting ? "Editing..." : "Edit Post"}
       </Button>
     </form>
   );
 };
 
-export default CreatePostForm;
+export default EditPostForm;
