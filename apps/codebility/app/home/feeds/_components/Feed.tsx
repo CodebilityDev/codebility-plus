@@ -44,7 +44,12 @@ export default function Feed({ isMentor }: FeedProp) {
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {currentPosts.map((post) => (
-          <Post post={post} isMentor={isMentor} onDelete={handleDeletePost} />
+          <Post
+            key={post.id}
+            post={post}
+            isMentor={isMentor}
+            onDelete={handleDeletePost}
+          />
         ))}
       </div>
       <DefaultPagination
