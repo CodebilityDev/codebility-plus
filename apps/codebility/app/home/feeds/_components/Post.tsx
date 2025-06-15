@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 
 import { deletePost } from "../_services/action";
 import { PostType } from "../_services/query";
+import PostUpvote from "./PostUpvote";
 
 interface PostProps {
   post: PostType;
@@ -92,13 +93,7 @@ export default function Post({ post, isMentor, onDelete }: PostProps) {
         </div>
 
         <div className="mx-4 mt-4 flex items-center space-x-4 text-gray-600 dark:text-gray-400">
-          <button
-            className="flex items-center space-x-1 hover:text-blue-500 dark:hover:text-blue-400"
-            onClick={handleUpvote}
-          >
-            <ArrowBigUp />
-            <span>{post.upvoters_id ? post.upvoters_id.length : 0}</span>
-          </button>
+          <PostUpvote post={post} />
         </div>
       </Box>
     </Link>
