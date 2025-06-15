@@ -58,7 +58,7 @@ export const addPost = async ( title, content, author_id?, image_url?) => {
   }
 };
 
-export const deletePost = async (post_id: number) => {
+export const deletePost = async (post_id: string) => {
   try {
     const supabase = await createClientServerComponent();
 
@@ -92,7 +92,7 @@ export const deletePost = async (post_id: number) => {
 };
 
 export const editPost = async (
-  id: number,
+  id: string,
   title?: string,
   content?: string,
   image_url?: string,
@@ -137,3 +137,101 @@ export const editPost = async (
     throw error;
   }
 };
+
+export const AddPostUpvote = async (postId: string, userId: string) => {
+  try {
+    const supabase = await createClientServerComponent();
+
+    // Fetch current upvoters_id array
+    const { data: post, error: fetchError } = await supabase
+      .from("posts")
+      .select("upvoters_id")
+      .eq("id", postId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    const currentUpvoters = post.upvoters_id || [];
+
+    // Avoid duplicate upvotes
+    if (currentUpvoters.includes(userId)) {
+      return { message: "User has already upvoted this post." };
+    }
+
+    const updatedUpvoters = [...currentUpvoters, userId];
+
+    // Update the post with new upvoter
+    const { data: updatedPost, error: updateError } = await supabase
+      .from("posts")
+      .update({ upvoters_id: updatedUpvoters })
+      .eq("id", postId)
+      .select();
+
+    if (updateError) throw updateError;
+
+    return updatedPost;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const removePostUpvote = async (postId: string, userId: string) => {
+  try {
+    const supabase = await createClientServerComponent();
+
+    // Fetch current upvoters_id array
+    const { data: post, error: fetchError } = await supabase
+      .from("posts")
+      .select("upvoters_id")
+      .eq("id", postId)
+      .single();
+
+    if (fetchError) throw fetchError;
+
+    const currentUpvoters = post.upvoters_id || [];
+
+    // If user hasn't upvoted, nothing to remove
+    if (!currentUpvoters.includes(userId)) {
+      return { message: "User hasn't upvoted this post." };
+    }
+
+    const updatedUpvoters = currentUpvoters.filter(id => id !== userId);
+
+    // Update the post with new upvoter array
+    const { data: updatedPost, error: updateError } = await supabase
+      .from("posts")
+      .update({ upvoters_id: updatedUpvoters })
+      .eq("id", postId)
+      .select();
+
+    if (updateError) throw updateError;
+
+    return updatedPost;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const hasUserUpvoted = async (postId: string, userId: string): Promise<boolean> => {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { data: post, error } = await supabase
+      .from("posts")
+      .select("upvoters_id")
+      .eq("id", postId)
+      .single();
+
+    if (error) throw error;
+
+    const upvoters: string[] = post.upvoters_id || [];
+
+    return upvoters.includes(userId);
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
