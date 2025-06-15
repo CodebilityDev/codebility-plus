@@ -6,12 +6,14 @@ import { useParams } from "next/navigation";
 import EditPostModal from "@/Components/modals/EditPostModal";
 import { Box } from "@/Components/shared/dashboard";
 import { Button } from "@/Components/ui/button";
+import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { format } from "date-fns";
 
 import type { PostType } from "../_services/query";
+import PostUpvote from "../_components/PostUpvote";
 import { getUserRole } from "../_services/action";
 
 export default function PostPage() {
@@ -76,7 +78,13 @@ export default function PostPage() {
   }
 
   if (!post) {
-    return <div className="p-4 text-gray-500">Loading...</div>;
+    return (
+      <div className="mx-auto flex w-[50%] max-w-screen-lg flex-col gap-4">
+        <Box className="mx-auto w-full rounded-lg bg-white p-8 shadow-xl dark:bg-gray-800">
+          <Skeleton className="h-40 w-full rounded-lg" />
+        </Box>
+      </div>
+    );
   }
 
   const openModal = () => setIsModalOpen(true);
@@ -107,6 +115,8 @@ export default function PostPage() {
                 {format(new Date(post.created_at), "MMM d, yyyy")}
               </p>
             </div>
+
+            <PostUpvote post={post} />
 
             <img
               src={post.image_url || "/assets/images/bg-certificate.png"}
