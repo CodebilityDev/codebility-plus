@@ -37,108 +37,109 @@ const OnboardingPage = () => {
 
   return (
     <div className="h-screen w-full">
-      <div className="absolute bottom-0 left-0 z-20 w-full p-4">
-        <div className="w-full px-8 py-4">
+      {/* Mobile responsive stepper container */}
+      <div className="absolute bottom-0 left-0 z-20 w-full p-2 sm:p-4">
+        <div className="w-full px-2 py-2 sm:px-8 sm:py-4">
           <Stepper
             activeStep={activeStep}
             isLastStep={(value) => setIsLastStep(value)}
             isFirstStep={(value) => setIsFirstStep(value)}
-            lineClassName="bg-white/30 h-[0.009rem] opacity-40 "
+            lineClassName="bg-white/30 h-[0.009rem] opacity-40"
             activeLineClassName="bg-white opacity-30"
             placeholder={undefined}
             onPointerEnterCapture={() => {}}
             onPointerLeaveCapture={() => {}}
-            onResize={() => {}} // Add this line
-            onResizeCapture={() => {}} // Add this line
+            onResize={() => {}}
+            onResizeCapture={() => {}}
           >
             <Step
               onClick={() => handleStepClick(0)}
-              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white ${0 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
+              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white text-xs sm:text-sm md:text-base h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex items-center justify-center ${0 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
               activeClassName="bg-white text-black hover:text-white"
               completedClassName="bg-white text-black hover:text-white"
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
-              onResize={() => {}} // Add this line
-              onResizeCapture={() => {}} // Add this line
+              onResize={() => {}}
+              onResizeCapture={() => {}}
             >
               1
             </Step>
             <Step
               onClick={() => handleStepClick(1)}
-              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white ${1 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
+              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white text-xs sm:text-sm md:text-base h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex items-center justify-center ${1 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
               activeClassName="bg-white text-black hover:text-white"
               completedClassName="bg-white text-black hover:text-white"
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
-              onResize={() => {}} // Add this line
-              onResizeCapture={() => {}} // Add this line
+              onResize={() => {}}
+              onResizeCapture={() => {}}
             >
               2
             </Step>
             <Step
               onClick={() => handleStepClick(2)}
-              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white ${2 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
+              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white text-xs sm:text-sm md:text-base h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex items-center justify-center ${2 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
               activeClassName="bg-white text-black hover:text-white"
               completedClassName="bg-white text-black hover:text-white"
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
-              onResize={() => {}} // Add this line
-              onResizeCapture={() => {}} // Add this line
+              onResize={() => {}}
+              onResizeCapture={() => {}}
             >
               3
             </Step>
             <Step
               onClick={() => handleStepClick(3)}
-              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white ${3 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
+              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white text-xs sm:text-sm md:text-base h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex items-center justify-center ${3 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
               activeClassName="bg-white text-black hover:text-white"
               completedClassName="bg-white text-black hover:text-white"
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
-              onResize={() => {}} // Add this line
-              onResizeCapture={() => {}} // Add this line
+              onResize={() => {}}
+              onResizeCapture={() => {}}
             >
               4
             </Step>
             <Step
               onClick={() => handleStepClick(4)}
-              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white ${4 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
+              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white text-xs sm:text-sm md:text-base h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex items-center justify-center ${4 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
               activeClassName="bg-white text-black hover:text-white"
               completedClassName="bg-white text-black hover:text-white"
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
-              onResize={() => {}} // Add this line
-              onResizeCapture={() => {}} // Add this line
+              onResize={() => {}}
+              onResizeCapture={() => {}}
             >
               5
             </Step>
             <Step
               onClick={() => handleStepClick(5)}
-              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white ${5 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
+              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white text-xs sm:text-sm md:text-base h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex items-center justify-center ${5 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
               activeClassName="bg-white text-black hover:text-white"
               completedClassName="bg-white text-black hover:text-white"
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
-              onResize={() => {}} // Add this line
-              onResizeCapture={() => {}} // Add this line
+              onResize={() => {}}
+              onResizeCapture={() => {}}
             >
               6
             </Step>
             <Step
               onClick={() => handleStepClick(6)}
-              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white ${6 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
+              className={`relative z-10 border border-white/30 bg-[#130a3d] text-white text-xs sm:text-sm md:text-base h-6 w-6 sm:h-8 sm:w-8 md:h-10 md:w-10 flex items-center justify-center ${6 <= highestStep + 1 ? "cursor-pointer hover:bg-[#1e1252]" : "cursor-not-allowed"}`}
               activeClassName="bg-white text-black hover:text-white"
               completedClassName="bg-white text-black hover:text-white"
               placeholder={undefined}
               onPointerEnterCapture={() => {}}
               onPointerLeaveCapture={() => {}}
-              onResize={() => {}} // Add this line
-              onResizeCapture={() => {}} // Add this line
+              onResize={() => {}}
+              onResizeCapture={() => {}}
             >
               7
             </Step>
