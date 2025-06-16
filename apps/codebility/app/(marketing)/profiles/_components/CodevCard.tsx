@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import CodevBadge from "@/Components/CodevBadge"
@@ -61,16 +61,28 @@ const CodevCard = ({ codev, color }: Props) => {
   const internalStatus = codev.internal_status || "MENTOR"
   const statusConfig = STATUS_CONFIG[internalStatus as InternalStatus] || STATUS_CONFIG.MENTOR
 
-  const filteredLevel = codev.level && codev.codev_points
+  const filteredLevel = useMemo(() => {
+  return codev.level && codev.codev_points && Array.isArray(codev.codev_points)
     ? Object.fromEntries(
-        Object.entries(codev.level).filter(([skillCategoryId, levelValue]) => {
-          return (
-            levelValue > 0 &&
-            codev.codev_points!.some((point) => point.skill_category_id === skillCategoryId)
-          );
-        })
+        Object.entries(codev.level)
+          .filter(([skillCategoryId, levelValue]) => {
+            return (
+              levelValue > 0 &&
+              codev.codev_points!.some((point) => point?.skill_category_id === skillCategoryId)
+            );
+          })
+          .sort(([skillCategoryIdA], [skillCategoryIdB]) => {
+            const pointsA = codev.codev_points!.find(
+              (point) => point?.skill_category_id === skillCategoryIdA
+            )?.points || 0;
+            const pointsB = codev.codev_points!.find(
+              (point) => point?.skill_category_id === skillCategoryIdB
+            )?.points || 0;
+            return pointsB - pointsA;
+          })
       )
     : {};
+}, [codev.level, codev.codev_points]);
 
   return (
     <div
