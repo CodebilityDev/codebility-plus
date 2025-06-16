@@ -24,43 +24,43 @@ const Onboarding5: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
         {/* Optional grid overlay */}
         <div className="absolute inset-0 z-[1] bg-[url('https://codebility-cdn.pages.dev/assets/images/index/hero-grid.png')] bg-repeat opacity-70"></div>
 
-        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 text-white mb-20">
-          <h1 className="mb-8 text-3xl font-bold md:mb-10 md:text-4xl lg:mb-12 lg:text-5xl">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center px-4 sm:px-6 md:px-8 text-white pb-20">
+          <h1 className="mb-6 sm:mb-8 md:mb-10 lg:mb-12 text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-center">
             What are the <span className="text-white">BENEFITS</span>?
           </h1>
 
           <div className="mx-auto max-w-5xl">
-            <ul className="space-y-3 text-left md:space-y-4 lg:space-y-5">
-              <li className="flex items-start  ">
-                <span className="mr-2 text-3xl text-white">•</span>
-                <span className="text-sm md:text-base lg:text-4xl">
+            <ul className="space-y-3 sm:space-y-4 md:space-y-5 text-left">
+              <li className="flex items-start">
+                <span className="mr-2 sm:mr-3 text-xl sm:text-2xl md:text-3xl text-white flex-shrink-0">•</span>
+                <span className="text-xs sm:text-sm md:text-base lg:text-xl xl:text-4xl">
                   Gain hands-on, practical experience by working on real
                   projects.
                 </span>
               </li>
-              <li className="flex items-start ">
-                <span className="mr-2 text-3xl text-white">•</span>
-                <span className="text-sm md:text-base lg:text-4xl">
+              <li className="flex items-start">
+                <span className="mr-2 sm:mr-3 text-xl sm:text-2xl md:text-3xl text-white flex-shrink-0">•</span>
+                <span className="text-xs sm:text-sm md:text-base lg:text-xl xl:text-4xl">
                   Collaborate with like-minded individuals and industry
                   professionals.
                 </span>
               </li>
-              <li className="flex items-start ">
-                <span className="mr-2 text-3xl text-white">•</span>
-                <span className="text-sm md:text-base lg:text-4xl">
+              <li className="flex items-start">
+                <span className="mr-2 sm:mr-3 text-xl sm:text-2xl md:text-3xl text-white flex-shrink-0">•</span>
+                <span className="text-xs sm:text-sm md:text-base lg:text-xl xl:text-4xl">
                   Expand your network and connect with mentors and peers.
                 </span>
               </li>
-              <li className="flex items-start ">
-                <span className="mr-2 text-3xl text-white">•</span>
-                <span className="text-sm md:text-base lg:text-4xl">
+              <li className="flex items-start">
+                <span className="mr-2 sm:mr-3 text-xl sm:text-2xl md:text-3xl text-white flex-shrink-0">•</span>
+                <span className="text-xs sm:text-sm md:text-base lg:text-xl xl:text-4xl">
                   Build and refine your personal portfolio to showcase your
                   skills.
                 </span>
               </li>
-              <li className="flex items-start ">
-                <span className="mr-2 text-3xl text-white">•</span>
-                <span className="text-sm md:text-base lg:text-4xl">
+              <li className="flex items-start">
+                <span className="mr-2 sm:mr-3 text-xl sm:text-2xl md:text-3xl text-white flex-shrink-0">•</span>
+                <span className="text-xs sm:text-sm md:text-base lg:text-xl xl:text-4xl">
                   Develop marketable skills that can help you land a job or
                   secure clients in the future.
                 </span>
@@ -68,8 +68,7 @@ const Onboarding5: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
             </ul>
           </div>
 
-        </div>
-          <div className="absolute bottom-20 right-[34%] w-1/3 translate-x-2/4 translate-y-1/4 transform opacity-80 mb-12">
+          <div className="hidden sm:block absolute bottom-20 right-[34%] w-1/4 sm:w-1/3 translate-x-2/4 translate-y-1/4 transform opacity-80 mb-12">
             <Image
               src="/assets/images/onboarding/envelop.png"
               alt="Purple folder"
@@ -77,6 +76,7 @@ const Onboarding5: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
               width={700}
             />
           </div>
+        </div>
       </div>
     </>
   );

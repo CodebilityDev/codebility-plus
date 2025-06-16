@@ -7,6 +7,7 @@ import { prioritizeCodevs } from "@/utils/codev-priority"; // Import the utility
 import Section from "../codevs/_components/CodevsSection";
 import CodevContainer from "./_components/CodevContainer";
 import CodevList from "./_components/CodevList";
+import { CodevHireCodevModal } from "./_components/CodevHireCodevModal";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -26,17 +27,20 @@ export default async function Profiles() {
   const sortedCodevs = prioritizeCodevs(codevsArray, true);
 
   return (
-    <Section
-      id="codevs"
-      className="from-black-500 relative w-full bg-gradient-to-b"
-    >
-      <div className="bg-code-pattern absolute inset-0 bg-repeat opacity-5"></div>
-      <div className="relative flex flex-col gap-8">
-        <CodevContainer />
-        <Suspense fallback={<UsersSkeleton />}>
-          <CodevList codevs={sortedCodevs} />
-        </Suspense>
-      </div>
-    </Section>
+    <>
+      <Section
+        id="codevs"
+        className="from-black-500 relative w-full bg-gradient-to-b"
+      >
+        <div className="bg-code-pattern absolute inset-0 bg-repeat opacity-5"></div>
+        <div className="relative flex flex-col gap-8">
+          <CodevContainer />
+          <Suspense fallback={<UsersSkeleton />}>
+            <CodevList codevs={sortedCodevs} />
+          </Suspense>
+        </div>
+      </Section>
+      <CodevHireCodevModal />
+    </>
   );
 }
