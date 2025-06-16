@@ -66,6 +66,7 @@ const TaskViewModal = ({
   const user = useUserStore((state) => state.user);
   const canModifyTask =
     user?.role_id === 1 || user?.role_id === 5 || user?.role_id === 4;
+  const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5
   const [prLink, setPrLink] = useState(task?.pr_link || "");
 
   //  handle PR link update
@@ -519,7 +520,7 @@ const TaskViewModal = ({
             >
               Close
             </Button>
-            {canModifyTask && task?.pr_link && (
+            {canMarkAsDone && task?.pr_link && (
               <Button
                 variant="default"
                 onClick={handleMarkAsDone}

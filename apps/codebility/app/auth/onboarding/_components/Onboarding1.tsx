@@ -26,13 +26,13 @@ const Onboarding1: React.FC<Onboarding1Props> = ({ className, onNext }) => {
         {/* Optional grid overlay */}
         <div className="absolute inset-0 z-[1] bg-[url('https://codebility-cdn.pages.dev/assets/images/index/hero-grid.png')] bg-repeat opacity-70"></div>
 
-        <div className="mb-30 absolute inset-0 z-10 flex flex-col items-center justify-center text-white">
+        <div className="absolute inset-0 z-10 flex flex-col items-center justify-center text-white px-4 sm:px-6 md:px-8">
           <motion.h1
             initial="hidden"
             animate="visible"
             variants={backgroundFade}
             transition={timing.background}
-            className="mb-6 text-4xl font-thin"
+            className="mb-4 sm:mb-6 text-xl sm:text-2xl md:text-4xl font-thin text-center"
           >
             Welcome To
           </motion.h1>
@@ -41,7 +41,7 @@ const Onboarding1: React.FC<Onboarding1Props> = ({ className, onNext }) => {
             animate="visible"
             variants={backgroundFade}
             transition={timing.background}
-            className="mb-6 text-9xl font-bold"
+            className="mb-6 text-4xl sm:text-6xl md:text-7xl lg:text-9xl font-bold text-center"
           >
             CODEBILITY
           </motion.h1>
