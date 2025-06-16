@@ -21,7 +21,7 @@ export function CodevHireCodevButton({
 				variant="purple"
 				size="sm"
 				className={cn(
-          "py-0.5 px-3 text-sm rounded-md hover:bg-purple-600 transition-opacity duration-200",
+          "h-[1.75rem] py-0.5 px-3 text-xs rounded-md hover:bg-purple-600 transition-opacity duration-200",
           hovered ? "opacity-100" : "opacity-0",
         )}
 				onClick={() => onOpen("marketingCodevHireCodevModal", codevId)}
