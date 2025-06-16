@@ -12,6 +12,7 @@ import { cn } from "@codevs/ui"
 import { BookOpenIcon } from "lucide-react"
 import { Button } from "@codevs/ui/button"
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip"
+import { CodevHireCodevButton } from "./CodevHireCodevButton"
 
 interface Props {
   codev: Codev
@@ -160,18 +161,7 @@ const CodevCard = ({ codev, color }: Props) => {
             <CodevBadge level={codev.level} className="transition-transform group-hover:scale-100" />
           ) : null}
         </div>
-        <div>
-          <Button
-            variant="purple"
-            size="sm"
-            className={cn(
-              "py-0.5 px-3 text-sm rounded-md hover:bg-purple-600 transition-opacity duration-200",
-              hovered ? "opacity-100" : "opacity-0",
-            )}
-          >
-            Hire Me
-          </Button>
-        </div>
+        <CodevHireCodevButton codevId={codev.id} hovered={hovered} />
       </div>
     </div>
   )
