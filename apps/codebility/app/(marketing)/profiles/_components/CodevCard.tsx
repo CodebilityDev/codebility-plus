@@ -61,9 +61,7 @@ const CodevCard = ({ codev, color }: Props) => {
   const statusConfig = STATUS_CONFIG[internalStatus as InternalStatus] || STATUS_CONFIG.MENTOR
 
   return (
-    <Link
-      href={`/profiles/${codev.id}`}
-      target="_blank"
+    <div
       className="h-64"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
@@ -131,9 +129,14 @@ const CodevCard = ({ codev, color }: Props) => {
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  <Button variant="outline" size="icon" className="h-8 w-8 rounded-full bg-black-500">
-                    <BookOpenIcon className="h-3.5 w-3.5" />
-                  </Button>
+                  <Link 
+                    href={`/profiles/${codev.id}`}
+                    target="_blank"
+                  >
+                    <Button variant="outline" size="icon" className="h-8 w-8 rounded-full bg-black-500">
+                      <BookOpenIcon className="h-3.5 w-3.5" />
+                    </Button>
+                  </Link>
                 </TooltipTrigger>
                 <TooltipContent className="bg-slate-700 text-xs px-2 py-1">Read Bio</TooltipContent>
               </Tooltip>
@@ -170,7 +173,7 @@ const CodevCard = ({ codev, color }: Props) => {
           </Button>
         </div>
       </div>
-    </Link>
+    </div>
   )
 }
 
