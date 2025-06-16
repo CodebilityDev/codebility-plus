@@ -68,10 +68,10 @@ const CodevCard = ({ codev, color }: Props) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="bg-black-500 flex h-full w-full flex-col items-center rounded-lg p-4 shadow-2xl hover:bg-black-800">
+      <div className="bg-black-500 flex h-full w-full flex-col items-center justify-between rounded-lg p-4 shadow-2xl hover:bg-black-800">
         <div className="w-full grid grid-cols-4 gap-2">
           <div className="col-span-1" />
-          <div className="col-span-2 relative flex justify-center lg:py-2">
+          <div className="col-span-2 relative flex justify-center">
             <Image
               alt={`${codev.first_name} Avatar`}
               src={
@@ -140,7 +140,7 @@ const CodevCard = ({ codev, color }: Props) => {
             </TooltipProvider>
           </div>
         </div>
-        <div className="flex flex-col items-center gap-1 mt-4">
+        <div className="flex flex-col items-center gap-0.5">
           <div className="flex flex-col gap-1 text-center">
             <p className="md:text-md text-sm capitalize text-white lg:text-base">
               {codev.first_name} {codev.last_name}
@@ -152,17 +152,17 @@ const CodevCard = ({ codev, color }: Props) => {
             )}
           </div>
         </div>
-        <div className="flex min-h-[20px] items-center justify-center mt-2">
+        <div className="flex min-h-[20px] items-center justify-center">
           {codev.level && Object.keys(codev.level).length > 0 ? (
             <CodevBadge level={codev.level} className="transition-transform group-hover:scale-100" />
           ) : null}
         </div>
-        <div className="mt-3">
+        <div>
           <Button
             variant="purple"
             size="sm"
             className={cn(
-              "py-0.5 px-3 text-xs rounded-md hover:bg-purple-600 transition-opacity duration-200",
+              "py-0.5 px-3 text-sm rounded-md hover:bg-purple-600 transition-opacity duration-200",
               hovered ? "opacity-100" : "opacity-0",
             )}
           >
