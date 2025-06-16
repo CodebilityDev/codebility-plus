@@ -23,17 +23,17 @@ const Onboarding4: React.FC<Onboarding1Props> = ({ className, onNext, onPrev }) 
       {/* Optional grid overlay */}
       <div className="absolute inset-0 z-[1] bg-[url('https://codebility-cdn.pages.dev/assets/images/index/hero-grid.png')] bg-repeat opacity-70"></div>
       
-      <div className="absolute inset-0 z-10 flex flex-col items-end justify-center text-white px-16 md:px-24 lg:px-32">
-        <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold mb-10 self-end">VISION</h1>
+      <div className="absolute inset-0 z-10 flex flex-col items-end justify-center text-white px-4 sm:px-8 md:px-16 lg:px-24 xl:px-32 pb-20">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-bold mb-6 sm:mb-8 md:mb-10 text-right">VISION</h1>
         
-        <div className="max-w-5xl text-right mb-20">
-          <div className="flex flex-col space-y-4 text-xl md:text-2xl lg:text-5xl leading-relaxed text-justify">
+        <div className="max-w-5xl text-right mb-10 sm:mb-15 md:mb-20 z-20 pl-4 sm:pl-8 md:pl-0">
+          <div className="flex flex-col space-y-4 text-sm sm:text-base md:text-xl lg:text-2xl xl:text-5xl leading-6 sm:leading-7 md:leading-8 lg:leading-relaxed text-justify sm:text-right">
             <p>Our goal is to become a leading tech community that nurtures top-tier developers.
             We aim to equip them with real-world experience and industry-relevant skills to succeed in the tech industry.</p>
           </div>
         </div>
         
-        <div className="z-[-12] absolute ml-[-10%] left-0 top-1/2 transform -translate-y-1/2 w-1/3 md:w-2/5 lg:w-3/3 opacity-90">
+        <div className="hidden sm:block z-[-12] absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-[10%] w-1/4 sm:w-1/3 md:w-2/5 lg:w-3/3 opacity-90">
           <Image
             src="/assets/images/onboarding/gear.png" 
             alt="Gear" 
