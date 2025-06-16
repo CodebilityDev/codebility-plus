@@ -22,22 +22,22 @@ const Onboarding7: React.FC<Onboarding1Props> = ({ className, onPrev }) => {
       {/* Optional grid overlay */}
       <div className="absolute inset-0 z-[1] bg-[url('https://codebility-cdn.pages.dev/assets/images/index/hero-grid.png')] bg-repeat opacity-70"></div>
       
-      <div className="mb-20 absolute inset-0 z-10 flex flex-col items-end justify-center text-white text-end">
-        <h1 className="text-5xl  md:text-6xl lg:text-8xl font-medium mb-40 mr-20 text-end">Ready to start your journey?</h1>
+      <div className="absolute inset-0 z-10 flex flex-col items-center sm:items-end justify-center text-white text-center sm:text-end px-4 sm:px-8 md:px-12 lg:px-20 pb-20 sm:pb-20">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl 2xl:text-8xl font-medium mb-8 sm:mb-20 md:mb-30 lg:mb-40 text-center sm:text-right">Ready to start your journey?</h1>
         
-        <div className="flex flex-col items-end justify-center max-w-2xl text-end mr-20">
-          <h2 className="text-3xl md:text-4xl lg:text-7xl font-medium mb-6 text-center leading-8">
+        <div className="flex flex-col items-center sm:items-end justify-center max-w-2xl text-center sm:text-end">
+          <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl 2xl:text-7xl font-medium mb-6 leading-6 sm:leading-7 md:leading-8">
             <span className='font-extrabold'>Join Codebility</span> and take the next step in your tech career!
           </h2>
           
-          <Link href="/auth/sign-up" className="mt-8 mx-auto">
-            <button className="bg-[#00904b] hover:bg-green text-white font-bold py-2 px-10 rounded-xl text-3xl transition-all duration-300">
+          <Link href="/auth/sign-up" className="mt-6 sm:mt-8">
+            <button className="bg-[#00904b] hover:bg-green text-white font-bold py-2 sm:py-3 px-6 sm:px-8 md:px-10 rounded-xl text-lg sm:text-xl md:text-2xl lg:text-3xl transition-all duration-300">
               Apply Now
             </button>
           </Link>
         </div>
         
-        <div className="z-[-12] absolute mt-28 left-0 ml-[-30px] top-1/2 transform -translate-y-1/2 rotate-[120deg] w-1/3 md:w-1/4 lg:w-[800px]">
+        <div className="hidden sm:block z-[-12] absolute left-0 ml-[-30px] top-1/2 transform -translate-y-1/2 rotate-[120deg] w-1/4 sm:w-1/3 md:w-1/4 lg:w-[800px]">
           <Image 
             src="/assets/images/onboarding/key.png" 
             alt="Key" 

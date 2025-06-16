@@ -109,11 +109,7 @@ export default function ClientCards({ clients }: Props) {
                 key={client.id}
                 /* If inactive, gray out or slightly dim the card */
                 className={`relative flex flex-col overflow-hidden rounded-lg border border-zinc-200 transition-colors dark:border-zinc-700
-                  ${
-                    isActive
-                      ? "dark:bg-dark-100 bg-white"
-                      : "bg-gray-50 opacity-90 dark:bg-gray-800"
-                  }
+                  ${isActive ? "dark:bg-dark-100 bg-white" : "dark:bg-dark-100 bg-white opacity-50 "}
                 `}
               >
                 {/* Top-right button toggles status */}
