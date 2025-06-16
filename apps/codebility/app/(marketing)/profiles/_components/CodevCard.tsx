@@ -61,6 +61,17 @@ const CodevCard = ({ codev, color }: Props) => {
   const internalStatus = codev.internal_status || "MENTOR"
   const statusConfig = STATUS_CONFIG[internalStatus as InternalStatus] || STATUS_CONFIG.MENTOR
 
+  const filteredLevel = codev.level && codev.codev_points
+    ? Object.fromEntries(
+        Object.entries(codev.level).filter(([skillCategoryId, levelValue]) => {
+          return (
+            levelValue > 0 &&
+            codev.codev_points!.some((point) => point.skill_category_id === skillCategoryId)
+          );
+        })
+      )
+    : {};
+
   return (
     <div
       className="h-64"
@@ -157,8 +168,8 @@ const CodevCard = ({ codev, color }: Props) => {
           </div>
         </div>
         <div className="flex min-h-[20px] items-center justify-center">
-          {codev.level && Object.keys(codev.level).length > 0 ? (
-            <CodevBadge level={codev.level} className="transition-transform group-hover:scale-100" />
+          {filteredLevel && Object.keys(filteredLevel).length > 0 ? (
+            <CodevBadge level={filteredLevel} className="transition-transform group-hover:scale-100" />
           ) : null}
         </div>
         <CodevHireCodevButton codevId={codev.id} hovered={hovered} />
