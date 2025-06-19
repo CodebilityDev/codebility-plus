@@ -15,24 +15,27 @@ const WorkWithUs = () => {
         <div className="flex flex-col gap-6 md:gap-10">
           <h2 className="text-center text-xl md:text-3xl">Work With Us</h2>
 
-          <div className="flex flex-col gap-3 sm:flex-row lg:gap-5">
-            <div className="border-light-900/5 bg-light-700/10 flex flex-1 flex-col gap-4 rounded-lg border-2 p-4">
-              <div className="block">
+          {/* Updated grid layout for 3 cards */}
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+            
+            {/* Card 1: Portfolio */}
+            <div className="border-light-900/5 bg-light-700/10 flex h-full flex-col gap-4 rounded-lg border-2 p-4">
+              <div className="aspect-[500/359] w-full overflow-hidden rounded-xl">
                 <Image
                   src="https://codebility-cdn.pages.dev/assets/images/index/projects-large.jpg"
-                  alt="projects"
+                  alt="portfolio projects"
                   width={500}
                   height={359}
-                  className="h-full w-full rounded-xl object-cover"
+                  className="h-full w-full object-cover"
                 />
               </div>
-              <p>
+              <p className="flex-1 text-sm leading-relaxed">
                 Build your own website with us today and ensure a reliable,
                 cutting-edge online presence.
               </p>
               <div className="flex md:justify-end">
                 <div className="w-full md:w-auto">
-                  <Link href="/services">
+                  <Link href="/portfolio">
                     <Button variant="purple" size="lg" rounded="full">
                       Our Portfolio
                     </Button>
@@ -40,17 +43,19 @@ const WorkWithUs = () => {
                 </div>
               </div>
             </div>
-            <div className="border-light-900/5 bg-light-700/10 flex flex-1 flex-col gap-4 rounded-lg border-2 p-4">
-              <div className="block">
+
+            {/* Card 2: Hire Developers */}
+            <div className="border-light-900/5 bg-light-700/10 flex h-full flex-col gap-4 rounded-lg border-2 p-4">
+              <div className="aspect-[500/359] w-full overflow-hidden rounded-xl">
                 <Image
                   src="https://codebility-cdn.pages.dev/assets/images/index/codevs-large.jpg"
-                  alt="codevs"
+                  alt="professional developers"
                   width={500}
                   height={359}
-                  className="h-full w-full rounded-xl object-cover"
+                  className="h-full w-full object-cover"
                 />
               </div>
-              <p>
+              <p className="flex-1 text-sm leading-relaxed">
                 Connect with the best developer to meet your needs through our
                 top-rated professionals.
               </p>
@@ -64,10 +69,37 @@ const WorkWithUs = () => {
                 </div>
               </div>
             </div>
+
+            {/* Card 3: Developer Journey */}
+            <div className="border-light-900/5 bg-light-700/10 flex h-full flex-col gap-4 rounded-lg border-2 p-4">
+              <div className="aspect-[500/359] w-full overflow-hidden rounded-xl">
+                <Image
+                  src="/assets/images/index/image.png"
+                  alt="developer learning journey phases"
+                  width={500}
+                  height={359}
+                  className="h-full w-full object-cover"
+                />
+              </div>
+              <p className="flex-1 text-sm leading-relaxed">
+                Connect with our developer community and explore exciting career opportunities in tech.
+              </p>
+              <div className="flex md:justify-end">
+                <div className="w-full md:w-auto">
+                  <Link href="/auth/onboarding">
+                    <Button variant="purple" size="lg" rounded="full">
+                      Start Journey
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
       </Container>
 
+      {/* Background decoration */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform overflow-hidden blur-3xl"
