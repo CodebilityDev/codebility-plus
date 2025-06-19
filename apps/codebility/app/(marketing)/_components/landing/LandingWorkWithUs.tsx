@@ -88,7 +88,7 @@ const WorkWithUs = () => {
                 <div className="w-full md:w-auto">
                   <Link href="/auth/onboarding">
                     <Button variant="purple" size="lg" rounded="full">
-                      Start Journey
+                      Apply as Codev
                     </Button>
                   </Link>
                 </div>
