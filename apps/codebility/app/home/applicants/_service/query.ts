@@ -12,6 +12,7 @@ export default async function getNewApplicants(): Promise<NewApplicantType[]> {
                 applicant (*)
                 `)
             .not("application_status", "eq", "passed")
+            .order("date_applied", { ascending: false })
 
         if (error) {
             console.error("Error fetching new applicants:", error);
