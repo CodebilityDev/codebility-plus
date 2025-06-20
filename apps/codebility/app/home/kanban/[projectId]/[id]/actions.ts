@@ -459,6 +459,8 @@ const updateDeveloperLevels = async (codevId?: string) => {
   }
 };
 
+/* 
+old implementation
 export const completeTask = async (
   task: Task,
 ): Promise<{ success: boolean; error?: string }> => {
@@ -557,6 +559,48 @@ export const completeTask = async (
 
     if (deleteError) throw deleteError;
 
+    revalidatePath("/home/kanban/*");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Error completing task:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to complete task",
+    };
+  }
+}; */
+
+export const completeTask = async (
+  task: Task,
+): Promise<{ success: boolean; error?: string }> => {
+  const supabase = await createClientServerComponent();
+
+  try {
+    // Call the RPC function
+    const { data, error } = await supabase.rpc('complete_task', {
+      task_id: task.id,
+      task_points: task.points || 0,
+      primary_codev_id: task.codev?.id,
+      skill_category_id: task.skill_category?.id,
+      sidekick_ids: task.sidekick_ids || null
+    });
+
+    if (error) {
+      throw error;
+    }
+
+    // The RPC function returns a JSON object with success/error info
+    const result = data as { success: boolean; error?: string; message?: string };
+
+    if (!result.success) {
+      return {
+        success: false,
+        error: result.error || "Failed to complete task"
+      };
+    }
+
+    // Revalidate the path after successful completion
     revalidatePath("/home/kanban/*");
 
     return { success: true };

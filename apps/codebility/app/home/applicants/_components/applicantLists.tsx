@@ -17,10 +17,6 @@ export default function ApplicantLists({
 }: {
   applicants: NewApplicantType[];
 }) {
-  const prioritizedApplicants = useMemo(() => {
-    return prioritizeCodevs(data as Codev[], false);
-  }, [data]);
-
   const [applicants, setApplicants] = React.useState(data);
   const [currentTab, setCurrentTab] = React.useState("applying");
 
