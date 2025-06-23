@@ -24,11 +24,7 @@ export default async function Profiles() {
   const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
 
   // Use the utility function with filterAdminAndFailed set to true
-  const sortedCodevs = getPrioritizedAndFilteredCodevs({
-    codevs: codevsArray,
-    filters: { availability: true },
-    filterAdminAndFailed: true,
-  });
+  const sortedCodevs = getPrioritizedAndFilteredCodevs(codevsArray, { activeStatus: ['active'] }, true);
 
   return (
     <>
