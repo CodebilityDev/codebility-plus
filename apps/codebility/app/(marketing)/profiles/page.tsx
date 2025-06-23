@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
 import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
-import { prioritizeCodevs } from "@/utils/codev-priority"; // Import the utility
+import { getPrioritizedAndFilteredCodevs, prioritizeCodevs } from "@/utils/codev-priority"; // Import the utility
 
 import Section from "../codevs/_components/CodevsSection";
 import CodevContainer from "./_components/CodevContainer";
@@ -24,7 +24,11 @@ export default async function Profiles() {
   const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
 
   // Use the utility function with filterAdminAndFailed set to true
-  const sortedCodevs = prioritizeCodevs(codevsArray, true);
+  const sortedCodevs = getPrioritizedAndFilteredCodevs({
+    codevs: codevsArray,
+    filters: { availability: true },
+    filterAdminAndFailed: true,
+  });
 
   return (
     <>
