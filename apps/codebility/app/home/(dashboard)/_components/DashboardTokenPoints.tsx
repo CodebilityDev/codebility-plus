@@ -1,17 +1,24 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import PromoteToCodevModal from "@/Components/modals/PromoteToCodevModal";
 import { Box } from "@/Components/shared/dashboard";
+import { Button } from "@/Components/ui/button";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import { useUserStore } from "@/store/codev-store";
 import { CodevPoints, Level, SkillCategory } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 export default function TokenPoints() {
+  const { user } = useUserStore();
   const [points, setPoints] = useState<Record<string, number>>({});
   const [levels, setLevels] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [supabase, setSupabase] = useState<any>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [roleToBePromoted, setRoleToBePromoted] = useState<string | null>(null);
+  const [promotionAccepted, setPromotionAccepted] = useState(false); // Add local state
 
   // Initialize Supabase client safely
   useEffect(() => {
@@ -102,6 +109,16 @@ export default function TokenPoints() {
         );
 
         setLevels(levelsByCategory);
+
+        //Intern ready to be promoted to Codev
+        if (
+          user?.role_id == 4 &&
+          Object.values(levelsByCategory).some((value) => value >= 2) &&
+          !promotionAccepted // Don't show if promotion was already accepted
+        ) {
+          setRoleToBePromoted("Codev");
+          if (!user?.promote_declined) setIsModalOpen(true);
+        }
       } catch (err) {
         console.error("Error fetching data:", err);
         setError("Failed to fetch data. Please try again.");
@@ -111,7 +128,13 @@ export default function TokenPoints() {
     };
 
     fetchPointsAndCategories();
-  }, [supabase]);
+  }, [supabase, user, promotionAccepted]); // Add promotionAccepted to dependencies
+
+  const handlePromotionAccepted = () => {
+    setPromotionAccepted(true);
+    setRoleToBePromoted(null);
+    setIsModalOpen(false);
+  };
 
   if (loading) {
     return (
@@ -132,6 +155,9 @@ export default function TokenPoints() {
     return <p className="text-red-500">{error}</p>;
   }
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
+
   return (
     <Box className="flex w-full flex-1 flex-col gap-4">
       <p className="text-2xl">Token Points</p>
@@ -147,6 +173,19 @@ export default function TokenPoints() {
           </div>
         ))}
       </div>
+      {roleToBePromoted == "Codev" && !promotionAccepted && (
+        <>
+          <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
+            Become a Codev
+          </Button>
+          <PromoteToCodevModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            userId={user?.id}
+            onPromotionAccepted={handlePromotionAccepted}
+          />
+        </>
+      )}
     </Box>
   );
 }

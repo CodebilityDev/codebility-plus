@@ -181,7 +181,7 @@ export const getSidebarData = async (
         },
       ].filter((link) => hasPermission(link.permission)),
     },
-  ];
+  ].filter(section => section.links.length > 0);
 
   return sidebarData;
 };
