@@ -1,7 +1,7 @@
 /**
  * Utility functions for prioritizing Codev profiles
  */
-import { Codev, CodevPoints } from "@/types/home/codev";
+import { Codev, CodevFilter, CodevPoints } from "@/types/home/codev";
 
 /**
  * Calculate the total level score for a codev
@@ -142,13 +142,9 @@ export function prioritizeCodevs(
  */
 export function filterCodevs(
   codevs: Codev[],
-  filters: {
-    positions?: string[];
-    projects?: string[];
-    availability?: boolean;
-  },
+  filters: CodevFilter,
 ): Codev[] {
-  const { positions = [], projects = [], availability } = filters;
+  const { positions = [], projects = [], availability = [], activeStatus = [] } = filters;
 
   return codevs.filter((codev) => {
     const matchesPosition =
@@ -156,15 +152,22 @@ export function filterCodevs(
       positions.includes(codev.display_position || "");
 
     const matchesAvailability =
-      availability === undefined ||
-      codev.availability_status === availability;
+      availability.length === 0 ||
+      availability
+        .map((status) => status.toUpperCase())
+        .includes(codev.internal_status || "");
 
     const matchesProject =
       projects.length === 0 ||
       codev.projects?.some((project) => projects.includes(project.id)) ||
       false;
 
-    return matchesPosition && matchesAvailability && matchesProject;
+    const matchesActiveStatus =
+      activeStatus.length === 0 ||
+      (activeStatus.includes('active') && codev.availability_status === true) ||
+      (activeStatus.includes('inactive') && codev.availability_status === false);
+
+    return matchesPosition && matchesAvailability && matchesProject && matchesActiveStatus;
   });
 }
 
@@ -175,20 +178,11 @@ export function filterCodevs(
  * @param filterAdminAndFailed Whether to filter out admin roles and failed/applying applicants
  * @returns Filtered and prioritized array of codevs
  */
-type getPrioritizedAndFilteredCodevsType = {
-  codevs: Codev[];
-  filters: {
-    positions?: string[];
-    projects?: string[];
-    availability?: boolean;
-  };
-  filterAdminAndFailed?: boolean;
-}
-export function getPrioritizedAndFilteredCodevs({
-  codevs,
-  filters,
-  filterAdminAndFailed = false,
-}: getPrioritizedAndFilteredCodevsType) {
+export function getPrioritizedAndFilteredCodevs(
+  codevs: Codev[],
+  filters: CodevFilter,
+  filterAdminAndFailed: boolean = false,
+): Codev[] {
   const prioritized = prioritizeCodevs(codevs, filterAdminAndFailed);
   return filterCodevs(prioritized, filters);
 }
