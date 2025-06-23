@@ -111,6 +111,8 @@ export interface Codev {
   project_members?: ProjectMember[];
   work_schedules?: WorkSchedule[];
   date_applied?: string;
+  promote_declined?: boolean;
+  date_passed?: string;
 }
 
 export type ApplicantStatus =
