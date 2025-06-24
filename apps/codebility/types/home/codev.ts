@@ -198,6 +198,15 @@ export interface Level {
   max_points?: number; // Optional
 }
 
+export type ActiveStatus = 'active' | 'inactive';
+
+export interface CodevFilter {
+  positions?: string[];
+  projects?: string[];
+  availability?: string[];
+  activeStatus?: ActiveStatus[]; // Only accepts 'active', 'inactive', or both
+}
+
 // Other related types
 export interface Client {
   id: string; // UUID
