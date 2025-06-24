@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import UserInactiveModal from "@/Components/modals/UserInactiveModal";
 import H1 from "@/Components/shared/dashboard/H1";
 import { useUserStore } from "@/store/codev-store";
 
@@ -12,6 +13,16 @@ import WeeklyTop from "./(dashboard)/_components/DashboardWeeklyTop";
 export default function DashboardPage() {
   const { user } = useUserStore();
   const [isClient, setIsClient] = useState(false);
+
+  const userIsInactive =
+    user?.internal_status == "INACTIVE" || user?.availability_status == false;
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    if (userIsInactive) {
+      setIsModalOpen(true);
+    }
+  }, [userIsInactive]);
 
   // Ensure we're on the client side before rendering components that might use Supabase
   useEffect(() => {
@@ -30,25 +41,32 @@ export default function DashboardPage() {
     );
   }
 
+  const closeModal = () => setIsModalOpen(false);
+
   return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
-      <H1>Home</H1>
-      <div className="flex flex-col gap-4 lg:flex-row">
-        <div className=" md:basis-[50%] xl:basis-[60%]">
-          <div className="flex flex-col gap-4">
-            <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
-              <Profile />
-              {/* <TimeTracker /> */}
+    <>
+      <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+        <H1>Home</H1>
+        <div className="flex flex-col gap-4 lg:flex-row">
+          <div className=" md:basis-[50%] xl:basis-[60%]">
+            <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
+                <Profile />
+                {/* <TimeTracker /> */}
+              </div>
+              <DashboardCurrentProject />
+              <TokenPoints />
+              {/* <DashboardRoadmap /> Hide Temporarily */}
             </div>
-            <DashboardCurrentProject />
-            <TokenPoints />
-            {/* <DashboardRoadmap /> Hide Temporarily */}
+          </div>
+          <div className="md:basis-[50%] xl:basis-[40%]">
+            <WeeklyTop />
           </div>
         </div>
-        <div className="md:basis-[50%] xl:basis-[40%]">
-          <WeeklyTop />
-        </div>
       </div>
-    </div>
+      {userIsInactive && (
+        <UserInactiveModal isOpen={isModalOpen} onClose={closeModal} />
+      )}
+    </>
   );
 }
