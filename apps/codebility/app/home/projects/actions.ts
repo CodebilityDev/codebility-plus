@@ -9,7 +9,9 @@ interface DbProjectMember {
   project: {
     id: string;
     name: string;
-    active_switch: boolean;
+    status: string;
+    kanban_display: boolean;
+    public_display: boolean
   };
   role: string;
   joined_at: string;
@@ -232,15 +234,15 @@ export async function createProject(
  * @param {string} projectId
  * @author Kas
  */
-export async function updateProjectsSwitch(
-  activeSwitch: boolean,
+export async function updateStatus(
+  status: string,
   projectId: string,
 ) {
   const supabase = await createClientServerComponent();
   const { error: projectError } = await supabase
     .from("projects")
     .update({
-      kanban_display: activeSwitch,
+      status: status,
     })
     .eq("id", projectId)
     .select();
@@ -248,7 +250,47 @@ export async function updateProjectsSwitch(
   if (projectError)
     console.error("Error in updating projects and kanban board:", projectError);
 
-  return { success: true, projectId, activeSwitch };
+  return { success: true, projectId, status };
+}
+
+export async function updateKanbanDisplaySwitch(
+  kanbanDisplay: boolean,
+  projectId: string,
+) {
+  const supabase = await createClientServerComponent();
+  const { error: projectError } = await supabase
+    .from("projects")
+    .update({
+      kanban_display: kanbanDisplay,
+    })
+    .eq("id", projectId)
+    .select();
+
+  if (projectError)
+    console.error("Error in updating projects and kanban board:", projectError);
+
+  return { success: true, projectId, kanbanDisplay };
+}
+
+export async function updatePublicDisplaySwitch(
+  publicDisplay: boolean,
+  projectId: string,
+) {
+  const supabase = await createClientServerComponent();
+  const { error: projectError } = await supabase
+    .from("projects")
+    .update({
+      public_display: publicDisplay,
+    })
+    .eq("id", projectId)
+    .select();
+
+  if (projectError)
+    console.error("Error in updating projects and kanban board:", projectError);
+
+  revalidatePath("/home/projects");
+
+  return { success: true, projectId, publicDisplay };
 }
 
 export async function updateProject(projectId: string, formData: FormData) {
@@ -583,7 +625,9 @@ export const getProjectCodevs = async (filters = {}): Promise<Codev[]> => {
             name: pm.project.name,
             role: pm.role,
             joined_at: pm.joined_at,
-            kanban_display: pm.project.active_switch,
+            status: pm.project.status,
+            kanban_display: pm.project.kanban_display,
+            public_display: pm.project.public_display
           };
           return project;
         },

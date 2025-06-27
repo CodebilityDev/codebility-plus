@@ -23,9 +23,11 @@ const Projects = async (props: PageProps) => {
   const supabase = await createClientServerComponent();
   const filter = searchParams.filter;
 
-  const allProjects = await getOrSetCache(cacheKeys.projects.all, () =>
+  /*  const allProjects = await getOrSetCache(cacheKeys.projects.all, () =>
     getProjects(),
-  );
+  ); */
+  /* to be back on redis */
+  const allProjects = await getProjects();
 
   const Projects =
     filter && filter !== "all"
