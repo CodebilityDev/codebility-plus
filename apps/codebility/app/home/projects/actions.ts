@@ -288,6 +288,8 @@ export async function updatePublicDisplaySwitch(
   if (projectError)
     console.error("Error in updating projects and kanban board:", projectError);
 
+  revalidatePath("/home/projects");
+
   return { success: true, projectId, publicDisplay };
 }
 
