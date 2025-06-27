@@ -164,6 +164,7 @@ export interface Project {
   joined_at?: string;
   project_members?: ProjectMember[];
   kanban_display: boolean;
+  public_display: boolean;
 }
 export interface Education {
   id: string;
