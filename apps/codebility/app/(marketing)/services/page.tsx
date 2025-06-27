@@ -1,4 +1,4 @@
-import getProjects from "@/lib/server/project.service";
+import { getPublicProjects } from "@/lib/server/project.service";
 import { getOrSetCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { createClientServerComponent } from "@/utils/supabase/server";
@@ -41,7 +41,9 @@ interface ProjectData {
 const ServicesPage = async () => {
   const supabase = await createClientServerComponent();
 
-  const data = await getOrSetCache(cacheKeys.projects.all, () => getProjects());
+  const data = await getOrSetCache(cacheKeys.projects.all, () =>
+    getPublicProjects(),
+  );
 
   const mappedData: ProjectData[] = data.map((item: any) => ({
     id: item.id,
