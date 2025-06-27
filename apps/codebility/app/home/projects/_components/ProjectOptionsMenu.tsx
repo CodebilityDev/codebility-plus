@@ -25,9 +25,9 @@ export default function ProjectOptionsMenu({
   const [kanbanDisplay, setKanbanDisplay] = useState<boolean>(
     project.kanban_display,
   );
-  const [publicDisplay, setPublicDisplay] = useState<boolean>(
+/*   const [publicDisplay, setPublicDisplay] = useState<boolean>(
     project.public_display,
-  );
+  ); */
 
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -45,22 +45,18 @@ export default function ProjectOptionsMenu({
     }
   };
 
-  const handlePublicDisplay = async (e: React.MouseEvent): Promise<void> => {
-    setLoading(true);
-    const { id } = e.currentTarget;
-    e.stopPropagation();
-    try {
-      setPublicDisplay(!publicDisplay);
-      await updatePublicDisplaySwitch(!publicDisplay, id);
-    } catch (error) {
-      console.error("Error updating public display:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   return (
-    <DropdownMenu>
+    <>
+      <SwitchStatusButton
+        disabled={loading}
+        handleSwitch={handleKanbanDisplay}
+        isActive={kanbanDisplay}
+        id={project.id}
+      />
+    </>
+    /*   <DropdownMenu>
       <DropdownMenuTrigger
         onClick={(e) => {
           e.stopPropagation();
@@ -72,12 +68,7 @@ export default function ProjectOptionsMenu({
       <DropdownMenuContent className="dark:bg-black-200 w-56 bg-white">
         <DropdownMenuItem className="flex cursor-default items-center justify-between px-3 py-2 focus:bg-transparent">
           <span className="text-sm font-medium">Kanban Display</span>
-          <SwitchStatusButton
-            disabled={loading}
-            handleSwitch={handleKanbanDisplay}
-            isActive={kanbanDisplay}
-            id={project.id}
-          />
+         
         </DropdownMenuItem>
 
         <DropdownMenuItem className="flex cursor-default items-center justify-between px-3 py-2 focus:bg-transparent">
@@ -90,6 +81,6 @@ export default function ProjectOptionsMenu({
           />
         </DropdownMenuItem>
       </DropdownMenuContent>
-    </DropdownMenu>
+    </DropdownMenu> */
   );
 }
