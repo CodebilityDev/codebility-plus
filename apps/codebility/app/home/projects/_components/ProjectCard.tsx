@@ -3,9 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  SimpleMemberData,
-} from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
@@ -14,6 +12,7 @@ import { defaultAvatar } from "@/public/assets/images";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Project } from "@/types/home/codev";
 
+import BookmarkButton from "./BookmarkButton";
 import ProjectOptionsMenu from "./ProjectOptionsMenu";
 
 export interface ProjectCardProps {
@@ -71,6 +70,14 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
               ? "In Progress"
               : projectStatus || "Unknown"}
           </span>
+        </div>
+
+        <div className="absolute left-2 top-2">
+          <BookmarkButton
+            project={project}
+            categoryId={categoryId}
+            onOpen={onOpen}
+          />
         </div>
       </div>
 
