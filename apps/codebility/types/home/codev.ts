@@ -111,6 +111,7 @@ export interface Codev {
   project_members?: ProjectMember[];
   work_schedules?: WorkSchedule[];
   date_applied?: string;
+  promote_declined?: boolean;
 }
 
 export type ApplicantStatus =
@@ -162,6 +163,7 @@ export interface Project {
   joined_at?: string;
   project_members?: ProjectMember[];
   kanban_display: boolean;
+  public_display: boolean;
 }
 export interface Education {
   id: string;
@@ -195,6 +197,15 @@ export interface Level {
   level: number; // Required
   min_points: number; // Required
   max_points?: number; // Optional
+}
+
+export type ActiveStatus = 'active' | 'inactive';
+
+export interface CodevFilter {
+  positions?: string[];
+  projects?: string[];
+  availability?: string[];
+  activeStatus?: ActiveStatus[]; // Only accepts 'active', 'inactive', or both
 }
 
 // Other related types
