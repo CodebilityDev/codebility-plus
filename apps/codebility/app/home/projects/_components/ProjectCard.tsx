@@ -3,10 +3,7 @@
 import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import {
-  SimpleMemberData,
-  updateProjectsSwitch,
-} from "@/app/home/projects/actions";
+import { SimpleMemberData } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/Components/DefaultAvatar";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
@@ -15,17 +12,16 @@ import { defaultAvatar } from "@/public/assets/images";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Project } from "@/types/home/codev";
 
-interface ProjectCardProps {
+import BookmarkButton from "./BookmarkButton";
+import ProjectOptionsMenu from "./ProjectOptionsMenu";
+
+export interface ProjectCardProps {
   project: Project;
   onOpen: (type: ModalType, data: Project) => void;
   categoryId: number | undefined;
 }
 
 const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
-  const [activeSwitch, setActiveSwitch] = useState<boolean>(
-    project.kanban_display,
-  );
-
   const projectStatus =
     project.status &&
     project.status.charAt(0).toUpperCase() + project.status.slice(1);
@@ -38,13 +34,6 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
         : project.status === "active"
           ? "bg-blue-500/80"
           : "dark:bg-zinc-700";
-
-  const handleSwitchBtn = async (e: React.MouseEvent): Promise<void> => {
-    const { id } = e.currentTarget;
-    e.stopPropagation();
-    setActiveSwitch(!activeSwitch);
-    await updateProjectsSwitch(!activeSwitch, id);
-  };
 
   return categoryId === project.project_category_id ? (
     <div
@@ -82,6 +71,14 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
               : projectStatus || "Unknown"}
           </span>
         </div>
+
+        <div className="absolute left-2 top-2">
+          <BookmarkButton
+            project={project}
+            categoryId={categoryId}
+            onOpen={onOpen}
+          />
+        </div>
       </div>
 
       {/* Content */}
@@ -95,11 +92,10 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
               </h3>
             </div>
             <div className="flex w-1/2 justify-end">
-              <SwitchStatusButton
-                disabled={false}
-                handleSwitch={handleSwitchBtn}
-                isActive={activeSwitch}
-                id={project.id}
+              <ProjectOptionsMenu
+                project={project}
+                onOpen={onOpen}
+                categoryId={categoryId}
               />
             </div>
           </div>

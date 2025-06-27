@@ -38,7 +38,12 @@ const NavContent = () => {
   useEffect(() => {
     const fetchSidebarData = async () => {
       if (user?.role_id) {
-        const data = await getSidebarData(user.role_id); // Fetch sidebar data based on role
+        const roleId =
+          user.internal_status == "INACTIVE" ||
+          user.availability_status == false
+            ? 11
+            : user.role_id;
+        const data = await getSidebarData(roleId);
         setSidebarData(data);
       }
     };
