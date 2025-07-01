@@ -25,7 +25,7 @@ export async function uploadImage(
 ) {
   const supabase = await createClientServerComponent();
   try {
-    const { bucket = "codebility", folder = "profileImage" } = options;
+    const { bucket, folder} = options;
 
     // Generate a cleaner file path
     const fileExtension = file.name.split(".").pop() || "";
@@ -33,7 +33,7 @@ export async function uploadImage(
     const filePath = `${folder}/${fileName}`; // Simpler path structure
 
     const { error: uploadError } = await supabase.storage
-      .from(bucket)
+      .from(bucket!)
       .upload(filePath, file, {
         cacheControl: options.cacheControl || "3600",
         upsert: options.upsert ?? true,
@@ -42,7 +42,7 @@ export async function uploadImage(
     if (uploadError) throw uploadError;
 
     const { data: publicUrlData } = supabase.storage
-      .from(bucket)
+      .from(bucket!)
       .getPublicUrl(filePath);
 
     if (!publicUrlData?.publicUrl) {
@@ -55,7 +55,8 @@ export async function uploadImage(
       publicUrl: String(publicUrlData.publicUrl),
     }; */
 
-    await updateCodev({ image_url: publicUrlData.publicUrl });
+    if (folder == "profileImage")
+      await updateCodev({ image_url: publicUrlData.publicUrl });
 
     return publicUrlData.publicUrl.toString();
 
