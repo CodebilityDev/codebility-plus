@@ -3,7 +3,7 @@ import { Input } from "@/Components/shared/dashboard/input";
 import { Button } from "@/Components/ui/button";
 import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
-import { uploadImageOther } from "@/utils/uploadImage";
+import { uploadImage } from "@/utils/uploadImage";
 import toast from "react-hot-toast";
 
 import { Textarea } from "@codevs/ui/textarea";
@@ -38,7 +38,7 @@ const CreatePostForm = ({
       let image_url;
 
       if (imageFile) {
-        image_url = await uploadImageOther(imageFile, {
+        image_url = await uploadImage(imageFile, {
           bucket: "codebility",
           folder: "postImage",
         });
