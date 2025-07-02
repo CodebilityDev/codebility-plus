@@ -8,14 +8,14 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function CodevsPage() {
-  const { data: interns, error } = await getOrSetCache(
+  const { data: allCodevs, error } = await getOrSetCache(
     cacheKeys.codevs.members,
-    () => getCodevs({ filters: { role_id: 4 } }),
+    () => getCodevs(), // Removed { filters: { role_id: 4 } }
   );
 
   if (error) {
     return <div>Error fetching interns: {error.message}</div>;
   }
 
-  return <CodevContainer data={interns || []} />;
+  return <CodevContainer data={allCodevs || []} />;
 }
