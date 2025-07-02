@@ -98,7 +98,7 @@ export default function FilterCodevs({
       </Button>
 
       <Box
-        className={`absolute -right-3/4 top-12 z-[1] min-h-[300px] w-[300%] overflow-auto
+        className={`absolute right-0 top-12 z-[1] max-h-[calc(100vh-20rem)] min-h-[300px] w-[300%] overflow-auto
           sm:-right-3/4 sm:w-96 md:right-0 md:w-80
           ${!showFilter && "hidden"}
         `}
