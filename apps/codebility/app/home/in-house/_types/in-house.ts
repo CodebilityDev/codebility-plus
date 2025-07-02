@@ -25,3 +25,9 @@ export interface InHouseEditable {
 }
 
 export type InHouseSort = (key: keyof Codev, direction: "up" | "down") => void;
+
+export type MemberStats = {
+  total: number;
+  active: number;
+  inactive: number;
+};
