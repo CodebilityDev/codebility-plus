@@ -51,11 +51,11 @@ export const aboutUsData: AboutUsData[] = [
   { id: "4", title: "CoDevs", href: "/codevs" },
   { id: "5", title: "Projects", href: "/services" },
   { id: "6", title: "Contact", href: "mailto:codebility.dev@gmail.com" },
-   {
-    id: "7",     
+  {
+    id: "7",
     title: "Career",
-    href: "/careers"
-  }
+    href: "/careers",
+  },
 ];
 
 export const connectUsData: ConnectUsData[] = [
