@@ -364,13 +364,13 @@ const AddMembersModal = ({
                       </div>
                       
                       <div className="flex-shrink-0">
-                        <div className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all duration-200 ${
+                        <div className={`w-6 h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
                           isSelected(user.id) 
-                            ? 'bg-blue-500 border-blue-500' 
-                            : 'border-gray-400 dark:border-gray-500'
+                            ? 'bg-blue-500 border-blue-400' 
+                            : 'bg-white border-gray-400 dark:bg-gray-500 dark:border-gray-300'
                         }`}>
                           {isSelected(user.id) && (
-                            <Check className="w-3 h-3 text-white" />
+                            <Check className="w-4 h-4 text-white" />
                           )}
                         </div>
                       </div>
