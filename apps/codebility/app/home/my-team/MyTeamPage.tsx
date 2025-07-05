@@ -1,4 +1,4 @@
-// my-team/MyTeamPage.tsx - Updated to use Kanban API patterns
+// my-team/MyTeamPage.tsx - Fixed Role/Position contrast for dark mode
 "use client";
 
 import { useState } from "react";
@@ -36,7 +36,7 @@ interface MyTeamPageProps {
 const formatName = (firstName: string, lastName: string): string => 
   `${firstName.charAt(0).toUpperCase()}${firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}${lastName.slice(1).toLowerCase()}`;
 
-// Consolidated member display component
+// Consolidated member display component - FIXED role/position contrast
 const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLead?: boolean }) => {
   const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
   const displayName = formatName(member.first_name, member.last_name);
@@ -68,7 +68,14 @@ const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLe
             {displayName}
           </span>
           {member.display_position && (
-            <span className="text-xs text-gray-600 dark:text-gray-400">
+            <span 
+              className="text-xs"
+              style={{ 
+                color: typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches 
+                  ? '#e5e7eb' 
+                  : '#6b7280'
+              }}
+            >
               {member.display_position}
             </span>
           )}
@@ -95,11 +102,18 @@ const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLe
           }}
         />
       </div>
-      <span className="text-[10px] sm:text-xs text-gray-700 dark:text-white text-center leading-tight block px-1 transition-colors duration-200">
+      <span className="text-[10px] sm:text-xs text-gray-900 dark:text-white font-semibold text-center leading-tight block px-1 transition-colors duration-200">
         {displayName}
       </span>
       {member.display_position && (
-        <span className="text-[8px] sm:text-[10px] text-gray-500 dark:text-gray-400 text-center">
+        <span 
+          className="text-[8px] sm:text-[9px] text-center font-normal italic"
+          style={{ 
+            color: typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches 
+              ? '#e5e7eb' 
+              : '#6b7280'
+          }}
+        >
           {member.display_position}
         </span>
       )}
