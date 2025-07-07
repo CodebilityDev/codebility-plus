@@ -218,3 +218,33 @@ export const signOut = async (): Promise<void> => {
     throw error;
   }
 };
+
+export const resendVerificationEmail = async (email: string) => {
+  try {
+    const supabase = await createClientServerComponent();
+    
+    // Normalize email to lowercase
+    const normalizedEmail = email.toLowerCase();
+
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email: normalizedEmail,
+      options: {
+        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/auth/callback`,
+      }
+    });
+
+    if (error) {
+      console.error("Error resending verification email:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, message: "Verification email sent successfully" };
+  } catch (error: any) {
+    console.error("Resend verification error:", error);
+    return { 
+      success: false, 
+      error: error.message || "Failed to resend verification email" 
+    };
+  }
+};
