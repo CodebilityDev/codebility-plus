@@ -20,6 +20,7 @@ export default function TokenPoints() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roleToBePromoted, setRoleToBePromoted] = useState<string | null>(null);
   const [promotionAccepted, setPromotionAccepted] = useState(false);
+  const setUserLevel = useUserStore((state) => state.setUserLevel);
 
   // Initialize Supabase client safely
   useEffect(() => {
@@ -111,8 +112,6 @@ export default function TokenPoints() {
 
         setLevels(levelsByCategory);
 
-        //Intern ready to be promoted to Codev
-        console.log();
         if (
           user?.role_id == 4 &&
           Object.values(levelsByCategory).some((value) => value >= 2) &&
@@ -127,6 +126,7 @@ export default function TokenPoints() {
           Object.values(levelsByCategory).some((value) => value >= 3) &&
           !promotionAccepted // Don't show if promotion was already accepted
         ) {
+          setUserLevel(2);
           setRoleToBePromoted("Mentor");
           if (!user?.promote_declined) setIsModalOpen(true);
         }
