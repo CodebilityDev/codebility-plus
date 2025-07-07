@@ -8,6 +8,7 @@ import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
+import { useSidebarStore } from "@/store/sidebar-store";
 
 import { cn } from "@codevs/ui";
 import { Badge } from "@codevs/ui/badge";
@@ -40,6 +41,8 @@ export default function DashboardProfile() {
     fetchStatus();
   }, [user]);
 
+  const triggerRefresh = useSidebarStore((state) => state.triggerRefresh);
+
   const handleStatusSwitch = async () => {
     if (!user) return;
 
@@ -52,10 +55,12 @@ export default function DashboardProfile() {
       });
 
       setActive((prev) => !prev);
+      await useUserStore.getState().hydrate();
     } catch (error) {
       console.error(error);
     } finally {
       setActiveLoading(false);
+      triggerRefresh();
     }
   };
 

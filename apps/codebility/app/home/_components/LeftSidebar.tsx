@@ -7,6 +7,7 @@ import { usePathname } from "next/navigation";
 import { getSidebarData } from "@/constants/sidebar";
 import { useNavStore } from "@/hooks/use-sidebar";
 import { useUserStore } from "@/store/codev-store";
+import { useSidebarStore } from "@/store/sidebar-store";
 import { AnimatePresence, motion } from "framer-motion";
 
 interface SidebarLink {
@@ -26,8 +27,11 @@ const LeftSidebar = () => {
   const { isToggleOpen, toggleNav } = useNavStore();
   const pathname = usePathname();
   const [sidebarData, setSidebarData] = useState<any[]>([]);
+  const refreshKey = useSidebarStore((state) => state.refreshKey);
 
   useEffect(() => {
+    console.log("HELLO FROM SIDEBAR USE EFFECT");
+    console.log("availability status: ", user?.availability_status);
     const fetchSidebarData = async () => {
       if (user?.role_id) {
         const roleId =
@@ -41,7 +45,7 @@ const LeftSidebar = () => {
     };
 
     fetchSidebarData();
-  }, [user?.role_id]);
+  }, [user?.role_id, refreshKey]);
 
   const sidebarVariants = {
     closed: {
