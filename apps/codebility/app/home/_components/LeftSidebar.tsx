@@ -30,8 +30,6 @@ const LeftSidebar = () => {
   const refreshKey = useSidebarStore((state) => state.refreshKey);
 
   useEffect(() => {
-    console.log("HELLO FROM SIDEBAR USE EFFECT");
-    console.log("availability status: ", user?.availability_status);
     const fetchSidebarData = async () => {
       if (user?.role_id) {
         const roleId =
