@@ -5,6 +5,7 @@ import { H1 } from "@/Components/shared/home";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
 
+import { getMemberStats } from "../_lib/utils";
 import { InHouseTable } from "./table/InHouseTable";
 import { TableFilters } from "./table/table-filters";
 
@@ -14,6 +15,7 @@ interface InHouseViewProps {
 
 export default function InHouseView({ initialData }: InHouseViewProps) {
   const [data, setData] = useState<Codev[]>(initialData);
+  const stats = getMemberStats(data);
 
   // Filters
   const [filters, setFilters] = useState({
@@ -111,9 +113,17 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
       <H1>In-House Codebility</H1>
 
       <div className="flex items-center justify-between">
-        <p className="text-light-900 text-sm">
-          {data.length} {data.length === 1 ? "member" : "members"}
-        </p>
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="rounded-full bg-blue-200 px-3 py-1 text-stone-100">
+            {stats.total} {stats.total === 1 ? "member" : "members"}
+          </span>
+          <span className="rounded-full bg-emerald-600 px-3 py-1 text-stone-100">
+            {stats.active} active
+          </span>
+          <span className="rounded-full bg-red-100 px-3 py-1 text-stone-100">
+            {stats.inactive} inactive
+          </span>
+        </div>
       </div>
 
       {/* Table Filters */}
