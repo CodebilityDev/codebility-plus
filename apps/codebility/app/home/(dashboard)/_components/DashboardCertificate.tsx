@@ -1,10 +1,12 @@
 import { Button } from "@/Components/ui/button";
-import { CertificateProps, Codev } from "@/types/home/codev";
-import { differenceInDays, isWeekend, startOfDay } from "date-fns";
+import { useUserStore } from "@/store/codev-store";
 import { BookDown } from "lucide-react";
 import { useRef } from "react";
 
-import Certificate, { handleDownload } from "./DashboardDownloadCertificate";
+import Certificate, {
+  CertificateProps,
+  handleDownload,
+} from "./DashboardDownloadCertificate";
 
 type Props = {
 	user: Codev;
