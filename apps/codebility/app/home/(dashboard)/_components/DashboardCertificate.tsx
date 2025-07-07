@@ -33,7 +33,7 @@ const DashboardCertificate = () => {
           mainSentence: (
             <p className="text-sm">
               has been promoted to <strong>Codev – Level 1</strong> at
-              <b> Codebility </b> from
+              <b> Codebility </b>
             </p>
           ),
           description1: (
@@ -51,7 +51,7 @@ const DashboardCertificate = () => {
           mainSentence: (
             <p className="text-sm">
               has been promoted to <strong>Codev – Level 2</strong> at
-              <b> Codebility </b> from
+              <b> Codebility </b>
             </p>
           ),
           description1: (
@@ -69,7 +69,7 @@ const DashboardCertificate = () => {
           mainSentence: (
             <p className="text-sm">
               has been promoted to <strong>Mentor</strong> at
-              <b> Codebility </b> from
+              <b> Codebility </b>
             </p>
           ),
           description1: (
@@ -89,7 +89,7 @@ const DashboardCertificate = () => {
             <p className="text-sm">
               has successfully completed the{" "}
               <strong>Internship Training Program</strong> at
-              <b> Codebility </b> from
+              <b> Codebility </b>
             </p>
           ),
           description1: (
