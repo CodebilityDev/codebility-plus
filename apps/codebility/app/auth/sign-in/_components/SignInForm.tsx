@@ -10,7 +10,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
-import { signinUser } from "../../actions";
+import { resendVerificationEmail, signinUser } from "../../actions";
 import SignInInputs from "./SignInInput";
 
 type Inputs = z.infer<typeof SignInValidation>;
@@ -37,11 +37,13 @@ const SignInForm = () => {
 
       // If the response indicates failure, log and show the error toast
       if (!response.success) {
-        console.error("Sign in failed:", response.error);
-        toast.error(response.error || "Invalid email or password");
-        // Delay a bit to let the toast show before returning
+        /* console.error("Sign in failed:", response.error); */
+   /*      toast.error(response.error || "Invalid email or password");
+ */
+        throw new Error(response.error);
+        /* // Delay a bit to let the toast show before returning
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        return; // Exit early so no redirect is attempted
+        return; // Exit early so no redirect is attempted */
       }
 
       // Otherwise, handle redirection based on the redirectTo value
@@ -65,9 +67,30 @@ const SignInForm = () => {
     } catch (error: any) {
       console.error("Sign in error:", error);
 
-      if (error.message?.includes("verify your email")) {
+      if (
+        error.message?.includes("verify your email") ||
+        error.message?.includes("Email not confirmed")
+      ) {
         toast.error("Please verify your email first");
-        router.replace("/verify");
+
+        // call supabase function to send verification email
+        try {
+          const resendResult = await resendVerificationEmail(
+            values.email_address,
+          );
+          if (resendResult.success) {
+            toast.success("Verification email sent! Please check your inbox.");
+          } else {
+            toast.error(
+              resendResult.error || "Failed to resend verification email",
+            );
+          }
+        } catch (resendError) {
+          console.error("Error resending verification email:", resendError);
+          toast.error("Failed to resend verification email");
+        }
+
+        router.push("/auth/verify");
       } else if (
         error.message?.includes("Invalid login credentials") ||
         error.message?.includes("Account not found")
