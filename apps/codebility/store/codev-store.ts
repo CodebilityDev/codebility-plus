@@ -5,7 +5,9 @@ import { create } from "zustand";
 
 interface UserState {
   user: Codev | null;
+  userLevel: number | null;
   setUser: (user: Codev) => void;
+  setUserLevel: (level: number) => void;
   clearUser: () => void;
   hydrate: () => Promise<void>;
   isLoading: boolean;
@@ -13,8 +15,10 @@ interface UserState {
 
 export const useUserStore = create<UserState>((set) => ({
   user: null,
+  userLevel: null,
   isLoading: true,
   setUser: (user) => set({ user }),
+  setUserLevel: (userLevel) => set({ userLevel }),
   clearUser: () => set({ user: null }),
   hydrate: async () => {
     try {
