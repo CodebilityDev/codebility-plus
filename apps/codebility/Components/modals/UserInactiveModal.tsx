@@ -26,12 +26,12 @@ const UserInactiveModal: React.FC<UserInactiveModalProps> = ({
       <DialogContent className="flex max-w-2xl flex-col">
         <DialogHeader>
           <DialogTitle className="text-center">
-            You are currently Inactive
+            You are currently inactive
           </DialogTitle>
         </DialogHeader>
         <p className="text-gray text-center text-sm">
-          Your account is currently inactive. For assistance, please contact us
-          at codebility.dev@gmail.com.
+          Your account is currently inactive. You can change your status using
+          the toggle switch above.
         </p>
       </DialogContent>
     </Dialog>
