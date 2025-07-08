@@ -10,7 +10,7 @@ import {
   DialogTitle,
 } from "@/Components/ui/dialog";
 import { Codev } from "@/types/home/codev";
-import { Search, X, Check, Users, Plus } from "lucide-react";
+import { Search, X, Check, Users } from "lucide-react";
 import toast from "react-hot-toast";
 
 interface AddMembersModalProps {
@@ -79,16 +79,27 @@ const SearchInput = ({
   </div>
 );
 
-// Line 70: Enhanced Team Members Display with proper +9 indicator
+// Line 70: Enhanced Team Members Display - ALL MEMBERS VISIBLE, NO SCROLL, NO BUTTON
 const TeamMembersDisplay = ({ 
-  members, 
-  maxVisible = 10 
+  members 
 }: { 
   members: SimpleMemberData[];
-  maxVisible?: number;
 }) => {
-  const visibleMembers = members.slice(0, maxVisible);
-  const remainingCount = Math.max(0, members.length - maxVisible);
+  // Calculate optimal grid columns based on member count
+  const getGridCols = (count: number) => {
+    if (count <= 3) return 'grid-cols-3';
+    if (count <= 4) return 'grid-cols-4';
+    if (count <= 6) return 'grid-cols-6';
+    if (count <= 8) return 'grid-cols-8';
+    if (count <= 10) return 'grid-cols-10';
+    return 'grid-cols-12'; // Maximum 12 columns for large teams
+  };
+
+  const getResponsiveGridCols = (count: number) => {
+    const baseCols = getGridCols(count);
+    // Responsive: fewer columns on smaller screens
+    return `grid-cols-3 sm:grid-cols-4 md:${baseCols} lg:${baseCols}`;
+  };
 
   return (
     <div className="space-y-3">
@@ -97,10 +108,10 @@ const TeamMembersDisplay = ({
         {members.length} member{members.length !== 1 ? 's' : ''}
       </div>
       
-      {/* Members grid - matches the uploaded image layout */}
-      <div className="grid grid-cols-5 gap-3 max-w-lg">
-        {visibleMembers.map((member) => (
-          <div key={member.id} className="flex flex-col items-center space-y-2">
+      {/* ALL Members grid - IMPROVED SPACING */}
+      <div className={`grid gap-4 sm:gap-6 ${getResponsiveGridCols(members.length)} max-w-full`}>
+        {members.map((member) => (
+          <div key={member.id} className="flex flex-col items-center space-y-2 p-2">
             <MemberAvatar
               imageUrl={member.image_url}
               name={`${member.first_name} ${member.last_name}`}
@@ -118,27 +129,12 @@ const TeamMembersDisplay = ({
             </div>
           </div>
         ))}
-        
-        {/* +N indicator when there are more members */}
-        {remainingCount > 0 && (
-          <div className="flex flex-col items-center space-y-2">
-            <div 
-              className="w-12 h-12 bg-gray-100 dark:bg-gray-700 rounded-full flex items-center justify-center text-sm font-medium text-gray-600 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600"
-              title={`${remainingCount} more member${remainingCount !== 1 ? 's' : ''}`}
-            >
-              +{remainingCount}
-            </div>
-            <div className="text-xs text-gray-500 dark:text-gray-400 text-center">
-              more
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
 };
 
-// Line 115: Project preview with enhanced layout
+// Line 115: Project preview with enhanced layout - NO ADD BUTTON
 const ProjectPreview = ({ 
   projectName, 
   teamLead, 
@@ -184,10 +180,10 @@ const ProjectPreview = ({
       )}
     </div>
     
-    {/* Team Members with enhanced display */}
+    {/* Team Members - NO BUTTON, NO SCROLL, ALL VISIBLE */}
     <div>
       <h4 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Team Members</h4>
-      <TeamMembersDisplay members={currentMembers} maxVisible={10} />
+      <TeamMembersDisplay members={currentMembers} />
     </div>
     
     {/* Status indicator */}
@@ -335,25 +331,17 @@ const AddMembersModal = ({
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent className="max-w-6xl h-[85vh] p-0 flex flex-col">
-        {/* Header */}
+        {/* Header - REMOVED X BUTTON */}
         <DialogHeader className="flex-shrink-0 p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
-          <div className="flex items-center justify-between">
-            <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
-              Add Members
-            </DialogTitle>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </div>
+          <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
+            Add Members
+          </DialogTitle>
         </DialogHeader>
 
         {/* Main Content */}
         <div className="flex flex-1 min-h-0 overflow-hidden">
-          {/* Left Panel - Project Preview */}
-          <div className="w-2/5 p-6 border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
+          {/* Left Panel - Project Preview - REMOVED SCROLL */}
+          <div className="w-2/5 p-6 border-r border-gray-200 dark:border-gray-700">
             <ProjectPreview 
               projectName={project.name}
               teamLead={teamLeadData}
