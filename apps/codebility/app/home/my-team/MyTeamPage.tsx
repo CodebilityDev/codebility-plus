@@ -126,30 +126,17 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
   const [projects, setProjects] = useState(projectData);
   const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [availableMembers, setAvailableMembers] = useState<Codev[]>([]);
+  // Removed availableMembers state since AddMembersModal handles it internally
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
   const handleOpenAddModal = async (project: ProjectData) => {
     setSelectedProject(project);
-    setIsLoadingMembers(true);
-    
-    try {
-      // Fetch available members using Kanban pattern
-      const users = await getProjectCodevs();
-      setAvailableMembers(users || []);
-      setShowAddModal(true);
-    } catch (error) {
-      console.error('Failed to fetch available members:', error);
-      toast.error('Failed to load available members');
-    } finally {
-      setIsLoadingMembers(false);
-    }
+    setShowAddModal(true);
   };
 
   const handleCloseModal = () => {
     setShowAddModal(false);
     setSelectedProject(null);
-    setAvailableMembers([]);
   };
 
   const handleUpdateMembers = async (selectedMembers: Codev[]) => {
@@ -303,12 +290,11 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
         </div>
       </div>
 
-      {/* Add Members Modal using Kanban pattern */}
+      {/* Add Members Modal - FIXED: Removed availableMembers prop */}
       {selectedProject && (
         <AddMembersModal
           isOpen={showAddModal}
           projectData={selectedProject}
-          availableMembers={availableMembers}
           onClose={handleCloseModal}
           onUpdate={handleUpdateMembers}
         />
