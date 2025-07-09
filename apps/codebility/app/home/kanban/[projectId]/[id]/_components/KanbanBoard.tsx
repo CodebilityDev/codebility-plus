@@ -3,11 +3,12 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
+import { getMembers } from "@/app/home/projects/actions";
 import pathsConfig from "@/config/paths.config";
 import { ArrowRightIcon, IconSearch } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { useQuery } from "@tanstack/react-query";
 
 import KanbanAddMembersButton from "./kanban_modals/KanbanAddMembersButton";
 import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
@@ -19,61 +20,35 @@ interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
   projectId: string;
 }
-export default function KanbanBoard({ boardData }: KanbanBoardProps) {
+
+export default function KanbanBoard({
+  boardData,
+  projectId,
+}: KanbanBoardProps) {
   const user = useUserStore((state) => state.user);
   const canAddColumn = user?.role_id === 1 || user?.role_id === 5;
   const canAddMember = canAddColumn;
+
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
-  const [members, setMembers] = useState<
-    Array<{
-      userId: string;
-      userName: string;
-      imageUrl?: string | null;
-      isActive: boolean;
-    }>
-  >([]);
-  const [supabase, setSupabase] = useState<any>(null);
 
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
+  // Fetch all project members using React Query
+  const { data: allMembers = [], isLoading: isMembersLoading } = useQuery({
+    queryKey: ["members", projectId],
+    queryFn: async () => {
+      const result = await getMembers(projectId);
+      return result.data || [];
+    },
+    enabled: !!projectId,
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
+  });
 
-  useEffect(() => {
-    if (!supabase) return;
-
-    const fetchMembers = async () => {
-      const uniqueUsers = new Set<string>();
-
-      boardData.kanban_columns.forEach((column) => {
-        column.tasks?.forEach((task) => {
-          if (task.codev?.id) {
-            uniqueUsers.add(task.codev.id);
-          }
-          task.sidekick_ids?.forEach((id) => uniqueUsers.add(id));
-        });
-      });
-
-      if (uniqueUsers.size > 0) {
-        const { data, error } = await supabase
-          .from("codev")
-          .select("id, first_name, last_name, image_url")
-          .in("id", Array.from(uniqueUsers));
-
-        if (!error && data) {
-          const membersList = data.map((user) => ({
-            userId: user.id,
-            userName: `${user.first_name} ${user.last_name}`,
-            imageUrl: user.image_url,
-            isActive: activeFilter === user.id,
-          }));
-          setMembers(membersList);
-        }
-      }
-    };
-
-    fetchMembers();
-  }, [boardData, activeFilter, supabase]);
+  const members = allMembers.map((user) => ({
+    userId: user.id,
+    userName: `${user.first_name} ${user.last_name}`,
+    imageUrl: user.image_url,
+    isActive: activeFilter === user.id,
+  }));
 
   const handleFilterClick = (userId: string) => {
     setActiveFilter(activeFilter === userId ? null : userId);
@@ -88,7 +63,7 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
   return (
     <div className="flex h-full w-full">
       <div className="mx-auto h-full w-[calc(100vw-22rem)] flex-1 flex-col">
-        <div className="text-dark100_light900 flex h-full flex-col gap-4 ">
+        <div className="text-dark100_light900 flex h-full flex-col gap-4">
           <div className="flex flex-row items-center gap-4 text-sm">
             <Link href={pathsConfig.app.kanban}>
               <span className="dark:text-white/50">Kanban Board</span>
@@ -104,7 +79,6 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
 
             <div className="flex flex-col gap-4 xl:flex-row">
               <div className="flex items-center gap-6">
-                {/* Added fixed height and overflow visible */}
                 <div className="h-10 overflow-visible">
                   <UserTaskFilter
                     members={members}
@@ -133,22 +107,19 @@ export default function KanbanBoard({ boardData }: KanbanBoardProps) {
             </div>
           </div>
 
-          {
-            // Empty board fallback
-            boardData.kanban_columns.length === 0 ? (
-              <div className="text-dark100_light900 py-10 text-center text-lg">
-                No columns found in this board.
-              </div>
-            ) : (
-              <div className="text-dark100_light900 flex h-full">
-                <KanbanBoardColumnContainer
-                  projectId={boardData.id}
-                  columns={boardData.kanban_columns || []}
-                  activeFilter={activeFilter}
-                />
-              </div>
-            )
-          }
+          {boardData.kanban_columns.length === 0 ? (
+            <div className="text-dark100_light900 py-10 text-center text-lg">
+              No columns found in this board.
+            </div>
+          ) : (
+            <div className="text-dark100_light900 flex h-full">
+              <KanbanBoardColumnContainer
+                projectId={boardData.id}
+                columns={boardData.kanban_columns || []}
+                activeFilter={activeFilter}
+              />
+            </div>
+          )}
         </div>
       </div>
 
