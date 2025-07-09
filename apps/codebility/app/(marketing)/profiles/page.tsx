@@ -2,19 +2,22 @@ import { Suspense } from "react";
 import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
 import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
-import { getPrioritizedAndFilteredCodevs, prioritizeCodevs } from "@/utils/codev-priority"; // Import the utility
+import {
+  getPrioritizedAndFilteredCodevs,
+  prioritizeCodevs,
+} from "@/utils/codev-priority"; // Import the utility
 
 import Section from "../codevs/_components/CodevsSection";
 import CodevContainer from "./_components/CodevContainer";
-import CodevList from "./_components/CodevList";
 import { CodevHireCodevModal } from "./_components/CodevHireCodevModal";
+import CodevList from "./_components/CodevList";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function Profiles() {
   const [{ data: allCodevs, error }] = await Promise.all([
-    getCodevs({ filters: { role_id: 4 } }),
+    getCodevs({ filters: { role_id: 10 } }), // show only Codevs with role_id 10 which is Codev
   ]);
 
   if (error) {
@@ -24,7 +27,11 @@ export default async function Profiles() {
   const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
 
   // Use the utility function with filterAdminAndFailed set to true
-  const sortedCodevs = getPrioritizedAndFilteredCodevs(codevsArray, { activeStatus: ['active'] }, true);
+  const sortedCodevs = getPrioritizedAndFilteredCodevs(
+    codevsArray,
+    { activeStatus: ["active"] },
+    true,
+  );
 
   return (
     <>
