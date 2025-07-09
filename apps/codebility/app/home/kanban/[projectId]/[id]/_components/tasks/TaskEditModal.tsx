@@ -33,9 +33,9 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
+import DifficultyPointsTooltip, { DIFFICULTY_LEVELS, DIFFICULTY_POINTS } from "../DifficultyPointsTooltip";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
-const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
 const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"];
 
 interface TaskFormData extends Partial<Task> {
@@ -67,6 +67,11 @@ const TaskEditModal = () => {
     codev_id: "",
     projectId: "",
   });
+  
+  // Calculate points based on difficulty
+  const getPointsFromDifficulty = (difficulty: string): number => {
+    return DIFFICULTY_POINTS[difficulty as keyof typeof DIFFICULTY_POINTS] || 0;
+  };
 
   const editor = useEditor({
     extensions: [StarterKit],
@@ -120,14 +125,17 @@ const TaskEditModal = () => {
               .single();
 
             if (board?.project_id) {
+              const difficulty = data.difficulty || "";
+              const calculatedPoints = difficulty ? getPointsFromDifficulty(difficulty) : (data.points || 0);
+              
               setTaskData({
                 title: data.title || "",
                 description: data.description || "",
                 priority: data.priority || "",
-                difficulty: data.difficulty || "",
+                difficulty: difficulty,
                 type: data.type || "",
                 pr_link: data.pr_link || "",
-                points: data.points || 0,
+                points: calculatedPoints,
                 sidekick_ids: data.sidekick_ids || [],
                 skill_category_id: data.skill_category?.id || "",
                 codev_id: data.codev?.id || "",
@@ -144,11 +152,19 @@ const TaskEditModal = () => {
       fetchProjectData();
     }
   }, [isModalOpen, data, supabase]);
+
   const handleInputChange = (
     key: keyof Task,
     value: string | number | string[],
   ) => {
-    setTaskData((prev) => ({ ...prev, [key]: value }));
+    setTaskData((prev) => {
+      const updated = { ...prev, [key]: value };
+      // Auto-calculate points when difficulty changes
+      if (key === "difficulty" && typeof value === "string") {
+        updated.points = getPointsFromDifficulty(value);
+      }
+      return updated;
+    });
   };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -238,31 +254,21 @@ const TaskEditModal = () => {
 
             {/* Points */}
             <div className="space-y-2">
-              <Label htmlFor="points" className="text-sm font-medium">
-                Points
-                {user?.role_id === 4 && (
-                  <span className="ml-2 text-xs text-gray-500">
-                    (Only lead can edit points)
-                  </span>
-                )}
-              </Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="points" className="text-sm font-medium">
+                  Points (Based on Difficulty)
+                </Label>
+              </div>
               <Input
                 id="points"
                 name="points"
                 type="number"
                 min="0"
-                placeholder="Task points"
+                placeholder="Select difficulty to auto-calculate points"
                 value={String(taskData.points)}
-                onChange={(e) =>
-                  handleInputChange("points", Number(e.target.value))
-                }
-                disabled={user?.role_id === 4}
-                className={cn(
-                  `border-gray-300 focus:border-blue-500 dark:border-gray-700`,
-                  user?.role_id === 4
-                    ? "cursor-not-allowed bg-gray-100 opacity-60 dark:bg-gray-800"
-                    : "",
-                )}
+                disabled={true}
+                readOnly
+                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 cursor-not-allowed border border-gray-300"
               />
             </div>
 
@@ -294,7 +300,10 @@ const TaskEditModal = () => {
 
             {/* Difficulty */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Difficulty</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">Difficulty</Label>
+                <DifficultyPointsTooltip />
+              </div>
               <Select
                 value={taskData.difficulty}
                 onValueChange={(value) =>
@@ -312,7 +321,7 @@ const TaskEditModal = () => {
                         value={level}
                         className="capitalize"
                       >
-                        {level}
+                        {level.charAt(0).toUpperCase() + level.slice(1)} - {DIFFICULTY_POINTS[level as keyof typeof DIFFICULTY_POINTS]} pts
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -348,7 +357,7 @@ const TaskEditModal = () => {
 
             {/* Skill Category */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Skill Category</Label>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">Skill Category</Label>
               <Select
                 value={taskData.skill_category_id}
                 onValueChange={(value) =>

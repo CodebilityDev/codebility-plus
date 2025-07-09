@@ -39,6 +39,7 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { completeTask, updateTaskPRLink } from "../../actions";
+import DifficultyPointsTooltip, { DIFFICULTY_LEVELS } from "../DifficultyPointsTooltip";
 
 interface CodevMember {
   id: string;
@@ -48,7 +49,6 @@ interface CodevMember {
 }
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
-const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
 
 // Utility function to capitalize the first letter
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
@@ -302,7 +302,9 @@ const TaskViewModal = ({
 
             {/* Points */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Points</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">Points</Label>
+              </div>
               <Input
                 type="number"
                 value={task?.points || 0}
@@ -336,7 +338,10 @@ const TaskViewModal = ({
 
             {/* Difficulty (capitalized) */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Difficulty</Label>
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">Difficulty</Label>
+                <DifficultyPointsTooltip />
+              </div>
               <Select disabled>
                 <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300 dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue
