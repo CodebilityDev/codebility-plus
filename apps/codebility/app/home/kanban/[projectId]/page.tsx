@@ -1,3 +1,5 @@
+import Link from "next/link";
+import { redirect } from "next/navigation";
 import { Box } from "@/Components/shared/dashboard";
 import H1 from "@/Components/shared/dashboard/H1";
 import { Button } from "@/Components/ui/button";
@@ -12,12 +14,10 @@ import {
 } from "@/Components/ui/table";
 import pathsConfig from "@/config/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
-import Link from "next/link";
-
-import { createClientServerComponent } from "@/utils/supabase/server";
-
 import { KanbanBoardType, KanbanSprintType } from "@/types/home/codev";
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { format } from "date-fns";
+
 import AddSprintButton from "./_components/AddSprintButton";
 
 // Types
@@ -51,7 +51,10 @@ const mapSprint = (sprint: any): KanbanSprintData => {
   };
 };
 
-function formatDateRange(startDate: string | null, endDate: string | null): string {
+function formatDateRange(
+  startDate: string | null,
+  endDate: string | null,
+): string {
   if (!startDate || !endDate) {
     return "No timeline";
   }
@@ -75,11 +78,35 @@ export default async function KanbanSprintPage(props: PageProps) {
     );
   }
 
+  // start:  see if the user is a member of the project
+  const {
+    data: { user: sessionUser },
+  } = await supabase.auth.getUser();
+
+  if (!sessionUser) {
+    redirect("/auth/sign-in");
+  }
+
+  const { data: member, error } = await supabase
+    .from("project_members")
+    .select("id")
+    .eq("codev_id", sessionUser?.id)
+    .eq("project_id", params?.projectId)
+    .single();
+
+  const userIsPartOfProject = !!member;
+
+  if (!userIsPartOfProject) {
+    redirect("/home/kanban");
+  }
+  // end:  see if the user is a member of the project
+
   try {
     // Construct the sprint query
     let projectWithSprintsQuery = supabase
       .from("projects")
-      .select(`
+      .select(
+        `
         id,
         name,
         kanban_sprints!kanban_sprints_project_id_fkey (
@@ -94,10 +121,10 @@ export default async function KanbanSprintPage(props: PageProps) {
             name
           )
         )
-      `)
+      `,
+      )
       .eq("id", params.projectId)
       .single();
-
 
     // Execute the query
     const { data, error } = await projectWithSprintsQuery;
