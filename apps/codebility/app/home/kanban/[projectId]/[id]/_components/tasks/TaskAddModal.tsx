@@ -30,11 +30,11 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { createNewTask } from "../../actions";
+import DifficultyPointsTooltip, { DIFFICULTY_LEVELS, DIFFICULTY_POINTS } from "../DifficultyPointsTooltip";
 import KanbanAddModalMembers from "../kanban_modals/KanbanAddModalMembers";
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
-const DIFFICULTY_LEVELS = ["easy", "medium", "hard"];
 const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"];
 
 const TaskAddModal = () => {
@@ -46,6 +46,7 @@ const TaskAddModal = () => {
   const [loading, setLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
   const [description, setDescription] = useState("");
+  const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
 
@@ -53,6 +54,24 @@ const TaskAddModal = () => {
 
   const onChange = (value: string) => {
     setDescription(value);
+  };
+
+  // Calculate points based on difficulty
+  const getPointsFromDifficulty = (difficulty: string): number => {
+    return DIFFICULTY_POINTS[difficulty as keyof typeof DIFFICULTY_POINTS] || 0;
+  };
+
+  const handleDifficultyChange = (difficulty: string) => {
+    setSelectedDifficulty(difficulty);
+  };
+
+  // Reset form when modal closes
+  const handleClose = () => {
+    setSelectedDifficulty("");
+    setDescription("");
+    setMainAssignee("");
+    setSidekicks([]);
+    onClose();
   };
 
   useEffect(() => {
@@ -85,11 +104,16 @@ const TaskAddModal = () => {
       if (!formData.get("title")) throw new Error("Title is required");
       if (!formData.get("skill_category_id"))
         throw new Error("Skill category is required");
+      if (!selectedDifficulty) throw new Error("Difficulty is required");
 
       formData.append(
         "description",
         description.trim() || "<p>No description provided</p>",
       );
+
+      // Set points based on selected difficulty
+      const calculatedPoints = getPointsFromDifficulty(selectedDifficulty);
+      formData.set("points", calculatedPoints.toString());
 
       const image = formData.get("image");
       if (image && image instanceof File) {
@@ -102,13 +126,13 @@ const TaskAddModal = () => {
 
       if (sidekicks.length)
         formData.append("sidekick_ids", sidekicks.join(","));
-    
+
       formData.append("created_by", user?.id as string);
 
       const response = await createNewTask(formData);
       if (response.success) {
         toast.success("Task created successfully");
-        onClose();
+        handleClose();
 
         router.refresh();
       } else {
@@ -126,7 +150,7 @@ const TaskAddModal = () => {
   if (!isModalOpen) return null;
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose}>
+    <Dialog open={isModalOpen} onOpenChange={handleClose}>
       <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px] h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <form
           onSubmit={(e) => {
@@ -167,24 +191,23 @@ const TaskAddModal = () => {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="points" className="text-sm font-medium">
-                Points
-              </Label>
+              <div className="flex items-center gap-2">
+                <Label htmlFor="points" className="text-sm font-medium">
+                  Points (Based on Difficulty)
+                </Label>
+              </div>
               <Input
                 id="points"
                 name="points"
                 type="number"
                 min="0"
-                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500 "
-                placeholder={
-                  user?.role_id === 4
-                    ? "Only lead can input points"
-                    : "Enter points"
-                }
-                disabled={user?.role_id === 4}
+                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 cursor-not-allowed border border-gray-300"
+                value={getPointsFromDifficulty(selectedDifficulty)}
+                placeholder="Select difficulty to auto-calculate points"
+                disabled={true}
+                readOnly
               />
             </div>
-
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority</Label>
               <Select name="priority">
@@ -208,8 +231,15 @@ const TaskAddModal = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Difficulty</Label>
-              <Select name="difficulty">
+              <div className="flex items-center gap-2">
+                <Label className="text-sm font-medium">Difficulty</Label>
+                <DifficultyPointsTooltip />
+              </div>
+              <Select
+                name="difficulty"
+                value={selectedDifficulty}
+                onValueChange={handleDifficultyChange}
+              >
                 <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-blue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
@@ -221,7 +251,13 @@ const TaskAddModal = () => {
                         value={level}
                         className="capitalize"
                       >
-                        {level.charAt(0).toUpperCase() + level.slice(1)}
+                        {level.charAt(0).toUpperCase() + level.slice(1)} -{" "}
+                        {
+                          DIFFICULTY_POINTS[
+                            level as keyof typeof DIFFICULTY_POINTS
+                          ]
+                        }{" "}
+                        pts
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -310,7 +346,7 @@ const TaskAddModal = () => {
             <Button
               type="button"
               variant="outline"
-              onClick={onClose}
+              onClick={handleClose}
               className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-3 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading || isPending}
             >
