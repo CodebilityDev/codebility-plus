@@ -120,9 +120,11 @@ export default async function KanbanPage(props: PageProps) {
       (member) => member.role === "team_leader" && member.codev,
     );
 
-    const isUserInvolved = project.project_members.some(
-      (member) => member.codev?.id === currentUserId,
-    );
+    const isUserInvolved = Array.isArray(board.projects?.project_members)
+      ? board.projects.project_members.some(
+          (member) => member.codev?.id === currentUserId,
+        )
+      : false;
 
     return {
       ...board,
