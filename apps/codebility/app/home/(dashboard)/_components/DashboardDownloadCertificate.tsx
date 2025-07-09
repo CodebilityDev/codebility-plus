@@ -1,9 +1,8 @@
 "use client";
 
-import type { RefObject } from "react";
+import type { ReactNode, RefObject } from "react";
 import React, { forwardRef } from "react";
 import Image from "next/image";
-import { CertificateProps } from "@/types/home/codev";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 
@@ -31,21 +30,20 @@ export const handleDownload = async (
   pdf.save(`${name}.pdf`);
 };
 
+export interface CertificateProps {
+  title: string;
+  name: string;
+  mainSentence: ReactNode;
+  description1: ReactNode;
+}
+
 const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
   (props, ref) => {
-    const {
-      background,
-      logo,
-      name,
-      course,
-      date_from,
-      date_to,
-      description,
-      key_projects,
-      signature,
-      // signature_name,
-      // signature_title,
-    } = props;
+    const { title, name, mainSentence, description1 } = props;
+
+    const background = "/assets/images/bg-certificate.png";
+    const logo = "/assets/images/codebility.png";
+    const signature = "/assets/images/signature1.png";
 
     return (
       <div
@@ -64,26 +62,24 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
               <span className="my-5 text-5xl font-bold">CERTIFICATE</span>
             </h1>
             <h1>
-              <span className="text-3xl">OF COMPLETION</span>
+              <span className="text-3xl">OF {title}</span>
             </h1>
             <p className="mt-1 text-base">This certifies that</p>
             <h2 className="mt-1 text-3xl font-semibold">
               {name.toUpperCase()}
             </h2>
             <hr className="mx-20 my-3 border-t border-white" />
-            <p className="text-sm">
-              has successfully completed the <strong>{course}</strong> at
-              <b> Codebility </b> from <strong>{date_from}</strong> to{" "}
-              <strong>{date_to}</strong>
-            </p>
-
-            <p className="mt-2 text-sm leading-relaxed">
-              During this period, <b>{name}</b> {description}
-            </p>
+            {mainSentence}
+            <br />
+            {description1}
+            <br />
+            <br />
+            <br />
+            <p>Authorized by:</p>
           </div>
 
           {/* Projects */}
-          <div className="mt-3">
+          {/* <div className="mt-3">
             <h3 className="mb-2 text-base font-semibold">
               Key Projects Completed:
             </h3>
@@ -98,7 +94,7 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
                 </li>
               ))}
             </ul>
-          </div>
+          </div> */}
 
           {/* Signature */}
           <div className="mt-10">
@@ -108,14 +104,6 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
                 alt="signature"
                 className="pointer-events-none mx-auto w-60 opacity-90"
               />
-              <p className="mt-2 text-center text-sm">
-                {/* Uncomment and use these if needed */}
-                {/* {signature_name} */}
-                {/* <br /> */}
-                {/* <span className="text-sm" style={{ color: "cyan" }}> */}
-                {/* {signature_title} */}
-                {/* </span> */}
-              </p>
             </div>
           </div>
         </div>

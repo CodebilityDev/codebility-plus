@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import PromoteToCodevModal from "@/Components/modals/PromoteToCodevModal";
+import PromoteToMentorModal from "@/Components/modals/PromoteToMentorModal";
 import { Box } from "@/Components/shared/dashboard";
 import { Button } from "@/Components/ui/button";
 import { Skeleton } from "@/Components/ui/skeleton/skeleton";
@@ -18,7 +19,8 @@ export default function TokenPoints() {
   const [supabase, setSupabase] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roleToBePromoted, setRoleToBePromoted] = useState<string | null>(null);
-  const [promotionAccepted, setPromotionAccepted] = useState(false); // Add local state
+  const [promotionAccepted, setPromotionAccepted] = useState(false);
+  const setUserLevel = useUserStore((state) => state.setUserLevel);
 
   // Initialize Supabase client safely
   useEffect(() => {
@@ -110,13 +112,22 @@ export default function TokenPoints() {
 
         setLevels(levelsByCategory);
 
-        //Intern ready to be promoted to Codev
         if (
           user?.role_id == 4 &&
           Object.values(levelsByCategory).some((value) => value >= 2) &&
           !promotionAccepted // Don't show if promotion was already accepted
         ) {
           setRoleToBePromoted("Codev");
+          if (!user?.promote_declined) setIsModalOpen(true);
+        }
+        //Codev ready to be promoted to Mentor
+        else if (
+          user?.role_id == 10 &&
+          Object.values(levelsByCategory).some((value) => value >= 3) &&
+          !promotionAccepted // Don't show if promotion was already accepted
+        ) {
+          setUserLevel(2);
+          setRoleToBePromoted("Mentor");
           if (!user?.promote_declined) setIsModalOpen(true);
         }
       } catch (err) {
@@ -179,6 +190,19 @@ export default function TokenPoints() {
             Become a Codev
           </Button>
           <PromoteToCodevModal
+            isOpen={isModalOpen}
+            onClose={closeModal}
+            userId={user?.id}
+            onPromotionAccepted={handlePromotionAccepted}
+          />
+        </>
+      )}
+      {roleToBePromoted == "Mentor" && !promotionAccepted && (
+        <>
+          <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
+            Become a Mentor
+          </Button>
+          <PromoteToMentorModal
             isOpen={isModalOpen}
             onClose={closeModal}
             userId={user?.id}
