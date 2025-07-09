@@ -1,7 +1,7 @@
 "use client";
 
 import {
-  acceptPromotionToCodev,
+  acceptPromotionToMentor,
   declinePromotion,
 } from "@/app/home/_services/actions";
 import { Button } from "@/Components/ui/button";
@@ -14,14 +14,14 @@ import {
 import { useUserStore } from "@/store/codev-store";
 import toast from "react-hot-toast";
 
-interface PromoteToCodevModalProps {
+interface PromoteToMentorModalProps {
   isOpen: boolean;
   onClose: () => void;
   userId?: string;
   onPromotionAccepted?: () => void;
 }
 
-const PromoteToCodevModal: React.FC<PromoteToCodevModalProps> = ({
+const PromoteToMentorModal: React.FC<PromoteToMentorModalProps> = ({
   isOpen,
   onClose,
   userId,
@@ -35,12 +35,12 @@ const PromoteToCodevModal: React.FC<PromoteToCodevModalProps> = ({
       onPromotionAccepted?.();
 
       // Call the promotion API
-      await acceptPromotionToCodev(id);
+      await acceptPromotionToMentor(id);
 
       // Update the store
       await hydrate();
 
-      toast.success("Promoted to Codev!");
+      toast.success("Promoted to Mentor!");
       onClose();
     } catch (error) {
       console.error("Error accepting promotion:", error);
@@ -58,11 +58,11 @@ const PromoteToCodevModal: React.FC<PromoteToCodevModalProps> = ({
     >
       <DialogContent className="flex max-w-2xl flex-col">
         <DialogHeader>
-          <DialogTitle className="text-center">Become a Codev</DialogTitle>
+          <DialogTitle className="text-center">Become a Mentor</DialogTitle>
         </DialogHeader>
         <p className="text-gray text-center text-sm">
-          Congratulations! You’ve reached the required points to become a Codev.
-          Would you like to proceed with your promotion?
+          Congratulations! You’ve reached the required points to become a
+          Mentor. Would you like to proceed with your promotion?
         </p>
         <div className="flex justify-center gap-4">
           <Button
@@ -74,7 +74,7 @@ const PromoteToCodevModal: React.FC<PromoteToCodevModalProps> = ({
               }
             }}
           >
-            Accept
+            Become a Mentor
           </Button>
           <Button
             className="bg-red-600 text-white hover:bg-red-700"
@@ -85,7 +85,7 @@ const PromoteToCodevModal: React.FC<PromoteToCodevModalProps> = ({
               }
             }}
           >
-            Decline
+            Continue as a Codev
           </Button>
         </div>
       </DialogContent>
@@ -93,4 +93,4 @@ const PromoteToCodevModal: React.FC<PromoteToCodevModalProps> = ({
   );
 };
 
-export default PromoteToCodevModal;
+export default PromoteToMentorModal;
