@@ -103,6 +103,11 @@ export function prioritizeCodevs(
     const aRank = rankLevelOfBadge(a.level, a.codev_points);
     const bRank = rankLevelOfBadge(b.level, b.codev_points);
 
+    // Priority 1a: Total points (highest first)
+    if (aRank.totalPoints !== bRank.totalPoints) {
+      return bRank.totalPoints - aRank.totalPoints; // Higher total points win
+    }
+
     // Sub-priority 1: Has level 2 or above (highest priority)
     if (aRank.hasLevel2OrAbove !== bRank.hasLevel2OrAbove) {
       return aRank.hasLevel2OrAbove ? -1 : 1;
