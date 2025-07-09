@@ -47,6 +47,7 @@ interface ProjectData {
   project_members?: ProjectMemberData[];
   codev?: CodevData;
   kanban_display: boolean;
+  isUserInvolved?: boolean;
 }
 
 interface KanbanBoardData {
@@ -66,6 +67,13 @@ interface PageProps {
 export default async function KanbanPage(props: PageProps) {
   const searchParams = await props.searchParams;
   const supabase = await createClientServerComponent();
+
+  //Get current user
+  const {
+    data: { user: sessionUser },
+  } = await supabase.auth.getUser();
+
+  const currentUserId = sessionUser?.id;
 
   // Construct the initial board query
   let boardQuery = supabase.from("kanban_boards").select(`
@@ -104,21 +112,26 @@ export default async function KanbanPage(props: PageProps) {
 
   // Fetch team leads for each board
   const boardsWithTeamLeads = (typedBoards || []).map((board) => {
-    if (board.projects?.project_members) {
-      // Find the team leader from project members
-      const teamLeader = board.projects.project_members.find(
-        (member) => member.role === "team_leader" && member.codev,
-      );
+    const project = board.projects;
 
-      return {
-        ...board,
-        projects: {
-          ...board.projects,
-          codev: teamLeader?.codev || null,
-        },
-      };
-    }
-    return board;
+    if (!project || !project.project_members) return board;
+
+    const teamLeader = project.project_members.find(
+      (member) => member.role === "team_leader" && member.codev,
+    );
+
+    const isUserInvolved = project.project_members.some(
+      (member) => member.codev?.id === currentUserId,
+    );
+
+    return {
+      ...board,
+      projects: {
+        ...(board.projects || {}),
+        codev: teamLeader?.codev || null,
+        isUserInvolved,
+      },
+    };
   });
 
   // Render table content
@@ -150,7 +163,7 @@ export default async function KanbanPage(props: PageProps) {
     }
 
     // Empty state
-    if (typedBoards.length === 0) {
+    if (!typedBoards || typedBoards.length === 0) {
       return (
         <TableRow>
           <TableCell
@@ -163,17 +176,34 @@ export default async function KanbanPage(props: PageProps) {
       );
     }
 
+    const view_sprint: React.ReactNode = (
+      <Button
+        variant="hollow"
+        className="inline-flex items-center gap-2 bg-[#000000] text-white hover:opacity-100 dark:bg-[#000000]"
+      >
+        <IconKanban className="h-4 w-4 text-white" />
+        <span className="hidden sm:inline">View Sprint</span>
+      </Button>
+    );
+
     // Render boards
     return boardsWithTeamLeads.map((board) => (
-      <TableRow key={board.id} className="grid grid-cols-1 md:table-row">
+      <TableRow
+        key={board.id}
+        className={`grid grid-cols-1 md:table-row ${board.projects?.isUserInvolved ? "text-light-900 bg-gradient-to-r from-purple-200 via-blue-50 to-sky-300 dark:from-purple-800 dark:via-blue-300 dark:to-sky-950" : "pointer-events-none cursor-not-allowed select-none opacity-30"}`}
+      >
         {board.projects?.kanban_display && (
           <>
             {/* Board Name */}
             <TableCell className="md:table-cell">
-              <div className="text-dark100_light900 flex flex-col">
-                <span className="font-medium">{board.name}</span>
+              <div className="flex flex-col">
+                <span className="text-dark100_light900 font-medium text-white">
+                  {board.name}
+                </span>
                 {board.description && (
-                  <span className="text-sm">{board.description}</span>
+                  <span className="text-dark100_light900 text-sm text-white">
+                    {board.description}
+                  </span>
                 )}
               </div>
             </TableCell>
@@ -205,16 +235,17 @@ export default async function KanbanPage(props: PageProps) {
               )}
             </TableCell>
 
-      {/* Actions */}
-      <TableCell className="text-center md:table-cell">
-        <Link href={`${pathsConfig.app.kanban}/${board.projects.id}`}>
-          <Button variant="hollow" className="inline-flex items-center gap-2">
-            <IconKanban className="invert-colors h-4 w-4" />
-            <span className="hidden sm:inline">View Sprint</span>
-          </Button>
-        </Link>
-      </TableCell>
-      </>
+            {/* Actions */}
+            <TableCell className="text-center md:table-cell">
+              {board.projects?.isUserInvolved ? (
+                <Link href={`${pathsConfig.app.kanban}/${board.projects.id}`}>
+                  {view_sprint}
+                </Link>
+              ) : (
+                <>{view_sprint}</>
+              )}
+            </TableCell>
+          </>
         )}
       </TableRow>
     ));
