@@ -1,40 +1,108 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { Button } from "@/Components/ui/button";
-import { CertificateProps } from "@/types/home/codev";
+import { useUserStore } from "@/store/codev-store";
 import { BookDown } from "lucide-react";
 
-import Certificate, { handleDownload } from "./DashboardDownloadCertificate";
+import Certificate, {
+  CertificateProps,
+  handleDownload,
+} from "./DashboardDownloadCertificate";
 
-type Props = {
-  user: {
-    first_name: string;
-    last_name: string;
-  };
-};
+const DashboardCertificate = () => {
+  const { user, userLevel } = useUserStore();
 
-const DashboardCertificate = ({ user }: Props) => {
+  // Check certificate type based on user
+  let certificateType = "intern";
+  // if (user?.role_id == 4) certificateType = "intern";
+  if (user?.role_id == 10) {
+    if (userLevel == 2) certificateType = "codev 2";
+    else certificateType = "codev 1";
+  }
+  if (user?.role_id == 5) certificateType = "mentor";
+
   const certRef = useRef<HTMLDivElement>(null);
-  // Dummy data for the certificate
-  // This should be replaced with actual data from the database
-  const fullName = `${user.first_name} ${user.last_name}`;
-  const certDummyData: CertificateProps = {
-    background: "/assets/images/bg-certificate.png",
-    logo: "/assets/images/codebility.png",
-    name: fullName ?? "Intern",
-    course: "Frontend Developer Training Program",
-    date_from: "March 1, 2025",
-    date_to: "May 1, 2025",
-    description:
-      "demonstrated a commitment to learning and growth and has mastered key skills in modern web technologies, including frameworks like NEXTJS, version control with Git, and the ability to create responsive and accessible web applications.",
-    key_projects: [
-      "Responsive Deadpool and Wolverine Website",
-      "E-commerce Storefront",
-    ],
-    signature: "/assets/images/signature1.png",
-    // signature_name: "Jzeff Kendrew Somera",
-    // signature_title: "C.E.O / Founder of Codebility",
-  };
+  const fullName = `${user!.first_name} ${user!.last_name}`;
+
+  const certData: CertificateProps = (() => {
+    switch (certificateType) {
+      case "codev 1":
+        return {
+          title: "PROMOTION",
+          name: fullName || "Codev",
+          mainSentence: (
+            <p className="text-sm">
+              has been promoted to <strong>Codev – Level 1</strong> at
+              <b> Codebility </b>
+            </p>
+          ),
+          description1: (
+            <p>
+              The recipient has earned this position by meeting the required
+              technical standards, exhibiting reliability, and showing readiness
+              to contribute in a full development role.
+            </p>
+          ),
+        };
+      case "codev 2":
+        return {
+          title: "PROMOTION",
+          name: fullName || "Codev",
+          mainSentence: (
+            <p className="text-sm">
+              has been promoted to <strong>Codev – Level 2</strong> at
+              <b> Codebility </b>
+            </p>
+          ),
+          description1: (
+            <p>
+              The recipient has achieved this advancement through consistent
+              delivery on development tasks, increased technical proficiency,
+              and active participation in team efforts.
+            </p>
+          ),
+        };
+      case "mentor":
+        return {
+          title: "PROMOTION",
+          name: fullName || "Mentor",
+          mainSentence: (
+            <p className="text-sm">
+              has been promoted to <strong>Mentor</strong> at
+              <b> Codebility </b>
+            </p>
+          ),
+          description1: (
+            <p>
+              Recognized for leadership, technical guidance, and contributions
+              to the development of peers within the organization, reflecting a
+              strong commitment to mentorship and team growth.
+            </p>
+          ),
+        };
+      // Intern
+      default:
+        return {
+          title: "COMPLETION",
+          name: fullName || "Intern",
+          mainSentence: (
+            <p className="text-sm">
+              has successfully completed the{" "}
+              <strong>Internship Training Program</strong> at
+              <b> Codebility </b>
+            </p>
+          ),
+          description1: (
+            <p>
+              The recipient has demonstrated a foundational understanding of
+              software development practices, a commitment to learning, and the
+              ability to collaborate effectively within a development team.
+            </p>
+          ),
+        };
+    }
+  })();
+
   return (
     <>
       <div className="absolute left-4 top-4">
@@ -49,11 +117,11 @@ const DashboardCertificate = ({ user }: Props) => {
             zIndex: -1,
           }}
         >
-          <Certificate {...certDummyData} ref={certRef} />
+          <Certificate {...certData} ref={certRef} />
         </div>
         <Button
           className="md:p-15 md:w-15 h-6 w-10 p-2"
-          onClick={() => handleDownload(certRef, certDummyData.name)}
+          onClick={() => handleDownload(certRef, certData.name)}
         >
           <BookDown />
         </Button>

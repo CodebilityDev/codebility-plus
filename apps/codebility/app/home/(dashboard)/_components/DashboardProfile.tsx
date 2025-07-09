@@ -8,6 +8,7 @@ import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
+import { useSidebarStore } from "@/store/sidebar-store";
 
 import { cn } from "@codevs/ui";
 import { Badge } from "@codevs/ui/badge";
@@ -40,6 +41,8 @@ export default function DashboardProfile() {
     fetchStatus();
   }, [user]);
 
+  const triggerRefresh = useSidebarStore((state) => state.triggerRefresh);
+
   const handleStatusSwitch = async () => {
     if (!user) return;
 
@@ -52,10 +55,12 @@ export default function DashboardProfile() {
       });
 
       setActive((prev) => !prev);
+      await useUserStore.getState().hydrate();
     } catch (error) {
       console.error(error);
     } finally {
       setActiveLoading(false);
+      triggerRefresh();
     }
   };
 
@@ -63,7 +68,7 @@ export default function DashboardProfile() {
     <>
       {!isLoading ? (
         <Box className="relative flex-1">
-          {user && <DashboardCertificate user={user} />}
+          {user && <DashboardCertificate />}
           <div className="mx-auto flex flex-col items-center gap-3">
             <p className="mt-4 text-2xl font-semibold capitalize md:mt-0">
               Hello, {user?.first_name ?? ""}!
