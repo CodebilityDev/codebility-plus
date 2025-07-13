@@ -68,6 +68,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
 
   const [sidekickDetails, setSidekickDetails] = useState<CodevMember[]>([]);
   const [supabase, setSupabase] = useState<any>(null);
+
   // Get priority-based styles
   const getPriorityStyles = () => {
     const baseClasses = "absolute top-0 left-0 w-1 h-full rounded-l-lg";
@@ -84,6 +85,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         return `${baseClasses} bg-gray-500`;
     }
   };
+
   // Get skill category color
   const getSkillCategoryColor = (category: string): string => {
     const colorMap: Record<string, string> = {
@@ -104,6 +106,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
       "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
     );
   };
+
   // Get task type color
   const getTaskTypeColor = (type: string): string => {
     const typeColorMap: Record<string, string> = {
@@ -176,7 +179,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
           </h3>
           <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
             <div
-              className={`flex items-center gap-1 rounded-full px-2 py-1 text-xs font-medium md:text-sm
+              className={`flex h-6 w-auto items-center justify-center gap-1 rounded-full px-2 py-1 text-xs font-medium md:h-8 md:text-sm
     ${
       task.priority === "critical"
         ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
@@ -188,11 +191,11 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
     }`}
             >
               <span className="capitalize">{task.priority ?? "Low"}</span>
-
               <PriorityIcon className="h-3 w-3 md:h-4 md:w-4" />
             </div>
+            {/* PRIMARY AVATAR - Fixed alignment */}
             <div
-              className="h-6 w-6 overflow-hidden rounded-full border-2 border-white shadow-md transition-colors 
+              className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-md transition-colors 
               group-hover:border-blue-200 dark:border-gray-800 md:h-8 md:w-8"
             >
               {primaryImage ? (
@@ -252,7 +255,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
           )}
         </div>
 
-        {/* Sidekicks */}
+        {/* Sidekicks - Fixed alignment */}
         {sidekicks.length > 0 && (
           <div className="flex -space-x-1.5 pt-1 md:-space-x-2 md:pt-2">
             {sidekicks.slice(0, 3).map((sidekickId) => {
@@ -260,7 +263,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
               return (
                 <div
                   key={sidekickId}
-                  className="h-5 w-5 overflow-hidden rounded-full border-2 border-white 
+                  className="flex h-5 w-5 items-center justify-center overflow-hidden rounded-full border-2 border-white 
                     shadow-sm transition-colors group-hover:border-blue-200 dark:border-gray-800 
                     md:h-7 md:w-7"
                 >
