@@ -8,6 +8,7 @@ import AdminDashboardMonthlyApplicantsLineChart from "./_components/AdminDashboa
 import AdminDashboardProjectsPie from "./_components/AdminDashboardProjectsPie";
 import AdminDashboardTotalActiveIntern from "./_components/AdminDashboardTotalActiveIntern";
 import AdminDashboardTotalAdmin from "./_components/AdminDashboardTotalAdmin";
+import AdminDashboardTotalCodev from "./_components/AdminDashboardTotalCodev";
 import AdminDashboardTotalInactiveIntern from "./_components/AdminDashboardTotalInactiveIntern ";
 import AdminDashboardTotalMentor from "./_components/AdminDashboardTotalMentor";
 import AdminDashboardTotalProjects from "./_components/AdminDashboardTotalProject";
@@ -19,7 +20,9 @@ async function getDashboardData() {
   const supabase = await createClientServerComponent();
   const { data: codev, error: codevError } = await supabase
     .from("codev")
-    .select("internal_status, role_id, application_status, date_applied");
+    .select(
+      "internal_status, availability_status, role_id, application_status, date_applied",
+    );
 
   const { data: projects, error: projectsError } = await supabase
     .from("projects")
@@ -72,17 +75,24 @@ async function getDashboardData() {
 
   //Interns
   const activeInterns = codev.filter(
-    (c) => c.internal_status !== "INACTIVE" && c.role_id === 4,
+    (c) =>
+      (c.internal_status !== "INACTIVE" || c.availability_status) &&
+      c.role_id === 4,
   ).length;
   const inactiveInterns = codev.filter(
-    (c) => c.internal_status === "INACTIVE" && c.role_id === 4,
+    (c) =>
+      (c.internal_status === "INACTIVE" || !c.availability_status) &&
+      c.role_id === 4,
   ).length;
 
-  //Admins
-  const admins = codev.filter((c) => c.role_id === 1).length;
+  //Codevs
+  const codevs = codev.filter((c) => c.role_id === 10).length;
 
   //Mentors
   const mentors = codev.filter((c) => c.role_id === 5).length;
+
+  //Admins
+  const admins = codev.filter((c) => c.role_id === 1).length;
 
   //Projects
   const projectCounts = categories.reduce(
@@ -103,8 +113,9 @@ async function getDashboardData() {
     dateApplied,
     activeInterns,
     inactiveInterns,
-    admins,
+    codevs,
     mentors,
+    admins,
     projectCounts,
     projectTotalCount,
   };
@@ -129,6 +140,9 @@ export default async function AdminDashboard() {
           <AdminDashboardTotalInactiveIntern
             count={dashboardData?.inactiveInterns}
           />
+        </div>
+        <div className="flex-1">
+          <AdminDashboardTotalCodev count={dashboardData?.codevs} />
         </div>
         <div className="flex-1">
           <AdminDashboardTotalAdmin count={dashboardData?.admins} />
