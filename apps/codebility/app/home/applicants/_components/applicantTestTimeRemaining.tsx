@@ -5,8 +5,10 @@ import { NewApplicantType } from "../_service/types";
 
 export default function ApplicantTestTimeRemaining({
   applicant,
+  isMobile,
 }: {
   applicant: NewApplicantType;
+  isMobile?: boolean;
 }) {
   const applicantData = applicant.applicant;
 
@@ -17,8 +19,8 @@ export default function ApplicantTestTimeRemaining({
 
   const isSubmitted = useMemo(
     () => applicantData?.fork_url !== null,
-    [applicantData?.fork_url],  
-  )
+    [applicantData?.fork_url],
+  );
 
   const [timeLeft, setTimeLeft] = useState(() => {
     const now = new Date();
@@ -65,27 +67,27 @@ export default function ApplicantTestTimeRemaining({
     return () => clearInterval(interval);
   }, [reapplyDate]);
 
-  return (
-    <div className="py-3 text-center text-sm text-gray-300">
-      {!timeLeft.isExpired ? (
-        <>
-          {timeLeft.days > 0 && (
-            <span>{`${timeLeft.days}d ${timeLeft.hours}h`}</span>
-          )}
-          {timeLeft.hours === 0 && timeLeft.minutes > 0 && (
-            <span>{`${timeLeft.minutes}m`}</span>
-          )}
-          {timeLeft.minutes === 0 && timeLeft.seconds > 0 && (
-            <span>{`${timeLeft.seconds}s`}</span>
-          )}
-        </>
-      ) : (
-        <span className="text-sm text-gray-500">
-          {isSubmitted
-            ? "Submitted test"
-            : "Expired"}
-        </span>
+  const content = !timeLeft.isExpired ? (
+    <>
+      {timeLeft.days > 0 && (
+        <span>{`${timeLeft.days}d ${timeLeft.hours}h`}</span>
       )}
-    </div>
+      {timeLeft.hours === 0 && timeLeft.minutes > 0 && (
+        <span>{`${timeLeft.minutes}m`}</span>
+      )}
+      {timeLeft.minutes === 0 && timeLeft.seconds > 0 && (
+        <span>{`${timeLeft.seconds}s`}</span>
+      )}
+    </>
+  ) : (
+    <span className="text-sm text-gray-500">
+      {isSubmitted ? "Submitted test" : "Expired"}
+    </span>
+  );
+
+  return isMobile ? (
+    content
+  ) : (
+    <div className="py-3 text-center text-sm text-gray-300">{content}</div>
   );
 }
