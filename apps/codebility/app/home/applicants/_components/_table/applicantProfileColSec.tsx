@@ -245,86 +245,96 @@ export default function ApplicantProfileColSec({
                   </TableRow>
 
                   {/* Test Taken Row */}
-                  <TableRow className="grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Test Taken</TableCell>
-                    <TableCell>
-                      {" "}
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="max-w-[150px] truncate text-xs">
-                            {applicant.applicant?.test_taken
-                              ? new Date(
-                                  applicant.applicant.test_taken,
-                                ).toLocaleDateString()
-                              : "N/A"}
-                          </span>
+                  {applicant.application_status === "testing" && (
+                    <TableRow className="grid grid-cols-2 p-2">
+                      <TableCell className="text-sm">Test Taken</TableCell>
+                      <TableCell>
+                        {" "}
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[150px] truncate text-xs">
+                              {applicant.applicant?.test_taken
+                                ? new Date(
+                                    applicant.applicant.test_taken,
+                                  ).toLocaleDateString()
+                                : "N/A"}
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                      </TableCell>
+                    </TableRow>
+                  )}
 
                   {/* Time Row */}
-                  <TableRow className="grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Time</TableCell>
-                    <TableCell>
-                      {" "}
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="max-w-[150px] truncate text-xs">
-                            <>
-                              <ApplicantTestTimeRemaining
+                  {applicant.application_status === "testing" && (
+                    <TableRow className="grid grid-cols-2 p-2">
+                      <TableCell className="text-sm">Time</TableCell>
+                      <TableCell>
+                        {" "}
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[150px] truncate text-xs">
+                              <>
+                                <ApplicantTestTimeRemaining
+                                  applicant={applicant}
+                                  isMobile={true}
+                                />
+                              </>
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {/* Fork URL Row */}
+                  {applicant.application_status === "testing" && (
+                    <TableRow className="grid grid-cols-2 p-2">
+                      <TableCell className="text-sm">Fork URL</TableCell>
+                      <TableCell>
+                        {" "}
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[150px] truncate text-xs">
+                              {applicant.applicant?.fork_url ? (
+                                <Link
+                                  href={applicant.applicant.fork_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <IconLink className="h-4 w-4 text-gray-200" />
+                                </Link>
+                              ) : (
+                                <span className="text-sm text-gray-500">
+                                  N/A
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {/* Reapply Row */}
+                  {applicant.application_status === "denied" && (
+                    <TableRow className="grid grid-cols-2 p-2">
+                      <TableCell className="text-sm">Reapply</TableCell>
+                      <TableCell>
+                        {" "}
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[150px] truncate text-xs">
+                              <ApplicantReapplyTime
                                 applicant={applicant}
                                 isMobile={true}
                               />
-                            </>
-                          </span>
+                            </span>
+                          </div>
                         </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-
-                  {/* Fork URL Row */}
-                  <TableRow className="grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Fork URL</TableCell>
-                    <TableCell>
-                      {" "}
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="max-w-[150px] truncate text-xs">
-                            {applicant.applicant?.fork_url ? (
-                              <Link
-                                href={applicant.applicant.fork_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                              >
-                                <IconLink className="h-4 w-4 text-gray-200" />
-                              </Link>
-                            ) : (
-                              <span className="text-sm text-gray-500">N/A</span>
-                            )}
-                          </span>
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
-
-                  {/* Reapply Row */}
-                  <TableRow className="grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Reapply</TableCell>
-                    <TableCell>
-                      {" "}
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="max-w-[150px] truncate text-xs">
-                            <ApplicantReapplyTime
-                              applicant={applicant}
-                              isMobile={true}
-                            />
-                          </span>
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                      </TableCell>
+                    </TableRow>
+                  )}
 
                   <TableRow className="grid grid-cols-2 p-2">
                     <TableCell className="text-sm">Actions</TableCell>
