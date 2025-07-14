@@ -203,7 +203,8 @@ export default function ApplicantProfileColSec({
                     <TableCell>
                       <div className="flex flex-wrap gap-2">
                         {applicant.tech_stacks &&
-                        applicant.tech_stacks.length > 0 && !applicant.tech_stacks.includes("none") ? (
+                        applicant.tech_stacks.length > 0 &&
+                        !applicant.tech_stacks.includes("none") ? (
                           applicant.tech_stacks.map((stack, i) => (
                             <Image
                               key={i}
@@ -218,6 +219,25 @@ export default function ApplicantProfileColSec({
                         ) : (
                           <span className="text-xs text-gray-500">None</span>
                         )}
+                      </div>
+                    </TableCell>
+                  </TableRow>
+
+                  {/* Date Applied Row */}
+                  <TableRow className="grid grid-cols-2 p-2">
+                    <TableCell className="text-sm">Date Applied</TableCell>
+                    <TableCell>
+                      {" "}
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="max-w-[150px] truncate text-xs">
+                            {applicant.date_applied
+                              ? new Date(
+                                  applicant.date_applied,
+                                ).toLocaleDateString()
+                              : "N/A"}
+                          </span>
+                        </div>
                       </div>
                     </TableCell>
                   </TableRow>
