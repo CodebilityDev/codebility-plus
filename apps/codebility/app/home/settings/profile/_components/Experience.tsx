@@ -83,26 +83,10 @@ const Experience = ({ data }: ExperienceProps) => {
 	);
 
 	const canAddNew = useCallback(() => {
-		console.log("ExperienceData", experienceData);
-		console.log(experienceData.length - 1)
-
 		const experienceLast = experienceData[experienceData.length - 1];
 		const hasEditMode = Object.values(editModePerItem.current).some(
 			(value) => value,
 		);
-
-		// if (
-		// 	experienceLast &&
-		// 	(!experienceLast.position ||
-		// 		!experienceLast.description ||
-		// 		!experienceLast.date_to ||
-		// 		!experienceLast.date_from ||
-		// 		!experienceLast.company_name ||
-		// 		!experienceLast.location)
-		// ) {
-		// 	toast.error("Please fill all empty fields first");
-		// 	return false;
-		// }
 
 		if (hasEditMode) {
 			toast.error("Please save your changes first");
