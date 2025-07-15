@@ -110,7 +110,7 @@ importers:
         specifier: ^1.1.0
         version: 1.1.9(@types/react-dom@19.1.5)(@types/react@19.1.5)(react-dom@19.1.0)(react@19.1.0)
       '@radix-ui/react-tooltip':
-        specifier: ^1.0.3
+        specifier: ^1.2.7
         version: 1.2.7(@types/react-dom@19.1.5)(@types/react@19.1.5)(react-dom@19.1.0)(react@19.1.0)
       '@react-email/components':
         specifier: ^0.0.34
