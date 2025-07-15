@@ -24,6 +24,8 @@ import {
 } from "@codevs/ui/hover-card";
 
 import { NewApplicantType } from "../../_service/types";
+import ApplicantReapplyTime from "../applicantReapplyTime";
+import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
 import ApplicantActionButton from "./applicantActionButton";
 
 export default function ApplicantProfileColSec({
@@ -203,7 +205,8 @@ export default function ApplicantProfileColSec({
                     <TableCell>
                       <div className="flex flex-wrap gap-2">
                         {applicant.tech_stacks &&
-                        applicant.tech_stacks.length > 0 && !applicant.tech_stacks.includes("none") ? (
+                        applicant.tech_stacks.length > 0 &&
+                        !applicant.tech_stacks.includes("none") ? (
                           applicant.tech_stacks.map((stack, i) => (
                             <Image
                               key={i}
@@ -221,6 +224,117 @@ export default function ApplicantProfileColSec({
                       </div>
                     </TableCell>
                   </TableRow>
+
+                  {/* Date Applied Row */}
+                  <TableRow className="grid grid-cols-2 p-2">
+                    <TableCell className="text-sm">Date Applied</TableCell>
+                    <TableCell>
+                      {" "}
+                      <div className="flex flex-col space-y-2">
+                        <div className="flex items-center gap-2">
+                          <span className="max-w-[150px] truncate text-xs">
+                            {applicant.date_applied
+                              ? new Date(
+                                  applicant.date_applied,
+                                ).toLocaleDateString()
+                              : "N/A"}
+                          </span>
+                        </div>
+                      </div>
+                    </TableCell>
+                  </TableRow>
+
+                  {/* Test Taken Row */}
+                  {applicant.application_status === "testing" && (
+                    <TableRow className="grid grid-cols-2 p-2">
+                      <TableCell className="text-sm">Test Taken</TableCell>
+                      <TableCell>
+                        {" "}
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[150px] truncate text-xs">
+                              {applicant.applicant?.test_taken
+                                ? new Date(
+                                    applicant.applicant.test_taken,
+                                  ).toLocaleDateString()
+                                : "N/A"}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {/* Time Row */}
+                  {applicant.application_status === "testing" && (
+                    <TableRow className="grid grid-cols-2 p-2">
+                      <TableCell className="text-sm">Time</TableCell>
+                      <TableCell>
+                        {" "}
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[150px] truncate text-xs">
+                              <>
+                                <ApplicantTestTimeRemaining
+                                  applicant={applicant}
+                                  isMobile={true}
+                                />
+                              </>
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {/* Fork URL Row */}
+                  {applicant.application_status === "testing" && (
+                    <TableRow className="grid grid-cols-2 p-2">
+                      <TableCell className="text-sm">Fork URL</TableCell>
+                      <TableCell>
+                        {" "}
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[150px] truncate text-xs">
+                              {applicant.applicant?.fork_url ? (
+                                <Link
+                                  href={applicant.applicant.fork_url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                >
+                                  <IconLink className="h-4 w-4 text-gray-200" />
+                                </Link>
+                              ) : (
+                                <span className="text-sm text-gray-500">
+                                  N/A
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {/* Reapply Row */}
+                  {applicant.application_status === "denied" && (
+                    <TableRow className="grid grid-cols-2 p-2">
+                      <TableCell className="text-sm">Reapply</TableCell>
+                      <TableCell>
+                        {" "}
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[150px] truncate text-xs">
+                              <ApplicantReapplyTime
+                                applicant={applicant}
+                                isMobile={true}
+                              />
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
 
                   <TableRow className="grid grid-cols-2 p-2">
                     <TableCell className="text-sm">Actions</TableCell>

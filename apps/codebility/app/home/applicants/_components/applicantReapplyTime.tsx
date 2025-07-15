@@ -5,8 +5,10 @@ import { NewApplicantType } from "../_service/types";
 
 export default function ApplicantReapplyTime({
   applicant,
+  isMobile,
 }: {
   applicant: NewApplicantType;
+  isMobile?: boolean;
 }) {
   const reapplyDate = useMemo(
     () =>
@@ -61,19 +63,21 @@ export default function ApplicantReapplyTime({
     return () => clearInterval(interval);
   }, [reapplyDate]);
 
-  return (
-    <div className="py-3 text-center text-sm">
-      {!timeLeft.isExpired ? (
-        <div className="text-gray-300">
-          <div className="flex justify-center space-x-1">
-            <span className="">{timeLeft.days}d</span>
-            <span className="">{timeLeft.hours}h</span>
-            <span className="">{timeLeft.minutes}m</span>
-          </div>
-        </div>
-      ) : (
-        <span className="font-medium text-green-500">Available now</span>
-      )}
+  const content = !timeLeft.isExpired ? (
+    <div className="text-gray-300">
+      <div className="flex justify-center space-x-1">
+        <span>{timeLeft.days}d</span>
+        <span>{timeLeft.hours}h</span>
+        <span>{timeLeft.minutes}m</span>
+      </div>
     </div>
+  ) : (
+    <span className="font-medium text-green-500">Available now</span>
+  );
+
+  return isMobile ? (
+    content
+  ) : (
+    <div className="py-3 text-center text-sm">{content}</div>
   );
 }
