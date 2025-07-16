@@ -9,5 +9,6 @@ export const columns = [
   { key: "projects", label: "Projects" },
   { key: "nda_status", label: "NDA Status" },
   { key: "portfolio_website", label: "Portfolio" },
+  { key: "date_joined", label: "Date Joined" },
   { key: "availability_status", label: "Availability Status" },
 ] as const;

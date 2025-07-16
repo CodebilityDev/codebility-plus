@@ -238,6 +238,26 @@ export function EditableCard({
             </span>
           </div>
         </div>
+
+        <div>
+          <Label>Date Joined</Label>
+          <Input
+            type="date"
+            value={
+              formData.date_joined
+                ? new Date(formData.date_joined).toISOString().split("T")[0]
+                : ""
+            }
+            onChange={(e) => {
+              const dateValue = e.target.value
+                ? new Date(e.target.value).toISOString()
+                : null;
+              handleChange("date_joined", dateValue);
+            }}
+            disabled={isSubmitting}
+            placeholder="Select date joined"
+          />
+        </div>
       </CardContent>
 
       <CardFooter className="flex justify-end space-x-2">
