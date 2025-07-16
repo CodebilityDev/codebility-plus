@@ -17,113 +17,113 @@ import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 import UserTaskFilter from "./UserTaskFilter";
 
 interface KanbanBoardProps {
-  boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
-  projectId: string;
+	boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
+	projectId: string;
 }
 
 export default function KanbanBoard({
-  boardData,
-  projectId,
+	boardData,
+	projectId,
 }: KanbanBoardProps) {
-  const user = useUserStore((state) => state.user);
-  const canAddColumn = user?.role_id === 1 || user?.role_id === 5;
-  const canAddMember = canAddColumn;
+	const user = useUserStore((state) => state.user);
+	const canAddColumn = user?.role_id === 1 || user?.role_id === 5;
+	const canAddMember = canAddColumn;
 
-  const [activeFilter, setActiveFilter] = useState<string | null>(null);
+	const [activeFilter, setActiveFilter] = useState<string | null>(null);
 
-  // Fetch all project members using React Query
-  const { data: allMembers = [], isLoading: isMembersLoading } = useQuery({
-    queryKey: ["members", projectId],
-    queryFn: async () => {
-      const result = await getMembers(projectId);
-      return result.data || [];
-    },
-    enabled: !!projectId,
-    staleTime: 5 * 60 * 1000,
-    refetchOnWindowFocus: false,
-  });
+	// Fetch all project members using React Query
+	const { data: allMembers = [], isLoading: isMembersLoading } = useQuery({
+		queryKey: ["members", projectId],
+		queryFn: async () => {
+			const result = await getMembers(projectId);
+			return result.data || [];
+		},
+		enabled: !!projectId,
+		staleTime: 5 * 60 * 1000,
+		refetchOnWindowFocus: false,
+	});
 
-  const members = allMembers.map((user) => ({
-    userId: user.id,
-    userName: `${user.first_name} ${user.last_name}`,
-    imageUrl: user.image_url,
-    isActive: activeFilter === user.id,
-  }));
+	const members = allMembers.map((user) => ({
+		userId: user.id,
+		userName: `${user.first_name} ${user.last_name}`,
+		imageUrl: user.image_url,
+		isActive: activeFilter === user.id,
+	}));
 
-  const handleFilterClick = (userId: string) => {
-    setActiveFilter(activeFilter === userId ? null : userId);
-  };
+	const handleFilterClick = (userId: string) => {
+		setActiveFilter(activeFilter === userId ? null : userId);
+	};
 
-  if (!boardData) {
-    return (
-      <div className="text-center text-red-500">Board data not found.</div>
-    );
-  }
+	if (!boardData) {
+		return (
+			<div className="text-center text-red-500">Board data not found.</div>
+		);
+	}
 
-  return (
-    <div className="flex h-full w-full">
-      <div className="mx-auto h-full w-[calc(100vw-22rem)] flex-1 flex-col">
-        <div className="text-dark100_light900 flex h-full flex-col gap-4">
-          <div className="flex flex-row items-center gap-4 text-sm">
-            <Link href={pathsConfig.app.kanban}>
-              <span className="dark:text-white/50">Kanban Board</span>
-            </Link>
-            <ArrowRightIcon />
-            <span className="font-semibold">{boardData.name}</span>
-          </div>
+	return (
+		<div className="flex h-full w-full">
+			<div className="mx-auto h-full w-[calc(100vw-22rem)] flex-1 flex-col">
+				<div className="text-dark100_light900 flex h-full flex-col gap-4">
+					<div className="flex flex-row items-center gap-4 text-sm">
+						<Link href={pathsConfig.app.kanban}>
+							<span className="dark:text-white/50">Kanban Board</span>
+						</Link>
+						<ArrowRightIcon />
+						<span className="font-semibold">{boardData.name}</span>
+					</div>
 
-          <div className="flex flex-col gap-4 md:justify-between lg:flex-row">
-            <h1 className="text-dark100_light900 text-md font-semibold md:text-2xl">
-              {boardData.name}
-            </h1>
+					<div className="flex flex-col gap-4 md:justify-between lg:flex-row">
+						<h1 className="text-dark100_light900 text-md font-semibold md:text-2xl">
+							{boardData.name}
+						</h1>
 
-            <div className="flex flex-col gap-4 xl:flex-row">
-              <div className="flex items-center gap-6">
-                <div className="h-10 overflow-visible">
-                  <UserTaskFilter
-                    members={members}
-                    onFilterClick={handleFilterClick}
-                  />
-                </div>
+						<div className="flex flex-col gap-4 xl:flex-row">
+							<div className="flex flex-col items-center gap-6">
+								<div className="h-10 overflow-visible">
+									<UserTaskFilter
+										members={members}
+										onFilterClick={handleFilterClick}
+									/>
+								</div>
 
-                <div className="bg-light-900 flex w-[280px] items-center gap-3 rounded-md border border-zinc-300 p-2 dark:border-zinc-500 dark:bg-[#2C303A]">
-                  <label htmlFor="kanbanSearch">
-                    <IconSearch />
-                  </label>
-                  <KanbanBoardsSearch
-                    className="w-full bg-transparent outline-none"
-                    placeholder="Search"
-                    id="kanbanSearch"
-                  />
-                </div>
-              </div>
+								<div className="bg-light-900 flex w-[280px] items-center gap-3 rounded-md border border-zinc-300 p-2 dark:border-zinc-500 dark:bg-[#2C303A]">
+									<label htmlFor="kanbanSearch">
+										<IconSearch />
+									</label>
+									<KanbanBoardsSearch
+										className="w-full bg-transparent outline-none"
+										placeholder="Search"
+										id="kanbanSearch"
+									/>
+								</div>
+							</div>
 
-              <div className="flex items-center justify-center gap-2 md:justify-start">
-                {canAddColumn && (
-                  <KanbanColumnAddButton boardId={boardData.id} />
-                )}
-                {canAddMember && <KanbanAddMembersButton />}
-              </div>
-            </div>
-          </div>
+							<div className="flex items-center justify-center gap-2 md:justify-start">
+								{canAddColumn && (
+									<KanbanColumnAddButton boardId={boardData.id} />
+								)}
+								{canAddMember && <KanbanAddMembersButton />}
+							</div>
+						</div>
+					</div>
 
-          {boardData.kanban_columns.length === 0 ? (
-            <div className="text-dark100_light900 py-10 text-center text-lg">
-              No columns found in this board.
-            </div>
-          ) : (
-            <div className="text-dark100_light900 flex h-full">
-              <KanbanBoardColumnContainer
-                projectId={boardData.id}
-                columns={boardData.kanban_columns || []}
-                activeFilter={activeFilter}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+					{boardData.kanban_columns.length === 0 ? (
+						<div className="text-dark100_light900 py-10 text-center text-lg">
+							No columns found in this board.
+						</div>
+					) : (
+						<div className="text-dark100_light900 flex h-full">
+							<KanbanBoardColumnContainer
+								projectId={boardData.id}
+								columns={boardData.kanban_columns || []}
+								activeFilter={activeFilter}
+							/>
+						</div>
+					)}
+				</div>
+			</div>
 
-      {canAddColumn && <KanbanColumnAddModal />}
-    </div>
-  );
+			{canAddColumn && <KanbanColumnAddModal />}
+		</div>
+	);
 }
