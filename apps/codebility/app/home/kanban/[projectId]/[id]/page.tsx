@@ -39,14 +39,18 @@ const mapColumn = (column: any): KanbanColumnType => ({
   position: column.position,
   created_at: column.created_at,
   updated_at: column.updated_at,
-  tasks: Array.isArray(column.tasks) ? column.tasks.map(mapTask) : [],
+  tasks: Array.isArray(column.tasks) 
+    ? column.tasks
+        .filter((task: any) => !task.is_archive) // Filter out archived tasks
+        .map(mapTask) 
+    : [],
 });
 
 export default async function KanbanBoardPage(props: KanbanBoardPageProps) {
   const searchParams = await props.searchParams;
   const params = await props.params;
   const supabase = await createClientServerComponent();
-  // Query the board with nested columns and tasks
+  // Query the board with nested columns and tasks (excluding archived tasks)
   const { data: board, error } = await supabase
     .from("kanban_boards")
     .select(
@@ -75,6 +79,7 @@ export default async function KanbanBoardPage(props: KanbanBoardPageProps) {
           sidekick_ids,
           created_by,
           kanban_column_id,
+          is_archive,
           codev!tasks_codev_id_fkey (
             id,
             first_name,

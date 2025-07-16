@@ -577,8 +577,8 @@ export const completeTask = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // Call the RPC function
-    const { data, error } = await supabase.rpc('complete_task', {
+    // Call the NEW RPC function to award points and archive task
+    const { data, error } = await supabase.rpc('new_complete_task', {
       task_id: task.id,
       task_points: task.points || 0,
       primary_codev_id: task.codev?.id,
@@ -667,6 +667,36 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
     return {
       success: false,
       error: error instanceof Error ? error.message : "Update failed",
+    };
+  }
+}
+
+// for unarchiving tasks
+export async function unarchiveTask(taskId: string) {
+  const supabase = await createClientServerComponent();
+  try {
+    const { error } = await supabase
+      .from("tasks")
+      .update({ 
+        is_archive: false,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", taskId);
+
+    if (error) {
+      console.error("Error unarchiving task:", error);
+      return { success: false, error: error.message };
+    }
+
+    // ✅ Revalidate the cache after updating
+    revalidatePath("/home/kanban");
+
+    return { success: true };
+  } catch (error) {
+    console.error("Unarchive error:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unarchive failed",
     };
   }
 }
