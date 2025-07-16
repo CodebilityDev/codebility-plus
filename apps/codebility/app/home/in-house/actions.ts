@@ -26,6 +26,7 @@ export const updateCodev = async (
       "role_id",
       "level",
       "tech_stacks",
+      "date_joined",
     ],
   };
 
