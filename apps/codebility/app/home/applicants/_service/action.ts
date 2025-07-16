@@ -257,6 +257,7 @@ export async function acceptApplicantAction(applicantId: string) {
             .update({
                 application_status: "passed",
                 role_id: 4,
+                date_joined: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             })
             .eq("id", applicantId);
@@ -283,6 +284,7 @@ export async function multipleAcceptApplicantAction(applicantIds: string[]) {
             .update({
                 application_status: "passed",
                 role_id: 4,
+                date_joined: new Date().toISOString(),
                 updated_at: new Date().toISOString()
             })
             .in("id", applicantIds);
