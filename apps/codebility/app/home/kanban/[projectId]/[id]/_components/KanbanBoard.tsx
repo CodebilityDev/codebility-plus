@@ -5,16 +5,19 @@ import Link from "next/link";
 import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
 import { getMembers } from "@/app/home/projects/actions";
 import pathsConfig from "@/config/paths.config";
-import { ArrowRightIcon, IconSearch } from "@/public/assets/svgs";
+import { ArrowRightIcon, IconSearch, IconArchive } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
 import { useQuery } from "@tanstack/react-query";
+import { Button } from "@codevs/ui/button";
 
 import KanbanAddMembersButton from "./kanban_modals/KanbanAddMembersButton";
 import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 import UserTaskFilter from "./UserTaskFilter";
+import ArchiveColumn from "./ArchiveColumn";
+
 
 interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
@@ -30,6 +33,7 @@ export default function KanbanBoard({
   const canAddMember = canAddColumn;
 
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
+  const [showArchive, setShowArchive] = useState(false);
 
   // Fetch all project members using React Query
   const { data: allMembers = [], isLoading: isMembersLoading } = useQuery({
@@ -103,6 +107,18 @@ export default function KanbanBoard({
                   <KanbanColumnAddButton boardId={boardData.id} />
                 )}
                 {canAddMember && <KanbanAddMembersButton />}
+                <Button
+                  onClick={() => setShowArchive(!showArchive)}
+                  variant={showArchive ? "default" : "outline"}
+                  className={`flex items-center gap-2 ${
+                    showArchive 
+                      ? "bg-blue-100 text-white hover:bg-blue-200 dark:bg-blue-100 dark:text-white dark:hover:bg-blue-200" 
+                      : "border-lightgray text-black-100 hover:bg-lightgray dark:border-darkgray dark:text-white dark:hover:bg-darkgray"
+                  }`}
+                >
+                  <IconArchive className="h-4 w-4" />
+                  {showArchive ? "Hide Archive" : "Show Archive"}
+                </Button>
               </div>
             </div>
           </div>
@@ -113,11 +129,15 @@ export default function KanbanBoard({
             </div>
           ) : (
             <div className="text-dark100_light900 flex h-full">
-              <KanbanBoardColumnContainer
-                projectId={boardData.id}
-                columns={boardData.kanban_columns || []}
-                activeFilter={activeFilter}
-              />
+              {!showArchive ? (
+                <KanbanBoardColumnContainer
+                  projectId={boardData.id}
+                  columns={boardData.kanban_columns || []}
+                  activeFilter={activeFilter}
+                />
+              ) : (
+                <ArchiveColumn projectId={projectId} boardId={boardData.id} />
+              )}
             </div>
           )}
         </div>
