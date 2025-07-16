@@ -113,6 +113,7 @@ export interface Codev {
   date_applied?: string;
   promote_declined?: boolean;
   date_passed?: string;
+  date_joined?: string; 
 }
 
 export type ApplicantStatus =
