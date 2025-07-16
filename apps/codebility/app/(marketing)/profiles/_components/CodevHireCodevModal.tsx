@@ -5,16 +5,15 @@ import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogFooter } from "
 import { useModal } from "@/hooks/use-modal";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
-import emailjs from "@emailjs/browser";
 import { Textarea } from "@codevs/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { getCodev } from "../actions";
-
+import { getCodev } from "../_service/actions";
 import { z } from "zod";
 import { toast } from "@/Components/ui/use-toast";
 import { Codev } from "@/types/home/codev";
 import { useEffect, useState } from "react";
+import { sentHireCodevEmail } from "../_service/emailAction";
 
 const formSchema = z.object({
 	name: z.string().min(1, { message: "Name is required" }),
@@ -23,6 +22,7 @@ const formSchema = z.object({
 });
 
 type FormValues = z.infer<typeof formSchema>;
+export type HireCodevEmail = FormValues;
 
 export function CodevHireCodevModal() {
 	const { isOpen, onClose, type, data: codevId } = useModal();
@@ -35,8 +35,6 @@ export function CodevHireCodevModal() {
 		});
 	}, [codevId]);
 
-	console.log("codev", codev);
-
 	const form = useForm<FormValues>({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
@@ -47,10 +45,6 @@ export function CodevHireCodevModal() {
 	});
 
 	const onSubmit = async (values: FormValues) => {
-		const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID!;
-		const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID!;
-		const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY!;
-
 		try {
 			// Prepare template parameters
 			const templateParams = {
@@ -63,20 +57,27 @@ export function CodevHireCodevModal() {
 				codev_display_position: codev?.display_position,
 			};
 
-			await emailjs.send(serviceId, templateId, templateParams, publicKey);
-
-			toast({
-				title: "Email sent successfully",
-				description: "We'll get back to you soon!",
-
+			const response = await sentHireCodevEmail({
+				name: values.name,
+				email: values.email,
+				message: values.message,
+				codev: codev!,
 			});
+
+
+			if (response) {
+				toast({
+					title: "Email sent successfully",
+					description: "We'll get back to you soon!",
+					duration: 4000,
+				});
+			}
 
 			// Reset form and close modal
 			form.reset();
 			handleClose();
 
 		} catch (error: any) {
-			console.error("EmailJS Error:", error);
 			toast({
 				title: "Email failed to send",
 				description: error?.text || "An error occurred while sending the email.",
