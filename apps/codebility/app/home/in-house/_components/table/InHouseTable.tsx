@@ -449,6 +449,14 @@ export function InHouseTable({
                             </DropdownMenuShortcut>
                           </DropdownMenuItem>
                           <DropdownMenuItem>
+                            Date Joined
+                            <DropdownMenuShortcut>
+                              {item.date_joined 
+                                ? new Date(item.date_joined).toLocaleDateString()
+                                : "-"}
+                            </DropdownMenuShortcut>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem>
                             Availability Status
                             <DropdownMenuShortcut>
                               <SwitchStatusButton
@@ -548,6 +556,12 @@ export function InHouseTable({
                     ) : (
                       "-"
                     )}
+                  </TableCell>
+
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
+                    {item.date_joined 
+                      ? new Date(item.date_joined).toLocaleDateString()
+                      : "-"}
                   </TableCell>
 
                   <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">

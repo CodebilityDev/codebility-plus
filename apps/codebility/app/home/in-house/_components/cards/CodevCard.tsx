@@ -171,6 +171,15 @@ export function CodevCard({ data, onEdit, onDelete, roles }: CodevCardProps) {
             {data.nda_status ? "Signed" : "Not Signed"}
           </span>
         </div>
+
+        <div className="flex justify-between text-sm">
+          <span className="text-gray dark:text-light-500">Date Joined:</span>
+          <span className="dark:text-light-900 text-black">
+            {data.date_joined 
+              ? new Date(data.date_joined).toLocaleDateString()
+              : "-"}
+          </span>
+        </div>
       </CardContent>
 
       <CardFooter className="border-light-700 dark:border-dark-200 flex justify-center gap-2 border-t py-1">

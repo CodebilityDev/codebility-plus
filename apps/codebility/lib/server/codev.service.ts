@@ -43,6 +43,7 @@ export const getCodevs = async ({
     mentor_id,
     created_at,
     updated_at,
+    date_joined,
     education (
       id,
       institution,
