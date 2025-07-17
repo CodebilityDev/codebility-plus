@@ -23,10 +23,11 @@ export const sentHireCodevEmail = async (emailData: EmailProps) => {
 			codev_display_position: emailData.codev.display_position,
 		}
 
+
 		const { data, error } = await resend.emails.send({
 			from: "Codebility Team <Codebility.dev@codebility.tech>",
 			to: "Codebility.dev@gmail.com",
-			subject: "Hire Codev - Codebility",
+			subject: "New Hire Codev Request - Codebility",
 			text: TextTemplate(email),
 			html: HTMLTemplate(email),
 		})
