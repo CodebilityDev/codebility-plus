@@ -208,6 +208,10 @@ export const HTMLTemplate = ({ from_name, from_email, message, codev_id, codev_f
 								overflow: hidden;
 						}
 						
+						.font-bold {
+								font-weight: 600;
+						}
+						
 						@media (max-width: 600px) {
 								.container {
 										padding: 20px 10px;
@@ -252,7 +256,7 @@ export const HTMLTemplate = ({ from_name, from_email, message, codev_id, codev_f
 								
 								<div class="welcome-text">
 										<h2>New Hire Request from ${from_name}</h2>
-										<p>${from_name} is interested in hiring ${codev_first_name} ${codev_last_name} for your team.</p>
+										<p><span class="font-bold">${from_name}</span> is interested in hiring <span class="font-bold">${codev_first_name} ${codev_last_name}</span></p>
 								</div>
 								
 								<div class="sender-info">
