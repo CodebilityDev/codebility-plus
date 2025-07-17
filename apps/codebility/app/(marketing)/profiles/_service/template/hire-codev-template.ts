@@ -12,7 +12,6 @@ export const TextTemplate = ({ from_name, from_email, message, codev_id, codev_f
 		Message: ${message}
 
 		Hiring Details: ${from_name} wants to hire ${codev_first_name} ${codev_last_name}
-		\tCodev ID: ${codev_id}
 		\tFirst Name: ${codev_first_name} 
 		\tLast Name: ${codev_last_name} 
 		\tPosition: ${codev_display_position}
@@ -269,10 +268,6 @@ export const HTMLTemplate = ({ from_name, from_email, message, codev_id, codev_f
 								<div class="codev-info">
 										<h3>Hire Details</h3>
 										<table>
-												<tr>
-														<td>Codev ID:</td>
-														<td>${codev_id}</td>
-												</tr>
 												<tr>
 														<td>First Name:</td>
 														<td>${codev_first_name}</td>
