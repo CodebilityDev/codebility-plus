@@ -167,6 +167,7 @@ export function EditableRow({
         "level",
         "tech_stacks",
         "phone_number",
+        "date_joined",
       ];
 
       // This can be a loose type so TS doesn't complain
@@ -362,6 +363,26 @@ export function EditableRow({
           />
         );
 
+      case "date_joined":
+        return (
+          <Input
+            type="date"
+            value={
+              editForm.date_joined
+                ? new Date(editForm.date_joined).toISOString().split("T")[0]
+                : ""
+            }
+            onChange={(e) => {
+              const dateValue = e.target.value
+                ? new Date(e.target.value).toISOString()
+                : null;
+              handleLocalChange("date_joined", dateValue);
+            }}
+            disabled={isSubmitting || isUploading}
+            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 border text-black dark:text-white"
+          />
+        );
+
       default:
         // For example: first_name, last_name, portfolio_website, etc.
         return (
@@ -389,6 +410,7 @@ export function EditableRow({
       <TableCell className="p-2 pb-6">
         {renderCell("portfolio_website")}
       </TableCell>
+      <TableCell className="p-2 pb-6">{renderCell("date_joined")}</TableCell>
       <TableCell className="p-2">{renderCell("availability_status")}</TableCell>
 
       <TableCell className="p-2">
