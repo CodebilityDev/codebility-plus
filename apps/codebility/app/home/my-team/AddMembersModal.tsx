@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/Components/ui/dialog";
-import { Codev } from "@/types/home/codev";
+import { Codev, InternalStatus } from "@/types/home/codev";
 import { Search, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import { useModal } from "@/hooks/use-modal-users";
@@ -103,12 +103,13 @@ const TeamLeaderDisplay = ({
             if (onProfileClick && teamLead) {
               const codevMember: Codev = {
                 ...teamLead,
-                internal_status: 'AVAILABLE',
+                internal_status: 'MENTOR' as InternalStatus,
                 availability_status: true,
                 years_of_experience: 0,
                 about: '',
                 education: [],
                 experience: [],
+                work_experience: [],
                 projects: [],
                 tech_stacks: [],
                 codev_points: [],
@@ -116,7 +117,10 @@ const TeamLeaderDisplay = ({
                 github: null,
                 linkedin: null,
                 facebook: null,
-                discord: null
+                discord: null,
+                phone_number: null,
+                address: null,
+                role_id: null
               };
               onProfileClick(codevMember);
             }
