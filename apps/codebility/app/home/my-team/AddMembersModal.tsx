@@ -13,6 +13,7 @@ import { Codev, InternalStatus } from "@/types/home/codev";
 import { Search, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import { useModal } from "@/hooks/use-modal-users";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface AddMembersModalProps {
   isOpen: boolean;
@@ -24,6 +25,82 @@ interface AddMembersModalProps {
   };
   onUpdate: (selectedMembers: Codev[]) => void;
 }
+
+// ✅ CLIENT-SIDE: Calculate years from work experience
+const calculateYearsFromExperience = (workExperience: any[]): number => {
+  if (!workExperience || workExperience.length === 0) return 0;
+  
+  let totalYears = 0;
+  workExperience.forEach(exp => {
+    if (exp.date_from) {
+      const startDate = new Date(exp.date_from);
+      const endDate = exp.is_present ? new Date() : (exp.date_to ? new Date(exp.date_to) : new Date());
+      const yearsDiff = (endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24 * 365.25);
+      totalYears += Math.max(0, yearsDiff);
+    }
+  });
+  
+  return Math.round(totalYears);
+};
+
+// ✅ FIXED: Client-side database query for complete profile
+const getCompleteCodevProfile = async (codevId: string): Promise<Codev | null> => {
+  try {
+    const supabase = createClientClientComponent();
+    
+    const { data, error } = await supabase
+      .from("codev")
+      .select(`
+        *,
+        education:education(*),
+        work_experience:work_experience(*),
+        projects:project_members(
+          project:project_id(*)
+        ),
+        codev_points:codev_points(*)
+      `)
+      .eq('id', codevId)
+      .single();
+
+    if (error || !data) {
+      console.error('Error fetching complete profile:', error);
+      return null;
+    }
+
+    // ✅ Handle years_of_experience calculation
+    let finalYearsOfExperience = data.years_of_experience;
+    
+    if (finalYearsOfExperience === null || finalYearsOfExperience === undefined) {
+      finalYearsOfExperience = calculateYearsFromExperience(data.work_experience || []);
+    }
+
+    // ✅ Return REAL database values - no forced status overrides
+    const enhancedProfile = {
+      ...data,
+      years_of_experience: finalYearsOfExperience,
+      work_experience: data.work_experience || [],
+      education: data.education || [],
+      projects: data.projects || [],
+      codev_points: data.codev_points || [],
+      tech_stacks: data.tech_stacks || [],
+      positions: data.positions || []
+    };
+
+    console.log('✅ AddMembersModal - REAL DATABASE VALUES:', {
+      id: enhancedProfile.id,
+      name: `${enhancedProfile.first_name} ${enhancedProfile.last_name}`,
+      availability_status: enhancedProfile.availability_status, // ✅ Real DB value
+      internal_status: enhancedProfile.internal_status, // ✅ Real DB value
+      years_of_experience: enhancedProfile.years_of_experience, // ✅ Real/calculated value
+      years_source: data.years_of_experience !== null ? 'database' : 'calculated'
+    });
+
+    return enhancedProfile as Codev;
+  } catch (error) {
+    console.error('Failed to fetch complete profile:', error);
+    return null;
+  }
+};
 
 // Line 25: Responsive Avatar Component with Profile Click
 const TeamMemberAvatar = ({ 
@@ -81,7 +158,7 @@ const TeamMemberAvatar = ({
   </div>
 );
 
-// Line 70: Team Leader Display Component with Profile Click
+// ✅ FIXED: Team Leader Display with real data handling
 const TeamLeaderDisplay = ({ 
   teamLead,
   onProfileClick
@@ -101,28 +178,35 @@ const TeamLeaderDisplay = ({
           onClick={(e) => {
             e.stopPropagation();
             if (onProfileClick && teamLead) {
-              const codevMember: Codev = {
-                ...teamLead,
-                internal_status: 'MENTOR' as InternalStatus,
-                availability_status: true,
-                years_of_experience: 0,
-                about: '',
+              // ✅ Create basic Codev object - real data will be fetched by handleProfileClick
+              const basicCodev: Codev = {
+                id: teamLead.id,
+                first_name: teamLead.first_name,
+                last_name: teamLead.last_name,
+                email_address: teamLead.email_address,
+                display_position: teamLead.display_position ?? undefined,
+                image_url: teamLead.image_url ?? undefined,
+                // ✅ Use undefined - real data will be fetched
+                availability_status: undefined,
+                internal_status: undefined,
+                years_of_experience: undefined,
+                about: undefined,
                 education: [],
-                experience: [],
                 work_experience: [],
                 projects: [],
                 tech_stacks: [],
                 codev_points: [],
                 positions: [],
-                github: null,
-                linkedin: null,
-                facebook: null,
-                discord: null,
-                phone_number: null,
-                address: null,
-                role_id: null
+                github: undefined,
+                linkedin: undefined,
+                facebook: undefined,
+                discord: undefined,
+                phone_number: undefined,
+                address: undefined,
+                role_id: undefined
               };
-              onProfileClick(codevMember);
+              
+              onProfileClick(basicCodev);
             }
           }}
           title={onProfileClick ? "Click to view profile" : undefined}
@@ -250,7 +334,7 @@ const ProjectPreview = ({
   </div>
 );
 
-// Line 205: Main Modal Component with Profile Modal Integration
+// ✅ FIXED: Main Modal Component with Real Database Profile Integration
 const AddMembersModal = ({ 
   isOpen, 
   onClose, 
@@ -270,9 +354,40 @@ const AddMembersModal = ({
   const [availableMembers, setAvailableMembers] = useState<Codev[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
-  // Line 222: Profile click handler
-  const handleProfileClick = (member: Codev) => {
-    openProfileModal("profileModal", member);
+  // ✅ FIXED: Profile click handler with REAL database values
+  const handleProfileClick = async (member: Codev) => {
+    try {
+      console.log('🔍 AddMembersModal - Fetching real profile data for:', member.id);
+      
+      // Step 1: Fetch complete real profile data
+      const completeProfile = await getCompleteCodevProfile(member.id);
+      
+      if (completeProfile) {
+        console.log('✅ AddMembersModal - Opening ProfileModal with REAL values');
+        // ✅ Pass REAL database values without any forced overrides
+        openProfileModal("profileModal", completeProfile);
+      } else {
+        console.warn('❌ AddMembersModal - Using fallback data');
+        // Fallback to basic member data with realistic defaults
+        const fallbackProfile = {
+          ...member,
+          years_of_experience: 0,
+          availability_status: member.availability_status ?? true,
+          internal_status: member.internal_status ?? 'GRADUATED'
+        };
+        openProfileModal("profileModal", fallbackProfile);
+      }
+    } catch (error) {
+      console.error('❌ AddMembersModal - Error in profile click handler:', error);
+      // Final fallback
+      const safeFallback = {
+        ...member,
+        years_of_experience: 0,
+        availability_status: true,
+        internal_status: 'GRADUATED'
+      };
+      openProfileModal("profileModal", safeFallback);
+    }
   };
 
   // Line 226: Load available members
