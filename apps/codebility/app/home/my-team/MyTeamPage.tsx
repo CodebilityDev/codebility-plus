@@ -1,4 +1,4 @@
-// my-team/MyTeamPage.tsx - Fixed Role/Position contrast for dark mode
+// my-team/MyTeamPage.tsx - Enhanced with Avatar Profile Clicks
 "use client";
 
 import { useState } from "react";
@@ -11,7 +11,8 @@ import {
   updateProjectMembers,
   SimpleMemberData 
 } from "@/app/home/projects/actions";
-import { Codev } from "@/types/home/codev";
+import { Codev, InternalStatus } from "@/types/home/codev";
+import { useModal } from "@/hooks/use-modal-users";
 import AddMembersModal from "./AddMembersModal";
 
 // Use imported SimpleMemberData type instead of declaring locally
@@ -36,15 +37,58 @@ interface MyTeamPageProps {
 const formatName = (firstName: string, lastName: string): string => 
   `${firstName.charAt(0).toUpperCase()}${firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}${lastName.slice(1).toLowerCase()}`;
 
-// Consolidated member display component - FIXED role/position contrast
-const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLead?: boolean }) => {
+// Consolidated member display component - ENHANCED with profile click
+const MemberCard = ({ 
+  member, 
+  isLead = false,
+  onProfileClick
+}: { 
+  member: SimpleMemberData; 
+  isLead?: boolean;
+  onProfileClick?: (member: Codev) => void;
+}) => {
   const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
   const displayName = formatName(member.first_name, member.last_name);
+  
+  // Convert SimpleMemberData to Codev for profile modal
+  const convertToCodev = (simpleMember: SimpleMemberData): Codev => ({
+    ...simpleMember,
+    internal_status: 'MENTOR' as InternalStatus, // Use valid InternalStatus
+    availability_status: true,
+    years_of_experience: 0,
+    about: '',
+    education: [],
+    experience: [],
+    work_experience: [], // Add work_experience property
+    projects: [],
+    tech_stacks: [],
+    codev_points: [],
+    positions: [],
+    github: null,
+    linkedin: null,
+    facebook: null,
+    discord: null,
+    phone_number: null,
+    address: null,
+    role_id: null
+  });
+
+  const handleAvatarClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (onProfileClick) {
+      onProfileClick(convertToCodev(member));
+    }
+  };
   
   if (isLead) {
     return (
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
-        <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
+        <div 
+          className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-blue-300 transition-all duration-200"
+          onClick={handleAvatarClick}
+          title="Click to view profile"
+        >
           <Image
             src={imageUrl}
             alt={displayName}
@@ -86,7 +130,11 @@ const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLe
 
   return (
     <div className="flex flex-col items-center gap-1 sm:gap-2">
-      <div className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0">
+      <div 
+        className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-blue-300 transition-all duration-200"
+        onClick={handleAvatarClick}
+        title="Click to view profile"
+      >
         <Image
           src={imageUrl}
           alt={displayName}
@@ -126,8 +174,15 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
   const [projects, setProjects] = useState(projectData);
   const [selectedProject, setSelectedProject] = useState<ProjectData | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
-  // Removed availableMembers state since AddMembersModal handles it internally
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
+
+  // Modal hook for profile integration
+  const { onOpen: openProfileModal } = useModal();
+
+  // Profile click handler
+  const handleProfileClick = (member: Codev) => {
+    openProfileModal("profileModal", member);
+  };
 
   const handleOpenAddModal = async (project: ProjectData) => {
     setSelectedProject(project);
@@ -265,7 +320,11 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
                     {/* Team Lead */}
                     {teamLead.data && (
                       <div className="space-y-2 sm:space-y-3">
-                        <MemberCard member={teamLead.data} isLead />
+                        <MemberCard 
+                          member={teamLead.data} 
+                          isLead 
+                          onProfileClick={handleProfileClick}
+                        />
                       </div>
                     )}
 
@@ -277,7 +336,11 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
                       <div className="space-y-2 sm:space-y-3">
                         <div className="grid grid-cols-4 gap-2 sm:gap-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
                           {members.data.map((member) => (
-                            <MemberCard key={member.id} member={member} />
+                            <MemberCard 
+                              key={member.id} 
+                              member={member} 
+                              onProfileClick={handleProfileClick}
+                            />
                           ))}
                         </div>
                       </div>
@@ -290,7 +353,7 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
         </div>
       </div>
 
-      {/* Add Members Modal - FIXED: Removed availableMembers prop */}
+      {/* Add Members Modal - ENHANCED with profile integration */}
       {selectedProject && (
         <AddMembersModal
           isOpen={showAddModal}
