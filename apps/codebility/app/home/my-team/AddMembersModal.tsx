@@ -10,8 +10,9 @@ import {
   DialogTitle,
 } from "@/Components/ui/dialog";
 import { Codev } from "@/types/home/codev";
-import { Search, Check, Users } from "lucide-react";
+import { Search, Users } from "lucide-react";
 import toast from "react-hot-toast";
+import { useModal } from "@/hooks/use-modal-users";
 
 interface AddMembersModalProps {
   isOpen: boolean;
@@ -24,22 +25,35 @@ interface AddMembersModalProps {
   onUpdate: (selectedMembers: Codev[]) => void;
 }
 
-// Line 25: Responsive Avatar Component
+// Line 25: Responsive Avatar Component with Profile Click
 const TeamMemberAvatar = ({ 
   imageUrl, 
   name, 
   position,
-  size = 32
+  size = 32,
+  member,
+  onClick
 }: { 
   imageUrl?: string | null; 
   name: string; 
   position?: string;
   size?: number;
+  member?: Codev;
+  onClick?: (member: Codev) => void;
 }) => (
   <div className="flex flex-col items-center space-y-1 w-full"> 
     <div 
-      className="relative flex-shrink-0 rounded-full overflow-hidden ring-1 sm:ring-2 ring-blue-400"
+      className={`relative flex-shrink-0 rounded-full overflow-hidden ring-1 sm:ring-2 ring-blue-400 ${
+        member && onClick ? 'cursor-pointer hover:ring-blue-300 transition-all duration-200' : ''
+      }`}
       style={{ width: size, height: size }}
+      onClick={(e) => {
+        e.stopPropagation();
+        if (member && onClick) {
+          onClick(member);
+        }
+      }}
+      title={member ? "Click to view profile" : undefined}
     >
       <img
         src={
@@ -67,19 +81,47 @@ const TeamMemberAvatar = ({
   </div>
 );
 
-// Line 63: Team Leader Display Component
+// Line 70: Team Leader Display Component with Profile Click
 const TeamLeaderDisplay = ({ 
-  teamLead 
+  teamLead,
+  onProfileClick
 }: { 
   teamLead: SimpleMemberData | null;
+  onProfileClick?: (member: Codev) => void;
 }) => (
   <div>
     <h4 className="text-base sm:text-lg font-semibold text-white mb-1">Team Leader</h4>
     {teamLead ? (
       <div className="flex items-center gap-2 sm:gap-3">
         <div 
-          className="relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-blue-400"
+          className={`relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-blue-400 ${
+            onProfileClick ? 'cursor-pointer hover:ring-blue-300 transition-all duration-200' : ''
+          }`}
           style={{ width: 40, height: 40 }}
+          onClick={(e) => {
+            e.stopPropagation();
+            if (onProfileClick && teamLead) {
+              const codevMember: Codev = {
+                ...teamLead,
+                internal_status: 'AVAILABLE',
+                availability_status: true,
+                years_of_experience: 0,
+                about: '',
+                education: [],
+                experience: [],
+                projects: [],
+                tech_stacks: [],
+                codev_points: [],
+                positions: [],
+                github: null,
+                linkedin: null,
+                facebook: null,
+                discord: null
+              };
+              onProfileClick(codevMember);
+            }
+          }}
+          title={onProfileClick ? "Click to view profile" : undefined}
         >
           <img
             src={
@@ -109,11 +151,13 @@ const TeamLeaderDisplay = ({
   </div>
 );
 
-// Line 101: Enhanced Responsive Team Grid
+// Line 125: Enhanced Responsive Team Grid with Profile Click
 const TeamMembersGrid = ({ 
-  members 
+  members,
+  onProfileClick
 }: { 
   members: Codev[];
+  onProfileClick?: (member: Codev) => void;
 }) => {
   const getAvatarSize = () => {
     if (typeof window !== 'undefined') {
@@ -138,6 +182,8 @@ const TeamMembersGrid = ({
               name={member.first_name}
               position={member.display_position}
               size={getAvatarSize()}
+              member={member}
+              onClick={onProfileClick}
             />
           </div>
         ))}
@@ -146,15 +192,17 @@ const TeamMembersGrid = ({
   );
 };
 
-// Line 124: Project Preview with Codebility Logo
+// Line 160: Project Preview with Enhanced Profile Click Support
 const ProjectPreview = ({ 
   projectName, 
   teamLead, 
-  selectedMembers
+  selectedMembers,
+  onProfileClick
 }: { 
   projectName: string; 
   teamLead: SimpleMemberData | null;
   selectedMembers: Codev[];
+  onProfileClick?: (member: Codev) => void;
 }) => (
   <div className="h-full flex flex-col p-1 sm:p-2 space-y-1">
     <div className="flex-shrink-0">
@@ -183,16 +231,22 @@ const ProjectPreview = ({
     </div>
     
     <div className="flex-shrink-0">
-      <TeamLeaderDisplay teamLead={teamLead} />
+      <TeamLeaderDisplay 
+        teamLead={teamLead} 
+        onProfileClick={onProfileClick}
+      />
     </div>
     
     <div className="flex-1 min-h-0">
-      <TeamMembersGrid members={selectedMembers} />
+      <TeamMembersGrid 
+        members={selectedMembers} 
+        onProfileClick={onProfileClick}
+      />
     </div>
   </div>
 );
 
-// Line 150: Main Modal Component - OPTIMIZED SIZE
+// Line 205: Main Modal Component with Profile Modal Integration
 const AddMembersModal = ({ 
   isOpen, 
   onClose, 
@@ -203,13 +257,21 @@ const AddMembersModal = ({
   const teamLeadData = teamLead.data;
   const currentMembers = members.data;
 
+  // Line 214: Modal hook for profile integration
+  const { onOpen: openProfileModal } = useModal();
+
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isUpdating, setIsUpdating] = useState(false);
   const [availableMembers, setAvailableMembers] = useState<Codev[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
-  // Line 162: Load available members
+  // Line 222: Profile click handler
+  const handleProfileClick = (member: Codev) => {
+    openProfileModal("profileModal", member);
+  };
+
+  // Line 226: Load available members
   useEffect(() => {
     const loadMembers = async () => {
       if (!isOpen) return;
@@ -229,7 +291,7 @@ const AddMembersModal = ({
     loadMembers();
   }, [isOpen]);
 
-  // Line 179: Initialize selected members
+  // Line 243: Initialize selected members
   useEffect(() => {
     if (isOpen && currentMembers && availableMembers.length > 0) {
       const currentMemberIds = currentMembers.map(m => m.id);
@@ -240,7 +302,7 @@ const AddMembersModal = ({
     }
   }, [isOpen, currentMembers, availableMembers]);
 
-  // Line 189: Member selection logic
+  // Line 253: Member selection logic
   const toggleMember = (member: Codev) => {
     setSelectedMembers(prev => {
       const isSelected = prev.some(m => m.id === member.id);
@@ -252,7 +314,7 @@ const AddMembersModal = ({
 
   const isSelected = (userId: string) => selectedMembers.some(m => m.id === userId);
 
-  // Line 200: Filter available members
+  // Line 264: Filter available members
   const filteredUsers = useMemo(() => {
     if (!availableMembers.length) return [];
     
@@ -268,7 +330,7 @@ const AddMembersModal = ({
     });
   }, [availableMembers, teamLeadData, searchQuery]);
 
-  // Line 214: Reset state on close
+  // Line 278: Reset state on close
   useEffect(() => {
     if (!isOpen) {
       setSearchQuery("");
@@ -276,7 +338,7 @@ const AddMembersModal = ({
     }
   }, [isOpen]);
 
-  // Line 221: Submit handler
+  // Line 285: Submit handler
   const handleSubmit = async () => {
     if (!teamLeadData) {
       toast.error('Team leader not found');
@@ -325,7 +387,6 @@ const AddMembersModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      {/* OPTIMIZED MODAL SIZE: Reduced from 95vw to 85vw/80vw and 90vh to 80vh */}
       <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] p-0 flex flex-col bg-gray-800">
         <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1 border-b border-gray-700 bg-gray-800">
           <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
@@ -340,6 +401,7 @@ const AddMembersModal = ({
               projectName={project.name}
               teamLead={teamLeadData}
               selectedMembers={selectedMembers}
+              onProfileClick={handleProfileClick}
             />
           </div>
 
@@ -382,12 +444,17 @@ const AddMembersModal = ({
                     >
                       <div className="flex-shrink-0">
                         <div 
-                          className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 ${
+                          className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 cursor-pointer hover:ring-blue-300 ${
                             isSelected(user.id) 
                               ? 'ring-blue-500' 
                               : 'ring-blue-400'
                           }`}
                           style={{ width: 40, height: 40 }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleProfileClick(user);
+                          }}
+                          title="Click to view profile"
                         >
                           <img
                             src={
@@ -415,7 +482,7 @@ const AddMembersModal = ({
                         )}
                       </div>
                       
-                      {/* FINAL FIX: White background with RGB black checkmark */}
+                      {/* Checkbox with white background and black checkmark */}
                       <div className="flex-shrink-0">
                         <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
                           isSelected(user.id) 
