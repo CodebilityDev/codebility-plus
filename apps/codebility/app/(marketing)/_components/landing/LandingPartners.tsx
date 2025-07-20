@@ -6,25 +6,27 @@ import { motion } from "framer-motion";
 import Section from "../MarketingSection";
 
 export default function Partners() {
-  const partners = [
-    {
-      name: "Genius Web Services",
-      logo: "/assets/images/partners/genius-web-services.png",
-    },
-    { name: "Travel Tribe", logo: "/assets/images/partners/travel-tribe.png" },
-    { name: "Netmedia", logo: "/assets/images/partners/netmedia.png" },
-    { name: "Zwift Tech", logo: "/assets/images/partners/zwift-tech.png" },
-    { name: "Bradwell", logo: "/assets/images/partners/bradwell.png" },
-    { name: "Ai", logo: "/assets/images/partners/ai.png" },
-    { name: "Averps", logo: "/assets/images/partners/averps.png" },
-    { name: "Tolle Design", logo: "/assets/images/partners/tolle-design.png" },
-    { name: "Infraspan", logo: "/assets/images/partners/infraspan.png" },
-    {
-      name: "Federal PLANS",
-      logo: "/assets/images/partners/federal-plans.png",
-    },
-    { name: "Web Divine", logo: "/assets/images/partners/web-divine.png" },
-  ];
+const partners = [
+  {
+    name: "Genius Web Services",
+    logo: "/assets/images/partners/genius-web-services.png",
+  },
+  { name: "Travel Tribe", logo: "/assets/images/partners/travel-tribe.png" },
+  { name: "Netmedia", logo: "/assets/images/partners/netmedia.png" },
+  { name: "Zwift Tech", logo: "/assets/images/partners/zwift-tech.png" },
+  { name: "Bradwell", logo: "/assets/images/partners/bradwell.png" },
+  { name: "Ai", logo: "/assets/images/partners/ai.png" },
+  { name: "Averps", logo: "/assets/images/partners/averps.png" },
+  { name: "Tolle Design", logo: "/assets/images/partners/tolle-design.png" },
+  { name: "Infraspan", logo: "/assets/images/partners/infraspan.png" },
+  {
+    name: "Federal PLANS",
+    logo: "/assets/images/partners/federal-plans.png",
+  },
+  { name: "Web Divine", logo: "/assets/images/partners/web-divine.png" },
+ 
+  { name: "FixFlow.ai", logo: "/assets/images/partners/fixflow-ai.png" },
+];
 
   return (
     <Section id="partners" className="relative w-full pt-10 text-white">
