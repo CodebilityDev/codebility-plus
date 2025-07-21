@@ -39,7 +39,9 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { completeTask, updateTaskPRLink } from "../../actions";
-import DifficultyPointsTooltip, { DIFFICULTY_LEVELS } from "../DifficultyPointsTooltip";
+import DifficultyPointsTooltip, {
+  DIFFICULTY_LEVELS,
+} from "../DifficultyPointsTooltip";
 
 interface CodevMember {
   id: string;
@@ -65,8 +67,11 @@ const TaskViewModal = ({
   const task = data as Task | null;
   const user = useUserStore((state) => state.user);
   const canModifyTask =
-    user?.role_id === 1 || user?.role_id === 5 || user?.role_id === 4;
-  const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5
+    user?.role_id === 1 ||
+    user?.role_id === 5 ||
+    user?.role_id === 4 ||
+    user?.role_id === 10;
+  const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
   const [prLink, setPrLink] = useState(task?.pr_link || "");
 
   //  handle PR link update
@@ -238,7 +243,7 @@ const TaskViewModal = ({
         if (!error && data) {
           setCreatedBy(data as CodevMember);
         } else {
-            setCreatedBy(null);
+          setCreatedBy(null);
         }
       }
     };
