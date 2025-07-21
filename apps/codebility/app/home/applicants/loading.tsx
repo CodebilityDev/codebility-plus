@@ -4,8 +4,16 @@ import { Skeleton } from "@/Components/ui/skeleton/skeleton";
 export default function ApplicantsLoading() {
   return (
     <div className="mx-auto flex max-w-screen-2xl flex-col gap-4">
-      <H1>Applicants List</H1>
-      <Box className="mt-6">
+      <H1>Applicants Management</H1>
+      {/* Simulate Tabs */}
+      <div className="mt-2 grid w-full grid-cols-2 gap-4 md:grid-cols-4">
+        {Array.from({ length: 4 }).map((_, idx) => (
+          <div key={idx} className="flex items-center gap-2">
+            <Skeleton className="h-9 w-full" />
+          </div>
+        ))}
+      </div>
+      <Box className="mt-1">
         <div className="hidden lg:grid">
           <div className="grid grid-cols-6 gap-5">
             {Array(6)
