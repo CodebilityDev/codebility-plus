@@ -43,65 +43,6 @@ const calculateYearsFromExperience = (workExperience: any[]): number => {
   return Math.round(totalYears);
 };
 
-// ✅ FIXED: Client-side database query for complete profile
-const getCompleteCodevProfile = async (codevId: string): Promise<Codev | null> => {
-  try {
-    const supabase = createClientClientComponent();
-    
-    const { data, error } = await supabase
-      .from("codev")
-      .select(`
-        *,
-        education:education(*),
-        work_experience:work_experience(*),
-        projects:project_members(
-          project:project_id(*)
-        ),
-        codev_points:codev_points(*)
-      `)
-      .eq('id', codevId)
-      .single();
-
-    if (error || !data) {
-      console.error('Error fetching complete profile:', error);
-      return null;
-    }
-
-    // ✅ Handle years_of_experience calculation
-    let finalYearsOfExperience = data.years_of_experience;
-    
-    if (finalYearsOfExperience === null || finalYearsOfExperience === undefined) {
-      finalYearsOfExperience = calculateYearsFromExperience(data.work_experience || []);
-    }
-
-    // ✅ Return REAL database values - no forced status overrides
-    const enhancedProfile = {
-      ...data,
-      years_of_experience: finalYearsOfExperience,
-      work_experience: data.work_experience || [],
-      education: data.education || [],
-      projects: data.projects || [],
-      codev_points: data.codev_points || [],
-      tech_stacks: data.tech_stacks || [],
-      positions: data.positions || []
-    };
-
-    console.log('✅ AddMembersModal - REAL DATABASE VALUES:', {
-      id: enhancedProfile.id,
-      name: `${enhancedProfile.first_name} ${enhancedProfile.last_name}`,
-      availability_status: enhancedProfile.availability_status, // ✅ Real DB value
-      internal_status: enhancedProfile.internal_status, // ✅ Real DB value
-      years_of_experience: enhancedProfile.years_of_experience, // ✅ Real/calculated value
-      years_source: data.years_of_experience !== null ? 'database' : 'calculated'
-    });
-
-    return enhancedProfile as Codev;
-  } catch (error) {
-    console.error('Failed to fetch complete profile:', error);
-    return null;
-  }
-};
-
 // Line 25: Responsive Avatar Component with Profile Click
 const TeamMemberAvatar = ({ 
   imageUrl, 
@@ -186,9 +127,9 @@ const TeamLeaderDisplay = ({
                 email_address: teamLead.email_address,
                 display_position: teamLead.display_position ?? undefined,
                 image_url: teamLead.image_url ?? undefined,
-                // ✅ Use undefined - real data will be fetched
+                // ✅ Fix 3: Use proper default values with correct typing
                 availability_status: undefined,
-                internal_status: undefined,
+                internal_status: undefined, // Will be fetched with real data
                 years_of_experience: undefined,
                 about: undefined,
                 education: [],
@@ -345,6 +286,14 @@ const AddMembersModal = ({
   const teamLeadData = teamLead.data;
   const currentMembers = members.data;
 
+  // ✅ FIXED: Initialize Supabase client safely following project pattern
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   // Line 214: Modal hook for profile integration
   const { onOpen: openProfileModal } = useModal();
 
@@ -354,37 +303,102 @@ const AddMembersModal = ({
   const [availableMembers, setAvailableMembers] = useState<Codev[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
-  // ✅ FIXED: Profile click handler with REAL database values
+  // ✅ FIXED: Enhanced profile fetching function with proper Supabase handling
+  const getCompleteCodevProfileSafe = async (codevId: string): Promise<Codev | null> => {
+    try {
+      if (!supabase) {
+        console.error('Supabase client not available');
+        return null;
+      }
+      
+      const { data, error } = await supabase
+        .from("codev")
+        .select(`
+          *,
+          education:education(*),
+          work_experience:work_experience(*),
+          projects:project_members(
+            project:project_id(*)
+          ),
+          codev_points:codev_points(*)
+        `)
+        .eq('id', codevId)
+        .single();
+
+      if (error || !data) {
+        console.error('Error fetching complete profile:', error);
+        return null;
+      }
+
+      // ✅ Handle years_of_experience calculation
+      let finalYearsOfExperience = data.years_of_experience;
+      
+      if (finalYearsOfExperience === null || finalYearsOfExperience === undefined) {
+        finalYearsOfExperience = calculateYearsFromExperience(data.work_experience || []);
+      }
+
+      // ✅ Fix 2: Proper type casting for InternalStatus
+      const safeInternalStatus = data.internal_status as InternalStatus | undefined;
+      
+      // ✅ Return REAL database values with proper typing
+      const enhancedProfile: Codev = {
+        ...data,
+        years_of_experience: finalYearsOfExperience,
+        internal_status: safeInternalStatus, // ✅ Properly typed
+        work_experience: data.work_experience || [],
+        education: data.education || [],
+        projects: data.projects || [],
+        codev_points: data.codev_points || [],
+        tech_stacks: data.tech_stacks || [],
+        positions: data.positions || []
+      };
+
+      console.log('✅ AddMembersModal - REAL DATABASE VALUES:', {
+        id: enhancedProfile.id,
+        name: `${enhancedProfile.first_name} ${enhancedProfile.last_name}`,
+        availability_status: enhancedProfile.availability_status,
+        internal_status: enhancedProfile.internal_status,
+        years_of_experience: enhancedProfile.years_of_experience,
+        years_source: data.years_of_experience !== null ? 'database' : 'calculated'
+      });
+
+      return enhancedProfile;
+    } catch (error) {
+      console.error('Failed to fetch complete profile:', error);
+      return null;
+    }
+  };
+
+  // ✅ FIXED: Profile click handler with REAL database values and proper error handling
   const handleProfileClick = async (member: Codev) => {
     try {
       console.log('🔍 AddMembersModal - Fetching real profile data for:', member.id);
       
-      // Step 1: Fetch complete real profile data
-      const completeProfile = await getCompleteCodevProfile(member.id);
+      // Step 1: Fetch complete real profile data using safe method
+      const completeProfile = await getCompleteCodevProfileSafe(member.id);
       
       if (completeProfile) {
         console.log('✅ AddMembersModal - Opening ProfileModal with REAL values');
-        // ✅ Pass REAL database values without any forced overrides
         openProfileModal("profileModal", completeProfile);
       } else {
         console.warn('❌ AddMembersModal - Using fallback data');
-        // Fallback to basic member data with realistic defaults
-        const fallbackProfile = {
+        // ✅ Fix 4: Proper fallback with correct InternalStatus typing
+        const fallbackProfile: Codev = {
           ...member,
           years_of_experience: 0,
           availability_status: member.availability_status ?? true,
-          internal_status: member.internal_status ?? 'GRADUATED'
+          internal_status: (member.internal_status as InternalStatus) ?? 'GRADUATED'
         };
         openProfileModal("profileModal", fallbackProfile);
       }
     } catch (error) {
       console.error('❌ AddMembersModal - Error in profile click handler:', error);
-      // Final fallback
-      const safeFallback = {
+      // ✅ Final fallback with safe typing
+      const safeFallback: Codev = {
         ...member,
         years_of_experience: 0,
         availability_status: true,
-        internal_status: 'GRADUATED'
+        internal_status: 'GRADUATED' as InternalStatus
       };
       openProfileModal("profileModal", safeFallback);
     }
@@ -601,7 +615,7 @@ const AddMembersModal = ({
                         )}
                       </div>
                       
-                      {/* Checkbox with white background and black checkmark */}
+                      {/* ✅ Fixed checkbox with proper contrast */}
                       <div className="flex-shrink-0">
                         <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
                           isSelected(user.id) 
