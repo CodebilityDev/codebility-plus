@@ -16,8 +16,6 @@
     "web": "cd apps/next && pnpm run next",
     "clean": "rm -rf node_modules",
     "clean:workspaces": "turbo clean",
-    "tapup": "turbo run dev -F tapup...",
-    "tapup:build": "turbo run build -F tapup...",
     "dev": "turbo watch dev",
     "codebility": "turbo run dev -F codebility...",
     "codebility:build": "turbo run build -F codebility...",
