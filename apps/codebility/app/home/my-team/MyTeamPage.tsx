@@ -1,7 +1,7 @@
 // my-team/MyTeamPage.tsx - Proper Client-Side Implementation
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Image from "next/image";
 import { toast } from "react-hot-toast";
 import { 
@@ -11,7 +11,7 @@ import {
   updateProjectMembers,
   SimpleMemberData 
 } from "@/app/home/projects/actions";
-import { Codev } from "@/types/home/codev";
+import { Codev, InternalStatus } from "@/types/home/codev";
 import { useModal } from "@/hooks/use-modal-users";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import AddMembersModal from "./AddMembersModal";
@@ -54,69 +54,6 @@ const calculateYearsFromExperience = (workExperience: any[]): number => {
   return Math.round(totalYears);
 };
 
-// ✅ FIXED: Client-side database query using client supabase
-const getCompleteCodevProfile = async (codevId: string): Promise<Codev | null> => {
-  try {
-    const supabase = createClientClientComponent();
-    
-    // ✅ Client-side query with complete profile data
-    const { data, error } = await supabase
-      .from("codev")
-      .select(`
-        *,
-        education:education(*),
-        work_experience:work_experience(*),
-        projects:project_members(
-          project:project_id(*)
-        ),
-        codev_points:codev_points(*)
-      `)
-      .eq('id', codevId)
-      .single();
-
-    if (error || !data) {
-      console.error('Error fetching complete profile:', error);
-      return null;
-    }
-
-    // ✅ Handle years_of_experience calculation
-    let finalYearsOfExperience = data.years_of_experience;
-    
-    // If years_of_experience is null/undefined, calculate from work experience
-    if (finalYearsOfExperience === null || finalYearsOfExperience === undefined) {
-      finalYearsOfExperience = calculateYearsFromExperience(data.work_experience || []);
-      console.log(`🔧 Calculated years from work experience: ${finalYearsOfExperience}`);
-    }
-
-    // ✅ Create enhanced profile with proper years_of_experience
-    const enhancedProfile = {
-      ...data,
-      years_of_experience: finalYearsOfExperience,
-      work_experience: data.work_experience || [],
-      education: data.education || [],
-      projects: data.projects || [],
-      codev_points: data.codev_points || [],
-      tech_stacks: data.tech_stacks || [],
-      positions: data.positions || []
-    };
-
-    console.log('✅ FIXED PROFILE DATA:', {
-      id: enhancedProfile.id,
-      name: `${enhancedProfile.first_name} ${enhancedProfile.last_name}`,
-      availability_status: enhancedProfile.availability_status,
-      internal_status: enhancedProfile.internal_status,
-      years_of_experience: enhancedProfile.years_of_experience, // ✅ Should now work
-      years_source: data.years_of_experience !== null ? 'database' : 'calculated',
-      work_experience_count: enhancedProfile.work_experience.length
-    });
-
-    return enhancedProfile as Codev;
-  } catch (error) {
-    console.error('Failed to fetch complete profile:', error);
-    return null;
-  }
-};
-
 // Enhanced member display component with profile click
 const MemberCard = ({ 
   member, 
@@ -130,7 +67,7 @@ const MemberCard = ({
   const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
   const displayName = formatName(member.first_name, member.last_name);
   
-  // ✅ Basic conversion for fallback
+  // ✅ FIXED: Basic conversion with proper InternalStatus typing
   const convertToCodev = (simpleMember: SimpleMemberData): Codev => {
     return {
       id: simpleMember.id,
@@ -140,7 +77,7 @@ const MemberCard = ({
       display_position: simpleMember.display_position ?? undefined,
       image_url: simpleMember.image_url ?? undefined,
       availability_status: true, // Fallback
-      internal_status: 'GRADUATED',
+      internal_status: 'GRADUATED' as InternalStatus, // ✅ Proper type casting
       years_of_experience: 0, // Fallback
       about: undefined,
       education: [],
@@ -262,39 +199,116 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
+  // ✅ FIXED: Initialize Supabase client safely following project pattern
+  const [supabase, setSupabase] = useState<any>(null);
+
+  useEffect(() => {
+    const supabaseClient = createClientClientComponent();
+    setSupabase(supabaseClient);
+  }, []);
+
   // Modal hook for profile integration
   const { onOpen: openProfileModal } = useModal();
 
-  // ✅ FIXED: Client-side profile click handler
+  // ✅ FIXED: Enhanced profile fetching function with proper Supabase handling
+  const getCompleteCodevProfileSafe = async (codevId: string): Promise<Codev | null> => {
+    try {
+      if (!supabase) {
+        console.error('Supabase client not available');
+        return null;
+      }
+      
+      const { data, error } = await supabase
+        .from("codev")
+        .select(`
+          *,
+          education:education(*),
+          work_experience:work_experience(*),
+          projects:project_members(
+            project:project_id(*)
+          ),
+          codev_points:codev_points(*)
+        `)
+        .eq('id', codevId)
+        .single();
+
+      if (error || !data) {
+        console.error('Error fetching complete profile:', error);
+        return null;
+      }
+
+      // ✅ Handle years_of_experience calculation
+      let finalYearsOfExperience = data.years_of_experience;
+      
+      // If years_of_experience is null/undefined, calculate from work experience
+      if (finalYearsOfExperience === null || finalYearsOfExperience === undefined) {
+        finalYearsOfExperience = calculateYearsFromExperience(data.work_experience || []);
+        console.log(`🔧 Calculated years from work experience: ${finalYearsOfExperience}`);
+      }
+
+      // ✅ FIXED: Proper type casting for InternalStatus
+      const safeInternalStatus = data.internal_status as InternalStatus | undefined;
+
+      // ✅ Create enhanced profile with proper years_of_experience and types
+      const enhancedProfile: Codev = {
+        ...data,
+        years_of_experience: finalYearsOfExperience,
+        internal_status: safeInternalStatus,
+        work_experience: data.work_experience || [],
+        education: data.education || [],
+        projects: data.projects || [],
+        codev_points: data.codev_points || [],
+        tech_stacks: data.tech_stacks || [],
+        positions: data.positions || []
+      };
+
+      console.log('✅ FIXED PROFILE DATA:', {
+        id: enhancedProfile.id,
+        name: `${enhancedProfile.first_name} ${enhancedProfile.last_name}`,
+        availability_status: enhancedProfile.availability_status,
+        internal_status: enhancedProfile.internal_status,
+        years_of_experience: enhancedProfile.years_of_experience, // ✅ Should now work
+        years_source: data.years_of_experience !== null ? 'database' : 'calculated',
+        work_experience_count: enhancedProfile.work_experience?.length || 0 // ✅ Safe optional chaining
+      });
+
+      return enhancedProfile;
+    } catch (error) {
+      console.error('Failed to fetch complete profile:', error);
+      return null;
+    }
+  };
+
+  // ✅ FIXED: Client-side profile click handler with proper type safety
   const handleProfileClick = async (member: Codev) => {
     try {
       console.log('🔍 Fetching profile data for:', member.id);
       
-      // Step 1: Try to fetch complete profile data
-      const completeProfile = await getCompleteCodevProfile(member.id);
+      // Step 1: Try to fetch complete profile data using safe method
+      const completeProfile = await getCompleteCodevProfileSafe(member.id);
       
       if (completeProfile) {
         console.log('✅ Successfully fetched complete profile');
         openProfileModal("profileModal", completeProfile);
       } else {
         console.warn('❌ Using fallback profile data');
-        // Fallback to basic member data with defaults
-        const fallbackProfile = {
+        // ✅ FIXED: Proper fallback with correct InternalStatus typing
+        const fallbackProfile: Codev = {
           ...member,
           years_of_experience: 0,
           availability_status: true,
-          internal_status: 'GRADUATED'
+          internal_status: 'GRADUATED' as InternalStatus // ✅ Explicit type casting
         };
         openProfileModal("profileModal", fallbackProfile);
       }
     } catch (error) {
       console.error('❌ Error in profile click handler:', error);
-      // Final fallback
-      const safeFallback = {
+      // ✅ FIXED: Final fallback with safe typing
+      const safeFallback: Codev = {
         ...member,
         years_of_experience: 0,
         availability_status: true,
-        internal_status: 'GRADUATED'
+        internal_status: 'GRADUATED' as InternalStatus // ✅ Explicit type casting
       };
       openProfileModal("profileModal", safeFallback);
     }
