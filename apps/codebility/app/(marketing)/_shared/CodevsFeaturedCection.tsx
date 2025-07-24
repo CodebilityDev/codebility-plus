@@ -8,7 +8,7 @@ import Heading3 from "@/components/shared/home/Heading3";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 
-import { FeaturedSectiondata } from "../../../../constants/landing_data";
+import { FeaturedSectiondata } from "@/constants/landing_data";
 import FeaturedCard from "./CodevsFeaturedCard";
 import Section from "./CodevsSection";
 

@@ -35,7 +35,7 @@ const WorkWithUs = () => {
               </p>
               <div className="flex md:justify-end">
                 <div className="w-full md:w-auto">
-                  <Link href="/portfolio">
+                  <Link href="/services">
                     <Button variant="purple" size="lg" rounded="full">
                       Our Portfolio
                     </Button>
