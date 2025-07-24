@@ -1,13 +1,13 @@
 "use client";
 
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
+} from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal-sprints";
 import { Form, FormControl, FormField, FormMessage } from "@codevs/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -16,7 +16,7 @@ import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { z } from "zod";
 
-import DatePicker from "@/Components/ui/date/date-picker";
+import DatePicker from "@/components/ui/date/date-picker";
 import { Input } from "@codevs/ui/input";
 import { createNewSprint } from "../actions";
 import { isBefore, isEqual } from "date-fns";

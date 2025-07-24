@@ -4,7 +4,7 @@ import React, { forwardRef, useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
-import Logo from "@/Components/shared/Logo";
+import Logo from "@/components/shared/Logo";
 import { toast } from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";

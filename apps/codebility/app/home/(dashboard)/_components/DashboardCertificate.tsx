@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import Image from "next/image";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/codev-store";
 import { BookDown } from "lucide-react";
 

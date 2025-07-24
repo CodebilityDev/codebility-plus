@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Box } from "@/Components/shared/dashboard";
-import { Button } from "@/Components/ui/button";
+import { Box } from "../components/shared/dashboard";
+import { Button } from "../components/ui/button";
 import { Position, Project, SkillCategory } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 

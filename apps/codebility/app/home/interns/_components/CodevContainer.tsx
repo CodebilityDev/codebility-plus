@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import H1 from "@/Components/shared/dashboard/H1";
+import H1 from "../components/shared/dashboard/H1";
 import { Codev } from "@/types/home/codev";
 
 import CodevList from "./CodevList";

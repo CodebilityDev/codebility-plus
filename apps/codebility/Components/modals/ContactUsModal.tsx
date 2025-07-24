@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { Button } from "@/Components/ui/button";
-import { Textarea } from "@/Components/ui/textarea-home";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea-home";
 import { useModal } from "@/hooks/use-modal";
 import { contactUsValidation } from "@/lib/validations/contact-us";
 import { IconClose } from "@/public/assets/svgs";
@@ -61,28 +61,35 @@ const ContactUsModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleReset}>
-      <DialogContent className="bg-black-100 dark:bg-black-100 flex h-[40rem] w-full max-w-5xl flex-col items-center gap-6 overflow-x-auto overflow-y-auto md:w-[30rem] lg:h-[45rem] lg:w-full lg:flex-row">
+      <DialogContent 
+        className="bg-black-100 dark:bg-black-100 flex h-[40rem] w-full max-w-5xl flex-col items-center gap-6 overflow-x-auto overflow-y-auto md:w-[30rem] lg:h-[45rem] lg:w-full lg:flex-row"
+        aria-labelledby="contact-modal-title"
+        aria-describedby="contact-modal-description"
+        role="dialog"
+      >
         <div className="w-full flex-1 flex-col gap-4">
           <Image
             className="mx-auto mb-2 hidden h-auto p-10 md:w-[250px] lg:flex lg:w-[300px]"
             src="/assets/svgs/icon-codebility.svg"
-            alt="logo"
+            alt="Codebility logo"
             priority
             width={30}
             height={40}
           />
           <div className="text-center">
-            <p className="text-2xl text-white">Ready to take your next step?</p>
-            <p className="md:text-md text-gray text-sm lg:text-lg">
+            <h2 id="contact-modal-title" className="text-2xl text-white">
+              Ready to take your next step?
+            </h2>
+            <p id="contact-modal-description" className="md:text-md text-gray text-sm lg:text-lg">
               Explore how Codebility can empower you.
             </p>
           </div>
         </div>
 
-        <div className="bg-black-500 flex w-full flex-1 flex-col gap-3 rounded-lg p-6 lg:gap-6">
-          <p className="text-lightgray mb-2 text-center text-lg">
+        <form className="bg-black-500 flex w-full flex-1 flex-col gap-3 rounded-lg p-6 lg:gap-6" role="form">
+          <h3 className="text-lightgray mb-2 text-center text-lg">
             Contact Information
-          </p>
+          </h3>
 
           <div>
             <Input
@@ -91,6 +98,9 @@ const ContactUsModal = () => {
               label="Name"
               placeholder="What is your name?"
               value={name}
+              required
+              error={validationErrors.name}
+              aria-invalid={!!validationErrors.name}
               onChange={(e) => {
                 setName(e.target.value.toLowerCase());
                 setValidationErrors((prevErrors) => ({
@@ -99,18 +109,18 @@ const ContactUsModal = () => {
                 }));
               }}
             />
-            {validationErrors.name && (
-              <p className="text-red-500">{validationErrors.name}</p>
-            )}
           </div>
 
           <div>
             <Input
               id="email"
-              type="text"
+              type="email"
               label="Email"
               placeholder="What is your email?"
               value={email}
+              required
+              error={validationErrors.email}
+              aria-invalid={!!validationErrors.email}
               onChange={(e) => {
                 setEmail(e.target.value.toLowerCase());
                 setValidationErrors((prevErrors) => ({
@@ -119,18 +129,18 @@ const ContactUsModal = () => {
                 }));
               }}
             />
-            {validationErrors.email && (
-              <p className="text-red-500">{validationErrors.email}</p>
-            )}
           </div>
 
           <div>
             <Input
               id="phone"
-              type="number"
+              type="tel"
               label="Telephone"
               placeholder="What is your telephone?"
               value={telephone}
+              required
+              error={validationErrors.telephone}
+              aria-invalid={!!validationErrors.telephone}
               onChange={(e) => {
                 setTelephone(e.target.value);
                 setValidationErrors((prevErrors) => ({
@@ -139,9 +149,6 @@ const ContactUsModal = () => {
                 }));
               }}
             />
-            {validationErrors.telephone && (
-              <p className="text-red-500">{validationErrors.telephone}</p>
-            )}
           </div>
 
           <div>
@@ -150,6 +157,9 @@ const ContactUsModal = () => {
               label="Message"
               placeholder="How can we help you?"
               value={message}
+              required
+              error={validationErrors.message}
+              aria-invalid={!!validationErrors.message}
               onChange={(e) => {
                 setMessage(e.target.value.toLowerCase());
                 setValidationErrors((prevErrors) => ({
@@ -158,20 +168,26 @@ const ContactUsModal = () => {
                 }));
               }}
             />
-            {validationErrors.message && (
-              <p className="text-red-500">{validationErrors.message}</p>
-            )}
           </div>
 
           <DialogFooter className="flex flex-col gap-2 lg:flex-row">
-            <Button onClick={handleSubmit} className="w-full lg:w-[130px]">
+            <Button 
+              onClick={handleSubmit} 
+              className="w-full lg:w-[130px]"
+              aria-label="Submit contact form"
+            >
               Submit
             </Button>
           </DialogFooter>
-        </div>
+        </form>
         <div>
-          <button onClick={() => onClose()} className="absolute right-4 top-4">
-            <IconClose />
+          <button 
+            onClick={() => onClose()} 
+            className="absolute right-4 top-4 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            aria-label="Close contact form dialog"
+          >
+            <IconClose aria-hidden="true" />
+            <span className="sr-only">Close dialog</span>
           </button>
         </div>
       </DialogContent>

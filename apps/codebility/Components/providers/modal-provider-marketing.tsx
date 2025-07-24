@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import FaqsModal from "@/app/(marketing)/_components/marketing_modals/MarketingFaqsModal";
 import PrivacyPolicyModalHome from "@/app/(marketing)/_components/marketing_modals/MarketingPrivacyPolicyModal";
 import TermsAndConditionModal from "@/app/(marketing)/_components/marketing_modals/MarketingTermsAndConditionModal";
-import ContactUsModal from "@/Components/modals/ContactUsModal";
+import ContactUsModal from "@/components/modals/ContactUsModal";
 
 import AvailableTimeModal from "../modals/AvailableTimeModal";
 import TechStackModal from "../modals/TechStackModal";

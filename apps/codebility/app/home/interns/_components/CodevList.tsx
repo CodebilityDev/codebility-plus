@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
-import DefaultPagination from "@/Components/ui/pagination";
+import DefaultPagination from "../components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";

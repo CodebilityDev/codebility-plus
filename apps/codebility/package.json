@@ -7,12 +7,9 @@
     "dev": "cross-env FORCE_COLOR=1 next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "next:lint": "next lint",
-    "next:lint:fix": "next lint --fix",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit --pretty",
     "clean": "rimraf .next node_modules",
-    "prettier:fix": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
     "analyze": "cross-env ANALYZE=true pnpm build",
     "format": "prettier --check \"**/*.{js,jsx,ts,tsx}\"",
     "format:fix": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
@@ -43,8 +40,6 @@
     "@radix-ui/react-tooltip": "^1.2.7",
     "@react-email/components": "^0.0.34",
     "@react-email/render": "^1.0.5",
-    "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.49.8",
     "@t3-oss/env-nextjs": "^0.7.1",
     "@tanstack/react-query": "^5.28.9",
     "@tanstack/react-table": "^8.20.5",
@@ -58,7 +53,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "country-calling-code": "^0.0.3",
-    "date-fns": "^3.6.0",
     "embla-carousel": "^8.1.8",
     "embla-carousel-autoplay": "^8.1.6",
     "embla-carousel-react": "^8.0.0",
@@ -78,10 +72,8 @@
     "next-compose-plugins": "^2.2.1",
     "next-themes": "^0.4.6",
     "nodemailer": "^6.10.1",
-    "react": "19.1.0",
     "react-big-calendar": "^1.8.5",
     "react-calendly": "^4.3.1",
-    "react-dom": "19.1.0",
     "react-dropzone": "^14.2.3",
     "react-easy-crop": "^5.2.0",
     "react-hook-form": "^7.56.2",
@@ -114,7 +106,6 @@
     "@types/hellosign-sdk": "^1.6.15",
     "@types/node": "^20",
     "@types/nodemailer": "^6.4.15",
-    "@types/react": "19.1.5",
     "@types/react-big-calendar": "^1.8.7",
     "@types/react-dom": "19.1.5",
     "@types/react-scroll": "^1.8.10",
@@ -145,9 +136,6 @@
   "prettier": "@codevs/prettier-config",
   "pnpm": {
     "overrides": {
-      "react": "19.1.0",
-      "react-dom": "19.1.0",
-      "@types/react": "19.1.5",
       "react-hook-form": "7.56.2"
     }
   }

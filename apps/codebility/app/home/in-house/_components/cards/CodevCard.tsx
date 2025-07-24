@@ -95,7 +95,6 @@ export function CodevCard({ data, onEdit, onDelete, roles }: CodevCardProps) {
             alt={`${data.first_name} avatar`}
             width={80}
             height={80}
-            unoptimized={true}
             className="border-light-700 dark:border-dark-200 h-20 w-20 rounded-full border-2 object-cover"
           />
         </div>

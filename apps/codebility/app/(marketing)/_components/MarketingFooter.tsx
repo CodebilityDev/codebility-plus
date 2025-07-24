@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Logo from "@/Components/shared/Logo";
+import Logo from "@/components/shared/Logo";
 import { footerLinks } from "@/constants/links";
 import { ModalType, useModal } from "@/hooks/use-modal";
 import { IconFacebookWhite } from "@/public/assets/svgs";

@@ -1,4 +1,4 @@
-import H1 from "@/Components/shared/dashboard/H1";
+import H1 from "@/components/shared/dashboard/H1";
 import { getOrSetCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { createClientServerComponent } from "@/utils/supabase/server";
@@ -9,7 +9,7 @@ import AdminDashboardProjectsPie from "./_components/AdminDashboardProjectsPie";
 import AdminDashboardTotalActiveIntern from "./_components/AdminDashboardTotalActiveIntern";
 import AdminDashboardTotalAdmin from "./_components/AdminDashboardTotalAdmin";
 import AdminDashboardTotalCodev from "./_components/AdminDashboardTotalCodev";
-import AdminDashboardTotalInactiveIntern from "./_components/AdminDashboardTotalInactiveIntern ";
+import AdminDashboardTotalInactiveIntern from "./_components/AdminDashboardTotalInactiveIntern";
 import AdminDashboardTotalMentor from "./_components/AdminDashboardTotalMentor";
 import AdminDashboardTotalProjects from "./_components/AdminDashboardTotalProject";
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+import SwitchStatusButton from "../components/ui/SwitchStatusButton";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
 import {
   Codev,

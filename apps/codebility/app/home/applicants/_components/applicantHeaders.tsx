@@ -1,5 +1,5 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { H1 } from "@/Components/shared/dashboard";
+import { H1 } from "../components/shared/dashboard";
 
 import { ExperienceRanges, NewApplicantType } from "../_service/types";
 import ApplicantFilters from "./applicantFilters";

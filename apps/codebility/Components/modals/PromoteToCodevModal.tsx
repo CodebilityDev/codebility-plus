@@ -4,13 +4,13 @@ import {
   acceptPromotionToCodev,
   declinePromotion,
 } from "@/app/home/_services/actions";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
+} from "@/components/ui/dialog";
 import { useUserStore } from "@/store/codev-store";
 import toast from "react-hot-toast";
 

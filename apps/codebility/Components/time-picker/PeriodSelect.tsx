@@ -5,14 +5,14 @@ import {
   display12HourValue,
   Period,
   setDateByType,
-} from "@/Components/time-picker/TimePickerUtils";
+} from "@/components/time-picker/TimePickerUtils";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 
 export interface PeriodSelectorProps {
   period: Period;

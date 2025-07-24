@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import DefaultAvatar from "@/Components/DefaultAvatar";
+import DefaultAvatar from "@/components/DefaultAvatar";
 
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Label } from "@codevs/ui/label";

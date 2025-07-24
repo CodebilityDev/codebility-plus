@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { item, SocialContainer } from "@/Components/FramerAnimation/Framer";
+import { item, SocialContainer } from "@/components/FramerAnimation/Framer";
 import { socialIcons } from "@/constants/social";
 import { motion } from "framer-motion";
 

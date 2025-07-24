@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import H1 from "@/Components/shared/dashboard/H1";
-import { Button } from "@/Components/ui/button";
+import H1 from "../components/shared/dashboard/H1";
+import { Button } from "../components/ui/button";
 
 export default function Error({
   error,

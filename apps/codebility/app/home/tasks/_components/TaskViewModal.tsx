@@ -1,15 +1,15 @@
 "use client";
 
-import RenderTeam from "@/Components/shared/dashboard/RenderTeam";
-import { Paragraph } from "@/Components/shared/home";
-import { Button } from "@/Components/ui/button";
+import RenderTeam from "../components/shared/dashboard/RenderTeam";
+import { Paragraph } from "../components/shared/home";
+import { Button } from "../components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@/Components/ui/dialog";
+} from "../components/ui/dialog";
 import { Task } from "@/types/home/codev";
 
 interface Member {

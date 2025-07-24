@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { TimePicker12 } from "@/Components/time-picker/TimePicker12hourDemo";
+import { TimePicker12 } from "@/components/time-picker/TimePicker12hourDemo";
 
 import { TimePickerDemo } from "./TimePickerDemo";
 

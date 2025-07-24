@@ -20,7 +20,6 @@ export const TeamMemberCard = ({
           width={80}
           height={80}
           priority
-          unoptimized={true}
           className="h-20 w-20 rounded-full object-cover"
         />
         <h3 className="text-center font-semibold capitalize">{`${first_name} ${last_name}`}</h3>

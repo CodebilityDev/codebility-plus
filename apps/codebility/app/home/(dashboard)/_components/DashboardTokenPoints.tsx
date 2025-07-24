@@ -1,11 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import PromoteToCodevModal from "@/Components/modals/PromoteToCodevModal";
-import PromoteToMentorModal from "@/Components/modals/PromoteToMentorModal";
-import { Box } from "@/Components/shared/dashboard";
-import { Button } from "@/Components/ui/button";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import PromoteToCodevModal from "@/components/modals/PromoteToCodevModal";
+import PromoteToMentorModal from "@/components/modals/PromoteToMentorModal";
+import { Box } from "@/components/shared/dashboard";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 import { CodevPoints, Level, SkillCategory } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";

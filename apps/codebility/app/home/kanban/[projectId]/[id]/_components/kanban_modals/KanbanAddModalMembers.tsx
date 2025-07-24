@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { IconPlus } from "@/public/assets/svgs";
 import { createClientClientComponent } from "@/utils/supabase/client";

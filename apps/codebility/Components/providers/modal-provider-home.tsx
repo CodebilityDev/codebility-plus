@@ -13,15 +13,15 @@ import ProjectAddModal from "@/app/home/projects/_components/ProjectAddModal";
 import ProjectDeleteModal from "@/app/home/projects/_components/ProjectDeleteModal";
 import ProjectEditModal from "@/app/home/projects/_components/ProjectEditModal";
 import ProjectViewModal from "@/app/home/projects/_components/ProjectViewModal";
-import ApplicantsEditModal from "@/Components/modals/ApplicantsEditModal";
-import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
-import TermsOfServiceModal from "@/Components/modals/TermsOfServiceModal";
-import TimeTrackerModal from "@/Components/modals/TimeTrackerModal";
+import ApplicantsEditModal from "@/components/modals/ApplicantsEditModal";
+import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
+import TermsOfServiceModal from "@/components/modals/TermsOfServiceModal";
+import TimeTrackerModal from "@/components/modals/TimeTrackerModal";
 
 import TaskDeleteModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskDeleteModal";
 import TaskEditModal from "@/app/home/kanban/[projectId]/[id]/_components/tasks/TaskEditModal";
-import DeleteWarningModal from "@/Components/modals/DeleteWarningModal";
-import TechStackModal from "@/Components/modals/TechStackModal";
+import DeleteWarningModal from "@/components/modals/DeleteWarningModal";
+import TechStackModal from "@/components/modals/TechStackModal";
 import SprintAddModal from "@/app/home/kanban/[projectId]/_components/SprintAddModal";
 import KanbanAddMembersModal from "@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddMembersModal";
 
