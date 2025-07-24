@@ -1,5 +1,5 @@
-import { Box, H1 } from "../components/shared/dashboard";
-import { Skeleton } from "../components/ui/skeleton/skeleton";
+import { Box, H1 } from "@/components/shared/dashboard";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 
 export default function ApplicantsLoading() {
   return (

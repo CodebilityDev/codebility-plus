@@ -9,17 +9,17 @@ import {
   getProjectCodevs,
   updateProject,
 } from "@/app/home/projects/actions";
-import ProjectAvatar from "../components/ProjectAvatar";
-import { CustomSelect } from "../components/ui/CustomSelect";
+import ProjectAvatar from "@/components/ProjectAvatar";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog";
-import { MemberSelection } from "../components/ui/MemberSelection";
-import { Skeleton } from "../components/ui/skeleton/skeleton";
+} from "@/components/ui/dialog";
+import { MemberSelection } from "@/components/ui/MemberSelection";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { Client, Codev, Project, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";

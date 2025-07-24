@@ -1,4 +1,4 @@
-import H1 from "../components/shared/dashboard/H1";
+import H1 from "@/components/shared/dashboard/H1";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import { getClients } from "@/lib/server/codev.service";
 import { Client } from "@/types/home/codev";

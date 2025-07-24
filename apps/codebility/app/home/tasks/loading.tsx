@@ -1,5 +1,5 @@
-import { Box } from "../components/shared/dashboard";
-import { Skeleton } from "../components/ui/skeleton/skeleton";
+import { Box } from "@/components/shared/dashboard";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 
 const Loading = () => {
   return (

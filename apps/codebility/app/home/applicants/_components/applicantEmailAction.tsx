@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -8,8 +8,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog";
-import { useToast } from "../components/ui/use-toast";
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 import { set } from "date-fns";
 import { Loader2Icon, MailIcon } from "lucide-react";
 

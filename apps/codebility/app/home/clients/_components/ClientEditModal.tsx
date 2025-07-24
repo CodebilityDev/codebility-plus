@@ -8,15 +8,15 @@ import {
   ClientWithStatusFormValues,
   getFormItemLabels,
 } from "@/app/home/clients/_lib/schema";
-import DefaultAvatar from "../components/DefaultAvatar";
-import { Button } from "../components/ui/button";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog";
+} from "@/components/ui/dialog";
 // Hook controlling modal open/close + data
 import { useModal } from "@/hooks/use-modal-clients";
 import { zodResolver } from "@hookform/resolvers/zod";

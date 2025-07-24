@@ -3,7 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { IconGithub, IconLink } from "@/public/assets/svgs";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";

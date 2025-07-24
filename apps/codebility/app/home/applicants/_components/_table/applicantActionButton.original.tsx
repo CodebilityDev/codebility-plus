@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -10,8 +10,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog";
-import { useToast } from "../components/ui/use-toast";
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 import { dialog } from "@material-tailwind/react";
 import { set } from "date-fns";
 import {
