@@ -16,6 +16,7 @@ const SignUpPage = () => {
             src="/assets/svgs/codebility-white.svg"
             width={200}
             height={45}
+            style={{ width: "auto", height: "auto" }}
             alt="Codebility Logo"
           />
         </Link>

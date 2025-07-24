@@ -291,6 +291,7 @@ const ProjectAddModal = () => {
             onClick={() => setOpenImageCropper(true)}
             width={408}
             height={192}
+            style={{ width: "auto", height: "auto" }}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-100">

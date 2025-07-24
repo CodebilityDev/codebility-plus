@@ -135,6 +135,7 @@ export default function ServiceCard({ service }: Props) {
                               src={teamLeader.image_url}
                               alt={`${teamLeader.first_name} ${teamLeader.last_name}`}
                               fill
+                              sizes="56px"
                               className="object-cover"
                             />
                           ) : (
@@ -165,6 +166,7 @@ export default function ServiceCard({ service }: Props) {
                               src={member.image_url}
                               alt={`${member.first_name} ${member.last_name}`}
                               fill
+                              sizes="40px"
                               className="object-cover"
                             />
                           ) : (
