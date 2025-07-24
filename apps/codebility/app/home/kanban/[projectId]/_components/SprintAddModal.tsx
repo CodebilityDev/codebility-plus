@@ -9,7 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal-sprints";
-import { Form, FormControl, FormField, FormMessage } from "@codevs/ui/form";
+import { FormControl, FormField, FormMessage } from "@codevs/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
@@ -101,7 +101,7 @@ const SprintAddModal = () => {
 	return (
 		<Dialog open={isModalOpen} onOpenChange={handleClose}>
 			<DialogContent aria-describedby={undefined} className="w-[90%] max-w-xl">
-				<Form {...form}>
+				
 					<form
 						onSubmit={form.handleSubmit(onSubmit)}
 						className="flex flex-col gap-4"
@@ -204,7 +204,7 @@ const SprintAddModal = () => {
 							</Button>
 						</DialogFooter>
 					</form>
-				</Form>
+				
 			</DialogContent>
 		</Dialog>
 	);

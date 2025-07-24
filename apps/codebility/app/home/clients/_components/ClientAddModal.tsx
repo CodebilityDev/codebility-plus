@@ -155,7 +155,7 @@ export default function ClientAddModal() {
           <DialogTitle className="text-2xl">Add New Company</DialogTitle>
         </DialogHeader>
 
-        <Form {...form}>
+        
           <form
             onSubmit={form.handleSubmit(handleCreateClient)}
             className="space-y-4"
@@ -292,7 +292,7 @@ export default function ClientAddModal() {
               </Button>
             </DialogFooter>
           </form>
-        </Form>
+        
       </DialogContent>
     </Dialog>
   );

@@ -75,7 +75,7 @@ export default function AccountSettingsChangePassword() {
   return (
     <div className="space-y-2">
       <h3 className="text-lg font-semibold">Change Password</h3>
-      <Form {...form}>
+      
         <form
           className="space-y-2"
           noValidate
@@ -130,7 +130,7 @@ export default function AccountSettingsChangePassword() {
             {form.formState.isSubmitting ? "Updating..." : "Update Password"}
           </Button>
         </form>
-      </Form>
+      
     </div>
   );
 }
