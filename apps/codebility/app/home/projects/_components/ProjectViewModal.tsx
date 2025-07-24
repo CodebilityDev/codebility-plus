@@ -8,15 +8,15 @@ import {
   getTeamLead,
   SimpleMemberData,
 } from "@/app/home/projects/actions";
-import DefaultAvatar from "../components/DefaultAvatar";
-import { Button } from "../components/ui/button";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog";
-import { Skeleton } from "../components/ui/skeleton/skeleton";
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { useQuery } from "@tanstack/react-query";

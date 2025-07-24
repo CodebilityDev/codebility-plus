@@ -1,14 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog";
-import { useToast } from "../components/ui/use-toast";
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 import { cn } from "@/lib/utils";
 import { set } from "date-fns";
 import { Loader2Icon, MailIcon, MoreHorizontalIcon } from "lucide-react";

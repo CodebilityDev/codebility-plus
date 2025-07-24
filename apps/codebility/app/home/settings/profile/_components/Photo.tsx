@@ -3,8 +3,8 @@
 import type { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import Box from "../components/shared/dashboard/Box";
-import { Paragraph } from "../components/shared/home";
+import Box from "@/components/shared/dashboard/Box";
+import { Paragraph } from "@/components/shared/home";
 import { useModal } from "@/hooks/use-modal";
 import { defaultAvatar } from "@/public/assets/images";
 import { deleteImage, getImagePath, uploadImage } from "@/utils/uploadImage";

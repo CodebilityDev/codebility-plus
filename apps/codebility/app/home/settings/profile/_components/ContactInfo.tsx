@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Box from "../components/shared/dashboard/Box";
-import InputField from "../components/shared/dashboard/InputPhone";
-import { Button } from "../components/ui/button";
+import Box from "@/components/shared/dashboard/Box";
+import InputField from "@/components/shared/dashboard/InputPhone";
+import { Button } from "@/components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";

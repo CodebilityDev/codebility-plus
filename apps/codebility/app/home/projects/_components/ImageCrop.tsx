@@ -1,13 +1,13 @@
 import React, { memo, useState } from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "../components/ui/dialog";
-import { Slider } from "../components/ui/sliders";
+} from "@/components/ui/dialog";
+import { Slider } from "@/components/ui/sliders";
 import getCroppedImg from "@/hooks/useImageCrop";
 import Cropper, { Area, Point } from "react-easy-crop";
 

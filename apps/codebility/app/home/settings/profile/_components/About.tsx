@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import Box from "../components/shared/dashboard/Box";
-import { Button } from "../components/ui/button";
+import Box from "@/components/shared/dashboard/Box";
+import { Button } from "@/components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 import { useForm } from "react-hook-form";

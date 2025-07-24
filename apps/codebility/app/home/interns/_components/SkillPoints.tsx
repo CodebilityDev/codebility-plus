@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback } from "react";
 import Image from "next/image";
-import CodevBadge from "../components/CodevBadge";
+import CodevBadge from "@/components/CodevBadge";
 import { Codev, CodevPoints } from "@/types/home/codev";
 
 import { cn } from "@codevs/ui";

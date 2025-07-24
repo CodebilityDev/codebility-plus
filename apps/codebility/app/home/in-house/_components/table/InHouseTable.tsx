@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import SwitchStatusButton from "../components/ui/SwitchStatusButton";
+import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Download, Link2, Mail } from "lucide-react";
