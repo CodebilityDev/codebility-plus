@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@codevs/ui/form";
+import { FormControl, FormField, FormItem, FormMessage } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -98,12 +98,11 @@ export function CodevHireCodevModal() {
 					<DialogTitle>Hire Codev</DialogTitle>
 				</DialogHeader>
 
-				<Form {...form}>
-					<form
-						onSubmit={form.handleSubmit(onSubmit)}
-						className="flex flex-col gap-4"
-						autoComplete="off"
-					>
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="flex flex-col gap-4"
+					autoComplete="off"
+				>
 						<FormField
 							control={form.control}
 							name="name"
@@ -181,8 +180,7 @@ export function CodevHireCodevModal() {
 								{form.formState.isSubmitting ? "Sending..." : "Send Email"}
 							</Button>
 						</DialogFooter>
-					</form>
-				</Form>
+				</form>
 			</DialogContent>
 		</Dialog>
 	)
