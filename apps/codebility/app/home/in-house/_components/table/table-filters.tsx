@@ -103,32 +103,23 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
   }, [supabase]);
 
   return (
-    <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 space-y-4 p-4">
-      <div className="max-w-[300px]">
-        <Label className="dark:text-light-900 text-black">Search</Label>
+    <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 space-y-4 p-3 sm:p-4">
+      {/* Search - Full width on mobile */}
+      <div className="w-full sm:max-w-[300px]">
+        <Label className="dark:text-light-900 mb-2 block text-sm font-medium text-black">Search</Label>
         <Input
-          placeholder="Name, Email..."
+          placeholder="Search name, email..."
           value={filters.search}
           onChange={(e) => onFilterChange("search", e.target.value)}
-          /**
-           * Replicate the same classes used by your SelectTrigger:
-           * Example: h-10, border, background, text color, etc.
-           */
-          className="
-              border-light-700 bg-light-800 dark:border-dark-200
-              dark:bg-dark-200 dark:text-light-900
-              h-10 w-full
-              rounded-md
-              border px-3
-              text-black
-              
-            "
+          className="border-light-700 bg-light-800 dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-10 w-full rounded-md border px-3 text-black focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
       </div>
-      <div className="flex flex-wrap gap-4">
+      
+      {/* Filters - Responsive grid */}
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
         {/* Status Filter */}
-        <div className="min-w-[200px] space-y-2">
-          <Label className="dark:text-light-900 text-black">Status</Label>
+        <div className="space-y-2">
+          <Label className="dark:text-light-900 block text-sm font-medium text-black">Status</Label>
           <Select
             value={filters.status || "all"}
             onValueChange={(val) =>
@@ -159,9 +150,9 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         </div>
 
         {/* Display Position Filter */}
-        <div className="min-w-[200px] space-y-2">
-          <Label className="dark:text-light-900 text-black">
-            Display Position
+        <div className="space-y-2">
+          <Label className="dark:text-light-900 block text-sm font-medium text-black">
+            Position
           </Label>
           <Select
             value={filters.display_position || "all"}
@@ -193,8 +184,8 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         </div>
 
         {/* Project Filter */}
-        <div className="min-w-[200px] space-y-2">
-          <Label className="dark:text-light-900 text-black">Project</Label>
+        <div className="space-y-2">
+          <Label className="dark:text-light-900 block text-sm font-medium text-black">Project</Label>
           <Select
             value={filters.project || "all"}
             onValueChange={(val) =>
@@ -225,8 +216,8 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         </div>
 
         {/* NDA Status Filter */}
-        <div className="min-w-[200px] space-y-2">
-          <Label className="dark:text-light-900 text-black">NDA Status</Label>
+        <div className="space-y-2">
+          <Label className="dark:text-light-900 block text-sm font-medium text-black">NDA</Label>
           <Select
             value={filters.nda_status || "all"}
             onValueChange={(val) =>
@@ -254,8 +245,8 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         </div>
 
         {/* Role Filter */}
-        <div className="min-w-[200px] space-y-2">
-          <Label className="dark:text-light-900 text-black">Role</Label>
+        <div className="space-y-2">
+          <Label className="dark:text-light-900 block text-sm font-medium text-black">Role</Label>
           <Select
             value={filters.role || "all"}
             onValueChange={(val) =>
@@ -285,9 +276,9 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           </Select>
         </div>
         {/* Availability Status Filter */}
-        <div className="min-w-[200px] space-y-2">
-          <Label className="dark:text-light-900 text-black">
-            Availability Status
+        <div className="space-y-2">
+          <Label className="dark:text-light-900 block text-sm font-medium text-black">
+            Available
           </Label>
           <Select
             value={filters.availability_status || "all"}
