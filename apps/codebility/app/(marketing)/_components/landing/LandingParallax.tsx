@@ -1,4 +1,4 @@
-import { services } from "../../../../constants/landing_data";
+import { services } from "@/constants/landing_data";
 import Section from "../MarketingSection";
 import Diamond from "./LandingDiamond";
 import Marquee from "./LandingMarquee";

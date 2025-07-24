@@ -6,7 +6,7 @@ import { footerLinks } from "@/constants/links";
 import { ModalType, useModal } from "@/hooks/use-modal";
 import { IconFacebookWhite } from "@/public/assets/svgs";
 
-import { aboutUsData, connectUsData } from "../../../constants/landing_data";
+import { aboutUsData, connectUsData } from "@/constants/landing_data";
 import Container from "./MarketingContainer";
 
 const Footer = () => {
