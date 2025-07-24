@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/Components/ui/button";
-import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogFooter } from "@/Components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@codevs/ui/form";
 import { Input } from "@codevs/ui/input";
@@ -10,7 +10,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { getCodev } from "../_service/actions";
 import { z } from "zod";
-import { toast } from "@/Components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { Codev } from "@/types/home/codev";
 import { useEffect, useState } from "react";
 import { sentHireCodevEmail } from "../_service/emailAction";

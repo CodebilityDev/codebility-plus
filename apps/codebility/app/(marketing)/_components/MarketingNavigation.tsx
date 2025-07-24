@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/app/auth/actions";
-import Logo from "@/Components/shared/home/Logo";
-import { Button } from "@/Components/ui/button";
+import Logo from "@/components/shared/home/Logo";
+import { Button } from "@/components/ui/button";
 import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
 import { defaultAvatar } from "@/public/assets/images";
 import {
@@ -173,7 +173,6 @@ const UserMenu = ({
             src={image_url || defaultAvatar}
             fill
             title={`${first_name}'s Avatar`}
-            unoptimized={true}
             className="rounded-full"
           />
         </div>

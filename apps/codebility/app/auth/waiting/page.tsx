@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import Logo from "@/Components/shared/Logo";
-import { Button } from "@/Components/ui/button";
+import Logo from "@/components/shared/Logo";
+import { Button } from "@/components/ui/button";
 
 // Add this line to prevent static generation
 export const dynamic = "force-dynamic";

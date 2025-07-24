@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, useCallback, memo } from "react";
 import Link from "next/link";
 import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
 import { getMembers } from "@/app/home/projects/actions";
@@ -24,7 +24,7 @@ interface KanbanBoardProps {
   projectId: string;
 }
 
-export default function KanbanBoard({
+function KanbanBoard({
   boardData,
   projectId,
 }: KanbanBoardProps) {
@@ -47,16 +47,16 @@ export default function KanbanBoard({
     refetchOnWindowFocus: false,
   });
 
-  const members = allMembers.map((user) => ({
+  const members = useMemo(() => allMembers.map((user) => ({
     userId: user.id,
     userName: `${user.first_name} ${user.last_name}`,
     imageUrl: user.image_url,
     isActive: activeFilter === user.id,
-  }));
+  })), [allMembers, activeFilter]);
 
-  const handleFilterClick = (userId: string) => {
-    setActiveFilter(activeFilter === userId ? null : userId);
-  };
+  const handleFilterClick = useCallback((userId: string) => {
+    setActiveFilter(prev => prev === userId ? null : userId);
+  }, []);
 
   if (!boardData) {
     return (
@@ -147,3 +147,5 @@ export default function KanbanBoard({
     </div>
   );
 }
+
+export default memo(KanbanBoard);

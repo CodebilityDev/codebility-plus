@@ -1,5 +1,5 @@
 import { ChangeEvent, useMemo, useState } from "react";
-import DefaultAvatar from "@/Components/DefaultAvatar";
+import DefaultAvatar from "@/components/DefaultAvatar";
 import {
   Select,
   SelectContent,
@@ -7,7 +7,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 
 import { Label } from "@codevs/ui/label";
 

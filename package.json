@@ -6,8 +6,11 @@
     "@codevs/prettier-config": "workspace:^",
     "@turbo/gen": "^2.1.1",
     "@types/react": "19.1.5",
+    "@types/react-dom": "19.1.5",
     "eslint": "^8.57.0",
     "prettier": "^3.3.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "turbo": "^2.1.1",
     "typescript": "^5.5.4"
   },
@@ -38,7 +41,7 @@
   "packageManager": "pnpm@8.11.0",
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.49.4",
+    "@supabase/supabase-js": "^2.49.8",
     "axios": "^1.7.3",
     "date-fns": "^3.6.0"
   }

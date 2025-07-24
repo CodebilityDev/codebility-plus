@@ -1,4 +1,4 @@
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 
 import { ServicesCardData } from "@/constants/landing_data";
 import Container from "../MarketingContainer";

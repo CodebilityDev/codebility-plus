@@ -2,13 +2,13 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { SimpleMemberData, getProjectCodevs, updateProjectMembers } from "@/app/home/projects/actions";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
+} from "@/components/ui/dialog";
 import { Codev } from "@/types/home/codev";
 import { Search, Check, Users } from "lucide-react";
 import toast from "react-hot-toast";

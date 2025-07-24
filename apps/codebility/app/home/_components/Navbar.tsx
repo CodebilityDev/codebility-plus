@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Theme from "@/Components/shared/dashboard/Theme";
+import Theme from "@/components/shared/dashboard/Theme";
 import { defaultAvatar } from "@/public/assets/images";
 import {
   IconCog,
@@ -53,14 +53,21 @@ const Navbar = () => {
   const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
 
   return (
-    <nav className="background-navbar fixed top-0 z-10 w-full shadow-sm">
+    <nav className="background-navbar fixed top-0 z-10 w-full shadow-sm" role="banner">
       <div className="flex items-center justify-between px-8 py-4">
-        <div className="flex items-center"></div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center" role="navigation" aria-label="Logo">
+          <span className="sr-only">Codebility Dashboard</span>
+        </div>
+        <div className="flex items-center gap-6" role="navigation" aria-label="User menu">
           <Theme />
           <DropdownMenu modal={false}>
-            <DropdownMenuTrigger className="flex items-center gap-4 focus:outline-none">
-              <div className="hidden flex-col items-end md:flex">
+            <DropdownMenuTrigger 
+              className="flex items-center gap-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1"
+              aria-haspopup="menu"
+              aria-expanded="false"
+              aria-label={`User menu for ${first_name} ${last_name}`}
+            >
+              <div className="hidden flex-col items-end md:flex" aria-hidden="true">
                 <p className="capitalize dark:text-white">
                   {first_name} {last_name}
                 </p>
@@ -68,28 +75,38 @@ const Navbar = () => {
               </div>
               <div className="from-violet relative size-[44px] rounded-full bg-gradient-to-b to-blue-500 p-[1.5px]">
                 <Image
-                  alt="Avatar"
+                  alt={`${first_name} ${last_name}'s profile picture`}
                   src={image_url || defaultAvatar}
                   fill
-                  unoptimized={true}
                   className="h-auto w-full rounded-full object-cover"
                   title={`${first_name}'s Avatar`}
                 />
               </div>
-              <IconDropdown className="hidden invert dark:invert-0 md:block" />
+              <IconDropdown className="hidden invert dark:invert-0 md:block" aria-hidden="true" />
+              <span className="sr-only">
+                Open user menu for {first_name} {last_name} ({email_address})
+              </span>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]">
+            <DropdownMenuContent 
+              className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]"
+              role="menu"
+              aria-label="User account options"
+            >
               {menuItems.map((item) => (
                 <Link href={item.href} key={item.label}>
-                  <DropdownMenuItem className="flex cursor-pointer items-center gap-6 p-3 px-5">
-                    <item.icon className="invert dark:invert-0" />
+                  <DropdownMenuItem 
+                    className="flex cursor-pointer items-center gap-6 p-3 px-5"
+                    role="menuitem"
+                    aria-label={`Go to ${item.label} page`}
+                  >
+                    <item.icon className="invert dark:invert-0" aria-hidden="true" />
                     {item.label}
                   </DropdownMenuItem>
                 </Link>
               ))}
 
-              <DropdownMenuSeparator />
+              <DropdownMenuSeparator role="separator" />
 
               <DropdownMenuItem
                 onClick={async (e) => {
@@ -97,8 +114,12 @@ const Navbar = () => {
                   await signOut();
                 }}
                 className="flex cursor-pointer items-center gap-6 p-3 px-5"
+                role="menuitem"
+                aria-label="Sign out of your account"
               >
-                <IconLogout className="invert dark:invert-0" /> Logout
+                <IconLogout className="invert dark:invert-0" aria-hidden="true" /> 
+                Logout
+                <span className="sr-only"> - This will sign you out of your account</span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

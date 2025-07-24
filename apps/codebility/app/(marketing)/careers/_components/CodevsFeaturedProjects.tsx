@@ -1,16 +1,16 @@
-import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer";
-import { H2, SectionWrapper } from "@/Components/shared/home";
+import { fadeInOutDownToUp } from "@/components/FramerAnimation/Framer";
+import { H2, SectionWrapper } from "@/components/shared/home";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/Components/ui/carousel/carousel";
+} from "@/components/ui/carousel/carousel";
 import { projects } from "@/constants";
 import { motion } from "framer-motion";
 
-import FeaturedProjectCard from "./CodevsFeaturedProjectCard";
+import FeaturedProjectCard from "../../_shared/CodevsFeaturedProjectCard";
 
 const FeaturedProjects = () => {
   return (

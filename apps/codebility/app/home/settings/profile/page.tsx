@@ -1,8 +1,8 @@
 "use client";
 
 import { lazy, Suspense, useEffect, useState } from "react";
-import { H1 } from "@/Components/shared/dashboard";
-import CustomBreadcrumb from "@/Components/shared/dashboard/CustomBreadcrumb";
+import { H1 } from "../components/shared/dashboard";
+import CustomBreadcrumb from "../components/shared/dashboard/CustomBreadcrumb";
 import { useUserStore } from "@/store/codev-store";
 import { JobStatus, WorkExperience, WorkSchedule } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";

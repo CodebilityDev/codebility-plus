@@ -1,5 +1,5 @@
 import { useState } from "react";
-import DefaultAvatar from "@/Components/DefaultAvatar";
+import DefaultAvatar from "@/components/DefaultAvatar";
 import { IconPlus } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 

@@ -5,7 +5,7 @@ import {
   Period,
   setDateByType,
   TimePickerType,
-} from "@/Components/time-picker/TimePickerUtils";
+} from "@/components/time-picker/TimePickerUtils";
 
 import { cn } from "@codevs/ui";
 import { Input } from "@codevs/ui/input";

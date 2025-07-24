@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { ScheduleType, useSchedule } from "@/hooks/use-timeavail";
 

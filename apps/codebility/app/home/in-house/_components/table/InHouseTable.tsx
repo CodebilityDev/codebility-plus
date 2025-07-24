@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+import SwitchStatusButton from "../components/ui/SwitchStatusButton";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Download, Link2, Mail } from "lucide-react";
@@ -302,7 +302,6 @@ export function InHouseTable({
                         alt={`${item.first_name} avatar`}
                         width={40}
                         height={40}
-                        unoptimized={true}
                         className="h-full w-full object-cover"
                       />
                     </div>

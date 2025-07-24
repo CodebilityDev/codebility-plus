@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import CodevBadge from "@/Components/CodevBadge";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import Box from "@/Components/shared/dashboard/Box";
+import CodevBadge from "../components/CodevBadge";
+import DefaultAvatar from "../components/DefaultAvatar";
+import Box from "../components/shared/dashboard/Box";
 import { useModal } from "@/hooks/use-modal-users";
 import { Codev, CodevPoints, InternalStatus } from "@/types/home/codev";
 import {

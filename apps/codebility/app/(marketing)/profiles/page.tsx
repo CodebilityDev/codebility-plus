@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
+import { UsersSkeleton } from "@/components/ui/skeleton/UsersSkeleton";
 import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
 import {

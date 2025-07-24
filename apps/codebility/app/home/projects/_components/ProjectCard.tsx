@@ -1,12 +1,12 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, memo, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { SimpleMemberData } from "@/app/home/projects/actions";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+import DefaultAvatar from "../components/DefaultAvatar";
+import { Skeleton } from "../components/ui/skeleton/skeleton";
+import SwitchStatusButton from "../components/ui/SwitchStatusButton";
 import { ModalType } from "@/hooks/use-modal-projects";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
@@ -22,18 +22,20 @@ export interface ProjectCardProps {
 }
 
 const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
-  const projectStatus =
+  const projectStatus = useMemo(() =>
     project.status &&
-    project.status.charAt(0).toUpperCase() + project.status.slice(1);
+    project.status.charAt(0).toUpperCase() + project.status.slice(1)
+  , [project.status]);
 
-  const bgProjectStatus =
+  const bgProjectStatus = useMemo(() =>
     project.status === "pending"
       ? "bg-orange-500/80"
       : project.status === "completed"
         ? "bg-green-500/80"
         : project.status === "active"
           ? "bg-blue-500/80"
-          : "dark:bg-zinc-700";
+          : "dark:bg-zinc-700"
+  , [project.status]);
 
   return categoryId === project.project_category_id ? (
     <div
@@ -47,7 +49,6 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
           src={project.main_image || defaultAvatar}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
-          unoptimized={true}
           className="object-cover"
           loading="eager"
           priority
@@ -109,7 +110,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
         {/* Team Section */}
         <div className="space-y-3">
           {/* Team Lead */}
-          {(() => {
+          {useMemo(() => {
             const teamLead = project.project_members?.find(
               (member) => member.role === "team_leader",
             );
@@ -124,7 +125,6 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                       src={teamLead.codev.image_url}
                       alt={`${teamLead.codev.first_name} ${teamLead.codev.last_name}`}
                       fill
-                      unoptimized={true}
                       className="rounded-full object-cover"
                     />
                   ) : (
@@ -141,7 +141,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                 </div>
               </div>
             );
-          })()}
+          }, [project.project_members])}
 
           {/* Team Members */}
           {project.project_members?.some(
@@ -161,7 +161,6 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                         src={member.codev.image_url}
                         alt={`${member.codev.first_name} ${member.codev.last_name}`}
                         fill
-                        unoptimized={true}
                         className="rounded-full object-cover"
                       />
                     ) : (
@@ -229,4 +228,4 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
   ) : null;
 };
 
-export default ProjectCard;
+export default memo(ProjectCard);

@@ -8,8 +8,8 @@ import {
   getProjectClients,
   getProjectCodevs,
 } from "@/app/home/projects/actions";
-import ProjectAvatar from "@/Components/ProjectAvatar";
-import { CustomSelect } from "@/Components/ui/CustomSelect";
+import ProjectAvatar from "../components/ProjectAvatar";
+import { CustomSelect } from "../components/ui/CustomSelect";
 import {
   Dialog,
   DialogContent,
@@ -17,8 +17,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { MemberSelection } from "@/Components/ui/MemberSelection";
+} from "../components/ui/dialog";
+import { MemberSelection } from "../components/ui/MemberSelection";
 import { useModal } from "@/hooks/use-modal-projects";
 import { Client, Codev, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";

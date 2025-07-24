@@ -6,13 +6,13 @@ import { useEffect, useState } from "react";
   applicantsSchema,
 } from "@/app/home/applicants/_lib/applicants-schema";
 import { updateAction } from "@/app/home/applicants/action"; */
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
-} from "@/Components/ui/dialog";
+} from "@/components/ui/dialog";
 import { useModal as useModalTechkStack } from "@/hooks/use-modal";
 import { useModal } from "@/hooks/use-modal-applicants";
 import { useTechStackStore } from "@/hooks/use-techstack";

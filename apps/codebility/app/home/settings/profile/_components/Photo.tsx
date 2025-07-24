@@ -3,8 +3,8 @@
 import type { StaticImageData } from "next/image";
 import React, { useEffect, useState } from "react";
 import Image from "next/image";
-import Box from "@/Components/shared/dashboard/Box";
-import { Paragraph } from "@/Components/shared/home";
+import Box from "../components/shared/dashboard/Box";
+import { Paragraph } from "../components/shared/home";
 import { useModal } from "@/hooks/use-modal";
 import { defaultAvatar } from "@/public/assets/images";
 import { deleteImage, getImagePath, uploadImage } from "@/utils/uploadImage";
@@ -87,7 +87,6 @@ const Photo = ({ data }: PhotoProps) => {
             alt="Avatar"
             fill
             sizes="80px"
-            unoptimized={true}
             className="from-violet h-auto w-auto rounded-lg bg-gradient-to-b to-blue-500 bg-cover object-cover"
           />
         </div>

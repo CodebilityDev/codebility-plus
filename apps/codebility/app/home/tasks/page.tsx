@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import H1 from "@/Components/shared/dashboard/H1";
+import H1 from "../components/shared/dashboard/H1";
+import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import { useUserStore } from "@/store/codev-store";
 import { Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
@@ -154,11 +155,23 @@ export default function TaskPage() {
   }
 
   return (
-    <div className="mx-auto flex min-h-[70vh] max-w-screen-xl flex-col gap-4">
-      <div className="flex justify-between gap-4">
-        <H1>My Tasks</H1>
+    <AsyncErrorBoundary
+      fallback={
+        <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+          <div className="mb-4 text-4xl">📝</div>
+          <h2 className="mb-2 text-xl font-semibold">Unable to load tasks</h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Something went wrong while fetching your tasks. Please refresh to try again.
+          </p>
+        </div>
+      }
+    >
+      <div className="mx-auto flex min-h-[70vh] max-w-screen-xl flex-col gap-4">
+        <div className="flex justify-between gap-4">
+          <H1>My Tasks</H1>
+        </div>
+        <TasksContainer tasks={tasks} />
       </div>
-      <TasksContainer tasks={tasks} />
-    </div>
+    </AsyncErrorBoundary>
   );
 }

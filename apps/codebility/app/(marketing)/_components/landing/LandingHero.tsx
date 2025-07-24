@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 
 import { MarketingCardData } from "../../../../constants/landing_data";
 import Container from "../MarketingContainer";

@@ -2,10 +2,11 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Box } from "@/Components/shared/dashboard";
-import H1 from "@/Components/shared/dashboard/H1";
-import { Button } from "@/Components/ui/button";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
+import { Box } from "@/components/shared/dashboard";
+import H1 from "@/components/shared/dashboard/H1";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import {
   Table,
   TableBody,
@@ -13,7 +14,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import pathsConfig from "@/config/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
 import { createClientServerComponent } from "@/utils/supabase/server";
@@ -255,29 +256,41 @@ export default async function KanbanPage(props: PageProps) {
 
   // Render the full page
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <H1>Kanban Projects</H1>
-        <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
-          <KanbanBoardsSearch
-            className="h-10 w-full rounded-full border border-gray-200 bg-transparent px-5 text-sm focus:outline-none dark:border-gray-700 md:w-80"
-            placeholder="Search boards..."
-          />
+    <AsyncErrorBoundary
+      fallback={
+        <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+          <div className="mb-4 text-4xl">📋</div>
+          <h2 className="mb-2 text-xl font-semibold">Unable to load Kanban boards</h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            There was an issue loading your Kanban boards. Please try refreshing the page.
+          </p>
         </div>
+      }
+    >
+      <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <H1>Kanban Projects</H1>
+          <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
+            <KanbanBoardsSearch
+              className="h-10 w-full rounded-full border border-gray-200 bg-transparent px-5 text-sm focus:outline-none dark:border-gray-700 md:w-80"
+              placeholder="Search boards..."
+            />
+          </div>
+        </div>
+
+        <Table>
+          <TableHeader className="hidden md:table-header-group">
+            <TableRow>
+              <TableHead className="w-[30%]">Board Name</TableHead>
+              <TableHead className="w-[30%]">Project</TableHead>
+              <TableHead className="w-[30%]">Team Lead</TableHead>
+              <TableHead className="w-[10%] text-center">Actions</TableHead>
+            </TableRow>
+          </TableHeader>
+
+          <TableBody>{renderTableContent()}</TableBody>
+        </Table>
       </div>
-
-      <Table>
-        <TableHeader className="hidden md:table-header-group">
-          <TableRow>
-            <TableHead className="w-[30%]">Board Name</TableHead>
-            <TableHead className="w-[30%]">Project</TableHead>
-            <TableHead className="w-[30%]">Team Lead</TableHead>
-            <TableHead className="w-[10%] text-center">Actions</TableHead>
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>{renderTableContent()}</TableBody>
-      </Table>
-    </div>
+    </AsyncErrorBoundary>
   );
 }

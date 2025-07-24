@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Paragraph } from "@/Components/shared/home";
+import { Paragraph } from "../components/shared/home";
 import {
   KanbanBoardType,
   KanbanColumnType,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { H1 } from "@/Components/shared/home";
+import { H1 } from "../components/shared/home";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
 

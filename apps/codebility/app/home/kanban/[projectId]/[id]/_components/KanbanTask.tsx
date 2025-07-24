@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo, memo } from "react";
 import Image from "next/image";
-import DefaultAvatar from "@/Components/DefaultAvatar";
+import DefaultAvatar from "@/components/DefaultAvatar";
 import {
   IconPriority1,
   IconPriority2,
@@ -22,8 +22,17 @@ interface CodevMember {
   image_url?: string | null;
 }
 
+interface SkillCategory {
+  name: string;
+}
+
+interface ExtendedTask extends Task {
+  codev?: CodevMember;
+  skill_category?: SkillCategory;
+}
+
 interface Props {
-  task: Task;
+  task: ExtendedTask;
   columnId?: string;
   onComplete?: (taskId: string) => void;
 }
@@ -50,27 +59,29 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
     transition,
   };
 
-  const primaryImage = (task as any)?.codev?.image_url;
-  const primaryName = (task as any)?.codev?.first_name || "Assignee";
+  const primaryImage = task.codev?.image_url;
+  const primaryName = task.codev?.first_name || "Assignee";
 
   const sidekicks = task.sidekick_ids ?? [];
 
-  const PriorityIconMap: { [key: string]: React.FC<any> } = {
+  const PriorityIconMap: { [key: string]: React.FC<React.SVGProps<SVGSVGElement>> } = useMemo(() => ({
     critical: IconPriority1,
     high: IconPriority2,
     medium: IconPriority3,
     low: IconPriority4,
-  };
+  }), []);
 
-  const PriorityIcon = task.priority
-    ? PriorityIconMap[task.priority.toLowerCase()] || IconPriority5
-    : IconPriority5;
+  const PriorityIcon = useMemo(() => 
+    task.priority
+      ? PriorityIconMap[task.priority.toLowerCase()] || IconPriority5
+      : IconPriority5
+  , [task.priority, PriorityIconMap]);
 
   const [sidekickDetails, setSidekickDetails] = useState<CodevMember[]>([]);
   const [supabase, setSupabase] = useState<any>(null);
 
   // Get priority-based styles
-  const getPriorityStyles = () => {
+  const priorityStyles = useMemo(() => {
     const baseClasses = "absolute top-0 left-0 w-1 h-full rounded-l-lg";
     switch (task.priority?.toLowerCase()) {
       case "critical":
@@ -84,10 +95,10 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
       default:
         return `${baseClasses} bg-gray-500`;
     }
-  };
+  }, [task.priority]);
 
   // Get skill category color
-  const getSkillCategoryColor = (category: string): string => {
+  const getSkillCategoryColor = useMemo(() => (category: string): string => {
     const colorMap: Record<string, string> = {
       "UI/UX Designer":
         "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
@@ -105,10 +116,10 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
       colorMap[category] ||
       "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
     );
-  };
+  }, []);
 
   // Get task type color
-  const getTaskTypeColor = (type: string): string => {
+  const getTaskTypeColor = useMemo(() => (type: string): string => {
     const typeColorMap: Record<string, string> = {
       BUG: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
       FEATURE: "bg-green text-white dark:bg-green-900/30 dark:text-green-300",
@@ -122,7 +133,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
       typeColorMap[type] ||
       "bg-gray text-white dark:bg-gray-700 dark:text-gray-300"
     );
-  };
+  }, []);
 
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -166,7 +177,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         data-type="Task"
       >
         {/* Priority Indicator Bar */}
-        <div className={getPriorityStyles()} />
+        <div className={priorityStyles} />
 
         {/* Task Header */}
         <div className="flex items-center justify-between">
@@ -212,14 +223,14 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         </div>
 
         {/* Skill Category Badge */}
-        {(task as any).skill_category && (
+        {task.skill_category && (
           <div>
             <span
               className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold md:px-3 md:py-1 ${getSkillCategoryColor(
-                (task as any).skill_category.name,
+                task.skill_category.name,
               )}`}
             >
-              {(task as any).skill_category.name}
+              {task.skill_category.name}
             </span>
           </div>
         )}
@@ -297,4 +308,4 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
   );
 }
 
-export default KanbanTask;
+export default memo(KanbanTask);

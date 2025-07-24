@@ -1,9 +1,9 @@
 "use client";
 
-import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer";
-import H2 from "@/Components/shared/home/H2";
-import Heading3 from "@/Components/shared/home/Heading3";
-import IntroText from "@/Components/shared/home/IntroText";
+import { fadeInOutDownToUp } from "@/components/FramerAnimation/Framer";
+import H2 from "@/components/shared/home/H2";
+import Heading3 from "@/components/shared/home/Heading3";
+import IntroText from "@/components/shared/home/IntroText";
 import { Codev } from "@/types/home/codev";
 import { motion } from "framer-motion";
 
