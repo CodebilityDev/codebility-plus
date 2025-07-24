@@ -32,7 +32,19 @@
   },
   "resolutions": {
     "metro": "~0.80.8",
-    "metro-resolver": "~0.80.8"
+    "metro-resolver": "~0.80.8",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0",
+      "react-signature-canvas": "npm:react-signature-canvas@1.1.0-alpha.1",
+      "reactjs-qr-code-reader": "npm:reactjs-qr-code-reader@1.0.3",
+      "react-smooth": "npm:react-smooth@4.0.4",
+      "react-overlays": "npm:react-overlays@5.2.1"
+    }
   },
   "nohoist": [
     "**/expo-router",
