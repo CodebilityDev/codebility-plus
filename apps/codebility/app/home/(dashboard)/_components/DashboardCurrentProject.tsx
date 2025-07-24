@@ -130,6 +130,7 @@ const DashboardCurrentProject = () => {
                       alt={involvement.project.name}
                       width={32}
                       height={32}
+                      style={{ width: "auto", height: "auto" }}
                       className="rounded"
                     />
                   )}

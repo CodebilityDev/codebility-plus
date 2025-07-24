@@ -33,9 +33,11 @@ export default async function Clients() {
       }
     >
       <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
-        <div className="flex flex-col gap-4 md:flex-row md:justify-between">
+        <div className="flex flex-row justify-between gap-4">
           <H1>Clients</H1>
-          <ClientButtons />
+          <div className="flex items-center gap-4">
+            <ClientButtons />
+          </div>
         </div>
 
         {error ? (
