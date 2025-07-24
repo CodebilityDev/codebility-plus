@@ -171,7 +171,7 @@ export default function AccountSettingsDelete() {
               deleted.
             </AlertDescription>
           </Alert> */}
-          <Form {...form}>
+          
             <Dialog
               open={isOpen}
               onOpenChange={(open) => {
@@ -230,7 +230,7 @@ export default function AccountSettingsDelete() {
                 </form>
               </DialogContent>
             </Dialog>
-          </Form>
+          
         </CardContent>
       </Card>
     </>

@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal";
-import { FormControl, FormField, FormItem, FormMessage } from "@codevs/ui/form";
+// Removed form imports to fix version conflict
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -103,64 +103,38 @@ export function CodevHireCodevModal() {
 					className="flex flex-col gap-4"
 					autoComplete="off"
 				>
-						<FormField
-							control={form.control}
-							name="name"
-							render={({ field }) => (
-								<>
-									<FormItem>
-										<FormControl>
-											<Input
-												label="Name"
-												placeholder="Your name"
-												value={field.value}
-												onChange={field.onChange}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								</>
-							)}
+					<div className="space-y-2">
+						<Input
+							label="Name"
+							placeholder="Your name"
+							{...form.register("name")}
 						/>
-						<FormField
-							control={form.control}
-							name="email"
-							render={({ field }) => (
-								<>
-									<FormItem>
-										<FormControl>
-											<Input
-												label="Email"
-												placeholder="your@email.com"
-												value={field.value}
-												onChange={field.onChange}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								</>
-							)}
+						{form.formState.errors.name && (
+							<p className="text-sm text-red-500">{form.formState.errors.name.message}</p>
+						)}
+					</div>
+					<div className="space-y-2">
+						<Input
+							label="Email"
+							placeholder="your@email.com"
+							{...form.register("email")}
 						/>
-						<FormField
-							control={form.control}
-							name="message"
-							render={({ field }) => (
-								<>
-									<FormItem>
-										<FormControl>
-											<Textarea
-												label="Message"
-												rows={4}
-												placeholder="Your message"
-												className="bg-muted/50"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								</>
-							)}
+						{form.formState.errors.email && (
+							<p className="text-sm text-red-500">{form.formState.errors.email.message}</p>
+						)}
+					</div>
+					<div className="space-y-2">
+						<Textarea
+							label="Message"
+							rows={4}
+							placeholder="Your message"
+							className="bg-muted/50"
+							{...form.register("message")}
 						/>
+						{form.formState.errors.message && (
+							<p className="text-sm text-red-500">{form.formState.errors.message.message}</p>
+						)}
+					</div>
 						<DialogFooter className="flex flex-col gap-2 lg:flex-row">
 							<Button
 								type="button"
