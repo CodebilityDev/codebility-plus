@@ -76,6 +76,7 @@ const TaskEditModal = () => {
   const editor = useEditor({
     extensions: [StarterKit],
     content: taskData.description || "",
+    immediatelyRender: false,
   });
   useEffect(() => {
     const supabaseClient = createClientClientComponent();

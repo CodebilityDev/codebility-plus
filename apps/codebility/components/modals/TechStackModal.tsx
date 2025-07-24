@@ -84,6 +84,7 @@ const TechStackModal = () => {
                       }
                       alt={`${stackItem.name} icon`}
                       fill
+                      sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
                       className="object-cover"
                     />
@@ -115,6 +116,7 @@ const TechStackModal = () => {
                       }
                       alt={`${stackItem.name} icon`}
                       fill
+                      sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
                       className="object-cover"
                     />
@@ -146,6 +148,7 @@ const TechStackModal = () => {
                       }
                       alt={`${stackItem.name} icon`}
                       fill
+                      sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
                       className="object-cover"
                     />
@@ -177,6 +180,7 @@ const TechStackModal = () => {
                       }
                       alt={`${stackItem.name} icon`}
                       fill
+                      sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
                       className="object-cover"
                     />
@@ -208,6 +212,7 @@ const TechStackModal = () => {
                       }
                       alt={`${stackItem.name} icon`}
                       fill
+                      sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
                       className="object-cover"
                     />
@@ -239,6 +244,7 @@ const TechStackModal = () => {
                       }
                       alt={`${stackItem.name} icon`}
                       fill
+                      sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
                       className="object-cover"
                     />
@@ -270,6 +276,7 @@ const TechStackModal = () => {
                       }
                       alt={`${stackItem.name} icon`}
                       fill
+                      sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
                       className="object-cover"
                     />
@@ -301,6 +308,7 @@ const TechStackModal = () => {
                       }
                       alt={`${stackItem.name} icon`}
                       fill
+                      sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
                       className="object-cover"
                     />

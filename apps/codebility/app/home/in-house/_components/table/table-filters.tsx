@@ -101,7 +101,6 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
     fetchDisplayPositions();
     fetchRoles();
   }, [supabase]);
-  console.log("Filtering by availability status:", filters.availability_status);
 
   return (
     <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 space-y-4 p-4">
