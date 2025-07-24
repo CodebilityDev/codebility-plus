@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useMemo, useCallback } from "react";
-import DefaultPagination from "../components/ui/pagination";
+import DefaultPagination from "@/components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
 import { useModal } from "@/hooks/use-modal-projects";
 import usePagination from "@/hooks/use-pagination";

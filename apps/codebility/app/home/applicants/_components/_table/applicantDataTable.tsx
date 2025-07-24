@@ -2,8 +2,8 @@
 
 import React, { useMemo, useCallback } from "react";
 import { getTestDate } from "@/app/applicant/waiting/_service/util";
-import { Box } from "../components/shared/dashboard";
-import DefaultPagination from "../components/ui/pagination";
+import { Box } from "@/components/shared/dashboard";
+import DefaultPagination from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../components/ui/table";
+} from "@/components/ui/table";
 import { pageSize } from "@/constants";
 import { cn } from "@/lib/utils";
 import {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import H1 from "../components/shared/dashboard/H1";
+import H1 from "@/components/shared/dashboard/H1";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import { useUserStore } from "@/store/codev-store";
 import { Task } from "@/types/home/codev";

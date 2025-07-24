@@ -1,4 +1,4 @@
-import H1 from "../components/shared/dashboard/H1";
+import H1 from "@/components/shared/dashboard/H1";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import getProjects from "@/lib/server/project.service";
 import { getOrSetCache } from "@/lib/server/redis-cache";

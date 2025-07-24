@@ -3,9 +3,9 @@
 import React, { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import DefaultAvatar from "../components/DefaultAvatar";
-import { Button } from "../components/ui/button";
-import { Table, TableCell, TableHeader, TableRow } from "../components/ui/table";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@/components/ui/button";
+import { Table, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Row } from "@tanstack/react-table";
 

@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
 import { move } from "react-big-calendar";
 
@@ -46,7 +46,7 @@ const ApplicantFiltersComponent = ({
   updateExperienceFilter: (key: keyof ExperienceRanges, value: boolean) => void;
   updatePositionFilter: (key: string, value: boolean) => void;
   onResetFilters: () => void;
-}) {
+}) => {
   return (
     <>
       <DropdownMenu>

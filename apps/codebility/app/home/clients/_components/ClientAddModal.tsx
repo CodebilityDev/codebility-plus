@@ -9,14 +9,14 @@ import {
   getFormItemLabels,
 } from "@/app/home/clients/_lib/schema";
 import { createClientAction, fetchCountry } from "@/app/home/clients/action";
-import DefaultAvatar from "../components/DefaultAvatar";
-import { Button } from "../components/ui/button";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
-} from "../components/ui/dialog";
+} from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal-clients";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogTitle } from "@radix-ui/react-dialog";

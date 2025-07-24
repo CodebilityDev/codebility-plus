@@ -1,5 +1,5 @@
 import React, { memo } from "react";
-import { Button } from "../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { ChevronDown, Filter, SortDescIcon, X } from "lucide-react";
 
 import {
@@ -22,7 +22,7 @@ const ApplicantSorters = ({
   sortDirection: "asc" | "desc";
   onToggleSort: (field: string) => void;
   resetSort: () => void;
-}) {
+}) => {
   return (
     <>
       <DropdownMenu>

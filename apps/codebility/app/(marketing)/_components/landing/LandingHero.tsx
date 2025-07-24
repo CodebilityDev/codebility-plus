@@ -7,7 +7,7 @@ import Container from "../MarketingContainer";
 import SideNavMenu from "../MarketingSidenavMenu";
 import HeroBackground from "./LandingHeroBg";
 import HeroCard from "./LandingHeroCard";
-import { ArrowRightIcon } from "lucide-react";
+
 
 const Hero = () => {
   return (

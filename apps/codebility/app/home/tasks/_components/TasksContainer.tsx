@@ -8,7 +8,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from "../components/ui/pagination/pagination";
+} from "@/components/ui/pagination/pagination";
 import { Task } from "@/types/home/codev";
 
 import TaskCard from "./TaskCard";

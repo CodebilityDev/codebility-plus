@@ -1,5 +1,5 @@
 import React from "react";
-import CustomBreadcrumb from "../components/shared/dashboard/CustomBreadcrumb";
+import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 
 import AccountSettingsPage from "../../account-settings/page";
 
