@@ -125,6 +125,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                       src={teamLead.codev.image_url}
                       alt={`${teamLead.codev.first_name} ${teamLead.codev.last_name}`}
                       fill
+                      sizes="32px"
                       className="rounded-full object-cover"
                     />
                   ) : (
@@ -161,6 +162,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                         src={member.codev.image_url}
                         alt={`${member.codev.first_name} ${member.codev.last_name}`}
                         fill
+                        sizes="32px"
                         className="rounded-full object-cover"
                       />
                     ) : (
