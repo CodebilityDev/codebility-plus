@@ -117,7 +117,8 @@
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
-    --primary: 2, 255, 226, 100%; /* Please check, not sure if this is for hsl or rgba */
+    --primary:
+      2, 255, 226, 100%; /* Please check, not sure if this is for hsl or rgba */
     --primary-foreground: 144.9 80.4% 10%;
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
@@ -449,16 +450,16 @@ html body[data-scroll-locked] {
   margin-right: 0 !important;
 }
 
-.tiptap-editor h1{
-  font-size:x-large
+.tiptap-editor h1 {
+  font-size: x-large;
 }
 
-.tiptap-editor h2{
-  font-size:larger
+.tiptap-editor h2 {
+  font-size: larger;
 }
 
-.tiptap-editor h3{
-  font-size:large
+.tiptap-editor h3 {
+  font-size: large;
 }
 
 .tiptap-editor * {
