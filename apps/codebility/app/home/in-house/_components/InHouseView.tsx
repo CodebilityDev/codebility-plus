@@ -14,7 +14,20 @@ interface InHouseViewProps {
 }
 
 export default function InHouseView({ initialData }: InHouseViewProps) {
-  const [data, setData] = useState<Codev[]>(initialData);
+  // Sort data to show active members first, inactive at the end
+  const sortedInitialData = [...initialData].sort((a, b) => {
+    // Active (true) should come first, inactive (false/null) at end
+    const aActive = a.availability_status ?? false;
+    const bActive = b.availability_status ?? false;
+    
+    // If both have same availability status, maintain original order
+    if (aActive === bActive) return 0;
+    
+    // Active comes first (true > false)
+    return bActive ? 1 : -1;
+  });
+
+  const [data, setData] = useState<Codev[]>(sortedInitialData);
   const stats = getMemberStats(data);
 
   // Filters
@@ -109,18 +122,18 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
   };
 
   return (
-    <div className="max-w-screen-4xl mx-auto flex flex-col gap-4 p-4">
-      <H1>In-House Codebility</H1>
+    <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <H1 className="text-xl sm:text-2xl">In-House Codebility</H1>
 
-      <div className="flex items-center justify-between">
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full bg-blue-200 px-3 py-1 text-stone-100">
+        <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+          <span className="rounded-full bg-blue-500 px-3 py-1.5 text-white shadow-sm">
             {stats.total} {stats.total === 1 ? "member" : "members"}
           </span>
-          <span className="rounded-full bg-emerald-600 px-3 py-1 text-stone-100">
+          <span className="rounded-full bg-emerald-600 px-3 py-1.5 text-white shadow-sm">
             {stats.active} active
           </span>
-          <span className="rounded-full bg-red-100 px-3 py-1 text-stone-100">
+          <span className="rounded-full bg-red-500 px-3 py-1.5 text-white shadow-sm">
             {stats.inactive} inactive
           </span>
         </div>

@@ -97,8 +97,8 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   }, []);
 
   return (
-    <div className="rounded-md border">
-      <Box className="p-1 py-2 sm:p-4 sm:py-4">
+    <div className="overflow-hidden rounded-md border">
+      <Box className="p-2 py-3 sm:p-4 sm:py-4">
         {/* if rows selected */}
 
         <div className="justify-betwee flex w-full items-center">
