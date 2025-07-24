@@ -1,9 +1,9 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { Box } from "@/Components/shared/dashboard";
-import H1 from "@/Components/shared/dashboard/H1";
-import { Button } from "@/Components/ui/button";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import { Box } from "@/components/shared/dashboard";
+import H1 from "@/components/shared/dashboard/H1";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import pathsConfig from "@/config/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
 import { KanbanBoardType, KanbanSprintType } from "@/types/home/codev";

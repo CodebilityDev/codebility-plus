@@ -5,7 +5,7 @@ import {
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
-} from "@/Components/ui/tooltip";
+} from "@/components/ui/tooltip";
 import { Info } from "lucide-react";
 
 const DIFFICULTY_LEVELS = ["very easy", "easy", "normal", "medium", "hard"];

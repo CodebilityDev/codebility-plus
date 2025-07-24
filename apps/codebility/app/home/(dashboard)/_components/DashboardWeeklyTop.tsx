@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Box from "@/Components/shared/dashboard/Box";
+import Box from "@/components/shared/dashboard/Box";
 import {
   Table,
   TableBody,
@@ -9,7 +9,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { startOfMonth, startOfWeek, subDays } from "date-fns";
 

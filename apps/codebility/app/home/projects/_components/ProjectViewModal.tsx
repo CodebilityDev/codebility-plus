@@ -8,15 +8,15 @@ import {
   getTeamLead,
   SimpleMemberData,
 } from "@/app/home/projects/actions";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
+import DefaultAvatar from "../components/DefaultAvatar";
+import { Button } from "../components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+} from "../components/ui/dialog";
+import { Skeleton } from "../components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { useQuery } from "@tanstack/react-query";
@@ -102,7 +102,6 @@ const ProjectViewModal = () => {
                   }`}
                   priority
                   onLoad={() => setImageLoaded(true)}
-                  unoptimized={true}
                 />
               </div>
             ) : (
@@ -224,7 +223,6 @@ const ProjectViewModal = () => {
                             src={teamLead.image_url}
                             alt={`${teamLead.first_name} ${teamLead.last_name}`}
                             fill
-                            unoptimized={true}
                             className="rounded-full object-cover"
                             loading="lazy"
                           />
@@ -260,7 +258,6 @@ const ProjectViewModal = () => {
                                 src={member.image_url}
                                 alt={`${member.first_name} ${member.last_name}`}
                                 fill
-                                unoptimized={true}
                                 className="rounded-full object-cover"
                                 loading="lazy"
                               />

@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import DefaultPagination from "@/Components/ui/pagination";
+import React, { useEffect, useState, useMemo, useCallback } from "react";
+import DefaultPagination from "../components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
 import { useModal } from "@/hooks/use-modal-projects";
 import usePagination from "@/hooks/use-pagination";
@@ -39,19 +39,21 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
 
   const { onOpen } = useModal();
 
-  // First filter by category, then apply pagination
-  useEffect(() => {
+  // Memoize filtered projects to prevent unnecessary recalculation
+  const filteredProjectsMemo = useMemo(() => {
     // If "All" category is selected, show all projects
     // Otherwise, filter by the selected category
-    const filtered =
-      currentCategory === ALL_CATEGORY_ID
-        ? projects
-        : projects.filter(
-            (project) => project.project_category_id === currentCategory,
-          );
-
-    setFilteredProjects(filtered);
+    return currentCategory === ALL_CATEGORY_ID
+      ? projects
+      : projects.filter(
+          (project) => project.project_category_id === currentCategory,
+        );
   }, [currentCategory, projects]);
+
+  // First filter by category, then apply pagination
+  useEffect(() => {
+    setFilteredProjects(filteredProjectsMemo);
+  }, [filteredProjectsMemo]);
 
   const {
     currentPage,
@@ -67,14 +69,14 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
     setCurrentPage(tabPages[currentCategory] || 1);
   }, [currentCategory, tabPages]);
 
-  const handleTabClick = (categoryId: number) => {
+  const handleTabClick = useCallback((categoryId: number) => {
     // Save current page for the current tab before switching
     setTabPages((prev) => ({
       ...prev,
       [currentCategory]: currentPage,
     }));
     setCurrentCategory(categoryId);
-  };
+  }, [currentCategory, currentPage]);
 
   return (
     <Section>

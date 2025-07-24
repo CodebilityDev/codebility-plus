@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
 import { ExtendedTask } from "@/types/home/codev";

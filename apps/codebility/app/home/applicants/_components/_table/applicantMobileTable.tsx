@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { memo } from "react";
 import {
   Table,
   TableBody,
@@ -8,7 +8,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "../components/ui/table";
 import { cn } from "@/lib/utils";
 import {
   ColumnDef,
@@ -24,7 +24,7 @@ import {
 import { NewApplicantType } from "../../_service/types";
 import ApplicantRowActionButton from "./applicantRowActionButton";
 
-export default function ApplicantMobileTable<TData extends NewApplicantType>({
+function ApplicantMobileTableComponent<TData extends NewApplicantType>({
   table,
 }: {
   table: TableInstance<TData>;
@@ -114,3 +114,5 @@ export default function ApplicantMobileTable<TData extends NewApplicantType>({
     </>
   );
 }
+
+export default memo(ApplicantMobileTableComponent) as typeof ApplicantMobileTableComponent;

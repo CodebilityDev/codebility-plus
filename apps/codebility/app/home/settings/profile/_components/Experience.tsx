@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import Box from "@/Components/shared/dashboard/Box";
-import { Button } from "@/Components/ui/button";
+import Box from "../components/shared/dashboard/Box";
+import { Button } from "../components/ui/button";
 import { IconDelete, IconEdit } from "@/public/assets/svgs";
 import { WorkExperience } from "@/types/home/codev";
 import toast from "react-hot-toast";

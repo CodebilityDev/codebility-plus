@@ -1,6 +1,6 @@
 "use client";
 
-import { Box } from "@/Components/shared/dashboard";
+import { Box } from "@/components/shared/dashboard";
 
 import { Card, CardContent, CardHeader, CardTitle } from "@codevs/ui/card";
 import { Tabs, TabsList, TabsTrigger } from "@codevs/ui/tabs";

@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal-sprints";
 import { useUserStore } from "@/store/codev-store";
 

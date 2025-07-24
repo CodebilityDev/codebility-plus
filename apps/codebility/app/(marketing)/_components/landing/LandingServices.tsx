@@ -1,6 +1,6 @@
 import React from "react";
 import ServicesCard from "@/app/(marketing)/_components/landing/LandingServicesCard";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 
 import { ServicesCardData } from "../../../../constants/landing_data";
 

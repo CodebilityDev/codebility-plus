@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 import { NewApplicantType } from "../_service/types";
 import { ApplicantDataTable } from "./_table/applicantDataTable";
-import { applicantsColumns } from "./_table/appplicantColumns";
+import { applicantsColumns } from "./_table/applicantColumns";
 import ApplicantFilterHeaders from "./applicantHeaders";
 
 export default function ApplicantLists({

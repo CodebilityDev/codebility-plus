@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import Box from "@/Components/shared/dashboard/Box";
-import { Button } from "@/Components/ui/button";
+import Box from "../components/shared/dashboard/Box";
+import { Button } from "../components/ui/button";
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "../components/ui/select";
 import { EMPLOYMENT_TYPES } from "@/constants/employement";
 import { IconDelete, IconEdit } from "@/public/assets/svgs";
 import { JobStatus } from "@/types/home/codev";

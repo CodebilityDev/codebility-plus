@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Badges from "@/Components/shared/Badges";
-import Box from "@/Components/shared/dashboard/Box";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+import Badges from "@/components/shared/Badges";
+import Box from "@/components/shared/dashboard/Box";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
+import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { useSidebarStore } from "@/store/sidebar-store";
@@ -75,12 +75,11 @@ export default function DashboardProfile() {
             </p>
 
             <Image
-              alt="Avatar"
+              alt={`Profile picture of ${user?.first_name} ${user?.last_name || ''}, ${user?.display_position || 'team member'}`}
               src={user?.image_url ? `${user.image_url}` : defaultAvatar}
               width={100}
               height={100}
-              title={`${user?.first_name}'s Avatar`}
-              unoptimized={true}
+              title={`${user?.first_name}'s Profile Picture`}
               className="from-violet h-[100px] w-[100px] rounded-lg bg-gradient-to-b to-blue-500 bg-cover object-cover"
             />
             <p className="text-md">{user?.display_position}</p>

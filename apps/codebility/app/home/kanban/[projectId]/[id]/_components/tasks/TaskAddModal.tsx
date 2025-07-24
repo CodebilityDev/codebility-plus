@@ -3,14 +3,14 @@
 import type { SkillCategory } from "@/types/home/codev";
 import { useEffect, useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -18,7 +18,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
 import { createClientClientComponent } from "@/utils/supabase/client";

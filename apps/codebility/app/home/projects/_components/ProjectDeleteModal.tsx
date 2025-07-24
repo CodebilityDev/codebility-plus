@@ -7,7 +7,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
+} from "../components/ui/dialog";
 import { useModal } from "@/hooks/use-modal-projects";
 import toast from "react-hot-toast";
 

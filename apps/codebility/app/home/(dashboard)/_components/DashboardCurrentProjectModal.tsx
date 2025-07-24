@@ -8,8 +8,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal";
 import {
   IconPriority1,
