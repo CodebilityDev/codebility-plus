@@ -279,6 +279,7 @@ const ProjectEditModal = () => {
               width={408}
               height={192}
               onLoad={() => setImageLoaded(true)}
+              style={{ width: "auto", height: "auto" }}
             />
           </>
         ) : (
