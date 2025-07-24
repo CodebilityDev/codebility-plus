@@ -110,7 +110,7 @@ const LeftSidebar = () => {
           whileTap={{ scale: 0.95 }}
           className="p-2 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
           aria-label={isToggleOpen ? "Collapse sidebar" : "Expand sidebar"}
-          aria-expanded={isToggleOpen}
+          aria-expanded={isToggleOpen ? "true" : "false"}
           aria-controls="sidebar-navigation"
         >
           <motion.div

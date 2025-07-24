@@ -315,7 +315,7 @@ export default function ClientEditModal() {
         </div>
 
         {/* MAIN FORM FIELDS */}
-        <Form {...form}>
+        
           <form onSubmit={handleSubmit(handleUpdateClient)}>
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {formFields.map(
@@ -414,7 +414,7 @@ export default function ClientEditModal() {
               </Button>
             </DialogFooter>
           </form>
-        </Form>
+        
       </DialogContent>
     </Dialog>
   );
