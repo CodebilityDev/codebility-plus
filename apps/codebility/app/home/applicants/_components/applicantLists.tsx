@@ -53,7 +53,7 @@ export default function ApplicantLists({
   );
 
   return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4 sm:max-w-screen-2xl">
+    <div className="mx-auto flex w-full max-w-screen-xl flex-col gap-4 px-4 sm:max-w-screen-2xl sm:px-6 lg:px-8">
       <ApplicantFilterHeaders
         applicants={data}
         setApplicants={setApplicants}
@@ -67,35 +67,35 @@ export default function ApplicantLists({
         }}
         className="w-full"
       >
-        <TabsList className="grid w-full grid-cols-2 md:grid-cols-4">
-          <TabsTrigger value="applying" className="relative">
-            <span>Applicants</span>
+        <TabsList className="grid w-full grid-cols-2 gap-1 sm:grid-cols-4 sm:gap-0">
+          <TabsTrigger value="applying" className="relative flex-col gap-1 py-3 text-xs sm:flex-row sm:gap-2 sm:py-2 sm:text-sm">
+            <span className="truncate">Applicants</span>
             {applicantsApplying.length > 0 && (
-              <Badge className="ml-2 bg-blue-500 text-white">
+              <Badge className="h-5 min-w-5 bg-blue-500 px-1.5 text-xs text-white sm:ml-2 sm:h-auto sm:min-w-0 sm:px-2">
                 {applicantsApplying.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="testing" className="relative">
-            <span>Testing</span>
+          <TabsTrigger value="testing" className="relative flex-col gap-1 py-3 text-xs sm:flex-row sm:gap-2 sm:py-2 sm:text-sm">
+            <span className="truncate">Testing</span>
             {applicantsTesting.length > 0 && (
-              <Badge className="ml-2 bg-amber-500 text-white">
+              <Badge className="h-5 min-w-5 bg-amber-500 px-1.5 text-xs text-white sm:ml-2 sm:h-auto sm:min-w-0 sm:px-2">
                 {applicantsTesting.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="onboarding" className="relative">
-            <span>Onboarding</span>
+          <TabsTrigger value="onboarding" className="relative flex-col gap-1 py-3 text-xs sm:flex-row sm:gap-2 sm:py-2 sm:text-sm">
+            <span className="truncate">Onboarding</span>
             {applicantsOnboarding.length > 0 && (
-              <Badge className="bg-codeGreen ml-2 text-white">
+              <Badge className="bg-codeGreen h-5 min-w-5 px-1.5 text-xs text-white sm:ml-2 sm:h-auto sm:min-w-0 sm:px-2">
                 {applicantsOnboarding.length}
               </Badge>
             )}
           </TabsTrigger>
-          <TabsTrigger value="denied" className="relative">
-            <span>Denied</span>
+          <TabsTrigger value="denied" className="relative flex-col gap-1 py-3 text-xs sm:flex-row sm:gap-2 sm:py-2 sm:text-sm">
+            <span className="truncate">Denied</span>
             {applicantsDenied.length > 0 && (
-              <Badge className="ml-2 bg-red-500 text-white">
+              <Badge className="h-5 min-w-5 bg-red-500 px-1.5 text-xs text-white sm:ml-2 sm:h-auto sm:min-w-0 sm:px-2">
                 {applicantsDenied.length}
               </Badge>
             )}

@@ -273,42 +273,52 @@ export default function ApplicantFilterHeaders({
   };
 
   return (
-    <div className="flex flex-col gap-2 ">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <H1>Applicants Management</H1>
-        <div className="flex flex-col items-center gap-2 sm:flex-row">
-          <div className="flex w-full items-center gap-2">
-            {/* Sort Dropdown */}
-            <ApplicantSorters
-              sortField={sortField}
-              sortDirection={sortDirection}
-              onToggleSort={toggleSort}
-              resetSort={resetSort}
-            />
-
-            {/* Filter Dropdown */}
-            <ApplicantFiltersComponent
-              activeFilterCount={activeFilterCount}
-              filters={filters}
-              onResetFilters={onResetFilters}
-              uniquePositions={uniquePositions}
-              updateExperienceFilter={updateExperienceFilter}
-              updateFilter={updateFilter}
-              updatePositionFilter={updatePositionFilter}
-            />
-          </div>
-
-          {/* search bar */}
+    <div className="flex flex-col gap-4">
+      {/* Header and Search - Mobile First */}
+      <div className="flex flex-col gap-4">
+        <H1 className="text-xl sm:text-2xl">Applicants Management</H1>
+        
+        {/* Search bar - Full width on mobile, constrained on desktop */}
+        <div className="w-full">
           <input
             type="text"
-            placeholder="Search applicants"
+            placeholder="Search applicants..."
             value={searchTerm}
             onChange={(e) => onSearch(e.target.value)}
-            className="border-gray h-10 w-full rounded-full border border-opacity-50 bg-inherit px-5 text-black focus:outline-none dark:text-white md:w-80"
+            className="h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400 md:max-w-80"
           />
+        </div>
+
+        {/* Filters and Sort - Stacked on mobile, inline on larger screens */}
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+            {/* Sort Dropdown */}
+            <div className="w-full sm:w-auto">
+              <ApplicantSorters
+                sortField={sortField}
+                sortDirection={sortDirection}
+                onToggleSort={toggleSort}
+                resetSort={resetSort}
+              />
+            </div>
+
+            {/* Filter Dropdown */}
+            <div className="w-full sm:w-auto">
+              <ApplicantFiltersComponent
+                activeFilterCount={activeFilterCount}
+                filters={filters}
+                onResetFilters={onResetFilters}
+                uniquePositions={uniquePositions}
+                updateExperienceFilter={updateExperienceFilter}
+                updateFilter={updateFilter}
+                updatePositionFilter={updatePositionFilter}
+              />
+            </div>
+          </div>
         </div>
       </div>
 
+      {/* Filter badges */}
       <ApplicantFiltersBadge
         filters={filters}
         setFilter={setFilters}
