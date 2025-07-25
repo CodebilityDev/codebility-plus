@@ -96,6 +96,23 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     return difference <= 0;
   }, []);
 
+  // Define pagination callbacks outside of conditional rendering
+  const handleNextPage = useCallback(() => {
+    if (table.getState().pagination.pageIndex < totalPages - 1) {
+      table.nextPage();
+    }
+  }, [table, totalPages]);
+
+  const handlePreviousPage = useCallback(() => table.previousPage(), [table]);
+
+  const setCurrentPage = useCallback((pageOrFunction: number | ((page: number) => number)) => {
+    const page =
+      typeof pageOrFunction === "function"
+        ? pageOrFunction(table.getState().pagination.pageIndex + 1)
+        : pageOrFunction;
+    table.setPageIndex(page - 1);
+  }, [table]);
+
   return (
     <div className="overflow-hidden rounded-md border">
       <Box className="p-2 py-3 sm:p-4 sm:py-4">
@@ -203,19 +220,9 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
           {data.length > pageSize.applicants && (
             <DefaultPagination
               currentPage={table.getState().pagination.pageIndex + 1}
-              handleNextPage={useCallback(() => {
-                if (table.getState().pagination.pageIndex < totalPages - 1) {
-                  table.nextPage();
-                }
-              }, [table, totalPages])}
-              handlePreviousPage={useCallback(() => table.previousPage(), [table])}
-              setCurrentPage={useCallback((pageOrFunction) => {
-                const page =
-                  typeof pageOrFunction === "function"
-                    ? pageOrFunction(table.getState().pagination.pageIndex + 1)
-                    : pageOrFunction;
-                table.setPageIndex(page - 1);
-              }, [table])}
+              handleNextPage={handleNextPage}
+              handlePreviousPage={handlePreviousPage}
+              setCurrentPage={setCurrentPage}
               totalPages={totalPages}
             />
           )}

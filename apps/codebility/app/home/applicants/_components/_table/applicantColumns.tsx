@@ -50,7 +50,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-200"
+          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
         >
           Applicant
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -74,7 +74,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-200"
+          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
         >
           Position
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -85,7 +85,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="px-3 py-3 text-sm text-gray-300">
+        <div className="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">
           {applicant.display_position || "Not specified"}
         </div>
       );
@@ -98,7 +98,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-200"
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
         >
           Exp
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -109,7 +109,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="px-3 py-3 text-center text-sm text-gray-300">
+        <div className="px-3 py-3 text-center text-sm text-gray-700 dark:text-gray-300">
           {applicant.years_of_experience !== undefined
             ? `${applicant.years_of_experience} ${
                 applicant.years_of_experience === 1 ? "yr" : "yrs"
@@ -136,12 +136,12 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
               <Link
                 href={applicant.github}
                 target="_blank"
-                className="text-gray-400 hover:text-gray-200"
+                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 <IconGithub className="h-5 w-5 invert dark:invert-0" />
               </Link>
             ) : (
-              <span className="text-sm text-gray-500">None</span>
+              <span className="text-sm text-gray-600 dark:text-gray-500">None</span>
             )}
           </div>
         </div>
@@ -162,12 +162,12 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
               <Link
                 href={applicant.portfolio_website}
                 target="_blank"
-                className="text-gray-400 hover:text-gray-200"
+                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
               >
                 <IconLink className="h-5 w-5 invert dark:invert-0" />
               </Link>
             ) : (
-              <span className="text-sm text-gray-500">None</span>
+              <span className="text-sm text-gray-600 dark:text-gray-500">None</span>
             )}
           </div>
         </div>
@@ -182,7 +182,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-200"
+          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
         >
           Tech Stacks
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -214,7 +214,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-200"
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
         >
           Date Applied
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -225,7 +225,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="py-3 text-center text-sm text-gray-300">
+        <div className="py-3 text-center text-sm text-gray-700 dark:text-gray-300">
           {applicant.date_applied
             ? new Date(applicant.date_applied).toLocaleDateString()
             : "N/A"}
@@ -244,7 +244,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-200"
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
         >
           Test Taken
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -255,7 +255,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="py-3 text-center text-sm text-gray-300">
+        <div className="py-3 text-center text-sm text-gray-700 dark:text-gray-300">
           {applicant.applicant?.test_taken
             ? new Date(applicant.applicant.test_taken).toLocaleDateString()
             : "N/A"}
@@ -273,7 +273,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-200"
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
         >
           Time
           <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -308,10 +308,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
               target="_blank"
               rel="noopener noreferrer"
             >
-              <IconLink className="h-4 w-4 text-gray-200" />
+              <IconLink className="h-4 w-4 text-gray-600 dark:text-gray-200" />
             </Link>
           ) : (
-            <span className="text-sm text-gray-500">N/A</span>
+            <span className="text-sm text-gray-600 dark:text-gray-500">N/A</span>
           )}
         </div>
       );
@@ -324,7 +324,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-200"
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
         >
           Reapply
           <ArrowUpDown className="ml-2 h-4 w-4" />
