@@ -150,7 +150,7 @@ const LeftSidebar = () => {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="text-gray ml-2 text-sm uppercase mt-4"
+                  className="ml-2 text-sm uppercase mt-4 text-gray-600 dark:text-white"
                 >
                   {section.title}
                 </motion.h4>
