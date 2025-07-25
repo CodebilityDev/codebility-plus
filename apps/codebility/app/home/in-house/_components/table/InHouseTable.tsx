@@ -243,6 +243,35 @@ export function InHouseTable({
     }
   };
 
+  // Define pagination callbacks outside of conditional rendering
+  const handleNextPage = useCallback(() => {
+    if (pagination.currentPage < pagination.totalPages) {
+      pagination.onNextPage();
+    }
+  }, [pagination]);
+
+  const handlePreviousPage = useCallback(() => pagination.onPreviousPage(), [pagination]);
+
+  const setCurrentPage = useCallback((pageOrFunction: number | ((page: number) => number)) => {
+    const page =
+      typeof pageOrFunction === "function"
+        ? pageOrFunction(pagination.currentPage)
+        : pageOrFunction;
+    // Note: DefaultPagination expects 1-based pages, which matches our current implementation
+    const targetPage = Math.max(1, Math.min(page, pagination.totalPages));
+    // Since we don't have direct page setting, we'll need to navigate step by step
+    const currentPage = pagination.currentPage;
+    if (targetPage > currentPage) {
+      for (let i = currentPage; i < targetPage; i++) {
+        pagination.onNextPage();
+      }
+    } else if (targetPage < currentPage) {
+      for (let i = currentPage; i > targetPage; i--) {
+        pagination.onPreviousPage();
+      }
+    }
+  }, [pagination]);
+
   return (
     <div className="mb-4 space-y-4">
       {/* Mobile Table for smaller screens */}
@@ -607,31 +636,9 @@ export function InHouseTable({
         {data.length > pageSize.applicants && (
           <DefaultPagination
             currentPage={pagination.currentPage}
-            handleNextPage={useCallback(() => {
-              if (pagination.currentPage < pagination.totalPages) {
-                pagination.onNextPage();
-              }
-            }, [pagination])}
-            handlePreviousPage={useCallback(() => pagination.onPreviousPage(), [pagination])}
-            setCurrentPage={useCallback((pageOrFunction) => {
-              const page =
-                typeof pageOrFunction === "function"
-                  ? pageOrFunction(pagination.currentPage)
-                  : pageOrFunction;
-              // Note: DefaultPagination expects 1-based pages, which matches our current implementation
-              const targetPage = Math.max(1, Math.min(page, pagination.totalPages));
-              // Since we don't have direct page setting, we'll need to navigate step by step
-              const currentPage = pagination.currentPage;
-              if (targetPage > currentPage) {
-                for (let i = currentPage; i < targetPage; i++) {
-                  pagination.onNextPage();
-                }
-              } else if (targetPage < currentPage) {
-                for (let i = currentPage; i > targetPage; i--) {
-                  pagination.onPreviousPage();
-                }
-              }
-            }, [pagination])}
+            handleNextPage={handleNextPage}
+            handlePreviousPage={handlePreviousPage}
+            setCurrentPage={setCurrentPage}
             totalPages={pagination.totalPages}
           />
         )}

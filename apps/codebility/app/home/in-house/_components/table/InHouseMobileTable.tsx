@@ -115,7 +115,7 @@ export function InHouseMobileTable({
                 <h3 className="dark:text-light-900 truncate text-sm font-semibold text-black">
                   {capitalize(item.first_name)} {capitalize(item.last_name)}
                 </h3>
-                <p className="dark:text-light-700 truncate text-xs text-gray-600">
+                <p className="dark:text-light-700 truncate text-xs text-gray-700">
                   {item.email_address}
                 </p>
               </div>
@@ -135,7 +135,7 @@ export function InHouseMobileTable({
           <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-3">
             {/* Position */}
             <div>
-              <span className="dark:text-light-700 font-medium text-gray-500">Position:</span>
+              <span className="dark:text-light-700 font-medium text-gray-700 dark:text-gray-500">Position:</span>
               <p className="dark:text-light-900 mt-0.5 text-black">
                 {typeof item.display_position === "string"
                   ? capitalize(item.display_position)
@@ -145,7 +145,7 @@ export function InHouseMobileTable({
 
             {/* Role */}
             <div>
-              <span className="dark:text-light-700 font-medium text-gray-500">Role:</span>
+              <span className="dark:text-light-700 font-medium text-gray-700 dark:text-gray-500">Role:</span>
               <p className="dark:text-light-900 mt-0.5 text-black">
                 {item.role_id
                   ? roles.find((role) => role.id === item.role_id)?.name || "-"
@@ -155,7 +155,7 @@ export function InHouseMobileTable({
 
             {/* Available */}
             <div>
-              <span className="dark:text-light-700 font-medium text-gray-500">Available:</span>
+              <span className="dark:text-light-700 font-medium text-gray-700 dark:text-gray-500">Available:</span>
               <div className="mt-0.5">
                 <SwitchStatusButton
                   disabled={false}
@@ -167,7 +167,7 @@ export function InHouseMobileTable({
 
             {/* NDA Status */}
             <div>
-              <span className="dark:text-light-700 font-medium text-gray-500">NDA:</span>
+              <span className="dark:text-light-700 font-medium text-gray-700 dark:text-gray-500">NDA:</span>
               <p className={`mt-0.5 font-medium ${getNdaStatusColor(item.nda_status)}`}>
                 {item.nda_status ? "✓" : "✗"}
               </p>
@@ -175,7 +175,7 @@ export function InHouseMobileTable({
 
             {/* Portfolio */}
             <div>
-              <span className="dark:text-light-700 font-medium text-gray-500">Portfolio:</span>
+              <span className="dark:text-light-700 font-medium text-gray-700 dark:text-gray-500">Portfolio:</span>
               <div className="mt-0.5">
                 {item.portfolio_website ? (
                   <a
@@ -187,14 +187,14 @@ export function InHouseMobileTable({
                     <Link2 className="h-3 w-3" />
                   </a>
                 ) : (
-                  <span className="text-gray-500">-</span>
+                  <span className="text-gray-700 dark:text-gray-500">-</span>
                 )}
               </div>
             </div>
 
             {/* Date Joined */}
             <div>
-              <span className="dark:text-light-700 font-medium text-gray-500">Joined:</span>
+              <span className="dark:text-light-700 font-medium text-gray-700 dark:text-gray-500">Joined:</span>
               <p className="dark:text-light-900 mt-0.5 text-black">
                 {item.date_joined 
                   ? new Date(item.date_joined).toLocaleDateString('en-US', { 
@@ -222,7 +222,7 @@ export function InHouseMobileTable({
                     </span>
                   ))}
                   {item.projects.length > 2 && (
-                    <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                    <span className="rounded bg-gray-100 px-1.5 py-0.5 text-xs text-gray-700 dark:bg-gray-700 dark:text-gray-300">
                       +{item.projects.length - 2}
                     </span>
                   )}

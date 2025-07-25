@@ -165,7 +165,7 @@ const UserMenu = ({
           <p className="capitalize text-white">
             {first_name} {last_name}
           </p>
-          <p className="text-gray text-sm">{email}</p>
+          <p className="text-white text-sm">{email}</p>
         </div>
         <div className="from-violet relative overflow-hidden rounded-full bg-gradient-to-b to-blue-500 lg:h-[44px] lg:w-[52px]">
           <Image
