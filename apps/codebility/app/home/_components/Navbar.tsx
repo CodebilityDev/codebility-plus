@@ -71,7 +71,7 @@ const Navbar = () => {
                 <p className="capitalize dark:text-white">
                   {first_name} {last_name}
                 </p>
-                <p className="text-gray text-sm">{email_address}</p>
+                <p className="text-dark100_light900 text-sm">{email_address}</p>
               </div>
               <div className="from-violet relative size-[44px] rounded-full bg-gradient-to-b to-blue-500 p-[1.5px]">
                 <Image
