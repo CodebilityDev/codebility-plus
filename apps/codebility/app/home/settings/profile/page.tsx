@@ -1,11 +1,7 @@
-"use client";
-
-import { lazy, Suspense, useEffect, useState } from "react";
+import { Suspense } from "react";
 import { H1 } from "@/components/shared/dashboard";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
-import { useUserStore } from "@/store/codev-store";
-import { JobStatus, WorkExperience, WorkSchedule } from "@/types/home/codev";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { Toaster } from "react-hot-toast";
 
 import About from "./_components/About";
@@ -23,7 +19,7 @@ const items = [
   { label: "Profile" },
 ];
 
-export default function Profile() {
+export default async function Profile() {
   return (
     <Suspense fallback={<Loading />}>
       <ProfileComponent />
@@ -31,108 +27,55 @@ export default function Profile() {
   );
 }
 
-const ProfileComponent = () => {
-  const { user, isLoading: userLoading } = useUserStore();
-  const [isLoading, setIsLoading] = useState(true);
-  const [isHydrated, setIsHydrated] = useState(false);
-  const [data, setData] = useState<{
-    education: any[];
-    workExperience: WorkExperience[];
-    schedules: WorkSchedule[];
-    jobStatuses: JobStatus[];
-  }>({
-    education: [],
-    workExperience: [],
-    schedules: [],
-    jobStatuses: [],
-  });
-  const [error, setError] = useState<string | null>(null);
-  const [supabase, setSupabase] = useState<any>(null);
+async function ProfileComponent() {
+  const supabase = await createClientServerComponent();
 
-  // Handle hydration
-  useEffect(() => {
-    setIsHydrated(true);
-  }, []);
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
+  // Get current user
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      if (!user?.id || !isHydrated) return;
-
-      try {
-        const [
-          { data: education, error: educationError },
-          { data: workExperience, error: experienceError },
-          { data: schedules, error: schedulesError },
-          { data: jobStatuses, error: jobStatusesError },
-        ] = await Promise.all([
-          supabase.from("education").select("*").eq("codev_id", user.id),
-          supabase.from("work_experience").select("*").eq("codev_id", user.id),
-          supabase.from("work_schedules").select("*").eq("codev_id", user.id),
-          supabase.from("job_status").select("*").eq("codev_id", user.id),
-        ]);
-
-        if (
-          educationError ||
-          experienceError ||
-          schedulesError ||
-          jobStatusesError
-        ) {
-          throw new Error("Error fetching data");
-        }
-
-        setData({
-          education: education || [],
-          workExperience: workExperience || [],
-          schedules: schedules || [],
-          jobStatuses: jobStatuses || [],
-        });
-      } catch (err) {
-        console.error("Fetch error:", err);
-        setError("Failed to load data");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    if (user?.id && isHydrated) {
-      fetchData();
-    }
-  }, [user?.id, isHydrated, supabase]);
-
-  // Show loading during hydration or user loading
-  if (!isHydrated || userLoading) {
-    return <Loading />;
-  }
-
-  // Check authentication
-  if (!user) {
+  if (!authUser) {
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-lg">Please log in to view your resume.</div>
+        <div className="text-lg">Please log in to view your profile.</div>
       </div>
     );
   }
 
-  if (isLoading) {
-    return <Loading />;
-  }
+  // Fetch user profile data
+  const { data: user, error: userError } = await supabase
+    .from("codev")
+    .select("*")
+    .eq("id", authUser.id)
+    .single();
 
-  if (error) {
+  if (userError || !user) {
+    console.error("Error fetching user:", userError);
     return (
       <div className="flex h-screen items-center justify-center">
-        <div className="text-lg text-red-500">{error}</div>
+        <div className="text-lg text-red-500">Failed to load user profile</div>
       </div>
     );
   }
 
-  // Combine store data with fetched relations
+  // Fetch related data in parallel
+  const [
+    { data: education },
+    { data: workExperience },
+    { data: schedules },
+    { data: jobStatuses },
+  ] = await Promise.all([
+    supabase.from("education").select("*").eq("codev_id", user.id),
+    supabase.from("work_experience").select("*").eq("codev_id", user.id),
+    supabase.from("work_schedules").select("*").eq("codev_id", user.id),
+    supabase.from("job_status").select("*").eq("codev_id", user.id),
+  ]);
+
+  // Combine data
   const codevData = {
     ...user,
-    education: data.education,
+    education: education || [],
   };
 
   return (
@@ -158,7 +101,7 @@ const ProfileComponent = () => {
                 phone_number: user.phone_number,
               }}
             />
-            <Experience data={data.workExperience} />
+            <Experience data={workExperience || []} />
           </div>
           <div className="flex w-full basis-[30%] flex-col gap-8 2xl:basis-[40%]">
             <Photo data={{ image_url: user.image_url || null }} />
@@ -168,11 +111,11 @@ const ProfileComponent = () => {
                 level: user.level,
               }}
             />
-            <TimeSchedule data={data.schedules[0]} />
-            <JobStatuses data={data.jobStatuses || []} />
+            <TimeSchedule data={schedules?.[0] || null} />
+            <JobStatuses data={jobStatuses || []} />
           </div>
         </div>
       </div>
     </div>
   );
-};
+}
