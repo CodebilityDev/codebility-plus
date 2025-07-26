@@ -25,12 +25,12 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({
   return (
     <div
       onClick={toggleSetting}
-      className={`bg-gray relative flex h-5 w-10 cursor-pointer items-center gap-4 rounded-full border-black p-2 ${
-        settingEnabled ? "bg-opacity-20" : " bg-opacity-30"
+      className={`relative flex h-5 w-10 cursor-pointer items-center gap-4 rounded-full border border-gray-300 p-2 transition-colors ${
+        settingEnabled ? "bg-gray-700 dark:bg-gray-600" : "bg-gray-300 dark:bg-gray-700"
       }`}
     >
       <motion.div
-        className={`absolute h-4 w-4 rounded-full ${settingEnabled ? "dark:bg-light-800 bg-slate-600" : "dark:bg-teal bg-blue-100"}`}
+        className={`absolute h-4 w-4 rounded-full ${settingEnabled ? "bg-white" : "bg-white"}`}
         animate={{ marginLeft: settingEnabled ? "-10%" : "34%" }}
         transition={{ type: "spring", stiffness: 700, damping: 60 }}
       />
