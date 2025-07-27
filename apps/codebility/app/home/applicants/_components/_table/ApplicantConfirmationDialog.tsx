@@ -35,15 +35,15 @@ export default function ApplicantConfirmationDialog({
   const config = ACTION_CONFIG[actionType];
 
   return (
-    <Dialog open={isOpen} onOpenChange={onCancel}>
-      <DialogContent className="sm:max-w-[425px]">
+    <Dialog open={isOpen} onOpenChange={onCancel} modal={true}>
+      <DialogContent className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 sm:max-w-[425px]">
         <DialogHeader>
-          <DialogTitle>{config.confirmTitle}</DialogTitle>
-          <DialogDescription>{config.confirmDescription}</DialogDescription>
+          <DialogTitle className="text-gray-900 dark:text-gray-100">{config.confirmTitle}</DialogTitle>
+          <DialogDescription className="text-gray-600 dark:text-gray-400">{config.confirmDescription}</DialogDescription>
         </DialogHeader>
-        <DialogFooter>
+        <DialogFooter className="gap-2">
           <DialogClose asChild>
-            <Button variant="outline" disabled={isLoading}>
+            <Button variant="outline" disabled={isLoading} className="text-gray-700 dark:text-gray-300">
               Cancel
             </Button>
           </DialogClose>

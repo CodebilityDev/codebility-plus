@@ -26,16 +26,8 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
   // Filter projects by current category
   const [filteredProjects, setFilteredProjects] = useState<Project[]>([]);
 
-  // Track current page for each tab
-  const [tabPages, setTabPages] = useState(() => {
-    const pages: Record<number, number> = {
-      [ALL_CATEGORY_ID]: 1, // Add "All" category to tracked pages
-    };
-    CATEGORIES.forEach((cat) => {
-      pages[cat.id] = 1;
-    });
-    return pages;
-  });
+  // Track current page for each tab - initialize with empty object
+  const [tabPages, setTabPages] = useState<Record<number, number>>({});
 
   const { onOpen } = useModal();
 
@@ -66,17 +58,22 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
 
   // Update current page when switching tabs
   useEffect(() => {
-    setCurrentPage(tabPages[currentCategory] || 1);
-  }, [currentCategory, tabPages]);
+    const savedPage = tabPages[currentCategory] || 1;
+    // Ensure the saved page doesn't exceed total pages
+    const validPage = Math.min(savedPage, totalPages || 1);
+    setCurrentPage(validPage);
+  }, [currentCategory, tabPages, setCurrentPage, totalPages]);
 
   const handleTabClick = useCallback((categoryId: number) => {
     // Save current page for the current tab before switching
-    setTabPages((prev) => ({
-      ...prev,
-      [currentCategory]: currentPage,
-    }));
+    if (currentPage > 0 && currentPage <= totalPages) {
+      setTabPages((prev) => ({
+        ...prev,
+        [currentCategory]: currentPage,
+      }));
+    }
     setCurrentCategory(categoryId);
-  }, [currentCategory, currentPage]);
+  }, [currentCategory, currentPage, totalPages]);
 
   return (
     <Section>
@@ -86,10 +83,10 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
           <div className="mx-auto flex flex-wrap justify-center gap-5 xl:gap-16 ">
             <p
               onClick={() => handleTabClick(ALL_CATEGORY_ID)}
-              className={`cursor-pointer px-2 pb-2 text-violet-200 xl:text-xl ${
+              className={`cursor-pointer px-2 pb-2 xl:text-xl transition-colors ${
                 currentCategory === ALL_CATEGORY_ID
-                  ? "border-violet text-violet border-b-2"
-                  : "text-white"
+                  ? "border-violet-600 text-violet-600 dark:border-violet-400 dark:text-violet-400 border-b-2"
+                  : "text-gray-700 dark:text-gray-300 hover:text-violet-600 dark:hover:text-violet-400"
               }`}
             >
               All
@@ -98,10 +95,10 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
               <p
                 key={category.id}
                 onClick={() => handleTabClick(category.id)}
-                className={`cursor-pointer px-2 pb-2 text-violet-200 xl:text-xl ${
+                className={`cursor-pointer px-2 pb-2 xl:text-xl transition-colors ${
                   currentCategory === category.id
-                    ? "border-violet text-violet border-b-2"
-                    : "text-white"
+                    ? "border-violet-600 text-violet-600 dark:border-violet-400 dark:text-violet-400 border-b-2"
+                    : "text-gray-700 dark:text-gray-300 hover:text-violet-600 dark:hover:text-violet-400"
                 }`}
               >
                 {category.name}
@@ -111,32 +108,38 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
 
           {/* Projects Grid */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-            {paginatedProjects && paginatedProjects.length > 0 ? (
-              paginatedProjects.map((project) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  onOpen={onOpen}
-                  categoryId={
-                    currentCategory === ALL_CATEGORY_ID
-                      ? project.project_category_id
-                      : currentCategory
-                  }
-                />
-              ))
+            {Array.isArray(paginatedProjects) && paginatedProjects.length > 0 ? (
+              paginatedProjects.map((project) => {
+                if (!project || !project.id) return null;
+                return (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    onOpen={onOpen}
+                    categoryId={
+                      currentCategory === ALL_CATEGORY_ID
+                        ? project.project_category_id
+                        : currentCategory
+                    }
+                  />
+                );
+              })
             ) : (
-              <div className="col-span-full text-center text-white">
+              <div className="col-span-full text-center text-gray-700 dark:text-gray-300">
                 No projects available for this category
               </div>
             )}
           </div>
 
-          {filteredProjects.length > pageSize.projects && (
+          {filteredProjects.length > pageSize.projects && totalPages > 1 && (
             <DefaultPagination
-              currentPage={currentPage}
+              currentPage={Math.max(1, Math.min(currentPage, totalPages))}
               handleNextPage={handleNextPage}
               handlePreviousPage={handlePreviousPage}
-              setCurrentPage={setCurrentPage}
+              setCurrentPage={(page: number) => {
+                const validPage = Math.max(1, Math.min(page, totalPages));
+                setCurrentPage(validPage);
+              }}
               totalPages={totalPages}
             />
           )}

@@ -127,4 +127,13 @@ export const ACTION_CONFIG: Record<ActionType, ActionConfig> = {
     confirmTitle: "Send Onboarding Reminder",
     confirmDescription: "Are you sure you want to send an onboarding reminder to this applicant?",
   },
+  viewDetails: {
+    action: () => Promise.resolve(), // No action needed for view details
+    successTitle: "Details Viewed",
+    successMessage: (firstName, lastName) => `Viewing details for ${firstName} ${lastName}.`,
+    errorMessage: "Failed to view details. Please try again later.",
+    requiresConfirmation: false,
+    confirmTitle: "View Details",
+    confirmDescription: "View applicant details",
+  },
 };

@@ -10,7 +10,8 @@ export type ActionType =
   | "accept"
   | "deny"
   | "remindToTakeTest"
-  | "remindToOnboarding";
+  | "remindToOnboarding"
+  | "viewDetails";
 
 export interface ActionConfig {
   action: (id: string) => Promise<any>;

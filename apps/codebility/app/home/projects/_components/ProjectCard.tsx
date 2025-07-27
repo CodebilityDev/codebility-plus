@@ -11,6 +11,7 @@ import { ModalType } from "@/hooks/use-modal-projects";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Project } from "@/types/home/codev";
+import { getValidImageUrl } from "@/utils/imageValidation";
 
 import BookmarkButton from "./BookmarkButton";
 import ProjectOptionsMenu from "./ProjectOptionsMenu";
@@ -37,7 +38,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
           : "dark:bg-zinc-700"
   , [project.status]);
 
-  return categoryId === project.project_category_id ? (
+  return (
     <div
       onClick={() => onOpen("projectViewModal", project)}
       className="background-box flex cursor-pointer flex-col overflow-hidden rounded-xl border border-zinc-200 transition-all hover:shadow-lg dark:border-zinc-700 dark:shadow-slate-700 "
@@ -120,17 +121,20 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
             return (
               <div className="flex items-center gap-2">
                 <div className="relative h-8 w-8">
-                  {teamLead.codev.image_url ? (
-                    <Image
-                      src={teamLead.codev.image_url}
-                      alt={`${teamLead.codev.first_name} ${teamLead.codev.last_name}`}
-                      fill
-                      sizes="32px"
-                      className="rounded-full object-cover"
-                    />
-                  ) : (
-                    <DefaultAvatar size={32} />
-                  )}
+                  {(() => {
+                    const validUrl = getValidImageUrl(teamLead.codev.image_url);
+                    return validUrl ? (
+                      <Image
+                        src={validUrl}
+                        alt={`${teamLead.codev.first_name} ${teamLead.codev.last_name}`}
+                        fill
+                        sizes="32px"
+                        className="rounded-full object-cover"
+                      />
+                    ) : (
+                      <DefaultAvatar size={32} />
+                    );
+                  })()}
                 </div>
                 <div className="flex flex-col">
                   <span className="text-dark100_light900 text-xs font-medium">
@@ -157,17 +161,20 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                     key={member.id}
                     className="relative h-8 w-8 rounded-full"
                   >
-                    {member.codev?.image_url ? (
-                      <Image
-                        src={member.codev.image_url}
-                        alt={`${member.codev.first_name} ${member.codev.last_name}`}
-                        fill
-                        sizes="32px"
-                        className="rounded-full object-cover"
-                      />
-                    ) : (
-                      <DefaultAvatar size={32} />
-                    )}
+                    {(() => {
+                      const validUrl = getValidImageUrl(member.codev?.image_url);
+                      return validUrl ? (
+                        <Image
+                          src={validUrl}
+                          alt={`${member.codev?.first_name} ${member.codev?.last_name}`}
+                          fill
+                          sizes="32px"
+                          className="rounded-full object-cover"
+                        />
+                      ) : (
+                        <DefaultAvatar size={32} />
+                      );
+                    })()}
                   </div>
                 ))}
               {project.project_members.filter(
@@ -185,7 +192,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
             </div>
           ) : (
             <div className="flex -space-x-2">
-              <div className="text-gray relative flex h-8 w-full rounded-full">
+              <div className="text-gray-600 dark:text-gray-400 relative flex h-8 w-full rounded-full">
                 No Members
               </div>
             </div>
@@ -227,7 +234,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
         </div>
       </div>
     </div>
-  ) : null;
+  );
 };
 
 export default memo(ProjectCard);
