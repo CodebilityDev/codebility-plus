@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { MoreHorizontalIcon, MailIcon } from "lucide-react";
+import { MoreHorizontalIcon, MailIcon, EyeIcon } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,6 +22,10 @@ interface ApplicantActionButtonProps {
 
 // Menu items configuration based on applicant status
 const getMenuItems = (status: string): Array<{ action: ActionType; label: string; icon?: React.ReactNode }> => {
+  const baseItems = [
+    { action: "viewDetails" as ActionType, label: "View Details", icon: <EyeIcon className="h-4 w-4" /> },
+  ];
+  
   const baseEmailItems = [
     { action: "remindToTakeTest" as ActionType, label: "Remind to Take Test", icon: <MailIcon className="h-4 w-4" /> },
     { action: "remindToOnboarding" as ActionType, label: "Remind for Onboarding", icon: <MailIcon className="h-4 w-4" /> },
@@ -30,41 +34,78 @@ const getMenuItems = (status: string): Array<{ action: ActionType; label: string
   switch (status.toLowerCase()) {
     case "applying":
       return [
+        ...baseItems,
+        // Move actions grouped together
         { action: "testing" as ActionType, label: "Move to Testing" },
+        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
+        { action: "deny" as ActionType, label: "Move to Denied" },
+        // Accept/Deny actions grouped together
         { action: "accept" as ActionType, label: "Accept" },
-        { action: "deny" as ActionType, label: "Deny" },
         ...baseEmailItems,
         { action: "delete" as ActionType, label: "Delete" },
       ];
     case "testing":
       return [
+        ...baseItems,
+        // Move actions grouped together
+        { action: "applying" as ActionType, label: "Move to Applying" },
+        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
+        { action: "deny" as ActionType, label: "Move to Denied" },
+        // Test-specific actions
         { action: "pass" as ActionType, label: "Pass Test" },
         { action: "fail" as ActionType, label: "Fail Test" },
-        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
+        // Accept action
+        { action: "accept" as ActionType, label: "Accept" },
         ...baseEmailItems,
         { action: "delete" as ActionType, label: "Delete" },
       ];
     case "passed":
       return [
+        ...baseItems,
+        // Move actions grouped together
+        { action: "applying" as ActionType, label: "Move to Applying" },
+        { action: "testing" as ActionType, label: "Move to Testing" },
         { action: "onboarding" as ActionType, label: "Move to Onboarding" },
+        { action: "deny" as ActionType, label: "Move to Denied" },
+        // Accept action
         { action: "accept" as ActionType, label: "Accept" },
-        { action: "deny" as ActionType, label: "Deny" },
         ...baseEmailItems,
         { action: "delete" as ActionType, label: "Delete" },
       ];
     case "onboarding":
       return [
+        ...baseItems,
+        // Move actions grouped together
+        { action: "applying" as ActionType, label: "Move to Applying" },
+        { action: "testing" as ActionType, label: "Move to Testing" },
+        { action: "deny" as ActionType, label: "Move to Denied" },
+        // Accept action
         { action: "accept" as ActionType, label: "Accept" },
-        { action: "deny" as ActionType, label: "Deny" },
+        ...baseEmailItems,
+        { action: "delete" as ActionType, label: "Delete" },
+      ];
+    case "denied":
+      return [
+        ...baseItems,
+        // Move actions grouped together
+        { action: "applying" as ActionType, label: "Move to Applying" },
+        { action: "testing" as ActionType, label: "Move to Testing" },
+        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
+        // Accept action
+        { action: "accept" as ActionType, label: "Accept" },
         ...baseEmailItems,
         { action: "delete" as ActionType, label: "Delete" },
       ];
     default:
       return [
+        ...baseItems,
+        // Move actions grouped together
         { action: "applying" as ActionType, label: "Move to Applying" },
         { action: "testing" as ActionType, label: "Move to Testing" },
+        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
+        { action: "deny" as ActionType, label: "Move to Denied" },
+        // Accept action
         { action: "accept" as ActionType, label: "Accept" },
-        { action: "deny" as ActionType, label: "Deny" },
         ...baseEmailItems,
         { action: "delete" as ActionType, label: "Delete" },
       ];

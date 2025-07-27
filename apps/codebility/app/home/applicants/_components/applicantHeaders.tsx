@@ -273,37 +273,28 @@ export default function ApplicantFilterHeaders({
   };
 
   return (
-    <div className="flex flex-col gap-4">
-      {/* Header and Search - Mobile First */}
-      <div className="flex flex-col gap-4">
-        <H1 className="text-xl sm:text-2xl">Applicants Management</H1>
-        
-        {/* Search bar - Full width on mobile, constrained on desktop */}
-        <div className="w-full">
-          <input
-            type="text"
-            placeholder="Search applicants..."
-            value={searchTerm}
-            onChange={(e) => onSearch(e.target.value)}
-            className="h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400 md:max-w-80"
-          />
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 md:flex-row">
+        <div className="flex-1">
+          <H1>Applicants Management</H1>
         </div>
-
-        {/* Filters and Sort - Stacked on mobile, inline on larger screens */}
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-2">
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-            {/* Sort Dropdown */}
-            <div className="w-full sm:w-auto">
+        <div className="flex flex-1 flex-col justify-center gap-4">
+          {/* Mobile: Stack search input on top, buttons below */}
+          <div className="flex flex-col gap-3 md:hidden">
+            <input
+              type="text"
+              placeholder="Search applicants..."
+              value={searchTerm}
+              onChange={(e) => onSearch(e.target.value)}
+              className="h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+            />
+            <div className="flex items-center justify-center gap-3">
               <ApplicantSorters
                 sortField={sortField}
                 sortDirection={sortDirection}
                 onToggleSort={toggleSort}
                 resetSort={resetSort}
               />
-            </div>
-
-            {/* Filter Dropdown */}
-            <div className="w-full sm:w-auto">
               <ApplicantFiltersComponent
                 activeFilterCount={activeFilterCount}
                 filters={filters}
@@ -314,6 +305,32 @@ export default function ApplicantFilterHeaders({
                 updatePositionFilter={updatePositionFilter}
               />
             </div>
+          </div>
+          
+          {/* Desktop: Inline layout */}
+          <div className="hidden items-center justify-end gap-4 md:flex">
+            <input
+              type="text"
+              placeholder="Search applicants..."
+              value={searchTerm}
+              onChange={(e) => onSearch(e.target.value)}
+              className="h-11 w-full max-w-80 rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+            />
+            <ApplicantSorters
+              sortField={sortField}
+              sortDirection={sortDirection}
+              onToggleSort={toggleSort}
+              resetSort={resetSort}
+            />
+            <ApplicantFiltersComponent
+              activeFilterCount={activeFilterCount}
+              filters={filters}
+              onResetFilters={onResetFilters}
+              uniquePositions={uniquePositions}
+              updateExperienceFilter={updateExperienceFilter}
+              updateFilter={updateFilter}
+              updatePositionFilter={updatePositionFilter}
+            />
           </div>
         </div>
       </div>
