@@ -170,7 +170,7 @@ export default function CodevBadge({
               className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded
              bg-slate-700 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100"
             >
-              {category.name} - Level {levelNumber}
+              Level {levelNumber}
             </div>
           </div>
         );
