@@ -105,36 +105,47 @@ export default function OverflowView() {
   };
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-8">
       {/* Header with filters and post button */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-2">
+      <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-1 rounded-full bg-white/80 p-1 shadow-sm backdrop-blur-sm dark:bg-gray-800/80">
           <Button
-            variant={sortBy === "newest" ? "default" : "outline"}
+            variant="ghost"
             size="sm"
             onClick={() => setSortBy("newest")}
-            className={sortBy === "newest" ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700" : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"}
+            className={`rounded-full px-4 py-2 transition-all duration-200 ${
+              sortBy === "newest" 
+                ? "bg-blue-500 text-white shadow-md hover:bg-blue-600" 
+                : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
           >
             Newest
           </Button>
           <Button
-            variant={sortBy === "popular" ? "default" : "outline"}
+            variant="ghost"
             size="sm"
             onClick={() => setSortBy("popular")}
-            className={sortBy === "popular" ? "bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700" : "border-gray-300 bg-white text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"}
+            className={`rounded-full px-4 py-2 transition-all duration-200 ${
+              sortBy === "popular" 
+                ? "bg-blue-500 text-white shadow-md hover:bg-blue-600" 
+                : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
           >
             Popular
           </Button>
         </div>
         
-        <Button onClick={() => setIsPostModalOpen(true)}>
+        <Button 
+          onClick={() => setIsPostModalOpen(true)}
+          className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-2 text-white shadow-lg transition-all duration-200 hover:from-blue-600 hover:to-indigo-600 hover:shadow-xl"
+        >
           <Plus className="mr-2 h-4 w-4" />
           Ask Question
         </Button>
       </div>
 
       {/* Questions list */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {sortedQuestions.length > 0 ? (
           sortedQuestions.map((question) => (
             <QuestionCard
@@ -144,13 +155,16 @@ export default function OverflowView() {
             />
           ))
         ) : (
-          <div className="rounded-lg border border-gray-200 bg-white p-8 text-center dark:border-gray-700 dark:bg-gray-800">
-            <div className="mb-4 text-4xl">💭</div>
-            <h3 className="mb-2 text-lg font-semibold text-gray-900 dark:text-white">No questions yet</h3>
-            <p className="text-gray-600 dark:text-gray-400">
+          <div className="mx-auto max-w-md rounded-2xl bg-white/60 p-12 text-center backdrop-blur-sm dark:bg-gray-800/60">
+            <div className="mb-6 text-6xl">💭</div>
+            <h3 className="mb-4 text-2xl font-light text-gray-900 dark:text-white">No questions yet</h3>
+            <p className="mb-8 text-gray-600 dark:text-gray-400">
               Be the first to ask a question and help build our knowledge base!
             </p>
-            <Button className="mt-4" onClick={() => setIsPostModalOpen(true)}>
+            <Button 
+              className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 px-8 py-3 text-white shadow-lg transition-all duration-200 hover:from-blue-600 hover:to-indigo-600 hover:shadow-xl" 
+              onClick={() => setIsPostModalOpen(true)}
+            >
               <Plus className="mr-2 h-4 w-4" />
               Ask the First Question
             </Button>
