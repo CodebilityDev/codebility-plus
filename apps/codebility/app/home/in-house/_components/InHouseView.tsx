@@ -122,30 +122,33 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
   };
 
   return (
-    <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <H1 className="text-xl sm:text-2xl">In-House Codebility</H1>
-
-        <div className="flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-          <span className="rounded-full bg-blue-500 px-3 py-1.5 text-white shadow-sm">
-            {stats.total} {stats.total === 1 ? "member" : "members"}
-          </span>
-          <span className="rounded-full bg-emerald-600 px-3 py-1.5 text-white shadow-sm">
-            {stats.active} active
-          </span>
-          <span className="rounded-full bg-red-500 px-3 py-1.5 text-white shadow-sm">
-            {stats.inactive} inactive
-          </span>
+    <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
+      <div className="flex flex-col gap-6 md:flex-row">
+        <div className="flex-1">
+          <H1>In-House Codebility</H1>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+            <span className="rounded-full bg-blue-500 px-3 py-1.5 text-white shadow-sm">
+              {stats.total} {stats.total === 1 ? "member" : "members"}
+            </span>
+            <span className="rounded-full bg-emerald-600 px-3 py-1.5 text-white shadow-sm">
+              {stats.active} active
+            </span>
+            <span className="rounded-full bg-red-500 px-3 py-1.5 text-white shadow-sm">
+              {stats.inactive} inactive
+            </span>
+          </div>
+        </div>
+        <div className="flex flex-1 flex-col justify-center gap-4">
+          <div className="flex items-center justify-center gap-4 md:justify-end">
+            <TableFilters
+              filters={filters}
+              onFilterChange={(key, value) =>
+                setFilters((prev) => ({ ...prev, [key]: value }))
+              }
+            />
+          </div>
         </div>
       </div>
-
-      {/* Table Filters */}
-      <TableFilters
-        filters={filters}
-        onFilterChange={(key, value) =>
-          setFilters((prev) => ({ ...prev, [key]: value }))
-        }
-      />
 
       {/* Table View Only */}
       <InHouseTable

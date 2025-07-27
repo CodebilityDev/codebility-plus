@@ -10,8 +10,9 @@ const Page = async () => {
   const { data: orgChartData, error } = await supabase
     .from("codev")
     .select(
-      "id, first_name, last_name, display_position, image_url, application_status",
-    );
+      "id, first_name, last_name, display_position, image_url, application_status, availability_status",
+    )
+    .eq("availability_status", true);
 
   if (error) {
     return <div>Error loading organization chart</div>;
@@ -32,7 +33,15 @@ const Page = async () => {
   );
 
   return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+    <div className="mx-auto flex max-w-screen-xl flex-col gap-8 p-4">
+      <div className="text-center">
+        <h1 className="mb-2 text-3xl font-bold text-gray-900 dark:text-white">
+          Organization Structure
+        </h1>
+        <p className="text-gray-600 dark:text-gray-400">
+          Meet the talented team behind Codebility
+        </p>
+      </div>
       <OrgCharts data={sortedData} />
     </div>
   );

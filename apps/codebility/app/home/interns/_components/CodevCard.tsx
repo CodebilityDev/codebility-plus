@@ -203,7 +203,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
                   variant="info"
                   key={project.id}
                   className="bg-blue-50 text-xs text-blue-800 transition duration-300
-                    hover:bg-blue-300 hover:text-white dark:bg-blue-500 dark:text-white
+                    hover:bg-blue-600 hover:text-white dark:bg-blue-500 dark:text-white dark:hover:bg-blue-400
                   "
                 >
                   {project.name}
