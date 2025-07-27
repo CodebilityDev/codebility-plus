@@ -7,11 +7,24 @@ export const revalidate = 0;
 
 export default async function OverflowPage() {
   return (
-    <div className="mx-auto flex w-full max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-      <div className="flex flex-row justify-between gap-4">
-        <H1 className="text-xl text-gray-900 dark:text-gray-100 sm:text-2xl">Codev Overflow</H1>
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+      <div className="mx-auto max-w-6xl px-6 py-12">
+        <div className="mb-12 text-center">
+          <div className="mb-4">
+            <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
+              Codev Overflow
+            </h1>
+            <div className="mx-auto mt-4 h-px w-32 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+          </div>
+          <p className="mx-auto max-w-2xl text-lg font-light text-gray-600 dark:text-gray-300">
+            A community-driven platform where developers collaborate, share knowledge, and solve problems together
+          </p>
+        </div>
+        
+        <div className="relative">
+          <OverflowView />
+        </div>
       </div>
-      <OverflowView />
     </div>
   );
 }
