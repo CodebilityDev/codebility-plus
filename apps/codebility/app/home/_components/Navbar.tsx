@@ -12,6 +12,7 @@ import {
   IconLogout,
   IconProfile,
 } from "@/public/assets/svgs";
+import { Bell } from "lucide-react";
 import { useUserStore } from "@/store/codev-store";
 
 import {
@@ -53,12 +54,33 @@ const Navbar = () => {
   const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
 
   return (
-    <nav className="background-navbar fixed top-0 z-10 w-full shadow-sm" role="banner">
-      <div className="flex items-center justify-between px-8 py-4">
+    <nav className="background-navbar fixed top-0 z-50 w-full shadow-sm" role="banner">
+      <div className="flex items-center justify-between px-8 py-2">
         <div className="flex items-center" role="navigation" aria-label="Logo">
-          <span className="sr-only">Codebility Dashboard</span>
+          <Link href="/home" className="flex items-center">
+            <img
+              src="/assets/svgs/codebility-black.svg"
+              alt="Codebility Logo"
+              className="h-8 w-auto dark:hidden"
+            />
+            <img
+              src="/assets/svgs/codebility-white.svg"
+              alt="Codebility Logo"
+              className="hidden h-8 w-auto dark:block"
+            />
+            <span className="sr-only">Codebility Dashboard - Go to Home</span>
+          </Link>
         </div>
-        <div className="flex items-center gap-6" role="navigation" aria-label="User menu">
+        <div className="flex items-center gap-4" role="navigation" aria-label="User menu">
+          <button
+            className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+            aria-label="Notifications"
+          >
+            <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
+              <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
+            </span>
+          </button>
           <Theme />
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger 
