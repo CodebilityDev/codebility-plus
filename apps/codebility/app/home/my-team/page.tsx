@@ -1,4 +1,3 @@
-import { H1 } from "@/components/shared/dashboard";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import { getMembers, getTeamLead, getUserProjects } from "../projects/actions";
 import MyTeamView from "./_components/MyTeamView";
@@ -13,14 +12,29 @@ const MyTeamPage = async () => {
 
     if (userProjectsResponse.error || !userProjectsResponse.data) {
       return (
-        <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <H1>My Team</H1>
-          <div className="flex flex-col items-center justify-center gap-4 py-8">
-            <div className="text-4xl">👥</div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">No projects found</h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              {userProjectsResponse.error?.message || "You are not assigned to any projects yet"}
-            </p>
+        <div className="min-h-screen bg-white dark:bg-gray-950">
+          <div className="mx-auto max-w-6xl px-6 py-16">
+            <div className="mb-20 text-center">
+              <div className="mb-6">
+                <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
+                  My Team
+                </h1>
+                <div className="mx-auto mt-6 h-px w-32 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+              </div>
+              <p className="mx-auto max-w-3xl text-lg font-light text-gray-600 dark:text-gray-300">
+                Connect and collaborate with your project team members
+              </p>
+            </div>
+            
+            <div className="relative">
+              <div className="flex flex-col items-center justify-center gap-6 py-16">
+                <div className="text-6xl opacity-60">👥</div>
+                <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">No projects found</h2>
+                <p className="text-center text-gray-600 dark:text-gray-400 max-w-md">
+                  {userProjectsResponse.error?.message || "You are not assigned to any projects yet"}
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -30,14 +44,29 @@ const MyTeamPage = async () => {
 
     if (userProjects.length === 0) {
       return (
-        <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <H1>My Team</H1>
-          <div className="flex flex-col items-center justify-center gap-4 py-8">
-            <div className="text-4xl">👥</div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">No team assigned</h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Contact your project manager to get assigned to a team.
-            </p>
+        <div className="min-h-screen bg-white dark:bg-gray-950">
+          <div className="mx-auto max-w-6xl px-6 py-16">
+            <div className="mb-20 text-center">
+              <div className="mb-6">
+                <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
+                  My Team
+                </h1>
+                <div className="mx-auto mt-6 h-px w-32 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+              </div>
+              <p className="mx-auto max-w-3xl text-lg font-light text-gray-600 dark:text-gray-300">
+                Connect and collaborate with your project team members
+              </p>
+            </div>
+            
+            <div className="relative">
+              <div className="flex flex-col items-center justify-center gap-6 py-16">
+                <div className="text-6xl opacity-60">👥</div>
+                <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">No team assigned</h2>
+                <p className="text-center text-gray-600 dark:text-gray-400 max-w-md">
+                  Contact your project manager to get assigned to a team.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       );
@@ -75,52 +104,95 @@ const MyTeamPage = async () => {
 
     if (validProjectData.length === 0) {
       return (
-        <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <H1>My Team</H1>
-          <div className="flex flex-col items-center justify-center gap-4 py-8">
-            <div className="text-4xl">⚠️</div>
-            <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">Unable to load team data</h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              There may be a temporary issue. Please try refreshing the page.
-            </p>
+        <div className="min-h-screen bg-white dark:bg-gray-950">
+          <div className="mx-auto max-w-6xl px-6 py-16">
+            <div className="mb-20 text-center">
+              <div className="mb-6">
+                <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
+                  My Team
+                </h1>
+                <div className="mx-auto mt-6 h-px w-32 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+              </div>
+              <p className="mx-auto max-w-3xl text-lg font-light text-gray-600 dark:text-gray-300">
+                Connect and collaborate with your project team members
+              </p>
+            </div>
+            
+            <div className="relative">
+              <div className="flex flex-col items-center justify-center gap-6 py-16">
+                <div className="text-6xl opacity-60">⚠️</div>
+                <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">Unable to load team data</h2>
+                <p className="text-center text-gray-600 dark:text-gray-400 max-w-md">
+                  There may be a temporary issue. Please try refreshing the page.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
       );
     }
 
     return (
-      <AsyncErrorBoundary
-        fallback={
-          <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
-            <div className="mb-4 text-4xl">👥</div>
-            <h2 className="mb-2 text-xl font-semibold">Unable to load team data</h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              Something went wrong while fetching your team data. Please refresh the page to try again.
+      <div className="min-h-screen bg-white dark:bg-gray-950">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <div className="mb-20 text-center">
+            <div className="mb-6">
+              <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
+                My Team
+              </h1>
+              <div className="mx-auto mt-6 h-px w-32 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+            </div>
+            <p className="mx-auto max-w-3xl text-lg font-light text-gray-600 dark:text-gray-300">
+              Connect and collaborate with your project team members
             </p>
           </div>
-        }
-      >
-        <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-          <div className="flex flex-row justify-between gap-4">
-            <H1>My Team</H1>
+          
+          <div className="relative">
+            <AsyncErrorBoundary
+              fallback={
+                <div className="flex flex-col items-center justify-center gap-6 py-16">
+                  <div className="text-6xl opacity-60">👥</div>
+                  <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">Unable to load team data</h2>
+                  <p className="text-center text-gray-600 dark:text-gray-400 max-w-md">
+                    Something went wrong while fetching your team data. Please refresh the page to try again.
+                  </p>
+                </div>
+              }
+            >
+              <MyTeamView projectData={validProjectData} />
+            </AsyncErrorBoundary>
           </div>
-          <MyTeamView projectData={validProjectData} />
         </div>
-      </AsyncErrorBoundary>
+      </div>
     );
 
   } catch (error) {
     console.error('MyTeamPage error:', error);
     
     return (
-      <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <H1>My Team</H1>
-        <div className="flex flex-col items-center justify-center gap-4 py-8">
-          <div className="text-4xl">⚠️</div>
-          <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">An unexpected error occurred</h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Please try refreshing the page or contact support if the issue persists.
-          </p>
+      <div className="min-h-screen bg-white dark:bg-gray-950">
+        <div className="mx-auto max-w-6xl px-6 py-16">
+          <div className="mb-20 text-center">
+            <div className="mb-6">
+              <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
+                My Team
+              </h1>
+              <div className="mx-auto mt-6 h-px w-32 bg-gradient-to-r from-transparent via-blue-400 to-transparent"></div>
+            </div>
+            <p className="mx-auto max-w-3xl text-lg font-light text-gray-600 dark:text-gray-300">
+              Connect and collaborate with your project team members
+            </p>
+          </div>
+          
+          <div className="relative">
+            <div className="flex flex-col items-center justify-center gap-6 py-16">
+              <div className="text-6xl opacity-60">⚠️</div>
+              <h2 className="text-2xl font-light text-gray-900 dark:text-gray-100">An unexpected error occurred</h2>
+              <p className="text-center text-gray-600 dark:text-gray-400 max-w-md">
+                Please try refreshing the page or contact support if the issue persists.
+              </p>
+            </div>
+          </div>
         </div>
       </div>
     );
