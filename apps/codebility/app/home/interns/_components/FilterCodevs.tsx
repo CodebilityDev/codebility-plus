@@ -88,23 +88,24 @@ export default function FilterCodevs({
   };
 
   return (
-    <div className="text-gray relative">
+    <div className="relative">
       <Button
         variant={showFilter ? "destructive" : "default"}
         size="sm"
         onClick={toggleFilter}
+        className={showFilter ? "" : "bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600"}
       >
         {showFilter ? "Close filter" : "Filter"}
       </Button>
 
-      <Box
+      <div
         className={`absolute right-0 top-12 z-[1] max-h-[calc(100vh-20rem)] min-h-[300px] w-[300%] overflow-auto
-          sm:-right-3/4 sm:w-96 md:right-0 md:w-80
+          sm:-right-3/4 sm:w-96 md:right-0 md:w-80 rounded-2xl bg-white/90 p-6 shadow-xl backdrop-blur-sm dark:bg-gray-800/90
           ${!showFilter && "hidden"}
         `}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-semibold">Filters</h3>
+          <h3 className="font-semibold text-white">Filters</h3>
           <button
             onClick={clearFilter}
             className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
@@ -124,7 +125,7 @@ export default function FilterCodevs({
             {positions.map((pos) => (
               <div
                 key={pos.id}
-                className="flex items-center space-x-2 p-2 hover:bg-gray-50"
+                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-gray-100/60 dark:hover:bg-gray-700/60"
               >
                 <Checkbox
                   id={`pos-${pos.id}`}
@@ -133,7 +134,7 @@ export default function FilterCodevs({
                     handleCheckedChange("positions", pos.name || "")
                   }
                 />
-                <label htmlFor={`pos-${pos.id}`} className="text-sm">
+                <label htmlFor={`pos-${pos.id}`} className="text-sm cursor-pointer text-gray-700 dark:text-gray-300">
                   {pos.name}
                 </label>
               </div>
@@ -144,7 +145,7 @@ export default function FilterCodevs({
             {AVAILABILITY_STATUS.map((status) => (
               <div
                 key={status}
-                className="flex items-center space-x-2 p-2 hover:bg-gray-50"
+                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-gray-100/60 dark:hover:bg-gray-700/60"
               >
                 <Checkbox
                   id={`status-${status}`}
@@ -153,7 +154,7 @@ export default function FilterCodevs({
                     handleCheckedChange("availability", status)
                   }
                 />
-                <label htmlFor={`status-${status}`} className="text-sm">
+                <label htmlFor={`status-${status}`} className="text-sm cursor-pointer text-gray-700 dark:text-gray-300">
                   {status}
                 </label>
               </div>
@@ -164,7 +165,7 @@ export default function FilterCodevs({
             {projects.map((project) => (
               <div
                 key={project.id}
-                className="flex items-center space-x-2 p-2 hover:bg-gray-50"
+                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-gray-100/60 dark:hover:bg-gray-700/60"
               >
                 <Checkbox
                   id={project.id}
@@ -173,14 +174,14 @@ export default function FilterCodevs({
                     handleCheckedChange("projects", project.id)
                   }
                 />
-                <label htmlFor={project.name} className="text-sm">
+                <label htmlFor={project.name} className="text-sm cursor-pointer text-gray-700 dark:text-gray-300">
                   {project.name}
                 </label>
               </div>
             ))}
           </TabsContent>
         </Tabs>
-      </Box>
+      </div>
     </div>
   );
 }

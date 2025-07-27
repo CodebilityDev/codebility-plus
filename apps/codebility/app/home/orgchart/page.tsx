@@ -33,7 +33,7 @@ const Page = async () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-7xl px-6 py-16">
         <div className="mb-20 text-center">
           <div className="mb-6">
