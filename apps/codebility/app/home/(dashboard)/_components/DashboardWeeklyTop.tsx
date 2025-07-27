@@ -312,17 +312,38 @@ export default function WeeklyTop() {
             onValueChange={setSelectedCategory}
             className="w-fit"
           >
-            <TabsList className="grid h-10 grid-cols-5">
-              {allCategories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  className="px-3 data-[state=active]:bg-[#1e1f26]"
-                  title={category}
-                >
-                  {getCategoryInitial(category)}
-                </TabsTrigger>
-              ))}
+            <TabsList className="grid h-10 grid-cols-5 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+              {allCategories.map((category) => {
+                const getCategoryStyle = () => {
+                  if (selectedCategory !== category) return "";
+                  
+                  switch (category) {
+                    case "Frontend Developer":
+                      return "data-[state=active]:bg-blue-600 data-[state=active]:text-white";
+                    case "Backend Developer":
+                      return "data-[state=active]:bg-green-600 data-[state=active]:text-white";
+                    case "UI/UX Designer":
+                      return "data-[state=active]:bg-purple-600 data-[state=active]:text-white";
+                    case "Mobile Developer":
+                      return "data-[state=active]:bg-orange-600 data-[state=active]:text-white";
+                    case "QA Engineer":
+                      return "data-[state=active]:bg-indigo-600 data-[state=active]:text-white";
+                    default:
+                      return "data-[state=active]:bg-gray-600 data-[state=active]:text-white";
+                  }
+                };
+
+                return (
+                  <TabsTrigger
+                    key={category}
+                    value={category}
+                    className={`px-3 rounded-md font-medium transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 ${getCategoryStyle()}`}
+                    title={category}
+                  >
+                    {getCategoryInitial(category)}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
           </Tabs>
         </div>

@@ -194,14 +194,14 @@ export default async function KanbanSprintPage(props: PageProps) {
       }
 
       return sprints.map((sprint) => (
-        <TableRow key={sprint.id} className="grid grid-cols-1 md:table-row">
+        <TableRow key={sprint.id} className="grid grid-cols-1 md:table-row hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200 border-l-4 border-blue-500">
           <TableCell className="md:table-cell">
-            <div className="text-dark100_light900 flex flex-col">
-              <span className="font-medium">{sprint.name}</span>
+            <div className="flex flex-col">
+              <span className="font-medium text-gray-900 dark:text-white">{sprint.name}</span>
             </div>
           </TableCell>
           <TableCell className="md:table-cell">
-            <span className="text-dark100_light900">
+            <span className="text-gray-700 dark:text-gray-300">
               {formatDateRange(sprint.start_at, sprint.end_at)}
             </span>
           </TableCell>
@@ -211,9 +211,9 @@ export default async function KanbanSprintPage(props: PageProps) {
             >
               <Button
                 variant="hollow"
-                className="inline-flex items-center gap-2"
+                className="inline-flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-sm"
               >
-                <IconKanban className="invert-colors h-4 w-4" />
+                <IconKanban className="h-4 w-4 text-white" />
                 <span className="hidden sm:inline">View Board</span>
               </Button>
             </Link>
@@ -232,17 +232,27 @@ export default async function KanbanSprintPage(props: PageProps) {
           </div>
         </div>
 
-        <Table>
-          <TableHeader className="hidden md:table-header-group">
-            <TableRow>
-              <TableHead className="w-[45%]">Sprint</TableHead>
-              <TableHead className="w-[45%]">Timeline</TableHead>
-              <TableHead className="w-[10%] text-center">Actions</TableHead>
-            </TableRow>
-          </TableHeader>
+        <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+          <Table>
+            <TableHeader className="hidden md:table-header-group">
+              <TableRow className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-0">
+                <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
+                  🏃‍♂️ Sprint
+                </TableHead>
+                <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
+                  📅 Timeline
+                </TableHead>
+                <TableHead className="w-[10%] text-center font-semibold text-gray-900 dark:text-white">
+                  ⚡ Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
 
-          <TableBody>{renderTableContent()}</TableBody>
-        </Table>
+            <TableBody className="bg-white dark:bg-gray-950">
+              {renderTableContent()}
+            </TableBody>
+          </Table>
+        </div>
       </div>
     );
   } catch (err) {
