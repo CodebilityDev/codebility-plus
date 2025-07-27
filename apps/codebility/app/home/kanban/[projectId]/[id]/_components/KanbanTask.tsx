@@ -87,7 +87,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
       case "critical":
         return `${baseClasses} bg-red-500`;
       case "high":
-        return `${baseClasses} bg-orange-500`;
+        return `${baseClasses} bg-red-500`;
       case "medium":
         return `${baseClasses} bg-yellow-500`;
       case "low":
@@ -101,37 +101,37 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
   const getSkillCategoryColor = useMemo(() => (category: string): string => {
     const colorMap: Record<string, string> = {
       "UI/UX Designer":
-        "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-300",
+        "bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/40 dark:text-pink-300 dark:border-pink-800",
       "Backend Developer":
-        "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300",
+        "bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-800",
       "Mobile Developer":
-        "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300",
+        "bg-green-100 text-green-800 border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800",
       "QA Engineer":
-        "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300",
+        "bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/40 dark:text-purple-300 dark:border-purple-800",
       "Frontend Developer":
-        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+        "bg-blue-600 text-white border-blue-700 dark:bg-blue-600 dark:text-white dark:border-blue-700",
     };
 
     return (
       colorMap[category] ||
-      "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-300"
+      "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-900/40 dark:text-gray-300 dark:border-gray-800"
     );
   }, []);
 
   // Get task type color
   const getTaskTypeColor = useMemo(() => (type: string): string => {
     const typeColorMap: Record<string, string> = {
-      BUG: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300",
-      FEATURE: "bg-green text-white dark:bg-green-900/30 dark:text-green-300",
+      BUG: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800",
+      FEATURE: "bg-green-600 text-black border-green-700 dark:bg-green-600 dark:text-white dark:border-green-700",
       IMPROVEMENT:
-        "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300",
+        "bg-orange-600 text-white border-orange-700 dark:bg-orange-600 dark:text-white dark:border-orange-700",
       DOCUMENTATION:
-        "bg-gray text-white dark:bg-gray-200/20 dark:text-gray-200",
+        "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600",
     };
 
     return (
       typeColorMap[type] ||
-      "bg-gray text-white dark:bg-gray-700 dark:text-gray-300"
+      "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600"
     );
   }, []);
 
@@ -166,39 +166,42 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         style={style}
         {...attributes}
         {...listeners}
-        className={`group relative mt-1 flex cursor-grab flex-col gap-2 rounded-lg bg-white 
-          p-2 md:mt-2 md:gap-3 md:p-4 
+        className={`group relative mt-1 flex cursor-grab flex-col gap-2 rounded-xl bg-white dark:bg-gray-800
+          p-3 md:mt-2 md:gap-3 md:p-4 
           ${
             isDragging
-              ? "rotate-3 scale-105 shadow-2xl ring-2 ring-blue-500 ring-offset-2"
-              : "hover:shadow-lg hover:ring-2 hover:ring-blue-200 hover:ring-offset-2"
+              ? "rotate-1 scale-[1.01] shadow-lg shadow-blue-500/15 ring-1 ring-blue-400 z-40"
+              : "hover:shadow-md hover:shadow-gray-300/30 dark:hover:shadow-gray-900/30 hover:-translate-y-0.5 hover:bg-gray-50 dark:hover:bg-gray-750 z-10"
           } 
-          transform transition-all duration-200 ease-in-out dark:bg-[#1E1F26]`}
+          border border-gray-200 dark:border-gray-600 shadow-sm
+          transform transition-all duration-200 ease-out`}
         data-type="Task"
       >
         {/* Priority Indicator Bar */}
-        <div className={priorityStyles} />
+        <div className={`${priorityStyles} transition-all duration-300`} />
 
         {/* Task Header */}
         <div className="flex items-center justify-between">
           <h3
-            className="mr-2 line-clamp-2 flex-1 text-sm font-bold 
-            text-gray-800 transition-colors group-hover:text-blue-600
-            dark:text-gray-200 dark:group-hover:text-blue-400 md:text-base"
+            className="mr-2 line-clamp-2 flex-1 text-sm font-semibold 
+            text-gray-900 transition-colors duration-200 group-hover:text-blue-600
+            dark:text-gray-100 dark:group-hover:text-blue-400 md:text-base"
           >
             {task.title}
           </h3>
           <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
             <div
-              className={`flex h-6 w-auto items-center justify-center gap-1 rounded-full px-2 py-1 text-xs font-medium md:h-8 md:text-sm
+              className={`flex h-6 w-auto items-center justify-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium shadow-sm transition-all duration-200 md:h-7 md:text-sm
     ${
       task.priority === "critical"
-        ? "bg-red-100 text-red-600 dark:bg-red-900/30 dark:text-red-400"
+        ? "bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800"
         : task.priority === "high"
-          ? "bg-orange-100 text-orange-600 dark:bg-orange-900/30 dark:text-orange-400"
+          ? "bg-red-600 text-white border border-red-700 dark:bg-red-600 dark:text-white dark:border-red-700"
           : task.priority === "medium"
-            ? "bg-yellow-100 text-yellow-600 dark:bg-yellow-900/30 dark:text-yellow-400"
-            : "bg-green-100 text-green-600 dark:bg-green-900/30 dark:text-green-400"
+            ? "bg-yellow-100 text-yellow-700 border border-yellow-200 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-800"
+            : task.priority === "low"
+              ? "bg-green-100 text-green-700 border border-green-200 dark:bg-green-900/40 dark:text-green-300 dark:border-green-800"
+              : "bg-gray-100 text-gray-700 border border-gray-200 dark:bg-gray-800/40 dark:text-gray-300 dark:border-gray-600"
     }`}
             >
               <span className="capitalize">{task.priority ?? "Low"}</span>
@@ -206,8 +209,8 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
             </div>
             {/* PRIMARY AVATAR - Fixed alignment */}
             <div
-              className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-md transition-colors 
-              group-hover:border-blue-200 dark:border-gray-800 md:h-8 md:w-8"
+              className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-sm transition-all duration-200 
+              group-hover:border-blue-300 group-hover:scale-110 dark:border-gray-700 md:h-8 md:w-8"
             >
               {primaryImage ? (
                 <img
@@ -226,9 +229,9 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         {task.skill_category && (
           <div>
             <span
-              className={`inline-block rounded-full px-2 py-0.5 text-xs font-semibold md:px-3 md:py-1 ${getSkillCategoryColor(
+              className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium shadow-sm border md:px-3 md:py-1 ${getSkillCategoryColor(
                 task.skill_category.name,
-              )}`}
+              )} transition-all duration-200 hover:scale-105`}
             >
               {task.skill_category.name}
             </span>
@@ -239,27 +242,27 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         <div className="flex flex-wrap gap-1 text-xs text-gray-600 dark:text-gray-400 md:gap-2 md:text-sm">
           {task.difficulty && (
             <span
-              className="inline-flex items-center rounded-md bg-purple-100 
-              px-1.5 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 
-              dark:text-purple-300 md:px-2 md:py-1"
+              className="inline-flex items-center rounded-md bg-purple-100 border border-purple-200
+              px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/40 
+              dark:text-purple-300 dark:border-purple-800 shadow-sm md:px-2.5 md:py-1"
             >
               {task.difficulty}
             </span>
           )}
           {typeof task.points === "number" && (
             <span
-              className="inline-flex items-center rounded-md bg-green-100 
-              px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 
-              dark:text-green-300 md:px-2 md:py-1"
+              className="inline-flex items-center rounded-md bg-green-100 border border-green-200
+              px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 
+              dark:text-green-300 dark:border-green-800 shadow-sm md:px-2.5 md:py-1"
             >
               {task.points} pts
             </span>
           )}
           {task.type && (
             <span
-              className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium md:px-2 md:py-1 ${getTaskTypeColor(
+              className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium shadow-sm border md:px-2.5 md:py-1 ${getTaskTypeColor(
                 task.type.toUpperCase(),
-              )}`}
+              )} transition-all duration-200`}
             >
               {task.type}
             </span>
@@ -274,8 +277,8 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
               return (
                 <div
                   key={sidekickId}
-                  className="flex h-5 w-5 items-center justify-center overflow-hidden rounded-full border-2 border-white 
-                    shadow-sm transition-colors group-hover:border-blue-200 dark:border-gray-800 
+                  className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border-2 border-white 
+                    shadow-sm transition-all duration-200 hover:scale-110 hover:border-blue-300 dark:border-gray-700 
                     md:h-7 md:w-7"
                 >
                   {member && member.image_url ? (
@@ -295,8 +298,8 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
             })}
             {sidekicks.length > 3 && (
               <div
-                className="flex h-5 w-5 items-center justify-center rounded-full bg-gray-200 
-                text-[10px] font-semibold dark:bg-gray-700 md:h-7 md:w-7 md:text-xs"
+                className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 border border-gray-200
+                text-[10px] font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 shadow-sm md:h-7 md:w-7 md:text-xs"
               >
                 +{sidekicks.length - 3}
               </div>
