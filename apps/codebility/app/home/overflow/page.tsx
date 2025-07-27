@@ -7,7 +7,7 @@ export const revalidate = 0;
 
 export default async function OverflowPage() {
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-6xl px-6 py-12">
         <div className="mb-12 text-center">
           <div className="mb-4">

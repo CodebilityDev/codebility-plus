@@ -1,5 +1,5 @@
 export const pageSize = {
-  codevsList: 16,
+  codevsList: 30,
   applicants: 10,
   clients: 12,
   clientsArchive: 6,
