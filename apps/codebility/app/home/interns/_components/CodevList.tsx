@@ -21,7 +21,7 @@ interface CodevListProps {
 export default function CodevList({ data, filters }: CodevListProps) {
   // Use the new utility function to get prioritized and filtered codevs
   const filteredCodevs = useMemo(
-    () => getPrioritizedAndFilteredCodevs(data, filters),
+    () => getPrioritizedAndFilteredCodevs(data, filters, true),
     [data, filters],
   );
 
