@@ -34,16 +34,16 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
       </div>
 
       {/* Controls Section */}
-      <div className="flex flex-col items-center gap-6 md:flex-row md:justify-between">
-        <div className="order-2 md:order-1">
-          <FilterCodevs filters={filters} setFilters={setFilters} />
-        </div>
-        <div className="order-1 w-full max-w-md md:order-2">
+      <div className="flex flex-col items-center gap-6 md:flex-row md:justify-end">
+        <div className="w-full max-w-md">
           <CodevSearchbar
             allCodevs={data}
             codevs={codevs}
             setCodevs={setCodevs}
           />
+        </div>
+        <div>
+          <FilterCodevs filters={filters} setFilters={setFilters} />
         </div>
       </div>
 
