@@ -1,6 +1,6 @@
 "use client";
 
-import DefaultAvatar from "@/Components/DefaultAvatar";
+import DefaultAvatar from "@/components/DefaultAvatar";
 import { IconDelete } from "@/public/assets/svgs";
 import { Task } from "@/types/home/codev";
 import { DeleteIcon } from "lucide-react";

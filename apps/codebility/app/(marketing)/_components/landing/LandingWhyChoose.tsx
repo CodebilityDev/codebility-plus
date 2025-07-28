@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 
 import BlueBg from "./LandingBlueBg";
 import PurpleBg from "./LandingPurpleBg";
@@ -31,7 +31,7 @@ const WhyChoose = () => {
               <div className="flex w-full flex-col gap-4 md:flex-row">
                 <div className=" h-[320px] w-full   rounded-lg  ">
                   <Image
-                    unoptimized
+
                     alt="A guy sitting"
                     src="/assets/images/campaign/guy-sitting.png"
                     width={300}
@@ -71,7 +71,7 @@ const WhyChoose = () => {
                   <Image
                     src="/assets/images/campaign/laptop-browsing.png"
                     alt="Laptop Browsing"
-                    unoptimized
+
                     width={410}
                     height={120}
                     className="hidden  md:block md:size-60 md:object-cover md:pt-36"
@@ -94,7 +94,7 @@ const WhyChoose = () => {
                   alt="projects"
                   width={100}
                   className="w-full rounded-lg object-cover"
-                  unoptimized
+
                   height={100}
                 />
               </div>
@@ -129,7 +129,7 @@ const WhyChoose = () => {
                   width={100}
                   height={100}
                   className="w-full rounded-lg object-cover"
-                  unoptimized
+
                 />
               </div>
               <div className="flex flex-col">

@@ -2,7 +2,7 @@ import {
   fadeInOutDownToUp,
   fadeInOutLeftToRight,
   fadeInOutRightToLeft,
-} from "@/Components/FramerAnimation/Framer";
+} from "@/components/FramerAnimation/Framer";
 import { motion } from "framer-motion";
 
 interface WhyChooseItemProps {

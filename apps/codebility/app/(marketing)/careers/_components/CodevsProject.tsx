@@ -4,8 +4,8 @@ import React from "react";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { EmblaOptionsType } from "embla-carousel";
 
-import EmblaCarousel from "./CodevsCarousel";
-import Section from "./CodevsSection";
+import EmblaCarousel from "../../_shared/CodevsCarousel";
+import Section from "../../_shared/CodevsSection";
 
 interface Project {
   id: string;

@@ -6,6 +6,7 @@ import { KanbanColumnType, Task } from "@/types/home/codev";
 import { debounce } from "@/utils/debounce";
 import {
   closestCenter,
+  closestCorners,
   DndContext,
   DragEndEvent,
   DragOverEvent,
@@ -54,10 +55,10 @@ interface DragAndDropHandlers {
 function useDragAndDrop(handlers: DragAndDropHandlers) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      activationConstraint: { distance: 10 },
+      activationConstraint: { distance: 3 }, // Very responsive
     }),
     useSensor(TouchSensor, {
-      activationConstraint: { distance: 10 },
+      activationConstraint: { distance: 3 }, // Very responsive
     }),
   );
 
@@ -83,10 +84,13 @@ export default function KanbanBoardColumnContainer({
 
   // Our board data: ensure every column has a tasks array.
   const [boardData, setBoardData] = useState<KanbanColumnType[]>([]);
-  // For batching task updates (when a task moves between columns).
+  // For batching task updates (when a task moves between columns)
   const [pendingUpdates, setPendingUpdates] = useState<
     Array<{ taskId: string; newColumnId: string }>
   >([]);
+  
+  // Track dragging state for immediate feedback
+  const [isDragging, setIsDragging] = useState(false);
 
   // Sort function for tasks (descending by updated_at)
   const sortByUpdatedAtDesc = (a: Task, b: Task) => {
@@ -94,6 +98,37 @@ export default function KanbanBoardColumnContainer({
     const dateB = b.updated_at ? new Date(b.updated_at).getTime() : 0;
     return dateB - dateA;
   };
+
+  // Debounced batch update with improved error handling
+  const debouncedBatchUpdate = useMemo(
+    () =>
+      debounce(
+        async (updates: Array<{ taskId: string; newColumnId: string }>) => {
+          if (updates.length === 0) return;
+          try {
+            const result = await batchUpdateTasks(updates);
+            if (result.success) {
+              setPendingUpdates([]);
+              // Success - no refresh needed
+            } else {
+              console.error("Batch update failed:", result.error);
+              toast.error(result.error || "Failed to update tasks");
+            }
+          } catch (error) {
+            console.error("Batch update error:", error);
+            toast.error("Failed to update tasks. Changes may not be saved.");
+          }
+        },
+        500, // Faster than before but still debounced
+      ),
+    [],
+  );
+
+  useEffect(() => {
+    if (pendingUpdates.length > 0) {
+      debouncedBatchUpdate(pendingUpdates);
+    }
+  }, [pendingUpdates, debouncedBatchUpdate]);
 
   // Filter and sort tasks
   const filterAndSortTasks = useCallback(
@@ -128,34 +163,6 @@ export default function KanbanBoardColumnContainer({
     );
   }, [orderedColumns, activeFilter, filterAndSortTasks]);
 
-  // Debounced batch update call for tasks
-  const debouncedBatchUpdate = useMemo(
-    () =>
-      debounce(
-        async (updates: Array<{ taskId: string; newColumnId: string }>) => {
-          if (updates.length === 0) return;
-          try {
-            const result = await batchUpdateTasks(updates);
-            if (!result.success) {
-              toast.error(result.error || "Failed to update tasks");
-            }
-            setPendingUpdates([]);
-            router.refresh();
-          } catch (error) {
-            console.error("Batch update error:", error);
-            toast.error("Failed to update tasks");
-          }
-        },
-        1000,
-      ),
-    [router],
-  );
-
-  useEffect(() => {
-    if (pendingUpdates.length > 0) {
-      debouncedBatchUpdate(pendingUpdates);
-    }
-  }, [pendingUpdates, debouncedBatchUpdate]);
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     // Optional: set active item state for custom drag overlays.
@@ -183,20 +190,21 @@ export default function KanbanBoardColumnContainer({
 
         const newCols = arrayMove(boardData, oldIndex, newIndex);
 
+        // Optimistic update - update UI immediately
         setBoardData(newCols);
         setOrderedColumns(newCols);
 
-        try {
-          await Promise.all(
-            newCols.map((column, index) =>
-              updateColumnPosition(column.id, index),
-            ),
-          );
-          router.refresh();
-        } catch (error) {
+        // Save to database in background without blocking UI
+        Promise.all(
+          newCols.map((column, index) =>
+            updateColumnPosition(column.id, index),
+          ),
+        ).catch((error) => {
           console.error("Column reorder error:", error);
           toast.error("Failed to reorder columns");
-        }
+          // Only refresh on error to revert changes
+          router.refresh();
+        });
         return;
       }
 
@@ -253,10 +261,12 @@ export default function KanbanBoardColumnContainer({
 
         setBoardData(updatedBoard);
 
-        setPendingUpdates((prev) => [
-          ...prev,
-          { taskId: movedTask.id, newColumnId: overColId },
-        ]);
+        // Add to pending updates for debounced batch processing
+        setPendingUpdates((prev) => {
+          // Remove any existing update for this task to avoid duplicates
+          const filtered = prev.filter(update => update.taskId !== movedTask.id);
+          return [...filtered, { taskId: movedTask.id, newColumnId: overColId }];
+        });
       }
     },
     [boardData, router],
@@ -286,7 +296,7 @@ export default function KanbanBoardColumnContainer({
     <div className={styles.container}>
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCenter}
+        collisionDetection={closestCorners}
         onDragStart={handleDragStart}
         onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}

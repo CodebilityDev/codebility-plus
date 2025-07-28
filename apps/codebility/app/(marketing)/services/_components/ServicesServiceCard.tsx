@@ -1,12 +1,12 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import DefaultAvatar from "@/Components/DefaultAvatar";
+import DefaultAvatar from "@/components/DefaultAvatar";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
-} from "@/Components/ui/tooltip";
+} from "@/components/ui/tooltip";
 import { IconLink } from "@/public/assets/svgs";
 import { Crown } from "lucide-react";
 
@@ -74,7 +74,6 @@ export default function ServiceCard({ service }: Props) {
           src={imageUrl}
           alt={name}
           fill
-          unoptimized={true}
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover"
           priority
@@ -136,7 +135,7 @@ export default function ServiceCard({ service }: Props) {
                               src={teamLeader.image_url}
                               alt={`${teamLeader.first_name} ${teamLeader.last_name}`}
                               fill
-                              unoptimized={true}
+                              sizes="56px"
                               className="object-cover"
                             />
                           ) : (
@@ -167,7 +166,7 @@ export default function ServiceCard({ service }: Props) {
                               src={member.image_url}
                               alt={`${member.first_name} ${member.last_name}`}
                               fill
-                              unoptimized={true}
+                              sizes="40px"
                               className="object-cover"
                             />
                           ) : (

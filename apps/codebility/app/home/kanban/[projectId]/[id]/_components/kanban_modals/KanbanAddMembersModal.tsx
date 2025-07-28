@@ -10,17 +10,17 @@ import {
   SimpleMemberData,
   updateProjectMembers,
 } from "@/app/home/projects/actions";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { MemberSelection } from "@/Components/ui/MemberSelection";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+} from "@/components/ui/dialog";
+import { MemberSelection } from "@/components/ui/MemberSelection";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { Codev } from "@/types/home/codev";
 import toast from "react-hot-toast";

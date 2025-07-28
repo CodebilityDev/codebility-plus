@@ -13,7 +13,8 @@ export default function ApplicantFiltersBadge({
 }: {
   filters: ApplicantFilters;
   setFilter: React.Dispatch<React.SetStateAction<ApplicantFilters>>;
-  onFilterChange: (filters: ApplicantFilters) => void;}) {
+  onFilterChange: (filters: ApplicantFilters) => void;
+}) {
   // Update a specific filter
   const updateFilter = (key: keyof ApplicantFilters, value: boolean) => {
     onFilterChange({

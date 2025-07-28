@@ -1,15 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { Box } from "@/Components/shared/dashboard";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import { useEffect, useState, useMemo, memo } from "react";
+import { Box } from "@/components/shared/dashboard";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 
 import { logUserTime } from "../actions";
 import TimeTrackerSchedule from "./DashboardTimeTrackerSchedule";
 import TimeTrackerTimer from "./DashboardTimeTrackerTimer";
 
-export default function TimeTracker() {
+function TimeTracker() {
   const { user } = useUserStore();
   const [data, setData] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -45,12 +45,16 @@ export default function TimeTracker() {
     );
   }
 
-  const tasks = data.codev.codev_task.map((item: { task: any }) => item.task);
+  const tasks = useMemo(() => 
+    data.codev.codev_task.map((item: { task: any }) => item.task)
+  , [data.codev.codev_task]);
+  
   const timerStartAt = data.codev.task_timer_start_at;
   const currentTaskId = data.codev.task?.id;
 
-  const timerInitialSecond =
-    timerStartAt && (Date.now() - new Date(timerStartAt).getTime()) / 1000;
+  const timerInitialSecond = useMemo(() =>
+    timerStartAt && (Date.now() - new Date(timerStartAt).getTime()) / 1000
+  , [timerStartAt]);
 
   return (
     <Box className="w-full flex-1">
@@ -79,3 +83,5 @@ export default function TimeTracker() {
     </Box>
   );
 }
+
+export default memo(TimeTracker);

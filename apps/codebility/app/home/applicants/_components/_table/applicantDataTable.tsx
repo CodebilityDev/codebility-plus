@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useMemo, useCallback } from "react";
 import { getTestDate } from "@/app/applicant/waiting/_service/util";
-import { Box } from "@/Components/shared/dashboard";
-import DefaultPagination from "@/Components/ui/pagination";
+import { Box } from "@/components/shared/dashboard";
+import DefaultPagination from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import { pageSize } from "@/constants";
 import { cn } from "@/lib/utils";
 import {
@@ -35,7 +35,7 @@ interface DataTableProps<TData extends NewApplicantType, TValue> {
   data: TData[];
 }
 
-export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
+function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -43,6 +43,17 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+
+  // Memoize initial column visibility to prevent recalculation
+  const initialColumnVisibility = useMemo(() => ({
+    github: data[0]?.application_status === "testing" ? false : true,
+    tech_stacks: data[0]?.application_status === "testing" ? false : true,
+    test_taken: data[0]?.application_status === "testing" ? true : false,
+    test_time_remaining:
+      data[0]?.application_status === "testing" ? true : false,
+    fork_url: data[0]?.application_status === "testing" ? true : false,
+    reapply: data[0]?.application_status === "denied" ? true : false,
+  }), [data[0]?.application_status]);
 
   const table = useReactTable({
     data,
@@ -56,27 +67,20 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
     state: {
       sorting,
       rowSelection,
+      columnVisibility,
     },
     initialState: {
       pagination: {
         pageSize: pageSize.applicants,
       },
-      columnVisibility: {
-        github: data[0]?.application_status === "testing" ? false : true,
-        tech_stacks: data[0]?.application_status === "testing" ? false : true,
-        test_taken: data[0]?.application_status === "testing" ? true : false,
-        test_time_remaining:
-          data[0]?.application_status === "testing" ? true : false,
-        fork_url: data[0]?.application_status === "testing" ? true : false,
-        reapply: data[0]?.application_status === "denied" ? true : false,
-      },
+      columnVisibility: initialColumnVisibility,
     },
   });
 
   // Calculate total pages
-  const totalPages = Math.ceil(data.length / pageSize.applicants);
+  const totalPages = useMemo(() => Math.ceil(data.length / pageSize.applicants), [data.length]);
 
-  const toBeFailed = (
+  const toBeFailed = useCallback((
     testTaken: string | null | undefined,
     forkUrl: string | null | undefined,
   ): Boolean => {
@@ -90,11 +94,28 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
     const difference = testTakenDate.getTime() - currentDate.getTime();
 
     return difference <= 0;
-  };
+  }, []);
+
+  // Define pagination callbacks outside of conditional rendering
+  const handleNextPage = useCallback(() => {
+    if (table.getState().pagination.pageIndex < totalPages - 1) {
+      table.nextPage();
+    }
+  }, [table, totalPages]);
+
+  const handlePreviousPage = useCallback(() => table.previousPage(), [table]);
+
+  const setCurrentPage = useCallback((pageOrFunction: number | ((page: number) => number)) => {
+    const page =
+      typeof pageOrFunction === "function"
+        ? pageOrFunction(table.getState().pagination.pageIndex + 1)
+        : pageOrFunction;
+    table.setPageIndex(page - 1);
+  }, [table]);
 
   return (
-    <div className="rounded-md border">
-      <Box className="p-1 py-2 sm:p-4 sm:py-4">
+    <div className="overflow-hidden rounded-md border">
+      <Box className="p-2 py-3 sm:p-4 sm:py-4">
         {/* if rows selected */}
 
         <div className="justify-betwee flex w-full items-center">
@@ -199,19 +220,9 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
           {data.length > pageSize.applicants && (
             <DefaultPagination
               currentPage={table.getState().pagination.pageIndex + 1}
-              handleNextPage={() => {
-                if (table.getState().pagination.pageIndex < totalPages - 1) {
-                  table.nextPage();
-                }
-              }}
-              handlePreviousPage={() => table.previousPage()}
-              setCurrentPage={(pageOrFunction) => {
-                const page =
-                  typeof pageOrFunction === "function"
-                    ? pageOrFunction(table.getState().pagination.pageIndex + 1)
-                    : pageOrFunction;
-                table.setPageIndex(page - 1);
-              }}
+              handleNextPage={handleNextPage}
+              handlePreviousPage={handlePreviousPage}
+              setCurrentPage={setCurrentPage}
               totalPages={totalPages}
             />
           )}
@@ -220,3 +231,5 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
     </div>
   );
 }
+
+export const ApplicantDataTable = React.memo(ApplicantDataTableComponent) as typeof ApplicantDataTableComponent;

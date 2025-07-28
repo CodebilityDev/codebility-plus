@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Box } from "@/Components/shared/dashboard";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import { Box } from "@/components/shared/dashboard";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
@@ -125,13 +125,19 @@ const DashboardCurrentProject = () => {
               <div className="p-[1px]-100 rounded-md bg-gradient-to-r from-purple-200 via-blue-50 to-sky-300 dark:from-purple-800 dark:via-blue-300 dark:to-sky-950  p-2 hover:shadow-lg hover:shadow-blue-500/50 dark:hover:shadow-blue-400/50">
                 <div className="flex items-center gap-2">
                   {involvement.project.main_image && (
-                    <Image
-                      src={involvement.project.main_image}
-                      alt={involvement.project.name}
-                      width={32}
-                      height={32}
-                      className="rounded"
-                    />
+                    <div className="h-8 w-8 overflow-hidden rounded bg-gray-100 dark:bg-gray-800">
+                      <Image
+                        src={involvement.project.main_image}
+                        alt={involvement.project.name}
+                        width={32}
+                        height={32}
+                        className="h-full w-full object-cover"
+                        style={{
+                          width: '32px',
+                          height: '32px',
+                        }}
+                      />
+                    </div>
                   )}
                   <div className="flex min-w-0 flex-1 items-center justify-between">
                     <div className="flex min-w-0 flex-col ">
