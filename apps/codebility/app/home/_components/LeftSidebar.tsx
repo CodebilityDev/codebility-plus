@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo, memo } from "react";
+import { memo, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -31,8 +31,9 @@ const LeftSidebar = () => {
 
   const roleId = useMemo(() => {
     if (!user?.role_id) return null;
-    return user.internal_status == "INACTIVE" || user.availability_status == false
-      ? 11
+    return user.internal_status == "INACTIVE" ||
+      user.availability_status == false
+      ? -1
       : user.role_id;
   }, [user?.role_id, user?.internal_status, user?.availability_status]);
 
@@ -108,7 +109,7 @@ const LeftSidebar = () => {
         <motion.button
           onClick={toggleNav}
           whileTap={{ scale: 0.95 }}
-          className="p-2 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+          className="rounded p-2 text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-white"
           aria-label={isToggleOpen ? "Collapse sidebar" : "Expand sidebar"}
           aria-expanded={isToggleOpen ? "true" : "false"}
           aria-controls="sidebar-navigation"
@@ -134,14 +135,18 @@ const LeftSidebar = () => {
       </div>
 
       {/* Sidebar Links */}
-      <nav 
+      <nav
         id="sidebar-navigation"
         className="flex flex-col overflow-y-auto"
         role="navigation"
         aria-label="Main navigation"
       >
         {sidebarData.map((section: SidebarSection) => (
-          <div key={section.id} role="group" aria-labelledby={`sidebar-section-${section.id}`}>
+          <div
+            key={section.id}
+            role="group"
+            aria-labelledby={`sidebar-section-${section.id}`}
+          >
             <AnimatePresence>
               {isToggleOpen ? (
                 <motion.h4
@@ -150,13 +155,13 @@ const LeftSidebar = () => {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="ml-2 text-sm uppercase mt-4 text-gray-600 dark:text-white"
+                  className="ml-2 mt-4 text-sm uppercase text-gray-600 dark:text-white"
                 >
                   {section.title}
                 </motion.h4>
               ) : (
-                <div 
-                  className="bg-dark300_light900 my-3 border-2" 
+                <div
+                  className="bg-dark300_light900 my-3 border-2"
                   role="separator"
                   aria-hidden="true"
                 />
@@ -178,7 +183,7 @@ const LeftSidebar = () => {
                         isActive
                           ? "primary-gradient text-light-900 rounded-lg"
                           : "text-dark300_light900"
-                      } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] dark:hover:bg-[#131417] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                      } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:hover:bg-[#131417]`}
                       aria-current={isActive ? "page" : undefined}
                       aria-label={`Navigate to ${link.label}${isActive ? " (current page)" : ""}`}
                       title={!isToggleOpen ? link.label : undefined}
