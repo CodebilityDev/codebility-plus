@@ -1,0 +1,19 @@
+{
+  "name": "Codebility",
+  "short_name": "Codebility",
+  "description": "Empowering developers with comprehensive coding solutions and community-driven projects",
+  "icons": [
+    {
+      "src": "/assets/svgs/codebility-dark-blue.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "theme_color": "#02FFE2",
+  "background_color": "#030303",
+  "display": "standalone",
+  "orientation": "portrait",
+  "scope": "/",
+  "start_url": "/"
+}

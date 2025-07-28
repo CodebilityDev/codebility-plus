@@ -1,5 +1,5 @@
 import React, { useRef } from "react";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -7,7 +7,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 import { Codev } from "@/types/home/codev";
 
 import { removeArrayDuplicate } from "../../_lib/util";

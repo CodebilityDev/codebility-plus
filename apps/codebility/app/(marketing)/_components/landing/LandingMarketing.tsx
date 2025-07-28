@@ -1,8 +1,8 @@
 import React from "react";
 import Image from "next/image";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 
-import { MarketingCardData } from "../../../../constants/landing_data";
+import { MarketingCardData } from "@/constants/landing_data";
 import GridBg from "./LandingGridBg";
 import MarketingCard from "./LandingMarketingCard";
 import PurpleBg from "./LandingPurpleBg";
@@ -19,7 +19,7 @@ const Marketing = () => {
         <div className="hidden pt-32 md:block">
           <Image
             src="/assets/images/campaign/left-task.png"
-            unoptimized
+
             alt=""
             width={200}
             height={100}
@@ -64,7 +64,7 @@ const Marketing = () => {
         <div className="hidden md:block md:pt-80">
           <Image
             src="/assets/images/campaign/right-task.png"
-            unoptimized
+
             alt=""
             width={200}
             height={100}

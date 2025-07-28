@@ -6,13 +6,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/Components/ui/card";
+} from "@/components/ui/card";
 import {
   ChartConfig,
   ChartContainer,
   ChartLegend,
   ChartLegendContent,
-} from "@/Components/ui/chart";
+} from "@/components/ui/chart";
 import { Pie, PieChart } from "recharts";
 
 interface ApplicantStatusCounts extends Record<string, number> {}

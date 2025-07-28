@@ -2,8 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import InputField from "@/Components/shared/dashboard/InputPhone";
-import { Button } from "@/Components/ui/button";
+import InputField from "@/components/shared/dashboard/InputPhone";
+import { Button } from "@/components/ui/button";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { FieldValues, SubmitHandler, useForm } from "react-hook-form";

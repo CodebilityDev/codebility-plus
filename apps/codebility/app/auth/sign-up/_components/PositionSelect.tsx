@@ -8,7 +8,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 interface Position {

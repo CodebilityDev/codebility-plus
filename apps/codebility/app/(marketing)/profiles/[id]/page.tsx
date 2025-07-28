@@ -1,8 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Paragraph } from "@/Components/shared/home";
-import Logo from "@/Components/shared/Logo";
+import { Paragraph } from "@/components/shared/home";
+import Logo from "@/components/shared/Logo";
 import getRandomColor from "@/lib/getRandomColor";
 import { getCodevs } from "@/lib/server/codev.service";
 import {

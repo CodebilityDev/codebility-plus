@@ -1,10 +1,10 @@
 "use client";
 
-import { Box } from "@/Components/shared/dashboard";
-import { Paragraph } from "@/Components/shared/home";
-import { TimePicker12 } from "@/Components/time-picker/TimePicker12hourDemo";
-import { Period } from "@/Components/time-picker/TimePickerUtils";
-import { Button } from "@/Components/ui/button";
+import { Box } from "@/components/shared/dashboard";
+import { Paragraph } from "@/components/shared/home";
+import { TimePicker12 } from "@/components/time-picker/TimePicker12hourDemo";
+import { Period } from "@/components/time-picker/TimePickerUtils";
+import { Button } from "@/components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import {

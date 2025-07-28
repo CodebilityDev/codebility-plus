@@ -1,16 +1,17 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, memo, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { SimpleMemberData } from "@/app/home/projects/actions";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
+import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { ModalType } from "@/hooks/use-modal-projects";
 import { defaultAvatar } from "@/public/assets/images";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Project } from "@/types/home/codev";
+import { getValidImageUrl } from "@/utils/imageValidation";
 
 import BookmarkButton from "./BookmarkButton";
 import ProjectOptionsMenu from "./ProjectOptionsMenu";
@@ -22,20 +23,22 @@ export interface ProjectCardProps {
 }
 
 const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
-  const projectStatus =
+  const projectStatus = useMemo(() =>
     project.status &&
-    project.status.charAt(0).toUpperCase() + project.status.slice(1);
+    project.status.charAt(0).toUpperCase() + project.status.slice(1)
+  , [project.status]);
 
-  const bgProjectStatus =
+  const bgProjectStatus = useMemo(() =>
     project.status === "pending"
       ? "bg-orange-500/80"
       : project.status === "completed"
         ? "bg-green-500/80"
         : project.status === "active"
           ? "bg-blue-500/80"
-          : "dark:bg-zinc-700";
+          : "dark:bg-zinc-700"
+  , [project.status]);
 
-  return categoryId === project.project_category_id ? (
+  return (
     <div
       onClick={() => onOpen("projectViewModal", project)}
       className="background-box flex cursor-pointer flex-col overflow-hidden rounded-xl border border-zinc-200 transition-all hover:shadow-lg dark:border-zinc-700 dark:shadow-slate-700 "
@@ -47,7 +50,6 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
           src={project.main_image || defaultAvatar}
           fill
           sizes="(max-width: 768px) 100vw, 33vw"
-          unoptimized={true}
           className="object-cover"
           loading="eager"
           priority
@@ -109,7 +111,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
         {/* Team Section */}
         <div className="space-y-3">
           {/* Team Lead */}
-          {(() => {
+          {useMemo(() => {
             const teamLead = project.project_members?.find(
               (member) => member.role === "team_leader",
             );
@@ -119,17 +121,20 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
             return (
               <div className="flex items-center gap-2">
                 <div className="relative h-8 w-8">
-                  {teamLead.codev.image_url ? (
-                    <Image
-                      src={teamLead.codev.image_url}
-                      alt={`${teamLead.codev.first_name} ${teamLead.codev.last_name}`}
-                      fill
-                      unoptimized={true}
-                      className="rounded-full object-cover"
-                    />
-                  ) : (
-                    <DefaultAvatar size={32} />
-                  )}
+                  {(() => {
+                    const validUrl = getValidImageUrl(teamLead.codev.image_url);
+                    return validUrl ? (
+                      <Image
+                        src={validUrl}
+                        alt={`${teamLead.codev.first_name} ${teamLead.codev.last_name}`}
+                        fill
+                        sizes="32px"
+                        className="rounded-full object-cover"
+                      />
+                    ) : (
+                      <DefaultAvatar size={32} />
+                    );
+                  })()}
                 </div>
                 <div className="flex flex-col">
                   <span className="text-dark100_light900 text-xs font-medium">
@@ -141,7 +146,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                 </div>
               </div>
             );
-          })()}
+          }, [project.project_members])}
 
           {/* Team Members */}
           {project.project_members?.some(
@@ -156,17 +161,20 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                     key={member.id}
                     className="relative h-8 w-8 rounded-full"
                   >
-                    {member.codev?.image_url ? (
-                      <Image
-                        src={member.codev.image_url}
-                        alt={`${member.codev.first_name} ${member.codev.last_name}`}
-                        fill
-                        unoptimized={true}
-                        className="rounded-full object-cover"
-                      />
-                    ) : (
-                      <DefaultAvatar size={32} />
-                    )}
+                    {(() => {
+                      const validUrl = getValidImageUrl(member.codev?.image_url);
+                      return validUrl ? (
+                        <Image
+                          src={validUrl}
+                          alt={`${member.codev?.first_name} ${member.codev?.last_name}`}
+                          fill
+                          sizes="32px"
+                          className="rounded-full object-cover"
+                        />
+                      ) : (
+                        <DefaultAvatar size={32} />
+                      );
+                    })()}
                   </div>
                 ))}
               {project.project_members.filter(
@@ -184,7 +192,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
             </div>
           ) : (
             <div className="flex -space-x-2">
-              <div className="text-gray relative flex h-8 w-full rounded-full">
+              <div className="text-gray-600 dark:text-gray-400 relative flex h-8 w-full rounded-full">
                 No Members
               </div>
             </div>
@@ -226,7 +234,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
         </div>
       </div>
     </div>
-  ) : null;
+  );
 };
 
-export default ProjectCard;
+export default memo(ProjectCard);
