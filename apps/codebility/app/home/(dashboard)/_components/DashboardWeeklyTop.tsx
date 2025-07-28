@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Box from "@/Components/shared/dashboard/Box";
+import Box from "@/components/shared/dashboard/Box";
 import {
   Table,
   TableBody,
@@ -9,9 +9,10 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { startOfMonth, startOfWeek, subDays } from "date-fns";
+import { Trophy, Medal, Award, Star, Zap } from "lucide-react";
 
 import {
   Select,
@@ -186,19 +187,64 @@ export default function WeeklyTop() {
     fetchTopCodevs();
   }, [supabase, timePeriod, allCategories]);
 
+  const getRankIcon = (rank: number) => {
+    switch (rank) {
+      case 1:
+        return <Trophy className="h-5 w-5 text-yellow-500" />;
+      case 2:
+        return <Medal className="h-5 w-5 text-gray-400" />;
+      case 3:
+        return <Award className="h-5 w-5 text-amber-600" />;
+      default:
+        return <Star className="h-4 w-4 text-gray-400" />;
+    }
+  };
+
+  const getPointsBar = (points: number, maxPoints: number) => {
+    const percentage = maxPoints > 0 ? (points / maxPoints) * 100 : 0;
+    return (
+      <div className="relative h-2 w-20 rounded-full bg-gray-200 dark:bg-gray-700">
+        <div 
+          className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+          style={{ width: `${Math.min(percentage, 100)}%` }}
+        />
+      </div>
+    );
+  };
+
   const generateTableRows = (category: string) => {
     const rows: React.ReactNode[] = [];
+    const categoryPoints = categoryData[category] || [];
+    const maxPoints = categoryPoints.length > 0 ? Math.max(...categoryPoints.map(d => d.points)) : 0;
+    
     for (let i = 0; i < 10; i++) {
       const data = categoryData[category]?.[i];
+      const hasData = data && data.points > 0;
+      
       rows.push(
-        <TableRow key={i} className={getRowStyle(i + 1)}>
-          <TableCell>{i + 1}</TableCell>
-          <TableCell>
-            {data && data.points > 0
-              ? data.codev?.first_name || "Unknown"
-              : "-"}
+        <TableRow key={i} className={`${getRowStyle(i + 1)} transition-all duration-200 hover:scale-[1.01] hover:shadow-md ${i <= 2 ? 'animate-pulse [animation-duration:3s]' : ''}`}>
+          <TableCell className="flex items-center gap-2">
+            {getRankIcon(i + 1)}
+            <span className="font-semibold">{i + 1}</span>
           </TableCell>
-          <TableCell>{data?.points || 0}</TableCell>
+          <TableCell className="font-medium">
+            {hasData ? (
+              <div className="flex items-center gap-2">
+                <span>{data.codev?.first_name || "Unknown"}</span>
+                {i < 3 && <Zap className="h-4 w-4 text-yellow-500 animate-bounce" />}
+              </div>
+            ) : (
+              <span className="text-gray-400">-</span>
+            )}
+          </TableCell>
+          <TableCell>
+            <div className="flex items-center gap-3">
+              <span className="font-bold text-blue-600 dark:text-blue-400">
+                {hasData ? data.points : 0}
+              </span>
+              {hasData && getPointsBar(data.points, maxPoints)}
+            </div>
+          </TableCell>
         </TableRow>,
       );
     }
@@ -223,10 +269,29 @@ export default function WeeklyTop() {
   };
 
   return (
-    <Box>
-      <div className="flex flex-col gap-6">
+    <Box className="relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20" />
+      <div className="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-br from-yellow-400/20 to-orange-400/20 blur-xl" />
+      <div className="absolute -bottom-4 -left-4 h-32 w-32 rounded-full bg-gradient-to-br from-purple-400/20 to-pink-400/20 blur-xl" />
+      
+      <div className="relative flex flex-col gap-6">
         <div className="flex items-center justify-between">
-          <p className="text-2xl">Leaderboard</p>
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-yellow-400 to-orange-500">
+              <Trophy className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                🏆 Leaderboard
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Compete and climb the ranks!</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <Star className="h-4 w-4 text-yellow-500" />
+            <span>Top Performers</span>
+          </div>
         </div>
         <div className="flex gap-4">
           <Select
@@ -247,17 +312,38 @@ export default function WeeklyTop() {
             onValueChange={setSelectedCategory}
             className="w-fit"
           >
-            <TabsList className="grid h-10 grid-cols-5">
-              {allCategories.map((category) => (
-                <TabsTrigger
-                  key={category}
-                  value={category}
-                  className="px-3 data-[state=active]:bg-[#1e1f26]"
-                  title={category}
-                >
-                  {getCategoryInitial(category)}
-                </TabsTrigger>
-              ))}
+            <TabsList className="grid h-10 grid-cols-5 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+              {allCategories.map((category) => {
+                const getCategoryStyle = () => {
+                  if (selectedCategory !== category) return "";
+                  
+                  switch (category) {
+                    case "Frontend Developer":
+                      return "data-[state=active]:bg-blue-600 data-[state=active]:text-white";
+                    case "Backend Developer":
+                      return "data-[state=active]:bg-green-600 data-[state=active]:text-white";
+                    case "UI/UX Designer":
+                      return "data-[state=active]:bg-purple-600 data-[state=active]:text-white";
+                    case "Mobile Developer":
+                      return "data-[state=active]:bg-orange-600 data-[state=active]:text-white";
+                    case "QA Engineer":
+                      return "data-[state=active]:bg-indigo-600 data-[state=active]:text-white";
+                    default:
+                      return "data-[state=active]:bg-gray-600 data-[state=active]:text-white";
+                  }
+                };
+
+                return (
+                  <TabsTrigger
+                    key={category}
+                    value={category}
+                    className={`px-3 rounded-md font-medium transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 ${getCategoryStyle()}`}
+                    title={category}
+                  >
+                    {getCategoryInitial(category)}
+                  </TabsTrigger>
+                );
+              })}
             </TabsList>
           </Tabs>
         </div>
@@ -267,16 +353,35 @@ export default function WeeklyTop() {
             {isLoading ? (
               <LoadingTable />
             ) : (
-              <Table>
-                <TableHeader className="bg-[#1e1f26]">
-                  <TableRow>
-                    <TableHead>Rank</TableHead>
-                    <TableHead>Name</TableHead>
-                    <TableHead>Points</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>{generateTableRows(selectedCategory)}</TableBody>
-              </Table>
+              <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-lg">
+                <Table>
+                  <TableHeader className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900">
+                    <TableRow className="border-0">
+                      <TableHead className="text-white font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Trophy className="h-4 w-4" />
+                          Rank
+                        </div>
+                      </TableHead>
+                      <TableHead className="text-white font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Star className="h-4 w-4" />
+                          Developer
+                        </div>
+                      </TableHead>
+                      <TableHead className="text-white font-semibold">
+                        <div className="flex items-center gap-2">
+                          <Zap className="h-4 w-4" />
+                          Points
+                        </div>
+                      </TableHead>
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody className="bg-white dark:bg-gray-950">
+                    {generateTableRows(selectedCategory)}
+                  </TableBody>
+                </Table>
+              </div>
             )}
           </>
         )}
@@ -287,10 +392,16 @@ export default function WeeklyTop() {
 
 const getRowStyle = (rank: number) => {
   const styles = {
-    1: "bg-gradient-to-r from-[#9c813b] to-[#ecc258] text-white",
-    2: "bg-gradient-to-r from-[#464646] to-[#a8a8a8] text-white",
-    3: "bg-gradient-to-r from-[#563c1e] to-[#ba8240] text-white",
+    1: "bg-gradient-to-r from-yellow-400 via-yellow-500 to-yellow-600 text-white shadow-lg shadow-yellow-500/25 border-yellow-300",
+    2: "bg-gradient-to-r from-gray-300 via-gray-400 to-gray-500 text-white shadow-lg shadow-gray-400/25 border-gray-300",
+    3: "bg-gradient-to-r from-amber-600 via-amber-700 to-amber-800 text-white shadow-lg shadow-amber-600/25 border-amber-500",
   } as const;
 
-  return styles[rank as keyof typeof styles] || "";
+  const baseStyle = styles[rank as keyof typeof styles];
+  
+  if (baseStyle) {
+    return `${baseStyle} border border-l-4`;
+  }
+  
+  return "hover:bg-gray-50 dark:hover:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800";
 };

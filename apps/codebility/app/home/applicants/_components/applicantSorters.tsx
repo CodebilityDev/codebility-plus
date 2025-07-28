@@ -1,5 +1,5 @@
-import React from "react";
-import { Button } from "@/Components/ui/button";
+import React, { memo } from "react";
+import { Button } from "@/components/ui/button";
 import { ChevronDown, Filter, SortDescIcon, X } from "lucide-react";
 
 import {
@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
 
-export default function ApplicantSorters({
+const ApplicantSorters = ({
   sortField,
   sortDirection,
   onToggleSort,
@@ -22,7 +22,7 @@ export default function ApplicantSorters({
   sortDirection: "asc" | "desc";
   onToggleSort: (field: string) => void;
   resetSort: () => void;
-}) {
+}) => {
   return (
     <>
       <DropdownMenu>
@@ -97,4 +97,6 @@ export default function ApplicantSorters({
       </DropdownMenu>
     </>
   );
-}
+};
+
+export default memo(ApplicantSorters);

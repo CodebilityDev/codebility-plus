@@ -1,6 +1,6 @@
-import { fadeInOutDownToUp } from "@/Components/FramerAnimation/Framer";
-import H2 from "@/Components/shared/home/H2";
-import SectionWrapper from "@/Components/shared/home/SectionWrapper";
+import { fadeInOutDownToUp } from "@/components/FramerAnimation/Framer";
+import H2 from "@/components/shared/home/H2";
+import SectionWrapper from "@/components/shared/home/SectionWrapper";
 import { motion } from "framer-motion";
 
 import WhyChooseItem from "./CodevsWhyChooseItem";

@@ -5,7 +5,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import { IconEdit } from "@/public/assets/svgs";
 
 import { TimeLog } from "../_types/time-log";

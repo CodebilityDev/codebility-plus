@@ -10,12 +10,12 @@ const SignUpPage = () => {
   return (
     <div className="bg-black-500 flex min-h-screen items-center justify-center text-white md:px-4">
       <div className="flex w-full max-w-[60rem] flex-col justify-center gap-2 bg-[#1E1F26] py-8 md:rounded-2xl xl:p-8">
-        <Link href="/" className="mx-auto mb-6">
+        <Link href="/" className="mx-auto mb-4">
           <Image
-            className="h-[45px] w-[200px] cursor-pointer"
+            className="cursor-pointer"
             src="/assets/svgs/codebility-white.svg"
-            width={200}
-            height={45}
+            width={250}
+            height={80}
             alt="Codebility Logo"
           />
         </Link>

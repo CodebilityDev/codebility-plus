@@ -1,7 +1,7 @@
 "use client";
 
-import { Button } from "@/Components/ui/button";
-import Input from "@/Components/ui/forms/input";
+import { Button } from "@/components/ui/button";
+import Input from "@/components/ui/forms/input";
 
 import { Label } from "@codevs/ui/label";
 

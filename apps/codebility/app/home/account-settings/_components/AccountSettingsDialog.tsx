@@ -101,7 +101,7 @@ export default function AccountSettingsDialog() {
   return (
     <>
       <AccountSettingsBackdrop isOpen={isOpen} />
-      <Form {...form}>
+      
         <Dialog
           open={isOpen}
           onOpenChange={(open) => {
@@ -165,7 +165,7 @@ export default function AccountSettingsDialog() {
             </form>
           </DialogContent>
         </Dialog>
-      </Form>
+      
     </>
   );
 }

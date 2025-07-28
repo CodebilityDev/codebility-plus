@@ -12,8 +12,6 @@
     "build-storybook": "storybook build"
   },
   "dependencies": {
-    "@codevs/mailers": "workspace:*",
-    "@codevs/supabase": "workspace:*",
     "@codevs/ui": "workspace:*",
     "@hookform/resolvers": "^3.9.0",
     "cookies-next": "^4.2.1",

@@ -2,14 +2,14 @@
 
 import { FormEvent, useEffect, useState } from "react";
 import { createNewBoard } from "@/app/home/kanban/actions";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -18,7 +18,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { Project } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";

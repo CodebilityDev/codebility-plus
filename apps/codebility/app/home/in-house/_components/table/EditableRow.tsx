@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { INTERNAL_STATUS } from "@/constants/internal_status";
 import {
   Codev,
@@ -219,7 +219,7 @@ export function EditableRow({
                   htmlFor="upload-avatar"
                   className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-gray-200 p-0.5 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
                 >
-                  <Plus className="h-4 w-4 text-gray-500 dark:text-gray-300" />
+                  <Plus className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                   <input
                     id="upload-avatar"
                     type="file"
@@ -238,7 +238,7 @@ export function EditableRow({
                 htmlFor="upload-avatar"
                 className="inline-flex cursor-pointer items-center justify-center rounded-full bg-gray-200 p-2 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
-                <Upload className="h-5 w-5 text-gray-500 dark:text-gray-300" />
+                <Upload className="h-5 w-5 text-gray-700 dark:text-gray-300" />
                 <input
                   id="upload-avatar"
                   type="file"
