@@ -88,7 +88,7 @@ export default function FilterCodevs({
   };
 
   return (
-    <div className="relative">
+    <div className="relative flex justify-end">
       <Button
         variant={showFilter ? "destructive" : "default"}
         size="sm"

@@ -75,7 +75,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
   };
 
   const applicationStatus = codev.application_status || "applying";
-  const statusConfig = STATUS_CONFIG[applicationStatus as ApplicantStatus];
+  const statusConfig = STATUS_CONFIG[applicationStatus as ApplicantStatus] || STATUS_CONFIG.applying;
 
   return (
     <div
@@ -130,12 +130,12 @@ export default function CodevCard({ codev }: CodevCardProps) {
                     className={cn(
                       `absolute -top-12 left-1/2 z-50 flex -translate-x-1/2
                        transform flex-col items-center justify-center rounded-xl px-3 py-2 shadow-xl 
-                        ${statusConfig.className}
+                        ${statusConfig?.className || ''}
                        `,
                     )}
                   >
                     <div className="relative z-30 text-sm font-medium">
-                      {statusConfig.label}
+                      {statusConfig?.label || 'Applying'}
                     </div>
                   </motion.div>
                 )}

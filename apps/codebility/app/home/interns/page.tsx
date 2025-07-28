@@ -27,10 +27,15 @@ export default async function CodevsPage() {
     );
   }
 
+  // Filter only codevs with application_status = "passed"
+  const passedCodevs = (allCodevs || []).filter(
+    (codev) => codev.application_status === "passed"
+  );
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-[1600px] px-4 py-12">
-        <CodevContainer data={allCodevs || []} />
+        <CodevContainer data={passedCodevs} />
       </div>
     </div>
   );
