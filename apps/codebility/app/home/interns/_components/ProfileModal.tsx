@@ -32,6 +32,11 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 import { StatusBadge } from "../../in-house/_components/shared/StatusBadge";
 import SkillPoints from "./SkillPoints";
 
+// ✅ Type guard to check if project has required properties
+const isValidProject = (project: any): boolean => {
+  return project && typeof project === 'object' && 'id' in project;
+};
+
 const ProfileModal = ({ user }: { user?: Codev | null }) => {
   const { isOpen, type, onClose, data } = useModal();
   const isModalOpen = isOpen && type === "profileModal";
@@ -83,7 +88,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                   <StatusBadge
                     className="mobile:justify-center"
                     status={
-                      (codev.internal_status as InternalStatus) || "AVAILABLE"
+                      (codev.internal_status as InternalStatus) || "GRADUATED"
                     }
                   />
 
@@ -92,7 +97,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
               </div>
             </div>
 
-            {/* addtional info */}
+            {/* additional info */}
             <div className="mobile:flex-col mobile:items-center flex gap-4 sm:items-start sm:justify-between 2xl:justify-start">
               {/* Contact Information */}
               <div className="mobile:flex-row mobile:gap-4 flex sm:flex-col">
@@ -251,83 +256,99 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
           <TabsContent value="projects" className="mt-4 space-y-6">
             {hasItems(codev.projects) ? (
               <div className="grid gap-4 md:grid-cols-2">
-                {codev.projects.map((project) => (
-                  <div key={project.id} className="rounded-lg border">
-                    {project.main_image ? (
-                      <div className="relative h-48 w-full">
-                        <Image
-                          alt={`${project.name} image`}
-                          src={project.main_image}
-                          fill
-                          className="object-cover"
-                          loading="eager"
-                          priority
-                        />
-                        <div className="absolute right-2 top-2 flex items-center rounded-xl bg-slate-200 px-2 py-1 text-slate-800 transition-all dark:bg-zinc-700 dark:text-white">
-                          <span
-                            className={`rounded-full px-3 py-1 text-sm font-medium ${
-                              project.status === "active"
-                                ? "bg-green-500/20 text-green-500"
-                                : project.status === "pending"
-                                  ? "bg-orange-500/20 text-orange-500"
-                                  : project.status === "completed"
-                                    ? "bg-blue-500/20 text-blue-500"
-                                    : "bg-gray-500/20 text-gray-500"
-                            }`}
-                          >
-                            {project.status || "Unknown"}
-                          </span>
+                {codev.projects
+                  .filter(isValidProject) // ✅ Fix: Filter out invalid projects
+                  .map((project, index) => {
+                    // ✅ Fix: Direct use since project is already the correct structure
+                    // No need for nested access - project is already of type Project & { role: string; joined_at: string; }
+                    
+                    // ✅ Additional safety check
+                    if (!project || !project.id) {
+                      return null;
+                    }
+
+                    // ✅ Fix: Generate unique key using project.id or fallback to index
+                    const uniqueKey = project.id || `project-${index}`;
+
+                    return (
+                      <div key={uniqueKey} className="rounded-lg border">
+                        {project.main_image ? (
+                          <div className="relative h-48 w-full">
+                            <Image
+                              alt={`${project.name} image`}
+                              src={project.main_image}
+                              fill
+                              className="object-cover"
+                              loading="eager"
+                              priority
+                            />
+                            <div className="absolute right-2 top-2 flex items-center rounded-xl bg-slate-200 px-2 py-1 text-slate-800 transition-all dark:bg-zinc-700 dark:text-white">
+                              <span
+                                className={`rounded-full px-3 py-1 text-sm font-medium ${
+                                  project.status === "active"
+                                    ? "bg-green-500/20 text-green-500"
+                                    : project.status === "pending"
+                                      ? "bg-orange-500/20 text-orange-500"
+                                      : project.status === "completed"
+                                        ? "bg-blue-500/20 text-blue-500"
+                                        : "bg-gray-500/20 text-gray-500"
+                                }`}
+                              >
+                                {project.status || "Unknown"}
+                              </span>
+                            </div>
+                          </div>
+                        ) : (
+                          <DefaultAvatar size={64} />
+                        )}
+
+                        <div className="space-y-2 p-4">
+                          <div className="flex items-start justify-between">
+                            <h4 className="text-xl font-medium">{project.name}</h4>
+                          </div>
+                          {project.description && (
+                            <p className="mt-2 text-sm text-gray-600">
+                              {project.description}
+                            </p>
+                          )}
+                          {/* Links */}
+                          <div className="flex items-center gap-3">
+                            {project.github_link && (
+                              <Link
+                                href={project.github_link}
+                                target="_blank"
+                                className="group"
+                                onClick={(e) => e.stopPropagation()} // Prevent card click when clicking link
+                              >
+                                <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+                              </Link>
+                            )}
+                            {project.website_url && (
+                              <Link
+                                href={project.website_url}
+                                target="_blank"
+                                className="group"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+                              </Link>
+                            )}
+                            {project.figma_link && (
+                              <Link
+                                href={project.figma_link}
+                                target="_blank"
+                                className="group"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+                              </Link>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    ) : (
-                      <DefaultAvatar size={64} />
-                    )}
-
-                    <div className="space-y-2 p-4">
-                      <div className="flex items-start justify-between">
-                        <h4 className="text-xl font-medium">{project.name}</h4>
-                      </div>
-                      {project.description && (
-                        <p className="mt-2 text-sm text-gray-600">
-                          {project.description}
-                        </p>
-                      )}
-                      {/* Links */}
-                      <div className="flex items-center gap-3">
-                        {project.github_link && (
-                          <Link
-                            href={project.github_link}
-                            target="_blank"
-                            className="group"
-                            onClick={(e) => e.stopPropagation()} // Prevent card click when clicking link
-                          >
-                            <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
-                          </Link>
-                        )}
-                        {project.website_url && (
-                          <Link
-                            href={project.website_url}
-                            target="_blank"
-                            className="group"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
-                          </Link>
-                        )}
-                        {project.figma_link && (
-                          <Link
-                            href={project.figma_link}
-                            target="_blank"
-                            className="group"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
-                          </Link>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                ))}
+                    );
+                  })
+                  .filter(Boolean)} {/* ✅ Remove null entries */}
               </div>
             ) : (
               <p className="text-center text-gray-500">No projects available</p>
