@@ -41,7 +41,7 @@ const NavContent = () => {
         const roleId =
           user.internal_status == "INACTIVE" ||
           user.availability_status == false
-            ? 11
+            ? -1
             : user.role_id;
         const data = await getSidebarData(roleId);
         setSidebarData(data);
@@ -54,10 +54,21 @@ const NavContent = () => {
   if (user?.application_status !== "passed") return null;
 
   return (
-    <nav className="flex h-full flex-col gap-2 pt-4" role="navigation" aria-label="Main navigation">
+    <nav
+      className="flex h-full flex-col gap-2 pt-4"
+      role="navigation"
+      aria-label="Main navigation"
+    >
       {sidebarData.map((item) => (
-        <div key={item.id} role="group" aria-labelledby={`nav-section-${item.id}`}>
-          <h4 id={`nav-section-${item.id}`} className="text-gray text-sm uppercase">
+        <div
+          key={item.id}
+          role="group"
+          aria-labelledby={`nav-section-${item.id}`}
+        >
+          <h4
+            id={`nav-section-${item.id}`}
+            className="text-gray text-sm uppercase"
+          >
             {item.title}
           </h4>
           <ul className="mt-3" role="list">
@@ -85,7 +96,9 @@ const NavContent = () => {
                         className={`${isActive ? "" : "invert-colors"} h-5 w-5 object-contain`}
                         aria-hidden="true"
                       />
-                      <span className={`${isActive ? "base-normal" : "base-sm"}`}>
+                      <span
+                        className={`${isActive ? "base-normal" : "base-sm"}`}
+                      >
                         {link.label}
                       </span>
                     </Link>
@@ -107,7 +120,7 @@ const MobileNav = () => {
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <button
-          className="lg:hidden focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded p-1"
+          className="rounded p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 lg:hidden"
           aria-label="Open navigation menu"
           aria-expanded={isSheetOpen}
           aria-controls="mobile-navigation"
@@ -141,7 +154,11 @@ const MobileNav = () => {
           </div>
         </SheetHeader>
         <div className="mb-4">
-          <Link href="/" className="flex items-center gap-1" aria-label="Go to homepage">
+          <Link
+            href="/"
+            className="flex items-center gap-1"
+            aria-label="Go to homepage"
+          >
             <Image
               src="/assets/svgs/codebility-violet.svg"
               width={147}
