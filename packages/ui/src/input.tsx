@@ -13,7 +13,7 @@ const InputVariants = cva(
         resume: "",
         lightgray:
           "border-lightgray text-black-100 dark:bg-dark-200 border bg-white dark:border-zinc-700 dark:text-white",
-        darkgray: "text-dark-200 dark:bg-dark-200 dark:text-gray bg-white",
+        darkgray: "text-gray-800 dark:bg-dark-200 dark:text-gray-200 bg-gray-100",
       },
     },
   },

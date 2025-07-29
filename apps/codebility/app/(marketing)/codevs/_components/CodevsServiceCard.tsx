@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { fadeInOutLeftToRight } from "@/Components/FramerAnimation/Framer";
+import { fadeInOutLeftToRight } from "@/components/FramerAnimation/Framer";
 import { useModal } from "@/hooks/use-modal-services";
 import { IconArrowRight } from "@/public/assets/svgs";
 import { motion } from "framer-motion";

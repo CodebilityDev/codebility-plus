@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
-import DefaultPagination from "@/Components/ui/pagination";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@/components/ui/button";
+import DefaultPagination from "@/components/ui/pagination";
+import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { pageSize } from "@/constants";
 import { useModal } from "@/hooks/use-modal-clients";
 import usePagination from "@/hooks/use-pagination";
@@ -144,7 +144,7 @@ export default function ClientCards({ clients }: Props) {
                           fill
                           loading="eager"
                           priority
-                          unoptimized={true}
+                          
                           className="h-auto w-auto rounded-full bg-cover object-cover"
                         />
                       ) : (

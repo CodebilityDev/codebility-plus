@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useParams } from "next/navigation";
-import EditPostModal from "@/Components/modals/EditPostModal";
-import { Box } from "@/Components/shared/dashboard";
-import { Button } from "@/Components/ui/button";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import EditPostModal from "@/components/modals/EditPostModal";
+import { Box } from "@/components/shared/dashboard";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { createClientClientComponent } from "@/utils/supabase/client";

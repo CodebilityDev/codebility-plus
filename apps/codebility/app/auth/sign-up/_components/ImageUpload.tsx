@@ -51,6 +51,7 @@ export const ImageUpload = ({ onChange, value, error }: ImageUploadProps) => {
             src={preview}
             alt="Profile preview"
             fill
+            sizes="96px"
             className="rounded-full object-cover"
           />
         ) : (

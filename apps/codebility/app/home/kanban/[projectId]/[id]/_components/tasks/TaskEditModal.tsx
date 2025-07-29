@@ -4,14 +4,14 @@ import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import KanbanAddModalMembers from "@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddModalMembers";
 import { updateTask } from "@/app/home/kanban/[projectId]/[id]/actions";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Select,
   SelectContent,
@@ -19,7 +19,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
 import { SkillCategory, Task } from "@/types/home/codev";
@@ -76,6 +76,7 @@ const TaskEditModal = () => {
   const editor = useEditor({
     extensions: [StarterKit],
     content: taskData.description || "",
+    immediatelyRender: false,
   });
   useEffect(() => {
     const supabaseClient = createClientClientComponent();

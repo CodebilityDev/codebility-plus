@@ -1,4 +1,5 @@
-import H1 from "@/Components/shared/dashboard/H1";
+import H1 from "@/components/shared/dashboard/H1";
+import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import getProjects from "@/lib/server/project.service";
 import { getOrSetCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
@@ -48,18 +49,30 @@ const Projects = async (props: PageProps) => {
   }
 
   return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
-      <div className="flex flex-row justify-between gap-4">
-        <H1>Projects</H1>
-        <div className="flex items-center gap-4">
-          <ProjectFilterButton />
-          <AddProjectButton />
+    <AsyncErrorBoundary
+      fallback={
+        <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+          <div className="mb-4 text-4xl">📁</div>
+          <h2 className="mb-2 text-xl font-semibold">Unable to load projects</h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Something went wrong while fetching your projects. Please refresh the page to try again.
+          </p>
         </div>
+      }
+    >
+      <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+        <div className="flex flex-row justify-between gap-4">
+          <H1>Projects</H1>
+          <div className="flex items-center gap-4">
+            <ProjectFilterButton />
+            <AddProjectButton />
+          </div>
+        </div>
+        {Projects && Projects.length > 0 && (
+          <ProjectCardContainer projects={Projects as Project[]} />
+        )}
       </div>
-      {Projects && Projects.length > 0 && (
-        <ProjectCardContainer projects={Projects as Project[]} />
-      )}
-    </div>
+    </AsyncErrorBoundary>
   );
 };
 export default Projects;

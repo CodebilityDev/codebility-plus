@@ -1,4 +1,4 @@
-import { Table, TableBody, TableCell, TableRow } from "@/Components/ui/table";
+import { Table, TableBody, TableCell, TableRow } from "@/components/ui/table";
 import { IconEdit } from "@/public/assets/svgs";
 
 import { TimeLog } from "../_types/time-log";
