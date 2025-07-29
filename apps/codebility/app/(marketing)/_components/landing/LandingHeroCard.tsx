@@ -23,7 +23,6 @@ const HeroCard: React.FC<HeroCardProps> = ({
               width={15}
               height={15}
               alt="arrow up"
-              unoptimized
             />
           </span>
         </div>

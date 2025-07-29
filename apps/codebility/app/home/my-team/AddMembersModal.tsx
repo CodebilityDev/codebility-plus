@@ -2,15 +2,15 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { SimpleMemberData, getProjectCodevs, updateProjectMembers } from "@/app/home/projects/actions";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { Codev, InternalStatus } from "@/types/home/codev";
-import { Search, Users } from "lucide-react";
+} from "@/components/ui/dialog";
+import { Codev } from "@/types/home/codev";
+import { Search, Check, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import { useModal } from "@/hooks/use-modal-users";
 import { createClientClientComponent } from "@/utils/supabase/client";

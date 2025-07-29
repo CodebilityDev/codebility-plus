@@ -1,15 +1,16 @@
 "use client";
 
-import { Card, CardContent, CardHeader } from "@/Components/ui/card";
+import React, { memo } from "react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { UserPlus } from "lucide-react";
 
 interface AdminDashboardTotalCodevProps {
   count?: number;
 }
 
-export default function AdminDashboardTotalCodev({
+const AdminDashboardTotalCodev = memo(({
   count,
-}: AdminDashboardTotalCodevProps) {
+}: AdminDashboardTotalCodevProps) => {
   return (
     <Card className="flex h-full flex-col bg-black">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -27,4 +28,8 @@ export default function AdminDashboardTotalCodev({
       </CardContent>
     </Card>
   );
-}
+});
+
+AdminDashboardTotalCodev.displayName = "AdminDashboardTotalCodev";
+
+export default AdminDashboardTotalCodev;

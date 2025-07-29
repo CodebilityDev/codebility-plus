@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -29,21 +29,23 @@ const LeftSidebar = () => {
   const [sidebarData, setSidebarData] = useState<any[]>([]);
   const refreshKey = useSidebarStore((state) => state.refreshKey);
 
+  const roleId = useMemo(() => {
+    if (!user?.role_id) return null;
+    return user.internal_status == "INACTIVE" || user.availability_status == false
+      ? 11
+      : user.role_id;
+  }, [user?.role_id, user?.internal_status, user?.availability_status]);
+
   useEffect(() => {
     const fetchSidebarData = async () => {
-      if (user?.role_id) {
-        const roleId =
-          user.internal_status == "INACTIVE" ||
-          user.availability_status == false
-            ? 11
-            : user.role_id;
+      if (roleId) {
         const data = await getSidebarData(roleId);
         setSidebarData(data);
       }
     };
 
     fetchSidebarData();
-  }, [user?.role_id, refreshKey]);
+  }, [roleId, refreshKey]);
 
   const sidebarVariants = {
     closed: {
@@ -63,11 +65,13 @@ const LeftSidebar = () => {
   };
 
   return (
-    <motion.section
+    <motion.aside
       initial={false}
       animate={isToggleOpen ? "open" : "closed"}
       variants={sidebarVariants}
       className="background-navbar sticky left-0 top-0 z-20 hidden h-screen flex-col gap-8 overflow-hidden p-1 shadow-lg lg:flex"
+      role="complementary"
+      aria-label="Main navigation sidebar"
     >
       {/* Logo and Toggle Button */}
       <div className="mt-4 flex items-center justify-between">
@@ -104,7 +108,10 @@ const LeftSidebar = () => {
         <motion.button
           onClick={toggleNav}
           whileTap={{ scale: 0.95 }}
-          className="p-2 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white"
+          className="p-2 text-gray-600 hover:text-black dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+          aria-label={isToggleOpen ? "Collapse sidebar" : "Expand sidebar"}
+          aria-expanded={isToggleOpen ? "true" : "false"}
+          aria-controls="sidebar-navigation"
         >
           <motion.div
             animate={{ rotate: isToggleOpen ? 180 : 0 }}
@@ -113,36 +120,50 @@ const LeftSidebar = () => {
           >
             <Image
               src="/assets/svgs/icon-codebility.svg"
-              alt="Toggle Sidebar"
+              alt=""
               width={50}
               height={50}
               style={{ width: "100%", height: "100%" }}
+              aria-hidden="true"
             />
           </motion.div>
+          <span className="sr-only">
+            {isToggleOpen ? "Collapse" : "Expand"} navigation sidebar
+          </span>
         </motion.button>
       </div>
 
       {/* Sidebar Links */}
-      <div className="flex flex-col overflow-y-auto">
+      <nav 
+        id="sidebar-navigation"
+        className="flex flex-col overflow-y-auto"
+        role="navigation"
+        aria-label="Main navigation"
+      >
         {sidebarData.map((section: SidebarSection) => (
-          <div key={section.id} className="mt-4">
+          <div key={section.id} role="group" aria-labelledby={`sidebar-section-${section.id}`}>
             <AnimatePresence>
               {isToggleOpen ? (
                 <motion.h4
+                  id={`sidebar-section-${section.id}`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-                  className="text-gray ml-2 text-sm uppercase"
+                  className="ml-2 text-sm uppercase mt-4 text-gray-600 dark:text-white"
                 >
                   {section.title}
                 </motion.h4>
               ) : (
-                <div className="bg-dark300_light900 my-3 border-2" />
+                <div 
+                  className="bg-dark300_light900 my-3 border-2" 
+                  role="separator"
+                  aria-hidden="true"
+                />
               )}
             </AnimatePresence>
 
-            <div className="mt-3 flex flex-col gap-2">
+            <ul className="mt-3 flex flex-col gap-2" role="list">
               {section.links.map((link: SidebarLink) => {
                 const isActive =
                   link.route === "/home"
@@ -150,43 +171,51 @@ const LeftSidebar = () => {
                     : pathname.startsWith(link.route);
 
                 return (
-                  <Link
-                    key={link.route}
-                    href={link.route}
-                    className={`${
-                      isActive
-                        ? "primary-gradient text-light-900 rounded-lg"
-                        : "text-dark300_light900"
-                    } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] dark:hover:bg-[#131417]`}
-                  >
-                    <div
-                      className="flex items-center justify-center"
-                      style={{ width: "18px", height: "18px" }}
-                    >
-                      <Image
-                        src={link.imgURL}
-                        alt={link.label}
-                        width={28}
-                        height={28}
-                        className={`${isActive ? "" : "invert-colors"} h-full w-full`}
-                      />
-                    </div>
-                    <span
+                  <li key={link.route} role="none">
+                    <Link
+                      href={link.route}
                       className={`${
-                        isToggleOpen ? "block" : "hidden"
-                      } transition-opacity duration-300`}
+                        isActive
+                          ? "primary-gradient text-light-900 rounded-lg"
+                          : "text-dark300_light900"
+                      } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] dark:hover:bg-[#131417] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2`}
+                      aria-current={isActive ? "page" : undefined}
+                      aria-label={`Navigate to ${link.label}${isActive ? " (current page)" : ""}`}
+                      title={!isToggleOpen ? link.label : undefined}
                     >
-                      {link.label}
-                    </span>
-                  </Link>
+                      <div
+                        className="flex items-center justify-center"
+                        style={{ width: "18px", height: "18px" }}
+                      >
+                        <Image
+                          src={link.imgURL}
+                          alt=""
+                          width={28}
+                          height={28}
+                          className={`${isActive ? "" : "invert-colors"} h-full w-full`}
+                          aria-hidden="true"
+                        />
+                      </div>
+                      <span
+                        className={`${
+                          isToggleOpen ? "block" : "hidden"
+                        } transition-opacity duration-300`}
+                      >
+                        {link.label}
+                      </span>
+                      {!isToggleOpen && (
+                        <span className="sr-only">{link.label}</span>
+                      )}
+                    </Link>
+                  </li>
                 );
               })}
-            </div>
+            </ul>
           </div>
         ))}
-      </div>
-    </motion.section>
+      </nav>
+    </motion.aside>
   );
 };
 
-export default LeftSidebar;
+export default memo(LeftSidebar);

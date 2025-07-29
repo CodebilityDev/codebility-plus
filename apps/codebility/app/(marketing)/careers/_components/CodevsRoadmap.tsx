@@ -1,4 +1,4 @@
-import { SectionWrapper } from "@/Components/shared/home";
+import { SectionWrapper } from "@/components/shared/home";
 
 import { roadmapData } from "../_lib/dummy-data";
 import RoadmapCard from "./CodevsRoadmapCard";

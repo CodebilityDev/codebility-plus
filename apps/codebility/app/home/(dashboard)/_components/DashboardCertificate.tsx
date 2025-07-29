@@ -1,6 +1,6 @@
 import { useRef } from "react";
 import Image from "next/image";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/codev-store";
 import { BookDown } from "lucide-react";
 
@@ -119,16 +119,18 @@ const DashboardCertificate = () => {
 				>
 					<Certificate {...certData} ref={certRef} />
 				</div>
-				{
-					hasLevelTwoBadge(user?.level) && (
-						<Button
-							className="md:p-15 md:w-15 h-6 w-10 p-2"
-							onClick={() => handleDownload(certRef, certData.name)}
-						>
-							<BookDown />
-						</Button>
-					)
-				}
+				<Button
+					className="md:p-15 md:w-15 h-6 w-10 p-2"
+					onClick={() => hasLevelTwoBadge(user?.level) && handleDownload(certRef, certData.name)}
+					disabled={!hasLevelTwoBadge(user?.level)}
+					title={
+						hasLevelTwoBadge(user?.level) 
+							? "Download your certificate" 
+							: "Complete more projects to unlock your certificate"
+					}
+				>
+					<BookDown className={hasLevelTwoBadge(user?.level) ? "" : "opacity-50"} />
+				</Button>
 			</div>
 		</>
 	);

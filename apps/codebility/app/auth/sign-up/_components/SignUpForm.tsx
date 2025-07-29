@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
-import TechStackModal from "@/Components/modals/TechStackModal";
-import { Button } from "@/Components/ui/button";
+import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
+import TechStackModal from "@/components/modals/TechStackModal";
+import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { SignUpValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";

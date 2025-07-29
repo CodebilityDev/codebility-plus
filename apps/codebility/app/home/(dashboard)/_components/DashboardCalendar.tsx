@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Box from "@/Components/shared/dashboard/Box";
+import Box from "@/components/shared/dashboard/Box";
 import { format } from "date-fns/format";
 import { getDay } from "date-fns/getDay";
 import { enUS } from "date-fns/locale/en-US";

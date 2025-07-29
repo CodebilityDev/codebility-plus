@@ -8,7 +8,7 @@ const MovingText = () => {
         <Image
           alt="diamond-icon"
           src="/assets/svgs/icon-diamond-purple.svg"
-          unoptimized
+
           width={30}
           height={30}
         />
@@ -19,7 +19,7 @@ const MovingText = () => {
             src="/assets/svgs/icon-diamond-sky.svg"
             width={30}
             height={30}
-            unoptimized
+
           />
         </span>{" "}
         Digital Marketing
@@ -29,7 +29,7 @@ const MovingText = () => {
             src="/assets/svgs/icon-diamond-purple.svg"
             width={30}
             height={30}
-            unoptimized
+
           />
         </span>{" "}
       </div>
@@ -41,7 +41,7 @@ const MovingText = () => {
             src="/assets/svgs/icon-diamond-sky.svg"
             width={30}
             height={30}
-            unoptimized
+
           />
         </span>{" "}
         AI-Development{" "}
@@ -51,7 +51,7 @@ const MovingText = () => {
             src="/assets/svgs/icon-diamond-purple.svg"
             width={30}
             height={30}
-            unoptimized
+
           />
         </span>{" "}
         Web Development

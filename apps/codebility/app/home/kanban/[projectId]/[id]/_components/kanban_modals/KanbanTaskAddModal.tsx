@@ -27,7 +27,7 @@ export default function KanbanTaskAddModal({
   return (
     <button
       type="button"
-      className="hover:bg-black-400/40 flex w-full items-center gap-2 rounded-md px-2"
+      className="hover:bg-black-400/40 flex w-full items-center gap-2 rounded-md px-2 text-gray-800 dark:text-white"
       onClick={() => onOpen("taskAddModal", data)}
     >
       <p className="text-2xl">+</p>

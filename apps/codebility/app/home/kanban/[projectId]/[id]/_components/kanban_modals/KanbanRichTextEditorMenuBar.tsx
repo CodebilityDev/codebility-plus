@@ -1,4 +1,4 @@
-import { Toggle } from "@/Components/ui/toggle";
+import { Toggle } from "@/components/ui/toggle";
 import { Editor } from "@tiptap/react";
 import {
   AlignCenter,

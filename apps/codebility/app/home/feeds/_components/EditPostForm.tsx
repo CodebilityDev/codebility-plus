@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Input } from "@/Components/shared/dashboard/input";
-import { Button } from "@/Components/ui/button";
+import { Input } from "@/components/shared/dashboard/input";
+import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
 import { uploadImage } from "@/utils/uploadImage";

@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Box } from "@/Components/shared/dashboard";
+import { Box } from "@/components/shared/dashboard";
 import { defaultAvatar } from "@/public/assets/images";
 import { format } from "date-fns";
 import { ArrowBigUp } from "lucide-react";

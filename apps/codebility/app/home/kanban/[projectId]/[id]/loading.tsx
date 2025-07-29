@@ -1,5 +1,5 @@
 
-import { Card, CardContent } from "@/Components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@codevs/ui/button";
 import { CardHeader } from "@codevs/ui/card";
 import { Input } from "@codevs/ui/input";
