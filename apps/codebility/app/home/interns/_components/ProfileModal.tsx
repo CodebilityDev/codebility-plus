@@ -3,15 +3,15 @@
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import Box from "@/Components/shared/dashboard/Box";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import Box from "@/components/shared/dashboard/Box";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+} from "@/components/ui/dialog";
+import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { useModal } from "@/hooks/use-modal-users";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Codev, InternalStatus } from "@/types/home/codev";

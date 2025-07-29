@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import CreatePostModal from "@/Components/modals/CreatePostModal";
-import { Button } from "@/Components/ui/button";
+import CreatePostModal from "@/components/modals/CreatePostModal";
+import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/codev-store";
 
 import Feed from "./_components/Feed";

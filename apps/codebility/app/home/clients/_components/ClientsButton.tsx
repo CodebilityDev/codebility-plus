@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/Components/ui/button";
+import AddNewButton from "@/components/ui/AddNewButton";
 import { useModal } from "@/hooks/use-modal-clients";
 import { useUserStore } from "@/store/codev-store";
 
@@ -14,17 +14,13 @@ export default function ClientButtons() {
     user?.role_id === 5;
 
   return (
-    <div className="flex flex-col-reverse gap-4 md:w-96 md:flex-row">
-      {/* You can add more buttons or links here if needed */}
+    <>
       {canAddClients && (
-        <Button
-          variant="default"
-          className="md:w-1/2"
+        <AddNewButton
           onClick={() => onOpen("clientAddModal")}
-        >
-          Add New Client
-        </Button>
+          label="Add New Client"
+        />
       )}
-    </div>
+    </>
   );
 }

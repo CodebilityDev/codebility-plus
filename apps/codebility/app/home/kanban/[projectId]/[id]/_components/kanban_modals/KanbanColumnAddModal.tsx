@@ -3,14 +3,14 @@
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createNewColumn } from "@/app/home/kanban/[projectId]/[id]/actions";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
+} from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal";
 import toast from "react-hot-toast";
 

@@ -5,8 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { signOut } from "@/app/auth/actions";
-import Logo from "@/Components/shared/home/Logo";
-import { Button } from "@/Components/ui/button";
+import Logo from "@/components/shared/home/Logo";
+import { Button } from "@/components/ui/button";
 import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
 import { defaultAvatar } from "@/public/assets/images";
 import {
@@ -165,7 +165,7 @@ const UserMenu = ({
           <p className="capitalize text-white">
             {first_name} {last_name}
           </p>
-          <p className="text-gray text-sm">{email}</p>
+          <p className="text-white text-sm">{email}</p>
         </div>
         <div className="from-violet relative overflow-hidden rounded-full bg-gradient-to-b to-blue-500 lg:h-[44px] lg:w-[52px]">
           <Image
@@ -173,7 +173,6 @@ const UserMenu = ({
             src={image_url || defaultAvatar}
             fill
             title={`${first_name}'s Avatar`}
-            unoptimized={true}
             className="rounded-full"
           />
         </div>

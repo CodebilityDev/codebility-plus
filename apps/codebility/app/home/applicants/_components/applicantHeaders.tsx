@@ -1,8 +1,7 @@
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
-import { H1 } from "@/Components/shared/dashboard";
+import { H1 } from "@/components/shared/dashboard";
 
 import { ExperienceRanges, NewApplicantType } from "../_service/types";
-import ApplicantFilters from "./applicantFilters";
 import ApplicantFiltersComponent from "./applicantFilters";
 import ApplicantFiltersBadge from "./applicantFiltersBadge";
 import ApplicantSorters from "./applicantSorters";
@@ -274,20 +273,55 @@ export default function ApplicantFilterHeaders({
   };
 
   return (
-    <div className="flex flex-col gap-2 ">
-      <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
-        <H1>Applicants Management</H1>
-        <div className="flex flex-col items-center gap-2 sm:flex-row">
-          <div className="flex w-full items-center gap-2">
-            {/* Sort Dropdown */}
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col gap-6 md:flex-row">
+        <div className="flex-1">
+          <H1>Applicants Management</H1>
+        </div>
+        <div className="flex flex-1 flex-col justify-center gap-4">
+          {/* Mobile: Stack search input on top, buttons below */}
+          <div className="flex flex-col gap-3 md:hidden">
+            <input
+              type="text"
+              placeholder="Search applicants..."
+              value={searchTerm}
+              onChange={(e) => onSearch(e.target.value)}
+              className="h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+            />
+            <div className="flex items-center justify-center gap-3">
+              <ApplicantSorters
+                sortField={sortField}
+                sortDirection={sortDirection}
+                onToggleSort={toggleSort}
+                resetSort={resetSort}
+              />
+              <ApplicantFiltersComponent
+                activeFilterCount={activeFilterCount}
+                filters={filters}
+                onResetFilters={onResetFilters}
+                uniquePositions={uniquePositions}
+                updateExperienceFilter={updateExperienceFilter}
+                updateFilter={updateFilter}
+                updatePositionFilter={updatePositionFilter}
+              />
+            </div>
+          </div>
+          
+          {/* Desktop: Inline layout */}
+          <div className="hidden items-center justify-end gap-4 md:flex">
+            <input
+              type="text"
+              placeholder="Search applicants..."
+              value={searchTerm}
+              onChange={(e) => onSearch(e.target.value)}
+              className="h-11 w-full max-w-80 rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+            />
             <ApplicantSorters
               sortField={sortField}
               sortDirection={sortDirection}
               onToggleSort={toggleSort}
               resetSort={resetSort}
             />
-
-            {/* Filter Dropdown */}
             <ApplicantFiltersComponent
               activeFilterCount={activeFilterCount}
               filters={filters}
@@ -298,18 +332,10 @@ export default function ApplicantFilterHeaders({
               updatePositionFilter={updatePositionFilter}
             />
           </div>
-
-          {/* search bar */}
-          <input
-            type="text"
-            placeholder="Search applicants"
-            value={searchTerm}
-            onChange={(e) => onSearch(e.target.value)}
-            className="border-gray h-10 w-full rounded-full border border-opacity-50 bg-inherit px-5 text-black focus:outline-none dark:text-white md:w-80"
-          />
         </div>
       </div>
 
+      {/* Filter badges */}
       <ApplicantFiltersBadge
         filters={filters}
         setFilter={setFilters}

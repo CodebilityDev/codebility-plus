@@ -9,17 +9,17 @@ import {
   getFormItemLabels,
 } from "@/app/home/clients/_lib/schema";
 import { createClientAction, fetchCountry } from "@/app/home/clients/action";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@codevs/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
-} from "@/Components/ui/dialog";
+  DialogTitle,
+} from "@codevs/ui/dialog";
 import { useModal } from "@/hooks/use-modal-clients";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { DialogTitle } from "@radix-ui/react-dialog";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
@@ -146,13 +146,13 @@ export default function ClientAddModal() {
   };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
+    <Dialog open={isModalOpen} onOpenChange={handleDialogChange} modal={true}>
       <DialogContent
         aria-describedby={undefined}
-        className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl">Add New Company</DialogTitle>
+          <DialogTitle className="text-gray-900 dark:text-gray-100 text-2xl">Add New Company</DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -162,7 +162,7 @@ export default function ClientAddModal() {
           >
             <div className="flex flex-col gap-4">
               <div className="flex justify-center md:justify-start">
-                <label className="md:text-md text-sm lg:text-lg">Logo</label>
+                <label className="text-gray-900 dark:text-gray-100 md:text-md text-sm lg:text-lg">Logo</label>
               </div>
               <div className="flex flex-col gap-4 md:flex-row">
                 <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
@@ -179,13 +179,13 @@ export default function ClientAddModal() {
                 </div>
 
                 <div className="flex flex-col justify-center gap-2">
-                  <p className="text-md text-gray text-center">
+                  <p className="text-md text-gray-600 dark:text-gray-400 text-center">
                     Image size 1080 x 768 px
                   </p>
                   <div className="gap-4">
                     {!logoPreview && (
                       <label htmlFor="company_logo">
-                        <p className="cursor-pointer text-center text-blue-100 md:text-left">
+                        <p className="cursor-pointer text-center text-blue-600 dark:text-blue-400 md:text-left">
                           Upload Image
                         </p>
                       </label>
@@ -201,7 +201,7 @@ export default function ClientAddModal() {
                     {logoPreview && (
                       <p
                         onClick={handleRemoveLogo}
-                        className="text-violet cursor-pointer text-center md:text-left"
+                        className="text-red-600 dark:text-red-400 cursor-pointer text-center md:text-left"
                       >
                         Remove Image
                       </p>
@@ -228,23 +228,23 @@ export default function ClientAddModal() {
                     name={formDefaultValue as keyof ClientFormValues}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{labelText}</FormLabel>
+                        <FormLabel className="text-gray-900 dark:text-gray-100">{labelText}</FormLabel>
                         <FormControl>
                           {options ? (
                             <Select
                               onValueChange={field.onChange}
                               defaultValue={String(field.value) ?? ""}
                             >
-                              <SelectTrigger className="focus:ring-inherit">
-                                <SelectValue placeholder={placeHolderText}>
+                              <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-inherit">
+                                <SelectValue placeholder={placeHolderText} className="text-gray-900 dark:text-gray-100">
                                   {options.find(
                                     (opt) => opt.value === field.value,
                                   )?.label || placeHolderText}
                                 </SelectValue>
                               </SelectTrigger>
-                              <SelectContent className="background-lightbox_darkbox">
+                              <SelectContent className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
                                 {options.map(({ value, label }) => (
-                                  <SelectItem key={value} value={value}>
+                                  <SelectItem key={value} value={value} className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">
                                     {label}
                                   </SelectItem>
                                 ))}
@@ -256,7 +256,7 @@ export default function ClientAddModal() {
                               type={inputType}
                               {...field}
                               value={field.value as string}
-                              className={`${
+                              className={`bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400 ${
                                 form.formState.errors[
                                   formDefaultValue as keyof ClientFormValues
                                 ]
@@ -276,8 +276,8 @@ export default function ClientAddModal() {
             <DialogFooter className="mt-8 flex flex-col gap-2 lg:flex-row">
               <Button
                 type="button"
-                variant="hollow"
-                className="order-2 w-full sm:order-1 sm:w-[130px]"
+                variant="outline"
+                className="order-2 w-full sm:order-1 sm:w-[130px] bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                 onClick={() => handleDialogChange(false)}
                 disabled={isLoading}
               >
@@ -285,7 +285,7 @@ export default function ClientAddModal() {
               </Button>
               <Button
                 type="submit"
-                className="order-1 w-full sm:order-2 sm:w-[130px]"
+                className="order-1 w-full sm:order-2 sm:w-[130px] bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700"
                 disabled={isLoading || !form.formState.isValid}
               >
                 Save

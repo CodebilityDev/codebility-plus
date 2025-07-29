@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import pathsConfig from "@/config/paths.config";
 import { SignInValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
