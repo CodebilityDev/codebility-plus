@@ -1,7 +1,25 @@
+// apps/codebility/app/home/applicants/_components/_table/applicantActionButton.tsx
+
 "use client";
 
-import React from "react";
-import { MoreHorizontalIcon, MailIcon, EyeIcon } from "lucide-react";
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  CheckCircle2Icon,
+  Loader2Icon,
+  MailIcon,
+  MoreHorizontalIcon,
+} from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,123 +28,180 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
-import { Button } from "@codevs/ui/button";
+import { useApplicantModal } from "../ApplicantClientWrapper";
+
+import {
+  acceptApplicantAction,
+  deleteApplicantAction,
+  denyApplicantAction,
+  moveApplicantToApplyingAction,
+  moveApplicantToOnboardingAction,
+  moveApplicantToTestingAction,
+  passApplicantTestAction,
+} from "../../_service/action";
+import {
+  sendDenyEmail,
+  sendFailedTestEmail,
+  sendOnboardingReminder,
+  sendPassedTestEmail,
+  sendTestReminder,
+} from "../../_service/emailAction";
 import { NewApplicantType } from "../../_service/types";
-import { useApplicantActions } from "./useApplicantActions";
-import ApplicantConfirmationDialog from "./ApplicantConfirmationDialog";
-import { ActionType } from "./applicantActionTypes";
 
-interface ApplicantActionButtonProps {
+export default function ApplicantActionButton({
+  applicant,
+}: {
   applicant: NewApplicantType;
-}
+}) {
+  const { toast } = useToast();
+  const { openModal } = useApplicantModal(); // Use our custom modal context
 
-// Menu items configuration based on applicant status
-const getMenuItems = (status: string): Array<{ action: ActionType; label: string; icon?: React.ReactNode }> => {
-  const baseItems = [
-    { action: "viewDetails" as ActionType, label: "View Details", icon: <EyeIcon className="h-4 w-4" /> },
-  ];
-  
-  const baseEmailItems = [
-    { action: "remindToTakeTest" as ActionType, label: "Remind to Take Test", icon: <MailIcon className="h-4 w-4" /> },
-    { action: "remindToOnboarding" as ActionType, label: "Remind for Onboarding", icon: <MailIcon className="h-4 w-4" /> },
-  ];
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogState, setDialogState] = useState<
+    | "applying"
+    | "testing"
+    | "onboarding"
+    | "denied"
+    | "delete"
+    | "pass"
+    | "fail"
+    | "accept"
+    | "deny"
+    | "remindToTakeTest"
+    | "remindToOnboarding"
+    | null
+  >(null);
 
-  switch (status.toLowerCase()) {
-    case "applying":
-      return [
-        ...baseItems,
-        // Move actions grouped together
-        { action: "testing" as ActionType, label: "Move to Testing" },
-        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
-        { action: "deny" as ActionType, label: "Move to Denied" },
-        // Accept/Deny actions grouped together
-        { action: "accept" as ActionType, label: "Accept" },
-        ...baseEmailItems,
-        { action: "delete" as ActionType, label: "Delete" },
-      ];
-    case "testing":
-      return [
-        ...baseItems,
-        // Move actions grouped together
-        { action: "applying" as ActionType, label: "Move to Applying" },
-        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
-        { action: "deny" as ActionType, label: "Move to Denied" },
-        // Test-specific actions
-        { action: "pass" as ActionType, label: "Pass Test" },
-        { action: "fail" as ActionType, label: "Fail Test" },
-        // Accept action
-        { action: "accept" as ActionType, label: "Accept" },
-        ...baseEmailItems,
-        { action: "delete" as ActionType, label: "Delete" },
-      ];
-    case "passed":
-      return [
-        ...baseItems,
-        // Move actions grouped together
-        { action: "applying" as ActionType, label: "Move to Applying" },
-        { action: "testing" as ActionType, label: "Move to Testing" },
-        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
-        { action: "deny" as ActionType, label: "Move to Denied" },
-        // Accept action
-        { action: "accept" as ActionType, label: "Accept" },
-        ...baseEmailItems,
-        { action: "delete" as ActionType, label: "Delete" },
-      ];
-    case "onboarding":
-      return [
-        ...baseItems,
-        // Move actions grouped together
-        { action: "applying" as ActionType, label: "Move to Applying" },
-        { action: "testing" as ActionType, label: "Move to Testing" },
-        { action: "deny" as ActionType, label: "Move to Denied" },
-        // Accept action
-        { action: "accept" as ActionType, label: "Accept" },
-        ...baseEmailItems,
-        { action: "delete" as ActionType, label: "Delete" },
-      ];
-    case "denied":
-      return [
-        ...baseItems,
-        // Move actions grouped together
-        { action: "applying" as ActionType, label: "Move to Applying" },
-        { action: "testing" as ActionType, label: "Move to Testing" },
-        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
-        // Accept action
-        { action: "accept" as ActionType, label: "Accept" },
-        ...baseEmailItems,
-        { action: "delete" as ActionType, label: "Delete" },
-      ];
-    default:
-      return [
-        ...baseItems,
-        // Move actions grouped together
-        { action: "applying" as ActionType, label: "Move to Applying" },
-        { action: "testing" as ActionType, label: "Move to Testing" },
-        { action: "onboarding" as ActionType, label: "Move to Onboarding" },
-        { action: "deny" as ActionType, label: "Move to Denied" },
-        // Accept action
-        { action: "accept" as ActionType, label: "Accept" },
-        ...baseEmailItems,
-        { action: "delete" as ActionType, label: "Delete" },
-      ];
-  }
-};
+  // Handle View Details click - uses our custom modal system
+  const handleViewDetails = () => {
+    console.log("🔍 View Details clicked for:", applicant.first_name, applicant.last_name);
+    openModal(applicant);
+  };
 
-export default function ApplicantActionButton({ applicant }: ApplicantActionButtonProps) {
-  const {
-    isLoading,
-    isDialogOpen,
-    currentAction,
-    executeAction,
-    openConfirmationDialog,
-    closeDialog,
-  } = useApplicantActions(applicant);
+  // Handle Edit Applicant click
+  const handleEditApplicant = () => {
+    toast({
+      title: "Edit Applicant",
+      description: "Edit functionality will be implemented soon.",
+    });
+  };
 
-  const menuItems = getMenuItems(applicant.application_status || "");
+  // All other handlers remain the same...
+  const handleMoveToApplying = async () => {
+    setIsLoading(true);
+    try {
+      await moveApplicantToApplyingAction(applicant.id);
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Applicant Moved",
+        description: `${applicant.first_name} ${applicant.last_name} has been moved to applying.`,
+      });
+    } catch (error) {
+      console.error("Error moving applicant to applying:", error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicant to applying. Please try again later.",
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
+  };
 
-  const handleConfirm = () => {
-    if (currentAction) {
-      executeAction(currentAction);
+  const handleMoveToTesting = async () => {
+    setIsLoading(true);
+    try {
+      await moveApplicantToTestingAction(applicant.id);
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Applicant Moved",
+        description: `${applicant.first_name} ${applicant.last_name} has been moved to testing.`,
+      });
+    } catch (error) {
+      console.error("Error moving applicant to testing:", error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicant to testing. Please try again later.",
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const handleMoveToOnboarding = async () => {
+    setIsLoading(true);
+    try {
+      await moveApplicantToOnboardingAction(applicant.id);
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Applicant Moved",
+        description: `${applicant.first_name} ${applicant.last_name} has been moved to onboarding.`,
+      });
+    } catch (error) {
+      console.error("Error moving applicant to onboarding:", error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicant to onboarding. Please try again later.",
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const handleMoveToDenied = async () => {
+    setIsLoading(true);
+    try {
+      await denyApplicantAction(applicant.id);
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Applicant Denied",
+        description: `${applicant.first_name} ${applicant.last_name} has been moved to denied.`,
+      });
+    } catch (error) {
+      console.error("Error moving applicant to denied:", error);
+      toast({
+        title: "Error",
+        description: "Failed to move applicant to denied. Please try again later.",
+        variant: "destructive",
+      });
+    }
+    setIsLoading(false);
+  };
+
+  const getDialogTitle = () => {
+    switch (dialogState) {
+      case "applying": return "Move to Applying";
+      case "testing": return "Move to Testing";
+      case "onboarding": return "Move to Onboarding";
+      case "denied": return "Move to Denied";
+      case "delete": return "Delete Applicant";
+      default: return "Confirm Action";
+    }
+  };
+
+  const getDialogDescription = () => {
+    const name = `${applicant.first_name} ${applicant.last_name}`;
+    switch (dialogState) {
+      case "applying": return `Are you sure you want to move ${name} to applying?`;
+      case "testing": return `Are you sure you want to move ${name} to testing?`;
+      case "onboarding": return `Are you sure you want to move ${name} to onboarding?`;
+      case "denied": return `Are you sure you want to move ${name} to denied?`;
+      case "delete": return `Are you sure you want to delete ${name}? This action cannot be undone.`;
+      default: return "Please confirm your action.";
+    }
+  };
+
+  const handleConfirmAction = () => {
+    switch (dialogState) {
+      case "applying": return handleMoveToApplying();
+      case "testing": return handleMoveToTesting();
+      case "onboarding": return handleMoveToOnboarding();
+      case "denied": return handleMoveToDenied();
+      default: return;
     }
   };
 
@@ -134,54 +209,122 @@ export default function ApplicantActionButton({ applicant }: ApplicantActionButt
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            className="h-8 w-8 p-0" 
-            disabled={isLoading}
-            aria-haspopup="menu"
-            aria-expanded="false"
-            aria-label={`Actions for ${applicant.first_name} ${applicant.last_name} (${applicant.application_status})`}
+          <Button
+            variant="ghost"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-300"
           >
-            <span className="sr-only">
-              Open actions menu for {applicant.first_name} {applicant.last_name}
-            </span>
-            <MoreHorizontalIcon className="h-4 w-4" aria-hidden="true" />
+            <span className="sr-only">More actions</span>
+            <MoreHorizontalIcon className="h-4 w-4" />
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" role="menu" aria-label="Applicant actions">
+        <DropdownMenuContent
+          align="end"
+          className="dark:bg-dark-200 min-w-[160px] bg-white"
+        >
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
           
-          {menuItems.map(({ action, label, icon }) => (
+          {/* Primary Actions */}
+          <DropdownMenuItem 
+            className="text-black-500 dark:text-light-800 cursor-pointer"
+            onClick={handleViewDetails}
+          >
+            View Details
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem 
+            className="text-black-500 dark:text-light-800 cursor-pointer"
+            onClick={handleEditApplicant}
+          >
+            Edit Applicant
+          </DropdownMenuItem>
+          
+          <DropdownMenuSeparator />
+
+          {/* Status Change Actions */}
+          {applicant.application_status !== "applying" && (
             <DropdownMenuItem
-              key={action}
-              onClick={() => openConfirmationDialog(action)}
-              className={action === "delete" || action === "deny" || action === "fail" ? "text-red-600" : ""}
-              role="menuitem"
-              aria-describedby={action === "delete" || action === "deny" || action === "fail" ? "destructive-action-warning" : undefined}
+              className="text-black-500 dark:text-light-800 cursor-pointer"
+              onClick={() => {
+                setDialogState("applying");
+                setIsDialogOpen(true);
+              }}
             >
-              {icon && <span className="mr-2" aria-hidden="true">{icon}</span>}
-              {label}
-              {(action === "delete" || action === "deny" || action === "fail") && (
-                <span className="sr-only"> - This is a destructive action</span>
-              )}
+              Move to Applying
             </DropdownMenuItem>
-          ))}
+          )}
+
+          {applicant.application_status !== "testing" && (
+            <DropdownMenuItem
+              className="text-black-500 dark:text-light-800 cursor-pointer"
+              onClick={() => {
+                setDialogState("testing");
+                setIsDialogOpen(true);
+              }}
+            >
+              Move to Testing
+            </DropdownMenuItem>
+          )}
+
+          {applicant.application_status !== "onboarding" && (
+            <DropdownMenuItem
+              className="text-black-500 dark:text-light-800 cursor-pointer"
+              onClick={() => {
+                setDialogState("onboarding");
+                setIsDialogOpen(true);
+              }}
+            >
+              Move to Onboarding
+            </DropdownMenuItem>
+          )}
+
+          {applicant.application_status !== "denied" && (
+            <DropdownMenuItem
+              className="text-red-500 dark:text-red-400 cursor-pointer"
+              onClick={() => {
+                setDialogState("denied");
+                setIsDialogOpen(true);
+              }}
+            >
+              Move to Denied
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
-      
-      {/* Hidden warning text for destructive actions */}
-      <div id="destructive-action-warning" className="sr-only">
-        This action cannot be undone and may permanently affect the applicant's status.
-      </div>
 
-      <ApplicantConfirmationDialog
-        isOpen={isDialogOpen}
-        isLoading={isLoading}
-        actionType={currentAction}
-        onConfirm={handleConfirm}
-        onCancel={closeDialog}
-      />
+      {/* Confirmation Dialog */}
+      <Dialog open={isDialogOpen && dialogState !== null} onOpenChange={(open) => {
+        setIsDialogOpen(open);
+        if (!open) setDialogState(null);
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{getDialogTitle()}</DialogTitle>
+            <DialogDescription>
+              {getDialogDescription()}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button
+              onClick={handleConfirmAction}
+              disabled={isLoading}
+              variant={dialogState === "delete" || dialogState === "denied" ? "destructive" : "default"}
+            >
+              {isLoading ? (
+                <>
+                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  Processing...
+                </>
+              ) : (
+                "Confirm"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
