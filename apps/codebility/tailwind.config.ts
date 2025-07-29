@@ -245,6 +245,10 @@ const config: Config = {
         "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
         floatY: "floatY 6s ease-in-out infinite",
       },
+      perspective: {
+        800: "800px",
+        1000: "1000px",
+      },
     },
   },
   plugins: [

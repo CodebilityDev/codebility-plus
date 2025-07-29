@@ -1,12 +1,19 @@
 "use client";
-import { useEffect, useRef } from "react";
-import { motion, useMotionValue, useTransform, animate } from "framer-motion";
+
+import { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useTransform } from "framer-motion";
 
 export function BubbleBackground() {
+  const [windowSize, setWindowSize] = useState({ width: 1000, height: 800 });
+
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+
     const handleMouseMove = (e: MouseEvent) => {
       mouseX.set(e.clientX);
       mouseY.set(e.clientY);
@@ -18,14 +25,13 @@ export function BubbleBackground() {
 
   return (
     <div className="pointer-events-none absolute inset-0 z-0 overflow-hidden rounded-3xl">
-      {/* Big Blurry Bubbles with Parallax */}
-      {[...Array(8)].map((_, i) => {
+      {[...Array(4)].map((_, i) => {
         const size = Math.floor(Math.random() * 80) + 100;
         const top = Math.random() * 100;
         const left = Math.random() * 100;
 
-        const x = useTransform(mouseX, [0, window.innerWidth], [-10, 10]);
-        const y = useTransform(mouseY, [0, window.innerHeight], [-10, 10]);
+        const x = useTransform(mouseX, [0, windowSize.width], [-10, 10]);
+        const y = useTransform(mouseY, [0, windowSize.height], [-10, 10]);
 
         return (
           <motion.div
@@ -44,8 +50,7 @@ export function BubbleBackground() {
         );
       })}
 
-      {/* Small Floaty Bubbles (Tailwind only) */}
-      {[...Array(18)].map((_, i) => {
+      {[...Array(8)].map((_, i) => {
         const isOutline = i % 3 === 0;
         const size = Math.floor(Math.random() * 20) + 10;
         const top = Math.random() * 100;
@@ -60,7 +65,7 @@ export function BubbleBackground() {
         return (
           <div
             key={`float-${i}`}
-            className={`absolute rounded-full ${className} opacity-[0.14] blur-[1px] animate-floatY`}
+            className={`absolute rounded-full ${className} animate-floatY opacity-[0.14] blur-[1px]`}
             style={{
               width: `${size}px`,
               height: `${size}px`,
@@ -73,8 +78,7 @@ export function BubbleBackground() {
         );
       })}
 
-      {/* Sparkle Bubbles */}
-      {[...Array(5)].map((_, i) => {
+      {[...Array(3)].map((_, i) => {
         const size = Math.floor(Math.random() * 4) + 2;
         const top = Math.random() * 100;
         const left = Math.random() * 100;
