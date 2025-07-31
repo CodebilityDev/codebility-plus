@@ -453,7 +453,8 @@ export default function PublicNdaSigningPage() {
                 <Input
                   id="first_name"
                   {...register("first_name")}
-                  className="mt-1 border-gray-700 bg-gray-800 text-dark-500"
+                  placeholder="Enter your first name"
+                  className="mt-1 border border-gray-500 bg-gray-800 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
                 {errors.first_name && (
                   <p className="mt-1 text-sm text-red-500">
@@ -469,7 +470,8 @@ export default function PublicNdaSigningPage() {
                 <Input
                   id="last_name"
                   {...register("last_name")}
-                  className="mt-1 border-gray-700 bg-gray-800 text-dark-500"
+                  placeholder="Enter your last name"
+                  className="mt-1 border border-gray-500 bg-gray-800 text-white placeholder:text-gray-400 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                 />
                 {errors.last_name && (
                   <p className="mt-1 text-sm text-red-500">

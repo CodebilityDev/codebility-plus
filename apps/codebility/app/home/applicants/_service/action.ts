@@ -39,7 +39,7 @@ export async function deleteApplicantAction(applicant: NewApplicantType) {
         }
 
         //revalidate the cache
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error deleting applicant:", error);
         throw new Error("Failed to delete applicant");
@@ -88,7 +88,7 @@ export async function multipleDeleteApplicantAction(applicant: NewApplicantType[
             throw new Error("Failed to delete applicants from auth");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error deleting applicants:", error);
         throw new Error("Failed to delete applicants");
@@ -113,7 +113,7 @@ export async function passApplicantTestAction(applicantId: string) {
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error passing applicant test:", error);
         throw new Error("Failed to pass applicant test");
@@ -160,7 +160,7 @@ export async function denyApplicantAction(applicantId: string) {
             throw new Error("Failed to update rejected_count in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error rejecting applicant test:", error);
         throw new Error("Failed to reject applicant test");
@@ -185,7 +185,7 @@ export async function multiplePassApplicantTestAction(applicantIds: string[]) {
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error passing multiple applicants test:", error);
         throw new Error("Failed to pass multiple applicants test");
@@ -240,7 +240,7 @@ export async function multipleDenyApplicantAction(applicantIds: string[]) {
             throw new Error("Failed to update rejected_count for multiple applicants");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error rejecting multiple applicants test:", error);
         throw new Error("Failed to reject multiple applicants test");
@@ -267,7 +267,7 @@ export async function acceptApplicantAction(applicantId: string) {
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error accepting applicant test:", error);
         throw new Error("Failed to accept applicant test");
@@ -294,7 +294,7 @@ export async function multipleAcceptApplicantAction(applicantIds: string[]) {
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error accepting multiple applicants test:", error);
         throw new Error("Failed to accept multiple applicants test");
@@ -333,7 +333,7 @@ export async function moveApplicantToApplyingAction(applicantId: string) {
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
 
     } catch (error) {
         console.error("Error moving applicant to applying:", error);
@@ -373,7 +373,7 @@ export async function multipleMoveApplicantToApplyingAction(applicantIds: string
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error moving multiple applicants to applying:", error);
         throw new Error("Failed to move multiple applicants to applying");
@@ -412,7 +412,7 @@ export async function moveApplicantToTestingAction(applicantId: string) {
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error moving applicant to testing:", error);
         throw new Error("Failed to move applicant to testing");
@@ -451,7 +451,7 @@ export async function multipleMoveApplicantToTestingAction(applicantIds: string[
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error moving multiple applicants to testing:", error);
         throw new Error("Failed to move multiple applicants to testing");
@@ -476,7 +476,7 @@ export async function moveApplicantToOnboardingAction(applicantId: string) {
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error moving applicant to onboarding:", error);
         throw new Error("Failed to move applicant to onboarding");
@@ -501,7 +501,7 @@ export async function multipleMoveApplicantToOnboardingAction(applicantIds: stri
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/new-applicants");
+        revalidatePath("/home/applicants");
     } catch (error) {
         console.error("Error moving multiple applicants to onboarding:", error);
         throw new Error("Failed to move multiple applicants to onboarding");

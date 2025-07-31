@@ -48,23 +48,23 @@ export default function DashboardPage() {
           </div>
           
           {/* Quick stats bar */}
-          <div className="flex gap-4 mt-4 overflow-x-auto pb-2">
-            <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-lg px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="flex flex-wrap gap-2 sm:gap-4 mt-4">
+            <div className="bg-white dark:bg-gray-800 rounded-lg px-3 sm:px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-gray-900 dark:text-gray-100">Active Today</span>
+                <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100">Active Today</span>
               </div>
             </div>
-            <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-lg px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg px-3 sm:px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">🔥 Streak:</span>
-                <span className="text-sm font-bold text-orange-500">7 days</span>
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">🔥 Streak:</span>
+                <span className="text-xs sm:text-sm font-bold text-orange-500">7 days</span>
               </div>
             </div>
-            <div className="flex-shrink-0 bg-white dark:bg-gray-800 rounded-lg px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-lg px-3 sm:px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
-                <span className="text-sm text-gray-600 dark:text-gray-400">🎯 Goal:</span>
-                <span className="text-sm font-bold text-blue-500">50 points this week</span>
+                <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">🎯 Goal:</span>
+                <span className="text-xs sm:text-sm font-bold text-blue-500">50 points this week</span>
               </div>
             </div>
           </div>
