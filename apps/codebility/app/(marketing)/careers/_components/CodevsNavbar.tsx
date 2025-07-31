@@ -14,6 +14,7 @@ import {
   Sheet,
   SheetContent,
   SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@codevs/ui/sheet";
 
@@ -102,6 +103,7 @@ const Navbar = () => {
             </Button>
           </SheetTrigger>
           <SheetContent className="bg-dark-100 border-r border-zinc-800 text-white">
+            <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
             <SheetHeader className="flex flex-col items-start gap-6">
               <div className="border-darkgray w-full border-b pb-6">
                 <Link

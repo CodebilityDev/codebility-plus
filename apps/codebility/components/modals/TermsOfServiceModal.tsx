@@ -1,7 +1,7 @@
 import React from "react";
 import { useModal } from "@/hooks/use-modal";
 
-import { Dialog, DialogContent } from "@codevs/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@codevs/ui/dialog";
 
 function TermsOfServiceModal() {
   const { isOpen, onClose, type } = useModal();
@@ -11,6 +11,7 @@ function TermsOfServiceModal() {
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="h-4/5 w-full overflow-scroll">
+        <DialogTitle className="sr-only">Terms of Service</DialogTitle>
         <div className="flex flex-col gap-8 py-10">
           <h1 className="text-center text-3xl">Terms of Service</h1>
           <p>Welcome to Codebility!</p>

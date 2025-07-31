@@ -101,8 +101,8 @@ const MobileDrawer = ({
       side="left"
       className="bg-black-900 flex h-full w-full flex-col justify-start border-none bg-stone-900 pt-20 text-white"
     >
-      <SheetTitle className="hidden">Mobile Navbar</SheetTitle>
-      <SheetDescription className="hidden">
+      <SheetTitle className="sr-only">Mobile Navbar</SheetTitle>
+      <SheetDescription className="sr-only">
         Navbar that contains links
       </SheetDescription>
       {NAV_ITEMS.map((item) => {
