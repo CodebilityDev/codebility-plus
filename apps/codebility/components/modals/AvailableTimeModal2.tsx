@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { ScheduleType, useSchedule } from "@/hooks/use-timeavail";
 
-import { Dialog, DialogContent } from "@codevs/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@codevs/ui/dialog";
 
 const AvailableTimeModal = () => {
   const { isOpen, onClose, type } = useModal();
@@ -31,6 +31,7 @@ const AvailableTimeModal = () => {
       }}
     >
       <DialogContent className="bg-black-100 flex max-w-[36rem] flex-col gap-6 overflow-y-auto p-10 text-white">
+        <DialogTitle className="sr-only">Available Time</DialogTitle>
         <p className="text-md text-center font-normal md:text-lg lg:text-2xl">
           What is your available intern time with us?
         </p>

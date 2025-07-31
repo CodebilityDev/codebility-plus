@@ -75,10 +75,10 @@ export default function DashboardProfile() {
           {user && <DashboardCertificate />}
           <div className="relative mx-auto flex flex-col items-center gap-4">
             <div className="text-center">
-              <h2 className="mt-4 text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent md:mt-0">
-                Hello, {user?.first_name ?? ""}! 👋
+              <h2 className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent md:mt-0">
+                Hello, {user?.first_name ?? ""}!
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Ready to level up today?</p>
+              <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Ready to level up today?</p>
             </div>
 
             <div className="relative">
@@ -111,21 +111,22 @@ export default function DashboardProfile() {
           </div>
 
           {/* Enhanced status switch */}
-          <div className="absolute right-4 top-4 flex w-1/3 flex-col items-center justify-center gap-3 lg:flex-col-reverse xl:flex-col">
+          <div className="absolute right-2 top-2 sm:right-4 sm:top-4">
             {active !== null && (
-              <div className="ml-auto flex flex-col items-end gap-2">
+              <div className="flex flex-col items-end gap-1 sm:gap-2">
                 <Badge className={cn(
-                  "font-medium shadow-lg transition-all duration-300",
+                  "text-xs sm:text-sm font-medium transition-all duration-300 px-2 py-1",
                   active 
-                    ? "bg-gradient-to-r from-green-500 to-emerald-500 text-white shadow-green-500/25" 
-                    : "bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-red-500/25"
+                    ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400 border border-green-200 dark:border-green-800" 
+                    : "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400 border border-red-200 dark:border-red-800"
                 )}>
                   <div className="flex items-center gap-1">
                     <div className={cn(
-                      "h-2 w-2 rounded-full",
-                      active ? "bg-white animate-pulse" : "bg-white/70"
+                      "h-1.5 w-1.5 rounded-full",
+                      active ? "bg-green-600 dark:bg-green-400 animate-pulse" : "bg-red-600 dark:bg-red-400"
                     )} />
-                    {active ? "🟢 Active" : "🔴 Inactive"}
+                    <span className="hidden sm:inline">{active ? "Active" : "Inactive"}</span>
+                    <span className="sm:hidden">{active ? "On" : "Off"}</span>
                   </div>
                 </Badge>
 
@@ -135,7 +136,7 @@ export default function DashboardProfile() {
                   handleSwitch={handleStatusSwitch}
                 />
                 
-                <p className="text-xs text-gray-500 dark:text-gray-400 text-center">
+                <p className="hidden sm:block text-[10px] sm:text-xs text-gray-500 dark:text-gray-400 text-center max-w-[80px] leading-tight">
                   {active ? "Available for work" : "Away"}
                 </p>
               </div>

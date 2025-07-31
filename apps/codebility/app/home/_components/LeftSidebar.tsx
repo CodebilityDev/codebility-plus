@@ -70,12 +70,12 @@ const LeftSidebar = () => {
       initial={false}
       animate={isToggleOpen ? "open" : "closed"}
       variants={sidebarVariants}
-      className="background-navbar sticky left-0 top-0 z-20 hidden h-screen flex-col gap-8 overflow-hidden p-1 shadow-lg lg:flex"
+      className="background-navbar sticky left-0 top-0 z-20 hidden h-screen flex-col gap-4 overflow-hidden p-1 pt-4 shadow-lg lg:flex"
       role="complementary"
       aria-label="Main navigation sidebar"
     >
       {/* Logo and Toggle Button */}
-      <div className="mt-4 flex items-center justify-between">
+      <div className="flex items-center justify-between">
         <div className="flex w-full items-center">
           <Link href="/" className="flex-grow overflow-hidden">
             <AnimatePresence>
@@ -155,7 +155,11 @@ const LeftSidebar = () => {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
+<<<<<<< Updated upstream
                   className="ml-2 mt-4 text-sm uppercase text-gray-600 dark:text-white"
+=======
+                  className="ml-2 text-sm uppercase mt-2 text-gray-600 dark:text-white"
+>>>>>>> Stashed changes
                 >
                   {section.title}
                 </motion.h4>

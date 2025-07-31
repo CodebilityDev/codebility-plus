@@ -13,6 +13,8 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@codevs/ui/sheet";
 
@@ -201,7 +203,14 @@ const MobileNav = () => {
       <SheetContent
         side="left"
         className="overflow-y-auto border-r border-zinc-300 bg-[#0E0E0E] dark:border-zinc-800"
+        aria-describedby="mobile-nav-description"
       >
+        <SheetHeader>
+          <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+        </SheetHeader>
+        <div id="mobile-nav-description" className="sr-only">
+          Navigate through the application pages
+        </div>
         <Link href="/" className="flex items-center gap-1">
           <Image
             src="/assets/svgs/codebility-violet.svg"

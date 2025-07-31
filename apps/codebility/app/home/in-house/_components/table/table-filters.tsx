@@ -103,23 +103,170 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
   }, [supabase]);
 
   return (
-    <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 space-y-4 p-3 sm:p-4">
-      {/* Search - Full width on mobile */}
-      <div className="w-full sm:max-w-[300px]">
-        <Label className="dark:text-light-900 mb-2 block text-sm font-medium text-black">Search</Label>
+    <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 p-2 sm:p-3">
+      {/* Mobile Layout */}
+      <div className="block sm:hidden space-y-3">
+        {/* Search Bar */}
         <Input
-          placeholder="Search name, email..."
+          placeholder="🔍 Search name, email..."
           value={filters.search}
           onChange={(e) => onFilterChange("search", e.target.value)}
-          className="border-light-700 bg-light-800 dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-10 w-full rounded-md border px-3 text-black focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-9 w-full rounded-full border px-4 text-sm text-black shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
         />
+        
+        {/* Mobile Filters Grid */}
+        <div className="grid grid-cols-2 gap-2">
+          {renderMobileFilters()}
+        </div>
       </div>
       
-      {/* Filters - Responsive grid */}
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
+      {/* Desktop Layout */}
+      <div className="hidden sm:block space-y-3">
+        {/* Search - Full width on desktop */}
+        <div className="w-full sm:max-w-[300px]">
+          <Label className="dark:text-light-900 mb-1.5 block text-sm font-medium text-black">Search</Label>
+          <Input
+            placeholder="Search name, email..."
+            value={filters.search}
+            onChange={(e) => onFilterChange("search", e.target.value)}
+            className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-9 w-full rounded-md border px-3 text-sm text-black focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          />
+        </div>
+        
+        {/* Filters - Desktop grid */}
+        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
+          {renderFilters()}
+        </div>
+      </div>
+    </Card>
+  );
+  
+  function renderMobileFilters() {
+    return (
+      <>
         {/* Status Filter */}
-        <div className="space-y-2">
-          <Label className="dark:text-light-900 block text-sm font-medium text-black">Status</Label>
+        <Select
+          value={filters.status || "all"}
+          onValueChange={(val) =>
+            onFilterChange("status", val === "all" ? "" : val)
+          }
+        >
+          <SelectTrigger className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-8 w-full rounded-md border px-2 text-xs text-black">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent className="bg-light-800 dark:bg-dark-200">
+            <SelectItem value="all">All Statuses</SelectItem>
+            {Object.entries(INTERNAL_STATUS).map(([key, label]) => (
+              <SelectItem key={key} value={key}>
+                {label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Position Filter */}
+        <Select
+          value={filters.display_position || "all"}
+          onValueChange={(val) =>
+            onFilterChange("display_position", val === "all" ? "" : val)
+          }
+        >
+          <SelectTrigger className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-8 w-full rounded-md border px-2 text-xs text-black">
+            <SelectValue placeholder="Position" />
+          </SelectTrigger>
+          <SelectContent className="bg-light-800 dark:bg-dark-200">
+            <SelectItem value="all">All Positions</SelectItem>
+            {displayPositions.map((pos, i) => (
+              <SelectItem key={i} value={pos}>
+                {pos}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Project Filter */}
+        <Select
+          value={filters.project || "all"}
+          onValueChange={(val) =>
+            onFilterChange("project", val === "all" ? "" : val)
+          }
+        >
+          <SelectTrigger className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-8 w-full rounded-md border px-2 text-xs text-black">
+            <SelectValue placeholder="Project" />
+          </SelectTrigger>
+          <SelectContent className="bg-light-800 dark:bg-dark-200">
+            <SelectItem value="all">All Projects</SelectItem>
+            {projects.map((project) => (
+              <SelectItem key={project.id} value={project.id}>
+                {project.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* NDA Filter */}
+        <Select
+          value={filters.nda_status || "all"}
+          onValueChange={(val) =>
+            onFilterChange("nda_status", val === "all" ? "" : val)
+          }
+        >
+          <SelectTrigger className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-8 w-full rounded-md border px-2 text-xs text-black">
+            <SelectValue placeholder="NDA" />
+          </SelectTrigger>
+          <SelectContent className="bg-light-800 dark:bg-dark-200">
+            <SelectItem value="all">All NDA</SelectItem>
+            <SelectItem value="true">Signed</SelectItem>
+            <SelectItem value="false">Not Signed</SelectItem>
+          </SelectContent>
+        </Select>
+
+        {/* Role Filter */}
+        <Select
+          value={filters.role || "all"}
+          onValueChange={(val) =>
+            onFilterChange("role", val === "all" ? "" : val)
+          }
+        >
+          <SelectTrigger className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-8 w-full rounded-md border px-2 text-xs text-black">
+            <SelectValue placeholder="Role" />
+          </SelectTrigger>
+          <SelectContent className="bg-light-800 dark:bg-dark-200">
+            <SelectItem value="all">All Roles</SelectItem>
+            {roles.map((role) => (
+              <SelectItem key={role.id} value={String(role.id)}>
+                {role.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        {/* Availability Filter */}
+        <Select
+          value={filters.availability_status || "all"}
+          onValueChange={(val) =>
+            onFilterChange("availability_status", val === "all" ? "" : val)
+          }
+        >
+          <SelectTrigger className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-8 w-full rounded-md border px-2 text-xs text-black">
+            <SelectValue placeholder="Available" />
+          </SelectTrigger>
+          <SelectContent className="bg-light-800 dark:bg-dark-200">
+            <SelectItem value="all">All Status</SelectItem>
+            <SelectItem value="true">Active</SelectItem>
+            <SelectItem value="false">Inactive</SelectItem>
+          </SelectContent>
+        </Select>
+      </>
+    );
+  }
+  
+  function renderFilters() {
+    return (
+      <>
+        {/* Status Filter */}
+        <div>
+          <Label className="dark:text-light-900 mb-1.5 block text-xs font-medium text-black">Status</Label>
           <Select
             value={filters.status || "all"}
             onValueChange={(val) =>
@@ -128,12 +275,12 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           >
             <SelectTrigger
               className="
-                border-light-700 bg-light-800 dark:border-dark-200
+                border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-10 w-full
+                h-8 sm:h-9 w-full
                 rounded-md
-                border px-3
-                text-black
+                border px-2 sm:px-3
+                text-xs sm:text-sm text-black
               "
             >
               <SelectValue placeholder="Filter by status" />
@@ -150,8 +297,8 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         </div>
 
         {/* Display Position Filter */}
-        <div className="space-y-2">
-          <Label className="dark:text-light-900 block text-sm font-medium text-black">
+        <div className="min-w-[140px] sm:min-w-0">
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">
             Position
           </Label>
           <Select
@@ -162,12 +309,12 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           >
             <SelectTrigger
               className="
-                border-light-700 bg-light-800 dark:border-dark-200
+                border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-10 w-full
+                h-8 sm:h-9 w-full
                 rounded-md
-                border px-3
-                text-black
+                border px-2 sm:px-3
+                text-xs sm:text-sm text-black
               "
             >
               <SelectValue placeholder="Filter by display position" />
@@ -184,8 +331,8 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         </div>
 
         {/* Project Filter */}
-        <div className="space-y-2">
-          <Label className="dark:text-light-900 block text-sm font-medium text-black">Project</Label>
+        <div className="min-w-[140px] sm:min-w-0">
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">Project</Label>
           <Select
             value={filters.project || "all"}
             onValueChange={(val) =>
@@ -194,12 +341,12 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           >
             <SelectTrigger
               className="
-                border-light-700 bg-light-800 dark:border-dark-200
+                border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-10 w-full
+                h-8 sm:h-9 w-full
                 rounded-md
-                border px-3
-                text-black
+                border px-2 sm:px-3
+                text-xs sm:text-sm text-black
               "
             >
               <SelectValue placeholder="Filter by project" />
@@ -216,8 +363,8 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         </div>
 
         {/* NDA Status Filter */}
-        <div className="space-y-2">
-          <Label className="dark:text-light-900 block text-sm font-medium text-black">NDA</Label>
+        <div className="min-w-[120px] sm:min-w-0">
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">NDA</Label>
           <Select
             value={filters.nda_status || "all"}
             onValueChange={(val) =>
@@ -226,12 +373,12 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           >
             <SelectTrigger
               className="
-                border-light-700 bg-light-800 dark:border-dark-200
+                border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-10 w-full
+                h-8 sm:h-9 w-full
                 rounded-md
-                border px-3
-                text-black
+                border px-2 sm:px-3
+                text-xs sm:text-sm text-black
               "
             >
               <SelectValue placeholder="Filter by NDA status" />
@@ -245,8 +392,8 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         </div>
 
         {/* Role Filter */}
-        <div className="space-y-2">
-          <Label className="dark:text-light-900 block text-sm font-medium text-black">Role</Label>
+        <div className="min-w-[120px] sm:min-w-0">
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">Role</Label>
           <Select
             value={filters.role || "all"}
             onValueChange={(val) =>
@@ -255,12 +402,12 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           >
             <SelectTrigger
               className="
-                border-light-700 bg-light-800 dark:border-dark-200
+                border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-10 w-full
+                h-8 sm:h-9 w-full
                 rounded-md
-                border px-3
-                text-black
+                border px-2 sm:px-3
+                text-xs sm:text-sm text-black
               "
             >
               <SelectValue placeholder="Filter by role" />
@@ -276,8 +423,8 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           </Select>
         </div>
         {/* Availability Status Filter */}
-        <div className="space-y-2">
-          <Label className="dark:text-light-900 block text-sm font-medium text-black">
+        <div className="min-w-[130px] sm:min-w-0">
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">
             Available
           </Label>
           <Select
@@ -288,12 +435,12 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           >
             <SelectTrigger
               className="
-                border-light-700 bg-light-800 dark:border-dark-200
+                border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-10 w-full
+                h-8 sm:h-9 w-full
                 rounded-md
-                border px-3
-                text-black
+                border px-2 sm:px-3
+                text-xs sm:text-sm text-black
               "
             >
               <SelectValue placeholder="Filter by Availabiity Status" />
@@ -305,7 +452,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
             </SelectContent>
           </Select>
         </div>
-      </div>
-    </Card>
-  );
+      </>
+    );
+  }
 }

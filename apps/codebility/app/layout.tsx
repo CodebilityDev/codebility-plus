@@ -75,7 +75,7 @@ export default function RootLayout({
           }}
         /> */}
       </head>
-      <body>
+      <body suppressHydrationWarning>
         <ReactQueryProvider>
           <ThemeProvider
             attribute="class"

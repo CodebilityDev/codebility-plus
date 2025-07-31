@@ -19,12 +19,13 @@ import {
 
 import { StatusBadge } from "../shared/StatusBadge";
 import { TableActions } from "./TableActions";
+import { MobileEditableForm } from "./MobileEditableForm";
 
 interface InHouseMobileTableProps {
   data: Codev[];
   onDataChange: (updatedItem: Codev) => void;
   onDelete: (deletedId: string) => void;
-  onEdit: (id: string) => void;
+  onEdit?: (id: string) => void;
   roles: { id: number; name: string }[];
   handleSendNdaEmail: (
     codevId: string,
@@ -92,9 +93,23 @@ export function InHouseMobileTable({
   handleSendNdaEmail,
   handleDownloadNda,
 }: InHouseMobileTableProps) {
+  const [editingId, setEditingId] = useState<string | null>(null);
+
   return (
     <div className="block space-y-2 xl:hidden">
       {data.map((item) => (
+        editingId === item.id ? (
+          <MobileEditableForm
+            key={item.id}
+            data={item}
+            onSave={(updatedItem) => {
+              onDataChange(updatedItem);
+              setEditingId(null);
+            }}
+            onCancel={() => setEditingId(null)}
+            roles={roles}
+          />
+        ) : (
         <div
           key={item.id}
           className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 rounded-lg border p-3 shadow-sm"
@@ -125,7 +140,7 @@ export function InHouseMobileTable({
               <StatusBadge status={item.internal_status as InternalStatus} />
               <TableActions
                 item={item}
-                onEdit={() => onEdit(item.id)}
+                onEdit={() => setEditingId(item.id)}
                 onDelete={() => onDelete(item.id)}
               />
             </div>
@@ -247,6 +262,7 @@ export function InHouseMobileTable({
             </div>
           )}
         </div>
+        )
       ))}
     </div>
   );

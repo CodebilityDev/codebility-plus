@@ -14,6 +14,7 @@ import {
   Sheet,
   SheetContent,
   SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@codevs/ui/sheet";
 
@@ -101,8 +102,10 @@ const Navbar = () => {
               <MenuIcon className="text-gray-300" />
             </Button>
           </SheetTrigger>
-          <SheetContent className="bg-dark-100 border-r border-zinc-800 text-white">
+          <SheetContent className="bg-dark-100 border-r border-zinc-800 text-white" aria-describedby="mobile-nav-description">
             <SheetHeader className="flex flex-col items-start gap-6">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              <div id="mobile-nav-description" className="sr-only">Mobile navigation menu</div>
               <div className="border-darkgray w-full border-b pb-6">
                 <Link
                   href="/"
