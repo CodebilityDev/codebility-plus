@@ -155,11 +155,7 @@ const LeftSidebar = () => {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
-<<<<<<< Updated upstream
                   className="ml-2 mt-4 text-sm uppercase text-gray-600 dark:text-white"
-=======
-                  className="ml-2 text-sm uppercase mt-2 text-gray-600 dark:text-white"
->>>>>>> Stashed changes
                 >
                   {section.title}
                 </motion.h4>
