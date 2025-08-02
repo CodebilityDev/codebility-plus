@@ -84,7 +84,7 @@ const Navbar = () => {
           <Theme />
           <DropdownMenu modal={false}>
             <DropdownMenuTrigger 
-              className="flex items-center gap-4 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded-lg p-1"
+              className="flex items-center gap-4 focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:ring-offset-2 rounded-lg p-1"
               aria-haspopup="menu"
               aria-expanded="false"
               aria-label={`User menu for ${first_name} ${last_name}`}
@@ -95,7 +95,7 @@ const Navbar = () => {
                 </p>
                 <p className="text-dark100_light900 text-sm">{email_address}</p>
               </div>
-              <div className="from-violet relative size-[44px] rounded-full bg-gradient-to-b to-blue-500 p-[1.5px]">
+              <div className="from-customViolet-300 relative size-[44px] rounded-full bg-gradient-to-b to-customBlue-500 p-[1.5px]">
                 <Image
                   alt={`${first_name} ${last_name}'s profile picture`}
                   src={image_url || defaultAvatar}

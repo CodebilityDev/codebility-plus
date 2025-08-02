@@ -10,7 +10,7 @@ export default function AccountSettings2FA() {
           Add an extra layer of security to your account
         </p>
       </div>
-      <Button className="bg-blue-200 text-white duration-300 hover:bg-blue-300 ">
+      <Button className="bg-customBlue-200 text-white duration-300 hover:bg-customBlue-300 ">
         Enable 2FA
       </Button>
     </div>

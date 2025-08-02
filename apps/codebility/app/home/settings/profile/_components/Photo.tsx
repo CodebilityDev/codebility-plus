@@ -87,14 +87,14 @@ const Photo = ({ data }: PhotoProps) => {
             alt="Avatar"
             fill
             sizes="80px"
-            className="from-violet h-auto w-auto rounded-lg bg-gradient-to-b to-blue-500 bg-cover object-cover"
+            className="from-customViolet-100 h-auto w-auto rounded-lg bg-gradient-to-b to-customBlue-500 bg-cover object-cover"
           />
         </div>
         <div className="flex flex-col justify-center gap-2">
           <div className="flex flex-col justify-start gap-2">
             {avatar === defaultAvatar ? (
               <label htmlFor="image" className="cursor-pointer">
-                <p className="transition duration-300 hover:text-blue-100">
+                <p className="transition duration-300 hover:text-customBlue-100">
                   {isUploading ? "Uploading..." : "Upload Image"}
                 </p>
                 <input
@@ -111,7 +111,7 @@ const Photo = ({ data }: PhotoProps) => {
                 variant="link"
                 onClick={handleDeleteWarning}
                 disabled={isUploading}
-                className="cursor-pointer transition duration-300 hover:text-blue-100 hover:no-underline dark:text-white"
+                className="cursor-pointer transition duration-300 hover:text-customBlue-100 hover:no-underline dark:text-white"
               >
                 Remove Image
               </Button>

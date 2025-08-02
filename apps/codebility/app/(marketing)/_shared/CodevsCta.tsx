@@ -20,7 +20,7 @@ export default async function CTA() {
           
         />
         <H2 className="text-primaryColor capitalize">
-          Become A <span className="text-violet-300">Codev!</span>
+          Become A <span className="text-customViolet-300">Codev!</span>
         </H2>
 
         <Paragraph className="lg:max-w-auto z-10 mx-auto max-w-[550px]">

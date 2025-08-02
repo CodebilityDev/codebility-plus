@@ -104,7 +104,7 @@ const DashboardCurrentProject = () => {
       case "pending":
         return "text-white bg-orange-500/80";
       case "completed":
-        return "text-white bg-blue-500/80";
+        return "text-white bg-customBlue-500/80";
       case "active":
         return "text-white bg-green-500/80";
       default:
@@ -122,7 +122,7 @@ const DashboardCurrentProject = () => {
               key={involvement.project.id}
               projectId={involvement.project.id}
             >
-              <div className="p-[1px]-100 rounded-md bg-gradient-to-r from-purple-200 via-blue-50 to-sky-300 dark:from-purple-800 dark:via-blue-300 dark:to-sky-950  p-2 hover:shadow-lg hover:shadow-blue-500/50 dark:hover:shadow-blue-400/50">
+              <div className="p-[1px]-100 rounded-md bg-gradient-to-r from-purple-200 via-customBlue-50 to-sky-300 dark:from-purple-800 dark:via-customBlue-300 dark:to-sky-950  p-2 hover:shadow-lg hover:shadow-customBlue-500/50 dark:hover:shadow-customBlue-400/50">
                 <div className="flex items-center gap-2">
                   {involvement.project.main_image && (
                     <div className="h-8 w-8 overflow-hidden rounded bg-gray-100 dark:bg-gray-800">

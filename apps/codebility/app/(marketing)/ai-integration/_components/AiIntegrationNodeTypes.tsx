@@ -7,7 +7,7 @@ export const DevProcessCard = ({ data: { id, title, process } }: Props) => {
   return (
     <>
       <div className="m-2 flex flex-col gap-3 text-white">
-        <p className="flex h-12 w-12 items-center justify-center rounded-full bg-violet-100 text-2xl font-medium">
+        <p className="flex h-12 w-12 items-center justify-center rounded-full bg-customViolet-100 text-2xl font-medium">
           {id}
         </p>
         <h3 className="mt-5 text-xl font-semibold text-gray-900">{title}</h3>
@@ -60,7 +60,7 @@ export const PartnerCard = ({
 }: NodeProps<{ title: string; description: string }>) => {
   return (
     <div className="flex flex-col gap-3 rounded-lg bg-white/5 p-5 lg:w-96">
-      <h3 className="text-xl font-semibold text-violet-100">{title}</h3>
+      <h3 className="text-xl font-semibold text-customViolet-100">{title}</h3>
       <p className="text-base font-normal">{description}</p>
       <Handle type="target" position={Position.Top} id="top" />
       <Handle type="target" position={Position.Bottom} id="bottom" />

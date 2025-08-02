@@ -40,7 +40,7 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
       case "medium":
         return "bg-codeBlue text-black-100 dark:bg-codeBlue dark:text-black-100";
       case "low":
-        return "bg-green text-white dark:bg-green dark:text-white";
+        return "bg-green-500 text-white dark:bg-green-500 dark:text-white";
       default:
         return "bg-lightgray text-black-100 dark:bg-darkgray dark:text-white";
     }
@@ -49,9 +49,9 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
   const getDifficultyColor = (difficulty?: string) => {
     switch (difficulty?.toLowerCase()) {
       case "easy":
-        return "bg-blue-100 text-white dark:bg-blue-200 dark:text-white";
+        return "bg-customBlue-100 text-white dark:bg-customBlue-200 dark:text-white";
       case "medium":
-        return "bg-violet-100 text-white dark:bg-violet-200 dark:text-black-100";
+        return "bg-customViolet-100 text-white dark:bg-customViolet-200 dark:text-black-100";
       case "hard":
         return "bg-codePurple text-white dark:bg-codePurple dark:text-white";
       default:
@@ -104,14 +104,14 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
 
             {/* Points */}
             {task.points && (
-              <span className="bg-green dark:bg-green inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-white dark:text-white">
+              <span className="bg-green-500 dark:bg-green-500 inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-white dark:text-white">
                 {task.points} pts
               </span>
             )}
 
             {/* Type */}
             {task.type && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-white dark:bg-blue-200 dark:text-white">
+              <span className="inline-flex items-center rounded-full bg-customBlue-100 px-2 py-1 text-xs font-medium text-white dark:bg-customBlue-200 dark:text-white">
                 {task.type}
               </span>
             )}

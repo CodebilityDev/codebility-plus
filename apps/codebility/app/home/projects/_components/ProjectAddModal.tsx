@@ -302,7 +302,7 @@ const ProjectAddModal = () => {
       <div className="flex gap-2">
         <label
           htmlFor="image-upload"
-          className="cursor-pointer text-sm text-blue-600 hover:text-blue-800 dark:text-white dark:hover:text-blue-100"
+          className="cursor-pointer text-sm text-customBlue-600 hover:text-customBlue-800 dark:text-white dark:hover:text-customBlue-100"
         >
           Upload Image
         </label>

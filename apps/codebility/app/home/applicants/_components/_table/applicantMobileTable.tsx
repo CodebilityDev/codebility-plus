@@ -38,7 +38,7 @@ function ApplicantMobileTableComponent<TData extends NewApplicantType>({
                       applicant.applicant?.fork_url &&
                       "bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700",
                     applicant.application_status === "onboarding" &&
-                      "bg-blue-50 border-blue-300 dark:bg-blue-900/20 dark:border-blue-700",
+                      "bg-customBlue-50 border-customBlue-300 dark:bg-customBlue-900/20 dark:border-customBlue-700",
                     applicant.application_status === "denied" &&
                       "bg-red-50 border-red-300 dark:bg-red-900/20 dark:border-red-700",
                   )}
@@ -135,7 +135,7 @@ function ApplicantMobileTableComponent<TData extends NewApplicantType>({
                                 href={applicant.applicant.fork_url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300"
+                                className="text-customBlue-600 hover:text-customBlue-800 dark:text-customBlue-400 dark:hover:text-customBlue-300"
                               >
                                 <IconLink className="h-2.5 w-2.5" />
                               </Link>

@@ -248,7 +248,7 @@ const TaskEditModal = () => {
                 placeholder="Enter task title"
                 value={taskData.title}
                 onChange={(e) => handleInputChange("title", e.target.value)}
-                className="border-gray-300 focus:border-blue-500 dark:border-gray-700"
+                className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700"
                 required
               />
             </div>
@@ -280,7 +280,7 @@ const TaskEditModal = () => {
                 value={taskData.priority}
                 onValueChange={(value) => handleInputChange("priority", value)}
               >
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                <SelectTrigger className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -311,7 +311,7 @@ const TaskEditModal = () => {
                   handleInputChange("difficulty", value)
                 }
               >
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                <SelectTrigger className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
                 <SelectContent>
@@ -337,7 +337,7 @@ const TaskEditModal = () => {
                 value={taskData.type}
                 onValueChange={(value) => handleInputChange("type", value)}
               >
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                <SelectTrigger className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select task type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -366,7 +366,7 @@ const TaskEditModal = () => {
                 }
                 required
               >
-                <SelectTrigger className="border-gray-300 focus:border-blue-500 dark:border-gray-700">
+                <SelectTrigger className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
                   <SelectValue placeholder="Select skill category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -431,14 +431,14 @@ const TaskEditModal = () => {
               type="button"
               variant="outline"
               onClick={onClose}
-              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading}
             >
               {loading ? "Saving..." : "Save Changes"}

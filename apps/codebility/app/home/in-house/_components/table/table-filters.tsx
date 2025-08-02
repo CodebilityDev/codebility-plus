@@ -111,7 +111,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
           placeholder="🔍 Search name, email..."
           value={filters.search}
           onChange={(e) => onFilterChange("search", e.target.value)}
-          className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-9 w-full rounded-full border px-4 text-sm text-black shadow-sm focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+          className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-9 w-full rounded-full border px-4 text-sm text-black shadow-sm focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500"
         />
         
         {/* Mobile Filters Grid */}
@@ -129,7 +129,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
             placeholder="Search name, email..."
             value={filters.search}
             onChange={(e) => onFilterChange("search", e.target.value)}
-            className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-9 w-full rounded-md border px-3 text-sm text-black focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500"
+            className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-9 w-full rounded-md border px-3 text-sm text-black focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500"
           />
         </div>
         

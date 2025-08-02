@@ -420,7 +420,7 @@ export function EditableRow({
             size="sm"
             onClick={handleSave}
             disabled={isSubmitting || isUploading}
-            className="hover:bg-green dark:hover:bg-green bg-white text-white dark:bg-transparent"
+            className="hover:bg-green-500 dark:hover:bg-green-500 bg-white text-white dark:bg-transparent"
           >
             <Check className="text-black-100 h-4 w-4 dark:text-white" />
           </Button>

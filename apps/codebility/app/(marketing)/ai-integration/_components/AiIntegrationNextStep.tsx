@@ -36,7 +36,7 @@ const NextStep = () => {
         </p>
         <Link
           href="/bookacall"
-          className="w-max rounded-full bg-violet-100 px-6 py-2 text-base font-semibold text-white md:mx-auto lg:mx-0 lg:text-lg "
+          className="w-max rounded-full bg-customViolet-100 px-6 py-2 text-base font-semibold text-white md:mx-auto lg:mx-0 lg:text-lg "
         >
           Let{`'`}s Connect
         </Link>
