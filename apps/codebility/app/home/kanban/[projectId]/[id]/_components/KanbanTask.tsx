@@ -121,12 +121,10 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
   // Get task type color
   const getTaskTypeColor = useMemo(() => (type: string): string => {
     const typeColorMap: Record<string, string> = {
-      BUG: "bg-red-100 text-red-800 border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800",
-      FEATURE: "bg-green-600 text-black border-green-700 dark:bg-green-600 dark:text-white dark:border-green-700",
-      IMPROVEMENT:
-        "bg-orange-600 text-white border-orange-700 dark:bg-orange-600 dark:text-white dark:border-orange-700",
-      DOCUMENTATION:
-        "bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-800 dark:text-gray-200 dark:border-gray-600",
+      BUG: "bg-red-200 text-red-900 border-red-300 dark:bg-red-900/60 dark:text-red-200 dark:border-red-800",
+      FEATURE: "bg-blue-200 text-blue-900 border-blue-300 dark:bg-blue-900/60 dark:text-blue-200 dark:border-blue-800",
+      IMPROVEMENT: "bg-amber-200 text-amber-900 border-amber-300 dark:bg-amber-900/60 dark:text-amber-200 dark:border-amber-800",
+      DOCUMENTATION: "bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/50 dark:text-indigo-200 dark:border-indigo-800",
     };
 
     return (
@@ -185,7 +183,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
           <h3
             className="mr-2 line-clamp-2 flex-1 text-sm font-semibold 
             text-gray-900 transition-colors duration-200 group-hover:text-customBlue-600
-            dark:text-gray-100 dark:group-hover:text-customBlue-400 md:text-base"
+            dark:text-gray-100 dark:group-hover:text-customBlue-100 md:text-base"
           >
             {task.title}
           </h3>
@@ -196,7 +194,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
       task.priority === "critical"
         ? "bg-red-100 text-red-700 border border-red-200 dark:bg-red-900/40 dark:text-red-300 dark:border-red-800"
         : task.priority === "high"
-          ? "bg-red-600 text-white border border-red-700 dark:bg-red-600 dark:text-white dark:border-red-700"
+          ? "bg-red-600 text-white border border-red-700 dark:bg-red-800 dark:text-white dark:border-red-700"
           : task.priority === "medium"
             ? "bg-yellow-100 text-yellow-700 border border-yellow-200 dark:bg-yellow-900/40 dark:text-yellow-300 dark:border-yellow-800"
             : task.priority === "low"

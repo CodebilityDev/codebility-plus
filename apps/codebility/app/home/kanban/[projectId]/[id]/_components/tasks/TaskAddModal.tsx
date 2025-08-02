@@ -168,7 +168,7 @@ const TaskAddModal = () => {
 
           {data?.listName && (
             <div className="rounded-md bg-customBlue-50 p-2 dark:bg-customBlue-900/20">
-              <Label className="text-sm text-customBlue-700 dark:text-customBlue-300">
+              <Label className="text-sm text-customBlue-700 dark:text-customBlue-100">
                 Adding to: {data.listName}
               </Label>
             </div>

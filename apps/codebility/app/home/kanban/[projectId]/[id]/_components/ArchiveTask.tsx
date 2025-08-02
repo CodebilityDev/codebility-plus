@@ -159,7 +159,7 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
             <Button
               variant="outline"
               size="sm"
-              className="ml-4 flex items-center gap-1 border-red-100 text-red-100 hover:bg-red-100 hover:text-white dark:border-red-100 dark:text-red-100 dark:hover:bg-red-100 dark:hover:text-white"
+              className="ml-4 flex items-center gap-1 border-customRed-100 text-customRed-100 hover:bg-customRed-100 hover:text-white dark:border-customRed-100 dark:text-customRed-100 dark:hover:bg-customRed-100 dark:hover:text-white"
             >
               <DeleteIcon className="h-3 w-3" />
               Delete
@@ -180,7 +180,7 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleDeleteConfirm}
-                className="bg-red-100 text-white hover:bg-red-200 dark:bg-red-100 dark:text-white dark:hover:bg-red-200 border-none"
+                className="bg-customRed-100 text-white hover:bg-customRed-200 dark:bg-customRed-100 dark:text-white dark:hover:bg-customRed-200 border-none"
               >
                 Delete
               </AlertDialogAction>

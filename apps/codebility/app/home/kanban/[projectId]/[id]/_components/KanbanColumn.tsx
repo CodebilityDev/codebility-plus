@@ -215,7 +215,7 @@ export default function KanbanColumn({
             <>
               <GripVertical className="hidden h-5 w-5 text-gray-400 cursor-grab hover:text-gray-600 dark:hover:text-gray-300 md:block transition-colors" />
               <span className="text-base font-semibold text-gray-900 dark:text-white md:text-lg">{column.name}</span>
-              <div className="flex items-center justify-center rounded-full bg-customBlue-100 dark:bg-customBlue-900/30 px-3 py-1 text-sm font-medium text-customBlue-800 dark:text-customBlue-300">
+              <div className="flex items-center justify-center rounded-full bg-customBlue-100 dark:bg-customBlue-900/30 px-3 py-1 text-sm font-medium text-blue-100 dark:text-customBlue-100">
                 {safeTasks.length}
               </div>
             </>
