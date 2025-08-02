@@ -53,19 +53,6 @@ export default function ApplicantLists({
     [applicants],
   );
 
-  // Filter columns based on the current tab
-  const getColumnsForTab = (tab: string): ColumnDef<NewApplicantType>[] => {
-    // Columns to exclude from "applying" tab
-    const excludeFromApplying = ["test_taken", "test_time_remaining", "fork_url"];
-    
-    if (tab === "applying") {
-      return applicantsColumns.filter(col => !excludeFromApplying.includes(col.id || ""));
-    }
-    
-    // For all other tabs, show all columns
-    return applicantsColumns;
-  };
-
   return (
     <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
       <ApplicantFilterHeaders
@@ -118,25 +105,25 @@ export default function ApplicantLists({
         <TabsContent value="applying" className="mt-10 md:mt-4">
           <ApplicantDataTable
             data={applicantsApplying}
-            columns={getColumnsForTab("applying")}
+            columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="testing" className="mt-10 md:mt-4">
           <ApplicantDataTable
             data={applicantsTesting}
-            columns={getColumnsForTab("testing")}
+            columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="onboarding" className="mt-10 md:mt-4">
           <ApplicantDataTable
             data={applicantsOnboarding}
-            columns={getColumnsForTab("onboarding")}
+            columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="denied" className="mt-10 md:mt-4">
           <ApplicantDataTable
             data={applicantsDenied}
-            columns={getColumnsForTab("denied")}
+            columns={applicantsColumns}
           />
         </TabsContent>
       </Tabs>

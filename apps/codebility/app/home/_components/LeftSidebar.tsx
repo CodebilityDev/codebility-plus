@@ -70,7 +70,7 @@ const LeftSidebar = () => {
       initial={false}
       animate={isToggleOpen ? "open" : "closed"}
       variants={sidebarVariants}
-      className="background-navbar sticky left-0 top-0 z-20 hidden h-screen flex-col gap-4 overflow-hidden p-1 pt-4 shadow-lg lg:flex"
+      className="background-navbar fixed left-0 top-0 z-20 hidden h-screen flex-col gap-4 overflow-hidden p-1 pt-4 shadow-lg lg:flex"
       role="complementary"
       aria-label="Main navigation sidebar"
     >

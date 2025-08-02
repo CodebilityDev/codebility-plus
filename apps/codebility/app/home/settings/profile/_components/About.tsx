@@ -81,21 +81,17 @@ const About = ({ data }: AboutProps) => {
 
             <div>
               <Textarea
-                variant="resume"
-                placeholder="Write something about yourself..."
-                id="about_me"
-                {...register("about")}
-                disabled={!isEditMode}
-                value={watch("about") || ""}
-                className={`placeholder-${
-                  !isEditMode
-                    ? "lightgray dark:placeholder-gray"
-                    : "black-100 dark:placeholder-gray-400"
-                } ${
-                  isEditMode
-                    ? "border-lightgray text-black-100 dark:bg-dark-200 border bg-white dark:border-zinc-700 dark:text-white"
-                    : "text-dark-200 dark:bg-dark-200 dark:text-gray border-none bg-white"
-                }`}
+              variant="resume"
+              placeholder="Write something about yourself..."
+              id="about_me"
+              {...register("about")}
+              disabled={!isEditMode}
+              value={watch("about") || ""}
+              className={`placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
+                isEditMode
+                ? "border-lightgray text-black dark:text-white bg-white dark:bg-dark-200 border dark:border-zinc-700"
+                : "text-gray-500 dark:text-gray-400 bg-white dark:bg-dark-200 border-none"
+              }`}
               />
             </div>
           </div>
