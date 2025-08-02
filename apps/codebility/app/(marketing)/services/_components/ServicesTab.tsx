@@ -105,7 +105,7 @@ export default function ServicesTab({ servicesData }: Props) {
               onClick={() => handleTabClick(ALL_CATEGORY_ID)}
               className={`cursor-pointer px-2 pb-2 text-customViolet-200 xl:text-xl ${
                 currentCategory === ALL_CATEGORY_ID
-                  ? "border-violet text-violet border-b-2"
+                  ? "border-customViolet-100 text-customViolet-100border-b-2"
                   : "text-white"
               }`}
             >
@@ -117,7 +117,7 @@ export default function ServicesTab({ servicesData }: Props) {
                 onClick={() => handleTabClick(cat.id)}
                 className={`cursor-pointer px-2 pb-2 text-customViolet-200 xl:text-xl ${
                   currentCategory === cat.id
-                    ? "border-violet text-violet border-b-2"
+                    ? "border-customViolet-100 text-customViolet-100 border-b-2"
                     : "text-white"
                 }`}
               >

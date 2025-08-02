@@ -72,12 +72,12 @@ function KanbanBoard({
           {/* Breadcrumb Navigation */}
           <div className="flex flex-row items-center gap-3 text-sm">
             <Link href={pathsConfig.app.kanban} className="group">
-              <span className="text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-200">
+              <span className="text-gray-500 dark:text-gray-400 group-hover:text-customBlue-600 dark:group-hover:text-customBlue-400 transition-colors duration-200">
                 📋 Kanban Board
               </span>
             </Link>
             <ArrowRightIcon className="text-gray-400 dark:text-gray-500" />
-            <span className="font-semibold text-gray-900 dark:text-white bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <span className="font-semibold text-gray-900 dark:text-white bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent">
               {boardData.name}
             </span>
           </div>
@@ -85,11 +85,11 @@ function KanbanBoard({
           {/* Header Section */}
           <div className="flex flex-col gap-6 md:justify-between lg:flex-row">
             <div className="flex items-center gap-4">
-              <div className="h-14 w-14 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-xl shadow-blue-500/25 animate-pulse [animation-duration:3s]">
+              <div className="h-14 w-14 rounded-full bg-gradient-to-br from-customBlue-500 to-purple-500 flex items-center justify-center shadow-xl shadow-customBlue-500/25 animate-pulse [animation-duration:3s]">
                 <span className="text-2xl">📋</span>
               </div>
               <div>
-                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent drop-shadow-sm">
+                <h1 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent drop-shadow-sm">
                   {boardData.name}
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 text-sm font-medium">Organize and track your project tasks efficiently</p>
@@ -98,7 +98,7 @@ function KanbanBoard({
 
             {/* Search Section - Full Width */}
             <div className="flex flex-col gap-4">
-              <div className="flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm p-3 shadow-lg transition-all duration-300 focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-300 focus-within:shadow-xl hover:bg-white dark:border-gray-600 dark:bg-gray-800/80">
+              <div className="flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-white/80 backdrop-blur-sm p-3 shadow-lg transition-all duration-300 focus-within:ring-2 focus-within:ring-customBlue-500 focus-within:border-customBlue-300 focus-within:shadow-xl hover:bg-white dark:border-gray-600 dark:bg-gray-800/80">
                 <label htmlFor="kanbanSearch">
                   <IconSearch className="text-gray-400 dark:text-gray-500 transition-colors duration-200" />
                 </label>
@@ -128,7 +128,7 @@ function KanbanBoard({
                     variant={showArchive ? "default" : "outline"}
                     className={`flex items-center gap-2 transition-all duration-300 transform hover:scale-105 text-sm px-3 py-2 whitespace-nowrap ${
                       showArchive 
-                        ? "bg-blue-600 text-white hover:bg-blue-700 shadow-lg shadow-blue-500/30" 
+                        ? "bg-customBlue-600 text-white hover:bg-customBlue-700 shadow-lg shadow-customBlue-500/30" 
                         : "border-gray-300 text-gray-700 hover:bg-gray-50 hover:border-gray-400 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
                     }`}
                   >

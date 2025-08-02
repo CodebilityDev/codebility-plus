@@ -195,7 +195,7 @@ export default async function KanbanPage(props: PageProps) {
         key={board.id}
         className={`grid grid-cols-1 md:table-row transition-all duration-200 ${
           board.projects?.isUserInvolved 
-            ? "bg-gradient-to-r from-blue-50 via-white to-purple-50 dark:from-blue-950/50 dark:via-gray-900 dark:to-purple-950/50 hover:from-blue-100 hover:via-blue-50 hover:to-purple-100 dark:hover:from-blue-900/70 dark:hover:via-gray-800 dark:hover:to-purple-900/70 border-l-4 border-blue-500 shadow-sm" 
+            ? "bg-gradient-to-r from-customBlue-50 via-white to-purple-50 dark:from-customBlue-950/50 dark:via-gray-900 dark:to-purple-950/50 hover:from-customBlue-100 hover:via-customBlue-50 hover:to-purple-100 dark:hover:from-customBlue-900/70 dark:hover:via-gray-800 dark:hover:to-purple-900/70 border-l-4 border-customBlue-500 shadow-sm" 
             : "bg-gray-50 dark:bg-gray-800/30 text-gray-500 dark:text-gray-400 border-l-4 border-gray-300 dark:border-gray-600"
         }`}
       >
@@ -272,7 +272,7 @@ export default async function KanbanPage(props: PageProps) {
                 <Link href={`${pathsConfig.app.kanban}/${board.projects.id}`}>
                   <Button
                     variant="hollow"
-                    className="inline-flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-sm"
+                    className="inline-flex items-center gap-2 bg-customBlue-600 text-white hover:bg-customBlue-700 dark:bg-customBlue-600 dark:hover:bg-customBlue-700 shadow-sm"
                   >
                     <IconKanban className="h-4 w-4 text-white" />
                     <span className="hidden sm:inline">View Sprint</span>
@@ -311,11 +311,11 @@ export default async function KanbanPage(props: PageProps) {
       <div className="mx-auto flex max-w-7xl flex-col gap-6 p-4">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center shadow-lg">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-customBlue-500 to-purple-500 flex items-center justify-center shadow-lg">
               <IconKanban className="h-5 w-5 text-white transform translate-x-0.5" />
             </div>
             <div>
-              <H1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <H1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent">
                 📋 Kanban Projects
               </H1>
               <p className="text-gray-600 dark:text-gray-400">Manage your project boards and sprints</p>
@@ -324,7 +324,7 @@ export default async function KanbanPage(props: PageProps) {
           <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
             <div className="relative">
               <KanbanBoardsSearch
-                className="h-10 w-full rounded-full border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-600 px-5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent shadow-sm md:w-80"
+                className="h-10 w-full rounded-full border border-gray-200 bg-white dark:bg-gray-800 dark:border-gray-600 px-5 text-sm focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:border-transparent shadow-sm md:w-80"
                 placeholder="🔍 Search boards..."
               />
             </div>

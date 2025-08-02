@@ -178,8 +178,8 @@ export default function DashboardCurrentProjectModal() {
                 <div className="flex items-center justify-between">
                   <h3
                     className="mr-2 line-clamp-2 flex-1 text-sm font-bold 
-            text-gray-800 transition-colors group-hover:text-blue-600
-            dark:text-gray-200 dark:group-hover:text-blue-400 md:text-base"
+            text-gray-800 transition-colors group-hover:text-customBlue-600
+            dark:text-gray-200 dark:group-hover:text-customBlue-400 md:text-base"
                   >
                     {tasked.title}
                   </h3>
@@ -251,7 +251,7 @@ export default function DashboardCurrentProjectModal() {
           <div className="flex gap-2">
             <button
               onClick={handleGoToKanban}
-              className="rounded bg-blue-600 px-4 py-2 text-white"
+              className="rounded bg-customBlue-600 px-4 py-2 text-white"
             >
               Go to Kanban
             </button>

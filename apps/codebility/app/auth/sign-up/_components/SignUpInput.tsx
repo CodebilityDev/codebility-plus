@@ -184,7 +184,7 @@ const SignUpInputs = ({
             className="absolute right-4 top-[65%] -translate-y-1/2 cursor-pointer sm:right-1"
           >
             {showPassword ? (
-              <IconEyeClose className="text-blue-100" />
+              <IconEyeClose className="text-customBlue-100" />
             ) : (
               <IconEye />
             )}

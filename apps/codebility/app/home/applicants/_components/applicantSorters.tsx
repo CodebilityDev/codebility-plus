@@ -45,7 +45,7 @@ const ApplicantSorters = ({
           <DropdownMenuItem
             className={`flex justify-between ${
               sortField === "name"
-                ? "text-blue-500 dark:text-blue-300"
+                ? "text-customBlue-500 dark:text-customBlue-300"
                 : "text-black-500 dark:text-light-800"
             }`}
             onClick={() => onToggleSort("name")}
@@ -58,7 +58,7 @@ const ApplicantSorters = ({
           <DropdownMenuItem
             className={`flex justify-between ${
               sortField === "position"
-                ? "text-blue-500 dark:text-blue-300"
+                ? "text-customBlue-500 dark:text-customBlue-300"
                 : "text-black-500 dark:text-light-800"
             }`}
             onClick={() => onToggleSort("position")}
@@ -71,7 +71,7 @@ const ApplicantSorters = ({
           <DropdownMenuItem
             className={`flex justify-between ${
               sortField === "experience"
-                ? "text-blue-500 dark:text-blue-300"
+                ? "text-customBlue-500 dark:text-customBlue-300"
                 : "text-black-500 dark:text-light-800"
             }`}
             onClick={() => onToggleSort("experience")}
