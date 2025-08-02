@@ -167,7 +167,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
             <div className="mobile:flex-col-reverse absolute right-4 top-12 flex items-center gap-4">
               <div>
                 {codev.availability_status ? (
-                  <div className="bg-green rounded px-2 py-1 text-xs">
+                  <div className="bg-green-500 rounded px-2 py-1 text-xs">
                     Active
                   </div>
                 ) : (

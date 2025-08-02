@@ -1,6 +1,8 @@
 import type { Config } from "tailwindcss";
 
 import baseConfig from "@codevs/tailwind-config/web";
+import { green } from "@mui/material/colors";
+import { custom } from "zod";
 
 const svgToDataUri = require("mini-svg-data-uri");
 const {
@@ -67,7 +69,7 @@ const config: Config = {
         secondary: "#8E8E8E",
         lightgray: "#DBDBDB",
         darkgray: "#2E2E2E",
-        green: "#4BCE97",
+        customGreen: "#4BCE97",
         blue: {
           100: "#6A78F2",
           200: "#404993",

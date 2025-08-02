@@ -40,7 +40,7 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
       case "medium":
         return "bg-codeBlue text-black-100 dark:bg-codeBlue dark:text-black-100";
       case "low":
-        return "bg-green text-white dark:bg-green dark:text-white";
+        return "bg-green-500 text-white dark:bg-green-500 dark:text-white";
       default:
         return "bg-lightgray text-black-100 dark:bg-darkgray dark:text-white";
     }
@@ -104,7 +104,7 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
 
             {/* Points */}
             {task.points && (
-              <span className="bg-green dark:bg-green inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-white dark:text-white">
+              <span className="bg-green-500 dark:bg-green-500 inline-flex items-center rounded-full px-2 py-1 text-xs font-medium text-white dark:text-white">
                 {task.points} pts
               </span>
             )}
