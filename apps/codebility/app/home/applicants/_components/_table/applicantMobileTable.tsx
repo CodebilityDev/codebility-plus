@@ -13,7 +13,7 @@ import {
 import { NewApplicantType } from "../../_service/types";
 import ApplicantRowActionButton from "./applicantRowActionButton";
 import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
-import ApplicantActionButton from "./applicantActionButton";
+import ApplicantActionButton from "./applicantActionButton.original";
 
 function ApplicantMobileTableComponent<TData extends NewApplicantType>({
   table,

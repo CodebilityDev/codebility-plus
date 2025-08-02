@@ -403,7 +403,7 @@ const TaskViewModal = ({
                   className={
                     prLink.trim() !== (task?.pr_link || "")
                       ? "text-md mt-4 flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-2 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
-                      : "text-grey-100 bg-light-900 mt-4 w-full border-2 border-gray-300  py-4 text-black hover:bg-green-700 sm:w-auto"
+                      : "text-grey-100 bg-light-900 dark:bg-black-200 mt-4 w-full border-2 border-gray-300  py-4 text-black hover:bg-green-700 sm:w-auto"
                   }
                   disabled={
                     updateLoading || prLink.trim() === (task?.pr_link || "")
