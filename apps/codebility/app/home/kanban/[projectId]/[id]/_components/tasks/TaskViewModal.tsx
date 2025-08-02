@@ -322,7 +322,7 @@ const TaskViewModal = ({
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority</Label>
               <Select disabled>
-                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300  dark:border-gray-700 dark:bg-gray-800">
+                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue placeholder={task?.priority || "None"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -348,7 +348,7 @@ const TaskViewModal = ({
                 <DifficultyPointsTooltip />
               </div>
               <Select disabled>
-                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue
                     placeholder={
                       task?.difficulty ? capitalize(task.difficulty) : "None"
@@ -377,7 +377,7 @@ const TaskViewModal = ({
               <Input
                 value={task?.type || "None"}
                 disabled
-                className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300 dark:border-gray-700 dark:bg-gray-800"
+                className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
               />
             </div>
 
