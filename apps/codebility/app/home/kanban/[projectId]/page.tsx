@@ -194,7 +194,7 @@ export default async function KanbanSprintPage(props: PageProps) {
       }
 
       return sprints.map((sprint) => (
-        <TableRow key={sprint.id} className="grid grid-cols-1 md:table-row hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200 border-l-4 border-blue-500">
+        <TableRow key={sprint.id} className="grid grid-cols-1 md:table-row hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200 border-l-4 border-customBlue-500">
           <TableCell className="md:table-cell">
             <div className="flex flex-col">
               <span className="font-medium text-gray-900 dark:text-white">{sprint.name}</span>
@@ -211,7 +211,7 @@ export default async function KanbanSprintPage(props: PageProps) {
             >
               <Button
                 variant="hollow"
-                className="inline-flex items-center gap-2 bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-700 shadow-sm"
+                className="inline-flex items-center gap-2 bg-customBlue-600 text-white hover:bg-customBlue-700 dark:bg-customBlue-600 dark:hover:bg-customBlue-700 shadow-sm"
               >
                 <IconKanban className="h-4 w-4 text-white" />
                 <span className="hidden sm:inline">View Board</span>

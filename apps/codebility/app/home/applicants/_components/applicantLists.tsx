@@ -85,7 +85,7 @@ export default function ApplicantLists({
           <TabsTrigger value="applying" className="!flex !h-auto flex-col gap-0.5 px-1 py-1.5 text-xs md:flex-row md:gap-2 md:px-3 md:py-1.5 md:text-sm">
             <span className="truncate text-xs md:text-sm">Applicants</span>
             {applicantsApplying.length > 0 && (
-              <Badge className="h-3.5 min-w-3.5 bg-blue-500 px-1 text-xs text-white md:ml-2 md:h-auto md:min-w-0 md:px-2">
+              <Badge className="h-3.5 min-w-3.5 bg-customBlue-500 px-1 text-xs text-white md:ml-2 md:h-auto md:min-w-0 md:px-2">
                 {applicantsApplying.length}
               </Badge>
             )}

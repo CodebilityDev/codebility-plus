@@ -183,18 +183,18 @@ export default function TokenPoints() {
 
   const getCategoryColor = (category: string) => {
     const colorMap: Record<string, string> = {
-      "Frontend Developer": "from-blue-500 to-cyan-500",
+      "Frontend Developer": "from-customBlue-500 to-cyan-500",
       "Backend Developer": "from-green-500 to-emerald-500", 
       "UI/UX Designer": "from-purple-500 to-pink-500",
       "Mobile Developer": "from-orange-500 to-red-500",
-      "QA Engineer": "from-indigo-500 to-blue-500"
+      "QA Engineer": "from-indigo-500 to-customBlue-500"
     };
     return colorMap[category] || "from-gray-500 to-gray-600";
   };
 
   const getProgressToNextLevel = (category: string, currentPoints: number) => {
-    const nextLevelThreshold = levels[category] * 50; // Assuming 50 points per level
-    const progress = (currentPoints % 50) / 50 * 100;
+    const nextLevelThreshold = (levels[category] ?? 1) * 100; // Assuming 100 points per level, default to level 1 if undefined
+    const progress = (currentPoints % 100) / 100 * 100;
     return Math.min(progress, 100);
   };
 
@@ -203,16 +203,16 @@ export default function TokenPoints() {
   return (
     <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30 dark:from-blue-950/10 dark:to-purple-950/10" />
+      <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/30 to-purple-50/30 dark:from-customBlue-950/10 dark:to-purple-950/10" />
       <div className="absolute -top-4 -right-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl" />
       
       <div className="relative">
         <div className="flex items-center gap-3 mb-4">
-          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500">
+          <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-customBlue-500 to-purple-500">
             <Zap className="h-5 w-5 text-white" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+            <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent">
               ⚡ Skill Points
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -246,7 +246,7 @@ export default function TokenPoints() {
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+                      <p className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent">
                         {point}
                       </p>
                       <p className="text-xs text-gray-500">points</p>
@@ -282,9 +282,9 @@ export default function TokenPoints() {
       </div>
       {roleToBePromoted == "Codev" && !promotionAccepted && (
         <div className="relative">
-          <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-blue-500 rounded-lg blur-sm opacity-75"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-green-400 to-customBlue-500 rounded-lg blur-sm opacity-75"></div>
           <Button 
-            className="relative mb-4 mt-4 w-auto bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 text-white font-bold py-3 px-6 shadow-lg transform transition-all duration-200 hover:scale-105 animate-pulse" 
+            className="relative mb-4 mt-4 w-auto bg-gradient-to-r from-green-500 to-customBlue-500 hover:from-green-600 hover:to-customBlue-600 text-white font-bold py-3 px-6 shadow-lg transform transition-all duration-200 hover:scale-105 animate-pulse" 
             onClick={openModal}
           >
             <Award className="h-5 w-5 mr-2" />

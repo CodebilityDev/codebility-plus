@@ -116,7 +116,7 @@ const ProjectViewModal = () => {
             <div className="dark:bg-dark-200 space-y-4 rounded-lg bg-slate-100 p-4">
               <div>
                 <h3 className="text-lg font-semibold">Project Details</h3>
-                <p className="text-2xl text-blue-600 dark:text-blue-400">
+                <p className="text-2xl text-customBlue-600 dark:text-customBlue-400">
                   {data?.name}
                 </p>
               </div>
@@ -133,7 +133,7 @@ const ProjectViewModal = () => {
                   <Link
                     href={data.github_link}
                     target="_blank"
-                    className="flex items-center gap-2 hover:text-blue-500"
+                    className="flex items-center gap-2 hover:text-customBlue-500"
                   >
                     <IconGithub className="h-5 w-5 invert dark:invert-0" />
                     <span className="text-sm">GitHub</span>
@@ -143,7 +143,7 @@ const ProjectViewModal = () => {
                   <Link
                     href={data.website_url}
                     target="_blank"
-                    className="flex items-center gap-2 hover:text-blue-500"
+                    className="flex items-center gap-2 hover:text-customBlue-500"
                   >
                     <IconLink className="h-5 w-5 invert dark:invert-0" />
                     <span className="text-sm">Website</span>
@@ -153,7 +153,7 @@ const ProjectViewModal = () => {
                   <Link
                     href={data.figma_link}
                     target="_blank"
-                    className="flex items-center gap-2 hover:text-blue-500"
+                    className="flex items-center gap-2 hover:text-customBlue-500"
                   >
                     <IconFigma className="h-5 w-5 invert dark:invert-0" />
                     <span className="text-sm">Figma</span>

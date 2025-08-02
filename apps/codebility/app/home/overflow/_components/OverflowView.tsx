@@ -115,7 +115,7 @@ export default function OverflowView() {
             onClick={() => setSortBy("newest")}
             className={`rounded-full px-4 py-2 transition-all duration-200 ${
               sortBy === "newest" 
-                ? "bg-blue-500 text-white shadow-md hover:bg-blue-600" 
+                ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600" 
                 : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             }`}
           >
@@ -127,7 +127,7 @@ export default function OverflowView() {
             onClick={() => setSortBy("popular")}
             className={`rounded-full px-4 py-2 transition-all duration-200 ${
               sortBy === "popular" 
-                ? "bg-blue-500 text-white shadow-md hover:bg-blue-600" 
+                ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600" 
                 : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
             }`}
           >
@@ -137,7 +137,7 @@ export default function OverflowView() {
         
         <Button 
           onClick={() => setIsPostModalOpen(true)}
-          className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 px-6 py-2 text-white shadow-lg transition-all duration-200 hover:from-blue-600 hover:to-indigo-600 hover:shadow-xl"
+          className="rounded-full bg-gradient-to-r from-customBlue-500 to-indigo-500 px-6 py-2 text-white shadow-lg transition-all duration-200 hover:from-customBlue-600 hover:to-indigo-600 hover:shadow-xl"
         >
           <Plus className="mr-2 h-4 w-4" />
           Ask Question
@@ -162,7 +162,7 @@ export default function OverflowView() {
               Be the first to ask a question and help build our knowledge base!
             </p>
             <Button 
-              className="rounded-full bg-gradient-to-r from-blue-500 to-indigo-500 px-8 py-3 text-white shadow-lg transition-all duration-200 hover:from-blue-600 hover:to-indigo-600 hover:shadow-xl" 
+              className="rounded-full bg-gradient-to-r from-customBlue-500 to-indigo-500 px-8 py-3 text-white shadow-lg transition-all duration-200 hover:from-customBlue-600 hover:to-indigo-600 hover:shadow-xl" 
               onClick={() => setIsPostModalOpen(true)}
             >
               <Plus className="mr-2 h-4 w-4" />

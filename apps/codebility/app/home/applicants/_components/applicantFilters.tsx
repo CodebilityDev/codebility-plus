@@ -59,7 +59,7 @@ const ApplicantFiltersComponent = ({
             <Filter className="h-4 w-4" />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <Badge className="ml-1 flex h-5 w-5 items-center justify-center bg-blue-500 p-0 text-white">
+              <Badge className="ml-1 flex h-5 w-5 items-center justify-center bg-customBlue-500 p-0 text-white">
                 {activeFilterCount}
               </Badge>
             )}

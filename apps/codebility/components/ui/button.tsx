@@ -6,20 +6,20 @@ import { cva } from "class-variance-authority";
 import { cn } from "@codevs/ui";
 
 const buttonVariants = cva(
-  "text-md inline-flex w-full items-center justify-center whitespace-nowrap rounded-md px-6 py-2 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed lg:text-lg",
+  "text-md inline-flex w-full items-center justify-center whitespace-nowrap rounded-md px-6 py-2 ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 disabled:cursor-not-allowed lg:text-lg",
   {
     variants: {
       variant: {
-        default: "bg-blue-100 text-white hover:bg-blue-200",
+        default: "bg-customBlue-100 text-white hover:bg-customBlue-200",
         ghost:
           "hover:bg-gray-100 hover:text-gray-900 dark:hover:bg-gray-800 dark:hover:text-gray-50",
         hollow:
           "border border border-[#8e8e8e] bg-white hover:opacity-80 dark:border dark:border-[#8e8e8e] dark:bg-[#444857] dark:text-white",
-        link: "text-dark-100 hover:text-blue-100 dark:text-white  hover:dark:text-blue-100",
+        link: "text-dark-100 hover:text-customBlue-100 dark:text-white  hover:dark:text-customBlue-100",
         destructive: "bg-red-100 text-white hover:bg-red-200",
         secondary: "primary-gradient hover:opacity-80",
         gradient:
-          "bg-gradient-to-r from-blue-100 to-blue-200 hover:from-blue-200 hover:to-blue-300",
+          "bg-gradient-to-r from-customBlue-100 to-customBlue-200 hover:from-customBlue-200 hover:to-customBlue-300",
         outline: "border border-white bg-transparent text-white",
         purple: "bg-[#9747FF] text-white dark:text-black",
         darkgray:

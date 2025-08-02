@@ -9,7 +9,7 @@ interface Props {
 const RenderTeam = ({ imgURL, onClick }: Props) => {
   return (
     <div
-      className="m-1 inline-flex h-[30px] w-[30px] items-center rounded-full bg-blue-600"
+      className="m-1 inline-flex h-[30px] w-[30px] items-center rounded-full bg-customBlue-600"
       onClick={onClick}
     >
       <Image

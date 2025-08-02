@@ -185,7 +185,7 @@ const ContactUsModal = () => {
         <div>
           <button 
             onClick={() => onClose()} 
-            className="absolute right-4 top-4 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="absolute right-4 top-4 p-2 rounded focus:outline-none focus:ring-2 focus:ring-customBlue-500"
             aria-label="Close contact form dialog"
           >
             <IconClose aria-hidden="true" />
