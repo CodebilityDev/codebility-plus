@@ -2,6 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { createClientClientComponent } from "@/utils/supabase/client";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface SkillCategory {
   id: string;
@@ -123,58 +129,60 @@ export default function CodevBadge({
   }
 
   return (
-    <div className={`flex gap-1 ${className}`}>
-      {Object.entries(level).map(([categoryId, levelNumber]) => {
-        const category = skillCategories.find((cat) => cat.id === categoryId);
-        if (!category) return null;
+    <TooltipProvider>
+      <div className={`flex gap-1 ${className}`}>
+        {Object.entries(level).map(([categoryId, levelNumber]) => {
+          const category = skillCategories.find((cat) => cat.id === categoryId);
+          if (!category) return null;
 
-        const prefix = category.badge_prefix;
-        const badgeName =
-          levelNumber >= 6
-            ? `${prefix}-tier-champion.svg`
-            : `${prefix}-tier-${levelNumber}.svg`;
+          const prefix = category.badge_prefix;
+          const badgeName =
+            levelNumber >= 6
+              ? `${prefix}-tier-champion.svg`
+              : `${prefix}-tier-${levelNumber}.svg`;
 
-        const badgePath = `/assets/svgs/badges/${badgeName}`;
-        const hasError = badgeErrors[categoryId];
+          const badgePath = `/assets/svgs/badges/${badgeName}`;
+          const hasError = badgeErrors[categoryId];
 
-        return (
-          <div key={categoryId} className="group relative cursor-pointer">
-            {hasError ? (
-              <FallbackBadge
-                categoryName={category.name}
-                levelNumber={levelNumber}
-              />
-            ) : (
-              <img
-                src={badgePath}
-                alt={`${category.name} Level ${levelNumber} Badge`}
-                width={size}
-                height={size}
-                className="object-contain transition-transform duration-200 group-hover:scale-110"
-                onError={(e) => {
-                  // Track which badges have errors
-                  setBadgeErrors((prev) => ({
-                    ...prev,
-                    [categoryId]: true,
-                  }));
+          return (
+            <Tooltip key={categoryId}>
+              <TooltipTrigger asChild>
+                <div className="cursor-pointer transition-transform duration-200 hover:scale-110">
+                  {hasError ? (
+                    <FallbackBadge
+                      categoryName={category.name}
+                      levelNumber={levelNumber}
+                    />
+                  ) : (
+                    <img
+                      src={badgePath}
+                      alt={`${category.name} Level ${levelNumber} Badge`}
+                      width={size}
+                      height={size}
+                      className="object-contain"
+                      onError={(e) => {
+                        // Track which badges have errors
+                        setBadgeErrors((prev) => ({
+                          ...prev,
+                          [categoryId]: true,
+                        }));
 
-                  // Log the error for debugging
-                  console.log(
-                    `Badge not found: ${badgePath}, falling back to generated badge`,
-                  );
-                }}
-              />
-            )}
-            {/* Custom hover tooltip */}
-            <div
-              className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 -translate-x-1/2 whitespace-nowrap rounded
-             bg-slate-700 px-2 py-1 text-xs text-white opacity-0 shadow-lg transition-opacity duration-200 group-hover:opacity-100"
-            >
-              Level {levelNumber}
-            </div>
-          </div>
-        );
-      })}
-    </div>
+                        // Log the error for debugging
+                        console.log(
+                          `Badge not found: ${badgePath}, falling back to generated badge`,
+                        );
+                      }}
+                    />
+                  )}
+                </div>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>{category.name} - Level {levelNumber}</p>
+              </TooltipContent>
+            </Tooltip>
+          );
+        })}
+      </div>
+    </TooltipProvider>
   );
 }
