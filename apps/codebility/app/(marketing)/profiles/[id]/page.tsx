@@ -112,7 +112,7 @@ export default async function CodevBioPage(props: Props) {
 							/>
 							<div className="absolute bottom-[7px] right-[7px]">
 								<p
-									className={`border-black-100 rounded-full px-2 text-[9px] ${availability_status ? "bg-green" : "bg-gray"
+									className={`border-black-100 rounded-full px-2 text-[9px] ${availability_status ? "bg-green-500" : "bg-gray"
 										}`}
 								>
 									{getStatusBadge()}

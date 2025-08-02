@@ -144,7 +144,7 @@ const CodevCard = ({ codev, color }: Props) => {
               <p
                 className={cn(
                   "border-black-100 rounded-full border-2 p-2 text-[9px]",
-                  codev.availability_status ? "bg-green" : "bg-red-500",
+                  codev.availability_status ? "bg-green-500" : "bg-red-500",
                 )}
               ></p>
             </div>
