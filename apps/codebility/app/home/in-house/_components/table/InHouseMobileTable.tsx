@@ -75,7 +75,7 @@ const SendNdaButton = ({
     <Button
       variant="outline"
       size="sm"
-      className="h-6 px-2 text-xs text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+      className="h-6 px-2 text-xs text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
       onClick={handleSendEmail}
       disabled={isSending}
     >
@@ -215,7 +215,7 @@ export function InHouseMobileTable({
                       href={item.portfolio_website}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                      className="text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
                     >
                       <Link2 className="h-3 w-3" />
                     </a>
@@ -252,7 +252,7 @@ export function InHouseMobileTable({
                     {item.projects.slice(0, 2).map((project) => (
                       <span
                         key={project.id}
-                        className="rounded bg-blue-100 px-1.5 py-0.5 text-xs text-blue-800 dark:bg-blue-900 dark:text-blue-200"
+                        className="rounded bg-customBlue-100 px-1.5 py-0.5 text-xs text-customBlue-800 dark:bg-customBlue-900 dark:text-customBlue-200"
                       >
                         {project.name}
                       </span>

@@ -61,7 +61,7 @@ const AISolutions = () => {
                 </div>
               </div>
             </div>
-            <div className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-blue-100 lg:block">
+            <div className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-customBlue-100 lg:block">
               <Image
                 src="/assets/images/ai-integration/woman.jpg"
                 alt="woman"
