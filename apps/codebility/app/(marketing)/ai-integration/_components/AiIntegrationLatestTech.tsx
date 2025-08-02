@@ -12,7 +12,7 @@ const LatestTech = () => {
             secure
           </span>
           , <span className="font-medium xl:text-5xl">&</span>{" "}
-          <span className="font-medium text-blue-100 xl:text-5xl">
+          <span className="font-medium text-customBlue-100 xl:text-5xl">
             future-proof
           </span>
           <br className="hidden md:block" /> websites.

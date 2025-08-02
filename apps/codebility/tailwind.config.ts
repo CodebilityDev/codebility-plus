@@ -70,7 +70,7 @@ const config: Config = {
         lightgray: "#DBDBDB",
         darkgray: "#2E2E2E",
         customGreen: "#4BCE97",
-        blue: {
+        customBlue: {
           100: "#6A78F2",
           200: "#404993",
           300: "#3A4285",
