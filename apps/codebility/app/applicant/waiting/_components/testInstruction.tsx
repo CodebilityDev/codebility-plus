@@ -167,7 +167,7 @@ export default function TestInstruction({
           <DialogFooter>
             <DialogClose asChild>
               {applicantData.test_taken ? (
-                <Button className="from-teal to-violet bg-gradient-to-r p-0.5 hover:bg-gradient-to-br">
+                <Button className="from-customTeal to-violet bg-gradient-to-r p-0.5 hover:bg-gradient-to-br">
                   <span className="flex items-center justify-center px-4 py-2">
                     <span className="text-lg text-white">
                       Close Instructions
@@ -179,7 +179,7 @@ export default function TestInstruction({
                   onClick={() => {
                     router.refresh();
                   }}
-                  className="from-teal to-violet bg-gradient-to-r p-0.5 hover:bg-gradient-to-br"
+                  className="from-customTeal to-violet bg-gradient-to-r p-0.5 hover:bg-gradient-to-br"
                 >
                   <span className="flex items-center justify-center px-4 py-2">
                     <span className="flex items-center gap-2 text-lg text-white">

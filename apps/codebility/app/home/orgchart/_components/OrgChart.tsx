@@ -139,10 +139,10 @@ export default function OrgChart({ data }: OrgChartProps) {
             .map(([title, members], index) => {
             const colors = [
               "from-indigo-500 to-blue-500",
-              "from-teal-500 to-green-500", 
+              "from-customTeal-500 to-green-500", 
               "from-orange-500 to-red-500",
               "from-purple-500 to-pink-500",
-              "from-violet-500 to-purple-500"
+              "from-customViolet-500 to-purple-500"
             ];
             return (
               <div key={title} className="flex flex-col items-center">

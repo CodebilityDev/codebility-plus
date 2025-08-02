@@ -77,7 +77,7 @@ function PreReadInstructions({
         {user?.display_position.includes("UI/UX Designer") ? (
           <TestQAInstruction applicantData={applicantData}>
             <Button
-              className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
+              className="from-customTeal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
               onClick={async () => {
                 setLoading(true);
                 try {
@@ -101,7 +101,7 @@ function PreReadInstructions({
         ) : (
           <TestInstruction applicantData={applicantData}>
             <Button
-              className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
+              className="from-customTeal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
               onClick={async () => {
                 setLoading(true);
                 try {
@@ -227,7 +227,7 @@ function PostReadInstructions({
             <div className="flex gap-4">
               {user?.display_position.includes("UI/UX Designer") ? (
                 <TestQAInstruction applicantData={applicantData}>
-                  <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+                  <Button className="from-customTeal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
                     <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
                       Read Instructions
                     </span>
@@ -235,7 +235,7 @@ function PostReadInstructions({
                 </TestQAInstruction>
               ) : (
                 <TestInstruction applicantData={applicantData}>
-                  <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+                  <Button className="from-customTeal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
                     <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
                       Read Instructions
                     </span>
@@ -245,7 +245,7 @@ function PostReadInstructions({
 
               <Button
                 disabled={isSubmitting || loading}
-                className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
+                className="from-customTeal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
               >
                 <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
                   {loading ? (
@@ -362,7 +362,7 @@ function PostSubmitted({
             <div className="flex gap-4">
               {user?.display_position.includes("UI/UX Designer") ? (
                 <TestQAInstruction applicantData={applicantData}>
-                  <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+                  <Button className="from-customTeal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
                     <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
                       Read Instructions
                     </span>
@@ -370,7 +370,7 @@ function PostSubmitted({
                 </TestQAInstruction>
               ) : (
                 <TestInstruction applicantData={applicantData}>
-                  <Button className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+                  <Button className="from-customTeal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
                     <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
                       Read Instructions
                     </span>
@@ -385,7 +385,7 @@ function PostSubmitted({
                   !applicantData.fork_url ||
                   applicantData.fork_url === watch("fork_url")
                 }
-                className="from-teal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
+                className="from-customTeal to-violet h-10 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12"
                 type="submit"
               >
                 <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
