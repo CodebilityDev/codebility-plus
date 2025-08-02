@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState, useMemo, useCallback } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import DefaultPagination from "@/components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
 import { useModal } from "@/hooks/use-modal-projects";
@@ -64,16 +64,19 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
     setCurrentPage(validPage);
   }, [currentCategory, tabPages, setCurrentPage, totalPages]);
 
-  const handleTabClick = useCallback((categoryId: number) => {
-    // Save current page for the current tab before switching
-    if (currentPage > 0 && currentPage <= totalPages) {
-      setTabPages((prev) => ({
-        ...prev,
-        [currentCategory]: currentPage,
-      }));
-    }
-    setCurrentCategory(categoryId);
-  }, [currentCategory, currentPage, totalPages]);
+  const handleTabClick = useCallback(
+    (categoryId: number) => {
+      // Save current page for the current tab before switching
+      if (currentPage > 0 && currentPage <= totalPages) {
+        setTabPages((prev) => ({
+          ...prev,
+          [currentCategory]: currentPage,
+        }));
+      }
+      setCurrentCategory(categoryId);
+    },
+    [currentCategory, currentPage, totalPages],
+  );
 
   return (
     <Section>
@@ -83,32 +86,33 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
           <div className="mx-auto flex flex-wrap justify-center gap-5 xl:gap-16 ">
             <p
               onClick={() => handleTabClick(ALL_CATEGORY_ID)}
-              className={`cursor-pointer px-2 pb-2 xl:text-xl transition-colors ${
-                currentCategory === ALL_CATEGORY_ID
-                  ? "border-customViolet-600 text-customViolet-600 dark:border-customViolet-400 dark:text-customViolet-400 border-b-2"
-                  : "text-gray-700 dark:text-gray-300 hover:text-customViolet-600 dark:hover:text-customViolet-400"
+              className={`cursor-pointer border-b-2 px-2 pb-2 transition-colors xl:text-xl ${
+              currentCategory === ALL_CATEGORY_ID
+                ? "border-customBlue-300 text-customBlue-300 dark:border-customBlue-200 dark:text-customBlue-200"
+                : "hover:text-customBlue-300 dark:hover:text-customBlue-200 border-transparent text-gray-700 dark:text-gray-300"
               }`}
             >
               All
             </p>
             {CATEGORIES.map((category) => (
               <p
-                key={category.id}
-                onClick={() => handleTabClick(category.id)}
-                className={`cursor-pointer px-2 pb-2 xl:text-xl transition-colors ${
-                  currentCategory === category.id
-                    ? "border-customViolet-600 text-customViolet-600 dark:border-customViolet-400 dark:text-customViolet-400 border-b-2"
-                    : "text-gray-700 dark:text-gray-300 hover:text-customViolet-600 dark:hover:text-customViolet-400"
-                }`}
+              key={category.id}
+              onClick={() => handleTabClick(category.id)}
+              className={`cursor-pointer border-b-2 px-2 pb-2 transition-colors xl:text-xl ${
+                currentCategory === category.id
+                ? "border-customBlue-300 text-customBlue-300 dark:border-customBlue-200 dark:text-customBlue-200"
+                : "hover:text-customBlue-300 dark:hover:text-customBlue-200 border-transparent text-gray-700 dark:text-gray-300"
+              }`}
               >
-                {category.name}
+              {category.name}
               </p>
             ))}
           </div>
 
           {/* Projects Grid */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
-            {Array.isArray(paginatedProjects) && paginatedProjects.length > 0 ? (
+            {Array.isArray(paginatedProjects) &&
+            paginatedProjects.length > 0 ? (
               paginatedProjects.map((project) => {
                 if (!project || !project.id) return null;
                 return (
