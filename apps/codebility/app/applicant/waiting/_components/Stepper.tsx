@@ -164,9 +164,9 @@ const StepperStep = React.forwardRef<
           className={cn(
             "flex h-full w-full items-center justify-center rounded-full border-2 bg-background p-2 text-xs font-medium transition-colors sm:h-8 sm:w-8 sm:text-sm",
             isActive
-              ? "border-primary bg-blue-200 text-primary-foreground"
+              ? "border-primary bg-customBlue-200 text-primary-foreground"
               : isCompleted
-                ? "from-customTeal w-full rounded-full border-primary bg-gradient-to-r via-blue-400 to-purple-950 text-primary-foreground"
+                ? "from-customTeal w-full rounded-full border-primary bg-gradient-to-r via-customBlue-400 to-purple-950 text-primary-foreground"
                 : isClickable
                   ? "border-border bg-background text-foreground hover:bg-muted"
                   : "border-muted-foreground/30 bg-muted text-muted-foreground",
@@ -252,7 +252,7 @@ const StepperConnector = React.forwardRef<
       ref={ref}
       className={cn(
         "max-w-[20px] flex-1 border-t sm:max-w-none", // Short on mobile, full length on desktop
-        isCompleted ? "border-blue-100" : "border-muted-foreground/30",
+        isCompleted ? "border-customBlue-100" : "border-muted-foreground/30",
         className,
       )}
       {...props}

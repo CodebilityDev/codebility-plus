@@ -8,7 +8,7 @@ const TextareaVariants = cva(
   {
     variants: {
       variant: {
-        default: "border border-gray-300 p-2 focus:border-blue-500",
+        default: "border border-gray-300 p-2 focus:border-customBlue-500",
         resume: " md:text-md  resize-none p-2 text-sm sm:text-sm lg:text-lg",
         ghost:
           "border-light_dark w-full rounded border bg-transparent px-3 py-2 text-sm focus:outline-none",

@@ -257,7 +257,7 @@ export default function KanbanAddModalMembers({
             onClick={handleSelfAssign}
             disabled={isLoading}
             type="button"
-            className="text-black-200 w-fit cursor-pointer text-xs font-light ml-2 hover:text-blue-300 dark:text-slate-300 dark:hover:text-blue-100"
+            className="text-black-200 w-fit cursor-pointer text-xs font-light ml-2 hover:text-customBlue-300 dark:text-slate-300 dark:hover:text-customBlue-100"
           >
             Assign to me
           </button>

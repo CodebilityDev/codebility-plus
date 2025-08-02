@@ -108,7 +108,7 @@
 
     --violet-color: theme("colors.violet.500");
 
-    --teal-color: theme("colors.teal");
+    --teal-color: theme("colors.customTeal");
 
     --blue-500: theme("colors.blue.500");
     --blue-100: theme("colors.blue.100");

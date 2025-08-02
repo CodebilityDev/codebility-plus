@@ -286,7 +286,7 @@ export default function ApplicantFilterHeaders({
               placeholder="Search applicants..."
               value={searchTerm}
               onChange={(e) => onSearch(e.target.value)}
-              className="h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+              className="h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
             />
             <div className="flex items-center justify-center gap-3">
               <ApplicantSorters
@@ -314,7 +314,7 @@ export default function ApplicantFilterHeaders({
               placeholder="Search applicants..."
               value={searchTerm}
               onChange={(e) => onSearch(e.target.value)}
-              className="h-11 w-full max-w-80 rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-blue-500 focus:outline-none focus:ring-1 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-blue-400 dark:focus:ring-blue-400"
+              className="h-11 w-full max-w-80 rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
             />
             <ApplicantSorters
               sortField={sortField}

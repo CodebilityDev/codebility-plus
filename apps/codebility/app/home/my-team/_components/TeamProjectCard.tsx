@@ -57,7 +57,7 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
   const totalMembers = members.data.length + (teamLead.data ? 1 : 0);
 
   return (
-    <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-300 hover:-translate-y-1 hover:bg-blue-50/50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-500 dark:hover:bg-gray-750 dark:hover:shadow-blue-500/20 cursor-pointer">
+    <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-customBlue-500/10 hover:border-customBlue-300 hover:-translate-y-1 hover:bg-customBlue-50/50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-customBlue-500 dark:hover:bg-gray-750 dark:hover:shadow-customBlue-500/20 cursor-pointer">
       {/* Clickable area for navigation */}
       <Link 
         href={`/home/my-team/${projectInfo.id}`}
@@ -69,7 +69,7 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
         {/* Header */}
         <div className="mb-5 flex items-start justify-between">
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-400">
+            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-customBlue-600 dark:text-white dark:group-hover:text-customBlue-400">
               {projectInfo.name}
             </h3>
             <div className="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">

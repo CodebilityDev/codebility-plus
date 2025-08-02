@@ -71,7 +71,7 @@ const DefaultPagination = ({
               <PaginationLink
                 className={`hover:bg-lightgray  dark:hover:bg-dark-100 cursor-pointer ${
                   currentPage === num
-                    ? "hover:bg-default dark:hover:bg-default border-0 bg-blue-100 text-white hover:text-white"
+                    ? "hover:bg-default dark:hover:bg-default border-0 bg-customBlue-100 text-white hover:text-white"
                     : ""
                 }`}
                 onClick={() => setCurrentPage && setCurrentPage(Number(num))}

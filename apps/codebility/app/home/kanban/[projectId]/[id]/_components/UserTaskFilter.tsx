@@ -42,7 +42,7 @@ export default function UserTaskFilter({ members, onFilterClick }: Props) {
             onClick={() => onFilterClick(member.userId)}
             className={`relative transform-gpu cursor-pointer transition-transform duration-300 ease-out ${
               member.isActive
-                ? "z-10 scale-110 rounded-full border-2 ring-2 ring-blue-500"
+                ? "z-10 scale-110 rounded-full border-2 ring-2 ring-customBlue-500"
                 : shouldUseGrid
                   ? "hover:scale-105"
                   : `hover:scale-105 ${index > 0 ? "-ml-2" : ""}`

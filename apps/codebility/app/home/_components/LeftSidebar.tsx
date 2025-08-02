@@ -109,7 +109,7 @@ const LeftSidebar = () => {
         <motion.button
           onClick={toggleNav}
           whileTap={{ scale: 0.95 }}
-          className="rounded p-2 text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-white"
+          className="rounded p-2 text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-white"
           aria-label={isToggleOpen ? "Collapse sidebar" : "Expand sidebar"}
           aria-expanded={isToggleOpen ? "true" : "false"}
           aria-controls="sidebar-navigation"
@@ -183,7 +183,7 @@ const LeftSidebar = () => {
                         isActive
                           ? "primary-gradient text-light-900 rounded-lg"
                           : "text-dark300_light900"
-                      } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:hover:bg-[#131417]`}
+                      } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:ring-offset-2 dark:hover:bg-[#131417]`}
                       aria-current={isActive ? "page" : undefined}
                       aria-label={`Navigate to ${link.label}${isActive ? " (current page)" : ""}`}
                       title={!isToggleOpen ? link.label : undefined}

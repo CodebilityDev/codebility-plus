@@ -96,7 +96,7 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
     <Button
       variant="outline"
       size="sm"
-      className="ml-2 text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+      className="ml-2 text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
       onClick={handleSendEmail}
       disabled={isSending}
     >
@@ -470,7 +470,7 @@ export function InHouseTable({
                                       href={item.portfolio_website}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                                      className="inline-flex items-center text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
                                     >
                                       <Link2 className="mr-1 h-4 w-4" />
                                       Portfolio
@@ -593,7 +593,7 @@ export function InHouseTable({
                         href={item.portfolio_website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                        className="inline-flex items-center text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
                       >
                         <Link2 className="mr-1 h-4 w-4" />
                         Portfolio

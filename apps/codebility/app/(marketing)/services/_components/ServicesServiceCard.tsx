@@ -80,7 +80,7 @@ export default function ServiceCard({ service }: Props) {
           quality={90}
         />
         {project_category_name && (
-          <div className="absolute left-2 top-2 rounded-md bg-blue-600/80 px-2 py-1 text-xs text-white">
+          <div className="absolute left-2 top-2 rounded-md bg-customBlue-600/80 px-2 py-1 text-xs text-white">
             {project_category_name}
           </div>
         )}
@@ -100,7 +100,7 @@ export default function ServiceCard({ service }: Props) {
           {isDescriptionLong && (
             <button
               onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-              className="mt-1 text-xs text-blue-400 hover:text-blue-300"
+              className="mt-1 text-xs text-customBlue-400 hover:text-customBlue-300"
             >
               {isDescriptionExpanded ? "Show less" : "Read more"}
             </button>
@@ -112,7 +112,7 @@ export default function ServiceCard({ service }: Props) {
             <Link
               href={website_url!}
               target="_blank"
-              className="inline-flex items-center gap-2 rounded-md bg-blue-600 px-4 py-2 text-sm transition-colors hover:bg-blue-700"
+              className="inline-flex items-center gap-2 rounded-md bg-customBlue-600 px-4 py-2 text-sm transition-colors hover:bg-customBlue-700"
             >
               <IconLink className="size-4" />
               <span>View Website</span>
@@ -129,7 +129,7 @@ export default function ServiceCard({ service }: Props) {
                   <Tooltip>
                     <TooltipTrigger>
                       <div className="relative mb-2 mr-4">
-                        <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-blue-500">
+                        <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-customBlue-500">
                           {teamLeader.image_url ? (
                             <Image
                               src={teamLeader.image_url}

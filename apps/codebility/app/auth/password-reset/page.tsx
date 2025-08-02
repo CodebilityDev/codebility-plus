@@ -20,7 +20,7 @@ const PasswordReset = () => {
 
         <p className="mx-auto text-sm text-white">
           Have an account?{" "}
-          <Link href="/auth/sign-in" className="text-blue-100 hover:underline">
+          <Link href="/auth/sign-in" className="text-customBlue-100 hover:underline">
             Login
           </Link>
         </p>

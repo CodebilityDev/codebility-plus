@@ -127,7 +127,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
         <div>
           <H1 className="text-2xl sm:text-3xl">In-House Codebility</H1>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-            <span className="rounded-full bg-blue-500 px-2.5 py-1 text-white shadow-sm sm:px-3 sm:py-1.5">
+            <span className="rounded-full bg-customBlue-500 px-2.5 py-1 text-white shadow-sm sm:px-3 sm:py-1.5">
               {stats.total} {stats.total === 1 ? "member" : "members"}
             </span>
             <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-white shadow-sm sm:px-3 sm:py-1.5">

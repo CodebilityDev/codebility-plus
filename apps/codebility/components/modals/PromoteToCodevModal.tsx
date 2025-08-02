@@ -66,7 +66,7 @@ const PromoteToCodevModal: React.FC<PromoteToCodevModalProps> = ({
         </p>
         <div className="flex justify-center gap-4">
           <Button
-            className="text-white hover:bg-blue-700"
+            className="text-white hover:bg-customBlue-700"
             onClick={() => {
               if (userId) {
                 handleAccept(userId);
