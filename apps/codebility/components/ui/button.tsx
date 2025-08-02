@@ -16,7 +16,7 @@ const buttonVariants = cva(
         hollow:
           "border border border-[#8e8e8e] bg-white hover:opacity-80 dark:border dark:border-[#8e8e8e] dark:bg-[#444857] dark:text-white",
         link: "text-dark-100 hover:text-customBlue-100 dark:text-white  hover:dark:text-customBlue-100",
-        destructive: "bg-red-100 text-white hover:bg-red-200",
+        destructive: "bg-customRed-100 text-white hover:bg-customRed-200",
         secondary: "primary-gradient hover:opacity-80",
         gradient:
           "bg-gradient-to-r from-customBlue-100 to-customBlue-200 hover:from-customBlue-200 hover:to-customBlue-300",

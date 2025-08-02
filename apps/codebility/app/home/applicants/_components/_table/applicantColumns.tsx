@@ -14,8 +14,9 @@ import { NewApplicantType } from "../../_service/types";
 import ApplicantReapplyTime from "../applicantReapplyTime";
 import ApplicantTechStack from "../applicantTechStack";
 import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
-import ApplicantActionButton from "./applicantActionButton";
+
 import ApplicantProfileColSec from "./applicantProfileColSec";
+import ApplicantActionButton from "./applicantActionButton.original";
 
 export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
   {
