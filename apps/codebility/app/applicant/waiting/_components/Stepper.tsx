@@ -166,7 +166,7 @@ const StepperStep = React.forwardRef<
             isActive
               ? "border-primary bg-blue-200 text-primary-foreground"
               : isCompleted
-                ? "from-teal w-full rounded-full border-primary bg-gradient-to-r via-blue-400 to-purple-950 text-primary-foreground"
+                ? "from-customTeal w-full rounded-full border-primary bg-gradient-to-r via-blue-400 to-purple-950 text-primary-foreground"
                 : isClickable
                   ? "border-border bg-background text-foreground hover:bg-muted"
                   : "border-muted-foreground/30 bg-muted text-muted-foreground",

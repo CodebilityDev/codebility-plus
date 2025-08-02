@@ -45,7 +45,7 @@ export default function Hero() {
         </p>
         <div className="mx-auto mt-6 flex w-full justify-center">
           <Link href="#codevs">
-            <Button className="from-teal to-violet h-12 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
+            <Button className="from-customTeal to-violet h-12 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
               <span className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
                 Hire Codevs
               </span>

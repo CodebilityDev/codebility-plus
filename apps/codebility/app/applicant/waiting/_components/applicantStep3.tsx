@@ -44,7 +44,7 @@ export default function ApplicantStep3({
           href={process.env.NEXT_PUBLIC_MESSENGER_WAITLIST || ""}
           target="_blank"
         >
-          <Button className="from-teal to-violet h-10  rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+          <Button className="from-customTeal to-violet h-10  rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
             <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
               Join Waiting List
             </span>
@@ -52,7 +52,7 @@ export default function ApplicantStep3({
         </Link>
 
         <Link href={process.env.NEXT_PUBLIC_DISCORD_LINK || ""} target="_blank">
-          <Button className="from-teal to-violet h-10  rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
+          <Button className="from-customTeal to-violet h-10  rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12">
             <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full px-4 text-lg text-white lg:text-lg">
               Join Discord Server
             </span>
