@@ -69,7 +69,7 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
         {/* Header */}
         <div className="mb-5 flex items-start justify-between">
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-customBlue-600 dark:text-white dark:group-hover:text-customBlue-400">
+            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-customBlue-600 dark:text-white dark:group-hover:text-customBlue-100">
               {projectInfo.name}
             </h3>
             <div className="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
