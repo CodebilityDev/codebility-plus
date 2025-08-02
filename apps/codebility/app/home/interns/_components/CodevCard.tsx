@@ -155,7 +155,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
               <h3 className="text-xl font-medium text-gray-900 dark:text-white">
                 {codev.first_name} {codev.last_name}
               </h3>
-              <p className="text-sm font-medium text-customBlue-600 dark:text-customBlue-400">
+              <p className="text-sm font-medium text-customBlue-300 dark:text-customBlue-100">
                 {codev.display_position || "No Position"}
               </p>
               {/* Years of Experience */}
@@ -228,7 +228,7 @@ function SkillPoints({ points }: { points: CodevPoints[] }) {
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1">
       {Object.keys(matcher).map((categoryId) => {
         const point = points.find((p) => p.skill_category_id === categoryId);
         return (
