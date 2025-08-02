@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useMemo, useCallback } from "react";
+import React, { useCallback, useMemo } from "react";
 import { getTestDate } from "@/app/applicant/waiting/_service/util";
 import { Box } from "@/components/shared/dashboard";
 import DefaultPagination from "@/components/ui/pagination";
@@ -45,15 +45,18 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     React.useState<VisibilityState>({});
 
   // Memoize initial column visibility to prevent recalculation
-  const initialColumnVisibility = useMemo(() => ({
-    github: data[0]?.application_status === "testing" ? false : true,
-    tech_stacks: data[0]?.application_status === "testing" ? false : true,
-    test_taken: data[0]?.application_status === "testing" ? true : false,
-    test_time_remaining:
-      data[0]?.application_status === "testing" ? true : false,
-    fork_url: data[0]?.application_status === "testing" ? true : false,
-    reapply: data[0]?.application_status === "denied" ? true : false,
-  }), [data[0]?.application_status]);
+  const initialColumnVisibility = useMemo(
+    () => ({
+      github: data[0]?.application_status === "testing" ? false : true,
+      tech_stacks: data[0]?.application_status === "testing" ? false : true,
+      test_taken: data[0]?.application_status === "testing" ? true : false,
+      test_time_remaining:
+        data[0]?.application_status === "testing" ? true : false,
+      fork_url: data[0]?.application_status === "testing" ? true : false,
+      reapply: data[0]?.application_status === "denied" ? true : false,
+    }),
+    [data[0]?.application_status],
+  );
 
   const table = useReactTable({
     data,
@@ -67,7 +70,6 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     state: {
       sorting,
       rowSelection,
-      columnVisibility,
     },
     initialState: {
       pagination: {
@@ -78,23 +80,31 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   });
 
   // Calculate total pages
-  const totalPages = useMemo(() => Math.ceil(data.length / pageSize.applicants), [data.length]);
+  const totalPages = useMemo(
+    () => Math.ceil(data.length / pageSize.applicants),
+    [data.length],
+  );
 
-  const toBeFailed = useCallback((
-    testTaken: string | null | undefined,
-    forkUrl: string | null | undefined,
-  ): Boolean => {
-    if (!testTaken) return false;
-    if (forkUrl) return false;
+  const toBeFailed = useCallback(
+    (
+      testTaken: string | null | undefined,
+      forkUrl: string | null | undefined,
+    ): Boolean => {
+      if (!testTaken) return false;
+      if (forkUrl) return false;
 
-    const currentDate = new Date();
+      const currentDate = new Date();
 
-    const testTakenDate = getTestDate(new Date(testTaken || "") || new Date());
+      const testTakenDate = getTestDate(
+        new Date(testTaken || "") || new Date(),
+      );
 
-    const difference = testTakenDate.getTime() - currentDate.getTime();
+      const difference = testTakenDate.getTime() - currentDate.getTime();
 
-    return difference <= 0;
-  }, []);
+      return difference <= 0;
+    },
+    [],
+  );
 
   // Define pagination callbacks outside of conditional rendering
   const handleNextPage = useCallback(() => {
@@ -105,13 +115,16 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
 
   const handlePreviousPage = useCallback(() => table.previousPage(), [table]);
 
-  const setCurrentPage = useCallback((pageOrFunction: number | ((page: number) => number)) => {
-    const page =
-      typeof pageOrFunction === "function"
-        ? pageOrFunction(table.getState().pagination.pageIndex + 1)
-        : pageOrFunction;
-    table.setPageIndex(page - 1);
-  }, [table]);
+  const setCurrentPage = useCallback(
+    (pageOrFunction: number | ((page: number) => number)) => {
+      const page =
+        typeof pageOrFunction === "function"
+          ? pageOrFunction(table.getState().pagination.pageIndex + 1)
+          : pageOrFunction;
+      table.setPageIndex(page - 1);
+    },
+    [table],
+  );
 
   return (
     <div className="overflow-hidden rounded-md">
@@ -181,7 +194,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                         row.original.applicant?.test_taken,
                         row.original.applicant?.fork_url,
                       ) &&
-                      "bg-red-100 bg-opacity-5",
+                      "bg-customRed-100 bg-opacity-5",
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -232,4 +245,6 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   );
 }
 
-export const ApplicantDataTable = React.memo(ApplicantDataTableComponent) as typeof ApplicantDataTableComponent;
+export const ApplicantDataTable = React.memo(
+  ApplicantDataTableComponent,
+) as typeof ApplicantDataTableComponent;
