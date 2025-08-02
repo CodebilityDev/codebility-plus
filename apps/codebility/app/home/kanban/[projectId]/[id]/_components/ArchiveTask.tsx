@@ -51,7 +51,7 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
       case "easy":
         return "bg-blue-100 text-white dark:bg-blue-200 dark:text-white";
       case "medium":
-        return "bg-violet-100 text-white dark:bg-violet-200 dark:text-black-100";
+        return "bg-customViolet-100 text-white dark:bg-customViolet-200 dark:text-black-100";
       case "hard":
         return "bg-codePurple text-white dark:bg-codePurple dark:text-white";
       default:

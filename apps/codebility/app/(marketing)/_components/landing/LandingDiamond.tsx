@@ -24,7 +24,7 @@ const Diamond = ({ color }: { color?: string }) => {
             height={30}
             className="relative z-10"
           />
-          <div className="bg-teal absolute left-0 top-0 h-full w-full rounded-full opacity-40 blur-sm filter"></div>
+          <div className="bg-customTeal absolute left-0 top-0 h-full w-full rounded-full opacity-40 blur-sm filter"></div>
         </div>
       ) : null}
     </>

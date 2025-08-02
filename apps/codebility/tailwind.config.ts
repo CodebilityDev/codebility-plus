@@ -88,7 +88,7 @@ const config: Config = {
           200: "#C108FE",
           300: "#9707DD",
         },
-        teal: "#02FFE2",
+        customTeal: "#02FFE2",
         white: "#F4F4F4",
         black: {
           100: "#181818",
