@@ -193,8 +193,8 @@ export default function TokenPoints() {
   };
 
   const getProgressToNextLevel = (category: string, currentPoints: number) => {
-    const nextLevelThreshold = levels[category] * 50; // Assuming 50 points per level
-    const progress = (currentPoints % 50) / 50 * 100;
+    const nextLevelThreshold = (levels[category] ?? 1) * 100; // Assuming 100 points per level, default to level 1 if undefined
+    const progress = (currentPoints % 100) / 100 * 100;
     return Math.min(progress, 100);
   };
 
