@@ -79,7 +79,7 @@ const config: Config = {
           700: "#00738B",
           800: "#0C3FDB",
         },
-        red: {
+        customRed: {
           100: "#D45454",
           200: "#A23939",
         },
