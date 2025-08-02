@@ -47,6 +47,7 @@ import {
   sendTestReminder,
 } from "../../_service/emailAction";
 import { NewApplicantType } from "../../_service/types";
+import { useApplicantModal } from "../ApplicantClientWrapper";
 
 export default function ApplicantActionButton({
   applicant,
@@ -54,6 +55,7 @@ export default function ApplicantActionButton({
   applicant: NewApplicantType;
 }) {
   const { toast } = useToast();
+  const { openModal } = useApplicantModal(); // Use our custom modal context
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [isOpen, setIsOpen] = React.useState(false);
@@ -69,8 +71,13 @@ export default function ApplicantActionButton({
     | "deny"
     | "remindToTakeTest"
     | "remindToOnboarding"
+    | "viewApplicant"
     | null
   >(null);
+
+  const handleViewApplicant = (applicant: NewApplicantType) => {
+    openModal(applicant);
+  };
 
   const handleMoveToApplying = async () => {
     setIsLoading(true);
@@ -393,12 +400,15 @@ export default function ApplicantActionButton({
             <DropdownMenuLabel>Actions</DropdownMenuLabel>
             <DropdownMenuSeparator />
             {/* viewing/editing applicant actions */}
-            <DropdownMenuItem className="text-black-500 dark:text-light-800 cursor-pointer">
+            <DropdownMenuItem
+              className="text-black-500 dark:text-light-800 cursor-pointer"
+              onClick={() => handleViewApplicant(applicant)}
+            >
               View Details
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-black-500 dark:text-light-800 cursor-pointer">
+            {/* <DropdownMenuItem className="text-black-500 dark:text-light-800 cursor-pointer">
               Edit Applicant
-            </DropdownMenuItem>
+            </DropdownMenuItem> */}
             <DropdownMenuSeparator />
 
             {/* moving applicant actions */}
