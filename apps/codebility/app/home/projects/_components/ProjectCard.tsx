@@ -180,7 +180,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
               {project.project_members.filter(
                 (member) => member.role === "member",
               ).length > 4 && (
-                <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full dark:bg-gray-800 dark:bg-zinc-700">
+                <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full dark:bg-zinc-700">
                   <span className="text-xs font-medium">
                     +
                     {project.project_members.filter(
