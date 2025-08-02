@@ -38,7 +38,7 @@ export default function BookCallPage() {
             clipPath:
               "polygon(0% 31.5%, 75.3% 19.5%, 100% 50%, 75.5% 80.5%, 0% 67.8%, 0% 50%)",
           }}
-          className="relative aspect-[855/678] w-[40rem] bg-gradient-to-r from-customBlue-700 via-customBlue-800 to-violet-300 opacity-20 sm:w-[72.1875rem]"
+          className="relative aspect-[855/678] w-[40rem] bg-gradient-to-r from-customBlue-700 via-customBlue-800 to-customViolet-300 opacity-20 sm:w-[72.1875rem]"
         />
       </div>
       <Footer />

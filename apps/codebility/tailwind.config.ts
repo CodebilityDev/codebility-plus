@@ -83,7 +83,7 @@ const config: Config = {
           100: "#D45454",
           200: "#A23939",
         },
-        violet: {
+        customViolet: {
           100: "#9747FF",
           200: "#C108FE",
           300: "#9707DD",
