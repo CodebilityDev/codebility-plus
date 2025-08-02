@@ -38,7 +38,7 @@ export default function AssistButton({status, id}:IAssistButton) {
   return (
     <Button className={`
     text-sm font-light hover:bg-custom-accent
-    ${status === AssistStatus.Pending ? "bg-custom-primary" : status === AssistStatus.Seen ? "bg-green-500" : "bg-blue-500"}
+    ${status === AssistStatus.Pending ? "bg-custom-primary" : status === AssistStatus.Seen ? "bg-green-500" : "bg-customBlue-500"}
     `}
     onClick={handleUpdateAssist}
     disabled={isLoading}

@@ -40,10 +40,10 @@ const Roadmap = () => {
           <div className="relative h-full w-full">
             {/* First Roadmap Section */}
             <div className="absolute left-10 top-1/2 flex w-max -translate-y-1/2 transform flex-col gap-3 text-white md:mx-auto">
-              <h3 className="text-teal text-lg font-medium xl:text-2xl">
+              <h3 className="text-customTeal text-lg font-medium xl:text-2xl">
                 {roadmapData[0]?.phase}
               </h3>
-              <h2 className="text-teal text-xl font-semibold xl:text-3xl">
+              <h2 className="text-customTeal text-xl font-semibold xl:text-3xl">
                 {roadmapData[0]?.title}
               </h2>
               <ul className="flex flex-col gap-3">
@@ -60,10 +60,10 @@ const Roadmap = () => {
 
             {/* Second Roadmap Section */}
             <div className="absolute -bottom-0 -right-56 flex w-max flex-col gap-3 text-white md:mx-auto xl:-bottom-32">
-              <h3 className="text-teal text-lg font-medium xl:text-2xl">
+              <h3 className="text-customTeal text-lg font-medium xl:text-2xl">
                 {roadmapData[1]?.phase}
               </h3>
-              <h2 className="text-teal text-xl font-semibold xl:text-3xl">
+              <h2 className="text-customTeal text-xl font-semibold xl:text-3xl">
                 {roadmapData[1]?.title}
               </h2>
               <ul className="flex flex-col gap-3">
@@ -86,10 +86,10 @@ const Roadmap = () => {
           <div className="relative h-full w-full">
             {/* Third Roadmap Section */}
             <div className="absolute -left-10 top-40 flex w-max flex-col gap-3 text-white md:mx-auto xl:-left-10 xl:top-16">
-              <h3 className="text-teal text-lg font-medium xl:text-2xl">
+              <h3 className="text-customTeal text-lg font-medium xl:text-2xl">
                 {roadmapData[2]?.phase}
               </h3>
-              <h2 className="text-teal text-xl font-semibold xl:text-3xl">
+              <h2 className="text-customTeal text-xl font-semibold xl:text-3xl">
                 {roadmapData[2]?.title}
               </h2>
               <ul className="flex flex-col gap-3">
@@ -106,10 +106,10 @@ const Roadmap = () => {
 
             {/* Fourth Roadmap Section */}
             <div className="absolute -bottom-0 -right-16 flex w-max flex-col gap-3 text-white md:mx-auto xl:-bottom-1 xl:-right-1">
-              <h3 className="text-teal text-lg font-medium xl:text-2xl">
+              <h3 className="text-customTeal text-lg font-medium xl:text-2xl">
                 {roadmapData[3]?.phase}
               </h3>
-              <h2 className="text-teal text-xl font-semibold xl:text-3xl">
+              <h2 className="text-customTeal text-xl font-semibold xl:text-3xl">
                 {roadmapData[3]?.title}
               </h2>
               <ul className="flex flex-col gap-3">

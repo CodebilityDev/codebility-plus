@@ -27,8 +27,8 @@ export default function DashboardPage() {
     <div className="relative min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
       {/* Background decorations */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-4 -left-4 h-72 w-72 rounded-full bg-gradient-to-br from-blue-400/10 to-purple-400/10 blur-3xl" />
-        <div className="absolute top-1/2 -right-4 h-96 w-96 rounded-full bg-gradient-to-br from-green-400/10 to-blue-400/10 blur-3xl" />
+        <div className="absolute -top-4 -left-4 h-72 w-72 rounded-full bg-gradient-to-br from-customBlue-400/10 to-purple-400/10 blur-3xl" />
+        <div className="absolute top-1/2 -right-4 h-96 w-96 rounded-full bg-gradient-to-br from-green-400/10 to-customBlue-400/10 blur-3xl" />
         <div className="absolute -bottom-4 left-1/3 h-80 w-80 rounded-full bg-gradient-to-br from-purple-400/10 to-pink-400/10 blur-3xl" />
       </div>
       
@@ -36,11 +36,11 @@ export default function DashboardPage() {
         {/* Enhanced Header */}
         <div className="mb-6">
           <div className="flex items-center gap-4 mb-2">
-            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center">
+            <div className="h-12 w-12 rounded-full bg-gradient-to-br from-customBlue-500 to-purple-500 flex items-center justify-center">
               <span className="text-2xl">🏠</span>
             </div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent">
                 Welcome Home
               </h1>
               <p className="text-gray-600 dark:text-gray-400">Track your progress and climb the leaderboards</p>
@@ -64,7 +64,7 @@ export default function DashboardPage() {
             <div className="bg-white dark:bg-gray-800 rounded-lg px-3 sm:px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">🎯 Goal:</span>
-                <span className="text-xs sm:text-sm font-bold text-blue-500">50 points this week</span>
+                <span className="text-xs sm:text-sm font-bold text-customBlue-500">50 points this week</span>
               </div>
             </div>
           </div>

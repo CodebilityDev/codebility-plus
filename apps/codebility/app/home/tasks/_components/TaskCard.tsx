@@ -37,7 +37,7 @@ export default function TaskCard({ task }: Props) {
     kanban_column?.board?.project?.name || "No associated project";
 
   return (
-    <div className="background-box text-dark100_light900 hover:border-violet cursor-pointer rounded border border-zinc-200 p-6 shadow-sm dark:border-zinc-700">
+    <div className="background-box text-dark100_light900 hover:border-customViolet-100 cursor-pointer rounded border border-zinc-200 p-6 shadow-sm dark:border-zinc-700">
       <div className="flex h-full flex-col justify-between">
         <div className="relative flex flex-col gap-1">
           <Image
@@ -50,7 +50,7 @@ export default function TaskCard({ task }: Props) {
             alt="Priority level"
             title={priority}
           />
-          <p className="text-violet text-lg font-semibold">#{id}</p>
+          <p className="text-customViolet-100 text-lg font-semibold">#{id}</p>
           <p>{title}</p>
           {description && <Paragraph>{description}</Paragraph>}
 

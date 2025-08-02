@@ -7,12 +7,12 @@ const LatestTech = () => {
       <Container className="text-white">
         <h2 className="mx-auto w-80 text-center text-4xl font-light md:w-full md:leading-relaxed xl:leading-loose">
           We use the latest tech for a <br className="hidden md:block" />{" "}
-          <span className="text-teal font-medium xl:text-5xl">fast</span>,{" "}
-          <span className="font-medium text-violet-200 xl:text-5xl">
+          <span className="text-customTeal font-medium xl:text-5xl">fast</span>,{" "}
+          <span className="font-medium text-customViolet-200 xl:text-5xl">
             secure
           </span>
           , <span className="font-medium xl:text-5xl">&</span>{" "}
-          <span className="font-medium text-blue-100 xl:text-5xl">
+          <span className="font-medium text-customBlue-100 xl:text-5xl">
             future-proof
           </span>
           <br className="hidden md:block" /> websites.

@@ -205,7 +205,7 @@ export default function WeeklyTop() {
     return (
       <div className="relative h-2 w-20 rounded-full bg-gray-200 dark:bg-gray-700">
         <div 
-          className="h-full rounded-full bg-gradient-to-r from-blue-500 to-purple-500 transition-all duration-300"
+          className="h-full rounded-full bg-gradient-to-r from-customBlue-500 to-purple-500 transition-all duration-300"
           style={{ width: `${Math.min(percentage, 100)}%` }}
         />
       </div>
@@ -239,7 +239,7 @@ export default function WeeklyTop() {
           </TableCell>
           <TableCell>
             <div className="flex items-center gap-3">
-              <span className="font-bold text-blue-600 dark:text-blue-400">
+              <span className="font-bold text-customBlue-600 dark:text-customBlue-400">
                 {hasData ? data.points : 0}
               </span>
               {hasData && getPointsBar(data.points, maxPoints)}
@@ -271,7 +271,7 @@ export default function WeeklyTop() {
   return (
     <Box className="relative overflow-hidden">
       {/* Background decoration */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-50/50 to-purple-50/50 dark:from-blue-950/20 dark:to-purple-950/20" />
+      <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/50 to-purple-50/50 dark:from-customBlue-950/20 dark:to-purple-950/20" />
       <div className="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-br from-yellow-400/20 to-orange-400/20 blur-xl" />
       <div className="absolute -bottom-4 -left-4 h-32 w-32 rounded-full bg-gradient-to-br from-purple-400/20 to-pink-400/20 blur-xl" />
       
@@ -282,7 +282,7 @@ export default function WeeklyTop() {
               <Trophy className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent">
                 🏆 Leaderboard
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">Compete and climb the ranks!</p>
@@ -319,7 +319,7 @@ export default function WeeklyTop() {
                   
                   switch (category) {
                     case "Frontend Developer":
-                      return "data-[state=active]:bg-blue-600 data-[state=active]:text-white";
+                      return "data-[state=active]:bg-customBlue-600 data-[state=active]:text-white";
                     case "Backend Developer":
                       return "data-[state=active]:bg-green-600 data-[state=active]:text-white";
                     case "UI/UX Designer":

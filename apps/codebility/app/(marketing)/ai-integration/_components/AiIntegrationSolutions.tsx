@@ -11,7 +11,7 @@ const AISolutions = () => {
         <div className="flex flex-col gap-6 md:gap-10">
           <h2 className="text-4xl font-semibold md:mx-auto md:w-2/3 md:text-center md:text-5xl lg:w-[809px] lg:text-6xl">
             The Power of Your Website with Our{" "}
-            <span className="text-teal">AI Solutions</span>
+            <span className="text-customTeal">AI Solutions</span>
           </h2>
           <p className="text-lg md:mx-auto md:w-2/3 md:text-center lg:w-[785px] lg:text-xl xl:w-[900px]">
             At Codebility, we specialize in integrating innovative Artificial
@@ -61,7 +61,7 @@ const AISolutions = () => {
                 </div>
               </div>
             </div>
-            <div className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-blue-100 lg:block">
+            <div className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-customBlue-100 lg:block">
               <Image
                 src="/assets/images/ai-integration/woman.jpg"
                 alt="woman"

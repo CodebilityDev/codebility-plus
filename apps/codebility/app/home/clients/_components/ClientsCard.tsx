@@ -167,12 +167,12 @@ export default function ClientCards({ clients }: Props) {
                                 client.address,
                               )}`}
                               target="_blank"
-                              className="hover:text-blue-100"
+                              className="hover:text-customBlue-100"
                             >
                               {client.address}
                             </Link>
                           ) : (
-                            <p className="hover:text-blue-100">No address</p>
+                            <p className="hover:text-customBlue-100">No address</p>
                           )}
                         </div>
                         {/* Email */}
@@ -182,7 +182,7 @@ export default function ClientCards({ clients }: Props) {
                             <>
                               <Link
                                 href={`mailto:${client.email}`}
-                                className="hover:text-blue-100"
+                                className="hover:text-customBlue-100"
                               >
                                 {client.email}
                               </Link>
@@ -196,7 +196,7 @@ export default function ClientCards({ clients }: Props) {
                               </button>
                             </>
                           ) : (
-                            <p className="hover:text-blue-100">No email</p>
+                            <p className="hover:text-customBlue-100">No email</p>
                           )}
                         </div>
                         {/* Phone Number */}
@@ -206,7 +206,7 @@ export default function ClientCards({ clients }: Props) {
                             <>
                               <Link
                                 href={`tel:${client.phone_number}`}
-                                className="hover:text-blue-100"
+                                className="hover:text-customBlue-100"
                               >
                                 {client.phone_number}
                               </Link>
@@ -220,7 +220,7 @@ export default function ClientCards({ clients }: Props) {
                               </button>
                             </>
                           ) : (
-                            <p className="hover:text-blue-100">No phone</p>
+                            <p className="hover:text-customBlue-100">No phone</p>
                           )}
                         </div>
                       </div>

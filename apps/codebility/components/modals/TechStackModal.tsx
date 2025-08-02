@@ -71,7 +71,7 @@ const TechStackModal = () => {
                   key={`stack-item-all-${i}`}
                   className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                     checkArray(stackItem.name.toLowerCase()) &&
-                    "bg-blue-100 text-white"
+                    "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
@@ -103,7 +103,7 @@ const TechStackModal = () => {
                   key={`stack-item-frontend-${i}`}
                   className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                     checkArray(stackItem.name.toLowerCase()) &&
-                    "bg-blue-100 text-white"
+                    "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
@@ -135,7 +135,7 @@ const TechStackModal = () => {
                   key={`stack-item-backend-${i}`}
                   className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                     checkArray(stackItem.name.toLowerCase()) &&
-                    "bg-blue-100 text-white"
+                    "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
@@ -167,7 +167,7 @@ const TechStackModal = () => {
                   key={`stack-item-mobile-${i}`}
                   className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                     checkArray(stackItem.name.toLowerCase()) &&
-                    "bg-blue-100 text-white"
+                    "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
@@ -199,7 +199,7 @@ const TechStackModal = () => {
                   key={`stack-item-blockchain-${i}`}
                   className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                     checkArray(stackItem.name.toLowerCase()) &&
-                    "bg-blue-100 text-white"
+                    "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
@@ -231,7 +231,7 @@ const TechStackModal = () => {
                   key={`stack-item-server-${i}`}
                   className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                     checkArray(stackItem.name.toLowerCase()) &&
-                    "bg-blue-100 text-white"
+                    "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
@@ -263,7 +263,7 @@ const TechStackModal = () => {
                   key={`stack-item-cms-${i}`}
                   className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                     checkArray(stackItem.name.toLowerCase()) &&
-                    "bg-blue-100 text-white"
+                    "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
@@ -295,7 +295,7 @@ const TechStackModal = () => {
                   key={`stack-item-design-${i}`}
                   className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
                     checkArray(stackItem.name.toLowerCase()) &&
-                    "bg-blue-100 text-white"
+                    "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >

@@ -46,7 +46,7 @@ const ApplicantProfileModal = () => {
   // Get status badge color for application status
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "applying": return "bg-blue-500";
+      case "applying": return "bg-customBlue-500";
       case "testing": return "bg-amber-500"; 
       case "onboarding": return "bg-green-500";
       case "denied": return "bg-red-500";
@@ -244,7 +244,7 @@ const ApplicantProfileModal = () => {
                       <Link
                         href={selectedApplicant.applicant.fork_url}
                         target="_blank"
-                        className="mt-2 inline-flex items-center gap-2 text-blue-500 hover:text-blue-700"
+                        className="mt-2 inline-flex items-center gap-2 text-customBlue-500 hover:text-customBlue-700"
                       >
                         <IconGithub className="h-4 w-4" />
                         View Test Repository
@@ -260,7 +260,7 @@ const ApplicantProfileModal = () => {
                     <Link
                       href={selectedApplicant.portfolio_website}
                       target="_blank"
-                      className="inline-flex items-center gap-2 text-blue-500 hover:text-blue-700"
+                      className="inline-flex items-center gap-2 text-customBlue-500 hover:text-customBlue-700"
                     >
                       <IconLink className="h-4 w-4" />
                       View Portfolio
@@ -276,7 +276,7 @@ const ApplicantProfileModal = () => {
             <Section title="Experience Level">
               <div className="rounded-lg border p-4">
                 <h4 className="font-medium">Years of Experience</h4>
-                <p className="text-2xl font-bold text-blue-500">
+                <p className="text-2xl font-bold text-customBlue-500">
                   {selectedApplicant.years_of_experience}
                 </p>
                 <p className="text-sm text-gray-500">
@@ -303,7 +303,7 @@ const ApplicantProfileModal = () => {
                   <Link
                     href={selectedApplicant.applicant.fork_url}
                     target="_blank"
-                    className="inline-flex items-center gap-2 text-blue-500 hover:text-blue-700"
+                    className="inline-flex items-center gap-2 text-customBlue-500 hover:text-customBlue-700"
                   >
                     <IconGithub className="h-4 w-4" />
                     View Submitted Test

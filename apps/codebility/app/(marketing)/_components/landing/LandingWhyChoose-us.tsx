@@ -56,7 +56,7 @@ const WhyChooseUs = () => {
                 </div>
               </div>
             </div>
-            <div className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-blue-100 lg:block">
+            <div className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-customBlue-100 lg:block">
               <Image
                 src="https://codebility-cdn.pages.dev/assets/images/index/choose-hands.jpg"
                 alt="codevs"
