@@ -162,7 +162,7 @@ export default function TestQAInstruction({
           <DialogFooter>
             <DialogClose asChild>
               {applicantData.test_taken ? (
-                <Button className="from-customTeal to-violet bg-gradient-to-r p-0.5 hover:bg-gradient-to-br">
+                <Button className="from-customTeal to-customViolet-100 bg-gradient-to-r p-0.5 hover:bg-gradient-to-br">
                   <span className="flex items-center justify-center px-4 py-2">
                     <span className="text-lg text-white">
                       Close Instructions
@@ -174,7 +174,7 @@ export default function TestQAInstruction({
                   onClick={() => {
                     router.refresh();
                   }}
-                  className="from-customTeal to-violet bg-gradient-to-r p-0.5 hover:bg-gradient-to-br"
+                  className="from-customTeal to-customViolet-100 bg-gradient-to-r p-0.5 hover:bg-gradient-to-br"
                 >
                   <span className="flex items-center justify-center px-4 py-2">
                     <span className="flex items-center gap-2 text-lg text-white">

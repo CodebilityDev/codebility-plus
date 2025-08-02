@@ -508,7 +508,7 @@ export default function NdaSigningPage() {
 
   if (loading) {
     return (
-      <div className="flex min-h-screen flex-col items-center justify-center bg-blue-300 p-4">
+      <div className="flex min-h-screen flex-col items-center justify-center bg-customBlue-300 p-4">
         <div className="text-center">
           <div className="mx-auto mb-4 h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-white"></div>
           <p className="text-lg font-bold text-white">
@@ -531,7 +531,7 @@ export default function NdaSigningPage() {
             </p>
           </div>
           <Link href="/">
-            <Button className="from-customTeal to-violet h-10 w-32 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
+            <Button className="from-customTeal to-customViolet-100 h-10 w-32 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
               <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full text-lg text-white lg:text-lg">
                 Go to Home
               </span>
@@ -703,7 +703,7 @@ export default function NdaSigningPage() {
             <Button
               onClick={handleSignNda}
               disabled={signing}
-              className="text-md flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-2 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
+              className="text-md flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-2 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
             >
               {signing ? "Processing..." : "Sign NDA"}
             </Button>

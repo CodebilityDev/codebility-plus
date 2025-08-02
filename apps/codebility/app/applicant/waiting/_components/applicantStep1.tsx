@@ -67,7 +67,7 @@ export default function ApplicantStep1({
       <div className="flex gap-4">
         {prioRoles.includes(user.display_position) ? (
           <Button
-            className="from-customTeal to-violet h-10 w-32 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36"
+            className="from-customTeal to-customViolet-100 h-10 w-32 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36"
             onClick={handleOnboard}
             disabled={loading}
           >
@@ -78,7 +78,7 @@ export default function ApplicantStep1({
           </Button>
         ) : (
           <Button
-            className="from-customTeal to-violet h-10 w-32 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36"
+            className="from-customTeal to-customViolet-100 h-10 w-32 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36"
             onClick={handleTakeTest}
           >
             <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full text-lg text-white lg:text-lg">

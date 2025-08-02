@@ -61,7 +61,7 @@ export default function QuestionCard({ question, onLike }: QuestionCardProps) {
       {/* Question Header */}
       <div className="mb-4 flex items-start justify-between">
         <div className="flex items-center gap-4">
-          <div className="h-10 w-10 overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-purple-100 p-0.5 dark:from-blue-900 dark:to-purple-900">
+          <div className="h-10 w-10 overflow-hidden rounded-full bg-gradient-to-br from-customBlue-100 to-purple-100 p-0.5 dark:from-customBlue-900 dark:to-purple-900">
             <div className="h-full w-full overflow-hidden rounded-full bg-white dark:bg-gray-800">
               {question.author.image_url ? (
                 <Image
@@ -121,7 +121,7 @@ export default function QuestionCard({ question, onLike }: QuestionCardProps) {
           {question.tags.map((tag, index) => (
             <span
               key={index}
-              className="rounded-full bg-gradient-to-r from-blue-50 to-indigo-50 px-3 py-1 text-sm font-medium text-blue-700 dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-300"
+              className="rounded-full bg-gradient-to-r from-customBlue-50 to-indigo-50 px-3 py-1 text-sm font-medium text-customBlue-700 dark:from-customBlue-900/30 dark:to-indigo-900/30 dark:text-customBlue-300"
             >
               {tag}
             </span>

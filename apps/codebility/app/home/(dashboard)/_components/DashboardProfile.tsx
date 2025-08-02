@@ -69,13 +69,13 @@ export default function DashboardProfile() {
       {!isLoading ? (
         <Box className="relative flex-1 overflow-hidden">
           {/* Background decoration */}
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-50/30 to-purple-50/30 dark:from-blue-950/10 dark:to-purple-950/10" />
+          <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/30 to-purple-50/30 dark:from-customBlue-950/10 dark:to-purple-950/10" />
           <div className="absolute -top-4 -left-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl" />
           
           {user && <DashboardCertificate />}
           <div className="relative mx-auto flex flex-col items-center gap-4">
             <div className="text-center">
-              <h2 className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent md:mt-0">
+              <h2 className="mt-2 sm:mt-4 text-2xl sm:text-3xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent md:mt-0">
                 Hello, {user?.first_name ?? ""}!
               </h2>
               <p className="text-xs sm:text-sm text-gray-500 dark:text-gray-400">Ready to level up today?</p>
@@ -84,7 +84,7 @@ export default function DashboardProfile() {
             <div className="relative">
               {/* Profile picture with enhanced styling */}
               <div className="relative group">
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-500 rounded-2xl blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-customBlue-500 to-purple-500 rounded-2xl blur-sm opacity-75 group-hover:opacity-100 transition-opacity"></div>
                 <div className="relative bg-white dark:bg-gray-800 p-1 rounded-2xl">
                   <Image
                     alt={`Profile picture of ${user?.first_name} ${user?.last_name || ''}, ${user?.display_position || 'team member'}`}

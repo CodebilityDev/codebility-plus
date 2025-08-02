@@ -49,7 +49,7 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
   const getDifficultyColor = (difficulty?: string) => {
     switch (difficulty?.toLowerCase()) {
       case "easy":
-        return "bg-blue-100 text-white dark:bg-blue-200 dark:text-white";
+        return "bg-customBlue-100 text-white dark:bg-customBlue-200 dark:text-white";
       case "medium":
         return "bg-customViolet-100 text-white dark:bg-customViolet-200 dark:text-black-100";
       case "hard":
@@ -111,7 +111,7 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
 
             {/* Type */}
             {task.type && (
-              <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-1 text-xs font-medium text-white dark:bg-blue-200 dark:text-white">
+              <span className="inline-flex items-center rounded-full bg-customBlue-100 px-2 py-1 text-xs font-medium text-white dark:bg-customBlue-200 dark:text-white">
                 {task.type}
               </span>
             )}

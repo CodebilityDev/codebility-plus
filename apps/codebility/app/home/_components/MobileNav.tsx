@@ -120,7 +120,7 @@ const MobileNav = () => {
     <Sheet open={isSheetOpen} onOpenChange={setIsSheetOpen}>
       <SheetTrigger asChild>
         <button
-          className="rounded p-1 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 lg:hidden"
+          className="rounded p-1 focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:ring-offset-2 lg:hidden"
           aria-label="Open navigation menu"
           aria-expanded={isSheetOpen}
           aria-controls="mobile-navigation"

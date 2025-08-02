@@ -93,7 +93,7 @@ export default function FilterCodevs({
         variant={showFilter ? "destructive" : "default"}
         size="sm"
         onClick={toggleFilter}
-        className={showFilter ? "" : "bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600"}
+        className={showFilter ? "" : "bg-gradient-to-r from-customBlue-500 to-indigo-500 text-white hover:from-customBlue-600 hover:to-indigo-600"}
       >
         {showFilter ? "Close filter" : "Filter"}
       </Button>
@@ -108,7 +108,7 @@ export default function FilterCodevs({
           <h3 className="font-semibold text-white">Filters</h3>
           <button
             onClick={clearFilter}
-            className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
+            className="text-sm text-customBlue-600 hover:text-customBlue-800 dark:text-customBlue-400 dark:hover:text-customBlue-500"
           >
             Clear all
           </button>

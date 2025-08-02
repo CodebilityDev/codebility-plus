@@ -59,8 +59,8 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
     <button
       className={`flex items-center space-x-1 ${
         isUpvoted
-          ? "text-blue-500 dark:text-blue-400"
-          : "hover:text-blue-500 dark:hover:text-blue-400"
+          ? "text-customBlue-500 dark:text-customBlue-400"
+          : "hover:text-customBlue-500 dark:hover:text-customBlue-400"
       }`}
       onClick={handleUpvote}
     >
