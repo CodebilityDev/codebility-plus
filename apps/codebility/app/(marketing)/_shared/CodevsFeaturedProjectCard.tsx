@@ -36,7 +36,7 @@ const FeaturedProjectCard: React.FC<FeaturedProjectCardProps> = ({
           <Link
             href={link}
             target="_blank"
-            className="mb-2 flex items-center gap-2 text-blue-100 duration-300 hover:ml-4"
+            className="mb-2 flex items-center gap-2 text-customBlue-100 duration-300 hover:ml-4"
           >
             Explore <IconArrowRight />
           </Link>
