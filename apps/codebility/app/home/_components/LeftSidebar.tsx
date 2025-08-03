@@ -6,6 +6,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { getSidebarData } from "@/constants/sidebar";
 import { useNavStore } from "@/hooks/use-sidebar";
+import { cn } from "@/lib/utils";
 import { useUserStore } from "@/store/codev-store";
 import { useSidebarStore } from "@/store/sidebar-store";
 import { AnimatePresence, motion } from "framer-motion";
@@ -70,12 +71,12 @@ const LeftSidebar = () => {
       initial={false}
       animate={isToggleOpen ? "open" : "closed"}
       variants={sidebarVariants}
-      className="background-navbar fixed left-0 top-0 z-20 hidden h-screen flex-col gap-4 overflow-hidden p-1 pt-4 shadow-lg lg:flex"
+      className="background-navbar sticky left-0 top-0 z-40 hidden h-screen flex-col gap-8 overflow-hidden p-1 shadow-lg lg:flex"
       role="complementary"
       aria-label="Main navigation sidebar"
     >
       {/* Logo and Toggle Button */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-center px-4 pt-2">
         <div className="flex w-full items-center">
           <Link href="/" className="flex-grow overflow-hidden">
             <AnimatePresence>
@@ -86,19 +87,15 @@ const LeftSidebar = () => {
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
                 >
-                  <Image
-                    src="/assets/svgs/codebility-white.svg"
-                    alt="Codebility White Logo"
-                    width={180}
-                    height={50}
-                    className="hidden dark:block"
-                  />
-                  <Image
+                  <img
                     src="/assets/svgs/codebility-black.svg"
-                    alt="Codebility Black Logo"
-                    width={180}
-                    height={50}
-                    className="block dark:hidden"
+                    alt="Codebility Logo"
+                    className="h-8 w-auto dark:hidden"
+                  />
+                  <img
+                    src="/assets/svgs/codebility-white.svg"
+                    alt="Codebility Logo"
+                    className="hidden h-8 w-auto dark:block"
                   />
                 </motion.div>
               )}
@@ -109,7 +106,7 @@ const LeftSidebar = () => {
         <motion.button
           onClick={toggleNav}
           whileTap={{ scale: 0.95 }}
-          className="rounded p-2 text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-white"
+          className="focus:ring-customBlue-500 z-50 rounded p-2 text-gray-600 hover:text-black focus:outline-none focus:ring-2 focus:ring-offset-2 dark:text-gray-400 dark:hover:text-white"
           aria-label={isToggleOpen ? "Collapse sidebar" : "Expand sidebar"}
           aria-expanded={isToggleOpen ? "true" : "false"}
           aria-controls="sidebar-navigation"
@@ -137,7 +134,10 @@ const LeftSidebar = () => {
       {/* Sidebar Links */}
       <nav
         id="sidebar-navigation"
-        className="flex flex-col overflow-y-auto"
+        className={cn(
+          "flex flex-col overflow-y-auto",
+          isToggleOpen ? "" : "items-center justify-center",
+        )}
         role="navigation"
         aria-label="Main navigation"
       >
@@ -183,7 +183,7 @@ const LeftSidebar = () => {
                         isActive
                           ? "primary-gradient text-light-900 rounded-lg"
                           : "text-dark300_light900"
-                      } mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:ring-offset-2 dark:hover:bg-[#131417]`}
+                      } focus:ring-customBlue-500 mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-offset-2 dark:hover:bg-[#131417]`}
                       aria-current={isActive ? "page" : undefined}
                       aria-label={`Navigate to ${link.label}${isActive ? " (current page)" : ""}`}
                       title={!isToggleOpen ? link.label : undefined}

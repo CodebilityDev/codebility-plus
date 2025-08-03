@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Theme from "@/components/shared/dashboard/Theme";
+import { MobileTheme } from "@/components/shared/dashboard/theme-mobile";
 import { defaultAvatar } from "@/public/assets/images";
 import {
   IconCog,
@@ -12,8 +13,8 @@ import {
   IconLogout,
   IconProfile,
 } from "@/public/assets/svgs";
-import { Bell } from "lucide-react";
 import { useUserStore } from "@/store/codev-store";
+import { Bell } from "lucide-react";
 
 import {
   DropdownMenu,
@@ -54,10 +55,16 @@ const Navbar = () => {
   const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
 
   return (
-    <nav className="background-navbar fixed top-0 z-50 w-full shadow-sm" role="banner">
-      <div className="flex items-center justify-between px-8 py-2">
-        <div className="flex items-center" role="navigation" aria-label="Logo">
-          <Link href="/home" className="flex items-center">
+    <nav
+      className="background-navbar fixed top-0 z-20 w-full shadow-sm"
+      role="banner"
+    >
+      <div className="flex w-full min-w-full items-center justify-end px-8 py-2">
+        {/*   <div className="md flex items-center" role="navigation" aria-label="Logo">
+          <Link
+            href="/home"
+            className="flex scale-75 items-center md:scale-100"
+          >
             <img
               src="/assets/svgs/codebility-black.svg"
               alt="Codebility Logo"
@@ -70,32 +77,47 @@ const Navbar = () => {
             />
             <span className="sr-only">Codebility Dashboard - Go to Home</span>
           </Link>
-        </div>
-        <div className="flex items-center gap-4" role="navigation" aria-label="User menu">
+        </div> */}
+        <div
+          className="flex items-center gap-4"
+          role="navigation"
+          aria-label="User menu"
+        >
           <button
-            className="relative p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors duration-200"
+            className="relative rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             aria-label="Notifications"
           >
             <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
-              <span className="h-1.5 w-1.5 bg-white rounded-full"></span>
+            <span className="absolute -right-1 -top-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
+              <span className="h-1.5 w-1.5 rounded-full bg-white"></span>
             </span>
           </button>
-          <Theme />
+          <div>
+            <div className="md:hidden">
+              <MobileTheme />
+            </div>
+            <div className="hidden items-center gap-4 md:flex">
+              <Theme />
+            </div>
+          </div>
+
           <DropdownMenu modal={false}>
-            <DropdownMenuTrigger 
-              className="flex items-center gap-4 focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:ring-offset-2 rounded-lg p-1"
+            <DropdownMenuTrigger
+              className="focus:ring-customBlue-500 flex items-center gap-4 rounded-lg p-1 focus:outline-none focus:ring-2 focus:ring-offset-2"
               aria-haspopup="menu"
               aria-expanded="false"
               aria-label={`User menu for ${first_name} ${last_name}`}
             >
-              <div className="hidden flex-col items-end md:flex" aria-hidden="true">
+              <div
+                className="hidden flex-col items-end md:flex"
+                aria-hidden="true"
+              >
                 <p className="capitalize dark:text-white">
                   {first_name} {last_name}
                 </p>
                 <p className="text-dark100_light900 text-sm">{email_address}</p>
               </div>
-              <div className="from-customViolet-300 relative size-[44px] rounded-full bg-gradient-to-b to-customBlue-500 p-[1.5px]">
+              <div className="from-customViolet-300 to-customBlue-500 relative size-[44px] rounded-full bg-gradient-to-b p-[1.5px]">
                 <Image
                   alt={`${first_name} ${last_name}'s profile picture`}
                   src={image_url || defaultAvatar}
@@ -105,25 +127,31 @@ const Navbar = () => {
                   title={`${first_name}'s Avatar`}
                 />
               </div>
-              <IconDropdown className="hidden invert dark:invert-0 md:block" aria-hidden="true" />
+              <IconDropdown
+                className="hidden invert dark:invert-0 md:block"
+                aria-hidden="true"
+              />
               <span className="sr-only">
                 Open user menu for {first_name} {last_name} ({email_address})
               </span>
             </DropdownMenuTrigger>
 
-            <DropdownMenuContent 
+            <DropdownMenuContent
               className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]"
               role="menu"
               aria-label="User account options"
             >
               {menuItems.map((item) => (
                 <Link href={item.href} key={item.label}>
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     className="flex cursor-pointer items-center gap-6 p-3 px-5"
                     role="menuitem"
                     aria-label={`Go to ${item.label} page`}
                   >
-                    <item.icon className="invert dark:invert-0" aria-hidden="true" />
+                    <item.icon
+                      className="invert dark:invert-0"
+                      aria-hidden="true"
+                    />
                     {item.label}
                   </DropdownMenuItem>
                 </Link>
@@ -140,9 +168,15 @@ const Navbar = () => {
                 role="menuitem"
                 aria-label="Sign out of your account"
               >
-                <IconLogout className="invert dark:invert-0" aria-hidden="true" /> 
+                <IconLogout
+                  className="invert dark:invert-0"
+                  aria-hidden="true"
+                />
                 Logout
-                <span className="sr-only"> - This will sign you out of your account</span>
+                <span className="sr-only">
+                  {" "}
+                  - This will sign you out of your account
+                </span>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
