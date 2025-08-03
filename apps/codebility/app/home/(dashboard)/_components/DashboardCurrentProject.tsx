@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Box } from "@/Components/shared/dashboard";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import { Box } from "@/components/shared/dashboard";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
