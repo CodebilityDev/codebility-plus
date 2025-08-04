@@ -1,4 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
 import { cn } from "@/lib/utils";
 import {
   Pagination,
@@ -14,7 +13,7 @@ interface DefaultPaginationProps {
   currentPage: number;
   handleNextPage: () => void;
   handlePreviousPage: () => void;
-  setCurrentPage?: Dispatch<SetStateAction<number>>;
+  setCurrentPage?: (page: number) => void;
 }
 
 const DefaultPagination = ({
