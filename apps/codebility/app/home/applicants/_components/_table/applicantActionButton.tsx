@@ -181,6 +181,110 @@ export default function ApplicantActionButton({
     }
   };
 
+  const handlePassApplicant = async () => {
+    setIsLoading(true);
+    try {
+      await passApplicantTestAction(applicant.id);
+      await sendPassedTestEmail({
+        email: applicant.email_address,
+        name: `${applicant.first_name} ${applicant.last_name}`,
+      });
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Applicant Passed",
+        description: `${applicant.first_name} ${applicant.last_name} has been moved to onboarding.`,
+      });
+      router.refresh();
+    } catch (error) {
+      console.error("Error passing applicant:", error);
+      toast({
+        title: "Error",
+        description: "Failed to pass applicant. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleFailApplicant = async () => {
+    setIsLoading(true);
+    try {
+      await denyApplicantAction(applicant.id);
+      await sendFailedTestEmail({
+        email: applicant.email_address,
+        name: `${applicant.first_name} ${applicant.last_name}`,
+      });
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Applicant Failed",
+        description: `${applicant.first_name} ${applicant.last_name} has been marked as failed.`,
+      });
+      router.refresh();
+    } catch (error) {
+      console.error("Error failing applicant:", error);
+      toast({
+        title: "Error",
+        description: "Failed to fail applicant. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAcceptApplicant = async () => {
+    setIsLoading(true);
+    try {
+      await acceptApplicantAction(applicant.id);
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Applicant Accepted",
+        description: `${applicant.first_name} ${applicant.last_name} has been accepted.`,
+      });
+      router.refresh();
+    } catch (error) {
+      console.error("Error accepting applicant:", error);
+      toast({
+        title: "Error",
+        description: "Failed to accept applicant. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleDenyApplicant = async () => {
+    setIsLoading(true);
+    try {
+      await denyApplicantAction(applicant.id);
+      await sendDenyEmail({
+        email: applicant.email_address,
+        name: `${applicant.first_name} ${applicant.last_name}`,
+      });
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Applicant Denied",
+        description: `${applicant.first_name} ${applicant.last_name} has been denied.`,
+      });
+      router.refresh();
+    } catch (error) {
+      console.error("Error denying applicant:", error);
+      toast({
+        title: "Error",
+        description: "Failed to deny applicant. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getDialogTitle = () => {
     switch (dialogState) {
       case "applying": return "Move to Applying";
@@ -188,6 +292,10 @@ export default function ApplicantActionButton({
       case "onboarding": return "Move to Onboarding";
       case "denied": return "Move to Denied";
       case "delete": return "Delete Applicant";
+      case "pass": return "Pass Applicant";
+      case "fail": return "Fail Applicant";
+      case "accept": return "Accept Applicant";
+      case "deny": return "Deny Applicant";
       default: return "Confirm Action";
     }
   };
@@ -200,6 +308,10 @@ export default function ApplicantActionButton({
       case "onboarding": return `Are you sure you want to move ${name} to onboarding?`;
       case "denied": return `Are you sure you want to move ${name} to denied?`;
       case "delete": return `Are you sure you want to delete ${name}? This action cannot be undone.`;
+      case "pass": return `Are you sure you want to pass ${name}? They will be moved to onboarding.`;
+      case "fail": return `Are you sure you want to fail ${name}? They will be moved to denied.`;
+      case "accept": return `Are you sure you want to accept ${name}? They will become an active member.`;
+      case "deny": return `Are you sure you want to deny ${name}? This will send them a denial email.`;
       default: return "Please confirm your action.";
     }
   };
@@ -210,6 +322,10 @@ export default function ApplicantActionButton({
       case "testing": return handleMoveToTesting();
       case "onboarding": return handleMoveToOnboarding();
       case "denied": return handleMoveToDenied();
+      case "pass": return handlePassApplicant();
+      case "fail": return handleFailApplicant();
+      case "accept": return handleAcceptApplicant();
+      case "deny": return handleDenyApplicant();
       default: return;
     }
   };
@@ -298,6 +414,56 @@ export default function ApplicantActionButton({
               Move to Denied
             </DropdownMenuItem>
           )}
+
+          <DropdownMenuSeparator />
+
+          {/* Test Actions - only show for testing status */}
+          {applicant.application_status === "testing" && (
+            <>
+              <DropdownMenuItem
+                className="text-green-500 dark:text-green-400 cursor-pointer"
+                onClick={() => {
+                  setDialogState("pass");
+                  setIsDialogOpen(true);
+                }}
+              >
+                Pass Test
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-500 dark:text-red-400 cursor-pointer"
+                onClick={() => {
+                  setDialogState("fail");
+                  setIsDialogOpen(true);
+                }}
+              >
+                Fail Test
+              </DropdownMenuItem>
+            </>
+          )}
+
+          {/* Onboarding Actions - only show for onboarding status */}
+          {applicant.application_status === "onboarding" && (
+            <>
+              <DropdownMenuItem
+                className="text-green-500 dark:text-green-400 cursor-pointer"
+                onClick={() => {
+                  setDialogState("accept");
+                  setIsDialogOpen(true);
+                }}
+              >
+                Accept Applicant
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-red-500 dark:text-red-400 cursor-pointer"
+                onClick={() => {
+                  setDialogState("deny");
+                  setIsDialogOpen(true);
+                }}
+              >
+                Deny Applicant
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -330,7 +496,7 @@ export default function ApplicantActionButton({
             <Button
               onClick={handleConfirmAction}
               disabled={isLoading}
-              variant={dialogState === "delete" || dialogState === "denied" ? "destructive" : "default"}
+              variant={dialogState === "delete" || dialogState === "denied" || dialogState === "fail" || dialogState === "deny" ? "destructive" : "default"}
             >
               {isLoading ? (
                 <>

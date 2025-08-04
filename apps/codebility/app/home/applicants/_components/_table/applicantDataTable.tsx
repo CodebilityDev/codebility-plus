@@ -134,6 +134,19 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     setRowSelection({});
   }, [pagination.pageIndex]);
 
+  // Reset pagination when data changes significantly (different length)
+  const prevDataLength = React.useRef(data.length);
+  React.useEffect(() => {
+    if (prevDataLength.current !== data.length) {
+      // Only reset if we're beyond the available pages
+      const newTotalPages = Math.ceil(data.length / pagination.pageSize);
+      if (pagination.pageIndex >= newTotalPages && newTotalPages > 0) {
+        setPagination(prev => ({ ...prev, pageIndex: 0 }));
+      }
+      prevDataLength.current = data.length;
+    }
+  }, [data.length, pagination.pageIndex, pagination.pageSize]);
+
   return (
     <div className="overflow-hidden rounded-md">
       <Box className="p-1 py-2 sm:p-3 sm:py-3">
@@ -161,7 +174,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
         </div>
 
         {/* Table for larger screens */}
-        <Table className="hidden xl:table">
+        <Table className="hidden xl:table" key={`table-page-${pagination.pageIndex}`}>
           {/* Table header */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -234,7 +247,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
         </Table>
 
         {/* Table for smaller screens */}
-        <div>
+        <div key={`mobile-page-${pagination.pageIndex}`}>
           <ApplicantMobileTable table={table} />
         </div>
 
