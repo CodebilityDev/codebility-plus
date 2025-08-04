@@ -43,6 +43,10 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: pageSize.applicants,
+  });
 
   // Memoize initial column visibility to prevent recalculation
   const initialColumnVisibility = useMemo(
@@ -58,6 +62,12 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     [data[0]?.application_status],
   );
 
+  // Calculate total pages
+  const totalPages = useMemo(
+    () => Math.ceil(data.length / pagination.pageSize),
+    [data.length, pagination.pageSize],
+  );
+
   const table = useReactTable({
     data,
     columns,
@@ -67,23 +77,19 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
     state: {
       sorting,
       rowSelection,
+      columnVisibility,
+      pagination,
     },
     initialState: {
-      pagination: {
-        pageSize: pageSize.applicants,
-      },
       columnVisibility: initialColumnVisibility,
     },
+    pageCount: totalPages,
+    manualPagination: false,
   });
-
-  // Calculate total pages
-  const totalPages = useMemo(
-    () => Math.ceil(data.length / pageSize.applicants),
-    [data.length],
-  );
 
   const toBeFailed = useCallback(
     (
@@ -108,31 +114,33 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
 
   // Define pagination callbacks outside of conditional rendering
   const handleNextPage = useCallback(() => {
-    if (table.getState().pagination.pageIndex < totalPages - 1) {
-      table.nextPage();
-    }
-  }, [table, totalPages]);
+    table.nextPage();
+  }, [table]);
 
-  const handlePreviousPage = useCallback(() => table.previousPage(), [table]);
+  const handlePreviousPage = useCallback(() => {
+    table.previousPage();
+  }, [table]);
 
   const setCurrentPage = useCallback(
-    (pageOrFunction: number | ((page: number) => number)) => {
-      const page =
-        typeof pageOrFunction === "function"
-          ? pageOrFunction(table.getState().pagination.pageIndex + 1)
-          : pageOrFunction;
+    (page: number) => {
       table.setPageIndex(page - 1);
     },
     [table],
   );
+
+
+  // Clear row selection when page changes
+  React.useEffect(() => {
+    setRowSelection({});
+  }, [pagination.pageIndex]);
 
   return (
     <div className="overflow-hidden rounded-md">
       <Box className="p-1 py-2 sm:p-3 sm:py-3">
         {/* if rows selected */}
 
-        <div className="justify-betwee flex w-full items-center">
-          <div className="hidden w-full items-center gap-4 px-2 pb-2 xl:flex">
+        <div className="justify-between flex w-full items-center">
+          <div className="flex w-full items-center gap-4 px-2 pb-2">
             <p className="text-sm text-gray-500">
               {Object.keys(rowSelection).length} selected
             </p>
@@ -183,7 +191,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={row.id}
+                  key={`${row.id}-${row.index}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
                     row.original.application_status === "testing" &&
@@ -226,11 +234,13 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
         </Table>
 
         {/* Table for smaller screens */}
-        <ApplicantMobileTable table={table} />
+        <div>
+          <ApplicantMobileTable table={table} />
+        </div>
 
         {/* Table pagination integrated with DefaultPagination component */}
         <div className="relative w-full">
-          {data.length > pageSize.applicants && (
+          {data.length > pagination.pageSize && (
             <DefaultPagination
               currentPage={table.getState().pagination.pageIndex + 1}
               handleNextPage={handleNextPage}
@@ -245,6 +255,4 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   );
 }
 
-export const ApplicantDataTable = React.memo(
-  ApplicantDataTableComponent,
-) as typeof ApplicantDataTableComponent;
+export const ApplicantDataTable = ApplicantDataTableComponent;

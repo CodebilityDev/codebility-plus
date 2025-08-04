@@ -5,7 +5,14 @@ import { revalidatePath } from "next/cache";
 import { NewApplicantType } from "./types";
 import { createAdminClient } from "@/utils/supabase/admin";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { invalidateCache } from "@/lib/server/redis-cache";
+import { cacheKeys } from "@/lib/server/redis-cache-keys";
 
+// Helper function to revalidate both cache and path
+async function revalidateApplicants() {
+    await invalidateCache(cacheKeys.codevs.applicants);
+    revalidatePath("/home/applicants");
+}
 
 export async function deleteApplicantAction(applicant: NewApplicantType) {
     try {
@@ -39,7 +46,7 @@ export async function deleteApplicantAction(applicant: NewApplicantType) {
         }
 
         //revalidate the cache
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error deleting applicant:", error);
         throw new Error("Failed to delete applicant");
@@ -88,7 +95,7 @@ export async function multipleDeleteApplicantAction(applicant: NewApplicantType[
             throw new Error("Failed to delete applicants from auth");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error deleting applicants:", error);
         throw new Error("Failed to delete applicants");
@@ -113,7 +120,7 @@ export async function passApplicantTestAction(applicantId: string) {
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error passing applicant test:", error);
         throw new Error("Failed to pass applicant test");
@@ -160,7 +167,7 @@ export async function denyApplicantAction(applicantId: string) {
             throw new Error("Failed to update rejected_count in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error rejecting applicant test:", error);
         throw new Error("Failed to reject applicant test");
@@ -185,7 +192,7 @@ export async function multiplePassApplicantTestAction(applicantIds: string[]) {
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error passing multiple applicants test:", error);
         throw new Error("Failed to pass multiple applicants test");
@@ -240,7 +247,7 @@ export async function multipleDenyApplicantAction(applicantIds: string[]) {
             throw new Error("Failed to update rejected_count for multiple applicants");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error rejecting multiple applicants test:", error);
         throw new Error("Failed to reject multiple applicants test");
@@ -267,7 +274,7 @@ export async function acceptApplicantAction(applicantId: string) {
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error accepting applicant test:", error);
         throw new Error("Failed to accept applicant test");
@@ -294,7 +301,7 @@ export async function multipleAcceptApplicantAction(applicantIds: string[]) {
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error accepting multiple applicants test:", error);
         throw new Error("Failed to accept multiple applicants test");
@@ -304,37 +311,39 @@ export async function multipleAcceptApplicantAction(applicantIds: string[]) {
 export async function moveApplicantToApplyingAction(applicantId: string) {
     try {
         const supabase = await createClientServerComponent();
+        const updateTime = new Date().toISOString();
 
-        const { error } = await supabase
-            .from("applicant")
-            .update({
-                test_taken: null,
-                fork_url: null,
-                updated_at: new Date().toISOString()
-            })
-            .eq("codev_id", applicantId);
+        // Run both updates in parallel
+        const [applicantResult, codevResult] = await Promise.all([
+            supabase
+                .from("applicant")
+                .update({
+                    test_taken: null,
+                    fork_url: null,
+                    updated_at: updateTime
+                })
+                .eq("codev_id", applicantId),
+            
+            supabase
+                .from("codev")
+                .update({
+                    application_status: "applying",
+                    updated_at: updateTime
+                })
+                .eq("id", applicantId)
+        ]);
 
-        if (error) {
-            console.error("Error updating applicant status in applicant:", error);
+        if (applicantResult.error) {
+            console.error("Error updating applicant status in applicant:", applicantResult.error);
             throw new Error("Failed to update applicant status in applicant");
         }
 
-        // update codev table
-        const { error: CodevError } = await supabase
-            .from("codev")
-            .update({
-                application_status: "applying",
-                updated_at: new Date().toISOString()
-            })
-            .eq("id", applicantId);
-
-        if (CodevError) {
-            console.error("Error updating applicant status in codev:", error);
+        if (codevResult.error) {
+            console.error("Error updating applicant status in codev:", codevResult.error);
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/applicants");
-
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error moving applicant to applying:", error);
         throw new Error("Failed to move applicant to applying");
@@ -373,7 +382,7 @@ export async function multipleMoveApplicantToApplyingAction(applicantIds: string
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error moving multiple applicants to applying:", error);
         throw new Error("Failed to move multiple applicants to applying");
@@ -383,36 +392,39 @@ export async function multipleMoveApplicantToApplyingAction(applicantIds: string
 export async function moveApplicantToTestingAction(applicantId: string) {
     try {
         const supabase = await createClientServerComponent();
+        const updateTime = new Date().toISOString();
 
-        const { error } = await supabase
-            .from("applicant")
-            .update({
-                test_taken: new Date().toISOString(),
-                fork_url: null,
-                updated_at: new Date().toISOString()
-            })
-            .eq("codev_id", applicantId);
+        // Run both updates in parallel
+        const [applicantResult, codevResult] = await Promise.all([
+            supabase
+                .from("applicant")
+                .update({
+                    test_taken: updateTime,
+                    fork_url: null,
+                    updated_at: updateTime
+                })
+                .eq("codev_id", applicantId),
+            
+            supabase
+                .from("codev")
+                .update({
+                    application_status: "testing",
+                    updated_at: updateTime
+                })
+                .eq("id", applicantId)
+        ]);
 
-        if (error) {
-            console.error("Error updating applicant status in applicant:", error);
+        if (applicantResult.error) {
+            console.error("Error updating applicant status in applicant:", applicantResult.error);
             throw new Error("Failed to update applicant status in applicant");
         }
 
-        // update codev table
-        const { error: CodevError } = await supabase
-            .from("codev")
-            .update({
-                application_status: "testing",
-                updated_at: new Date().toISOString()
-            })
-            .eq("id", applicantId);
-
-        if (CodevError) {
-            console.error("Error updating applicant status in codev:", error);
+        if (codevResult.error) {
+            console.error("Error updating applicant status in codev:", codevResult.error);
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error moving applicant to testing:", error);
         throw new Error("Failed to move applicant to testing");
@@ -451,7 +463,7 @@ export async function multipleMoveApplicantToTestingAction(applicantIds: string[
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error moving multiple applicants to testing:", error);
         throw new Error("Failed to move multiple applicants to testing");
@@ -476,7 +488,7 @@ export async function moveApplicantToOnboardingAction(applicantId: string) {
             throw new Error("Failed to update applicant status in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error moving applicant to onboarding:", error);
         throw new Error("Failed to move applicant to onboarding");
@@ -501,7 +513,7 @@ export async function multipleMoveApplicantToOnboardingAction(applicantIds: stri
             throw new Error("Failed to update applicants status in codev");
         }
 
-        revalidatePath("/home/applicants");
+        await revalidateApplicants();
     } catch (error) {
         console.error("Error moving multiple applicants to onboarding:", error);
         throw new Error("Failed to move multiple applicants to onboarding");
