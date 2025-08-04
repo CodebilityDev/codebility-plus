@@ -109,28 +109,24 @@ function ApplicantLists({
         </TabsList>
         <TabsContent value="applying" className="mt-10 md:mt-4">
           <ApplicantDataTable
-            key={`applying-${applicantsApplying.map(a => a.id).join('-')}`}
             data={applicantsApplying}
             columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="testing" className="mt-10 md:mt-4">
           <ApplicantDataTable
-            key={`testing-${applicantsTesting.map(a => a.id).join('-')}`}
             data={applicantsTesting}
             columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="onboarding" className="mt-10 md:mt-4">
           <ApplicantDataTable
-            key={`onboarding-${applicantsOnboarding.map(a => a.id).join('-')}`}
             data={applicantsOnboarding}
             columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="denied" className="mt-10 md:mt-4">
           <ApplicantDataTable
-            key={`denied-${applicantsDenied.map(a => a.id).join('-')}`}
             data={applicantsDenied}
             columns={applicantsColumns}
           />
