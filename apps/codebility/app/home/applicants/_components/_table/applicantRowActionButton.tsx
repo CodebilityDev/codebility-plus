@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -45,6 +46,7 @@ export default function ApplicantRowActionButton({
   applicants: NewApplicantType[];
 }) {
   const { toast } = useToast();
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [dialogState, setDialogState] = useState<
@@ -74,6 +76,7 @@ export default function ApplicantRowActionButton({
         title: "Applicants moved to applying",
         description: "All selected applicants have been moved to applying.",
       });
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast({
@@ -96,6 +99,7 @@ export default function ApplicantRowActionButton({
         description: "All selected applicants have been moved to testing.",
       });
       setOpen(false);
+      router.refresh();
     } catch (error) {
       toast({
         title: "Error",
@@ -118,6 +122,7 @@ export default function ApplicantRowActionButton({
         title: "Applicants moved to onboarding",
         description: "All selected applicants have been moved to onboarding.",
       });
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast({
@@ -146,6 +151,7 @@ export default function ApplicantRowActionButton({
         title: "Applicants denied",
         description: "All selected applicants have been denied.",
       });
+      router.refresh();
     } catch (error) {
       console.error(error);
     }
@@ -169,6 +175,7 @@ export default function ApplicantRowActionButton({
         title: "Applicants passed",
         description: "All selected applicants have passed the test.",
       });
+      router.refresh();
     } catch (error) {
       console.error(error);
       toast({
@@ -187,6 +194,7 @@ export default function ApplicantRowActionButton({
         applicants.map((applicant) => applicant.id),
       );
       setOpen(false);
+      router.refresh();
     } catch (error) {
       console.error(error);
     }
@@ -198,6 +206,7 @@ export default function ApplicantRowActionButton({
     try {
       await multipleDeleteApplicantAction(applicants);
       setOpen(false);
+      router.refresh();
     } catch (error) {
       console.error(error);
     }
@@ -327,7 +336,7 @@ export default function ApplicantRowActionButton({
               variant="ghost"
               className={cn(
                 "p-0 text-gray-400 hover:text-gray-300",
-                applicants.length <= 0 && "invisible",
+                applicants.length === 0 && "invisible",
               )}
             >
               <span className="sr-only">More actions</span>

@@ -86,3 +86,16 @@ export async function isRedisHealthy(): Promise<boolean> {
     return false;
   }
 }
+
+// Function to invalidate cache
+export async function invalidateCache(key: string): Promise<void> {
+  if (!redis) {
+    return;
+  }
+  
+  try {
+    await redis.del(key);
+  } catch (err) {
+    console.warn(`Failed to invalidate cache for key "${key}"`, err);
+  }
+}
