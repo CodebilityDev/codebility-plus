@@ -3,6 +3,7 @@
 "use client";
 
 import React, { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -54,6 +55,7 @@ export default function ApplicantActionButton({
   applicant: NewApplicantType;
 }) {
   const { toast } = useToast();
+  const router = useRouter();
   const { openModal } = useApplicantModal(); // Use our custom modal context
 
   const [isLoading, setIsLoading] = useState(false);
@@ -75,7 +77,6 @@ export default function ApplicantActionButton({
 
   // Handle View Details click - uses our custom modal system
   const handleViewDetails = () => {
-    console.log("🔍 View Details clicked for:", applicant.first_name, applicant.last_name);
     openModal(applicant);
   };
 
@@ -98,6 +99,7 @@ export default function ApplicantActionButton({
         title: "Applicant Moved",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to applying.`,
       });
+      router.refresh();
     } catch (error) {
       console.error("Error moving applicant to applying:", error);
       toast({
@@ -105,8 +107,9 @@ export default function ApplicantActionButton({
         description: "Failed to move applicant to applying. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleMoveToTesting = async () => {
@@ -119,15 +122,17 @@ export default function ApplicantActionButton({
         title: "Applicant Moved",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to testing.`,
       });
+      router.refresh();
     } catch (error) {
       console.error("Error moving applicant to testing:", error);
       toast({
         title: "Error",
-        description: "Failed to move applicant to testing. Please try again later.",
+        description: error instanceof Error ? error.message : "Failed to move applicant to testing. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleMoveToOnboarding = async () => {
@@ -140,6 +145,7 @@ export default function ApplicantActionButton({
         title: "Applicant Moved",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to onboarding.`,
       });
+      router.refresh();
     } catch (error) {
       console.error("Error moving applicant to onboarding:", error);
       toast({
@@ -147,8 +153,9 @@ export default function ApplicantActionButton({
         description: "Failed to move applicant to onboarding. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleMoveToDenied = async () => {
@@ -161,6 +168,7 @@ export default function ApplicantActionButton({
         title: "Applicant Denied",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to denied.`,
       });
+      router.refresh();
     } catch (error) {
       console.error("Error moving applicant to denied:", error);
       toast({
@@ -168,8 +176,9 @@ export default function ApplicantActionButton({
         description: "Failed to move applicant to denied. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const getDialogTitle = () => {
@@ -295,7 +304,10 @@ export default function ApplicantActionButton({
       {/* Confirmation Dialog */}
       <Dialog open={isDialogOpen && dialogState !== null} onOpenChange={(open) => {
         setIsDialogOpen(open);
-        if (!open) setDialogState(null);
+        if (!open) {
+          setDialogState(null);
+          setIsLoading(false); // Reset loading state when dialog closes
+        }
       }}>
         <DialogContent>
           <DialogHeader>
@@ -305,9 +317,16 @@ export default function ApplicantActionButton({
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsDialogOpen(false);
+                setDialogState(null);
+                setIsLoading(false);
+              }}
+            >
+              Cancel
+            </Button>
             <Button
               onClick={handleConfirmAction}
               disabled={isLoading}

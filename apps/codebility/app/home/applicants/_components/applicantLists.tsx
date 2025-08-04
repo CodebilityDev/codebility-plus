@@ -13,51 +13,56 @@ import { ApplicantDataTable } from "./_table/applicantDataTable";
 import { applicantsColumns } from "./_table/applicantColumns";
 import ApplicantFilterHeaders from "./applicantHeaders";
 
-export default function ApplicantLists({
-  applicants: data,
+function ApplicantLists({
+  applicants,
 }: {
   applicants: NewApplicantType[];
 }) {
-  const [applicants, setApplicants] = React.useState(data);
+  const [filteredApplicants, setFilteredApplicants] = React.useState(applicants);
   const [currentTab, setCurrentTab] = React.useState("applying");
+
+  // Always use the latest applicants data for filtering
+  React.useEffect(() => {
+    setFilteredApplicants(applicants);
+  }, [applicants]);
 
   const applicantsApplying = React.useMemo(
     () =>
-      applicants.filter(
+      filteredApplicants.filter(
         (applicant) => applicant.application_status === "applying",
       ),
-    [applicants],
+    [filteredApplicants],
   );
 
   const applicantsTesting = React.useMemo(
     () =>
-      applicants.filter(
+      filteredApplicants.filter(
         (applicant) => applicant.application_status === "testing",
       ),
-    [applicants],
+    [filteredApplicants],
   );
 
   const applicantsOnboarding = React.useMemo(
     () =>
-      applicants.filter(
+      filteredApplicants.filter(
         (applicant) => applicant.application_status === "onboarding",
       ),
-    [applicants],
+    [filteredApplicants],
   );
 
   const applicantsDenied = React.useMemo(
     () =>
-      applicants.filter(
+      filteredApplicants.filter(
         (applicant) => applicant.application_status === "denied",
       ),
-    [applicants],
+    [filteredApplicants],
   );
 
   return (
     <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
       <ApplicantFilterHeaders
-        applicants={data}
-        setApplicants={setApplicants}
+        applicants={applicants}
+        setApplicants={setFilteredApplicants}
         setCurrentTab={setCurrentTab}
       />
       <Tabs
@@ -104,24 +109,28 @@ export default function ApplicantLists({
         </TabsList>
         <TabsContent value="applying" className="mt-10 md:mt-4">
           <ApplicantDataTable
+            key={`applying-${applicantsApplying.map(a => a.id).join('-')}`}
             data={applicantsApplying}
             columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="testing" className="mt-10 md:mt-4">
           <ApplicantDataTable
+            key={`testing-${applicantsTesting.map(a => a.id).join('-')}`}
             data={applicantsTesting}
             columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="onboarding" className="mt-10 md:mt-4">
           <ApplicantDataTable
+            key={`onboarding-${applicantsOnboarding.map(a => a.id).join('-')}`}
             data={applicantsOnboarding}
             columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="denied" className="mt-10 md:mt-4">
           <ApplicantDataTable
+            key={`denied-${applicantsDenied.map(a => a.id).join('-')}`}
             data={applicantsDenied}
             columns={applicantsColumns}
           />
@@ -131,4 +140,4 @@ export default function ApplicantLists({
   );
 }
 
-memo(ApplicantLists);
+export default ApplicantLists;

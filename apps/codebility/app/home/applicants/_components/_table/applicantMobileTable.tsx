@@ -13,7 +13,7 @@ import {
 import { NewApplicantType } from "../../_service/types";
 import ApplicantRowActionButton from "./applicantRowActionButton";
 import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
-import ApplicantActionButton from "./applicantActionButton.original";
+import ApplicantActionButton from "./applicantActionButton";
 
 function ApplicantMobileTableComponent<TData extends NewApplicantType>({
   table,
@@ -31,7 +31,7 @@ function ApplicantMobileTableComponent<TData extends NewApplicantType>({
               const applicant = row.original;
               return (
                 <div
-                  key={row.id}
+                  key={`${row.id}-${row.index}`}
                   className={cn(
                     "rounded-md border bg-white p-2 shadow-sm transition-all hover:shadow-md dark:bg-gray-900 dark:border-gray-700",
                     applicant.application_status === "testing" &&
