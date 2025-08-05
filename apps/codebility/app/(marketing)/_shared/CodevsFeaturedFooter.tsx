@@ -19,7 +19,7 @@ const Footer = () => {
               <Link
                 key={index}
                 href={link.url}
-                className="text-base font-light duration-300 hover:text-blue-100"
+                className="text-base font-light duration-300 hover:text-customBlue-100"
               >
                 {link.label}
               </Link>
@@ -35,21 +35,21 @@ const Footer = () => {
                 {link.label === "Contact Us" ? (
                   <button
                     onClick={() => onOpen("contactUsModal")}
-                    className="text-base font-light duration-300 hover:text-blue-100"
+                    className="text-base font-light duration-300 hover:text-customBlue-100"
                   >
                     {link.label}
                   </button>
                 ) : link.label === "Privacy Policy" ? (
                   <button
                     onClick={() => onOpen("privacyPolicyModal")}
-                    className="text-base font-light duration-300 hover:text-blue-100"
+                    className="text-base font-light duration-300 hover:text-customBlue-100"
                   >
                     {link.label}
                   </button>
                 ) : link.label === "Terms of Service" ? (
                   <button
                     onClick={() => onOpen("termsOfServiceModal")}
-                    className="text-base font-light duration-300 hover:text-blue-100"
+                    className="text-base font-light duration-300 hover:text-customBlue-100"
                   >
                     {link.label}
                   </button>
@@ -57,7 +57,7 @@ const Footer = () => {
                   <Link
                     key={index}
                     href={link.url}
-                    className="text-base font-light duration-300 hover:text-blue-100"
+                    className="text-base font-light duration-300 hover:text-customBlue-100"
                   >
                     {link.label}
                   </Link>
@@ -72,7 +72,7 @@ const Footer = () => {
           <Link
             href="https://www.facebook.com/Codebilitydev"
             target="_blank"
-            className="text-base font-light duration-300 hover:text-blue-100"
+            className="text-base font-light duration-300 hover:text-customBlue-100"
           >
             Codebility on Facebook
           </Link>

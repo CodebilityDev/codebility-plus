@@ -255,7 +255,7 @@ export default function ClientEditModal() {
               <div className="gap-4">
                 {!logoPreview && (
                   <label htmlFor="edit_company_logo">
-                    <p className="cursor-pointer text-center text-blue-600 dark:text-blue-400 md:text-left">
+                    <p className="cursor-pointer text-center text-customBlue-600 dark:text-customBlue-400 md:text-left">
                       Upload Image
                     </p>
                   </label>
@@ -408,7 +408,7 @@ export default function ClientEditModal() {
               </Button>
               <Button
                 type="submit"
-                className="order-1 w-full sm:order-2 sm:w-[130px] bg-blue-600 hover:bg-blue-700 text-white dark:bg-blue-600 dark:hover:bg-blue-700"
+                className="order-1 w-full sm:order-2 sm:w-[130px] bg-customBlue-600 hover:bg-customBlue-700 text-white dark:bg-customBlue-600 dark:hover:bg-customBlue-700"
                 disabled={isLoading || !isValid}
               >
                 Save

@@ -3,7 +3,7 @@
 import React, { ReactNode, useState } from "react";
 import { useModal } from "@/hooks/use-modal";
 
-import { Dialog, DialogContent } from "@codevs/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@codevs/ui/dialog";
 
 function FaqsModal() {
   const { isOpen, onClose, type } = useModal();
@@ -12,7 +12,7 @@ function FaqsModal() {
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className=" bg-black-800 flex max-w-[1260px] flex-col justify-between gap-4 text-white">
-        
+        <DialogTitle className="sr-only">Frequently Asked Questions</DialogTitle>
         
         <div className="flex max-h-[500px] flex-col gap-2 overflow-hidden overflow-y-scroll ">
          

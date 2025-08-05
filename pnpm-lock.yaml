@@ -90,7 +90,7 @@ importers:
         version: 11.14.1(@emotion/react@11.14.0)(@types/react@19.1.5)(react@19.1.0)
       '@hookform/resolvers':
         specifier: ^3.3.4
-        version: 3.10.0(react-hook-form@7.61.1)
+        version: 3.3.4(react-hook-form@7.56.4)
       '@material-tailwind/react':
         specifier: ^2.1.10
         version: 2.1.10(react-dom@19.1.0)(react@19.1.0)
@@ -248,8 +248,8 @@ importers:
         specifier: ^5.2.0
         version: 5.5.0(react-dom@19.1.0)(react@19.1.0)
       react-hook-form:
-        specifier: ^7.56.2
-        version: 7.61.1(react@19.1.0)
+        specifier: ^7.56.4
+        version: 7.56.4(react@19.1.0)
       react-hot-toast:
         specifier: ^2.4.1
         version: 2.5.2(react-dom@19.1.0)(react@19.1.0)
@@ -648,8 +648,8 @@ importers:
   packages/ui:
     dependencies:
       '@hookform/resolvers':
-        specifier: ^3.9.0
-        version: 3.10.0(react-hook-form@7.61.1)
+        specifier: ^3.3.4
+        version: 3.3.4(react-hook-form@7.56.4)
       '@radix-ui/react-accessible-icon':
         specifier: ^1.0.1
         version: 1.1.7(@types/react-dom@19.1.5)(@types/react@19.1.5)(react-dom@19.1.0)(react@19.1.0)
@@ -771,8 +771,8 @@ importers:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
       react-hook-form:
-        specifier: ^7.56.2
-        version: 7.61.1(react@19.1.0)
+        specifier: ^7.56.4
+        version: 7.56.4(react@19.1.0)
       react-resizable-panels:
         specifier: ^2.1.2
         version: 2.1.9(react-dom@19.1.0)(react@19.1.0)
@@ -3005,7 +3005,7 @@ packages:
 
   /@expo/bunyan@4.0.1:
     resolution: {integrity: sha512-+Lla7nYSiHZirgK+U/uYzsLv/X+HaJienbD5AKX1UQZHYfWaP+9uuQluRB4GrEVWF0GZ7vEVp/jzaOT9k/SQlg==}
-    engines: {node: '>=0.10.0'}
+    engines: {'0': node >=0.10.0}
     dependencies:
       uuid: 8.3.2
     dev: false
@@ -3520,7 +3520,7 @@ packages:
     resolution: {integrity: sha512-FQinlwHrTlJbntp8a7NAlCKedVXe06Va/0DSLXRO8lZVtgbEMrYYSUZWQNcOlNtc58c2elNph6z9dMOYwSo3JQ==}
     engines: {node: '>=12'}
     dependencies:
-      '@expo/spawn-async': 1.5.0
+      '@expo/spawn-async': 1.7.2
       exec-async: 2.2.0
     dev: false
 
@@ -3536,7 +3536,7 @@ packages:
     resolution: {integrity: sha512-MdV7dpFA4aI8HIW0xsW2DBUem5aFKL8+/v5LXKPZuXmYW02/EXPSp7DBJAwow8ULpa3Q2VlYfb46hWPre3hw4A==}
     dependencies:
       '@expo/json-file': 8.3.3
-      '@expo/spawn-async': 1.5.0
+      '@expo/spawn-async': 1.7.2
       ansi-regex: 5.0.1
       chalk: 4.1.2
       find-up: 5.0.0
@@ -3800,6 +3800,14 @@ packages:
       react-hook-form: ^7.0.0
     dependencies:
       react-hook-form: 7.61.1(react@19.1.0)
+    dev: false
+
+  /@hookform/resolvers@3.3.4(react-hook-form@7.56.4):
+    resolution: {integrity: sha512-o5cgpGOuJYrd+iMKvkttOclgwRW86EsWJZZRC23prf0uU2i48Htq4PuT73AVb9ionFyZrwYEITuOFGF+BydEtQ==}
+    peerDependencies:
+      react-hook-form: ^7.0.0
+    dependencies:
+      react-hook-form: 7.56.4(react@19.1.0)
     dev: false
 
   /@humanfs/core@0.19.1:
@@ -11291,7 +11299,7 @@ packages:
       glob: 7.2.3
       infer-owner: 1.0.4
       lru-cache: 6.0.0
-      minipass: 3.1.6
+      minipass: 3.3.6
       minipass-collect: 1.0.2
       minipass-flush: 1.0.5
       minipass-pipeline: 1.2.4
@@ -17630,7 +17638,7 @@ packages:
     resolution: {integrity: sha512-6T6lH0H8OG9kITm/Jm6tdooIbogG9e0tLgpY6mphXSm/A9u8Nq1ryBG+Qspiub9LjWlBPsPS3tWQ/Botq4FdxA==}
     engines: {node: '>= 8'}
     dependencies:
-      minipass: 3.1.6
+      minipass: 3.3.6
     dev: false
 
   /minipass-collect@2.0.1:
@@ -19855,6 +19863,15 @@ packages:
       react: 19.1.0
     dev: false
 
+  /react-hook-form@7.56.4(react@19.1.0):
+    resolution: {integrity: sha512-Rob7Ftz2vyZ/ZGsQZPaRdIefkgOSrQSPXfqBdvOPwJfoGnjwRJUs7EM7Kc1mcoDv3NOtqBzPGbcMB8CGn9CKgw==}
+    engines: {node: '>=18.0.0'}
+    peerDependencies:
+      react: 19.1.0
+    dependencies:
+      react: 19.1.0
+    dev: false
+
   /react-hook-form@7.61.1(react@19.1.0):
     resolution: {integrity: sha512-2vbXUFDYgqEgM2RcXcAT2PwDW/80QARi+PKmHy5q2KhuKvOlG8iIYgf7eIlIANR5trW9fJbP4r5aub3a4egsew==}
     engines: {node: '>=18.0.0'}
@@ -21553,7 +21570,7 @@ packages:
     resolution: {integrity: sha512-97qShzy1AiyxvPNIkLWoGua7xoQzzPjQ0HAH4B0rWKo7SZ6USuPcrUiAFrws0UH8RrbWmgq3LMTObhPIHbbBeQ==}
     engines: {node: '>= 8'}
     dependencies:
-      minipass: 3.1.6
+      minipass: 3.3.6
     dev: false
 
   /stable-hash@0.0.5:

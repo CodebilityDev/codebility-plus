@@ -40,7 +40,7 @@ export default async function ProjectSection() {
           <h1 className="text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
             Our Featured
           </h1>
-          <p className="text-teal text-lg font-bold lg:text-2xl">internal</p>
+          <p className="text-customTeal text-lg font-bold lg:text-2xl">internal</p>
           <h1 className="text-3xl font-normal uppercase -tracking-widest text-white lg:text-5xl">
             Projects
           </h1>
@@ -90,7 +90,7 @@ export default async function ProjectSection() {
         <h1 className="text-2xl font-bold uppercase tracking-[0.7em] text-white lg:text-4xl">
           Our Featured
         </h1>
-        <p className="text-teal text-lg font-bold lg:text-2xl">internal</p>
+        <p className="text-customTeal text-lg font-bold lg:text-2xl">internal</p>
         <h1 className="text-3xl font-normal uppercase -tracking-widest text-white lg:text-5xl">
           Projects
         </h1>

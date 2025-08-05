@@ -8,7 +8,7 @@ import { useModal } from "@/hooks/use-modal";
 import { contactUsValidation } from "@/lib/validations/contact-us";
 import { IconClose } from "@/public/assets/svgs";
 
-import { Dialog, DialogContent, DialogFooter } from "@codevs/ui/dialog";
+import { Dialog, DialogContent, DialogFooter, DialogTitle } from "@codevs/ui/dialog";
 import { Input } from "@codevs/ui/input";
 
 const ContactUsModal = () => {
@@ -66,6 +66,8 @@ const ContactUsModal = () => {
         aria-labelledby="contact-modal-title"
         aria-describedby="contact-modal-description"
         role="dialog"
+      >
+        <DialogTitle id="contact-modal-title" className="sr-only">Contact Us</DialogTitle>
       >
         <div className="w-full flex-1 flex-col gap-4">
           <Image
@@ -183,7 +185,7 @@ const ContactUsModal = () => {
         <div>
           <button 
             onClick={() => onClose()} 
-            className="absolute right-4 top-4 p-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="absolute right-4 top-4 p-2 rounded focus:outline-none focus:ring-2 focus:ring-customBlue-500"
             aria-label="Close contact form dialog"
           >
             <IconClose aria-hidden="true" />

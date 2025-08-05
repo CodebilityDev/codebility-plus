@@ -18,8 +18,8 @@ const RoadmapCard: React.FC<RoadmapCardProps> = ({
 }) => {
   return (
     <div id={id} className="flex w-max flex-col gap-3 text-white md:mx-auto">
-      <h3 className="text-teal text-lg font-medium xl:text-2xl">{phase}</h3>
-      <h2 className="text-teal text-xl font-semibold xl:text-3xl">{title}</h2>
+      <h3 className="text-customTeal text-lg font-medium xl:text-2xl">{phase}</h3>
+      <h2 className="text-customTeal text-xl font-semibold xl:text-3xl">{title}</h2>
       <ul className="flex flex-col gap-3">
         {steps.map((data) => (
           <li key={data.id} className="flex gap-3">

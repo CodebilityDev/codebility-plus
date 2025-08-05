@@ -26,7 +26,7 @@ export default function Hero() {
             clipPath:
               "polygon(20.7% 28%, 76.2% 29%, 89.8% 59.5%, 87.3% 98%, 70% 100%, 30% 100%, 9.4% 96.8%, 7.3% 64.8%)",
           }}
-          className="relative aspect-[855/678] w-[40rem] bg-blue-200 opacity-30 sm:w-[72.1875rem]"
+          className="relative aspect-[855/678] w-[40rem] bg-customBlue-200 opacity-30 sm:w-[72.1875rem]"
         />
       </div>
     </div>

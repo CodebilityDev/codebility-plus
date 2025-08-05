@@ -111,7 +111,7 @@ export default function Testimonials() {
 
 export function TestimonialCard({ client }: { client: ClientTestimonyType }) {
   return (
-    <Card className="overflow-hidden border-0 bg-gradient-to-br from-[#0f172a] to-[#1e1b4b] transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-300">
+    <Card className="overflow-hidden border-0 bg-gradient-to-br from-[#0f172a] to-[#1e1b4b] transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-customBlue-300">
       <CardContent className="p-6">
         <div className="flex flex-col gap-6">
           <div className="flex items-start justify-between">

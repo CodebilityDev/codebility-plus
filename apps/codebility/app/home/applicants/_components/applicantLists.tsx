@@ -13,64 +13,56 @@ import { ApplicantDataTable } from "./_table/applicantDataTable";
 import { applicantsColumns } from "./_table/applicantColumns";
 import ApplicantFilterHeaders from "./applicantHeaders";
 
-export default function ApplicantLists({
-  applicants: data,
+function ApplicantLists({
+  applicants,
 }: {
   applicants: NewApplicantType[];
 }) {
-  const [applicants, setApplicants] = React.useState(data);
+  const [filteredApplicants, setFilteredApplicants] = React.useState(applicants);
   const [currentTab, setCurrentTab] = React.useState("applying");
+
+  // Always use the latest applicants data for filtering
+  React.useEffect(() => {
+    setFilteredApplicants(applicants);
+  }, [applicants]);
 
   const applicantsApplying = React.useMemo(
     () =>
-      applicants.filter(
+      filteredApplicants.filter(
         (applicant) => applicant.application_status === "applying",
       ),
-    [applicants],
+    [filteredApplicants],
   );
 
   const applicantsTesting = React.useMemo(
     () =>
-      applicants.filter(
+      filteredApplicants.filter(
         (applicant) => applicant.application_status === "testing",
       ),
-    [applicants],
+    [filteredApplicants],
   );
 
   const applicantsOnboarding = React.useMemo(
     () =>
-      applicants.filter(
+      filteredApplicants.filter(
         (applicant) => applicant.application_status === "onboarding",
       ),
-    [applicants],
+    [filteredApplicants],
   );
 
   const applicantsDenied = React.useMemo(
     () =>
-      applicants.filter(
+      filteredApplicants.filter(
         (applicant) => applicant.application_status === "denied",
       ),
-    [applicants],
+    [filteredApplicants],
   );
-
-  // Filter columns based on the current tab
-  const getColumnsForTab = (tab: string): ColumnDef<NewApplicantType>[] => {
-    // Columns to exclude from "applying" tab
-    const excludeFromApplying = ["test_taken", "test_time_remaining", "fork_url"];
-    
-    if (tab === "applying") {
-      return applicantsColumns.filter(col => !excludeFromApplying.includes(col.id || ""));
-    }
-    
-    // For all other tabs, show all columns
-    return applicantsColumns;
-  };
 
   return (
     <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
       <ApplicantFilterHeaders
-        applicants={data}
-        setApplicants={setApplicants}
+        applicants={applicants}
+        setApplicants={setFilteredApplicants}
         setCurrentTab={setCurrentTab}
       />
       <Tabs
@@ -85,7 +77,7 @@ export default function ApplicantLists({
           <TabsTrigger value="applying" className="!flex !h-auto flex-col gap-0.5 px-1 py-1.5 text-xs md:flex-row md:gap-2 md:px-3 md:py-1.5 md:text-sm">
             <span className="truncate text-xs md:text-sm">Applicants</span>
             {applicantsApplying.length > 0 && (
-              <Badge className="h-3.5 min-w-3.5 bg-blue-500 px-1 text-xs text-white md:ml-2 md:h-auto md:min-w-0 md:px-2">
+              <Badge className="h-3.5 min-w-3.5 bg-customBlue-500 px-1 text-xs text-white md:ml-2 md:h-auto md:min-w-0 md:px-2">
                 {applicantsApplying.length}
               </Badge>
             )}
@@ -118,25 +110,25 @@ export default function ApplicantLists({
         <TabsContent value="applying" className="mt-10 md:mt-4">
           <ApplicantDataTable
             data={applicantsApplying}
-            columns={getColumnsForTab("applying")}
+            columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="testing" className="mt-10 md:mt-4">
           <ApplicantDataTable
             data={applicantsTesting}
-            columns={getColumnsForTab("testing")}
+            columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="onboarding" className="mt-10 md:mt-4">
           <ApplicantDataTable
             data={applicantsOnboarding}
-            columns={getColumnsForTab("onboarding")}
+            columns={applicantsColumns}
           />
         </TabsContent>
         <TabsContent value="denied" className="mt-10 md:mt-4">
           <ApplicantDataTable
             data={applicantsDenied}
-            columns={getColumnsForTab("denied")}
+            columns={applicantsColumns}
           />
         </TabsContent>
       </Tabs>
@@ -144,4 +136,4 @@ export default function ApplicantLists({
   );
 }
 
-memo(ApplicantLists);
+export default ApplicantLists;

@@ -49,7 +49,7 @@ const ShortSurvey = () => {
                 {services.map((service, i) => (
                   <SelectItem
                     key={i}
-                    className="cursor-default px-3 py-2 text-sm hover:bg-blue-100"
+                    className="cursor-default px-3 py-2 text-sm hover:bg-customBlue-100"
                     value={service.label}
                   >
                     {service.label}

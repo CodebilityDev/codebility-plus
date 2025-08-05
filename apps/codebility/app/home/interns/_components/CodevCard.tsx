@@ -29,7 +29,7 @@ const STATUS_CONFIG: Record<
 > = {
   applying: {
     label: "Applying",
-    className: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200",
+    className: "bg-customBlue-100 text-customBlue-800 dark:bg-customBlue-900 dark:text-customBlue-200",
   },
   testing: {
     label: "Testing",
@@ -93,7 +93,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
           {/* Header Section */}
           <div className="relative flex items-start justify-start gap-4">
             <div className="relative">
-              <div className="h-16 w-16 overflow-hidden rounded-full bg-gradient-to-br from-blue-100 to-purple-100 p-0.5 dark:from-blue-900 dark:to-purple-900">
+              <div className="h-16 w-16 overflow-hidden rounded-full bg-gradient-to-br from-customBlue-100 to-purple-100 p-0.5 dark:from-customBlue-900 dark:to-purple-900">
                 <div className="h-full w-full overflow-hidden rounded-full bg-white dark:bg-gray-800">
                   {codev.image_url ? (
                     <img
@@ -155,7 +155,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
               <h3 className="text-xl font-medium text-gray-900 dark:text-white">
                 {codev.first_name} {codev.last_name}
               </h3>
-              <p className="text-sm font-medium text-blue-600 dark:text-blue-400">
+              <p className="text-sm font-medium text-customBlue-300 dark:text-customBlue-100">
                 {codev.display_position || "No Position"}
               </p>
               {/* Years of Experience */}
@@ -196,8 +196,8 @@ export default function CodevCard({ codev }: CodevCardProps) {
                 <Badge
                   variant="info"
                   key={project.id}
-                  className="rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-1 text-xs font-medium text-white transition-all duration-300
-                    hover:from-blue-700 hover:to-indigo-700 dark:from-blue-500 dark:to-indigo-500 dark:hover:from-blue-600 dark:hover:to-indigo-600
+                  className="rounded-full bg-gradient-to-r from-customBlue-600 to-indigo-600 px-3 py-1 text-xs font-medium text-white transition-all duration-300
+                    hover:from-customBlue-700 hover:to-indigo-700 dark:from-customBlue-500 dark:to-indigo-500 dark:hover:from-customBlue-600 dark:hover:to-indigo-600
                   "
                 >
                   {project.name}
@@ -228,7 +228,7 @@ function SkillPoints({ points }: { points: CodevPoints[] }) {
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1">
       {Object.keys(matcher).map((categoryId) => {
         const point = points.find((p) => p.skill_category_id === categoryId);
         return (
