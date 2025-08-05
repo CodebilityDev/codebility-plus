@@ -171,9 +171,9 @@ export default function KanbanColumn({
         lg:w-[400px] lg:min-w-[400px]
         ${
           isColumnDragging
-            ? "border-blue-500 opacity-95 shadow-lg shadow-blue-500/15 scale-[1.02]"
+            ? "border-customBlue-500 opacity-95 shadow-lg shadow-customBlue-500/15 scale-[1.02]"
             : isOver
-              ? "border-blue-400 bg-blue-50/50 dark:border-blue-500 dark:bg-blue-950/20"
+              ? "border-customBlue-400 bg-customBlue-50/50 dark:border-customBlue-500 dark:bg-customBlue-950/20"
               : "border-gray-300 dark:border-gray-600 shadow-sm hover:shadow-md"
         }
         bg-gray-50/90 backdrop-blur-sm transition-all duration-200 ease-out dark:bg-gray-800/90
@@ -215,7 +215,7 @@ export default function KanbanColumn({
             <>
               <GripVertical className="hidden h-5 w-5 text-gray-400 cursor-grab hover:text-gray-600 dark:hover:text-gray-300 md:block transition-colors" />
               <span className="text-base font-semibold text-gray-900 dark:text-white md:text-lg">{column.name}</span>
-              <div className="flex items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30 px-3 py-1 text-sm font-medium text-blue-800 dark:text-blue-300">
+              <div className="flex items-center justify-center rounded-full bg-customBlue-100 dark:bg-customBlue-900/30 px-3 py-1 text-sm font-medium text-blue-100 dark:text-customBlue-100">
                 {safeTasks.length}
               </div>
             </>
@@ -261,7 +261,7 @@ export default function KanbanColumn({
           className={`
             flex min-h-[100px] flex-col gap-2 rounded-md p-1 transition-colors duration-200
             md:gap-4 md:p-2
-            ${isOver ? "border-2 border-blue-200 bg-blue-50 dark:bg-blue-900/20" : ""}
+            ${isOver ? "border-2 border-customBlue-200 bg-customBlue-50 dark:bg-customBlue-900/20" : ""}
           `}
         >
           <SortableContext

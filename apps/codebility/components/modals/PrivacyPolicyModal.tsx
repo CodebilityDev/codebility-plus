@@ -4,7 +4,7 @@ import { useModal } from "@/hooks/use-modal";
 import { XIcon } from "lucide-react";
 
 import { Button } from "@codevs/ui/button";
-import { Dialog, DialogClose, DialogContent } from "@codevs/ui/dialog";
+import { Dialog, DialogClose, DialogContent, DialogTitle } from "@codevs/ui/dialog";
 
 const PrivacyPolicyModal = () => {
   const { isOpen, onClose, type } = useModal();
@@ -13,6 +13,7 @@ const PrivacyPolicyModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="h-4/5 w-full overflow-scroll text-primary dark:text-white">
+        <DialogTitle className="sr-only">Privacy Policy</DialogTitle>
         <DialogClose asChild className="absolute right-4 top-4">
           <Button variant={"ghost"}>
             <XIcon className="h-6 w-6" />

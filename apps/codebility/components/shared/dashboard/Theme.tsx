@@ -19,7 +19,7 @@ const Theme = () => {
     <div className="flex gap-4">
       <div
         onClick={toggleTheme}
-        className={`w-18 flex h-8 cursor-pointer items-center gap-4 rounded-full border-black bg-zinc-200 p-2 dark:bg-blue-100 ${
+        className={`w-18 flex h-8 cursor-pointer items-center gap-4 rounded-full border-black bg-zinc-200 p-2 dark:bg-customBlue-100 ${
           theme === "dark" ? "justify-end" : "justify-start"
         }`}
       >

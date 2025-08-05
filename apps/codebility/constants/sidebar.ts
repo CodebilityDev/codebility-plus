@@ -40,39 +40,51 @@ export const getSidebarData = async (
   if (!roleId) {
     return [];
   }
-
-  /* const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
- */
-  const supabase = await createClientServerComponent();
-
-  // Fetch role permissions
-  const { data: rolePermissions, error } = await supabase
-    .from("roles")
-    .select(
-      `
-      dashboard,
-      kanban,
-      time_tracker,
-      interns,
-      applicants,
-      inhouse,
-      clients,
-      projects,
-      settings,
-      orgchart
-    `,
-    )
-    .eq("id", roleId)
-    .single();
-
-  if (error || !rolePermissions) {
-    console.error("Failed to fetch role permissions:", error);
-    return [];
+  
+  let rolePermissions: RolePermissions;
+  if (roleId == -1) {
+    // If inactive
+    rolePermissions = {
+      dashboard: true,
+      kanban: false,
+      time_tracker: false,
+      interns: false,
+      applicants: false,
+      inhouse: false,
+      clients: false,
+      projects: false,
+      settings: true,
+      orgchart: false,
+      overflow: false,
+    };
+  } else {
+    const supabase = await createClientServerComponent();
+    // Fetch role permissions
+    const { data, error } = await supabase
+      .from("roles")
+      .select(
+        `
+        dashboard,
+        kanban,
+        time_tracker,
+        interns,
+        applicants,
+        inhouse,
+        clients,
+        projects,
+        settings,
+        orgchart
+      `,
+      )
+      .eq("id", roleId)
+      .single();
+  
+    rolePermissions = data as RolePermissions;
+    
+    if (error || !rolePermissions) {
+      console.error("Failed to fetch role permissions:", error);
+      return [];
+    }
   }
 
   const hasPermission = (permission: PermissionKey): boolean => {

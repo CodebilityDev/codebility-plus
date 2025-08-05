@@ -8,6 +8,7 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
+import { cn } from "@/lib/utils";
 
 interface Filters {
   positions: string[];
@@ -90,10 +91,15 @@ export default function FilterCodevs({
   return (
     <div className="relative flex justify-end">
       <Button
-        variant={showFilter ? "destructive" : "default"}
+        variant="default"
         size="sm"
         onClick={toggleFilter}
-        className={showFilter ? "" : "bg-gradient-to-r from-blue-500 to-indigo-500 text-white hover:from-blue-600 hover:to-indigo-600"}
+        className={cn(
+          "text-white transition-colors",
+          showFilter
+        ? "bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700"
+        : "bg-gradient-to-r from-customBlue-500 to-indigo-500 hover:from-customBlue-600 hover:to-indigo-600"
+        )}
       >
         {showFilter ? "Close filter" : "Filter"}
       </Button>
@@ -108,7 +114,7 @@ export default function FilterCodevs({
           <h3 className="font-semibold text-white">Filters</h3>
           <button
             onClick={clearFilter}
-            className="text-sm text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-500"
+            className="text-sm text-customBlue-600 hover:text-customBlue-800 dark:text-customBlue-400 dark:hover:text-customBlue-500"
           >
             Clear all
           </button>

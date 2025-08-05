@@ -201,7 +201,7 @@ const SignUpForm = () => {
                       I agree to the{" "}
                       <span
                         onClick={() => onOpen("privacyPolicyModal")}
-                        className="cursor-pointer text-blue-100 hover:underline"
+                        className="cursor-pointer text-customBlue-100 hover:underline"
                       >
                         Privacy Policy
                       </span>
@@ -227,7 +227,7 @@ const SignUpForm = () => {
                             "width=800,height=600",
                           )
                         }
-                        className="cursor-pointer text-blue-100 hover:underline"
+                        className="cursor-pointer text-customBlue-100 hover:underline"
                         style={{ textDecoration: "underline" }}
                         role="button"
                         tabIndex={0}

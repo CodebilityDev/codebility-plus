@@ -92,7 +92,7 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
       <form className="px-2" onSubmit={handleSubmit(onSubmit)}>
         <p className="text-lg">Contact Info</p>
 
-        <div className="flex flex-col pt-4">
+        <div className="flex flex-col gap-4 pt-4">
           <InputField
             id="phone_number"
             control={control}
@@ -100,10 +100,15 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
             label="Phone Number"
             placeholder="eg. 9054936302"
             disabled={!isEditMode}
-            inputClassName={`${
+            className={`transition-colors ${
               isEditMode
-                ? "border border-lightgray bg-white text-black-100 dark:border-zinc-700 dark:bg-dark-200 dark:text-white"
-                : "bg-white text-dark-200 dark:bg-dark-200 dark:text-gray"
+                ? "dark:bg-dark-200 border-gray-300 bg-white text-gray-900 dark:border-zinc-700 dark:text-white"
+                : "dark:bg-dark-200 border-transparent bg-gray-100 text-gray-500 dark:text-gray-400"
+            }`}
+            inputClassName={`transition-colors ${
+              isEditMode
+                ? "border-gray-300 bg-white text-gray-900 dark:border-zinc-700 dark:bg-dark-200 dark:text-white"
+                : "bg-gray-100 text-gray-500 dark:bg-dark-200 dark:text-gray-400 border-transparent"
             }`}
             {...register("phone_number")}
           />

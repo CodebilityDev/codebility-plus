@@ -81,7 +81,7 @@ export default function OrgChart({ data }: OrgChartProps) {
   return (
     <div className="mx-auto w-full">
       <CardHeader className="mb-8 text-center">
-        <CardTitle className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">
+        <CardTitle className="bg-gradient-to-r from-customBlue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">
           CODEBILITY
         </CardTitle>
         <p className="mt-1 text-lg text-gray-600 dark:text-gray-400">Organizational Chart</p>
@@ -106,7 +106,7 @@ export default function OrgChart({ data }: OrgChartProps) {
         <div className="absolute left-1/2 top-0 h-px w-3/4 -translate-x-1/2 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
         <div className="grid w-full grid-cols-1 gap-6 pt-6 md:grid-cols-3">
           {[
-            { title: "Admin", members: admin, color: "from-blue-500 to-cyan-500" },
+            { title: "Admin", members: admin, color: "from-customBlue-500 to-cyan-500" },
             { title: "Marketing", members: marketing, color: "from-purple-500 to-pink-500" },
             { title: "Project Managers", members: pm, color: "from-green-500 to-emerald-500" },
           ].map(({ title, members, color }) => (
@@ -138,11 +138,11 @@ export default function OrgChart({ data }: OrgChartProps) {
             .filter(([title, members]) => members.filter(member => member.application_status === "passed").length > 0)
             .map(([title, members], index) => {
             const colors = [
-              "from-indigo-500 to-blue-500",
-              "from-teal-500 to-green-500", 
+              "from-indigo-500 to-customBlue-500",
+              "from-customTeal-500 to-green-500", 
               "from-orange-500 to-red-500",
               "from-purple-500 to-pink-500",
-              "from-violet-500 to-purple-500"
+              "from-customViolet-500 to-purple-500"
             ];
             return (
               <div key={title} className="flex flex-col items-center">

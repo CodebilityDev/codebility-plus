@@ -15,23 +15,22 @@ export default function SwitchStatusButton({
 }) {
   return (
     <div className="flex items-center justify-center">
-      <motion.button
+      <button
         className={cn(
-          "flex h-6 w-12 cursor-pointer items-center rounded-full p-1",
-          isActive ? "bg-green-500" : "bg-gray-300",
-          disabled && "cursor-not-allowed",
+          "relative flex h-6 w-12 cursor-pointer items-center rounded-full p-1 transition-all duration-200",
+          isActive 
+            ? "bg-green-500 dark:bg-green-600" 
+            : "bg-gray-300 dark:bg-gray-600",
+          disabled && "cursor-not-allowed opacity-50",
         )}
         onClick={handleSwitch}
-        animate={{
-          backgroundColor: isActive ? "#22c55e" : "#d1d5db",
-        }}
         disabled={disabled}
         id={id}
       >
         <motion.div
-          className="h-5 w-5 rounded-full bg-white shadow-md"
+          className="h-4 w-4 rounded-full bg-white shadow-md"
           animate={{
-            x: isActive ? "100%" : "0%",
+            x: isActive ? 24 : 0,
           }}
           transition={{
             type: "spring",
@@ -39,7 +38,7 @@ export default function SwitchStatusButton({
             damping: 30,
           }}
         />
-      </motion.button>
+      </button>
     </div>
   );
 }

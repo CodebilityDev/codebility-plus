@@ -58,7 +58,7 @@ const DifficultyPointsTooltip = ({
               {DIFFICULTY_LEVELS.map((level) => (
                 <div key={level} className="text-center border border-gray-200 dark:border-gray-600 rounded-lg p-3 bg-gray-50 dark:bg-gray-700">
                   <div className="font-medium capitalize text-lg mb-2 text-gray-900 dark:text-white">{level}</div>
-                  <div className="text-blue-600 dark:text-blue-400 font-bold text-xl mb-2">
+                  <div className="text-customBlue-600 dark:text-customBlue-400 font-bold text-xl mb-2">
                     {DIFFICULTY_POINTS[level as keyof typeof DIFFICULTY_POINTS]} pts
                   </div>
                   <div className="text-dark-200 dark:text-lightgray">

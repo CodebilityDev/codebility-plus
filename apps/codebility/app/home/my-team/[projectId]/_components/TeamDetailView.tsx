@@ -70,7 +70,7 @@ const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLe
             </div>
           )}
           {isLead && (
-            <div className="absolute -bottom-1 -right-1 rounded-full bg-blue-500 px-2 py-1">
+            <div className="absolute -bottom-1 -right-1 rounded-full bg-customBlue-500 px-2 py-1">
               <span className="text-xs font-semibold text-white">LEAD</span>
             </div>
           )}
@@ -89,8 +89,8 @@ const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLe
               )}
             </div>
             {isLead && (
-              <div className="rounded-full bg-blue-100 px-3 py-1 dark:bg-blue-900/30">
-                <span className="text-xs font-medium text-blue-800 dark:text-blue-200">
+              <div className="rounded-full bg-customBlue-100 px-3 py-1 dark:bg-customBlue-900/30">
+                <span className="text-xs font-medium text-customBlue-800 dark:text-customBlue-200">
                   Team Lead
                 </span>
               </div>

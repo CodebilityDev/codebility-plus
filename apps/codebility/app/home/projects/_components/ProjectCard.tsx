@@ -34,7 +34,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
       : project.status === "completed"
         ? "bg-green-500/80"
         : project.status === "active"
-          ? "bg-blue-500/80"
+          ? "bg-customBlue-500/80"
           : "dark:bg-zinc-700"
   , [project.status]);
 
@@ -64,7 +64,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                 : project.status === "pending"
                   ? "text-white-500 bg-orange-500/80"
                   : project.status === "completed"
-                    ? "text-white-500 bg-blue-500/80"
+                    ? "text-white-500 bg-customBlue-500/80"
                     : "text-white-500 bg-gray-500/80"
             }`}
           >
@@ -180,7 +180,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
               {project.project_members.filter(
                 (member) => member.role === "member",
               ).length > 4 && (
-                <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full dark:bg-gray-800 dark:bg-zinc-700">
+                <div className="text-dark100_light900 relative flex h-8 w-8 items-center justify-center rounded-full dark:bg-zinc-700">
                   <span className="text-xs font-medium">
                     +
                     {project.project_members.filter(
@@ -208,7 +208,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
               className="group"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+              <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-customBlue-500 dark:invert-0" />
             </Link>
           )}
           {project.website_url && (
@@ -218,7 +218,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
               className="group"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+              <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-customBlue-500 dark:invert-0" />
             </Link>
           )}
           {project.figma_link && (
@@ -228,7 +228,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
               className="group"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+              <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-customBlue-500 dark:invert-0" />
             </Link>
           )}
         </div>

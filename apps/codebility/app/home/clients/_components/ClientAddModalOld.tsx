@@ -129,7 +129,7 @@ export default function ClientAddModal() {
               <div className="gap-4">
                 {!logoPreview && (
                   <label htmlFor="company_logo">
-                    <p className="cursor-pointer text-center text-blue-100 md:text-left">
+                    <p className="cursor-pointer text-center text-customBlue-100 md:text-left">
                       Upload Image
                     </p>
                   </label>
@@ -145,7 +145,7 @@ export default function ClientAddModal() {
                 {logoPreview && (
                   <p
                     onClick={handleRemoveLogo}
-                    className="text-violet cursor-pointer text-center md:text-left"
+                    className="text-customViolet-100 cursor-pointer text-center md:text-left"
                   >
                     Remove Image
                   </p>

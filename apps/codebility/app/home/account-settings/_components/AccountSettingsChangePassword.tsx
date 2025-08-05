@@ -106,7 +106,7 @@ export default function AccountSettingsChangePassword() {
 
           <Button
             type="submit"
-            className="w-full bg-blue-200 text-white duration-300 hover:bg-blue-300 md:w-auto"
+            className="w-full bg-customBlue-200 text-white duration-300 hover:bg-customBlue-300 md:w-auto"
             disabled={isButtonDisabled}
           >
             {form.formState.isSubmitting ? "Updating..." : "Update Password"}
