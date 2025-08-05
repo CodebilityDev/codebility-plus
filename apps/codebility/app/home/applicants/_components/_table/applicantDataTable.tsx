@@ -45,7 +45,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     React.useState<VisibilityState>({});
   const [pagination, setPagination] = React.useState({
     pageIndex: 0,
-    pageSize: pageSize.applicants,
+    pageSize: Number(pageSize.applicants),
   });
 
   // Memoize initial column visibility to prevent recalculation
@@ -81,7 +81,6 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     state: {
       sorting,
       rowSelection,
-      columnVisibility,
       pagination,
     },
     initialState: {
@@ -128,7 +127,6 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     [table],
   );
 
-
   // Clear row selection when page changes
   React.useEffect(() => {
     setRowSelection({});
@@ -141,7 +139,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
       // Only reset if we're beyond the available pages
       const newTotalPages = Math.ceil(data.length / pagination.pageSize);
       if (pagination.pageIndex >= newTotalPages && newTotalPages > 0) {
-        setPagination(prev => ({ ...prev, pageIndex: 0 }));
+        setPagination((prev) => ({ ...prev, pageIndex: 0 }));
       }
       prevDataLength.current = data.length;
     }
@@ -152,7 +150,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
       <Box className="p-1 py-2 sm:p-3 sm:py-3">
         {/* if rows selected */}
 
-        <div className="justify-between flex w-full items-center">
+        <div className="flex w-full items-center justify-between">
           <div className="flex w-full items-center gap-4 px-2 pb-2">
             <p className="text-sm text-gray-500">
               {Object.keys(rowSelection).length} selected
