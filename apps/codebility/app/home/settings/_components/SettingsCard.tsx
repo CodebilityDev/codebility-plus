@@ -31,7 +31,7 @@ const SettingsCard = ({
         </div>
         <div className="flex w-full flex-col justify-center  gap-3 ">
           <h3 className="text-black-100 text-lg dark:text-white">{title}</h3>
-          <p className="text-gray">{description}</p>
+          <p className="text-gray-600 dark:text-gray-400">{description}</p>
         </div>
       </div>
     </div>

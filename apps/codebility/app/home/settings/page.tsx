@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import SettingsCard from "@/app/home/settings/_components/SettingsCard";
-import { H1 } from "@/Components/shared/dashboard";
+import { H1 } from "@/components/shared/dashboard";
 import { settingsCardData } from "@/constants/settings";
 import { createClientClientComponent } from "@/utils/supabase/client";
 

@@ -113,11 +113,18 @@ export default async function KanbanBoardPage(props: KanbanBoardPageProps) {
 
   const query = searchParams.query?.toLowerCase() || "";
 
-  // Apply search filter if a query is provided.
+  // Apply search filter if a query is provided - search within tasks instead of columns
   const filteredColumns = query
-    ? mappedColumns.filter((column) =>
-        column.name.toLowerCase().includes(query),
-      )
+    ? mappedColumns.map((column) => ({
+        ...column,
+        tasks: (column.tasks || []).filter((task) =>
+          task.title.toLowerCase().includes(query) ||
+          task.description?.toLowerCase().includes(query) ||
+          task.codev?.first_name?.toLowerCase().includes(query) ||
+          task.codev?.last_name?.toLowerCase().includes(query) ||
+          task.skill_category?.name?.toLowerCase().includes(query)
+        ),
+      }))
     : mappedColumns;
 
   // Build the typed board data

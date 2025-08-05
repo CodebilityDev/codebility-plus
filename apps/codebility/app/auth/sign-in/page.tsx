@@ -1,6 +1,6 @@
 import Link from "next/link";
-import Logo from "@/Components/shared/Logo";
-import { Toaster } from "@/Components/ui/toaster";
+import Logo from "@/components/shared/Logo";
+import { Toaster } from "@/components/ui/toaster";
 import pathsConfig from "@/config/paths.config";
 
 import AuthForm from "./_components/SignInForm";
@@ -25,7 +25,7 @@ const SignIn = () => {
             Don{`'`}t have an account?{" "}
             <Link
               href={pathsConfig.auth.onboarding}
-              className="text-blue-100 hover:underline"
+              className="text-customBlue-100 hover:underline"
             >
               Register Now
             </Link>

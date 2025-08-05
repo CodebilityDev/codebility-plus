@@ -1,7 +1,10 @@
+// apps/codebility/app/home/applicants/_components/_table/applicantActionButton.tsx
+
 "use client";
 
-import React from "react";
-import { Button } from "@/Components/ui/button";
+import React, { useState } from "react";
+import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogClose,
@@ -10,17 +13,14 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { useToast } from "@/Components/ui/use-toast";
-import { dialog } from "@material-tailwind/react";
-import { set } from "date-fns";
+} from "@/components/ui/dialog";
+import { useToast } from "@/components/ui/use-toast";
 import {
   CheckCircle2Icon,
   Loader2Icon,
   MailIcon,
   MoreHorizontalIcon,
 } from "lucide-react";
-
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -29,6 +29,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
+import { useApplicantModal } from "../ApplicantClientWrapper";
 
 import {
   acceptApplicantAction,
@@ -54,10 +55,12 @@ export default function ApplicantActionButton({
   applicant: NewApplicantType;
 }) {
   const { toast } = useToast();
+  const router = useRouter();
+  const { openModal } = useApplicantModal(); // Use our custom modal context
 
-  const [isLoading, setIsLoading] = React.useState(false);
-  const [isOpen, setIsOpen] = React.useState(false);
-  const [dialogState, setDialogState] = React.useState<
+  const [isLoading, setIsLoading] = useState(false);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [dialogState, setDialogState] = useState<
     | "applying"
     | "testing"
     | "onboarding"
@@ -72,113 +75,110 @@ export default function ApplicantActionButton({
     | null
   >(null);
 
+  // Handle View Details click - uses our custom modal system
+  const handleViewDetails = () => {
+    openModal(applicant);
+  };
+
+  // Handle Edit Applicant click
+  const handleEditApplicant = () => {
+    toast({
+      title: "Edit Applicant",
+      description: "Edit functionality will be implemented soon.",
+    });
+  };
+
+  // All other handlers remain the same...
   const handleMoveToApplying = async () => {
     setIsLoading(true);
     try {
       await moveApplicantToApplyingAction(applicant.id);
-      setIsOpen(false);
-
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
         title: "Applicant Moved",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to applying.`,
       });
+      router.refresh();
     } catch (error) {
       console.error("Error moving applicant to applying:", error);
       toast({
         title: "Error",
-        description:
-          "Failed to move applicant to applying. Please try again later.",
+        description: "Failed to move applicant to applying. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleMoveToTesting = async () => {
     setIsLoading(true);
     try {
       await moveApplicantToTestingAction(applicant.id);
-      setIsOpen(false);
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
         title: "Applicant Moved",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to testing.`,
       });
+      router.refresh();
     } catch (error) {
-      console.error("Error moving applicant to Testing:", error);
+      console.error("Error moving applicant to testing:", error);
       toast({
         title: "Error",
-        description:
-          "Failed to move applicant to testing. Please try again later.",
+        description: error instanceof Error ? error.message : "Failed to move applicant to testing. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleMoveToOnboarding = async () => {
     setIsLoading(true);
     try {
       await moveApplicantToOnboardingAction(applicant.id);
-      setIsOpen(false);
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
         title: "Applicant Moved",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to onboarding.`,
       });
+      router.refresh();
     } catch (error) {
       console.error("Error moving applicant to onboarding:", error);
       toast({
         title: "Error",
-        description:
-          "Failed to move applicant to onboarding. Please try again later.",
+        description: "Failed to move applicant to onboarding. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleMoveToDenied = async () => {
     setIsLoading(true);
     try {
       await denyApplicantAction(applicant.id);
-      await sendDenyEmail({
-        email: applicant.email_address,
-        name: `${applicant.first_name} ${applicant.last_name}`,
-      });
-      setIsOpen(false);
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
-        title: "Applicant Moved",
+        title: "Applicant Denied",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to denied.`,
       });
+      router.refresh();
     } catch (error) {
       console.error("Error moving applicant to denied:", error);
       toast({
         title: "Error",
-        description:
-          "Failed to move applicant to denied. Please try again later.",
+        description: "Failed to move applicant to denied. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
-  };
-
-  const handleDeleteApplicant = async () => {
-    setIsLoading(true);
-    try {
-      await deleteApplicantAction(applicant);
-      setIsOpen(false);
-      toast({
-        title: "Applicant Deleted",
-        description: `${applicant.first_name} ${applicant.last_name} has been deleted.`,
-      });
-    } catch (error) {
-      console.error("Error deleting applicant:", error);
-      toast({
-        title: "Error",
-        description: "Failed to delete applicant. Please try again later.",
-        variant: "destructive",
-      });
-    }
-    setIsLoading(false);
   };
 
   const handlePassApplicant = async () => {
@@ -189,22 +189,23 @@ export default function ApplicantActionButton({
         email: applicant.email_address,
         name: `${applicant.first_name} ${applicant.last_name}`,
       });
-
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
         title: "Applicant Passed",
         description: `${applicant.first_name} ${applicant.last_name} has been moved to onboarding.`,
       });
-
-      setIsOpen(false);
+      router.refresh();
     } catch (error) {
-      console.error("Error passing all applicants:", error);
+      console.error("Error passing applicant:", error);
       toast({
         title: "Error",
         description: "Failed to pass applicant. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleFailApplicant = async () => {
@@ -215,40 +216,46 @@ export default function ApplicantActionButton({
         email: applicant.email_address,
         name: `${applicant.first_name} ${applicant.last_name}`,
       });
-      setIsOpen(false);
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
         title: "Applicant Failed",
         description: `${applicant.first_name} ${applicant.last_name} has been marked as failed.`,
       });
+      router.refresh();
     } catch (error) {
-      console.error("Error failing all applicants:", error);
+      console.error("Error failing applicant:", error);
       toast({
         title: "Error",
         description: "Failed to fail applicant. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleAcceptApplicant = async () => {
     setIsLoading(true);
     try {
       await acceptApplicantAction(applicant.id);
-      setIsOpen(false);
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
         title: "Applicant Accepted",
         description: `${applicant.first_name} ${applicant.last_name} has been accepted.`,
       });
+      router.refresh();
     } catch (error) {
-      console.error("Error accepting all applicants:", error);
+      console.error("Error accepting applicant:", error);
       toast({
         title: "Error",
         description: "Failed to accept applicant. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleDenyApplicant = async () => {
@@ -259,522 +266,324 @@ export default function ApplicantActionButton({
         email: applicant.email_address,
         name: `${applicant.first_name} ${applicant.last_name}`,
       });
-      setIsOpen(false);
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
         title: "Applicant Denied",
         description: `${applicant.first_name} ${applicant.last_name} has been denied.`,
       });
+      router.refresh();
     } catch (error) {
-      console.error("Error denying all applicants:", error);
+      console.error("Error denying applicant:", error);
       toast({
         title: "Error",
         description: "Failed to deny applicant. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleRemindToTakeTest = async () => {
     setIsLoading(true);
     try {
-      await sendTestReminder({
-        email: applicant.email_address,
-        name: `${applicant.first_name} ${applicant.last_name}`,
-      });
-
-      setIsOpen(false);
-
+      await sendTestReminder(applicant.email_address);
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
         title: "Reminder Sent",
-        description: `A reminder has been sent to ${applicant.first_name} ${applicant.last_name} to take the test.`,
+        description: `Test reminder sent to ${applicant.first_name} ${applicant.last_name}.`,
       });
     } catch (error) {
-      console.error("Error sending reminder to take test:", error);
+      console.error("Error sending test reminder:", error);
       toast({
         title: "Error",
-        description: "Failed to send reminder. Please try again later.",
+        description: "Failed to send test reminder. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   const handleRemindToOnboarding = async () => {
     setIsLoading(true);
     try {
-      await sendOnboardingReminder({
-        email: applicant.email_address,
-        name: `${applicant.first_name} ${applicant.last_name}`,
-      });
-
-      setIsOpen(false);
-
+      await sendOnboardingReminder(applicant.email_address);
+      setIsDialogOpen(false);
+      setDialogState(null);
       toast({
         title: "Reminder Sent",
-        description: `A reminder has been sent to ${applicant.first_name} ${applicant.last_name} to complete the onboarding process.`,
+        description: `Onboarding reminder sent to ${applicant.first_name} ${applicant.last_name}.`,
       });
     } catch (error) {
-      console.error("Error sending reminder to onboarding:", error);
+      console.error("Error sending onboarding reminder:", error);
       toast({
         title: "Error",
-        description: "Failed to send reminder. Please try again later.",
+        description: "Failed to send onboarding reminder. Please try again later.",
         variant: "destructive",
       });
+    } finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
+  };
+
+  const getDialogTitle = () => {
+    switch (dialogState) {
+      case "applying": return "Move to Applying";
+      case "testing": return "Move to Testing";
+      case "onboarding": return "Move to Onboarding";
+      case "denied": return "Move to Denied";
+      case "delete": return "Delete Applicant";
+      case "pass": return "Pass Applicant";
+      case "fail": return "Fail Applicant";
+      case "accept": return "Accept Applicant";
+      case "deny": return "Deny Applicant";
+      case "remindToTakeTest": return "Send Test Reminder";
+      case "remindToOnboarding": return "Send Onboarding Reminder";
+      default: return "Confirm Action";
+    }
+  };
+
+  const getDialogDescription = () => {
+    const name = `${applicant.first_name} ${applicant.last_name}`;
+    switch (dialogState) {
+      case "applying": return `Are you sure you want to move ${name} to applying?`;
+      case "testing": return `Are you sure you want to move ${name} to testing?`;
+      case "onboarding": return `Are you sure you want to move ${name} to onboarding?`;
+      case "denied": return `Are you sure you want to move ${name} to denied?`;
+      case "delete": return `Are you sure you want to delete ${name}? This action cannot be undone.`;
+      case "pass": return `Are you sure you want to pass ${name}? They will be moved to onboarding.`;
+      case "fail": return `Are you sure you want to fail ${name}? They will be moved to denied.`;
+      case "accept": return `Are you sure you want to accept ${name}? They will become an active member.`;
+      case "deny": return `Are you sure you want to deny ${name}? This will send them a denial email.`;
+      case "remindToTakeTest": return `Are you sure you want to send a test reminder to ${name}?`;
+      case "remindToOnboarding": return `Are you sure you want to send an onboarding reminder to ${name}?`;
+      default: return "Please confirm your action.";
+    }
+  };
+
+  const handleConfirmAction = () => {
+    switch (dialogState) {
+      case "applying": return handleMoveToApplying();
+      case "testing": return handleMoveToTesting();
+      case "onboarding": return handleMoveToOnboarding();
+      case "denied": return handleMoveToDenied();
+      case "pass": return handlePassApplicant();
+      case "fail": return handleFailApplicant();
+      case "accept": return handleAcceptApplicant();
+      case "deny": return handleDenyApplicant();
+      case "remindToTakeTest": return handleRemindToTakeTest();
+      case "remindToOnboarding": return handleRemindToOnboarding();
+      default: return;
+    }
   };
 
   return (
-    <div className="flex flex-wrap items-center gap-3">
-      {applicant.application_status === "testing" && (
-        <div className="flex flex-col items-center gap-3 sm:flex-row">
+    <>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
           <Button
-            className="h-fit py-1 text-sm lg:text-base"
-            onClick={() => {
-              setDialogState("pass");
-              setIsOpen(true);
-            }}
+            variant="ghost"
+            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-300"
           >
-            Pass
+            <span className="sr-only">More actions</span>
+            <MoreHorizontalIcon className="h-4 w-4" />
           </Button>
-          <Button
-            variant={"destructive"}
-            className="h-fit py-1 text-sm lg:text-base"
-            onClick={() => {
-              setDialogState("fail");
-              setIsOpen(true);
-            }}
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          className="dark:bg-dark-200 min-w-[160px] bg-white"
+        >
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          
+          {/* Primary Actions */}
+          <DropdownMenuItem 
+            className="text-black-500 dark:text-light-800 cursor-pointer"
+            onClick={handleViewDetails}
           >
-            Fail
-          </Button>
-        </div>
-      )}
+            View Details
+          </DropdownMenuItem>
+          
+          <DropdownMenuItem 
+            className="text-black-500 dark:text-light-800 cursor-pointer"
+            onClick={handleEditApplicant}
+          >
+            Edit Applicant
+          </DropdownMenuItem>
+          
+          <DropdownMenuSeparator />
 
-      {applicant.application_status === "onboarding" && (
-        <div className="flex flex-col items-center gap-3 sm:flex-row">
-          <Button
-            className="h-fit py-1 text-sm lg:text-base"
-            onClick={() => {
-              setDialogState("accept");
-              setIsOpen(true);
-            }}
-          >
-            Accept
-          </Button>
-          <Button
-            variant={"destructive"}
-            className="h-fit py-1 text-sm lg:text-base"
-            onClick={() => {
-              setDialogState("deny");
-              setIsOpen(true);
-            }}
-          >
-            Deny
-          </Button>
-        </div>
-      )}
-
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-8 w-8 p-0 text-gray-400 hover:text-gray-300"
+          {/* Status Change Actions */}
+          {applicant.application_status !== "applying" && (
+            <DropdownMenuItem
+              className="text-black-500 dark:text-light-800 cursor-pointer"
+              onClick={() => {
+                setDialogState("applying");
+                setIsDialogOpen(true);
+              }}
             >
-              <span className="sr-only">More actions</span>
-              <MoreHorizontalIcon className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="dark:bg-dark-200 min-w-[160px] bg-white"
-          >
-            <DropdownMenuLabel>Actions</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            {/* viewing/editing applicant actions */}
-            <DropdownMenuItem className="text-black-500 dark:text-light-800 cursor-pointer">
-              View Details
+              Move to Applying
             </DropdownMenuItem>
-            <DropdownMenuItem className="text-black-500 dark:text-light-800 cursor-pointer">
-              Edit Applicant
+          )}
+
+          {applicant.application_status !== "testing" && (
+            <DropdownMenuItem
+              className="text-black-500 dark:text-light-800 cursor-pointer"
+              onClick={() => {
+                setDialogState("testing");
+                setIsDialogOpen(true);
+              }}
+            >
+              Move to Testing
             </DropdownMenuItem>
-            <DropdownMenuSeparator />
+          )}
 
-            {/* moving applicant actions */}
-            {applicant.application_status !== "applying" && (
+          {applicant.application_status !== "onboarding" && (
+            <DropdownMenuItem
+              className="text-black-500 dark:text-light-800 cursor-pointer"
+              onClick={() => {
+                setDialogState("onboarding");
+                setIsDialogOpen(true);
+              }}
+            >
+              Move to Onboarding
+            </DropdownMenuItem>
+          )}
+
+          {applicant.application_status !== "denied" && (
+            <DropdownMenuItem
+              className="text-red-500 dark:text-red-400 cursor-pointer"
+              onClick={() => {
+                setDialogState("denied");
+                setIsDialogOpen(true);
+              }}
+            >
+              Move to Denied
+            </DropdownMenuItem>
+          )}
+
+          <DropdownMenuSeparator />
+
+          {/* Test Actions - only show for testing status */}
+          {applicant.application_status === "testing" && (
+            <>
               <DropdownMenuItem
-                className="text-black-500 dark:text-light-800 cursor-pointer"
+                className="text-green-500 dark:text-green-400 cursor-pointer"
                 onClick={() => {
-                  setDialogState("applying");
-                  setIsOpen(true);
+                  setDialogState("pass");
+                  setIsDialogOpen(true);
                 }}
               >
-                Move to Applying
+                Pass Test
               </DropdownMenuItem>
-            )}
-
-            {applicant.application_status !== "testing" && (
               <DropdownMenuItem
-                className="text-black-500 dark:text-light-800 cursor-pointer"
+                className="text-red-500 dark:text-red-400 cursor-pointer"
                 onClick={() => {
-                  setDialogState("testing");
-                  setIsOpen(true);
+                  setDialogState("fail");
+                  setIsDialogOpen(true);
                 }}
               >
-                Move to Testing
+                Fail Test
               </DropdownMenuItem>
-            )}
+            </>
+          )}
 
-            {applicant.application_status !== "onboarding" && (
+          {/* Onboarding Actions - only show for onboarding status */}
+          {applicant.application_status === "onboarding" && (
+            <>
               <DropdownMenuItem
-                className="text-black-500 dark:text-light-800 cursor-pointer"
+                className="text-green-500 dark:text-green-400 cursor-pointer"
                 onClick={() => {
-                  setDialogState("onboarding");
-                  setIsOpen(true);
+                  setDialogState("accept");
+                  setIsDialogOpen(true);
                 }}
               >
-                Move to Onboarding
+                Accept Applicant
               </DropdownMenuItem>
-            )}
-
-            {applicant.application_status !== "denied" && (
               <DropdownMenuItem
-                className="text-black-500 dark:text-light-800 cursor-pointer"
+                className="text-red-500 dark:text-red-400 cursor-pointer"
                 onClick={() => {
-                  setDialogState("denied");
-                  setIsOpen(true);
+                  setDialogState("deny");
+                  setIsDialogOpen(true);
                 }}
               >
-                Move to Denied
+                Deny Applicant
               </DropdownMenuItem>
-            )}
-            <DropdownMenuSeparator />
-            {/* remind applicant to take test */}
-            {(applicant.application_status === "applying" ||
-              applicant.application_status === "testing") && (
-              <DropdownMenuItem
-                className="text-black-500 dark:text-light-800 cursor-pointer"
-                onClick={() => {
-                  setDialogState("remindToTakeTest");
-                  setIsOpen(true);
-                }}
-              >
-                <MailIcon className="mr-2 h-4 w-4" />
-                Remind to Take Test
-              </DropdownMenuItem>
-            )}
-
-            {/* remind applicant of onboarding */}
-            {applicant.application_status === "onboarding" && (
               <DropdownMenuItem
                 className="text-black-500 dark:text-light-800 cursor-pointer"
                 onClick={() => {
                   setDialogState("remindToOnboarding");
-                  setIsOpen(true);
+                  setIsDialogOpen(true);
                 }}
               >
                 <MailIcon className="mr-2 h-4 w-4" />
-                Remind to Onboard
+                Remind to Onboarding
               </DropdownMenuItem>
-            )}
+            </>
+          )}
 
-            <DropdownMenuSeparator />
-            {/* deleting applicant actions */}
+          {/* Remind to Take Test - show for testing and applying status */}
+          {(applicant.application_status === "testing" || applicant.application_status === "applying") && (
             <DropdownMenuItem
-              className="cursor-pointer text-red-500"
+              className="text-black-500 dark:text-light-800 cursor-pointer"
               onClick={() => {
-                setDialogState("delete");
-                setIsOpen(true);
+                setDialogState("remindToTakeTest");
+                setIsDialogOpen(true);
               }}
             >
-              Delete Applicant
+              <MailIcon className="mr-2 h-4 w-4" />
+              Remind to Take Test
             </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
+          )}
+        </DropdownMenuContent>
+      </DropdownMenu>
 
-        {dialogState === "applying" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Move to Applying</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to move this applicant to applying?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handleMoveToApplying} disabled={isLoading}>
-                {isLoading ? (
+      {/* Confirmation Dialog */}
+      <Dialog open={isDialogOpen && dialogState !== null} onOpenChange={(open) => {
+        setIsDialogOpen(open);
+        if (!open) {
+          setDialogState(null);
+          setIsLoading(false); // Reset loading state when dialog closes
+        }
+      }}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{getDialogTitle()}</DialogTitle>
+            <DialogDescription>
+              {getDialogDescription()}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button 
+              variant="outline" 
+              onClick={() => {
+                setIsDialogOpen(false);
+                setDialogState(null);
+                setIsLoading(false);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleConfirmAction}
+              disabled={isLoading}
+              variant={dialogState === "delete" || dialogState === "denied" || dialogState === "fail" || dialogState === "deny" ? "destructive" : "default"}
+            >
+              {isLoading ? (
+                <>
                   <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Confirm
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "testing" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Move to Testing</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to move this applicant to Testing?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handleMoveToTesting} disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Confirm
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "onboarding" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Move to onboarding</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to move this applicant to onboarding?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handleMoveToOnboarding} disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Confirm
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "denied" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Move to denied</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to move this applicant to denied?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handleMoveToDenied} disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Confirm
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "delete" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Delete Applicant</DialogTitle>
-              <DialogDescription>
-                Are you sure you want to delete this applicant?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button
-                variant="destructive"
-                onClick={handleDeleteApplicant}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Confirm
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "pass" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Pass Assessment</DialogTitle>
-              <DialogDescription>
-                This will move the applicant to the onboarding phase. Has this
-                applicant completed the assessment successfully?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handlePassApplicant} disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Confirm
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "fail" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Fail Applicant</DialogTitle>
-              <DialogDescription>
-                This will mark the applicant as rejected for failing the
-                assessment. This increases their rejection count. Are you sure?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button
-                onClick={handleFailApplicant}
-                disabled={isLoading}
-                variant={"destructive"}
-              >
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Confirm
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "accept" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Accept Applicant</DialogTitle>
-              <DialogDescription>
-                This will approve the applicant and mark them as an official
-                CODEV member. Are you sure?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handleAcceptApplicant} disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Accept
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "deny" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Deny Applicant</DialogTitle>
-              <DialogDescription>
-                This will deny the applicant&apos;s current application, but
-                they can reapply after 3 months. Are you sure?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button
-                onClick={handleDenyApplicant}
-                disabled={isLoading}
-                variant={"destructive"}
-              >
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Deny
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "remindToTakeTest" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Remind to Take Test</DialogTitle>
-              <DialogDescription>
-                This will send a reminder email to the applicant to take the
-                test. Are you sure?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handleRemindToTakeTest} disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Send Reminder
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
-
-        {dialogState === "remindToOnboarding" && (
-          <DialogContent className="sm:max-w-md">
-            <DialogHeader>
-              <DialogTitle>Remind to Onboard</DialogTitle>
-              <DialogDescription>
-                This will send a reminder email to the applicant to complete the
-                onboarding process. Are you sure?
-              </DialogDescription>
-            </DialogHeader>
-            <DialogFooter className="flex flex-row justify-end gap-2">
-              <DialogClose asChild>
-                <Button variant="outline">Cancel</Button>
-              </DialogClose>
-              <Button onClick={handleRemindToOnboarding} disabled={isLoading}>
-                {isLoading ? (
-                  <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                ) : (
-                  <CheckCircle2Icon className="mr-2 h-4 w-4" />
-                )}
-                Send Reminder
-              </Button>
-            </DialogFooter>
-          </DialogContent>
-        )}
+                  Processing...
+                </>
+              ) : (
+                "Confirm"
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
       </Dialog>
-    </div>
+    </>
   );
 }

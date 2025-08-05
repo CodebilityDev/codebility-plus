@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import pathsConfig from "@/config/paths.config";
 import { SignInValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -129,7 +129,7 @@ const SignInForm = () => {
           <button
             type="button"
             onClick={() => router.push(pathsConfig.auth.passwordReset)}
-            className="text-md w-max self-end text-right duration-300 hover:text-blue-100"
+            className="text-md w-max self-end text-right duration-300 hover:text-customBlue-100"
           >
             Forgot Password?
           </button>

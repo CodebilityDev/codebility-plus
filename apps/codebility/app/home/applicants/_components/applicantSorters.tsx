@@ -1,5 +1,5 @@
-import React from "react";
-import { Button } from "@/Components/ui/button";
+import React, { memo } from "react";
+import { Button } from "@/components/ui/button";
 import { ChevronDown, Filter, SortDescIcon, X } from "lucide-react";
 
 import {
@@ -12,7 +12,7 @@ import {
   DropdownMenuTrigger,
 } from "@codevs/ui/dropdown-menu";
 
-export default function ApplicantSorters({
+const ApplicantSorters = ({
   sortField,
   sortDirection,
   onToggleSort,
@@ -22,7 +22,7 @@ export default function ApplicantSorters({
   sortDirection: "asc" | "desc";
   onToggleSort: (field: string) => void;
   resetSort: () => void;
-}) {
+}) => {
   return (
     <>
       <DropdownMenu>
@@ -45,7 +45,7 @@ export default function ApplicantSorters({
           <DropdownMenuItem
             className={`flex justify-between ${
               sortField === "name"
-                ? "text-blue-500 dark:text-blue-300"
+                ? "text-customBlue-500 dark:text-customBlue-300"
                 : "text-black-500 dark:text-light-800"
             }`}
             onClick={() => onToggleSort("name")}
@@ -58,7 +58,7 @@ export default function ApplicantSorters({
           <DropdownMenuItem
             className={`flex justify-between ${
               sortField === "position"
-                ? "text-blue-500 dark:text-blue-300"
+                ? "text-customBlue-500 dark:text-customBlue-300"
                 : "text-black-500 dark:text-light-800"
             }`}
             onClick={() => onToggleSort("position")}
@@ -71,7 +71,7 @@ export default function ApplicantSorters({
           <DropdownMenuItem
             className={`flex justify-between ${
               sortField === "experience"
-                ? "text-blue-500 dark:text-blue-300"
+                ? "text-customBlue-500 dark:text-customBlue-300"
                 : "text-black-500 dark:text-light-800"
             }`}
             onClick={() => onToggleSort("experience")}
@@ -97,4 +97,6 @@ export default function ApplicantSorters({
       </DropdownMenu>
     </>
   );
-}
+};
+
+export default memo(ApplicantSorters);

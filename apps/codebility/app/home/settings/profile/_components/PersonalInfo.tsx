@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Box from "@/Components/shared/dashboard/Box";
-import { Button } from "@/Components/ui/button";
+import Box from "@/components/shared/dashboard/Box";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -11,7 +11,7 @@ import {
   SelectLabel,
   SelectTrigger,
   SelectValue,
-} from "@/Components/ui/select";
+} from "@/components/ui/select";
 import { IconEdit } from "@/public/assets/svgs";
 import { Codev, Position } from "@/types/home/codev";
 import { useForm } from "react-hook-form";
@@ -156,16 +156,16 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
               value={watch("display_position") || ""}
               disabled={!isEditMode}
             >
-              <SelectTrigger
+                <SelectTrigger
                 aria-label="display_position"
-                className={`${
+                className={`h-11 w-full border-none ${
                   isEditMode
-                    ? "dark:bg-dark-200 bg-white"
-                    : "text-dark-200 dark:bg-dark-200 dark:text-gray bg-white"
-                } h-11 w-full border-none`}
-              >
+                  ? "bg-light-100 dark:bg-dark-200 text-dark-900 dark:text-light-900"
+                  : "bg-light-200 dark:bg-dark-200 text-gray-500 dark:text-gray-400"
+                }`}
+                >
                 <SelectValue placeholder="Select a position" />
-              </SelectTrigger>
+                </SelectTrigger>
 
               <SelectContent className="rounded-md">
                 <SelectGroup>

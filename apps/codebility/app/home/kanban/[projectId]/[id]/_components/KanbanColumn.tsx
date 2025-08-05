@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
 import { ExtendedTask } from "@/types/home/codev";
@@ -90,7 +90,7 @@ export default function KanbanColumn({
   const columnStyle = {
     transform: CSS.Transform.toString(transform),
     transition,
-    zIndex: isColumnDragging ? 999 : undefined,
+    zIndex: isColumnDragging ? 40 : undefined,
   };
 
   // Sorted tasks by updated_at (DESC) using safeTasks array
@@ -166,23 +166,23 @@ export default function KanbanColumn({
         relative flex h-full 
         w-[calc(100vw-2rem)] min-w-[280px] 
         flex-col overflow-hidden 
-        rounded-md border-2 
+        rounded-xl border 
         md:w-[350px] md:min-w-[350px]
         lg:w-[400px] lg:min-w-[400px]
         ${
           isColumnDragging
-            ? "border-blue-500 opacity-50 shadow-lg"
+            ? "border-customBlue-500 opacity-95 shadow-lg shadow-customBlue-500/15 scale-[1.02]"
             : isOver
-              ? "border-blue-300 dark:border-blue-500"
-              : "border-zinc-200 dark:border-zinc-700"
+              ? "border-customBlue-400 bg-customBlue-50/50 dark:border-customBlue-500 dark:bg-customBlue-950/20"
+              : "border-gray-300 dark:border-gray-600 shadow-sm hover:shadow-md"
         }
-        bg-[#FCFCFC] transition-all duration-200 dark:bg-[#2C303A]
+        bg-gray-50/90 backdrop-blur-sm transition-all duration-200 ease-out dark:bg-gray-800/90
       `}
       {...attributes}
     >
-      {/* Column Header - Update the padding and text sizes */}
+      {/* Column Header */}
       <div
-        className="flex items-center justify-between p-2 font-bold dark:bg-[#1E1F26] md:p-3"
+        className="flex items-center justify-between bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 p-3 md:p-4 border-b border-gray-300 dark:border-gray-600"
         {...listeners}
       >
         <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 md:gap-3">
@@ -213,9 +213,9 @@ export default function KanbanColumn({
             </div>
           ) : (
             <>
-              <GripVertical className="hidden h-4 w-4 text-gray-400 md:block" />
-              <span className="text-sm md:text-base">{column.name}</span>
-              <div className="flex items-center justify-center rounded-full bg-zinc-300 px-2 py-1 text-xs dark:bg-[#1C1C1C] md:px-3 md:text-sm">
+              <GripVertical className="hidden h-5 w-5 text-gray-400 cursor-grab hover:text-gray-600 dark:hover:text-gray-300 md:block transition-colors" />
+              <span className="text-base font-semibold text-gray-900 dark:text-white md:text-lg">{column.name}</span>
+              <div className="flex items-center justify-center rounded-full bg-customBlue-100 dark:bg-customBlue-900/30 px-3 py-1 text-sm font-medium text-blue-100 dark:text-customBlue-100">
                 {safeTasks.length}
               </div>
             </>
@@ -261,7 +261,7 @@ export default function KanbanColumn({
           className={`
             flex min-h-[100px] flex-col gap-2 rounded-md p-1 transition-colors duration-200
             md:gap-4 md:p-2
-            ${isOver ? "border-2 border-blue-200 bg-blue-50 dark:bg-blue-900/20" : ""}
+            ${isOver ? "border-2 border-customBlue-200 bg-customBlue-50 dark:bg-customBlue-900/20" : ""}
           `}
         >
           <SortableContext

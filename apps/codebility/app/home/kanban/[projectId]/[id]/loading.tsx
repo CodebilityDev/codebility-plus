@@ -1,5 +1,5 @@
 
-import { Card, CardContent } from "@/Components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@codevs/ui/button";
 import { CardHeader } from "@codevs/ui/card";
 import { Input } from "@codevs/ui/input";
@@ -136,7 +136,7 @@ function KanbanCardSkeleton() {
       group relative cursor-pointer overflow-hidden 
       rounded-lg border border-gray-200 bg-white p-3 shadow-sm
       transition-all duration-200 ease-in-out 
-      hover:shadow-lg hover:ring-2 hover:ring-blue-200 hover:ring-offset-2
+      hover:shadow-lg hover:ring-2 hover:ring-customBlue-200 hover:ring-offset-2
       dark:border-gray-700 dark:bg-[#1E1F26]
       md:p-4
     ">

@@ -166,8 +166,21 @@ export const createNewTask = async (
       return { success: false, error: error.message };
     }
 
+    // Get the board and project info for specific revalidation
+    const { data: columnData } = await supabase
+      .from("kanban_columns")
+      .select(`
+        board_id,
+        kanban_boards!inner (
+          project_id
+        )
+      `)
+      .eq("id", kanban_column_id)
+      .single();
 
-    revalidatePath("/home/kanban/*");
+    if (columnData?.kanban_boards?.project_id && columnData?.board_id) {
+      revalidatePath(`/home/kanban/${columnData.kanban_boards.project_id}/${columnData.board_id}`);
+    }
 
     return { success: true };
 
@@ -261,6 +274,20 @@ export const deleteTask = async (
   const supabase = await createClientServerComponent();
 
   try {
+    // Get task info before deletion for revalidation
+    const { data: taskData } = await supabase
+      .from("tasks")
+      .select(`
+        kanban_column!inner (
+          board_id,
+          kanban_boards!inner (
+            project_id
+          )
+        )
+      `)
+      .eq("id", taskId)
+      .single();
+
     const { error } = await supabase.from("tasks").delete().eq("id", taskId);
 
     if (error) {
@@ -268,7 +295,10 @@ export const deleteTask = async (
       return { success: false, error: error.message };
     }
 
-    revalidatePath("/home/kanban/*");
+    // Revalidate only the specific board
+    if (taskData?.kanban_column?.kanban_boards?.project_id && taskData?.kanban_column?.board_id) {
+      revalidatePath(`/home/kanban/${taskData.kanban_column.kanban_boards.project_id}/${taskData.kanban_column.board_id}`);
+    }
     return { success: true };
   } catch (error) {
     console.error("Error deleting task:", error);
@@ -600,8 +630,24 @@ export const completeTask = async (
       };
     }
 
-    // Revalidate the path after successful completion
-    revalidatePath("/home/kanban/*");
+    // Get task info for revalidation
+    const { data: taskData } = await supabase
+      .from("tasks")
+      .select(`
+        kanban_column!inner (
+          board_id,
+          kanban_boards!inner (
+            project_id
+          )
+        )
+      `)
+      .eq("id", task.id)
+      .single();
+
+    // Revalidate only the specific board
+    if (taskData?.kanban_column?.kanban_boards?.project_id && taskData?.kanban_column?.board_id) {
+      revalidatePath(`/home/kanban/${taskData.kanban_column.kanban_boards.project_id}/${taskData.kanban_column.board_id}`);
+    }
 
     return { success: true };
   } catch (error) {
@@ -658,8 +704,24 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
       return { success: false, error: error.message };
     }
 
-    // ✅ Revalidate the cache after updating
-    revalidatePath("/home/kanban");
+    // Get task info for revalidation
+    const { data: taskData } = await supabase
+      .from("tasks")
+      .select(`
+        kanban_column!inner (
+          board_id,
+          kanban_boards!inner (
+            project_id
+          )
+        )
+      `)
+      .eq("id", taskId)
+      .single();
+
+    // Revalidate only the specific board
+    if (taskData?.kanban_column?.kanban_boards?.project_id && taskData?.kanban_column?.board_id) {
+      revalidatePath(`/home/kanban/${taskData.kanban_column.kanban_boards.project_id}/${taskData.kanban_column.board_id}`);
+    }
 
     return { success: true };
   } catch (error) {
@@ -688,8 +750,24 @@ export async function unarchiveTask(taskId: string) {
       return { success: false, error: error.message };
     }
 
-    // ✅ Revalidate the cache after updating
-    revalidatePath("/home/kanban");
+    // Get task info for revalidation
+    const { data: taskData } = await supabase
+      .from("tasks")
+      .select(`
+        kanban_column!inner (
+          board_id,
+          kanban_boards!inner (
+            project_id
+          )
+        )
+      `)
+      .eq("id", taskId)
+      .single();
+
+    // Revalidate only the specific board
+    if (taskData?.kanban_column?.kanban_boards?.project_id && taskData?.kanban_column?.board_id) {
+      revalidatePath(`/home/kanban/${taskData.kanban_column.kanban_boards.project_id}/${taskData.kanban_column.board_id}`);
+    }
 
     return { success: true };
   } catch (error) {

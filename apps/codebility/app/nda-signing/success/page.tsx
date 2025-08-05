@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import Logo from "@/Components/shared/Logo";
+import Logo from "@/components/shared/Logo";
 
 import { Button } from "@codevs/ui/button";
 
@@ -19,7 +19,7 @@ export default function NdaSuccessPage() {
           </p>
         </div>
         <Link href="/">
-          <Button className="from-teal to-violet h-10 w-32 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
+          <Button className="from-customTeal to-customViolet-100 h-10 w-32 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
             <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full text-lg text-white lg:text-lg">
               Go to Home
             </span>

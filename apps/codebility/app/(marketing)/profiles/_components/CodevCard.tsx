@@ -4,7 +4,7 @@ import type React from "react"
 import { useMemo, useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import CodevBadge from "@/Components/CodevBadge"
+import CodevBadge from "@/components/CodevBadge"
 import type { Codev, InternalStatus } from "@/types/home/codev"
 import { AnimatePresence, motion, useMotionValue, useSpring, useTransform } from "framer-motion"
 
@@ -109,7 +109,7 @@ const CodevCard = ({ codev, color }: Props) => {
                 console.error(`Failed to load image for ${codev.first_name}: ${codev.image_url}`)
                 e.currentTarget.src = "/assets/svgs/icon-codebility-black.svg"
               }}
-              unoptimized={true}
+              
             />
             <AnimatePresence>
               {hovered && internalStatus && (
@@ -144,7 +144,7 @@ const CodevCard = ({ codev, color }: Props) => {
               <p
                 className={cn(
                   "border-black-100 rounded-full border-2 p-2 text-[9px]",
-                  codev.availability_status ? "bg-green" : "bg-red-500",
+                  codev.availability_status ? "bg-green-500" : "bg-red-500",
                 )}
               ></p>
             </div>

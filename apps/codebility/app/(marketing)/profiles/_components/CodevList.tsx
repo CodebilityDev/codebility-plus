@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DefaultPagination from "@/Components/ui/pagination";
+import DefaultPagination from "@/components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 import getRandomColor from "@/lib/getRandomColor";

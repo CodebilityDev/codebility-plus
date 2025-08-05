@@ -8,13 +8,7 @@ import toast from "react-hot-toast";
 import { z } from "zod";
 
 import { Button } from "@codevs/ui/button";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@codevs/ui/form";
+// Removed form imports to fix version conflict
 import { Input } from "@codevs/ui/input";
 
 // Password validation schema
@@ -75,62 +69,50 @@ export default function AccountSettingsChangePassword() {
   return (
     <div className="space-y-2">
       <h3 className="text-lg font-semibold">Change Password</h3>
-      <Form {...form}>
+      
         <form
           className="space-y-2"
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
         >
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }: { field: any }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="New Password"
-                    label="New Password"
-                    parentClassName="flex gap-2 flex-col"
-                    variant="lightgray"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600" />
-              </FormItem>
+          <div className="space-y-2">
+            <Input
+              type="password"
+              placeholder="New Password"
+              label="New Password"
+              parentClassName="flex gap-2 flex-col"
+              variant="lightgray"
+              {...form.register("password")}
+            />
+            {form.formState.errors.password && (
+              <p className="text-red-600 text-sm">{form.formState.errors.password.message}</p>
             )}
-          />
+          </div>
 
-          <FormField
-            control={form.control}
-            name="confirmPassword"
-            render={({ field }: { field: any }) => (
-              <FormItem>
-                <FormControl>
-                  <Input
-                    type="password"
-                    placeholder="Confirm Password"
-                    label="Confirm Password"
-                    parentClassName="flex gap-2 flex-col"
-                    variant="lightgray"
-                    className="mb-4"
-                    {...field}
-                  />
-                </FormControl>
-                <FormMessage className="text-red-600" />
-              </FormItem>
+          <div className="space-y-2">
+            <Input
+              type="password"
+              placeholder="Confirm Password"
+              label="Confirm Password"
+              parentClassName="flex gap-2 flex-col"
+              variant="lightgray"
+              className="mb-4"
+              {...form.register("confirmPassword")}
+            />
+            {form.formState.errors.confirmPassword && (
+              <p className="text-red-600 text-sm">{form.formState.errors.confirmPassword.message}</p>
             )}
-          />
+          </div>
 
           <Button
             type="submit"
-            className="w-full bg-blue-200 text-white duration-300 hover:bg-blue-300 md:w-auto"
+            className="w-full bg-customBlue-200 text-white duration-300 hover:bg-customBlue-300 md:w-auto"
             disabled={isButtonDisabled}
           >
             {form.formState.isSubmitting ? "Updating..." : "Update Password"}
           </Button>
         </form>
-      </Form>
+      
     </div>
   );
 }

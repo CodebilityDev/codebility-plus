@@ -1,5 +1,5 @@
-import React from "react";
-import { Button } from "@/Components/ui/button";
+import React, { memo } from "react";
+import { Button } from "@/components/ui/button";
 import { Filter, X } from "lucide-react";
 import { move } from "react-big-calendar";
 
@@ -17,7 +17,7 @@ import {
 import { ExperienceRanges } from "../_service/types";
 import { ApplicantFilters } from "./applicantHeaders";
 
-export default function ApplicantFiltersComponent({
+const ApplicantFiltersComponent = ({
   activeFilterCount,
   filters,
   uniquePositions,
@@ -46,7 +46,7 @@ export default function ApplicantFiltersComponent({
   updateExperienceFilter: (key: keyof ExperienceRanges, value: boolean) => void;
   updatePositionFilter: (key: string, value: boolean) => void;
   onResetFilters: () => void;
-}) {
+}) => {
   return (
     <>
       <DropdownMenu>
@@ -59,7 +59,7 @@ export default function ApplicantFiltersComponent({
             <Filter className="h-4 w-4" />
             <span>Filters</span>
             {activeFilterCount > 0 && (
-              <Badge className="ml-1 flex h-5 w-5 items-center justify-center bg-blue-500 p-0 text-white">
+              <Badge className="ml-1 flex h-5 w-5 items-center justify-center bg-customBlue-500 p-0 text-white">
                 {activeFilterCount}
               </Badge>
             )}
@@ -188,4 +188,6 @@ export default function ApplicantFiltersComponent({
       </DropdownMenu>
     </>
   );
-}
+};
+
+export default memo(ApplicantFiltersComponent);

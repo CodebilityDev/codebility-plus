@@ -29,6 +29,7 @@ type RolePermissions = {
   projects: boolean;
   settings: boolean;
   orgchart: boolean;
+  overflow: boolean;
 };
 
 type PermissionKey = keyof RolePermissions;
@@ -39,39 +40,51 @@ export const getSidebarData = async (
   if (!roleId) {
     return [];
   }
-
-  /* const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
- */
-  const supabase = await createClientServerComponent();
-
-  // Fetch role permissions
-  const { data: rolePermissions, error } = await supabase
-    .from("roles")
-    .select(
-      `
-      dashboard,
-      kanban,
-      time_tracker,
-      interns,
-      applicants,
-      inhouse,
-      clients,
-      projects,
-      settings,
-      orgchart
-    `,
-    )
-    .eq("id", roleId)
-    .single();
-
-  if (error || !rolePermissions) {
-    console.error("Failed to fetch role permissions:", error);
-    return [];
+  
+  let rolePermissions: RolePermissions;
+  if (roleId == -1) {
+    // If inactive
+    rolePermissions = {
+      dashboard: true,
+      kanban: false,
+      time_tracker: false,
+      interns: false,
+      applicants: false,
+      inhouse: false,
+      clients: false,
+      projects: false,
+      settings: true,
+      orgchart: false,
+      overflow: false,
+    };
+  } else {
+    const supabase = await createClientServerComponent();
+    // Fetch role permissions
+    const { data, error } = await supabase
+      .from("roles")
+      .select(
+        `
+        dashboard,
+        kanban,
+        time_tracker,
+        interns,
+        applicants,
+        inhouse,
+        clients,
+        projects,
+        settings,
+        orgchart
+      `,
+      )
+      .eq("id", roleId)
+      .single();
+  
+    rolePermissions = data as RolePermissions;
+    
+    if (error || !rolePermissions) {
+      console.error("Failed to fetch role permissions:", error);
+      return [];
+    }
   }
 
   const hasPermission = (permission: PermissionKey): boolean => {
@@ -130,6 +143,12 @@ export const getSidebarData = async (
           imgURL: "/assets/svgs/icon-my-team-white.svg", // Replace with your icon path
           label: "My Team",
           permission: "interns" as PermissionKey, // Using "interns" permission for now
+        },
+        {
+          route: pathsConfig.app.overflow,
+          imgURL: "/assets/svgs/icon-overflow.svg",
+          label: "Codev Overflow",
+          permission: "interns" as PermissionKey, // Temporarily using "interns" permission until overflow column is added to database
         },
         {
           route: pathsConfig.app.orgchart,

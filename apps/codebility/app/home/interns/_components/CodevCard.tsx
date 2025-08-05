@@ -1,11 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import CodevBadge from "@/Components/CodevBadge";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import Box from "@/Components/shared/dashboard/Box";
+import CodevBadge from "@/components/CodevBadge";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import Box from "@/components/shared/dashboard/Box";
 import { useModal } from "@/hooks/use-modal-users";
-import { Codev, CodevPoints, InternalStatus } from "@/types/home/codev";
+import { Codev, CodevPoints, ApplicantStatus } from "@/types/home/codev";
 import {
   AnimatePresence,
   motion,
@@ -24,32 +24,28 @@ interface CodevCardProps {
 }
 
 const STATUS_CONFIG: Record<
-  InternalStatus,
+  ApplicantStatus,
   { label: string; className: string }
 > = {
-  TRAINING: {
-    label: "Training",
-    className: "bg-status-training text-status-training-text",
+  applying: {
+    label: "Applying",
+    className: "bg-customBlue-100 text-customBlue-800 dark:bg-customBlue-900 dark:text-customBlue-200",
   },
-  GRADUATED: {
-    label: "Graduated",
-    className: "bg-status-graduated text-status-graduated-text",
+  testing: {
+    label: "Testing",
+    className: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
   },
-  INACTIVE: {
-    label: "Busy",
-    className: "bg-status-busy text-status-busy-text",
+  onboarding: {
+    label: "Onboarding",
+    className: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
   },
-  MENTOR: {
-    label: "Available",
-    className: "bg-status-available text-status-available-text",
+  denied: {
+    label: "Denied",
+    className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
   },
-  ADMIN: {
-    label: "Deployed",
-    className: "bg-status-deployed text-status-deployed-text",
-  },
-  DEPLOYED: {
-    label: "Client Ready",
-    className: "bg-status-clientready text-status-clientready-text",
+  passed: {
+    label: "Passed",
+    className: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
   },
 };
 
@@ -78,42 +74,41 @@ export default function CodevCard({ codev }: CodevCardProps) {
     x.set(event.nativeEvent.offsetX - halfWidth);
   };
 
-  const internalStatus = codev.internal_status || "AVAILABLE";
-  const statusConfig = STATUS_CONFIG[internalStatus as InternalStatus];
+  const applicationStatus = codev.application_status || "applying";
+  const statusConfig = STATUS_CONFIG[applicationStatus as ApplicantStatus] || STATUS_CONFIG.applying;
 
   return (
     <div
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onMouseMove={handleMouseMove}
     >
-      <Box
-        className={`
-      h-full w-full rounded-lg border-none px-0 
-      py-2 transition-all hover:shadow-lg
-      dark:shadow-slate-700
-      `}
+      <div
+        className="group relative h-full rounded-2xl bg-white/70 p-4 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/80 hover:shadow-xl dark:bg-gray-800/70 dark:hover:bg-gray-800/80"
       >
         <div
-          className="flex h-full cursor-pointer flex-col justify-start gap-4 px-4 py-2"
+          className="flex h-full cursor-pointer flex-col justify-start gap-4"
           onClick={() => onOpen("profileModal", codev)}
         >
           {/* Header Section */}
-          <div className="relative flex items-start justify-start gap-4 text-center ">
-            <div className=" relative rounded-full border-2">
-              {codev.image_url ? (
-                <div className="relative h-24 w-24">
-                  <img
-                    src={codev.image_url}
-                    alt={`${codev.first_name}'s avatar`}
-                    className="h-full w-full rounded-full object-cover"
-                  />
+          <div className="relative flex items-start justify-start gap-4">
+            <div className="relative">
+              <div className="h-16 w-16 overflow-hidden rounded-full bg-gradient-to-br from-customBlue-100 to-purple-100 p-0.5 dark:from-customBlue-900 dark:to-purple-900">
+                <div className="h-full w-full overflow-hidden rounded-full bg-white dark:bg-gray-800">
+                  {codev.image_url ? (
+                    <img
+                      src={codev.image_url}
+                      alt={`${codev.first_name}'s avatar`}
+                      className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
+                  ) : (
+                    <DefaultAvatar size={64} className="mx-auto" />
+                  )}
                 </div>
-              ) : (
-                <DefaultAvatar size={96} className="mx-auto" />
-              )}
+              </div>
 
               <AnimatePresence>
-                {hovered && internalStatus && (
+                {hovered && applicationStatus && (
                   <motion.div
                     initial={{ opacity: 0, y: 20, scale: 0.6 }}
                     animate={{
@@ -133,57 +128,56 @@ export default function CodevCard({ codev }: CodevCardProps) {
                       whiteSpace: "nowrap",
                     }}
                     className={cn(
-                      `absolute -top-8 left-1/2 z-50 flex -translate-x-1/2
-                       transform flex-col items-center justify-center rounded-md p-2 shadow-xl 
-                        ${statusConfig.className}
+                      `absolute -top-12 left-1/2 z-50 flex -translate-x-1/2
+                       transform flex-col items-center justify-center rounded-xl px-3 py-2 shadow-xl 
+                        ${statusConfig?.className || ''}
                        `,
                     )}
                   >
-                    <div className="relative z-30 text-base">
-                      {statusConfig.label}
+                    <div className="relative z-30 text-sm font-medium">
+                      {statusConfig?.label || 'Applying'}
                     </div>
                   </motion.div>
                 )}
               </AnimatePresence>
 
-              <div className="absolute bottom-[1px] right-[1px]">
-                <p
+              <div className="absolute -bottom-1 -right-1">
+                <div
                   className={cn(
-                    "rounded-full p-[0.7rem] text-[9px]",
-                    codev.availability_status ? "bg-green" : "bg-red-500",
+                    "h-4 w-4 rounded-full border-2 border-white dark:border-gray-800",
+                    codev.availability_status === true ? "bg-green-500" : "bg-red-500",
                   )}
-                ></p>
+                ></div>
               </div>
             </div>
 
-            <div className="flex flex-col items-start justify-start gap-1">
-              <h3 className="text-start text-lg font-semibold text-gray-900 dark:text-gray-100">
+            <div className="flex flex-1 flex-col items-start justify-start gap-2">
+              <h3 className="text-xl font-medium text-gray-900 dark:text-white">
                 {codev.first_name} {codev.last_name}
               </h3>
-              <p className="text-gray-600 dark:text-gray-400">
+              <p className="text-sm font-medium text-customBlue-300 dark:text-customBlue-100">
                 {codev.display_position || "No Position"}
               </p>
               {/* Years of Experience */}
               {codev.years_of_experience !== undefined && (
-                <div className="text-sm text-gray-600 dark:text-gray-400">
+                <div className="text-sm text-gray-500 dark:text-gray-400">
                   {codev.years_of_experience}{" "}
-                  {codev.years_of_experience === 1 ? "year" : "years"} of
-                  experience
+                  {codev.years_of_experience === 1 ? "year" : "years"} experience
                 </div>
               )}
               {/* Add CodevBadge here */}
               {codev.level && Object.keys(codev.level).length > 0 && (
                 <div className="mt-1">
-                  <CodevBadge level={codev.level} size={24} />
+                  <CodevBadge level={codev.level} size={20} />
                 </div>
               )}
             </div>
           </div>
 
           {/* Content Section */}
-          <div className="flex flex-col gap-4 bg-gray-50 dark:bg-gray-800">
+          <div className="flex flex-col gap-4">
             {/* points */}
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-3">
               <SkillPoints points={codev.codev_points ?? []} />
             </div>
 
@@ -196,14 +190,14 @@ export default function CodevCard({ codev }: CodevCardProps) {
           </div>
 
           {/* Projects */}
-          <div className="mt-auto flex flex-wrap justify-end gap-1">
+          <div className="mt-auto flex flex-wrap justify-end gap-2">
             {hasItems(codev.projects) ? (
               codev.projects.map((project) => (
                 <Badge
                   variant="info"
                   key={project.id}
-                  className="bg-blue-50 text-xs text-blue-800 transition duration-300
-                    hover:bg-blue-300 hover:text-white dark:bg-blue-500 dark:text-white
+                  className="rounded-full bg-gradient-to-r from-customBlue-600 to-indigo-600 px-3 py-1 text-xs font-medium text-white transition-all duration-300
+                    hover:from-customBlue-700 hover:to-indigo-700 dark:from-customBlue-500 dark:to-indigo-500 dark:hover:from-customBlue-600 dark:hover:to-indigo-600
                   "
                 >
                   {project.name}
@@ -212,16 +206,14 @@ export default function CodevCard({ codev }: CodevCardProps) {
             ) : (
               <Badge
                 variant="info"
-                className={`
-                  bg-gray-50 text-gray-800 dark:bg-slate-700 dark:text-slate-200
-                `}
+                className="rounded-full bg-gradient-to-r from-gray-500 to-gray-600 px-3 py-1 text-xs font-medium text-white dark:from-gray-600 dark:to-gray-700"
               >
                 Available for Projects
               </Badge>
             )}
           </div>
         </div>
-      </Box>
+      </div>
     </div>
   );
 }
@@ -236,27 +228,21 @@ function SkillPoints({ points }: { points: CodevPoints[] }) {
   };
 
   return (
-    <div className="flex flex-wrap gap-2">
+    <div className="flex flex-wrap gap-1">
       {Object.keys(matcher).map((categoryId) => {
         const point = points.find((p) => p.skill_category_id === categoryId);
         return (
           <div
             key={categoryId}
-            className={`dark:bg-black-200 flex h-14 w-14 flex-col items-center
-          justify-center gap-1 rounded-md
-          bg-slate-100 p-1
-          `}
+            className="flex h-12 w-12 flex-col items-center justify-center gap-0.5 rounded-lg bg-white/50 p-1 backdrop-blur-sm transition-all duration-300 hover:bg-white/80 dark:bg-gray-700/50 dark:hover:bg-gray-700/80"
           >
             {/* skill points */}
-            <p
-              className={`text-center text-xs font-semibold text-gray-700 dark:text-gray-300
-          `}
-            >
+            <p className="text-center text-xs font-bold text-gray-800 dark:text-gray-200">
               {point ? point.points : 0}
             </p>
 
             {/* skill category */}
-            <p className="text-center text-xs text-gray-600 dark:text-gray-400">
+            <p className="text-center text-[8px] font-medium text-gray-600 dark:text-gray-400">
               {matcher[categoryId] ?? "Unknown"}
             </p>
           </div>

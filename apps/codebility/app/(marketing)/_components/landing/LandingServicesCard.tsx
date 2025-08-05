@@ -31,7 +31,7 @@ const ServicesCard: React.FC<ServicesCardProps> = ({
           width={90}
           alt={imageAlt}
           height={100}
-          unoptimized
+
           className="h-[210px] w-full bg-[#9747FF]"
         />
       </div>

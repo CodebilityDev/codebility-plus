@@ -1,8 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
+import DefaultPagination from "@/components/ui/pagination";
+import { pageSize } from "@/constants";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Download, Link2, Mail } from "lucide-react";
@@ -36,6 +38,7 @@ import { StatusBadge } from "../shared/StatusBadge";
 import { columns } from "./columns";
 import { EditableRow, Role } from "./EditableRow";
 import { TableActions } from "./TableActions";
+import { InHouseMobileTable } from "./InHouseMobileTable";
 
 interface NdaEmailDialogProps {
   codev: Codev;
@@ -93,7 +96,7 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
     <Button
       variant="outline"
       size="sm"
-      className="ml-2 text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+      className="ml-2 text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
       onClick={handleSendEmail}
       disabled={isSending}
     >
@@ -110,6 +113,9 @@ export function InHouseTable({
   onDelete,
 }: InHouseTableProps) {
   const [supabase, setSupabase] = useState<any>(null);
+
+  // Calculate total pages for DefaultPagination
+  const totalPages = useMemo(() => Math.ceil(data.length / pageSize.applicants), [data.length]);
 
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -237,10 +243,50 @@ export function InHouseTable({
     }
   };
 
+  // Define pagination callbacks outside of conditional rendering
+  const handleNextPage = useCallback(() => {
+    if (pagination.currentPage < pagination.totalPages) {
+      pagination.onNextPage();
+    }
+  }, [pagination]);
+
+  const handlePreviousPage = useCallback(() => pagination.onPreviousPage(), [pagination]);
+
+  const setCurrentPage = useCallback((pageOrFunction: number | ((page: number) => number)) => {
+    const page =
+      typeof pageOrFunction === "function"
+        ? pageOrFunction(pagination.currentPage)
+        : pageOrFunction;
+    // Note: DefaultPagination expects 1-based pages, which matches our current implementation
+    const targetPage = Math.max(1, Math.min(page, pagination.totalPages));
+    // Since we don't have direct page setting, we'll need to navigate step by step
+    const currentPage = pagination.currentPage;
+    if (targetPage > currentPage) {
+      for (let i = currentPage; i < targetPage; i++) {
+        pagination.onNextPage();
+      }
+    } else if (targetPage < currentPage) {
+      for (let i = currentPage; i > targetPage; i--) {
+        pagination.onPreviousPage();
+      }
+    }
+  }, [pagination]);
+
   return (
     <div className="mb-4 space-y-4">
-      {/* Table Container */}
-      <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 rounded-lg border">
+      {/* Mobile Table for smaller screens */}
+      <InHouseMobileTable
+        data={data}
+        onDataChange={onDataChange}
+        onDelete={handleDelete}
+        onEdit={setEditingId}
+        roles={roles}
+        handleSendNdaEmail={handleSendNdaEmail}
+        handleDownloadNda={handleDownloadNda}
+      />
+
+      {/* Desktop Table Container */}
+      <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 hidden rounded-lg border xl:block">
         <Table>
           {/* Table Header */}
           <TableHeader>
@@ -302,7 +348,6 @@ export function InHouseTable({
                         alt={`${item.first_name} avatar`}
                         width={40}
                         height={40}
-                        unoptimized={true}
                         className="h-full w-full object-cover"
                       />
                     </div>
@@ -425,7 +470,7 @@ export function InHouseTable({
                                       href={item.portfolio_website}
                                       target="_blank"
                                       rel="noopener noreferrer"
-                                      className="inline-flex items-center text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                                      className="inline-flex items-center text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
                                     >
                                       <Link2 className="mr-1 h-4 w-4" />
                                       Portfolio
@@ -548,7 +593,7 @@ export function InHouseTable({
                         href={item.portfolio_website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                        className="inline-flex items-center text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
                       >
                         <Link2 className="mr-1 h-4 w-4" />
                         Portfolio
@@ -587,27 +632,17 @@ export function InHouseTable({
       </div>
 
       {/* Pagination Controls */}
-      {pagination && data.length > 0 && (
-        <div className="flex items-center justify-end gap-2">
-          <button
-            onClick={pagination.onPreviousPage}
-            disabled={pagination.currentPage === 1}
-            className="hover:bg-light-200 dark:text-light-900 dark:hover:bg-dark-300 rounded px-4 py-2 text-sm text-black disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span className="dark:text-light-900 text-sm text-black">
-            Page {pagination.currentPage} of {pagination.totalPages}
-          </span>
-          <button
-            onClick={pagination.onNextPage}
-            disabled={pagination.currentPage === pagination.totalPages}
-            className="hover:bg-light-200 dark:text-light-900 dark:hover:bg-dark-300 rounded px-4 py-2 text-sm text-black disabled:opacity-50"
-          >
-            Next
-          </button>
-        </div>
-      )}
+      <div className="relative w-full">
+        {data.length > pageSize.applicants && (
+          <DefaultPagination
+            currentPage={pagination.currentPage}
+            handleNextPage={handleNextPage}
+            handlePreviousPage={handlePreviousPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={pagination.totalPages}
+          />
+        )}
+      </div>
     </div>
   );
 }

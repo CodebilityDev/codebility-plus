@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/Components/ui/button";
+import AddNewButton from "@/components/ui/AddNewButton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { useUserStore } from "@/store/codev-store";
 
@@ -17,13 +17,10 @@ export default function AddProjectButton() {
   return (
     <>
       {canAddProjects && (
-        <Button
-          variant="default"
-          className="items-center"
+        <AddNewButton
           onClick={() => onOpen("projectAddModal")}
-        >
-          Add New Project
-        </Button>
+          label="Add New Project"
+        />
       )}
     </>
   );

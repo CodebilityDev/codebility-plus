@@ -40,7 +40,7 @@ const SideNavMenu = () => {
           <div
             className={`relative flex h-8 ${
               isScrolling ? "w-12 text-xs" : "w-36 text-base"
-            } border-light-900/5 bg-light-700/10 group items-center gap-2 rounded-md border-2 ps-4 text-white backdrop-blur-lg duration-300 hover:ml-4 hover:w-36  hover:bg-violet-100 hover:text-base hover:text-opacity-100 hover:opacity-100 xl:h-10`}
+            } border-light-900/5 bg-light-700/10 group items-center gap-2 rounded-md border-2 ps-4 text-white backdrop-blur-lg duration-300 hover:ml-4 hover:w-36  hover:bg-customViolet-100 hover:text-base hover:text-opacity-100 hover:opacity-100 xl:h-10`}
           >
             <p
               className={`text-nowrap transition-opacity duration-300 ${

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DefaultPagination from "@/Components/ui/pagination";
+import DefaultPagination from "@/components/ui/pagination";
 import { useFeedsStore } from "@/store/feeds-store"; // Adjust path as needed
 
 import Post from "./Post";

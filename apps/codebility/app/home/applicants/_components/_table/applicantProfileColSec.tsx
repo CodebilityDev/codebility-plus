@@ -3,9 +3,9 @@
 import React, { memo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
-import { Table, TableCell, TableHeader, TableRow } from "@/Components/ui/table";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@/components/ui/button";
+import { Table, TableCell, TableHeader, TableRow } from "@/components/ui/table";
 import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Row } from "@tanstack/react-table";
 
@@ -26,7 +26,7 @@ import {
 import { NewApplicantType } from "../../_service/types";
 import ApplicantReapplyTime from "../applicantReapplyTime";
 import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
-import ApplicantActionButton from "./applicantActionButton";
+import ApplicantActionButton from "./applicantActionButton.original";
 
 export default function ApplicantProfileColSec({
   applicant,
@@ -50,13 +50,13 @@ export default function ApplicantProfileColSec({
                 )}
               </Avatar>
               <div className="flex flex-col">
-                <p className="cursor-pointer text-sm font-medium text-gray-200 hover:underline">
+                <p className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">
                   {applicant.first_name.charAt(0).toUpperCase() +
                     applicant.first_name.slice(1)}{" "}
                   {applicant.last_name.charAt(0).toUpperCase() +
                     applicant.last_name.slice(1)}
                 </p>
-                <p className="max-w-[170px] truncate text-xs text-gray-400">
+                <p className="max-w-[170px] truncate text-xs text-gray-600 dark:text-gray-400">
                   {applicant.email_address}
                 </p>
               </div>
@@ -75,18 +75,18 @@ export default function ApplicantProfileColSec({
               ) : (
                 <DefaultAvatar size={80} className="rounded-md" />
               )}
-              <div className="text-gray-200">
+              <div className="text-gray-700 dark:text-gray-200">
                 <h4 className="text-base font-medium">
                   {applicant.first_name.charAt(0).toUpperCase() +
                     applicant.first_name.slice(1)}{" "}
                   {applicant.last_name.charAt(0).toUpperCase() +
                     applicant.last_name.slice(1)}
                 </h4>
-                <p className="text-sm text-gray-400">
+                <p className="text-sm text-gray-600 dark:text-gray-400">
                   {applicant.email_address}
                 </p>
                 {applicant.display_position && (
-                  <p className="text-sm text-gray-400">
+                  <p className="text-sm text-gray-600 dark:text-gray-400">
                     {applicant.display_position}
                   </p>
                 )}
@@ -132,11 +132,11 @@ export default function ApplicantProfileColSec({
                       {applicant.first_name} {applicant.last_name}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-600 dark:text-gray-400">
                     {applicant.display_position || "Not specified"}
                   </p>
                   {applicant.years_of_experience !== undefined && (
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
                       {applicant.years_of_experience}{" "}
                       {applicant.years_of_experience === 1 ? "year" : "years"}{" "}
                       experience
@@ -177,7 +177,7 @@ export default function ApplicantProfileColSec({
                           <IconGithub className="h-[18px] w-[18px] invert dark:invert-0" />
                         </Link>
                       ) : (
-                        <span className="text-xs text-gray-500">None</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-500">None</span>
                       )}
                     </TableCell>
                   </TableRow>
@@ -194,7 +194,7 @@ export default function ApplicantProfileColSec({
                           <IconLink className="h-[18px] w-[18px] invert dark:invert-0" />
                         </Link>
                       ) : (
-                        <span className="text-xs text-gray-500">None</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-500">None</span>
                       )}
                     </TableCell>
                   </TableRow>
@@ -219,7 +219,7 @@ export default function ApplicantProfileColSec({
                             />
                           ))
                         ) : (
-                          <span className="text-xs text-gray-500">None</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-500">None</span>
                         )}
                       </div>
                     </TableCell>
@@ -302,10 +302,10 @@ export default function ApplicantProfileColSec({
                                   target="_blank"
                                   rel="noopener noreferrer"
                                 >
-                                  <IconLink className="h-4 w-4 text-gray-200" />
+                                  <IconLink className="h-4 w-4 text-gray-600 dark:text-gray-200" />
                                 </Link>
                               ) : (
-                                <span className="text-sm text-gray-500">
+                                <span className="text-sm text-gray-600 dark:text-gray-500">
                                   N/A
                                 </span>
                               )}

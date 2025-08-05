@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
+import { UsersSkeleton } from "@/components/ui/skeleton/UsersSkeleton";
 import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
 import {
@@ -7,7 +7,7 @@ import {
   prioritizeCodevs,
 } from "@/utils/codev-priority"; // Import the utility
 
-import Section from "../codevs/_components/CodevsSection";
+import Section from "../_shared/CodevsSection";
 import CodevContainer from "./_components/CodevContainer";
 import { CodevHireCodevModal } from "./_components/CodevHireCodevModal";
 import CodevList from "./_components/CodevList";

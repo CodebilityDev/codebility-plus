@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import H1 from "@/Components/shared/dashboard/H1";
+import H1 from "@/components/shared/dashboard/H1";
 import { Codev } from "@/types/home/codev";
 
 import CodevList from "./CodevList";
@@ -13,28 +13,41 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
     positions: [] as string[],
     projects: [] as string[],
     availability: [] as string[],
-
   });
 
   const [codevs, setCodevs] = useState<Codev[]>(data);
 
+
   return (
-    <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
-      <div className="flex flex-col gap-6 md:flex-row">
-        <div className="flex-1">
-          <H1>Codevs</H1>
+    <div className="flex flex-col gap-12">
+      {/* Header Section */}
+      <div className="text-center">
+        <div className="mb-6">
+          <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
+            Our Developers
+          </h1>
+          <div className="via-customBlue-400 mx-auto mt-4 h-px w-32 bg-gradient-to-r from-transparent to-transparent"></div>
         </div>
-        <div className="flex flex-1 flex-col justify-center gap-4">
-          <div className="flex items-center justify-center gap-4 md:justify-end">
-            <CodevSearchbar
-              allCodevs={data}
-              codevs={codevs}
-              setCodevs={setCodevs}
-            />
-            <FilterCodevs filters={filters} setFilters={setFilters} />
-          </div>
+        <p className="mx-auto max-w-2xl text-lg font-light text-gray-600 dark:text-gray-300">
+          Meet our talented team of developers ready to bring your ideas to life
+        </p>
+      </div>
+
+      {/* Controls Section */}
+      <div className="flex flex-col items-center gap-6 md:flex-row md:justify-end">
+        <div className="w-full max-w-md">
+          <CodevSearchbar
+            allCodevs={data}
+            codevs={codevs}
+            setCodevs={setCodevs}
+          />
+        </div>
+        <div>
+          <FilterCodevs filters={filters} setFilters={setFilters} />
         </div>
       </div>
+
+      {/* Content Section */}
       <CodevList filters={filters} data={codevs} />
     </div>
   );

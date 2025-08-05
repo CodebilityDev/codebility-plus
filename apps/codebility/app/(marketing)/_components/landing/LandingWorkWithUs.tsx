@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 
 import Container from "../MarketingContainer";
 import Section from "../MarketingSection";
@@ -35,7 +35,7 @@ const WorkWithUs = () => {
               </p>
               <div className="flex md:justify-end">
                 <div className="w-full md:w-auto">
-                  <Link href="/portfolio">
+                  <Link href="/services">
                     <Button variant="purple" size="lg" rounded="full">
                       Our Portfolio
                     </Button>
