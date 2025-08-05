@@ -39,7 +39,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
         </p>
         {/* <button
           onClick={() => openModal({ main_image, name, description })}
-          className="mb-2 flex items-center gap-2 text-blue-100 duration-300 hover:ml-4"
+          className="mb-2 flex items-center gap-2 text-customBlue-100 duration-300 hover:ml-4"
         >
           Read More <IconArrowRight />
         </button> */}

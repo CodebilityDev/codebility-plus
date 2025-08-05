@@ -129,7 +129,7 @@ const SignInForm = () => {
           <button
             type="button"
             onClick={() => router.push(pathsConfig.auth.passwordReset)}
-            className="text-md w-max self-end text-right duration-300 hover:text-blue-100"
+            className="text-md w-max self-end text-right duration-300 hover:text-customBlue-100"
           >
             Forgot Password?
           </button>

@@ -136,7 +136,7 @@ const AvailableTimeModal = () => {
               setTime((prev) => ({ ...prev, start_time: "", end_time: "" }));
             }}
             variant="link"
-            className="w-full text-white hover:text-blue-100"
+            className="w-full text-white hover:text-customBlue-100"
           >
             Clear
           </Button>

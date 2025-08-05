@@ -101,8 +101,8 @@ const MobileDrawer = ({
       side="left"
       className="bg-black-900 flex h-full w-full flex-col justify-start border-none bg-stone-900 pt-20 text-white"
     >
-      <SheetTitle className="hidden">Mobile Navbar</SheetTitle>
-      <SheetDescription className="hidden">
+      <SheetTitle className="sr-only">Mobile Navbar</SheetTitle>
+      <SheetDescription className="sr-only">
         Navbar that contains links
       </SheetDescription>
       {NAV_ITEMS.map((item) => {
@@ -167,7 +167,7 @@ const UserMenu = ({
           </p>
           <p className="text-white text-sm">{email}</p>
         </div>
-        <div className="from-violet relative overflow-hidden rounded-full bg-gradient-to-b to-blue-500 lg:h-[44px] lg:w-[52px]">
+        <div className="from-customViolet-300 relative overflow-hidden rounded-full bg-gradient-to-b to-customBlue-500 lg:h-[44px] lg:w-[52px]">
           <Image
             alt="Avatar"
             src={image_url || defaultAvatar}

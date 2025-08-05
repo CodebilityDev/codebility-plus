@@ -167,7 +167,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
             <div className="mobile:flex-col-reverse absolute right-4 top-12 flex items-center gap-4">
               <div>
                 {codev.availability_status ? (
-                  <div className="bg-green rounded px-2 py-1 text-xs">
+                  <div className="bg-green-500 rounded px-2 py-1 text-xs">
                     Active
                   </div>
                 ) : (
@@ -290,7 +290,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                                     : project.status === "pending"
                                       ? "bg-orange-500/20 text-orange-500"
                                       : project.status === "completed"
-                                        ? "bg-blue-500/20 text-blue-500"
+                                        ? "bg-customBlue-500/20 text-customBlue-500"
                                         : "bg-gray-500/20 text-gray-500"
                                 }`}
                               >
@@ -320,7 +320,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                                 className="group"
                                 onClick={(e) => e.stopPropagation()} // Prevent card click when clicking link
                               >
-                                <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+                                <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-customBlue-500 dark:invert-0" />
                               </Link>
                             )}
                             {project.website_url && (
@@ -330,7 +330,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                                 className="group"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+                                <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-customBlue-500 dark:invert-0" />
                               </Link>
                             )}
                             {project.figma_link && (
@@ -340,7 +340,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                                 className="group"
                                 onClick={(e) => e.stopPropagation()}
                               >
-                                <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-blue-500 dark:invert-0" />
+                                <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-customBlue-500 dark:invert-0" />
                               </Link>
                             )}
                           </div>

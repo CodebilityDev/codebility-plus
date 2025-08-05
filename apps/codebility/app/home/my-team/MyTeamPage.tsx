@@ -108,7 +108,7 @@ const MemberCard = ({
     return (
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
         <div 
-          className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-blue-300 transition-all duration-200"
+          className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-customBlue-300 transition-all duration-200"
           onClick={handleAvatarClick}
           title="Click to view profile"
         >
@@ -154,7 +154,7 @@ const MemberCard = ({
   return (
     <div className="flex flex-col items-center gap-1 sm:gap-2">
       <div 
-        className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-blue-300 transition-all duration-200"
+        className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-customBlue-300 transition-all duration-200"
         onClick={handleAvatarClick}
         title="Click to view profile"
       >
@@ -437,7 +437,7 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
                         <button
                           onClick={() => handleOpenAddModal(projectItem)}
                           disabled={isLoadingMembers}
-                          className="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium border border-blue-300 dark:border-blue-500 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                          className="px-3 py-1 text-sm text-customBlue-600 dark:text-customBlue-400 hover:text-customBlue-800 dark:hover:text-customBlue-300 font-medium border border-customBlue-300 dark:border-customBlue-500 rounded-lg hover:bg-customBlue-50 dark:hover:bg-customBlue-900/20 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           {isLoadingMembers ? 'Loading...' : 'Add Members'}
                         </button>

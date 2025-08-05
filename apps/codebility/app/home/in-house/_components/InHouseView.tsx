@@ -122,32 +122,28 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
   };
 
   return (
-    <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
-      <div className="flex flex-col gap-6 md:flex-row">
-        <div className="flex-1">
-          <H1>In-House Codebility</H1>
+    <div className="mx-auto flex max-w-[1600px] flex-col gap-6 px-2 sm:px-4">
+      <div className="flex flex-col gap-4">
+        <div>
+          <H1 className="text-2xl sm:text-3xl">In-House Codebility</H1>
           <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
-            <span className="rounded-full bg-blue-500 px-3 py-1.5 text-white shadow-sm">
+            <span className="rounded-full bg-customBlue-500 px-2.5 py-1 text-white shadow-sm sm:px-3 sm:py-1.5">
               {stats.total} {stats.total === 1 ? "member" : "members"}
             </span>
-            <span className="rounded-full bg-emerald-600 px-3 py-1.5 text-white shadow-sm">
+            <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-white shadow-sm sm:px-3 sm:py-1.5">
               {stats.active} active
             </span>
-            <span className="rounded-full bg-red-500 px-3 py-1.5 text-white shadow-sm">
+            <span className="rounded-full bg-red-500 px-2.5 py-1 text-white shadow-sm sm:px-3 sm:py-1.5">
               {stats.inactive} inactive
             </span>
           </div>
         </div>
-        <div className="flex flex-1 flex-col justify-center gap-4">
-          <div className="flex items-center justify-center gap-4 md:justify-end">
-            <TableFilters
-              filters={filters}
-              onFilterChange={(key, value) =>
-                setFilters((prev) => ({ ...prev, [key]: value }))
-              }
-            />
-          </div>
-        </div>
+        <TableFilters
+          filters={filters}
+          onFilterChange={(key, value) =>
+            setFilters((prev) => ({ ...prev, [key]: value }))
+          }
+        />
       </div>
 
       {/* Table View Only */}

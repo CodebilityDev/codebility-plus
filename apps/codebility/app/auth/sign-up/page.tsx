@@ -29,7 +29,7 @@ const SignUpPage = () => {
         <SignUpForm />
         <p className="text-gray mx-auto text-sm">
           Have an account?{" "}
-          <Link href="/auth/sign-in" className="text-blue-100 hover:underline">
+          <Link href="/auth/sign-in" className="text-customBlue-100 hover:underline">
             Sign In
           </Link>
         </p>

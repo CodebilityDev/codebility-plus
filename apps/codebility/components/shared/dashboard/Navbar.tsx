@@ -110,7 +110,7 @@ const Navbar = () => {
                 </p>
                 <p className="text-gray text-sm">{userData?.email_address}</p>
               </div>
-              <div className="from-violet relative size-[44px] rounded-full bg-gradient-to-b to-blue-500 bg-cover object-cover p-[1.5px]">
+              <div className="from-customViolet-100 relative size-[44px] rounded-full bg-gradient-to-b to-customBlue-500 bg-cover object-cover p-[1.5px]">
                 <Image
                   alt="Avatar"
                   src={userData?.image_url ?? defaultAvatar}

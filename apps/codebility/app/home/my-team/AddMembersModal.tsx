@@ -61,8 +61,8 @@ const TeamMemberAvatar = ({
 }) => (
   <div className="flex flex-col items-center space-y-1 w-full"> 
     <div 
-      className={`relative flex-shrink-0 rounded-full overflow-hidden ring-1 sm:ring-2 ring-blue-400 ${
-        member && onClick ? 'cursor-pointer hover:ring-blue-300 transition-all duration-200' : ''
+      className={`relative flex-shrink-0 rounded-full overflow-hidden ring-1 sm:ring-2 ring-customBlue-400 ${
+        member && onClick ? 'cursor-pointer hover:ring-customBlue-300 transition-all duration-200' : ''
       }`}
       style={{ width: size, height: size }}
       onClick={(e) => {
@@ -112,8 +112,8 @@ const TeamLeaderDisplay = ({
     {teamLead ? (
       <div className="flex items-center gap-2 sm:gap-3">
         <div 
-          className={`relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-blue-400 ${
-            onProfileClick ? 'cursor-pointer hover:ring-blue-300 transition-all duration-200' : ''
+          className={`relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-customBlue-400 ${
+            onProfileClick ? 'cursor-pointer hover:ring-customBlue-300 transition-all duration-200' : ''
           }`}
           style={{ width: 40, height: 40 }}
           onClick={(e) => {
@@ -237,7 +237,7 @@ const ProjectPreview = ({
     <div className="flex-shrink-0">
       <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Project Name</h3>
       <div className="flex items-center gap-2 sm:gap-3">
-        <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg overflow-hidden flex items-center justify-center bg-blue-600">
+        <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg overflow-hidden flex items-center justify-center bg-customBlue-600">
           <img
             src="https://codebility-cdn.pages.dev/assets/images/logo.png"
             alt="Codebility Logo"
@@ -250,7 +250,7 @@ const ProjectPreview = ({
                 target.src = "https://codebility-cdn.pages.dev/assets/images/brand/logo.png";
               } else {
                 target.style.display = 'none';
-                target.parentElement!.innerHTML = '<div class="w-8 h-8 sm:w-12 sm:h-12 bg-blue-600 rounded-lg flex items-center justify-center"><div class="w-4 h-4 sm:w-6 sm:h-6 bg-white rounded text-white font-bold flex items-center justify-center text-xs">C</div></div>';
+                target.parentElement!.innerHTML = '<div class="w-8 h-8 sm:w-12 sm:h-12 bg-customBlue-600 rounded-lg flex items-center justify-center"><div class="w-4 h-4 sm:w-6 sm:h-6 bg-white rounded text-white font-bold flex items-center justify-center text-xs">C</div></div>';
               }
             }}
           />
@@ -542,7 +542,7 @@ const AddMembersModal = ({
           <div className="w-full lg:w-2/5 flex flex-col min-h-0 bg-gray-800">
             <div className="flex-shrink-0 px-3 sm:px-6 pt-3 sm:pt-6 pb-4">
               <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
-                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-blue-400" />
+                <Users className="h-4 w-4 sm:h-5 sm:w-5 text-customBlue-400" />
                 <span className="truncate">Team Members ({selectedMembers.length} selected)</span>
               </h3>
               
@@ -553,7 +553,7 @@ const AddMembersModal = ({
                   placeholder="Search members..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                  className="w-full pl-10 pr-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:border-transparent transition-colors text-sm sm:text-base"
                 />
               </div>
             </div>
@@ -571,16 +571,16 @@ const AddMembersModal = ({
                       onClick={() => toggleMember(user)}
                       className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                         isSelected(user.id) 
-                          ? 'bg-gray-700/50 ring-1 ring-blue-500' 
+                          ? 'bg-gray-700/50 ring-1 ring-customBlue-500' 
                           : 'hover:bg-gray-700/30'
                       }`}
                     >
                       <div className="flex-shrink-0">
                         <div 
-                          className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 cursor-pointer hover:ring-blue-300 ${
+                          className={`relative rounded-full overflow-hidden ring-2 transition-all duration-200 cursor-pointer hover:ring-customBlue-300 ${
                             isSelected(user.id) 
-                              ? 'ring-blue-500' 
-                              : 'ring-blue-400'
+                              ? 'ring-customBlue-500' 
+                              : 'ring-customBlue-400'
                           }`}
                           style={{ width: 40, height: 40 }}
                           onClick={(e) => {
@@ -662,7 +662,7 @@ const AddMembersModal = ({
           <Button
             onClick={handleSubmit}
             disabled={isUpdating || isLoadingMembers}
-            className="w-full sm:flex-1 bg-blue-600 hover:bg-blue-700 text-white border-0"
+            className="w-full sm:flex-1 bg-customBlue-600 hover:bg-customBlue-700 text-white border-0"
           >
             {isUpdating ? "Updating..." : "Update Members"}
           </Button>

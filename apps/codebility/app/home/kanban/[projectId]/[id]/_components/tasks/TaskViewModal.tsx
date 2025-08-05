@@ -322,7 +322,7 @@ const TaskViewModal = ({
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority</Label>
               <Select disabled>
-                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300  dark:border-gray-700 dark:bg-gray-800">
+                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue placeholder={task?.priority || "None"} />
                 </SelectTrigger>
                 <SelectContent>
@@ -348,7 +348,7 @@ const TaskViewModal = ({
                 <DifficultyPointsTooltip />
               </div>
               <Select disabled>
-                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
                   <SelectValue
                     placeholder={
                       task?.difficulty ? capitalize(task.difficulty) : "None"
@@ -377,7 +377,7 @@ const TaskViewModal = ({
               <Input
                 value={task?.type || "None"}
                 disabled
-                className="text-grey-100 bg-light-900 border border-gray-300 border-gray-300 dark:border-gray-700 dark:bg-gray-800"
+                className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800"
               />
             </div>
 
@@ -393,7 +393,7 @@ const TaskViewModal = ({
                       setPrLink(task.pr_link || "");
                     }
                   }}
-                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500"
+                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-customBlue-500"
                   required
                   placeholder="Enter PR Link..."
                 />
@@ -402,8 +402,8 @@ const TaskViewModal = ({
                   onClick={handleUpdate}
                   className={
                     prLink.trim() !== (task?.pr_link || "")
-                      ? "text-md mt-4 flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-2 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
-                      : "text-grey-100 bg-light-900 mt-4 w-full border-2 border-gray-300 bg-green-600 py-4 text-black hover:bg-green-700 sm:w-auto"
+                      ? "text-md mt-4 flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-2 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
+                      : "text-grey-100 bg-light-900 dark:bg-black-200 mt-4 w-full border-2 border-gray-300  py-4 text-black hover:bg-green-700 sm:w-auto"
                   }
                   disabled={
                     updateLoading || prLink.trim() === (task?.pr_link || "")
@@ -421,7 +421,7 @@ const TaskViewModal = ({
             <div className="space-y-2">
               <Label className="text-sm font-medium">Skill Category</Label>
               {skillCategory ? (
-                <div className="rounded-md bg-blue-50 p-2 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                <div className="rounded-md bg-customBlue-50 p-2 text-sm font-medium text-customBlue-700 dark:bg-customBlue-900/20 dark:text-customBlue-300">
                   {skillCategory.name}
                 </div>
               ) : (
@@ -526,7 +526,7 @@ const TaskViewModal = ({
             <Button
               variant="outline"
               onClick={onClose}
-              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
             >
               Close
             </Button>
@@ -535,7 +535,7 @@ const TaskViewModal = ({
                 variant="default"
                 onClick={handleMarkAsDone}
                 disabled={isLoading}
-                className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-blue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-blue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+                className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               >
                 {isLoading && (
                   <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
