@@ -4,10 +4,10 @@ import React, { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
-import DefaultPagination from "@/Components/ui/pagination";
-import SwitchStatusButton from "@/Components/ui/SwitchStatusButton";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@/components/ui/button";
+import DefaultPagination from "@/components/ui/pagination";
+import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { pageSize } from "@/constants";
 import { useModal } from "@/hooks/use-modal-clients";
 import usePagination from "@/hooks/use-pagination";
@@ -144,7 +144,7 @@ export default function ClientCards({ clients }: Props) {
                           fill
                           loading="eager"
                           priority
-                          unoptimized={true}
+                          
                           className="h-auto w-auto rounded-full bg-cover object-cover"
                         />
                       ) : (
@@ -167,12 +167,12 @@ export default function ClientCards({ clients }: Props) {
                                 client.address,
                               )}`}
                               target="_blank"
-                              className="hover:text-blue-100"
+                              className="hover:text-customBlue-100"
                             >
                               {client.address}
                             </Link>
                           ) : (
-                            <p className="hover:text-blue-100">No address</p>
+                            <p className="hover:text-customBlue-100">No address</p>
                           )}
                         </div>
                         {/* Email */}
@@ -182,7 +182,7 @@ export default function ClientCards({ clients }: Props) {
                             <>
                               <Link
                                 href={`mailto:${client.email}`}
-                                className="hover:text-blue-100"
+                                className="hover:text-customBlue-100"
                               >
                                 {client.email}
                               </Link>
@@ -196,7 +196,7 @@ export default function ClientCards({ clients }: Props) {
                               </button>
                             </>
                           ) : (
-                            <p className="hover:text-blue-100">No email</p>
+                            <p className="hover:text-customBlue-100">No email</p>
                           )}
                         </div>
                         {/* Phone Number */}
@@ -206,7 +206,7 @@ export default function ClientCards({ clients }: Props) {
                             <>
                               <Link
                                 href={`tel:${client.phone_number}`}
-                                className="hover:text-blue-100"
+                                className="hover:text-customBlue-100"
                               >
                                 {client.phone_number}
                               </Link>
@@ -220,7 +220,7 @@ export default function ClientCards({ clients }: Props) {
                               </button>
                             </>
                           ) : (
-                            <p className="hover:text-blue-100">No phone</p>
+                            <p className="hover:text-customBlue-100">No phone</p>
                           )}
                         </div>
                       </div>

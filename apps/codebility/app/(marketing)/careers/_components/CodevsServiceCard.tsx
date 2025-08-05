@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { fadeInOutLeftToRight } from "@/Components/FramerAnimation/Framer";
+import { fadeInOutLeftToRight } from "@/components/FramerAnimation/Framer";
 import { useModal } from "@/hooks/use-modal-services";
 import { IconArrowRight } from "@/public/assets/svgs";
 import { motion } from "framer-motion";
@@ -39,7 +39,7 @@ const ServiceCard: React.FC<ServiceCardProps> = ({
         </p>
         {/* <button
           onClick={() => openModal({ main_image, name, description })}
-          className="mb-2 flex items-center gap-2 text-blue-100 duration-300 hover:ml-4"
+          className="mb-2 flex items-center gap-2 text-customBlue-100 duration-300 hover:ml-4"
         >
           Read More <IconArrowRight />
         </button> */}

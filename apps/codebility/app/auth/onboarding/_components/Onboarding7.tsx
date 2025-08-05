@@ -31,7 +31,7 @@ const Onboarding7: React.FC<Onboarding1Props> = ({ className, onPrev }) => {
           </h2>
           
           <Link href="/auth/sign-up" className="mt-6 sm:mt-8">
-            <button className="bg-[#00904b] hover:bg-green text-white font-bold py-2 sm:py-3 px-6 sm:px-8 md:px-10 rounded-xl text-lg sm:text-xl md:text-2xl lg:text-3xl transition-all duration-300">
+            <button className="bg-[#00904b] hover:bg-green-500 text-white font-bold py-2 sm:py-3 px-6 sm:px-8 md:px-10 rounded-xl text-lg sm:text-xl md:text-2xl lg:text-3xl transition-all duration-300">
               Apply Now
             </button>
           </Link>

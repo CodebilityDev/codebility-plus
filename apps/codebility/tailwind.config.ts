@@ -1,6 +1,8 @@
 import type { Config } from "tailwindcss";
 
 import baseConfig from "@codevs/tailwind-config/web";
+import { green } from "@mui/material/colors";
+import { custom } from "zod";
 
 const svgToDataUri = require("mini-svg-data-uri");
 const {
@@ -27,11 +29,12 @@ type PluginFunctionParams = {
 const config: Config = {
   content: [
     ...baseConfig.content,
-    "./pages/**/*.{ts,tsx}",
-    "./Components/**/*.{ts,tsx}",
-    "./app/**/*.{ts,tsx}",
-    "./src/**/*.{ts,tsx}",
-    "./@/**/*.{ts,tsx}",
+    "./pages/**/*.{js,ts,jsx,tsx,mdx}",
+    "./components/**/*.{js,ts,jsx,tsx,mdx}",
+    "./app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/**/*.{js,ts,jsx,tsx,mdx}",
+    "./@/**/*.{js,ts,jsx,tsx,mdx}",
+    "../../packages/ui/src/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     container: {
@@ -64,29 +67,30 @@ const config: Config = {
       colors: {
         primary: "#0E0E0E",
         secondary: "#8E8E8E",
-        gray: "#8E8E8E",
         lightgray: "#DBDBDB",
         darkgray: "#2E2E2E",
-        green: "#4BCE97",
-        blue: {
+        customGreen: "#4BCE97",
+        customBlue: {
           100: "#6A78F2",
           200: "#404993",
           300: "#3A4285",
+          400: "#2B2F5C",
           500: "#583DFF",
           600: "#1F2449",
           700: "#00738B",
           800: "#0C3FDB",
+          900: "#0A3B9D",
         },
-        red: {
+        customRed: {
           100: "#D45454",
           200: "#A23939",
         },
-        violet: {
+        customViolet: {
           100: "#9747FF",
           200: "#C108FE",
           300: "#9707DD",
         },
-        teal: "#02FFE2",
+        customTeal: "#02FFE2",
         white: "#F4F4F4",
         black: {
           100: "#181818",
@@ -97,6 +101,18 @@ const config: Config = {
           600: "#0A0A0A",
           700: "#101010",
           800: "#1D1D1E",
+        },
+        gray: {
+          50: "#f9fafb",
+          100: "#f3f4f6",
+          200: "#e5e7eb",
+          300: "#d1d5db",
+          400: "#9ca3af",
+          500: "#6b7280",
+          600: "#4b5563",
+          700: "#374151",
+          800: "#2c303a",
+          900: "#2C303A",
         },
         grey: {
           100: "#898989",
@@ -123,21 +139,6 @@ const config: Config = {
         codeYellow: "#D9D9D9",
         codePurple: "#4FBD95",
         codeViolet: "#FFAB4A",
-
-        "dark-100": "#1e1f26",
-        "dark-200": "#2c303a",
-        "dark-300": "#131417",
-        "dark-400": "#212734",
-        "dark-500": "#14161a",
-        "light-500": "#7B8EC8",
-        "light-700": "#DCE3F1",
-        "light-800": "#F4F6F8",
-        "light-850": "#FDFDFD",
-        "light-900": "#FFFFFF",
-
-        primaryColor: "#D9D9D9",
-        secondaryColor: "#8E8E8E",
-        backgroundColor: "#030303",
 
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
@@ -246,29 +247,33 @@ const config: Config = {
     require("tailwindcss-animate"),
     addVariablesForColors,
     function ({ matchUtilities, theme }: PluginFunctionParams) {
-      matchUtilities(
-        {
-          "bg-grid": (value: string) => ({
-            backgroundImage: `url("${svgToDataUri(
-              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`,
-            )}")`,
-          }),
-          "bg-grid-small": (value: string) => ({
-            backgroundImage: `url("${svgToDataUri(
-              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="8" height="8" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`,
-            )}")`,
-          }),
-          "bg-dot": (value: string) => ({
-            backgroundImage: `url("${svgToDataUri(
-              `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="none"><circle fill="${value}" id="pattern-circle" cx="10" cy="10" r="1.6257413380501518"></circle></svg>`,
-            )}")`,
-          }),
-        },
-        {
-          values: flattenColorPalette(theme("backgroundColor")),
-          type: "color",
-        },
-      );
+      try {
+        matchUtilities(
+          {
+            "bg-grid": (value: string) => ({
+              backgroundImage: `url("${svgToDataUri(
+                `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`,
+              )}")`,
+            }),
+            "bg-grid-small": (value: string) => ({
+              backgroundImage: `url("${svgToDataUri(
+                `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="8" height="8" fill="none" stroke="${value}"><path d="M0 .5H31.5V32"/></svg>`,
+              )}")`,
+            }),
+            "bg-dot": (value: string) => ({
+              backgroundImage: `url("${svgToDataUri(
+                `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="16" height="16" fill="none"><circle fill="${value}" id="pattern-circle" cx="10" cy="10" r="1.6257413380501518"></circle></svg>`,
+              )}")`,
+            }),
+          },
+          {
+            values: flattenColorPalette(theme("backgroundColor")),
+            type: "color",
+          },
+        );
+      } catch (error) {
+        console.warn("Failed to register Tailwind utilities:", error);
+      }
     },
   ],
   presets: [baseConfig],

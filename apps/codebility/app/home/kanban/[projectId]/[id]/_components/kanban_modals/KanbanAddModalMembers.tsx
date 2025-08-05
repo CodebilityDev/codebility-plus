@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 import { getCachedUser } from "@/lib/server/supabase-server-comp";
 import { IconPlus } from "@/public/assets/svgs";
 import { createClientClientComponent } from "@/utils/supabase/client";
@@ -196,7 +196,7 @@ export default function KanbanAddModalMembers({
                 placeholder="Search members..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="dark:bg-dark-200 w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+                className="dark:bg-dark-200 w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-customViolet-500"
               />
             </div>
 
@@ -257,7 +257,7 @@ export default function KanbanAddModalMembers({
             onClick={handleSelfAssign}
             disabled={isLoading}
             type="button"
-            className="text-black-200 w-fit cursor-pointer text-xs font-light ml-2 hover:text-blue-300 dark:text-slate-300 dark:hover:text-blue-100"
+            className="text-black-200 w-fit cursor-pointer text-xs font-light ml-2 hover:text-customBlue-300 dark:text-slate-300 dark:hover:text-customBlue-100"
           >
             Assign to me
           </button>

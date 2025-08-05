@@ -9,17 +9,17 @@ import {
   getProjectCodevs,
   updateProject,
 } from "@/app/home/projects/actions";
-import ProjectAvatar from "@/Components/ProjectAvatar";
-import { CustomSelect } from "@/Components/ui/CustomSelect";
+import ProjectAvatar from "@/components/ProjectAvatar";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { MemberSelection } from "@/Components/ui/MemberSelection";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+} from "@/components/ui/dialog";
+import { MemberSelection } from "@/components/ui/MemberSelection";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { Client, Codev, Project, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";
@@ -279,6 +279,7 @@ const ProjectEditModal = () => {
               width={408}
               height={192}
               onLoad={() => setImageLoaded(true)}
+              style={{ width: "auto", height: "auto" }}
             />
           </>
         ) : (
@@ -290,7 +291,7 @@ const ProjectEditModal = () => {
       <div className="flex gap-2">
         <label
           htmlFor="image-upload"
-          className="cursor-pointer text-sm text-blue-600 hover:text-blue-800 dark:text-white dark:hover:text-blue-100"
+          className="cursor-pointer text-sm text-customBlue-600 hover:text-customBlue-800 dark:text-white dark:hover:text-customBlue-100"
         >
           Upload Image
         </label>

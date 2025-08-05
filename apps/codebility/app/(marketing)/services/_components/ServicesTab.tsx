@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import DefaultPagination from "@/Components/ui/pagination";
+import DefaultPagination from "@/components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 
@@ -103,9 +103,9 @@ export default function ServicesTab({ servicesData }: Props) {
           <div className="mx-auto flex flex-wrap justify-center gap-5 xl:gap-16">
             <p
               onClick={() => handleTabClick(ALL_CATEGORY_ID)}
-              className={`cursor-pointer px-2 pb-2 text-violet-200 xl:text-xl ${
+              className={`cursor-pointer px-2 pb-2 text-customViolet-200 xl:text-xl ${
                 currentCategory === ALL_CATEGORY_ID
-                  ? "border-violet text-violet border-b-2"
+                  ? "border-customViolet-100 text-customViolet-100border-b-2"
                   : "text-white"
               }`}
             >
@@ -115,9 +115,9 @@ export default function ServicesTab({ servicesData }: Props) {
               <p
                 key={cat.id}
                 onClick={() => handleTabClick(cat.id)}
-                className={`cursor-pointer px-2 pb-2 text-violet-200 xl:text-xl ${
+                className={`cursor-pointer px-2 pb-2 text-customViolet-200 xl:text-xl ${
                   currentCategory === cat.id
-                    ? "border-violet text-violet border-b-2"
+                    ? "border-customViolet-100 text-customViolet-100 border-b-2"
                     : "text-white"
                 }`}
               >

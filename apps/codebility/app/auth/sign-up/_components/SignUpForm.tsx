@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import PrivacyPolicyModal from "@/Components/modals/PrivacyPolicyModal";
-import TechStackModal from "@/Components/modals/TechStackModal";
-import { Button } from "@/Components/ui/button";
+import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
+import TechStackModal from "@/components/modals/TechStackModal";
+import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { SignUpValidation } from "@/lib/validations/auth";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -201,7 +201,7 @@ const SignUpForm = () => {
                       I agree to the{" "}
                       <span
                         onClick={() => onOpen("privacyPolicyModal")}
-                        className="cursor-pointer text-blue-100 hover:underline"
+                        className="cursor-pointer text-customBlue-100 hover:underline"
                       >
                         Privacy Policy
                       </span>
@@ -227,7 +227,7 @@ const SignUpForm = () => {
                             "width=800,height=600",
                           )
                         }
-                        className="cursor-pointer text-blue-100 hover:underline"
+                        className="cursor-pointer text-customBlue-100 hover:underline"
                         style={{ textDecoration: "underline" }}
                         role="button"
                         tabIndex={0}

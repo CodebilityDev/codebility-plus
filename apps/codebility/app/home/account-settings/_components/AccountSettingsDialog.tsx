@@ -101,7 +101,7 @@ export default function AccountSettingsDialog() {
   return (
     <>
       <AccountSettingsBackdrop isOpen={isOpen} />
-      <Form {...form}>
+      
         <Dialog
           open={isOpen}
           onOpenChange={(open) => {
@@ -112,7 +112,7 @@ export default function AccountSettingsDialog() {
           }}
         >
           <DialogTrigger asChild>
-            <Button className="h-11 bg-blue-200 text-white duration-300 hover:bg-blue-300">
+            <Button className="h-11 bg-customBlue-200 text-white duration-300 hover:bg-customBlue-300">
               Change email
             </Button>
           </DialogTrigger>
@@ -156,7 +156,7 @@ export default function AccountSettingsDialog() {
                 </DialogClose>
                 <Button
                   type="submit"
-                  className="text-dark100_light900 bg-blue-200 duration-300 hover:bg-blue-300"
+                  className="text-dark100_light900 bg-customBlue-200 duration-300 hover:bg-customBlue-300"
                   disabled={!form.formState.isValid || isLoading}
                 >
                   {isLoading ? "Updating..." : "Change Email"}
@@ -165,7 +165,7 @@ export default function AccountSettingsDialog() {
             </form>
           </DialogContent>
         </Dialog>
-      </Form>
+      
     </>
   );
 }

@@ -1,8 +1,8 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { Paragraph } from "@/Components/shared/home";
-import Logo from "@/Components/shared/Logo";
+import { Paragraph } from "@/components/shared/home";
+import Logo from "@/components/shared/Logo";
 import getRandomColor from "@/lib/getRandomColor";
 import { getCodevs } from "@/lib/server/codev.service";
 import {
@@ -112,7 +112,7 @@ export default async function CodevBioPage(props: Props) {
 							/>
 							<div className="absolute bottom-[7px] right-[7px]">
 								<p
-									className={`border-black-100 rounded-full px-2 text-[9px] ${availability_status ? "bg-green" : "bg-gray"
+									className={`border-black-100 rounded-full px-2 text-[9px] ${availability_status ? "bg-green-500" : "bg-gray"
 										}`}
 								>
 									{getStatusBadge()}
@@ -276,7 +276,7 @@ export default async function CodevBioPage(props: Props) {
 												{exp.position}
 											</p>
 											<p className="text-md text-gray font-semibold">
-												<span className="text-violet mr-2">
+												<span className="text-customViolet-100 mr-2">
 													{exp.company_name.toUpperCase()}
 												</span>
 												({exp.date_from} - {exp.date_to || "Present"})

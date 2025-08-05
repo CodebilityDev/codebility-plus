@@ -3,14 +3,14 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import React, { use, useEffect, useState } from "react";
 import Image from "next/image";
-import { Card, CardContent } from "@/Components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   Carousel,
   CarouselContent,
   CarouselItem,
   CarouselNext,
   CarouselPrevious,
-} from "@/Components/ui/carousel/carousel";
+} from "@/components/ui/carousel/carousel";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import Autoplay from "embla-carousel-autoplay";
 import { Quote } from "lucide-react";
@@ -111,7 +111,7 @@ export default function Testimonials() {
 
 export function TestimonialCard({ client }: { client: ClientTestimonyType }) {
   return (
-    <Card className="overflow-hidden border-0 bg-gradient-to-br from-[#0f172a] to-[#1e1b4b] transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-blue-300">
+    <Card className="overflow-hidden border-0 bg-gradient-to-br from-[#0f172a] to-[#1e1b4b] transition-transform duration-300 hover:scale-105 hover:shadow-lg hover:shadow-customBlue-300">
       <CardContent className="p-6">
         <div className="flex flex-col gap-6">
           <div className="flex items-start justify-between">
@@ -127,7 +127,7 @@ export function TestimonialCard({ client }: { client: ClientTestimonyType }) {
               <Image
                 src={client.company_logo}
                 alt={`${client.name} logo`}
-                unoptimized={true}
+                
                 className="object-contain brightness-110"
                 fill
                 sizes="96px"

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { H1 } from "@/Components/shared/home";
+import { H1 } from "@/components/shared/home";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
 
@@ -14,7 +14,20 @@ interface InHouseViewProps {
 }
 
 export default function InHouseView({ initialData }: InHouseViewProps) {
-  const [data, setData] = useState<Codev[]>(initialData);
+  // Sort data to show active members first, inactive at the end
+  const sortedInitialData = [...initialData].sort((a, b) => {
+    // Active (true) should come first, inactive (false/null) at end
+    const aActive = a.availability_status ?? false;
+    const bActive = b.availability_status ?? false;
+    
+    // If both have same availability status, maintain original order
+    if (aActive === bActive) return 0;
+    
+    // Active comes first (true > false)
+    return bActive ? 1 : -1;
+  });
+
+  const [data, setData] = useState<Codev[]>(sortedInitialData);
   const stats = getMemberStats(data);
 
   // Filters
@@ -109,30 +122,29 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
   };
 
   return (
-    <div className="max-w-screen-4xl mx-auto flex flex-col gap-4 p-4">
-      <H1>In-House Codebility</H1>
-
-      <div className="flex items-center justify-between">
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="rounded-full bg-blue-200 px-3 py-1 text-stone-100">
-            {stats.total} {stats.total === 1 ? "member" : "members"}
-          </span>
-          <span className="rounded-full bg-emerald-600 px-3 py-1 text-stone-100">
-            {stats.active} active
-          </span>
-          <span className="rounded-full bg-red-100 px-3 py-1 text-stone-100">
-            {stats.inactive} inactive
-          </span>
+    <div className="mx-auto flex max-w-[1600px] flex-col gap-6 px-2 sm:px-4">
+      <div className="flex flex-col gap-4">
+        <div>
+          <H1 className="text-2xl sm:text-3xl">In-House Codebility</H1>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-xs sm:text-sm">
+            <span className="rounded-full bg-customBlue-500 px-2.5 py-1 text-white shadow-sm sm:px-3 sm:py-1.5">
+              {stats.total} {stats.total === 1 ? "member" : "members"}
+            </span>
+            <span className="rounded-full bg-emerald-600 px-2.5 py-1 text-white shadow-sm sm:px-3 sm:py-1.5">
+              {stats.active} active
+            </span>
+            <span className="rounded-full bg-red-500 px-2.5 py-1 text-white shadow-sm sm:px-3 sm:py-1.5">
+              {stats.inactive} inactive
+            </span>
+          </div>
         </div>
+        <TableFilters
+          filters={filters}
+          onFilterChange={(key, value) =>
+            setFilters((prev) => ({ ...prev, [key]: value }))
+          }
+        />
       </div>
-
-      {/* Table Filters */}
-      <TableFilters
-        filters={filters}
-        onFilterChange={(key, value) =>
-          setFilters((prev) => ({ ...prev, [key]: value }))
-        }
-      />
 
       {/* Table View Only */}
       <InHouseTable

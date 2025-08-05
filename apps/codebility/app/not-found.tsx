@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { Button } from "@/Components/ui/button";
+import { Button } from "@/components/ui/button";
 
 const NotFoundPage = () => {
   return (
@@ -28,7 +28,7 @@ const NotFoundPage = () => {
 
         <Link
           href="/"
-          className="from-teal to-violet mx-auto h-12 w-44 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br"
+          className="from-customTeal via-customBlue-100 mx-auto h-12 w-44 rounded-full bg-gradient-to-r to-customViolet-300 p-0.5 hover:bg-gradient-to-br"
         >
           <Button className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
             Go to Home Page

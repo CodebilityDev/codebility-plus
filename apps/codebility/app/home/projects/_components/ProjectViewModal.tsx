@@ -8,15 +8,15 @@ import {
   getTeamLead,
   SimpleMemberData,
 } from "@/app/home/projects/actions";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+} from "@/components/ui/dialog";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
 import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
 import { useQuery } from "@tanstack/react-query";
@@ -102,7 +102,6 @@ const ProjectViewModal = () => {
                   }`}
                   priority
                   onLoad={() => setImageLoaded(true)}
-                  unoptimized={true}
                 />
               </div>
             ) : (
@@ -117,7 +116,7 @@ const ProjectViewModal = () => {
             <div className="dark:bg-dark-200 space-y-4 rounded-lg bg-slate-100 p-4">
               <div>
                 <h3 className="text-lg font-semibold">Project Details</h3>
-                <p className="text-2xl text-blue-600 dark:text-blue-400">
+                <p className="text-2xl text-customBlue-600 dark:text-customBlue-400">
                   {data?.name}
                 </p>
               </div>
@@ -134,7 +133,7 @@ const ProjectViewModal = () => {
                   <Link
                     href={data.github_link}
                     target="_blank"
-                    className="flex items-center gap-2 hover:text-blue-500"
+                    className="flex items-center gap-2 hover:text-customBlue-500"
                   >
                     <IconGithub className="h-5 w-5 invert dark:invert-0" />
                     <span className="text-sm">GitHub</span>
@@ -144,7 +143,7 @@ const ProjectViewModal = () => {
                   <Link
                     href={data.website_url}
                     target="_blank"
-                    className="flex items-center gap-2 hover:text-blue-500"
+                    className="flex items-center gap-2 hover:text-customBlue-500"
                   >
                     <IconLink className="h-5 w-5 invert dark:invert-0" />
                     <span className="text-sm">Website</span>
@@ -154,7 +153,7 @@ const ProjectViewModal = () => {
                   <Link
                     href={data.figma_link}
                     target="_blank"
-                    className="flex items-center gap-2 hover:text-blue-500"
+                    className="flex items-center gap-2 hover:text-customBlue-500"
                   >
                     <IconFigma className="h-5 w-5 invert dark:invert-0" />
                     <span className="text-sm">Figma</span>
@@ -224,7 +223,6 @@ const ProjectViewModal = () => {
                             src={teamLead.image_url}
                             alt={`${teamLead.first_name} ${teamLead.last_name}`}
                             fill
-                            unoptimized={true}
                             className="rounded-full object-cover"
                             loading="lazy"
                           />
@@ -260,7 +258,6 @@ const ProjectViewModal = () => {
                                 src={member.image_url}
                                 alt={`${member.first_name} ${member.last_name}`}
                                 fill
-                                unoptimized={true}
                                 className="rounded-full object-cover"
                                 loading="lazy"
                               />

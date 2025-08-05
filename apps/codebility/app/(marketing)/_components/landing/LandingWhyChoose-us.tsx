@@ -20,7 +20,7 @@ const WhyChooseUs = () => {
                   width={300}
                   height={300}
                   className="h-[150px] w-[150px] object-contain lg:h-[300px] lg:w-[300px]"
-                  unoptimized={true}
+                  
                 />
                 <div className="flex flex-col gap-2">
                   <h3 className="text-lg font-medium md:text-2xl lg:text-3xl">
@@ -42,7 +42,7 @@ const WhyChooseUs = () => {
                   width={400}
                   height={400}
                   className="h-[150px] w-[150px] object-contain lg:h-[400px] lg:w-[400px]"
-                  unoptimized={true}
+                  
                 />
                 <div className="flex flex-col gap-2 text-center">
                   <h3 className="text-lg font-medium md:text-2xl lg:text-3xl">
@@ -56,14 +56,14 @@ const WhyChooseUs = () => {
                 </div>
               </div>
             </div>
-            <div className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-blue-100 lg:block">
+            <div className="col-start-1 col-end-2 row-start-3 row-end-5 hidden overflow-hidden rounded-xl bg-customBlue-100 lg:block">
               <Image
                 src="https://codebility-cdn.pages.dev/assets/images/index/choose-hands.jpg"
                 alt="codevs"
                 width={300}
                 height={450}
                 className="h-full w-full object-cover"
-                unoptimized={true}
+                
               />
             </div>
             <div className="border-dark-100 bg-black-600 col-start-1 col-end-1 row-start-3 row-end-3 rounded-lg border-2 p-4 md:col-end-3 md:row-end-5 md:p-6 lg:col-start-2">
@@ -74,7 +74,7 @@ const WhyChooseUs = () => {
                   width={200}
                   height={200}
                   className="h-[150px] w-[150px] object-contain lg:h-[200px] lg:w-[200px]"
-                  unoptimized={true}
+                  
                 />
                 <div className="flex flex-col gap-2 text-center">
                   <h3 className="font-medium md:text-2xl">

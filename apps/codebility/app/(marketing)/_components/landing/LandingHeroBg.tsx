@@ -21,7 +21,7 @@ const HeroBackground = () => {
         width={910}
         height={420}
         className="absolute -right-[650px] top-[400px] hidden h-[420px] w-[910px] lg:block"
-        unoptimized={true}
+        
       />
     </>
   );

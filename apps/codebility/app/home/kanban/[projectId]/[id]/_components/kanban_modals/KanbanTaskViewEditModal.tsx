@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode } from "react";
+import { ReactNode, memo, useCallback } from "react";
 import { useModal } from "@/hooks/use-modal";
 import { ExtendedTask } from "@/types/home/codev";
 
@@ -10,16 +10,22 @@ interface Props {
   onComplete?: (taskId: string) => void;
 }
 
-export default function KanbanTaskViewEditModal({
+function KanbanTaskViewEditModal({
   children,
   task,
   onComplete,
 }: Props) {
   const { onOpen } = useModal();
 
+  const handleClick = useCallback(() => {
+    onOpen("taskViewModal", task, onComplete);
+  }, [onOpen, task, onComplete]);
+
   return (
-    <div onClick={() => onOpen("taskViewModal", task, onComplete)}>
+    <div onClick={handleClick}>
       {children}
     </div>
   );
 }
+
+export default memo(KanbanTaskViewEditModal);

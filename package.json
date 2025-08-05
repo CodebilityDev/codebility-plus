@@ -6,8 +6,11 @@
     "@codevs/prettier-config": "workspace:^",
     "@turbo/gen": "^2.1.1",
     "@types/react": "19.1.5",
+    "@types/react-dom": "19.1.5",
     "eslint": "^8.57.0",
     "prettier": "^3.3.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
     "turbo": "^2.1.1",
     "typescript": "^5.5.4"
   },
@@ -16,8 +19,6 @@
     "web": "cd apps/next && pnpm run next",
     "clean": "rm -rf node_modules",
     "clean:workspaces": "turbo clean",
-    "tapup": "turbo run dev -F tapup...",
-    "tapup:build": "turbo run build -F tapup...",
     "dev": "turbo watch dev",
     "codebility": "turbo run dev -F codebility...",
     "codebility:build": "turbo run build -F codebility...",
@@ -31,7 +32,19 @@
   },
   "resolutions": {
     "metro": "~0.80.8",
-    "metro-resolver": "~0.80.8"
+    "metro-resolver": "~0.80.8",
+    "react": "19.1.0",
+    "react-dom": "19.1.0"
+  },
+  "pnpm": {
+    "overrides": {
+      "react": "19.1.0",
+      "react-dom": "19.1.0",
+      "react-signature-canvas": "npm:react-signature-canvas@1.1.0-alpha.1",
+      "reactjs-qr-code-reader": "npm:reactjs-qr-code-reader@1.0.3",
+      "react-smooth": "npm:react-smooth@4.0.4",
+      "react-overlays": "npm:react-overlays@5.2.1"
+    }
   },
   "nohoist": [
     "**/expo-router",
@@ -40,7 +53,7 @@
   "packageManager": "pnpm@8.11.0",
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
-    "@supabase/supabase-js": "^2.49.4",
+    "@supabase/supabase-js": "^2.49.8",
     "axios": "^1.7.3",
     "date-fns": "^3.6.0"
   }

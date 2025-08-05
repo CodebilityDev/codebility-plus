@@ -2,8 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import useUser from "@/app/home/_hooks/use-user";
-import Logo from "@/Components/shared/Logo";
-import { Button } from "@/Components/ui/button";
+import Logo from "@/components/shared/Logo";
+import { Button } from "@/components/ui/button";
 import { navLinks } from "@/constants/navigation";
 import { useModal } from "@/hooks/use-modal";
 import useChangeBgNavigation from "@/hooks/useChangeBgNavigation";
@@ -14,6 +14,7 @@ import {
   Sheet,
   SheetContent,
   SheetHeader,
+  SheetTitle,
   SheetTrigger,
 } from "@codevs/ui/sheet";
 
@@ -43,14 +44,14 @@ const Navbar = () => {
               ) : link.name === "Contact Us" ? (
                 <button
                   onClick={() => onOpen("contactUsModal")}
-                  className="text-lg text-white transition duration-300 hover:text-blue-100"
+                  className="text-lg text-white transition duration-300 hover:text-customBlue-100"
                 >
                   {link.name}
                 </button>
               ) : (
                 <Link
                   href={link.href}
-                  className="text-lg text-white transition duration-300 hover:text-blue-100"
+                  className="text-lg text-white transition duration-300 hover:text-customBlue-100"
                 >
                   {link.name}
                 </Link>
@@ -60,13 +61,13 @@ const Navbar = () => {
         </ul>
         <div className="font-inter font-regular hidden items-center gap-4 text-base lg:flex">
           <Link href={isAuthenticated ? "/dashboard" : "/auth/signin"}>
-            <Button variant="link" className="text-white hover:text-blue-100">
+            <Button variant="link" className="text-white hover:text-customBlue-100">
               {isAuthenticated ? "Dashboard" : "Login"}
             </Button>
           </Link>
 
           <Link href="/auth/signup">
-            <Button className="from-teal to-violet h-10 w-28 rounded-full bg-gradient-to-r via-blue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
+            <Button className="from-customTeal to-customViolet-100h-10 w-28 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br xl:h-12 xl:w-36">
               <span className="bg-black-100 flex h-full w-full items-center justify-center rounded-full text-lg text-white lg:text-lg">
                 Sign Up
               </span>
@@ -101,8 +102,10 @@ const Navbar = () => {
               <MenuIcon className="text-gray-300" />
             </Button>
           </SheetTrigger>
-          <SheetContent className="bg-dark-100 border-r border-zinc-800 text-white">
+          <SheetContent className="bg-dark-100 border-r border-zinc-800 text-white" aria-describedby="mobile-nav-description">
             <SheetHeader className="flex flex-col items-start gap-6">
+              <SheetTitle className="sr-only">Navigation Menu</SheetTitle>
+              <div id="mobile-nav-description" className="sr-only">Mobile navigation menu</div>
               <div className="border-darkgray w-full border-b pb-6">
                 <Link
                   href="/"
@@ -126,14 +129,14 @@ const Navbar = () => {
                       ) : link.name === "Contact Us" ? (
                         <button
                           onClick={() => onOpen("contactUsModal")}
-                          className="text-lg text-white transition duration-300 hover:text-blue-100"
+                          className="text-lg text-white transition duration-300 hover:text-customBlue-100"
                         >
                           {link.name}
                         </button>
                       ) : (
                         <Link
                           href={link.href}
-                          className="text-lg transition duration-300 hover:text-blue-100"
+                          className="text-lg transition duration-300 hover:text-customBlue-100"
                         >
                           {link.name}
                         </Link>
@@ -147,13 +150,13 @@ const Navbar = () => {
                 <Link href={isAuthenticated ? "/dashboard" : "/auth/signin"}>
                   <Button
                     variant="link"
-                    className="w-full rounded-full bg-transparent text-lg text-white hover:text-blue-100"
+                    className="w-full rounded-full bg-transparent text-lg text-white hover:text-customBlue-100"
                   >
                     {isAuthenticated ? "Dashboard" : "Login"}
                   </Button>
                 </Link>
                 <Link href="/auth/signup">
-                  <Button className="from-teal to-violet w-full rounded-full bg-gradient-to-r via-blue-100 p-0.5 text-lg hover:bg-gradient-to-br xl:h-12 xl:w-36">
+                  <Button className="from-customTeal to-customViolet-100w-full rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 text-lg hover:bg-gradient-to-br xl:h-12 xl:w-36">
                     Sign Up
                   </Button>
                 </Link>

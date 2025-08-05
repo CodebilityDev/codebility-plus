@@ -1,16 +1,16 @@
 "use client";
 
-import { Button } from "@/Components/ui/button";
-import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogFooter } from "@/Components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { Dialog, DialogHeader, DialogContent, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal";
-import { Form, FormControl, FormField, FormItem, FormMessage } from "@codevs/ui/form";
+// Removed form imports to fix version conflict
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { getCodev } from "../_service/actions";
 import { z } from "zod";
-import { toast } from "@/Components/ui/use-toast";
+import { toast } from "@/components/ui/use-toast";
 import { Codev } from "@/types/home/codev";
 import { useEffect, useState } from "react";
 import { sentHireCodevEmail } from "../_service/emailAction";
@@ -98,70 +98,43 @@ export function CodevHireCodevModal() {
 					<DialogTitle>Hire Codev</DialogTitle>
 				</DialogHeader>
 
-				<Form {...form}>
-					<form
-						onSubmit={form.handleSubmit(onSubmit)}
-						className="flex flex-col gap-4"
-						autoComplete="off"
-					>
-						<FormField
-							control={form.control}
-							name="name"
-							render={({ field }) => (
-								<>
-									<FormItem>
-										<FormControl>
-											<Input
-												label="Name"
-												placeholder="Your name"
-												value={field.value}
-												onChange={field.onChange}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								</>
-							)}
+				<form
+					onSubmit={form.handleSubmit(onSubmit)}
+					className="flex flex-col gap-4"
+					autoComplete="off"
+				>
+					<div className="space-y-2">
+						<Input
+							label="Name"
+							placeholder="Your name"
+							{...form.register("name")}
 						/>
-						<FormField
-							control={form.control}
-							name="email"
-							render={({ field }) => (
-								<>
-									<FormItem>
-										<FormControl>
-											<Input
-												label="Email"
-												placeholder="your@email.com"
-												value={field.value}
-												onChange={field.onChange}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								</>
-							)}
+						{form.formState.errors.name && (
+							<p className="text-sm text-red-500">{form.formState.errors.name.message}</p>
+						)}
+					</div>
+					<div className="space-y-2">
+						<Input
+							label="Email"
+							placeholder="your@email.com"
+							{...form.register("email")}
 						/>
-						<FormField
-							control={form.control}
-							name="message"
-							render={({ field }) => (
-								<>
-									<FormItem>
-										<FormControl>
-											<Textarea
-												label="Message"
-												rows={4}
-												placeholder="Your message"
-												className="bg-muted/50"
-												{...field}
-											/>
-										</FormControl>
-										<FormMessage />
-									</FormItem>
-								</>
-							)}
+						{form.formState.errors.email && (
+							<p className="text-sm text-red-500">{form.formState.errors.email.message}</p>
+						)}
+					</div>
+					<div className="space-y-2">
+						<Textarea
+							label="Message"
+							rows={4}
+							placeholder="Your message"
+							className="bg-muted/50"
+							{...form.register("message")}
 						/>
+						{form.formState.errors.message && (
+							<p className="text-sm text-red-500">{form.formState.errors.message.message}</p>
+						)}
+					</div>
 						<DialogFooter className="flex flex-col gap-2 lg:flex-row">
 							<Button
 								type="button"
@@ -181,8 +154,7 @@ export function CodevHireCodevModal() {
 								{form.formState.isSubmitting ? "Sending..." : "Send Email"}
 							</Button>
 						</DialogFooter>
-					</form>
-				</Form>
+				</form>
 			</DialogContent>
 		</Dialog>
 	)

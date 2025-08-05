@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useCallback, useMemo } from "react";
 import { getTestDate } from "@/app/applicant/waiting/_service/util";
-import { Box } from "@/Components/shared/dashboard";
-import DefaultPagination from "@/Components/ui/pagination";
+import { Box } from "@/components/shared/dashboard";
+import DefaultPagination from "@/components/ui/pagination";
 import {
   Table,
   TableBody,
@@ -11,7 +11,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import { pageSize } from "@/constants";
 import { cn } from "@/lib/utils";
 import {
@@ -35,7 +35,7 @@ interface DataTableProps<TData extends NewApplicantType, TValue> {
   data: TData[];
 }
 
-export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
+function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   columns,
   data,
 }: DataTableProps<TData, TValue>) {
@@ -43,6 +43,30 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
   const [rowSelection, setRowSelection] = React.useState({});
   const [columnVisibility, setColumnVisibility] =
     React.useState<VisibilityState>({});
+  const [pagination, setPagination] = React.useState({
+    pageIndex: 0,
+    pageSize: pageSize.applicants,
+  });
+
+  // Memoize initial column visibility to prevent recalculation
+  const initialColumnVisibility = useMemo(
+    () => ({
+      github: data[0]?.application_status === "testing" ? false : true,
+      tech_stacks: data[0]?.application_status === "testing" ? false : true,
+      test_taken: data[0]?.application_status === "testing" ? true : false,
+      test_time_remaining:
+        data[0]?.application_status === "testing" ? true : false,
+      fork_url: data[0]?.application_status === "testing" ? true : false,
+      reapply: data[0]?.application_status === "denied" ? true : false,
+    }),
+    [data[0]?.application_status],
+  );
+
+  // Calculate total pages
+  const totalPages = useMemo(
+    () => Math.ceil(data.length / pagination.pageSize),
+    [data.length, pagination.pageSize],
+  );
 
   const table = useReactTable({
     data,
@@ -53,52 +77,83 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
     getSortedRowModel: getSortedRowModel(),
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
+    onPaginationChange: setPagination,
     state: {
       sorting,
       rowSelection,
+      columnVisibility,
+      pagination,
     },
     initialState: {
-      pagination: {
-        pageSize: pageSize.applicants,
-      },
-      columnVisibility: {
-        github: data[0]?.application_status === "testing" ? false : true,
-        tech_stacks: data[0]?.application_status === "testing" ? false : true,
-        test_taken: data[0]?.application_status === "testing" ? true : false,
-        test_time_remaining:
-          data[0]?.application_status === "testing" ? true : false,
-        fork_url: data[0]?.application_status === "testing" ? true : false,
-        reapply: data[0]?.application_status === "denied" ? true : false,
-      },
+      columnVisibility: initialColumnVisibility,
     },
+    pageCount: totalPages,
+    manualPagination: false,
   });
 
-  // Calculate total pages
-  const totalPages = Math.ceil(data.length / pageSize.applicants);
+  const toBeFailed = useCallback(
+    (
+      testTaken: string | null | undefined,
+      forkUrl: string | null | undefined,
+    ): Boolean => {
+      if (!testTaken) return false;
+      if (forkUrl) return false;
 
-  const toBeFailed = (
-    testTaken: string | null | undefined,
-    forkUrl: string | null | undefined,
-  ): Boolean => {
-    if (!testTaken) return false;
-    if (forkUrl) return false;
+      const currentDate = new Date();
 
-    const currentDate = new Date();
+      const testTakenDate = getTestDate(
+        new Date(testTaken || "") || new Date(),
+      );
 
-    const testTakenDate = getTestDate(new Date(testTaken || "") || new Date());
+      const difference = testTakenDate.getTime() - currentDate.getTime();
 
-    const difference = testTakenDate.getTime() - currentDate.getTime();
+      return difference <= 0;
+    },
+    [],
+  );
 
-    return difference <= 0;
-  };
+  // Define pagination callbacks outside of conditional rendering
+  const handleNextPage = useCallback(() => {
+    table.nextPage();
+  }, [table]);
+
+  const handlePreviousPage = useCallback(() => {
+    table.previousPage();
+  }, [table]);
+
+  const setCurrentPage = useCallback(
+    (page: number) => {
+      table.setPageIndex(page - 1);
+    },
+    [table],
+  );
+
+
+  // Clear row selection when page changes
+  React.useEffect(() => {
+    setRowSelection({});
+  }, [pagination.pageIndex]);
+
+  // Reset pagination when data changes significantly (different length)
+  const prevDataLength = React.useRef(data.length);
+  React.useEffect(() => {
+    if (prevDataLength.current !== data.length) {
+      // Only reset if we're beyond the available pages
+      const newTotalPages = Math.ceil(data.length / pagination.pageSize);
+      if (pagination.pageIndex >= newTotalPages && newTotalPages > 0) {
+        setPagination(prev => ({ ...prev, pageIndex: 0 }));
+      }
+      prevDataLength.current = data.length;
+    }
+  }, [data.length, pagination.pageIndex, pagination.pageSize]);
 
   return (
-    <div className="rounded-md border">
-      <Box className="p-1 py-2 sm:p-4 sm:py-4">
+    <div className="overflow-hidden rounded-md">
+      <Box className="p-1 py-2 sm:p-3 sm:py-3">
         {/* if rows selected */}
 
-        <div className="justify-betwee flex w-full items-center">
-          <div className="hidden w-full items-center gap-4 px-2 pb-2 xl:flex">
+        <div className="justify-between flex w-full items-center">
+          <div className="flex w-full items-center gap-4 px-2 pb-2">
             <p className="text-sm text-gray-500">
               {Object.keys(rowSelection).length} selected
             </p>
@@ -149,7 +204,7 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
             {table.getRowModel().rows?.length ? (
               table.getRowModel().rows.map((row) => (
                 <TableRow
-                  key={row.id}
+                  key={`${row.id}-${row.index}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
                     row.original.application_status === "testing" &&
@@ -160,7 +215,7 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
                         row.original.applicant?.test_taken,
                         row.original.applicant?.fork_url,
                       ) &&
-                      "bg-red-100 bg-opacity-5",
+                      "bg-customRed-100 bg-opacity-5",
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
@@ -192,26 +247,18 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
         </Table>
 
         {/* Table for smaller screens */}
-        <ApplicantMobileTable table={table} />
+        <div>
+          <ApplicantMobileTable table={table} />
+        </div>
 
         {/* Table pagination integrated with DefaultPagination component */}
         <div className="relative w-full">
-          {data.length > pageSize.applicants && (
+          {data.length > pagination.pageSize && (
             <DefaultPagination
               currentPage={table.getState().pagination.pageIndex + 1}
-              handleNextPage={() => {
-                if (table.getState().pagination.pageIndex < totalPages - 1) {
-                  table.nextPage();
-                }
-              }}
-              handlePreviousPage={() => table.previousPage()}
-              setCurrentPage={(pageOrFunction) => {
-                const page =
-                  typeof pageOrFunction === "function"
-                    ? pageOrFunction(table.getState().pagination.pageIndex + 1)
-                    : pageOrFunction;
-                table.setPageIndex(page - 1);
-              }}
+              handleNextPage={handleNextPage}
+              handlePreviousPage={handlePreviousPage}
+              setCurrentPage={setCurrentPage}
               totalPages={totalPages}
             />
           )}
@@ -220,3 +267,5 @@ export function ApplicantDataTable<TData extends NewApplicantType, TValue>({
     </div>
   );
 }
+
+export const ApplicantDataTable = ApplicantDataTableComponent;

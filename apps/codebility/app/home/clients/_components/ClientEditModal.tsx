@@ -8,15 +8,15 @@ import {
   ClientWithStatusFormValues,
   getFormItemLabels,
 } from "@/app/home/clients/_lib/schema";
-import DefaultAvatar from "@/Components/DefaultAvatar";
-import { Button } from "@/Components/ui/button";
+import DefaultAvatar from "@/components/DefaultAvatar";
+import { Button } from "@codevs/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
+} from "@codevs/ui/dialog";
 // Hook controlling modal open/close + data
 import { useModal } from "@/hooks/use-modal-clients";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -219,19 +219,19 @@ export default function ClientEditModal() {
   };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={handleDialogChange}>
+    <Dialog open={isModalOpen} onOpenChange={handleDialogChange} modal={true}>
       <DialogContent
         aria-describedby={undefined}
-        className="flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
+        className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl">Edit Company</DialogTitle>
+          <DialogTitle className="text-gray-900 dark:text-gray-100 text-2xl">Edit Company</DialogTitle>
         </DialogHeader>
 
         {/* COMPANY LOGO UPLOAD */}
         <div className="flex flex-col gap-4">
           <div className="flex justify-center md:justify-start">
-            <label className="md:text-md text-sm lg:text-lg">Logo</label>
+            <label className="text-gray-900 dark:text-gray-100 md:text-md text-sm lg:text-lg">Logo</label>
           </div>
 
           <div className="flex flex-col gap-4 md:flex-row">
@@ -249,13 +249,13 @@ export default function ClientEditModal() {
             </div>
 
             <div className="flex flex-col justify-center gap-2">
-              <p className="text-md text-gray">
+              <p className="text-md text-gray-600 dark:text-gray-400">
                 Recommended size 1080 x 768 px
               </p>
               <div className="gap-4">
                 {!logoPreview && (
                   <label htmlFor="edit_company_logo">
-                    <p className="cursor-pointer text-center text-blue-100 md:text-left">
+                    <p className="cursor-pointer text-center text-customBlue-600 dark:text-customBlue-400 md:text-left">
                       Upload Image
                     </p>
                   </label>
@@ -271,7 +271,7 @@ export default function ClientEditModal() {
                 {logoPreview && (
                   <p
                     onClick={handleRemoveLogo}
-                    className="text-violet cursor-pointer text-center md:text-left"
+                    className="text-red-600 dark:text-red-400 cursor-pointer text-center md:text-left"
                   >
                     Remove Image
                   </p>
@@ -284,11 +284,11 @@ export default function ClientEditModal() {
         {/* STATUS FIELD (SIMPLE SELECT) */}
         <div className="flex items-center justify-end border-b pb-3">
           <div className="flex gap-4">
-            <p className="w-auto text-sm">
+            <p className="w-auto text-sm text-gray-900 dark:text-gray-100">
               Status:{" "}
               <span
                 className={
-                  currentStatus === "active" ? "text-green" : "text-red-600"
+                  currentStatus === "active" ? "text-green-600" : "text-red-600"
                 }
               >
                 {currentStatus}
@@ -303,12 +303,12 @@ export default function ClientEditModal() {
               }
               disabled={isLoading}
             >
-              <SelectTrigger className="focus:ring-inherit">
+              <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-inherit">
                 <SelectValue placeholder="status" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="active">Active</SelectItem>
-                <SelectItem value="inactive">Inactive</SelectItem>
+              <SelectContent className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
+                <SelectItem value="active" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">Active</SelectItem>
+                <SelectItem value="inactive" className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">Inactive</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -335,7 +335,7 @@ export default function ClientEditModal() {
                     name={formDefaultValue as keyof ClientWithStatusFormValues}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel>{labelText}</FormLabel>
+                        <FormLabel className="text-gray-900 dark:text-gray-100">{labelText}</FormLabel>
                         <FormControl>
                           {options ? (
                             <Select
@@ -344,14 +344,15 @@ export default function ClientEditModal() {
                               }}
                               value={String(field.value) ?? ""}
                             >
-                              <SelectTrigger className="focus:ring-inherit">
+                              <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-inherit">
                                 <SelectValue placeholder={placeHolderText} />
                               </SelectTrigger>
-                              <SelectContent>
+                              <SelectContent className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
                                 {options.map((option) => (
                                   <SelectItem
                                     key={option.value}
                                     value={option.value}
+                                    className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600"
                                   >
                                     {option.label}
                                   </SelectItem>
@@ -363,7 +364,7 @@ export default function ClientEditModal() {
                               type={inputType || "text"}
                               placeholder={placeHolderText}
                               {...field}
-                              className={`${
+                              className={`bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400 ${
                                 errors[
                                   formDefaultValue as keyof ClientWithStatusFormValues
                                 ]
@@ -398,8 +399,8 @@ export default function ClientEditModal() {
             <DialogFooter className="mt-8 flex flex-col gap-2 lg:flex-row">
               <Button
                 type="button"
-                variant="hollow"
-                className="order-2 w-full sm:order-1 sm:w-[130px]"
+                variant="outline"
+                className="order-2 w-full sm:order-1 sm:w-[130px] bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600"
                 onClick={() => handleDialogChange(false)}
                 disabled={isLoading}
               >
@@ -407,7 +408,7 @@ export default function ClientEditModal() {
               </Button>
               <Button
                 type="submit"
-                className="order-1 w-full sm:order-2 sm:w-[130px]"
+                className="order-1 w-full sm:order-2 sm:w-[130px] bg-customBlue-600 hover:bg-customBlue-700 text-white dark:bg-customBlue-600 dark:hover:bg-customBlue-700"
                 disabled={isLoading || !isValid}
               >
                 Save

@@ -8,8 +8,8 @@ import {
   getProjectClients,
   getProjectCodevs,
 } from "@/app/home/projects/actions";
-import ProjectAvatar from "@/Components/ProjectAvatar";
-import { CustomSelect } from "@/Components/ui/CustomSelect";
+import ProjectAvatar from "@/components/ProjectAvatar";
+import { CustomSelect } from "@/components/ui/CustomSelect";
 import {
   Dialog,
   DialogContent,
@@ -17,8 +17,8 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "@/Components/ui/dialog";
-import { MemberSelection } from "@/Components/ui/MemberSelection";
+} from "@/components/ui/dialog";
+import { MemberSelection } from "@/components/ui/MemberSelection";
 import { useModal } from "@/hooks/use-modal-projects";
 import { Client, Codev, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";
@@ -291,6 +291,7 @@ const ProjectAddModal = () => {
             onClick={() => setOpenImageCropper(true)}
             width={408}
             height={192}
+            style={{ width: "auto", height: "auto" }}
           />
         ) : (
           <div className="flex h-full w-full items-center justify-center bg-gray-100">
@@ -301,7 +302,7 @@ const ProjectAddModal = () => {
       <div className="flex gap-2">
         <label
           htmlFor="image-upload"
-          className="cursor-pointer text-sm text-blue-600 hover:text-blue-800 dark:text-white dark:hover:text-blue-100"
+          className="cursor-pointer text-sm text-customBlue-600 hover:text-customBlue-800 dark:text-white dark:hover:text-customBlue-100"
         >
           Upload Image
         </label>
