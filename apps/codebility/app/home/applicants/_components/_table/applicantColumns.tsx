@@ -29,7 +29,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        className="dark:border-none dark:ring-1 dark:ring-white"
+        className=""
       />
     ),
     cell: ({ row }) => (
@@ -37,7 +37,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="mx-0 mt-8 px-0 dark:border-none dark:ring-1 dark:ring-white xl:mt-2"
+        className="mx-0 mt-8 px-0 xl:mt-2"
       />
     ),
     enableSorting: false,

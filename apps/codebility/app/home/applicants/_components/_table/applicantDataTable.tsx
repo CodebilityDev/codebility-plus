@@ -174,7 +174,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
         </div>
 
         {/* Table for larger screens */}
-        <Table className="hidden xl:table" key={`table-page-${pagination.pageIndex}`}>
+        <Table className="hidden xl:table">
           {/* Table header */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -247,7 +247,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
         </Table>
 
         {/* Table for smaller screens */}
-        <div key={`mobile-page-${pagination.pageIndex}`}>
+        <div>
           <ApplicantMobileTable table={table} />
         </div>
 
