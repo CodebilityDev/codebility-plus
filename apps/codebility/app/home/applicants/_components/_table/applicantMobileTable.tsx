@@ -33,7 +33,7 @@ function ApplicantMobileTableComponent<TData extends NewApplicantType>({
                 <div
                   key={`${row.id}-${row.index}`}
                   className={cn(
-                    "rounded-md border bg-white p-2 shadow-sm transition-all hover:shadow-md dark:bg-gray-900 dark:border-gray-700",
+                    "rounded-md border bg-slate-100 p-2 shadow-sm transition-all hover:shadow-md dark:bg-slate-800 dark:border-slate-600",
                     applicant.application_status === "testing" &&
                       applicant.applicant?.fork_url &&
                       "bg-green-50 border-green-300 dark:bg-green-900/20 dark:border-green-700",
@@ -43,9 +43,22 @@ function ApplicantMobileTableComponent<TData extends NewApplicantType>({
                       "bg-red-50 border-red-300 dark:bg-red-900/20 dark:border-red-700",
                   )}
                 >
-                  {/* Header with avatar, name, and action */}
+                  {/* Header with checkbox, avatar, name, and action */}
                   <div className="mb-1.5 flex items-center justify-between">
                     <div className="flex items-center gap-2">
+                      <div
+                        onClick={() => row.toggleSelected(!row.getIsSelected())}
+                        className={cn(
+                          "h-5 w-5 rounded border-2 cursor-pointer transition-all flex items-center justify-center",
+                          row.getIsSelected()
+                            ? "bg-blue-500 border-blue-500"
+                            : "bg-white border-gray-300 dark:bg-gray-700 dark:border-gray-500"
+                        )}
+                      >
+                        {row.getIsSelected() && (
+                          <span className="text-white text-sm font-bold">✓</span>
+                        )}
+                      </div>
                       <div className="h-7 w-7 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                         {applicant.image_url ? (
                           <Image
@@ -109,7 +122,7 @@ function ApplicantMobileTableComponent<TData extends NewApplicantType>({
                       </div>
                       {/* Links and test status */}
                       <div className="flex items-center justify-end gap-1.5">
-                        {applicant.github && (
+                        {applicant.application_status !== "testing" && applicant.github && (
                           <Link
                             href={applicant.github}
                             target="_blank"
@@ -118,7 +131,7 @@ function ApplicantMobileTableComponent<TData extends NewApplicantType>({
                             <IconGithub className="h-3 w-3" />
                           </Link>
                         )}
-                        {applicant.portfolio_website && (
+                        {applicant.application_status !== "testing" && applicant.portfolio_website && (
                           <Link
                             href={applicant.portfolio_website}
                             target="_blank"
@@ -146,8 +159,8 @@ function ApplicantMobileTableComponent<TData extends NewApplicantType>({
                     </div>
                   </div>
 
-                  {/* Tech stacks - ultra compact inline */}
-                  {applicant.tech_stacks && applicant.tech_stacks.length > 0 && (
+                  {/* Tech stacks - only show if not in testing status */}
+                  {applicant.application_status !== "testing" && applicant.tech_stacks && applicant.tech_stacks.length > 0 && (
                     <div className="mt-1 flex items-center gap-1 overflow-hidden">
                       <span className="text-[10px] text-gray-500 dark:text-gray-400">💻</span>
                       <div className="flex gap-0.5 overflow-x-auto">

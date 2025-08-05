@@ -285,6 +285,50 @@ export default function ApplicantActionButton({
     }
   };
 
+  const handleRemindToTakeTest = async () => {
+    setIsLoading(true);
+    try {
+      await sendTestReminder(applicant.email_address);
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Reminder Sent",
+        description: `Test reminder sent to ${applicant.first_name} ${applicant.last_name}.`,
+      });
+    } catch (error) {
+      console.error("Error sending test reminder:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send test reminder. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleRemindToOnboarding = async () => {
+    setIsLoading(true);
+    try {
+      await sendOnboardingReminder(applicant.email_address);
+      setIsDialogOpen(false);
+      setDialogState(null);
+      toast({
+        title: "Reminder Sent",
+        description: `Onboarding reminder sent to ${applicant.first_name} ${applicant.last_name}.`,
+      });
+    } catch (error) {
+      console.error("Error sending onboarding reminder:", error);
+      toast({
+        title: "Error",
+        description: "Failed to send onboarding reminder. Please try again later.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const getDialogTitle = () => {
     switch (dialogState) {
       case "applying": return "Move to Applying";
@@ -296,6 +340,8 @@ export default function ApplicantActionButton({
       case "fail": return "Fail Applicant";
       case "accept": return "Accept Applicant";
       case "deny": return "Deny Applicant";
+      case "remindToTakeTest": return "Send Test Reminder";
+      case "remindToOnboarding": return "Send Onboarding Reminder";
       default: return "Confirm Action";
     }
   };
@@ -312,6 +358,8 @@ export default function ApplicantActionButton({
       case "fail": return `Are you sure you want to fail ${name}? They will be moved to denied.`;
       case "accept": return `Are you sure you want to accept ${name}? They will become an active member.`;
       case "deny": return `Are you sure you want to deny ${name}? This will send them a denial email.`;
+      case "remindToTakeTest": return `Are you sure you want to send a test reminder to ${name}?`;
+      case "remindToOnboarding": return `Are you sure you want to send an onboarding reminder to ${name}?`;
       default: return "Please confirm your action.";
     }
   };
@@ -326,6 +374,8 @@ export default function ApplicantActionButton({
       case "fail": return handleFailApplicant();
       case "accept": return handleAcceptApplicant();
       case "deny": return handleDenyApplicant();
+      case "remindToTakeTest": return handleRemindToTakeTest();
+      case "remindToOnboarding": return handleRemindToOnboarding();
       default: return;
     }
   };
@@ -462,7 +512,31 @@ export default function ApplicantActionButton({
               >
                 Deny Applicant
               </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-black-500 dark:text-light-800 cursor-pointer"
+                onClick={() => {
+                  setDialogState("remindToOnboarding");
+                  setIsDialogOpen(true);
+                }}
+              >
+                <MailIcon className="mr-2 h-4 w-4" />
+                Remind to Onboarding
+              </DropdownMenuItem>
             </>
+          )}
+
+          {/* Remind to Take Test - show for testing and applying status */}
+          {(applicant.application_status === "testing" || applicant.application_status === "applying") && (
+            <DropdownMenuItem
+              className="text-black-500 dark:text-light-800 cursor-pointer"
+              onClick={() => {
+                setDialogState("remindToTakeTest");
+                setIsDialogOpen(true);
+              }}
+            >
+              <MailIcon className="mr-2 h-4 w-4" />
+              Remind to Take Test
+            </DropdownMenuItem>
           )}
         </DropdownMenuContent>
       </DropdownMenu>
