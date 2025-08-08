@@ -1,14 +1,13 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image from "next/image";
 import {
   ClientFormValues,
   clientSchema,
-  FormItems,
   getFormItemLabels,
 } from "@/app/home/clients/_lib/schema";
-import { createClientAction, fetchCountry } from "@/app/home/clients/action";
+import { createClientAction } from "@/app/home/clients/action";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@codevs/ui/button";
 import {
@@ -19,6 +18,7 @@ import {
   DialogTitle,
 } from "@codevs/ui/dialog";
 import { useModal } from "@/hooks/use-modal-clients";
+import { useCountries } from "@/hooks/useCountries"; // Import new hook
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
@@ -46,30 +46,8 @@ export default function ClientAddModal() {
   const [isLoading, setIsLoading] = useState(false);
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
-  const [country, setCountry] = useState<{ value: string; label: string }[]>(
-    [],
-  );
-
-  useEffect(() => {
-    const getCountries = async () => {
-      try {
-        const countryList = (await fetchCountry()) ?? [];
-
-        if (!countryList.length) {
-          console.warn("Country list is empty or undefined.");
-          return;
-        }
-
-        setCountry(countryList);
-      } catch (error) {
-        console.error("Failed to fetch countries:", error);
-      }
-    };
-
-    if (isModalOpen) {
-      getCountries();
-    }
-  }, [isModalOpen]);
+  // Use centralized country hook
+  const { countries } = useCountries();
 
   const form = useForm<ClientFormValues>({
     resolver: zodResolver(clientSchema),
@@ -97,7 +75,7 @@ export default function ClientAddModal() {
   const handleLogoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      form.setValue("company_logo", file); // store as `company_logo`
+      form.setValue("company_logo", file);
       setLogoPreview(URL.createObjectURL(file));
     }
   };
@@ -112,17 +90,16 @@ export default function ClientAddModal() {
     try {
       const formData = new FormData();
 
-      // Required in your schema
+      // Required fields
       formData.append("name", data.name);
 
-      // Optional fields
+      // Optional fields - only append if they exist
       if (data.email) formData.append("email", data.email);
       if (data.phone_number) formData.append("phone_number", data.phone_number);
       if (data.address) formData.append("address", data.address);
       if (data.website) formData.append("website", data.website);
-
-      formData.append("client_type", data.client_type ?? "");
-      formData.append("country", data.country?.toUpperCase() ?? "");
+      if (data.client_type) formData.append("client_type", data.client_type);
+      if (data.country) formData.append("country", data.country.toUpperCase());
 
       // File upload
       if (data.company_logo) {
@@ -138,7 +115,7 @@ export default function ClientAddModal() {
         toast.error(`Error: ${response.error}`);
       }
     } catch (error) {
-      console.log("Error creating new client:", error);
+      console.error("Error creating new client:", error);
       toast.error("Error creating new client");
     } finally {
       setIsLoading(false);
@@ -152,7 +129,9 @@ export default function ClientAddModal() {
         className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 flex h-[32rem] w-[90%] max-w-4xl flex-col gap-6 overflow-x-auto overflow-y-auto lg:h-auto"
       >
         <DialogHeader>
-          <DialogTitle className="text-gray-900 dark:text-gray-100 text-2xl">Add New Company</DialogTitle>
+          <DialogTitle className="text-gray-900 dark:text-gray-100 text-2xl">
+            Add New Company
+          </DialogTitle>
         </DialogHeader>
 
         <Form {...form}>
@@ -160,10 +139,12 @@ export default function ClientAddModal() {
             onSubmit={form.handleSubmit(handleCreateClient)}
             className="space-y-4"
           >
+            {/* Logo Upload Section */}
             <div className="flex flex-col gap-4">
-              <div className="flex justify-center md:justify-start">
-                <label className="text-gray-900 dark:text-gray-100 md:text-md text-sm lg:text-lg">Logo</label>
-              </div>
+              <label className="text-gray-900 dark:text-gray-100 md:text-md text-sm lg:text-lg">
+                Logo
+              </label>
+              
               <div className="flex flex-col gap-4 md:flex-row">
                 <div className="relative mx-auto flex size-[100px] md:mx-0 md:size-[80px]">
                   {logoPreview ? (
@@ -195,7 +176,6 @@ export default function ClientAddModal() {
                       type="file"
                       accept="image/*"
                       className="hidden"
-                      name="company_logo"
                       onChange={handleLogoChange}
                     />
                     {logoPreview && (
@@ -210,25 +190,20 @@ export default function ClientAddModal() {
                 </div>
               </div>
             </div>
+
+            {/* Form Fields */}
             <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {getFormItemLabels(country).map(
-                (
-                  {
-                    labelText,
-                    placeHolderText,
-                    inputType,
-                    formDefaultValue,
-                    options,
-                  },
-                  idx,
-                ) => (
+              {getFormItemLabels(countries).map(
+                ({ labelText, placeHolderText, inputType, formDefaultValue, options }, idx) => (
                   <FormField
                     key={idx}
                     control={form.control}
                     name={formDefaultValue as keyof ClientFormValues}
                     render={({ field }) => (
                       <FormItem>
-                        <FormLabel className="text-gray-900 dark:text-gray-100">{labelText}</FormLabel>
+                        <FormLabel className="text-gray-900 dark:text-gray-100">
+                          {labelText}
+                        </FormLabel>
                         <FormControl>
                           {options ? (
                             <Select
@@ -236,15 +211,15 @@ export default function ClientAddModal() {
                               defaultValue={String(field.value) ?? ""}
                             >
                               <SelectTrigger className="bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 focus:ring-inherit">
-                                <SelectValue placeholder={placeHolderText} className="text-gray-900 dark:text-gray-100">
-                                  {options.find(
-                                    (opt) => opt.value === field.value,
-                                  )?.label || placeHolderText}
-                                </SelectValue>
+                                <SelectValue placeholder={placeHolderText} />
                               </SelectTrigger>
                               <SelectContent className="bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600">
                                 {options.map(({ value, label }) => (
-                                  <SelectItem key={value} value={value} className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600">
+                                  <SelectItem 
+                                    key={value} 
+                                    value={value} 
+                                    className="text-gray-900 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-600"
+                                  >
                                     {label}
                                   </SelectItem>
                                 ))}
@@ -253,14 +228,12 @@ export default function ClientAddModal() {
                           ) : (
                             <Input
                               placeholder={placeHolderText}
-                              type={inputType}
+                              type={inputType || "text"}
                               {...field}
                               value={field.value as string}
                               className={`bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 border-gray-300 dark:border-gray-600 placeholder:text-gray-500 dark:placeholder:text-gray-400 ${
-                                form.formState.errors[
-                                  formDefaultValue as keyof ClientFormValues
-                                ]
-                                  ? "border border-red-500 focus:outline-none"
+                                form.formState.errors[formDefaultValue as keyof ClientFormValues]
+                                  ? "border-red-500"
                                   : ""
                               }`}
                             />
@@ -269,7 +242,7 @@ export default function ClientAddModal() {
                       </FormItem>
                     )}
                   />
-                ),
+                )
               )}
             </div>
 
@@ -288,7 +261,7 @@ export default function ClientAddModal() {
                 className="order-1 w-full sm:order-2 sm:w-[130px] bg-customBlue-600 hover:bg-customBlue-700 text-white dark:bg-customBlue-600 dark:hover:bg-customBlue-700"
                 disabled={isLoading || !form.formState.isValid}
               >
-                Save
+                {isLoading ? "Creating..." : "Save"}
               </Button>
             </DialogFooter>
           </form>
