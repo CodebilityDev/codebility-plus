@@ -24,21 +24,11 @@ export function useHeroAnimations({
   setIsLogoVisible,
 }: UseHeroAnimationsProps) {
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === "undefined" || window.innerWidth < 1024) return;
+
+    let ctx: gsap.Context | undefined;
 
     const setup = () => {
-      const isDesktop = window.innerWidth >= 1024;
-
-      if (
-        !heroRef.current ||
-        !logoRef.current ||
-        !aboutRef.current ||
-        !slidesRef.current ||
-        !regularRef.current ||
-        !h1Ref.current
-      )
-        return;
-
       const hero = heroRef.current;
       const logo = logoRef.current;
       const about = aboutRef.current;
@@ -46,35 +36,14 @@ export function useHeroAnimations({
       const regular = regularRef.current;
       const h1 = h1Ref.current;
 
+      if (!hero || !logo || !about || !slides || !regular || !h1) return;
+
       const slideCount = slides.children.length;
-
-      // ✅ MOBILE fallback
-      if (!isDesktop) {
-        slides.style.transform = "none";
-        slides.style.width = "100%";
-        slides.style.display = "block";
-        slides.style.flexDirection = "column";
-
-        Array.from(slides.children).forEach((child) => {
-          const el = child as HTMLElement;
-          el.style.width = "100%";
-          el.style.display = "block";
-          el.style.flex = "none";
-          el.style.minHeight = "100vh";
-        });
-
-        gsap.set("#codebility-h2", { opacity: 1, filter: "none" });
-        gsap.set("#codebility-btn", { autoAlpha: 1, filter: "none" });
-
-        ScrollTrigger.getAll().forEach((t) => t.kill());
-        return;
-      }
-
       const slideWidth = window.innerWidth;
       const scrollDistance = slideWidth * (slideCount - 1);
       const logoEndY = window.innerHeight - 210 - 120;
 
-      const ctx = gsap.context(() => {
+      ctx = gsap.context(() => {
         // Animate Hero on load
         gsap.from("#welcome-text", {
           y: -30,
@@ -125,7 +94,7 @@ export function useHeroAnimations({
           delay: 0.1,
         });
 
-        // Sticky Logo Fall
+        // Sticky logo drop
         ScrollTrigger.create({
           trigger: hero,
           start: "top top",
@@ -144,12 +113,14 @@ export function useHeroAnimations({
           },
         });
 
-        // Logo spin during horizontal scroll
+        // Logo spin + slides
         ScrollTrigger.create({
           trigger: about,
           start: "top top",
-          end: () => `+=${scrollDistance}`,
+          end: () => `+=${scrollDistance + 200}`,
           scrub: true,
+          anticipatePin: 1,
+          invalidateOnRefresh: true,
           onUpdate: (self) => {
             gsap.set(logo, {
               rotateX: 360,
@@ -159,21 +130,20 @@ export function useHeroAnimations({
           },
         });
 
-        // Horizontal slide scroll
         ScrollTrigger.create({
           trigger: about,
           start: "top top",
-          end: () => `+=${scrollDistance}`,
+          end: () => `+=${scrollDistance + 200}`,
           scrub: true,
           pin: true,
           anticipatePin: 1,
+          invalidateOnRefresh: true,
           onUpdate: (self) => {
             const x = -scrollDistance * self.progress;
             slides.style.transform = `translate3d(${x}px, 0, 0)`;
           },
         });
 
-        // Floating H1
         gsap.fromTo(
           h1,
           { y: 0 },
@@ -203,30 +173,6 @@ export function useHeroAnimations({
               filter: `blur(${6 * p}px)`,
             });
           },
-          onLeaveBack: () => {
-            gsap.fromTo(
-              "#co .letter-co",
-              { y: -20, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.6,
-                ease: "bounce.out",
-                stagger: 0.05,
-              },
-            );
-            gsap.fromTo(
-              "#ebility .letter-eb",
-              { y: -20, opacity: 0 },
-              {
-                y: 0,
-                opacity: 1,
-                duration: 0.6,
-                ease: "bounce.out",
-                stagger: 0.05,
-              },
-            );
-          },
         });
 
         gsap.to("#d", {
@@ -250,31 +196,34 @@ export function useHeroAnimations({
           },
         });
 
-        // Hide logo after About
         ScrollTrigger.create({
           trigger: regular,
           start: "top bottom",
           onEnter: () => setIsLogoVisible(false),
           onLeaveBack: () => setIsLogoVisible(true),
         });
+      }, hero);
 
-        ScrollTrigger.refresh();
-      });
-
-      return ctx;
+      ScrollTrigger.refresh();
     };
 
-    let ctx = setup();
+    const rafId = requestAnimationFrame(() => {
+      setTimeout(setup, 200);
+    });
 
     const resizeHandler = () => {
       ScrollTrigger.getAll().forEach((t) => t.kill());
       if (ctx) ctx.revert();
-      ctx = setup();
+      ctx = undefined;
+      requestAnimationFrame(() => {
+        setTimeout(setup, 200);
+      });
     };
 
     window.addEventListener("resize", resizeHandler);
 
     return () => {
+      cancelAnimationFrame(rafId);
       window.removeEventListener("resize", resizeHandler);
       if (ctx) ctx.revert();
       ScrollTrigger.getAll().forEach((t) => t.kill());
