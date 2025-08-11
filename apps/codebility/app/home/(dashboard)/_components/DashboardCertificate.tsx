@@ -1,13 +1,25 @@
 import { useRef } from "react";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/codev-store";
 import { BookDown } from "lucide-react";
+import certificateSvg from "@/public/assets/ssvgs/certificate.svg";
 
 import Certificate, {
 	CertificateProps,
 	handleDownload,
 } from "./DashboardDownloadCertificate";
+import { cn } from "@codevs/ui";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
+import { CertificateIcon, CertificateOffIcon } from "./DashboardCertificateIcons";
+import { Button } from "@codevs/ui/button";
+
+function hasLevelTwoBadge(level: Record<string, number> | undefined): boolean {
+	const validLevels = Object.entries(level!).filter(
+		([, levelValue]) => levelValue > 0,
+	);
+
+	return validLevels.some(([, levelValue]) => levelValue >= 2);
+}
 
 const DashboardCertificate = () => {
 	const { user, userLevel } = useUserStore();
@@ -103,9 +115,11 @@ const DashboardCertificate = () => {
 		}
 	})();
 
+	const isCertificateUnlocked = hasLevelTwoBadge(user?.level);
+
 	return (
 		<>
-			<div className="absolute left-4 top-4">
+			<div className="absolute left-4 top-4 z-10">
 				<div
 					style={{
 						position: "absolute",
@@ -114,34 +128,45 @@ const DashboardCertificate = () => {
 						width: "1000px",
 						height: "700px",
 						overflow: "hidden",
-						zIndex: -1,
+						visibility: "hidden",
+						pointerEvents: "none",
 					}}
+					aria-hidden="true"
 				>
 					<Certificate {...certData} ref={certRef} />
 				</div>
-				<Button
-					className="md:p-15 md:w-15 h-6 w-10 p-2"
-					onClick={() => hasLevelTwoBadge(user?.level) && handleDownload(certRef, certData.name)}
-					disabled={!hasLevelTwoBadge(user?.level)}
-					title={
-						hasLevelTwoBadge(user?.level) 
-							? "Download your certificate" 
-							: "Complete more projects to unlock your certificate"
-					}
-				>
-					<BookDown className={hasLevelTwoBadge(user?.level) ? "" : "opacity-50"} />
-				</Button>
+				<Tooltip>
+					<TooltipTrigger asChild>
+						<Button
+							size="icon"
+							variant="ghost"
+							className={cn(
+								"rounded-full inline-flex items-center justify-center",
+								"transition-colors duration-200",
+								isCertificateUnlocked
+									? "hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+									: "cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-900"
+							)}
+							onClick={() => isCertificateUnlocked && handleDownload(certRef, certData.name)}
+						>
+							{isCertificateUnlocked ? (
+								<CertificateIcon className="h-6 w-6 text-[#9747FF]" />
+							) : (
+								<CertificateOffIcon className="h-6 w-6 opacity-50" />
+							)}
+						</Button>
+					</TooltipTrigger>
+					<TooltipContent side="bottom" align="start">
+						{isCertificateUnlocked
+							? "Download your certificate"
+							: "Reach level 2 to unlock the certificate"}
+					</TooltipContent>
+				</Tooltip>
 			</div>
 		</>
 	);
 };
 
-function hasLevelTwoBadge(level: Record<string, number> | undefined): boolean {
-	const validLevels = Object.entries(level!).filter(
-		([, levelValue]) => levelValue > 0,
-	);
 
-	return validLevels.some(([, levelValue]) => levelValue >= 2);
-}
 
 export default DashboardCertificate;
