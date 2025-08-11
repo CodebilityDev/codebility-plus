@@ -1,14 +1,12 @@
+// IsRoadMap.tsx (patched)
+
 "use client";
 
-import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
+import React, { forwardRef, useEffect, useState } from "react";
 
-// ✅ Dynamically load the SVG after hydration
-const AnimatedRoadmapSvg = dynamic(() => import("./AnimatedRoadmapSvg"), {
-  ssr: false,
-});
+import AnimatedRoadmapSvg from "./AnimatedRoadmapSvg";
 
-export default function IsRoadMap() {
+const IsRoadMap = forwardRef<HTMLDivElement>((_props, ref) => {
   const [isDesktop, setIsDesktop] = useState(false);
 
   useEffect(() => {
@@ -49,6 +47,7 @@ export default function IsRoadMap() {
 
   return (
     <div
+      ref={ref}
       id="isroadmap-trigger"
       className="relative h-[200vh] w-full snap-start bg-white px-4 py-10"
     >
@@ -77,4 +76,6 @@ export default function IsRoadMap() {
       )}
     </div>
   );
-}
+});
+
+export default IsRoadMap;

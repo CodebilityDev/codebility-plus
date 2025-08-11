@@ -160,14 +160,171 @@ export function useOnboardingAnimations({
         });
 
         if (roadmap) {
-          ScrollTrigger.create({
-            trigger: roadmap,
-            start: "top+=100 top",
-            end: "+=1500",
-            scrub: true,
-            pin: true,
-            anticipatePin: 1,
-            invalidateOnRefresh: true,
+          const svgWrapper = document.querySelector("#roadmap-svg-wrapper");
+
+          if (!svgWrapper || svgWrapper.getAttribute("data-ready") !== "true") {
+            // Retry shortly after hydration
+            setTimeout(() => ScrollTrigger.refresh(), 300);
+            return;
+          }
+
+          const path = svgWrapper.querySelector(
+            "#main-path",
+          ) as SVGPathElement | null;
+          const left = svgWrapper.querySelector(
+            "#left-rail",
+          ) as SVGPathElement | null;
+          const right = svgWrapper.querySelector(
+            "#right-rail",
+          ) as SVGPathElement | null;
+          const arrow = svgWrapper.querySelector(
+            "#main-arrowhead",
+          ) as SVGPathElement | null;
+
+          if (!path || !left || !right || !arrow) return;
+
+          const pathLength = path.getTotalLength();
+          const progress = { value: 0 };
+          const revealed = [false, false, false, false];
+          const phaseCys = [460, 350, 240, 130];
+
+          gsap.set([path, left, right, arrow], { autoAlpha: 0 });
+          gsap.set(path, {
+            strokeDasharray: pathLength,
+            strokeDashoffset: pathLength,
+          });
+          gsap.set(left, {
+            strokeDasharray: pathLength,
+            strokeDashoffset: pathLength,
+          });
+          gsap.set(right, {
+            strokeDasharray: pathLength,
+            strokeDashoffset: pathLength,
+          });
+
+          gsap.to("#starting-circle", {
+            repeat: -1,
+            yoyo: true,
+            duration: 1,
+            scale: 1.2,
+            ease: "sine.inOut",
+            transformOrigin: "center center",
+          });
+
+          gsap.set(".milestone-group circle", {
+            opacity: 0,
+            scale: 0.6,
+            transformOrigin: "center",
+          });
+          gsap.set(".milestone-group polygon", {
+            opacity: 0,
+            scale: 0,
+            transformOrigin: "center",
+          });
+          gsap.set(".milestone-group foreignObject", { opacity: 0 });
+          gsap.set(".milestone-group g", { opacity: 0 });
+
+          const tl = gsap.timeline({
+            scrollTrigger: {
+              trigger: roadmap,
+              start: "top top",
+              end: "+=2000",
+              scrub: true,
+              pin: true,
+            },
+          });
+
+          tl.set([path, left, right], { autoAlpha: 1 });
+
+          tl.to(progress, {
+            value: 1,
+            duration: 2,
+            ease: "none",
+            onUpdate: () => {
+              const len = pathLength * progress.value;
+              const pt = path.getPointAtLength(len);
+              const prev = path.getPointAtLength(Math.max(len - 2, 0));
+
+              const dx = pt.x - prev.x;
+              const dy = pt.y - prev.y;
+              const dist = Math.sqrt(dx * dx + dy * dy);
+              const ux = dx / dist;
+              const uy = dy / dist;
+
+              const tipX = pt.x + ux * 35;
+              const tipY = pt.y + uy * 35;
+
+              const baseX = tipX - ux * 28;
+              const baseY = tipY - uy * 28;
+
+              const perpX = -uy;
+              const perpY = ux;
+
+              const leftX = baseX + perpX * 20;
+              const leftY = baseY + perpY * 20;
+              const rightX = baseX - perpX * 20;
+              const rightY = baseY - perpY * 20;
+
+              const triangle = `M${tipX},${tipY} L${leftX},${leftY} L${rightX},${rightY} Z`;
+              arrow.setAttribute("d", triangle);
+
+              gsap.set(path, { strokeDashoffset: pathLength - len });
+              gsap.set(left, { strokeDashoffset: pathLength - len });
+              gsap.set(right, { strokeDashoffset: pathLength - len });
+              gsap.set(arrow, { autoAlpha: 1 });
+
+              phaseCys.forEach((cy, i) => {
+                const el = svgWrapper.querySelectorAll(".milestone-group")[i];
+                if (!el) return;
+
+                const circle = el.querySelector("circle");
+                const polygon = el.querySelector("polygon");
+                const icon = el.querySelector("foreignObject");
+                const labels = Array.from(el.querySelectorAll("g")).filter(
+                  (g) => !g.contains(circle),
+                );
+                const label = labels[0];
+
+                const threshold = cy - 10;
+
+                if (!revealed[i] && pt.y <= threshold) {
+                  if (circle)
+                    gsap.to(circle, {
+                      opacity: 1,
+                      scale: 1,
+                      duration: 0.4,
+                      ease: "back.out(1.7)",
+                    });
+                  if (polygon)
+                    gsap.fromTo(
+                      polygon,
+                      { opacity: 0, scale: 0 },
+                      {
+                        opacity: 1,
+                        scale: 1,
+                        duration: 0.3,
+                        ease: "back.out(1.7)",
+                      },
+                    );
+                  gsap.to([icon, label], {
+                    opacity: 1,
+                    delay: 0.2,
+                    duration: 0.4,
+                    ease: "power1.out",
+                  });
+                  revealed[i] = true;
+                }
+
+                if (revealed[i] && pt.y > threshold + 15) {
+                  if (circle)
+                    gsap.to(circle, { opacity: 0, scale: 0.6, duration: 0.2 });
+                  if (polygon)
+                    gsap.to(polygon, { opacity: 0, scale: 0, duration: 0.2 });
+                  gsap.to([icon, label], { opacity: 0, duration: 0.2 });
+                  revealed[i] = false;
+                }
+              });
+            },
           });
         }
 
