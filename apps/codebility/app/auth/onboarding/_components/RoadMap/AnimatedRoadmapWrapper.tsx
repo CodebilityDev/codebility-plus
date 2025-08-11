@@ -1,19 +1,16 @@
-"use client";
-
-import dynamic from "next/dynamic";
-import { useEffect, useState } from "react";
-
-const AnimatedRoadmapSvg = dynamic(() => import("./AnimatedRoadmapSvg"), {
-  ssr: false,
-});
+import { useState, useEffect } from "react";
+import AnimatedRoadmapSvg from "./AnimatedRoadmapSvg";
 
 export default function AnimatedRoadmapWrapper() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Ensure client DOM is ready before rendering SVG
-    setReady(true);
+    setTimeout(() => setReady(true), 0); // ensure next tick
   }, []);
 
-  return ready ? <AnimatedRoadmapSvg /> : null;
+  return (
+    <div id="roadmap-svg-wrapper" data-ready={ready}>
+      {ready ? <AnimatedRoadmapSvg /> : null}
+    </div>
+  );
 }

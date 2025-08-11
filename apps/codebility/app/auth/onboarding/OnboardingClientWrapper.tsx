@@ -13,5 +13,6 @@ export default function OnboardingClientWrapper() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
   return <HeroWithAboutEffect />;
 }

@@ -25,7 +25,7 @@ export default function AboutUsSlide() {
           ABOUT <span className="text-pink-500">US</span>
         </h2>
 
-        <p className="mt-6 text-base leading-relaxed text-gray-300 md:text-lg">
+        <p className="mt-6 text-base leading-relaxed md:text-lg">
           Codebility is not a traditional bootcamp. It’s a growing community of
           aspiring and experienced developers who collaborate, learn, and build
           real-world projects together. Think of it as a supportive ecosystem
@@ -33,8 +33,8 @@ export default function AboutUsSlide() {
           portfolios through teamwork and mentorship.
         </p>
 
-        <div className="mt-6 space-y-2 text-base text-gray-200">
-          <p className="font-semibold text-white">We provide:</p>
+        <div className="mt-6 space-y-2 text-base">
+          <p className="font-semibold">We provide:</p>
           <ul className="ml-4 list-disc space-y-1">
             <li>Access to mini-projects and internal tools</li>
             <li>Guidance from experienced team leads</li>
@@ -42,7 +42,7 @@ export default function AboutUsSlide() {
           </ul>
         </div>
 
-        <p className="mt-6 text-base leading-relaxed text-gray-400 md:text-lg">
+        <p className="mt-6 text-base leading-relaxed md:text-lg">
           However, joining Codebility doesn’t replace the need to study and
           build your own foundation. Members are expected to continue learning
           on their own, and then apply those skills in the community to
