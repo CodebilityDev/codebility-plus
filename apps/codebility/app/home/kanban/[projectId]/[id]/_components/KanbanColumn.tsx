@@ -1,10 +1,10 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
+import { useKanbanStore } from "@/store/kanban-store";
 import { ExtendedTask } from "@/types/home/codev";
 import { useDroppable } from "@dnd-kit/core";
 import {
@@ -52,12 +52,17 @@ export default function KanbanColumn({
   tasks,
   onTaskComplete,
 }: Props) {
-  const router = useRouter();
   const { user } = useUserStore();
   const canModifyColumn = user?.role_id === 1 || user?.role_id === 5;
-  const canAddTask = user?.role_id === 1 || user?.role_id === 5 || user?.role_id === 4 || user?.role_id === 10;
+  const canAddTask =
+    user?.role_id === 1 ||
+    user?.role_id === 5 ||
+    user?.role_id === 4 ||
+    user?.role_id === 10;
   const [isEditing, setIsEditing] = useState(false);
   const [newName, setNewName] = useState(column.name);
+
+  const { fetchBoardData } = useKanbanStore();
 
   const safeTasks = tasks ?? [];
 
@@ -115,7 +120,8 @@ export default function KanbanColumn({
     const response = await deleteColumn(column.id);
     if (response.success) {
       toast.success("Column deleted successfully");
-      window.location.reload();
+      // Refetch the board data
+      await fetchBoardData();
     } else {
       toast.error(response.error || "Failed to delete column");
     }
@@ -126,15 +132,14 @@ export default function KanbanColumn({
       toast.error("You don't have permission to delete columns");
       return;
     }
-  
+
     if (safeTasks.length > 0) {
       toast.error("Cannot delete column with tasks");
       return;
     }
-  
+
     onOpen("deleteWarningModal", {}, {}, () => confirmDelete());
   };
-  
 
   // Handle column rename
   const handleUpdateName = async () => {
@@ -152,7 +157,8 @@ export default function KanbanColumn({
     if (response.success) {
       toast.success("Column name updated");
       setIsEditing(false);
-      router.refresh();
+      // Refetch the board data
+      await fetchBoardData();
     } else {
       toast.error(response.error || "Failed to update column name");
     }
@@ -171,10 +177,10 @@ export default function KanbanColumn({
         lg:w-[400px] lg:min-w-[400px]
         ${
           isColumnDragging
-            ? "border-customBlue-500 opacity-95 shadow-lg shadow-customBlue-500/15 scale-[1.02]"
+            ? "border-customBlue-500 shadow-customBlue-500/15 scale-[1.02] opacity-95 shadow-lg"
             : isOver
               ? "border-customBlue-400 bg-customBlue-50/50 dark:border-customBlue-500 dark:bg-customBlue-950/20"
-              : "border-gray-300 dark:border-gray-600 shadow-sm hover:shadow-md"
+              : "border-gray-300 shadow-sm hover:shadow-md dark:border-gray-600"
         }
         bg-gray-50/90 backdrop-blur-sm transition-all duration-200 ease-out dark:bg-gray-800/90
       `}
@@ -182,7 +188,7 @@ export default function KanbanColumn({
     >
       {/* Column Header */}
       <div
-        className="flex items-center justify-between bg-gradient-to-r from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 p-3 md:p-4 border-b border-gray-300 dark:border-gray-600"
+        className="flex items-center justify-between border-b border-gray-300 bg-gradient-to-r from-gray-100 to-gray-200 p-3 dark:border-gray-600 dark:from-gray-700 dark:to-gray-800 md:p-4"
         {...listeners}
       >
         <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 md:gap-3">
@@ -213,9 +219,11 @@ export default function KanbanColumn({
             </div>
           ) : (
             <>
-              <GripVertical className="hidden h-5 w-5 text-gray-400 cursor-grab hover:text-gray-600 dark:hover:text-gray-300 md:block transition-colors" />
-              <span className="text-base font-semibold text-gray-900 dark:text-white md:text-lg">{column.name}</span>
-              <div className="flex items-center justify-center rounded-full bg-customBlue-100 dark:bg-customBlue-900/30 px-3 py-1 text-sm font-medium text-blue-100 dark:text-customBlue-100">
+              <GripVertical className="hidden h-5 w-5 cursor-grab text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300 md:block" />
+              <span className="text-base font-semibold text-gray-900 dark:text-white md:text-lg">
+                {column.name}
+              </span>
+              <div className="bg-customBlue-100 dark:bg-customBlue-900/30 dark:text-customBlue-100 flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium text-blue-100">
                 {safeTasks.length}
               </div>
             </>
@@ -261,7 +269,7 @@ export default function KanbanColumn({
           className={`
             flex min-h-[100px] flex-col gap-2 rounded-md p-1 transition-colors duration-200
             md:gap-4 md:p-2
-            ${isOver ? "border-2 border-customBlue-200 bg-customBlue-50 dark:bg-customBlue-900/20" : ""}
+            ${isOver ? "border-customBlue-200 bg-customBlue-50 dark:bg-customBlue-900/20 border-2" : ""}
           `}
         >
           <SortableContext

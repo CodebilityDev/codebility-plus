@@ -1,11 +1,14 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { useKanbanStore } from "@/store/kanban-store";
 import { KanbanBoardType, KanbanColumnType, Task } from "@/types/home/codev";
-import { createClientServerComponent } from "@/utils/supabase/server";
 
 import KanbanBoard from "./_components/KanbanBoard";
 
 interface KanbanBoardPageProps {
-  params: Promise<{ id: string; projectId: string }>;
-  searchParams: Promise<{ query?: string }>;
+  params: { id: string; projectId: string };
+  searchParams?: { query?: string };
 }
 
 // Mapping functions to convert raw data into our expected types.
@@ -27,7 +30,6 @@ const mapTask = (task: any): Task => ({
   created_at: task.created_at,
   updated_at: task.updated_at,
   skill_category_id: task.skill_category_id,
-  // Optionally, if you need to map codev and skill_category further, you can do so.
   codev: task.codev,
   skill_category: task.skill_category,
 });
@@ -39,103 +41,69 @@ const mapColumn = (column: any): KanbanColumnType => ({
   position: column.position,
   created_at: column.created_at,
   updated_at: column.updated_at,
-  tasks: Array.isArray(column.tasks) 
-    ? column.tasks
-        .filter((task: any) => !task.is_archive) // Filter out archived tasks
-        .map(mapTask) 
+  tasks: Array.isArray(column.tasks)
+    ? column.tasks.filter((task: any) => !task.is_archive).map(mapTask)
     : [],
 });
 
-export default async function KanbanBoardPage(props: KanbanBoardPageProps) {
-  const searchParams = await props.searchParams;
-  const params = await props.params;
-  const supabase = await createClientServerComponent();
-  // Query the board with nested columns and tasks (excluding archived tasks)
-  const { data: board, error } = await supabase
-    .from("kanban_boards")
-    .select(
-      `
-      id,
-      name,
-      description,
-      created_at,
-      updated_at,
-      kanban_columns (
-        id,
-        name,
-        position,
-        created_at,
-        updated_at,
-        tasks (
-          id,
-          title,
-          description,
-          priority,
-          difficulty,
-          type,
-          due_date,
-          points,
-          pr_link,
-          sidekick_ids,
-          created_by,
-          kanban_column_id,
-          is_archive,
-          codev!tasks_codev_id_fkey (
-            id,
-            first_name,
-            last_name,
-            image_url
-          ),
-          skill_category!tasks_skill_category_id_fkey (
-            id,
-            name
-          )
-        )
-      )
-    `,
-    )
-    .eq("id", params.id)
-    .single();
+export default function KanbanBoardPage({
+  params,
+  searchParams,
+}: KanbanBoardPageProps) {
+  const { boardData, fetchBoardData, setBoardId } = useKanbanStore();
+  const [loading, setLoading] = useState(true);
 
-  if (error) {
-    console.error("Error fetching board:", error);
-    return <div>Error loading board: {error.message}</div>;
+  const query = searchParams?.query?.toLowerCase() || "";
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await setBoardId(params.id);
+      await fetchBoardData();
+      setLoading(false);
+    };
+    loadData();
+  }, [params.id, fetchBoardData]);
+
+  const processedBoardData = useMemo(() => {
+    if (!boardData) return null;
+
+    const mappedColumns: KanbanColumnType[] = Array.isArray(
+      boardData.kanban_columns,
+    )
+      ? boardData.kanban_columns.map(mapColumn)
+      : [];
+
+    const filteredColumns = query
+      ? mappedColumns.map((column) => ({
+          ...column,
+          tasks: (column.tasks || []).filter(
+            (task) =>
+              task.title.toLowerCase().includes(query) ||
+              task.description?.toLowerCase().includes(query) ||
+              task.codev?.first_name?.toLowerCase().includes(query) ||
+              task.codev?.last_name?.toLowerCase().includes(query) ||
+              task.skill_category?.name?.toLowerCase().includes(query),
+          ),
+        }))
+      : mappedColumns;
+
+    return {
+      ...boardData,
+      id: String(boardData.id),
+      kanban_columns: filteredColumns,
+    } as KanbanBoardType & { kanban_columns: KanbanColumnType[] };
+  }, [boardData, query]);
+
+  if (loading) {
+    return <div>Loading board...</div>;
   }
 
-  if (!board) {
+  if (!processedBoardData) {
     return <div>Board not found</div>;
   }
 
-  // Map the columns using our mapping function
-  const mappedColumns: KanbanColumnType[] = Array.isArray(board.kanban_columns)
-    ? board.kanban_columns.map(mapColumn)
-    : [];
-
-  const query = searchParams.query?.toLowerCase() || "";
-
-  // Apply search filter if a query is provided - search within tasks instead of columns
-  const filteredColumns = query
-    ? mappedColumns.map((column) => ({
-        ...column,
-        tasks: (column.tasks || []).filter((task) =>
-          task.title.toLowerCase().includes(query) ||
-          task.description?.toLowerCase().includes(query) ||
-          task.codev?.first_name?.toLowerCase().includes(query) ||
-          task.codev?.last_name?.toLowerCase().includes(query) ||
-          task.skill_category?.name?.toLowerCase().includes(query)
-        ),
-      }))
-    : mappedColumns;
-
-  // Build the typed board data
-  const boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] } = {
-    id: String(board.id),
-    name: board.name,
-    description: board.description,
-    created_at: board.created_at,
-    updated_at: board.updated_at,
-    kanban_columns: filteredColumns,
-  };
-
-  return <KanbanBoard projectId={params.projectId} boardData={boardData} />;
+  return (
+    <KanbanBoard projectId={params.projectId} boardData={processedBoardData} />
+  );
 }
