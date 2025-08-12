@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -10,6 +9,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal";
+import { useKanbanStore } from "@/store/kanban-store";
 import { Task } from "@/types/home/codev";
 import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -19,8 +19,9 @@ import { deleteTask } from "../../actions";
 const TaskDeleteModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskDeleteModal";
-  const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
+
+  const { fetchBoardData } = useKanbanStore();
 
   const task = data as Task;
 
@@ -39,7 +40,8 @@ const TaskDeleteModal = () => {
 
       if (response.success) {
         toast.success("Task deleted successfully");
-        router.refresh();
+        // Refetch the board data
+        await fetchBoardData();
         onClose();
       } else {
         toast.error(response.error || "Failed to delete task");

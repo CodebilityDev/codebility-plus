@@ -50,7 +50,7 @@ export default function KanbanBoardPage({
   params,
   searchParams,
 }: KanbanBoardPageProps) {
-  const { boardData, fetchBoardData } = useKanbanStore();
+  const { boardData, fetchBoardData, setBoardId } = useKanbanStore();
   const [loading, setLoading] = useState(true);
 
   const query = searchParams?.query?.toLowerCase() || "";
@@ -58,7 +58,8 @@ export default function KanbanBoardPage({
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await fetchBoardData(params.id);
+      await setBoardId(params.id);
+      await fetchBoardData();
       setLoading(false);
     };
     loadData();

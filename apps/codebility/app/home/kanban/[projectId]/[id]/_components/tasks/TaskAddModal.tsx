@@ -2,7 +2,6 @@
 
 import type { SkillCategory } from "@/types/home/codev";
 import { useEffect, useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -21,6 +20,7 @@ import {
 } from "@/components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
+import { useKanbanStore } from "@/store/kanban-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
@@ -30,7 +30,10 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 
 import { createNewTask } from "../../actions";
-import DifficultyPointsTooltip, { DIFFICULTY_LEVELS, DIFFICULTY_POINTS } from "../DifficultyPointsTooltip";
+import DifficultyPointsTooltip, {
+  DIFFICULTY_LEVELS,
+  DIFFICULTY_POINTS,
+} from "../DifficultyPointsTooltip";
 import KanbanAddModalMembers from "../kanban_modals/KanbanAddModalMembers";
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
 
@@ -50,7 +53,7 @@ const TaskAddModal = () => {
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
 
-  const router = useRouter();
+  const { fetchBoardData } = useKanbanStore();
 
   const onChange = (value: string) => {
     setDescription(value);
@@ -134,7 +137,8 @@ const TaskAddModal = () => {
         toast.success("Task created successfully");
         handleClose();
 
-        router.refresh();
+        // Refetch the board data
+        await fetchBoardData();
       } else {
         toast.error(response.error || "Failed to create task");
       }
@@ -167,8 +171,8 @@ const TaskAddModal = () => {
           </DialogHeader>
 
           {data?.listName && (
-            <div className="rounded-md bg-customBlue-50 p-2 dark:bg-customBlue-900/20">
-              <Label className="text-sm text-customBlue-700 dark:text-customBlue-100">
+            <div className="bg-customBlue-50 dark:bg-customBlue-900/20 rounded-md p-2">
+              <Label className="text-customBlue-700 dark:text-customBlue-100 text-sm">
                 Adding to: {data.listName}
               </Label>
             </div>
@@ -185,7 +189,7 @@ const TaskAddModal = () => {
                 id="title"
                 name="title"
                 placeholder="Enter task title"
-                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-customBlue-500 "
+                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300 "
                 required
               />
             </div>
@@ -211,7 +215,7 @@ const TaskAddModal = () => {
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority</Label>
               <Select name="priority">
-                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
+                <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -240,7 +244,7 @@ const TaskAddModal = () => {
                 value={selectedDifficulty}
                 onValueChange={handleDifficultyChange}
               >
-                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
+                <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
                 <SelectContent>
@@ -268,7 +272,7 @@ const TaskAddModal = () => {
             <div className="space-y-2">
               <Label className="text-sm font-medium">Task Type</Label>
               <Select name="type">
-                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
+                <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -291,7 +295,7 @@ const TaskAddModal = () => {
             <div className="space-y-2">
               <Label className="text-sm font-medium">Skill Category</Label>
               <Select name="skill_category_id" required>
-                <SelectTrigger className="bg-light-900 border border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
+                <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select skill category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -347,14 +351,14 @@ const TaskAddModal = () => {
               type="button"
               variant="outline"
               onClick={handleClose}
-              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-3 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-3 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading || isPending}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading || isPending}
             >
               {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
