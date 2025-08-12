@@ -62,151 +62,193 @@ const phases = [
 
 export default function AnimatedRoadmapSvg() {
   return (
-    <svg
-      id="roadmap-svg"
-      xmlns="http://www.w3.org/2000/svg"
-      viewBox="0 0 1200 600"
-      className="h-auto w-full"
-    >
-      {/* Main path */}
-      <path
-        d="M 180 500 L 480 350 L 700 240 L 1020 80"
-        stroke="#272728"
-        strokeWidth="25"
-        fill="none"
-        strokeLinecap="round"
-      />
-      {/* Yellow rails */}
-      <path
-        d="M 180 500 L 480 350 L 700 240 L 1020 80"
-        stroke="#fde047"
-        strokeWidth="2"
-        fill="none"
-        strokeLinecap="round"
-        transform="translate(-3, 3)"
-      />
-      <path
-        d="M 180 500 L 480 350 L 700 240 L 1020 80"
-        stroke="#fde047"
-        strokeWidth="2"
-        fill="none"
-        strokeLinecap="round"
-        transform="translate(3, -3)"
-      />
-      <path
-        id="main-arrowhead"
-        d={(() => {
-          const tipX = 1020;
-          const tipY = 80;
-          const prevX = 700;
-          const prevY = 240;
+    <>
+      {/* Desktop: SVG (animated by GSAP) */}
+      <svg
+        id="roadmap-svg"
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 1200 600"
+        className="hidden h-auto w-full lg:block"
+      >
+        {/* Main path */}
+        <path
+          id="main-path"
+          d="M 180 500 L 480 350 L 700 240 L 1020 80"
+          stroke="#272728"
+          strokeWidth="25"
+          fill="none"
+          strokeLinecap="round"
+        />
+        {/* Yellow rails */}
+        <path
+          id="left-rail"
+          d="M 180 500 L 480 350 L 700 240 L 1020 80"
+          stroke="#fde047"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+          transform="translate(-3, 3)"
+        />
+        <path
+          id="right-rail"
+          d="M 180 500 L 480 350 L 700 240 L 1020 80"
+          stroke="#fde047"
+          strokeWidth="2"
+          fill="none"
+          strokeLinecap="round"
+          transform="translate(3, -3)"
+        />
 
-          const dx = tipX - prevX;
-          const dy = tipY - prevY;
-          const dist = Math.sqrt(dx * dx + dy * dy);
+        {/* Main arrowhead (hook rewrites its “d”) */}
+        <path
+          id="main-arrowhead"
+          d={(() => {
+            const tipX = 1020;
+            const tipY = 80;
+            const prevX = 700;
+            const prevY = 240;
 
-          const ux = dx / dist;
-          const uy = dy / dist;
+            const dx = tipX - prevX;
+            const dy = tipY - prevY;
+            const dist = Math.sqrt(dx * dx + dy * dy);
 
-          // ⏩ Push tip 25px past the end of the path
-          const finalTipX = tipX + ux * 25;
-          const finalTipY = tipY + uy * 25;
+            const ux = dx / dist;
+            const uy = dy / dist;
 
-          // Base = 28px behind the tip
-          const baseX = finalTipX - ux * 28;
-          const baseY = finalTipY - uy * 28;
+            // push 35px past path end
+            const finalTipX = tipX + ux * 35;
+            const finalTipY = tipY + uy * 35;
 
-          // Perpendicular for triangle width
-          const perpX = -uy;
-          const perpY = ux;
+            // base 28px behind tip
+            const baseX = finalTipX - ux * 28;
+            const baseY = finalTipY - uy * 28;
 
-          const leftX = baseX + perpX * 20;
-          const leftY = baseY + perpY * 20;
-          const rightX = baseX - perpX * 20;
-          const rightY = baseY - perpY * 20;
+            // perpendicular for width
+            const perpX = -uy;
+            const perpY = ux;
 
-          return `M${finalTipX},${finalTipY} L${leftX},${leftY} L${rightX},${rightY} Z`;
-        })()}
-        fill="#272728"
-      />
+            const leftX = baseX + perpX * 20;
+            const leftY = baseY + perpY * 20;
+            const rightX = baseX - perpX * 20;
+            const rightY = baseY - perpY * 20;
 
-      {/* Starting circle */}
-      <circle cx="170" cy="505" r="20" fill="#272728" />
+            return `M${finalTipX},${finalTipY} L${leftX},${leftY} L${rightX},${rightY} Z`;
+          })()}
+          fill="#272728"
+        />
 
-      {/* Milestones */}
-      {phases.map((p, i) => (
-        <g key={`p-${i}`} className="milestone-group" style={{ opacity: 0 }}>
-          {/* Circle */}
-          <circle cx={p.cx} cy={p.cy} r="35" fill={p.color} />
+        {/* Starting circle */}
+        <circle id="starting-circle" cx="170" cy="505" r="20" fill="#272728" />
 
-          {/* Arrowhead */}
-          {p.direction === "top" && (
-            <polygon
-              points={`${p.cx},${p.cy - 35 - 18} ${p.cx - 6},${p.cy - 35} ${p.cx + 6},${p.cy - 35}`}
-              fill={p.color}
-            />
-          )}
-          {p.direction === "right" &&
-            (() => {
-              const angle = (60 * Math.PI) / 180; // ~5 o'clock
-              const r = 35;
-              const h = 18;
-              const b = 12;
+        {/* Milestones */}
+        {phases.map((p, i) => (
+          <g key={`p-${i}`} className="milestone-group" style={{ opacity: 0 }}>
+            {/* Circle */}
+            <circle cx={p.cx} cy={p.cy} r="35" fill={p.color} />
 
-              const tipX = p.cx + Math.cos(angle) * (r + h);
-              const tipY = p.cy + Math.sin(angle) * (r + h);
+            {/* Directional arrow */}
+            {p.direction === "top" && (
+              <polygon
+                points={`${p.cx},${p.cy - 35 - 18} ${p.cx - 6},${p.cy - 35} ${p.cx + 6},${p.cy - 35}`}
+                fill={p.color}
+              />
+            )}
+            {p.direction === "right" &&
+              (() => {
+                const angle = (60 * Math.PI) / 180; // ~5 o'clock
+                const r = 35;
+                const h = 18;
+                const b = 12;
 
-              const baseCx = p.cx + Math.cos(angle) * r;
-              const baseCy = p.cy + Math.sin(angle) * r;
+                const tipX = p.cx + Math.cos(angle) * (r + h);
+                const tipY = p.cy + Math.sin(angle) * (r + h);
 
-              const dx = Math.cos(angle + Math.PI / 2) * (b / 2);
-              const dy = Math.sin(angle + Math.PI / 2) * (b / 2);
+                const baseCx = p.cx + Math.cos(angle) * r;
+                const baseCy = p.cy + Math.sin(angle) * r;
 
-              const base1X = baseCx + dx;
-              const base1Y = baseCy + dy;
-              const base2X = baseCx - dx;
-              const base2Y = baseCy - dy;
+                const dx = Math.cos(angle + Math.PI / 2) * (b / 2);
+                const dy = Math.sin(angle + Math.PI / 2) * (b / 2);
 
-              return (
-                <polygon
-                  points={`${tipX},${tipY} ${base1X},${base1Y} ${base2X},${base2Y}`}
-                  fill={p.color}
-                />
-              );
-            })()}
+                const base1X = baseCx + dx;
+                const base1Y = baseCy + dy;
+                const base2X = baseCx - dx;
+                const base2Y = baseCy - dy;
 
-          {/* Icon */}
-          <foreignObject x={p.cx - 24} y={p.cy - 24} width="48" height="48">
-            <div className="flex h-full w-full items-center justify-center">
-              {p.icon}
-            </div>
-          </foreignObject>
+                return (
+                  <polygon
+                    points={`${tipX},${tipY} ${base1X},${base1Y} ${base2X},${base2Y}`}
+                    fill={p.color}
+                  />
+                );
+              })()}
 
-          {/* Label */}
-          <g transform={`translate(${p.textX}, ${p.textY})`}>
-            <rect
-              width="180"
-              height={p.steps.length * 20 + 32}
-              rx="10"
-              fill={p.color}
-            />
-            <text x="10" y="20" fontSize="12" fill="white" fontWeight="bold">
-              {p.title}
-            </text>
-            {p.steps.map((s, j) => (
-              <text
-                key={`step-${i}-${j}`}
-                x="10"
-                y={40 + j * 20}
-                fontSize="10"
-                fill="white"
-              >
-                • {s}
+            {/* Icon */}
+            <foreignObject x={p.cx - 24} y={p.cy - 24} width="48" height="48">
+              <div className="flex h-full w-full items-center justify-center">
+                {p.icon}
+              </div>
+            </foreignObject>
+
+            {/* Label */}
+            <g transform={`translate(${p.textX}, ${p.textY})`}>
+              <rect
+                width="180"
+                height={p.steps.length * 20 + 32}
+                rx="10"
+                fill={p.color}
+              />
+              <text x="10" y="20" fontSize="12" fill="white" fontWeight="bold">
+                {p.title}
               </text>
-            ))}
+              {p.steps.map((s, j) => (
+                <text
+                  key={`step-${i}-${j}`}
+                  x="10"
+                  y={40 + j * 20}
+                  fontSize="10"
+                  fill="white"
+                >
+                  • {s}
+                </text>
+              ))}
+            </g>
           </g>
-        </g>
-      ))}
-    </svg>
+        ))}
+      </svg>
+
+      {/* Mobile: simple vertical roadmap list */}
+      <div className="lg:hidden">
+        <ol className="relative ml-3 space-y-6 border-l border-zinc-300 dark:border-zinc-700">
+          {phases.map((p, i) => (
+            <li key={`m-${i}`} className="relative pl-6">
+              {/* Dot */}
+              <span
+                className="absolute -left-2 top-1.5 h-4 w-4 rounded-full ring-2 ring-white dark:ring-zinc-900"
+                style={{ backgroundColor: p.color }}
+                aria-hidden="true"
+              />
+              <div className="flex items-start gap-3">
+                <span
+                  className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-full shadow-sm"
+                  style={{ backgroundColor: p.color }}
+                >
+                  {p.icon}
+                </span>
+                <div>
+                  <h3 className="text-base font-semibold leading-6">
+                    {p.title}
+                  </h3>
+                  <ul className="mt-2 list-disc pl-5 text-sm/6 opacity-90">
+                    {p.steps.map((s, j) => (
+                      <li key={`ms-${i}-${j}`}>{s}</li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
+    </>
   );
 }

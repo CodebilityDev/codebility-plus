@@ -1,80 +1,48 @@
-// IsRoadMap.tsx (patched)
-
 "use client";
 
-import React, { forwardRef, useEffect, useState } from "react";
+import React, { forwardRef, useRef } from "react";
 
-import AnimatedRoadmapSvg from "./AnimatedRoadmapSvg";
+import { useOnboardingAnimations } from "../../hooks/useOnboardingAnimations";
+import AnimatedRoadmapWrapper from "./AnimatedRoadmapWrapper";
 
-const IsRoadMap = forwardRef<HTMLDivElement>((_props, ref) => {
-  const [isDesktop, setIsDesktop] = useState(false);
+type Props = React.HTMLAttributes<HTMLDivElement>;
 
-  useEffect(() => {
-    const checkSize = () => setIsDesktop(window.innerWidth >= 1024);
-    checkSize();
-    window.addEventListener("resize", checkSize);
-    return () => window.removeEventListener("resize", checkSize);
-  }, []);
+const IsRoadMap = forwardRef<HTMLDivElement, Props>(function IsRoadMap(
+  { className = "", ...rest },
+  roadmapRef,
+) {
+  // Keep existing hero/about/regular refs — unchanged
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const logoRef = useRef<HTMLDivElement | null>(null);
+  const aboutRef = useRef<HTMLDivElement | null>(null);
+  const slidesRef = useRef<HTMLDivElement | null>(null);
+  const regularRef = useRef<HTMLDivElement | null>(null);
+  const h1Ref = useRef<HTMLHeadingElement | null>(null);
 
-  const phases = [
-    {
-      title: "Phase 1: Code Explorer",
-      steps: ["Learn The Basics", "Hands-On Practice", "Version Control"],
-    },
-    {
-      title: "Phase 2: Artisan",
-      steps: [
-        "Deepen Language Proficiency",
-        "Explore Frameworks & Libraries",
-        "Work On Projects",
-        "Development Practices",
-      ],
-    },
-    {
-      title: "Phase 3: Specialization",
-      steps: ["Specialize", "Advanced Concepts", "Collaborate"],
-    },
-    {
-      title: "Phase 4: Code Maestro",
-      steps: [
-        "Leadership",
-        "Innovate",
-        "Contribute To The Community",
-        "Continues Learning",
-      ],
-    },
-  ];
+  const setIsLogoVisible = (_: boolean) => {};
+
+  useOnboardingAnimations({
+    heroRef,
+    logoRef,
+    aboutRef,
+    slidesRef,
+    regularRef,
+    h1Ref,
+    roadmapRef: roadmapRef as React.RefObject<HTMLDivElement | null>,
+    setIsLogoVisible,
+  });
 
   return (
-    <div
-      ref={ref}
-      id="isroadmap-trigger"
-      className="relative h-[200vh] w-full snap-start bg-white px-4 py-10"
+    <section
+      ref={roadmapRef}
+      className={`relative min-h-screen w-full bg-cover bg-center bg-no-repeat ${className}`}
+      style={{
+        backgroundImage: "url('/assets/images/onboarding/roadmap_bg.svg')",
+      }}
+      {...rest}
     >
-      {isDesktop ? (
-        <div id="roadmap-svg-wrapper" className="relative w-full">
-          <AnimatedRoadmapSvg />
-        </div>
-      ) : (
-        <div className="mx-auto max-w-xl space-y-8">
-          {phases.map((phase, i) => (
-            <div
-              key={`mobile-${i}`}
-              className="rounded-lg bg-white p-6 shadow-md transition duration-300"
-            >
-              <h3 className="mb-2 text-lg font-bold text-gray-800">
-                {phase.title}
-              </h3>
-              <ul className="list-disc pl-5 text-sm text-gray-700">
-                {phase.steps.map((step, idx) => (
-                  <li key={idx}>{step}</li>
-                ))}
-              </ul>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+      <AnimatedRoadmapWrapper />
+    </section>
   );
 });
 
