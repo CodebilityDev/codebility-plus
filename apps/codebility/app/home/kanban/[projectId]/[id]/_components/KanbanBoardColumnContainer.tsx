@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useKanbanStore } from "@/store/kanban-store";
 import { KanbanColumnType, Task } from "@/types/home/codev";
 import { debounce } from "@/utils/debounce";
 import {
@@ -88,7 +89,7 @@ export default function KanbanBoardColumnContainer({
   const [pendingUpdates, setPendingUpdates] = useState<
     Array<{ taskId: string; newColumnId: string }>
   >([]);
-  
+
   // Track dragging state for immediate feedback
   const [isDragging, setIsDragging] = useState(false);
 
@@ -162,7 +163,6 @@ export default function KanbanBoardColumnContainer({
       })),
     );
   }, [orderedColumns, activeFilter, filterAndSortTasks]);
-
 
   const handleDragStart = useCallback((event: DragStartEvent) => {
     // Optional: set active item state for custom drag overlays.
@@ -264,8 +264,13 @@ export default function KanbanBoardColumnContainer({
         // Add to pending updates for debounced batch processing
         setPendingUpdates((prev) => {
           // Remove any existing update for this task to avoid duplicates
-          const filtered = prev.filter(update => update.taskId !== movedTask.id);
-          return [...filtered, { taskId: movedTask.id, newColumnId: overColId }];
+          const filtered = prev.filter(
+            (update) => update.taskId !== movedTask.id,
+          );
+          return [
+            ...filtered,
+            { taskId: movedTask.id, newColumnId: overColId },
+          ];
         });
       }
     },
