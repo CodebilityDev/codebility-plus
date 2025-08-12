@@ -120,7 +120,8 @@ export default function KanbanColumn({
     const response = await deleteColumn(column.id);
     if (response.success) {
       toast.success("Column deleted successfully");
-      window.location.reload();
+      // Refetch the board data
+      await fetchBoardData();
     } else {
       toast.error(response.error || "Failed to delete column");
     }
