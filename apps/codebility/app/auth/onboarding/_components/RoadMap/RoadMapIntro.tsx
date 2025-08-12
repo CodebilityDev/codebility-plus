@@ -18,13 +18,12 @@ export default function RoadMapIntro() {
       </div>
 
       {/* Centered Text */}
-      <div className="relative z-10 flex min-h-screen flex-col items-center justify-center px-4 text-center">
+      <div className="bg-black-600/65 relative z-10 flex min-h-screen flex-col items-center justify-center px-4  text-center">
         <motion.h1
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1, ease: "easeOut" }}
-          className="text-[80px] font-extrabold drop-shadow-[0_0_30px_white] sm:text-[100px] md:text-[130px] lg:text-[170px]"
-          style={{ color: "#1e1d17" }}
+          className="text-[80px] font-extrabold text-pink-600 sm:text-[100px] md:text-[130px] lg:text-[170px]"
         >
           ROADMAP TO SUCCESS
         </motion.h1>
@@ -33,8 +32,7 @@ export default function RoadMapIntro() {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.5, duration: 0.8 }}
-          className="mt-4 text-base font-medium sm:text-lg md:text-2xl"
-          style={{ color: "#1e1d17" }}
+          className="mt-4 text-base font-medium text-pink-600 sm:text-lg md:text-2xl"
         >
           Check your journey below
         </motion.h2>

@@ -41,6 +41,8 @@ export default function HeroWithAboutEffect() {
         className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-[#017780] via-[#441e70] to-[#130a3d] px-10 py-10 text-white lg:h-screen"
       >
         <div className="relative mx-auto flex w-full flex-col items-center justify-start overflow-hidden rounded-3xl bg-[#130a3d]/80 p-10 lg:h-[calc(100vh-80px)]">
+          <LottieBackground />
+          <FloatingCodeTags />
           <HeroSection h1Ref={h1Ref} />
         </div>
       </section>
@@ -48,7 +50,7 @@ export default function HeroWithAboutEffect() {
       <section
         ref={aboutRef}
         id="about-section"
-        className="relative z-10 w-full overflow-hidden bg-black text-white lg:h-screen"
+        className="relative z-10 w-full overflow-hidden bg-white lg:h-screen"
       >
         <div className="h-auto w-full lg:sticky lg:top-0 lg:h-screen">
           <AboutSlides slidesRef={slidesRef} />
