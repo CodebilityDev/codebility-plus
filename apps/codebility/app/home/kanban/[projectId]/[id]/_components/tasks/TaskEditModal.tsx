@@ -1,7 +1,6 @@
 "use client";
 
 import { FormEvent, useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import KanbanAddModalMembers from "@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddModalMembers";
 import { updateTask } from "@/app/home/kanban/[projectId]/[id]/actions";
 import { Button } from "@/components/ui/button";
@@ -22,6 +21,7 @@ import {
 } from "@/components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
+import { useKanbanStore } from "@/store/kanban-store";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { useEditor } from "@tiptap/react";
@@ -32,8 +32,11 @@ import { cn } from "@codevs/ui";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
+import DifficultyPointsTooltip, {
+  DIFFICULTY_LEVELS,
+  DIFFICULTY_POINTS,
+} from "../DifficultyPointsTooltip";
 import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
-import DifficultyPointsTooltip, { DIFFICULTY_LEVELS, DIFFICULTY_POINTS } from "../DifficultyPointsTooltip";
 
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"];
@@ -48,7 +51,7 @@ const TaskEditModal = () => {
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
 
-  const router = useRouter();
+  const { fetchBoardData } = useKanbanStore();
 
   const [boardId, setBoardId] = useState<string>("");
 
@@ -67,7 +70,7 @@ const TaskEditModal = () => {
     codev_id: "",
     projectId: "",
   });
-  
+
   // Calculate points based on difficulty
   const getPointsFromDifficulty = (difficulty: string): number => {
     return DIFFICULTY_POINTS[difficulty as keyof typeof DIFFICULTY_POINTS] || 0;
@@ -127,8 +130,10 @@ const TaskEditModal = () => {
 
             if (board?.project_id) {
               const difficulty = data.difficulty || "";
-              const calculatedPoints = difficulty ? getPointsFromDifficulty(difficulty) : (data.points || 0);
-              
+              const calculatedPoints = difficulty
+                ? getPointsFromDifficulty(difficulty)
+                : data.points || 0;
+
               setTaskData({
                 title: data.title || "",
                 description: data.description || "",
@@ -209,7 +214,8 @@ const TaskEditModal = () => {
       const response = await updateTask(formData, data.id);
       if (response.success) {
         toast.success("Task updated successfully.");
-        router.refresh();
+        // Refetch the board data
+        await fetchBoardData();
         onClose();
       } else {
         toast.error(response.error || "Failed to update task.");
@@ -248,7 +254,7 @@ const TaskEditModal = () => {
                 placeholder="Enter task title"
                 value={taskData.title}
                 onChange={(e) => handleInputChange("title", e.target.value)}
-                className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700"
+                className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700"
                 required
               />
             </div>
@@ -280,7 +286,7 @@ const TaskEditModal = () => {
                 value={taskData.priority}
                 onValueChange={(value) => handleInputChange("priority", value)}
               >
-                <SelectTrigger className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
+                <SelectTrigger className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
                 <SelectContent>
@@ -311,7 +317,7 @@ const TaskEditModal = () => {
                   handleInputChange("difficulty", value)
                 }
               >
-                <SelectTrigger className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
+                <SelectTrigger className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select difficulty" />
                 </SelectTrigger>
                 <SelectContent>
@@ -322,7 +328,13 @@ const TaskEditModal = () => {
                         value={level}
                         className="capitalize"
                       >
-                        {level.charAt(0).toUpperCase() + level.slice(1)} - {DIFFICULTY_POINTS[level as keyof typeof DIFFICULTY_POINTS]} pts
+                        {level.charAt(0).toUpperCase() + level.slice(1)} -{" "}
+                        {
+                          DIFFICULTY_POINTS[
+                            level as keyof typeof DIFFICULTY_POINTS
+                          ]
+                        }{" "}
+                        pts
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -337,7 +349,7 @@ const TaskEditModal = () => {
                 value={taskData.type}
                 onValueChange={(value) => handleInputChange("type", value)}
               >
-                <SelectTrigger className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
+                <SelectTrigger className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select task type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -358,7 +370,9 @@ const TaskEditModal = () => {
 
             {/* Skill Category */}
             <div className="space-y-2">
-              <Label className="text-sm font-medium text-gray-900 dark:text-white">Skill Category</Label>
+              <Label className="text-sm font-medium text-gray-900 dark:text-white">
+                Skill Category
+              </Label>
               <Select
                 value={taskData.skill_category_id}
                 onValueChange={(value) =>
@@ -366,7 +380,7 @@ const TaskEditModal = () => {
                 }
                 required
               >
-                <SelectTrigger className="border-gray-300 focus:border-customBlue-500 dark:border-gray-700">
+                <SelectTrigger className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select skill category" />
                 </SelectTrigger>
                 <SelectContent>
@@ -431,14 +445,14 @@ const TaskEditModal = () => {
               type="button"
               variant="outline"
               onClick={onClose}
-              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               disabled={loading}
             >
               {loading ? "Saving..." : "Save Changes"}
