@@ -4,7 +4,7 @@
 
 import { useRef, useState } from "react";
 
-import { useOnboardingAnimations } from "../../hooks/useOnboardingAnimations";
+import useOnboardingAnimations from "../../hooks/useOnboardingAnimations";
 import AboutSlides from "./AboutSlides";
 import { BubbleBackground } from "./BubbleBackground";
 import { FloatingCodeTags } from "./FloatingCodeTags";
@@ -38,7 +38,7 @@ export default function HeroWithAboutEffect() {
 
       <section
         ref={heroRef}
-        className="relative flex min-h-screen items-center justify-center bg-gradient-to-br from-[#017780] via-[#441e70] to-[#130a3d] px-10 py-10 text-white lg:h-screen"
+        className="relative flex items-center justify-center bg-gradient-to-br from-[#017780] via-[#441e70] to-[#130a3d] px-10 py-10 text-white lg:h-screen lg:min-h-screen"
       >
         <div className="relative mx-auto flex w-full flex-col items-center justify-start overflow-hidden rounded-3xl bg-[#130a3d]/80 p-10 lg:h-[calc(100vh-80px)]">
           <LottieBackground />

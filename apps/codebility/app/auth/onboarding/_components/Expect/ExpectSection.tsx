@@ -54,7 +54,7 @@ export default function ExpectSection() {
   }, []);
 
   return (
-    <section className="flex min-h-screen w-full items-center justify-center bg-[#10131a] px-6 py-24 text-white">
+    <section className="flex w-full items-center justify-center bg-[#10131a] px-6 py-24 text-white lg:min-h-screen">
       <div className="w-full max-w-5xl">
         {/* Heading */}
         <motion.h2
@@ -104,7 +104,7 @@ export default function ExpectSection() {
 
                   {/* Content wrapper with flex gap */}
                   <div
-                    className={`z-10 flex flex-col items-center gap-4 md:w-[calc(50%-1.5rem)] md:flex-row ${
+                    className={`z-10 flex w-full flex-col items-center gap-4 md:w-[calc(50%-1.5rem)] md:flex-row ${
                       isLeft
                         ? "md:order-2 md:ml-0 md:mr-auto"
                         : "flex-row-reverse md:order-1 md:ml-auto md:mr-0"
@@ -119,7 +119,7 @@ export default function ExpectSection() {
 
                     {/* Card */}
                     <div
-                      className={`mt-4 w-full rounded-xl bg-white/5 p-5 text-left text-sm md:mt-0 ${
+                      className={`mt-4 w-full rounded-xl bg-white/5 p-5 text-center text-sm md:mt-0 lg:text-left ${
                         isLeft ? "md:text-left" : "md:text-right"
                       }`}
                     >

@@ -4,16 +4,16 @@
 
 export default function MissionVisionSlide() {
   return (
-    <div className="slide justify-cente flex h-screen w-screen items-center px-6 py-10 text-stone-900">
+    <div className="slide justify-cente flex w-screen items-center px-6 text-stone-900 lg:h-screen">
       <div className="mx-auto flex max-w-7xl flex-col justify-center gap-10 lg:flex-row lg:gap-16">
         {/* LEFT: Header and Vision */}
         <div className="flex flex-col justify-center">
-          <h2 className="max-w-lg text-3xl font-extrabold leading-tight sm:text-4xl md:text-5xl">
-            to be the world’s most impactful developer community
+          <h2 className="w-full text-center text-3xl font-bold leading-tight sm:text-4xl md:text-5xl lg:max-w-lg lg:text-left">
+            To be the world's most impactful developer community
           </h2>
 
           {/* Vision Card */}
-          <div className="mt-10 max-w-lg rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 p-6 shadow-md">
+          <div className="mt-10 w-full rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 p-6 shadow-md lg:max-w-lg">
             <div className="mb-2 flex items-center gap-3">
               <VisionIcon />
               <h3 className="text-3xl font-bold">vision</h3>
@@ -30,7 +30,7 @@ export default function MissionVisionSlide() {
 
         {/* RIGHT: Mission */}
         <div className="flex flex-col justify-between gap-6">
-          <div className="max-w-xl rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 p-6 shadow-md">
+          <div className="w-full rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 p-6 shadow-md lg:max-w-xl">
             <div className="mb-2 flex items-center gap-3">
               <MissionIcon />
               <h3 className="text-3xl font-bold">mission</h3>

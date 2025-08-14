@@ -56,13 +56,13 @@ export default function SoftwareDevelopmentSection() {
   return (
     <section
       id="software-dev"
-      className="relative z-10 min-h-screen overflow-visible bg-gradient-to-br from-purple-100 to-purple-200"
+      className="relative z-10 overflow-visible bg-gradient-to-br from-purple-100 to-purple-200 lg:min-h-screen"
     >
       {/* Background visuals */}
       <SoftwareDevelopmentBackground />
 
       <div className="relative z-10 mx-auto max-w-7xl px-4 py-20 sm:px-8 lg:px-16 lg:py-28">
-        <div className="w-full px-4 sm:w-2/3 sm:px-8 lg:px-16">
+        <div className="w-full px-4 sm:px-8 lg:w-2/3 lg:px-16">
           <motion.h2
             initial={{ opacity: 0, y: -40 }}
             animate={{ opacity: 1, y: 0 }}

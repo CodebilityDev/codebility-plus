@@ -35,7 +35,7 @@ const cards = [
 export default function MindsetSection() {
   return (
     <LazyMotion features={domAnimation}>
-      <section className="relative flex min-h-screen w-full items-center justify-center bg-white px-6 py-16 text-black">
+      <section className="relative flex w-full items-center justify-center bg-white px-6 py-20 text-black lg:min-h-screen">
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 md:grid-cols-2">
           {/* LEFT: Heading + Lightbulb (Centered) */}
           <m.div

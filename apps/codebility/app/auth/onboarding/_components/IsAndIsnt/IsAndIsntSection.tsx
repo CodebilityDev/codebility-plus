@@ -26,7 +26,7 @@ const items = [
 
 export default function IsAndIsntSection() {
   return (
-    <section className="flex min-h-screen w-full items-center justify-center bg-gradient-to-br from-white via-gray-50 to-white px-6 py-24 text-black">
+    <section className="flex w-full items-center justify-center bg-gradient-to-br from-white via-gray-50 to-white px-6 py-20 text-black lg:min-h-screen">
       <div className="w-full max-w-6xl text-center">
         <h2 className="mb-16 text-4xl font-bold tracking-tight text-[#130a3d] md:text-5xl">
           What <span className="text-indigo-600">Codebility</span> Is and Isn’t?
