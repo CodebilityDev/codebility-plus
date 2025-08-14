@@ -34,7 +34,7 @@ const items = [
 
 export default function IsNotSection() {
   return (
-    <section className="flex min-h-screen w-full items-center justify-center bg-[#10131a] px-6 py-24 text-white">
+    <section className="flex w-full items-center justify-center bg-[#10131a] px-6 py-20 text-white lg:min-h-screen">
       <div className="w-full max-w-6xl text-center">
         {/* Heading */}
         <motion.h2

@@ -13,9 +13,9 @@ export default function WellcomeSection() {
     <section
       id="welcome-section"
       className="
-        relative isolate min-h-[90vh] w-full overflow-hidden
-        bg-gradient-to-br from-slate-50 via-white to-slate-100
-        text-[#1e1d17]
+        relative isolate w-full overflow-hidden bg-gradient-to-br
+        from-slate-50 via-white to-slate-100 text-[#1e1d17]
+        lg:min-h-[90vh]
       "
     >
       {/* soft decor blobs */}

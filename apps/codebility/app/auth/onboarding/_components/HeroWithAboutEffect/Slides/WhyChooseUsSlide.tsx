@@ -30,7 +30,7 @@ export default function WhyChooseUsSlide() {
   ];
 
   return (
-    <div className="slide relative flex h-screen w-screen flex-col justify-center text-stone-900">
+    <div className="slide relative flex w-screen flex-col justify-center text-stone-900 lg:h-screen">
       {/* Features Grid */}
       <div className="z-0 flex flex-col items-center justify-center px-6 md:px-12 lg:px-24">
         <h2 className="mb-16 text-4xl font-bold tracking-tight text-[#130a3d] md:text-5xl">

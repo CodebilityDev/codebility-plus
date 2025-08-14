@@ -2,7 +2,7 @@
 
 import React, { forwardRef, useRef } from "react";
 
-import { useOnboardingAnimations } from "../../hooks/useOnboardingAnimations";
+import useOnboardingAnimations from "../../hooks/useOnboardingAnimations";
 import AnimatedRoadmapWrapper from "./AnimatedRoadmapWrapper";
 
 type Props = React.HTMLAttributes<HTMLDivElement>;
@@ -35,7 +35,7 @@ const IsRoadMap = forwardRef<HTMLDivElement, Props>(function IsRoadMap(
   return (
     <section
       ref={roadmapRef}
-      className={`relative min-h-screen w-full bg-cover bg-center bg-no-repeat ${className}`}
+      className={`relative w-full bg-cover bg-center bg-no-repeat lg:min-h-screen ${className}`}
       style={{
         backgroundImage: "url('/assets/images/onboarding/roadmap_bg.svg')",
       }}
