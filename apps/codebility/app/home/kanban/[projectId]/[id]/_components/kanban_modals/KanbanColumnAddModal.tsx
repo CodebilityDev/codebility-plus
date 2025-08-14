@@ -12,6 +12,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal";
+import { useKanbanStore } from "@/store/kanban-store";
 import toast from "react-hot-toast";
 
 import { Input } from "@codevs/ui/input";
@@ -22,6 +23,7 @@ export default function KanbanColumnAddModal() {
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const isModalOpen = isOpen && type === "ColumnAddModal";
+  const { fetchBoardData } = useKanbanStore();
 
   const validateColumnName = (name: string): boolean => {
     // Add validation rules based on your database constraints
@@ -46,7 +48,9 @@ export default function KanbanColumnAddModal() {
       const response = await createNewColumn(columnName, boardId);
       if (response.success) {
         toast.success("Column created successfully!");
-        window.location.reload();
+        // Refetch the board data
+        await fetchBoardData();
+        // window.location.reload();
         onClose();
         setColumnName("");
       } else {
