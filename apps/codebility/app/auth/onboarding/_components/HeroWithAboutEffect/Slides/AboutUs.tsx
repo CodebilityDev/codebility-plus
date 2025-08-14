@@ -8,7 +8,7 @@ const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 export default function AboutUsSlide() {
   return (
-    <div className="slide flex h-screen w-screen flex-col items-center justify-center px-6 md:flex-row md:px-16">
+    <div className="slide flex lg:h-screen w-screen flex-col items-center justify-center px-6 md:flex-row md:px-16">
       {/* LEFT: Lottie Animation */}
       <div className="flex w-full items-center justify-center md:w-1/2">
         <Lottie

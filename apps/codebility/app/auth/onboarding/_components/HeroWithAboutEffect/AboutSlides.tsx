@@ -19,16 +19,16 @@ export default function AboutSlides({ slidesRef }: AboutSlidesProps) {
       ref={slidesRef}
       className="flex h-auto transform-gpu flex-col will-change-transform lg:h-full lg:w-[400vw] lg:flex-row"
     >
-      <div className="w-full flex-shrink-0 lg:min-h-screen lg:w-screen">
+      <div className="w-full flex-shrink-0 pb-20 lg:min-h-screen lg:w-screen lg:pb-0">
         <AboutUsSlide />
       </div>
-      <div className="w-full flex-shrink-0 lg:min-h-screen lg:w-screen">
+      <div className="w-full flex-shrink-0 pb-20 lg:min-h-screen lg:w-screen lg:pb-0">
         <LaunchpadSlide />
       </div>
-      <div className="w-full flex-shrink-0 lg:min-h-screen lg:w-screen">
+      <div className="w-full flex-shrink-0 pb-20 lg:min-h-screen lg:w-screen lg:pb-0">
         <MissionVisionSlide />
       </div>
-      <div className="w-full flex-shrink-0 lg:min-h-screen lg:w-screen">
+      <div className="w-full flex-shrink-0 pb-20 lg:min-h-screen lg:w-screen lg:pb-0">
         <WhyChooseUsSlide />
       </div>
     </div>

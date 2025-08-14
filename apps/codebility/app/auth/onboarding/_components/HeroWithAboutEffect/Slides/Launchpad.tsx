@@ -8,7 +8,7 @@ const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
 export default function LaunchpadSlide() {
   return (
-    <div className="slide relative flex h-screen w-screen items-center justify-center">
+    <div className="slide relative flex lg:h-screen w-screen items-center justify-center">
       {/* Background Lottie */}
       <div className="pointer-events-none absolute inset-0 opacity-30">
         <Lottie

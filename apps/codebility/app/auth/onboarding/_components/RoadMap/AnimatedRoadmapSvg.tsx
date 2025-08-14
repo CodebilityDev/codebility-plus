@@ -217,8 +217,8 @@ export default function AnimatedRoadmapSvg() {
       </svg>
 
       {/* Mobile: simple vertical roadmap list */}
-      <div className="lg:hidden">
-        <ol className="relative ml-3 space-y-6 border-l border-zinc-300 dark:border-zinc-700">
+      <div className="px-6 py-20 lg:hidden">
+        <ol className="text-black-400 relative ml-3 space-y-6 border-l border-zinc-300 dark:border-zinc-700">
           {phases.map((p, i) => (
             <li key={`m-${i}`} className="relative pl-6">
               {/* Dot */}
