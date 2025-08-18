@@ -12,7 +12,7 @@ interface KanbanBoardPageProps {
   searchParams?: { query?: string };
 }
 
-// Mapping functions
+// Mapping functions to convert raw data into our expected types.
 const mapTask = (task: any): Task => ({
   id: String(task.id),
   title: task.title,
@@ -52,15 +52,21 @@ export default function KanbanBoardPage({
   searchParams,
 }: KanbanBoardPageProps) {
   const { boardData, fetchBoardData, setBoardId } = useKanbanStore();
-  const [loaded, setLoaded] = useState(false);
+  const [loading, setLoading] = useState(true);
 
   const query = searchParams?.query?.toLowerCase() || "";
 
   useEffect(() => {
     const loadData = async () => {
-      await setBoardId(params.id);
-      await fetchBoardData();
-      setLoaded(true);
+      setLoading(true);
+      try {
+        setBoardId(params.id); // no need to await if this is a Zustand setter
+        await fetchBoardData();
+      } catch (err) {
+        console.error("Failed to load board data:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     loadData();
   }, [params.id, fetchBoardData, setBoardId]);
@@ -95,17 +101,15 @@ export default function KanbanBoardPage({
     } as KanbanBoardType & { kanban_columns: KanbanColumnType[] };
   }, [boardData, query]);
 
-  // Show skeleton while loading
-  if (!processedBoardData && !loaded) {
+  if (loading) {
     return <KanbanLoadingSkeleton />;
   }
 
-  // After load but still no board
-  if (!processedBoardData && loaded) {
+  if (!processedBoardData) {
     return <div>Board not found</div>;
   }
 
   return (
-    <KanbanBoard projectId={params.projectId} boardData={processedBoardData!} />
+    <KanbanBoard projectId={params.projectId} boardData={processedBoardData} />
   );
 }
