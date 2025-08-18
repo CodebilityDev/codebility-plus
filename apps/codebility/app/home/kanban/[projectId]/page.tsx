@@ -201,12 +201,12 @@ export default async function KanbanSprintPage(props: PageProps) {
           <TableCell className="md:table-cell">
             <div className="flex flex-col">
               <span className="font-medium text-gray-900 dark:text-white">
-                Sprint {index + 1}
+                {sprint.name}
               </span>
             </div>
             <div className="flex flex-col">
               <span className="text-gray-700 dark:text-gray-300">
-                {sprint.name}
+                {sprint.kanban_board?.name}
               </span>
             </div>
           </TableCell>
