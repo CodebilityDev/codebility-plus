@@ -5,13 +5,14 @@ import { useKanbanStore } from "@/store/kanban-store";
 import { KanbanBoardType, KanbanColumnType, Task } from "@/types/home/codev";
 
 import KanbanBoard from "./_components/KanbanBoard";
+import KanbanLoadingSkeleton from "./loading";
 
 interface KanbanBoardPageProps {
   params: { id: string; projectId: string };
   searchParams?: { query?: string };
 }
 
-// Mapping functions to convert raw data into our expected types.
+// Mapping functions
 const mapTask = (task: any): Task => ({
   id: String(task.id),
   title: task.title,
@@ -51,19 +52,18 @@ export default function KanbanBoardPage({
   searchParams,
 }: KanbanBoardPageProps) {
   const { boardData, fetchBoardData, setBoardId } = useKanbanStore();
-  const [loading, setLoading] = useState(true);
+  const [loaded, setLoaded] = useState(false);
 
   const query = searchParams?.query?.toLowerCase() || "";
 
   useEffect(() => {
     const loadData = async () => {
-      setLoading(true);
       await setBoardId(params.id);
       await fetchBoardData();
-      setLoading(false);
+      setLoaded(true);
     };
     loadData();
-  }, [params.id, fetchBoardData]);
+  }, [params.id, fetchBoardData, setBoardId]);
 
   const processedBoardData = useMemo(() => {
     if (!boardData) return null;
@@ -95,15 +95,17 @@ export default function KanbanBoardPage({
     } as KanbanBoardType & { kanban_columns: KanbanColumnType[] };
   }, [boardData, query]);
 
-  if (loading) {
-    return <div>Loading board...</div>;
+  // Show skeleton while loading
+  if (!processedBoardData && !loaded) {
+    return <KanbanLoadingSkeleton />;
   }
 
-  if (!processedBoardData) {
+  // After load but still no board
+  if (!processedBoardData && loaded) {
     return <div>Board not found</div>;
   }
 
   return (
-    <KanbanBoard projectId={params.projectId} boardData={processedBoardData} />
+    <KanbanBoard projectId={params.projectId} boardData={processedBoardData!} />
   );
 }
