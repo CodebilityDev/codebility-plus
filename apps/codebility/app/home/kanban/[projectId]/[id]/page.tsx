@@ -1,14 +1,15 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { use, useEffect, useMemo, useState } from "react";
 import { useKanbanStore } from "@/store/kanban-store";
 import { KanbanBoardType, KanbanColumnType, Task } from "@/types/home/codev";
 
 import KanbanBoard from "./_components/KanbanBoard";
+import KanbanLoadingSkeleton from "./loading";
 
 interface KanbanBoardPageProps {
-  params: { id: string; projectId: string };
-  searchParams?: { query?: string };
+  params: Promise<{ id: string; projectId: string }>;
+  searchParams?: Promise<{ query?: string }>;
 }
 
 // Mapping functions to convert raw data into our expected types.
@@ -46,24 +47,29 @@ const mapColumn = (column: any): KanbanColumnType => ({
     : [],
 });
 
-export default function KanbanBoardPage({
-  params,
-  searchParams,
-}: KanbanBoardPageProps) {
+export default function KanbanBoardPage(props: KanbanBoardPageProps) {
   const { boardData, fetchBoardData, setBoardId } = useKanbanStore();
   const [loading, setLoading] = useState(true);
 
+  // ✅ unwrap params and searchParams
+  const { id, projectId } = use(props.params);
+  const searchParams = props.searchParams ? use(props.searchParams) : {};
   const query = searchParams?.query?.toLowerCase() || "";
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await setBoardId(params.id);
-      await fetchBoardData();
-      setLoading(false);
+      try {
+        setBoardId(id);
+        await fetchBoardData();
+      } catch (err) {
+        console.error("Failed to load board data:", err);
+      } finally {
+        setLoading(false);
+      }
     };
     loadData();
-  }, [params.id, fetchBoardData]);
+  }, [id, fetchBoardData, setBoardId]);
 
   const processedBoardData = useMemo(() => {
     if (!boardData) return null;
@@ -96,14 +102,12 @@ export default function KanbanBoardPage({
   }, [boardData, query]);
 
   if (loading) {
-    return <div>Loading board...</div>;
+    return <KanbanLoadingSkeleton />;
   }
 
   if (!processedBoardData) {
     return <div>Board not found</div>;
   }
 
-  return (
-    <KanbanBoard projectId={params.projectId} boardData={processedBoardData} />
-  );
+  return <KanbanBoard projectId={projectId} boardData={processedBoardData} />;
 }
