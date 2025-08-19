@@ -29,14 +29,13 @@ export async function createNewSprint(formData: FormData) {
 			return { success: false, error: "Failed to generate sprint name" };
 		}
 
-		// TODO: Also add creating a new board for the sprint
-
     // Insert the new board
 		const board = await supabase
 			.from("kanban_boards")
 			.insert({
 				name: boardName,
 				description: boardDescription,
+				project_id: projectId,
 			})
 			.select()
 			.single();
