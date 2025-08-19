@@ -62,16 +62,44 @@ interface InHouseTableProps {
   };
 }
 
+// Default fallback image for team members without avatars
 const defaultImage = "/assets/svgs/icon-codebility-black.svg";
 
-// Add this function before the InHouseTable component
+/**
+ * Returns appropriate color classes for NDA status display
+ * @param status - Boolean indicating if NDA is signed
+ * @returns CSS color classes for text styling
+ */
 const getNdaStatusColor = (status: boolean | null | undefined) => {
   if (status === true) return "text-green-600 dark:text-green-400";
   return "text-red-600 dark:text-red-400";
 };
 
-// NDA Email Dialog Component
-// Replace the NdaEmailDialog component with this SendNdaButton component
+/**
+ * Capitalizes first letter of each word in a string
+ * @param str - Input string to capitalize
+ * @returns Capitalized string or dash for empty values
+ */
+const capitalize = (str: string) =>
+  str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
+
+/**
+ * Converts display position to uppercase format
+ * Input → Output Examples:
+ * "frontend developer" → "FRONTEND DEVELOPER"
+ * "ui/ux designer" → "UI/UX DESIGNER"
+ * @param position - Display position string
+ * @returns Uppercase position or dash for empty values
+ */
+const formatDisplayPosition = (position: string | null | undefined): string => {
+  if (!position || typeof position !== "string") return "-";
+  return position.toUpperCase();
+};
+
+/**
+ * NDA Email Button Component
+ * Handles sending NDA signing requests to team members
+ */
 const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
   const [isSending, setIsSending] = useState(false);
 
@@ -106,27 +134,33 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
   );
 };
 
+/**
+ * Main InHouseTable Component
+ * Displays team member data with responsive design and inline editing
+ */
 export function InHouseTable({
   data,
   onDataChange,
   pagination,
   onDelete,
 }: InHouseTableProps) {
+  // Supabase client instance for database operations
   const [supabase, setSupabase] = useState<any>(null);
+  
+  // Inline editing state management
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [roles, setRoles] = useState<Role[]>([]);
 
-  // Calculate total pages for DefaultPagination
+  // Calculate total pages for pagination component
   const totalPages = useMemo(() => Math.ceil(data.length / pageSize.applicants), [data.length]);
 
+  // Initialize Supabase client on component mount
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
     setSupabase(supabaseClient);
   }, []);
 
-  // For inline editing
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [roles, setRoles] = useState<Role[]>([]);
-
-  // Fetch roles when component mounts
+  // Fetch available roles for dropdown selection
   useEffect(() => {
     if (!supabase) return;
 
@@ -145,16 +179,18 @@ export function InHouseTable({
     fetchRoles();
   }, [supabase]);
 
-  // Helper to handle item deletion in local state
+  /**
+   * Handles member deletion from the table
+   * @param deletedId - ID of the member to delete
+   */
   const handleDelete = (deletedId: string) => {
     onDelete(deletedId);
   };
 
-  // Helper to capitalize names
-  const capitalize = (str: string) =>
-    str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : "-";
-
-  // Add this function to handle sending NDA email
+  /**
+   * Sends NDA signing request email to team member
+   * Creates unique token and database record for tracking
+   */
   const handleSendNdaEmail = async (
     codevId: string,
     email: string,
@@ -162,12 +198,12 @@ export function InHouseTable({
     message: string,
   ) => {
     try {
-      // Generate a unique token for this NDA request
+      // Generate unique token with 7-day expiration
       const token = crypto.randomUUID();
       const expiresAt = new Date();
-      expiresAt.setDate(expiresAt.getDate() + 7); // Token expires in 7 days
+      expiresAt.setDate(expiresAt.getDate() + 7);
 
-      // Save the NDA request to the database
+      // Store NDA request in database
       const { error: dbError } = await supabase.from("nda_requests").insert({
         codev_id: codevId,
         token: token,
@@ -177,13 +213,11 @@ export function InHouseTable({
 
       if (dbError) throw dbError;
 
-      // Generate the NDA signing link
+      // Generate signing link for the email
       const signingLink = `${window.location.origin}/nda-signing/${token}`;
-
-      // Find the codev from the data array using codevId
       const codevData = data.find((item) => item.id === codevId);
 
-      // Use the local API route instead of Supabase Edge Function
+      // Send email via API endpoint
       const emailResponse = await fetch("/api/send-email", {
         method: "POST",
         headers: {
@@ -203,7 +237,7 @@ export function InHouseTable({
         throw new Error(await emailResponse.text());
       }
 
-      // Update the codev's status in the local state
+      // Update local state to reflect sent status
       const updatedRow = {
         ...codevData!,
         nda_request_sent: true,
@@ -215,7 +249,10 @@ export function InHouseTable({
     }
   };
 
-  // Add this function to handle downloading NDA document
+  /**
+   * Downloads NDA document for signed members
+   * @param codevId - ID of the member whose NDA to download
+   */
   const handleDownloadNda = async (codevId: string) => {
     try {
       const { data, error } = await supabase
@@ -228,7 +265,7 @@ export function InHouseTable({
         throw new Error("Failed to fetch NDA document");
       }
 
-      // Create a link element to download the PDF
+      // Create download link and trigger download
       const link = document.createElement("a");
       link.href = data.nda_document;
       link.download = `NDA_${data.first_name}_${data.last_name}.pdf`;
@@ -243,7 +280,7 @@ export function InHouseTable({
     }
   };
 
-  // Define pagination callbacks outside of conditional rendering
+  // Pagination callback handlers
   const handleNextPage = useCallback(() => {
     if (pagination.currentPage < pagination.totalPages) {
       pagination.onNextPage();
@@ -252,15 +289,20 @@ export function InHouseTable({
 
   const handlePreviousPage = useCallback(() => pagination.onPreviousPage(), [pagination]);
 
+  /**
+   * Advanced pagination handler for direct page navigation
+   * Implements step-by-step navigation since direct page setting isn't available
+   */
   const setCurrentPage = useCallback((pageOrFunction: number | ((page: number) => number)) => {
     const page =
       typeof pageOrFunction === "function"
         ? pageOrFunction(pagination.currentPage)
         : pageOrFunction;
-    // Note: DefaultPagination expects 1-based pages, which matches our current implementation
+    
     const targetPage = Math.max(1, Math.min(page, pagination.totalPages));
-    // Since we don't have direct page setting, we'll need to navigate step by step
     const currentPage = pagination.currentPage;
+    
+    // Navigate step by step to target page
     if (targetPage > currentPage) {
       for (let i = currentPage; i < targetPage; i++) {
         pagination.onNextPage();
@@ -274,7 +316,7 @@ export function InHouseTable({
 
   return (
     <div className="mb-4 space-y-4">
-      {/* Mobile Table for smaller screens */}
+      {/* Mobile-optimized table for smaller screens */}
       <InHouseMobileTable
         data={data}
         onDataChange={onDataChange}
@@ -285,13 +327,14 @@ export function InHouseTable({
         handleDownloadNda={handleDownloadNda}
       />
 
-      {/* Desktop Table Container */}
+      {/* Desktop Table Container - Hidden on mobile, visible on XL+ screens */}
       <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 hidden rounded-lg border xl:block">
         <Table>
-          {/* Table Header */}
+          {/* Table Header with responsive column visibility */}
           <TableHeader>
             <TableRow className="border-light-700 dark:border-dark-200 bg-light-200 dark:bg-dark-300 border-b">
               {columns.map((column) =>
+                // Always visible columns for mobile compatibility
                 column.key === "image_url" ||
                 column.key === "first_name" ||
                 column.key === "last_name" ||
@@ -303,6 +346,7 @@ export function InHouseTable({
                     {column.label}
                   </TableHead>
                 ) : (
+                  // Hidden on smaller screens, visible on 2XL+
                   <TableHead
                     key={column.key}
                     className="dark:text-light-900 hidden px-2 py-3 text-sm font-semibold text-black 2xl:table-cell"
@@ -312,6 +356,7 @@ export function InHouseTable({
                 ),
               )}
 
+              {/* Responsive info column for mobile */}
               <TableHead className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black 2xl:hidden">
                 Info
               </TableHead>
@@ -321,15 +366,15 @@ export function InHouseTable({
             </TableRow>
           </TableHeader>
 
-          {/* Table Body */}
+          {/* Table Body with conditional rendering for edit mode */}
           <TableBody>
             {data.map((item) =>
               editingId === item.id ? (
+                // Edit mode: Show editable form row
                 <EditableRow
                   key={item.id}
                   data={item}
                   onSave={(updatedItem) => {
-                    // Update local data
                     onDataChange(updatedItem);
                     setEditingId(null);
                   }}
@@ -337,10 +382,12 @@ export function InHouseTable({
                   roles={roles}
                 />
               ) : (
+                // Display mode: Show data with responsive layout
                 <TableRow
                   key={item.id}
                   className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b"
                 >
+                  {/* Avatar column - Always visible */}
                   <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                       <Image
@@ -353,28 +400,32 @@ export function InHouseTable({
                     </div>
                   </TableCell>
 
+                  {/* First Name column - Always visible */}
                   <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
 
+                  {/* Last Name column - Always visible */}
                   <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {capitalize(item.last_name)}
                   </TableCell>
 
+                  {/* Email column - Always visible */}
                   <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
                     {item.email_address}
                   </TableCell>
 
-                  {/* Available only on xs, sm, md screens  */}
+                  {/* Mobile Info Dropdown - Hidden on 2XL+ screens */}
                   <TableCell className="dark:text-light-900 flex items-start justify-start px-2 py-2 text-base text-black 2xl:hidden">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
-                        <span>...</span>
+                        <span className="cursor-pointer hover:text-gray-600">...</span>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="w-56">
-                        <DropdownMenuLabel>Users Info</DropdownMenuLabel>
+                        <DropdownMenuLabel>User Info</DropdownMenuLabel>
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
+                          {/* Role information in dropdown */}
                           <DropdownMenuItem>
                             Role
                             <DropdownMenuShortcut>
@@ -384,14 +435,16 @@ export function InHouseTable({
                                 : "-"}
                             </DropdownMenuShortcut>
                           </DropdownMenuItem>
+                          
+                          {/* Display Position - Now with UPPERCASE formatting */}
                           <DropdownMenuItem>
                             Position
                             <DropdownMenuShortcut>
-                              {typeof item.display_position === "string"
-                                ? capitalize(item.display_position)
-                                : "-"}
+                              {formatDisplayPosition(item.display_position)}
                             </DropdownMenuShortcut>
                           </DropdownMenuItem>
+                          
+                          {/* Projects submenu */}
                           <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
                               Projects
@@ -410,6 +463,8 @@ export function InHouseTable({
                               </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                           </DropdownMenuSub>
+                          
+                          {/* NDA Status submenu with action buttons */}
                           <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
                               NDA Status
@@ -417,16 +472,12 @@ export function InHouseTable({
                             <DropdownMenuPortal>
                               <DropdownMenuSubContent>
                                 <DropdownMenuItem className="flex items-center gap-2">
-                                  {/* NDA status display */}
-                                  <span
-                                    className={`${getNdaStatusColor(item.nda_status)}`}
-                                  >
+                                  <span className={`${getNdaStatusColor(item.nda_status)}`}>
                                     {item.nda_status ? "Yes" : "No"}
                                   </span>
 
-                                  {/* Conditional buttons based on NDA status */}
+                                  {/* Conditional NDA action buttons */}
                                   {item.nda_status ? (
-                                    // If NDA is signed, show download button
                                     <Button
                                       variant="outline"
                                       size="sm"
@@ -437,7 +488,6 @@ export function InHouseTable({
                                       Download
                                     </Button>
                                   ) : item.nda_request_sent ? (
-                                    // If NDA request is sent but not signed yet, show pending button
                                     <Button
                                       variant="outline"
                                       size="sm"
@@ -448,7 +498,6 @@ export function InHouseTable({
                                       Pending
                                     </Button>
                                   ) : (
-                                    // If no NDA request sent, show send button
                                     <SendNdaButton
                                       codev={item}
                                       onSendNdaEmail={handleSendNdaEmail}
@@ -458,6 +507,8 @@ export function InHouseTable({
                               </DropdownMenuSubContent>
                             </DropdownMenuPortal>
                           </DropdownMenuSub>
+                          
+                          {/* Portfolio submenu */}
                           <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
                               Portfolio
@@ -483,7 +534,10 @@ export function InHouseTable({
                             </DropdownMenuPortal>
                           </DropdownMenuSub>
                         </DropdownMenuGroup>
+                        
                         <DropdownMenuSeparator />
+                        
+                        {/* Additional status information */}
                         <DropdownMenuGroup>
                           <DropdownMenuItem>
                             Status
@@ -493,6 +547,7 @@ export function InHouseTable({
                               />
                             </DropdownMenuShortcut>
                           </DropdownMenuItem>
+                          
                           <DropdownMenuItem>
                             Date Joined
                             <DropdownMenuShortcut>
@@ -501,6 +556,7 @@ export function InHouseTable({
                                 : "-"}
                             </DropdownMenuShortcut>
                           </DropdownMenuItem>
+                          
                           <DropdownMenuItem>
                             Availability Status
                             <DropdownMenuShortcut>
@@ -516,25 +572,28 @@ export function InHouseTable({
                     </DropdownMenu>
                   </TableCell>
 
+                  {/* Desktop-only columns - Hidden on smaller screens */}
+                  
+                  {/* Status Badge column */}
                   <TableCell className="hidden px-2 py-2 2xl:table-cell">
                     <StatusBadge
                       status={item.internal_status as InternalStatus}
                     />
                   </TableCell>
 
+                  {/* Role column */}
                   <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     {item.role_id
-                      ? roles.find((role) => role.id === item.role_id)?.name ||
-                        "-"
+                      ? roles.find((role) => role.id === item.role_id)?.name || "-"
                       : "-"}
                   </TableCell>
 
+                  {/* Display Position column - Now with UPPERCASE formatting */}
                   <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
-                    {typeof item.display_position === "string"
-                      ? capitalize(item.display_position)
-                      : "-"}
+                    {formatDisplayPosition(item.display_position)}
                   </TableCell>
 
+                  {/* Projects column */}
                   <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     {item.projects?.length ? (
                       <div className="space-y-1">
@@ -547,16 +606,15 @@ export function InHouseTable({
                     )}
                   </TableCell>
 
+                  {/* NDA Status column with action buttons */}
                   <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     <div className="flex items-center gap-2">
-                      {/* NDA status display */}
                       <span className={`${getNdaStatusColor(item.nda_status)}`}>
                         {item.nda_status ? "Yes" : "No"}
                       </span>
 
-                      {/* Conditional buttons based on NDA status */}
+                      {/* Conditional NDA action buttons */}
                       {item.nda_status ? (
-                        // If NDA is signed, show download button
                         <Button
                           variant="outline"
                           size="sm"
@@ -567,7 +625,6 @@ export function InHouseTable({
                           Download
                         </Button>
                       ) : item.nda_request_sent ? (
-                        // If NDA request is sent but not signed yet, show pending button
                         <Button
                           variant="outline"
                           size="sm"
@@ -578,7 +635,6 @@ export function InHouseTable({
                           Pending
                         </Button>
                       ) : (
-                        // If no NDA request sent, show send button
                         <SendNdaButton
                           codev={item}
                           onSendNdaEmail={handleSendNdaEmail}
@@ -587,6 +643,7 @@ export function InHouseTable({
                     </div>
                   </TableCell>
 
+                  {/* Portfolio column */}
                   <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     {item.portfolio_website ? (
                       <a
@@ -603,12 +660,14 @@ export function InHouseTable({
                     )}
                   </TableCell>
 
+                  {/* Date Joined column */}
                   <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     {item.date_joined 
                       ? new Date(item.date_joined).toLocaleDateString()
                       : "-"}
                   </TableCell>
 
+                  {/* Availability Status column */}
                   <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     <SwitchStatusButton
                       disabled={false}
@@ -617,6 +676,7 @@ export function InHouseTable({
                     />
                   </TableCell>
 
+                  {/* Actions column - Always visible */}
                   <TableCell className="px-2 py-2">
                     <TableActions
                       item={item}
@@ -631,7 +691,7 @@ export function InHouseTable({
         </Table>
       </div>
 
-      {/* Pagination Controls */}
+      {/* Pagination Controls - Only show when data exceeds page size */}
       <div className="relative w-full">
         {data.length > pageSize.applicants && (
           <DefaultPagination

@@ -93,11 +93,6 @@ const TaskViewModal = ({
       // ✅ Manually update state so UI updates immediately
       setPrLink(prLink);
       task.pr_link = prLink;
-
-      // ✅ Delay refresh to ensure the update syncs
-      /* setTimeout(() => {
-        router.refresh();
-      }, 500); */
     } else {
       toast.error(response.error || "Failed to update PR Link");
     }
@@ -393,7 +388,7 @@ const TaskViewModal = ({
                       setPrLink(task.pr_link || "");
                     }
                   }}
-                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-customBlue-500"
+                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300"
                   required
                   placeholder="Enter PR Link..."
                 />
@@ -402,7 +397,7 @@ const TaskViewModal = ({
                   onClick={handleUpdate}
                   className={
                     prLink.trim() !== (task?.pr_link || "")
-                      ? "text-md mt-4 flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-2 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
+                      ? "text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 mt-4 flex h-10 w-max items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-2 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 lg:text-lg"
                       : "text-grey-100 bg-light-900 dark:bg-black-200 mt-4 w-full border-2 border-gray-300  py-4 text-black hover:bg-green-700 sm:w-auto"
                   }
                   disabled={
@@ -421,7 +416,7 @@ const TaskViewModal = ({
             <div className="space-y-2">
               <Label className="text-sm font-medium">Skill Category</Label>
               {skillCategory ? (
-                <div className="rounded-md bg-customBlue-50 p-2 text-sm font-medium text-customBlue-700 dark:bg-customBlue-900/20 dark:text-customBlue-300">
+                <div className="bg-customBlue-50 text-customBlue-700 dark:bg-customBlue-900/20 dark:text-customBlue-300 rounded-md p-2 text-sm font-medium">
                   {skillCategory.name}
                 </div>
               ) : (
@@ -526,7 +521,7 @@ const TaskViewModal = ({
             <Button
               variant="outline"
               onClick={onClose}
-              className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
             >
               Close
             </Button>
@@ -535,7 +530,7 @@ const TaskViewModal = ({
                 variant="default"
                 onClick={handleMarkAsDone}
                 disabled={isLoading}
-                className="text-md flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md bg-customBlue-100 px-6 py-1 text-white ring-offset-background transition-colors duration-300 hover:bg-customBlue-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-customBlue-100 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+                className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               >
                 {isLoading && (
                   <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />

@@ -66,7 +66,7 @@ export function ProjectSelect({
     <div className="space-y-2">
       {/* Dropdown for selecting more projects */}
       <Select onValueChange={handleProjectChange} disabled={disabled}>
-        <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-200 w-full">
+        <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-200 dark:text-light-900 w-full text-black">
           <SelectValue placeholder="Select a project" />
         </SelectTrigger>
         <SelectContent className="bg-light-800 dark:bg-dark-200">

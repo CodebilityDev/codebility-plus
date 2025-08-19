@@ -1,11 +1,11 @@
-
 import { Card, CardContent } from "@/components/ui/card";
+import { IconSearch } from "@/public/assets/svgs";
+import { Plus, Users } from "lucide-react";
+
 import { Button } from "@codevs/ui/button";
 import { CardHeader } from "@codevs/ui/card";
 import { Input } from "@codevs/ui/input";
 import { Skeleton } from "@codevs/ui/skeleton";
-import { IconSearch } from "@/public/assets/svgs";
-import { Plus, Users } from "lucide-react"
 
 export default function KanbanLoadingSkeleton() {
   return (
@@ -32,9 +32,9 @@ export default function KanbanLoadingSkeleton() {
                   <div className="flex items-center">
                     <div className="flex space-x-2">
                       {Array.from({ length: 6 }).map((_, i) => (
-                        <Skeleton 
-                          key={i} 
-                          className="h-8 w-8 rounded-full bg-gray-700 dark:bg-gray-300" 
+                        <Skeleton
+                          key={i}
+                          className="h-8 w-8 rounded-full bg-gray-700 dark:bg-gray-300"
                           style={{ zIndex: 6 - i }}
                         />
                       ))}
@@ -51,13 +51,19 @@ export default function KanbanLoadingSkeleton() {
 
               {/* Action buttons */}
               <div className="flex items-center justify-center gap-2 md:justify-start">
-                <Button disabled className="flex w-max items-center gap-2 text-sm md:text-base">
-                  <Plus className="w-4 h-4" />
+                <Button
+                  disabled
+                  className="flex w-max items-center gap-2 text-sm md:text-base"
+                >
+                  <Plus className="h-4 w-4" />
                   Add column
                 </Button>
 
-                <Button disabled className="flex w-max items-center gap-2 text-sm md:text-base">
-                  <Plus className="w-4 h-4" />
+                <Button
+                  disabled
+                  className="flex w-max items-center gap-2 text-sm md:text-base"
+                >
+                  <Plus className="h-4 w-4" />
                   Add Members
                 </Button>
               </div>
@@ -67,7 +73,7 @@ export default function KanbanLoadingSkeleton() {
           {/* Kanban Columns */}
           <div className="text-dark100_light900 flex h-full">
             <div className="overflow-x-auto overflow-y-hidden">
-              <div className="flex flex-wrap min-h-[calc(100vh-12rem)] w-full gap-4 p-2 md:p-4">
+              <div className="flex min-h-[calc(100vh-12rem)] w-full flex-wrap gap-4 p-2 md:p-4">
                 {/* Column 1 */}
                 <KanbanColumnSkeleton title="Todo" cardCount={3} />
 
@@ -85,20 +91,28 @@ export default function KanbanLoadingSkeleton() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 
-function KanbanColumnSkeleton({ title, cardCount }: { title: string; cardCount: number }) {
+function KanbanColumnSkeleton({
+  title,
+  cardCount,
+}: {
+  title: string;
+  cardCount: number;
+}) {
   return (
-    <div className="
+    <div
+      className="
       relative flex h-full 
       w-[calc(100vw-2rem)] min-w-[280px] 
       flex-col overflow-hidden 
       rounded-md border-2 border-zinc-200 
-      md:w-[350px] md:min-w-[350px]
-      lg:w-[400px] lg:min-w-[400px]
-      bg-[#FCFCFC] dark:border-zinc-700 dark:bg-[#2C303A]
-    ">
+      bg-[#FCFCFC] dark:border-zinc-700
+      dark:bg-[#2C303A] md:w-[350px]
+      md:min-w-[350px] lg:w-[400px] lg:min-w-[400px]
+    "
+    >
       {/* Column Header */}
       <div className="flex items-center justify-between p-2 font-bold dark:bg-[#1E1F26] md:p-3">
         <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 md:gap-3">
@@ -120,33 +134,35 @@ function KanbanColumnSkeleton({ title, cardCount }: { title: string; cardCount: 
           ))}
 
           {/* Add card button skeleton */}
-          <div className="flex items-center gap-2 p-3 text-gray-500 hover:text-gray-300 cursor-pointer">
-            <Plus className="w-4 h-4" />
+          <div className="flex cursor-pointer items-center gap-2 p-3 text-gray-500 hover:text-gray-300">
+            <Plus className="h-4 w-4" />
             <span className="text-sm">Add a card</span>
           </div>
         </div>
       </div>
     </div>
-  )
+  );
 }
 
 function KanbanCardSkeleton() {
   return (
-    <div className="
-      group relative cursor-pointer overflow-hidden 
-      rounded-lg border border-gray-200 bg-white p-3 shadow-sm
-      transition-all duration-200 ease-in-out 
-      hover:shadow-lg hover:ring-2 hover:ring-customBlue-200 hover:ring-offset-2
+    <div
+      className="
+      hover:ring-customBlue-200 group relative cursor-pointer 
+      overflow-hidden rounded-lg border border-gray-200 bg-white p-3
+      shadow-sm transition-all duration-200 
+      ease-in-out hover:shadow-lg hover:ring-2 hover:ring-offset-2
       dark:border-gray-700 dark:bg-[#1E1F26]
       md:p-4
-    ">
+    "
+    >
       {/* Priority Indicator Bar */}
-      <div className="absolute top-0 left-0 w-1 h-full rounded-l-lg bg-orange-500" />
+      <div className="absolute left-0 top-0 h-full w-1 rounded-l-lg bg-orange-500" />
 
       {/* Task Header */}
-      <div className="flex items-center justify-between mb-3">
+      <div className="mb-3 flex items-center justify-between">
         <Skeleton className="h-5 w-3/4 bg-gray-300 dark:bg-gray-600" />
-        
+
         {/* Primary Avatar */}
         <div className="flex h-6 w-6 items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-md dark:border-gray-800 md:h-8 md:w-8">
           <Skeleton className="h-full w-full rounded-full bg-gray-300 dark:bg-gray-600" />
@@ -157,7 +173,9 @@ function KanbanCardSkeleton() {
         {/* Priority and Status */}
         <div className="flex items-center justify-between text-xs md:text-sm">
           <div className="flex items-center gap-1">
-            <span className="capitalize text-gray-600 dark:text-gray-400">Medium</span>
+            <span className="capitalize text-gray-600 dark:text-gray-400">
+              Medium
+            </span>
             <Skeleton className="h-3 w-3 bg-gray-300 dark:bg-gray-600 md:h-4 md:w-4" />
           </div>
         </div>
@@ -170,13 +188,13 @@ function KanbanCardSkeleton() {
         {/* Sidekick avatars */}
         <div className="flex -space-x-1.5 pt-1 md:-space-x-2 md:pt-2">
           {Array.from({ length: 3 }).map((_, i) => (
-            <Skeleton 
-              key={i} 
-              className="h-5 w-5 rounded-full border-2 border-white bg-gray-300 dark:border-gray-800 dark:bg-gray-600 md:h-7 md:w-7" 
+            <Skeleton
+              key={i}
+              className="h-5 w-5 rounded-full border-2 border-white bg-gray-300 dark:border-gray-800 dark:bg-gray-600 md:h-7 md:w-7"
             />
           ))}
         </div>
       </div>
     </div>
-  )
+  );
 }
