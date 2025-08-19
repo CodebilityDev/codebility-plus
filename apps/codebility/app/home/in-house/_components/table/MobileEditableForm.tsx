@@ -223,8 +223,12 @@ export function MobileEditableForm({
             )}
           </div>
           <div>
-            <h3 className="text-sm font-semibold dark:text-white">Edit Member</h3>
-            <p className="text-xs text-gray-600 dark:text-gray-400">Update information</p>
+            <h3 className="text-sm font-semibold dark:text-white">
+              Edit Member
+            </h3>
+            <p className="text-xs text-gray-600 dark:text-gray-400">
+              Update information
+            </p>
           </div>
         </div>
         <div className="flex gap-2">
@@ -253,40 +257,48 @@ export function MobileEditableForm({
         {/* Name fields */}
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">First Name</label>
+            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+              First Name
+            </label>
             <Input
               value={editForm.first_name || ""}
               onChange={(e) => handleLocalChange("first_name", e.target.value)}
               disabled={isSubmitting || isUploading}
-              className="h-8 text-sm"
+              className="h-8 text-sm dark:text-white"
             />
           </div>
           <div>
-            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">Last Name</label>
+            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+              Last Name
+            </label>
             <Input
               value={editForm.last_name || ""}
               onChange={(e) => handleLocalChange("last_name", e.target.value)}
               disabled={isSubmitting || isUploading}
-              className="h-8 text-sm"
+              className="h-8 text-sm dark:text-white"
             />
           </div>
         </div>
 
         {/* Email */}
         <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">Email</label>
+          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+            Email
+          </label>
           <Input
             value={editForm.email_address || ""}
             onChange={(e) => handleLocalChange("email_address", e.target.value)}
             disabled={isSubmitting || isUploading}
-            className="h-8 text-sm"
+            className="h-8 text-sm dark:text-white"
           />
         </div>
 
         {/* Status and Role */}
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">Status</label>
+            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+              Status
+            </label>
             <Select
               value={editForm.internal_status || undefined}
               onValueChange={(value: InternalStatus) =>
@@ -294,7 +306,7 @@ export function MobileEditableForm({
               }
               disabled={isSubmitting || isUploading}
             >
-              <SelectTrigger className="h-8 text-sm">
+              <SelectTrigger className="h-8 text-sm text-gray-900 dark:text-white">
                 <SelectValue placeholder="Select status" />
               </SelectTrigger>
               <SelectContent>
@@ -307,7 +319,9 @@ export function MobileEditableForm({
             </Select>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">Role</label>
+            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+              Role
+            </label>
             <Select
               value={String(editForm.role_id || "")}
               onValueChange={(value) =>
@@ -315,7 +329,7 @@ export function MobileEditableForm({
               }
               disabled={isSubmitting || isUploading}
             >
-              <SelectTrigger className="h-8 text-sm">
+              <SelectTrigger className="h-8 text-sm text-gray-900 dark:text-white">
                 <SelectValue placeholder="Select role" />
               </SelectTrigger>
               <SelectContent>
@@ -331,7 +345,9 @@ export function MobileEditableForm({
 
         {/* Position */}
         <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">Position</label>
+          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+            Position
+          </label>
           <Select
             value={editForm.display_position || ""}
             onValueChange={(value) =>
@@ -339,7 +355,7 @@ export function MobileEditableForm({
             }
             disabled={isSubmitting || isUploading}
           >
-            <SelectTrigger className="h-8 text-sm">
+            <SelectTrigger className="h-8 text-sm text-gray-900 dark:text-white">
               <SelectValue placeholder="Select position" />
             </SelectTrigger>
             <SelectContent>
@@ -354,7 +370,9 @@ export function MobileEditableForm({
 
         {/* Projects */}
         <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">Projects</label>
+          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+            Projects
+          </label>
           <ProjectSelect
             value={editForm.projects || []}
             onChange={(projects) => handleLocalChange("projects", projects)}
@@ -365,7 +383,9 @@ export function MobileEditableForm({
         {/* NDA Status and Availability */}
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">NDA Status</label>
+            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+              NDA Status
+            </label>
             <Select
               value={editForm.nda_status ? "Yes" : "No"}
               onValueChange={(value) =>
@@ -373,7 +393,7 @@ export function MobileEditableForm({
               }
               disabled={isSubmitting || isUploading}
             >
-              <SelectTrigger className="h-8 text-sm">
+              <SelectTrigger className="h-8 text-sm text-gray-900 dark:text-white">
                 <SelectValue placeholder="Select NDA status" />
               </SelectTrigger>
               <SelectContent>
@@ -383,7 +403,9 @@ export function MobileEditableForm({
             </Select>
           </div>
           <div>
-            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">Available</label>
+            <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+              Available
+            </label>
             <div className="mt-1">
               <SwitchStatusButton
                 isActive={editForm.availability_status ?? false}
@@ -401,19 +423,25 @@ export function MobileEditableForm({
 
         {/* Portfolio */}
         <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">Portfolio</label>
+          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+            Portfolio
+          </label>
           <Input
             value={editForm.portfolio_website || ""}
-            onChange={(e) => handleLocalChange("portfolio_website", e.target.value)}
+            onChange={(e) =>
+              handleLocalChange("portfolio_website", e.target.value)
+            }
             disabled={isSubmitting || isUploading}
             placeholder="https://..."
-            className="h-8 text-sm"
+            className="h-8 text-sm text-gray-900 dark:text-white"
           />
         </div>
 
         {/* Date Joined */}
         <div>
-          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">Date Joined</label>
+          <label className="mb-1 block text-xs text-gray-600 dark:text-gray-400">
+            Date Joined
+          </label>
           <Input
             type="date"
             value={
@@ -428,7 +456,7 @@ export function MobileEditableForm({
               handleLocalChange("date_joined", dateValue);
             }}
             disabled={isSubmitting || isUploading}
-            className="h-8 text-sm"
+            className="h-8 text-sm text-gray-900 dark:text-white"
           />
         </div>
       </div>

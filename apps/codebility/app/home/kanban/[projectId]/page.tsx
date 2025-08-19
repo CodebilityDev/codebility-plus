@@ -193,11 +193,21 @@ export default async function KanbanSprintPage(props: PageProps) {
         );
       }
 
-      return sprints.map((sprint) => (
-        <TableRow key={sprint.id} className="grid grid-cols-1 md:table-row hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-all duration-200 border-l-4 border-customBlue-500">
+      return sprints.map((sprint, index) => (
+        <TableRow
+          key={sprint.id}
+          className="border-customBlue-500 grid grid-cols-1 border-l-4 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 md:table-row"
+        >
           <TableCell className="md:table-cell">
             <div className="flex flex-col">
-              <span className="font-medium text-gray-900 dark:text-white">{sprint.name}</span>
+              <span className="font-medium text-gray-900 dark:text-white">
+                {sprint.name}
+              </span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-gray-700 dark:text-gray-300">
+                {sprint.kanban_board?.name}
+              </span>
             </div>
           </TableCell>
           <TableCell className="md:table-cell">
@@ -211,7 +221,7 @@ export default async function KanbanSprintPage(props: PageProps) {
             >
               <Button
                 variant="hollow"
-                className="inline-flex items-center gap-2 bg-customBlue-600 text-white hover:bg-customBlue-700 dark:bg-customBlue-600 dark:hover:bg-customBlue-700 shadow-sm"
+                className="bg-customBlue-600 hover:bg-customBlue-700 dark:bg-customBlue-600 dark:hover:bg-customBlue-700 inline-flex items-center gap-2 text-white shadow-sm"
               >
                 <IconKanban className="h-4 w-4 text-white" />
                 <span className="hidden sm:inline">View Board</span>
@@ -232,10 +242,10 @@ export default async function KanbanSprintPage(props: PageProps) {
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm">
+        <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm dark:border-gray-700">
           <Table>
             <TableHeader className="hidden md:table-header-group">
-              <TableRow className="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 border-0">
+              <TableRow className="border-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
                 <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
                   🏃‍♂️ Sprint
                 </TableHead>
