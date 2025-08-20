@@ -93,23 +93,36 @@ export default function ApplicantTestTimeRemaining({
     );
   }
 
-  const content = !timeLeft.isExpired ? (
-    <>
-      {timeLeft.days > 0 && (
-        <span>{`${timeLeft.days}d ${timeLeft.hours}h`}</span>
-      )}
-      {timeLeft.hours === 0 && timeLeft.minutes > 0 && (
-        <span>{`${timeLeft.minutes}m`}</span>
-      )}
-      {timeLeft.minutes === 0 && timeLeft.seconds > 0 && (
-        <span>{`${timeLeft.seconds}s`}</span>
-      )}
-    </>
-  ) : (
-    <span className="text-sm text-gray-500">
-      {isSubmitted ? "Submitted test" : "Expired"}
-    </span>
-  );
+  console.log("timeleft", timeLeft);
+
+  const content =
+    timeLeft.isExpired === false ? (
+      <>
+        {/* if days left */}
+        {timeLeft.days > 0 && (
+          <span>{`${timeLeft.days}d ${timeLeft.hours}h`}</span>
+        )}
+
+        {/* if hours left */}
+        {timeLeft.days === 0 && timeLeft.hours > 0 && (
+          <span>{`${timeLeft.hours}h`}</span>
+        )}
+
+        {/* if minutes left */}
+        {timeLeft.hours === 0 && timeLeft.minutes > 0 && (
+          <span>{`${timeLeft.minutes}m`}</span>
+        )}
+
+        {/* if secongs left */}
+        {timeLeft.minutes === 0 && timeLeft.seconds > 0 && (
+          <span>{`${timeLeft.seconds}s`}</span>
+        )}
+      </>
+    ) : (
+      <span className="text-sm text-gray-500">
+        {isSubmitted ? "Submitted test" : "Expired"}
+      </span>
+    );
 
   return isMobile ? (
     content
