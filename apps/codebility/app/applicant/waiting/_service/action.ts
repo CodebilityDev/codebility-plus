@@ -133,3 +133,43 @@ export async function applicantUpdateTestSubmission({
         console.error("Error updating test submission:", error);
     }
 }
+
+export async function applicantUpdateJoinedStatus({
+    applicantId,
+    joinedDiscord,
+    joinedMessenger,
+}: {
+    applicantId: string;
+    joinedDiscord?: boolean;
+    joinedMessenger?: boolean;
+}) {
+    try {
+        const supabase = await createClientServerComponent();
+
+        const updateData: any = {
+            updated_at: new Date(),
+        };
+
+        if (joinedDiscord !== undefined) {
+            updateData.joined_discord = joinedDiscord;
+        }
+        
+        if (joinedMessenger !== undefined) {
+            updateData.joined_messenger = joinedMessenger;
+        }
+
+        const { data, error } = await supabase
+            .from("applicant")
+            .update(updateData)
+            .eq("id", applicantId);
+
+        if (error) {
+            console.error("Error updating applicant joined status:", error);
+            return undefined;
+        }
+
+        revalidatePath("/applicant/waiting");
+    } catch (error) {
+        console.error("Error updating joined status:", error);
+    }
+}
