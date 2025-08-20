@@ -14,9 +14,8 @@ import { NewApplicantType } from "../../_service/types";
 import ApplicantReapplyTime from "../applicantReapplyTime";
 import ApplicantTechStack from "../applicantTechStack";
 import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
-
+import ApplicantActionButton from "./applicantActionButton";
 import ApplicantProfileColSec from "./applicantProfileColSec";
-import ApplicantActionButton from "./applicantActionButton.original";
 
 export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
   {
@@ -142,7 +141,9 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
                 <IconGithub className="h-5 w-5 invert dark:invert-0" />
               </Link>
             ) : (
-              <span className="text-sm text-gray-600 dark:text-gray-500">None</span>
+              <span className="text-sm text-gray-600 dark:text-gray-500">
+                None
+              </span>
             )}
           </div>
         </div>
@@ -168,7 +169,9 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
                 <IconLink className="h-5 w-5 invert dark:invert-0" />
               </Link>
             ) : (
-              <span className="text-sm text-gray-600 dark:text-gray-500">None</span>
+              <span className="text-sm text-gray-600 dark:text-gray-500">
+                None
+              </span>
             )}
           </div>
         </div>
@@ -312,7 +315,9 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
               <IconLink className="h-4 w-4 text-gray-600 dark:text-gray-200" />
             </Link>
           ) : (
-            <span className="text-sm text-gray-600 dark:text-gray-500">N/A</span>
+            <span className="text-sm text-gray-600 dark:text-gray-500">
+              N/A
+            </span>
           )}
         </div>
       );
@@ -345,8 +350,46 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       className: "m-0 px-0",
     },
     enableHiding: true,
-  },
-  {
+    },
+
+    {
+    id: "reminded",
+    header: ({ column }) => {
+      return (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        className="flex items-center justify-center gap-1 text-xs font-medium text-gray-700 dark:text-gray-200"
+      >
+        Reminded
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant: NewApplicantType = row.original;
+
+      return (
+      <div className="flex items-center justify-center px-2 py-1">
+        <div className="flex flex-col items-center gap-0.5">
+        <span className="inline-flex h-5 items-center justify-center rounded-full bg-gray-100 px-1 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+          {applicant.applicant?.reminded_count ?? 0}
+        </span>
+        <span className="text-[10px] text-gray-500 dark:text-gray-400">
+          {applicant.applicant?.last_reminded_date &&
+          new Date(
+            applicant.applicant.last_reminded_date,
+          ).toLocaleDateString()}
+        </span>
+        </div>
+      </div>
+      );
+    },
+    meta: {
+      className: "m-0 px-0",
+    },
+    },
+    {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {
