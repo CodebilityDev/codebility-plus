@@ -26,7 +26,7 @@ import {
 import { NewApplicantType } from "../../_service/types";
 import ApplicantReapplyTime from "../applicantReapplyTime";
 import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
-import ApplicantActionButton from "./applicantActionButton.original";
+import ApplicantActionButton from "./applicantActionButton";
 
 export default function ApplicantProfileColSec({
   applicant,
