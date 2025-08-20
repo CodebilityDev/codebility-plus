@@ -36,6 +36,8 @@ export const newApplicantsSchema = z.object({
         codev_id: z.string(),
         test_taken: z.string().datetime({ offset: true }).nullable(),
         fork_url: z.string().nullable(),
+        reminded_count: z.number().min(0).nullable(),
+        last_reminded_date: z.string().datetime({ offset: true }).nullable(),
         created_at: z.string().datetime({ offset: true }),
         updated_at: z.string().datetime({ offset: true }),
     }).nullable(),
