@@ -58,6 +58,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
         data[0]?.application_status === "testing" ? true : false,
       fork_url: data[0]?.application_status === "testing" ? true : false,
       reapply: data[0]?.application_status === "denied" ? true : false,
+      reminded: data[0]?.application_status !== "denied" ? true : false,
     }),
     [data[0]?.application_status],
   );

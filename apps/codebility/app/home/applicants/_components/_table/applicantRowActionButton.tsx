@@ -34,9 +34,9 @@ import {
 } from "../../_service/action";
 import {
   sendMultipleDenyEmail,
-  sendMultipleOnboardingReminder,
+  sendMultipleOnboardingReminderWithUpdate,
   sendMultiplePassedTestEmail,
-  sendMultipleTestReminderEmail,
+  sendMultipleTestReminderEmailWithUpdate,
 } from "../../_service/emailAction";
 import { NewApplicantType } from "../../_service/types";
 
@@ -216,8 +216,11 @@ export default function ApplicantRowActionButton({
   const handleRemindToTakeTest = async () => {
     setLoading(true);
     try {
-      await sendMultipleTestReminderEmail(
-        applicants.map((applicant) => applicant.email_address),
+      await sendMultipleTestReminderEmailWithUpdate(
+        applicants.map((applicant) => ({
+          email: applicant.email_address,
+          applicantId: applicant.id
+        })),
       );
 
       setOpen(false);
@@ -241,8 +244,11 @@ export default function ApplicantRowActionButton({
   const handleRemindToOnboarding = async () => {
     setLoading(true);
     try {
-      await sendMultipleOnboardingReminder(
-        applicants.map((applicant) => applicant.email_address),
+      await sendMultipleOnboardingReminderWithUpdate(
+        applicants.map((applicant) => ({
+          email: applicant.email_address,
+          applicantId: applicant.id
+        })),
       );
 
       setOpen(false);

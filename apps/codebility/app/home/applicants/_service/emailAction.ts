@@ -1531,3 +1531,224 @@ export const sendDenyEmail = async ({ email, name }: { email: string, name: stri
         throw new Error("Failed to send deny email");
     }
 }
+
+// New wrapper functions that handle both email sending and database updates
+export const sendTestReminderWithUpdate = async ({ email, name, applicantId }: { email: string, name: string, applicantId: string }) => {
+    const { updateReminderCountAction } = await import('./action');
+    
+    try {
+        // Send the email first
+        await sendTestReminder({ email, name });
+        
+        // Update the reminder count and date in the database
+        await updateReminderCountAction(applicantId);
+    } catch (error) {
+        console.error("Error sending test reminder with update:", error);
+        throw new Error("Failed to send test reminder with update");
+    }
+}
+
+export const sendOnboardingReminderWithUpdate = async ({ email, name, applicantId }: { email: string, name: string, applicantId: string }) => {
+    const { updateReminderCountAction } = await import('./action');
+    
+    try {
+        // Send the email first
+        await sendOnboardingReminder({ email, name });
+        
+        // Update the reminder count and date in the database
+        await updateReminderCountAction(applicantId);
+    } catch (error) {
+        console.error("Error sending onboarding reminder with update:", error);
+        throw new Error("Failed to send onboarding reminder with update");
+    }
+}
+
+// Wrapper functions for config compatibility - these will be used by the action config
+export const sendTestReminderForConfig = async (email: string) => {
+    // This function will be called from useApplicantActions, but we need applicant data
+    // We'll need to get the applicant data from the database first
+    const { createClientServerComponent } = await import('@/utils/supabase/server');
+    const { updateReminderCountAction } = await import('./action');
+    
+    try {
+        const supabase = await createClientServerComponent();
+        
+        // Get applicant data by email
+        const { data: applicantData, error: queryError } = await supabase
+            .from('codev')
+            .select('id, first_name, last_name')
+            .eq('email_address', email)
+            .single();
+            
+        if (queryError) {
+            console.error('Error querying applicant data:', queryError);
+            throw new Error(`Failed to query applicant data: ${queryError.message}`);
+        }
+            
+        if (!applicantData) {
+            console.error('Applicant not found for email:', email);
+            throw new Error('Applicant not found');
+        }
+        
+        // Send the email first
+        await sendTestReminder({ 
+            email, 
+            name: `${applicantData.first_name} ${applicantData.last_name}` 
+        });
+        
+        // Update the reminder count and date in the database
+        await updateReminderCountAction(applicantData.id);
+    } catch (error) {
+        console.error("Error sending test reminder for config:", error);
+        throw new Error("Failed to send test reminder");
+    }
+}
+
+export const sendOnboardingReminderForConfig = async (email: string) => {
+    // This function will be called from useApplicantActions, but we need applicant data
+    // We'll need to get the applicant data from the database first
+    const { createClientServerComponent } = await import('@/utils/supabase/server');
+    const { updateReminderCountAction } = await import('./action');
+    
+    try {
+        const supabase = await createClientServerComponent();
+        
+        // Get applicant data by email
+        const { data: applicantData } = await supabase
+            .from('codev')
+            .select('id, first_name, last_name')
+            .eq('email_address', email)
+            .single();
+            
+        if (!applicantData) {
+            throw new Error('Applicant not found');
+        }
+        
+        // Send the email first
+        await sendOnboardingReminder({ 
+            email, 
+            name: `${applicantData.first_name} ${applicantData.last_name}` 
+        });
+        
+        // Update the reminder count and date in the database
+        await updateReminderCountAction(applicantData.id);
+    } catch (error) {
+        console.error("Error sending onboarding reminder for config:", error);
+        throw new Error("Failed to send onboarding reminder");
+    }
+}
+
+export const sendPassedTestEmailForConfig = async (email: string) => {
+    const { createClientServerComponent } = await import('@/utils/supabase/server');
+    
+    try {
+        const supabase = await createClientServerComponent();
+        
+        // Get applicant data by email
+        const { data: applicantData } = await supabase
+            .from('codev')
+            .select('first_name, last_name')
+            .eq('email_address', email)
+            .single();
+            
+        if (!applicantData) {
+            throw new Error('Applicant not found');
+        }
+        
+        await sendPassedTestEmail({ 
+            email, 
+            name: `${applicantData.first_name} ${applicantData.last_name}` 
+        });
+    } catch (error) {
+        console.error("Error sending passed test email for config:", error);
+        throw new Error("Failed to send passed test email");
+    }
+}
+
+export const sendFailedTestEmailForConfig = async (email: string) => {
+    const { createClientServerComponent } = await import('@/utils/supabase/server');
+    
+    try {
+        const supabase = await createClientServerComponent();
+        
+        // Get applicant data by email
+        const { data: applicantData } = await supabase
+            .from('codev')
+            .select('first_name, last_name')
+            .eq('email_address', email)
+            .single();
+            
+        if (!applicantData) {
+            throw new Error('Applicant not found');
+        }
+        
+        await sendFailedTestEmail({ 
+            email, 
+            name: `${applicantData.first_name} ${applicantData.last_name}` 
+        });
+    } catch (error) {
+        console.error("Error sending failed test email for config:", error);
+        throw new Error("Failed to send failed test email");
+    }
+}
+
+export const sendDenyEmailForConfig = async (email: string) => {
+    const { createClientServerComponent } = await import('@/utils/supabase/server');
+    
+    try {
+        const supabase = await createClientServerComponent();
+        
+        // Get applicant data by email
+        const { data: applicantData } = await supabase
+            .from('codev')
+            .select('first_name, last_name')
+            .eq('email_address', email)
+            .single();
+            
+        if (!applicantData) {
+            throw new Error('Applicant not found');
+        }
+        
+        await sendDenyEmail({ 
+            email, 
+            name: `${applicantData.first_name} ${applicantData.last_name}` 
+        });
+    } catch (error) {
+        console.error("Error sending deny email for config:", error);
+        throw new Error("Failed to send deny email");
+    }
+}
+
+export const sendMultipleTestReminderEmailWithUpdate = async (applicants: { email: string, applicantId: string }[]) => {
+    const { updateMultipleReminderCountAction } = await import('./action');
+    
+    try {
+        // Send the emails first
+        const emails = applicants.map(applicant => applicant.email);
+        await sendMultipleTestReminderEmail(emails);
+        
+        // Update the reminder counts and dates in the database
+        const applicantIds = applicants.map(applicant => applicant.applicantId);
+        await updateMultipleReminderCountAction(applicantIds);
+    } catch (error) {
+        console.error("Error sending multiple test reminders with update:", error);
+        throw new Error("Failed to send multiple test reminders with update");
+    }
+}
+
+export const sendMultipleOnboardingReminderWithUpdate = async (applicants: { email: string, applicantId: string }[]) => {
+    const { updateMultipleReminderCountAction } = await import('./action');
+    
+    try {
+        // Send the emails first
+        const emails = applicants.map(applicant => applicant.email);
+        await sendMultipleOnboardingReminder(emails);
+        
+        // Update the reminder counts and dates in the database
+        const applicantIds = applicants.map(applicant => applicant.applicantId);
+        await updateMultipleReminderCountAction(applicantIds);
+    } catch (error) {
+        console.error("Error sending multiple onboarding reminders with update:", error);
+        throw new Error("Failed to send multiple onboarding reminders with update");
+    }
+}
