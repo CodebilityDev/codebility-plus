@@ -20,7 +20,7 @@ export function useApplicantActions(applicant: NewApplicantType) {
 
       // Execute the email action if it exists
       if (config.emailAction) {
-        await config.emailAction(applicant.email);
+        await config.emailAction(applicant.email_address);
       }
 
       setIsDialogOpen(false);
