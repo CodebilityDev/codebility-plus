@@ -21,8 +21,8 @@ import {
 } from "@codevs/ui/dropdown-menu";
 
 import {
-  sendMultipleOnboardingReminder,
-  sendMultipleTestReminderEmail,
+  sendMultipleOnboardingReminderWithUpdate,
+  sendMultipleTestReminderEmailWithUpdate,
 } from "../_service/emailAction";
 import { NewApplicantType } from "../_service/types";
 
@@ -47,8 +47,11 @@ export default function ApplicantEmailAction({
         (applicant) => !applicant.applicant?.fork_url,
       );
 
-      await sendMultipleTestReminderEmail(
-        applicantsToRemind.map((applicant) => applicant.email_address),
+      await sendMultipleTestReminderEmailWithUpdate(
+        applicantsToRemind.map((applicant) => ({
+          email: applicant.email_address,
+          applicantId: applicant.id
+        })),
       );
 
       setDialogOpen(false);
@@ -73,8 +76,11 @@ export default function ApplicantEmailAction({
   const handleRemindToOnboard = async () => {
     setIsLoading(true);
     try {
-      await sendMultipleOnboardingReminder(
-        applicants.map((applicants) => applicants.email_address),
+      await sendMultipleOnboardingReminderWithUpdate(
+        applicants.map((applicant) => ({
+          email: applicant.email_address,
+          applicantId: applicant.id
+        })),
       );
 
       setDialogOpen(false);
