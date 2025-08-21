@@ -42,7 +42,30 @@ const LeftSidebar = () => {
     const fetchSidebarData = async () => {
       if (roleId) {
         const data = await getSidebarData(roleId);
-        setSidebarData(data);
+        
+        // Filter out unimplemented features
+        const filteredData = data.map((section: SidebarSection) => ({
+          ...section,
+          links: section.links.filter((link: SidebarLink) => {
+            // TODO: Remove these filters when features are implemented
+            
+            // Filter out Feeds from MENU section
+            if (link.label === "Feeds") {
+              console.log("🚧 Feeds feature not yet implemented - hiding from navigation");
+              return false;
+            }
+            
+            // Filter out Codev Overflow from CODEVS section
+            if (link.label === "Codev Overflow") {
+              console.log("🚧 Codev Overflow feature not yet implemented - hiding from navigation");
+              return false;
+            }
+            
+            return true; // Keep all other links
+          })
+        }));
+        
+        setSidebarData(filteredData);
       }
     };
 
@@ -219,6 +242,7 @@ const LeftSidebar = () => {
           </div>
         ))}
       </nav>
+
     </motion.aside>
   );
 };
