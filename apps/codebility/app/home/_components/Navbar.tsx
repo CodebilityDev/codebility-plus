@@ -14,7 +14,7 @@ import {
   IconProfile,
 } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
-import { Bell } from "lucide-react";
+// import { Bell } from "lucide-react"; // TODO: Uncomment when notification system is implemented
 
 import {
   DropdownMenu,
@@ -83,6 +83,13 @@ const Navbar = () => {
           role="navigation"
           aria-label="User menu"
         >
+          {/* 
+          TODO: Implement notification system functionality
+          - Add backend integration for notifications
+          - Implement notification count/status tracking
+          - Add click handler for notification dropdown
+          - Connect to real-time notification updates
+          
           <button
             className="relative rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
             aria-label="Notifications"
@@ -92,6 +99,8 @@ const Navbar = () => {
               <span className="h-1.5 w-1.5 rounded-full bg-white"></span>
             </span>
           </button>
+          */}
+          
           <div>
             <div className="md:hidden">
               <MobileTheme />
