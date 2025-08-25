@@ -47,26 +47,43 @@ export default function DashboardPage() {
             </div>
           </div>
           
-          {/* Quick stats bar */}
+          {/* Quick stats bar - Only showing implemented features */}
           <div className="flex flex-wrap gap-2 sm:gap-4 mt-4">
+            {/* Active Status - Functional indicator */}
             <div className="bg-white dark:bg-gray-800 rounded-lg px-3 sm:px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <div className="h-2 w-2 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100">Active Today</span>
               </div>
             </div>
+            
+            {/* 
+            TODO: Implement streak tracking functionality
+            - Add backend integration for user activity tracking
+            - Calculate consecutive active days
+            - Store/retrieve streak data from database
+            
             <div className="bg-white dark:bg-gray-800 rounded-lg px-3 sm:px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">🔥 Streak:</span>
                 <span className="text-xs sm:text-sm font-bold text-orange-500">7 days</span>
               </div>
             </div>
+            */}
+            
+            {/* 
+            TODO: Implement goal management system
+            - Add user goal setting functionality
+            - Integrate with points/scoring system
+            - Track progress toward weekly/monthly goals
+            
             <div className="bg-white dark:bg-gray-800 rounded-lg px-3 sm:px-4 py-2 shadow-sm border border-gray-200 dark:border-gray-700">
               <div className="flex items-center gap-2">
                 <span className="text-xs sm:text-sm text-gray-600 dark:text-gray-400">🎯 Goal:</span>
                 <span className="text-xs sm:text-sm font-bold text-customBlue-500">50 points this week</span>
               </div>
             </div>
+            */}
           </div>
         </div>
 
