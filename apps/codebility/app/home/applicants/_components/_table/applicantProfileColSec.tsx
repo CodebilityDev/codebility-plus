@@ -50,7 +50,7 @@ export default function ApplicantProfileColSec({
                 )}
               </Avatar>
               <div className="flex flex-col">
-                <p className="cursor-pointer text-sm font-medium text-gray-700 dark:text-gray-200 hover:underline">
+                <p className="cursor-pointer text-sm font-medium text-gray-700 hover:underline dark:text-gray-200">
                   {applicant.first_name.charAt(0).toUpperCase() +
                     applicant.first_name.slice(1)}{" "}
                   {applicant.last_name.charAt(0).toUpperCase() +
@@ -98,7 +98,7 @@ export default function ApplicantProfileColSec({
 
       {/* Mobile View */}
       <div className="flex w-full items-start justify-start gap-2 xl:hidden">
-        <Checkbox
+        {/* <Checkbox
           checked={row.getIsSelected()}
           onCheckedChange={(value) => row.toggleSelected(!!value)}
           aria-label="Select row"
@@ -106,7 +106,7 @@ export default function ApplicantProfileColSec({
             event.stopPropagation();
           }}
           className="mr-2 mt-8 dark:border-none dark:ring-1 dark:ring-white"
-        />
+        /> */}
         <Accordion
           key={applicant.id}
           type="single"
@@ -177,7 +177,9 @@ export default function ApplicantProfileColSec({
                           <IconGithub className="h-[18px] w-[18px] invert dark:invert-0" />
                         </Link>
                       ) : (
-                        <span className="text-xs text-gray-600 dark:text-gray-500">None</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-500">
+                          None
+                        </span>
                       )}
                     </TableCell>
                   </TableRow>
@@ -194,7 +196,9 @@ export default function ApplicantProfileColSec({
                           <IconLink className="h-[18px] w-[18px] invert dark:invert-0" />
                         </Link>
                       ) : (
-                        <span className="text-xs text-gray-600 dark:text-gray-500">None</span>
+                        <span className="text-xs text-gray-600 dark:text-gray-500">
+                          None
+                        </span>
                       )}
                     </TableCell>
                   </TableRow>
@@ -219,7 +223,9 @@ export default function ApplicantProfileColSec({
                             />
                           ))
                         ) : (
-                          <span className="text-xs text-gray-600 dark:text-gray-500">None</span>
+                          <span className="text-xs text-gray-600 dark:text-gray-500">
+                            None
+                          </span>
                         )}
                       </div>
                     </TableCell>
@@ -329,6 +335,33 @@ export default function ApplicantProfileColSec({
                                 applicant={applicant}
                                 isMobile={true}
                               />
+                            </span>
+                          </div>
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  )}
+
+                  {/* Reminded Row */}
+                  {applicant.application_status !== "denied" && (
+                    <TableRow className="grid grid-cols-2 p-2">
+                      <TableCell className="text-sm">Reminded</TableCell>
+                      <TableCell>
+                        {" "}
+                        <div className="flex flex-col space-y-2">
+                          <div className="flex items-center gap-2">
+                            <span className="max-w-[150px] truncate text-xs">
+                              <div className="flex flex-col items-center gap-0.5">
+                                <span className="inline-flex h-5 items-center justify-center rounded-full bg-gray-100 px-1 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+                                  {applicant.applicant?.reminded_count ?? 0}
+                                </span>
+                                <span className="text-[10px] text-gray-500 dark:text-gray-400">
+                                  {applicant.applicant?.last_reminded_date &&
+                                    new Date(
+                                      applicant.applicant.last_reminded_date,
+                                    ).toLocaleDateString()}
+                                </span>
+                              </div>
                             </span>
                           </div>
                         </div>
