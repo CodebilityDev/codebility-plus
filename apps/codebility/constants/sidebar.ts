@@ -193,6 +193,12 @@ export const getSidebarData = async (
           permission: "projects" as PermissionKey,
         },
         {
+          route: "/home/hire",
+          imgURL: "/assets/svgs/icon-bag.svg",
+          label: "Hire",
+          permission: "clients" as PermissionKey,
+        },
+        {
           route: pathsConfig.app.settings,
           imgURL: "/assets/svgs/icon-cog.svg",
           label: "Settings",
