@@ -3,6 +3,8 @@ import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
 import { getMembers, getTeamLead, getUserProjects } from "../../projects/actions";
 import TeamDetailView from "./_components/TeamDetailView";
 import { notFound } from "next/navigation";
+import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -17,6 +19,14 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
   const { projectId } = await params;
 
   try {
+    // Get current user
+    const supabase = await createClientServerComponent();
+    const { data: { user } } = await supabase.auth.getUser();
+    
+    if (!user) {
+      notFound();
+    }
+
     // Fetch user projects to verify access
     const userProjectsResponse = await getUserProjects();
     
@@ -44,7 +54,8 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
     const projectData = {
       project: project.project,
       teamLead,
-      members
+      members,
+      currentUserId: user.id
     };
 
     return (
@@ -60,6 +71,12 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
         }
       >
         <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+          <div className="mb-4">
+            <CustomBreadcrumb items={[
+              { label: "My Team", href: "/home/my-team" },
+              { label: project.project.name }
+            ]} />
+          </div>
           <div className="flex flex-row justify-between gap-4">
             <H1>{project.project.name} Team</H1>
           </div>
