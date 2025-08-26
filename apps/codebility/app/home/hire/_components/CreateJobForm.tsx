@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -24,11 +24,11 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const jobSchema = z.object({
   title: z.string().min(3, "Title must be at least 3 characters"),
-  department: z.string().min(2, "Department is required"),
-  location: z.string().min(3, "Location is required"),
+  titleType: z.enum(["existing", "custom"]),
   type: z.enum(["Full-time", "Part-time", "Contract", "Internship"]),
   level: z.enum(["Entry", "Mid", "Senior", "Lead"]),
   description: z.string().min(50, "Description must be at least 50 characters"),
@@ -47,6 +47,8 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
   const { toast } = useToast();
   const [isOpen, setIsOpen] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [positions, setPositions] = useState<string[]>([]);
+  const [titleType, setTitleType] = useState<"existing" | "custom">("existing");
 
   const {
     register,
@@ -61,41 +63,78 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
       remote: false,
       type: "Full-time",
       level: "Mid",
+      titleType: "existing",
     },
   });
 
   const watchRemote = watch("remote");
+  const watchTitleType = watch("titleType");
+
+  useEffect(() => {
+    const fetchPositions = async () => {
+      const supabase = createClientClientComponent();
+      
+      // Fetch distinct display_positions from codev table
+      const { data, error } = await supabase
+        .from('codev')
+        .select('display_position')
+        .not('display_position', 'is', null)
+        .order('display_position');
+
+      if (data) {
+        // Get unique positions and filter out CEO/Founder
+        const uniquePositions = [...new Set(data.map(item => item.display_position))]
+          .filter(Boolean)
+          .filter(position => !position.toLowerCase().includes('ceo') && !position.toLowerCase().includes('founder'));
+        setPositions(uniquePositions);
+      }
+    };
+
+    if (isOpen) {
+      fetchPositions();
+    }
+  }, [isOpen]);
 
   const onSubmit = async (data: JobFormData) => {
     setIsSubmitting(true);
     
     try {
+      const supabase = createClientClientComponent();
+      
+      // Get current user
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        throw new Error("You must be logged in to create a job listing");
+      }
+
       // Convert requirements string to array
       const requirementsArray = data.requirements
         .split('\n')
         .map(req => req.trim())
         .filter(req => req.length > 0);
 
-      // In a real app, you would get this from your auth context/store
-      const currentUser = {
-        id: "current-user-id",
-        name: "Current User", // Replace with actual user name
-        email: "user@codebility.com" // Replace with actual user email
-      };
+      // Save to database
+      const { error } = await supabase
+        .from('job_listings')
+        .insert({
+          title: data.title,
+          department: 'General', // Default department since we're removing this field
+          location: data.remote ? 'Remote' : 'Philippines', // Default location based on remote status
+          type: data.type,
+          level: data.level,
+          description: data.description,
+          requirements: requirementsArray,
+          salary_range: data.salary_range || null,
+          remote: data.remote,
+          status: 'active',
+          posted_date: new Date().toISOString().split('T')[0],
+          created_by: user.id
+        });
 
-      const jobData = {
-        ...data,
-        requirements: requirementsArray,
-        posted_date: new Date().toISOString(),
-        id: Date.now().toString(), // Temporary ID generation
-        created_by: currentUser,
-      };
-
-      // Here you would typically send to your backend
-      console.log("Creating job:", jobData);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: "Job Posted Successfully",
@@ -106,9 +145,10 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
       setIsOpen(false);
       onJobCreated?.();
     } catch (error) {
+      console.error('Error creating job:', error);
       toast({
         title: "Failed to post job",
-        description: "Please try again later.",
+        description: error instanceof Error ? error.message : "Please try again later.",
         variant: "destructive",
       });
     } finally {
@@ -121,7 +161,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
       <Button
         onClick={() => setIsOpen(true)}
         variant="purple"
-        className="flex items-center gap-2"
+        className="flex items-center gap-2 max-w-[200px]"
       >
         <Plus className="h-4 w-4" />
         Create Job Listing
@@ -140,51 +180,76 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
             <div className="space-y-4">
               <h3 className="text-lg font-medium text-white">Basic Information</h3>
               
+              {/* Job Title Selection */}
+              <div className="space-y-2">
+                <Label className="text-gray-300">
+                  Job Title Type *
+                </Label>
+                <div className="flex gap-4 mb-2">
+                  <label className="flex items-center gap-2 text-sm text-gray-300">
+                    <input
+                      type="radio"
+                      value="existing"
+                      checked={watchTitleType === "existing"}
+                      onChange={(e) => {
+                        setValue("titleType", "existing");
+                        setValue("title", ""); // Reset title when changing type
+                      }}
+                      className="text-customViolet-100"
+                    />
+                    Select from existing positions
+                  </label>
+                  <label className="flex items-center gap-2 text-sm text-gray-300">
+                    <input
+                      type="radio"
+                      value="custom"
+                      checked={watchTitleType === "custom"}
+                      onChange={(e) => {
+                        setValue("titleType", "custom");
+                        setValue("title", ""); // Reset title when changing type
+                      }}
+                      className="text-customViolet-100"
+                    />
+                    Enter custom title
+                  </label>
+                </div>
+              </div>
+
               <div className="space-y-2">
                 <Label htmlFor="title" className="text-gray-300">
                   Job Title *
                 </Label>
-                <Input
-                  id="title"
-                  {...register("title")}
-                  className="bg-gray-800 border-gray-700 text-white"
-                  placeholder="e.g., Senior Full Stack Developer"
-                />
+                {watchTitleType === "existing" ? (
+                  <Select
+                    onValueChange={(value) => setValue("title", value)}
+                    {...register("title")}
+                  >
+                    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                      <SelectValue placeholder="Select a position" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700">
+                      {positions.map((position) => (
+                        <SelectItem 
+                          key={position} 
+                          value={position}
+                          className="text-gray-300 hover:bg-gray-700"
+                        >
+                          {position}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <Input
+                    id="title"
+                    {...register("title")}
+                    className="bg-gray-800 border-gray-700 text-white"
+                    placeholder="e.g., Senior Full Stack Developer"
+                  />
+                )}
                 {errors.title && (
                   <p className="text-sm text-red-400">{errors.title.message}</p>
                 )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="department" className="text-gray-300">
-                    Department *
-                  </Label>
-                  <Input
-                    id="department"
-                    {...register("department")}
-                    className="bg-gray-800 border-gray-700 text-white"
-                    placeholder="e.g., Engineering"
-                  />
-                  {errors.department && (
-                    <p className="text-sm text-red-400">{errors.department.message}</p>
-                  )}
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="location" className="text-gray-300">
-                    Location *
-                  </Label>
-                  <Input
-                    id="location"
-                    {...register("location")}
-                    className="bg-gray-800 border-gray-700 text-white"
-                    placeholder="e.g., Manila, Philippines"
-                  />
-                  {errors.location && (
-                    <p className="text-sm text-red-400">{errors.location.message}</p>
-                  )}
-                </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">

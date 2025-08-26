@@ -1,129 +1,58 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight, MapPin, Clock, Briefcase, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@codevs/ui/badge";
 import { JobListing } from "../_types/job-listings";
 import JobApplicationModal from "./JobApplicationModal";
-
-const mockJobListings: JobListing[] = [
-  {
-    id: "1",
-    title: "Senior Full Stack Developer",
-    department: "Engineering",
-    location: "Manila, Philippines",
-    type: "Full-time",
-    level: "Senior",
-    description: "We are looking for an experienced Full Stack Developer to join our growing team and help build innovative web applications.",
-    requirements: ["5+ years experience", "React/Next.js", "Node.js", "PostgreSQL"],
-    posted_date: "2024-01-15",
-    salary_range: "₱80,000 - ₱120,000",
-    remote: true,
-  },
-  {
-    id: "2",
-    title: "Frontend Developer",
-    department: "Engineering",
-    location: "Cebu, Philippines",
-    type: "Full-time",
-    level: "Mid",
-    description: "Join our frontend team to create beautiful, responsive user interfaces using modern web technologies.",
-    requirements: ["3+ years experience", "React", "TypeScript", "Tailwind CSS"],
-    posted_date: "2024-01-18",
-    salary_range: "₱50,000 - ₱80,000",
-    remote: true,
-  },
-  {
-    id: "3",
-    title: "UI/UX Designer",
-    department: "Design",
-    location: "Remote",
-    type: "Full-time",
-    level: "Mid",
-    description: "We need a creative UI/UX designer to help us design intuitive and visually appealing user experiences.",
-    requirements: ["3+ years experience", "Figma", "Design Systems", "User Research"],
-    posted_date: "2024-01-20",
-    salary_range: "₱45,000 - ₱70,000",
-    remote: true,
-  },
-  {
-    id: "4",
-    title: "Backend Developer",
-    department: "Engineering",
-    location: "Manila, Philippines",
-    type: "Full-time",
-    level: "Senior",
-    description: "Looking for a backend developer to architect and build scalable server-side applications.",
-    requirements: ["5+ years experience", "Node.js", "PostgreSQL", "AWS"],
-    posted_date: "2024-01-22",
-    salary_range: "₱70,000 - ₱110,000",
-    remote: false,
-  },
-  {
-    id: "5",
-    title: "Mobile Developer",
-    department: "Engineering",
-    location: "Davao, Philippines",
-    type: "Full-time",
-    level: "Mid",
-    description: "Join our mobile team to build cross-platform mobile applications using React Native.",
-    requirements: ["3+ years experience", "React Native", "TypeScript", "Mobile UI/UX"],
-    posted_date: "2024-01-25",
-    salary_range: "₱55,000 - ₱85,000",
-    remote: true,
-  },
-  {
-    id: "6",
-    title: "DevOps Engineer",
-    department: "Engineering",
-    location: "Remote",
-    type: "Contract",
-    level: "Senior",
-    description: "We need a DevOps engineer to help us improve our CI/CD pipelines and infrastructure.",
-    requirements: ["5+ years experience", "Docker", "Kubernetes", "AWS/GCP"],
-    posted_date: "2024-01-28",
-    salary_range: "₱90,000 - ₱130,000",
-    remote: true,
-  },
-  {
-    id: "7",
-    title: "Junior Developer",
-    department: "Engineering",
-    location: "Manila, Philippines",
-    type: "Full-time",
-    level: "Entry",
-    description: "Great opportunity for fresh graduates or junior developers to learn and grow with our team.",
-    requirements: ["0-2 years experience", "JavaScript", "HTML/CSS", "Eager to learn"],
-    posted_date: "2024-02-01",
-    salary_range: "₱25,000 - ₱40,000",
-    remote: false,
-  },
-  {
-    id: "8",
-    title: "Project Manager",
-    department: "Management",
-    location: "Cebu, Philippines",
-    type: "Full-time",
-    level: "Mid",
-    description: "Looking for an experienced project manager to lead software development projects.",
-    requirements: ["4+ years experience", "Agile/Scrum", "Technical background", "Leadership skills"],
-    posted_date: "2024-02-05",
-    salary_range: "₱60,000 - ₱90,000",
-    remote: true,
-  },
-];
+import { createClientClientComponent } from "@/utils/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 
 export default function JobListings() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedJob, setSelectedJob] = useState<JobListing | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [jobListings, setJobListings] = useState<JobListing[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  
   const itemsPerPage = 4;
-  const totalPages = Math.ceil(mockJobListings.length / itemsPerPage);
+  const totalPages = Math.ceil(jobListings.length / itemsPerPage);
 
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentJobs = mockJobListings.slice(startIndex, endIndex);
+  const currentJobs = jobListings.slice(startIndex, endIndex);
+
+  useEffect(() => {
+    fetchJobListings();
+  }, []);
+
+  const fetchJobListings = async () => {
+    try {
+      setLoading(true);
+      const supabase = createClientClientComponent();
+      
+      const { data, error } = await supabase
+        .from('job_listings')
+        .select('*')
+        .eq('status', 'active')
+        .order('posted_date', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching job listings:', error);
+        setError('Failed to load job listings');
+        return;
+      }
+
+      setJobListings(data || []);
+    } catch (err) {
+      console.error('Error:', err);
+      setError('An error occurred while loading job listings');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleApply = (job: JobListing) => {
     setSelectedJob(job);
@@ -177,8 +106,33 @@ export default function JobListings() {
           </p>
         </div>
 
-        <div className="grid gap-6">
-          {currentJobs.map((job) => (
+        {loading ? (
+          <div className="grid gap-6">
+            {[1, 2, 3, 4].map((i) => (
+              <div key={i} className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
+                <Skeleton className="mb-3 h-6 w-3/4" />
+                <Skeleton className="mb-2 h-4 w-1/2" />
+                <Skeleton className="mb-4 h-16 w-full" />
+                <div className="flex gap-2">
+                  <Skeleton className="h-6 w-20" />
+                  <Skeleton className="h-6 w-20" />
+                  <Skeleton className="h-6 w-20" />
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : error ? (
+          <div className="text-center py-12">
+            <p className="text-red-400">{error}</p>
+          </div>
+        ) : jobListings.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">No open positions at the moment. Please check back later.</p>
+          </div>
+        ) : (
+          <>
+            <div className="grid gap-6">
+              {currentJobs.map((job) => (
             <div
               key={job.id}
               className="group relative overflow-hidden rounded-lg border border-gray-800 bg-gray-900/50 p-6 backdrop-blur-sm transition-all hover:border-customViolet-100/50 hover:bg-gray-900/70"
@@ -255,10 +209,10 @@ export default function JobListings() {
                 </div>
               </div>
             </div>
-          ))}
-        </div>
+              ))}
+            </div>
 
-        {totalPages > 1 && (
+            {totalPages > 1 && (
           <div className="mt-12 flex items-center justify-center">
             <div className="flex items-center gap-1 rounded-lg border border-gray-800 bg-gray-900/30 p-1">
               <button
@@ -294,6 +248,8 @@ export default function JobListings() {
               </button>
             </div>
           </div>
+            )}
+          </>
         )}
       </div>
 
