@@ -43,12 +43,12 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id}>
             {headerGroup.headers
-              .filter((_, index) => index <= 1) // 👈 show 1st and 2nd columns
+              .filter((_, index) => index === 0) // show ONLY 1st column
               .map((header) => (
                 <TableHead
                   key={header.id}
                   className={cn(
-                    "whitespace-nowrap",
+                    "h-10 whitespace-nowrap",
                     (header.column.columnDef.meta as any)?.className,
                   )}
                 >
@@ -86,7 +86,7 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
             >
               {row
                 .getVisibleCells()
-                .filter((_, index) => index <= 1) // 👈 show 1st and 2nd columns
+                .filter((_, index) => index <= 1) //show 1st and 2nd columns
                 .map((cell) => (
                   <TableCell
                     key={cell.id}
