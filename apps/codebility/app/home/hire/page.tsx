@@ -1,19 +1,59 @@
 import { Briefcase, Users, TrendingUp, Clock } from "lucide-react";
-import CreateJobForm from "./_components/CreateJobForm";
-import JobListingsTable from "./_components/JobListingsTable";
+import HirePageClient from "./_components/HirePageClient";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import { H1 } from "@/components/shared/dashboard";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default function HirePage() {
-  // Mock stats - replace with actual data
+export default async function HirePage() {
+  const supabase = await createClientServerComponent();
+  
+  // Fetch real stats from database
+  const [activeListingsResult, totalApplicationsResult, newApplicationsResult] = await Promise.all([
+    // Count active job listings
+    supabase
+      .from('job_listings')
+      .select('*', { count: 'exact', head: true })
+      .eq('status', 'active'),
+    
+    // Count total applications
+    supabase
+      .from('job_applications')
+      .select('*', { count: 'exact', head: true }),
+    
+    // Count new applications this week
+    supabase
+      .from('job_applications')
+      .select('*', { count: 'exact', head: true })
+      .gte('applied_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString())
+  ]);
+
+  // Calculate average time to hire (for hired applications)
+  const { data: hiredApplications } = await supabase
+    .from('job_applications')
+    .select('applied_at, reviewed_at')
+    .eq('status', 'hired')
+    .not('reviewed_at', 'is', null);
+
+  let avgTimeToHire = "N/A";
+  if (hiredApplications && hiredApplications.length > 0) {
+    const totalDays = hiredApplications.reduce((sum, app) => {
+      const applied = new Date(app.applied_at);
+      const reviewed = new Date(app.reviewed_at);
+      const days = Math.floor((reviewed.getTime() - applied.getTime()) / (1000 * 60 * 60 * 24));
+      return sum + days;
+    }, 0);
+    const avgDays = Math.round(totalDays / hiredApplications.length);
+    avgTimeToHire = `${avgDays} days`;
+  }
+
   const stats = {
-    activeListings: 8,
-    totalApplications: 47,
-    newThisWeek: 12,
-    avgTimeToHire: "14 days",
+    activeListings: activeListingsResult.count || 0,
+    totalApplications: totalApplicationsResult.count || 0,
+    newThisWeek: newApplicationsResult.count || 0,
+    avgTimeToHire,
   };
 
   const breadcrumbItems = [
@@ -28,14 +68,11 @@ export default function HirePage() {
       </div>
 
       {/* Header */}
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <H1>Job Management</H1>
-          <p className="mt-2 text-gray-400">
-            Create and manage job listings, review applications
-          </p>
-        </div>
-        <CreateJobForm />
+      <div className="mb-8">
+        <H1>Job Management</H1>
+        <p className="mt-2 text-gray-400">
+          Create and manage job listings, review applications
+        </p>
       </div>
 
         {/* Stats Cards */}
@@ -97,11 +134,8 @@ export default function HirePage() {
           </div>
         </div>
 
-      {/* Job Listings Table */}
-      <div>
-        <h2 className="mb-4 text-xl font-light text-white">Active Job Listings</h2>
-        <JobListingsTable />
-      </div>
+      {/* Client Components */}
+      <HirePageClient />
     </div>
   );
 }

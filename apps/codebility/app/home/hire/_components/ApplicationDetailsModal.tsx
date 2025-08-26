@@ -10,7 +10,8 @@ import {
   Calendar, 
   User,
   Briefcase,
-  Download
+  Download,
+  Github
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@codevs/ui/badge";
@@ -87,10 +88,18 @@ export default function ApplicationDetailsModal({
               <h2 className="text-xl font-medium text-white">
                 {application.first_name} {application.last_name}
               </h2>
-              <p className="text-gray-400">{application.job_title}</p>
-              <div className="mt-2 flex items-center gap-2 text-sm text-gray-400">
-                <Calendar className="h-4 w-4" />
-                Applied {new Date(application.applied_at).toLocaleDateString()}
+              <p className="text-gray-400">{application.job_title || 'Position'}</p>
+              <div className="mt-2 flex items-center gap-4 text-sm text-gray-400">
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  Applied {new Date(application.applied_at).toLocaleDateString()}
+                </span>
+                {application.years_of_experience !== undefined && (
+                  <span className="flex items-center gap-1">
+                    <Briefcase className="h-4 w-4" />
+                    {application.years_of_experience} years experience
+                  </span>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
@@ -139,6 +148,17 @@ export default function ApplicationDetailsModal({
                   LinkedIn Profile
                 </a>
               )}
+              {application.github && (
+                <a
+                  href={application.github}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                >
+                  <Github className="h-4 w-4" />
+                  GitHub Profile
+                </a>
+              )}
               {application.portfolio && (
                 <a
                   href={application.portfolio}
@@ -152,6 +172,16 @@ export default function ApplicationDetailsModal({
               )}
             </div>
           </div>
+
+          {/* Additional Details */}
+          {application.notes && (
+            <div className="rounded-lg border border-gray-800 p-4">
+              <h3 className="mb-3 text-lg font-medium text-white">Additional Information</h3>
+              <p className="text-gray-300">
+                {application.notes}
+              </p>
+            </div>
+          )}
 
           {/* Experience */}
           <div className="rounded-lg border border-gray-800 p-4">

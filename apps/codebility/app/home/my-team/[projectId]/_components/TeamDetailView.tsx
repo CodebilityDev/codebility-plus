@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
 import { toast } from "react-hot-toast";
 import { 
   getMembers, 
@@ -12,9 +10,11 @@ import {
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Users, UserPlus, Mail, Calendar } from "lucide-react";
-import DefaultAvatar from "@/components/DefaultAvatar";
+import { Users, UserPlus, Table, Calendar, TrendingUp } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
+import AttendanceGrid from "./AttendanceGrid";
+import CompactMemberGrid from "./CompactMemberGrid";
+import SyncAllAttendance from "./SyncAllAttendance";
 
 interface ProjectData {
   project: {
@@ -27,99 +27,24 @@ interface ProjectData {
   members: {
     data: SimpleMemberData[];
   };
+  currentUserId?: string;
 }
 
 interface TeamDetailViewProps {
   projectData: ProjectData;
 }
 
-const formatName = (firstName: string, lastName: string): string => 
-  `${firstName.charAt(0).toUpperCase()}${firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}${lastName.slice(1).toLowerCase()}`;
-
-const formatDate = (dateString: string): string => {
-  try {
-    return new Date(dateString).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
-    });
-  } catch {
-    return 'Unknown';
-  }
-};
-
-const MemberCard = ({ member, isLead = false }: { member: SimpleMemberData; isLead?: boolean }) => {
-  const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
-  const displayName = formatName(member.first_name, member.last_name);
-
-  return (
-    <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800">
-      <div className="flex items-start gap-4">
-        <div className="relative" style={{ width: 64, height: 64 }}>
-          {member.image_url ? (
-            <Image
-              src={imageUrl}
-              alt={displayName}
-              width={64}
-              height={64}
-              className="rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600"
-            />
-          ) : (
-            <div className="rounded-full ring-2 ring-gray-200 dark:ring-gray-600">
-              <DefaultAvatar size={64} />
-            </div>
-          )}
-          {isLead && (
-            <div className="absolute -bottom-1 -right-1 rounded-full bg-customBlue-500 px-2 py-1">
-              <span className="text-xs font-semibold text-white">LEAD</span>
-            </div>
-          )}
-        </div>
-        
-        <div className="min-w-0 flex-1">
-          <div className="flex items-start justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {displayName}
-              </h3>
-              {member.display_position && (
-                <p className="text-sm text-gray-600 dark:text-gray-400">
-                  {member.display_position}
-                </p>
-              )}
-            </div>
-            {isLead && (
-              <div className="rounded-full bg-customBlue-100 px-3 py-1 dark:bg-customBlue-900/30">
-                <span className="text-xs font-medium text-customBlue-800 dark:text-customBlue-200">
-                  Team Lead
-                </span>
-              </div>
-            )}
-          </div>
-          
-          <div className="mt-4 space-y-2">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Mail className="h-4 w-4" />
-              <span>{member.email_address}</span>
-            </div>
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Calendar className="h-4 w-4" />
-              <span>Joined {formatDate(member.joined_at)}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [project, setProject] = useState(projectData);
   const [showAddModal, setShowAddModal] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
+  const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
 
-  const { project: projectInfo, teamLead, members } = project;
+  const { project: projectInfo, teamLead, members, currentUserId } = project;
   const totalMembers = members.data.length + (teamLead.data ? 1 : 0);
+  
+  // Check if current user is the team lead
+  const isTeamLead = currentUserId && teamLead.data && teamLead.data.id === currentUserId;
 
   const handleOpenAddModal = () => {
     setShowAddModal(true);
@@ -201,91 +126,145 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   return (
     <>
       <div className="space-y-6">
-        {/* Header with back button */}
+        {/* Header */}
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <Link
-              href="/home/my-team"
-              className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
+          <div className="flex items-center gap-2">
+            <Button
+              variant={viewMode === "team" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("team")}
+              className="flex items-center gap-2"
             >
-              <ArrowLeft className="h-4 w-4" />
-              Back to My Team
-            </Link>
+              <Users className="h-4 w-4" />
+              Team View
+            </Button>
+            {isTeamLead && (
+              <Button
+                variant={viewMode === "attendance" ? "default" : "outline"}
+                size="sm"
+                onClick={() => setViewMode("attendance")}
+                className="flex items-center gap-2"
+              >
+                <Table className="h-4 w-4" />
+                Attendance
+              </Button>
+            )}
           </div>
-          <Button
-            onClick={handleOpenAddModal}
-            disabled={isLoadingMembers}
-            size="sm"
-            className="flex items-center gap-2"
-          >
-            <UserPlus className="h-4 w-4" />
-            {isLoadingMembers ? 'Loading...' : 'Add Members'}
-          </Button>
-        </div>
-
-        {/* Project stats */}
-        <div className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
-          <div className="flex items-center gap-3">
-            <Users className="h-6 w-6 text-gray-400" />
-            <div>
-              <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Team Overview
-              </h2>
-              <p className="text-sm text-gray-600 dark:text-gray-400">
-                {totalMembers} total member{totalMembers !== 1 ? 's' : ''} • {members.data.length} team member{members.data.length !== 1 ? 's' : ''} + 1 lead
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Team Lead Section */}
-        {teamLead.data && (
-          <div>
-            <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-white">
-              Team Lead
-            </h3>
-            <MemberCard member={teamLead.data} isLead />
-          </div>
-        )}
-
-        {/* Team Members Section */}
-        <div>
-          <div className="mb-4 flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-              Team Members
-            </h3>
-            <span className="text-sm text-gray-500 dark:text-gray-400">
-              {members.data.length} member{members.data.length !== 1 ? 's' : ''}
-            </span>
-          </div>
-          
-          {members.data.length > 0 ? (
-            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-              {members.data.map((member) => (
-                <MemberCard key={member.id} member={member} />
-              ))}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 py-12 dark:border-gray-700">
-              <UserPlus className="h-12 w-12 text-gray-400" />
-              <h4 className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
-                No team members yet
-              </h4>
-              <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
-                Add team members to get started with your project.
-              </p>
+          <div className="flex gap-2">
+            {viewMode === "attendance" && (
+              <SyncAllAttendance 
+                projectId={projectInfo.id} 
+                isTeamLead={isTeamLead || false} 
+              />
+            )}
+            {viewMode === "team" && (
               <Button
                 onClick={handleOpenAddModal}
                 disabled={isLoadingMembers}
-                className="mt-4"
                 size="sm"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto max-w-[200px]"
               >
-                <UserPlus className="mr-2 h-4 w-4" />
-                Add Members
+                <UserPlus className="h-3.5 w-3.5" />
+                {isLoadingMembers ? 'Loading...' : 'Add Members'}
               </Button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
+
+        {viewMode === "team" ? (
+          <>
+            {/* Project stats */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+              {/* Team Overview Card */}
+              <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Users className="h-5 w-5 text-gray-400" />
+                    <div>
+                      <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                        Team Overview
+                      </h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        {totalMembers} total member{totalMembers !== 1 ? 's' : ''}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                      {totalMembers}
+                    </div>
+                    <div className="text-xs text-gray-500">Members</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Attendance Summary Card */}
+              <div className="rounded-lg border border-gray-200 bg-gradient-to-br from-blue-50 to-cyan-50 dark:from-blue-950/20 dark:to-cyan-950/20 p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <Calendar className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                    <div>
+                      <h2 className="text-base font-semibold text-gray-900 dark:text-white">
+                        Attendance Points
+                      </h2>
+                      <p className="text-sm text-gray-600 dark:text-gray-400">
+                        This month's progress
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                        +{totalMembers * 20}
+                      </div>
+                      <div className="text-xs text-gray-500">Est. Points</div>
+                    </div>
+                  </div>
+                </div>
+                {isTeamLead && (
+                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
+                    Click "Attendance" tab to manage team attendance
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Team Members Grid */}
+            {totalMembers > 0 ? (
+              <CompactMemberGrid 
+                members={members.data}
+                teamLead={teamLead.data}
+              />
+            ) : (
+              <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 py-12 dark:border-gray-700">
+                <UserPlus className="h-12 w-12 text-gray-400" />
+                <h4 className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
+                  No team members yet
+                </h4>
+                <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+                  Add team members to get started with your project.
+                </p>
+                <Button
+                  onClick={handleOpenAddModal}
+                  disabled={isLoadingMembers}
+                  className="mt-4 text-xs px-3 py-1.5 h-auto max-w-[200px]"
+                  size="sm"
+                >
+                  <UserPlus className="mr-1.5 h-3.5 w-3.5" />
+                  Add Members
+                </Button>
+              </div>
+            )}
+          </>
+        ) : (
+          /* Attendance Grid View */
+          <AttendanceGrid
+            teamMembers={members.data}
+            teamLead={teamLead.data}
+            projectId={projectInfo.id}
+          />
+        )}
       </div>
 
       {/* Add Members Modal */}

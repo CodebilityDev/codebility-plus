@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { 
   MoreVertical, 
@@ -32,84 +32,106 @@ import {
 import { useToast } from "@/components/ui/use-toast";
 import { JobListing } from "@/app/(marketing)/careers/_types/job-listings";
 import EditJobModal from "./EditJobModal";
+import { createClientClientComponent } from "@/utils/supabase/client";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 
-// Mock data - replace with actual data from your backend
-const mockJobListings: JobListing[] = [
-  {
-    id: "1",
-    title: "Senior Full Stack Developer",
-    department: "Engineering",
-    location: "Manila, Philippines",
-    type: "Full-time",
-    level: "Senior",
-    description: "We are looking for an experienced Full Stack Developer to join our growing team.",
-    requirements: ["5+ years experience", "React/Next.js", "Node.js", "PostgreSQL"],
-    posted_date: "2024-01-15",
-    salary_range: "₱80,000 - ₱120,000",
-    remote: true,
-    created_by: {
-      id: "user1",
-      name: "Admin User",
-      email: "admin@codebility.com"
-    }
-  },
-  {
-    id: "2",
-    title: "Frontend Developer",
-    department: "Engineering",
-    location: "Cebu, Philippines",
-    type: "Full-time",
-    level: "Mid",
-    description: "Join our frontend team to create beautiful, responsive user interfaces.",
-    requirements: ["3+ years experience", "React", "TypeScript", "Tailwind CSS"],
-    posted_date: "2024-01-18",
-    salary_range: "₱50,000 - ₱80,000",
-    remote: true,
-    created_by: {
-      id: "user2",
-      name: "HR Manager",
-      email: "hr@codebility.com"
-    }
-  },
-  {
-    id: "3",
-    title: "UI/UX Designer",
-    department: "Design",
-    location: "Remote",
-    type: "Full-time",
-    level: "Mid",
-    description: "We need a creative UI/UX designer to help us design intuitive user experiences.",
-    requirements: ["3+ years experience", "Figma", "Design Systems", "User Research"],
-    posted_date: "2024-01-20",
-    salary_range: "₱45,000 - ₱70,000",
-    remote: true,
-    created_by: {
-      id: "user1",
-      name: "Admin User",
-      email: "admin@codebility.com"
-    }
-  },
-];
-
-// Mock applications count - replace with actual data
-const applicationCounts: Record<string, number> = {
-  "1": 15,
-  "2": 8,
-  "3": 12,
-};
+interface JobWithApplicationCount extends JobListing {
+  application_count?: number;
+  created_by_details?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    email_address: string;
+  };
+}
 
 export default function JobListingsTable() {
   const router = useRouter();
   const { toast } = useToast();
-  const [jobs, setJobs] = useState(mockJobListings);
+  const [jobs, setJobs] = useState<JobWithApplicationCount[]>([]);
+  const [loading, setLoading] = useState(true);
   const [editingJob, setEditingJob] = useState<JobListing | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetchJobListings();
+  }, []);
+
+  const fetchJobListings = async () => {
+    try {
+      setLoading(true);
+      const supabase = createClientClientComponent();
+      
+      // Fetch job listings with creator details
+      const { data: jobsData, error: jobsError } = await supabase
+        .from('job_listings')
+        .select(`
+          *,
+          created_by_details:codev!job_listings_created_by_fkey(
+            id,
+            first_name,
+            last_name,
+            email_address
+          )
+        `)
+        .order('posted_date', { ascending: false });
+
+      if (jobsError) {
+        console.error('Error fetching job listings:', jobsError);
+        toast({
+          title: "Failed to load job listings",
+          description: "Please refresh the page to try again.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Fetch application counts for each job
+      const jobsWithCounts = await Promise.all(
+        (jobsData || []).map(async (job) => {
+          const { count } = await supabase
+            .from('job_applications')
+            .select('*', { count: 'exact', head: true })
+            .eq('job_id', job.id);
+          
+          return {
+            ...job,
+            application_count: count || 0,
+            created_by: job.created_by_details ? {
+              id: job.created_by_details.id,
+              name: `${job.created_by_details.first_name} ${job.created_by_details.last_name}`,
+              email: job.created_by_details.email_address
+            } : undefined
+          };
+        })
+      );
+
+      setJobs(jobsWithCounts);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "An error occurred",
+        description: "Failed to load job listings.",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleDelete = async (jobId: string) => {
     if (confirm("Are you sure you want to delete this job listing? This action cannot be undone.")) {
       try {
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 500));
+        const supabase = createClientClientComponent();
+        
+        const { error } = await supabase
+          .from('job_listings')
+          .delete()
+          .eq('id', jobId);
+
+        if (error) {
+          throw error;
+        }
         
         // Remove from local state
         setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
@@ -119,6 +141,7 @@ export default function JobListingsTable() {
           description: "The job listing has been permanently removed.",
         });
       } catch (error) {
+        console.error('Delete error:', error);
         toast({
           title: "Failed to delete",
           description: "Please try again later.",
@@ -139,8 +162,9 @@ export default function JobListingsTable() {
   };
 
   const handleJobUpdated = () => {
-    // In a real app, you would refetch the jobs from the API
-    // For now, we'll just show a success message
+    // Refetch the jobs from the database
+    fetchJobListings();
+    
     toast({
       title: "Job Updated",
       description: "The job listing has been updated successfully.",
@@ -181,13 +205,34 @@ export default function JobListingsTable() {
     }
   };
 
+  if (loading) {
+    return (
+      <div className="rounded-lg border border-gray-800 bg-gray-900/50 overflow-hidden p-8">
+        <div className="space-y-4">
+          {[1, 2, 3].map((i) => (
+            <div key={i} className="flex items-center space-x-4">
+              <Skeleton className="h-12 w-full" />
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (jobs.length === 0) {
+    return (
+      <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-12 text-center">
+        <p className="text-gray-400">No job listings yet. Create your first job listing to get started.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="rounded-lg border border-gray-800 bg-gray-900/50 overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow className="border-gray-800 hover:bg-gray-900/50">
             <TableHead className="text-gray-300">Position</TableHead>
-            <TableHead className="text-gray-300">Department</TableHead>
             <TableHead className="text-gray-300">Location</TableHead>
             <TableHead className="text-gray-300">Type</TableHead>
             <TableHead className="text-gray-300 text-center">Applications</TableHead>
@@ -214,7 +259,6 @@ export default function JobListingsTable() {
                   </div>
                 </div>
               </TableCell>
-              <TableCell className="text-gray-400">{job.department}</TableCell>
               <TableCell>
                 <div className="flex items-center gap-1 text-gray-400">
                   <MapPin className="h-3 w-3" />
@@ -232,7 +276,7 @@ export default function JobListingsTable() {
                   className="group inline-flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
                 >
                   <Users className="h-3.5 w-3.5" />
-                  <span className="font-medium">{applicationCounts[job.id] || 0}</span>
+                  <span className="font-medium">{job.application_count || 0}</span>
                   <span className="text-xs ml-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     View
                   </span>

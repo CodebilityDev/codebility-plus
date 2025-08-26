@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -17,6 +17,7 @@ import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
 import { useToast } from "@/components/ui/use-toast";
 import { JobListing } from "../_types/job-listings";
+import { createClientClientComponent } from "@/utils/supabase/client";
 
 const applicationSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -24,9 +25,12 @@ const applicationSchema = z.object({
   email: z.string().email("Invalid email address"),
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   linkedIn: z.string().url("Invalid LinkedIn URL").optional().or(z.literal("")),
+  github: z.string().url("Invalid GitHub URL").optional().or(z.literal("")),
   portfolio: z.string().url("Invalid portfolio URL").optional().or(z.literal("")),
+  yearsOfExperience: z.string().min(1, "Years of experience is required"),
   coverLetter: z.string().min(50, "Cover letter must be at least 50 characters"),
   experience: z.string().min(20, "Please describe your relevant experience"),
+  referredBy: z.string().optional(),
   resume: z.any().optional(),
 });
 
@@ -52,9 +56,11 @@ export default function JobApplicationModal({
     handleSubmit,
     formState: { errors },
     reset,
+    setValue,
   } = useForm<ApplicationFormData>({
     resolver: zodResolver(applicationSchema),
   });
+
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -77,19 +83,48 @@ export default function JobApplicationModal({
     setIsSubmitting(true);
     
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      const supabase = createClientClientComponent();
       
-      // Here you would typically send the application to your backend
-      const applicationData = {
-        ...data,
-        jobId: job.id,
-        jobTitle: job.title,
-        resume: resumeFile?.name,
-        appliedAt: new Date().toISOString(),
-      };
+      // Upload resume if provided
+      let resumeUrl = null;
+      if (resumeFile) {
+        const fileExt = resumeFile.name.split('.').pop();
+        const fileName = `${data.email.replace('@', '_')}_${Date.now()}.${fileExt}`;
+        
+        const { data: uploadData, error: uploadError } = await supabase.storage
+          .from('resumes')
+          .upload(fileName, resumeFile);
+          
+        if (uploadError) {
+          console.error('Resume upload error:', uploadError);
+        } else {
+          resumeUrl = uploadData.path;
+        }
+      }
       
-      console.log("Application submitted:", applicationData);
+      // Save application to database
+      const { error } = await supabase
+        .from('job_applications')
+        .insert({
+          job_id: job.id,
+          first_name: data.firstName,
+          last_name: data.lastName,
+          email: data.email,
+          phone: data.phone,
+          linkedin: data.linkedIn || null,
+          github: data.github || null,
+          portfolio: data.portfolio || null,
+          years_of_experience: parseInt(data.yearsOfExperience),
+          cover_letter: data.coverLetter,
+          experience: data.experience,
+          resume_url: resumeUrl,
+          status: 'pending',
+          notes: data.referredBy ? `Referred by: ${data.referredBy}` : 'Direct Application'
+        });
+      
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: "Application Submitted!",
@@ -100,6 +135,7 @@ export default function JobApplicationModal({
       setResumeFile(null);
       onClose();
     } catch (error) {
+      console.error('Application submission error:', error);
       toast({
         title: "Submission failed",
         description: "Please try again later.",
@@ -189,6 +225,40 @@ export default function JobApplicationModal({
                 <p className="text-sm text-red-400">{errors.phone.message}</p>
               )}
             </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="yearsOfExperience" className="text-gray-300">
+                  Years of Experience *
+                </Label>
+                <Input
+                  id="yearsOfExperience"
+                  type="number"
+                  min="0"
+                  {...register("yearsOfExperience")}
+                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                  placeholder="5"
+                />
+                {errors.yearsOfExperience && (
+                  <p className="text-sm text-red-400">{errors.yearsOfExperience.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="referredBy" className="text-gray-300">
+                  Referred By (Optional)
+                </Label>
+                <Input
+                  id="referredBy"
+                  {...register("referredBy")}
+                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                  placeholder="Name of referrer (if any)"
+                />
+                {errors.referredBy && (
+                  <p className="text-sm text-red-400">{errors.referredBy.message}</p>
+                )}
+              </div>
+            </div>
           </div>
 
           {/* Professional Links */}
@@ -208,6 +278,22 @@ export default function JobApplicationModal({
               />
               {errors.linkedIn && (
                 <p className="text-sm text-red-400">{errors.linkedIn.message}</p>
+              )}
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="github" className="text-gray-300">
+                GitHub Profile
+              </Label>
+              <Input
+                id="github"
+                type="url"
+                {...register("github")}
+                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                placeholder="https://github.com/johndoe"
+              />
+              {errors.github && (
+                <p className="text-sm text-red-400">{errors.github.message}</p>
               )}
             </div>
 
