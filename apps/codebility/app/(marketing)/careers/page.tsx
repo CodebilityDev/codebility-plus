@@ -4,6 +4,7 @@ import Profiles from "../profiles/page";
 import CTA from "../_shared/CodevsCta";
 import FeaturedSection from "../_shared/CodevsFeaturedCection";
 import CodevHero from "./_components/CodevsHero";
+import JobListings from "./_components/JobListings";
 import MissionVision from "./_components/CodevsMissionVision";
 import Project from "./_components/CodevsProject";
 import Roadmap from "./_components/CodevsRoadmap";
@@ -17,6 +18,7 @@ export default function Codevs() {
       <Navigation />
       <CodevHero />
       {/*     <Profiles /> */}
+      <JobListings />
       <FeaturedSection />
       <Project />
       <Roadmap />

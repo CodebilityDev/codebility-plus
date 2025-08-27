@@ -28,7 +28,6 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
-        className=""
       />
     ),
     cell: ({ row }) => (
@@ -36,11 +35,14 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="mx-0 mt-8 px-0 xl:mt-2"
+        className="mx-0 mt-8 px-0 xl:mt-0"
       />
     ),
     enableSorting: false,
     enableHiding: false,
+    meta: {
+      className: "align-top xl:align-middle",
+    },
   },
   {
     id: "applicant",
@@ -350,46 +352,46 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       className: "m-0 px-0",
     },
     enableHiding: true,
-    },
+  },
 
-    {
+  {
     id: "reminded",
     header: ({ column }) => {
       return (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-        className="flex items-center justify-center gap-1 text-xs font-medium text-gray-700 dark:text-gray-200"
-      >
-        Reminded
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-center gap-1 text-xs font-medium text-gray-700 dark:text-gray-200"
+        >
+          Reminded
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
       );
     },
     cell: ({ row }) => {
       const applicant: NewApplicantType = row.original;
 
       return (
-      <div className="flex items-center justify-center px-2 py-1">
-        <div className="flex flex-col items-center gap-0.5">
-        <span className="inline-flex h-5 items-center justify-center rounded-full bg-gray-100 px-1 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-          {applicant.applicant?.reminded_count ?? 0}
-        </span>
-        <span className="text-[10px] text-gray-500 dark:text-gray-400">
-          {applicant.applicant?.last_reminded_date &&
-          new Date(
-            applicant.applicant.last_reminded_date,
-          ).toLocaleDateString()}
-        </span>
+        <div className="flex items-center justify-center px-2 py-1">
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="inline-flex h-5 items-center justify-center rounded-full bg-gray-100 px-1 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+              {applicant.applicant?.reminded_count ?? 0}
+            </span>
+            <span className="text-[10px] text-gray-500 dark:text-gray-400">
+              {applicant.applicant?.last_reminded_date &&
+                new Date(
+                  applicant.applicant.last_reminded_date,
+                ).toLocaleDateString()}
+            </span>
+          </div>
         </div>
-      </div>
       );
     },
     meta: {
       className: "m-0 px-0",
     },
-    },
-    {
+  },
+  {
     id: "actions",
     header: "Actions",
     cell: ({ row }) => {

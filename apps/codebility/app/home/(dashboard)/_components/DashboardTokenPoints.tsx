@@ -9,12 +9,13 @@ import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 import { CodevPoints, Level, SkillCategory } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { Zap, Target, TrendingUp, Award, Star, ArrowUp } from "lucide-react";
+import { Zap, Target, TrendingUp, Award, Star, ArrowUp, Calendar } from "lucide-react";
 
 export default function TokenPoints() {
   const { user } = useUserStore();
   const [points, setPoints] = useState<Record<string, number>>({});
   const [levels, setLevels] = useState<Record<string, number>>({});
+  const [attendancePoints, setAttendancePoints] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [supabase, setSupabase] = useState<any>(null);
@@ -78,6 +79,48 @@ export default function TokenPoints() {
         );
 
         setPoints(pointsByCategory);
+
+        // Fetch attendance points from separate table
+        const { data: attendanceData, error: attendanceError } = await supabase
+          .from("attendance_points")
+          .select("points")
+          .eq("codev_id", session.user.id)
+          .single();
+
+
+        // If no attendance points record exists, create one
+        if (attendanceError && attendanceError.code === 'PGRST116') {
+          // Count actual attendance records
+          const { data: attendanceCount, error: countError, count } = await supabase
+            .from("attendance")
+            .select("*", { count: 'exact', head: true })
+            .eq("codev_id", session.user.id)
+            .in("status", ["present", "late"]);
+          
+          const totalPoints = (count || 0) * 2;
+          
+          if (totalPoints > 0) {
+            // Create attendance points record
+            const { data: newAttendancePoints } = await supabase
+              .from("attendance_points")
+              .insert({
+                codev_id: session.user.id,
+                points: totalPoints,
+                last_updated: new Date().toISOString().split('T')[0]
+              })
+              .select()
+              .single();
+            
+            setAttendancePoints(newAttendancePoints?.points || 0);
+          } else {
+            setAttendancePoints(0);
+          }
+        } else if (!attendanceError) {
+          setAttendancePoints(attendanceData?.points || 0);
+        } else {
+          console.error("Error fetching attendance points:", attendanceError);
+          setAttendancePoints(0);
+        }
 
         // Fetch levels for all categories
         const { data: levelsData, error: levelsError } = await supabase
@@ -198,7 +241,8 @@ export default function TokenPoints() {
     return Math.min(progress, 100);
   };
 
-  const totalPoints = Object.values(points).reduce((sum, point) => sum + point, 0);
+  const totalSkillPoints = Object.values(points).reduce((sum, point) => sum + point, 0);
+  const totalPoints = totalSkillPoints + attendancePoints;
 
   return (
     <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
@@ -213,15 +257,48 @@ export default function TokenPoints() {
           </div>
           <div>
             <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent">
-              ⚡ Skill Points
+              ⚡ Points Overview
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Total: {totalPoints} points across all skills
+              Total: {totalPoints} points (Skills: {totalSkillPoints} + Attendance: {attendancePoints})
             </p>
           </div>
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
+          {/* Attendance Points Card */}
+          <div className="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 opacity-5 group-hover:opacity-10 transition-opacity" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="rounded-lg p-2 bg-gradient-to-br from-blue-500 to-cyan-500 text-white">
+                    <Calendar className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Attendance</p>
+                    <p className="text-xs text-gray-500">Consistency Points</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
+                    {attendancePoints}
+                  </p>
+                  <p className="text-xs text-gray-500">points</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Earned by marking attendance regularly
+                </p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  +2 points per day present
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Skill Points Cards */}
           {Object.entries(points).map(([category, point]) => {
             const currentLevel = levels[category] || 1;
             const progress = getProgressToNextLevel(category, point);
