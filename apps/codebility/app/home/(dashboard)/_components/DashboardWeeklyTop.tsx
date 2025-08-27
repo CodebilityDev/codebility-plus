@@ -200,6 +200,30 @@ export default function WeeklyTop() {
     }
   };
 
+  // NEW: Rank-specific lightning icon function
+  const getRankLightningIcon = (rank: number) => {
+    switch (rank) {
+      case 1:
+        // Violet lightning for rank 1 (top performer)
+        return (
+          <div title="Top Performer!">
+            <Zap className="h-4 w-4 text-violet-500 animate-bounce" />
+          </div>
+        );
+      case 2:
+      case 3:
+        // Yellow lightning for ranks 2 and 3
+        return (
+          <div title="High Achiever!">
+            <Zap className="h-4 w-4 text-yellow-500 animate-bounce" />
+          </div>
+        );
+      default:
+        // No lightning icon for ranks 4-10
+        return null;
+    }
+  };
+
   const getPointsBar = (points: number, maxPoints: number) => {
     const percentage = maxPoints > 0 ? (points / maxPoints) * 100 : 0;
     return (
@@ -231,7 +255,8 @@ export default function WeeklyTop() {
             {hasData ? (
               <div className="flex items-center gap-2">
                 <span>{data.codev?.first_name || "Unknown"}</span>
-                {i < 3 && <Zap className="h-4 w-4 text-yellow-500 animate-bounce" />}
+                {/* UPDATED: Rank-specific lightning icon logic */}
+                {getRankLightningIcon(i + 1)}
               </div>
             ) : (
               <span className="text-gray-400">-</span>

@@ -246,7 +246,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
         </Table>
 
         {/* Table for smaller screens */}
-        <div>
+        <div className="xl:hidden">
           <ApplicantMobileTable table={table} />
         </div>
 

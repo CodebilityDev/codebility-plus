@@ -183,9 +183,11 @@ const TeamLeaderDisplay = ({
 // Line 125: Enhanced Responsive Team Grid with Profile Click
 const TeamMembersGrid = ({ 
   members,
+  currentMemberIds,
   onProfileClick
 }: { 
   members: Codev[];
+  currentMemberIds: string[];
   onProfileClick?: (member: Codev) => void;
 }) => {
   const getAvatarSize = () => {
@@ -204,18 +206,26 @@ const TeamMembersGrid = ({
         <span className="text-white text-xs sm:text-sm">{members.length} members</span>
       </div>
       <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2 w-full">
-        {members.map((member) => (
-          <div key={member.id} className="w-full flex flex-col items-center">
-            <TeamMemberAvatar
-              imageUrl={member.image_url}
-              name={member.first_name}
-              position={member.display_position}
-              size={getAvatarSize()}
-              member={member}
-              onClick={onProfileClick}
-            />
-          </div>
-        ))}
+        {members.map((member) => {
+          const isNew = !currentMemberIds.includes(member.id);
+          return (
+            <div key={member.id} className="w-full flex flex-col items-center relative">
+              {isNew && (
+                <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-1 rounded-full z-10">
+                  New
+                </div>
+              )}
+              <TeamMemberAvatar
+                imageUrl={member.image_url}
+                name={member.first_name}
+                position={member.display_position}
+                size={getAvatarSize()}
+                member={member}
+                onClick={onProfileClick}
+              />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -226,11 +236,13 @@ const ProjectPreview = ({
   projectName, 
   teamLead, 
   selectedMembers,
+  currentMemberIds,
   onProfileClick
 }: { 
   projectName: string; 
   teamLead: SimpleMemberData | null;
   selectedMembers: Codev[];
+  currentMemberIds: string[];
   onProfileClick?: (member: Codev) => void;
 }) => (
   <div className="h-full flex flex-col p-1 sm:p-2 space-y-1">
@@ -269,6 +281,7 @@ const ProjectPreview = ({
     <div className="flex-1 min-h-0">
       <TeamMembersGrid 
         members={selectedMembers} 
+        currentMemberIds={currentMemberIds}
         onProfileClick={onProfileClick}
       />
     </div>
@@ -435,6 +448,12 @@ const AddMembersModal = ({
     }
   }, [isOpen, currentMembers, availableMembers]);
 
+  // Calculate newly selected members (not already in the team)
+  const newlySelectedMembers = useMemo(() => {
+    const currentMemberIds = currentMembers.map(m => m.id);
+    return selectedMembers.filter(member => !currentMemberIds.includes(member.id));
+  }, [selectedMembers, currentMembers]);
+
   // Line 253: Member selection logic
   const toggleMember = (member: Codev) => {
     setSelectedMembers(prev => {
@@ -446,20 +465,26 @@ const AddMembersModal = ({
   };
 
   const isSelected = (userId: string) => selectedMembers.some(m => m.id === userId);
+  const isCurrentMember = (userId: string) => currentMembers.some(m => m.id === userId);
 
-  // Line 264: Filter available members
+  // Line 264: Filter available members - Optimize with better filtering
   const filteredUsers = useMemo(() => {
     if (!availableMembers.length) return [];
+    
+    const searchLower = searchQuery.toLowerCase().trim();
     
     return availableMembers.filter(user => {
       if (!user?.id || !user?.first_name || !user?.last_name) return false;
       
       const isTeamLead = teamLeadData?.id === user.id;
-      const matchesSearch = !searchQuery.trim() || 
-        `${user.first_name} ${user.last_name}`.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        user.display_position?.toLowerCase().includes(searchQuery.toLowerCase());
+      if (isTeamLead) return false;
       
-      return !isTeamLead && matchesSearch;
+      if (!searchLower) return true;
+      
+      const fullName = `${user.first_name} ${user.last_name}`.toLowerCase();
+      const position = user.display_position?.toLowerCase() || '';
+      
+      return fullName.includes(searchLower) || position.includes(searchLower);
     });
   }, [availableMembers, teamLeadData, searchQuery]);
 
@@ -534,6 +559,7 @@ const AddMembersModal = ({
               projectName={project.name}
               teamLead={teamLeadData}
               selectedMembers={selectedMembers}
+              currentMemberIds={currentMembers.map(m => m.id)}
               onProfileClick={handleProfileClick}
             />
           </div>
@@ -543,7 +569,7 @@ const AddMembersModal = ({
             <div className="flex-shrink-0 px-3 sm:px-6 pt-3 sm:pt-6 pb-4">
               <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
                 <Users className="h-4 w-4 sm:h-5 sm:w-5 text-customBlue-400" />
-                <span className="truncate">Team Members ({selectedMembers.length} selected)</span>
+                <span className="truncate">Available Members ({newlySelectedMembers.length} new selected)</span>
               </h3>
               
               <div className="relative mb-3 sm:mb-4">
@@ -565,11 +591,11 @@ const AddMembersModal = ({
                     Loading members...
                   </div>
                 ) : filteredUsers.length > 0 ? (
-                  filteredUsers.map((user) => (
+                  filteredUsers.slice(0, 50).map((user) => (
                     <div
                       key={user.id}
                       onClick={() => toggleMember(user)}
-                      className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 ${
+                      className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-colors ${
                         isSelected(user.id) 
                           ? 'bg-gray-700/50 ring-1 ring-customBlue-500' 
                           : 'hover:bg-gray-700/30'
@@ -607,6 +633,9 @@ const AddMembersModal = ({
                       <div className="flex-1 min-w-0">
                         <div className="text-white font-semibold text-sm sm:text-base truncate">
                           {user.first_name} {user.last_name}
+                          {isCurrentMember(user.id) && (
+                            <span className="ml-2 text-xs text-gray-400">(Current member)</span>
+                          )}
                         </div>
                         {user.display_position && (
                           <div className="text-gray-300 text-xs sm:text-sm truncate">

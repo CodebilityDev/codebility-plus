@@ -1,5 +1,6 @@
 "use client";
 
+import { resourceLimits } from "worker_threads";
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -22,6 +23,7 @@ import {
 } from "@/components/ui/select";
 import { useModal } from "@/hooks/use-modal";
 import { useUserStore } from "@/store/codev-store";
+import { useKanbanStore } from "@/store/kanban-store";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { set } from "date-fns";
@@ -74,6 +76,8 @@ const TaskViewModal = ({
   const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
   const [prLink, setPrLink] = useState(task?.pr_link || "");
 
+  const { fetchBoardData } = useKanbanStore();
+
   //  handle PR link update
   const handleUpdate = async () => {
     if (!task) return;
@@ -119,8 +123,8 @@ const TaskViewModal = ({
         // ✅ Close modal before refreshing
         onClose();
 
-        //remove refreshing the page, should be handled in action and on should revalidate
-        /*  window.location.href = window.location.pathname + "?t=" + Date.now(); */
+        // Refetch the board data
+        await fetchBoardData();
       } else {
         toast.error(result.error || "Failed to complete task");
       }
