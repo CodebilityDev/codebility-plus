@@ -220,7 +220,7 @@ const LeftSidebar = () => {
                           alt=""
                           width={28}
                           height={28}
-                          className={`${isActive ? "" : "invert-colors"} h-full w-full`}
+                          className={`${isActive ? "" : "brightness-0 dark:brightness-100"} h-full w-full`}
                           aria-hidden="true"
                         />
                       </div>

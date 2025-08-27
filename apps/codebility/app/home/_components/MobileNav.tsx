@@ -93,7 +93,7 @@ const NavContent = () => {
                         alt=""
                         width={20}
                         height={20}
-                        className={`${isActive ? "" : "invert-colors"} h-5 w-5 object-contain`}
+                        className={`${isActive ? "" : "brightness-0 dark:brightness-100"} h-5 w-5 object-contain`}
                         aria-hidden="true"
                       />
                       <span
@@ -131,7 +131,7 @@ const MobileNav = () => {
             width={20}
             height={20}
             alt=""
-            className="invert-colors"
+            className="invert dark:invert-0"
             aria-hidden="true"
           />
           <span className="sr-only">Open mobile navigation menu</span>
