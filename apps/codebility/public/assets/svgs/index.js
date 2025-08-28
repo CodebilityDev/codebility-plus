@@ -13,7 +13,6 @@ export { default as IconArchive } from "./icon-archive.svg";
 export { default as IconArrowRight } from "./icon-arrow-right.svg";
 export { default as IconArrow225 } from "./icon-arrow225.svg";
 export { default as IconAWS } from "./icon-aws.svg";
-export { default as IconBag } from "./icon-bag.svg";
 export { default as IconBack } from "./icon-back.svg";
 export { default as IconBell } from "./icon-bell.svg";
 export { default as IconBootstrap } from "./icon-bootstrap.svg";
