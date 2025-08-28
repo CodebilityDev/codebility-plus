@@ -93,7 +93,7 @@ const NavContent = () => {
                         alt=""
                         width={20}
                         height={20}
-                        className={`${isActive ? "" : "brightness-0 dark:brightness-100"} h-5 w-5 object-contain`}
+                        className={`${isActive ? "brightness-0 invert" : "brightness-0"} h-5 w-5 object-contain`}
                         aria-hidden="true"
                       />
                       <span
