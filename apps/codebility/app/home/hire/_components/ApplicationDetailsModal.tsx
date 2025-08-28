@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Mail, 
-  Phone, 
-  Linkedin, 
-  Globe, 
-  FileText, 
-  Calendar, 
+import {
+  Mail,
+  Phone,
+  Linkedin,
+  Globe,
+  FileText,
+  Calendar,
   User,
   Briefcase,
   Download,
@@ -39,11 +39,11 @@ interface ApplicationDetailsModalProps {
   onStatusChange?: (applicationId: string, status: string) => void;
 }
 
-export default function ApplicationDetailsModal({ 
-  application, 
-  isOpen, 
+export default function ApplicationDetailsModal({
+  application,
+  isOpen,
   onClose,
-  onStatusChange 
+  onStatusChange
 }: ApplicationDetailsModalProps) {
   const { toast } = useToast();
   const [status, setStatus] = useState(application?.status || "pending");
@@ -74,14 +74,14 @@ export default function ApplicationDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto bg-gray-900 border-gray-800">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto overflow-x-hidden bg-gray-900 border-gray-800">
         <DialogHeader>
           <DialogTitle className="text-2xl font-light text-white">
             Application Details
           </DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-6 py-4">
+        <div className="space-y-6 py-4 min-w-0">
           {/* Applicant Header */}
           <div className="flex items-start justify-between">
             <div>
@@ -197,10 +197,10 @@ export default function ApplicationDetailsModal({
           {/* Cover Letter */}
           <div className="rounded-lg border border-gray-800 p-4">
             <h3 className="mb-3 flex items-center gap-2 text-lg font-medium text-white">
-              <FileText className="h-5 w-5" />
+              <FileText className="h-5 w-5 flex-shrink-0" />
               Cover Letter
             </h3>
-            <p className="text-gray-300 whitespace-pre-wrap">
+            <p className="text-gray-300 whitespace-pre-wrap break-words">
               {application.cover_letter}
             </p>
           </div>

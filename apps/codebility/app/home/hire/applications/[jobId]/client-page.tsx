@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Phone, Linkedin, Globe, FileText, Calendar, User, Github } from "lucide-react";
+import { Mail, Phone, Linkedin, Globe, FileText, Calendar, User, Github, Trash2, Download, MoreVertical } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@codevs/ui/badge";
 import {
@@ -16,7 +16,8 @@ import { useToast } from "@/components/ui/use-toast";
 import ApplicationDetailsModal from "../../_components/ApplicationDetailsModal";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import { H1 } from "@/components/shared/dashboard";
-import { updateApplicationStatus } from "../../actions";
+import { deleteJobApplication, updateApplicationStatus } from "../../actions";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 
 interface JobApplication {
   id: string;
@@ -49,12 +50,14 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
   const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
+
+
   const handleStatusChange = async (applicationId: string, newStatus: string) => {
     const result = await updateApplicationStatus(
-      applicationId, 
+      applicationId,
       newStatus as 'pending' | 'reviewing' | 'shortlisted' | 'rejected' | 'hired'
     );
-    
+
     if (result.success) {
       toast({
         title: "Status Updated",
@@ -89,6 +92,25 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
     { label: jobTitle },
   ];
 
+  const handleDeleteApplication = async (applicationId: string) => {
+    const result = await deleteJobApplication(applicationId, jobId);
+    if (result.success) {
+      toast({
+        title: `Application Deleted: ${applicationId}`,
+        description: "The application has been successfully removed",
+      });
+      setSelectedApplication(null);
+      setIsDetailsModalOpen(false);
+    } else {
+      toast({
+        title: "Error",
+        description: result.error || "Failed to delete application",
+        variant: "destructive",
+      });
+    }
+  };
+
+
   return (
     <div className="container mx-auto max-w-7xl p-6">
       <div className="mb-6">
@@ -102,154 +124,174 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
         </p>
       </div>
 
-        {/* Applications Table */}
-        <div className="overflow-x-auto rounded-lg border border-gray-800 bg-gray-900/50">
-          <table className="w-full">
-            <thead className="border-b border-gray-800">
-              <tr className="text-left">
-                <th className="px-4 py-3 text-sm font-medium text-gray-300">Applicant</th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-300">Contact</th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-300">Applied</th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-300">Status</th>
-                <th className="px-4 py-3 text-sm font-medium text-gray-300 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-800">
-              {applications.map((application) => (
-                <tr key={application.id} className="hover:bg-gray-900/70">
-                  <td className="px-4 py-3">
-                    <div>
-                      <p className="font-medium text-white">
-                        {application.first_name} {application.last_name}
-                      </p>
-                      <div className="mt-1 flex items-center gap-3">
-                        {application.years_of_experience !== undefined && (
-                          <span className="text-xs text-gray-400">
-                            {application.years_of_experience} years exp
-                          </span>
-                        )}
-                        {application.linkedin && (
-                          <a
-                            href={application.linkedin}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
-                          >
-                            <Linkedin className="h-3 w-3" />
-                          </a>
-                        )}
-                        {application.github && (
-                          <a
-                            href={application.github}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
-                          >
-                            <Github className="h-3 w-3" />
-                          </a>
-                        )}
-                        {application.portfolio && (
-                          <a
-                            href={application.portfolio}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
-                          >
-                            <Globe className="h-3 w-3" />
-                          </a>
-                        )}
-                      </div>
-                      {application.notes && (
-                        <p className="mt-1 text-xs text-gray-500">
-                          {application.notes}
-                        </p>
+      {/* Applications Table */}
+      <div className="overflow-x-auto rounded-lg border border-gray-800 bg-gray-900/50">
+        <table className="w-full">
+          <thead className="border-b border-gray-800">
+            <tr className="text-left">
+              <th className="px-4 py-3 text-sm font-medium text-gray-300">Applicant</th>
+              <th className="px-4 py-3 text-sm font-medium text-gray-300">Contact</th>
+              <th className="px-4 py-3 text-sm font-medium text-gray-300">Applied</th>
+              <th className="px-4 py-3 text-sm font-medium text-gray-300">Status</th>
+              <th className="px-4 py-3 text-sm font-medium text-gray-300 text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-800">
+            {applications.map((application) => (
+              <tr key={application.id} className="hover:bg-gray-900/70">
+                <td className="px-4 py-3">
+                  <div>
+                    <p className="font-medium text-white">
+                      {application.first_name} {application.last_name}
+                    </p>
+                    <div className="mt-1 flex items-center gap-3">
+                      {application.years_of_experience !== undefined && (
+                        <span className="text-xs text-gray-400">
+                          {application.years_of_experience} years exp
+                        </span>
+                      )}
+                      {application.linkedin && (
+                        <a
+                          href={application.linkedin}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
+                        >
+                          <Linkedin className="h-3 w-3" />
+                        </a>
+                      )}
+                      {application.github && (
+                        <a
+                          href={application.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
+                        >
+                          <Github className="h-3 w-3" />
+                        </a>
+                      )}
+                      {application.portfolio && (
+                        <a
+                          href={application.portfolio}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
+                        >
+                          <Globe className="h-3 w-3" />
+                        </a>
                       )}
                     </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="space-y-1">
-                      <a
-                        href={`mailto:${application.email}`}
-                        className="flex items-center gap-1 text-xs text-gray-400 hover:text-white"
-                      >
-                        <Mail className="h-3 w-3" />
-                        {application.email}
-                      </a>
-                      <div className="flex items-center gap-1 text-xs text-gray-400">
-                        <Phone className="h-3 w-3" />
-                        {application.phone}
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3">
-                    <span className="text-xs text-gray-400">
-                      {new Date(application.applied_at).toLocaleDateString()}
-                    </span>
-                  </td>
-                  <td className="px-4 py-3">
-                    <Select
-                      defaultValue={application.status}
-                      onValueChange={(value) => handleStatusChange(application.id, value)}
+                    {application.notes && (
+                      <p className="mt-1 text-xs text-gray-500">
+                        {application.notes}
+                      </p>
+                    )}
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <div className="space-y-1">
+                    <a
+                      href={`mailto:${application.email}`}
+                      className="flex items-center gap-1 text-xs text-gray-400 hover:text-white"
                     >
-                      <SelectTrigger className="h-8 w-[120px] bg-gray-800 border-gray-700 text-xs text-white">
-                        <SelectValue className="text-white" />
-                      </SelectTrigger>
-                      <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                        <SelectItem value="pending" className="text-gray-300 hover:text-white">Pending</SelectItem>
-                        <SelectItem value="reviewing" className="text-gray-300 hover:text-white">Reviewing</SelectItem>
-                        <SelectItem value="shortlisted" className="text-gray-300 hover:text-white">Shortlisted</SelectItem>
-                        <SelectItem value="rejected" className="text-gray-300 hover:text-white">Rejected</SelectItem>
-                        <SelectItem value="hired" className="text-gray-300 hover:text-white">Hired</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </td>
-                  <td className="px-4 py-3 text-right">
-                    <div className="inline-flex gap-2">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => {
-                          setSelectedApplication(application);
-                          setIsDetailsModalOpen(true);
-                        }}
-                        className="h-8 text-xs text-gray-400 hover:text-white"
-                      >
-                        View Details
-                      </Button>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={async () => {
-                          if (application.resume_url) {
-                            // If it's a full URL, open directly
-                            if (application.resume_url.startsWith('http')) {
-                              window.open(application.resume_url, '_blank');
-                            } else {
-                              // Otherwise, construct the Supabase storage URL
-                              const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                              const resumeUrl = `${supabaseUrl}/storage/v1/object/public/resumes/${application.resume_url}`;
-                              window.open(resumeUrl, '_blank');
-                            }
-                          } else {
-                            toast({
-                              title: "No Resume",
-                              description: "This applicant hasn't uploaded a resume",
-                            });
-                          }
-                        }}
-                        disabled={!application.resume_url}
-                        className="h-8 text-xs text-gray-400 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
-                        title={application.resume_url ? "Download Resume" : "No Resume Available"}
-                      >
-                        <FileText className="h-3 w-3" />
-                      </Button>
+                      <Mail className="h-3 w-3" />
+                      {application.email}
+                    </a>
+                    <div className="flex items-center gap-1 text-xs text-gray-400">
+                      <Phone className="h-3 w-3" />
+                      {application.phone}
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+                  </div>
+                </td>
+                <td className="px-4 py-3">
+                  <span className="text-xs text-gray-400">
+                    {new Date(application.applied_at).toLocaleDateString()}
+                  </span>
+                </td>
+                <td className="px-4 py-3">
+                  <Select
+                    defaultValue={application.status}
+                    onValueChange={(value) => handleStatusChange(application.id, value)}
+                  >
+                    <SelectTrigger className="h-8 w-[120px] bg-gray-800 border-gray-700 text-xs text-white">
+                      <SelectValue className="text-white" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-800 border-gray-700 text-white">
+                      <SelectItem value="pending" className="text-gray-300 hover:text-white">Pending</SelectItem>
+                      <SelectItem value="reviewing" className="text-gray-300 hover:text-white">Reviewing</SelectItem>
+                      <SelectItem value="shortlisted" className="text-gray-300 hover:text-white">Shortlisted</SelectItem>
+                      <SelectItem value="rejected" className="text-gray-300 hover:text-white">Rejected</SelectItem>
+                      <SelectItem value="hired" className="text-gray-300 hover:text-white">Hired</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </td>
+                <td className="px-4 py-3 text-right">
+                  <div className="inline-flex gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => {
+                        setSelectedApplication(application);
+                        setIsDetailsModalOpen(true);
+                      }}
+                      className="h-8 text-xs text-gray-400 hover:text-white"
+                    >
+                      View Details
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-8 text-xs text-gray-400 hover:text-white"
+                          title="Resume options"
+                        >
+                          <MoreVertical className="h-4 w-4 flex-shrink-0" />
+                          <span className="sr-only">Open resume menu</span>
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="bg-gray-900 border-gray-800">
+                        <DropdownMenuItem
+                          onClick={async () => {
+                            if (application.resume_url) {
+                              // If it's a full URL, open directly
+                              if (application.resume_url.startsWith('http')) {
+                                window.open(application.resume_url, '_blank');
+                              } else {
+                                // Otherwise, construct the Supabase storage URL
+                                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                                const resumeUrl = `${supabaseUrl}/storage/v1/object/public/resumes/${application.resume_url}`;
+                                window.open(resumeUrl, '_blank');
+                              }
+                            } else {
+                              toast({
+                                title: "No Resume",
+                                description: "This applicant hasn't uploaded a resume",
+                              });
+                            }
+                          }}
+                          className="text-gray-300 hover:text-white hover:bg-gray-800"
+                        >
+                          <Download className="mr-2 h-4 w-4" />
+                          Download Resume
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                          onClick={() => handleDeleteApplication(application.id)}
+                          className="text-red-400 hover:text-red-300 hover:bg-gray-800"
+                        >
+                          <Trash2 className="mr-2 h-4 w-4" />
+                          Delete Application
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                    <FileText className="h-3 w-3" />
+                  </div>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {applications.length === 0 && (
         <div className="flex flex-col items-center justify-center rounded-lg border border-gray-800 bg-gray-900/50 py-16">
