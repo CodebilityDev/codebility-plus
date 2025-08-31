@@ -2,11 +2,11 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { 
-  MoreVertical, 
-  Edit, 
-  Trash2, 
-  Eye, 
+import {
+  MoreVertical,
+  Edit,
+  Trash2,
+  Eye,
   Users,
   Calendar,
   MapPin,
@@ -61,7 +61,7 @@ export default function JobListingsTable() {
     try {
       setLoading(true);
       const supabase = createClientClientComponent();
-      
+
       // Fetch job listings with creator details
       const { data: jobsData, error: jobsError } = await supabase
         .from('job_listings')
@@ -93,7 +93,7 @@ export default function JobListingsTable() {
             .from('job_applications')
             .select('*', { count: 'exact', head: true })
             .eq('job_id', job.id);
-          
+
           return {
             ...job,
             application_count: count || 0,
@@ -123,7 +123,7 @@ export default function JobListingsTable() {
     if (confirm("Are you sure you want to delete this job listing? This action cannot be undone.")) {
       try {
         const supabase = createClientClientComponent();
-        
+
         const { error } = await supabase
           .from('job_listings')
           .delete()
@@ -132,10 +132,10 @@ export default function JobListingsTable() {
         if (error) {
           throw error;
         }
-        
+
         // Remove from local state
         setJobs(prevJobs => prevJobs.filter(job => job.id !== jobId));
-        
+
         toast({
           title: "Job Deleted",
           description: "The job listing has been permanently removed.",
@@ -164,7 +164,7 @@ export default function JobListingsTable() {
   const handleJobUpdated = () => {
     // Refetch the jobs from the database
     fetchJobListings();
-    
+
     toast({
       title: "Job Updated",
       description: "The job listing has been updated successfully.",
@@ -312,9 +312,9 @@ export default function JobListingsTable() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="h-8 w-8 text-gray-400 hover:text-white"
+                        className="group h-8 w-8 text-gray-400 hover:text-white"
                       >
-                        <MoreVertical className="h-4 w-4" />
+                        <MoreVertical className="h-4 w-4 flex-shrink-0" />
                         <span className="sr-only">Open menu</span>
                       </Button>
                     </DropdownMenuTrigger>
@@ -341,7 +341,7 @@ export default function JobListingsTable() {
           ))}
         </TableBody>
       </Table>
-      
+
       {/* Edit Job Modal */}
       <EditJobModal
         job={editingJob}
