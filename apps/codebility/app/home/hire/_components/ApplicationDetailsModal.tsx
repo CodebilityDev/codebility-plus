@@ -212,6 +212,19 @@ export default function ApplicationDetailsModal({
               <Button
                 variant="outline"
                 className="border-gray-700 bg-gray-800 text-white hover:bg-gray-700"
+                onClick={async () => {
+                  if (application.resume_url) {
+                    // Construct the Supabase storage URL
+                    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                    const resumeUrl = `${supabaseUrl}/storage/v1/object/public/codebility/${application.resume_url}`;
+                    window.open(resumeUrl, "_blank");
+                  } else {
+                    toast({
+                      title: "No Resume",
+                      description: "This applicant hasn't uploaded a resume",
+                    });
+                  }
+                }}
               >
                 <Download className="mr-2 h-4 w-4" />
                 Download Resume
