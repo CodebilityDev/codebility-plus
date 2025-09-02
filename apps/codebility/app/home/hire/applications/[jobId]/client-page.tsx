@@ -2,9 +2,31 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Mail, Phone, Linkedin, Globe, FileText, Calendar, User, Github, Trash2, Download, MoreVertical } from "lucide-react";
+import { H1 } from "@/components/shared/dashboard";
+import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/ui/use-toast";
+import {
+  Calendar,
+  Download,
+  FileText,
+  Github,
+  Globe,
+  Linkedin,
+  Mail,
+  MoreVertical,
+  Phone,
+  Trash2,
+  User,
+} from "lucide-react";
+
 import { Badge } from "@codevs/ui/badge";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@codevs/ui/dropdown-menu";
 import {
   Select,
   SelectContent,
@@ -12,12 +34,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
-import { useToast } from "@/components/ui/use-toast";
+
 import ApplicationDetailsModal from "../../_components/ApplicationDetailsModal";
-import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
-import { H1 } from "@/components/shared/dashboard";
 import { deleteJobApplication, updateApplicationStatus } from "../../actions";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@codevs/ui/dropdown-menu";
 
 interface JobApplication {
   id: string;
@@ -34,7 +53,7 @@ interface JobApplication {
   experience?: string;
   resume_url?: string;
   applied_at: string;
-  status: 'pending' | 'reviewing' | 'shortlisted' | 'rejected' | 'hired';
+  status: "pending" | "reviewing" | "shortlisted" | "rejected" | "hired";
   notes?: string;
 }
 
@@ -44,18 +63,29 @@ interface JobApplicationsClientProps {
   applications: JobApplication[];
 }
 
-export default function JobApplicationsClient({ jobId, jobTitle, applications }: JobApplicationsClientProps) {
+export default function JobApplicationsClient({
+  jobId,
+  jobTitle,
+  applications,
+}: JobApplicationsClientProps) {
   const router = useRouter();
   const { toast } = useToast();
-  const [selectedApplication, setSelectedApplication] = useState<JobApplication | null>(null);
+  const [selectedApplication, setSelectedApplication] =
+    useState<JobApplication | null>(null);
   const [isDetailsModalOpen, setIsDetailsModalOpen] = useState(false);
 
-
-
-  const handleStatusChange = async (applicationId: string, newStatus: string) => {
+  const handleStatusChange = async (
+    applicationId: string,
+    newStatus: string,
+  ) => {
     const result = await updateApplicationStatus(
       applicationId,
-      newStatus as 'pending' | 'reviewing' | 'shortlisted' | 'rejected' | 'hired'
+      newStatus as
+        | "pending"
+        | "reviewing"
+        | "shortlisted"
+        | "rejected"
+        | "hired",
     );
 
     if (result.success) {
@@ -75,15 +105,35 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
 
   const getStatusBadge = (status: string) => {
     const statusConfig = {
-      pending: { color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20", label: "Pending" },
-      reviewing: { color: "bg-blue-500/10 text-blue-400 border-blue-500/20", label: "Reviewing" },
-      shortlisted: { color: "bg-green-500/10 text-green-400 border-green-500/20", label: "Shortlisted" },
-      rejected: { color: "bg-red-500/10 text-red-400 border-red-500/20", label: "Rejected" },
-      hired: { color: "bg-purple-500/10 text-purple-400 border-purple-500/20", label: "Hired" },
+      pending: {
+        color: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
+        label: "Pending",
+      },
+      reviewing: {
+        color: "bg-blue-500/10 text-blue-400 border-blue-500/20",
+        label: "Reviewing",
+      },
+      shortlisted: {
+        color: "bg-green-500/10 text-green-400 border-green-500/20",
+        label: "Shortlisted",
+      },
+      rejected: {
+        color: "bg-red-500/10 text-red-400 border-red-500/20",
+        label: "Rejected",
+      },
+      hired: {
+        color: "bg-purple-500/10 text-purple-400 border-purple-500/20",
+        label: "Hired",
+      },
     };
 
-    const config = statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
-    return <Badge variant="outline" className={config.color}>{config.label}</Badge>;
+    const config =
+      statusConfig[status as keyof typeof statusConfig] || statusConfig.pending;
+    return (
+      <Badge variant="outline" className={config.color}>
+        {config.label}
+      </Badge>
+    );
   };
 
   const breadcrumbItems = [
@@ -110,7 +160,6 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
     }
   };
 
-
   return (
     <div className="container mx-auto max-w-7xl p-6">
       <div className="mb-6">
@@ -120,7 +169,8 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
       <div className="mb-8">
         <H1>Applications for {jobTitle}</H1>
         <p className="mt-2 text-gray-400">
-          {applications.length} applicant{applications.length !== 1 ? 's' : ''} found
+          {applications.length} applicant{applications.length !== 1 ? "s" : ""}{" "}
+          found
         </p>
       </div>
 
@@ -129,11 +179,21 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
         <table className="w-full">
           <thead className="border-b border-gray-800">
             <tr className="text-left">
-              <th className="px-4 py-3 text-sm font-medium text-gray-300">Applicant</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-300">Contact</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-300">Applied</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-300">Status</th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-300 text-right">Actions</th>
+              <th className="px-4 py-3 text-sm font-medium text-gray-300">
+                Applicant
+              </th>
+              <th className="px-4 py-3 text-sm font-medium text-gray-300">
+                Contact
+              </th>
+              <th className="px-4 py-3 text-sm font-medium text-gray-300">
+                Applied
+              </th>
+              <th className="px-4 py-3 text-sm font-medium text-gray-300">
+                Status
+              </th>
+              <th className="px-4 py-3 text-right text-sm font-medium text-gray-300">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-800">
@@ -155,7 +215,7 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
                           href={application.linkedin}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
+                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-white"
                         >
                           <Linkedin className="h-3 w-3" />
                         </a>
@@ -165,7 +225,7 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
                           href={application.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
+                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-white"
                         >
                           <Github className="h-3 w-3" />
                         </a>
@@ -175,7 +235,7 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
                           href={application.portfolio}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="text-xs text-gray-400 hover:text-white flex items-center gap-1"
+                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-white"
                         >
                           <Globe className="h-3 w-3" />
                         </a>
@@ -211,17 +271,44 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
                 <td className="px-4 py-3">
                   <Select
                     defaultValue={application.status}
-                    onValueChange={(value) => handleStatusChange(application.id, value)}
+                    onValueChange={(value) =>
+                      handleStatusChange(application.id, value)
+                    }
                   >
-                    <SelectTrigger className="h-8 w-[120px] bg-gray-800 border-gray-700 text-xs text-white">
+                    <SelectTrigger className="h-8 w-[120px] border-gray-700 bg-gray-800 text-xs text-white">
                       <SelectValue className="text-white" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                      <SelectItem value="pending" className="text-gray-300 hover:text-white">Pending</SelectItem>
-                      <SelectItem value="reviewing" className="text-gray-300 hover:text-white">Reviewing</SelectItem>
-                      <SelectItem value="shortlisted" className="text-gray-300 hover:text-white">Shortlisted</SelectItem>
-                      <SelectItem value="rejected" className="text-gray-300 hover:text-white">Rejected</SelectItem>
-                      <SelectItem value="hired" className="text-gray-300 hover:text-white">Hired</SelectItem>
+                    <SelectContent className="border-gray-700 bg-gray-800 text-white">
+                      <SelectItem
+                        value="pending"
+                        className="text-gray-300 hover:text-white"
+                      >
+                        Pending
+                      </SelectItem>
+                      <SelectItem
+                        value="reviewing"
+                        className="text-gray-300 hover:text-white"
+                      >
+                        Reviewing
+                      </SelectItem>
+                      <SelectItem
+                        value="shortlisted"
+                        className="text-gray-300 hover:text-white"
+                      >
+                        Shortlisted
+                      </SelectItem>
+                      <SelectItem
+                        value="rejected"
+                        className="text-gray-300 hover:text-white"
+                      >
+                        Rejected
+                      </SelectItem>
+                      <SelectItem
+                        value="hired"
+                        className="text-gray-300 hover:text-white"
+                      >
+                        Hired
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </td>
@@ -250,34 +337,40 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
                           <span className="sr-only">Open resume menu</span>
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="bg-gray-900 border-gray-800">
+                      <DropdownMenuContent
+                        align="end"
+                        className="border-gray-800 bg-gray-900"
+                      >
                         <DropdownMenuItem
                           onClick={async () => {
                             if (application.resume_url) {
                               // If it's a full URL, open directly
-                              if (application.resume_url.startsWith('http')) {
+                              /*  if (application.resume_url.startsWith('http')) {
                                 window.open(application.resume_url, '_blank');
-                              } else {
-                                // Otherwise, construct the Supabase storage URL
-                                const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-                                const resumeUrl = `${supabaseUrl}/storage/v1/object/public/resumes/${application.resume_url}`;
-                                window.open(resumeUrl, '_blank');
-                              }
+                              } else { */
+                              // Otherwise, construct the Supabase storage URL
+                              const supabaseUrl =
+                                process.env.NEXT_PUBLIC_SUPABASE_URL;
+                              const resumeUrl = `${supabaseUrl}/storage/v1/object/public/codebility/${application.resume_url}`;
+                              window.open(resumeUrl, "_blank");
                             } else {
                               toast({
                                 title: "No Resume",
-                                description: "This applicant hasn't uploaded a resume",
+                                description:
+                                  "This applicant hasn't uploaded a resume",
                               });
                             }
                           }}
-                          className="text-gray-300 hover:text-white hover:bg-gray-800"
+                          className="text-gray-300 hover:bg-gray-800 hover:text-white"
                         >
                           <Download className="mr-2 h-4 w-4" />
                           Download Resume
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDeleteApplication(application.id)}
-                          className="text-red-400 hover:text-red-300 hover:bg-gray-800"
+                          onClick={() =>
+                            handleDeleteApplication(application.id)
+                          }
+                          className="text-red-400 hover:bg-gray-800 hover:text-red-300"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete Application
@@ -298,7 +391,8 @@ export default function JobApplicationsClient({ jobId, jobTitle, applications }:
           <User className="mb-4 h-12 w-12 text-gray-600" />
           <p className="text-lg text-gray-400">No applications yet</p>
           <p className="mt-2 text-sm text-gray-500">
-            Applications will appear here when candidates apply for this position
+            Applications will appear here when candidates apply for this
+            position
           </p>
         </div>
       )}
