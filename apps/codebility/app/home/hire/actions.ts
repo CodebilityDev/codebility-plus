@@ -35,11 +35,11 @@ interface JobApplication {
 
 export async function createJobListing(jobData: JobListing) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return { success: false, error: "Unauthorized" };
     }
@@ -61,7 +61,7 @@ export async function createJobListing(jobData: JobListing) {
 
     revalidatePath("/home/hire");
     revalidatePath("/careers");
-    
+
     return { success: true, data };
   } catch (error) {
     console.error("Error in createJobListing:", error);
@@ -71,7 +71,7 @@ export async function createJobListing(jobData: JobListing) {
 
 export async function updateJobListing(id: string, jobData: Partial<JobListing>) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     const { data, error } = await supabase
       .from("job_listings")
@@ -90,7 +90,7 @@ export async function updateJobListing(id: string, jobData: Partial<JobListing>)
 
     revalidatePath("/home/hire");
     revalidatePath("/careers");
-    
+
     return { success: true, data };
   } catch (error) {
     console.error("Error in updateJobListing:", error);
@@ -100,7 +100,7 @@ export async function updateJobListing(id: string, jobData: Partial<JobListing>)
 
 export async function deleteJobListing(id: string) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     const { error } = await supabase
       .from("job_listings")
@@ -114,7 +114,7 @@ export async function deleteJobListing(id: string) {
 
     revalidatePath("/home/hire");
     revalidatePath("/careers");
-    
+
     return { success: true };
   } catch (error) {
     console.error("Error in deleteJobListing:", error);
@@ -124,7 +124,7 @@ export async function deleteJobListing(id: string) {
 
 export async function getJobListings(status: 'active' | 'closed' | 'draft' = 'active') {
   const supabase = await createClientServerComponent();
-  
+
   try {
     const { data, error } = await supabase
       .from("job_listings")
@@ -149,7 +149,7 @@ export async function getJobListings(status: 'active' | 'closed' | 'draft' = 'ac
 
 export async function getJobApplications(jobId: string) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     const { data, error } = await supabase
       .from("job_applications")
@@ -169,9 +169,34 @@ export async function getJobApplications(jobId: string) {
   }
 }
 
+
+export async function deleteJobApplication(applicationId: string, jobId: string) {
+  const supabase = await createClientServerComponent();
+  try {
+
+    const { data, error } = await supabase
+      .from("job_applications")
+      .delete()
+      .eq("id", applicationId);
+
+    if (error) {
+      console.error("Error deleting job application:", error);
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath(`/home/hire/applications/${jobId}`);
+    return { success: true };
+  } catch (error) {
+    console.error("Error in deleteJobApplication:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+
+
 export async function submitJobApplication(applicationData: JobApplication) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     const { data, error } = await supabase
       .from("job_applications")
@@ -185,7 +210,7 @@ export async function submitJobApplication(applicationData: JobApplication) {
     }
 
     revalidatePath(`/home/hire/applications/${applicationData.job_id}`);
-    
+
     return { success: true, data };
   } catch (error) {
     console.error("Error in submitJobApplication:", error);
@@ -194,14 +219,14 @@ export async function submitJobApplication(applicationData: JobApplication) {
 }
 
 export async function updateApplicationStatus(
-  applicationId: string, 
+  applicationId: string,
   status: 'pending' | 'reviewing' | 'shortlisted' | 'rejected' | 'hired'
 ) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     const { data: { user } } = await supabase.auth.getUser();
-    
+
     if (!user) {
       return { success: false, error: "Unauthorized" };
     }
@@ -224,7 +249,7 @@ export async function updateApplicationStatus(
     }
 
     revalidatePath("/home/hire");
-    
+
     return { success: true, data };
   } catch (error) {
     console.error("Error in updateApplicationStatus:", error);
