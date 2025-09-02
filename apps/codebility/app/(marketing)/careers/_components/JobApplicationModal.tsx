@@ -1,23 +1,25 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { X, Upload, Loader2 } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import Input from "@/components/ui/forms/input";
+import { useToast } from "@/components/ui/use-toast";
+import { createClientClientComponent } from "@/utils/supabase/client";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { Loader2, Upload, X } from "lucide-react";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+
 import { Label } from "@codevs/ui/label";
 import { Textarea } from "@codevs/ui/textarea";
-import { useToast } from "@/components/ui/use-toast";
+
 import { JobListing } from "../_types/job-listings";
-import { createClientClientComponent } from "@/utils/supabase/client";
 
 const applicationSchema = z.object({
   firstName: z.string().min(2, "First name must be at least 2 characters"),
@@ -26,9 +28,15 @@ const applicationSchema = z.object({
   phone: z.string().min(10, "Phone number must be at least 10 digits"),
   linkedIn: z.string().url("Invalid LinkedIn URL").optional().or(z.literal("")),
   github: z.string().url("Invalid GitHub URL").optional().or(z.literal("")),
-  portfolio: z.string().url("Invalid portfolio URL").optional().or(z.literal("")),
+  portfolio: z
+    .string()
+    .url("Invalid portfolio URL")
+    .optional()
+    .or(z.literal("")),
   yearsOfExperience: z.string().min(1, "Years of experience is required"),
-  coverLetter: z.string().min(50, "Cover letter must be at least 50 characters"),
+  coverLetter: z
+    .string()
+    .min(50, "Cover letter must be at least 50 characters"),
   experience: z.string().min(20, "Please describe your relevant experience"),
   referredBy: z.string().optional(),
   resume: z.any().optional(),
@@ -61,7 +69,6 @@ export default function JobApplicationModal({
     resolver: zodResolver(applicationSchema),
   });
 
-
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
@@ -81,61 +88,61 @@ export default function JobApplicationModal({
     if (!job) return;
 
     setIsSubmitting(true);
-    
+
     try {
       const supabase = createClientClientComponent();
-      
+
       // Upload resume if provided
       let resumeUrl = null;
       if (resumeFile) {
-        const fileExt = resumeFile.name.split('.').pop();
-        const fileName = `${data.email.replace('@', '_')}_${Date.now()}.${fileExt}`;
-        
+        const fileExt = resumeFile.name.split(".").pop();
+        const fileName = `${data.email.replace("@", "_")}_${Date.now()}.${fileExt}`;
+
         const { data: uploadData, error: uploadError } = await supabase.storage
-          .from('resumes')
-          .upload(fileName, resumeFile);
-          
+          .from("codebility")
+          .upload(`resumes/${fileName}`, resumeFile);
+
         if (uploadError) {
-          console.error('Resume upload error:', uploadError);
+          console.error("Resume upload error:", uploadError);
         } else {
           resumeUrl = uploadData.path;
         }
       }
-      
+
       // Save application to database
-      const { error } = await supabase
-        .from('job_applications')
-        .insert({
-          job_id: job.id,
-          first_name: data.firstName,
-          last_name: data.lastName,
-          email: data.email,
-          phone: data.phone,
-          linkedin: data.linkedIn || null,
-          github: data.github || null,
-          portfolio: data.portfolio || null,
-          years_of_experience: parseInt(data.yearsOfExperience),
-          cover_letter: data.coverLetter,
-          experience: data.experience,
-          resume_url: resumeUrl,
-          status: 'pending',
-          notes: data.referredBy ? `Referred by: ${data.referredBy}` : 'Direct Application'
-        });
-      
+      const { error } = await supabase.from("job_applications").insert({
+        job_id: job.id,
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        phone: data.phone,
+        linkedin: data.linkedIn || null,
+        github: data.github || null,
+        portfolio: data.portfolio || null,
+        years_of_experience: parseInt(data.yearsOfExperience),
+        cover_letter: data.coverLetter,
+        experience: data.experience,
+        resume_url: resumeUrl,
+        status: "pending",
+        notes: data.referredBy
+          ? `Referred by: ${data.referredBy}`
+          : "Direct Application",
+      });
+
       if (error) {
         throw error;
       }
-      
+
       toast({
         title: "Application Submitted!",
         description: `Your application for ${job.title} has been received. We'll be in touch soon.`,
       });
-      
+
       reset();
       setResumeFile(null);
       onClose();
     } catch (error) {
-      console.error('Application submission error:', error);
+      console.error("Application submission error:", error);
       toast({
         title: "Submission failed",
         description: "Please try again later.",
@@ -150,7 +157,7 @@ export default function JobApplicationModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto bg-gray-900 border-gray-800">
+      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto border-gray-800 bg-gray-900">
         <DialogHeader>
           <DialogTitle className="text-2xl font-light text-white">
             Apply for {job.title}
@@ -160,8 +167,10 @@ export default function JobApplicationModal({
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 py-4">
           {/* Personal Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-white">Personal Information</h3>
-            
+            <h3 className="text-lg font-medium text-white">
+              Personal Information
+            </h3>
+
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="firstName" className="text-gray-300">
@@ -170,11 +179,13 @@ export default function JobApplicationModal({
                 <Input
                   id="firstName"
                   {...register("firstName")}
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                  className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                   placeholder="John"
                 />
                 {errors.firstName && (
-                  <p className="text-sm text-red-400">{errors.firstName.message}</p>
+                  <p className="text-sm text-red-400">
+                    {errors.firstName.message}
+                  </p>
                 )}
               </div>
 
@@ -185,11 +196,13 @@ export default function JobApplicationModal({
                 <Input
                   id="lastName"
                   {...register("lastName")}
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                  className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                   placeholder="Doe"
                 />
                 {errors.lastName && (
-                  <p className="text-sm text-red-400">{errors.lastName.message}</p>
+                  <p className="text-sm text-red-400">
+                    {errors.lastName.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -202,7 +215,7 @@ export default function JobApplicationModal({
                 id="email"
                 type="email"
                 {...register("email")}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                 placeholder="john.doe@example.com"
               />
               {errors.email && (
@@ -218,7 +231,7 @@ export default function JobApplicationModal({
                 id="phone"
                 type="tel"
                 {...register("phone")}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                 placeholder="+63 912 345 6789"
               />
               {errors.phone && (
@@ -236,11 +249,13 @@ export default function JobApplicationModal({
                   type="number"
                   min="0"
                   {...register("yearsOfExperience")}
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                  className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                   placeholder="5"
                 />
                 {errors.yearsOfExperience && (
-                  <p className="text-sm text-red-400">{errors.yearsOfExperience.message}</p>
+                  <p className="text-sm text-red-400">
+                    {errors.yearsOfExperience.message}
+                  </p>
                 )}
               </div>
 
@@ -251,11 +266,13 @@ export default function JobApplicationModal({
                 <Input
                   id="referredBy"
                   {...register("referredBy")}
-                  className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                  className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                   placeholder="Name of referrer (if any)"
                 />
                 {errors.referredBy && (
-                  <p className="text-sm text-red-400">{errors.referredBy.message}</p>
+                  <p className="text-sm text-red-400">
+                    {errors.referredBy.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -263,8 +280,10 @@ export default function JobApplicationModal({
 
           {/* Professional Links */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-white">Professional Links</h3>
-            
+            <h3 className="text-lg font-medium text-white">
+              Professional Links
+            </h3>
+
             <div className="space-y-2">
               <Label htmlFor="linkedIn" className="text-gray-300">
                 LinkedIn Profile
@@ -273,11 +292,13 @@ export default function JobApplicationModal({
                 id="linkedIn"
                 type="url"
                 {...register("linkedIn")}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                 placeholder="https://linkedin.com/in/johndoe"
               />
               {errors.linkedIn && (
-                <p className="text-sm text-red-400">{errors.linkedIn.message}</p>
+                <p className="text-sm text-red-400">
+                  {errors.linkedIn.message}
+                </p>
               )}
             </div>
 
@@ -289,7 +310,7 @@ export default function JobApplicationModal({
                 id="github"
                 type="url"
                 {...register("github")}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                 placeholder="https://github.com/johndoe"
               />
               {errors.github && (
@@ -305,19 +326,23 @@ export default function JobApplicationModal({
                 id="portfolio"
                 type="url"
                 {...register("portfolio")}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500"
+                className="border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                 placeholder="https://johndoe.com"
               />
               {errors.portfolio && (
-                <p className="text-sm text-red-400">{errors.portfolio.message}</p>
+                <p className="text-sm text-red-400">
+                  {errors.portfolio.message}
+                </p>
               )}
             </div>
           </div>
 
           {/* Application Details */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-white">Application Details</h3>
-            
+            <h3 className="text-lg font-medium text-white">
+              Application Details
+            </h3>
+
             <div className="space-y-2">
               <Label htmlFor="experience" className="text-gray-300">
                 Relevant Experience *
@@ -325,11 +350,13 @@ export default function JobApplicationModal({
               <Textarea
                 id="experience"
                 {...register("experience")}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 min-h-[100px]"
+                className="min-h-[100px] border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                 placeholder="Describe your relevant experience for this position..."
               />
               {errors.experience && (
-                <p className="text-sm text-red-400">{errors.experience.message}</p>
+                <p className="text-sm text-red-400">
+                  {errors.experience.message}
+                </p>
               )}
             </div>
 
@@ -340,11 +367,13 @@ export default function JobApplicationModal({
               <Textarea
                 id="coverLetter"
                 {...register("coverLetter")}
-                className="bg-gray-800 border-gray-700 text-white placeholder:text-gray-500 min-h-[150px]"
+                className="min-h-[150px] border-gray-700 bg-gray-800 text-white placeholder:text-gray-500"
                 placeholder="Tell us why you're interested in this position..."
               />
               {errors.coverLetter && (
-                <p className="text-sm text-red-400">{errors.coverLetter.message}</p>
+                <p className="text-sm text-red-400">
+                  {errors.coverLetter.message}
+                </p>
               )}
             </div>
 

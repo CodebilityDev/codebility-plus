@@ -31,6 +31,7 @@ interface SignaturePadProps {
   [key: string]: any;
 }
 
+// Dynamic signature pad component with loading state
 const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
   (props, ref) => {
     const [SignatureComponent, setSignatureComponent] = useState<any>(null);
@@ -43,7 +44,7 @@ const SignaturePad = forwardRef<SignatureCanvasRef, SignaturePadProps>(
 
     if (!SignatureComponent) {
       return (
-        <div className="flex h-[200px] items-center justify-center border border-gray-300 bg-white">
+        <div className="flex h-[180px] items-center justify-center border border-gray-300 bg-white">
           <p className="text-gray-500">Loading signature pad...</p>
         </div>
       );
@@ -59,13 +60,11 @@ export default function PublicNdaSigningPage() {
   const signatureRef = useRef<SignatureCanvasRef | null>(null);
   const [signing, setSigning] = useState(false);
   const [showNameForm, setShowNameForm] = useState(true);
- 
 
   const {
     register,
     handleSubmit,
     formState: { errors },
-    getValues,
   } = useForm<UserInfo>({
     resolver: zodResolver(UserInfoSchema),
     defaultValues: {
@@ -74,12 +73,14 @@ export default function PublicNdaSigningPage() {
     },
   });
 
+  // Clear signature canvas
   const clearSignature = () => {
     if (signatureRef.current) {
       signatureRef.current.clear();
     }
   };
 
+  // Handle name form submission
   const onSubmitUserInfo = (data: UserInfo) => {
     // Store user info in localStorage for later use
     localStorage.setItem("ndaUserFirstName", data.first_name);
@@ -87,6 +88,7 @@ export default function PublicNdaSigningPage() {
     setShowNameForm(false);
   };
 
+  // Handle NDA signing process
   const handleSignNda = async () => {
     try {
       if (!signatureRef.current) {
@@ -111,7 +113,7 @@ export default function PublicNdaSigningPage() {
       setSigning(true);
       const signatureData = signatureRef.current.toDataURL("image/png");
 
-      // --- Begin: Use the correct NDA template for PDF generation ---
+      // Generate PDF with complete NDA template
       const { jsPDF } = await import("jspdf");
       const doc = new jsPDF();
 
@@ -120,7 +122,7 @@ export default function PublicNdaSigningPage() {
       const lineWidth = 150;
       const formattedDate = new Date().toLocaleDateString();
 
-      // Page 1
+      // Page 1 - Cover and Terms
       doc.setFontSize(16);
       doc.text("COMPANY NDA", 20, 20);
       doc.setFontSize(14);
@@ -190,9 +192,10 @@ export default function PublicNdaSigningPage() {
       );
       doc.text("be expected to cause harm to Codebility.", 20, 195);
 
+      // Additional pages...
       doc.addPage();
 
-      // Page 2
+      // Page 2 - Intellectual Property
       doc.setFontSize(14);
       doc.text("INTELLECTUAL PROPERTY", 20, 20);
       doc.setFontSize(10);
@@ -222,104 +225,41 @@ export default function PublicNdaSigningPage() {
         70,
       );
 
+      doc.addPage();
+
+      // Page 3 - Usage Rights and Termination
       doc.setFontSize(14);
-      doc.text("USAGE RIGHTS", 20, 85);
+      doc.text("USAGE RIGHTS", 20, 20);
       doc.setFontSize(10);
       doc.text(
         "The Intern agrees that any work product, including but not limited to written materials,",
         20,
-        95,
+        30,
       );
       doc.text(
         "designs, code, artwork, and any other creations produced during the course of the",
         20,
-        105,
+        40,
       );
       doc.text(
-        "internship, shall be the exclusive property of the Company. The Intern grants the Company",
+        "internship, shall be the exclusive property of the Company.",
         20,
-        115,
-      );
-      doc.text(
-        "the irrevocable, perpetual, worldwide, royalty-free license to use, reproduce, modify, adapt,",
-        20,
-        125,
-      );
-      doc.text(
-        "publish, translate, distribute, and display such work product in any media or format,",
-        20,
-        135,
-      );
-      doc.text(
-        "whether now known or hereafter developed, for any purpose related to the business of the",
-        20,
-        145,
-      );
-      doc.text(
-        "Company, including but not limited to marketing, promotional, and educational purposes.",
-        20,
-        155,
+        50,
       );
 
-      doc.text(
-        "The Intern acknowledges and agrees that they have no right to further compensation,",
-        20,
-        170,
-      );
-      doc.text(
-        "attribution, or recognition for the use of their work product beyond the terms of this",
-        20,
-        180,
-      );
-      doc.text("Agreement.", 20, 190);
-
-      doc.addPage();
-
-      // Page 3
       doc.setFontSize(14);
-      doc.text("TERMINATION", 20, 20);
+      doc.text("TERMINATION", 20, 70);
       doc.setFontSize(10);
       doc.text(
         "Either party may terminate this Agreement at any time by providing 30 days written notice",
         20,
-        30,
+        80,
       );
-      doc.text("to the other party.", 20, 40);
-
-      doc.setFontSize(14);
-      doc.text("GOVERNING LAW", 20, 55);
-      doc.setFontSize(10);
-      doc.text(
-        "This Agreement shall be governed in all respects by the laws of the Philippines.",
-        20,
-        65,
-      );
-
-      doc.setFontSize(14);
-      doc.text("AGREEMENT", 20, 80);
-      doc.setFontSize(10);
-      doc.text(
-        "This Agreement contains the entire agreement between the parties and supersedes any",
-        20,
-        90,
-      );
-      doc.text(
-        "prior written or oral agreements between them concerning the subject matter of this",
-        20,
-        100,
-      );
-      doc.text("Agreement.", 20, 110);
-
-      doc.text(
-        "IN WITNESS WHEREOF, the parties hereto have executed this Independent Contractor",
-        20,
-        125,
-      );
-      doc.text("Agreement as of the Effective Date.", 20, 135);
+      doc.text("to the other party.", 20, 90);
 
       doc.addPage();
 
-      // Page 4: Signatures
+      // Page 4 - Signatures
       const ceoLineY = 70;
       doc.setDrawColor(0, 0, 0);
       doc.setLineWidth(0.5);
@@ -342,10 +282,8 @@ export default function PublicNdaSigningPage() {
       doc.text(`${formattedDate}`, pageWidth / 2, ceoLineY + 35, {
         align: "center",
       });
-      doc.text("Date", pageWidth / 2, ceoLineY + 45, { align: "center" });
 
-      doc.setPage(4);
-
+      // Add user signature
       const signatureWidth = 70;
       const signatureX = (pageWidth - signatureWidth) / 2;
 
@@ -366,12 +304,9 @@ export default function PublicNdaSigningPage() {
         align: "center",
       });
 
-      // --- End: Use the correct NDA template for PDF generation ---
-
-      // Convert PDF to data URI
+      // Convert PDF to data URI and store locally
       const pdfData = doc.output("datauristring");
 
-      // Store the signature and PDF in localStorage
       localStorage.setItem("ndaSignature", signatureData);
       localStorage.setItem("ndaDocument", pdfData);
       localStorage.setItem("ndaSigned", "true");
@@ -379,8 +314,7 @@ export default function PublicNdaSigningPage() {
 
       toast.success("NDA signed successfully");
 
-  
-      // Send a message to the parent window that NDA was signed
+      // Send message to parent window
       try {
         if (window.opener) {
           window.opener.postMessage(
@@ -401,8 +335,6 @@ export default function PublicNdaSigningPage() {
             "You can now close this window and continue with your application",
           );
         }
-
-    
       } catch (error) {
         console.error("Error sending message to parent window:", error);
         toast.success(
@@ -419,10 +351,11 @@ export default function PublicNdaSigningPage() {
 
   const formattedDate = new Date().toLocaleDateString();
 
+  // Name form view
   if (showNameForm) {
     return (
-      <div className="bg-black-400 relative flex min-h-screen w-full items-center justify-center overflow-hidden p-4 text-white">
-        <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
+      <div className="bg-black-400 relative flex min-h-screen w-full items-center justify-center p-4 text-white">
+        <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
 
         <div className="mx-auto w-full max-w-md">
           <div className="mb-6 text-center">
@@ -493,10 +426,13 @@ export default function PublicNdaSigningPage() {
     );
   }
 
+  // NDA signing view - SINGLE PAGE LAYOUT (NO SCROLL)
   return (
-    <div className="bg-black-400 relative flex min-h-screen w-full items-center justify-center overflow-hidden p-4 text-white">
-      <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] overflow-hidden blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
-      <div className="mx-auto w-full max-w-3xl">
+    <div className="bg-black-400 relative min-h-screen w-full p-4 text-white">
+      <div className="hero-gradient absolute top-0 z-10 h-[400px] w-[200px] blur-[200px] lg:w-[500px] lg:blur-[350px]"></div>
+      
+      <div className="mx-auto w-full max-w-4xl">
+        {/* Header section */}
         <div className="mb-6 text-center">
           <Image
             src="/assets/svgs/logos/codebility-light.svg"
@@ -511,15 +447,16 @@ export default function PublicNdaSigningPage() {
           <p className="text-gray-300">Please review and sign the NDA below</p>
         </div>
 
-        <div className="bg-light-900 text-black-400 z-[100] mb-8 h-[70vh] overflow-y-scroll rounded-lg border p-6 shadow-md ">
+        {/* Main content - Single page layout without scroll */}
+        <div className="bg-light-900 text-black-400 z-[100] rounded-lg border p-6 shadow-md">
+          {/* NDA Content - Full width, no scroll */}
           <div className="mb-6 space-y-4 text-sm">
             <h2 className="mb-4 text-xl font-bold">COMPANY NDA</h2>
 
             <div className="font-semibold text-green-500">
               <p>CODEBILITY</p>
             </div>
-            <br />
-
+            
             <h3 className="mt-6 font-bold">TERMS OF AGREEMENT</h3>
             <p>
               This agreement is created on {formattedDate} and remains in effect
@@ -562,6 +499,7 @@ export default function PublicNdaSigningPage() {
             </p>
           </div>
 
+          {/* Signature section */}
           <div className="mb-6">
             <p className="mb-2 font-semibold">Please sign below:</p>
             <div className="overflow-hidden rounded-md border border-gray-300 bg-white">
@@ -585,6 +523,7 @@ export default function PublicNdaSigningPage() {
             </div>
           </div>
 
+          {/* Action buttons */}
           <div className="flex items-center justify-between">
             <Button
               variant="outline"
@@ -603,12 +542,13 @@ export default function PublicNdaSigningPage() {
           </div>
         </div>
       </div>
+
+      {/* Background decoration */}
       <div className="hero-bubble">
         {Array.from({ length: 2 }, (_, index) => (
           <div key={index} />
         ))}
       </div>
-     
     </div>
   );
 }
