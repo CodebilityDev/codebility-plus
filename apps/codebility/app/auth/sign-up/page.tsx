@@ -18,6 +18,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 import { signupUser } from "@/app/auth/actions";
 import { getNdaDataFromStorage, hasCompleteNdaData, cleanupNdaStorage } from "@/utils/nda-helpers";
+import { useModal } from "@/hooks/use-modal";
+import { useTechStackStore } from "@/hooks/use-techstack";
 
 // Constants - Extract configuration data
 const POSITIONS = [
@@ -26,11 +28,6 @@ const POSITIONS = [
   { id: 3, name: "Full Stack Developer" },
   { id: 4, name: "UI/UX Designer" },
   { id: 5, name: "QA Engineer" },
-];
-
-const TECH_STACKS = [
-  "javascript", "typescript", "react", "nextjs", "nodejs", 
-  "python", "php", "java", "angular", "vue", "laravel", "django"
 ];
 
 // Validation schema with improved validation messages
@@ -115,11 +112,14 @@ const PasswordField = ({ label, name, placeholder, register, errors, showPasswor
 
 export default function SignUpForm() {
   const router = useRouter();
+  
+  const { onOpen } = useModal();
+  const { stack } = useTechStackStore();
+  
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [ndaSigned, setNdaSigned] = useState(false);
   const [selectedPositions, setSelectedPositions] = useState<typeof POSITIONS>([]);
-  const [selectedTechStacks, setSelectedTechStacks] = useState<string[]>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -146,7 +146,7 @@ export default function SignUpForm() {
     },
   });
 
-  // Initialize NDA status and message listener - consolidated effect
+  // Initialize NDA status and message listener
   useEffect(() => {
     const initialNdaStatus = hasCompleteNdaData();
     setNdaSigned(initialNdaStatus);
@@ -167,7 +167,73 @@ export default function SignUpForm() {
     return () => window.removeEventListener("message", handleMessage);
   }, [form]);
 
-  // Simplified NDA signing handler
+  // Sync tech stack with form validation
+  useEffect(() => {
+    if (stack && stack.length > 0) {
+      form.setValue("tech_stacks", stack);
+      form.clearErrors("tech_stacks");
+    }
+  }, [stack, form]);
+
+  // Enhanced tech stack modal handler with comprehensive debugging
+  const handleTechStackModal = () => {
+    console.log("=== TECH STACK BUTTON CLICKED ===");
+    console.log("Current stack:", stack);
+    console.log("onOpen function:", onOpen);
+    
+    try {
+      // Check if modal elements exist before opening
+      const existingModal = document.querySelector('[role="dialog"]');
+      console.log("Existing modal before open:", existingModal);
+      
+      onOpen("techStackModal");
+      console.log("Modal open command executed");
+      
+      // Check DOM after modal should open
+      setTimeout(() => {
+        const modalElements = document.querySelectorAll('[role="dialog"]');
+        const backdrop = document.querySelector('[data-state="open"]');
+        
+        console.log("Modal elements after open:", modalElements);
+        console.log("Modal backdrop:", backdrop);
+        
+        if (modalElements.length > 0) {
+          const modal = modalElements[0] as HTMLElement;
+          const styles = window.getComputedStyle(modal);
+          
+          console.log("Modal found! Checking styles...");
+          console.log("Display:", styles.display);
+          console.log("Visibility:", styles.visibility);
+          console.log("Z-index:", styles.zIndex);
+          console.log("Position:", styles.position);
+          console.log("Opacity:", styles.opacity);
+          console.log("Transform:", styles.transform);
+          
+          // Force modal visibility if hidden
+          if (styles.display === "none" || styles.visibility === "hidden") {
+            console.log("Modal is hidden! Attempting to force visibility...");
+            modal.style.display = "flex";
+            modal.style.visibility = "visible";
+            modal.style.zIndex = "99999";
+            modal.style.position = "fixed";
+            modal.style.inset = "0";
+            modal.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
+            modal.style.alignItems = "center";
+            modal.style.justifyContent = "center";
+          }
+        } else {
+          console.warn("No modal elements found in DOM after open command");
+          toast.error("Modal component not found. Please check TechStackModal implementation.");
+        }
+      }, 100);
+      
+    } catch (error) {
+      console.error("Failed to open tech stack modal:", error);
+      toast.error("Unable to open tech stack selector. Please try again.");
+    }
+  };
+
+  // NDA signing handler
   const handleSignNda = () => {
     const popup = window.open("/nda-signing/public", "nda-signing", "width=800,height=600,scrollbars=yes,resizable=yes");
     
@@ -190,7 +256,7 @@ export default function SignUpForm() {
     }, 1000);
   };
 
-  // Consolidated form submission logic
+  // Form submission handler
   const onSubmit = async (data: SignupFormData) => {
     if (!ndaSigned) {
       toast.error("Please sign the NDA before submitting your application");
@@ -210,7 +276,7 @@ export default function SignUpForm() {
 
       // Complex fields
       formData.append("positions", JSON.stringify(selectedPositions));
-      formData.append("tech_stacks", JSON.stringify(selectedTechStacks));
+      formData.append("tech_stacks", JSON.stringify(stack || []));
 
       if (profileImage) {
         formData.append("profileImage", profileImage);
@@ -248,7 +314,7 @@ export default function SignUpForm() {
     }
   };
 
-  // Image upload handler with validation
+  // Image upload handler
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -268,318 +334,353 @@ export default function SignUpForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-5xl mx-auto">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <Image
-            src="/assets/svgs/logos/codebility-light.svg"
-            alt="Codebility"
-            width={300}
-            height={80}
-            className="mx-auto mb-8"
-          />
-          <h1 className="text-3xl font-bold text-white mb-4">Create new account</h1>
-          <p className="text-gray-400 text-lg mb-2">To use Codebility, please enter your details</p>
-          <p className="text-gray-500 text-sm">All fields not labeled optional are required.</p>
-        </div>
+    <>
+      {/* Enhanced CSS for modal visibility debugging */}
+      <style jsx global>{`
+        [role="dialog"] {
+          z-index: 99999 !important;
+        }
+        
+        [data-state="open"] {
+          display: flex !important;
+          align-items: center !important;
+          justify-content: center !important;
+        }
+        
+        /* Debug helper - remove this in production */
+        .modal-debug {
+          position: fixed !important;
+          inset: 0 !important;
+          background: rgba(255, 0, 0, 0.1) !important;
+          z-index: 99998 !important;
+          pointer-events: none !important;
+        }
+      `}</style>
 
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-          {/* Profile Image Upload */}
-          <div className="flex flex-col items-center mb-10">
-            <div className="bg-gray-700 flex h-24 w-24 items-center justify-center rounded-full mb-4">
-              <svg className="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-              </svg>
-            </div>
-            <label htmlFor="profileImage" className="text-white text-base font-medium cursor-pointer">
-              Upload picture
-            </label>
-            <input
-              id="profileImage"
-              type="file"
-              accept="image/jpeg,image/png,image/webp"
-              onChange={handleImageChange}
-              className="hidden"
+      <div className="min-h-screen relative bg-gray-900 flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-5xl mx-auto">
+          {/* Header */}
+          <div className="text-center mb-12">
+            <Image
+              src="/assets/svgs/logos/codebility-light.svg"
+              alt="Codebility"
+              width={300}
+              height={80}
+              className="mx-auto mb-8"
             />
-            {profileImage && (
-              <p className="mt-2 text-sm text-green-400">{profileImage.name}</p>
-            )}
+            <h1 className="text-3xl font-bold text-white mb-4">Create new account</h1>
+            <p className="text-gray-400 text-lg mb-2">To use Codebility, please enter your details</p>
+            <p className="text-gray-500 text-sm">All fields not labeled optional are required.</p>
           </div>
 
-          {/* Main Form Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Column 1 - Personal Info */}
-            <div className="space-y-6">
-              <FormField
-                label="First Name"
-                name="first_name"
-                placeholder="Enter your first name"
-                register={form.register}
-                errors={form.formState.errors}
-                required
-              />
-
-              <FormField
-                label="Last Name"
-                name="last_name"
-                placeholder="Enter your last name"
-                register={form.register}
-                errors={form.formState.errors}
-                required
-              />
-
-              <div className="space-y-2">
-                <Label className="text-white text-base font-medium">Positions</Label>
-                <Select onValueChange={(value) => {
-                  const position = POSITIONS.find(p => p.id === parseInt(value));
-                  if (position) {
-                    setSelectedPositions([position]);
-                    form.setValue("positions", [position]);
-                  }
-                }}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                    <SelectValue placeholder="Select applicable positions" />
-                    <ChevronDown className="h-5 w-5" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600">
-                    {POSITIONS.map((position) => (
-                      <SelectItem key={position.id} value={position.id.toString()} className="text-white hover:bg-gray-600">
-                        {position.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {form.formState.errors.positions && (
-                  <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
-                )}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+            {/* Profile Image Upload */}
+            <div className="flex flex-col items-center mb-10">
+              <div className="bg-gray-700 flex h-24 w-24 items-center justify-center rounded-full mb-4">
+                <svg className="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                </svg>
               </div>
-
-              <FormField
-                label="Years of Experience"
-                name="years_of_experience"
-                type="number"
-                placeholder="0"
-                register={form.register}
-                errors={form.formState.errors}
-                required
+              <label htmlFor="profileImage" className="text-white text-base font-medium cursor-pointer">
+                Upload picture
+              </label>
+              <input
+                id="profileImage"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                onChange={handleImageChange}
+                className="hidden"
               />
+              {profileImage && (
+                <p className="mt-2 text-sm text-green-400">{profileImage.name}</p>
+              )}
+            </div>
 
-              <div className="space-y-2">
-                <Label className="text-white text-base font-medium">Tech Stack</Label>
-                <div className="relative">
+            {/* Main Form Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Column 1 - Personal Info */}
+              <div className="space-y-6">
+                <FormField
+                  label="First Name"
+                  name="first_name"
+                  placeholder="Enter your first name"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  required
+                />
+
+                <FormField
+                  label="Last Name"
+                  name="last_name"
+                  placeholder="Enter your last name"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  required
+                />
+
+                <div className="space-y-2">
+                  <Label className="text-white text-base font-medium">Positions</Label>
+                  <Select onValueChange={(value) => {
+                    const position = POSITIONS.find(p => p.id === parseInt(value));
+                    if (position) {
+                      setSelectedPositions([position]);
+                      form.setValue("positions", [position]);
+                    }
+                  }}>
+                    <SelectTrigger className="bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                      <SelectValue placeholder="Select applicable positions" />
+                      <ChevronDown className="h-5 w-5" />
+                    </SelectTrigger>
+                    <SelectContent className="bg-gray-700 border-gray-600">
+                      {POSITIONS.map((position) => (
+                        <SelectItem key={position.id} value={position.id.toString()} className="text-white hover:bg-gray-600">
+                          {position.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  {form.formState.errors.positions && (
+                    <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
+                  )}
+                </div>
+
+                <FormField
+                  label="Years of Experience"
+                  name="years_of_experience"
+                  type="number"
+                  placeholder="0"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  required
+                />
+
+                {/* Tech Stack Section - FIXED */}
+                <div className="space-y-2">
+                  <Label className="text-white text-base font-medium">Tech Stack</Label>
                   <Button
                     type="button"
-                    onClick={handleTechStackModal}
-                    className="w-full bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg hover:bg-gray-600 justify-between font-normal"
+                    onClick={() => onOpen("techStackModal")}
+                    className="w-full bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg hover:bg-gray-600 justify-between font-normal transition-all duration-200 hover:border-blue-500"
                   >
-                    {stack.length > 0 ? (
+                    {stack && stack.length > 0 ? (
                       <span className="text-white">
                         {stack.length === 1 
-                          ? `${stack[0].charAt(0).toUpperCase()}${stack[0].slice(1)}`
+                          ? `${stack[0]?.charAt(0).toUpperCase()}${stack[0]?.slice(1)}`
                           : `${stack.length} technologies selected`
                         }
                       </span>
                     ) : (
-                      "Select your tech stack"
+                      <span className="text-gray-400">Select your tech stack</span>
                     )}
                     <ChevronDown className="h-5 w-5" />
                   </Button>
+                  
+                  {/* Show selected technologies */}
+                  {stack && stack.length > 0 && (
+                    <div className="text-xs text-gray-400 flex flex-wrap gap-1">
+                      {stack.map((tech) => (
+                        <span key={tech} className="bg-blue-600 text-white px-2 py-1 rounded">
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {form.formState.errors.tech_stacks && (
+                    <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
+                  )}
                 </div>
-                {form.formState.errors.tech_stacks && (
-                  <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
-                )}
+
+                <div className="space-y-2">
+                  <Label className="text-white text-base font-medium">About (Optional)</Label>
+                  <Textarea
+                    {...form.register("about")}
+                    placeholder="Tell us about yourself"
+                    rows={4}
+                    className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+                  />
+                </div>
               </div>
 
-              <div className="space-y-2">
-                <Label className="text-white text-base font-medium">About (Optional)</Label>
-                <Textarea
-                  {...form.register("about")}
-                  placeholder="Tell us about yourself"
-                  rows={4}
-                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+              {/* Column 2 - Contact & Auth */}
+              <div className="space-y-6">
+                <FormField
+                  label="Email"
+                  name="email_address"
+                  type="email"
+                  placeholder="Enter your email"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  required
+                />
+
+                <FormField
+                  label="Phone Number"
+                  name="phone_number"
+                  type="tel"
+                  placeholder="+63 or 0 followed by your number"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  required
+                />
+
+                <PasswordField
+                  label="Password"
+                  name="password"
+                  placeholder="Enter your password"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  showPassword={showPassword}
+                  toggleShow={() => setShowPassword(!showPassword)}
+                />
+
+                <PasswordField
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  placeholder="Confirm your password"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  showPassword={showConfirmPassword}
+                  toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
+                />
+
+                <FormField
+                  label="Portfolio Website (Optional)"
+                  name="portfolio_website"
+                  type="url"
+                  placeholder="Enter your portfolio URL"
+                  register={form.register}
+                  errors={form.formState.errors}
+                />
+              </div>
+
+              {/* Column 3 - Social Links */}
+              <div className="space-y-6">
+                <FormField
+                  label="Facebook"
+                  name="facebook"
+                  placeholder="Enter your Facebook profile"
+                  register={form.register}
+                  errors={form.formState.errors}
+                />
+
+                <FormField
+                  label="LinkedIn (Optional)"
+                  name="linkedin"
+                  placeholder="Enter your LinkedIn profile"
+                  register={form.register}
+                  errors={form.formState.errors}
+                />
+
+                <FormField
+                  label="GitHub (Optional)"
+                  name="github"
+                  placeholder="Enter your GitHub profile"
+                  register={form.register}
+                  errors={form.formState.errors}
+                />
+
+                <FormField
+                  label="Discord (Optional)"
+                  name="discord"
+                  placeholder="username#1234"
+                  register={form.register}
+                  errors={form.formState.errors}
                 />
               </div>
             </div>
 
-            {/* Column 2 - Contact & Auth */}
-            <div className="space-y-6">
-              <FormField
-                label="Email"
-                name="email_address"
-                type="email"
-                placeholder="Enter your email"
-                register={form.register}
-                errors={form.formState.errors}
-                required
-              />
-
-              <FormField
-                label="Phone Number"
-                name="phone_number"
-                type="tel"
-                placeholder="+63 or 0 followed by your number"
-                register={form.register}
-                errors={form.formState.errors}
-                required
-              />
-
-              <PasswordField
-                label="Password"
-                name="password"
-                placeholder="Enter your password"
-                register={form.register}
-                errors={form.formState.errors}
-                showPassword={showPassword}
-                toggleShow={() => setShowPassword(!showPassword)}
-              />
-
-              <PasswordField
-                label="Confirm Password"
-                name="confirmPassword"
-                placeholder="Confirm your password"
-                register={form.register}
-                errors={form.formState.errors}
-                showPassword={showConfirmPassword}
-                toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
-              />
-
-              <FormField
-                label="Portfolio Website (Optional)"
-                name="portfolio_website"
-                type="url"
-                placeholder="Enter your portfolio URL"
-                register={form.register}
-                errors={form.formState.errors}
-              />
-            </div>
-
-            {/* Column 3 - Social Links */}
-            <div className="space-y-6">
-              <FormField
-                label="Facebook"
-                name="facebook"
-                placeholder="Enter your Facebook profile"
-                register={form.register}
-                errors={form.formState.errors}
-              />
-
-              <FormField
-                label="LinkedIn (Optional)"
-                name="linkedin"
-                placeholder="Enter your LinkedIn profile"
-                register={form.register}
-                errors={form.formState.errors}
-              />
-
-              <FormField
-                label="GitHub (Optional)"
-                name="github"
-                placeholder="Enter your GitHub profile"
-                register={form.register}
-                errors={form.formState.errors}
-              />
-
-              <FormField
-                label="Discord (Optional)"
-                name="discord"
-                placeholder="username#1234"
-                register={form.register}
-                errors={form.formState.errors}
-              />
-            </div>
-          </div>
-
-          {/* NDA Section */}
-          {ndaSigned ? (
-            <div className="bg-green-900/20 border border-green-600/30 p-4 rounded-lg">
-              <div className="flex items-center gap-2 text-green-400 mb-2">
-                <CheckCircle className="h-5 w-5" />
-                <span className="font-medium">NDA Signed</span>
-              </div>
-              <p className="text-sm text-green-400">
-                ✓ NDA has been signed and will be included with your application.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <Label className="text-white text-base font-medium">
-                  Non-Disclosure Agreement (NDA)
-                </Label>
-                <div className="flex items-center gap-2 text-orange-400 text-sm">
-                  <AlertCircle className="h-4 w-4" />
-                  <span>Required</span>
+            {/* NDA Section */}
+            {ndaSigned ? (
+              <div className="bg-green-900/20 border border-green-600/30 p-4 rounded-lg">
+                <div className="flex items-center gap-2 text-green-400 mb-2">
+                  <CheckCircle className="h-5 w-5" />
+                  <span className="font-medium">NDA Signed</span>
                 </div>
+                <p className="text-sm text-green-400">
+                  ✓ NDA has been signed and will be included with your application.
+                </p>
               </div>
-              <p className="text-sm text-gray-400">
-                Please sign the NDA before completing your registration.
-              </p>
+            ) : (
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <Label className="text-white text-base font-medium">
+                    Non-Disclosure Agreement (NDA)
+                  </Label>
+                  <div className="flex items-center gap-2 text-orange-400 text-sm">
+                    <AlertCircle className="h-4 w-4" />
+                    <span>Required</span>
+                  </div>
+                </div>
+                <p className="text-sm text-gray-400">
+                  Please sign the NDA before completing your registration.
+                </p>
+                <Button
+                  type="button"
+                  onClick={handleSignNda}
+                  variant="outline"
+                  className="text-blue-400 border-blue-400 hover:bg-blue-400/10 bg-transparent"
+                >
+                  Sign NDA
+                </Button>
+              </div>
+            )}
+
+            {/* Agreements */}
+            <div className="space-y-4">
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="privacyPolicy"
+                  checked={form.watch("privacyPolicy")}
+                  onCheckedChange={(checked) => form.setValue("privacyPolicy", !!checked)}
+                  className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                />
+                <Label htmlFor="privacyPolicy" className="text-white text-sm leading-relaxed">
+                  I agree to the <span className="text-blue-400 underline cursor-pointer">Privacy Policy</span>
+                </Label>
+              </div>
+              {form.formState.errors.privacyPolicy && (
+                <p className="text-sm text-red-400 ml-6">{form.formState.errors.privacyPolicy.message}</p>
+              )}
+
+              <div className="flex items-start space-x-3">
+                <Checkbox
+                  id="ndaAgreement"
+                  checked={form.watch("ndaAgreement")}
+                  onCheckedChange={(checked) => form.setValue("ndaAgreement", !!checked)}
+                  className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                />
+                <Label htmlFor="ndaAgreement" className="text-white text-sm leading-relaxed">
+                  I agree to the <span className="text-blue-400 underline cursor-pointer">Non-Disclosure Agreement</span> 
+                  <span className="text-yellow-400 ml-2">(Please sign the NDA first)</span>
+                </Label>
+              </div>
+              {form.formState.errors.ndaAgreement && (
+                <p className="text-sm text-red-400 ml-6">{form.formState.errors.ndaAgreement.message}</p>
+              )}
+            </div>
+
+            {/* Action Buttons */}
+            <div className="flex justify-end space-x-4 pt-6">
               <Button
                 type="button"
-                onClick={handleSignNda}
                 variant="outline"
-                className="text-blue-400 border-blue-400 hover:bg-blue-400/10 bg-transparent"
+                className="px-8 py-3 text-gray-300 border-gray-600 hover:bg-gray-800 bg-transparent"
+                disabled={isSubmitting}
               >
-                Sign NDA
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Processing..." : "Apply"}
               </Button>
             </div>
-          )}
-
-          {/* Agreements */}
-          <div className="space-y-4">
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="privacyPolicy"
-                checked={form.watch("privacyPolicy")}
-                onCheckedChange={(checked) => form.setValue("privacyPolicy", !!checked)}
-                className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
-              />
-              <Label htmlFor="privacyPolicy" className="text-white text-sm leading-relaxed">
-                I agree to the <span className="text-blue-400 underline cursor-pointer">Privacy Policy</span>
-              </Label>
-            </div>
-            {form.formState.errors.privacyPolicy && (
-              <p className="text-sm text-red-400 ml-6">{form.formState.errors.privacyPolicy.message}</p>
-            )}
-
-            <div className="flex items-start space-x-3">
-              <Checkbox
-                id="ndaAgreement"
-                checked={form.watch("ndaAgreement")}
-                onCheckedChange={(checked) => form.setValue("ndaAgreement", !!checked)}
-                className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
-              />
-              <Label htmlFor="ndaAgreement" className="text-white text-sm leading-relaxed">
-                I agree to the <span className="text-blue-400 underline cursor-pointer">Non-Disclosure Agreement</span> 
-                <span className="text-yellow-400 ml-2">(Please sign the NDA first)</span>
-              </Label>
-            </div>
-            {form.formState.errors.ndaAgreement && (
-              <p className="text-sm text-red-400 ml-6">{form.formState.errors.ndaAgreement.message}</p>
-            )}
-          </div>
-
-          {/* Action Buttons */}
-          <div className="flex justify-end space-x-4 pt-6">
-            <Button
-              type="button"
-              variant="outline"
-              className="px-8 py-3 text-gray-300 border-gray-600 hover:bg-gray-800 bg-transparent"
-              disabled={isSubmitting}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              disabled={isSubmitting}
-              className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isSubmitting ? "Processing..." : "Apply"}
-            </Button>
-          </div>
-        </form>
+          </form>
+        </div>
       </div>
-    </div>
+    </>
   );
 }
