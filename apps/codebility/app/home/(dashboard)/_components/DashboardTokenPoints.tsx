@@ -37,11 +37,11 @@ export default function TokenPoints() {
       setLoading(true);
       setError(null);
 
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      if (!session?.user) {
-        setError("No user session found.");
+      // FIXED: Use getUser() instead of getSession()
+      const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
+      
+      if (authError || !authUser) {
+        setError("No authenticated user found.");
         setLoading(false);
         return;
       }
@@ -60,7 +60,7 @@ export default function TokenPoints() {
         const { data: pointsData, error: pointsError } = await supabase
           .from("codev_points")
           .select("id, codev_id, skill_category_id, points")
-          .eq("codev_id", session.user.id);
+          .eq("codev_id", authUser.id);
 
         if (pointsError) throw pointsError;
 
@@ -84,9 +84,8 @@ export default function TokenPoints() {
         const { data: attendanceData, error: attendanceError } = await supabase
           .from("attendance_points")
           .select("points")
-          .eq("codev_id", session.user.id)
+          .eq("codev_id", authUser.id)
           .single();
-
 
         // If no attendance points record exists, create one
         if (attendanceError && attendanceError.code === 'PGRST116') {
@@ -94,7 +93,7 @@ export default function TokenPoints() {
           const { data: attendanceCount, error: countError, count } = await supabase
             .from("attendance")
             .select("*", { count: 'exact', head: true })
-            .eq("codev_id", session.user.id)
+            .eq("codev_id", authUser.id)
             .in("status", ["present", "late"]);
           
           const totalPoints = (count || 0) * 2;
@@ -104,7 +103,7 @@ export default function TokenPoints() {
             const { data: newAttendancePoints } = await supabase
               .from("attendance_points")
               .insert({
-                codev_id: session.user.id,
+                codev_id: authUser.id,
                 points: totalPoints,
                 last_updated: new Date().toISOString().split('T')[0]
               })
@@ -365,7 +364,7 @@ export default function TokenPoints() {
             onClick={openModal}
           >
             <Award className="h-5 w-5 mr-2" />
-            🎉 Become a Codev!
+            Become a Codev!
           </Button>
           <PromoteToCodevModal
             isOpen={isModalOpen}
@@ -383,7 +382,7 @@ export default function TokenPoints() {
             onClick={openModal}
           >
             <Star className="h-5 w-5 mr-2" />
-            🌟 Become a Mentor!
+            Become a Mentor!
           </Button>
           <PromoteToMentorModal
             isOpen={isModalOpen}

@@ -1,16 +1,16 @@
-
 import { createClientServerComponent } from "@/utils/supabase/server";
-
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest, props: { params: Promise<{ id: string }> }) {
   const params = await props.params;
+  
   try {
     const supabase = await createClientServerComponent();
     
-    // Check if user is authenticated
-    const { data: { session } } = await supabase.auth.getSession();
-    if (!session) {
+    // FIXED: Use getUser() instead of getSession()
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
       return NextResponse.json(
         { error: "Unauthorized" },
         { status: 401 }

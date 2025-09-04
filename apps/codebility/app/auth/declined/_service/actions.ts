@@ -1,6 +1,5 @@
 "use server";
 
-
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
@@ -8,10 +7,10 @@ export async function getUserData(): Promise<any> {
     try {
         const supabase = await createClientServerComponent();
 
-        const {
-            data: { session },
-        } = await supabase.auth.getSession();
-        if (!session) {
+        // FIXED: Use getUser() instead of getSession()
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
+        
+        if (authError || !user) {
             redirect("/auth/sign-in");
         }
 
@@ -20,7 +19,7 @@ export async function getUserData(): Promise<any> {
             .select(`*,
                     applicant (*)
                 `)
-            .eq("id", session.user.id)
+            .eq("id", user.id)
             .single();
 
         if (!data) {

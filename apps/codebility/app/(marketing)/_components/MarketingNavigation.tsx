@@ -172,6 +172,7 @@ const UserMenu = ({
             alt="Avatar"
             src={image_url || defaultAvatar}
             fill
+            sizes="52px"
             title={`${first_name}'s Avatar`}
             className="rounded-full"
           />
@@ -221,7 +222,6 @@ const UserMenu = ({
 };
 
 const Navigation = () => {
-  /*  const supabase = createClientClientComponent(); */
   const { color } = useChangeBgNavigation();
   const pathname = usePathname();
   const [openSheet, setOpenSheet] = useState(false);
@@ -239,10 +239,8 @@ const Navigation = () => {
 
     async function fetchUser() {
       try {
-        const {
-          data: { session },
-          error: authError,
-        } = await supabase.auth.getSession();
+        // FIXED: Use getUser() instead of getSession()
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError) {
           console.error("Auth error:", authError.message);
@@ -250,7 +248,7 @@ const Navigation = () => {
           return;
         }
 
-        if (!session) {
+        if (!user) {
           // not logged in → silent
           setUserData(null);
           return;
@@ -259,7 +257,7 @@ const Navigation = () => {
         const { data: userRow, error: fetchError } = await supabase
           .from("codev")
           .select(`*, applicant (id, codev_id)`)
-          .eq("id", session.user.id)
+          .eq("id", user.id)
           .single();
 
         console.log("User Row:", userRow);

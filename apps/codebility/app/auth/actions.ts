@@ -5,8 +5,6 @@ import { useUserStore } from "@/store/codev-store";
 import { Codev } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
-
-
 const uploadProfileImage = async (
   file: File,
   folderName: string,
@@ -55,7 +53,7 @@ export const signupUser = async (formData: FormData) => {
 
     // Extract form data with proper typing and convert email to lowercase
     const rawEmail = formData.get("email_address") as string;
-    const email_address = rawEmail.toLowerCase(); // Normalize the email to lowercase
+    const email_address = rawEmail.toLowerCase();
     const password = formData.get("password") as string;
     const tech_stacks = JSON.parse(formData.get("tech_stacks") as string) || [];
     const positions: { id: number; name: string }[] =
@@ -83,7 +81,7 @@ export const signupUser = async (formData: FormData) => {
     }
 
     // Handle profile image upload if provided
-    const image_url = profileImage
+    const image_url = profileImage && profileImage.size > 0
       ? await uploadProfileImage(profileImage, "profileImage", "codebility")
       : null;
 
@@ -102,12 +100,33 @@ export const signupUser = async (formData: FormData) => {
     if (authError) throw authError;
     if (!user) throw new Error("Failed to create user");
 
+    // Extract NDA data from formData (passed from client-side localStorage)
+    let nda_status = false;
+    let nda_signature: string | undefined = undefined;
+    let nda_document: string | undefined = undefined;
+    let nda_signed_at: string | undefined = undefined;
+
+    // Check if NDA data was included in the form submission
+    const ndaSigned = formData.get("ndaSigned") as string;
+    const signature = formData.get("ndaSignature") as string;
+    const document = formData.get("ndaDocument") as string;
+    const signedAt = formData.get("ndaSignedAt") as string;
+
+    if (ndaSigned === "true" && signature && document && signedAt) {
+      nda_status = true;
+      nda_signature = signature;
+      nda_document = document;
+      nda_signed_at = signedAt;
+      
+      console.log("NDA data found in form submission, integrating into signup...");
+    }
+
     // Prepare user data for insertion into the "codev" table
     const userData: Codev = {
       id: user.id,
       first_name: formData.get("first_name") as string,
       last_name: formData.get("last_name") as string,
-      email_address, // already normalized to lowercase
+      email_address,
       phone_number: formData.get("phone_number") as string,
       address: null,
       about: (formData.get("about") as string) || null,
@@ -117,9 +136,12 @@ export const signupUser = async (formData: FormData) => {
       tech_stacks: tech_stacks as string[],
       image_url,
       availability_status: true,
-      nda_status: false,
+      nda_status,
+      nda_signature,
+      nda_document,
+      nda_signed_at,
       level: {},
-      application_status: "applying", // Matches DB constraint
+      application_status: "applying",
       rejected_count: 0,
       facebook: (formData.get("facebook") as string) || null,
       linkedin: (formData.get("linkedin") as string) || null,
@@ -140,21 +162,26 @@ export const signupUser = async (formData: FormData) => {
 
     if (insertError) throw insertError;
 
-    // create applicant entry
+    // Create applicant entry
     const { error } = await supabase
       .from("applicant")
-      .insert(
-        {
-          codev_id: user.id
-        }
-      )
+      .insert({
+        codev_id: user.id
+      });
 
     if (error) {
-      throw error
+      throw error;
     }
 
     setUser(userData);
-    return { success: true, data: user };
+    
+    // Return success with all necessary data
+    return { 
+      success: true, 
+      data: user, 
+      ndaProcessed: nda_status,
+      message: "Account created successfully! Redirecting to sign-in page..."
+    };
   } catch (error: any) {
     console.error("Signup error:", error);
     return {

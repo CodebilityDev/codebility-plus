@@ -1,6 +1,7 @@
+// File: @/Components/providers/modal-provider-home.tsx
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, ReactNode } from "react";
 import DashboardCurrentProjectModal from "@/app/home/(dashboard)/_components/DashboardCurrentProjectModal";
 import ClientAddModal from "@/app/home/clients/_components/ClientAddModal";
 import ClientEditModal from "@/app/home/clients/_components/ClientEditModal";
@@ -25,23 +26,33 @@ import TechStackModal from "@/components/modals/TechStackModal";
 import SprintAddModal from "@/app/home/kanban/[projectId]/_components/SprintAddModal";
 import KanbanAddMembersModal from "@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddMembersModal";
 
-export const ModalProviderHome = () => {
+// Add interface for props to support children
+interface ModalProviderHomeProps {
+  children?: ReactNode;
+}
+
+export const ModalProviderHome = ({ children }: ModalProviderHomeProps = {}) => {
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
+
   if (!isMounted) {
     return null;
   }
+
   return (
     <>
+      {/* Render children if provided */}
+      {children}
+      
+      {/* All modal components - ENSURE TechStackModal IS INCLUDED */}
       <TaskAddModal />
       <TaskViewModal />
       <TaskEditModal />
       <TaskDeleteModal />
 
-      <BoardAddModal />
       <BoardAddModal />
       <ColumnAddModal />
 
@@ -67,6 +78,7 @@ export const ModalProviderHome = () => {
 
       <DeleteWarningModal />
 
+      {/* CRITICAL: TechStackModal must be rendered here */}
       <TechStackModal />
 
       <DashboardCurrentProjectModal />
