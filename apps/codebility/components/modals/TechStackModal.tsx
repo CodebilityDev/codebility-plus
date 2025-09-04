@@ -1,109 +1,341 @@
-// File: @/components/modals/TechStackModal.tsx
-// EMERGENCY FIX - REPLACE ENTIRE FILE
-"use client";
-
-import React, { useState, useEffect } from "react";
+import Image from "next/image";
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { techstacks } from "@/constants/techstack";
 import { useModal } from "@/hooks/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
+import { IconClose } from "@/public/assets/svgs";
 
-const TECH_STACKS = [
-  "javascript", "typescript", "react", "nextjs", "nodejs",
-  "python", "php", "java", "angular", "vue", "laravel", "django",
-  "html", "css", "sass", "tailwindcss", "bootstrap",
-  "mongodb", "mysql", "postgresql", "redis", "firebase"
-];
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
-export default function TechStackModal() {
-  console.log("🔥 TechStackModal component is rendering!");
-  
+import ToggleSwitch from "../ui/switch";
+
+const TechStackModal = () => {
   const { isOpen, onClose, type } = useModal();
-  const { stack, setStack } = useTechStackStore();
-  const [tempStack, setTempStack] = useState<string[]>([]);
-  
+  const { stack, nonTech, setNonTech, addRemoveStack } = useTechStackStore();
+
+  const checkArray = (objectItem: string) => {
+    const isObjectInArray = stack.some((obj) => {
+      return JSON.stringify(obj) === JSON.stringify(objectItem);
+    });
+    return isObjectInArray;
+  };
+
   const isModalOpen = isOpen && type === "techStackModal";
-  
-  console.log("🔥 Modal state - isOpen:", isOpen, "type:", type, "isModalOpen:", isModalOpen);
 
-  useEffect(() => {
-    if (isModalOpen) {
-      setTempStack(stack || []);
-      console.log("🔥 Modal opened, temp stack:", stack);
-    }
-  }, [isModalOpen, stack]);
-
-  const toggleTechStack = (tech: string) => {
-    setTempStack(prev => 
-      prev.includes(tech) 
-        ? prev.filter(t => t !== tech)
-        : [...prev, tech]
+  const filterByCategory = (category: string) => {
+    return techstacks.filter(
+      (item) =>
+        item.category && item.category.toLowerCase() === category.toLowerCase(),
     );
   };
 
-  const handleSave = () => {
-    setStack(tempStack);
-    onClose();
-  };
-
-  const handleCancel = () => {
-    onClose();
-  };
-
-  // Force render when modal should be open
-  if (!isModalOpen) {
-    console.log("🔥 Modal should not be open, returning null");
-    return null;
-  }
-
-  console.log("🔥 Modal should be visible now!");
-
   return (
-    <div 
-      className="fixed inset-0 z-[99999] flex items-center justify-center bg-black bg-opacity-80"
-      onClick={handleCancel}
-    >
-      <div 
-        className="bg-white rounded-lg p-6 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto"
-        onClick={(e) => e.stopPropagation()}
+    <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
+      <DialogContent
+        aria-describedby={undefined}
+        className="bg-light-900 dark:bg-dark-100 h-auto w-[90%] max-w-md overflow-y-auto py-8 sm:max-w-2xl sm:px-12 sm:py-16"
       >
-        <div className="mb-4">
-          <h2 className="text-2xl font-bold text-black">Select Your Tech Stack</h2>
-        </div>
-        
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
-          {TECH_STACKS.map((tech) => (
-            <button
-              key={tech}
-              type="button"
-              onClick={() => toggleTechStack(tech)}
-              className={`p-3 rounded border text-sm ${
-                tempStack.includes(tech) 
-                  ? 'bg-blue-500 text-white border-blue-500' 
-                  : 'bg-gray-100 text-black border-gray-300 hover:bg-gray-200'
-              }`}
-            >
-              {tech.charAt(0).toUpperCase() + tech.slice(1)}
-            </button>
-          ))}
-        </div>
-        
-        <div className="flex justify-end space-x-3">
-          <button
-            onClick={handleCancel}
-            className="px-4 py-2 border border-gray-300 rounded text-black hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={handleSave}
-            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-          >
-            Save ({tempStack.length} selected)
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
+        <button onClick={onClose} className="absolute right-4 top-4">
+          <IconClose />
+        </button>
+        <DialogHeader>
+          <DialogTitle className="text-md mb-4 text-center text-black dark:text-white md:text-xl">
+            Select your Tech Stack
+          </DialogTitle>
+        </DialogHeader>
+        {/* Tabs for grouping tech stacks by category */}
+        <Tabs defaultValue="all" className="w-full">
+          <TabsList className="mb-12 flex flex-wrap justify-center ">
+            <TabsTrigger value="all">All</TabsTrigger>
+            <TabsTrigger value="frontend">Frontend</TabsTrigger>
+            <TabsTrigger value="backend">Backend</TabsTrigger>
+            <TabsTrigger value="mobile">Mobile</TabsTrigger>
+            <TabsTrigger value="blockchain">Blockchain</TabsTrigger>
+            <TabsTrigger value="server">Server</TabsTrigger>
+            <TabsTrigger value="cms">CMS</TabsTrigger>
+            <TabsTrigger value="design">Design</TabsTrigger>
+          </TabsList>
 
-// EMERGENCY: Also export as named export in case import is wrong
-export { TechStackModal };
+          {/* All */}
+          <TabsContent value="all">
+            <div className="grid w-full grid-cols-3 gap-2">
+              {techstacks.map((stackItem, i) => (
+                <div
+                  key={`stack-item-all-${i}`}
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                    checkArray(stackItem.name.toLowerCase()) &&
+                    "bg-customBlue-100 text-white"
+                  } ${nonTech && "pointer-events-none saturate-0"}`}
+                  onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
+                >
+                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                    <Image
+                      src={
+                        stackItem.alias
+                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                      }
+                      alt={`${stackItem.name} icon`}
+                      fill
+                      sizes="(min-width: 640px) 24px, 20px"
+                      title={stackItem.name}
+                      className="object-cover"
+                    />
+                  </div>
+                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Frontend */}
+          <TabsContent value="frontend">
+            <div className="grid w-full grid-cols-3 gap-2">
+              {filterByCategory("Frontend").map((stackItem, i) => (
+                <div
+                  key={`stack-item-frontend-${i}`}
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                    checkArray(stackItem.name.toLowerCase()) &&
+                    "bg-customBlue-100 text-white"
+                  } ${nonTech && "pointer-events-none saturate-0"}`}
+                  onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
+                >
+                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                    <Image
+                      src={
+                        stackItem.alias
+                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                      }
+                      alt={`${stackItem.name} icon`}
+                      fill
+                      sizes="(min-width: 640px) 24px, 20px"
+                      title={stackItem.name}
+                      className="object-cover"
+                    />
+                  </div>
+                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Backend */}
+          <TabsContent value="backend">
+            <div className="grid w-full grid-cols-3 gap-2">
+              {filterByCategory("Backend").map((stackItem, i) => (
+                <div
+                  key={`stack-item-backend-${i}`}
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                    checkArray(stackItem.name.toLowerCase()) &&
+                    "bg-customBlue-100 text-white"
+                  } ${nonTech && "pointer-events-none saturate-0"}`}
+                  onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
+                >
+                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                    <Image
+                      src={
+                        stackItem.alias
+                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                      }
+                      alt={`${stackItem.name} icon`}
+                      fill
+                      sizes="(min-width: 640px) 24px, 20px"
+                      title={stackItem.name}
+                      className="object-cover"
+                    />
+                  </div>
+                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Mobile */}
+          <TabsContent value="mobile">
+            <div className="grid w-full grid-cols-3 gap-2">
+              {filterByCategory("Mobile").map((stackItem, i) => (
+                <div
+                  key={`stack-item-mobile-${i}`}
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                    checkArray(stackItem.name.toLowerCase()) &&
+                    "bg-customBlue-100 text-white"
+                  } ${nonTech && "pointer-events-none saturate-0"}`}
+                  onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
+                >
+                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                    <Image
+                      src={
+                        stackItem.alias
+                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                      }
+                      alt={`${stackItem.name} icon`}
+                      fill
+                      sizes="(min-width: 640px) 24px, 20px"
+                      title={stackItem.name}
+                      className="object-cover"
+                    />
+                  </div>
+                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Blockchain */}
+          <TabsContent value="blockchain">
+            <div className="grid w-full grid-cols-3 gap-2">
+              {filterByCategory("Blockchain").map((stackItem, i) => (
+                <div
+                  key={`stack-item-blockchain-${i}`}
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                    checkArray(stackItem.name.toLowerCase()) &&
+                    "bg-customBlue-100 text-white"
+                  } ${nonTech && "pointer-events-none saturate-0"}`}
+                  onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
+                >
+                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                    <Image
+                      src={
+                        stackItem.alias
+                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                      }
+                      alt={`${stackItem.name} icon`}
+                      fill
+                      sizes="(min-width: 640px) 24px, 20px"
+                      title={stackItem.name}
+                      className="object-cover"
+                    />
+                  </div>
+                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Server */}
+          <TabsContent value="server">
+            <div className="grid w-full grid-cols-3 gap-2">
+              {filterByCategory("Server").map((stackItem, i) => (
+                <div
+                  key={`stack-item-server-${i}`}
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                    checkArray(stackItem.name.toLowerCase()) &&
+                    "bg-customBlue-100 text-white"
+                  } ${nonTech && "pointer-events-none saturate-0"}`}
+                  onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
+                >
+                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                    <Image
+                      src={
+                        stackItem.alias
+                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                      }
+                      alt={`${stackItem.name} icon`}
+                      fill
+                      sizes="(min-width: 640px) 24px, 20px"
+                      title={stackItem.name}
+                      className="object-cover"
+                    />
+                  </div>
+                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* CMS */}
+          <TabsContent value="cms">
+            <div className="grid w-full grid-cols-3 gap-2">
+              {filterByCategory("CMS").map((stackItem, i) => (
+                <div
+                  key={`stack-item-cms-${i}`}
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                    checkArray(stackItem.name.toLowerCase()) &&
+                    "bg-customBlue-100 text-white"
+                  } ${nonTech && "pointer-events-none saturate-0"}`}
+                  onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
+                >
+                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                    <Image
+                      src={
+                        stackItem.alias
+                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                      }
+                      alt={`${stackItem.name} icon`}
+                      fill
+                      sizes="(min-width: 640px) 24px, 20px"
+                      title={stackItem.name}
+                      className="object-cover"
+                    />
+                  </div>
+                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+
+          {/* Design */}
+          <TabsContent value="design">
+            <div className="grid w-full grid-cols-3 gap-2">
+              {filterByCategory("Design").map((stackItem, i) => (
+                <div
+                  key={`stack-item-design-${i}`}
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                    checkArray(stackItem.name.toLowerCase()) &&
+                    "bg-customBlue-100 text-white"
+                  } ${nonTech && "pointer-events-none saturate-0"}`}
+                  onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
+                >
+                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                    <Image
+                      src={
+                        stackItem.alias
+                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                      }
+                      alt={`${stackItem.name} icon`}
+                      fill
+                      sizes="(min-width: 640px) 24px, 20px"
+                      title={stackItem.name}
+                      className="object-cover"
+                    />
+                  </div>
+                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                </div>
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+
+        <DialogFooter className="mt-4 flex w-full items-center justify-between gap-2">
+          <div className="flex flex-1 items-center gap-2">
+            <ToggleSwitch enabled={!nonTech} onClick={() => setNonTech()} />
+            <span>I&apos;m applying for a non-tech role. </span>
+          </div>
+          <Button
+            onClick={() => onClose()}
+            variant="default"
+            className="mx-auto md:w-[100px]"
+          >
+            Ok
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default TechStackModal;
