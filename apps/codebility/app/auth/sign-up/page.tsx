@@ -367,22 +367,25 @@ export default function SignUpForm() {
 
               <div className="space-y-2">
                 <Label className="text-white text-base font-medium">Tech Stack</Label>
-                <Select onValueChange={(value) => {
-                  setSelectedTechStacks([value]);
-                  form.setValue("tech_stacks", [value]);
-                }}>
-                  <SelectTrigger className="bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                    <SelectValue placeholder="Select your tech stack" />
+                <div className="relative">
+                  <Button
+                    type="button"
+                    onClick={handleTechStackModal}
+                    className="w-full bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg hover:bg-gray-600 justify-between font-normal"
+                  >
+                    {stack.length > 0 ? (
+                      <span className="text-white">
+                        {stack.length === 1 
+                          ? `${stack[0].charAt(0).toUpperCase()}${stack[0].slice(1)}`
+                          : `${stack.length} technologies selected`
+                        }
+                      </span>
+                    ) : (
+                      "Select your tech stack"
+                    )}
                     <ChevronDown className="h-5 w-5" />
-                  </SelectTrigger>
-                  <SelectContent className="bg-gray-700 border-gray-600">
-                    {TECH_STACKS.map((tech) => (
-                      <SelectItem key={tech} value={tech} className="text-white hover:bg-gray-600">
-                        {tech.charAt(0).toUpperCase() + tech.slice(1)}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                  </Button>
+                </div>
                 {form.formState.errors.tech_stacks && (
                   <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
                 )}
