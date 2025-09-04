@@ -356,7 +356,7 @@ export default function SignUpForm() {
                   <Label className="text-white text-base font-medium">Positions *</Label>
                   <div className="relative">
                     <select
-                      value={selectedPositions.length > 0 ? selectedPositions[0].id.toString() : ""}
+                      value={selectedPositions[0]?.id?.toString() || ""}
                       onChange={(e) => {
                         const position = POSITIONS.find(p => p.id === parseInt(e.target.value));
                         if (position) {
@@ -379,7 +379,7 @@ export default function SignUpForm() {
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
                   </div>
-                  {selectedPositions.length > 0 && (
+                  {selectedPositions[0] && (
                     <p className="text-sm text-green-400">Selected: {selectedPositions[0].name}</p>
                   )}
                   {form.formState.errors.positions && (
