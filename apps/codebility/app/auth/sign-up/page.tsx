@@ -5,25 +5,35 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
-import { CheckCircle, AlertCircle, ChevronDown, Eye, EyeOff } from "lucide-react";
+import { ChevronDown, Eye, EyeOff, CheckCircle, AlertCircle } from "lucide-react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Textarea } from "@codevs/ui/textarea";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@codevs/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@codevs/ui/select";
 
 import { signupUser } from "@/app/auth/actions";
 import { getNdaDataFromStorage, hasCompleteNdaData, cleanupNdaStorage } from "@/utils/nda-helpers";
 
+// Constants - Extract configuration data
+const POSITIONS = [
+  { id: 1, name: "Frontend Developer" },
+  { id: 2, name: "Backend Developer" },
+  { id: 3, name: "Full Stack Developer" },
+  { id: 4, name: "UI/UX Designer" },
+  { id: 5, name: "QA Engineer" },
+];
+
+const TECH_STACKS = [
+  "javascript", "typescript", "react", "nextjs", "nodejs", 
+  "python", "php", "java", "angular", "vue", "laravel", "django"
+];
+
+// Validation schema with improved validation messages
 const SignupFormSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
@@ -49,18 +59,59 @@ const SignupFormSchema = z.object({
 
 type SignupFormData = z.infer<typeof SignupFormSchema>;
 
-const POSITIONS = [
-  { id: 1, name: "Frontend Developer" },
-  { id: 2, name: "Backend Developer" },
-  { id: 3, name: "Full Stack Developer" },
-  { id: 4, name: "UI/UX Designer" },
-  { id: 5, name: "QA Engineer" },
-];
+// Simple input field component following DRY principle
+interface FormFieldProps {
+  label: string;
+  name: keyof SignupFormData;
+  type?: string;
+  placeholder: string;
+  register: any;
+  errors: any;
+  required?: boolean;
+  className?: string;
+}
 
-const TECH_STACKS = [
-  "javascript", "typescript", "react", "nextjs", "nodejs", 
-  "python", "php", "java", "angular", "vue", "laravel", "django"
-];
+const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
+  <div className="space-y-2">
+    <Label className="text-white text-base font-medium">
+      {label} {required && ""}
+    </Label>
+    <Input
+      type={type}
+      {...register(name)}
+      placeholder={placeholder}
+      className={`bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${className || ""}`}
+    />
+    {errors[name] && (
+      <p className="text-sm text-red-400">{errors[name].message}</p>
+    )}
+  </div>
+);
+
+// Password field with show/hide functionality
+const PasswordField = ({ label, name, placeholder, register, errors, showPassword, toggleShow }: any) => (
+  <div className="space-y-2">
+    <Label className="text-white text-base font-medium">{label}</Label>
+    <div className="relative">
+      <Input
+        type={showPassword ? "text" : "password"}
+        {...register(name)}
+        placeholder={placeholder}
+        className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-12"
+      />
+      <button
+        type="button"
+        onClick={toggleShow}
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+      >
+        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+      </button>
+    </div>
+    {errors[name] && (
+      <p className="text-sm text-red-400">{errors[name].message}</p>
+    )}
+  </div>
+);
 
 export default function SignUpForm() {
   const router = useRouter();
@@ -95,7 +146,7 @@ export default function SignUpForm() {
     },
   });
 
-  // Initialize NDA status
+  // Initialize NDA status and message listener - consolidated effect
   useEffect(() => {
     const initialNdaStatus = hasCompleteNdaData();
     setNdaSigned(initialNdaStatus);
@@ -116,9 +167,9 @@ export default function SignUpForm() {
     return () => window.removeEventListener("message", handleMessage);
   }, [form]);
 
+  // Simplified NDA signing handler
   const handleSignNda = () => {
-    const ndaUrl = "/nda-signing/public";
-    const popup = window.open(ndaUrl, "nda-signing", "width=800,height=600,scrollbars=yes,resizable=yes");
+    const popup = window.open("/nda-signing/public", "nda-signing", "width=800,height=600,scrollbars=yes,resizable=yes");
     
     if (!popup) {
       toast.error("Please allow pop-ups to sign the NDA");
@@ -139,29 +190,25 @@ export default function SignUpForm() {
     }, 1000);
   };
 
+  // Consolidated form submission logic
   const onSubmit = async (data: SignupFormData) => {
+    if (!ndaSigned) {
+      toast.error("Please sign the NDA before submitting your application");
+      return;
+    }
+
     try {
       setIsSubmitting(true);
-
-      if (!ndaSigned) {
-        toast.error("Please sign the NDA before submitting your application");
-        return;
-      }
-
       const formData = new FormData();
       
-      formData.append("first_name", data.first_name);
-      formData.append("last_name", data.last_name);
-      formData.append("email_address", data.email_address);
-      formData.append("phone_number", data.phone_number);
-      formData.append("password", data.password);
-      formData.append("about", data.about || "");
-      formData.append("portfolio_website", data.portfolio_website || "");
-      formData.append("years_of_experience", data.years_of_experience.toString());
-      formData.append("facebook", data.facebook || "");
-      formData.append("linkedin", data.linkedin || "");
-      formData.append("github", data.github || "");
-      formData.append("discord", data.discord || "");
+      // Basic info
+      Object.entries(data).forEach(([key, value]) => {
+        if (typeof value === "string" || typeof value === "number") {
+          formData.append(key, value.toString());
+        }
+      });
+
+      // Complex fields
       formData.append("positions", JSON.stringify(selectedPositions));
       formData.append("tech_stacks", JSON.stringify(selectedTechStacks));
 
@@ -169,6 +216,7 @@ export default function SignUpForm() {
         formData.append("profileImage", profileImage);
       }
 
+      // NDA data
       const ndaData = getNdaDataFromStorage();
       if (hasCompleteNdaData()) {
         formData.append("ndaSigned", "true");
@@ -184,21 +232,14 @@ export default function SignUpForm() {
           cleanupNdaStorage();
         }
         toast.success("Account created successfully! Please check your email to verify your account.");
+        toast.success("Redirecting to sign-in page...", { duration: 2000 });
         
-        // Show redirect message
-        toast.success("Redirecting to sign-in page...", {
-          duration: 2000,
-        });
-        
-        // Redirect after 2 seconds
         setTimeout(() => {
           router.push('/auth/signin');
         }, 2000);
-        
       } else {
         toast.error(result.error || "Failed to create account");
       }
-
     } catch (error) {
       console.error("Signup error:", error);
       toast.error("An unexpected error occurred. Please try again.");
@@ -207,365 +248,335 @@ export default function SignUpForm() {
     }
   };
 
+  // Image upload handler with validation
   const handleImageChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image size must be less than 5MB");
-        return;
-      }
-      
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
-      if (!allowedTypes.includes(file.type)) {
-        toast.error("Please select a valid image file (JPEG, PNG, or WebP)");
-        return;
-      }
-      
-      setProfileImage(file);
+    if (!file) return;
+
+    const errors: string[] = [];
+    if (file.size > 5 * 1024 * 1024) errors.push("Image size must be less than 5MB");
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      errors.push("Please select a valid image file (JPEG, PNG, or WebP)");
     }
+
+    if (errors.length > 0) {
+      toast.error(errors.join(". "));
+      return;
+    }
+
+    setProfileImage(file);
   };
 
   return (
-    <div className="w-full px-4">
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-        {/* Upload Picture */}
-        <div className="mx-auto flex w-fit flex-col items-center">
-          <div className="bg-light-800 dark:bg-dark-200 flex h-20 w-20 items-center justify-center rounded-full">
-            <svg className="h-8 w-8 text-light-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-            </svg>
-          </div>
-          <label htmlFor="profileImage" className="mt-2 cursor-pointer text-sm text-light-500">
-            Upload picture
-          </label>
-          <input
-            id="profileImage"
-            type="file"
-            accept="image/jpeg,image/png,image/webp"
-            onChange={handleImageChange}
-            className="hidden"
+    <div className="min-h-screen bg-gray-900 flex items-center justify-center px-6 py-12">
+      <div className="w-full max-w-5xl mx-auto">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <Image
+            src="/assets/svgs/logos/codebility-light.svg"
+            alt="Codebility"
+            width={300}
+            height={80}
+            className="mx-auto mb-8"
           />
-          {profileImage && (
-            <p className="mt-1 text-xs text-green-400">{profileImage.name}</p>
-          )}
+          <h1 className="text-3xl font-bold text-white mb-4">Create new account</h1>
+          <p className="text-gray-400 text-lg mb-2">To use Codebility, please enter your details</p>
+          <p className="text-gray-500 text-sm">All fields not labeled optional are required.</p>
         </div>
 
-        {/* Main Form Grid */}
-        <div className="grid grid-cols-3 gap-6">
-          {/* Column 1 */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-light-500">First Name</Label>
-              <Input
-                {...form.register("first_name")}
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          {/* Profile Image Upload */}
+          <div className="flex flex-col items-center mb-10">
+            <div className="bg-gray-700 flex h-24 w-24 items-center justify-center rounded-full mb-4">
+              <svg className="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+            </div>
+            <label htmlFor="profileImage" className="text-white text-base font-medium cursor-pointer">
+              Upload picture
+            </label>
+            <input
+              id="profileImage"
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleImageChange}
+              className="hidden"
+            />
+            {profileImage && (
+              <p className="mt-2 text-sm text-green-400">{profileImage.name}</p>
+            )}
+          </div>
+
+          {/* Main Form Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            {/* Column 1 - Personal Info */}
+            <div className="space-y-6">
+              <FormField
+                label="First Name"
+                name="first_name"
                 placeholder="Enter your first name"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
+                required
               />
-              {form.formState.errors.first_name && (
-                <p className="text-sm text-red-400">{form.formState.errors.first_name.message}</p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-light-500">Last Name</Label>
-              <Input
-                {...form.register("last_name")}
+              <FormField
+                label="Last Name"
+                name="last_name"
                 placeholder="Enter your last name"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
+                required
               />
-              {form.formState.errors.last_name && (
-                <p className="text-sm text-red-400">{form.formState.errors.last_name.message}</p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-light-500">Positions</Label>
-              <Select onValueChange={(value) => {
-                const position = POSITIONS.find(p => p.id === parseInt(value));
-                if (position) {
-                  setSelectedPositions([position]);
-                  form.setValue("positions", [position]);
-                }
-              }}>
-                <SelectTrigger className="bg-light-800 border-light-700 text-light-400">
-                  <SelectValue placeholder="Select applicable positions" />
-                  <ChevronDown className="h-4 w-4" />
-                </SelectTrigger>
-                <SelectContent>
-                  {POSITIONS.map((position) => (
-                    <SelectItem key={position.id} value={position.id.toString()}>
-                      {position.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.positions && (
-                <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
-              )}
-            </div>
+              <div className="space-y-2">
+                <Label className="text-white text-base font-medium">Positions</Label>
+                <Select onValueChange={(value) => {
+                  const position = POSITIONS.find(p => p.id === parseInt(value));
+                  if (position) {
+                    setSelectedPositions([position]);
+                    form.setValue("positions", [position]);
+                  }
+                }}>
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <SelectValue placeholder="Select applicable positions" />
+                    <ChevronDown className="h-5 w-5" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
+                    {POSITIONS.map((position) => (
+                      <SelectItem key={position.id} value={position.id.toString()} className="text-white hover:bg-gray-600">
+                        {position.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {form.formState.errors.positions && (
+                  <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
+                )}
+              </div>
 
-            <div className="space-y-2">
-              <Label className="text-light-500">Years of Experience</Label>
-              <Input
+              <FormField
+                label="Years of Experience"
+                name="years_of_experience"
                 type="number"
-                min="0"
-                {...form.register("years_of_experience", { valueAsNumber: true })}
                 placeholder="0"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
+                required
               />
-              {form.formState.errors.years_of_experience && (
-                <p className="text-sm text-red-400">{form.formState.errors.years_of_experience.message}</p>
-              )}
+
+              <div className="space-y-2">
+                <Label className="text-white text-base font-medium">Tech Stack</Label>
+                <Select onValueChange={(value) => {
+                  setSelectedTechStacks([value]);
+                  form.setValue("tech_stacks", [value]);
+                }}>
+                  <SelectTrigger className="bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
+                    <SelectValue placeholder="Select your tech stack" />
+                    <ChevronDown className="h-5 w-5" />
+                  </SelectTrigger>
+                  <SelectContent className="bg-gray-700 border-gray-600">
+                    {TECH_STACKS.map((tech) => (
+                      <SelectItem key={tech} value={tech} className="text-white hover:bg-gray-600">
+                        {tech.charAt(0).toUpperCase() + tech.slice(1)}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {form.formState.errors.tech_stacks && (
+                  <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-white text-base font-medium">About (Optional)</Label>
+                <Textarea
+                  {...form.register("about")}
+                  placeholder="Tell us about yourself"
+                  rows={4}
+                  className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+                />
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <Label className="text-light-500">Tech Stack</Label>
-              <Select onValueChange={(value) => {
-                setSelectedTechStacks([value]);
-                form.setValue("tech_stacks", [value]);
-              }}>
-                <SelectTrigger className="bg-light-800 border-light-700 text-light-400">
-                  <SelectValue placeholder="Select your tech stack" />
-                  <ChevronDown className="h-4 w-4" />
-                </SelectTrigger>
-                <SelectContent>
-                  {TECH_STACKS.map((tech) => (
-                    <SelectItem key={tech} value={tech}>
-                      {tech.charAt(0).toUpperCase() + tech.slice(1)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-              {form.formState.errors.tech_stacks && (
-                <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-light-500">About (Optional)</Label>
-              <Textarea
-                {...form.register("about")}
-                placeholder="Tell us about yourself"
-                rows={3}
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
-              />
-            </div>
-          </div>
-
-          {/* Column 2 */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-light-500">Email</Label>
-              <Input
+            {/* Column 2 - Contact & Auth */}
+            <div className="space-y-6">
+              <FormField
+                label="Email"
+                name="email_address"
                 type="email"
-                {...form.register("email_address")}
                 placeholder="Enter your email"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
+                required
               />
-              {form.formState.errors.email_address && (
-                <p className="text-sm text-red-400">{form.formState.errors.email_address.message}</p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-light-500">Phone Number</Label>
-              <Input
+              <FormField
+                label="Phone Number"
+                name="phone_number"
                 type="tel"
-                {...form.register("phone_number")}
                 placeholder="+63 or 0 followed by your number"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
+                required
               />
-              {form.formState.errors.phone_number && (
-                <p className="text-sm text-red-400">{form.formState.errors.phone_number.message}</p>
-              )}
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-light-500">Password</Label>
-              <div className="relative">
-                <Input
-                  type={showPassword ? "text" : "password"}
-                  {...form.register("password")}
-                  placeholder="Enter your password"
-                  className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-light-400 hover:text-light-500"
-                >
-                  {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {form.formState.errors.password && (
-                <p className="text-sm text-red-400">{form.formState.errors.password.message}</p>
-              )}
-            </div>
+              <PasswordField
+                label="Password"
+                name="password"
+                placeholder="Enter your password"
+                register={form.register}
+                errors={form.formState.errors}
+                showPassword={showPassword}
+                toggleShow={() => setShowPassword(!showPassword)}
+              />
 
-            <div className="space-y-2">
-              <Label className="text-light-500">Confirm Password</Label>
-              <div className="relative">
-                <Input
-                  type={showConfirmPassword ? "text" : "password"}
-                  {...form.register("confirmPassword")}
-                  placeholder="Confirm your password"
-                  className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400 pr-10"
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-light-400 hover:text-light-500"
-                >
-                  {showConfirmPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                </button>
-              </div>
-              {form.formState.errors.confirmPassword && (
-                <p className="text-sm text-red-400">{form.formState.errors.confirmPassword.message}</p>
-              )}
-            </div>
+              <PasswordField
+                label="Confirm Password"
+                name="confirmPassword"
+                placeholder="Confirm your password"
+                register={form.register}
+                errors={form.formState.errors}
+                showPassword={showConfirmPassword}
+                toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
+              />
 
-            <div className="space-y-2">
-              <Label className="text-light-500">Portfolio Website (Optional)</Label>
-              <Input
+              <FormField
+                label="Portfolio Website (Optional)"
+                name="portfolio_website"
                 type="url"
-                {...form.register("portfolio_website")}
                 placeholder="Enter your portfolio URL"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
               />
-              {form.formState.errors.portfolio_website && (
-                <p className="text-sm text-red-400">{form.formState.errors.portfolio_website.message}</p>
-              )}
             </div>
-          </div>
 
-          {/* Column 3 */}
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label className="text-light-500">Facebook</Label>
-              <Input
-                {...form.register("facebook")}
+            {/* Column 3 - Social Links */}
+            <div className="space-y-6">
+              <FormField
+                label="Facebook"
+                name="facebook"
                 placeholder="Enter your Facebook profile"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-light-500">LinkedIn (Optional)</Label>
-              <Input
-                {...form.register("linkedin")}
+              <FormField
+                label="LinkedIn (Optional)"
+                name="linkedin"
                 placeholder="Enter your LinkedIn profile"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-light-500">GitHub (Optional)</Label>
-              <Input
-                {...form.register("github")}
+              <FormField
+                label="GitHub (Optional)"
+                name="github"
                 placeholder="Enter your GitHub profile"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
               />
-            </div>
 
-            <div className="space-y-2">
-              <Label className="text-light-500">Discord (Optional)</Label>
-              <Input
-                {...form.register("discord")}
+              <FormField
+                label="Discord (Optional)"
+                name="discord"
                 placeholder="username#1234"
-                className="bg-light-800 border-light-700 text-light-500 placeholder:text-light-400"
+                register={form.register}
+                errors={form.formState.errors}
               />
             </div>
           </div>
-        </div>
 
-        {/* NDA Section */}
-        {ndaSigned ? (
-          <div className="bg-green-900/20 border border-green-600/30 p-4 rounded-lg">
-            <div className="flex items-center gap-2 text-green-400 mb-2">
-              <CheckCircle className="h-5 w-5" />
-              <span className="font-medium">Signed</span>
-            </div>
-            <p className="text-sm text-green-400">
-              ✓ NDA has been signed and will be included with your application.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
-              <Label className="text-light-500 font-medium">
-                Non-Disclosure Agreement (NDA) *
-              </Label>
-              <div className="flex items-center gap-2 text-orange-400 text-sm">
-                <AlertCircle className="h-4 w-4" />
-                <span>Required</span>
+          {/* NDA Section */}
+          {ndaSigned ? (
+            <div className="bg-green-900/20 border border-green-600/30 p-4 rounded-lg">
+              <div className="flex items-center gap-2 text-green-400 mb-2">
+                <CheckCircle className="h-5 w-5" />
+                <span className="font-medium">NDA Signed</span>
               </div>
+              <p className="text-sm text-green-400">
+                ✓ NDA has been signed and will be included with your application.
+              </p>
             </div>
-            <p className="text-sm text-light-400">
-              Please sign the NDA before completing your registration.
-            </p>
+          ) : (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <Label className="text-white text-base font-medium">
+                  Non-Disclosure Agreement (NDA)
+                </Label>
+                <div className="flex items-center gap-2 text-orange-400 text-sm">
+                  <AlertCircle className="h-4 w-4" />
+                  <span>Required</span>
+                </div>
+              </div>
+              <p className="text-sm text-gray-400">
+                Please sign the NDA before completing your registration.
+              </p>
+              <Button
+                type="button"
+                onClick={handleSignNda}
+                variant="outline"
+                className="text-blue-400 border-blue-400 hover:bg-blue-400/10 bg-transparent"
+              >
+                Sign NDA
+              </Button>
+            </div>
+          )}
+
+          {/* Agreements */}
+          <div className="space-y-4">
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="privacyPolicy"
+                checked={form.watch("privacyPolicy")}
+                onCheckedChange={(checked) => form.setValue("privacyPolicy", !!checked)}
+                className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+              />
+              <Label htmlFor="privacyPolicy" className="text-white text-sm leading-relaxed">
+                I agree to the <span className="text-blue-400 underline cursor-pointer">Privacy Policy</span>
+              </Label>
+            </div>
+            {form.formState.errors.privacyPolicy && (
+              <p className="text-sm text-red-400 ml-6">{form.formState.errors.privacyPolicy.message}</p>
+            )}
+
+            <div className="flex items-start space-x-3">
+              <Checkbox
+                id="ndaAgreement"
+                checked={form.watch("ndaAgreement")}
+                onCheckedChange={(checked) => form.setValue("ndaAgreement", !!checked)}
+                className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+              />
+              <Label htmlFor="ndaAgreement" className="text-white text-sm leading-relaxed">
+                I agree to the <span className="text-blue-400 underline cursor-pointer">Non-Disclosure Agreement</span> 
+                <span className="text-yellow-400 ml-2">(Please sign the NDA first)</span>
+              </Label>
+            </div>
+            {form.formState.errors.ndaAgreement && (
+              <p className="text-sm text-red-400 ml-6">{form.formState.errors.ndaAgreement.message}</p>
+            )}
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-end space-x-4 pt-6">
             <Button
               type="button"
-              onClick={handleSignNda}
               variant="outline"
-              className="text-customBlue-100 border-customBlue-100 hover:bg-customBlue-100/10"
+              className="px-8 py-3 text-gray-300 border-gray-600 hover:bg-gray-800 bg-transparent"
+              disabled={isSubmitting}
             >
-              Sign NDA
+              Cancel
+            </Button>
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isSubmitting ? "Processing..." : "Apply"}
             </Button>
           </div>
-        )}
-
-        {/* Agreements */}
-        <div className="space-y-4">
-          <div className="flex items-start space-x-3">
-            <Checkbox
-              id="privacyPolicy"
-              checked={form.watch("privacyPolicy")}
-              onCheckedChange={(checked) => form.setValue("privacyPolicy", !!checked)}
-              className="mt-1"
-            />
-            <Label htmlFor="privacyPolicy" className="text-white text-sm leading-relaxed">
-              I agree to the <span className="text-customBlue-100 underline cursor-pointer">Privacy Policy</span> *
-            </Label>
-          </div>
-          {form.formState.errors.privacyPolicy && (
-            <p className="text-sm text-red-400">{form.formState.errors.privacyPolicy.message}</p>
-          )}
-
-          <div className="flex items-start space-x-3">
-            <Checkbox
-              id="ndaAgreement"
-              checked={form.watch("ndaAgreement")}
-              onCheckedChange={(checked) => form.setValue("ndaAgreement", !!checked)}
-              className="mt-1"
-            />
-            <Label htmlFor="ndaAgreement" className="text-white text-sm leading-relaxed">
-              I agree to the <span className="text-customBlue-100 underline cursor-pointer">Non-Disclosure Agreement</span> *
-            </Label>
-          </div>
-          {form.formState.errors.ndaAgreement && (
-            <p className="text-sm text-red-400">{form.formState.errors.ndaAgreement.message}</p>
-          )}
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex justify-end space-x-4">
-          <Button
-            type="button"
-            variant="outline"
-            className="px-8 text-light-500 border-light-700 hover:bg-light-800"
-            disabled={isSubmitting}
-          >
-            Cancel
-          </Button>
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="px-8 bg-customBlue-100 hover:bg-customBlue-200 text-white disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            {isSubmitting ? "Processing..." : "Apply"}
-          </Button>
-        </div>
-      </form>
+        </form>
+      </div>
     </div>
   );
 }
