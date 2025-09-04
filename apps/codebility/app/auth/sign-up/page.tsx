@@ -354,39 +354,56 @@ export default function SignUpForm() {
 
                 <div className="space-y-2">
                   <Label className="text-white text-base font-medium">Positions *</Label>
-                  <Select onValueChange={(value) => {
-                    const position = POSITIONS.find(p => p.id === parseInt(value));
-                    if (position) {
-                      setSelectedPositions([position]);
-                      form.setValue("positions", [position]);
-                    }
-                  }}>
-                    <SelectTrigger className="bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500">
-                      <SelectValue placeholder="Select applicable positions" />
-                      <ChevronDown className="h-5 w-5" />
-                    </SelectTrigger>
-                    <SelectContent className="bg-gray-700 border-gray-600">
+                  <div className="relative">
+                    <select
+                      value={selectedPositions.length > 0 ? selectedPositions[0].id.toString() : ""}
+                      onChange={(e) => {
+                        const position = POSITIONS.find(p => p.id === parseInt(e.target.value));
+                        if (position) {
+                          setSelectedPositions([position]);
+                          form.setValue("positions", [position]); // Sets array properly
+                          form.clearErrors("positions");
+                        } else {
+                          setSelectedPositions([]);
+                          form.setValue("positions", []);
+                        }
+                      }}
+                      className="bg-gray-700 border-gray-600 text-white h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-full px-3 appearance-none cursor-pointer"
+                    >
+                      <option value="" className="text-gray-400">Select applicable positions</option>
                       {POSITIONS.map((position) => (
-                        <SelectItem key={position.id} value={position.id.toString()} className="text-white hover:bg-gray-600">
+                        <option key={position.id} value={position.id.toString()} className="text-white bg-gray-700">
                           {position.name}
-                        </SelectItem>
+                        </option>
                       ))}
-                    </SelectContent>
-                  </Select>
+                    </select>
+                    <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
+                  </div>
+                  {selectedPositions.length > 0 && (
+                    <p className="text-sm text-green-400">Selected: {selectedPositions[0].name}</p>
+                  )}
                   {form.formState.errors.positions && (
                     <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
                   )}
                 </div>
 
-                <FormField
-                  label="Years of Experience"
-                  name="years_of_experience"
-                  type="number"
-                  placeholder="0"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  required
-                />
+                <div className="space-y-2">
+                  <Label className="text-white text-base font-medium">Years of Experience *</Label>
+                  <Input
+                    type="number"
+                    value={form.watch("years_of_experience") || 0}
+                    onChange={(e) => {
+                      const numValue = parseInt(e.target.value) || 0;
+                      form.setValue("years_of_experience", numValue); // Sets number properly
+                      form.clearErrors("years_of_experience");
+                    }}
+                    placeholder="0"
+                    className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                  />
+                  {form.formState.errors.years_of_experience && (
+                    <p className="text-sm text-red-400">{form.formState.errors.years_of_experience.message}</p>
+                  )}
+                </div>
 
                 {/* Tech Stack Section - WORKING IMPLEMENTATION FROM ORIGINAL */}
                 <div className="space-y-2">
