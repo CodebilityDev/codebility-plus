@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-hot-toast";
 import { z } from "zod";
@@ -20,6 +20,10 @@ import { signupUser } from "@/app/auth/actions";
 import { getNdaDataFromStorage, hasCompleteNdaData, cleanupNdaStorage } from "@/utils/nda-helpers";
 import { useModal } from "@/hooks/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
+
+// Import modals
+import TechStackModal from "@/components/modals/TechStackModal";
+import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
 
 // Constants - Extract configuration data
 const POSITIONS = [
@@ -71,7 +75,7 @@ interface FormFieldProps {
 const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
   <div className="space-y-2">
     <Label className="text-white text-base font-medium">
-      {label} {required && ""}
+      {label} {required && "*"}
     </Label>
     <Input
       type={type}
@@ -88,7 +92,7 @@ const FormField = ({ label, name, type = "text", placeholder, register, errors, 
 // Password field with show/hide functionality
 const PasswordField = ({ label, name, placeholder, register, errors, showPassword, toggleShow }: any) => (
   <div className="space-y-2">
-    <Label className="text-white text-base font-medium">{label}</Label>
+    <Label className="text-white text-base font-medium">{label} *</Label>
     <div className="relative">
       <Input
         type={showPassword ? "text" : "password"}
@@ -113,6 +117,7 @@ const PasswordField = ({ label, name, placeholder, register, errors, showPasswor
 export default function SignUpForm() {
   const router = useRouter();
   
+  // Modal hooks - CRITICAL: These must be available
   const { onOpen } = useModal();
   const { stack } = useTechStackStore();
   
@@ -156,6 +161,7 @@ export default function SignUpForm() {
     }
 
     const handleMessage = (event: MessageEvent) => {
+      console.log("Received message:", event.data);
       if (event.data?.type === "NDA_SIGNED" && event.data?.signed === true) {
         setNdaSigned(true);
         form.setValue("ndaAgreement", true);
@@ -167,7 +173,7 @@ export default function SignUpForm() {
     return () => window.removeEventListener("message", handleMessage);
   }, [form]);
 
-  // Sync tech stack with form validation
+  // Sync tech stack with form validation - CRITICAL: This syncs the modal selection with form
   useEffect(() => {
     if (stack && stack.length > 0) {
       form.setValue("tech_stacks", stack);
@@ -175,67 +181,13 @@ export default function SignUpForm() {
     }
   }, [stack, form]);
 
-  // Enhanced tech stack modal handler with comprehensive debugging
-  const handleTechStackModal = () => {
-    console.log("=== TECH STACK BUTTON CLICKED ===");
-    console.log("Current stack:", stack);
-    console.log("onOpen function:", onOpen);
-    
-    try {
-      // Check if modal elements exist before opening
-      const existingModal = document.querySelector('[role="dialog"]');
-      console.log("Existing modal before open:", existingModal);
-      
-      onOpen("techStackModal");
-      console.log("Modal open command executed");
-      
-      // Check DOM after modal should open
-      setTimeout(() => {
-        const modalElements = document.querySelectorAll('[role="dialog"]');
-        const backdrop = document.querySelector('[data-state="open"]');
-        
-        console.log("Modal elements after open:", modalElements);
-        console.log("Modal backdrop:", backdrop);
-        
-        if (modalElements.length > 0) {
-          const modal = modalElements[0] as HTMLElement;
-          const styles = window.getComputedStyle(modal);
-          
-          console.log("Modal found! Checking styles...");
-          console.log("Display:", styles.display);
-          console.log("Visibility:", styles.visibility);
-          console.log("Z-index:", styles.zIndex);
-          console.log("Position:", styles.position);
-          console.log("Opacity:", styles.opacity);
-          console.log("Transform:", styles.transform);
-          
-          // Force modal visibility if hidden
-          if (styles.display === "none" || styles.visibility === "hidden") {
-            console.log("Modal is hidden! Attempting to force visibility...");
-            modal.style.display = "flex";
-            modal.style.visibility = "visible";
-            modal.style.zIndex = "99999";
-            modal.style.position = "fixed";
-            modal.style.inset = "0";
-            modal.style.backgroundColor = "rgba(0, 0, 0, 0.8)";
-            modal.style.alignItems = "center";
-            modal.style.justifyContent = "center";
-          }
-        } else {
-          console.warn("No modal elements found in DOM after open command");
-          toast.error("Modal component not found. Please check TechStackModal implementation.");
-        }
-      }, 100);
-      
-    } catch (error) {
-      console.error("Failed to open tech stack modal:", error);
-      toast.error("Unable to open tech stack selector. Please try again.");
-    }
-  };
-
   // NDA signing handler
   const handleSignNda = () => {
-    const popup = window.open("/nda-signing/public", "nda-signing", "width=800,height=600,scrollbars=yes,resizable=yes");
+    const popup = window.open(
+      "/nda-signing/public", 
+      "nda-signing", 
+      "width=800,height=600,scrollbars=yes,resizable=yes"
+    );
     
     if (!popup) {
       toast.error("Please allow pop-ups to sign the NDA");
@@ -334,29 +286,11 @@ export default function SignUpForm() {
   };
 
   return (
-    <>
-      {/* Enhanced CSS for modal visibility debugging */}
-      <style jsx global>{`
-        [role="dialog"] {
-          z-index: 99999 !important;
-        }
-        
-        [data-state="open"] {
-          display: flex !important;
-          align-items: center !important;
-          justify-content: center !important;
-        }
-        
-        /* Debug helper - remove this in production */
-        .modal-debug {
-          position: fixed !important;
-          inset: 0 !important;
-          background: rgba(255, 0, 0, 0.1) !important;
-          z-index: 99998 !important;
-          pointer-events: none !important;
-        }
-      `}</style>
-
+    <FormProvider {...form}>
+      {/* CRITICAL: Include the modals inside FormProvider */}
+      <TechStackModal />
+      <PrivacyPolicyModal />
+      
       <div className="min-h-screen relative bg-gray-900 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-5xl mx-auto">
           {/* Header */}
@@ -419,7 +353,7 @@ export default function SignUpForm() {
                 />
 
                 <div className="space-y-2">
-                  <Label className="text-white text-base font-medium">Positions</Label>
+                  <Label className="text-white text-base font-medium">Positions *</Label>
                   <Select onValueChange={(value) => {
                     const position = POSITIONS.find(p => p.id === parseInt(value));
                     if (position) {
@@ -454,33 +388,32 @@ export default function SignUpForm() {
                   required
                 />
 
-                {/* Tech Stack Section - FIXED */}
+                {/* Tech Stack Section - WORKING IMPLEMENTATION FROM ORIGINAL */}
                 <div className="space-y-2">
-                  <Label className="text-white text-base font-medium">Tech Stack</Label>
+                  <Label className="text-white text-base font-medium">Tech Stack *</Label>
                   <Button
                     type="button"
+                    variant="outline"
+                    role="combobox"
+                    className={`md:text-md bg-gray-700 border-gray-600 text-gray-100 flex justify-between border-b-2 p-2 text-sm font-normal focus:outline-none lg:text-lg h-12 rounded-lg w-full ${
+                      form.formState.errors.tech_stacks ? "border-red-400" : "border-gray-600"
+                    }`}
                     onClick={() => onOpen("techStackModal")}
-                    className="w-full bg-gray-700 border-gray-600 text-gray-400 h-12 rounded-lg hover:bg-gray-600 justify-between font-normal transition-all duration-200 hover:border-blue-500"
                   >
-                    {stack && stack.length > 0 ? (
-                      <span className="text-white">
-                        {stack.length === 1 
-                          ? `${stack[0]?.charAt(0).toUpperCase()}${stack[0]?.slice(1)}`
-                          : `${stack.length} technologies selected`
-                        }
-                      </span>
-                    ) : (
-                      <span className="text-gray-400">Select your tech stack</span>
-                    )}
+                    {stack && stack.includes("none")
+                      ? "Non-tech role"
+                      : stack && stack.length > 0
+                        ? `${stack.length} tech stack${stack.length > 1 ? "s" : ""} selected`
+                        : "Select your tech stack"}
                     <ChevronDown className="h-5 w-5" />
                   </Button>
                   
                   {/* Show selected technologies */}
-                  {stack && stack.length > 0 && (
+                  {stack && stack.length > 0 && !stack.includes("none") && (
                     <div className="text-xs text-gray-400 flex flex-wrap gap-1">
                       {stack.map((tech) => (
                         <span key={tech} className="bg-blue-600 text-white px-2 py-1 rounded">
-                          {tech}
+                          {tech.charAt(0).toUpperCase() + tech.slice(1)}
                         </span>
                       ))}
                     </div>
@@ -557,7 +490,7 @@ export default function SignUpForm() {
               {/* Column 3 - Social Links */}
               <div className="space-y-6">
                 <FormField
-                  label="Facebook"
+                  label="Facebook (Optional)"
                   name="facebook"
                   placeholder="Enter your Facebook profile"
                   register={form.register}
@@ -605,7 +538,7 @@ export default function SignUpForm() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-white text-base font-medium">
-                    Non-Disclosure Agreement (NDA)
+                    Non-Disclosure Agreement (NDA) *
                   </Label>
                   <div className="flex items-center gap-2 text-orange-400 text-sm">
                     <AlertCircle className="h-4 w-4" />
@@ -636,7 +569,12 @@ export default function SignUpForm() {
                   className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
                 />
                 <Label htmlFor="privacyPolicy" className="text-white text-sm leading-relaxed">
-                  I agree to the <span className="text-blue-400 underline cursor-pointer">Privacy Policy</span>
+                  I agree to the <span 
+                    className="text-blue-400 underline cursor-pointer"
+                    onClick={() => onOpen("privacyPolicyModal")}
+                  >
+                    Privacy Policy
+                  </span> *
                 </Label>
               </div>
               {form.formState.errors.privacyPolicy && (
@@ -648,11 +586,14 @@ export default function SignUpForm() {
                   id="ndaAgreement"
                   checked={form.watch("ndaAgreement")}
                   onCheckedChange={(checked) => form.setValue("ndaAgreement", !!checked)}
+                  disabled={!ndaSigned}
                   className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
                 />
                 <Label htmlFor="ndaAgreement" className="text-white text-sm leading-relaxed">
-                  I agree to the <span className="text-blue-400 underline cursor-pointer">Non-Disclosure Agreement</span> 
-                  <span className="text-yellow-400 ml-2">(Please sign the NDA first)</span>
+                  I agree to the <span className="text-blue-400 underline cursor-pointer">Non-Disclosure Agreement</span> *
+                  {!ndaSigned && (
+                    <span className="text-yellow-400 ml-2">(Please sign the NDA first)</span>
+                  )}
                 </Label>
               </div>
               {form.formState.errors.ndaAgreement && (
@@ -667,12 +608,13 @@ export default function SignUpForm() {
                 variant="outline"
                 className="px-8 py-3 text-gray-300 border-gray-600 hover:bg-gray-800 bg-transparent"
                 disabled={isSubmitting}
+                onClick={() => router.push("/")}
               >
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={isSubmitting}
+                disabled={isSubmitting || !ndaSigned}
                 className="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Processing..." : "Apply"}
@@ -681,6 +623,6 @@ export default function SignUpForm() {
           </form>
         </div>
       </div>
-    </>
+    </FormProvider>
   );
 }
