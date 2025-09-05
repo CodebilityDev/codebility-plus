@@ -6,6 +6,7 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ClockIcon } from "lucide-react";
 import { cn } from "@codevs/ui";
+import getRandomColor from "@/lib/getRandomColor";
 import {
 	IconAbout,
 	IconGithub,
@@ -52,22 +53,37 @@ const staggerContainer = {
 interface ProfileContentProps {
 	codev: Codev;
 	availableSchedule: any;
-	getRandomBgColor: () => string;
-	getStatusBadge: () => string;
-	sanitizeUrl: (url: string | undefined) => string;
-	formatTime: (time: string) => string;
-	allDays: string[];
 }
 
 export default function ProfileContent({
 	codev,
-	availableSchedule,
-	getRandomBgColor,
-	getStatusBadge,
-	sanitizeUrl,
-	formatTime,
-	allDays
+	availableSchedule
 }: ProfileContentProps) {
+	const allDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+	const getRandomBgColor = () => `bg-${getRandomColor()}`;
+
+	const getStatusBadge = () =>
+		codev.availability_status
+			? "Available"
+			: codev.nda_status
+				? "Under NDA"
+				: "Unavailable";
+
+	const sanitizeUrl = (url: string | undefined): string => {
+		if (!url) return "#";
+		return url
+			.replace(process.env.NEXT_PUBLIC_APP_BASE_URL || "", "")
+			.replace(process.env.NEXT_PUBLIC_APP_BASE_URL || "", "");
+	};
+
+	const formatTime = (time: string) => {
+		const [hours, minutes] = time.split(":");
+		const hour = Number.parseInt(hours!);
+		const ampm = hour >= 12 ? "PM" : "AM";
+		const displayHour = hour % 12 || 12;
+		return `${displayHour}:${minutes} ${ampm}`;
+	};
 	const {
 		first_name,
 		last_name,
