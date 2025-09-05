@@ -6,10 +6,10 @@ const usePagination = <T>(data: T[], pageSize: number) => {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [totalPages, setTotalPages] = useState<number>(1);
 
-  const paginatedData = data.slice(
-    (currentPage - 1) * pageSize,
-    currentPage * pageSize,
-  );
+  const startIndex = Math.max(0, (currentPage - 1) * pageSize);
+  const endIndex = Math.min(data.length, currentPage * pageSize);
+  
+  const paginatedData = data.slice(startIndex, endIndex);
 
   const { length: lenghtOfData } = data;
 
@@ -25,12 +25,17 @@ const usePagination = <T>(data: T[], pageSize: number) => {
   };
 
   useEffect(() => {
-    setTotalPages(Math.ceil(lenghtOfData / pageSize));
+    const newTotalPages = Math.ceil(lenghtOfData / pageSize) || 1;
+    setTotalPages(newTotalPages);
 
-    if (data.length <= pageSize) {
-      setCurrentPage(1);
-    }
-  }, [data]);
+    // Reset to page 1 if current page exceeds new total pages
+    setCurrentPage((prev) => {
+      if (prev > newTotalPages) {
+        return 1;
+      }
+      return prev;
+    });
+  }, [data, lenghtOfData, pageSize]);
 
   return {
     currentPage,

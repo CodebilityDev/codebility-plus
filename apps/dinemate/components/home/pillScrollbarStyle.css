@@ -1,0 +1,11 @@
+@media (max-width: 576px) { /* NOTE: update this value when increasing number of pills  */
+  #pills-container::-webkit-scrollbar {
+    height: 0px; /* for mobile view  */
+    width: 0px;
+  }
+
+  #pills-container {
+    scrollbar-width: none; /* Firefox - hide scrollbar */
+    -ms-overflow-style: none; /* IE and Edge - hide scrollbar */
+  }
+}

@@ -1,27 +1,28 @@
-import Footer from "../_components/marketing-footer";
-import Navigation from "../_components/marketing-navigation";
+import Footer from "../_components/MarketingFooter";
+import Navigation from "../_components/MarketingNavigation";
 import Profiles from "../profiles/page";
-import CTA from "./_components/codevs-cta";
-import FeaturedSection from "./_components/codevs-featured-section";
-import Hero from "./_components/codevs-hero";
-import MissionVision from "./_components/codevs-mission-vision";
-import Project from "./_components/codevs-project";
-import Roadmap from "./_components/codevs-roadmap";
+import CTA from "../_shared/CodevsCta";
+import FeaturedSection from "../_shared/CodevsFeaturedCection";
+import Hero from "./_components/CodevsHero";
+import MissionVision from "./_components/CodevsMissionVision";
+import Project from "./_components/CodevsProject";
+import Roadmap from "./_components/CodevsRoadmap";
 
-const Codevs = () => {
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
+export default function Codevs() {
   return (
-    <div className="bg-black-400 relative flex w-full flex-col overflow-x-hidden overflow-y-hidden">
+    <div className="bg-black-400 relative flex w-full flex-col">
       <Navigation />
       <Hero />
+      <Profiles />
       <FeaturedSection />
       <Project />
-      <Profiles />
       <Roadmap />
       <MissionVision />
       <CTA />
       <Footer />
     </div>
   );
-};
-
-export default Codevs;
+}

@@ -1,20 +1,19 @@
-import { ClientDetails } from "@/app/home/clients/_types/clients";
+import { Client } from "@/types/home/codev";
 import { create } from "zustand";
 
 export type ModalType = "clientAddModal" | "clientEditModal";
 
 interface ModalStore {
   type: ModalType | null;
-  data?: ClientDetails;
+  data?: Client;
   isOpen: boolean;
-  onOpen: (type: ModalType, data?: ClientDetails) => void;
+  onOpen: (type: ModalType, data?: Client) => void;
   onClose: () => void;
 }
 
 export const useModal = create<ModalStore>((set) => ({
   type: null,
   isOpen: false,
-  onOpen: (type: ModalType, data?: ClientDetails) =>
-    set({ isOpen: true, type, data }),
+  onOpen: (type: ModalType, data?: Client) => set({ isOpen: true, type, data }),
   onClose: () => set({ type: null, isOpen: false }),
 }));

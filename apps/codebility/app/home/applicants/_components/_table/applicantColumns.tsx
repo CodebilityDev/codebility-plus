@@ -1,0 +1,407 @@
+"use client";
+
+import React from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import { IconGithub, IconLink } from "@/public/assets/svgs";
+import { ColumnDef } from "@tanstack/react-table";
+import { ArrowUpDown } from "lucide-react";
+
+import { Checkbox } from "@codevs/ui/checkbox";
+
+import { NewApplicantType } from "../../_service/types";
+import ApplicantReapplyTime from "../applicantReapplyTime";
+import ApplicantTechStack from "../applicantTechStack";
+import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
+import ApplicantActionButton from "./applicantActionButton";
+import ApplicantProfileColSec from "./applicantProfileColSec";
+
+export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
+  {
+    id: "select",
+    header: ({ table }) => (
+      <Checkbox
+        checked={
+          table.getIsAllPageRowsSelected() ||
+          (table.getIsSomePageRowsSelected() && "indeterminate")
+        }
+        onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
+        aria-label="Select all"
+      />
+    ),
+    cell: ({ row }) => (
+      <Checkbox
+        checked={row.getIsSelected()}
+        onCheckedChange={(value) => row.toggleSelected(!!value)}
+        aria-label="Select row"
+        className="mx-0 mt-8 px-0 xl:mt-0"
+      />
+    ),
+    enableSorting: false,
+    enableHiding: false,
+    meta: {
+      className: "align-top xl:align-middle",
+    },
+  },
+  {
+    id: "applicant",
+    accessorKey: "first_name",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Applicant
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <>
+          <ApplicantProfileColSec applicant={applicant} row={row} />
+        </>
+      );
+    },
+  },
+  {
+    accessorKey: "display_position",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Position
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">
+          {applicant.display_position || "Not specified"}
+        </div>
+      );
+    },
+  },
+  {
+    accessorKey: "years_of_experience",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Exp
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="px-3 py-3 text-center text-sm text-gray-700 dark:text-gray-300">
+          {applicant.years_of_experience !== undefined
+            ? `${applicant.years_of_experience} ${
+                applicant.years_of_experience === 1 ? "yr" : "yrs"
+              }`
+            : "N/A"}
+        </div>
+      );
+    },
+    meta: {
+      className: "m-0 px-0",
+    },
+  },
+  {
+    id: "github",
+    accessorKey: "github",
+    header: "GitHub",
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="px-3 py-3">
+          <div className="flex justify-center">
+            {applicant.github ? (
+              <Link
+                href={applicant.github}
+                target="_blank"
+                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <IconGithub className="h-5 w-5 invert dark:invert-0" />
+              </Link>
+            ) : (
+              <span className="text-sm text-gray-600 dark:text-gray-500">
+                None
+              </span>
+            )}
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    id: "portfolio_website",
+    accessorKey: "portfolio_website",
+    header: "Portfolio",
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="px-3 py-3">
+          <div className="flex justify-center">
+            {applicant.portfolio_website ? (
+              <Link
+                href={applicant.portfolio_website}
+                target="_blank"
+                className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <IconLink className="h-5 w-5 invert dark:invert-0" />
+              </Link>
+            ) : (
+              <span className="text-sm text-gray-600 dark:text-gray-500">
+                None
+              </span>
+            )}
+          </div>
+        </div>
+      );
+    },
+  },
+  {
+    id: "tech_stacks",
+    accessorKey: "tech_stacks",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Tech Stacks
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    sortingFn: (rowA, rowB) => {
+      const lengthA = rowA.original.tech_stacks?.length || 0;
+      const lengthB = rowB.original.tech_stacks?.length || 0;
+      return lengthA - lengthB;
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <>
+          <ApplicantTechStack applicant={applicant} />
+        </>
+      );
+    },
+    meta: {
+      className: "m-0 px-0",
+    },
+  },
+  {
+    accessorKey: "date_applied",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Date Applied
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="py-3 text-center text-sm text-gray-700 dark:text-gray-300">
+          {applicant.date_applied
+            ? new Date(applicant.date_applied).toLocaleDateString()
+            : "N/A"}
+        </div>
+      );
+    },
+    meta: {
+      className: "m-0 px-0",
+    },
+  },
+  {
+    id: "test_taken",
+    accessorKey: "applicant.test_taken",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Test Taken
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="py-3 text-center text-sm text-gray-700 dark:text-gray-300">
+          {applicant.applicant?.test_taken
+            ? new Date(applicant.applicant.test_taken).toLocaleDateString()
+            : "N/A"}
+        </div>
+      );
+    },
+    meta: {
+      className: "m-0 px-0",
+    },
+  },
+  {
+    id: "test_time_remaining",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Time
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <>
+          <ApplicantTestTimeRemaining applicant={applicant} />
+        </>
+      );
+    },
+    meta: {
+      className: "m-0 px-0",
+    },
+  },
+  {
+    id: "fork_url",
+    accessorKey: "applicant.fork_url",
+    header: "Fork URL",
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="flex items-center justify-center px-3 py-3 text-center">
+          {applicant.applicant?.fork_url ? (
+            <Link
+              href={applicant.applicant.fork_url}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <IconLink className="h-4 w-4 text-gray-600 dark:text-gray-200" />
+            </Link>
+          ) : (
+            <span className="text-sm text-gray-600 dark:text-gray-500">
+              N/A
+            </span>
+          )}
+        </div>
+      );
+    },
+  },
+  {
+    id: "reapply",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+        >
+          Reapply
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <>
+          <ApplicantReapplyTime applicant={applicant} />
+        </>
+      );
+    },
+    meta: {
+      className: "m-0 px-0",
+    },
+    enableHiding: true,
+  },
+
+  {
+    id: "reminded",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex items-center justify-center gap-1 text-xs font-medium text-gray-700 dark:text-gray-200"
+        >
+          Reminded
+          <ArrowUpDown className="ml-2 h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant: NewApplicantType = row.original;
+
+      return (
+        <div className="flex items-center justify-center px-2 py-1">
+          <div className="flex flex-col items-center gap-0.5">
+            <span className="inline-flex h-5 items-center justify-center rounded-full bg-gray-100 px-1 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+              {applicant.applicant?.reminded_count ?? 0}
+            </span>
+            <span className="text-[10px] text-gray-500 dark:text-gray-400">
+              {applicant.applicant?.last_reminded_date &&
+                new Date(
+                  applicant.applicant.last_reminded_date,
+                ).toLocaleDateString()}
+            </span>
+          </div>
+        </div>
+      );
+    },
+    meta: {
+      className: "m-0 px-0",
+    },
+  },
+  {
+    id: "actions",
+    header: "Actions",
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="flex items-center justify-start gap-2 px-3 py-3">
+          <ApplicantActionButton applicant={applicant} />
+        </div>
+      );
+    },
+  },
+];
