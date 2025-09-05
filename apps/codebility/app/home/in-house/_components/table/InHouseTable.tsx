@@ -691,9 +691,9 @@ export function InHouseTable({
         </Table>
       </div>
 
-      {/* Pagination Controls - Only show when data exceeds page size */}
+      {/* Pagination Controls - Show when there are multiple pages */}
       <div className="relative w-full">
-        {data.length > pageSize.applicants && (
+        {pagination.totalPages > 1 && (
           <DefaultPagination
             currentPage={pagination.currentPage}
             handleNextPage={handleNextPage}

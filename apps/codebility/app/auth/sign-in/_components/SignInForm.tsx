@@ -38,8 +38,8 @@ const SignInForm = () => {
       // If the response indicates failure, log and show the error toast
       if (!response.success) {
         /* console.error("Sign in failed:", response.error); */
-   /*      toast.error(response.error || "Invalid email or password");
- */
+        /*      toast.error(response.error || "Invalid email or password");
+         */
         throw new Error(response.error);
         /* // Delay a bit to let the toast show before returning
         await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -81,13 +81,11 @@ const SignInForm = () => {
           if (resendResult.success) {
             toast.success("Verification email sent! Please check your inbox.");
           } else {
-            toast.error(
-              resendResult.error || "Failed to resend verification email",
-            );
+            toast.error("Failed to resend verification email");
+            throw new Error(resendResult.error);
           }
         } catch (resendError) {
           console.error("Error resending verification email:", resendError);
-          toast.error("Failed to resend verification email");
         }
 
         router.push("/auth/verify");
@@ -97,7 +95,7 @@ const SignInForm = () => {
       ) {
         toast.error("Invalid email or password");
       } else {
-        toast.error(error.message || "Failed to sign in");
+        toast.error("Failed to sign in");
       }
     } finally {
       setIsLoading(false);
@@ -129,7 +127,7 @@ const SignInForm = () => {
           <button
             type="button"
             onClick={() => router.push(pathsConfig.auth.passwordReset)}
-            className="text-md w-max self-end text-right duration-300 hover:text-customBlue-100"
+            className="text-md hover:text-customBlue-100 w-max self-end text-right duration-300"
           >
             Forgot Password?
           </button>

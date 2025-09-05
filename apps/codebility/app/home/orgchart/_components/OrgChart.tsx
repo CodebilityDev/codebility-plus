@@ -27,22 +27,23 @@ export default function OrgChart({ data }: OrgChartProps) {
   
 
   const ceo = sortedData.find(
-    (member) => member.display_position === "CEO / Founder",
+    (member) => member.display_position === "CEO / Founder" && member.application_status === "passed",
   );
   const admin = sortedData.filter(
-    (member) => member.display_position === "Admin",
+    (member) => member.display_position === "Admin" && member.application_status === "passed",
   );
   const marketing = sortedData.filter(
-    (member) => member.display_position === "Marketing",
+    (member) => member.display_position === "Marketing" && member.application_status === "passed",
   );
   const pm = sortedData.filter(
-    (member) => member.display_position === "Project Manager",
+    (member) => member.display_position === "Project Manager" && member.application_status === "passed",
   );
   const developers = {
     "Full Stack Developers": sortedData
       .filter((member) => 
-        member.display_position === "Full Stack Developer" || 
-        member.display_position === "Developer"
+        (member.display_position === "Full Stack Developer" || 
+        member.display_position === "Developer") &&
+        member.application_status === "passed"
       )
       .sort(
         (a, b) =>
@@ -50,28 +51,28 @@ export default function OrgChart({ data }: OrgChartProps) {
           a.first_name.localeCompare(b.first_name), // Sort by first name
       ),
     "Frontend Developers": sortedData
-      .filter((member) => member.display_position === "Frontend Developer")
+      .filter((member) => member.display_position === "Frontend Developer" && member.application_status === "passed")
       .sort(
         (a, b) =>
           (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0) ||
           a.first_name.localeCompare(b.first_name),
       ),
     "Backend Developers": sortedData
-      .filter((member) => member.display_position === "Backend Developer")
+      .filter((member) => member.display_position === "Backend Developer" && member.application_status === "passed")
       .sort(
         (a, b) =>
           (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0) ||
           a.first_name.localeCompare(b.first_name),
       ),
     "Mobile Developers": sortedData
-      .filter((member) => member.display_position === "Mobile Developer")
+      .filter((member) => member.display_position === "Mobile Developer" && member.application_status === "passed")
       .sort(
         (a, b) =>
           (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0) ||
           a.first_name.localeCompare(b.first_name),
       ),
     "UI/UX Designers": sortedData
-      .filter((member) => member.display_position === "UI/UX Designer")
+      .filter((member) => member.display_position === "UI/UX Designer" && member.application_status === "passed")
       .sort(
         (a, b) =>
           (b.image_url ? 1 : 0) - (a.image_url ? 1 : 0) ||
@@ -135,7 +136,7 @@ export default function OrgChart({ data }: OrgChartProps) {
         <div className="absolute left-1/2 top-0 h-px w-4/5 -translate-x-1/2 bg-gradient-to-r from-transparent via-gray-300 to-transparent dark:via-gray-600" />
         <div className="grid w-full grid-cols-1 gap-8 pt-6 md:grid-cols-2 xl:grid-cols-3">
           {Object.entries(developers)
-            .filter(([title, members]) => members.filter(member => member.application_status === "passed").length > 0)
+            .filter(([title, members]) => members.length > 0)
             .map(([title, members], index) => {
             const colors = [
               "from-indigo-500 to-customBlue-500",
@@ -156,7 +157,7 @@ export default function OrgChart({ data }: OrgChartProps) {
                   <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rounded-full bg-gray-400 dark:bg-gray-600" />
                 </div>
                 <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
-                  {members.filter(member => member.application_status === "passed").map((member) => (
+                  {members.map((member) => (
                     <TeamMemberCard key={member.id} {...member} />
                   ))}
                 </div>
