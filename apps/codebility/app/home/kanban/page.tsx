@@ -1,8 +1,11 @@
+import React from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { Box } from "@/Components/shared/dashboard";
-import H1 from "@/Components/shared/dashboard/H1";
-import { Button } from "@/Components/ui/button";
-import { Skeleton } from "@/Components/ui/skeleton/skeleton";
+import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
+import { Box } from "@/components/shared/dashboard";
+import H1 from "@/components/shared/dashboard/H1";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import {
   Table,
   TableBody,
@@ -10,132 +13,293 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/Components/ui/table";
+} from "@/components/ui/table";
 import pathsConfig from "@/config/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
 
-import KanbanBoardsSearch from "./_components/kanban-boards-search";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+// Types
+interface SearchParams {
+  query?: string;
+}
 
-export default async function KanbanPage({
-  searchParams,
-}: {
-  searchParams: {
-    query: string;
-  };
-}) {
-  const query = searchParams.query;
-  const supabase = getSupabaseServerComponentClient();
+interface CodevData {
+  id: string;
+  first_name: string;
+  last_name: string;
+  image_url?: string | null;
+}
 
-  let supabaseBoardQuery = supabase.from("board").select(`*,
-    project(
-      *,
-      codev(
-        user(
-          profile(
-            first_name,
-            last_name
-          )
+interface ProjectMemberData {
+  codev?: CodevData | null;
+  role?: string;
+}
+
+interface ProjectData {
+  id: string;
+  name: string;
+  client_id?: string;
+  team_leader?: CodevData | null;
+  kanban_display: boolean;
+  project_members: ProjectMemberData[];
+  isUserInvolved?: boolean;
+}
+
+interface PageProps {
+  searchParams: Promise<SearchParams>;
+}
+
+export default async function KanbanPage(props: PageProps) {
+  const searchParams = await props.searchParams;
+  const supabase = await createClientServerComponent();
+
+  //Get current user
+  const {
+    data: { user: sessionUser },
+  } = await supabase.auth.getUser();
+
+  const currentUserId = sessionUser?.id;
+
+  let projectQuery = supabase.from("projects").select(
+    `
+      id,
+      name,
+      description,
+      kanban_display,
+      project_members!inner (
+        role,
+        codev:codev_id (
+          id,
+          first_name,
+          last_name,
+          image_url
         )
       )
-    )
-  `);
+    `,
+  );
 
-  if (query) {
-    // apply board filter if there is query in url search query.
-    supabaseBoardQuery = supabaseBoardQuery.like("name", `%${query}%`);
+  if (searchParams.query) {
+    projectQuery = projectQuery.ilike("name", `%${searchParams.query}%`);
   }
 
-  const { data, error } = await supabaseBoardQuery;
+  const { data: projects, error } = await projectQuery;
+  const typedProjects = projects as unknown as ProjectData[];
 
+  // Extended type for the new array
+  const projectsWithTeamLead: ProjectData[] = typedProjects?.map((project) => {
+    const teamLeader = project.project_members.find(
+      (member) => member.role === "team_leader",
+    );
+
+    return {
+      ...project,
+
+      team_leader: teamLeader ? teamLeader.codev : null,
+      isUserInvolved: project.project_members.some(
+        (member) => member.codev?.id === currentUserId,
+      ),
+    };
+  });
+
+  // Render table content
+  const renderTableContent = () => {
+    // Error handling
+    if (error) {
+      return (
+        <TableRow>
+          <TableCell colSpan={4} className="text-center text-red-500">
+            {error.message || "Error loading boards"}
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    // Loading state
+    if (!typedProjects) {
+      return Array.from({ length: 3 }).map((_, index) => (
+        <TableRow key={`loading-${index}`}>
+          <TableCell colSpan={4}>
+            <Box className="flex-1">
+              <div className="flex flex-col items-center gap-3">
+                <Skeleton className="h-8 w-full" />
+              </div>
+            </Box>
+          </TableCell>
+        </TableRow>
+      ));
+    }
+
+    // Empty state
+    if (!typedProjects || typedProjects.length === 0) {
+      return (
+        <TableRow>
+          <TableCell
+            colSpan={4}
+            className="text-dark100_light900 py-8 text-center"
+          >
+            No boards available. Create a board to get started.
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    // Render boards
+    return projectsWithTeamLead.map((project) => (
+      <TableRow
+        key={project.id}
+        className={`grid grid-cols-1 transition-all duration-200 md:table-row ${
+          project.isUserInvolved
+            ? "from-customBlue-50 dark:from-customBlue-950/50 hover:from-customBlue-100 hover:via-customBlue-50 dark:hover:from-customBlue-900/70 border-customBlue-500 border-l-4 bg-gradient-to-r via-white to-purple-50 shadow-sm hover:to-purple-100 dark:via-gray-900 dark:to-purple-950/50 dark:hover:via-gray-800 dark:hover:to-purple-900/70"
+            : "border-l-4 border-gray-300 bg-gray-50 text-gray-500 dark:border-gray-600 dark:bg-gray-800/30 dark:text-gray-400"
+        }`}
+      >
+        {project.kanban_display && (
+          <>
+            {/* Project Name */}
+            <TableCell className="md:table-cell">
+              <span
+                className={
+                  project.isUserInvolved
+                    ? "text-gray-800 dark:text-gray-200"
+                    : "text-gray-500 dark:text-gray-400"
+                }
+              >
+                {project.name || "No project assigned"}
+              </span>
+            </TableCell>
+
+            {/* Team Lead */}
+            <TableCell className="md:table-cell">
+              {project.team_leader ? (
+                <div className="flex items-center gap-2">
+                  {project.team_leader.image_url && (
+                    <img
+                      src={project.team_leader.image_url}
+                      alt={`${project.team_leader.first_name}'s avatar`}
+                      className={`h-8 w-8 rounded-full object-cover ${
+                        project.isUserInvolved ? "" : "opacity-50 grayscale"
+                      }`}
+                    />
+                  )}
+                  <span
+                    className={`capitalize ${
+                      project.isUserInvolved
+                        ? "text-gray-800 dark:text-gray-200"
+                        : "text-gray-500 dark:text-gray-400"
+                    }`}
+                  >
+                    {`${project.team_leader.first_name} ${project.team_leader.last_name}`}
+                  </span>
+                </div>
+              ) : (
+                <span
+                  className={
+                    project.isUserInvolved
+                      ? "text-gray-600 dark:text-gray-300"
+                      : "text-gray-500 dark:text-gray-400"
+                  }
+                >
+                  No team lead assigned
+                </span>
+              )}
+            </TableCell>
+
+            {/* Actions */}
+            <TableCell className="text-center md:table-cell">
+              {project.isUserInvolved ? (
+                <Link href={`${pathsConfig.app.kanban}/${project.id}`}>
+                  <Button
+                    variant="hollow"
+                    className="bg-customBlue-600 hover:bg-customBlue-700 dark:bg-customBlue-600 dark:hover:bg-customBlue-700 inline-flex items-center gap-2 text-white shadow-sm"
+                  >
+                    <IconKanban className="h-4 w-4 text-white" />
+                    <span className="hidden sm:inline">View Sprint</span>
+                  </Button>
+                </Link>
+              ) : (
+                <Button
+                  variant="hollow"
+                  disabled
+                  className="inline-flex cursor-not-allowed items-center gap-2 bg-gray-300 text-gray-500 dark:bg-gray-600 dark:text-gray-400"
+                >
+                  <IconKanban className="h-4 w-4" />
+                  <span className="hidden sm:inline">No Access</span>
+                </Button>
+              )}
+            </TableCell>
+          </>
+        )}
+      </TableRow>
+    ));
+  };
+
+  // Render the full page
   return (
-    <div className="text-dark100_light900 mx-auto flex max-w-7xl flex-col gap-4 ">
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between">
-        <H1>Codevs Board</H1>
-        <div className="flex flex-col items-end gap-4 md:flex-row md:items-center md:justify-end">
-          <KanbanBoardsSearch
-            className="border-gray h-10 w-full rounded-full border border-opacity-50 bg-inherit px-5 text-xs focus:outline-none md:w-80"
-            placeholder="Search Board"
-          />
+    <AsyncErrorBoundary
+      fallback={
+        <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+          <div className="mb-4 text-4xl">📋</div>
+          <h2 className="mb-2 text-xl font-semibold">
+            Unable to load Kanban boards
+          </h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            There was an issue loading your Kanban boards. Please try refreshing
+            the page.
+          </p>
+        </div>
+      }
+    >
+      <div className="mx-auto flex max-w-7xl flex-col gap-6 p-4">
+        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="from-customBlue-500 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br to-purple-500 shadow-lg">
+              <IconKanban className="h-5 w-5 translate-x-0.5 transform text-white" />
+            </div>
+            <div>
+              <H1 className="to-customBlue-600 bg-gradient-to-r from-purple-600 bg-clip-text text-3xl font-bold text-transparent">
+                📋 Kanban Projects
+              </H1>
+              <p className="text-gray-600 dark:text-gray-400">
+                Manage your project boards and sprints
+              </p>
+            </div>
+          </div>
+          <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
+            <div className="relative">
+              <KanbanBoardsSearch
+                className="focus:ring-customBlue-500 h-10 w-full rounded-full border border-gray-200 bg-white px-5 text-sm shadow-sm focus:border-transparent focus:outline-none focus:ring-2 dark:border-gray-600 dark:bg-gray-800 md:w-80"
+                placeholder="🔍 Search boards..."
+              />
+            </div>
+          </div>
+        </div>
+
+        <div className="overflow-hidden rounded-lg border border-gray-200 shadow-sm dark:border-gray-700">
+          <Table>
+            <TableHeader className="hidden md:table-header-group">
+              <TableRow className="border-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+                <TableHead className="w-[30%] font-semibold text-gray-900 dark:text-white">
+                  🚀 Project
+                </TableHead>
+                <TableHead className="w-[30%] font-semibold text-gray-900 dark:text-white">
+                  👑 Team Lead
+                </TableHead>
+                <TableHead className="w-[10%] text-center font-semibold text-gray-900 dark:text-white">
+                  ⚡ Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+
+            <TableBody className="bg-white dark:bg-gray-950">
+              {renderTableContent()}
+            </TableBody>
+          </Table>
         </div>
       </div>
-      <Table>
-        <TableHeader className="hidden xl:block">
-          <TableRow className="text-dark100_light900 grid grid-cols-4 place-items-center border-none">
-            <TableHead>Name</TableHead>
-            <TableHead>Project Name</TableHead>
-            <TableHead>Lead</TableHead>
-            <TableHead>Board</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody className="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-1">
-          {!error ? (
-            <>
-              {data?.map((board) => (
-                <TableRow
-                  key={board.id}
-                  className="background-lightbox_darkbox text-dark100_light900 border-lightgray dark:border-black-500 flex flex-col xl:grid xl:flex-none xl:grid-cols-4 xl:place-items-center"
-                >
-                  <TableCell>
-                    <p>{board.name}</p>
-                  </TableCell>
-                  <TableCell>
-                    <p>{board.project.name}</p>
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex gap-x-1">
-                      <p className="capitalize">
-                        {board.project?.codev.user.profile.first_name}
-                      </p>
-                      <p className="capitalize">
-                        {board.project?.codev.user.profile.last_name}
-                      </p>
-                    </div>
-                  </TableCell>
-                  <TableCell className="xl:flex xl:items-center xl:justify-center">
-                    <Link href={`${pathsConfig.app.kanban}/${board.id}`}>
-                      <Button variant="hollow" className="border-none xl:w-max">
-                        <IconKanban className="invert dark:invert-0" />
-                      </Button>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </>
-          ) : (
-            <>
-              <TableRow className="background-lightbox_darkbox text-dark100_light900 border-lightgray dark:border-black-500 flex flex-col">
-                <TableCell>
-                  <Box className="flex-1">
-                    <div className="mx-auto flex flex-col items-center gap-3">
-                      <Skeleton className="h-8 w-full" />
-                    </div>
-                  </Box>
-                </TableCell>
-              </TableRow>
-              <TableRow className="background-lightbox_darkbox text-dark100_light900 border-lightgray dark:border-black-500 flex flex-col">
-                <TableCell>
-                  <Box className="flex-1">
-                    <div className="mx-auto flex flex-col items-center gap-3">
-                      <Skeleton className="h-8 w-full" />
-                    </div>
-                  </Box>
-                </TableCell>
-              </TableRow>
-              <TableRow className="background-lightbox_darkbox text-dark100_light900 border-lightgray dark:border-black-500 flex flex-col">
-                <TableCell>
-                  <Box className="flex-1">
-                    <div className="mx-auto flex flex-col items-center gap-3">
-                      <Skeleton className="h-8 w-full" />
-                    </div>
-                  </Box>
-                </TableCell>
-              </TableRow>
-            </>
-          )}
-        </TableBody>
-      </Table>
-    </div>
+    </AsyncErrorBoundary>
   );
 }

@@ -1,5 +1,4 @@
-import { TaskT } from "@/types";
-import { client_ClientCardT } from "@/types/protectedroutes";
+import { Client, Task } from "@/types/home/codev";
 import { create } from "zustand";
 
 export type ModalType =
@@ -16,24 +15,26 @@ export type ModalType =
   | "privacyPolicyModal"
   | "termsOfServiceModal"
   | "timeTrackerTicketModal"
-  | "listAddModal"
+  | "ColumnAddModal"
   | "boardAddModal"
   | "homeTermsAndConditionModal"
   | "homeFAQSModal"
   | "homePrivacyPolicyModal"
-  | "addRoleModal"
-  | "editRoleModal"
-  | "deleteRoleModal";
+  | "deleteWarningModal"
+  | "dashboardCurrentProjectModal"
+  | "marketingCodevHireCodevModal";
 
 interface ModalStore {
   type: ModalType | null;
-  data?: TaskT | client_ClientCardT[] | any;
+  data?: Task | Client[] | any;
   dataObject?: any;
+  callback?: () => void;
   isOpen: boolean;
   onOpen: (
     type: ModalType,
-    data?: TaskT | client_ClientCardT[] | any,
+    data?: Task | Client[] | any,
     dataObject?: any,
+    callback?: () => void,
   ) => void;
   onClose: () => void;
 }
@@ -42,7 +43,8 @@ export const useModal = create<ModalStore>((set) => ({
   type: null,
   dataObject: {},
   isOpen: false,
-  onOpen: (type, data?: TaskT | client_ClientCardT[] | any, dataObject?) =>
-    set({ isOpen: true, type, data, dataObject }),
-  onClose: () => set({ type: null, isOpen: false }),
+  callback: undefined,
+  onOpen: (type, data?: Task | Client[] | any, dataObject?, callback?) =>
+    set({ isOpen: true, type, data, dataObject, callback }),
+  onClose: () => set({ type: null, isOpen: false, callback: undefined }),
 }));

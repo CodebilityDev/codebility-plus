@@ -1,24 +1,27 @@
-import H1 from "@/Components/shared/dashboard/H1";
 import { getCodevs } from "@/lib/server/codev.service";
-import { Codev } from "@/types/home/codev";
+import { getOrSetCache } from "@/lib/server/redis-cache";
+import { cacheKeys } from "@/lib/server/redis-cache-keys";
 
-import InHouseContainer from "./_components/in-house-container";
+import InHouseView from "./_components/InHouseView";
 
-async function InHousePage() {
-  const { error, data } = await getCodevs();
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-  if (error) return <div>ERROR</div>;
-
-  return (
-    <div className="max-w-screen-xl mx-auto flex flex-col gap-2">
-      <H1>In-House Codebility</H1>
-      {error ? (
-        <div>ERROR</div>
-      ) : (
-        <InHouseContainer codevData={data as Codev[]} />
-      )}
-    </div>
+export default async function InHousePage() {
+  const { data, error } = await getOrSetCache(
+    cacheKeys.codevs.inhouse,
+    // Fetch Codev data with the desired filter
+    () =>
+      getCodevs({
+        filters: { application_status: "passed" },
+      }),
   );
-}
 
-export default InHousePage;
+  // Check for errors or missing data
+  if (error || !data) {
+    throw new Error("Failed to fetch data");
+  }
+
+  // Pass the fully prepared data to the view
+  return <InHouseView initialData={data} />;
+}

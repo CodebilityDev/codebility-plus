@@ -1,10 +1,13 @@
 import React from "react";
 
-import Container from "../_components/marketing-container";
-import Footer from "../_components/marketing-footer";
-import Navigation from "../_components/marketing-navigation";
-import SideNavMenu from "../_components/marketing-sidenav-menu";
-import BookACallCalendlyWidgetContainer from "./_components/bookacall-calendly-widget-container";
+import Container from "../_components/MarketingContainer";
+import Footer from "../_components/MarketingFooter";
+import Navigation from "../_components/MarketingNavigation";
+import SideNavMenu from "../_components/MarketingSidenavMenu";
+import BookACallCalendlyWidgetContainer from "./_components/BookACallCalendlyWidgetContainer";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default function BookCallPage() {
   return (
@@ -35,7 +38,7 @@ export default function BookCallPage() {
             clipPath:
               "polygon(0% 31.5%, 75.3% 19.5%, 100% 50%, 75.5% 80.5%, 0% 67.8%, 0% 50%)",
           }}
-          className="relative aspect-[855/678] w-[40rem] bg-gradient-to-r from-[#00738B] via-[#0C3FDB] to-[#9707DD] opacity-20 sm:w-[72.1875rem]"
+          className="relative aspect-[855/678] w-[40rem] bg-gradient-to-r from-customBlue-700 via-customBlue-800 to-customViolet-300 opacity-20 sm:w-[72.1875rem]"
         />
       </div>
       <Footer />

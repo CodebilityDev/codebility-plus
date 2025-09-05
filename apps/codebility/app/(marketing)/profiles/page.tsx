@@ -1,37 +1,53 @@
 import { Suspense } from "react";
-import SectionWrapper from "@/Components/shared/home/SectionWrapper";
-import { UsersSkeleton } from "@/Components/ui/skeleton/UsersSkeleton";
-import { getAdmins, getCodevs } from "@/lib/server/codev.service";
+import { UsersSkeleton } from "@/components/ui/skeleton/UsersSkeleton";
+import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
+import {
+  getPrioritizedAndFilteredCodevs,
+  prioritizeCodevs,
+} from "@/utils/codev-priority"; // Import the utility
 
-import "./style.css";
+import Section from "../_shared/CodevsSection";
+import CodevContainer from "./_components/CodevContainer";
+import { CodevHireCodevModal } from "./_components/CodevHireCodevModal";
+import CodevList from "./_components/CodevList";
 
-import ProfileContainer from "./_components/profile-container";
-import CodevLists from "./_components/profile-lists";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 export default async function Profiles() {
-  const [{ data: codevs }, { data: admins }] = await Promise.all([
-    getCodevs("INHOUSE"),
-    getAdmins(),
+  const [{ data: allCodevs, error }] = await Promise.all([
+    getCodevs({ filters: { role_id: 10 } }), // show only Codevs with role_id 10 which is Codev
   ]);
 
-  const filteredCodevs = (codevs as Codev[]).filter(
-    (codev) =>
-      !(admins as Codev[]).some((admin) => admin.user_id === codev.user_id),
+  if (error) {
+    throw new Error("Failed to fetch profiles data");
+  }
+
+  const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
+
+  // Use the utility function with filterAdminAndFailed set to true
+  const sortedCodevs = getPrioritizedAndFilteredCodevs(
+    codevsArray,
+    { activeStatus: ["active"] },
+    true,
   );
 
   return (
-    <SectionWrapper
-      id="codevs"
-      className="from-black-500 relative w-full bg-gradient-to-b"
-    >
-      <div className="bg-code-pattern absolute inset-0 bg-repeat opacity-5"></div>
-      <div className="relative flex flex-col gap-8">
-        <ProfileContainer />
-        <Suspense fallback={<UsersSkeleton />}>
-          <CodevLists codevs={filteredCodevs} />
-        </Suspense>
-      </div>
-    </SectionWrapper>
+    <>
+      <Section
+        id="codevs"
+        className="from-black-500 relative w-full bg-gradient-to-b"
+      >
+        <div className="bg-code-pattern absolute inset-0 bg-repeat opacity-5"></div>
+        <div className="relative flex flex-col gap-8">
+          <CodevContainer />
+          <Suspense fallback={<UsersSkeleton />}>
+            <CodevList codevs={sortedCodevs} />
+          </Suspense>
+        </div>
+      </Section>
+      <CodevHireCodevModal />
+    </>
   );
 }

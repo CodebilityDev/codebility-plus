@@ -1,10 +1,10 @@
-import { ServiceCardT } from "@/types";
+import { Project } from "@/types/home/codev";
 import { create } from "zustand";
 
 type ModalState = {
   isOpen: boolean;
-  modalContent: ServiceCardT | null;
-  openModal: (content: ServiceCardT) => void;
+  modalContent: Project | null;
+  openModal: (content: Project) => void;
   closeModal: () => void;
 };
 

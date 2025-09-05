@@ -1,50 +1,88 @@
 "use server";
 
 import { Codev } from "@/types/home/codev";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
+
 
 export const updateCodev = async (
   key: keyof Codev,
   value: any,
-  { codevId, userId }: { codevId: string; userId: string },
+  { codevId }: { codevId: string },
 ) => {
-  const supabase = getSupabaseServerActionClient();
+  const supabase = await createClientServerComponent();
+
+  // Define keys and their corresponding target tables
   const keys = {
-    project: ["projects"],
-    codev: ["internal_status", "nda_status", "type"],
-    profile: ["main_position"],
+    projects: ["projects"],
+    codev: [
+      "internal_status",
+      "nda_status",
+      "availability_status",
+      "application_status",
+      "image_url",
+      "email_address",
+      "display_position",
+      "role_id",
+      "level",
+      "tech_stacks",
+      "date_joined",
+    ],
   };
 
-  // target table
+  // Dynamically find the target table
   const target = Object.keys(keys).find((table) =>
     keys[table as keyof typeof keys].includes(key),
   );
 
-  if (!target) throw new Error(`invalid codev info: ${key}`);
+  if (!target) {
+    throw new Error(`Invalid codev info: ${key}`);
+  }
 
-  if (target === "project") {
-    await supabase.from("codev_project").delete().eq("codev_id", codevId);
+  if (target === "projects") {
+    // 1) Delete all existing pivot rows for that codev
+    const { error: deleteError } = await supabase
+      .from("project_members")
+      .delete()
+      .eq("codev_id", codevId);
 
+    if (deleteError) throw deleteError;
+
+    // 2) Re-insert the new relationships
     for (let i = 0; i < value.length; i++) {
-      const { id } = value[i];
+      const project = value[i];
 
-      await supabase.from("codev_project").insert({
+      // If your 'project_members' table requires 'role' (not nullable),
+      // ensure you're providing it here. Example fallback 'Developer'.
+      const insertPayload = {
         codev_id: codevId,
-        project_id: id,
-      });
+        project_id: project.id,
+        role: project.role || "member",
+      };
+
+      const { error: insertError } = await supabase
+        .from("project_members")
+        .insert(insertPayload);
+
+      if (insertError) throw insertError;
     }
   } else {
+    // Handle standard update to the 'codev' table
     let newValue = value;
 
-    if (target === "codev")
-      // since all the data we are updating in codev table are status. and all status are enums.
-      newValue = value.replace(/ /g, "").toUpperCase(); // we will transform all the new data to a constants naming convention.
+    if (
+      target === "codev" &&
+      ["internal_status", "availability_status"].includes(key)
+    ) {
+      // Example: convert spaces to no-space uppercase
+      newValue = String(newValue).replace(/\s+/g, "").toUpperCase();
+    }
 
     const { error } = await supabase
-      .from(target)
+      .from(target) // 'codev'
       .update({ [key]: newValue })
-      .eq("user_id", userId);
+      .eq("id", codevId);
+
     if (error) throw error;
   }
 };
