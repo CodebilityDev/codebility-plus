@@ -1,38 +1,78 @@
-import { use } from "react";
-import H1 from "@/Components/shared/dashboard/H1";
-import { ProjectT } from "@/types/index";
+import H1 from "@/components/shared/dashboard/H1";
+import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
+import getProjects from "@/lib/server/project.service";
+import { getOrSetCache } from "@/lib/server/redis-cache";
+import { cacheKeys } from "@/lib/server/redis-cache-keys";
+import { Project } from "@/types/home/codev";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
-import { getSupabaseServerComponentClient } from "@codevs/supabase/server-component-client";
+import AddProjectButton from "./_components/AddProjectButton";
+import ProjectCardContainer from "./_components/ProjectCardContainer";
+import ProjectFilterButton from "./_components/ProjectFilterButton";
 
-import ProjectsCard from "./_components/projects-card";
-import InsertButton from "./_components/projects-insert-button";
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
-const Projects = () => {
-  const supabase = getSupabaseServerComponentClient();
-
-  const Projects = use(
-    supabase
-      .from("project")
-      .select("*")
-      .then(({ data, error }) => {
-        if (error) throw error;
-        return data;
-      }),
-  );
-
-  return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
-      <div className="flex flex-row justify-between gap-4">
-        <H1>Projects</H1>
-        <div className="flex items-center gap-4">
-          <InsertButton />
-        </div>
-      </div>
-      {Projects && Projects.length > 0 && (
-        <ProjectsCard projects={Projects as ProjectT[]} />
-      )}
-    </div>
-  );
+type PageProps = {
+  searchParams: Promise<{
+    filter?: string;
+  }>;
 };
 
+const Projects = async (props: PageProps) => {
+  const searchParams = await props.searchParams;
+  const supabase = await createClientServerComponent();
+  const filter = searchParams.filter;
+
+  /*  const allProjects = await getOrSetCache(cacheKeys.projects.all, () =>
+    getProjects(),
+  ); */
+  /* to be back on redis */
+  const allProjects = await getProjects();
+
+  const Projects =
+    filter && filter !== "all"
+      ? allProjects?.filter(
+          (project) => project.status?.toLowerCase() === filter.toLowerCase(),
+        )
+      : allProjects;
+
+  if (!Projects) {
+    return (
+      <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+        <H1>Projects</H1>
+        <div className="flex flex-col items-center justify-center gap-4">
+          <p className="text-lg font-semibold">No projects found</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <AsyncErrorBoundary
+      fallback={
+        <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+          <div className="mb-4 text-4xl">📁</div>
+          <h2 className="mb-2 text-xl font-semibold">Unable to load projects</h2>
+          <p className="text-gray-600 dark:text-gray-400">
+            Something went wrong while fetching your projects. Please refresh the page to try again.
+          </p>
+        </div>
+      }
+    >
+      <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+        <div className="flex flex-row justify-between gap-4">
+          <H1>Projects</H1>
+          <div className="flex items-center gap-4">
+            <ProjectFilterButton />
+            <AddProjectButton />
+          </div>
+        </div>
+        {Projects && Projects.length > 0 && (
+          <ProjectCardContainer projects={Projects as Project[]} />
+        )}
+      </div>
+    </AsyncErrorBoundary>
+  );
+};
 export default Projects;

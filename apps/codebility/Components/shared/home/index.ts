@@ -1,9 +1,0 @@
-export { default as ButtonLink } from "@/Components/shared/home/ButtonLink";
-export { default as CodevHeading } from "@/Components/shared/home/CodevHeading";
-export { default as H1 } from "@/Components/shared/home/H1";
-export { default as H2 } from "@/Components/shared/home/H2";
-export { default as Heading3 } from "@/Components/shared/home/Heading3";
-export { default as IntroText } from "@/Components/shared/home/IntroText";
-export { default as Paragraph } from "@/Components/shared/home/Paragraph";
-export { default as SectionWrapper } from "@/Components/shared/home/SectionWrapper";
-export { default as TextGradient } from "@/Components/shared/home/TextGradient";

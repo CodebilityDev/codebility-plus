@@ -1,14 +1,14 @@
 "use server";
 
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
-import { getSupabaseServerActionClient } from "@codevs/supabase/server-actions-client";
 
 export const updatePassword = async (formData: FormData) => {
     const email = formData.get("email") as string;
     const password = formData.get("currentPassword") as string;
     const newPassword = formData.get("newPassword") as string;
 
-    const supabase = getSupabaseServerActionClient();
+    const supabase = await createClientServerComponent();
 
     const { error: signInError } = await supabase.auth.signInWithPassword({
         email,

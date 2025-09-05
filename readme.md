@@ -112,15 +112,11 @@ You can add other folders inside of `packages/` if you know what you're doing an
 ## 🏁 Start the app
 
 - Install dependencies: `pnpm i`
-- Codebility / Tapup local dev:
+- Codebility local dev:
   - First, provide environment variables
-    - run either `cd apps/tapup` - if running tapup
-      **or**
-      `cd apps/codebilty` - if running codebility.
+    - run `cd apps/codebility`
     - run `cp .env.example .env.local`
-  - Then `pnpm codebility` - if running codebility.
-    **or**
-    `pnpm tapup` - if running tapup.
+  - Then `pnpm codebility`
 - Next.js local dev: `pnpm run web`
   - Runs `pnpm run next`
 - Expo local dev:

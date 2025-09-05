@@ -1,20 +1,23 @@
-import Footer from "../_components/marketing-footer";
-import Navigation from "../_components/marketing-navigation";
-import SideNavMenu from "../_components/marketing-sidenav-menu";
-import DevelopmentProcess from "./_components/ai-integration-development-process";
-import DevelopmentProcessReactFLow from "./_components/ai-integration-development-process-react-flow";
-import HeroBackground from "./_components/ai-integration-hero-bg";
-import LatestTech from "./_components/ai-integration-latest-tech";
-import MobileAppServices from "./_components/ai-integration-mobile-app-services";
-import NextStep from "./_components/ai-integration-next-step";
-import Partner from "./_components/ai-integration-partner";
-import PartnerReactFlow from "./_components/ai-integration-partner-react-flow";
-import AISolutions from "./_components/ai-integration-solutions";
-import UnparallelDigitalSuccess from "./_components/ai-integration-unparallel-digital-success";
+import Footer from "../_components/MarketingFooter";
+import Navigation from "../_components/MarketingNavigation";
+import SideNavMenu from "../_components/MarketingSidenavMenu";
+import DevelopmentProcessReactFLow from "./_components/AiIntegration-development-process-react-flow";
+import DevelopmentProcess from "./_components/AiIntegrationDevelopmentProcess";
+import HeroBackground from "./_components/AiIntegrationHeroBg";
+import LatestTech from "./_components/AiIntegrationLatestTech";
+import MobileAppServices from "./_components/AiIntegrationMobileAppServices";
+import NextStep from "./_components/AiIntegrationNextStep";
+import Partner from "./_components/AiIntegrationPartner";
+import PartnerReactFlow from "./_components/AiIntegrationPartnerReactFlow";
+import AISolutions from "./_components/AiIntegrationSolutions";
+import UnparallelDigitalSuccess from "./_components/AiIntegrationUnparallelDigitalSuccess";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 const AiIntegration = () => {
   return (
-    <div className="relative mx-auto flex min-h-screen flex-col gap-10 bg-[#030303] text-white">
+    <div className="bg-black-400 relative mx-auto flex min-h-screen flex-col gap-10 text-white">
       <HeroBackground />
       <Navigation />
       <SideNavMenu />

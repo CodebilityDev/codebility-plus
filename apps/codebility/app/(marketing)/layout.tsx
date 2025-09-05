@@ -1,19 +1,12 @@
-import React, { ReactNode } from "react";
-import { Poppins } from "next/font/google";
-
-const poppins = Poppins({
-  subsets: ["latin"],
-  display: "swap",
-  weight: ["100", "200", "300", "400", "500", "600", "700", "800", "900"],
-  style: ["normal", "italic"],
-});
-
-const RootLayout = ({ children }: { children: ReactNode }) => {
+"use server";
+export default async function MarketingLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <main className={poppins.className}>
-      <div>{children}</div>
-    </main>
+    <div>
+      <main>{children}</main>
+    </div>
   );
-};
-
-export default RootLayout;
+}

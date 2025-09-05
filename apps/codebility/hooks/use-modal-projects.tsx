@@ -1,4 +1,4 @@
-import { ProjectT } from "@/types";
+import { Project } from "@/types/home/codev";
 import { create } from "zustand";
 
 export type ModalType =
@@ -6,20 +6,20 @@ export type ModalType =
   | "projectEditModal"
   | "projectViewModal"
   | "projectDeleteModal"
-  | "projectMembersModal";
+  | "KanbanAddMembersModal";
 
 interface ModalStore {
   type: ModalType | null;
-  data?: ProjectT;
+  data?: Project;
   isOpen: boolean;
-  onOpen: (type: ModalType, data?: ProjectT) => void;
+  onOpen: (type: ModalType, data?: Project) => void;
   onClose: () => void;
 }
 
 export const useModal = create<ModalStore>((set) => ({
   type: null,
   isOpen: false,
-  onOpen: (type: ModalType, data?: ProjectT) =>
+  onOpen: (type: ModalType, data?: Project) =>
     set({ isOpen: true, type, data }),
   onClose: () => set({ type: null, isOpen: false }),
 }));
