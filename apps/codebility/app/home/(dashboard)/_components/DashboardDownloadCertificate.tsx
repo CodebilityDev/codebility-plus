@@ -12,10 +12,16 @@ export const handleDownload = async (
 ) => {
   if (!certRef.current) return;
 
+  // Wait a bit to ensure images are loaded
+  await new Promise(resolve => setTimeout(resolve, 500));
+
   const canvas = await html2canvas(certRef.current, {
     useCORS: true,
     scale: 2,
     backgroundColor: null,
+    logging: true, // Enable logging to debug
+    allowTaint: true, // Allow tainted images
+    foreignObjectRendering: true, // Better SVG/CSS rendering
   });
 
   const imgData = canvas.toDataURL("image/png");
@@ -27,7 +33,7 @@ export const handleDownload = async (
   });
 
   pdf.addImage(imgData, "PNG", 0, 0, canvas.width, canvas.height);
-  pdf.save(`${name}.pdf`);
+  pdf.save(`${name}-certificate.pdf`);
 };
 
 export interface CertificateProps {
@@ -48,16 +54,19 @@ const Certificate = forwardRef<HTMLDivElement, CertificateProps>(
     return (
       <div
         ref={ref}
-        className="relative h-[700px] w-[1000px] overflow-hidden border font-sans text-white shadow-md"
+        className="relative h-[700px] w-[1000px] overflow-hidden font-sans text-white"
         style={{
           backgroundImage: `url(${background})`,
           backgroundSize: "cover",
           backgroundPosition: "center",
+          backgroundColor: "transparent",
         }}
       >
         <div className="flex h-full w-full flex-col justify-between px-40 py-10 text-center">
           <div>
-            <img className="mx-auto w-60" src={logo} alt="logo" />
+            <div className="mx-auto w-60 h-[80px] relative">
+              <img className="mx-auto w-60" src={logo} alt="logo" />
+            </div>
             <h1 className="mt-3 leading-tight">
               <span className="my-5 text-5xl font-bold">CERTIFICATE</span>
             </h1>

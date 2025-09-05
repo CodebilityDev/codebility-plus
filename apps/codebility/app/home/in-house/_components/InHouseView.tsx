@@ -5,6 +5,8 @@ import { H1 } from "@/components/shared/home";
 import usePagination from "@/hooks/use-pagination";
 import { Codev } from "@/types/home/codev";
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
+
 import { getMemberStats } from "../_lib/utils";
 import { InHouseTable } from "./table/InHouseTable";
 import { TableFilters } from "./table/table-filters";
@@ -14,20 +16,8 @@ interface InHouseViewProps {
 }
 
 export default function InHouseView({ initialData }: InHouseViewProps) {
-  // Sort data to show active members first, inactive at the end
-  const sortedInitialData = [...initialData].sort((a, b) => {
-    // Active (true) should come first, inactive (false/null) at end
-    const aActive = a.availability_status ?? false;
-    const bActive = b.availability_status ?? false;
-    
-    // If both have same availability status, maintain original order
-    if (aActive === bActive) return 0;
-    
-    // Active comes first (true > false)
-    return bActive ? 1 : -1;
-  });
-
-  const [data, setData] = useState<Codev[]>(sortedInitialData);
+  const [data, setData] = useState<Codev[]>(initialData);
+  const [activeTab, setActiveTab] = useState<"active" | "inactive">("active");
   const stats = getMemberStats(data);
 
   // Filters
@@ -45,6 +35,11 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
 
   // Filtering logic
   const filteredData = data.filter((item) => {
+    // Filter by tab first
+    const isActive = item.availability_status === true;
+    if (activeTab === "active" && !isActive) return false;
+    if (activeTab === "inactive" && isActive) return false;
+
     // 1) Search filter (case-insensitive)
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
@@ -138,6 +133,25 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
             </span>
           </div>
         </div>
+        
+        {/* Tabs for Active/Inactive */}
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "active" | "inactive")} className="w-full">
+          <TabsList className="grid w-full max-w-md grid-cols-2 bg-gray-100 dark:bg-gray-800">
+            <TabsTrigger value="active" className="flex items-center gap-2">
+              Active Members
+              <span className="rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs font-semibold text-emerald-600 dark:text-emerald-400">
+                {stats.active}
+              </span>
+            </TabsTrigger>
+            <TabsTrigger value="inactive" className="flex items-center gap-2">
+              Inactive Members
+              <span className="rounded-full bg-red-600/20 px-2 py-0.5 text-xs font-semibold text-red-600 dark:text-red-400">
+                {stats.inactive}
+              </span>
+            </TabsTrigger>
+          </TabsList>
+        </Tabs>
+        
         <TableFilters
           filters={filters}
           onFilterChange={(key, value) =>
@@ -146,7 +160,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
         />
       </div>
 
-      {/* Table View Only */}
+      {/* Table View */}
       <InHouseTable
         // pass only the paginated subset in:
         data={paginatedData}

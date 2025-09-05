@@ -30,12 +30,12 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
 
   const bgProjectStatus = useMemo(() =>
     project.status === "pending"
-      ? "bg-orange-500/80"
+      ? "bg-orange-500"
       : project.status === "completed"
-        ? "bg-green-500/80"
-        : project.status === "active"
-          ? "bg-customBlue-500/80"
-          : "dark:bg-zinc-700"
+        ? "bg-green-500"
+        : project.status === "active" || project.status === "inprogress"
+          ? "bg-blue-500"
+          : "bg-gray-500"
   , [project.status]);
 
   return (
@@ -54,19 +54,9 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
           loading="eager"
           priority
         />
-        <div
-          className={`absolute right-2 top-2 flex items-center rounded-xl text-slate-800 transition-all ${bgProjectStatus} dark:text-white`}
-        >
+        <div className="absolute right-2 top-2">
           <span
-            className={`rounded-full px-4 py-2 text-sm font-medium ${
-              project.status === "active"
-                ? "text-white-500 bg-green-500/80"
-                : project.status === "pending"
-                  ? "text-white-500 bg-orange-500/80"
-                  : project.status === "completed"
-                    ? "text-white-500 bg-customBlue-500/80"
-                    : "text-white-500 bg-gray-500/80"
-            }`}
+            className={`rounded-full px-4 py-2 text-sm font-medium text-white ${bgProjectStatus}`}
           >
             {project.status === "inprogress"
               ? "In Progress"
