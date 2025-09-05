@@ -12,7 +12,8 @@ const Page = async () => {
     .select(
       "id, first_name, last_name, display_position, image_url, application_status, availability_status",
     )
-    .eq("availability_status", true);
+    .eq("availability_status", true)
+    .eq("application_status", "passed");
 
   if (error) {
     return <div>Error loading organization chart</div>;

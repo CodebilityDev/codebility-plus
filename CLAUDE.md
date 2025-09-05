@@ -93,6 +93,7 @@ This is a Turborepo monorepo with pnpm workspaces containing multiple Next.js ap
 - `pnpm-workspace.yaml` - Workspace package definitions
 - `middleware.ts` - Authentication and route protection logic
 - `.env.example` files in each app for required environment variables
+- `database-schema.md` - Complete database schema documentation with table relationships
 
 ### Environment Setup
 1. Copy `.env.example` to `.env.local` in the target app directory
@@ -114,3 +115,13 @@ This is a Turborepo monorepo with pnpm workspaces containing multiple Next.js ap
 
 ### Package Naming Convention
 All shared packages must be prefixed with `@codevs/` (e.g., `@codevs/ui`, `@codevs/eslint-config`).
+
+### Database Schema
+The project uses Supabase (PostgreSQL) with the following key tables:
+- **Core**: `codev` (users), `roles` (permissions), `project`, `project_members`
+- **Job System**: `job_listings`, `job_applications` 
+- **Attendance**: `attendance`, `attendance_summary`
+- **Gamification**: `skill_categories`, `codev_points`
+- **Kanban**: `kanban_board`, `kanban_column`, `kanban_sprint`, `task`
+
+For detailed schema information, relationships, and SQL examples, see `database-schema.md` in the root directory.
