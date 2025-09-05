@@ -3,8 +3,6 @@
 import pathsConfig from "@/config/paths.config";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
-
-
 export type SidebarLink = {
   route: string;
   imgURL: string;
@@ -140,15 +138,15 @@ export const getSidebarData = async (
         },
         {
           route: pathsConfig.app.my_team,
-          imgURL: "/assets/svgs/icon-my-team-white.svg", // Replace with your icon path
+          imgURL: "/assets/svgs/icon-my-team-white.svg",
           label: "My Team",
-          permission: "interns" as PermissionKey, // Using "interns" permission for now
+          permission: "interns" as PermissionKey,
         },
         {
           route: pathsConfig.app.overflow,
           imgURL: "/assets/svgs/icon-overflow.svg",
           label: "Codev Overflow",
-          permission: "interns" as PermissionKey, // Temporarily using "interns" permission until overflow column is added to database
+          permission: "interns" as PermissionKey,
         },
         {
           route: pathsConfig.app.orgchart,
@@ -191,6 +189,12 @@ export const getSidebarData = async (
           imgURL: "/assets/svgs/icon-projects.svg",
           label: "Projects",
           permission: "projects" as PermissionKey,
+        },
+        {
+          route: "/home/hire",
+          imgURL: "/assets/svgs/icon-bag.svg",
+          label: "Hire",
+          permission: "clients" as PermissionKey,
         },
         {
           route: pathsConfig.app.settings,

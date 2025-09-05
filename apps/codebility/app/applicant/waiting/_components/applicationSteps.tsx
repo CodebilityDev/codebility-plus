@@ -83,7 +83,7 @@ export default function ApplicationSteps({
           </StepperContent>
 
           <StepperContent step={2}>
-            <ApplicantStep3 setActiveStep={setActiveStep} user={user} />
+            <ApplicantStep3 setActiveStep={setActiveStep} user={user} applicantData={applicantData} />
           </StepperContent>
         </StepperBody>
       </Stepper>

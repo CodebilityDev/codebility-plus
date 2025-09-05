@@ -43,9 +43,9 @@ import {
 import {
   sendDenyEmail,
   sendFailedTestEmail,
-  sendOnboardingReminder,
+  sendOnboardingReminderWithUpdate,
   sendPassedTestEmail,
-  sendTestReminder,
+  sendTestReminderWithUpdate,
 } from "../../_service/emailAction";
 import { NewApplicantType } from "../../_service/types";
 
@@ -288,7 +288,11 @@ export default function ApplicantActionButton({
   const handleRemindToTakeTest = async () => {
     setIsLoading(true);
     try {
-      await sendTestReminder(applicant.email_address);
+      await sendTestReminderWithUpdate({
+        email: applicant.email_address,
+        name: `${applicant.first_name} ${applicant.last_name}`,
+        applicantId: applicant.id
+      });
       setIsDialogOpen(false);
       setDialogState(null);
       toast({
@@ -310,7 +314,11 @@ export default function ApplicantActionButton({
   const handleRemindToOnboarding = async () => {
     setIsLoading(true);
     try {
-      await sendOnboardingReminder(applicant.email_address);
+      await sendOnboardingReminderWithUpdate({
+        email: applicant.email_address,
+        name: `${applicant.first_name} ${applicant.last_name}`,
+        applicantId: applicant.id
+      });
       setIsDialogOpen(false);
       setDialogState(null);
       toast({

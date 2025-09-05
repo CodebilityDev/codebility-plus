@@ -16,12 +16,22 @@ interface CodevListProps {
     projects: string[];
     availability: string[];
   };
+  activeTab?: "all" | "active" | "inactive";
 }
 
-export default function CodevList({ data, filters }: CodevListProps) {
+export default function CodevList({ data, filters, activeTab = "active" }: CodevListProps) {
   // Use the new utility function to get prioritized and filtered codevs
   const filteredCodevs = useMemo(() => {
-    const result = getPrioritizedAndFilteredCodevs(data, filters, true);
+    // First filter by tab selection based on availability_status (same as in-house)
+    let tabFilteredData = data;
+    if (activeTab === "active") {
+      tabFilteredData = data.filter(codev => codev.availability_status === true);
+    } else if (activeTab === "inactive") {
+      tabFilteredData = data.filter(codev => codev.availability_status !== true);
+    }
+    // activeTab === "all" shows everyone
+    
+    const result = getPrioritizedAndFilteredCodevs(tabFilteredData, filters, true);
 
     /*     // Console logs for debugging
     console.log("🔍 INTERNS PAGE DEBUG:");
@@ -57,7 +67,7 @@ export default function CodevList({ data, filters }: CodevListProps) {
     console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"); */
 
     return result;
-  }, [data, filters]);
+  }, [data, filters, activeTab]);
 
   console.log("📊 FILTERED CODEVS:", filteredCodevs.length);
   console.log("🔍 FILTERS USED:", filters);

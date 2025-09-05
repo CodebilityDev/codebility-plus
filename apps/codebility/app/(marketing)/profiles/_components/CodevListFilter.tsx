@@ -44,13 +44,13 @@ const CodevListFilter: React.FC<Props> = ({
         <Select value={selectedPosition} onValueChange={setSelectedPosition}>
           <SelectTrigger
             aria-label="Position"
-            className="text-md bg-dark-100 h-11 w-full rounded-full border-none px-5 text-white"
+            className="text-md bg-gray-100 dark:bg-dark-100 h-11 w-full rounded-full border border-gray-200 dark:border-gray-700 px-5 text-gray-900 dark:text-white"
           >
             <SelectValue placeholder="Filter" />
           </SelectTrigger>
           <SelectContent
             ref={selectGroupRef}
-            className="bg-dark-300 relative rounded-xl text-white"
+            className="bg-white dark:bg-dark-300 relative rounded-xl text-gray-900 dark:text-white border border-gray-200 dark:border-gray-700"
           >
             <SelectGroup className="mt-12">
               {positions.map((position, i) => (
@@ -62,10 +62,10 @@ const CodevListFilter: React.FC<Props> = ({
                   {position}
                 </SelectItem>
               ))}
-              <div className="border-dark-200 bg-dark-300 fixed left-0 right-0 top-0 flex w-full flex-row items-center justify-between border-b px-3 py-2">
-                <span>Filter by</span>
+              <div className="border-gray-200 dark:border-dark-200 bg-white dark:bg-dark-300 fixed left-0 right-0 top-0 flex w-full flex-row items-center justify-between border-b px-3 py-2">
+                <span className="text-gray-900 dark:text-white">Filter by</span>
                 <Button
-                  className="w-auto bg-transparent hover:bg-transparent"
+                  className="w-auto bg-transparent hover:bg-gray-100 dark:hover:bg-gray-800 text-gray-900 dark:text-white"
                   variant="default"
                   size="sm"
                   onClick={handleSelectPosition}

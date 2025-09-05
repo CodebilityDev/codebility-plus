@@ -46,7 +46,7 @@ export default function CodevList({ codevs }: Props) {
 
   if (codevs.length === 0) {
     return (
-      <p className="text-gray text-center text-2xl">Sorry, no data found.</p>
+      <p className="text-gray-500 dark:text-gray-400 text-center text-2xl">Sorry, no data found.</p>
     );
   }
 
@@ -70,7 +70,7 @@ export default function CodevList({ codevs }: Props) {
           />
         ))}
       </div>
-      <div className="text-white">
+      <div className="mt-6">
         {codevs.length > pageSize.codevsList && (
           <DefaultPagination
             currentPage={currentPage}

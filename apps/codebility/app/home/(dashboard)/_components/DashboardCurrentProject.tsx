@@ -130,74 +130,107 @@ const DashboardCurrentProject = () => {
   function getStatusClass(status: string | undefined) {
     switch (status) {
       case "pending":
-        return "text-white bg-orange-500/80";
+        return "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400 border-orange-300 dark:border-orange-700";
       case "completed":
-        return "text-white bg-blue-500/80";
+        return "bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-400 border-blue-300 dark:border-blue-700";
       case "active":
-        return "text-white bg-green-500/80";
+      case "inprogress":
+        return "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 border-green-300 dark:border-green-700";
       default:
-        return "text-white bg-black-500/80";
+        return "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400 border-gray-300 dark:border-gray-700";
+    }
+  }
+  
+  // Get role display text
+  function getRoleDisplay(role: string) {
+    switch (role) {
+      case "team_leader":
+        return "Team Leader";
+      case "member":
+        return "Member";
+      case "developer":
+        return "Developer";
+      default:
+        return role.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
   }
 
   return (
-    <Box className="flex w-full flex-1 flex-col gap-4">
-      <p className="text-2xl">Current Projects</p>
+    <Box className="flex w-full flex-1 flex-col gap-5">
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl font-semibold">Current Projects</h2>
+        <span className="text-sm text-muted-foreground">
+          {projects.length} {projects.length === 1 ? 'project' : 'projects'}
+        </span>
+      </div>
+      
       {projects.length > 0 ? (
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
           {projects.map((involvement) => (
             <DashboardCurrentProjectButton
               key={involvement.project.id}
               projectId={involvement.project.id}
             >
-              <div className="p-[1px] rounded-md bg-gradient-to-r from-purple-200 via-blue-50 to-sky-300 dark:from-purple-800 dark:via-blue-300 dark:to-sky-950 p-2 hover:shadow-lg hover:shadow-blue-500/50 dark:hover:shadow-blue-400/50">
-                <div className="flex items-center gap-2">
-                  {/* Enhanced image handling with fallback */}
-                  <div className="relative h-8 w-8 flex-shrink-0">
-                    <Image
-                      src={getProjectImageSrc(involvement.project)}
-                      alt={`${involvement.project.name} project icon`}
-                      width={32}
-                      height={32}
-                      className="rounded object-cover"
-                      onError={() => handleImageError(involvement.project.id)}
-                      // Add unoptimized for external URLs
-                      unoptimized={getProjectImageSrc(involvement.project).includes('http')}
-                    />
-                  </div>
+              <div className="group relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 transition-all duration-200 hover:border-customBlue-400 dark:hover:border-customBlue-600 hover:shadow-md">
+                <div className="p-4">
+                  <div className="flex items-center gap-3">
+                    {/* Project Image */}
+                    <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+                      <Image
+                        src={getProjectImageSrc(involvement.project)}
+                        alt={`${involvement.project.name} project icon`}
+                        width={48}
+                        height={48}
+                        className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-110"
+                        onError={() => handleImageError(involvement.project.id)}
+                        unoptimized={getProjectImageSrc(involvement.project).includes('http')}
+                      />
+                    </div>
 
-                  <div className="flex min-w-0 flex-1 items-center justify-between">
-                    <div className="flex min-w-0 flex-col">
-                      <p className="truncate text-sm font-medium">
-                        {involvement.project.name}
-                      </p>
-                      <p className="text-start text-xs text-muted-foreground">
-                        {involvement.role === "member"
-                          ? "Member"
-                          : involvement.role}
+                    {/* Project Info */}
+                    <div className="flex min-w-0 flex-1 flex-col gap-1">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="truncate text-base font-semibold text-gray-900 dark:text-white">
+                          {involvement.project.name}
+                        </h3>
+                        <Badge
+                          variant="outline"
+                          className={`shrink-0 text-xs font-medium ${getStatusClass(involvement.project.status)}`}
+                        >
+                          {involvement.project.status === "inprogress"
+                            ? "In Progress"
+                            : involvement.project.status
+                              ? involvement.project.status.charAt(0).toUpperCase() +
+                                involvement.project.status.slice(1)
+                              : "Unknown"}
+                        </Badge>
+                      </div>
+                      <p className="flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+                        <span className="inline-block h-1.5 w-1.5 rounded-full bg-customBlue-500"></span>
+                        {getRoleDisplay(involvement.role)}
                       </p>
                     </div>
-                    <Badge
-                      variant="outline"
-                      className={`ml-2 shrink-0 whitespace-nowrap text-xs ${getStatusClass(involvement.project.status)}`}
-                    >
-                      {involvement.project.status === "inprogress"
-                        ? "In Progress"
-                        : involvement.project.status
-                          ? involvement.project.status.charAt(0).toUpperCase() +
-                            involvement.project.status.slice(1)
-                          : "Unknown"}
-                    </Badge>
                   </div>
                 </div>
+                
+                {/* Hover accent */}
+                <div className="absolute bottom-0 left-0 h-1 w-full bg-gradient-to-r from-customBlue-500 to-purple-500 transform scale-x-0 transition-transform duration-200 group-hover:scale-x-100" />
               </div>
             </DashboardCurrentProjectButton>
           ))}
         </div>
       ) : (
-        <p className="text-sm text-muted-foreground">
-          No project involvements yet
-        </p>
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 py-12 px-6 text-center">
+          <div className="mb-3 rounded-full bg-gray-100 dark:bg-gray-800 p-3">
+            <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+            </svg>
+          </div>
+          <p className="text-sm font-medium text-gray-900 dark:text-gray-100">No projects yet</p>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
+            You'll see your active projects here once you're assigned to one
+          </p>
+        </div>
       )}
     </Box>
   );
