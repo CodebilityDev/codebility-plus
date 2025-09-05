@@ -37,27 +37,27 @@ const STATUS_CONFIG: Record<
 > = {
   TRAINING: {
     label: "Training",
-    className: "bg-status-training text-status-training-text",
+    className: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/20 dark:text-yellow-400",
   },
   GRADUATED: {
     label: "Graduated",
-    className: "bg-status-graduated text-status-graduated-text",
+    className: "bg-green-100 text-green-800 dark:bg-green-900/20 dark:text-green-400",
   },
   INACTIVE: {
     label: "Inactive",
-    className: "bg-status-inactive text-status-inactive-text",
+    className: "bg-gray-100 text-gray-800 dark:bg-gray-900/20 dark:text-gray-400",
   },
   MENTOR: {
     label: "Mentor",
-    className: "bg-status-mentor text-status-mentor-text",
+    className: "bg-purple-100 text-purple-800 dark:bg-purple-900/20 dark:text-purple-400",
   },
   ADMIN: {
     label: "Admin",
-    className: "bg-status-admin text-status-admin-text",
+    className: "bg-blue-100 text-blue-800 dark:bg-blue-900/20 dark:text-blue-400",
   },
   DEPLOYED: {
     label: "Deployed",
-    className: "bg-status-deployed text-status-deployed-text",
+    className: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400",
   },
 };
 
@@ -118,7 +118,7 @@ const CodevCard = ({ codev, color }: Props) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="bg-black-500 hover:bg-black-800 flex h-full w-full flex-col items-center justify-between rounded-lg p-4 shadow-2xl">
+      <div className="bg-gray-900 dark:bg-black-500 hover:bg-gray-800 dark:hover:bg-black-800 flex h-full w-full flex-col items-center justify-between rounded-lg p-4 shadow-2xl transition-colors">
         <div className="grid w-full grid-cols-4 gap-2">
           <div className="col-span-1" />
           <div className="relative col-span-2 flex justify-center">
@@ -176,8 +176,10 @@ const CodevCard = ({ codev, color }: Props) => {
             <div className="absolute bottom-[1px] right-[1px]">
               <p
                 className={cn(
-                  "border-black-100 rounded-full border-2 p-2 text-[9px]",
-                  codev.availability_status ? "bg-green-500" : "bg-red-500",
+                  "rounded-full border-2 p-2 text-[9px]",
+                  codev.availability_status 
+                    ? "bg-green-500 border-green-600" 
+                    : "bg-red-500 border-red-600",
                 )}
               ></p>
             </div>
@@ -190,13 +192,13 @@ const CodevCard = ({ codev, color }: Props) => {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="bg-black-500 h-8 w-8 rounded-full"
+                      className="bg-gray-800 dark:bg-black-500 hover:bg-gray-700 dark:hover:bg-black-600 h-8 w-8 rounded-full transition-colors"
                     >
                       <BookOpenIcon className="h-3.5 w-3.5" />
                     </Button>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent className="bg-slate-700 px-2 py-1 text-xs">
+                <TooltipContent className="bg-gray-900 dark:bg-slate-700 px-2 py-1 text-xs text-white">
                   Read Bio
                 </TooltipContent>
               </Tooltip>
@@ -205,11 +207,11 @@ const CodevCard = ({ codev, color }: Props) => {
         </div>
         <div className="flex flex-col items-center gap-0.5">
           <div className="flex flex-col gap-1 text-center">
-            <p className="md:text-md text-sm capitalize text-white lg:text-base">
+            <p className="md:text-md text-sm capitalize text-gray-900 dark:text-white lg:text-base">
               {codev.first_name} {codev.last_name}
             </p>
             {codev.display_position ? (
-              <p className="text-sm text-gray-300">{codev.display_position}</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">{codev.display_position}</p>
             ) : (
               <div className="text-sm lg:text-base">&nbsp;</div>
             )}
