@@ -116,8 +116,8 @@ export default function AnimatedRoadmapSvg() {
             const uy = dy / dist;
 
             // push 35px past path end
-            const finalTipX = tipX + ux * 35;
-            const finalTipY = tipY + uy * 35;
+            const finalTipX = tipX + ux * 30;
+            const finalTipY = tipY + uy * 30;
 
             // base 28px behind tip
             const baseX = finalTipX - ux * 28;
@@ -137,8 +137,52 @@ export default function AnimatedRoadmapSvg() {
           fill="#272728"
         />
 
-        {/* Starting circle */}
-        <circle id="starting-circle" cx="170" cy="505" r="20" fill="#272728" />
+        {/* Starting circle (badge with pulsing outer ring + START text) */}
+        <g id="starting-badge" aria-label="Start">
+          {/* core fill */}
+          <circle cx="170" cy="505" r="28" fill="#16a34a" />
+
+          {/* OUTER ring — pulses */}
+          <circle cx="170" cy="505" r="28" fill="none" stroke="#ffffff">
+            <animate
+              attributeName="stroke-width"
+              values="2;4;2"
+              dur="1.6s"
+              repeatCount="indefinite"
+            />
+            <animate
+              attributeName="opacity"
+              values="1;0.5;1"
+              dur="1.6s"
+              repeatCount="indefinite"
+            />
+          </circle>
+
+          {/* inner ring — static */}
+          <circle
+            cx="170"
+            cy="505"
+            r="22"
+            fill="none"
+            stroke="#ffffff"
+            strokeWidth="2"
+            opacity="0.95"
+          />
+
+          {/* centered label */}
+          <text
+            x="170"
+            y="505"
+            textAnchor="middle"
+            dominantBaseline="middle"
+            fontSize="10"
+            fontWeight="700"
+            fill="#ffffff"
+            letterSpacing="1.2"
+          >
+            START
+          </text>
+        </g>
 
         {/* Milestones */}
         {phases.map((p, i) => (
@@ -227,7 +271,7 @@ export default function AnimatedRoadmapSvg() {
                 style={{ backgroundColor: p.color }}
                 aria-hidden="true"
               />
-              <div className="flex items-start gap-3">
+              <div className="flex items-start gap-3 text-white">
                 <span
                   className="mt-0.5 inline-flex h-10 w-10 items-center justify-center rounded-full shadow-sm"
                   style={{ backgroundColor: p.color }}

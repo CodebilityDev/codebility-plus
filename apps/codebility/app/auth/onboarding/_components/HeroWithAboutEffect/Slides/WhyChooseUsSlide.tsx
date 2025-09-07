@@ -34,7 +34,7 @@ export default function WhyChooseUsSlide() {
       {/* Features Grid */}
       <div className="z-0 flex flex-col items-center justify-center px-6 md:px-12 lg:px-24">
         <h2 className="mb-16 text-4xl font-bold tracking-tight text-[#130a3d] md:text-5xl">
-          Why Choose <span className="text-indigo-600">Codebility</span>?
+          Why Choose <span className="text-purple-600">Codebility</span>?
         </h2>
         <div className="grid w-full max-w-7xl grid-cols-1 gap-8 sm:grid-cols-2">
           {features.map((item, i) => (
@@ -44,7 +44,7 @@ export default function WhyChooseUsSlide() {
               whileHover={{ scale: 1.03 }}
               transition={{ type: "spring", stiffness: 100, damping: 12 }}
             >
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-cyan-500 to-purple-600 text-white">
+              <div className="primary-gradient flex h-12 w-12 items-center justify-center rounded-full text-white">
                 <item.icon />
               </div>
 

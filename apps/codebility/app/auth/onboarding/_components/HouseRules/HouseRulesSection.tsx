@@ -30,7 +30,7 @@ const rules = [
   {
     n: 5,
     title: "Be a Team Player",
-    desc: "We build together. Be collaborative, helpful, and open‑minded. Celebrate wins — big or small — and lift others as you climb.",
+    desc: "We build together. Be collaborative, helpful, and open-minded. Celebrate wins — big or small — and lift others as you climb.",
   },
   {
     n: 6,
@@ -63,32 +63,26 @@ export default function HouseRulesSection({ className, ...rest }: Props) {
   return (
     <section
       className={cn(
-        "relative w-full overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-950 to-black",
+        "relative w-full overflow-hidden bg-gradient-to-br from-white via-slate-50 to-slate-100",
         "py-16 sm:py-20 lg:py-28",
         className,
       )}
       {...rest}
     >
-      {/* soft vignette + motif glow */}
-      <div className="pointer-events-none absolute inset-0">
-        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-cyan-400/10 blur-3xl" />
-        <div className="absolute -right-32 top-1/3 h-80 w-80 rounded-full bg-fuchsia-500/10 blur-3xl" />
-        <div className="absolute bottom-0 left-1/2 h-40 w-[120%] -translate-x-1/2 bg-gradient-to-t from-black to-transparent" />
-      </div>
+      {/* soft pastel glows for light motif */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.15),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.15),transparent_60%)]" />
 
       <div className="container mx-auto px-4">
         {/* Heading */}
         <div className="mx-auto mb-10 max-w-5xl text-center sm:mb-14 lg:mb-16">
           <h2
-            className={cn(
-              "text-4xl font-black tracking-tight sm:text-5xl lg:text-6xl",
-              "bg-gradient-to-b from-cyan-300 to-teal-100 bg-clip-text text-transparent",
-              "drop-shadow-[0_0_18px_rgba(34,211,238,0.25)]",
-            )}
+            className="translate-y-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text
+            text-center text-3xl font-extrabold tracking-tight text-transparent opacity-100
+            transition-all duration-700 sm:text-4xl md:text-5xl"
           >
-            HOUSE RULES
+            House Rules
           </h2>
-          <p className="mx-auto mt-3 max-w-3xl text-sm text-zinc-300/80 sm:text-base">
+          <p className="mx-auto mt-3 max-w-3xl text-sm text-slate-600 sm:text-base">
             A simple playbook for how we work and grow together at Codebility.
           </p>
         </div>
@@ -100,33 +94,33 @@ export default function HouseRulesSection({ className, ...rest }: Props) {
               <article
                 className={cn(
                   "relative overflow-hidden rounded-2xl border",
-                  "border-white/5 bg-zinc-900/40 p-5 sm:p-6",
-                  "transition-shadow duration-300 hover:shadow-[0_0_0_1px_rgba(255,255,255,0.06),0_12px_40px_-12px_rgba(34,197,94,0.15)]",
+                  "border-slate-200 bg-white/90 p-5 shadow-sm sm:p-6",
+                  "transition-shadow duration-300 hover:shadow-[0_8px_24px_rgba(2,6,23,0.08)]",
                 )}
               >
-                {/* neon top bar */}
-                <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-emerald-400 opacity-60" />
+                {/* pastel accent bar */}
+                <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-emerald-400 opacity-40" />
 
                 <div className="flex items-start gap-4">
                   {/* numbered badge */}
                   <div className="relative">
                     <span
                       className={cn(
-                        "grid h-12 w-12 place-items-center rounded-full text-lg font-extrabold text-white",
-                        "bg-zinc-800/70 ring-2 ring-cyan-400/60",
-                        "shadow-[0_0_20px_0_rgba(34,211,238,0.25)]",
+                        "grid h-12 w-12 place-items-center rounded-full text-lg font-extrabold",
+                        "bg-white text-slate-800 ring-2 ring-cyan-400/50",
+                        "shadow-[0_6px_16px_-6px_rgba(2,6,23,0.15)]",
                       )}
                     >
                       {r.n}
                     </span>
-                    <span className="absolute inset-0 -z-10 rounded-full bg-cyan-400/0 blur-2xl transition-all duration-300 group-hover:bg-cyan-400/15" />
+                    <span className="absolute inset-0 -z-10 rounded-full bg-cyan-400/0 blur-2xl transition-all duration-300 group-hover:bg-cyan-400/20" />
                   </div>
 
                   <div className="min-w-0">
-                    <h3 className="text-base font-semibold tracking-tight text-white sm:text-lg">
+                    <h3 className="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
                       {r.title}
                     </h3>
-                    <p className="mt-1 text-sm leading-relaxed text-zinc-300/90">
+                    <p className="mt-1 text-sm leading-relaxed text-slate-600">
                       {r.desc}
                     </p>
                   </div>
