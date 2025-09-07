@@ -34,7 +34,13 @@ const items = [
 
 export default function IsNotSection() {
   return (
-    <section className="flex w-full items-center justify-center bg-[#10131a] px-6 py-20 text-white lg:min-h-screen">
+    <section className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-950 to-black px-6 py-20 text-white lg:min-h-screen">
+      {/* soft decor glows for dark theme */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />
+        <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-fuchsia-500/10 blur-3xl" />
+        <div className="absolute bottom-0 left-1/2 h-40 w-[120%] -translate-x-1/2 bg-gradient-to-t from-black to-transparent" />
+      </div>
       <div className="w-full max-w-6xl text-center">
         {/* Heading */}
         <motion.h2
@@ -42,13 +48,12 @@ export default function IsNotSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="mb-16 text-4xl font-bold leading-tight tracking-tight md:text-5xl"
+          className=" mb-16 bg-clip-text text-purple-500 text-4xl font-bold leading-tight
+ tracking-tight md:text-5xl"
         >
-          What <span className="text-white">CODE</span>
-          <span className="text-white">BILITY</span>{" "}
-          <span className="text-white">is</span>{" "}
-          <span className="text-[3rem] font-black leading-none text-cyan-400 drop-shadow-lg md:text-[75px]">
-            not
+          What CODEBILITY is{" "}
+          <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-teal-600 bg-clip-text text-[3rem] font-black leading-none text-transparent drop-shadow-lg md:text-[75px]">
+            NOT
           </span>
         </motion.h2>
 

@@ -35,7 +35,10 @@ const cards = [
 export default function MindsetSection() {
   return (
     <LazyMotion features={domAnimation}>
-      <section className="relative flex w-full items-center justify-center bg-white px-6 py-20 text-black lg:min-h-screen">
+      <section className="relative flex w-full items-center justify-center overflow-hidden bg-white px-6 py-20 text-black lg:min-h-screen">
+        {/* soft pastel glows for light motif */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.15),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.15),transparent_60%)]" />
+
         <div className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 md:grid-cols-2">
           {/* LEFT: Heading + Lightbulb (Centered) */}
           <m.div
@@ -45,10 +48,8 @@ export default function MindsetSection() {
             viewport={{ once: true }}
             className="flex flex-col items-center text-center md:items-center md:text-center"
           >
-            <h2 className="text-3xl font-bold leading-tight sm:text-4xl md:text-5xl">
-              <span className="text-neutral-600">the </span>
-              <span className="text-neutral-800">Codebility</span>{" "}
-              <span className="text-pink-500">mindset</span>
+            <h2 className="text-3xl font-bold leading-tight text-neutral-800 sm:text-4xl md:text-5xl">
+              the Codebility <span className="text-purple-600">mindset</span>
             </h2>
 
             {/* Animated Glowing Lightbulb */}

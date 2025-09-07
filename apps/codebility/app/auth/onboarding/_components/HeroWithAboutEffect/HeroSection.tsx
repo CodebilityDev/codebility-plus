@@ -46,7 +46,7 @@ export default function HeroSection({ h1Ref }: HeroSectionProps) {
         </span>
       </h1>
 
-      <div className="mt-10 flex items-center justify-center lg:hidden">
+      <div className="z-[999] mt-10 flex items-center justify-center lg:hidden">
         <span className=" -mr-4 text-[clamp(32px,10vw,48px)] text-white">
           Co
         </span>
@@ -68,70 +68,67 @@ export default function HeroSection({ h1Ref }: HeroSectionProps) {
         <div className="pointer-events-auto z-[999] flex flex-col items-center space-y-10 lg:-mr-[140px]">
           <h2
             id="codebility-h2"
-            className="z-10 text-center text-[clamp(32px,5vw,64px)] text-[#02e6dd] drop-shadow-[0_0_12px_#02e6dd] 2xl:text-[64px]"
+            className="z-10 text-center text-[clamp(32px,5vw,64px)] text-white drop-shadow-[0_0_1px_#fff] 2xl:text-[64px]"
           >
             Everyone has the ability to code
           </h2>
           <button
             id="codebility-btn"
-            className="group relative flex items-center justify-center overflow-hidden rounded-full bg-orange-500 px-8 py-2 text-white transition-all duration-300"
-            style={{
-              transition: "box-shadow 0.3s ease-in-out",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.boxShadow =
-                "0 0 20px #02e6dd, 0 0 40px #02e6dd";
-            }}
-            onMouseLeave={(e) => {
-              e.currentTarget.style.boxShadow = "none";
-            }}
+            type="button"
+            onClick={() =>
+              document
+                .getElementById("about-section")
+                ?.scrollIntoView({ behavior: "smooth", block: "start" })
+            }
+            className="
+    group relative inline-flex items-center justify-center overflow-hidden
+    rounded-full bg-gradient-to-r from-cyan-500 to-fuchsia-500
+    px-8 py-3 text-base font-semibold text-white
+    shadow-[0_12px_40px_-12px_rgba(168,85,247,0.45)]
+    transition-all duration-300
+    hover:brightness-[1.05]
+    focus:outline-none
+    focus:ring-2 focus:ring-cyan-400/60 active:scale-[0.98]
+  "
           >
-            {/* Expanding Purple Circle */}
+            {/* Button text */}
+            <span className="relative z-10 px-6">About Us</span>
+
+            {/* Arrow (reveals on hover) */}
             <span
-              className="absolute left-4 top-1/2 z-10 h-3 w-3 -translate-y-1/2 rounded-full bg-[#8c52ff] transition-all duration-300 ease-in-out
-      group-hover:left-0 group-hover:top-0 group-hover:h-full group-hover:w-full group-hover:translate-y-0 group-hover:rounded-none"
+              className="
+      absolute right-4 z-10 translate-x-1 opacity-0
+      transition-all duration-300
+      group-hover:translate-x-0 group-hover:opacity-100
+    "
+              aria-hidden
+            >
+              →
+            </span>
+
+            {/* subtle glow ring */}
+            <span
+              className="pointer-events-none absolute inset-0 -z-0 rounded-full ring-1 ring-white/20"
+              aria-hidden
             />
 
-            {/* Text */}
-            <span className="relative z-30 px-6">About</span>
-
-            {/* Arrow Icon */}
-            <span className="absolute right-4 z-30 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-              →
+            {/* animated shine sweep */}
+            <span
+              className="pointer-events-none absolute inset-0 -z-0 overflow-hidden rounded-full"
+              aria-hidden
+            >
+              <span
+                className="
+        absolute -left-1/3 top-0 h-full w-1/3 translate-x-0 skew-x-[-12deg]
+        bg-white/25 blur-md
+        transition-transform duration-700
+        group-hover:translate-x-[350%]
+      "
+              />
             </span>
           </button>
         </div>
         <div className="hidden pb-10 lg:block" />
-      </div>
-
-      {/* Left image */}
-      <div
-        className="absolute left-0 top-1/2 hidden -translate-y-1/2 "
-        id="hero-left-img"
-      >
-        <div className="relative h-[574px] w-[440px]">
-          <Image
-            src="/assets/images/onboarding/hero1.svg"
-            alt="Hero Left"
-            fill
-            className="object-cover"
-          />
-        </div>
-      </div>
-
-      {/* Right image */}
-      <div
-        className="absolute right-0 top-1/2 hidden -translate-y-1/2"
-        id="hero-right-img"
-      >
-        <div className="relative h-[340px] w-[276px]">
-          <Image
-            src="/assets/images/onboarding/hero2.svg"
-            alt="Hero Right"
-            fill
-            className="object-cover"
-          />
-        </div>
       </div>
     </>
   );

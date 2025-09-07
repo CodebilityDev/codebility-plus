@@ -22,7 +22,7 @@ export default function AboutUsSlide() {
       {/* RIGHT: Text Content */}
       <div className="mt-10 w-full text-stone-900 md:mt-0 md:w-1/2 md:pl-10">
         <h2 className="text-center text-4xl font-bold sm:text-5xl md:text-left">
-          ABOUT <span className="text-pink-500">US</span>
+          ABOUT <span className="text-purple-600">US</span>
         </h2>
 
         <p className="mt-6 text-base leading-relaxed md:text-lg">
