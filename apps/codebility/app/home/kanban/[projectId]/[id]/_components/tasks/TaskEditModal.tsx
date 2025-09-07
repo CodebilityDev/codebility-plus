@@ -51,7 +51,7 @@ const TaskEditModal = () => {
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
 
-  const { fetchBoardData } = useKanbanStore();
+  const { fetchBoardData, boardData } = useKanbanStore();
 
   const [boardId, setBoardId] = useState<string>("");
 
@@ -405,7 +405,7 @@ const TaskEditModal = () => {
                 onMembersChange={(memberIds) => {
                   handleInputChange("codev_id", memberIds[0] || "");
                 }}
-                projectId={boardId}
+                projectId={boardData.project_id}
                 initialSelectedMembers={[data.codev?.id].filter(Boolean)}
               />
             </div>
@@ -421,7 +421,7 @@ const TaskEditModal = () => {
                 onMembersChange={(memberIds) => {
                   handleInputChange("sidekick_ids", memberIds);
                 }}
-                projectId={boardId}
+                projectId={boardData.project_id}
                 disabledMembers={[data.codev?.id].filter(Boolean)}
               />
             </div>
