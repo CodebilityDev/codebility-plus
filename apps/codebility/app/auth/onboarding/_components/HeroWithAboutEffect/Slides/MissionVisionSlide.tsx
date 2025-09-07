@@ -70,7 +70,7 @@ export default function MissionVisionSlide() {
 function VisionIcon() {
   return (
     <svg
-      className="h-8 w-8 text-purple-700"
+      className="h-8 w-8 text-purple-600"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
@@ -85,7 +85,7 @@ function VisionIcon() {
 function MissionIcon() {
   return (
     <svg
-      className="h-8 w-8 text-sky-600"
+      className="h-8 w-8 text-teal-500"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"

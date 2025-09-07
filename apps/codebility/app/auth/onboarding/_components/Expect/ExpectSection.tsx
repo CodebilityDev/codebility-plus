@@ -54,7 +54,10 @@ export default function ExpectSection() {
   }, []);
 
   return (
-    <section className="flex w-full items-center justify-center bg-[#10131a] px-6 py-24 text-white lg:min-h-screen">
+    <section className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-950 to-black px-6 py-24 text-white lg:min-h-screen">
+      {/* soft pastel glows for light motif */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.15),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.15),transparent_60%)]" />
+
       <div className="w-full max-w-5xl">
         {/* Heading */}
         <motion.h2
@@ -62,10 +65,10 @@ export default function ExpectSection() {
           whileInView={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
           viewport={{ once: true }}
-          className="mb-20 text-center text-4xl font-bold leading-tight md:text-5xl"
+          className="mb-20 text-center text-4xl font-bold leading-tight text-purple-500 md:text-5xl"
         >
           What we expect from{" "}
-          <span className="text-[3.5rem] font-black text-pink-400 drop-shadow-lg md:text-[4.5rem]">
+          <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-teal-600 bg-clip-text text-[3.5rem] font-black text-transparent drop-shadow-lg md:text-[4.5rem]">
             YOU
           </span>
         </motion.h2>

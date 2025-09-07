@@ -25,7 +25,7 @@ export default function LottieBackground() {
           width: "100%",
           height: "100%",
           transform: "translate(-30%, 11%)",
-          opacity: 0.45,
+          opacity: 0.1,
         }}
       />
     </div>

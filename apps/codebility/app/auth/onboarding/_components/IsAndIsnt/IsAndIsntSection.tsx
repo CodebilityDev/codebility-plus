@@ -26,10 +26,16 @@ const items = [
 
 export default function IsAndIsntSection() {
   return (
-    <section className="flex w-full items-center justify-center bg-gradient-to-br from-white via-gray-50 to-white px-6 py-20 text-black lg:min-h-screen">
+    <section className="relative overflow-hidden flex w-full items-center justify-center bg-gradient-to-br from-white via-gray-50 to-white px-6 py-20 text-black lg:min-h-screen">
+      {/* soft vignette + motif glow */}
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute -left-24 -top-24 h-72 w-72 rounded-full bg-teal-400/30 blur-3xl" />
+        <div className="absolute -right-32 top-1/2 h-80 w-80 rounded-full bg-teal-500/25 blur-3xl" />
+        <div className="absolute bottom-0 left-1/2 h-32 w-[120%] -translate-x-1/2 bg-gradient-to-t from-purple-400 to-transparent" />
+      </div>
       <div className="w-full max-w-6xl text-center">
         <h2 className="mb-16 text-4xl font-bold tracking-tight text-[#130a3d] md:text-5xl">
-          What <span className="text-indigo-600">Codebility</span> Is and Isn’t?
+          What <span className="text-purple-600">Codebility</span> Is and Isn’t?
         </h2>
 
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
