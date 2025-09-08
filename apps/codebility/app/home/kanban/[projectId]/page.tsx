@@ -18,10 +18,11 @@ import { KanbanBoardType, KanbanSprintType } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { format } from "date-fns";
 
+import { TableActions } from "../_components/TableActions";
 import AddSprintButton from "./_components/AddSprintButton";
 
 // Types
-interface KanbanSprintData extends KanbanSprintType {
+export interface KanbanSprintData extends KanbanSprintType {
   kanban_board: KanbanBoardType | null;
 }
 
@@ -232,17 +233,20 @@ export default async function KanbanSprintPage(props: PageProps) {
             </span>
           </TableCell>
           <TableCell className="text-center md:table-cell">
-            <Link
-              href={`${pathsConfig.app.kanban}/${params.projectId}/${sprint.kanban_board?.id}`}
-            >
-              <Button
-                variant="hollow"
-                className="bg-customBlue-600 hover:bg-customBlue-700 dark:bg-customBlue-600 dark:hover:bg-customBlue-700 inline-flex items-center gap-2 text-white shadow-sm"
+            <div className="flex items-center justify-center gap-2">
+              <Link
+                href={`${pathsConfig.app.kanban}/${params.projectId}/${sprint.kanban_board?.id}`}
               >
-                <IconKanban className="h-4 w-4 text-white" />
-                <span className="hidden sm:inline">View Board</span>
-              </Button>
-            </Link>
+                <Button
+                  variant="hollow"
+                  className="bg-customBlue-600 hover:bg-customBlue-700 dark:bg-customBlue-600 dark:hover:bg-customBlue-700 inline-flex items-center gap-2 text-white shadow-sm"
+                >
+                  <IconKanban className="h-4 w-4 text-white" />
+                  <span className="hidden sm:inline">View Board</span>
+                </Button>
+              </Link>
+              <TableActions sprint={sprint} />
+            </div>
           </TableCell>
         </TableRow>
       ));
@@ -251,23 +255,28 @@ export default async function KanbanSprintPage(props: PageProps) {
     // Main page render
     return (
       <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
-        
         {/* Two-Level Breadcrumb Navigation */}
-        <nav className="flex flex-row items-center gap-3 text-sm pb-2" aria-label="Breadcrumb">
+        <nav
+          className="flex flex-row items-center gap-3 pb-2 text-sm"
+          aria-label="Breadcrumb"
+        >
           {/* Level 1: Kanban Board Overview */}
-          <Link 
-            href={pathsConfig.app.kanban} 
+          <Link
+            href={pathsConfig.app.kanban}
             className="group transition-colors duration-200"
           >
             <span className="group-hover:text-customBlue-600 dark:group-hover:text-customBlue-400 text-gray-500 dark:text-gray-400">
               📋 Kanban Board
             </span>
           </Link>
-          
-          <ArrowRightIcon className="text-gray-400 dark:text-gray-500" aria-hidden="true" />
-          
+
+          <ArrowRightIcon
+            className="text-gray-400 dark:text-gray-500"
+            aria-hidden="true"
+          />
+
           {/* Level 2: Current Project Name */}
-          <span 
+          <span
             className="to-customBlue-600 bg-gradient-to-r from-purple-600 bg-clip-text font-semibold text-gray-900 text-transparent dark:text-white"
             aria-current="page"
           >
