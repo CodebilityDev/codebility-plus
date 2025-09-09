@@ -708,3 +708,37 @@ export async function getAllProjects(kanbanBoardId?: string) {
     };
   }
 }
+
+
+export async function getProjectByID(id: string) {
+  const supabase = await createClientServerComponent();
+
+  const { data, error } = await supabase
+    .from("projects")
+    .select(
+      `
+        *,
+        project_members (
+          id,
+          codev_id,
+          role,
+          joined_at,
+          codev (
+            first_name,
+            last_name,
+            image_url
+          )
+        ),
+        projects_category (
+          id,
+          name
+        )
+      `
+    )
+    .eq("id", id)
+    .single();    
+
+  if (error) throw error;
+
+  return data;
+}
