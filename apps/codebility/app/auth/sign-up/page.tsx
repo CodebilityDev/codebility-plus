@@ -14,10 +14,8 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Textarea } from "@codevs/ui/textarea";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@codevs/ui/select";
 
 import { signupUser } from "@/app/auth/actions";
-import { getNdaDataFromStorage, hasCompleteNdaData, cleanupNdaStorage } from "@/utils/nda-helpers";
 import { useModal } from "@/hooks/use-modal";
 import { useTechStackStore } from "@/hooks/use-techstack";
 
@@ -25,7 +23,7 @@ import { useTechStackStore } from "@/hooks/use-techstack";
 import TechStackModal from "@/components/modals/TechStackModal";
 import PrivacyPolicyModal from "@/components/modals/PrivacyPolicyModal";
 
-// Constants - Extract configuration data
+// Constants
 const POSITIONS = [
   { id: 1, name: "Frontend Developer" },
   { id: 2, name: "Backend Developer" },
@@ -34,7 +32,7 @@ const POSITIONS = [
   { id: 5, name: "QA Engineer" },
 ];
 
-// Validation schema with improved validation messages
+// Validation schema
 const SignupFormSchema = z.object({
   first_name: z.string().min(1, "First name is required"),
   last_name: z.string().min(1, "Last name is required"),
@@ -60,7 +58,7 @@ const SignupFormSchema = z.object({
 
 type SignupFormData = z.infer<typeof SignupFormSchema>;
 
-// Simple input field component following DRY principle
+// Form field component
 interface FormFieldProps {
   label: string;
   name: keyof SignupFormData;
@@ -89,7 +87,7 @@ const FormField = ({ label, name, type = "text", placeholder, register, errors, 
   </div>
 );
 
-// Password field with show/hide functionality
+// Password field component
 const PasswordField = ({ label, name, placeholder, register, errors, showPassword, toggleShow }: any) => (
   <div className="space-y-2">
     <Label className="text-white text-base font-medium">{label} *</Label>
@@ -117,13 +115,14 @@ const PasswordField = ({ label, name, placeholder, register, errors, showPasswor
 export default function SignUpForm() {
   const router = useRouter();
   
-  // Modal hooks - CRITICAL: These must be available
+  // Modal hooks
   const { onOpen } = useModal();
   const { stack } = useTechStackStore();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [profileImage, setProfileImage] = useState<File | null>(null);
   const [ndaSigned, setNdaSigned] = useState(false);
+  const [ndaData, setNdaData] = useState<{signature: string, document: string} | null>(null);
   const [selectedPositions, setSelectedPositions] = useState<typeof POSITIONS>([]);
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -153,16 +152,32 @@ export default function SignUpForm() {
 
   // Initialize NDA status and message listener
   useEffect(() => {
-    const initialNdaStatus = hasCompleteNdaData();
-    setNdaSigned(initialNdaStatus);
-    
-    if (initialNdaStatus) {
-      form.setValue("ndaAgreement", true);
-    }
+    // Check for existing NDA data in localStorage
+    const checkNdaData = () => {
+      const signature = localStorage.getItem("ndaSignature");
+      const document = localStorage.getItem("ndaDocument");
+      
+      if (signature && document) {
+        setNdaSigned(true);
+        setNdaData({ signature, document });
+        form.setValue("ndaAgreement", true);
+      }
+    };
 
+    checkNdaData();
+
+    // Listen for NDA signing completion
     const handleMessage = (event: MessageEvent) => {
-      console.log("Received message:", event.data);
       if (event.data?.type === "NDA_SIGNED" && event.data?.signed === true) {
+        // Store NDA data temporarily in localStorage
+        if (event.data.signatureDataUrl && event.data.documentDataUrl) {
+          localStorage.setItem("ndaSignature", event.data.signatureDataUrl);
+          localStorage.setItem("ndaDocument", event.data.documentDataUrl);
+          setNdaData({
+            signature: event.data.signatureDataUrl,
+            document: event.data.documentDataUrl
+          });
+        }
         setNdaSigned(true);
         form.setValue("ndaAgreement", true);
         toast.success("NDA signed successfully! You can now complete your registration.");
@@ -173,7 +188,7 @@ export default function SignUpForm() {
     return () => window.removeEventListener("message", handleMessage);
   }, [form]);
 
-  // Sync tech stack with form validation - CRITICAL: This syncs the modal selection with form
+  // Sync tech stack with form validation
   useEffect(() => {
     if (stack && stack.length > 0) {
       form.setValue("tech_stacks", stack);
@@ -198,9 +213,13 @@ export default function SignUpForm() {
       if (popup.closed) {
         clearInterval(checkClosed);
         setTimeout(() => {
-          const newNdaStatus = hasCompleteNdaData();
-          setNdaSigned(newNdaStatus);
-          if (newNdaStatus) {
+          // Check if NDA was completed
+          const signature = localStorage.getItem("ndaSignature");
+          const document = localStorage.getItem("ndaDocument");
+          
+          if (signature && document) {
+            setNdaSigned(true);
+            setNdaData({ signature, document });
             form.setValue("ndaAgreement", true);
           }
         }, 500);
@@ -208,9 +227,9 @@ export default function SignUpForm() {
     }, 1000);
   };
 
-  // Form submission handler
+  // Form submission handler with storage integration
   const onSubmit = async (data: SignupFormData) => {
-    if (!ndaSigned) {
+    if (!ndaSigned || !ndaData) {
       toast.error("Please sign the NDA before submitting your application");
       return;
     }
@@ -234,21 +253,18 @@ export default function SignUpForm() {
         formData.append("profileImage", profileImage);
       }
 
-      // NDA data
-      const ndaData = getNdaDataFromStorage();
-      if (hasCompleteNdaData()) {
-        formData.append("ndaSigned", "true");
-        formData.append("ndaSignature", ndaData.signature!);
-        formData.append("ndaDocument", ndaData.document!);
-        formData.append("ndaSignedAt", ndaData.signedAt!);
-      }
+      // NDA data for storage upload
+      formData.append("ndaSigned", "true");
+      formData.append("ndaSignature", ndaData.signature);
+      formData.append("ndaDocument", ndaData.document);
 
       const result = await signupUser(formData);
 
       if (result.success) {
-        if (result.ndaProcessed) {
-          cleanupNdaStorage();
-        }
+        // Clean up localStorage after successful signup
+        localStorage.removeItem("ndaSignature");
+        localStorage.removeItem("ndaDocument");
+        
         toast.success("Account created successfully! Please check your email to verify your account.");
         toast.success("Redirecting to sign-in page...", { duration: 2000 });
         
@@ -287,13 +303,11 @@ export default function SignUpForm() {
 
   return (
     <FormProvider {...form}>
-      {/* CRITICAL: Include the modals inside FormProvider */}
       <TechStackModal />
       <PrivacyPolicyModal />
       
       <div className="min-h-screen relative bg-gray-900 flex items-center justify-center px-6 py-12">
         <div className="w-full max-w-5xl mx-auto">
-          {/* Header */}
           <div className="text-center mb-12">
             <Image
               src="/assets/svgs/logos/codebility-light.svg"
@@ -352,16 +366,17 @@ export default function SignUpForm() {
                   required
                 />
 
+                {/* FIXED: Positions Dropdown */}
                 <div className="space-y-2">
                   <Label className="text-white text-base font-medium">Positions *</Label>
                   <div className="relative">
                     <select
-                      value={selectedPositions[0]?.id?.toString() || ""}
+                      value={selectedPositions[0]?.id?.toString() || ""} // FIXED: Added optional chaining
                       onChange={(e) => {
                         const position = POSITIONS.find(p => p.id === parseInt(e.target.value));
                         if (position) {
                           setSelectedPositions([position]);
-                          form.setValue("positions", [position]); // Sets array properly
+                          form.setValue("positions", [position]);
                           form.clearErrors("positions");
                         } else {
                           setSelectedPositions([]);
@@ -369,6 +384,7 @@ export default function SignUpForm() {
                         }
                       }}
                       className="bg-gray-700 border-gray-600 text-white h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-full px-3 appearance-none cursor-pointer"
+                      style={{ appearance: 'none' }} // FIXED: Removes double arrows
                     >
                       <option value="" className="text-gray-400">Select applicable positions</option>
                       {POSITIONS.map((position) => (
@@ -394,7 +410,7 @@ export default function SignUpForm() {
                     value={form.watch("years_of_experience") || 0}
                     onChange={(e) => {
                       const numValue = parseInt(e.target.value) || 0;
-                      form.setValue("years_of_experience", numValue); // Sets number properly
+                      form.setValue("years_of_experience", numValue);
                       form.clearErrors("years_of_experience");
                     }}
                     placeholder="0"
@@ -405,7 +421,7 @@ export default function SignUpForm() {
                   )}
                 </div>
 
-                {/* Tech Stack Section - WORKING IMPLEMENTATION FROM ORIGINAL */}
+                {/* Tech Stack Section */}
                 <div className="space-y-2">
                   <Label className="text-white text-base font-medium">Tech Stack *</Label>
                   <Button
@@ -425,7 +441,6 @@ export default function SignUpForm() {
                     <ChevronDown className="h-5 w-5" />
                   </Button>
                   
-                  {/* Show selected technologies */}
                   {stack && stack.length > 0 && !stack.includes("none") && (
                     <div className="text-xs text-gray-400 flex flex-wrap gap-1">
                       {stack.map((tech) => (
@@ -548,7 +563,7 @@ export default function SignUpForm() {
                   <span className="font-medium">NDA Signed</span>
                 </div>
                 <p className="text-sm text-green-400">
-                  ✓ NDA has been signed and will be included with your application.
+                  ✓ NDA has been signed and will be automatically stored in our secure storage system.
                 </p>
               </div>
             ) : (
@@ -576,7 +591,7 @@ export default function SignUpForm() {
               </div>
             )}
 
-            {/* Agreements */}
+            {/* FIXED: Agreements - Added pointer events fix */}
             <div className="space-y-4">
               <div className="flex items-start space-x-3">
                 <Checkbox
@@ -584,6 +599,7 @@ export default function SignUpForm() {
                   checked={form.watch("privacyPolicy")}
                   onCheckedChange={(checked) => form.setValue("privacyPolicy", !!checked)}
                   className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                  style={{ pointerEvents: 'auto' }} // FIXED: Ensures clickability
                 />
                 <Label htmlFor="privacyPolicy" className="text-white text-sm leading-relaxed">
                   I agree to the <span 
@@ -605,6 +621,7 @@ export default function SignUpForm() {
                   onCheckedChange={(checked) => form.setValue("ndaAgreement", !!checked)}
                   disabled={!ndaSigned}
                   className="mt-1 border-gray-600 data-[state=checked]:bg-blue-500 data-[state=checked]:border-blue-500"
+                  style={{ pointerEvents: 'auto' }} // FIXED: Ensures clickability
                 />
                 <Label htmlFor="ndaAgreement" className="text-white text-sm leading-relaxed">
                   I agree to the <span className="text-blue-400 underline cursor-pointer">Non-Disclosure Agreement</span> *

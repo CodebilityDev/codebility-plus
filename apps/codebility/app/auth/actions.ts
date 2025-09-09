@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { useUserStore } from "@/store/codev-store";
 import { Codev } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { uploadNdaToStorage, updateCodevNdaUrls } from "@/utils/ndaStorageService";
 
 const uploadProfileImage = async (
   file: File,
@@ -69,6 +70,10 @@ export const signupUser = async (formData: FormData) => {
       parseInt(formData.get("years_of_experience") as string) || 0;
     const profileImage = formData.get("profileImage") as File;
 
+    // Extract user names for NDA processing
+    const firstName = formData.get("first_name") as string;
+    const lastName = formData.get("last_name") as string;
+
     // Check for an existing user (comparing lowercase email)
     const { data: existingUser } = await supabase
       .from("codev")
@@ -100,11 +105,12 @@ export const signupUser = async (formData: FormData) => {
     if (authError) throw authError;
     if (!user) throw new Error("Failed to create user");
 
-    // Extract NDA data from formData (passed from client-side localStorage)
+    // **ENHANCED NDA PROCESSING WITH STORAGE SYSTEM**
     let nda_status = false;
     let nda_signature: string | undefined = undefined;
     let nda_document: string | undefined = undefined;
     let nda_signed_at: string | undefined = undefined;
+    let ndaProcessedWithStorage = false;
 
     // Check if NDA data was included in the form submission
     const ndaSigned = formData.get("ndaSigned") as string;
@@ -112,20 +118,61 @@ export const signupUser = async (formData: FormData) => {
     const document = formData.get("ndaDocument") as string;
     const signedAt = formData.get("ndaSignedAt") as string;
 
-    if (ndaSigned === "true" && signature && document && signedAt) {
-      nda_status = true;
-      nda_signature = signature;
-      nda_document = document;
-      nda_signed_at = signedAt;
+    if (ndaSigned === "true" && signature && document) {
+      console.log("NDA data found in form submission, processing with storage system...");
       
-      console.log("NDA data found in form submission, integrating into signup...");
+      try {
+        // **NEW: Upload NDA files to Supabase Storage instead of storing base64**
+        const ndaUploadResult = await uploadNdaToStorage(
+          signature,
+          document,
+          {
+            first_name: firstName,
+            last_name: lastName,
+            codev_id: user.id, // Use the newly created user ID
+          }
+        );
+
+        if (ndaUploadResult.success) {
+          console.log("NDA files uploaded to storage successfully");
+          
+          // Set the storage URLs instead of base64 data
+          nda_status = true;
+          nda_signature = ndaUploadResult.signatureUrl;
+          nda_document = ndaUploadResult.documentUrl;
+          nda_signed_at = new Date().toISOString();
+          ndaProcessedWithStorage = true;
+          
+          console.log(`NDA stored in Supabase Storage:
+            - Signature: ${ndaUploadResult.signatureUrl}
+            - Document: ${ndaUploadResult.documentUrl}`);
+        } else {
+          console.error("Failed to upload NDA to storage:", ndaUploadResult.error);
+          
+          // **FALLBACK: Use base64 storage if storage upload fails**
+          console.log("Falling back to base64 storage for NDA data");
+          nda_status = true;
+          nda_signature = signature;
+          nda_document = document;
+          nda_signed_at = signedAt || new Date().toISOString();
+        }
+      } catch (ndaError) {
+        console.error("Error processing NDA with storage system:", ndaError);
+        
+        // **FALLBACK: Use base64 storage if there's an error**
+        console.log("Falling back to base64 storage due to error");
+        nda_status = true;
+        nda_signature = signature;
+        nda_document = document;
+        nda_signed_at = signedAt || new Date().toISOString();
+      }
     }
 
     // Prepare user data for insertion into the "codev" table
     const userData: Codev = {
       id: user.id,
-      first_name: formData.get("first_name") as string,
-      last_name: formData.get("last_name") as string,
+      first_name: firstName,
+      last_name: lastName,
       email_address,
       phone_number: formData.get("phone_number") as string,
       address: null,
@@ -175,12 +222,23 @@ export const signupUser = async (formData: FormData) => {
 
     setUser(userData);
     
-    // Return success with all necessary data
+    // **ENHANCED: Return additional information about NDA processing**
+    const responseMessage = ndaProcessedWithStorage 
+      ? "Account created successfully! NDA files securely stored. Redirecting to sign-in page..."
+      : "Account created successfully! Redirecting to sign-in page...";
+    
+    console.log(`Signup completed for ${email_address}:
+      - User ID: ${user.id}
+      - NDA Status: ${nda_status}
+      - NDA Storage Method: ${ndaProcessedWithStorage ? 'Supabase Storage' : 'Database'}
+      - Profile Image: ${image_url ? 'Uploaded' : 'None'}`);
+    
     return { 
       success: true, 
       data: user, 
       ndaProcessed: nda_status,
-      message: "Account created successfully! Redirecting to sign-in page..."
+      ndaStorageMethod: ndaProcessedWithStorage ? 'storage' : 'database',
+      message: responseMessage
     };
   } catch (error: any) {
     console.error("Signup error:", error);

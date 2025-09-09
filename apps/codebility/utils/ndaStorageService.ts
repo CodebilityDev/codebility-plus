@@ -26,14 +26,10 @@ interface UserData {
 
 /**
  * Converts data URL to File object for uploading
- * @param dataUrl - Base64 data URL from canvas or PDF
- * @param filename - Name for the file
- * @param mimeType - MIME type of the file
  */
 function dataUrlToFile(dataUrl: string, filename: string, mimeType: string): File {
   const arr = dataUrl.split(',');
   
-  // Validate data URL format
   if (arr.length !== 2) {
     throw new Error('Invalid data URL format');
   }
@@ -59,9 +55,7 @@ function dataUrlToFile(dataUrl: string, filename: string, mimeType: string): Fil
 }
 
 /**
- * Server-side file upload function following your existing pattern
- * @param file - File to upload
- * @param options - Upload configuration options
+ * Server-side file upload function
  */
 async function uploadFileToStorage(
   file: File,
@@ -72,10 +66,13 @@ async function uploadFileToStorage(
   try {
     const { bucket = "codebility", folder = "nda", cacheControl = "3600", upsert = true } = options;
 
-    // Generate a cleaner file path following your pattern
+    // Generate unique filename with timestamp
+    const timestamp = Date.now();
     const fileExtension = file.name.split(".").pop() || "";
-    const fileName = `${Date.now()}.${fileExtension}`;
+    const fileName = `${timestamp}_${file.name}`;
     const filePath = `${folder}/${fileName}`;
+
+    console.log(`Uploading file to: ${bucket}/${filePath}`);
 
     const { error: uploadError } = await supabase.storage
       .from(bucket)
@@ -84,7 +81,10 @@ async function uploadFileToStorage(
         upsert,
       });
 
-    if (uploadError) throw uploadError;
+    if (uploadError) {
+      console.error(`Upload error for ${filePath}:`, uploadError);
+      throw uploadError;
+    }
 
     const { data: publicUrlData } = supabase.storage
       .from(bucket)
@@ -94,6 +94,7 @@ async function uploadFileToStorage(
       throw new Error("Failed to get public URL");
     }
 
+    console.log(`File uploaded successfully: ${publicUrlData.publicUrl}`);
     return publicUrlData.publicUrl.toString();
 
   } catch (error) {
@@ -103,22 +104,7 @@ async function uploadFileToStorage(
 }
 
 /**
- * Generates complete NDA PDF with signature using jsPDF (client-side function)
- * This function needs to be called from client component since jsPDF requires browser environment
- * @param userData - User information for the document
- * @param signatureDataUrl - Base64 signature image
- */
-export function generateNdaPdf(userData: UserData, signatureDataUrl: string): Promise<string> {
-  // This function should be called from client-side component
-  // Moving PDF generation logic to client component since jsPDF requires browser environment
-  throw new Error("generateNdaPdf must be called from client component");
-}
-
-/**
  * Server action to upload NDA files to Supabase Storage
- * @param signatureDataUrl - Base64 signature from canvas
- * @param documentDataUrl - Base64 PDF document
- * @param userData - User information for file naming
  */
 export async function uploadNdaToStorage(
   signatureDataUrl: string,
@@ -135,6 +121,8 @@ export async function uploadNdaToStorage(
     const signatureFilename = `nda_signature_${userIdentifier}_${timestamp}.png`;
     const documentFilename = `nda_document_${userIdentifier}_${timestamp}.pdf`;
 
+    console.log(`Processing NDA upload for user: ${first_name} ${last_name}`);
+
     // Convert data URLs to File objects
     const signatureFile = dataUrlToFile(
       signatureDataUrl, 
@@ -148,6 +136,8 @@ export async function uploadNdaToStorage(
       'application/pdf'
     );
 
+    console.log(`Files created - Signature: ${signatureFile.size} bytes, Document: ${documentFile.size} bytes`);
+
     // Upload signature to Supabase Storage
     const signatureUrl = await uploadFileToStorage(signatureFile, {
       bucket: "codebility",
@@ -159,6 +149,8 @@ export async function uploadNdaToStorage(
       bucket: "codebility", 
       folder: "nda/documents",
     });
+
+    console.log(`NDA files uploaded successfully for ${userIdentifier}`);
 
     return {
       signatureUrl,
@@ -179,9 +171,6 @@ export async function uploadNdaToStorage(
 
 /**
  * Server action to update codev record with NDA URLs after successful storage upload
- * @param codevId - ID of the codev record to update
- * @param signatureUrl - URL of stored signature file
- * @param documentUrl - URL of stored document file
  */
 export async function updateCodevNdaUrls(
   codevId: string,
@@ -190,6 +179,8 @@ export async function updateCodevNdaUrls(
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const supabase = await createClientServerComponent();
+    
+    console.log(`Updating database for codev ${codevId} with storage URLs`);
     
     const { error } = await supabase
       .from("codev")
@@ -201,7 +192,12 @@ export async function updateCodevNdaUrls(
       })
       .eq("id", codevId);
 
-    if (error) throw error;
+    if (error) {
+      console.error(`Database update error for ${codevId}:`, error);
+      throw error;
+    }
+
+    console.log(`Database updated successfully for codev ${codevId}`);
 
     // Revalidate the in-house page to show updated NDA status
     revalidatePath("/home/in-house");
@@ -218,9 +214,6 @@ export async function updateCodevNdaUrls(
 
 /**
  * Complete NDA signing workflow - uploads to storage then updates database
- * @param signatureDataUrl - Base64 signature from canvas
- * @param documentDataUrl - Base64 PDF document  
- * @param userData - User information including codev_id
  */
 export async function completeNdaSigning(
   signatureDataUrl: string,
@@ -232,37 +225,49 @@ export async function completeNdaSigning(
     return { success: false, error: "Codev ID is required" };
   }
 
-  // Step 1: Upload files to storage
-  const uploadResult = await uploadNdaToStorage(signatureDataUrl, documentDataUrl, userData);
-  
-  if (!uploadResult.success) {
-    return { 
-      success: false, 
-      error: uploadResult.error || "Failed to upload files to storage" 
+  console.log(`Starting complete NDA signing process for ${userData.first_name} ${userData.last_name}`);
+
+  try {
+    // Step 1: Upload files to storage
+    const uploadResult = await uploadNdaToStorage(signatureDataUrl, documentDataUrl, userData);
+    
+    if (!uploadResult.success) {
+      return { 
+        success: false, 
+        error: uploadResult.error || "Failed to upload files to storage" 
+      };
+    }
+
+    console.log(`Storage upload completed, updating database for codev ${userData.codev_id}`);
+
+    // Step 2: Update database with URLs
+    const dbResult = await updateCodevNdaUrls(
+      userData.codev_id,
+      uploadResult.signatureUrl,
+      uploadResult.documentUrl
+    );
+
+    if (!dbResult.success) {
+      return { 
+        success: false, 
+        error: dbResult.error || "Failed to update database" 
+      };
+    }
+
+    console.log(`NDA signing process completed successfully for ${userData.codev_id}`);
+    return { success: true };
+
+  } catch (error) {
+    console.error("Error in complete NDA signing:", error);
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Failed to complete NDA signing process"
     };
   }
-
-  // Step 2: Update database with URLs
-  const dbResult = await updateCodevNdaUrls(
-    userData.codev_id,
-    uploadResult.signatureUrl,
-    uploadResult.documentUrl
-  );
-
-  if (!dbResult.success) {
-    return { 
-      success: false, 
-      error: dbResult.error || "Failed to update database" 
-    };
-  }
-
-  return { success: true };
 }
 
 /**
- * Server action to delete NDA files from storage
- * @param filePath - Path to the file in storage
- * @param bucket - Storage bucket name
+ * Server action to delete NDA files from storage (cleanup utility)
  */
 export async function deleteNdaFile(
   filePath: string,
@@ -284,7 +289,6 @@ export async function deleteNdaFile(
 
 /**
  * Helper function to extract file path from storage URL
- * @param url - Full storage URL
  */
 export async function getNdaFilePath(url: string): Promise<string | null> {
   try {
