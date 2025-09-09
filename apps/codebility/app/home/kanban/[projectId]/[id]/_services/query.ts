@@ -15,6 +15,7 @@ export const getBoardData = async (boardId: String) => {
       description,
       created_at,
       updated_at,
+      project_id,
       kanban_columns (
         id,
         name,

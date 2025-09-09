@@ -37,27 +37,29 @@ export const updateTaskColumnId = async (
 };
 
 export const fetchAvailableMembers = async (
-  boardId: string,
+  projectId: string,
 ): Promise<CodevMember[]> => {
   const supabase = await createClientServerComponent();
 
-  // 1. Get the project_id from the kanban_boards table.
-  const { data: board, error: boardError } = await supabase
-    .from("kanban_boards")
-    .select("project_id")
-    .eq("id", boardId)
-    .single();
+  // // 1. Get the project_id from the kanban_boards table.
+  // const { data: board, error: boardError } = await supabase
+  //   .from("kanban_boards")
+  //   .select("project_id")
+  //   .eq("id", boardId)
+  //   .single();
 
-  if (boardError || !board?.project_id) {
-    console.error("No project associated with this board");
-    return [];
-  }
+  // console.log('STEP 1:', board);
+
+  // if (boardError || !board?.project_id) {
+  //   console.error("No project associated with this board");
+  //   return [];
+  // }
 
   // 2. Get all project members from project_members table.
   const { data: projectMembers, error: projectMembersError } = await supabase
     .from("project_members")
     .select("codev_id, role")
-    .eq("project_id", board.project_id);
+    .eq("project_id", projectId);
 
   if (projectMembersError || !projectMembers?.length) {
     console.error(
