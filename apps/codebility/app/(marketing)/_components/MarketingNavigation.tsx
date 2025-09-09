@@ -243,7 +243,7 @@ const Navigation = () => {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError) {
-          console.error("Auth error:", authError.message);
+          console.log("Auth error:", authError.message);
           setUserData(null);
           return;
         }
