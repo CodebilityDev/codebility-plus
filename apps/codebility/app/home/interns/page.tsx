@@ -27,7 +27,8 @@ export default async function CodevsPage() {
     );
   }
 
-  // Filter only codevs with application_status = "passed"
+  // Filter only codevs with application_status = "passed" 
+  // Include all passed members regardless of their internal_status (active or inactive)
   const passedCodevs = (allCodevs || []).filter(
     (codev) => codev.application_status === "passed"
   );
