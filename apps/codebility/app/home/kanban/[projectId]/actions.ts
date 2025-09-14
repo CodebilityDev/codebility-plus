@@ -69,9 +69,6 @@ export async function createNewSprint(formData: FormData) {
 			return { success: false, error: sprint.error.message };
 		}
 
-		// Revalidate the KanbanSprintPage to refresh the sprints list
-		revalidatePath(`/kanban/${projectId}`);
-
 		return {
 			success: true,
 			data: {

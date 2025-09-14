@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import EditSprintModal from "@/components/modals/EditSprintModal";
+import { useSprintStore } from "@/store/sprints-store";
 import { Codev } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Edit2, Eye, MoreHorizontal, Trash2 } from "lucide-react";
@@ -27,6 +28,7 @@ export function TableActions({ sprint }: TableActionsProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [supabase, setSupabase] = useState<any>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const { fetchSprintsData } = useSprintStore();
 
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -47,6 +49,8 @@ export function TableActions({ sprint }: TableActionsProps) {
       console.error("Error deleting sprint:", error);
       toast.error("Failed to delete sprint");
     } finally {
+      //revalidate sprints store
+      fetchSprintsData();
       setIsDeleting(false);
       setShowDeleteDialog(false);
     }
