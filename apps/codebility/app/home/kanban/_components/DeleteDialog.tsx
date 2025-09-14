@@ -43,7 +43,7 @@ export function DeleteDialog({
       <AlertDialogContent className="bg-light-300 dark:bg-dark-100">
         <AlertDialogHeader>
           <AlertDialogTitle className="dark:text-light-900 text-black">
-            Delete Member
+            Delete Sprint
           </AlertDialogTitle>
           <AlertDialogDescription className="text-gray dark:text-light-500">
             Are you sure you want to delete{" "}
