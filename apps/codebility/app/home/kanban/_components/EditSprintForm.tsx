@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Input } from "@/components/shared/dashboard/input";
 import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/codev-store";
+import { useSprintStore } from "@/store/sprints-store";
 import { uploadImage } from "@/utils/uploadImage";
 import toast from "react-hot-toast";
 
@@ -22,6 +23,7 @@ const EditSprintForm = ({
 }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { user } = useUserStore();
+  const { fetchSprintsData } = useSprintStore();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -35,6 +37,9 @@ const EditSprintForm = ({
       const { isSuccess, error } = await EditSprint(formData);
 
       if (!isSuccess) throw error;
+
+      // Revalidate sprint store
+      fetchSprintsData();
 
       // Notify
       toast.success("Sprint edited successfully!");

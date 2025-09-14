@@ -1,5 +1,8 @@
+"use client";
+
+import { use, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { Box } from "@/components/shared/dashboard";
 import H1 from "@/components/shared/dashboard/H1";
 import { Button } from "@/components/ui/button";
@@ -14,8 +17,9 @@ import {
 } from "@/components/ui/table";
 import pathsConfig from "@/config/paths.config";
 import { ArrowRightIcon, IconKanban } from "@/public/assets/svgs";
+import { useSprintStore } from "@/store/sprints-store";
 import { KanbanBoardType, KanbanSprintType } from "@/types/home/codev";
-import { createClientServerComponent } from "@/utils/supabase/server";
+import { createClientClientComponent } from "@/utils/supabase/client";
 import { format } from "date-fns";
 
 import { TableActions } from "../_components/TableActions";
@@ -26,7 +30,7 @@ export interface KanbanSprintData extends KanbanSprintType {
   kanban_board: KanbanBoardType | null;
 }
 
-interface KanbanProjectWithSprintsData {
+export interface KanbanProjectWithSprintsData {
   id: string;
   name: string;
   created_at?: string;
@@ -40,7 +44,6 @@ interface PageProps {
 
 /**
  * Maps raw sprint data to typed sprint structure
- * Ensures type safety and handles null values gracefully
  */
 const mapSprint = (sprint: any): KanbanSprintData => {
   return {
@@ -57,8 +60,7 @@ const mapSprint = (sprint: any): KanbanSprintData => {
 };
 
 /**
- * Formats date range for display in timeline column
- * Handles edge cases and provides fallback text
+ * Formats date range for display
  */
 function formatDateRange(
   startDate: string | null,
@@ -74,254 +76,238 @@ function formatDateRange(
   }
 }
 
-/**
- * Enhanced Kanban Sprint Page with two-level breadcrumb navigation
- * Shows project sprints with timeline and board access
- * Follows KISS, YAGNI, DRY, and SOLID principles
- */
-export default async function KanbanSprintPage(props: PageProps) {
-  const params = await props.params;
-  const supabase = await createClientServerComponent();
+export default function KanbanSprintPage({ params }: PageProps) {
+  const { projectId } = use(params);
+  const router = useRouter();
+  const supabase = createClientClientComponent()!;
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  // Early validation for required parameters
-  if (!params?.projectId) {
-    return (
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
-        <H1>Error: Invalid Project ID</H1>
-        <p>Please ensure you are accessing a valid project URL.</p>
-      </div>
-    );
-  }
-
-  // Authentication and authorization checks
   const {
-    data: { user: sessionUser },
-  } = await supabase.auth.getUser();
+    setProjectId,
+    fetchSprintsData,
+    sprintsData,
+    error: sprintStoreError,
+  } = useSprintStore();
 
-  if (!sessionUser) {
-    redirect("/auth/sign-in");
-  }
+  const fetchData = useCallback(async () => {
+    // if (!projectId) {
+    //   setError("Invalid Project ID");
+    //   setLoading(false);
+    //   return;
+    // }
 
-  // Verify user is member of the project
-  const { data: member, error } = await supabase
-    .from("project_members")
-    .select("id")
-    .eq("codev_id", sessionUser?.id)
-    .eq("project_id", params?.projectId)
-    .single();
+    setProjectId(projectId);
 
-  const userIsPartOfProject = !!member;
+    try {
+      // Auth check
+      const {
+        data: { user: sessionUser },
+      } = await supabase.auth.getUser();
 
-  if (!userIsPartOfProject) {
-    redirect("/home/kanban");
-  }
-
-  try {
-    // Fetch project data with nested sprints and boards
-    let projectWithSprintsQuery = supabase
-      .from("projects")
-      .select(
-        `
-        id,
-        name,
-        kanban_sprints!kanban_sprints_project_id_fkey (
-          id,
-          name,
-          start_at,
-          end_at,
-          project_id,
-          board_id,
-          kanban_board:kanban_boards!kanban_sprints_board_id_fkey (
-            id,
-            name
-          )
-        )
-      `,
-      )
-      .eq("id", params.projectId)
-      .single();
-
-    const { data, error } = await projectWithSprintsQuery;
-    const project = data as KanbanProjectWithSprintsData | null;
-
-    /**
-     * Renders table content based on data state
-     * Handles loading, error, and empty states appropriately
-     */
-    const renderTableContent = () => {
-      // Error handling
-      if (error) {
-        return (
-          <TableRow>
-            <TableCell colSpan={4} className="text-center text-red-500">
-              {error.message || "Error loading sprints"}
-            </TableCell>
-          </TableRow>
-        );
+      if (!sessionUser) {
+        router.push("/auth/sign-in");
+        return;
       }
 
-      // Loading state
-      if (!project) {
-        return Array.from({ length: 3 }).map((_, index) => (
-          <TableRow key={`loading-${index}`}>
-            <TableCell colSpan={4}>
-              <Box className="flex-1">
-                <div className="flex flex-col items-center gap-3">
-                  <Skeleton className="h-8 w-full" />
-                </div>
-              </Box>
-            </TableCell>
-          </TableRow>
-        ));
+      // Verify membership
+      const { data: member } = await supabase
+        .from("project_members")
+        .select("id")
+        .eq("codev_id", sessionUser.id)
+        .eq("project_id", projectId)
+        .single();
+
+      if (!member) {
+        router.push("/home/kanban");
+        return;
       }
 
-      // Empty state
-      if (!project.kanban_sprints) {
-        return (
-          <TableRow>
-            <TableCell
-              colSpan={4}
-              className="text-dark100_light900 py-8 text-center"
-            >
-              No sprints available. Create a sprint to get started.
-            </TableCell>
-          </TableRow>
-        );
+      // Fetch project + sprints
+      await fetchSprintsData();
+      // const { data, error: queryError } = await supabase
+      //   .from("projects")
+      //   .select(
+      //     `
+      //     id,
+      //     name,
+      //     kanban_sprints!kanban_sprints_project_id_fkey (
+      //       id,
+      //       name,
+      //       start_at,
+      //       end_at,
+      //       project_id,
+      //       board_id,
+      //       kanban_board:kanban_boards!kanban_sprints_board_id_fkey (
+      //         id,
+      //         name
+      //       )
+      //     )
+      //   `,
+      //   )
+      //   .eq("id", projectId)
+      //   .single();
+
+      if (sprintStoreError) {
+        setError(sprintStoreError);
       }
+    } catch (err: any) {
+      setError(err.message || "Unexpected error");
+    } finally {
+      setLoading(false);
+    }
+  }, [projectId, supabase, router]);
 
-      // Normalize kanban_sprints to an array
-      const sprints: KanbanSprintData[] = project.kanban_sprints
-        ? Array.isArray(project.kanban_sprints)
-          ? project.kanban_sprints.map(mapSprint)
-          : [mapSprint(project.kanban_sprints)]
-        : [];
+  useEffect(() => {
+    fetchData();
+  }, [fetchData, projectId, setProjectId, fetchSprintsData]);
 
-      // Render sprints
-      if (sprints.length === 0) {
-        return (
-          <TableRow>
-            <TableCell
-              colSpan={4}
-              className="text-dark100_light900 py-8 text-center"
-            >
-              No sprints available. Create a sprint to get started.
-            </TableCell>
-          </TableRow>
-        );
-      }
-
-      return sprints.map((sprint) => (
-        <TableRow
-          key={sprint.id}
-          className="border-customBlue-500 grid grid-cols-1 border-l-4 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 md:table-row"
-        >
-          <TableCell className="md:table-cell">
-            <div className="flex flex-col">
-              <span className="font-medium text-gray-900 dark:text-white">
-                {sprint.name}
-              </span>
-            </div>
-            <div className="flex flex-col">
-              <span className="text-gray-700 dark:text-gray-300">
-                {sprint.kanban_board?.name}
-              </span>
-            </div>
-          </TableCell>
-          <TableCell className="md:table-cell">
-            <span className="text-gray-700 dark:text-gray-300">
-              {formatDateRange(sprint.start_at, sprint.end_at)}
-            </span>
-          </TableCell>
-          <TableCell className="text-center md:table-cell">
-            <div className="flex items-center justify-center gap-2">
-              <Link
-                href={`${pathsConfig.app.kanban}/${params.projectId}/${sprint.kanban_board?.id}`}
-              >
-                <Button
-                  variant="hollow"
-                  className="bg-customBlue-600 hover:bg-customBlue-700 dark:bg-customBlue-600 dark:hover:bg-customBlue-700 inline-flex items-center gap-2 text-white shadow-sm"
-                >
-                  <IconKanban className="h-4 w-4 text-white" />
-                  <span className="hidden sm:inline">View Board</span>
-                </Button>
-              </Link>
-              <TableActions sprint={sprint} />
-            </div>
+  /**
+   * Render table content
+   */
+  const renderTableContent = () => {
+    if (loading) {
+      return Array.from({ length: 3 }).map((_, index) => (
+        <TableRow key={`loading-${index}`}>
+          <TableCell colSpan={4}>
+            <Box className="flex-1">
+              <div className="flex flex-col items-center gap-3">
+                <Skeleton className="h-8 w-full" />
+              </div>
+            </Box>
           </TableCell>
         </TableRow>
       ));
-    };
+    }
 
-    // Main page render
-    return (
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
-        {/* Two-Level Breadcrumb Navigation */}
-        <nav
-          className="flex flex-row items-center gap-3 pb-2 text-sm"
-          aria-label="Breadcrumb"
-        >
-          {/* Level 1: Kanban Board Overview */}
-          <Link
-            href={pathsConfig.app.kanban}
-            className="group transition-colors duration-200"
-          >
-            <span className="group-hover:text-customBlue-600 dark:group-hover:text-customBlue-400 text-gray-500 dark:text-gray-400">
-              📋 Kanban Board
+    if (error) {
+      return (
+        <TableRow>
+          <TableCell colSpan={4} className="text-center text-red-500">
+            {error}
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    if (!sprintsData?.kanban_sprints) {
+      return (
+        <TableRow>
+          <TableCell colSpan={4} className="py-8 text-center text-gray-500">
+            No sprints available. Create a sprint to get started.
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    const sprints: KanbanSprintData[] = Array.isArray(
+      sprintsData!.kanban_sprints,
+    )
+      ? sprintsData!.kanban_sprints.map(mapSprint)
+      : [mapSprint(sprintsData!.kanban_sprints)];
+
+    if (sprints.length === 0) {
+      return (
+        <TableRow>
+          <TableCell colSpan={4} className="py-8 text-center text-gray-500">
+            No sprints available. Create a sprint to get started.
+          </TableCell>
+        </TableRow>
+      );
+    }
+
+    return sprints.map((sprint) => (
+      <TableRow
+        key={sprint.id}
+        className="border-customBlue-500 grid grid-cols-1 border-l-4 transition-all duration-200 hover:bg-gray-50 dark:hover:bg-gray-800/50 md:table-row"
+      >
+        <TableCell>
+          <div className="flex flex-col">
+            <span className="font-medium text-gray-900 dark:text-white">
+              {sprint.name}
             </span>
-          </Link>
-
-          <ArrowRightIcon
-            className="text-gray-400 dark:text-gray-500"
-            aria-hidden="true"
-          />
-
-          {/* Level 2: Current Project Name */}
-          <span
-            className="to-customBlue-600 bg-gradient-to-r from-purple-600 bg-clip-text font-semibold text-gray-900 text-transparent dark:text-white"
-            aria-current="page"
-          >
-            {project?.name || "Loading..."}
-          </span>
-        </nav>
-
-        {/* Page Header */}
-        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-          <H1>Kanban Sprints - {project?.name || "Loading..."}</H1>
-          <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
-            <AddSprintButton projectId={params.projectId} />
           </div>
-        </header>
+          <div className="flex flex-col">
+            <span className="text-gray-700 dark:text-gray-300">
+              {sprint.kanban_board?.name}
+            </span>
+          </div>
+        </TableCell>
+        <TableCell>
+          <span className="text-gray-700 dark:text-gray-300">
+            {formatDateRange(sprint.start_at, sprint.end_at)}
+          </span>
+        </TableCell>
+        <TableCell className="text-center">
+          <div className="flex items-center justify-center gap-2">
+            <Link
+              href={`${pathsConfig.app.kanban}/${projectId}/${sprint.kanban_board?.id}`}
+            >
+              <Button
+                variant="hollow"
+                className="bg-customBlue-600 hover:bg-customBlue-700 dark:bg-customBlue-600 dark:hover:bg-customBlue-700 inline-flex items-center gap-2 text-white shadow-sm"
+              >
+                <IconKanban className="h-4 w-4 text-white" />
+                <span className="hidden sm:inline">View Board</span>
+              </Button>
+            </Link>
+            <TableActions sprint={sprint} />
+          </div>
+        </TableCell>
+      </TableRow>
+    ));
+  };
 
-        {/* Sprints Table */}
-        <main className="overflow-hidden rounded-lg border border-gray-200 shadow-sm dark:border-gray-700">
-          <Table>
-            <TableHeader className="hidden md:table-header-group">
-              <TableRow className="border-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-                <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
-                  🏃‍♂️ Sprint
-                </TableHead>
-                <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
-                  📅 Timeline
-                </TableHead>
-                <TableHead className="w-[10%] text-center font-semibold text-gray-900 dark:text-white">
-                  ⚡ Actions
-                </TableHead>
-              </TableRow>
-            </TableHeader>
+  return (
+    <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
+      {/* Breadcrumb */}
+      <nav className="flex flex-row items-center gap-3 pb-2 text-sm">
+        <Link
+          href={pathsConfig.app.kanban}
+          className="group transition-colors duration-200"
+        >
+          <span className="group-hover:text-customBlue-600 dark:group-hover:text-customBlue-400 text-gray-500 dark:text-gray-400">
+            📋 Kanban Board
+          </span>
+        </Link>
+        <ArrowRightIcon
+          className="text-gray-400 dark:text-gray-500"
+          aria-hidden="true"
+        />
+        <span className="to-customBlue-600 bg-gradient-to-r from-purple-600 bg-clip-text font-semibold text-gray-900 text-transparent dark:text-white">
+          {sprintsData?.name || (loading ? "Loading..." : "Error")}
+        </span>
+      </nav>
 
-            <TableBody className="bg-white dark:bg-gray-950">
-              {renderTableContent()}
-            </TableBody>
-          </Table>
-        </main>
-      </div>
-    );
-  } catch (err) {
-    return (
-      <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
-        <H1>Error Loading Kanban Sprints</H1>
-        <p>An unexpected error occurred. Please try again later.</p>
-      </div>
-    );
-  }
+      {/* Header */}
+      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <H1>Kanban Sprints - {sprintsData?.name || "Loading..."}</H1>
+        <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
+          <AddSprintButton projectId={projectId} />
+        </div>
+      </header>
+
+      {/* Table */}
+      <main className="overflow-hidden rounded-lg border border-gray-200 shadow-sm dark:border-gray-700">
+        <Table>
+          <TableHeader className="hidden md:table-header-group">
+            <TableRow className="border-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+              <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
+                🏃‍♂️ Sprint
+              </TableHead>
+              <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
+                📅 Timeline
+              </TableHead>
+              <TableHead className="w-[10%] text-center font-semibold text-gray-900 dark:text-white">
+                ⚡ Actions
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody className="bg-white dark:bg-gray-950">
+            {renderTableContent()}
+          </TableBody>
+        </Table>
+      </main>
+    </div>
+  );
 }

@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dialog";
 import { useModal } from "@/hooks/use-modal-sprints";
 import { objectToFormData } from "@/lib/form-data";
+import { useSprintStore } from "@/store/sprints-store";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { isBefore, isEqual } from "date-fns";
 import { useForm } from "react-hook-form";
@@ -53,6 +54,7 @@ const SprintAddModal = () => {
   const isModalOpen = isOpen && type === "sprintAddModal";
 
   const [isLoading, setIsLoading] = useState(false);
+  const { fetchSprintsData } = useSprintStore();
 
   const form = useForm<FormValues>({
     resolver: zodResolver(formSchema),
@@ -92,6 +94,8 @@ const SprintAddModal = () => {
       toast.error("Something went wrong!");
     } finally {
       setIsLoading(false);
+      //revalidate sprints
+      fetchSprintsData();
     }
   };
 
