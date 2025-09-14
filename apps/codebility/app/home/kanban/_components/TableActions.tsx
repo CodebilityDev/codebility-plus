@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import EditSprintModal from "@/components/modals/EditSprintModal";
 import { Codev } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Edit2, Eye, MoreHorizontal, Trash2 } from "lucide-react";
@@ -25,6 +26,7 @@ export function TableActions({ sprint }: TableActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [supabase, setSupabase] = useState<any>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -50,6 +52,9 @@ export function TableActions({ sprint }: TableActionsProps) {
     }
   };
 
+  const openEditModal = () => setIsEditModalOpen(true);
+  const closeEditModal = () => setIsEditModalOpen(false);
+
   return (
     <>
       <DropdownMenu>
@@ -70,7 +75,7 @@ export function TableActions({ sprint }: TableActionsProps) {
     dark:text-white
   "
         >
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={openEditModal}>
             <Edit2 className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
@@ -90,6 +95,11 @@ export function TableActions({ sprint }: TableActionsProps) {
         onConfirm={handleDelete}
         name={`${sprint.name}: ${sprint.kanban_board?.name}`}
         isLoading={isDeleting}
+      />
+      <EditSprintModal
+        isOpen={isEditModalOpen}
+        onClose={closeEditModal}
+        sprint={sprint}
       />
     </>
   );

@@ -84,3 +84,70 @@ export async function createNewSprint(formData: FormData) {
 		return { success: false, error: "Failed to create sprint" };
 	}
 }
+
+export async function EditSprint(formData: FormData) {
+  const supabase = await createClientServerComponent();
+
+	const sprintName = formData.get("sprintName") as string;
+	const boardName = formData.get("boardName") as string;
+	const sprintId = formData.get("sprintId") as string;
+	const boardId = formData.get("boardId") as string;
+	const projectId = formData.get("projectId") as string;
+
+	if (!sprintName || !boardName || !sprintId || !projectId) {
+		return { isSuccess: false, error: "Missing required fields" };
+	}
+
+	try {
+		// Update sprint name
+		const { data: sprintData, error: sprintError } = await supabase
+			.from("kanban_sprints")
+			.update({
+				name: sprintName,
+			})
+			.eq("id", sprintId)
+			.select()
+			.single();
+
+		if (sprintError) {
+			console.error("Supabase error:", sprintError.message);
+			return { isSuccess: false, error: sprintError.message };
+		}
+
+		if (!sprintData) {
+			return { isSuccess: false, error: "Sprint not found" };
+		}
+
+		// Update board name
+		const { data: boardData, error: boardError } = await supabase
+			.from("kanban_boards")
+			.update({
+				name: boardName,
+			})
+			.eq("id", boardId) 
+			.select()
+			.single();
+
+		if (boardError) {
+			console.error("Supabase error (board):", boardError.message);
+			return { isSuccess: false, error: boardError.message };
+		}
+
+		if (!boardData) {
+			return { isSuccess: false, error: "Board not found" };
+		}
+
+		// Revalidate the KanbanSprintPage to refresh the sprints list
+		revalidatePath(`/kanban/${projectId}`);
+
+		return {
+			isSuccess: true,
+			error: null,
+		};
+	} catch (err) {
+		// Handle unexpected runtime error
+		console.error("Unexpected error:", err);
+		return { isSuccess: false, error: "Failed to edit sprint" };
+	}
+
+}
