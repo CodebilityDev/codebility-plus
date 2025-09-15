@@ -26,13 +26,14 @@ const FeedPostModal: React.FC<FeedPostModalProps> = ({
       onOpenChange={(open) => {
         if (!open) onClose();
       }}
+      
     >
       <DialogHeader>
         <DialogTitle>
           <VisuallyHidden>Post</VisuallyHidden>
         </DialogTitle>
       </DialogHeader>
-      <DialogContent className="flex max-w-2xl flex-col">
+      <DialogContent className="flex max-w-2xl max-h-[80vh] flex-col overflow-auto">
         <PostView postId={postId} />
       </DialogContent>
     </Dialog>
