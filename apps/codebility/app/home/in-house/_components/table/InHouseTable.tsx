@@ -1,3 +1,4 @@
+// app/home/in-house/_components/table/InHouseTable.tsx
 "use client";
 
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -85,9 +86,6 @@ const capitalize = (str: string) =>
 
 /**
  * Converts display position to uppercase format
- * Input → Output Examples:
- * "frontend developer" → "FRONTEND DEVELOPER"
- * "ui/ux designer" → "UI/UX DESIGNER"
  * @param position - Display position string
  * @returns Uppercase position or dash for empty values
  */
@@ -97,8 +95,8 @@ const formatDisplayPosition = (position: string | null | undefined): string => {
 };
 
 /**
- * NDA Email Button Component
- * Handles sending NDA signing requests to team members
+ * Enhanced NDA Email Button Component
+ * Now integrates with the new storage-first NDA process
  */
 const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
   const [isSending, setIsSending] = useState(false);
@@ -135,8 +133,8 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
 };
 
 /**
- * Main InHouseTable Component
- * Displays team member data with responsive design and inline editing
+ * Main InHouseTable Component with Enhanced NDA Storage Integration
+ * Now properly handles NDA signature and document URLs from Supabase Storage
  */
 export function InHouseTable({
   data,
@@ -188,8 +186,8 @@ export function InHouseTable({
   };
 
   /**
-   * Sends NDA signing request email to team member
-   * Creates unique token and database record for tracking
+   * Enhanced NDA email sending with proper database tracking
+   * Now creates NDA request records and generates secure tokens
    */
   const handleSendNdaEmail = async (
     codevId: string,
@@ -250,33 +248,98 @@ export function InHouseTable({
   };
 
   /**
-   * Downloads NDA document for signed members
+   * Enhanced NDA document download function
+   * Now downloads from Supabase Storage URLs instead of base64 data
    * @param codevId - ID of the member whose NDA to download
    */
   const handleDownloadNda = async (codevId: string) => {
     try {
       const { data, error } = await supabase
         .from("codev")
-        .select("nda_document, first_name, last_name")
+        .select("nda_document, nda_signature, first_name, last_name")
         .eq("id", codevId)
         .single();
 
-      if (error || !data || !data.nda_document) {
-        throw new Error("Failed to fetch NDA document");
+      if (error || !data) {
+        throw new Error("Failed to fetch member data");
       }
 
+      // Check if NDA document URL exists
+      if (!data.nda_document) {
+        throw new Error("No signed NDA document found for this member");
+      }
+
+      // Download the document directly from the storage URL
+      const response = await fetch(data.nda_document);
+      if (!response.ok) {
+        throw new Error("Failed to download NDA document");
+      }
+
+      const blob = await response.blob();
+      
       // Create download link and trigger download
+      const url = window.URL.createObjectURL(blob);
       const link = document.createElement("a");
-      link.href = data.nda_document;
+      link.href = url;
       link.download = `NDA_${data.first_name}_${data.last_name}.pdf`;
       document.body.appendChild(link);
       link.click();
+      
+      // Cleanup
       document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
 
       toast.success("NDA document downloaded successfully");
     } catch (error) {
       console.error("Error downloading NDA:", error);
-      toast.error("Failed to download NDA document");
+      toast.error(
+        error instanceof Error 
+          ? error.message 
+          : "Failed to download NDA document"
+      );
+    }
+  };
+
+  /**
+   * Downloads NDA signature image separately
+   * @param codevId - ID of the member whose signature to download
+   */
+  const handleDownloadSignature = async (codevId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from("codev")
+        .select("nda_signature, first_name, last_name")
+        .eq("id", codevId)
+        .single();
+
+      if (error || !data || !data.nda_signature) {
+        throw new Error("No signature found for this member");
+      }
+
+      // Download the signature directly from the storage URL
+      const response = await fetch(data.nda_signature);
+      if (!response.ok) {
+        throw new Error("Failed to download signature");
+      }
+
+      const blob = await response.blob();
+      
+      // Create download link and trigger download
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `Signature_${data.first_name}_${data.last_name}.png`;
+      document.body.appendChild(link);
+      link.click();
+      
+      // Cleanup
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+
+      toast.success("Signature downloaded successfully");
+    } catch (error) {
+      console.error("Error downloading signature:", error);
+      toast.error("Failed to download signature");
     }
   };
 
@@ -291,7 +354,6 @@ export function InHouseTable({
 
   /**
    * Advanced pagination handler for direct page navigation
-   * Implements step-by-step navigation since direct page setting isn't available
    */
   const setCurrentPage = useCallback((pageOrFunction: number | ((page: number) => number)) => {
     const page =
@@ -464,7 +526,7 @@ export function InHouseTable({
                             </DropdownMenuPortal>
                           </DropdownMenuSub>
                           
-                          {/* NDA Status submenu with action buttons */}
+                          {/* Enhanced NDA Status submenu with storage-based actions */}
                           <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
                               NDA Status
@@ -476,17 +538,28 @@ export function InHouseTable({
                                     {item.nda_status ? "Yes" : "No"}
                                   </span>
 
-                                  {/* Conditional NDA action buttons */}
+                                  {/* Enhanced NDA action buttons */}
                                   {item.nda_status ? (
-                                    <Button
-                                      variant="outline"
-                                      size="sm"
-                                      className="ml-2 text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
-                                      onClick={() => handleDownloadNda(item.id)}
-                                    >
-                                      <Download className="mr-1 h-4 w-4" />
-                                      Download
-                                    </Button>
+                                    <div className="flex gap-1">
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
+                                        onClick={() => handleDownloadNda(item.id)}
+                                      >
+                                        <Download className="mr-1 h-3 w-3" />
+                                        PDF
+                                      </Button>
+                                      <Button
+                                        variant="outline"
+                                        size="sm"
+                                        className="text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                                        onClick={() => handleDownloadSignature(item.id)}
+                                      >
+                                        <Download className="mr-1 h-3 w-3" />
+                                        Sig
+                                      </Button>
+                                    </div>
                                   ) : item.nda_request_sent ? (
                                     <Button
                                       variant="outline"
@@ -606,24 +679,37 @@ export function InHouseTable({
                     )}
                   </TableCell>
 
-                  {/* NDA Status column with action buttons */}
+                  {/* Enhanced NDA Status column with storage-based action buttons */}
                   <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
                     <div className="flex items-center gap-2">
                       <span className={`${getNdaStatusColor(item.nda_status)}`}>
                         {item.nda_status ? "Yes" : "No"}
                       </span>
 
-                      {/* Conditional NDA action buttons */}
+                      {/* Enhanced NDA action buttons with dual download options */}
                       {item.nda_status ? (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="ml-2 text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
-                          onClick={() => handleDownloadNda(item.id)}
-                        >
-                          <Download className="mr-1 h-4 w-4" />
-                          Download
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
+                            onClick={() => handleDownloadNda(item.id)}
+                            title="Download NDA Document"
+                          >
+                            <Download className="mr-1 h-4 w-4" />
+                            PDF
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                            onClick={() => handleDownloadSignature(item.id)}
+                            title="Download Signature"
+                          >
+                            <Download className="mr-1 h-4 w-4" />
+                            Signature
+                          </Button>
+                        </div>
                       ) : item.nda_request_sent ? (
                         <Button
                           variant="outline"
@@ -691,9 +777,9 @@ export function InHouseTable({
         </Table>
       </div>
 
-      {/* Pagination Controls - Show when there are multiple pages */}
+      {/* Pagination Controls - Only show when data exceeds page size */}
       <div className="relative w-full">
-        {pagination.totalPages > 1 && (
+        {data.length > pageSize.applicants && (
           <DefaultPagination
             currentPage={pagination.currentPage}
             handleNextPage={handleNextPage}

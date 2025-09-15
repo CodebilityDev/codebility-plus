@@ -1,4 +1,6 @@
 "use server";
+import { ModalProviderMarketing } from "@/components/providers/modal-provider-marketing";
+
 export default async function MarketingLayout({
   children,
 }: {
@@ -6,7 +8,10 @@ export default async function MarketingLayout({
 }) {
   return (
     <div>
-      <main>{children}</main>
+      <main>
+        {children}
+        <ModalProviderMarketing />
+      </main>
     </div>
   );
 }

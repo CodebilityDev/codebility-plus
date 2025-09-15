@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import {
   getAllProjects,
   getMembers,
+  getProjectByID,
   getProjectCodevs,
   getTeamLead,
   SimpleMemberData,
@@ -35,6 +36,7 @@ export default function KanbanAddMembersModal() {
   const [teamLead, setTeamLead] = useState<SimpleMemberData | null>(null);
   const [allUsers, setAllUsers] = useState<Codev[]>([]);
   const pathname = usePathname();
+  const projectIdFromUrl = pathname?.split("/").slice(-2, -1)[0] || null;
   const kanbanBoardIdFromUrl = pathname?.split("/").pop() || null;
 
   useEffect(() => {
@@ -42,44 +44,20 @@ export default function KanbanAddMembersModal() {
 
     setIsLoading(true);
 
-    const targetProjectId = selectedProject || kanbanBoardIdFromUrl;
-
-    if (!targetProjectId) {
-      setIsLoading(false);
-      return;
-    }
+    setSelectedProject(projectIdFromUrl);
 
     const fetchData = async () => {
       try {
         setIsLoading(true);
 
-        // Fetch project linked to the kanbanBoardId from URL
-        const result = await getAllProjects(kanbanBoardIdFromUrl ?? undefined);
-
-        if (Array.isArray(result) && result.length > 0) {
-          setProjects(result);
-
-          // Use fetched project ID as selected project
-          const firstProject = result[0] as { id: string };
-          setSelectedProject(firstProject.id); // this is the project.id
-        } else if (result && typeof result === "object" && "error" in result) {
-          toast.error(result.error || "Failed to fetch project");
-          return;
-        }
-
-        const targetProjectId =
-          result &&
-          Array.isArray(result) &&
-          result[0] &&
-          typeof result[0] === "object" &&
-          "id" in result[0]
-            ? (result[0] as { id: string }).id
-            : undefined;
-
-        if (!targetProjectId) {
+        if (!projectIdFromUrl) {
           toast.error("No valid project ID found.");
           return;
         }
+
+        const targetProjectId = projectIdFromUrl;
+
+        setProjects([await getProjectByID(projectIdFromUrl)]);
 
         const [membersResult, users, teamLeadResult] = await Promise.all([
           getMembers(targetProjectId),

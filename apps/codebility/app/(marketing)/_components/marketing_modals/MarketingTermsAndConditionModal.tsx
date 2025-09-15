@@ -16,7 +16,7 @@ function TermsAndCondition() {
         <DialogTitle className="sr-only">Terms and Conditions</DialogTitle>
         <div className="flex h-full overflow-hidden rounded-[10px] border border-[#1D1D1E]">
           <div className="hidden sm:flex">
-          <NavBar />
+            <NavBar />
           </div>
           <Content />
         </div>
@@ -45,9 +45,8 @@ const NavBar: React.FC = () => {
           key={index}
           href={`#${tab}`}
           onClick={() => setActiveTab(index)}
-          className={`px-2 py-1 text-xs sm:whitespace-nowrap sm:px-[1.2rem] sm:py-[10px] sm:text-base ${
-            index === activeTab ? "rounded-[10px] bg-[#222222]" : ""
-          }`}
+          className={`px-2 py-1 text-xs sm:whitespace-nowrap sm:px-[1.2rem] sm:py-[10px] sm:text-base ${index === activeTab ? "rounded-[10px] bg-[#222222]" : ""
+            }`}
         >
           {tab}
         </Link>
