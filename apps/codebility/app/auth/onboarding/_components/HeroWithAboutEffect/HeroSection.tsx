@@ -12,7 +12,7 @@ export default function HeroSection({ h1Ref }: HeroSectionProps) {
     <>
       <p
         id="welcome-text"
-        className="relative text-[25px] text-[#02e6dd] drop-shadow-[0_0_12px_#02e6dd] lg:-mr-[140px]"
+        className="relative text-[32px] text-[#02e6dd] drop-shadow-[0_0_16px_#02e6dd] lg:-mr-[140px] lg:text-[40px]"
       >
         Welcome to
       </p>
@@ -20,7 +20,7 @@ export default function HeroSection({ h1Ref }: HeroSectionProps) {
       <h1
         id="codebility-h1"
         ref={h1Ref}
-        className="relative z-[999999] -mr-[140px] mt-16 hidden text-[91px] lg:flex"
+        className="relative z-[999999] -mr-[140px] mt-16 hidden text-[120px] lg:flex 2xl:text-[140px]"
       >
         <span id="co" className="flex">
           {"Co".split("").map((c, i) => (
@@ -47,28 +47,30 @@ export default function HeroSection({ h1Ref }: HeroSectionProps) {
       </h1>
 
       <div className="z-[999] mt-10 flex items-center justify-center lg:hidden">
-        <span className=" -mr-4 text-[clamp(32px,10vw,48px)] text-white">
+        <span className="text-[clamp(40px,12vw,60px)] text-white leading-none">
           Co
         </span>
-        <Image
-          src="/assets/images/onboarding/code_logo.svg"
-          alt="d"
-          width={66}
-          height={66}
-          className="object-contain"
-        />
-        <span className="-ml-4 text-[clamp(32px,10vw,48px)] text-white">
+        <div className="mx-1 flex items-center justify-center">
+          <Image
+            src="/assets/images/onboarding/code_logo.svg"
+            alt="d"
+            width={66}
+            height={66}
+            className="object-contain translate-y-[-2px]"
+          />
+        </div>
+        <span className="text-[clamp(40px,12vw,60px)] text-white leading-none">
           ebility
         </span>
       </div>
 
       {/* Grouped h2 and button centered between h1 and bottom */}
-      <div className="pointer-events-none inset-0 mt-10 flex flex-col items-center justify-between lg:absolute lg:mt-0">
-        <div className="hidden pt-[260px] lg:block" />
-        <div className="pointer-events-auto z-[999] flex flex-col items-center space-y-10 lg:-mr-[140px]">
+      <div className="pointer-events-none inset-0 mt-12 flex flex-col items-center justify-between lg:absolute lg:mt-0">
+        <div className="hidden pt-[300px] lg:block" />
+        <div className="pointer-events-auto z-[999] flex flex-col items-center space-y-12 lg:-mr-[140px]">
           <h2
             id="codebility-h2"
-            className="z-10 text-center text-[clamp(32px,5vw,64px)] text-white drop-shadow-[0_0_1px_#fff] 2xl:text-[64px]"
+            className="z-10 text-center text-[clamp(36px,6vw,80px)] font-medium text-white drop-shadow-[0_0_2px_#fff] 2xl:text-[80px]"
           >
             Everyone has the ability to code
           </h2>
@@ -83,7 +85,7 @@ export default function HeroSection({ h1Ref }: HeroSectionProps) {
             className="
     group relative inline-flex items-center justify-center overflow-hidden
     rounded-full bg-gradient-to-r from-cyan-500 to-fuchsia-500
-    px-8 py-3 text-base font-semibold text-white
+    px-10 py-4 text-lg font-semibold text-white
     shadow-[0_12px_40px_-12px_rgba(168,85,247,0.45)]
     transition-all duration-300
     hover:brightness-[1.05]
