@@ -1,5 +1,7 @@
+import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import FeedPostModal from "@/components/modals/FeedPostModal";
 import { Box } from "@/components/shared/dashboard";
 import { defaultAvatar } from "@/public/assets/images";
 import { format } from "date-fns";
@@ -17,6 +19,8 @@ interface PostProps {
 }
 
 export default function Post({ post, isMentor, onDelete }: PostProps) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -39,9 +43,14 @@ export default function Post({ post, isMentor, onDelete }: PostProps) {
     // You can add upvote logic here
   };
 
+  const openModal = () => setIsModalOpen(true);
+  const closeModal = () => setIsModalOpen(false);
   return (
-    <Link href={`/home/feeds/${post.id}`} passHref>
-      <Box className="group relative flex h-[400px] cursor-pointer flex-col justify-between p-3">
+    <>
+      <Box
+        className="group relative flex h-[400px] cursor-pointer flex-col justify-between p-3"
+        onClick={openModal}
+      >
         {/* Delete Button in top-right */}
         {isMentor && (
           <button
@@ -96,6 +105,11 @@ export default function Post({ post, isMentor, onDelete }: PostProps) {
           <PostUpvote post={post} />
         </div>
       </Box>
-    </Link>
+      <FeedPostModal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        postId={post.id}
+      />
+    </>
   );
 }
