@@ -13,66 +13,100 @@ type Person = {
 const CEO: Person = {
   name: "Jzeff Kendrew Somera",
   role: "CEO / Founder",
-  image: "", // e.g. "/assets/images/team/ceo.png"
+  image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1743063656637.jpeg", 
 };
 
 const ADMINS: Person[] = [
-  { name: "Kyla Ronquillo", role: "Project Manager" },
-  { name: "Thea Somera", role: "Admin" },
-  { name: "Reyniel Magparangalan", role: "Admin" },
-  { name: "Charles Lloyd Adecer", role: "Admin" },
-  { name: "Jkoinonia Go", role: "Admin" },
-  { name: "Christian Timothy Santiago", role: "Admin" },
-  { name: "Kailah Laron", role: "Admin" },
-  { name: "Jamie Tolentino", role: "Admin" },
-  { name: "Alec Gilo", role: "Admin" },
-  { name: "Jan Ralph Placido", role: "Admin" },
-  { name: "Name 1", role: "Job Title" },
-  { name: "Name 2", role: "Job Title" },
+  { name: "Thea Somera", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1743080203775.jpeg" }, // image-url from person data in Supabase
+  { name: "Kyla Ronquillo", role: "Project Manager", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1743069204484.jpeg" },
+  { name: "Reyniel Magparangalan", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1739862024876.jpeg" },
+  { name: "Charles Lloyd Adecer", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1744628475031.jpeg" },
+  { name: "Christy Canay", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/2025-07-22T06-44-42-279Z.jpg" },
+  { name: "Allana Victoria Nual", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/2025-08-19T13-23-30-520Z.jpg" }, 
+  { name: "Kailah Laron", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1752060003265.jpeg" }, 
+  { name: "Ryan Kim Dionisio", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1756431796200.jpeg" },
+  { name: "Steffi Marie Villaruz", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1753258624501.jpeg" }, 
+  { name: "Allessandra Valianne Miral", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1755773806928.jpeg" }, 
+  { name: "Jan Ralph Placido", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1751861443242.jpeg" },
+  { name: "Patricia Anne Delos Reyes", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1753350799770.jpeg" },
+  { name: "Patrick Vargas", role: "Admin", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1755784165565.jpeg" }
 ];
 
 const MENTORS: Person[] = [
-  { name: "Jade Barry Lazo", role: "Full Stack Developer" },
-  { name: "Arlie Torres", role: "Full Stack Developer" },
-  { name: "Jason Kean Tajor", role: "UI/UX Designer" },
-  { name: "Khalid SanggoYod", role: "Full Stack Developer" },
-  { name: "Jan Phillip Dacallos", role: "Full Stack Developer" },
-  { name: "Rovic", role: "UI/UX Designer" },
-  { name: "David Tribugenia", role: "Project Manager" },
+  { name: "Jason Kean Tajor", role: "UI/UX Designer", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1743089351545.jpeg" },
+  { name: "Khalid Sanggoyod", role: "Full Stack Developer", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1756433463573.jpeg" }, 
+  { name: "Rovic Villaralvo", role: "UI/UX Designer", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/2025-07-17T03-46-18-258Z.png" },
+  { name: "Ian Troy Pahilga", role: "Full Stack Developer", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1751477212479.jpeg" },
+  { name: "Jade Barry Lazo", role: "Full Stack Developer", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1749187517118.jpeg" },
+  { name: "Jan Phillip Dacallos", role: "Full Stack Developer", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1757163791110.jpeg" },
+  { name: "Francis Charles Gonzales", role: "Mobile Developer", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1756434726108.jpeg" }, 
+  { name: "Karryl Shane Saldua", role: "Project Manager", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/1756720228636.jpeg" },
+  { name: "Bryan Angelo Castillo", role: "Full Stack Developer", image: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/profileImage/2025-02-07T22-40-47-526Z.jpg" },
+  { name: "David Tribugenia", role: "Project Manager", image: "" },
+  { name: "Deo Cagunot", role: "Frontend Developer", image: "" },
 ];
 
 // —————————————————————————————————————————————
 
-function Avatar({ person, size = 72 }: { person: Person; size?: number }) {
+function Avatar({ 
+  person, 
+  size = 72, 
+  position = 'center top' 
+}: { 
+  person: Person; 
+  size?: number;
+  position?: string;
+}) {
   const initials = person.name
     .split(" ")
     .slice(0, 2)
     .map((n) => n[0])
     .join("")
     .toUpperCase();
-
+  
   return person.image ? (
-    // eslint-disable-next-line @next/next/no-img-element
-    <img
-      src={person.image}
-      alt={person.name}
-      className="h-18 w-18 rounded-full object-cover shadow-md ring-2 ring-white/20"
-      style={{ height: size, width: size }}
-      loading="lazy"
-    />
+    <div 
+      className="rounded-full shadow-md ring-2 ring-white/20 overflow-hidden flex-shrink-0 relative bg-gray-200"
+      style={{ 
+        height: size, 
+        width: size,
+        minWidth: size,
+        minHeight: size
+      }}
+    >
+      <img
+        src={person.image}
+        alt={person.name}
+        className="absolute top-1/2 left-1/2 object-cover"
+        style={{ 
+          objectPosition: position,
+          width: `${size * 1.2}px`,
+          height: `${size * 1.2}px`,
+          transform: 'translate(-50%, -50%)',
+          minWidth: `${size * 1.2}px`,
+          minHeight: `${size * 1.2}px`
+        }}
+        loading="lazy"
+      />
+    </div>
   ) : (
     <div
       className={cn(
-        "grid place-items-center rounded-full bg-white/10 text-white shadow-md ring-2 ring-white/15",
+        "grid place-items-center rounded-full bg-white/10 text-white shadow-md ring-2 ring-white/15 flex-shrink-0",
       )}
-      style={{ height: size, width: size }}
+      style={{ 
+        height: size, 
+        width: size,
+        minWidth: size,
+        minHeight: size
+      }}
       aria-hidden
     >
       <span className="text-xl font-bold">{initials}</span>
     </div>
   );
 }
-
+    
 function PersonCard({ person }: { person: Person }) {
   return (
     <div
