@@ -12,7 +12,7 @@ export default function StickyLogo({ logoRef, isVisible }: StickyLogoProps) {
   return (
     <div
       ref={logoRef}
-      className={`fixed left-1/2 top-[195px] z-[9999] hidden aspect-square w-[120px] -translate-x-1/2 rounded-full shadow-xl transition-opacity duration-300 will-change-transform lg:block ${
+      className={`fixed left-[calc(50%-30px)] top-[260px] z-[9999] hidden aspect-square w-[120px] -translate-x-1/2 rounded-full shadow-xl transition-opacity duration-300 will-change-transform lg:block ${
         isVisible || !isDesktop ? "" : "pointer-events-none opacity-0"
       }`}
       style={{

@@ -1,4 +1,4 @@
-// HeroWithAboutEffect/index.tsx (patched)
+// HeroWithAboutEffect/index.tsx
 
 "use client";
 
@@ -40,14 +40,16 @@ export default function HeroWithAboutEffect() {
         ref={heroRef}
         className="primary-gradient relative flex items-center justify-center px-10 py-10 text-white lg:h-screen lg:min-h-screen"
       >
-        <div className="relative mx-auto flex w-full flex-col items-center justify-start overflow-hidden rounded-3xl bg-gray-950 p-10 lg:h-[calc(100vh-80px)]">
+        <div className="relative mx-auto flex w-full flex-col items-center justify-start overflow-hidden rounded-3xl bg-gradient-to-br from-gray-900 via-gray-950 to-black p-10 shadow-2xl lg:h-[calc(100vh-80px)]">
           <BubbleBackground />
           <LottieBackground />
+          <FloatingCodeTags />
           {/* soft decor glows for dark motif */}
           <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -left-24 -top-24 h-80 w-80 rounded-full bg-cyan-400/10 blur-3xl" />
-            <div className="absolute -bottom-24 -right-24 h-96 w-96 rounded-full bg-fuchsia-500/10 blur-3xl" />
-            <div className="absolute inset-0 bg-[radial-gradient(1200px_600px_at_85%_10%,rgba(99,102,241,0.10),transparent_60%),radial-gradient(1100px_560px_at_15%_90%,rgba(124,58,237,0.10),transparent_60%)]" />
+            <div className="absolute -left-32 -top-32 h-96 w-96 rounded-full bg-cyan-400/15 blur-3xl" />
+            <div className="absolute -bottom-32 -right-32 h-[28rem] w-[28rem] rounded-full bg-fuchsia-500/15 blur-3xl" />
+            <div className="absolute left-1/2 top-1/4 h-64 w-64 -translate-x-1/2 rounded-full bg-violet-500/10 blur-3xl" />
+            <div className="absolute inset-0 bg-[radial-gradient(1400px_700px_at_85%_10%,rgba(99,102,241,0.12),transparent_60%),radial-gradient(1200px_600px_at_15%_90%,rgba(124,58,237,0.12),transparent_60%)]" />
           </div>
           <HeroSection h1Ref={h1Ref} />
         </div>
