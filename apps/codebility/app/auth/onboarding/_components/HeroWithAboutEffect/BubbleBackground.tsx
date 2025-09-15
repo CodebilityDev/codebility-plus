@@ -63,7 +63,7 @@ export function BubbleBackground() {
         size: A.r * 2,
         topPct: toPct(A.y - A.r, vh),
         leftPct: toPct(A.x - A.r, vw),
-        hue: hues[0],
+        hue: hues[0] ?? 285,
         depth: 0.75,
         floatDur: 12 + Math.random() * 5,
         delay: Math.random() * 1.2,
@@ -73,7 +73,7 @@ export function BubbleBackground() {
         size: B.r * 2,
         topPct: toPct(B.y - B.r, vh),
         leftPct: toPct(B.x - B.r, vw),
-        hue: hues[2],
+        hue: hues[2] ?? 200,
         depth: 1.0,
         floatDur: 12 + Math.random() * 5,
         delay: Math.random() * 1.2,
@@ -100,7 +100,7 @@ export function BubbleBackground() {
         size: d,
         topPct: toPct(cy - r, vh),
         leftPct: toPct(cx - r, vw),
-        hue: hues[(3 + smallSpheres.length) % hues.length],
+        hue: hues[(3 + smallSpheres.length) % hues.length] ?? 255,
         depth: 0.9,
         floatDur: 7 + Math.random() * 4,
         delay: Math.random() * 3,
@@ -229,17 +229,63 @@ export function BubbleBackground() {
       <style jsx global>{`
         @keyframes bb-float-y {
           0% {
-            transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0) scale(1);
+          }
+          25% {
+            transform: translate3d(2px, -8px, 0) scale(1.02);
           }
           50% {
-            transform: translate3d(0, -10px, 0);
+            transform: translate3d(0, -16px, 0) scale(1);
+          }
+          75% {
+            transform: translate3d(-2px, -8px, 0) scale(0.98);
           }
           100% {
-            transform: translate3d(0, 0, 0);
+            transform: translate3d(0, 0, 0) scale(1);
           }
         }
+        
+        @keyframes bb-float-x {
+          0% {
+            transform: translateX(0);
+          }
+          33% {
+            transform: translateX(4px);
+          }
+          66% {
+            transform: translateX(-4px);
+          }
+          100% {
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes bb-pulse {
+          0% {
+            opacity: 0.7;
+          }
+          50% {
+            opacity: 1;
+          }
+          100% {
+            opacity: 0.7;
+          }
+        }
+        
+        @keyframes bb-rotate {
+          0% {
+            transform: rotate(0deg);
+          }
+          100% {
+            transform: rotate(360deg);
+          }
+        }
+        
         .bb-float {
-          animation: bb-float-y 9s ease-in-out infinite;
+          animation: bb-float-y 9s ease-in-out infinite,
+                     bb-float-x 7s ease-in-out infinite,
+                     bb-pulse 6s ease-in-out infinite,
+                     bb-rotate 20s linear infinite;
         }
       `}</style>
     </div>

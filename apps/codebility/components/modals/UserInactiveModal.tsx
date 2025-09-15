@@ -30,8 +30,8 @@ const UserInactiveModal: React.FC<UserInactiveModalProps> = ({
           </DialogTitle>
         </DialogHeader>
         <p className="text-gray text-center text-sm">
-          Your account is currently inactive. You can change your status using
-          the toggle switch above.
+          Your account is currently inactive. Please Contanct Admins to reactivate
+          your account.
         </p>
       </DialogContent>
     </Dialog>
