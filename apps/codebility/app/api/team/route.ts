@@ -18,6 +18,10 @@ export async function GET() {
         last_name,
         image_url,
         availability_status,
+        project_members (
+          project_id,
+          role
+        ),
         roles!inner ( name )
       `)
       .eq("availability_status", true)
@@ -36,29 +40,39 @@ export async function GET() {
     let CEO: Person | null = null;
 
     (data ?? []).forEach((row: any) => {
-        const name = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
-        const role = row.roles?.name ?? "Member";
-        const person: Person = {
-            name: name || "Unknown",
-            role,
-            image: row.image_url ?? undefined,
-        };
+      const name = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
+      const role = row.roles?.name ?? "Member";
+      const person: Person = {
+        name: name || "Unknown",
+        role,
+        image: row.image_url ?? undefined,
+      };
 
-        // Normalize comparison
-        const normalizedName = name.toLowerCase();
-        const normalizedCEO = CEO_FULL_NAME.trim().toLowerCase();
+      // Normalize comparison
+      const normalizedName = name.toLowerCase();
+      const normalizedCEO = CEO_FULL_NAME.trim().toLowerCase();
 
-        if (role === "Admin" && normalizedCEO && normalizedName === normalizedCEO) {
-            // ✅ Found CEO: assign to CEO, exclude from ADMINS
-            CEO = { ...person, role: "Founder / CEO" };
-        } else if (role === "Admin") {
-            ADMINS.push(person);
-        } else if (role === "Mentor") {
-            MENTORS.push(person);
-        }
+      if (role === "Admin" && normalizedCEO && normalizedName === normalizedCEO) {
+        // ✅ Found CEO: assign to CEO, exclude from ADMINS
+        CEO = { ...person, role: "Founder / CEO" };
+      } else if (role === "Admin") {
+        ADMINS.push(person);
+      } else if (role === "Mentor") {
+        MENTORS.push(person);
+      }
     });
 
-    return NextResponse.json({ ADMINS, MENTORS, CEO });
+    // filter admins with project_id e0124447-1978-400f-bfc7-7ea2f974d100 and role `member` or project_id 54d5fba1-056c-45a2-b492-02eec8530640 and role `member` or name is `Ian Troy Pahilga
+    const filteredAdmins = ADMINS.filter((admin) => {
+      const projectMember = data?.find((row: any) => {
+        const name = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
+        return name === admin.name;
+      })?.project_members;
+
+      return !projectMember?.some((pm: any) => ((pm.project_id === 'e0124447-1978-400f-bfc7-7ea2f974d100' && pm.role === 'member') || (pm.project_id === '54d5fba1-056c-45a2-b492-02eec8530640' && pm.role === 'member'))) && admin.name !== 'Ian Troy Pahilga';
+    });
+
+    return NextResponse.json({ ADMINS: filteredAdmins, MENTORS, CEO });
   } catch (err) {
     console.error("Unexpected error in /api/team:", err);
     return NextResponse.json(
