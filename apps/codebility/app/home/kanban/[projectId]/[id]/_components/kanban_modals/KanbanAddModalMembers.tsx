@@ -76,11 +76,11 @@ export default function KanbanAddModalMembers({
 
     const loadMembers = async () => {
       try {
-        console.log("Fetching members for project ID:", projectId);
+        // console.log("Fetching members for project ID:", projectId);
         const members = await fetchAvailableMembers(projectId);
-        console.log("Fetched members:", members); // Debugging log
+        // console.log("Fetched members:", members); // Debugging log
         const user = await supabase.auth.getUser();
-        console.log("Current user:", user); // Debugging logi
+        // console.log("Current user:", user); // Debugging log
 
         if (Array.isArray(members)) {
           setAvailableMembers(members);
@@ -196,7 +196,7 @@ export default function KanbanAddModalMembers({
                 placeholder="Search members..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="dark:bg-dark-200 w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-customViolet-500"
+                className="dark:bg-dark-200 focus:ring-customViolet-500 w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2"
               />
             </div>
 
@@ -257,7 +257,7 @@ export default function KanbanAddModalMembers({
             onClick={handleSelfAssign}
             disabled={isLoading}
             type="button"
-            className="text-black-200 w-fit cursor-pointer text-xs font-light ml-2 hover:text-customBlue-300 dark:text-slate-300 dark:hover:text-customBlue-100"
+            className="text-black-200 hover:text-customBlue-300 dark:hover:text-customBlue-100 ml-2 w-fit cursor-pointer text-xs font-light dark:text-slate-300"
           >
             Assign to me
           </button>

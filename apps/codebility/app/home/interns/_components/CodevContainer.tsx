@@ -4,12 +4,11 @@ import { useState } from "react";
 import H1 from "@/components/shared/dashboard/H1";
 import { Codev } from "@/types/home/codev";
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
-
 import CodevList from "./CodevList";
 import CodevSearchbar from "./CodevSearchbar";
 import FilterCodevs from "./FilterCodevs";
 import InternalProjects from "./InternalProjects";
+import { Tabs, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 export default function CodevContainer({ data }: { data: Codev[] }) {
   const [filters, setFilters] = useState({

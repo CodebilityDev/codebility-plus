@@ -56,11 +56,10 @@ const Footer = () => {
                   return (
                     <Link key={social.id} href={social.href} target="_blank">
                       <IconComponent
-                        className={`${
-                          IconComponent === IconFacebookWhite
-                            ? "h-[25px] w-[25px]"
-                            : "h-[32px] w-[32px]"
-                        }`}
+                        className={`${IconComponent === IconFacebookWhite
+                          ? "h-[25px] w-[25px]"
+                          : "h-[32px] w-[32px]"
+                          }`}
                       />
                     </Link>
                   );
