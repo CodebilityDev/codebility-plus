@@ -186,7 +186,7 @@ export default function JobListingsTable() {
       case "Lead":
         return "bg-orange-500/10 text-orange-400 border-orange-500/20";
       default:
-        return "bg-gray-500/10 text-gray-400 border-gray-500/20";
+        return "bg-gray-500/10 text-muted-foreground border-gray-500/20";
     }
   };
 
@@ -201,7 +201,7 @@ export default function JobListingsTable() {
       case "Internship":
         return "bg-indigo-500/10 text-indigo-400 border-indigo-500/20";
       default:
-        return "bg-gray-500/10 text-gray-400 border-gray-500/20";
+        return "bg-gray-500/10 text-muted-foreground border-gray-500/20";
     }
   };
 
@@ -222,31 +222,31 @@ export default function JobListingsTable() {
   if (jobs.length === 0) {
     return (
       <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-12 text-center">
-        <p className="text-gray-400">No job listings yet. Create your first job listing to get started.</p>
+        <p className="text-muted-foreground">No job listings yet. Create your first job listing to get started.</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-lg border border-gray-800 bg-gray-900/50 overflow-hidden">
+    <div className="rounded-lg border bg-card overflow-hidden">
       <Table>
         <TableHeader>
-          <TableRow className="border-gray-800 hover:bg-gray-900/50">
-            <TableHead className="text-gray-300">Position</TableHead>
-            <TableHead className="text-gray-300">Location</TableHead>
-            <TableHead className="text-gray-300">Type</TableHead>
-            <TableHead className="text-gray-300 text-center">Applications</TableHead>
-            <TableHead className="text-gray-300">Created By</TableHead>
-            <TableHead className="text-gray-300">Posted</TableHead>
-            <TableHead className="text-gray-300 text-right min-w-[200px]">Actions</TableHead>
+          <TableRow className="border-border hover:bg-muted/50 transition-colors">
+            <TableHead className="text-foreground">Position</TableHead>
+            <TableHead className="text-foreground">Location</TableHead>
+            <TableHead className="text-foreground">Type</TableHead>
+            <TableHead className="text-foreground text-center">Applications</TableHead>
+            <TableHead className="text-foreground">Created By</TableHead>
+            <TableHead className="text-foreground">Posted</TableHead>
+            <TableHead className="text-foreground text-right min-w-[200px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {jobs.map((job) => (
-            <TableRow key={job.id} className="border-gray-800 hover:bg-gray-900/70">
+            <TableRow key={job.id} className="border-border hover:bg-muted/30 transition-colors">
               <TableCell>
                 <div>
-                  <p className="font-medium text-white">{job.title}</p>
+                  <p className="font-medium text-foreground">{job.title}</p>
                   <div className="mt-1 flex gap-2">
                     <Badge variant="outline" className={getLevelColor(job.level)}>
                       {job.level}
@@ -260,7 +260,7 @@ export default function JobListingsTable() {
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-1 text-gray-400">
+                <div className="flex items-center gap-1 text-muted-foreground">
                   <MapPin className="h-3 w-3" />
                   <span className="text-sm">{job.location}</span>
                 </div>
@@ -273,7 +273,7 @@ export default function JobListingsTable() {
               <TableCell className="text-center">
                 <button
                   onClick={() => handleViewApplications(job.id)}
-                  className="group inline-flex items-center gap-1 text-gray-400 hover:text-white transition-colors"
+                  className="group inline-flex items-center gap-1 text-muted-foreground hover:text-foreground transition-colors"
                 >
                   <Users className="h-3.5 w-3.5" />
                   <span className="font-medium">{job.application_count || 0}</span>
@@ -283,13 +283,13 @@ export default function JobListingsTable() {
                 </button>
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-1 text-gray-400">
+                <div className="flex items-center gap-1 text-muted-foreground">
                   <User className="h-3 w-3" />
                   <span className="text-sm">{job.created_by?.name || "Unknown"}</span>
                 </div>
               </TableCell>
               <TableCell>
-                <div className="flex items-center gap-1 text-gray-400">
+                <div className="flex items-center gap-1 text-muted-foreground">
                   <Calendar className="h-3 w-3" />
                   <span className="text-sm">
                     {new Date(job.posted_date).toLocaleDateString()}
@@ -302,7 +302,7 @@ export default function JobListingsTable() {
                     variant="outline"
                     size="sm"
                     onClick={() => handleViewApplications(job.id)}
-                    className="h-8 border-gray-700 bg-gray-800 text-white hover:bg-gray-700"
+                    className="h-8 bg-background border-border text-foreground transition-colors hover:bg-accent"
                   >
                     <Eye className="mr-2 h-3 w-3" />
                     Applications
@@ -312,23 +312,23 @@ export default function JobListingsTable() {
                       <Button
                         variant="ghost"
                         size="icon"
-                        className="group h-8 w-8 text-gray-400 hover:text-white"
+                        className="group h-8 w-8 text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <MoreVertical className="h-4 w-4 flex-shrink-0" />
                         <span className="sr-only">Open menu</span>
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-gray-900 border-gray-800">
+                    <DropdownMenuContent align="end" className="bg-popover border-border">
                       <DropdownMenuItem
                         onClick={() => handleEdit(job)}
-                        className="text-gray-300 hover:text-white hover:bg-gray-800"
+                        className="text-foreground hover:text-foreground hover:bg-accent"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Listing
                       </DropdownMenuItem>
                       <DropdownMenuItem
                         onClick={() => handleDelete(job.id)}
-                        className="text-red-400 hover:text-red-300 hover:bg-gray-800"
+                        className="text-destructive hover:text-destructive hover:bg-accent "
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
