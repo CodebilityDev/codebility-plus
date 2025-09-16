@@ -74,9 +74,9 @@ export default function ApplicationDetailsModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto overflow-x-hidden bg-gray-900 border-gray-800">
+      <DialogContent className="max-h-[90vh] max-w-4xl overflow-y-auto overflow-x-hidden border bg-card">
         <DialogHeader>
-          <DialogTitle className="text-2xl font-light text-white">
+          <DialogTitle className="text-2xl font-light text-foreground">
             Application Details
           </DialogTitle>
         </DialogHeader>
@@ -85,11 +85,11 @@ export default function ApplicationDetailsModal({
           {/* Applicant Header */}
           <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-xl font-medium text-white">
+              <h2 className="text-xl font-medium text-foreground">
                 {application.first_name} {application.last_name}
               </h2>
-              <p className="text-gray-400">{application.job_title || 'Position'}</p>
-              <div className="mt-2 flex items-center gap-4 text-sm text-gray-400">
+              <p className="text-muted-foreground">{application.job_title || 'Position'}</p>
+              <div className="mt-2 flex items-center gap-4 text-sm text-muted-foreground">
                 <span className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   Applied {new Date(application.applied_at).toLocaleDateString()}
@@ -108,32 +108,32 @@ export default function ApplicationDetailsModal({
                 value={status}
                 onValueChange={handleStatusChange}
               >
-                <SelectTrigger className="w-[140px] bg-gray-800 border-gray-700 text-white">
-                  <SelectValue className="text-white" />
+                <SelectTrigger className="w-[140px] border bg-accent/70 text-foreground">
+                  <SelectValue className="text-foreground" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700 text-white">
-                  <SelectItem value="pending" className="text-gray-300 hover:text-white">Pending</SelectItem>
-                  <SelectItem value="reviewing" className="text-gray-300 hover:text-white">Reviewing</SelectItem>
-                  <SelectItem value="shortlisted" className="text-gray-300 hover:text-white">Shortlisted</SelectItem>
-                  <SelectItem value="rejected" className="text-gray-300 hover:text-white">Rejected</SelectItem>
-                  <SelectItem value="hired" className="text-gray-300 hover:text-white">Hired</SelectItem>
+                <SelectContent className="border bg-accent/70 text-foreground">
+                  <SelectItem value="pending" className="text-muted-foreground hover:text-foreground">Pending</SelectItem>
+                  <SelectItem value="reviewing" className="text-muted-foreground hover:text-foreground">Reviewing</SelectItem>
+                  <SelectItem value="shortlisted" className="text-muted-foreground hover:text-foreground">Shortlisted</SelectItem>
+                  <SelectItem value="rejected" className="text-muted-foreground hover:text-foreground">Rejected</SelectItem>
+                  <SelectItem value="hired" className="text-muted-foreground hover:text-foreground">Hired</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           {/* Contact Information */}
-          <div className="rounded-lg border border-gray-800 p-4">
-            <h3 className="mb-3 text-lg font-medium text-white">Contact Information</h3>
+          <div className="rounded-lg border bg-accent/50 p-4">
+            <h3 className="mb-3 text-lg font-medium text-foreground">Contact Information</h3>
             <div className="grid gap-3">
               <a
                 href={`mailto:${application.email}`}
-                className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                className="flex items-center gap-2 text-muted-foreground hover:text-muted-foreground/50 transition-colors"
               >
                 <Mail className="h-4 w-4" />
                 {application.email}
               </a>
-              <div className="flex items-center gap-2 text-gray-400">
+              <div className="flex items-center gap-2 text-muted-foreground">
                 <Phone className="h-4 w-4" />
                 {application.phone}
               </div>
@@ -142,7 +142,7 @@ export default function ApplicationDetailsModal({
                   href={application.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-muted-foreground/50 transition-colors"
                 >
                   <Linkedin className="h-4 w-4" />
                   LinkedIn Profile
@@ -153,7 +153,7 @@ export default function ApplicationDetailsModal({
                   href={application.github}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-muted-foreground/50 transition-colors"
                 >
                   <Github className="h-4 w-4" />
                   GitHub Profile
@@ -164,7 +164,7 @@ export default function ApplicationDetailsModal({
                   href={application.portfolio}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors"
+                  className="flex items-center gap-2 text-muted-foreground hover:text-muted-foreground/50 transition-colors"
                 >
                   <Globe className="h-4 w-4" />
                   Portfolio Website
@@ -175,43 +175,47 @@ export default function ApplicationDetailsModal({
 
           {/* Additional Details */}
           {application.notes && (
-            <div className="rounded-lg border border-gray-800 p-4">
-              <h3 className="mb-3 text-lg font-medium text-white">Additional Information</h3>
-              <p className="text-gray-300">
+            <div className="rounded-lg border bg-accent/50 p-4">
+              <h3 className="mb-3 text-lg font-medium text-foreground">Additional Information</h3>
+              <p className="text-muted-foreground">
                 {application.notes}
               </p>
             </div>
           )}
 
           {/* Experience */}
-          <div className="rounded-lg border border-gray-800 p-4">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-medium text-white">
+          <div className="rounded-lg border bg-accent/50 p-4">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-medium text-foreground">
               <Briefcase className="h-5 w-5" />
               Experience
             </h3>
-            <p className="text-gray-300 whitespace-pre-wrap">
+            <p className="text-muted-foreground whitespace-pre-wrap">
               {application.experience}
             </p>
           </div>
 
           {/* Cover Letter */}
-          <div className="rounded-lg border border-gray-800 p-4">
-            <h3 className="mb-3 flex items-center gap-2 text-lg font-medium text-white">
+          <div className="rounded-lg border bg-accent/50 p-4">
+            <h3 className="mb-3 flex items-center gap-2 text-lg font-medium text-foreground">
               <FileText className="h-5 w-5 flex-shrink-0" />
               Cover Letter
             </h3>
-            <p className="text-gray-300 whitespace-pre-wrap break-words">
+            <p className="text-muted-foreground whitespace-pre-wrap break-words">
               {application.cover_letter}
             </p>
           </div>
 
           {/* Resume */}
           {application.resume_url && (
-            <div className="rounded-lg border border-gray-800 p-4">
-              <h3 className="mb-3 text-lg font-medium text-white">Resume</h3>
+            <div className="rounded-lg border bg-accent/50 p-4">
+
+              <h3 className="mb-3 flex items-center gap-2 text-lg font-medium text-foreground">
+                <FileText className="h-5 w-5 flex-shrink-0" />
+                Resume
+              </h3>
               <Button
                 variant="outline"
-                className="border-gray-700 bg-gray-800 text-white hover:bg-gray-700"
+                className="border border-foreground bg-card text-foreground hover:bg-muted-foreground/10"
                 onClick={async () => {
                   if (application.resume_url) {
                     // Construct the Supabase storage URL

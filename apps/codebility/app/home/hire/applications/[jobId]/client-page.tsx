@@ -7,6 +7,12 @@ import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/components/ui/use-toast";
 import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@codevs/ui/accordion"
+import {
   Calendar,
   Download,
   FileText,
@@ -225,9 +231,9 @@ export default function JobApplicationsClient({
 
       </div>
       <div className="mb-6">
-        <div className="bg-gray-900/50 rounded-lg border border-gray-800 p-6">
+        <div className="bg-card rounded-lg border p-6">
           <div className="mb-6">
-            <Label htmlFor="search" className="text-sm font-medium text-gray-300 mb-2 block">
+            <Label htmlFor="search" className="text-sm font-medium text-muted-foreground mb-2 block">
               Search
             </Label>
             <div className="md:block relative lg:max-w-md max-w-full">
@@ -237,7 +243,7 @@ export default function JobApplicationsClient({
                 placeholder="Search applicant name, email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 bg-gray-800 border-gray-700 text-white placeholder:text-gray-400focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500"
+                className="pl-10 bg-card border text-foreground placeholder:text-muted-foreground focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500"
               />
             </div>
           </div>
@@ -246,15 +252,15 @@ export default function JobApplicationsClient({
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {/* Sort By */}
             <div>
-              <Label className="text-sm font-medium text-gray-300 mb-2 block">
+              <Label className="text-sm font-medium text-muted-foreground mb-2 block">
                 Sort By
               </Label>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                <SelectTrigger className="bg-card border text-foreground">
                   <ArrowUpDown className="w-4 h-4 mr-2" />
                   <SelectValue />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700">
+                <SelectContent className="bg-card border">
                   <SelectItem value="name_asc">Name (A-Z)</SelectItem>
                   <SelectItem value="name_desc">Name (Z-A)</SelectItem>
                   <SelectItem value="date_asc">Date Applied (Oldest)</SelectItem>
@@ -265,14 +271,14 @@ export default function JobApplicationsClient({
 
             {/* Status Filter */}
             <div>
-              <Label className="text-sm font-medium text-gray-300 mb-2 block">
+              <Label className="text-sm font-medium text-muted-foreground mb-2 block">
                 Status
               </Label>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                <SelectTrigger className="bg-card border text-foreground">
                   <SelectValue placeholder="All Statuses" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700">
+                <SelectContent className="bg-card border">
                   <SelectItem value="all">All Statuses</SelectItem>
                   <SelectItem value="pending">Pending</SelectItem>
                   <SelectItem value="reviewing">Reviewing</SelectItem>
@@ -285,14 +291,14 @@ export default function JobApplicationsClient({
 
             {/* Resume Filter */}
             <div>
-              <Label className="text-sm font-medium text-gray-300 mb-2 block">
+              <Label className="text-sm font-medium text-muted-foreground mb-2 block">
                 Resume
               </Label>
               <Select value={resumeFilter} onValueChange={setResumeFilter}>
-                <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                <SelectTrigger className="border bg-card text-foreground">
                   <SelectValue placeholder="All Applications" />
                 </SelectTrigger>
-                <SelectContent className="bg-gray-800 border-gray-700">
+                <SelectContent className="bg-card border">
                   <SelectItem value="all">All Applications</SelectItem>
                   <SelectItem value="with_resume">With Resume</SelectItem>
                   <SelectItem value="without_resume">Without Resume</SelectItem>
@@ -309,12 +315,12 @@ export default function JobApplicationsClient({
                   setStatusFilter("all");
                   setResumeFilter("all");
                 }}
-                className="w-full px-4 py-2 text-sm font-medium text-dark bg-red-500 hover:bg-red-600 rounded-md transition-colors"
+                className="w-full px-4 py-2 text-sm font-medium text-foreground bg-destructive/80 border hover:bg-accent rounded-md"
               >
                 Clear Filters
               </button>
             </div>
-            <p className="mt-2 text-gray-400">
+            <p className="mt-2 text-muted-foreground">
               {filteredApplications.length} applicant{filteredApplications.length !== 1 ? "s" : ""}{" "}
               found
             </p>
@@ -322,42 +328,210 @@ export default function JobApplicationsClient({
         </div>
 
       </div>
-      {/* Applications Table */}
-      <div className="overflow-x-auto rounded-lg border border-gray-800 bg-gray-900/50">
-        <table className="w-full table-fixed min-w-[800px]">
-          <thead className="border-b border-gray-800">
-            <tr className="text-left">
-              <th className="px-4 py-3 text-sm font-medium text-gray-300" style={{ width: '25%' }}>
-                Applicant
-              </th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-300" style={{ width: '25%' }}>
-                Contact
-              </th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-300" style={{ width: '15%' }}>
-                Applied
-              </th>
-              <th className="px-4 py-3 text-sm font-medium text-gray-300" style={{ width: '15%' }}>
-                Status
-              </th>
-              <th className="px-4 py-3 text-right text-sm font-medium text-gray-300" style={{ width: '20%' }}>
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-gray-800">
+
+
+      <div className="rounded-lg border bg-card">
+        {/* Desktop Table */}
+        <div className="hidden xl:block">
+          <div className=" overflow-hidden">
+            <table className="w-full min-w-[800px]">
+              <thead className="border-b bg-card">
+                <tr className="text-left">
+                  <th className="px-4 py-3 text-sm font-medium text-foreground w-1/4 min-w-[200px]">
+                    Applicant
+                  </th>
+                  <th className="px-4 py-3 text-sm font-medium text-foreground w-1/4 min-w-[200px]">
+                    Contact
+                  </th>
+                  <th className="px-4 py-3 text-sm font-medium text-foreground w-[15%] min-w-[120px]">
+                    Applied
+                  </th>
+                  <th className="px-4 py-3 text-center text-sm font-medium text-foreground w-[15%] min-w-[120px]">
+                    Status
+                  </th>
+                  <th className="px-4 py-3 text-center text-sm font-medium text-foreground w-[20%] min-w-[200px]">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {filteredApplications.map((application) => (
+                  <tr key={application.id} className="hover:bg-accent">
+                    <td className="px-4 py-3 w-1/4 min-w-[200px]">
+                      <div className="overflow-hidden">
+                        <p className="font-medium text-foreground truncate">
+                          {application.first_name} {application.last_name}
+                        </p>
+                        <div className="mt-1 flex items-center gap-3">
+                          {application.years_of_experience !== undefined && (
+                            <span className="text-xs text-muted-foreground flex-shrink-0">
+                              {application.years_of_experience} years exp
+                            </span>
+                          )}
+                          {application.linkedin && (
+                            <a
+                              href={application.linkedin}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground flex-shrink-0"
+                            >
+                              <Linkedin className="h-3 w-3" />
+                            </a>
+                          )}
+                          {application.github && (
+                            <a
+                              href={application.github}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground flex-shrink-0"
+                            >
+                              <Github className="h-3 w-3" />
+                            </a>
+                          )}
+                          {application.portfolio && (
+                            <a
+                              href={application.portfolio}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground flex-shrink-0"
+                            >
+                              <Globe className="h-3 w-3" />
+                            </a>
+                          )}
+                        </div>
+                        {application.notes && (
+                          <p className="mt-1 text-xs text-muted-foreground truncate">
+                            {application.notes}
+                          </p>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 w-1/4 min-w-[200px]">
+                      <div className="space-y-1 overflow-hidden">
+                        <a
+                          href={`mailto:${application.email}`}
+                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground"
+                        >
+                          <Mail className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{application.email}</span>
+                        </a>
+                        <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <Phone className="h-3 w-3 flex-shrink-0" />
+                          <span className="truncate">{application.phone}</span>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-4 py-3 w-[15%] min-w-[120px]">
+                      <span className="text-xs text-muted-foreground whitespace-nowrap">
+                        {new Date(application.applied_at).toLocaleDateString()}
+                      </span>
+                    </td>
+                    <td className="px-4 py-3 w-[15%] min-w-[120px]">
+                      <Select
+                        defaultValue={application.status}
+                        onValueChange={(value) => handleStatusChange(application.id, value)}
+                      >
+                        <SelectTrigger className="h-8 w-full border border-muted-foreground bg-card text-xs text-foreground">
+                          <SelectValue className="text-foreground" />
+                        </SelectTrigger>
+                        <SelectContent className="border bg-card text-foreground">
+                          <SelectItem value="pending" className="text-muted-foreground hover:text-foreground">
+                            Pending
+                          </SelectItem>
+                          <SelectItem value="reviewing" className="text-muted-foreground hover:text-foreground">
+                            Reviewing
+                          </SelectItem>
+                          <SelectItem value="shortlisted" className="text-muted-foreground hover:text-foreground">
+                            Shortlisted
+                          </SelectItem>
+                          <SelectItem value="rejected" className="text-muted-foreground hover:text-foreground">
+                            Rejected
+                          </SelectItem>
+                          <SelectItem value="hired" className="text-muted-foreground hover:text-foreground">
+                            Hired
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </td>
+                    <td className="px-4 py-3 text-right w-[20%] min-w-[160px]">
+                      <div className="inline-flex gap-2 items-center justify-end">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => {
+                            setSelectedApplication(application);
+                            setIsDetailsModalOpen(true);
+                          }}
+                          className="h-8 text-xs text-muted-foreground hover:text-foreground whitespace-nowrap border border-muted-foreground"
+                        >
+                          View Details
+                        </Button>
+                        <DropdownMenu>
+                          <DropdownMenuTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-8 text-xs text-muted-foreground hover:text-foreground"
+                              title="Resume options"
+                            >
+                              <MoreVertical className="h-4 w-4 flex-shrink-0" />
+                              <span className="sr-only">Open resume menu</span>
+                            </Button>
+                          </DropdownMenuTrigger>
+                          <DropdownMenuContent
+                            align="end"
+                            className="border bg-card"
+                          >
+                            <DropdownMenuItem
+                              onClick={async () => {
+                                if (application.resume_url) {
+                                  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+                                  const resumeUrl = `${supabaseUrl}/storage/v1/object/public/codebility/${application.resume_url}`;
+                                  window.open(resumeUrl, "_blank");
+                                } else {
+                                  toast({
+                                    title: "No Resume",
+                                    description: "This applicant hasn't uploaded a resume",
+                                  });
+                                }
+                              }}
+                              className="text-muted-foreground hover:bg-accent hover:text-foreground"
+                            >
+                              <Download className="mr-2 h-4 w-4" />
+                              Download Resume
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              onClick={() => handleDeleteApplication(application.id)}
+                              className="text-destructive hover:bg-accent hover:text-destructive"
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete Application
+                            </DropdownMenuItem>
+                          </DropdownMenuContent>
+                        </DropdownMenu>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Mobile Accordion */}
+        <div className="xl:hidden">
+          <Accordion type="single" collapsible className="w-full">
             {filteredApplications.map((application) => (
-              <tr key={application.id} className="hover:bg-gray-900/70">
-                <td className="px-4 py-3" style={{ width: '25%' }}>
-                  <div className="overflow-hidden">
-                    <p className="font-medium text-white truncate">
+              <AccordionItem key={application.id} value={application.id}>
+                <AccordionTrigger className="px-4 py-3 text-left [&>svg]:text-white" >
+                  <div>
+                    <p className="font-medium text-white">
                       {application.first_name} {application.last_name}
                     </p>
-                    <div className="mt-1 flex items-center gap-3">
-                      {application.years_of_experience !== undefined && (
-                        <span className="text-xs text-gray-400 flex-shrink-0">
-                          {application.years_of_experience} years exp
-                        </span>
-                      )}
+                    <p className="text-xs text-gray-400">
+                      {application.email}
+                    </p>
+                    <p className="text-xs text-gray-400">
                       {application.linkedin && (
                         <a
                           href={application.linkedin}
@@ -388,71 +562,54 @@ export default function JobApplicationsClient({
                           <Globe className="h-3 w-3" />
                         </a>
                       )}
-                    </div>
-                    {application.notes && (
-                      <p className="mt-1 text-xs text-gray-500 truncate">
-                        {application.notes}
-                      </p>
-                    )}
+                      {application.notes && (
+                        <p className="mt-1 text-xs text-gray-500 truncate">
+                          {application.notes}
+                        </p>
+                      )}
+                    </p>
                   </div>
-                </td>
-                <td className="px-4 py-3" style={{ width: '25%' }}>
-                  <div className="space-y-1 overflow-hidden">
-                    <a
-                      href={`mailto:${application.email}`}
-                      className="flex items-center gap-1 text-xs text-gray-400 hover:text-white"
+                </AccordionTrigger>
+                <AccordionContent className="px-4 py-3 space-y-3 text-sm text-gray-300">
+                  <div>
+                    <span className="block text-gray-400 text-xs">Phone</span>
+                    <span>{application.phone}</span>
+                  </div>
+                  <div>
+                    <span className="block text-gray-400 text-xs">Applied</span>
+                    <span>{new Date(application.applied_at).toLocaleDateString()}</span>
+                  </div>
+                  <div>
+                    <span className="block text-gray-400 text-xs">Status</span>
+                    <Select
+                      defaultValue={application.status}
+                      onValueChange={(value) =>
+                        handleStatusChange(application.id, value)
+                      }
                     >
-                      <Mail className="h-3 w-3 flex-shrink-0" />
-                      <span className="truncate">{application.email}</span>
-                    </a>
-                    <div className="flex items-center gap-1 text-xs text-gray-400">
-                      <Phone className="h-3 w-3 flex-shrink-0" />
-                      <span className="truncate">{application.phone}</span>
-                    </div>
+                      <SelectTrigger className="h-8 w-full border-gray-700 bg-gray-800 text-xs text-white">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent className="border-gray-700 bg-gray-800 text-white">
+                        <SelectItem value="pending">Pending</SelectItem>
+                        <SelectItem value="reviewing">Reviewing</SelectItem>
+                        <SelectItem value="shortlisted">Shortlisted</SelectItem>
+                        <SelectItem value="rejected">Rejected</SelectItem>
+                        <SelectItem value="hired">Hired</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                </td>
-                <td className="px-4 py-3" style={{ width: '15%' }}>
-                  <span className="text-xs text-gray-400 whitespace-nowrap">
-                    {new Date(application.applied_at).toLocaleDateString()}
-                  </span>
-                </td>
-                <td className="px-4 py-3" style={{ width: '15%' }}>
-                  <Select
-                    defaultValue={application.status}
-                    onValueChange={(value) => handleStatusChange(application.id, value)}
-                  >
-                    <SelectTrigger className="h-8 w-full border-gray-700 bg-gray-800 text-xs text-white">
-                      <SelectValue className="text-white" />
-                    </SelectTrigger>
-                    <SelectContent className="border-gray-700 bg-gray-800 text-white">
-                      <SelectItem value="pending" className="text-gray-300 hover:text-white">
-                        Pending
-                      </SelectItem>
-                      <SelectItem value="reviewing" className="text-gray-300 hover:text-white">
-                        Reviewing
-                      </SelectItem>
-                      <SelectItem value="shortlisted" className="text-gray-300 hover:text-white">
-                        Shortlisted
-                      </SelectItem>
-                      <SelectItem value="rejected" className="text-gray-300 hover:text-white">
-                        Rejected
-                      </SelectItem>
-                      <SelectItem value="hired" className="text-gray-300 hover:text-white">
-                        Hired
-                      </SelectItem>
-                    </SelectContent>
-                  </Select>
-                </td>
-                <td className="px-4 py-3 text-right" style={{ width: '20%' }}>
-                  <div className="inline-flex gap-2 items-center justify-end">
+
+                  {/* Actions */}
+                  <div className="flex justify-end gap-2 pt-2">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={() => {
-                        setSelectedApplication(application);
-                        setIsDetailsModalOpen(true);
+                        setSelectedApplication(application)
+                        setIsDetailsModalOpen(true)
                       }}
-                      className="h-8 text-xs text-gray-400 hover:text-white whitespace-nowrap"
+                      className="h-8 text-xs text-gray-400 hover:text-white"
                     >
                       View Details
                     </Button>
@@ -462,46 +619,31 @@ export default function JobApplicationsClient({
                           variant="ghost"
                           size="sm"
                           className="h-8 text-xs text-gray-400 hover:text-white"
-                          title="Resume options"
                         >
-                          <MoreVertical className="h-4 w-4 flex-shrink-0" />
-                          <span className="sr-only">Open resume menu</span>
+                          <MoreVertical className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent
-                        align="end"
-                        className="border-gray-800 bg-gray-900"
-                      >
+                      <DropdownMenuContent align="end" className="border-gray-800 bg-gray-900">
                         <DropdownMenuItem
                           onClick={async () => {
                             if (application.resume_url) {
-                              // If it's a full URL, open directly
-                              /*  if (application.resume_url.startsWith('http')) {
-                                window.open(application.resume_url, '_blank');
-                              } else { */
-                              // Otherwise, construct the Supabase storage URL
-                              const supabaseUrl =
-                                process.env.NEXT_PUBLIC_SUPABASE_URL;
-                              const resumeUrl = `${supabaseUrl}/storage/v1/object/public/codebility/${application.resume_url}`;
-                              window.open(resumeUrl, "_blank");
+                              const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+                              const resumeUrl = `${supabaseUrl}/storage/v1/object/public/codebility/${application.resume_url}`
+                              window.open(resumeUrl, "_blank")
                             } else {
                               toast({
                                 title: "No Resume",
-                                description:
-                                  "This applicant hasn't uploaded a resume",
-                              });
+                                description: "This applicant hasn't uploaded a resume",
+                              })
                             }
                           }}
-                          className="text-gray-300 hover:bg-gray-800 hover:text-white"
                         >
                           <Download className="mr-2 h-4 w-4" />
                           Download Resume
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() =>
-                            handleDeleteApplication(application.id)
-                          }
-                          className="text-red-400 hover:bg-gray-800 hover:text-red-300"
+                          onClick={() => handleDeleteApplication(application.id)}
+                          className="text-red-400 hover:text-red-300"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete Application
@@ -509,33 +651,38 @@ export default function JobApplicationsClient({
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
-                </td>
-              </tr>
+                </AccordionContent>
+              </AccordionItem>
             ))}
-          </tbody>
-        </table>
-      </div>
-
-
-      {filteredApplications.length === 0 && applications.length > 0 && (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-gray-800 bg-gray-900/50 py-16">
-          <User className="mb-4 h-12 w-12 text-gray-600" />
-          <p className="text-lg text-gray-400">No applications match your filters</p>
-          <p className="mt-2 text-sm text-gray-500">
-            Try adjusting your search or filter criteria
-          </p>
+          </Accordion>
         </div>
-      )}
+      </div >
 
-      {applications.length === 0 && (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-gray-800 bg-gray-900/50 py-16">
-          <User className="mb-4 h-12 w-12 text-gray-600" />
-          <p className="text-lg text-gray-400">No applications yet</p>
-          <p className="mt-2 text-sm text-gray-500">
-            Applications will appear here when candidates apply for this position
-          </p>
-        </div>
-      )}
+
+
+      {
+        filteredApplications.length === 0 && applications.length > 0 && (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-gray-800 bg-gray-900/50 py-16">
+            <User className="mb-4 h-12 w-12 text-gray-600" />
+            <p className="text-lg text-gray-400">No applications match your filters</p>
+            <p className="mt-2 text-sm text-gray-500">
+              Try adjusting your search or filter criteria
+            </p>
+          </div>
+        )
+      }
+
+      {
+        applications.length === 0 && (
+          <div className="flex flex-col items-center justify-center rounded-lg border border-gray-800 bg-gray-900/50 py-16">
+            <User className="mb-4 h-12 w-12 text-gray-600" />
+            <p className="text-lg text-gray-400">No applications yet</p>
+            <p className="mt-2 text-sm text-gray-500">
+              Applications will appear here when candidates apply for this position
+            </p>
+          </div>
+        )
+      }
 
       {/* Application Details Modal */}
       <ApplicationDetailsModal
@@ -547,6 +694,6 @@ export default function JobApplicationsClient({
         }}
         onStatusChange={handleStatusChange}
       />
-    </div>
+    </div >
   );
 }
