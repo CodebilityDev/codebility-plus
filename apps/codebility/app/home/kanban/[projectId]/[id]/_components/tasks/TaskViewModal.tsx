@@ -65,6 +65,7 @@ const TaskViewModal = ({
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const [isLoading, setIsLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
+  const [assigneeLoading, setAssigneeLoading] = useState(false);
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task | null;
   const user = useUserStore((state) => state.user);
@@ -137,7 +138,6 @@ const TaskViewModal = ({
   };
 
   // State for Skill Category, Sidekick Details, and Primary Assignee
-
   const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(
     null,
   );
@@ -146,12 +146,71 @@ const TaskViewModal = ({
     null,
   );
   const [createdBy, setCreatedBy] = useState<CodevMember | null>(null);
+  const [availableCodevs, setAvailableCodevs] = useState<CodevMember[]>([]);
 
   const [supabase, setSupabase] = useState<any>(null);
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
     setSupabase(supabaseClient);
   }, []);
+
+  // Fetch available codevs for assignment
+  useEffect(() => {
+    if (!supabase) return;
+
+    const fetchAvailableCodevs = async () => {
+      const { data, error } = await supabase
+        .from("codev")
+        .select("id, first_name, last_name, image_url")
+        .eq("status", "active")
+        .order("first_name");
+      
+      if (!error && data) {
+        setAvailableCodevs(data as CodevMember[]);
+      }
+    };
+
+    fetchAvailableCodevs();
+  }, [supabase]);
+
+  // Handle assignee selection
+  const handleAssigneeSelect = async (codevId: string) => {
+    if (!task || !supabase) return;
+
+    setAssigneeLoading(true);
+
+    try {
+      const { error } = await supabase
+        .from("task")
+        .update({ codev_id: codevId })
+        .eq("id", task.id);
+
+      if (!error) {
+        toast.success("Assignee updated successfully");
+        
+        // Update local state
+        const selectedCodev = availableCodevs.find(c => c.id === codevId);
+        if (selectedCodev) {
+          setPrimaryAssignee(selectedCodev);
+          // Update task object
+          if (task) {
+            task.codev_id = codevId;
+            task.codev = selectedCodev as any;
+          }
+        }
+
+        // Refetch board data
+        await fetchBoardData();
+      } else {
+        toast.error("Failed to update assignee");
+      }
+    } catch (error) {
+      console.error("Error updating assignee:", error);
+      toast.error("Failed to update assignee");
+    }
+
+    setAssigneeLoading(false);
+  };
 
   // Set the skill category from the task
   useEffect(() => {
@@ -428,27 +487,72 @@ const TaskViewModal = ({
               )}
             </div>
 
-            {/* Primary Assignee */}
+            {/* Primary Assignee - MODIFIED SECTION */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Primary Assignee</Label>
-              <div className="flex items-center gap-2">
-                {primaryAssignee && primaryAssignee.image_url ? (
-                  <Image
-                    src={primaryAssignee.image_url}
-                    alt={`${primaryAssignee.first_name} ${primaryAssignee.last_name}`}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                  />
-                ) : (
-                  <DefaultAvatar size={32} />
-                )}
-                <span>
-                  {primaryAssignee && task
-                    ? `${primaryAssignee.first_name} ${primaryAssignee.last_name}`
-                    : "Unassigned"}
-                </span>
-              </div>
+              {primaryAssignee ? (
+                // Show assigned member
+                <div className="flex items-center gap-2">
+                  {primaryAssignee.image_url ? (
+                    <Image
+                      src={primaryAssignee.image_url}
+                      alt={`${primaryAssignee.first_name} ${primaryAssignee.last_name}`}
+                      width={32}
+                      height={32}
+                      className="rounded-full"
+                    />
+                  ) : (
+                    <DefaultAvatar size={32} />
+                  )}
+                  <span>
+                    {`${primaryAssignee.first_name} ${primaryAssignee.last_name}`}
+                  </span>
+                </div>
+              ) : (
+                // Show assignee selection dropdown when unassigned
+                <div className="flex items-center gap-2">
+                  {canModifyTask ? (
+                    <Select 
+                      onValueChange={handleAssigneeSelect} 
+                      disabled={assigneeLoading}
+                    >
+                      <SelectTrigger className="text-grey-100 bg-light-900 border border-gray-300 dark:border-gray-700 dark:bg-gray-800">
+                        <SelectValue placeholder="Select assignee..." />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectGroup>
+                          {availableCodevs.map((codev) => (
+                            <SelectItem key={codev.id} value={codev.id}>
+                              <div className="flex items-center gap-2">
+                                {codev.image_url ? (
+                                  <Image
+                                    src={codev.image_url}
+                                    alt={`${codev.first_name} ${codev.last_name}`}
+                                    width={20}
+                                    height={20}
+                                    className="rounded-full"
+                                  />
+                                ) : (
+                                  <DefaultAvatar size={20} />
+                                )}
+                                <span>{`${codev.first_name} ${codev.last_name}`}</span>
+                              </div>
+                            </SelectItem>
+                          ))}
+                        </SelectGroup>
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <div className="flex items-center gap-2 text-gray-500">
+                      <DefaultAvatar size={32} />
+                      <span>Unassigned</span>
+                    </div>
+                  )}
+                  {assigneeLoading && (
+                    <Loader2Icon className="h-4 w-4 animate-spin" />
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
