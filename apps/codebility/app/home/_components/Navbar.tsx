@@ -14,7 +14,8 @@ import {
   IconProfile,
 } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
-// import { Bell } from "lucide-react"; // TODO: Uncomment when notification system is implemented
+import { NotificationContainer } from "@/components/notifications/NotificationContainer";
+import { NotificationDemo } from "@/components/notifications/NotificationDemo";
 
 import {
   DropdownMenu,
@@ -55,10 +56,11 @@ const Navbar = () => {
   const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
 
   return (
-    <nav
-      className="background-navbar fixed top-0 z-20 w-full shadow-sm"
-      role="banner"
-    >
+    <>
+      <nav
+        className="background-navbar fixed top-0 z-20 w-full shadow-sm"
+        role="banner"
+      >
       <div className="flex w-full min-w-full items-center justify-end px-8 py-2">
         {/*   <div className="md flex items-center" role="navigation" aria-label="Logo">
           <Link
@@ -83,23 +85,7 @@ const Navbar = () => {
           role="navigation"
           aria-label="User menu"
         >
-          {/* 
-          TODO: Implement notification system functionality
-          - Add backend integration for notifications
-          - Implement notification count/status tracking
-          - Add click handler for notification dropdown
-          - Connect to real-time notification updates
-          
-          <button
-            className="relative rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-            aria-label="Notifications"
-          >
-            <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-            <span className="absolute -right-1 -top-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-white"></span>
-            </span>
-          </button>
-          */}
+          <NotificationContainer />
           
           <div>
             <div className="md:hidden">
@@ -193,6 +179,8 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
+    <NotificationDemo />
+    </>
   );
 };
 
