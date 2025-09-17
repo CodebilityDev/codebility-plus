@@ -22,35 +22,40 @@ export default async function Admins() {
   if (adminError || mentorError) return <div>ERROR</div>;
 
   const sortedAdmins = admins
-    ? [...admins].sort((a, b) => {
-        // Founder always first
-        if (a.id === FOUNDER_USER_ID) return -1;
-        if (b.id === FOUNDER_USER_ID) return 1;
+    ? [...admins]
+        .filter((admin) => admin.availability_status !== false)
+        .sort((a, b) => {
+          // Founder always first
+          if (a.id === FOUNDER_USER_ID) return -1;
+          if (b.id === FOUNDER_USER_ID) return 1;
 
-        // Admins with profile pictures come before those without
-        const aHasImage = !!a.image_url;
-        const bHasImage = !!b.image_url;
+          // Admins with profile pictures come before those without
+          const aHasImage = !!a.image_url;
+          const bHasImage = !!b.image_url;
 
-        if (aHasImage && !bHasImage) return -1;
-        if (!aHasImage && bHasImage) return 1;
+          if (aHasImage && !bHasImage) return -1;
+          if (!aHasImage && bHasImage) return 1;
 
-        // If both have images or both don't have images, maintain original order
-        return 0;
-      }).filter((admin) => !admin.display_position?.includes("Developer"))
+          // If both have images or both don't have images, maintain original order
+          return 0;
+        })
+        .filter((admin) => !admin.display_position?.includes("Developer"))
     : [];
 
   const sortedMentors = mentors
-    ? [...mentors].sort((a, b) => {
-        // Mentors with profile pictures come before those without
-        const aHasImage = !!a.image_url;
-        const bHasImage = !!b.image_url;
+    ? [...mentors]
+        .filter((mentor) => mentor.availability_status !== false)
+        .sort((a, b) => {
+          // Mentors with profile pictures come before those without
+          const aHasImage = !!a.image_url;
+          const bHasImage = !!b.image_url;
 
-        if (aHasImage && !bHasImage) return -1;
-        if (!aHasImage && bHasImage) return 1;
+          if (aHasImage && !bHasImage) return -1;
+          if (!aHasImage && bHasImage) return 1;
 
-        // If both have images or both don't have images, maintain original order
-        return 0;
-      })
+          // If both have images or both don't have images, maintain original order
+          return 0;
+        })
     : [];
 
   // Helper function to format position text
