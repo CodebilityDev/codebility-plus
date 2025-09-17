@@ -77,8 +77,8 @@ export function NotificationPanel({
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
         <div className="flex items-center gap-2">
-          <Bell className="h-5 w-5" />
-          <h3 className="font-semibold">Notifications</h3>
+          <Bell className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+          <h3 className="font-semibold text-gray-900 dark:text-white">Notifications</h3>
           {unreadCount > 0 && (
             <span className="rounded-full bg-red-500 px-2 py-0.5 text-xs text-white">
               {unreadCount}
@@ -111,8 +111,8 @@ export function NotificationPanel({
       {/* Notifications List */}
       <ScrollArea className="h-[400px]">
         {notifications.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-12 text-gray-500">
-            <Bell className="mb-2 h-12 w-12 text-gray-300" />
+          <div className="flex flex-col items-center justify-center py-12 text-gray-500 dark:text-gray-400">
+            <Bell className="mb-2 h-12 w-12 text-gray-300 dark:text-gray-600" />
             <p>No notifications yet</p>
           </div>
         ) : (
@@ -136,14 +136,14 @@ export function NotificationPanel({
                     <div className="min-w-0 flex-1">
                       <p className={cn(
                         "text-sm font-medium",
-                        !notification.read && "text-gray-900 dark:text-white"
+                        !notification.read ? "text-gray-900 dark:text-white" : "text-gray-700 dark:text-gray-300"
                       )}>
                         {notification.title}
                       </p>
                       <p className="mt-0.5 text-sm text-gray-600 dark:text-gray-400">
                         {notification.message}
                       </p>
-                      <p className="mt-1 text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
                         {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
                       </p>
                     </div>
