@@ -237,6 +237,28 @@ const config: Config = {
           "0%, 100%": { transform: "translateY(0)" },
           "50%": { transform: "translateY(-15px)" },
         },
+        "bell-ring": {
+          "0%, 100%": { transform: "rotate(0)" },
+          "10%, 30%": { transform: "rotate(-10deg)" },
+          "20%, 40%": { transform: "rotate(10deg)" },
+          "50%": { transform: "rotate(0)" },
+        },
+        "slide-down": {
+          from: { 
+            opacity: "0",
+            transform: "translateY(-10px)"
+          },
+          to: { 
+            opacity: "1",
+            transform: "translateY(0)"
+          },
+        },
+        ping: {
+          "75%, 100%": {
+            transform: "scale(2)",
+            opacity: "0",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -245,6 +267,9 @@ const config: Config = {
         marquee: "marquee var(--duration) linear infinite",
         "marquee-vertical": "marquee-vertical var(--duration) linear infinite",
         floatY: "floatY 6s ease-in-out infinite",
+        "bell-ring": "bell-ring 1s ease-in-out",
+        "slide-down": "slide-down 0.3s ease-out",
+        ping: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
       },
       perspective: {
         800: "800px",
