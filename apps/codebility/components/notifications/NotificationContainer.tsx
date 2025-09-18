@@ -28,13 +28,21 @@ export function NotificationContainer() {
 
   const unreadCount = getUnreadCount();
 
-  // Fetch notifications on mount
+  // Fetch notifications on mount and when panel opens
   useEffect(() => {
     if (user?.id) {
       console.log("Fetching notifications for user:", user.id);
       fetchNotifications();
     }
-  }, [user?.id, fetchNotifications]);
+  }, [user?.id]);
+
+  // Also fetch when panel opens
+  useEffect(() => {
+    if (isOpen && user?.id) {
+      console.log("Panel opened, fetching latest notifications");
+      fetchNotifications();
+    }
+  }, [isOpen, user?.id]);
 
   // Set up real-time subscription
   useEffect(() => {
@@ -102,6 +110,16 @@ export function NotificationContainer() {
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, setOpen]);
+
+  // Add debug info
+  console.log("NotificationContainer render:", {
+    user: user?.id,
+    notificationCount: notifications.length,
+    unreadCount,
+    isOpen,
+    isLoading: useNotificationStore.getState().isLoading,
+    error: useNotificationStore.getState().error
+  });
 
   return (
     <div ref={containerRef} className="relative">
