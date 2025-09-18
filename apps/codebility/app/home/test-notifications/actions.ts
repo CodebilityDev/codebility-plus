@@ -1,7 +1,11 @@
 "use server";
 
-import { createNotification } from "@/lib/server/notification.service";
+import { createNotification, getNotifications } from "@/lib/server/notification.service";
 import type { Notification } from "@/types/notifications";
+
+export async function fetchNotifications() {
+  return getNotifications();
+}
 
 export async function sendTestNotification(notification: {
   recipientId: string;
