@@ -5,7 +5,7 @@ import { Button } from "@codevs/ui/button";
 import { Card } from "@codevs/ui/card";
 import { useUserStore } from "@/store/codev-store";
 import { toast } from "sonner";
-import { sendTestNotification } from "./actions";
+import { sendTestNotification as sendNotificationAction } from "./actions";
 
 const testNotifications = [
   {
@@ -88,7 +88,7 @@ export default function TestNotificationsPage() {
 
     setIsLoading(true);
     try {
-      const result = await sendTestNotification({
+      const result = await sendNotificationAction({
         recipientId: user.id,
         ...notification,
       });
