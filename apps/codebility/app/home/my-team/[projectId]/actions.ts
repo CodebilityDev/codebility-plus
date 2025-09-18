@@ -108,6 +108,39 @@ export async function saveAttendance(record: AttendanceRecord) {
     revalidatePath(`/home/my-team/${record.project_id}`);
     revalidatePath(`/home`);
     
+    // Create notification for attendance update (only for present status)
+    if (record.status === "present") {
+      try {
+        const supabase = await createClientServerComponent();
+        
+        // Get project name for notification
+        const { data: project } = await supabase
+          .from("projects")
+          .select("name")
+          .eq("id", record.project_id)
+          .single();
+        
+        // Create notification using raw SQL to bypass triggers
+        await supabase.rpc('create_notification', {
+          p_recipient_id: record.codev_id,
+          p_title: 'Attendance Marked',
+          p_message: `Your attendance has been marked as present for ${project?.name || 'your project'}. You earned ${ATTENDANCE_POINTS_PER_DAY} points!`,
+          p_type: 'attendance',
+          p_priority: 'normal',
+          p_metadata: {
+            date: record.date,
+            status: record.status,
+            project_id: record.project_id,
+            points_earned: ATTENDANCE_POINTS_PER_DAY
+          },
+          p_project_id: record.project_id
+        });
+      } catch (notificationError) {
+        // Don't fail the attendance save if notification fails
+        console.error("Error creating attendance notification:", notificationError);
+      }
+    }
+    
     return { success: true, data: result.data };
   } catch (error) {
     console.error("Error in saveAttendance:", error);

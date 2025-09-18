@@ -15,6 +15,7 @@ import AddMembersModal from "../../AddMembersModal";
 import AttendanceGrid from "./AttendanceGrid";
 import CompactMemberGrid from "./CompactMemberGrid";
 import SyncAllAttendance from "./SyncAllAttendance";
+import ScheduleMeetingModal from "./ScheduleMeetingModal";
 
 interface ProjectData {
   project: {
@@ -41,6 +42,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
   const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
   const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(false);
+  const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
   const attendanceGridRef = useRef<any>(null);
 
   const { project: projectInfo, teamLead, members, currentUserId } = project;
@@ -193,8 +195,9 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-1.5 text-xs"
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto"
               title="Schedule Meetings"
+              onClick={() => setShowScheduleMeetingModal(true)}
             >
               <CalendarDays className="h-3.5 w-3.5" />
               Schedule Meeting
@@ -307,6 +310,16 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         projectData={project}
         onClose={handleCloseModal}
         onUpdate={handleUpdateMembers}
+      />
+
+      {/* Schedule Meeting Modal */}
+      <ScheduleMeetingModal
+        isOpen={showScheduleMeetingModal}
+        onClose={() => setShowScheduleMeetingModal(false)}
+        projectId={projectInfo.id}
+        projectName={projectInfo.name}
+        teamMembers={members?.data || []}
+        teamLead={teamLead?.data || null}
       />
     </>
   );
