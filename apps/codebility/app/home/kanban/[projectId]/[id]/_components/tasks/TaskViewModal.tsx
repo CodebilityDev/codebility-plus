@@ -76,7 +76,7 @@ const TaskViewModal = ({
   const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
   const [prLink, setPrLink] = useState(task?.pr_link || "");
 
-  const { fetchBoardData } = useKanbanStore();
+  const { fetchBoardData, removeTaskOptimistic } = useKanbanStore();
 
   //  handle PR link update
   const handleUpdate = async () => {
@@ -109,31 +109,45 @@ const TaskViewModal = ({
 
     setIsLoading(true);
 
+    // Optimistically remove the task from UI immediately
+    removeTaskOptimistic(task.id);
+    
+    // Close modal immediately for better UX
+    onClose();
+    
+    // Show optimistic success message
+    toast.success("Completing task...");
+
     try {
       const result = await completeTask(task);
 
       if (result.success) {
+        // Update success message
         toast.success("Task completed and points awarded!");
 
-        // ✅ Manually update local state (UI update)
+        // Call onComplete callback if provided
         if (onComplete) {
           onComplete(task.id);
         }
 
-        // ✅ Close modal before refreshing
-        onClose();
-
-        // Refetch the board data
-        await fetchBoardData();
+        // Optional: Fetch fresh data in background after a delay
+        // This ensures data consistency without blocking the UI
+        setTimeout(() => {
+          fetchBoardData();
+        }, 1000);
       } else {
+        // Revert optimistic update by refetching data
         toast.error(result.error || "Failed to complete task");
+        await fetchBoardData();
       }
     } catch (error) {
       console.error("Error completing task:", error);
       toast.error("Failed to complete task");
+      // Revert optimistic update by refetching data
+      await fetchBoardData();
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   // State for Skill Category, Sidekick Details, and Primary Assignee

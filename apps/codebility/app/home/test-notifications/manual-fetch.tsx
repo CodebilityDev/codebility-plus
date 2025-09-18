@@ -14,9 +14,7 @@ export function ManualFetchTest() {
     setIsLoading(true);
     setError(null);
     try {
-      console.log("Manually fetching notifications...");
       const result = await fetchNotifications();
-      console.log("Manual fetch result:", result);
       
       if (result.error) {
         setError(result.error);
@@ -24,7 +22,6 @@ export function ManualFetchTest() {
         setNotifications(result.data || []);
       }
     } catch (err) {
-      console.error("Manual fetch error:", err);
       setError(err instanceof Error ? err.message : "Failed to fetch");
     } finally {
       setIsLoading(false);

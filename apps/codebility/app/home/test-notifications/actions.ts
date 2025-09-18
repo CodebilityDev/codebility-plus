@@ -17,7 +17,6 @@ export async function sendTestNotification(notification: {
   metadata?: any;
 }): Promise<{ data: string | null; error: string | null }> {
   try {
-    console.log("Sending notification:", notification);
     
     const result = await createNotification({
       recipientId: notification.recipientId,
@@ -29,10 +28,8 @@ export async function sendTestNotification(notification: {
       metadata: notification.metadata,
     });
     
-    console.log("Notification result:", result);
     return result;
   } catch (error) {
-    console.error("Error in sendTestNotification:", error);
     return { data: null, error: error instanceof Error ? error.message : "Failed to create notification" };
   }
 }

@@ -609,14 +609,104 @@ export const completeTask = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // Call the NEW RPC function to award points and archive task
-    const { data, error } = await supabase.rpc('new_complete_task', {
+    // Try to use the RPC function first for better performance
+    const { data, error } = await supabase.rpc('complete_task', {
       task_id: task.id,
       task_points: task.points || 0,
       primary_codev_id: task.codev?.id,
       skill_category_id: task.skill_category?.id,
       sidekick_ids: task.sidekick_ids || null
     });
+
+    // If RPC function doesn't exist, fall back to manual implementation
+    if (error && error.message.includes('function complete_task')) {
+      
+      // 1. Archive the task instead of deleting
+      const { error: archiveError } = await supabase
+        .from("task")
+        .update({ 
+          is_archive: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", task.id);
+
+      if (archiveError) throw archiveError;
+
+      // 2. Award points to primary assignee
+      if (task.codev?.id && task.skill_category?.id && task.points) {
+        const { data: existingPoints } = await supabase
+          .from("codev_points")
+          .select("*")
+          .eq("codev_id", task.codev.id)
+          .eq("skill_category_id", task.skill_category.id)
+          .single();
+
+        if (existingPoints) {
+          await supabase
+            .from("codev_points")
+            .update({
+              points: existingPoints.points + task.points,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existingPoints.id);
+        } else {
+          await supabase
+            .from("codev_points")
+            .insert({
+              codev_id: task.codev.id,
+              skill_category_id: task.skill_category.id,
+              points: task.points,
+            });
+        }
+
+        // 3. Award points to sidekicks (50% of task points)
+        if (task.sidekick_ids?.length) {
+          const sidekickPoints = Math.floor(task.points * 0.5);
+          
+          for (const sidekickId of task.sidekick_ids) {
+            const { data: sidekickExisting } = await supabase
+              .from("codev_points")
+              .select("*")
+              .eq("codev_id", sidekickId)
+              .eq("skill_category_id", task.skill_category.id)
+              .single();
+
+            if (sidekickExisting) {
+              await supabase
+                .from("codev_points")
+                .update({
+                  points: sidekickExisting.points + sidekickPoints,
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", sidekickExisting.id);
+            } else {
+              await supabase
+                .from("codev_points")
+                .insert({
+                  codev_id: sidekickId,
+                  skill_category_id: task.skill_category.id,
+                  points: sidekickPoints,
+                });
+            }
+          }
+        }
+
+        // 4. Update developer levels
+        await updateDeveloperLevels(task.codev.id);
+        
+        if (task.sidekick_ids?.length) {
+          for (const sidekickId of task.sidekick_ids) {
+            await updateDeveloperLevels(sidekickId);
+          }
+        }
+      }
+
+      // Only revalidate the specific board path
+      const boardPath = `/home/kanban/${task.kanban_column?.kanban_board?.project_id}/${task.kanban_column?.kanban_board?.id}`;
+      revalidatePath(boardPath);
+      
+      return { success: true };
+    }
 
     if (error) {
       throw error;
