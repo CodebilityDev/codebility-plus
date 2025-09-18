@@ -41,7 +41,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
   const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
-  const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(false);
+  const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(true); // Allow by default for teams with weekend meetings
   const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
   const attendanceGridRef = useRef<any>(null);
 
@@ -192,16 +192,18 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 {isLoadingMembers ? 'Loading...' : 'Add Members'}
               </Button>
             )}
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto"
-              title="Schedule Meetings"
-              onClick={() => setShowScheduleMeetingModal(true)}
-            >
-              <CalendarDays className="h-3.5 w-3.5" />
-              Schedule Meeting
-            </Button>
+            {isTeamLead && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto"
+                title="Schedule Meetings"
+                onClick={() => setShowScheduleMeetingModal(true)}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Schedule Meeting
+              </Button>
+            )}
           </div>
         </div>
 
