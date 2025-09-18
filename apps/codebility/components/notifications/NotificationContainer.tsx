@@ -31,6 +31,7 @@ export function NotificationContainer() {
   // Fetch notifications on mount
   useEffect(() => {
     if (user?.id) {
+      console.log("Fetching notifications for user:", user.id);
       fetchNotifications();
     }
   }, [user?.id, fetchNotifications]);

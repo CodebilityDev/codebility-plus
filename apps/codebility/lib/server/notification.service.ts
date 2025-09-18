@@ -5,9 +5,11 @@ import { Notification } from "@/types/notifications";
  * Fetch notifications for the current user
  */
 export async function getNotifications(limit: number = 50) {
+  console.log("Service: getNotifications called");
   const supabase = await createClientServerComponent();
 
   const { data: session } = await supabase.auth.getSession();
+  console.log("Service: Session user:", session?.session?.user?.id);
   if (!session?.session?.user) {
     return { data: null, error: "Not authenticated" };
   }
@@ -16,8 +18,11 @@ export async function getNotifications(limit: number = 50) {
     .from("notifications")
     .select("*")
     .eq("recipient_id", session.session.user.id)
+    .eq("archived", false) // Only get non-archived notifications
     .order("created_at", { ascending: false })
     .limit(limit);
+
+  console.log("Service: Raw query result:", { data, error });
 
   if (error) {
     console.error("Error fetching notifications:", error);
@@ -33,6 +38,7 @@ export async function getNotifications(limit: number = 50) {
     expiresAt: n.expires_at ? new Date(n.expires_at) : undefined,
   }));
 
+  console.log("Service: Transformed notifications:", notifications);
   return { data: notifications, error: null };
 }
 
