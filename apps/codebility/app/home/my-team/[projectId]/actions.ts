@@ -274,3 +274,62 @@ async function syncAttendancePointsTotal(codevId: string) {
     console.error("Error syncing attendance points total:", error);
   }
 }
+
+export async function saveMeetingSchedule(
+  projectId: string,
+  schedule: {
+    selectedDays: string[];
+    time: string;
+  }
+) {
+  const supabase = await createClientServerComponent();
+  
+  try {
+    // Save meeting schedule to project metadata or a dedicated table
+    const { data, error } = await supabase
+      .from("projects")
+      .update({
+        meeting_schedule: schedule
+      })
+      .eq("id", projectId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error("Error saving meeting schedule:", error);
+      return { success: false, error: error.message };
+    }
+    
+    revalidatePath(`/home/my-team/${projectId}`);
+    
+    return { success: true, data };
+  } catch (error) {
+    console.error("Error in saveMeetingSchedule:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+export async function getMeetingSchedule(projectId: string) {
+  const supabase = await createClientServerComponent();
+  
+  try {
+    const { data, error } = await supabase
+      .from("projects")
+      .select("id, name, meeting_schedule")
+      .eq("id", projectId)
+      .single();
+    
+    if (error && error.code !== 'PGRST116') {
+      console.error("Error fetching meeting schedule:", error);
+      return { success: false, error: error.message };
+    }
+    
+    return { 
+      success: true, 
+      schedule: data?.meeting_schedule || null
+    };
+  } catch (error) {
+    console.error("Error in getMeetingSchedule:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}

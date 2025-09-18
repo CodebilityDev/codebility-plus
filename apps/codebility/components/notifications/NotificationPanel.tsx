@@ -93,7 +93,7 @@ export function NotificationPanel({
               onClick={onMarkAllAsRead}
               className="text-xs text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
             >
-              <Check className="mr-1 h-3 w-3" />
+              <Check className="mr-1 h-3 w-3 text-gray-700 dark:text-gray-300" />
               Mark all read
             </Button>
           )}
@@ -162,7 +162,7 @@ export function NotificationPanel({
                         className="h-6 w-6 p-0"
                         title="Mark as read"
                       >
-                        <Check className="h-3 w-3" />
+                        <Check className="h-3 w-3 text-gray-700 dark:text-gray-300" />
                       </Button>
                     )}
                     <Button
@@ -172,7 +172,7 @@ export function NotificationPanel({
                       className="h-6 w-6 p-0"
                       title="Archive"
                     >
-                      <Archive className="h-3 w-3" />
+                      <Archive className="h-3 w-3 text-gray-700 dark:text-gray-300" />
                     </Button>
                   </div>
                 </div>

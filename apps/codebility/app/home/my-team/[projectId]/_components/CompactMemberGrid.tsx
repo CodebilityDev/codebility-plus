@@ -60,7 +60,7 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
   }, [allMembers.length]);
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-3">
       {allMembers.map((member) => {
         const isLead = teamLead?.id === member.id;
         const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
@@ -68,7 +68,7 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
         return (
           <div
             key={member.id}
-            className="relative rounded-lg border border-gray-200 bg-white p-3 shadow-sm transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
+            className="relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 overflow-hidden"
           >
             {/* Status indicator */}
             <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-green-500" title="Active" />
@@ -80,12 +80,12 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
                   <Image
                     src={imageUrl}
                     alt={`${member.first_name} ${member.last_name}`}
-                    width={40}
-                    height={40}
-                    className="h-10 w-10 rounded-full object-cover"
+                    width={48}
+                    height={48}
+                    className="h-12 w-12 rounded-full object-cover"
                   />
                 ) : (
-                  <DefaultAvatar size={40} />
+                  <DefaultAvatar size={48} />
                 )}
                 {isLead && (
                   <div className="absolute -bottom-1 -right-1 rounded-full bg-blue-500 px-1.5 py-0.5">
@@ -96,22 +96,22 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
 
               {/* Info */}
               <div className="min-w-0 flex-1">
-                <h4 className="text-sm font-semibold text-gray-900 dark:text-white truncate">
+                <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate">
                   {member.first_name} {member.last_name}
                 </h4>
-                <p className="text-xs text-gray-600 dark:text-gray-400 truncate">
+                <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
                   {member.display_position || "Team Member"}
                 </p>
                 
                 {/* Quick stats */}
-                <div className="mt-2 flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400">
+                <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-gray-500 dark:text-gray-400">
                   <span className="flex items-center gap-1">
-                    <Calendar className="h-3 w-3" />
+                    <Calendar className="h-3 w-3 flex-shrink-0" />
                     {new Date(member.joined_at).getFullYear()}
                   </span>
-                  <span className="flex items-center gap-1">
-                    <Mail className="h-3 w-3" />
-                    {member.email_address.split('@')[0]}
+                  <span className="flex items-center gap-1 min-w-0">
+                    <Mail className="h-3 w-3 flex-shrink-0" />
+                    <span className="truncate">{member.email_address.split('@')[0]}</span>
                   </span>
                 </div>
               </div>
