@@ -6,6 +6,7 @@ import { ThemeProvider } from "@/context/ThemeProvider";
 import ReactQueryProvider from "@/hooks/reactQuery";
 import { UserProvider } from "@/store/UserProvider";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
+import { Toaster } from "sonner";
 
 import ToastNotification from "./_components/HomeToastNotification";
 import LeftSidebar from "./_components/LeftSidebar";
@@ -24,6 +25,13 @@ export default async function HomeLayout({
           <ThemeProvider>
             <ModalProviderHome />
             <ToastNotification />
+            <Toaster 
+              richColors
+              position="top-right"
+              toastOptions={{
+                className: "dark:bg-gray-800 dark:text-white",
+              }}
+            />
             <AppRouterCacheProvider>
               <MuiStyleRoot>
                 <main className="background-light850_dark100 relative flex max-w-full flex-col overflow-clip">
