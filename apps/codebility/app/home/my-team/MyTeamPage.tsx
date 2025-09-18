@@ -108,7 +108,7 @@ const MemberCard = ({
     return (
       <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
         <div 
-          className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-customBlue-300 transition-all duration-200"
+          className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-customBlue-300 transition-all duration-200 rounded-full overflow-hidden"
           onClick={handleAvatarClick}
           title="Click to view profile"
         >
@@ -119,11 +119,9 @@ const MemberCard = ({
             height={48}
             className="rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 transition-colors duration-200"
             style={{
-              position: "absolute",
-              height: "100%",
               width: "100%",
-              inset: "0px",
-              color: "transparent",
+              height: "100%",
+              objectFit: "cover"
             }}
           />
         </div>
@@ -154,7 +152,7 @@ const MemberCard = ({
   return (
     <div className="flex flex-col items-center gap-1 sm:gap-2">
       <div 
-        className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-customBlue-300 transition-all duration-200"
+        className="relative h-10 w-10 sm:h-12 sm:w-12 flex-shrink-0 cursor-pointer hover:ring-2 hover:ring-customBlue-300 transition-all duration-200 rounded-full overflow-hidden"
         onClick={handleAvatarClick}
         title="Click to view profile"
       >
@@ -165,11 +163,9 @@ const MemberCard = ({
           height={48}
           className="rounded-full object-cover ring-2 ring-gray-200 dark:ring-gray-600 transition-colors duration-200"
           style={{
-            position: "absolute",
-            height: "100%",
             width: "100%",
-            inset: "0px",
-            color: "transparent",
+            height: "100%",
+            objectFit: "cover"
           }}
         />
       </div>
