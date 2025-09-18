@@ -57,6 +57,11 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     setShowAddModal(false);
   };
 
+  const handleSaveStateChange = useCallback((hasChanges: boolean, saveFunction: () => Promise<void>) => {
+    setHasAttendanceChanges(hasChanges);
+    setSaveAttendanceFunction(() => saveFunction);
+  }, []);
+
   const handleUpdateMembers = async (selectedMembers: Codev[]) => {
     try {
       setIsLoadingMembers(true);
@@ -289,10 +294,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             teamLead={teamLead?.data || null}
             projectId={projectInfo.id}
             allowWeekendMeetings={allowWeekendMeetings}
-            onSaveStateChange={useCallback((hasChanges, saveFunction) => {
-              setHasAttendanceChanges(hasChanges);
-              setSaveAttendanceFunction(() => saveFunction);
-            }, [])}
+            onSaveStateChange={handleSaveStateChange}
           />
         )}
       </div>
