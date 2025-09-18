@@ -623,7 +623,7 @@ export const completeTask = async (
       
       // 1. Archive the task instead of deleting
       const { error: archiveError } = await supabase
-        .from("task")
+        .from("tasks")
         .update({ 
           is_archive: true,
           updated_at: new Date().toISOString()
