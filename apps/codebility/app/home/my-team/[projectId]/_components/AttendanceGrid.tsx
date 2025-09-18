@@ -63,13 +63,6 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, a
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
-  // Notify parent component about save state
-  useEffect(() => {
-    if (onSaveStateChange) {
-      onSaveStateChange(hasUnsavedChanges, saveAllAttendance);
-    }
-  }, [hasUnsavedChanges, saveAllAttendance, onSaveStateChange]);
-
   // Load attendance data from database
   useEffect(() => {
     const loadAttendance = async () => {
@@ -196,6 +189,13 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, a
       setIsSaving(false);
     }
   }, [allMembers, monthDays, selectedYear, selectedMonth, attendanceData, projectId, allowWeekendMeetings]);
+
+  // Notify parent component about save state
+  useEffect(() => {
+    if (onSaveStateChange) {
+      onSaveStateChange(hasUnsavedChanges, saveAllAttendance);
+    }
+  }, [hasUnsavedChanges, saveAllAttendance, onSaveStateChange]);
 
   // Count present days for a member
   const countPresentDays = (memberId: string) => {
