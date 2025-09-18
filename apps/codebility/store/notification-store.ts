@@ -27,13 +27,18 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   fetchNotifications: async () => {
     set({ isLoading: true, error: null });
     try {
+      console.log("Store: Fetching notifications...");
       const { data, error } = await notificationService.getNotifications();
+      console.log("Store: Fetch result:", { data, error });
       if (error) {
+        console.error("Store: Error fetching notifications:", error);
         set({ error, isLoading: false });
       } else {
+        console.log("Store: Setting notifications:", data);
         set({ notifications: data || [], isLoading: false });
       }
     } catch (error) {
+      console.error("Store: Exception fetching notifications:", error);
       set({ error: "Failed to fetch notifications", isLoading: false });
     }
   },
