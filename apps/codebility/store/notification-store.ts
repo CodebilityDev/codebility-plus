@@ -39,9 +39,16 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   },
 
   addNotification: (notification) =>
-    set((state) => ({
-      notifications: [notification, ...state.notifications],
-    })),
+    set((state) => {
+      // Check if notification already exists to prevent duplicates
+      const exists = state.notifications.some(n => n.id === notification.id);
+      if (exists) {
+        return state;
+      }
+      return {
+        notifications: [notification, ...state.notifications],
+      };
+    }),
 
   markAsRead: async (id) => {
     const { error } = await notificationService.markNotificationAsRead(id);
