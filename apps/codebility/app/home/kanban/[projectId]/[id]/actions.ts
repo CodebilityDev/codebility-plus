@@ -614,7 +614,7 @@ export const completeTask = async (
       task_id: task.id,
       task_points: task.points || 0,
       primary_codev_id: task.codev?.id,
-      skill_category_id: task.skill_category?.id,
+      p_skill_category_id: task.skill_category?.id,
       sidekick_ids: task.sidekick_ids || null
     });
 
