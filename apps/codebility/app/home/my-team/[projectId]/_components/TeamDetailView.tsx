@@ -10,7 +10,7 @@ import {
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Table, Calendar, TrendingUp } from "lucide-react";
+import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
 import AttendanceGrid from "./AttendanceGrid";
 import CompactMemberGrid from "./CompactMemberGrid";
@@ -39,6 +39,9 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
+  const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
+  const [saveAttendanceFunction, setSaveAttendanceFunction] = useState<(() => Promise<void>) | null>(null);
+  const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(false);
 
   const { project: projectInfo, teamLead, members, currentUserId } = project;
   const totalMembers = members.data.length + (teamLead.data ? 1 : 0);
@@ -152,10 +155,23 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           </div>
           <div className="flex gap-2">
             {viewMode === "attendance" && (
-              <SyncAllAttendance 
-                projectId={projectInfo.id} 
-                isTeamLead={isTeamLead || false} 
-              />
+              <>
+                {hasAttendanceChanges && saveAttendanceFunction && (
+                  <Button
+                    onClick={saveAttendanceFunction}
+                    variant="default"
+                    size="sm"
+                    className="flex items-center gap-1.5 text-xs"
+                  >
+                    <Save className="h-3.5 w-3.5" />
+                    Save Changes
+                  </Button>
+                )}
+                <SyncAllAttendance 
+                  projectId={projectInfo.id} 
+                  isTeamLead={isTeamLead || false} 
+                />
+              </>
             )}
             {viewMode === "team" && (
               <Button
@@ -168,6 +184,15 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 {isLoadingMembers ? 'Loading...' : 'Add Members'}
               </Button>
             )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1.5 text-xs"
+              title="Schedule Meetings"
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+              Schedule Meeting
+            </Button>
           </div>
         </div>
 
@@ -263,6 +288,11 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             teamMembers={members.data}
             teamLead={teamLead.data}
             projectId={projectInfo.id}
+            allowWeekendMeetings={allowWeekendMeetings}
+            onSaveStateChange={(hasChanges, saveFunction) => {
+              setHasAttendanceChanges(hasChanges);
+              setSaveAttendanceFunction(() => saveFunction);
+            }}
           />
         )}
       </div>
