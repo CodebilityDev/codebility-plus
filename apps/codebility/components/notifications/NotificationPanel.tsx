@@ -71,6 +71,12 @@ export function NotificationPanel({
   onClearAll,
 }: NotificationPanelProps) {
   const unreadCount = notifications.filter(n => !n.read).length;
+  
+  console.log("NotificationPanel render:", {
+    notificationCount: notifications.length,
+    notifications,
+    unreadCount
+  });
 
   return (
     <div className="absolute right-0 top-full mt-2 w-96 animate-slide-down rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
