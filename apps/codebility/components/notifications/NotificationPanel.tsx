@@ -97,7 +97,7 @@ export function NotificationPanel({
               variant="ghost"
               size="sm"
               onClick={onMarkAllAsRead}
-              className="text-xs"
+              className="text-xs text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
             >
               <Check className="mr-1 h-3 w-3" />
               Mark all read
@@ -107,7 +107,7 @@ export function NotificationPanel({
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
           >
             <X className="h-4 w-4" />
           </Button>

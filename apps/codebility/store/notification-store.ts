@@ -1,6 +1,12 @@
 import { create } from "zustand";
 import type { Notification } from "@/types/notifications";
-import * as notificationService from "@/lib/server/notification.service";
+import { 
+  fetchNotificationsAction,
+  markNotificationAsReadAction,
+  markAllNotificationsAsReadAction,
+  archiveNotificationAction,
+  clearAllNotificationsAction
+} from "@/lib/actions/notification.actions";
 
 interface NotificationStore {
   notifications: Notification[];
@@ -28,7 +34,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
     set({ isLoading: true, error: null });
     try {
       console.log("Store: Fetching notifications...");
-      const { data, error } = await notificationService.getNotifications();
+      const { data, error } = await fetchNotificationsAction();
       console.log("Store: Fetch result:", { data, error });
       if (error) {
         console.error("Store: Error fetching notifications:", error);
@@ -56,7 +62,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
     }),
 
   markAsRead: async (id) => {
-    const { error } = await notificationService.markNotificationAsRead(id);
+    const { error } = await markNotificationAsReadAction(id);
     if (!error) {
       set((state) => ({
         notifications: state.notifications.map((n) =>
@@ -67,7 +73,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   },
 
   markAllAsRead: async () => {
-    const { error } = await notificationService.markAllNotificationsAsRead();
+    const { error } = await markAllNotificationsAsReadAction();
     if (!error) {
       set((state) => ({
         notifications: state.notifications.map((n) => ({ 
@@ -80,7 +86,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   },
 
   archiveNotification: async (id) => {
-    const { error } = await notificationService.archiveNotification(id);
+    const { error } = await archiveNotificationAction(id);
     if (!error) {
       set((state) => ({
         notifications: state.notifications.filter((n) => n.id !== id),
@@ -89,7 +95,7 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   },
 
   clearAll: async () => {
-    const { error } = await notificationService.clearAllNotifications();
+    const { error } = await clearAllNotificationsAction();
     if (!error) {
       set({ notifications: [] });
     }
