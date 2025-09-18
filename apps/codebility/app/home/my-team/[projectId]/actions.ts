@@ -333,3 +333,47 @@ export async function getMeetingSchedule(projectId: string) {
     return { success: false, error: "An unexpected error occurred" };
   }
 }
+
+export async function getTeamMonthlyAttendancePoints(
+  projectId: string,
+  year: number,
+  month: number
+) {
+  const supabase = await createClientServerComponent();
+  
+  try {
+    // Get the start and end dates for the month
+    const startDate = new Date(year, month, 1).toISOString().split('T')[0];
+    const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+    
+    // Get all attendance records for the project for this month
+    const { data, error } = await supabase
+      .from("attendance")
+      .select("codev_id, status")
+      .eq("project_id", projectId)
+      .gte("date", startDate)
+      .lte("date", endDate)
+      .in("status", ["present", "late"]);
+    
+    if (error) {
+      console.error("Error fetching team attendance points:", error);
+      return { success: false, error: error.message, totalPoints: 0, presentDays: 0 };
+    }
+    
+    // Calculate total points (2 points per present/late day)
+    const totalPoints = (data?.length || 0) * ATTENDANCE_POINTS_PER_DAY;
+    
+    // Count unique member-days
+    const uniqueMemberDays = new Set(data?.map(record => `${record.codev_id}-${record.status}`)).size;
+    
+    return { 
+      success: true, 
+      totalPoints,
+      presentDays: data?.length || 0,
+      uniqueMembers: new Set(data?.map(record => record.codev_id)).size
+    };
+  } catch (error) {
+    console.error("Error in getTeamMonthlyAttendancePoints:", error);
+    return { success: false, error: "An unexpected error occurred", totalPoints: 0, presentDays: 0 };
+  }
+}
