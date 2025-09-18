@@ -18,7 +18,7 @@ const PUBLIC_ROUTES = [
   "/",
   "/careers",
   "/nda-signing/public",
-
+  "/ai-integration",
   "/auth/callback",
 
 ] as const;

@@ -179,7 +179,7 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
-    <NotificationDemo />
+  {/*   <NotificationDemo /> */}
     </>
   );
 };
