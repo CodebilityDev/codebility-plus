@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
 import { ChevronLeft, ChevronRight, Circle, Save, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimpleMemberData } from "@/app/home/projects/actions";
@@ -26,11 +26,11 @@ interface AttendanceGridProps {
   teamMembers: SimpleMemberData[];
   teamLead: SimpleMemberData | null;
   projectId: string;
-  onSaveStateChange?: (hasChanges: boolean, saveFunction: () => Promise<void>) => void;
+  onHasChangesUpdate?: (hasChanges: boolean) => void;
   allowWeekendMeetings?: boolean;
 }
 
-const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, allowWeekendMeetings = false }: AttendanceGridProps) => {
+const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, teamLead, projectId, onHasChangesUpdate, allowWeekendMeetings = false }, ref) => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
@@ -190,12 +190,17 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, a
     }
   }, [allMembers, monthDays, selectedYear, selectedMonth, attendanceData, projectId, allowWeekendMeetings]);
 
-  // Notify parent component about save state
+  // Expose save function to parent via ref
+  useImperativeHandle(ref, () => ({
+    saveAllAttendance
+  }), [saveAllAttendance]);
+
+  // Notify parent component about changes
   useEffect(() => {
-    if (onSaveStateChange) {
-      onSaveStateChange(hasUnsavedChanges, saveAllAttendance);
+    if (onHasChangesUpdate) {
+      onHasChangesUpdate(hasUnsavedChanges);
     }
-  }, [hasUnsavedChanges, saveAllAttendance, onSaveStateChange]);
+  }, [hasUnsavedChanges, onHasChangesUpdate]);
 
   // Count present days for a member
   const countPresentDays = (memberId: string) => {
@@ -467,6 +472,8 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, a
     </div>
     </div>
   );
-};
+});
+
+AttendanceGrid.displayName = 'AttendanceGrid';
 
 export default AttendanceGrid;
