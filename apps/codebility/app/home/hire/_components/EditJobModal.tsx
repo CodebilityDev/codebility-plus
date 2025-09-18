@@ -89,27 +89,42 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
         .map(req => req.trim())
         .filter(req => req.length > 0);
 
-      const updatedJob = {
-        ...job,
-        ...data,
-        requirements: requirementsArray,
-        updated_at: new Date().toISOString(),
-      };
+      // Import Supabase client
+      const { createClientClientComponent } = await import("@/utils/supabase/client");
+      const supabase = createClientClientComponent();
 
-      // Here you would typically send to your backend
-      console.log("Updating job:", updatedJob);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      // Update the job in the database
+      const { data: updatedJob, error } = await supabase
+        .from('job_listings')
+        .update({
+          title: data.title,
+          department: data.department,
+          location: data.location,
+          type: data.type,
+          level: data.level,
+          description: data.description,
+          requirements: requirementsArray,
+          salary_range: data.salary_range || null,
+          remote: data.remote,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', job.id)
+        .select()
+        .single();
+
+      if (error) {
+        throw error;
+      }
       
       toast({
         title: "Job Updated Successfully",
         description: `${data.title} has been updated.`,
       });
       
-      onClose();
       onJobUpdated?.();
+      onClose();
     } catch (error) {
+      console.error("Update error:", error);
       toast({
         title: "Failed to update job",
         description: "Please try again later.",
@@ -122,9 +137,27 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
 
   if (!job) return null;
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !isSubmitting) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto bg-gray-900 border-gray-800">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent 
+        className="max-h-[90vh] max-w-2xl overflow-y-auto bg-gray-900 border-gray-800"
+        onPointerDownOutside={(e) => {
+          if (isSubmitting) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          if (isSubmitting) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-light text-white">
             Edit Job Listing

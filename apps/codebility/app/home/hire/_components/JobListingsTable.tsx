@@ -307,7 +307,7 @@ export default function JobListingsTable() {
                     <Eye className="mr-2 h-3 w-3" />
                     Applications
                   </Button>
-                  <DropdownMenu>
+                  <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
@@ -320,15 +320,23 @@ export default function JobListingsTable() {
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-gray-900 border-gray-800">
                       <DropdownMenuItem
-                        onClick={() => handleEdit(job)}
-                        className="text-gray-300 hover:text-white hover:bg-gray-800"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleEdit(job);
+                        }}
+                        className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
                       >
                         <Edit className="mr-2 h-4 w-4" />
                         Edit Listing
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => handleDelete(job.id)}
-                        className="text-red-400 hover:text-red-300 hover:bg-gray-800"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          e.stopPropagation();
+                          handleDelete(job.id);
+                        }}
+                        className="text-red-400 hover:text-red-300 hover:bg-gray-800 cursor-pointer"
                       >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete
