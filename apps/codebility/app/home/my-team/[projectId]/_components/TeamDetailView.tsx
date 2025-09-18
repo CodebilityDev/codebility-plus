@@ -143,7 +143,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               <Users className="h-4 w-4" />
               Team View
             </Button>
-            {isTeamLead && (
+            {(isTeamLead || !currentUserId) && (
               <Button
                 variant={viewMode === "attendance" ? "default" : "outline"}
                 size="sm"
@@ -171,7 +171,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 )}
                 <SyncAllAttendance 
                   projectId={projectInfo.id} 
-                  isTeamLead={isTeamLead || false} 
+                  isTeamLead={isTeamLead || !currentUserId} 
                 />
               </>
             )}
