@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { toast } from "react-hot-toast";
 import { 
   getMembers, 
@@ -40,8 +40,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
   const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
-  const [saveAttendanceFunction, setSaveAttendanceFunction] = useState<(() => Promise<void>) | null>(null);
   const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(false);
+  const attendanceGridRef = useRef<any>(null);
 
   const { project: projectInfo, teamLead, members, currentUserId } = project;
   const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
@@ -57,9 +57,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     setShowAddModal(false);
   };
 
-  const handleSaveStateChange = useCallback((hasChanges: boolean, saveFunction: () => Promise<void>) => {
-    setHasAttendanceChanges(hasChanges);
-    setSaveAttendanceFunction(() => saveFunction);
+  const handleSaveAttendance = useCallback(async () => {
+    if (attendanceGridRef.current?.saveAllAttendance) {
+      await attendanceGridRef.current.saveAllAttendance();
+    }
   }, []);
 
   const handleUpdateMembers = async (selectedMembers: Codev[]) => {
@@ -161,9 +162,9 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           <div className="flex gap-2">
             {viewMode === "attendance" && (
               <>
-                {hasAttendanceChanges && saveAttendanceFunction && (
+                {hasAttendanceChanges && (
                   <Button
-                    onClick={saveAttendanceFunction}
+                    onClick={handleSaveAttendance}
                     variant="default"
                     size="sm"
                     className="flex items-center gap-1.5 text-xs"
@@ -290,11 +291,12 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         ) : (
           /* Attendance Grid View */
           <AttendanceGrid
+            ref={attendanceGridRef}
             teamMembers={members?.data || []}
             teamLead={teamLead?.data || null}
             projectId={projectInfo.id}
             allowWeekendMeetings={allowWeekendMeetings}
-            onSaveStateChange={handleSaveStateChange}
+            onHasChangesUpdate={setHasAttendanceChanges}
           />
         )}
       </div>
