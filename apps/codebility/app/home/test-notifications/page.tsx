@@ -6,6 +6,7 @@ import { Card } from "@codevs/ui/card";
 import { useUserStore } from "@/store/codev-store";
 import { toast } from "sonner";
 import { sendTestNotification as sendNotificationAction } from "./actions";
+import { ManualFetchTest } from "./manual-fetch";
 
 const testNotifications = [
   {
@@ -166,6 +167,8 @@ export default function TestNotificationsPage() {
           <li>• Click the bell icon in the header to see all notifications</li>
         </ul>
       </div>
+
+      <ManualFetchTest />
     </div>
   );
 }
