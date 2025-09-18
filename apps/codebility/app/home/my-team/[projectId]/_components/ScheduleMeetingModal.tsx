@@ -4,10 +4,10 @@ import { useState } from "react";
 import { toast } from "react-hot-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@codevs/ui/input";
+import { Label } from "@codevs/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@codevs/ui/select";
+import { Textarea } from "@codevs/ui/textarea";
 import { Calendar, Clock, MapPin, Users, Video } from "lucide-react";
 import { createNotification } from "@/lib/actions/notification.actions";
 
