@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { ChevronLeft, ChevronRight, Circle, Save, Trophy } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimpleMemberData } from "@/app/home/projects/actions";
@@ -68,7 +68,7 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, a
     if (onSaveStateChange) {
       onSaveStateChange(hasUnsavedChanges, saveAllAttendance);
     }
-  }, [hasUnsavedChanges, onSaveStateChange]);
+  }, [hasUnsavedChanges, saveAllAttendance, onSaveStateChange]);
 
   // Load attendance data from database
   useEffect(() => {
@@ -153,7 +153,7 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, a
   };
 
   // Save all attendance changes
-  const saveAllAttendance = async () => {
+  const saveAllAttendance = useCallback(async () => {
     setIsSaving(true);
     try {
       const records: any[] = [];
@@ -195,7 +195,7 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, a
     } finally {
       setIsSaving(false);
     }
-  };
+  }, [allMembers, monthDays, selectedYear, selectedMonth, attendanceData, projectId, allowWeekendMeetings]);
 
   // Count present days for a member
   const countPresentDays = (memberId: string) => {
