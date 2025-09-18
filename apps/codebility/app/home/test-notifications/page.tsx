@@ -88,13 +88,13 @@ export default function TestNotificationsPage() {
 
     setIsLoading(true);
     try {
-      const { error } = await sendTestNotification({
+      const result = await sendTestNotification({
         recipientId: user.id,
         ...notification,
       });
 
-      if (error) {
-        toast.error("Failed to create notification: " + error);
+      if (result?.error) {
+        toast.error("Failed to create notification: " + result.error);
       } else {
         toast.success("Notification sent!");
       }
