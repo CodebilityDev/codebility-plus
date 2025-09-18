@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { 
   getMembers, 
@@ -10,12 +10,13 @@ import {
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays } from "lucide-react";
+import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
 import AttendanceGrid from "./AttendanceGrid";
 import CompactMemberGrid from "./CompactMemberGrid";
 import SyncAllAttendance from "./SyncAllAttendance";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
+import { getMeetingSchedule } from "../actions";
 
 interface ProjectData {
   project: {
@@ -43,6 +44,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
   const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(true); // Allow by default for teams with weekend meetings
   const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
+  const [currentSchedule, setCurrentSchedule] = useState<{ selectedDays: string[]; time: string } | null>(null);
   const attendanceGridRef = useRef<any>(null);
 
   const { project: projectInfo, teamLead, members, currentUserId } = project;
@@ -50,6 +52,39 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   
   // Check if current user is the team lead
   const isTeamLead = currentUserId && teamLead?.data && teamLead.data.id === currentUserId;
+
+  // Load meeting schedule on component mount
+  useEffect(() => {
+    const loadSchedule = async () => {
+      const result = await getMeetingSchedule(projectInfo.id);
+      if (result.success && result.schedule) {
+        setCurrentSchedule(result.schedule);
+      }
+    };
+    loadSchedule();
+  }, [projectInfo.id]);
+
+  // Format schedule for display
+  const formatSchedule = () => {
+    if (!currentSchedule || !currentSchedule.selectedDays || currentSchedule.selectedDays.length === 0) return null;
+    
+    const weekDays = [
+      { value: "monday", label: "Monday", short: "Mon" },
+      { value: "tuesday", label: "Tuesday", short: "Tue" },
+      { value: "wednesday", label: "Wednesday", short: "Wed" },
+      { value: "thursday", label: "Thursday", short: "Thu" },
+      { value: "friday", label: "Friday", short: "Fri" },
+      { value: "saturday", label: "Saturday", short: "Sat" },
+      { value: "sunday", label: "Sunday", short: "Sun" },
+    ];
+    
+    const selectedDaysDisplay = currentSchedule.selectedDays
+      .map(day => weekDays.find(d => d.value === day)?.short)
+      .filter(Boolean)
+      .join(", ");
+      
+    return `${selectedDaysDisplay} at ${currentSchedule.time} @ Discord`;
+  };
 
   const handleOpenAddModal = () => {
     setShowAddModal(true);
@@ -134,9 +169,42 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     }
   };
 
+  const handleScheduleUpdate = async () => {
+    // Close modal and reload schedule
+    setShowScheduleMeetingModal(false);
+    
+    // Reload the schedule after a short delay to ensure the save is complete
+    setTimeout(async () => {
+      const result = await getMeetingSchedule(projectInfo.id);
+      if (result.success && result.schedule) {
+        setCurrentSchedule(result.schedule);
+      }
+    }, 500);
+  };
+
   return (
     <>
       <div className="space-y-6">
+        {/* Meeting Schedule Banner */}
+        {formatSchedule() && (
+          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2">
+                  <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Meeting Schedule</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mt-0.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    {formatSchedule()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -295,14 +363,16 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           </>
         ) : (
           /* Attendance Grid View */
-          <AttendanceGrid
-            ref={attendanceGridRef}
-            teamMembers={members?.data || []}
-            teamLead={teamLead?.data || null}
-            projectId={projectInfo.id}
-            allowWeekendMeetings={allowWeekendMeetings}
-            onHasChangesUpdate={setHasAttendanceChanges}
-          />
+          <div className="w-full overflow-x-hidden">
+            <AttendanceGrid
+              ref={attendanceGridRef}
+              teamMembers={members?.data || []}
+              teamLead={teamLead?.data || null}
+              projectId={projectInfo.id}
+              allowWeekendMeetings={allowWeekendMeetings}
+              onHasChangesUpdate={setHasAttendanceChanges}
+            />
+          </div>
         )}
       </div>
 
@@ -317,11 +387,12 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       {/* Schedule Meeting Modal */}
       <ScheduleMeetingModal
         isOpen={showScheduleMeetingModal}
-        onClose={() => setShowScheduleMeetingModal(false)}
+        onClose={handleScheduleUpdate}
         projectId={projectInfo.id}
         projectName={projectInfo.name}
         teamMembers={members?.data || []}
         teamLead={teamLead?.data || null}
+        currentSchedule={currentSchedule}
       />
     </>
   );

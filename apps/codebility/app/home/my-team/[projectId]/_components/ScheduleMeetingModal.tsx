@@ -1,16 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@codevs/ui/select";
-import { Textarea } from "@codevs/ui/textarea";
-import { Calendar, Clock, Users, Video, MapPin, AlertCircle } from "lucide-react";
+import { Calendar, Clock, Users, AlertCircle } from "lucide-react";
 import { createNotificationAction } from "@/lib/actions/notification.actions";
-import { Checkbox } from "@/components/ui/checkbox";
+import { saveMeetingSchedule } from "../actions";
 
 interface ScheduleMeetingModalProps {
   isOpen: boolean;
@@ -19,17 +17,16 @@ interface ScheduleMeetingModalProps {
   projectName: string;
   teamMembers: any[];
   teamLead: any;
+  currentSchedule?: {
+    selectedDays: string[];
+    time: string;
+  } | null;
 }
 
-const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMembers, teamLead }: ScheduleMeetingModalProps) => {
+const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMembers, teamLead, currentSchedule }: ScheduleMeetingModalProps) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [meetingData, setMeetingData] = useState({
-    title: "",
-    description: "",
-    time: "",
-    duration: "60",
-    type: "online",
-    location: "",
+    time: "00:00",
     selectedDays: [] as string[],
   });
 
@@ -43,6 +40,24 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
     { value: "sunday", label: "Sunday", short: "Sun" },
   ];
 
+  // Load existing schedule when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      if (currentSchedule) {
+        setMeetingData({
+          time: currentSchedule.time || "00:00",
+          selectedDays: currentSchedule.selectedDays || [],
+        });
+      } else {
+        // Set defaults if no schedule exists
+        setMeetingData({
+          time: "00:00",
+          selectedDays: [],
+        });
+      }
+    }
+  }, [isOpen, currentSchedule]);
+
   const toggleDay = (day: string) => {
     setMeetingData(prev => ({
       ...prev,
@@ -53,13 +68,23 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
   };
 
   const handleSubmit = async () => {
-    if (!meetingData.title || !meetingData.time || meetingData.selectedDays.length === 0) {
-      toast.error("Please fill in all required fields and select at least one day");
+    if (!meetingData.time || meetingData.selectedDays.length === 0) {
+      toast.error("Please select meeting days and time");
       return;
     }
 
     setIsSubmitting(true);
     try {
+      // Check if schedule has changed
+      const hasExistingSchedule = currentSchedule && 
+        currentSchedule.selectedDays.length > 0 && 
+        currentSchedule.time;
+      
+      const scheduleChanged = hasExistingSchedule && (
+        JSON.stringify(currentSchedule.selectedDays.sort()) !== JSON.stringify(meetingData.selectedDays.sort()) ||
+        currentSchedule.time !== meetingData.time
+      );
+      
       // Create a recurring meeting schedule
       const allMembers = teamLead ? [teamLead, ...teamMembers] : teamMembers;
       
@@ -68,22 +93,26 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
         .map(day => weekDays.find(d => d.value === day)?.short)
         .join(", ");
       
-      const scheduleMessage = `Weekly ${meetingData.title} scheduled every ${selectedDaysDisplay} at ${meetingData.time}`;
+      const notificationTitle = scheduleChanged ? "Meeting Schedule Changed" : "Meeting Schedule Set";
+      const scheduleMessage = `Team meetings scheduled every ${selectedDaysDisplay} at ${meetingData.time} @ Discord`;
       
       // Send notifications to all team members
       const notificationPromises = allMembers.map(member => 
         createNotificationAction({
           recipientId: member.id,
-          title: `Recurring Meeting Schedule Set`,
-          message: `${scheduleMessage}. ${meetingData.description ? `Details: ${meetingData.description}` : ''} Location: ${meetingData.type === 'online' ? meetingData.location || 'Meeting link will be shared' : meetingData.location || 'TBD'}`,
+          title: notificationTitle,
+          message: scheduleMessage,
           type: 'event',
           priority: 'high',
           actionUrl: `/home/my-team/${projectId}`,
           metadata: {
             meetingData: {
-              ...meetingData,
+              time: meetingData.time,
+              selectedDays: meetingData.selectedDays,
+              platform: 'Discord',
               recurring: true,
-              schedule: selectedDaysDisplay
+              schedule: selectedDaysDisplay,
+              changed: scheduleChanged
             },
             projectId,
             projectName
@@ -93,19 +122,13 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
 
       await Promise.all(notificationPromises);
       
-      // Save the meeting schedule (you can implement backend storage later)
-      toast.success("Fixed weekly schedule set and team notified!");
-      
-      // Reset form
-      setMeetingData({
-        title: "",
-        description: "",
-        time: "",
-        duration: "60",
-        type: "online",
-        location: "",
-        selectedDays: [],
+      // Save the meeting schedule
+      await saveMeetingSchedule(projectId, {
+        selectedDays: meetingData.selectedDays,
+        time: meetingData.time
       });
+      
+      toast.success(scheduleChanged ? "Meeting schedule updated!" : "Meeting schedule set!");
       
       onClose();
     } catch (error) {
@@ -118,48 +141,18 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg">
+      <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Set Fixed Weekly Meeting Schedule
+            Set Meeting Schedule
           </DialogTitle>
           <DialogDescription>
-            As team lead, set a fixed weekly meeting schedule for {projectName}. This will be the regular meeting time for your team.
+            Set your team's regular meeting schedule @ Discord
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 p-3 border border-blue-200 dark:border-blue-800">
-            <div className="flex items-start gap-2">
-              <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
-              <p className="text-sm text-blue-600 dark:text-blue-400">
-                This will set a recurring weekly schedule. Team members will be notified of the fixed meeting times.
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="title">Meeting Title *</Label>
-            <Input
-              id="title"
-              placeholder="e.g., Team Standup, Sprint Planning"
-              value={meetingData.title}
-              onChange={(e) => setMeetingData({ ...meetingData, title: e.target.value })}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              placeholder="Regular meeting agenda, topics to discuss..."
-              value={meetingData.description}
-              onChange={(e) => setMeetingData({ ...meetingData, description: e.target.value })}
-              rows={3}
-            />
-          </div>
-
           <div className="space-y-2">
             <Label>Select Days *</Label>
             <div className="grid grid-cols-4 gap-2">
@@ -167,9 +160,9 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
                 <div
                   key={day.value}
                   className={`
-                    flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-colors
+                    flex items-center justify-center p-3 rounded-lg border cursor-pointer transition-all
                     ${meetingData.selectedDays.includes(day.value)
-                      ? 'bg-blue-500 text-white border-blue-500'
+                      ? 'bg-blue-500 text-white border-blue-500 shadow-sm'
                       : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
                     }
                   `}
@@ -179,91 +172,30 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
                 </div>
               ))}
             </div>
-            <p className="text-xs text-gray-500">Click to select meeting days (e.g., MWF for Mon/Wed/Fri)</p>
-          </div>
-
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="time">Meeting Time *</Label>
-              <Input
-                id="time"
-                type="time"
-                value={meetingData.time}
-                onChange={(e) => setMeetingData({ ...meetingData, time: e.target.value })}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="duration">Duration</Label>
-              <Select
-                value={meetingData.duration}
-                onValueChange={(value) => setMeetingData({ ...meetingData, duration: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="30">30 minutes</SelectItem>
-                  <SelectItem value="60">1 hour</SelectItem>
-                  <SelectItem value="90">1.5 hours</SelectItem>
-                  <SelectItem value="120">2 hours</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
           </div>
 
           <div className="space-y-2">
-            <Label htmlFor="type">Meeting Type</Label>
-            <Select
-              value={meetingData.type}
-              onValueChange={(value) => setMeetingData({ ...meetingData, type: value })}
-            >
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="online">
-                  <div className="flex items-center gap-2">
-                    <Video className="h-4 w-4" />
-                    Online Meeting
-                  </div>
-                </SelectItem>
-                <SelectItem value="in-person">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    In-Person Meeting
-                  </div>
-                </SelectItem>
-              </SelectContent>
-            </Select>
+            <Label htmlFor="time">Meeting Time *</Label>
+            <Input
+              id="time"
+              type="time"
+              value={meetingData.time}
+              onChange={(e) => setMeetingData({ ...meetingData, time: e.target.value })}
+              className="w-full"
+            />
           </div>
 
-          {meetingData.type === "online" ? (
-            <div className="space-y-2">
-              <Label htmlFor="location">Meeting Link</Label>
-              <Input
-                id="location"
-                placeholder="https://meet.google.com/abc-defg-hij"
-                value={meetingData.location}
-                onChange={(e) => setMeetingData({ ...meetingData, location: e.target.value })}
-              />
-            </div>
-          ) : (
-            <div className="space-y-2">
-              <Label htmlFor="location">Location</Label>
-              <Input
-                id="location"
-                placeholder="Conference Room A, Office Address"
-                value={meetingData.location}
-                onChange={(e) => setMeetingData({ ...meetingData, location: e.target.value })}
-              />
-            </div>
-          )}
-
-          <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
-            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Users className="h-4 w-4" />
-              <span>{teamMembers.length + (teamLead ? 1 : 0)} team members will be notified of this fixed schedule</span>
+          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 p-3 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+              <div className="space-y-1">
+                <p className="text-sm text-blue-600 dark:text-blue-400">
+                  All meetings will be held on Discord
+                </p>
+                <p className="text-xs text-blue-500 dark:text-blue-300">
+                  {teamMembers.length + 1} team members will be notified
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -273,7 +205,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Setting Schedule..." : "Set Weekly Schedule"}
+            {isSubmitting ? "Setting..." : "Set Schedule"}
           </Button>
         </DialogFooter>
       </DialogContent>

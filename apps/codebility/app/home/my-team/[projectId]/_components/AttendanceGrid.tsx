@@ -263,10 +263,10 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 w-full max-w-full overflow-hidden">
 
       {/* Attendance Table */}
-      <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 overflow-hidden">
+      <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 overflow-hidden max-w-full lg:max-w-6xl xl:max-w-7xl">
         {/* Header */}
         <div className="bg-gray-50 dark:bg-gray-900 p-2 sm:p-3 border-b border-gray-200 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
@@ -332,11 +332,11 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
         </div>
 
       {/* Attendance Grid */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
+      <div className="overflow-x-auto max-w-full">
+        <table className="w-full table-auto">
           <thead>
             <tr className="border-b border-gray-200 dark:border-gray-700">
-              <th className="sticky left-0 z-10 bg-gray-50 dark:bg-gray-900 text-left p-1 sm:p-2 text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 min-w-[80px] sm:min-w-[150px]">
+              <th className="sticky left-0 z-10 bg-gray-50 dark:bg-gray-900 text-left p-1 sm:p-2 text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 w-28 sm:w-36">
                 <span className="hidden sm:inline">Team Member</span>
                 <span className="sm:hidden">Member</span>
               </th>
@@ -346,7 +346,7 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
                 return (
                   <th
                     key={day}
-                    className={`p-0 text-center text-[9px] font-medium min-w-[20px] sm:min-w-[28px] ${
+                    className={`p-0 text-center text-[9px] font-medium w-7 sm:w-8 ${
                       isWeekend 
                         ? 'bg-gray-100 dark:bg-gray-800 text-gray-400' 
                         : 'text-gray-700 dark:text-gray-300'
@@ -356,7 +356,7 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
                   </th>
                 );
               })}
-              <th className="sticky right-0 z-10 bg-green-50 dark:bg-green-900/20 text-center p-1 text-[9px] font-medium text-gray-700 dark:text-gray-300 min-w-[40px] sm:min-w-[60px]">
+              <th className="sticky right-0 z-10 bg-green-50 dark:bg-green-900/20 text-center p-1 text-[9px] font-medium text-gray-700 dark:text-gray-300 w-14 sm:w-16">
                 <div className="text-[8px] sm:text-[10px]">Days</div>
                 <div className="text-[8px] sm:text-[10px] font-normal text-gray-500">Pts</div>
               </th>
@@ -375,7 +375,7 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
                   <td className="sticky left-0 z-10 bg-inherit p-1 sm:p-2">
                     <div className="flex flex-col">
                       <div className="flex items-center gap-1">
-                        <span className="font-medium text-[9px] sm:text-[11px] text-gray-900 dark:text-white truncate max-w-[60px] sm:max-w-[120px]">
+                        <span className="font-medium text-[9px] sm:text-[11px] text-gray-900 dark:text-white truncate max-w-[50px] sm:max-w-[100px]">
                           <span className="sm:hidden">{member.first_name.charAt(0)}. {member.last_name.charAt(0)}.</span>
                           <span className="hidden sm:inline">{member.first_name} {member.last_name}</span>
                         </span>
@@ -399,7 +399,7 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
                     return (
                       <td
                         key={day}
-                        className={`p-0 sm:p-0.5 text-center ${
+                        className={`p-0 sm:p-0.5 text-center w-7 sm:w-8 ${
                           isWeekend ? 'bg-gray-100 dark:bg-gray-800' : ''
                         }`}
                       >
