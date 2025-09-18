@@ -8,8 +8,9 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@codevs/ui/select";
 import { Textarea } from "@codevs/ui/textarea";
-import { Calendar, Clock, MapPin, Users, Video } from "lucide-react";
+import { Calendar, Clock, Users, Video, MapPin, AlertCircle } from "lucide-react";
 import { createNotificationAction } from "@/lib/actions/notification.actions";
+import { Checkbox } from "@/components/ui/checkbox";
 
 interface ScheduleMeetingModalProps {
   isOpen: boolean;
@@ -25,37 +26,65 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
   const [meetingData, setMeetingData] = useState({
     title: "",
     description: "",
-    date: "",
     time: "",
     duration: "60",
     type: "online",
     location: "",
-    isRecurring: false,
-    recurringFrequency: "weekly"
+    selectedDays: [] as string[],
   });
 
+  const weekDays = [
+    { value: "monday", label: "Monday", short: "Mon" },
+    { value: "tuesday", label: "Tuesday", short: "Tue" },
+    { value: "wednesday", label: "Wednesday", short: "Wed" },
+    { value: "thursday", label: "Thursday", short: "Thu" },
+    { value: "friday", label: "Friday", short: "Fri" },
+    { value: "saturday", label: "Saturday", short: "Sat" },
+    { value: "sunday", label: "Sunday", short: "Sun" },
+  ];
+
+  const toggleDay = (day: string) => {
+    setMeetingData(prev => ({
+      ...prev,
+      selectedDays: prev.selectedDays.includes(day)
+        ? prev.selectedDays.filter(d => d !== day)
+        : [...prev.selectedDays, day]
+    }));
+  };
+
   const handleSubmit = async () => {
-    if (!meetingData.title || !meetingData.date || !meetingData.time) {
-      toast.error("Please fill in all required fields");
+    if (!meetingData.title || !meetingData.time || meetingData.selectedDays.length === 0) {
+      toast.error("Please fill in all required fields and select at least one day");
       return;
     }
 
     setIsSubmitting(true);
     try {
-      // Create notifications for all team members
+      // Create a recurring meeting schedule
       const allMembers = teamLead ? [teamLead, ...teamMembers] : teamMembers;
-      const meetingDateTime = new Date(`${meetingData.date}T${meetingData.time}`);
       
+      // Format selected days for display
+      const selectedDaysDisplay = meetingData.selectedDays
+        .map(day => weekDays.find(d => d.value === day)?.short)
+        .join(", ");
+      
+      const scheduleMessage = `Weekly ${meetingData.title} scheduled every ${selectedDaysDisplay} at ${meetingData.time}`;
+      
+      // Send notifications to all team members
       const notificationPromises = allMembers.map(member => 
         createNotificationAction({
           recipientId: member.id,
-          title: `Meeting Scheduled: ${meetingData.title}`,
-          message: `A meeting has been scheduled for ${meetingDateTime.toLocaleDateString()} at ${meetingData.time}. ${meetingData.description ? `Details: ${meetingData.description}` : ''}`,
+          title: `Recurring Meeting Schedule Set`,
+          message: `${scheduleMessage}. ${meetingData.description ? `Details: ${meetingData.description}` : ''} Location: ${meetingData.type === 'online' ? meetingData.location || 'Meeting link will be shared' : meetingData.location || 'TBD'}`,
           type: 'event',
           priority: 'high',
           actionUrl: `/home/my-team/${projectId}`,
           metadata: {
-            meetingData,
+            meetingData: {
+              ...meetingData,
+              recurring: true,
+              schedule: selectedDaysDisplay
+            },
             projectId,
             projectName
           }
@@ -64,11 +93,24 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
 
       await Promise.all(notificationPromises);
       
-      toast.success("Meeting scheduled and team members notified!");
+      // Save the meeting schedule (you can implement backend storage later)
+      toast.success("Fixed weekly schedule set and team notified!");
+      
+      // Reset form
+      setMeetingData({
+        title: "",
+        description: "",
+        time: "",
+        duration: "60",
+        type: "online",
+        location: "",
+        selectedDays: [],
+      });
+      
       onClose();
     } catch (error) {
-      console.error("Error scheduling meeting:", error);
-      toast.error("Failed to schedule meeting");
+      console.error("Error setting meeting schedule:", error);
+      toast.error("Failed to set meeting schedule");
     } finally {
       setIsSubmitting(false);
     }
@@ -80,19 +122,28 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5" />
-            Schedule Team Meeting
+            Set Fixed Weekly Meeting Schedule
           </DialogTitle>
           <DialogDescription>
-            Schedule a meeting for {projectName} team. All team members will be notified.
+            As team lead, set a fixed weekly meeting schedule for {projectName}. This will be the regular meeting time for your team.
           </DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4 py-4">
+          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 p-3 border border-blue-200 dark:border-blue-800">
+            <div className="flex items-start gap-2">
+              <AlertCircle className="h-4 w-4 text-blue-600 dark:text-blue-400 mt-0.5" />
+              <p className="text-sm text-blue-600 dark:text-blue-400">
+                This will set a recurring weekly schedule. Team members will be notified of the fixed meeting times.
+              </p>
+            </div>
+          </div>
+
           <div className="space-y-2">
             <Label htmlFor="title">Meeting Title *</Label>
             <Input
               id="title"
-              placeholder="e.g., Sprint Planning Meeting"
+              placeholder="e.g., Team Standup, Sprint Planning"
               value={meetingData.title}
               onChange={(e) => setMeetingData({ ...meetingData, title: e.target.value })}
             />
@@ -102,27 +153,38 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
-              placeholder="Meeting agenda and details..."
+              placeholder="Regular meeting agenda, topics to discuss..."
               value={meetingData.description}
               onChange={(e) => setMeetingData({ ...meetingData, description: e.target.value })}
               rows={3}
             />
           </div>
 
+          <div className="space-y-2">
+            <Label>Select Days *</Label>
+            <div className="grid grid-cols-4 gap-2">
+              {weekDays.map(day => (
+                <div
+                  key={day.value}
+                  className={`
+                    flex items-center justify-center p-2 rounded-lg border cursor-pointer transition-colors
+                    ${meetingData.selectedDays.includes(day.value)
+                      ? 'bg-blue-500 text-white border-blue-500'
+                      : 'bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700'
+                    }
+                  `}
+                  onClick={() => toggleDay(day.value)}
+                >
+                  <span className="text-sm font-medium">{day.short}</span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-gray-500">Click to select meeting days (e.g., MWF for Mon/Wed/Fri)</p>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="date">Date *</Label>
-              <Input
-                id="date"
-                type="date"
-                value={meetingData.date}
-                onChange={(e) => setMeetingData({ ...meetingData, date: e.target.value })}
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="time">Time *</Label>
+              <Label htmlFor="time">Meeting Time *</Label>
               <Input
                 id="time"
                 type="time"
@@ -130,11 +192,9 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
                 onChange={(e) => setMeetingData({ ...meetingData, time: e.target.value })}
               />
             </div>
-          </div>
 
-          <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="duration">Duration (minutes)</Label>
+              <Label htmlFor="duration">Duration</Label>
               <Select
                 value={meetingData.duration}
                 onValueChange={(value) => setMeetingData({ ...meetingData, duration: value })}
@@ -150,32 +210,32 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
                 </SelectContent>
               </Select>
             </div>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="type">Meeting Type</Label>
-              <Select
-                value={meetingData.type}
-                onValueChange={(value) => setMeetingData({ ...meetingData, type: value })}
-              >
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="online">
-                    <div className="flex items-center gap-2">
-                      <Video className="h-4 w-4" />
-                      Online
-                    </div>
-                  </SelectItem>
-                  <SelectItem value="in-person">
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      In-Person
-                    </div>
-                  </SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="type">Meeting Type</Label>
+            <Select
+              value={meetingData.type}
+              onValueChange={(value) => setMeetingData({ ...meetingData, type: value })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="online">
+                  <div className="flex items-center gap-2">
+                    <Video className="h-4 w-4" />
+                    Online Meeting
+                  </div>
+                </SelectItem>
+                <SelectItem value="in-person">
+                  <div className="flex items-center gap-2">
+                    <MapPin className="h-4 w-4" />
+                    In-Person Meeting
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
           </div>
 
           {meetingData.type === "online" ? (
@@ -193,17 +253,17 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
               <Label htmlFor="location">Location</Label>
               <Input
                 id="location"
-                placeholder="Conference Room A"
+                placeholder="Conference Room A, Office Address"
                 value={meetingData.location}
                 onChange={(e) => setMeetingData({ ...meetingData, location: e.target.value })}
               />
             </div>
           )}
 
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 p-3">
-            <div className="flex items-center gap-2 text-sm text-blue-600 dark:text-blue-400">
+          <div className="rounded-lg bg-gray-50 dark:bg-gray-900 p-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
               <Users className="h-4 w-4" />
-              <span>{teamMembers.length + (teamLead ? 1 : 0)} team members will be notified</span>
+              <span>{teamMembers.length + (teamLead ? 1 : 0)} team members will be notified of this fixed schedule</span>
             </div>
           </div>
         </div>
@@ -213,7 +273,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
             Cancel
           </Button>
           <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Scheduling..." : "Schedule Meeting"}
+            {isSubmitting ? "Setting Schedule..." : "Set Weekly Schedule"}
           </Button>
         </DialogFooter>
       </DialogContent>
