@@ -4,9 +4,14 @@ import { useEffect, useRef } from "react";
 import { useNotificationStore } from "@/store/notification-store";
 import { NotificationIcon } from "./NotificationIcon";
 import { NotificationPanel } from "./NotificationPanel";
+import { createClientClientComponent } from "@/utils/supabase/client";
+import { useUserStore } from "@/store/codev-store";
+import { toast } from "sonner";
 
 export function NotificationContainer() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const supabase = createClientClientComponent();
+  const { user } = useUserStore();
   const {
     notifications,
     isOpen,
@@ -17,9 +22,54 @@ export function NotificationContainer() {
     archiveNotification,
     clearAll,
     getUnreadCount,
+    fetchNotifications,
+    addNotification,
   } = useNotificationStore();
 
   const unreadCount = getUnreadCount();
+
+  // Fetch notifications on mount
+  useEffect(() => {
+    if (user?.id) {
+      fetchNotifications();
+    }
+  }, [user?.id, fetchNotifications]);
+
+  // Set up real-time subscription
+  useEffect(() => {
+    if (!user?.id) return;
+
+    const channel = supabase
+      .channel(`notifications:${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `recipient_id=eq.${user.id}`,
+        },
+        (payload) => {
+          console.log("New notification received:", payload);
+          const newNotification = {
+            ...payload.new,
+            createdAt: new Date(payload.new.created_at),
+          };
+          addNotification(newNotification as any);
+          
+          // Show toast notification
+          toast.success(payload.new.title, {
+            description: payload.new.message,
+            duration: 5000,
+          });
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [user?.id, addNotification, supabase]);
 
   // Close panel when clicking outside
   useEffect(() => {

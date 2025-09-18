@@ -15,7 +15,6 @@ import {
 } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { NotificationContainer } from "@/components/notifications/NotificationContainer";
-import { NotificationDemo } from "@/components/notifications/NotificationDemo";
 
 import {
   DropdownMenu,
@@ -179,7 +178,6 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
-  {/*   <NotificationDemo /> */}
     </>
   );
 };
