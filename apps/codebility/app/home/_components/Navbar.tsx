@@ -32,8 +32,8 @@ export const defaultMenuItems = [
 ];
 
 export const adminMenus = [
-  { href: "/home/account-settings", icon: IconCog, label: "Settings" },
   { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
+  { href: "/home/account-settings", icon: IconCog, label: "Settings" },
 ];
 
 const Navbar = () => {
