@@ -28,13 +28,16 @@ export function NotificationContainer() {
 
   const unreadCount = getUnreadCount();
 
-  // Fetch notifications on mount and when panel opens
+  // Fetch notifications on mount and when user changes
   useEffect(() => {
+    console.log("useEffect triggered - user?.id:", user?.id);
     if (user?.id) {
       console.log("Fetching notifications for user:", user.id);
       fetchNotifications();
+    } else {
+      console.log("No user ID, skipping fetch");
     }
-  }, [user?.id]);
+  }, [user?.id]); // Remove fetchNotifications from deps to avoid circular dependency
 
   // Also fetch when panel opens
   useEffect(() => {
@@ -42,7 +45,7 @@ export function NotificationContainer() {
       console.log("Panel opened, fetching latest notifications");
       fetchNotifications();
     }
-  }, [isOpen, user?.id]);
+  }, [isOpen, user?.id]); // Remove fetchNotifications from deps
 
   // Set up real-time subscription
   useEffect(() => {

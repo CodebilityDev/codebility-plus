@@ -110,7 +110,7 @@ export default function TestNotificationsPage() {
 
   return (
     <div className="container mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Test Notifications</h1>
+      <h1 className="text-2xl font-bold mb-6 text-gray-900 dark:text-white">Test Notifications</h1>
       <p className="text-gray-600 dark:text-gray-400 mb-8">
         Click any notification below to send it to yourself. The notification will appear in real-time in your notification panel.
       </p>
