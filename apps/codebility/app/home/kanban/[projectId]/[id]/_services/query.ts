@@ -35,7 +35,7 @@ export const getBoardData = async (boardId: String) => {
       const columnIds = boardData.kanban_columns.map((col: any) => col.id);
       
       const { data: tasks, error: tasksError } = await supabase
-        .from("task")
+        .from("tasks")
         .select(`
           id,
           title,
@@ -50,15 +50,15 @@ export const getBoardData = async (boardId: String) => {
           created_by,
           kanban_column_id,
           is_archive,
-          codev!task_codev_id_fkey (
+          codev!tasks_codev_id_fkey (
             id,
             first_name,
             last_name,
             image_url
           ),
-          skill_category!task_skill_category_id_fkey (
+          skill_category!tasks_skill_category_id_fkey (
             id,
-            title
+            name
           )
         `)
         .in("kanban_column_id", columnIds)
