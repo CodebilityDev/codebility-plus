@@ -1,11 +1,11 @@
-import { createServerClient } from "@/utils/supabase/server";
+import { createClientServerComponent } from "@/utils/supabase/server";
 import { Notification } from "@/types/notifications";
 
 /**
  * Fetch notifications for the current user
  */
 export async function getNotifications(limit: number = 50) {
-  const supabase = createServerClient();
+  const supabase = await createClientServerComponent();
 
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session?.user) {
@@ -40,7 +40,7 @@ export async function getNotifications(limit: number = 50) {
  * Mark a notification as read
  */
 export async function markNotificationAsRead(notificationId: string) {
-  const supabase = createServerClient();
+  const supabase = await createClientServerComponent();
 
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session?.user) {
@@ -64,7 +64,7 @@ export async function markNotificationAsRead(notificationId: string) {
  * Mark all notifications as read for the current user
  */
 export async function markAllNotificationsAsRead() {
-  const supabase = createServerClient();
+  const supabase = await createClientServerComponent();
 
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session?.user) {
@@ -87,7 +87,7 @@ export async function markAllNotificationsAsRead() {
  * Archive (soft delete) a notification
  */
 export async function archiveNotification(notificationId: string) {
-  const supabase = createServerClient();
+  const supabase = await createClientServerComponent();
 
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session?.user) {
@@ -112,7 +112,7 @@ export async function archiveNotification(notificationId: string) {
  * Delete all notifications for the current user
  */
 export async function clearAllNotifications() {
-  const supabase = createServerClient();
+  const supabase = await createClientServerComponent();
 
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session?.user) {
@@ -136,7 +136,7 @@ export async function clearAllNotifications() {
  * Get notification preferences for the current user
  */
 export async function getNotificationPreferences() {
-  const supabase = createServerClient();
+  const supabase = await createClientServerComponent();
 
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session?.user) {
@@ -162,7 +162,7 @@ export async function getNotificationPreferences() {
  * Update notification preferences for the current user
  */
 export async function updateNotificationPreferences(preferences: any) {
-  const supabase = createServerClient();
+  const supabase = await createClientServerComponent();
 
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session?.user) {
@@ -213,7 +213,7 @@ export async function createNotification({
   projectId?: string;
   jobId?: string;
 }) {
-  const supabase = createServerClient();
+  const supabase = await createClientServerComponent();
 
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session?.user) {
