@@ -27,6 +27,13 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       notFound();
     }
 
+    // Get the current user's codev id
+    const { data: currentCodev } = await supabase
+      .from("codev")
+      .select("id")
+      .eq("email_address", user.email)
+      .single();
+
     // Fetch user projects to verify access
     const userProjectsResponse = await getUserProjects();
     
@@ -48,6 +55,11 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
     ]);
 
     if (teamLead.error || members.error) {
+      console.error("Team data fetch error:", {
+        teamLeadError: teamLead.error,
+        membersError: members.error,
+        projectId
+      });
       throw new Error("Failed to load team data");
     }
 
@@ -55,7 +67,7 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       project: project.project,
       teamLead: teamLead,
       members: members,
-      currentUserId: user.id
+      currentUserId: currentCodev?.id || null
     };
 
     return (
