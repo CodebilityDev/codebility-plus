@@ -43,7 +43,7 @@ export default function SyncAllAttendance({ projectId, isTeamLead }: SyncAllAtte
       disabled={isSyncing}
       size="sm"
       variant="outline"
-      className="flex items-center gap-1.5 text-xs"
+      className="flex items-center gap-1.5 text-xs border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
       title="Sync all team members' attendance points"
     >
       <RefreshCw className={`h-3.5 w-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
