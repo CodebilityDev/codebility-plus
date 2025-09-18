@@ -213,7 +213,13 @@ export async function createNotification({
   projectId?: string;
   jobId?: string;
 }) {
-  const supabase = await createClientServerComponent();
+  let supabase;
+  try {
+    supabase = await createClientServerComponent();
+  } catch (error) {
+    console.error("Failed to create Supabase client:", error);
+    return { data: null, error: "Failed to initialize database connection" };
+  }
 
   const { data: session } = await supabase.auth.getSession();
   if (!session?.session?.user) {
@@ -229,13 +235,19 @@ export async function createNotification({
     p_action_url: actionUrl,
     p_metadata: metadata || {},
     p_sender_id: senderId || session.session.user.id,
-    p_project_id: projectId,
-    p_job_id: jobId,
+    p_project_id: projectId || null,
+    p_job_id: jobId || null,
   });
 
   if (error) {
     console.error("Error creating notification:", error);
     return { data: null, error: error.message };
+  }
+
+  // The function returns NULL if duplicate or notifications disabled
+  if (data === null) {
+    console.log("Notification not created (duplicate or disabled)");
+    return { data: "skipped", error: null };
   }
 
   return { data, error: null };

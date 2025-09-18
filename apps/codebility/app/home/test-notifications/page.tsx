@@ -101,7 +101,7 @@ export default function TestNotificationsPage() {
       }
     } catch (error) {
       toast.error("Failed to create notification");
-      console.error(error);
+      console.error("Error details:", error);
     } finally {
       setIsLoading(false);
     }

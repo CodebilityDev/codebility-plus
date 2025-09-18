@@ -13,13 +13,22 @@ export async function sendTestNotification(notification: {
   metadata?: any;
 }): Promise<{ data: string | null; error: string | null }> {
   try {
+    console.log("Sending notification:", notification);
+    
     const result = await createNotification({
-      ...notification,
+      recipientId: notification.recipientId,
+      title: notification.title,
+      message: notification.message,
+      type: notification.type,
+      priority: notification.priority,
       actionUrl: notification.action_url,
+      metadata: notification.metadata,
     });
+    
+    console.log("Notification result:", result);
     return result;
   } catch (error) {
     console.error("Error in sendTestNotification:", error);
-    return { data: null, error: "Failed to create notification" };
+    return { data: null, error: error instanceof Error ? error.message : "Failed to create notification" };
   }
 }
