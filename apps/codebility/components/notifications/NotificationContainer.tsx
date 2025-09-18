@@ -30,19 +30,15 @@ export function NotificationContainer() {
 
   // Fetch notifications on mount and when user changes
   useEffect(() => {
-    console.log("useEffect triggered - user?.id:", user?.id);
     if (user?.id) {
-      console.log("Fetching notifications for user:", user.id);
       fetchNotifications();
     } else {
-      console.log("No user ID, skipping fetch");
     }
   }, [user?.id]); // Remove fetchNotifications from deps to avoid circular dependency
 
   // Also fetch when panel opens
   useEffect(() => {
     if (isOpen && user?.id) {
-      console.log("Panel opened, fetching latest notifications");
       fetchNotifications();
     }
   }, [isOpen, user?.id]); // Remove fetchNotifications from deps
@@ -62,7 +58,6 @@ export function NotificationContainer() {
           filter: `recipient_id=eq.${user.id}`,
         },
         (payload) => {
-          console.log("New notification received:", payload);
           const newNotification = {
             ...payload.new,
             createdAt: new Date(payload.new.created_at),
@@ -115,14 +110,6 @@ export function NotificationContainer() {
   }, [isOpen, setOpen]);
 
   // Add debug info
-  console.log("NotificationContainer render:", {
-    user: user?.id,
-    notificationCount: notifications.length,
-    unreadCount,
-    isOpen,
-    isLoading: useNotificationStore.getState().isLoading,
-    error: useNotificationStore.getState().error
-  });
 
   return (
     <div ref={containerRef} className="relative">

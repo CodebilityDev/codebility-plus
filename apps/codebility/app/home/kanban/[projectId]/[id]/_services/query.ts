@@ -21,8 +21,22 @@ export const getBoardData = async (boardId: String) => {
         name,
         position,
         created_at,
-        updated_at,
-        tasks (
+        updated_at
+      )
+    `,
+    )
+    .eq("id", boardId)
+    .single();
+
+    if (error) throw error;
+
+    // Fetch tasks separately with proper filtering
+    if (boardData?.kanban_columns) {
+      const columnIds = boardData.kanban_columns.map((col: any) => col.id);
+      
+      const { data: tasks, error: tasksError } = await supabase
+        .from("task")
+        .select(`
           id,
           title,
           description,
@@ -36,22 +50,29 @@ export const getBoardData = async (boardId: String) => {
           created_by,
           kanban_column_id,
           is_archive,
-          codev!tasks_codev_id_fkey (
+          codev!task_codev_id_fkey (
             id,
             first_name,
             last_name,
             image_url
           ),
-          skill_category!tasks_skill_category_id_fkey (
+          skill_category!task_skill_category_id_fkey (
             id,
-            name
+            title
           )
-        )
-      )
-    `,
-    )
-    .eq("id", boardId)
-    .single();
+        `)
+        .in("kanban_column_id", columnIds)
+        .eq("is_archive", false)
+        .order("created_at", { ascending: true });
+
+      if (tasksError) throw tasksError;
+
+      // Attach tasks to their respective columns
+      boardData.kanban_columns = boardData.kanban_columns.map((column: any) => ({
+        ...column,
+        tasks: tasks?.filter((task: any) => task.kanban_column_id === column.id) || []
+      }));
+    }
 
     if (error) throw error;
 
