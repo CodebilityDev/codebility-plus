@@ -44,12 +44,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(false);
 
   const { project: projectInfo, teamLead, members, currentUserId } = project;
-  const membersData = members?.data || [];
-  const teamLeadData = teamLead?.data || null;
-  const totalMembers = membersData.length + (teamLeadData ? 1 : 0);
+  const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
   
   // Check if current user is the team lead
-  const isTeamLead = currentUserId && teamLeadData && teamLeadData.id === currentUserId;
+  const isTeamLead = currentUserId && teamLead?.data && teamLead.data.id === currentUserId;
 
   const handleOpenAddModal = () => {
     setShowAddModal(true);
@@ -260,8 +258,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             {/* Team Members Grid */}
             {totalMembers > 0 ? (
               <CompactMemberGrid 
-                members={membersData}
-                teamLead={teamLeadData}
+                members={members?.data || []}
+                teamLead={teamLead?.data || null}
               />
             ) : (
               <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 py-12 dark:border-gray-700">
@@ -287,8 +285,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         ) : (
           /* Attendance Grid View */
           <AttendanceGrid
-            teamMembers={membersData}
-            teamLead={teamLeadData}
+            teamMembers={members?.data || []}
+            teamLead={teamLead?.data || null}
             projectId={projectInfo.id}
             allowWeekendMeetings={allowWeekendMeetings}
             onSaveStateChange={(hasChanges, saveFunction) => {
