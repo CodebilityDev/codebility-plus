@@ -60,7 +60,7 @@ const STATUS_CONFIG: Record<
     className: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/20 dark:text-indigo-400",
   },
 };
-
+ 
 const CodevCard = ({ codev, color }: Props) => {
   const [hovered, setHovered] = useState(false);
   const springConfig = { stiffness: 100, damping: 5 };
