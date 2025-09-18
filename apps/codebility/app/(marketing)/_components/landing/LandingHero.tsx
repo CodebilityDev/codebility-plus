@@ -60,7 +60,7 @@ const Hero = () => {
             />
           </div>
 
-          <div className="grid w-full grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-5">
+          <div className="grid w-full grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-2 lg:gap-5">
             {MarketingCardData.map((data, index) => (
               <HeroCard
                 key={index}
