@@ -36,8 +36,9 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, a
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
   const [attendanceData, setAttendanceData] = useState<AttendanceData>({});
 
-  // Combine team lead and members
-  const allMembers = teamLead ? [teamLead, ...teamMembers] : teamMembers;
+  // Safely combine team lead and members
+  const safeTeamMembers = teamMembers || [];
+  const allMembers = teamLead ? [teamLead, ...safeTeamMembers] : safeTeamMembers;
 
   // Get days in selected month
   const getDaysInMonth = (year: number, month: number) => {
@@ -240,6 +241,21 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, a
       setSelectedMonth(selectedMonth + 1);
     }
   };
+
+  // Early return if no members
+  if (!allMembers || allMembers.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 py-12 dark:border-gray-700">
+        <Calendar className="h-12 w-12 text-gray-400" />
+        <h4 className="mt-4 text-lg font-semibold text-gray-900 dark:text-white">
+          No team members to track attendance
+        </h4>
+        <p className="mt-2 text-sm text-gray-600 dark:text-gray-400">
+          Add team members to start tracking attendance.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
