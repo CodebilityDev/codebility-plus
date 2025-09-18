@@ -82,7 +82,7 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
                     alt={`${member.first_name} ${member.last_name}`}
                     width={40}
                     height={40}
-                    className="rounded-full object-cover"
+                    className="h-10 w-10 rounded-full object-cover"
                   />
                 ) : (
                   <DefaultAvatar size={40} />
