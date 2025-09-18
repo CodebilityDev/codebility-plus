@@ -37,7 +37,7 @@ export function NotificationContainer() {
 
   // Set up real-time subscription
   useEffect(() => {
-    if (!user?.id) return;
+    if (!user?.id || !supabase) return;
 
     const channel = supabase
       .channel(`notifications:${user.id}`)
@@ -57,17 +57,22 @@ export function NotificationContainer() {
           };
           addNotification(newNotification as any);
           
-          // Show toast notification
-          toast.success(payload.new.title, {
-            description: payload.new.message,
-            duration: 5000,
-          });
+          // Only show toast for notifications from other users
+          // Check if sender_id exists and is different from current user
+          if (payload.new.sender_id && payload.new.sender_id !== user.id) {
+            toast.info(payload.new.title, {
+              description: payload.new.message,
+              duration: 5000,
+            });
+          }
         }
       )
       .subscribe();
 
     return () => {
-      supabase.removeChannel(channel);
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
     };
   }, [user?.id, addNotification, supabase]);
 

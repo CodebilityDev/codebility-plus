@@ -96,7 +96,8 @@ export default function TestNotificationsPage() {
       if (result?.error) {
         toast.error("Failed to create notification: " + result.error);
       } else {
-        toast.success("Notification sent!");
+        // Don't show success toast here, the notification will appear in the panel
+        console.log("Notification created successfully");
       }
     } catch (error) {
       toast.error("Failed to create notification");
