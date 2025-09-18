@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { toast } from "react-hot-toast";
 import { 
   getMembers, 
@@ -35,8 +35,6 @@ interface TeamDetailViewProps {
 }
 
 const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
-  console.log("TeamDetailView received projectData:", projectData);
-  
   const [project, setProject] = useState(projectData);
   const [showAddModal, setShowAddModal] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
@@ -46,22 +44,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(false);
 
   const { project: projectInfo, teamLead, members, currentUserId } = project;
-  
-  console.log("Destructured data:", {
-    projectInfo,
-    teamLead,
-    members,
-    currentUserId
-  });
   const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
-  
-  console.log("Calculated totalMembers:", totalMembers);
-  console.log("members?.data:", members?.data);
-  console.log("teamLead?.data:", teamLead?.data);
   
   // Check if current user is the team lead
   const isTeamLead = currentUserId && teamLead?.data && teamLead.data.id === currentUserId;
-  console.log("isTeamLead:", isTeamLead);
 
   const handleOpenAddModal = () => {
     setShowAddModal(true);
@@ -159,12 +145,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               <Button
                 variant={viewMode === "attendance" ? "default" : "outline"}
                 size="sm"
-                onClick={() => {
-                  console.log("Switching to attendance view");
-                  console.log("Current members data:", members);
-                  console.log("Current teamLead data:", teamLead);
-                  setViewMode("attendance");
-                }}
+                onClick={() => setViewMode("attendance")}
                 className="flex items-center gap-2"
               >
                 <Table className="h-4 w-4" />
@@ -308,10 +289,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             teamLead={teamLead?.data || null}
             projectId={projectInfo.id}
             allowWeekendMeetings={allowWeekendMeetings}
-            onSaveStateChange={(hasChanges, saveFunction) => {
+            onSaveStateChange={useCallback((hasChanges, saveFunction) => {
               setHasAttendanceChanges(hasChanges);
               setSaveAttendanceFunction(() => saveFunction);
-            }}
+            }, [])}
           />
         )}
       </div>

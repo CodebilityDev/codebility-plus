@@ -48,13 +48,6 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
     ]);
 
     if (teamLead.error || members.error) {
-      console.error("Team data fetch error:", {
-        teamLeadError: teamLead.error,
-        membersError: members.error,
-        teamLead,
-        members,
-        projectId
-      });
       throw new Error("Failed to load team data");
     }
 
