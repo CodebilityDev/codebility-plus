@@ -26,9 +26,11 @@ interface AttendanceGridProps {
   teamMembers: SimpleMemberData[];
   teamLead: SimpleMemberData | null;
   projectId: string;
+  onSaveStateChange?: (hasChanges: boolean, saveFunction: () => Promise<void>) => void;
+  allowWeekendMeetings?: boolean;
 }
 
-const AttendanceGrid = ({ teamMembers, teamLead, projectId }: AttendanceGridProps) => {
+const AttendanceGrid = ({ teamMembers, teamLead, projectId, onSaveStateChange, allowWeekendMeetings = false }: AttendanceGridProps) => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
@@ -59,6 +61,13 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId }: AttendanceGridProp
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+
+  // Notify parent component about save state
+  useEffect(() => {
+    if (onSaveStateChange) {
+      onSaveStateChange(hasUnsavedChanges, saveAllAttendance);
+    }
+  }, [hasUnsavedChanges, onSaveStateChange]);
 
   // Load attendance data from database
   useEffect(() => {
@@ -123,11 +132,17 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId }: AttendanceGridProp
   const toggleAttendance = (memberId: string, day: number) => {
     const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const currentStatus = attendanceData[dateKey] || "absent";
+    const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);
+    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+    
+    // Don't allow weekend changes unless explicitly enabled
+    if (isWeekend && !allowWeekendMeetings) return;
     
     let newStatus: AttendanceStatus;
     if (currentStatus === "present") newStatus = "absent";
-    else if (currentStatus === "absent") newStatus = "present";
-    else return; // Don't change weekend/holiday status
+    else if (currentStatus === "absent" || (isWeekend && currentStatus === "weekend")) newStatus = "present";
+    else if (currentStatus === "holiday") return; // Don't change holiday status
+    else newStatus = "absent";
     
     setAttendanceData(prev => ({
       ...prev,
@@ -145,7 +160,10 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId }: AttendanceGridProp
       allMembers.forEach(member => {
         monthDays.forEach(day => {
           const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);
-          if (dayOfWeek === 0 || dayOfWeek === 6) return; // Skip weekends
+          const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+          
+          // Skip weekends unless meetings are allowed
+          if (isWeekend && !allowWeekendMeetings) return;
           
           const dateKey = `${member.id}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
           const status = attendanceData[dateKey] || "absent";
@@ -192,15 +210,15 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId }: AttendanceGridProp
   const getStatusIcon = (status: AttendanceStatus) => {
     switch (status) {
       case "present":
-        return <Circle className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-green-500 text-green-500" />;
+        return <Circle className="h-4 w-4 sm:h-5 sm:w-5 fill-green-500 text-green-500" />;
       case "absent":
-        return <Circle className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-red-500 text-red-500" />;
+        return <Circle className="h-4 w-4 sm:h-5 sm:w-5 fill-red-500 text-red-500" />;
       case "weekend":
-        return <Circle className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-blue-500 text-blue-500" />;
+        return <Circle className="h-4 w-4 sm:h-5 sm:w-5 fill-blue-500 text-blue-500" />;
       case "holiday":
-        return <Circle className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-yellow-500 text-yellow-500" />;
+        return <Circle className="h-4 w-4 sm:h-5 sm:w-5 fill-yellow-500 text-yellow-500" />;
       default:
-        return <Circle className="h-2.5 w-2.5 sm:h-3 sm:w-3 text-gray-300" />;
+        return <Circle className="h-4 w-4 sm:h-5 sm:w-5 text-gray-300" />;
     }
   };
 
@@ -225,30 +243,22 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId }: AttendanceGridProp
 
   return (
     <div className="space-y-3">
-      {/* Save Changes Button - Outside the table */}
-      {hasUnsavedChanges && (
-        <div className="flex justify-end">
-          <Button
-            onClick={saveAllAttendance}
-            disabled={isSaving}
-            variant="default"
-            size="sm"
-            className="flex items-center gap-1.5 text-xs max-w-[200px]"
-          >
-            <Save className="h-3.5 w-3.5" />
-            {isSaving ? "Saving..." : "Save Changes"}
-          </Button>
-        </div>
-      )}
 
       {/* Attendance Table */}
       <div className="rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-800 overflow-hidden">
         {/* Header */}
         <div className="bg-gray-50 dark:bg-gray-900 p-2 sm:p-3 border-b border-gray-200 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-              Attendance Tracker
-            </h3>
+            <div className="flex items-center gap-3">
+              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                Attendance Tracker
+              </h3>
+              {allowWeekendMeetings && (
+                <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-0.5 rounded-full">
+                  Weekend meetings enabled
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-1 sm:gap-2">
               <Button
                 variant="ghost"
@@ -372,15 +382,15 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId }: AttendanceGridProp
                           isWeekend ? 'bg-gray-100 dark:bg-gray-800' : ''
                         }`}
                       >
-                        <div className="flex items-center justify-center p-0.5">
-                          {isWeekend ? (
+                        <div className="flex items-center justify-center p-1">
+                          {isWeekend && !allowWeekendMeetings ? (
                             <div className="cursor-not-allowed">
                               {getStatusIcon(status)}
                             </div>
                           ) : (
                             <button
                               onClick={() => toggleAttendance(member.id, day)}
-                              className="hover:scale-110 transition-transform"
+                              className="hover:scale-110 transition-transform p-1"
                             >
                               {getStatusIcon(status)}
                             </button>
@@ -411,21 +421,21 @@ const AttendanceGrid = ({ teamMembers, teamLead, projectId }: AttendanceGridProp
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-1.5">
           <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-[10px] sm:text-xs">
             <div className="flex items-center gap-1">
-              <Circle className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-green-500 text-green-500" />
+              <Circle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-green-500 text-green-500" />
               <span className="text-gray-600 dark:text-gray-400">
                 <span className="hidden sm:inline">Present ({ATTENDANCE_POINTS_PER_DAY} pts/day)</span>
                 <span className="sm:hidden">Present</span>
               </span>
             </div>
             <div className="flex items-center gap-1">
-              <Circle className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-red-500 text-red-500" />
+              <Circle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-red-500 text-red-500" />
               <span className="text-gray-600 dark:text-gray-400">
                 <span className="hidden sm:inline">Absent (0 pts)</span>
                 <span className="sm:hidden">Absent</span>
               </span>
             </div>
             <div className="flex items-center gap-1">
-              <Circle className="h-2.5 w-2.5 sm:h-3 sm:w-3 fill-blue-500 text-blue-500" />
+              <Circle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-blue-500 text-blue-500" />
               <span className="text-gray-600 dark:text-gray-400">Weekend</span>
             </div>
           </div>
