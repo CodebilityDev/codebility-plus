@@ -55,9 +55,9 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
                   {header.isPlaceholder
                     ? null
                     : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext(),
-                      )}
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
                 </TableHead>
               ))}
           </TableRow>
@@ -72,16 +72,16 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
               data-state={row.getIsSelected() && "selected"}
               className={cn(
                 (row.original as NewApplicantType).application_status ===
-                  "testing" &&
-                  (row.original as NewApplicantType).applicant?.fork_url &&
-                  "bg-green bg-opacity-5",
+                "testing" &&
+                (row.original as NewApplicantType).applicant?.fork_url &&
+                "bg-green bg-opacity-5",
                 (row.original as NewApplicantType).application_status ===
-                  "testing" &&
-                  toBeFailed(
-                    (row.original as NewApplicantType).applicant?.test_taken,
-                    (row.original as NewApplicantType).applicant?.fork_url,
-                  ) &&
-                  "bg-customRed-100 bg-opacity-5",
+                "testing" &&
+                toBeFailed(
+                  (row.original as NewApplicantType).applicant?.test_taken,
+                  (row.original as NewApplicantType).applicant?.fork_url,
+                ) &&
+                "bg-customRed-100 bg-opacity-5",
               )}
             >
               {row

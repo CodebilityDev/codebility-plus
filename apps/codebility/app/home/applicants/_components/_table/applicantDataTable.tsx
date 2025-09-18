@@ -190,9 +190,9 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                     </TableHead>
                   );
                 })}
@@ -207,14 +207,14 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
                     row.original.application_status === "testing" &&
-                      row.original.applicant?.fork_url &&
-                      "bg-green bg-opacity-5",
+                    row.original.applicant?.fork_url &&
+                    "bg-green bg-opacity-5",
                     row.original.application_status === "testing" &&
-                      toBeFailed(
-                        row.original.applicant?.test_taken,
-                        row.original.applicant?.fork_url,
-                      ) &&
-                      "bg-customRed-100 bg-opacity-5",
+                    toBeFailed(
+                      row.original.applicant?.test_taken,
+                      row.original.applicant?.fork_url,
+                    ) &&
+                    "bg-customRed-100 bg-opacity-5",
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
