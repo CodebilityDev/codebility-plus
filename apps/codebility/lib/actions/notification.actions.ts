@@ -21,3 +21,18 @@ export async function archiveNotificationAction(notificationId: string) {
 export async function clearAllNotificationsAction() {
   return notificationService.clearAllNotifications();
 }
+
+export async function createNotificationAction(data: {
+  recipientId: string;
+  title: string;
+  message: string;
+  type: string;
+  priority?: string;
+  actionUrl?: string;
+  metadata?: any;
+  senderId?: string;
+  projectId?: string;
+  jobId?: string;
+}) {
+  return notificationService.createNotification(data);
+}

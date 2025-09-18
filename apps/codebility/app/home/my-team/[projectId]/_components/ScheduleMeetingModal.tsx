@@ -9,7 +9,7 @@ import { Label } from "@codevs/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@codevs/ui/select";
 import { Textarea } from "@codevs/ui/textarea";
 import { Calendar, Clock, MapPin, Users, Video } from "lucide-react";
-import { createNotification } from "@/lib/actions/notification.actions";
+import { createNotificationAction } from "@/lib/actions/notification.actions";
 
 interface ScheduleMeetingModalProps {
   isOpen: boolean;
@@ -47,7 +47,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
       const meetingDateTime = new Date(`${meetingData.date}T${meetingData.time}`);
       
       const notificationPromises = allMembers.map(member => 
-        createNotification({
+        createNotificationAction({
           recipientId: member.id,
           title: `Meeting Scheduled: ${meetingData.title}`,
           message: `A meeting has been scheduled for ${meetingDateTime.toLocaleDateString()} at ${meetingData.time}. ${meetingData.description ? `Details: ${meetingData.description}` : ''}`,
