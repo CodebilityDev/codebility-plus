@@ -5,6 +5,7 @@ import { getOrSetCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { Project } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import PageContainer from "../_components/PageContainer";
 
 import AddProjectButton from "./_components/AddProjectButton";
 import ProjectCardContainer from "./_components/ProjectCardContainer";
@@ -39,40 +40,42 @@ const Projects = async (props: PageProps) => {
 
   if (!Projects) {
     return (
-      <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+      <PageContainer maxWidth="xl">
         <H1>Projects</H1>
         <div className="flex flex-col items-center justify-center gap-4">
           <p className="text-lg font-semibold">No projects found</p>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <AsyncErrorBoundary
-      fallback={
-        <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
-          <div className="mb-4 text-4xl">📁</div>
-          <h2 className="mb-2 text-xl font-semibold">Unable to load projects</h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            Something went wrong while fetching your projects. Please refresh the page to try again.
-          </p>
-        </div>
-      }
-    >
-      <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
-        <div className="flex flex-row justify-between gap-4">
-          <H1>Projects</H1>
-          <div className="flex items-center gap-4">
-            <ProjectFilterButton />
-            <AddProjectButton />
+    <PageContainer maxWidth="xl">
+      <AsyncErrorBoundary
+        fallback={
+          <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+            <div className="mb-4 text-4xl">📁</div>
+            <h2 className="mb-2 text-xl font-semibold">Unable to load projects</h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Something went wrong while fetching your projects. Please refresh the page to try again.
+            </p>
           </div>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-row justify-between gap-4">
+            <H1>Projects</H1>
+            <div className="flex items-center gap-4">
+              <ProjectFilterButton />
+              <AddProjectButton />
+            </div>
+          </div>
+          {Projects && Projects.length > 0 && (
+            <ProjectCardContainer projects={Projects as Project[]} />
+          )}
         </div>
-        {Projects && Projects.length > 0 && (
-          <ProjectCardContainer projects={Projects as Project[]} />
-        )}
-      </div>
-    </AsyncErrorBoundary>
+      </AsyncErrorBoundary>
+    </PageContainer>
   );
 };
 export default Projects;

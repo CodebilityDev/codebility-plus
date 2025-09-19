@@ -2,6 +2,7 @@ import { Briefcase, Users, TrendingUp, Clock } from "lucide-react";
 import HirePageClient from "./_components/HirePageClient";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import { H1 } from "@/components/shared/dashboard";
+import PageContainer from "../_components/PageContainer";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -62,7 +63,7 @@ export default async function HirePage() {
   ];
 
   return (
-    <div className="container mx-auto max-w-7xl p-6">
+    <PageContainer>
       <div className="mb-6">
         <CustomBreadcrumb items={breadcrumbItems} />
       </div>
@@ -75,7 +76,7 @@ export default async function HirePage() {
         </p>
       </div>
 
-        {/* Stats Cards */}
+      {/* Stats Cards */}
         <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
             <div className="flex items-center justify-between">
@@ -136,6 +137,6 @@ export default async function HirePage() {
 
       {/* Client Components */}
       <HirePageClient />
-    </div>
+    </PageContainer>
   );
 }

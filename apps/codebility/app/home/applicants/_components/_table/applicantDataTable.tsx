@@ -173,7 +173,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
         </div>
 
         {/* Table for larger screens */}
-        <Table className="hidden xl:table table-fixed">
+        <Table className="hidden xl:table table-auto">
           {/* Table header */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (

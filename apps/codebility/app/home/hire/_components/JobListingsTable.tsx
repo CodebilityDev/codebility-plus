@@ -35,6 +35,7 @@ import EditJobModal from "./EditJobModal";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
+import { deleteJobListing } from "../actions";
 
 interface JobWithApplicationCount extends JobListing {
   application_count?: number;
@@ -127,15 +128,10 @@ export default function JobListingsTable() {
   const handleDelete = async (jobId: string) => {
     if (confirm("Are you sure you want to delete this job listing? This action cannot be undone.")) {
       try {
-        const supabase = createClientClientComponent();
+        const result = await deleteJobListing(jobId);
 
-        const { error } = await supabase
-          .from('job_listings')
-          .delete()
-          .eq('id', jobId);
-
-        if (error) {
-          throw error;
+        if (!result.success) {
+          throw new Error(result.error || "Failed to delete job");
         }
 
         // Remove from local state
@@ -149,7 +145,7 @@ export default function JobListingsTable() {
         console.error('Delete error:', error);
         toast({
           title: "Failed to delete",
-          description: "Please try again later.",
+          description: error instanceof Error ? error.message : "Please try again later.",
           variant: "destructive",
         });
       }

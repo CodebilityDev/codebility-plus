@@ -29,7 +29,6 @@ export default async function HomeLayout({
             <ModalProviderHome />
             <ToastNotification />
             <PageTransitionSettings />
-            
             <Toaster 
               richColors
               position="top-right"
@@ -37,10 +36,9 @@ export default async function HomeLayout({
                 className: "dark:bg-gray-800 dark:text-white",
               }}
             />
-            
             <AppRouterCacheProvider>
               <MuiStyleRoot>
-                <main className="background-light850_dark100 relative flex max-w-full flex-col overflow-clip">
+                <div className="background-light850_dark100 flex min-h-screen flex-col">
                   <ErrorBoundary
                     fallback={
                       <div className="p-4 text-center">
@@ -50,7 +48,7 @@ export default async function HomeLayout({
                   >
                     <Navbar />
                   </ErrorBoundary>
-                  <div className="flex">
+                  <div className="flex flex-1">
                     <ErrorBoundary
                       fallback={
                         <div className="w-16 bg-gray-100 dark:bg-gray-800" />
@@ -58,21 +56,21 @@ export default async function HomeLayout({
                     >
                       <LeftSidebar />
                     </ErrorBoundary>
-                    <section className="background-lightsection_darksection flex min-h-screen w-full flex-1 flex-col px-2 pb-6 pt-24 max-md:pb-14 sm:px-4 md:px-8 lg:px-12">
-                      <div className="max-w-8xl mx-auto h-full w-full">
+                    <main className="background-lightsection_darksection flex-1 pt-[60px]">
+                      <div className="mx-auto h-full max-w-8xl">
                         <PageTransitionWrapper>
                           <Suspense fallback={
-                            <div className="flex items-center justify-center h-64">
-                              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-customBlue-500"></div>
+                            <div className="flex h-64 items-center justify-center">
+                              <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-customBlue-500"></div>
                             </div>
                           }>
                             <AsyncErrorBoundary>{children}</AsyncErrorBoundary>
                           </Suspense>
                         </PageTransitionWrapper>
                       </div>
-                    </section>
+                    </main>
                   </div>
-                </main>
+                </div>
               </MuiStyleRoot>
             </AppRouterCacheProvider>
           </ThemeProvider>
