@@ -148,11 +148,11 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
 
   return (
     <div className="overflow-hidden rounded-md">
-      <Box className="p-1 py-2 sm:p-3 sm:py-3">
+      <Box className="p-2">
         {/* if rows selected */}
 
         <div className="flex w-full items-center justify-between">
-          <div className="flex w-full items-center gap-4 px-2 pb-2">
+          <div className="flex w-full items-center gap-2 px-1 pb-1">
             <p className="text-sm text-gray-500">
               {Object.keys(rowSelection).length} selected
             </p>
@@ -173,7 +173,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
         </div>
 
         {/* Table for larger screens */}
-        <Table className="hidden xl:table">
+        <Table className="hidden xl:table table-fixed">
           {/* Table header */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -183,7 +183,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                     <TableHead
                       key={header.id}
                       className={cn(
-                        "whitespace-nowrap",
+                        "whitespace-nowrap px-2 py-1 text-xs",
                         (header.column.columnDef.meta as any)?.className,
                       )}
                     >
@@ -221,6 +221,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                     <TableCell
                       key={cell.id}
                       className={cn(
+                        "px-2 py-1",
                         (cell.column.columnDef.meta as any)?.className,
                       )}
                     >
