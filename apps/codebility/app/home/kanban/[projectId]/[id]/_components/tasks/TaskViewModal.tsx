@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useModal } from "@/hooks/use-modal";
+import { IconPlus } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { useKanbanStore } from "@/store/kanban-store";
 import { SkillCategory, Task } from "@/types/home/codev";
@@ -36,118 +37,60 @@ import {
 } from "@codevs/ui/dropdown-menu";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { IconPlus } from "@/public/assets/svgs";
 
 import { completeTask, updateTaskPRLink } from "../../actions";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
 } from "../DifficultyPointsTooltip";
 
-// ============================================================================
-// WORKING fetchAvailableMembers implementation with debug logging
-// ============================================================================
-const fetchAvailableMembers = async (boardId: string): Promise<CodevMember[]> => {
+// Fetch available members function - unchanged from original
+const fetchAvailableMembers = async (
+  boardId: string,
+): Promise<CodevMember[]> => {
   try {
     const supabase = createClientClientComponent();
-    
-    if (!supabase) {
-      console.error("=== Supabase client not initialized ===");
-      return [];
-    }
+    if (!supabase) return [];
 
-    console.log("=== STARTING fetchAvailableMembers for boardId:", boardId, "===");
-
-    // 1. Get the project_id from the kanban_boards table
     const { data: board, error: boardError } = await supabase
       .from("kanban_boards")
       .select("project_id")
       .eq("id", boardId)
       .single();
 
-    if (boardError) {
-      console.error("=== Board fetch error:", boardError, "===");
-      return [];
-    }
+    if (boardError || !board?.project_id) return [];
 
-    if (!board?.project_id) {
-      console.error("=== No project associated with board:", boardId, "===");
-      return [];
-    }
-
-    console.log("=== Found project_id:", board.project_id, "===");
-
-    // 2. Get all project members from project_members table
     const { data: projectMembers, error: projectMembersError } = await supabase
       .from("project_members")
       .select("codev_id, role")
       .eq("project_id", board.project_id);
 
-    if (projectMembersError) {
-      console.error("=== Project members fetch error:", projectMembersError, "===");
-      return [];
-    }
+    if (projectMembersError || !projectMembers?.length) return [];
 
-    if (!projectMembers?.length) {
-      console.error("=== No project members found for project:", board.project_id, "===");
-      return [];
-    }
+    const allMemberIds = projectMembers.map((member) => member.codev_id);
 
-    console.log("=== Found project members:", projectMembers, "===");
-
-    // 3. Collect ALL member IDs (including team leader)
-    const allMemberIds = projectMembers.map(member => member.codev_id);
-    console.log("=== All member IDs:", allMemberIds, "===");
-
-    // 4. Fetch ALL members' details from the codev table 
     const { data: codevMembers, error: codevError } = await supabase
       .from("codev")
       .select("id, first_name, last_name, image_url, availability_status")
       .in("id", allMemberIds);
 
-    if (codevError) {
-      console.error("=== Codev members fetch error:", codevError, "===");
-      return [];
-    }
+    if (codevError || !codevMembers?.length) return [];
 
-    if (!codevMembers?.length) {
-      console.error("=== No codev details found for member IDs:", allMemberIds, "===");
-      return [];
-    }
-
-    console.log("=== Found codev members:", codevMembers, "===");
-
-    // 5. Filter available members and format for return
-    const availableMembers = codevMembers
-      .filter(member => member.availability_status === true)
-      .map(member => ({
+    return codevMembers
+      .filter((member) => member.availability_status === true)
+      .map((member) => ({
         id: member.id,
         first_name: member.first_name,
         last_name: member.last_name,
         image_url: member.image_url,
       }));
-
-    console.log("=== Final available members:", availableMembers, "===");
-    return availableMembers;
-
   } catch (error) {
-    console.error("=== CRITICAL ERROR in fetchAvailableMembers:", error, "===");
+    console.error("Error in fetchAvailableMembers:", error);
     return [];
   }
 };
 
-// ============================================================================
-// CONSTANTS - Following DRY principle
-// ============================================================================
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 
-const BUTTON_STYLES = {
-  primary: "text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg",
-  secondary: "text-grey-100 bg-light-900 dark:bg-black-200 mt-4 w-full border-2 border-gray-300 py-4 text-black hover:bg-green-700 sm:w-auto"
-};
-
-// ============================================================================
-// INTERFACES - Following SOLID principle
-// ============================================================================
 interface CodevMember {
   id: string;
   first_name: string;
@@ -155,20 +98,15 @@ interface CodevMember {
   image_url?: string | null;
 }
 
-// ============================================================================
-// UTILITY FUNCTIONS
-// ============================================================================
 const capitalize = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
-// ============================================================================
-// AGGRESSIVE ASSIGNEE SELECTOR - IMMEDIATE UI UPDATES
-// ============================================================================
+// Fixed AssigneeSelector component with proper removal functionality
 function AssigneeSelector({
   primaryAssignee,
   onAssigneeChange,
   boardId,
   user,
-  forceRefreshKey // Add this to force complete re-render when needed
+  forceRefreshKey,
 }: {
   primaryAssignee: CodevMember | null;
   onAssigneeChange: (memberIds: string[]) => void;
@@ -179,37 +117,32 @@ function AssigneeSelector({
   const [availableMembers, setAvailableMembers] = useState<CodevMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [localAssignee, setLocalAssignee] = useState<CodevMember | null>(primaryAssignee);
+  const [localAssignee, setLocalAssignee] = useState<CodevMember | null>(
+    primaryAssignee,
+  );
 
-  // Sync with prop changes but prioritize local state for immediate feedback
   useEffect(() => {
     setLocalAssignee(primaryAssignee);
   }, [primaryAssignee, forceRefreshKey]);
 
-  // Load members when boardId changes
   useEffect(() => {
     if (!boardId) {
       setAvailableMembers([]);
       setIsLoading(false);
       return;
     }
-    
+
     const loadMembers = async () => {
       setIsLoading(true);
       try {
-        console.log("=== LOADING MEMBERS FOR BOARD:", boardId, "===");
         const members = await fetchAvailableMembers(boardId);
-        console.log("=== FETCHED MEMBERS:", members, "===");
-        
         if (Array.isArray(members) && members.length > 0) {
           setAvailableMembers(members);
-          console.log("=== SET AVAILABLE MEMBERS:", members.length, "===");
         } else {
-          console.warn("=== NO MEMBERS FOUND OR INVALID RESPONSE ===");
           setAvailableMembers([]);
         }
       } catch (error) {
-        console.error("=== ERROR LOADING MEMBERS:", error, "===");
+        console.error("Error loading members:", error);
         setAvailableMembers([]);
       } finally {
         setIsLoading(false);
@@ -225,24 +158,18 @@ function AssigneeSelector({
       .includes(searchQuery.toLowerCase()),
   );
 
-  // IMMEDIATE REMOVAL - Updates UI instantly with FORCED state reset
+  // ✅ FIXED: Restore proper removal functionality for AssigneeSelector
   const handleRemove = () => {
-    console.log("=== REMOVING ASSIGNEE IMMEDIATELY ===");
-    // TRIPLE state reset to ensure avatar disappears
-    setLocalAssignee(null); 
-    onAssigneeChange([]); 
-    // Force immediate re-render by updating key
-    setTimeout(() => setLocalAssignee(null), 0);
+    setLocalAssignee(null);
+    onAssigneeChange([]); // Pass empty array to indicate no assignee
+    setTimeout(() => setLocalAssignee(null), 0); // Ensure UI updates
   };
 
-  // IMMEDIATE SELECTION - Updates UI instantly
   const handleSelect = (memberId: string) => {
-    const selectedMember = availableMembers.find(m => m.id === memberId);
-    console.log("=== SELECTING MEMBER IMMEDIATELY:", selectedMember, "===");
-    
+    const selectedMember = availableMembers.find((m) => m.id === memberId);
     if (selectedMember) {
-      setLocalAssignee(selectedMember); // IMMEDIATE UI UPDATE
-      onAssigneeChange([memberId]); // Trigger parent update
+      setLocalAssignee(selectedMember);
+      onAssigneeChange([memberId]);
     }
   };
 
@@ -252,18 +179,16 @@ function AssigneeSelector({
         id: user.id,
         first_name: user.first_name || "You",
         last_name: user.last_name || "",
-        image_url: user.image_url
+        image_url: user.image_url,
       };
-      console.log("=== SELF ASSIGNING IMMEDIATELY:", userAsMember, "===");
-      setLocalAssignee(userAsMember); // IMMEDIATE UI UPDATE
-      onAssigneeChange([user.id]); // Trigger parent update
+      setLocalAssignee(userAsMember);
+      onAssigneeChange([user.id]);
     }
   };
 
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-wrap gap-2">
-        {/* Show current assignee with IMMEDIATE state */}
         {localAssignee && (
           <div
             className="group relative h-10 w-10 cursor-pointer rounded-full hover:opacity-80"
@@ -288,15 +213,14 @@ function AssigneeSelector({
           </div>
         )}
 
-        {/* Add member dropdown */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
               variant="default"
-              className="h-10 w-10 rounded-full p-0"
+              className="h-10 w-10 rounded-full bg-blue-600 p-0 hover:bg-blue-700"
               disabled={isLoading}
             >
-              <IconPlus className="h-4 w-4" />
+              <IconPlus className="h-4 w-4 text-white" />
             </Button>
           </DropdownMenuTrigger>
 
@@ -312,7 +236,7 @@ function AssigneeSelector({
                 placeholder="Search members..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="dark:bg-dark-200 focus:ring-customViolet-500 w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2"
+                className="dark:bg-dark-200 w-full rounded-md border px-3 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
 
@@ -324,7 +248,9 @@ function AssigneeSelector({
               </div>
             ) : filteredMembers.length === 0 ? (
               <div className="py-4 text-center text-sm text-gray-500">
-                {availableMembers.length === 0 ? "No members available" : "No members found"}
+                {availableMembers.length === 0
+                  ? "No members available"
+                  : "No members found"}
               </div>
             ) : (
               filteredMembers.map((member) => (
@@ -356,115 +282,131 @@ function AssigneeSelector({
           </DropdownMenuContent>
         </DropdownMenu>
 
-        {/* Self assign button */}
         {user && (!localAssignee || localAssignee.id !== user.id) && (
           <button
             onClick={handleSelfAssign}
             disabled={isLoading}
             type="button"
-            className="text-black-200 hover:text-customBlue-300 dark:hover:text-customBlue-100 ml-2 w-fit cursor-pointer text-xs font-light dark:text-slate-300"
+            className="ml-2 w-fit cursor-pointer text-xs font-light text-gray-600 hover:text-blue-500 dark:text-slate-300 dark:hover:text-blue-400"
           >
             Assign to me
           </button>
         )}
       </div>
-
     </div>
   );
 }
 
-// ============================================================================
-// MAIN COMPONENT
-// ============================================================================
 const TaskViewModal = ({
   onComplete,
 }: {
   onComplete?: (taskId: string) => void;
 }) => {
-  // ============================================================================
-  // HOOKS AND STATE
-  // ============================================================================
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const user = useUserStore((state) => state.user);
   const { fetchBoardData } = useKanbanStore();
-  
-  // Loading states
+
   const [isLoading, setIsLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
-  
-  // Component state
+
   const [prLink, setPrLink] = useState("");
+  const [originalPrLink, setOriginalPrLink] = useState("");
   const [supabase, setSupabase] = useState<any>(null);
   const [boardId, setBoardId] = useState<string>("");
-  
-  // Data states
-  const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(null);
+
+  const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(
+    null,
+  );
   const [sidekickDetails, setSidekickDetails] = useState<CodevMember[]>([]);
-  const [primaryAssignee, setPrimaryAssignee] = useState<CodevMember | null>(null);
+  const [primaryAssignee, setPrimaryAssignee] = useState<CodevMember | null>(
+    null,
+  );
   const [createdBy, setCreatedBy] = useState<CodevMember | null>(null);
   const [forceRefreshKey, setForceRefreshKey] = useState<string>("");
-  
-  // Derived state
+
+  // ✅ FIXED: Enhanced state management for assignee changes
+  const [manualSaveChanges, setManualSaveChanges] = useState(false);
+  const [isSavingChanges, setIsSavingChanges] = useState(false);
+  const [pendingAssigneeId, setPendingAssigneeId] = useState<string | undefined>(undefined);
+
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task | null;
-  
-  // Permission checks
-  const canModifyTask = user?.role_id === 1 || user?.role_id === 5 || user?.role_id === 4 || user?.role_id === 10;
+
+  const hasPrLinkChanges = prLink.trim() !== originalPrLink;
+  const hasUnsavedChanges = manualSaveChanges || hasPrLinkChanges;
+
+  const canModifyTask =
+    user?.role_id === 1 ||
+    user?.role_id === 5 ||
+    user?.role_id === 4 ||
+    user?.role_id === 10;
   const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
 
-  // ============================================================================
-  // EFFECTS
-  // ============================================================================
-  
-  // Initialize Supabase client
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
     setSupabase(supabaseClient);
   }, []);
 
-  // Fetch board ID from task's column
   useEffect(() => {
     if (!supabase || !task?.kanban_column_id) {
       setBoardId("");
       return;
     }
-    
+
     const fetchBoardId = async () => {
       try {
-        console.log("=== FETCHING BOARD ID FOR COLUMN:", task.kanban_column_id, "===");
         const { data, error } = await supabase
           .from("kanban_columns")
           .select("board_id")
           .eq("id", task.kanban_column_id)
           .single();
-        
+
         if (error) {
-          console.error("=== ERROR FETCHING BOARD ID:", error, "===");
           setBoardId("");
         } else if (data?.board_id) {
-          console.log("=== FOUND BOARD ID:", data.board_id, "===");
           setBoardId(data.board_id);
         }
       } catch (err) {
-        console.error("=== EXCEPTION FETCHING BOARD ID:", err, "===");
+        console.error("Exception fetching board ID:", err);
         setBoardId("");
       }
     };
-    
+
     fetchBoardId();
   }, [task?.kanban_column_id, supabase]);
 
-  // Reset states when task changes - AGGRESSIVE RESET
   useEffect(() => {
     if (task?.id) {
-      console.log("=== TASK CHANGED, RESETTING STATES ===");
-      setPrLink(task?.pr_link || "");
-      setPrimaryAssignee(null);
-      setForceRefreshKey(Date.now().toString()); // Force component refresh
+      const taskPrLink = task?.pr_link || "";
+      setPrLink(taskPrLink);
+      setOriginalPrLink(taskPrLink);
+      setPrimaryAssignee(null); // Reset to null first
+      setManualSaveChanges(false);
+      setPendingAssigneeId(undefined);
+      setForceRefreshKey(Date.now().toString());
+      
+      // Force reset the AssigneeSelector local state by resetting primaryAssignee
+      setTimeout(() => {
+        // Fetch actual assignee from task after reset
+        if (task.codev_id || task?.codev?.id) {
+          const assigneeId = task.codev_id || (task.codev?.id || "");
+          if (supabase && assigneeId) {
+            supabase
+              .from("codev")
+              .select("id, first_name, last_name, image_url")
+              .eq("id", assigneeId)
+              .single()
+              .then(({ data, error }) => {
+                if (!error && data) {
+                  setPrimaryAssignee(data as CodevMember);
+                }
+              });
+          }
+        }
+      }, 0);
     }
-  }, [task?.id]);
+  }, [task?.id, supabase]);
 
-  // Fetch skill category
   useEffect(() => {
     if (!supabase || !task?.skill_category_id) return;
 
@@ -481,7 +423,6 @@ const TaskViewModal = ({
     fetchSkillCategory();
   }, [task?.skill_category_id, supabase]);
 
-  // Fetch sidekick details
   useEffect(() => {
     if (!supabase || !task?.sidekick_ids?.length) return;
 
@@ -497,16 +438,12 @@ const TaskViewModal = ({
     fetchSidekickDetails();
   }, [task?.sidekick_ids, supabase]);
 
-  // Fetch primary assignee - AGGRESSIVE FETCHING
   useEffect(() => {
     if (!supabase || !task) return;
 
     const fetchPrimaryAssignee = async () => {
       const assigneeId = task?.codev_id || task?.codev?.id;
-      
-      console.log("=== FETCHING PRIMARY ASSIGNEE, ID:", assigneeId, "===");
-      
-      // Always reset first
+
       setPrimaryAssignee(null);
 
       if (assigneeId) {
@@ -517,28 +454,21 @@ const TaskViewModal = ({
           .single();
 
         if (!error && data) {
-          console.log("=== FOUND ASSIGNEE DATA:", data, "===");
           setPrimaryAssignee(data as CodevMember);
-        } else {
-          console.log("=== NO ASSIGNEE FOUND, ERROR:", error, "===");
         }
       } else if (task?.codev) {
-        console.log("=== USING TASK.CODEV DIRECTLY:", task.codev, "===");
         setPrimaryAssignee({
           id: task.codev.id,
           first_name: task.codev.first_name,
           last_name: task.codev.last_name,
           image_url: task.codev.image_url,
         });
-      } else {
-        console.log("=== NO ASSIGNEE DATA AVAILABLE ===");
       }
     };
 
     fetchPrimaryAssignee();
   }, [task, supabase]);
 
-  // Fetch created by
   useEffect(() => {
     if (!supabase || !task?.created_by) return;
 
@@ -556,10 +486,6 @@ const TaskViewModal = ({
     fetchCreatedBy();
   }, [task?.created_by, supabase]);
 
-  // ============================================================================
-  // EVENT HANDLERS
-  // ============================================================================
-  
   const handleUpdate = async () => {
     if (!task) return;
 
@@ -574,7 +500,7 @@ const TaskViewModal = ({
 
     if (response.success) {
       toast.success("PR Link updated successfully");
-      setPrLink(prLink);
+      setOriginalPrLink(prLink);
       if (task) task.pr_link = prLink;
     } else {
       toast.error(response.error || "Failed to update PR Link");
@@ -611,98 +537,135 @@ const TaskViewModal = ({
     setIsLoading(false);
   };
 
-  // ============================================================================
-  // ULTRA-AGGRESSIVE ASSIGNEE CHANGE HANDLER with immediate UI updates
-  // ============================================================================
   const handleAssigneeChange = async (memberIds: string[]) => {
     if (!task || !supabase) return;
 
-    const newAssigneeId = memberIds[0] || undefined;
-    console.log("=== ASSIGNMENT CHANGE:", { newAssigneeId, memberIds }, "===");
+    const newAssigneeId = memberIds.length > 0 ? memberIds[0] : undefined;
 
-    // IMMEDIATE UI UPDATES FIRST - for instant feedback
+    // Set manual save state to show Save Changes button
+    setManualSaveChanges(true);
+    setPendingAssigneeId(newAssigneeId);
+
     if (newAssigneeId) {
-      // Find member in available members and set immediately
-      const selectedMember = primaryAssignee; // Use current state temporarily
-      console.log("=== SETTING ASSIGNEE IMMEDIATELY ===");
+      // Fetch assignee data for UI display only
+      const { data: assigneeData } = await supabase
+        .from("codev")
+        .select("id, first_name, last_name, image_url")
+        .eq("id", newAssigneeId)
+        .single();
+
+      if (assigneeData) {
+        setPrimaryAssignee(assigneeData);
+      }
     } else {
-      console.log("=== CLEARING ASSIGNEE IMMEDIATELY ===");
+      // Handle removal case
       setPrimaryAssignee(null);
     }
 
-    try {
-      // Update database
-      const { error } = await supabase
-        .from("tasks")
-        .update({ codev_id: newAssigneeId || null })
-        .eq("id", task.id);
+    setForceRefreshKey(`${Date.now()}-${Math.random()}`);
+  };
 
-      if (!error) {
-        if (newAssigneeId) {
-          // Fetch new assignee data and update state
-          const { data: assigneeData } = await supabase
-            .from("codev")
-            .select("id, first_name, last_name, image_url")
-            .eq("id", newAssigneeId)
-            .single();
-          
-          if (assigneeData) {
-            console.log("=== UPDATING TASK OBJECT WITH NEW ASSIGNEE:", assigneeData, "===");
-            setPrimaryAssignee(assigneeData);
-            if (task) {
-              task.codev_id = newAssigneeId;
-              task.codev = assigneeData as any;
-            }
-            toast.success(`Task assigned to ${assigneeData.first_name} ${assigneeData.last_name}`);
+  // Reset state when modal closes without saving
+  const handleClose = () => {
+    if (hasUnsavedChanges) {
+      // Reset all unsaved changes
+      setManualSaveChanges(false);
+      setPendingAssigneeId(undefined);
+      setPrLink(originalPrLink);
+      
+      // Force complete reset by setting primary assignee to null first
+      setPrimaryAssignee(null);
+      
+      // Then set a unique force refresh key to reset AssigneeSelector
+      setForceRefreshKey(`close-reset-${Date.now()}-${Math.random()}`);
+      
+      // Reset to original task assignee after a brief delay
+      setTimeout(() => {
+        if (task?.codev_id || task?.codev?.id) {
+          const assigneeId = task.codev_id || (task.codev?.id || "");
+          if (supabase && assigneeId) {
+            supabase
+              .from("codev")
+              .select("id, first_name, last_name, image_url")
+              .eq("id", assigneeId)
+              .single()
+              .then(({ data, error }) => {
+                if (!error && data) {
+                  setPrimaryAssignee(data as CodevMember);
+                }
+              });
           }
         } else {
-          console.log("=== REMOVING ASSIGNEE FROM TASK - FINAL ===");
+          // Ensure it stays null for unassigned tasks
           setPrimaryAssignee(null);
-          if (task) {
-            task.codev_id = undefined;
-            task.codev = undefined;
-          }
-          toast.success("Task unassigned successfully");
         }
+      }, 50);
+    }
+    onClose();
+  };
 
-        // Force refresh key to trigger component re-render
-        setForceRefreshKey(`${Date.now()}-${Math.random()}`);
-        
-        // Refresh board data
-        await fetchBoardData();
-      } else {
-        console.error("=== DATABASE ERROR:", error, "===");
-        toast.error("Failed to update assignee");
-        
-        // Revert UI changes on database error
-        if (task?.codev_id) {
-          const { data: revertData } = await supabase
-            .from("codev")
-            .select("id, first_name, last_name, image_url")
-            .eq("id", task.codev_id)
-            .single();
-          if (revertData) setPrimaryAssignee(revertData);
+  // ✅ FIXED: Enhanced handleSaveChanges with assignee removal support
+  const handleSaveChanges = async () => {
+    if (!task || !supabase) return;
+
+    setIsSavingChanges(true);
+
+    try {
+      // Save PR Link changes
+      if (hasPrLinkChanges) {
+        await handleUpdate();
+      }
+
+      // Save assignee changes (including removal)
+      if (manualSaveChanges) {
+        const { error } = await supabase
+          .from("tasks")
+          .update({ codev_id: pendingAssigneeId || null }) // Convert undefined to null for database
+          .eq("id", task.id);
+
+        if (!error) {
+          // Update task object after successful save
+          if (task) {
+            task.codev_id = pendingAssigneeId;
+            if (pendingAssigneeId && primaryAssignee) {
+              task.codev = primaryAssignee as any;
+            } else {
+              task.codev = undefined;
+            }
+          }
+          
+          if (pendingAssigneeId && primaryAssignee) {
+            toast.success(
+              `Task assigned to ${primaryAssignee.first_name} ${primaryAssignee.last_name}`,
+            );
+          } else {
+            toast.success("Task assignee removed");
+          }
         } else {
-          setPrimaryAssignee(null);
+          toast.error("Failed to update assignee");
+          throw new Error("Assignee update failed");
         }
       }
+
+      await fetchBoardData();
+      setManualSaveChanges(false);
+      setPendingAssigneeId(undefined);
+      setOriginalPrLink(prLink);
+      toast.success("All changes saved successfully");
     } catch (error) {
-      console.error("=== ERROR UPDATING ASSIGNEE:", error, "===");
-      toast.error("Failed to update assignee");
+      console.error("Error saving changes:", error);
+      toast.error("Failed to save changes");
+    } finally {
+      setIsSavingChanges(false);
     }
   };
 
-  // Early return
   if (!isModalOpen) return null;
 
-  // ============================================================================
-  // RENDER
-  // ============================================================================
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <div className="flex flex-col gap-6">
-          {/* Header */}
           <div className="flex items-center justify-between">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
@@ -733,9 +696,7 @@ const TaskViewModal = ({
             )}
           </div>
 
-          {/* Form Fields */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-            {/* Task Title */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Task Title</Label>
               <Input
@@ -745,7 +706,6 @@ const TaskViewModal = ({
               />
             </div>
 
-            {/* Points */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Points</Label>
               <Input
@@ -756,7 +716,6 @@ const TaskViewModal = ({
               />
             </div>
 
-            {/* Priority */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority</Label>
               <Select disabled value={task?.priority || ""}>
@@ -765,7 +724,11 @@ const TaskViewModal = ({
                 </SelectTrigger>
                 <SelectContent>
                   {PRIORITY_LEVELS.map((level) => (
-                    <SelectItem key={level} value={level} className="capitalize">
+                    <SelectItem
+                      key={level}
+                      value={level}
+                      className="capitalize"
+                    >
                       {level}
                     </SelectItem>
                   ))}
@@ -773,7 +736,6 @@ const TaskViewModal = ({
               </Select>
             </div>
 
-            {/* Difficulty */}
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Label className="text-sm font-medium">Difficulty</Label>
@@ -785,7 +747,11 @@ const TaskViewModal = ({
                 </SelectTrigger>
                 <SelectContent>
                   {DIFFICULTY_LEVELS.map((level) => (
-                    <SelectItem key={level} value={level} className="capitalize">
+                    <SelectItem
+                      key={level}
+                      value={level}
+                      className="capitalize"
+                    >
                       {capitalize(level)}
                     </SelectItem>
                   ))}
@@ -793,7 +759,6 @@ const TaskViewModal = ({
               </Select>
             </div>
 
-            {/* Task Type */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Task Type</Label>
               <Input
@@ -803,7 +768,6 @@ const TaskViewModal = ({
               />
             </div>
 
-            {/* PR Link */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">PR Link</Label>
               <div className="flex items-center space-x-2">
@@ -815,34 +779,29 @@ const TaskViewModal = ({
                       setPrLink(task.pr_link);
                     }
                   }}
-                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300"
+                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500"
                   placeholder="Enter PR Link..."
                 />
-                <Button
-                  variant="outline"
-                  onClick={handleUpdate}
-                  className={
-                    prLink.trim() !== (task?.pr_link || "")
-                      ? BUTTON_STYLES.primary
-                      : BUTTON_STYLES.secondary
-                  }
-                  disabled={
-                    updateLoading || prLink.trim() === (task?.pr_link || "")
-                  }
-                >
-                  {updateLoading && (
-                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
-                  )}
-                  Update
-                </Button>
+                {hasPrLinkChanges && (
+                  <Button
+                    variant="outline"
+                    onClick={handleUpdate}
+                    className="bg-blue-600 text-white hover:bg-blue-700"
+                    disabled={updateLoading}
+                  >
+                    {updateLoading && (
+                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Update
+                  </Button>
+                )}
               </div>
             </div>
 
-            {/* Skill Category */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Skill Category</Label>
               {skillCategory ? (
-                <div className="bg-customBlue-50 text-customBlue-700 dark:bg-customBlue-900/20 dark:text-customBlue-300 rounded-md p-2 text-sm font-medium">
+                <div className="rounded-md bg-blue-50 p-2 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
                   {skillCategory.name}
                 </div>
               ) : (
@@ -850,12 +809,10 @@ const TaskViewModal = ({
               )}
             </div>
 
-            {/* ================================================================ */}
-            {/* WORKING PRIMARY ASSIGNEE SELECTOR */}
-            {/* ================================================================ */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Primary Assignee</Label>
-              {canModifyTask ? (
+              {canModifyTask && !primaryAssignee ? (
+                // Only show AssigneeSelector for UNASSIGNED tasks
                 <div className="space-y-2">
                   {boardId ? (
                     <AssigneeSelector
@@ -867,10 +824,13 @@ const TaskViewModal = ({
                       forceRefreshKey={forceRefreshKey}
                     />
                   ) : (
-                    <div className="text-sm text-gray-500">Loading board...</div>
+                    <div className="text-sm text-gray-500">
+                      Loading board...
+                    </div>
                   )}
                 </div>
               ) : primaryAssignee ? (
+                // Read-only display for ASSIGNED tasks
                 <div className="flex items-center gap-2">
                   {primaryAssignee.image_url ? (
                     <Image
@@ -888,6 +848,7 @@ const TaskViewModal = ({
                   </span>
                 </div>
               ) : (
+                // Read-only display for users without modify permissions
                 <div className="flex items-center gap-2 text-gray-500">
                   <DefaultAvatar size={32} />
                   <span>Unassigned</span>
@@ -896,7 +857,6 @@ const TaskViewModal = ({
             </div>
           </div>
 
-          {/* Team Members (Sidekicks) */}
           {task?.sidekick_ids && task.sidekick_ids.length > 0 && (
             <div className="space-y-2">
               <Label className="text-sm font-medium">Team Members</Label>
@@ -932,7 +892,6 @@ const TaskViewModal = ({
             </div>
           )}
 
-          {/* Description */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Description</Label>
             <div
@@ -943,7 +902,6 @@ const TaskViewModal = ({
             />
           </div>
 
-          {/* Created By */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Created By</Label>
             <div className="flex items-center gap-2">
@@ -966,21 +924,82 @@ const TaskViewModal = ({
             </div>
           </div>
 
-          {/* Footer Actions */}
           <DialogFooter className="flex gap-2 sm:justify-end">
-            <Button
-              variant="outline"
-              onClick={onClose}
-              className={BUTTON_STYLES.primary}
-            >
-              Close
-            </Button>
+            {/* VIEWING MODE: Show Close when just viewing (no changes) */}
+            {!hasUnsavedChanges && (
+              <Button
+                onClick={onClose}
+                style={{
+                  backgroundColor: "#3B82F6",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
+              >
+                Close
+              </Button>
+            )}
+
+            {/* EDITING MODE: Show Cancel + Save Changes when has changes */}
+            {hasUnsavedChanges && (
+              <>
+                <Button
+                  onClick={handleClose}
+                  style={{
+                    backgroundColor: "#3B82F6",
+                    color: "white",
+                    padding: "6px 16px",
+                    fontSize: "14px",
+                    borderRadius: "4px",
+                    border: "none",
+                    minWidth: "auto",
+                    width: "auto",
+                  }}
+                >
+                  Cancel
+                </Button>
+
+                <Button
+                  onClick={handleSaveChanges}
+                  disabled={isSavingChanges}
+                  style={{
+                    backgroundColor: "#2563EB",
+                    color: "white",
+                    padding: "6px 16px",
+                    fontSize: "14px",
+                    borderRadius: "4px",
+                    border: "none",
+                    minWidth: "auto",
+                    width: "auto",
+                  }}
+                >
+                  {isSavingChanges && (
+                    <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                  )}
+                  Save Changes
+                </Button>
+              </>
+            )}
+
+            {/* Mark as Done button - separate logic */}
             {canMarkAsDone && task?.pr_link && (
               <Button
-                variant="default"
                 onClick={handleMarkAsDone}
                 disabled={isLoading}
-                className={BUTTON_STYLES.primary}
+                style={{
+                  backgroundColor: "#2563EB",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
               >
                 {isLoading && (
                   <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
