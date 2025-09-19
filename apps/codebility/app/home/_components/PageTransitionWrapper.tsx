@@ -4,24 +4,10 @@ import { useEffect, useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import PageLoadingAnimation from "./PageLoadingAnimation";
-import { 
-  CubeLoadingAnimation, 
-  DNALoadingAnimation, 
-  WaveLoadingAnimation, 
-  PulseLoadingAnimation 
-} from "./PageLoadingVariants";
 
 interface PageTransitionWrapperProps {
   children: React.ReactNode;
 }
-
-const loadingAnimations = [
-  PageLoadingAnimation,
-  CubeLoadingAnimation,
-  DNALoadingAnimation,
-  WaveLoadingAnimation,
-  PulseLoadingAnimation,
-];
 
 export default function PageTransitionWrapper({ children }: PageTransitionWrapperProps) {
   const pathname = usePathname();
@@ -29,12 +15,6 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
   const [displayedPathname, setDisplayedPathname] = useState(pathname);
   const [animationEnabled, setAnimationEnabled] = useState(true);
   const [animationDuration, setAnimationDuration] = useState(800);
-  
-  // Randomly select a loading animation
-  const LoadingComponent = useMemo(() => {
-    const randomIndex = Math.floor(Math.random() * loadingAnimations.length);
-    return loadingAnimations[randomIndex];
-  }, [pathname]); // Change animation when route changes
 
   // Load user preferences
   useEffect(() => {
@@ -98,7 +78,7 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
               transition: { duration: 0.3, ease: "easeOut" }
             }}
           >
-            <LoadingComponent />
+            <PageLoadingAnimation />
           </motion.div>
         )}
       </AnimatePresence>
