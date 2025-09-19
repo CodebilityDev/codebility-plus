@@ -103,7 +103,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
   }, [supabase]);
 
   return (
-    <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 p-2 sm:p-3">
+    <Card className="border-light-700 bg-light-300 dark:border-dark-200 dark:bg-dark-100 mb-4 p-3 sm:p-4">
       {/* Mobile Layout */}
       <div className="block sm:hidden space-y-3">
         {/* Search Bar */}
@@ -123,18 +123,18 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
       {/* Desktop Layout */}
       <div className="hidden sm:block space-y-3">
         {/* Search - Full width on desktop */}
-        <div className="w-full sm:max-w-[300px]">
+        <div className="w-full sm:max-w-[400px]">
           <Label className="dark:text-light-900 mb-1.5 block text-sm font-medium text-black">Search</Label>
           <Input
             placeholder="Search name, email..."
             value={filters.search}
             onChange={(e) => onFilterChange("search", e.target.value)}
-            className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-9 w-full rounded-md border px-3 text-sm text-black focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500"
+            className="border-light-700 bg-white dark:border-dark-200 dark:bg-dark-200 dark:text-light-900 h-10 w-full rounded-md border px-4 text-sm text-black focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500"
           />
         </div>
         
         {/* Filters - Desktop grid */}
-        <div className="grid grid-cols-2 gap-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
+        <div className="grid grid-cols-2 gap-4 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-6">
           {renderFilters()}
         </div>
       </div>
@@ -266,7 +266,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
       <>
         {/* Status Filter */}
         <div>
-          <Label className="dark:text-light-900 mb-1.5 block text-xs font-medium text-black">Status</Label>
+          <Label className="dark:text-light-900 mb-1.5 block text-sm font-medium text-black">Status</Label>
           <Select
             value={filters.status || "all"}
             onValueChange={(val) =>
@@ -277,7 +277,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
               className="
                 border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-8 sm:h-9 w-full
+                h-9 sm:h-10 w-full
                 rounded-md
                 border px-2 sm:px-3
                 text-xs sm:text-sm text-black
@@ -298,7 +298,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
 
         {/* Display Position Filter */}
         <div className="min-w-[140px] sm:min-w-0">
-          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-sm font-medium text-black">
             Position
           </Label>
           <Select
@@ -311,7 +311,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
               className="
                 border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-8 sm:h-9 w-full
+                h-9 sm:h-10 w-full
                 rounded-md
                 border px-2 sm:px-3
                 text-xs sm:text-sm text-black
@@ -332,7 +332,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
 
         {/* Project Filter */}
         <div className="min-w-[140px] sm:min-w-0">
-          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">Project</Label>
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-sm font-medium text-black">Project</Label>
           <Select
             value={filters.project || "all"}
             onValueChange={(val) =>
@@ -343,7 +343,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
               className="
                 border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-8 sm:h-9 w-full
+                h-9 sm:h-10 w-full
                 rounded-md
                 border px-2 sm:px-3
                 text-xs sm:text-sm text-black
@@ -364,7 +364,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
 
         {/* NDA Status Filter */}
         <div className="min-w-[120px] sm:min-w-0">
-          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">NDA</Label>
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-sm font-medium text-black">NDA</Label>
           <Select
             value={filters.nda_status || "all"}
             onValueChange={(val) =>
@@ -375,7 +375,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
               className="
                 border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-8 sm:h-9 w-full
+                h-9 sm:h-10 w-full
                 rounded-md
                 border px-2 sm:px-3
                 text-xs sm:text-sm text-black
@@ -393,7 +393,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
 
         {/* Role Filter */}
         <div className="min-w-[120px] sm:min-w-0">
-          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">Role</Label>
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-sm font-medium text-black">Role</Label>
           <Select
             value={filters.role || "all"}
             onValueChange={(val) =>
@@ -404,7 +404,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
               className="
                 border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-8 sm:h-9 w-full
+                h-9 sm:h-10 w-full
                 rounded-md
                 border px-2 sm:px-3
                 text-xs sm:text-sm text-black
@@ -424,7 +424,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
         </div>
         {/* Availability Status Filter */}
         <div className="min-w-[130px] sm:min-w-0">
-          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-xs font-medium text-black">
+          <Label className="dark:text-light-900 mb-1.5 hidden sm:block text-sm font-medium text-black">
             Available
           </Label>
           <Select
@@ -437,7 +437,7 @@ export function TableFilters({ filters, onFilterChange }: TableFiltersProps) {
               className="
                 border-light-700 bg-white dark:border-dark-200
                 dark:bg-dark-200 dark:text-light-900
-                h-8 sm:h-9 w-full
+                h-9 sm:h-10 w-full
                 rounded-md
                 border px-2 sm:px-3
                 text-xs sm:text-sm text-black

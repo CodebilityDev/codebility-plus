@@ -137,18 +137,18 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
         </div>
         
         {/* Tabs for Active/Inactive */}
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col gap-4">
           <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "active" | "inactive")} className="w-full">
-            <TabsList className="grid h-7 w-full max-w-[240px] grid-cols-2 bg-gray-100 dark:bg-gray-800">
-              <TabsTrigger value="active" className="flex h-6 items-center gap-1 text-[11px]">
+            <TabsList className="grid h-9 w-full max-w-[280px] grid-cols-2 bg-gray-100 dark:bg-gray-800">
+              <TabsTrigger value="active" className="flex h-8 items-center gap-1 text-xs">
                 Active
-                <span className="rounded-full bg-emerald-600/20 px-1 py-0 text-[9px] font-semibold text-emerald-600 dark:text-emerald-400">
+                <span className="rounded-full bg-emerald-600/20 px-1.5 py-0.5 text-[10px] font-semibold text-emerald-600 dark:text-emerald-400">
                   {stats.active}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="inactive" className="flex h-6 items-center gap-1 text-[11px]">
+              <TabsTrigger value="inactive" className="flex h-8 items-center gap-1 text-xs">
                 Inactive
-                <span className="rounded-full bg-red-600/20 px-1 py-0 text-[9px] font-semibold text-red-600 dark:text-red-400">
+                <span className="rounded-full bg-red-600/20 px-1.5 py-0.5 text-[10px] font-semibold text-red-600 dark:text-red-400">
                   {stats.inactive}
                 </span>
               </TabsTrigger>
