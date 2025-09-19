@@ -11,6 +11,8 @@ import { Toaster } from "sonner";
 import ToastNotification from "./_components/HomeToastNotification";
 import LeftSidebar from "./_components/LeftSidebar";
 import Navbar from "./_components/Navbar";
+import PageTransitionWrapper from "./_components/PageTransitionWrapper";
+import { PageTransitionSettings } from "./_components/PageTransitionSettings";
 import { MuiStyleRoot } from "./(dashboard)/_components/DashboardRoadmapStyleRoot";
 
 // Optimize provider structure - move heavy providers to client
@@ -26,6 +28,7 @@ export default async function HomeLayout({
           <ThemeProvider>
             <ModalProviderHome />
             <ToastNotification />
+            <PageTransitionSettings />
             
             <Toaster 
               richColors
@@ -57,13 +60,15 @@ export default async function HomeLayout({
                     </ErrorBoundary>
                     <section className="background-lightsection_darksection flex min-h-screen w-full flex-1 flex-col px-2 pb-6 pt-24 max-md:pb-14 sm:px-4 md:px-8 lg:px-12">
                       <div className="max-w-8xl mx-auto h-full w-full">
-                        <Suspense fallback={
-                          <div className="flex items-center justify-center h-64">
-                            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-customBlue-500"></div>
-                          </div>
-                        }>
-                          <AsyncErrorBoundary>{children}</AsyncErrorBoundary>
-                        </Suspense>
+                        <PageTransitionWrapper>
+                          <Suspense fallback={
+                            <div className="flex items-center justify-center h-64">
+                              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-customBlue-500"></div>
+                            </div>
+                          }>
+                            <AsyncErrorBoundary>{children}</AsyncErrorBoundary>
+                          </Suspense>
+                        </PageTransitionWrapper>
                       </div>
                     </section>
                   </div>
