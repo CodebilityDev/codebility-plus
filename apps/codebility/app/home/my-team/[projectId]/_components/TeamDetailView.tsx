@@ -228,6 +228,14 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   return (
     <>
       <div className="space-y-6">
+        {/* Attendance Warning Banner */}
+        {viewMode === "attendance" && (
+          <AttendanceWarningBanner 
+            projectId={projectInfo.id} 
+            isTeamLead={isTeamLead || !currentUserId}
+          />
+        )}
+        
         {/* Meeting Schedule Banner */}
         {formatSchedule() && (
           <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4">

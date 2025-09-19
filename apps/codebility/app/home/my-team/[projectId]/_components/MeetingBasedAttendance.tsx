@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
-import { ChevronLeft, ChevronRight, Circle, Calendar, Clock, Info } from "lucide-react";
+import { ChevronLeft, ChevronRight, Circle, Calendar, Clock, Info, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimpleMemberData } from "@/app/home/projects/actions";
 import {
@@ -14,6 +14,7 @@ import {
 import { toast } from "react-hot-toast";
 import { saveAttendance, getMonthlyAttendance, bulkSaveAttendance } from "../actions";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
+import { checkAttendanceWarnings } from "../actions/attendance-warnings";
 
 const ATTENDANCE_POINTS_PER_MEETING = 2;
 
@@ -202,6 +203,15 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
       if (result.success) {
         toast.success("Meeting attendance saved successfully!");
         setHasUnsavedChanges(false);
+        
+        // Check for attendance warnings after saving
+        const warningResult = await checkAttendanceWarnings(projectId, selectedYear, selectedMonth);
+        if (warningResult.success && warningResult.warnings && warningResult.warnings.length > 0) {
+          const warningCount = warningResult.warnings.filter(w => w.notificationSent).length;
+          if (warningCount > 0) {
+            toast.warning(`${warningCount} member${warningCount > 1 ? 's' : ''} received attendance warnings`);
+          }
+        }
       } else {
         toast.error(result.error || "Failed to save attendance");
       }
@@ -234,6 +244,21 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
       
       const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (attendanceData[dateKey] === "present" || attendanceData[dateKey] === "excused") {
+        count++;
+      }
+    });
+    return count;
+  };
+
+  // Count absences for a member
+  const countAbsences = (memberId: string) => {
+    let count = 0;
+    monthDays.forEach(day => {
+      const scheduledMeeting = hasScheduledMeeting(day);
+      if (!scheduledMeeting) return;
+      
+      const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      if (attendanceData[dateKey] === "absent") {
         count++;
       }
     });
@@ -458,6 +483,8 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
               {allMembers.map((member, index) => {
                 const isLead = teamLead?.id === member.id;
                 const meetingsAttended = countMeetingsAttended(member.id);
+                const absences = countAbsences(member.id);
+                const hasWarning = absences >= 3;
                 
                 return (
                   <tr
@@ -477,6 +504,18 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
                             <span className="rounded bg-blue-100 px-0.5 py-0 text-[7px] text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
                               TL
                             </span>
+                          )}
+                          {hasWarning && (
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <AlertTriangle className="h-3 w-3 text-red-500 animate-pulse" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="text-xs">
+                                  Warning: {absences} absences - Account at risk of deactivation
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
                           )}
                         </div>
                       </div>
@@ -511,14 +550,19 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
                         </td>
                       );
                     })}
-                    <td className="sticky right-0 z-10 bg-green-50 dark:bg-green-900/20 text-center p-0.5">
+                    <td className={`sticky right-0 z-10 text-center p-0.5 ${hasWarning ? 'bg-red-50 dark:bg-red-900/20' : 'bg-green-50 dark:bg-green-900/20'}`}>
                       <div className="space-y-0">
-                        <div className="font-semibold text-[10px] sm:text-xs text-green-700 dark:text-green-400">
+                        <div className={`font-semibold text-[10px] sm:text-xs ${hasWarning ? 'text-red-700 dark:text-red-400' : 'text-green-700 dark:text-green-400'}`}>
                           {meetingsAttended}/{totalScheduledMeetings}
                         </div>
                         <div className="text-[8px] sm:text-[10px] text-gray-600 dark:text-gray-400 leading-tight">
                           +{meetingsAttended * ATTENDANCE_POINTS_PER_MEETING}
                         </div>
+                        {hasWarning && (
+                          <div className="text-[7px] text-red-600 dark:text-red-400 font-medium">
+                            {absences} absent
+                          </div>
+                        )}
                       </div>
                     </td>
                   </tr>

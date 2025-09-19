@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
-import { ChevronLeft, ChevronRight, Circle, Save, Trophy } from "lucide-react";
+import { ChevronLeft, ChevronRight, Circle, Save, Trophy, AlertTriangle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimpleMemberData } from "@/app/home/projects/actions";
 import {
@@ -13,6 +13,8 @@ import {
 } from "@codevs/ui/select";
 import { toast } from "react-hot-toast";
 import { saveAttendance, getMonthlyAttendance, bulkSaveAttendance } from "../actions";
+import { checkAttendanceWarnings } from "../actions/attendance-warnings";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codevs/ui/tooltip";
 
 const ATTENDANCE_POINTS_PER_DAY = 2;
 
@@ -179,6 +181,15 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
       if (result.success) {
         toast.success("Attendance saved successfully! Points have been updated.");
         setHasUnsavedChanges(false);
+        
+        // Check for attendance warnings after saving
+        const warningResult = await checkAttendanceWarnings(projectId, selectedYear, selectedMonth);
+        if (warningResult.success && warningResult.warnings && warningResult.warnings.length > 0) {
+          const warningCount = warningResult.warnings.filter(w => w.notificationSent).length;
+          if (warningCount > 0) {
+            toast.warning(`${warningCount} member${warningCount > 1 ? 's' : ''} received attendance warnings`);
+          }
+        }
       } else {
         toast.error(result.error || "Failed to save attendance");
       }
@@ -208,6 +219,21 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
     monthDays.forEach(day => {
       const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (attendanceData[dateKey] === "present") count++;
+    });
+    return count;
+  };
+
+  // Count absent days for a member
+  const countAbsentDays = (memberId: string) => {
+    let count = 0;
+    monthDays.forEach(day => {
+      const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      // Only count absences on weekdays unless weekend meetings are allowed
+      const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      if ((!isWeekend || allowWeekendMeetings) && attendanceData[dateKey] === "absent") {
+        count++;
+      }
     });
     return count;
   };
@@ -365,6 +391,8 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
           <tbody>
             {allMembers.map((member, index) => {
               const isLead = teamLead?.id === member.id;
+              const absentDays = countAbsentDays(member.id);
+              const hasWarning = absentDays >= 3;
               return (
                 <tr
                   key={member.id}
@@ -383,6 +411,20 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
                           <span className="rounded bg-blue-100 px-0.5 py-0 text-[7px] text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
                             TL
                           </span>
+                        )}
+                        {hasWarning && (
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger>
+                                <AlertTriangle className="h-3 w-3 text-red-500 animate-pulse" />
+                              </TooltipTrigger>
+                              <TooltipContent>
+                                <p className="text-xs">
+                                  Warning: {absentDays} absences - Account at risk of deactivation
+                                </p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
                         )}
                       </div>
                       <div className="text-[10px] text-gray-500 dark:text-gray-400 hidden sm:block truncate">
@@ -420,14 +462,19 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
                       </td>
                     );
                   })}
-                  <td className="sticky right-0 z-10 bg-green-50 dark:bg-green-900/20 text-center p-0.5">
+                  <td className={`sticky right-0 z-10 text-center p-0.5 ${hasWarning ? 'bg-red-50 dark:bg-red-900/20' : 'bg-green-50 dark:bg-green-900/20'}`}>
                     <div className="space-y-0">
-                      <div className="font-semibold text-[10px] sm:text-xs text-green-700 dark:text-green-400">
+                      <div className={`font-semibold text-[10px] sm:text-xs ${hasWarning ? 'text-red-700 dark:text-red-400' : 'text-green-700 dark:text-green-400'}`}>
                         {countPresentDays(member.id)}
                       </div>
                       <div className="text-[8px] sm:text-[10px] text-gray-600 dark:text-gray-400 leading-tight">
                         +{countPresentDays(member.id) * ATTENDANCE_POINTS_PER_DAY}
                       </div>
+                      {hasWarning && (
+                        <div className="text-[7px] text-red-600 dark:text-red-400 font-medium">
+                          {absentDays} absent
+                        </div>
+                      )}
                     </div>
                   </td>
                 </tr>
