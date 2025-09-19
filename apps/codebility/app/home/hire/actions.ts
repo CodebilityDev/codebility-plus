@@ -29,7 +29,7 @@ export async function updateJobListing(
     const { data: userData } = await supabase
       .from('codev')
       .select('id, role_id')
-      .eq('auth_id', user.id)
+      .eq('id', user.id)
       .single();
 
     if (!userData) {
@@ -100,7 +100,7 @@ export async function deleteJobListing(jobId: string) {
     const { data: userData } = await supabase
       .from('codev')
       .select('id, role_id')
-      .eq('auth_id', user.id)
+      .eq('id', user.id)
       .single();
 
     if (!userData) {
