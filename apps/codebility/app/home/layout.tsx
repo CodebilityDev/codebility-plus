@@ -16,6 +16,9 @@ import PageTransitionWrapper from "./_components/PageTransitionWrapper";
 import { PageTransitionSettings } from "./_components/PageTransitionSettings";
 import { MuiStyleRoot } from "./(dashboard)/_components/DashboardRoadmapStyleRoot";
 
+// Force dynamic rendering for layout due to server-side Supabase usage
+export const dynamic = "force-dynamic";
+
 // Optimize provider structure - move heavy providers to client
 export default async function HomeLayout({
   children,
