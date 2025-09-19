@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
 import AttendanceGrid from "./AttendanceGrid";
+import MeetingBasedAttendance from "./MeetingBasedAttendance";
 import CompactMemberGrid from "./CompactMemberGrid";
 import SyncAllAttendance from "./SyncAllAttendance";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
@@ -42,7 +43,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
   const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
-  const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(true); // Allow by default for teams with weekend meetings
+  const [useMeetingBasedAttendance, setUseMeetingBasedAttendance] = useState(true); // Use meeting-based attendance by default
   const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
   const [currentSchedule, setCurrentSchedule] = useState<{ selectedDays: string[]; time: string } | null>(null);
   const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ totalPoints: number; presentDays: number }>({ totalPoints: 0, presentDays: 0 });
@@ -419,14 +420,30 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         ) : (
           /* Attendance Grid View */
           <div className="w-full overflow-x-hidden">
-            <AttendanceGrid
-              ref={attendanceGridRef}
-              teamMembers={members?.data || []}
-              teamLead={teamLead?.data || null}
-              projectId={projectInfo.id}
-              allowWeekendMeetings={allowWeekendMeetings}
-              onHasChangesUpdate={setHasAttendanceChanges}
-            />
+            {useMeetingBasedAttendance && currentSchedule ? (
+              <MeetingBasedAttendance
+                ref={attendanceGridRef}
+                teamMembers={members?.data || []}
+                teamLead={teamLead?.data || null}
+                projectId={projectInfo.id}
+                meetingSchedule={
+                  currentSchedule.selectedDays.map(day => ({
+                    day,
+                    time: currentSchedule.time
+                  }))
+                }
+                onHasChangesUpdate={setHasAttendanceChanges}
+              />
+            ) : (
+              <AttendanceGrid
+                ref={attendanceGridRef}
+                teamMembers={members?.data || []}
+                teamLead={teamLead?.data || null}
+                projectId={projectInfo.id}
+                allowWeekendMeetings={true}
+                onHasChangesUpdate={setHasAttendanceChanges}
+              />
+            )}
           </div>
         )}
       </div>
