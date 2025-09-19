@@ -28,6 +28,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
+        className="h-3 w-3"
       />
     ),
     cell: ({ row }) => (
@@ -35,18 +36,21 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="mx-0 mt-8 px-0 xl:mt-0"
+        className="mx-0 mt-6 px-0 xl:mt-0 h-3 w-3"
       />
     ),
     enableSorting: false,
     enableHiding: false,
     meta: {
-      className: "align-top xl:align-middle",
+      className: "align-top xl:align-middle w-10",
     },
   },
   {
     id: "applicant",
     accessorKey: "first_name",
+    meta: {
+      className: "min-w-[200px]",
+    },
     header: ({ column }) => {
       return (
         <Button
@@ -91,6 +95,9 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
           {applicant.display_position || "Not specified"}
         </div>
       );
+    },
+    meta: {
+      className: "w-32",
     },
   },
   {
