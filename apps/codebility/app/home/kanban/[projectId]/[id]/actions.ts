@@ -118,8 +118,8 @@ export const createNewTask = async (
     const skill_category_id = formData.get("skill_category_id")?.toString();
     const created_by = formData.get("created_by")?.toString();
 
-    if (!title || !kanban_column_id) {
-      return { success: false, error: "Required fields are missing" };
+    if (!title || !kanban_column_id || !skill_category_id) {
+      return { success: false, error: "Required fields are missing (title, column, and skill category)" };
     }
 
     const { error } = await supabase.from("tasks").insert([
