@@ -9,6 +9,13 @@ const DashboardCertificate = () => {
 	const router = useRouter();
 	const { user, userLevel } = useUserStore();
 
+	// Show certificate button if user is admin (role_id 1) or has points/level requirements
+	const canViewCertificate = user?.role_id === 1 || user; // Admins can always view, others need to be logged in
+
+	if (!canViewCertificate) {
+		return null;
+	}
+
 	return (
 		<div className="absolute left-4 top-4 z-10">
 			<Tooltip>
@@ -29,7 +36,7 @@ const DashboardCertificate = () => {
 					</Button>
 				</TooltipTrigger>
 				<TooltipContent side="bottom" align="start">
-					View your certificate
+					{user?.role_id === 1 ? "View certificates (Admin)" : "View your certificate"}
 				</TooltipContent>
 			</Tooltip>
 		</div>
