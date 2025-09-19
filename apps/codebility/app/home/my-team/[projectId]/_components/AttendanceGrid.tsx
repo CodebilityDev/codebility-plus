@@ -226,7 +226,14 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
   // Count absent days for a member
   const countAbsentDays = (memberId: string) => {
     let count = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
+    
     monthDays.forEach(day => {
+      // Skip future dates
+      const currentDateToCheck = new Date(selectedYear, selectedMonth, day);
+      if (currentDateToCheck > today) return;
+      
       const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       // Only count absences on weekdays unless weekend meetings are allowed
       const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);

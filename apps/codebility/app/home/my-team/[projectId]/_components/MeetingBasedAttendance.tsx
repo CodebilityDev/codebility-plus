@@ -253,9 +253,16 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
   // Count absences for a member
   const countAbsences = (memberId: string) => {
     let count = 0;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
+    
     monthDays.forEach(day => {
       const scheduledMeeting = hasScheduledMeeting(day);
       if (!scheduledMeeting) return;
+      
+      // Skip future dates
+      const currentDateToCheck = new Date(selectedYear, selectedMonth, day);
+      if (currentDateToCheck > today) return;
       
       const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (attendanceData[dateKey] === "absent") {

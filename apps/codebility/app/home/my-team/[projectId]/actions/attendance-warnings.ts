@@ -69,9 +69,16 @@ export async function checkAttendanceWarnings(
       return { success: false, error: "No attendance records found" };
     }
 
-    // Count absences per member
+    // Count absences per member (excluding future dates)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset to start of day
+    
     const absenceCounts = new Map<string, number>();
     attendance.forEach(record => {
+      // Skip future dates
+      const recordDate = new Date(record.date);
+      if (recordDate > today) return;
+      
       if (record.status === "absent") {
         const current = absenceCounts.get(record.codev_id) || 0;
         absenceCounts.set(record.codev_id, current + 1);
@@ -190,18 +197,26 @@ export async function getAttendanceWarningStatus(
       .gte("date", startDate)
       .lte("date", endDate);
 
-    // Count absences per member
+    // Count absences per member (excluding future dates)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset to start of day
+    
     const memberStatus = members.map(member => {
       const memberAttendance = attendance?.filter(a => a.codev_id === member.codev_id) || [];
-      const absences = memberAttendance.filter(a => a.status === "absent").length;
+      // Filter out future dates before counting absences
+      const pastAttendance = memberAttendance.filter(a => {
+        const recordDate = new Date(a.date);
+        return recordDate <= today;
+      });
+      const absences = pastAttendance.filter(a => a.status === "absent").length;
       
       return {
         codevId: member.codev_id,
         name: `${member.codev.first_name} ${member.codev.last_name}`,
         absences,
         hasWarning: absences >= ABSENCE_WARNING_THRESHOLD,
-        attendancePercentage: memberAttendance.length > 0 
-          ? Math.round(((memberAttendance.length - absences) / memberAttendance.length) * 100)
+        attendancePercentage: pastAttendance.length > 0 
+          ? Math.round(((pastAttendance.length - absences) / pastAttendance.length) * 100)
           : 100
       };
     });
