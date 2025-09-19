@@ -17,7 +17,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@codev
 
 const ATTENDANCE_POINTS_PER_MEETING = 2;
 
-type AttendanceStatus = "present" | "absent" | "late" | "not_scheduled";
+type AttendanceStatus = "present" | "absent" | "excused" | "not_scheduled";
 
 interface AttendanceData {
   [key: string]: AttendanceStatus; // key format: "memberId-YYYY-MM-DD"
@@ -153,8 +153,8 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
     
     let newStatus: AttendanceStatus;
     if (currentStatus === "present") newStatus = "absent";
-    else if (currentStatus === "absent") newStatus = "late";
-    else if (currentStatus === "late") newStatus = "present";
+    else if (currentStatus === "absent") newStatus = "excused";
+    else if (currentStatus === "excused") newStatus = "present";
     else newStatus = "absent"; // For not_scheduled, start with absent
     
     setAttendanceData(prev => ({
@@ -190,8 +190,8 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
             project_id: projectId,
             date: dateStr,
             status: status as any,
-            check_in: status === "present" || status === "late" ? scheduledMeeting.time : undefined,
-            check_out: status === "present" || status === "late" ? 
+            check_in: status === "present" || status === "excused" ? scheduledMeeting.time : undefined,
+            check_out: status === "present" || status === "excused" ? 
               `${parseInt(scheduledMeeting.time.split(':')[0]) + 1}:${scheduledMeeting.time.split(':')[1]}` : undefined
           });
         });
@@ -233,7 +233,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
       if (!scheduledMeeting) return;
       
       const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-      if (attendanceData[dateKey] === "present" || attendanceData[dateKey] === "late") {
+      if (attendanceData[dateKey] === "present" || attendanceData[dateKey] === "excused") {
         count++;
       }
     });
@@ -260,7 +260,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
         return <Circle className="h-4 w-4 sm:h-5 sm:w-5 fill-green-500 text-green-500" />;
       case "absent":
         return <Circle className="h-4 w-4 sm:h-5 sm:w-5 fill-red-500 text-red-500" />;
-      case "late":
+      case "excused":
         return <Circle className="h-4 w-4 sm:h-5 sm:w-5 fill-yellow-500 text-yellow-500" />;
       case "not_scheduled":
         return <Circle className="h-4 w-4 sm:h-5 sm:w-5 fill-gray-300 text-gray-300 dark:fill-gray-600 dark:text-gray-600" />;
@@ -538,7 +538,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
               </div>
               <div className="flex items-center gap-1">
                 <Circle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-yellow-500 text-yellow-500" />
-                <span className="text-gray-600 dark:text-gray-400">Late</span>
+                <span className="text-gray-600 dark:text-gray-400">Excused</span>
               </div>
               <div className="flex items-center gap-1">
                 <Circle className="h-3.5 w-3.5 sm:h-4 sm:w-4 fill-red-500 text-red-500" />
