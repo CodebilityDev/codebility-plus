@@ -127,7 +127,7 @@ export default async function AdminDashboard() {
   );
 
   return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4">
+    <div className="mx-auto flex max-w-screen-xl flex-col gap-4 pt-6">
       <H1>Dashboard</H1>
       {/* <p>{JSON.stringify(dashboardData, null, 2)}</p> */}
       <div className="flex flex-col gap-4 md:flex-row">
