@@ -17,6 +17,7 @@ import MeetingBasedAttendance from "./MeetingBasedAttendance";
 import CompactMemberGrid from "./CompactMemberGrid";
 import SyncAllAttendance from "./SyncAllAttendance";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
+import AttendanceWarningBanner from "./AttendanceWarningBanner";
 import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "../actions";
 
 interface ProjectData {
