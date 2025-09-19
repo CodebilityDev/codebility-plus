@@ -1,11 +1,12 @@
 import { Suspense } from "react";
 import H1 from "@/components/shared/dashboard/H1";
+import PageContainer from "./_components/PageContainer";
 import DashboardClient from "./_components/DashboardClient";
 
 // Loading component for better UX
 function DashboardLoading() {
   return (
-    <div className="flex flex-col gap-4 lg:flex-row">
+    <div className="flex flex-col gap-4 lg:flex-row ">
       <div className="md:basis-[50%] xl:basis-[60%]">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
@@ -26,15 +27,15 @@ export const revalidate = 3600; // Revalidate every hour for fresh data
 
 export default function DashboardPage() {
   return (
-    <div className="relative min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 dark:from-gray-950 dark:via-gray-900 dark:to-gray-950">
+    <PageContainer maxWidth="xl">
       {/* Background decorations */}
-      <div className="absolute inset-0 overflow-hidden">
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute -top-4 -left-4 h-72 w-72 rounded-full bg-gradient-to-br from-customBlue-400/10 to-purple-400/10 blur-3xl" />
         <div className="absolute top-1/2 -right-4 h-96 w-96 rounded-full bg-gradient-to-br from-green-400/10 to-customBlue-400/10 blur-3xl" />
         <div className="absolute -bottom-4 left-1/3 h-80 w-80 rounded-full bg-gradient-to-br from-purple-400/10 to-pink-400/10 blur-3xl" />
       </div>
       
-      <div className="relative mx-auto flex max-w-screen-xl flex-col gap-6 p-6">
+      <div className="relative z-10 flex flex-col gap-6">
         {/* Enhanced Header */}
         <div className="mb-6">
           <div className="flex items-center gap-4 mb-2">
@@ -89,10 +90,10 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <Suspense fallback={<DashboardLoading />}>
-          <DashboardClient />
-        </Suspense>
+          <Suspense fallback={<DashboardLoading />}>
+            <DashboardClient />
+          </Suspense>
       </div>
-    </div>
+    </PageContainer>
   );
 }

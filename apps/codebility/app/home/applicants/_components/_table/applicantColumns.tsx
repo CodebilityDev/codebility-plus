@@ -49,7 +49,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
     id: "applicant",
     accessorKey: "first_name",
     meta: {
-      className: "min-w-[200px]",
+      className: "min-w-[250px] max-w-[350px]",
     },
     header: ({ column }) => {
       return (
@@ -97,7 +97,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       );
     },
     meta: {
-      className: "w-32",
+      className: "min-w-[120px] max-w-[150px]",
     },
   },
   {
@@ -412,6 +412,9 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
           <ApplicantActionButton applicant={applicant} />
         </div>
       );
+    },
+    meta: {
+      className: "w-16 max-w-[64px]",
     },
   },
 ];

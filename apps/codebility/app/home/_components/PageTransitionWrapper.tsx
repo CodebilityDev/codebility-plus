@@ -67,7 +67,7 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
   }, [pathname, displayedPathname, animationEnabled, animationDuration]);
 
   return (
-    <>
+    <div className="relative min-h-[400px]">
       <AnimatePresence mode="wait">
         {isLoading && (
           <motion.div
@@ -77,6 +77,7 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
               opacity: 0,
               transition: { duration: 0.3, ease: "easeOut" }
             }}
+            className="absolute inset-0"
           >
             <PageLoadingAnimation />
           </motion.div>
@@ -97,6 +98,6 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
       >
         {children}
       </motion.div>
-    </>
+    </div>
   );
 }

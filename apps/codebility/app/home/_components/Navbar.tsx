@@ -57,7 +57,7 @@ const Navbar = () => {
   return (
     <>
       <nav
-        className="background-navbar fixed top-0 z-20 w-full shadow-sm"
+        className="fixed top-0 z-20 w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm"
         role="banner"
       >
       <div className="flex w-full min-w-full items-center justify-end px-8 py-2">
@@ -106,10 +106,10 @@ const Navbar = () => {
                 className="hidden flex-col items-end md:flex"
                 aria-hidden="true"
               >
-                <p className="capitalize dark:text-white">
+                <p className="capitalize text-gray-900 dark:text-gray-100">
                   {first_name} {last_name}
                 </p>
-                <p className="text-dark100_light900 text-sm">{email_address}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{email_address}</p>
               </div>
               <div className="from-customViolet-300 to-customBlue-500 relative size-[44px] rounded-full bg-gradient-to-b p-[1.5px]">
                 <Image
@@ -122,7 +122,7 @@ const Navbar = () => {
                 />
               </div>
               <IconDropdown
-                className="hidden invert dark:invert-0 md:block"
+                className="hidden text-gray-600 dark:text-gray-400 md:block"
                 aria-hidden="true"
               />
               <span className="sr-only">
@@ -131,7 +131,7 @@ const Navbar = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
-              className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]"
+              className="bg-white dark:bg-gray-800 absolute -left-24 top-3 border-gray-200 dark:border-gray-700 md:w-[200px] shadow-lg"
               role="menu"
               aria-label="User account options"
             >

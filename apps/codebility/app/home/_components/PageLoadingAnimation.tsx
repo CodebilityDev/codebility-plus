@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 
 export default function PageLoadingAnimation() {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-950">
+    <div className="absolute inset-0 z-50 flex items-center justify-center bg-white dark:bg-gray-950 min-h-[400px]">
       {/* Background gradient animation */}
       <motion.div
         className="absolute inset-0 opacity-30"

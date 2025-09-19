@@ -18,6 +18,7 @@ import {
 } from "@codevs/ui/select";
 import { Switch } from "@codevs/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
+import { updateJobListing } from "../actions";
 import {
   Dialog,
   DialogContent,
@@ -89,31 +90,21 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
         .map(req => req.trim())
         .filter(req => req.length > 0);
 
-      // Import Supabase client
-      const { createClientClientComponent } = await import("@/utils/supabase/client");
-      const supabase = createClientClientComponent();
+      // Use server action to update the job
+      const result = await updateJobListing(job.id, {
+        title: data.title,
+        department: data.department,
+        location: data.location,
+        type: data.type,
+        level: data.level,
+        description: data.description,
+        requirements: requirementsArray,
+        salary_range: data.salary_range || null,
+        remote: data.remote,
+      });
 
-      // Update the job in the database
-      const { data: updatedJob, error } = await supabase
-        .from('job_listings')
-        .update({
-          title: data.title,
-          department: data.department,
-          location: data.location,
-          type: data.type,
-          level: data.level,
-          description: data.description,
-          requirements: requirementsArray,
-          salary_range: data.salary_range || null,
-          remote: data.remote,
-          updated_at: new Date().toISOString(),
-        })
-        .eq('id', job.id)
-        .select()
-        .single();
-
-      if (error) {
-        throw error;
+      if (!result.success) {
+        throw new Error(result.error || "Failed to update job");
       }
       
       toast({
