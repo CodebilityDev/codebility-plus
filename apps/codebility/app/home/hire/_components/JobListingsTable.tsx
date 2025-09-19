@@ -34,6 +34,7 @@ import { JobListing } from "@/app/(marketing)/careers/_types/job-listings";
 import EditJobModal from "./EditJobModal";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
+import { useUserStore } from "@/store/codev-store";
 
 interface JobWithApplicationCount extends JobListing {
   application_count?: number;
@@ -48,10 +49,14 @@ interface JobWithApplicationCount extends JobListing {
 export default function JobListingsTable() {
   const router = useRouter();
   const { toast } = useToast();
+  const { user } = useUserStore();
   const [jobs, setJobs] = useState<JobWithApplicationCount[]>([]);
   const [loading, setLoading] = useState(true);
   const [editingJob, setEditingJob] = useState<JobListing | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  // Check if user is admin (role_id 1 or 4)
+  const isAdmin = user?.role_id === 1 || user?.role_id === 4;
 
   useEffect(() => {
     fetchJobListings();
@@ -319,28 +324,37 @@ export default function JobListingsTable() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-gray-900 border-gray-800">
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleEdit(job);
-                        }}
-                        className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit Listing
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={(e) => {
-                          e.preventDefault();
-                          e.stopPropagation();
-                          handleDelete(job.id);
-                        }}
-                        className="text-red-400 hover:text-red-300 hover:bg-gray-800 cursor-pointer"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
+                      {(isAdmin || job.created_by === user?.id) && (
+                        <>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleEdit(job);
+                            }}
+                            className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Listing
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleDelete(job.id);
+                            }}
+                            className="text-red-400 hover:text-red-300 hover:bg-gray-800 cursor-pointer"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      {!isAdmin && job.created_by !== user?.id && (
+                        <DropdownMenuItem disabled className="text-gray-500">
+                          No actions available
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
