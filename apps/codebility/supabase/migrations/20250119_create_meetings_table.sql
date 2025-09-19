@@ -23,7 +23,7 @@ CREATE TABLE IF NOT EXISTS meeting_attendance (
     id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
     meeting_id UUID NOT NULL REFERENCES meetings(id) ON DELETE CASCADE,
     codev_id UUID NOT NULL REFERENCES codev(id) ON DELETE CASCADE,
-    attendance_status TEXT NOT NULL DEFAULT 'pending' CHECK (attendance_status IN ('pending', 'present', 'absent', 'late', 'excused')),
+    attendance_status TEXT NOT NULL DEFAULT 'pending' CHECK (attendance_status IN ('pending', 'present', 'absent', 'excused')),
     join_time TIMESTAMP WITH TIME ZONE,
     leave_time TIMESTAMP WITH TIME ZONE,
     notes TEXT,
@@ -116,7 +116,6 @@ BEGIN
             NEW.scheduled_date,
             CASE 
                 WHEN ma.attendance_status = 'present' THEN 'present'::text
-                WHEN ma.attendance_status = 'late' THEN 'late'::text
                 WHEN ma.attendance_status = 'excused' THEN 'present'::text
                 ELSE 'absent'::text
             END,
