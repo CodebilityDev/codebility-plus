@@ -17,6 +17,7 @@ import {
 import pathsConfig from "@/config/paths.config";
 import { IconKanban } from "@/public/assets/svgs";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import PageContainer from "../_components/PageContainer";
 
 import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
 
@@ -239,21 +240,22 @@ export default async function KanbanPage(props: PageProps) {
 
   // Render the full page
   return (
-    <AsyncErrorBoundary
-      fallback={
-        <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
-          <div className="mb-4 text-4xl">📋</div>
-          <h2 className="mb-2 text-xl font-semibold">
-            Unable to load Kanban boards
-          </h2>
-          <p className="text-gray-600 dark:text-gray-400">
-            There was an issue loading your Kanban boards. Please try refreshing
-            the page.
-          </p>
-        </div>
-      }
-    >
-      <div className="mx-auto flex max-w-7xl flex-col gap-6 p-4">
+    <PageContainer>
+      <AsyncErrorBoundary
+        fallback={
+          <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+            <div className="mb-4 text-4xl">📋</div>
+            <h2 className="mb-2 text-xl font-semibold">
+              Unable to load Kanban boards
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              There was an issue loading your Kanban boards. Please try refreshing
+              the page.
+            </p>
+          </div>
+        }
+      >
+        <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             <div className="from-customBlue-500 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br to-purple-500 shadow-lg">
@@ -300,6 +302,7 @@ export default async function KanbanPage(props: PageProps) {
           </Table>
         </div>
       </div>
-    </AsyncErrorBoundary>
+      </AsyncErrorBoundary>
+    </PageContainer>
   );
 }

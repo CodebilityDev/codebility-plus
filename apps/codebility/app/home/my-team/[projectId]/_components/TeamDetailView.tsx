@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { 
   getMembers, 
@@ -10,11 +10,13 @@ import {
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Table, Calendar, TrendingUp } from "lucide-react";
+import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
 import AttendanceGrid from "./AttendanceGrid";
 import CompactMemberGrid from "./CompactMemberGrid";
 import SyncAllAttendance from "./SyncAllAttendance";
+import ScheduleMeetingModal from "./ScheduleMeetingModal";
+import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "../actions";
 
 interface ProjectData {
   project: {
@@ -39,12 +41,77 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [showAddModal, setShowAddModal] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
+  const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
+  const [allowWeekendMeetings, setAllowWeekendMeetings] = useState(true); // Allow by default for teams with weekend meetings
+  const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
+  const [currentSchedule, setCurrentSchedule] = useState<{ selectedDays: string[]; time: string } | null>(null);
+  const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ totalPoints: number; presentDays: number }>({ totalPoints: 0, presentDays: 0 });
+  const attendanceGridRef = useRef<any>(null);
 
   const { project: projectInfo, teamLead, members, currentUserId } = project;
-  const totalMembers = members.data.length + (teamLead.data ? 1 : 0);
+  const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
   
   // Check if current user is the team lead
-  const isTeamLead = currentUserId && teamLead.data && teamLead.data.id === currentUserId;
+  const isTeamLead = currentUserId && teamLead?.data && teamLead.data.id === currentUserId;
+
+  // Load meeting schedule on component mount
+  useEffect(() => {
+    const loadSchedule = async () => {
+      const result = await getMeetingSchedule(projectInfo.id);
+      if (result.success && result.schedule) {
+        setCurrentSchedule(result.schedule);
+      }
+    };
+    loadSchedule();
+  }, [projectInfo.id]);
+
+  // Load monthly attendance points
+  useEffect(() => {
+    const loadAttendancePoints = async () => {
+      const currentDate = new Date();
+      const result = await getTeamMonthlyAttendancePoints(
+        projectInfo.id,
+        currentDate.getFullYear(),
+        currentDate.getMonth()
+      );
+      
+      if (result.success) {
+        setMonthlyAttendancePoints({
+          totalPoints: result.totalPoints,
+          presentDays: result.presentDays
+        });
+      }
+    };
+    
+    loadAttendancePoints();
+    
+    // Refresh when view mode changes to/from attendance
+    if (viewMode === 'team') {
+      loadAttendancePoints();
+    }
+  }, [projectInfo.id, viewMode]);
+
+  // Format schedule for display
+  const formatSchedule = () => {
+    if (!currentSchedule || !currentSchedule.selectedDays || currentSchedule.selectedDays.length === 0) return null;
+    
+    const weekDays = [
+      { value: "monday", label: "Monday", short: "Mon" },
+      { value: "tuesday", label: "Tuesday", short: "Tue" },
+      { value: "wednesday", label: "Wednesday", short: "Wed" },
+      { value: "thursday", label: "Thursday", short: "Thu" },
+      { value: "friday", label: "Friday", short: "Fri" },
+      { value: "saturday", label: "Saturday", short: "Sat" },
+      { value: "sunday", label: "Sunday", short: "Sun" },
+    ];
+    
+    const selectedDaysDisplay = currentSchedule.selectedDays
+      .map(day => weekDays.find(d => d.value === day)?.short)
+      .filter(Boolean)
+      .join(", ");
+      
+    return `${selectedDaysDisplay} at ${currentSchedule.time} @ Discord`;
+  };
 
   const handleOpenAddModal = () => {
     setShowAddModal(true);
@@ -53,6 +120,27 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const handleCloseModal = () => {
     setShowAddModal(false);
   };
+
+  const handleSaveAttendance = useCallback(async () => {
+    if (attendanceGridRef.current?.saveAllAttendance) {
+      await attendanceGridRef.current.saveAllAttendance();
+      
+      // Refresh attendance points after saving
+      const currentDate = new Date();
+      const result = await getTeamMonthlyAttendancePoints(
+        projectInfo.id,
+        currentDate.getFullYear(),
+        currentDate.getMonth()
+      );
+      
+      if (result.success) {
+        setMonthlyAttendancePoints({
+          totalPoints: result.totalPoints,
+          presentDays: result.presentDays
+        });
+      }
+    }
+  }, [projectInfo.id]);
 
   const handleUpdateMembers = async (selectedMembers: Codev[]) => {
     try {
@@ -123,9 +211,42 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     }
   };
 
+  const handleScheduleUpdate = async () => {
+    // Close modal and reload schedule
+    setShowScheduleMeetingModal(false);
+    
+    // Reload the schedule after a short delay to ensure the save is complete
+    setTimeout(async () => {
+      const result = await getMeetingSchedule(projectInfo.id);
+      if (result.success && result.schedule) {
+        setCurrentSchedule(result.schedule);
+      }
+    }, 500);
+  };
+
   return (
     <>
       <div className="space-y-6">
+        {/* Meeting Schedule Banner */}
+        {formatSchedule() && (
+          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2">
+                  <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-900 dark:text-white">Meeting Schedule</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mt-0.5">
+                    <Clock className="h-3.5 w-3.5" />
+                    {formatSchedule()}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
@@ -133,17 +254,21 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               variant={viewMode === "team" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("team")}
-              className="flex items-center gap-2"
+              className={`flex items-center gap-2 ${
+                viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
+              }`}
             >
               <Users className="h-4 w-4" />
               Team View
             </Button>
-            {isTeamLead && (
+            {(isTeamLead || !currentUserId) && (
               <Button
                 variant={viewMode === "attendance" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setViewMode("attendance")}
-                className="flex items-center gap-2"
+                className={`flex items-center gap-2 ${
+                  viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
+                }`}
               >
                 <Table className="h-4 w-4" />
                 Attendance
@@ -152,10 +277,23 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           </div>
           <div className="flex gap-2">
             {viewMode === "attendance" && (
-              <SyncAllAttendance 
-                projectId={projectInfo.id} 
-                isTeamLead={isTeamLead || false} 
-              />
+              <>
+                {hasAttendanceChanges && (
+                  <Button
+                    onClick={handleSaveAttendance}
+                    variant="default"
+                    size="sm"
+                    className="flex items-center gap-1.5 text-xs"
+                  >
+                    <Save className="h-3.5 w-3.5" />
+                    Save Changes
+                  </Button>
+                )}
+                <SyncAllAttendance 
+                  projectId={projectInfo.id} 
+                  isTeamLead={isTeamLead || !currentUserId} 
+                />
+              </>
             )}
             {viewMode === "team" && (
               <Button
@@ -166,6 +304,18 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               >
                 <UserPlus className="h-3.5 w-3.5" />
                 {isLoadingMembers ? 'Loading...' : 'Add Members'}
+              </Button>
+            )}
+            {isTeamLead && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                title="Schedule Meetings"
+                onClick={() => setShowScheduleMeetingModal(true)}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Schedule Meeting
               </Button>
             )}
           </div>
@@ -216,25 +366,34 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                     <TrendingUp className="h-4 w-4 text-green-600 dark:text-green-400" />
                     <div className="text-right">
                       <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                        +{totalMembers * 20}
+                        +{monthlyAttendancePoints.totalPoints}
                       </div>
-                      <div className="text-xs text-gray-500">Est. Points</div>
+                      <div className="text-xs text-gray-500">
+                        {monthlyAttendancePoints.presentDays > 0 ? 'Earned' : 'No attendance yet'}
+                      </div>
                     </div>
                   </div>
                 </div>
-                {isTeamLead && (
-                  <p className="mt-2 text-xs text-gray-600 dark:text-gray-400">
-                    Click "Attendance" tab to manage team attendance
-                  </p>
-                )}
+                <div className="mt-2 space-y-1">
+                  {monthlyAttendancePoints.presentDays > 0 && (
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      {monthlyAttendancePoints.presentDays} attendance {monthlyAttendancePoints.presentDays === 1 ? 'day' : 'days'} recorded
+                    </p>
+                  )}
+                  {isTeamLead && (
+                    <p className="text-xs text-gray-600 dark:text-gray-400">
+                      Click "Attendance" tab to manage team attendance
+                    </p>
+                  )}
+                </div>
               </div>
             </div>
 
             {/* Team Members Grid */}
             {totalMembers > 0 ? (
               <CompactMemberGrid 
-                members={members.data}
-                teamLead={teamLead.data}
+                members={members?.data || []}
+                teamLead={teamLead?.data || null}
               />
             ) : (
               <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 py-12 dark:border-gray-700">
@@ -259,11 +418,16 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           </>
         ) : (
           /* Attendance Grid View */
-          <AttendanceGrid
-            teamMembers={members.data}
-            teamLead={teamLead.data}
-            projectId={projectInfo.id}
-          />
+          <div className="w-full overflow-x-hidden">
+            <AttendanceGrid
+              ref={attendanceGridRef}
+              teamMembers={members?.data || []}
+              teamLead={teamLead?.data || null}
+              projectId={projectInfo.id}
+              allowWeekendMeetings={allowWeekendMeetings}
+              onHasChangesUpdate={setHasAttendanceChanges}
+            />
+          </div>
         )}
       </div>
 
@@ -273,6 +437,17 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         projectData={project}
         onClose={handleCloseModal}
         onUpdate={handleUpdateMembers}
+      />
+
+      {/* Schedule Meeting Modal */}
+      <ScheduleMeetingModal
+        isOpen={showScheduleMeetingModal}
+        onClose={handleScheduleUpdate}
+        projectId={projectInfo.id}
+        projectName={projectInfo.name}
+        teamMembers={members?.data || []}
+        teamLead={teamLead?.data || null}
+        currentSchedule={currentSchedule}
       />
     </>
   );

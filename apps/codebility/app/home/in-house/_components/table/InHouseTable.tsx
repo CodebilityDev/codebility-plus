@@ -122,11 +122,11 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
     <Button
       variant="outline"
       size="sm"
-      className="ml-2 text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
+      className="ml-1 text-xs text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
       onClick={handleSendEmail}
       disabled={isSending}
     >
-      <Mail className="mr-1 h-4 w-4" />
+      <Mail className="mr-1 h-3 w-3" />
       {isSending ? "Sending..." : "Send NDA"}
     </Button>
   );
@@ -403,7 +403,7 @@ export function InHouseTable({
                 column.key === "email_address" ? (
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black"
+                    className="dark:text-light-900 px-1 py-2 text-xs font-semibold text-black"
                   >
                     {column.label}
                   </TableHead>
@@ -411,7 +411,7 @@ export function InHouseTable({
                   // Hidden on smaller screens, visible on 2XL+
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 hidden px-2 py-3 text-sm font-semibold text-black 2xl:table-cell"
+                    className="dark:text-light-900 hidden px-1 py-2 text-xs font-semibold text-black 2xl:table-cell"
                   >
                     {column.label}
                   </TableHead>
@@ -419,10 +419,10 @@ export function InHouseTable({
               )}
 
               {/* Responsive info column for mobile */}
-              <TableHead className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black 2xl:hidden">
+              <TableHead className="dark:text-light-900 px-1 py-2 text-xs font-semibold text-black 2xl:hidden">
                 Info
               </TableHead>
-              <TableHead className="dark:text-light-900 px-2 py-3 text-sm font-semibold text-black">
+              <TableHead className="dark:text-light-900 px-1 py-2 text-xs font-semibold text-black">
                 Actions
               </TableHead>
             </TableRow>
@@ -450,7 +450,7 @@ export function InHouseTable({
                   className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b"
                 >
                   {/* Avatar column - Always visible */}
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-1 py-1 text-xs text-black">
                     <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                       <Image
                         src={item.image_url || defaultImage}
@@ -463,22 +463,22 @@ export function InHouseTable({
                   </TableCell>
 
                   {/* First Name column - Always visible */}
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-1 py-1 text-xs text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
 
                   {/* Last Name column - Always visible */}
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-1 py-1 text-xs text-black">
                     {capitalize(item.last_name)}
                   </TableCell>
 
                   {/* Email column - Always visible */}
-                  <TableCell className="dark:text-light-900 px-2 py-2 text-base text-black">
+                  <TableCell className="dark:text-light-900 px-1 py-1 text-xs text-black">
                     {item.email_address}
                   </TableCell>
 
                   {/* Mobile Info Dropdown - Hidden on 2XL+ screens */}
-                  <TableCell className="dark:text-light-900 flex items-start justify-start px-2 py-2 text-base text-black 2xl:hidden">
+                  <TableCell className="dark:text-light-900 flex items-start justify-start px-1 py-1 text-xs text-black 2xl:hidden">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <span className="cursor-pointer hover:text-gray-600">...</span>
@@ -648,30 +648,30 @@ export function InHouseTable({
                   {/* Desktop-only columns - Hidden on smaller screens */}
                   
                   {/* Status Badge column */}
-                  <TableCell className="hidden px-2 py-2 2xl:table-cell">
+                  <TableCell className="hidden px-1 py-1 2xl:table-cell">
                     <StatusBadge
                       status={item.internal_status as InternalStatus}
                     />
                   </TableCell>
 
                   {/* Role column */}
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
                     {item.role_id
                       ? roles.find((role) => role.id === item.role_id)?.name || "-"
                       : "-"}
                   </TableCell>
 
                   {/* Display Position column - Now with UPPERCASE formatting */}
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
                     {formatDisplayPosition(item.display_position)}
                   </TableCell>
 
                   {/* Projects column */}
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
                     {item.projects?.length ? (
                       <div className="space-y-1">
                         {item.projects.map((project) => (
-                          <div key={project.id}>{project.name}</div>
+                          <div key={project.id} className="text-xs">{project.name}</div>
                         ))}
                       </div>
                     ) : (
@@ -680,8 +680,8 @@ export function InHouseTable({
                   </TableCell>
 
                   {/* Enhanced NDA Status column with storage-based action buttons */}
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
-                    <div className="flex items-center gap-2">
+                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
+                    <div className="flex items-center gap-1">
                       <span className={`${getNdaStatusColor(item.nda_status)}`}>
                         {item.nda_status ? "Yes" : "No"}
                       </span>
@@ -692,29 +692,29 @@ export function InHouseTable({
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
+                            className="text-xs text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
                             onClick={() => handleDownloadNda(item.id)}
                             title="Download NDA Document"
                           >
-                            <Download className="mr-1 h-4 w-4" />
+                            <Download className="mr-1 h-3 w-3" />
                             PDF
                           </Button>
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                            className="text-xs text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
                             onClick={() => handleDownloadSignature(item.id)}
                             title="Download Signature"
                           >
-                            <Download className="mr-1 h-4 w-4" />
-                            Signature
+                            <Download className="mr-1 h-3 w-3" />
+                            Sig
                           </Button>
                         </div>
                       ) : item.nda_request_sent ? (
                         <Button
                           variant="outline"
                           size="sm"
-                          className="ml-2 text-yellow-500 dark:text-yellow-200"
+                          className="ml-1 text-xs text-yellow-500 dark:text-yellow-200"
                           disabled
                         >
                           <span className="mr-1">⏳</span>
@@ -730,15 +730,15 @@ export function InHouseTable({
                   </TableCell>
 
                   {/* Portfolio column */}
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
                     {item.portfolio_website ? (
                       <a
                         href={item.portfolio_website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
+                        className="inline-flex items-center text-xs text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
                       >
-                        <Link2 className="mr-1 h-4 w-4" />
+                        <Link2 className="mr-1 h-3 w-3" />
                         Portfolio
                       </a>
                     ) : (
@@ -747,14 +747,14 @@ export function InHouseTable({
                   </TableCell>
 
                   {/* Date Joined column */}
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
                     {item.date_joined 
                       ? new Date(item.date_joined).toLocaleDateString()
                       : "-"}
                   </TableCell>
 
                   {/* Availability Status column */}
-                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
                     <SwitchStatusButton
                       disabled={false}
                       handleSwitch={() => {}}
@@ -763,7 +763,7 @@ export function InHouseTable({
                   </TableCell>
 
                   {/* Actions column - Always visible */}
-                  <TableCell className="px-2 py-2">
+                  <TableCell className="px-1 py-1">
                     <TableActions
                       item={item}
                       onEdit={() => setEditingId(item.id)}

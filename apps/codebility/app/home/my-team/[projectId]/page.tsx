@@ -53,8 +53,8 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
 
     const projectData = {
       project: project.project,
-      teamLead,
-      members,
+      teamLead: teamLead,
+      members: members,
       currentUserId: user.id
     };
 

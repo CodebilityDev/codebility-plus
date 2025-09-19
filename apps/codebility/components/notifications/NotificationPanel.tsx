@@ -19,15 +19,7 @@ import { cn } from "@/lib/utils";
 import { Button } from "@codevs/ui/button";
 import { ScrollArea } from "@codevs/ui/scroll-area";
 
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: "info" | "success" | "warning" | "error" | "message" | "user" | "event" | "achievement" | "job";
-  read: boolean;
-  createdAt: Date;
-  actionUrl?: string;
-}
+import type { Notification } from "@/types/notifications";
 
 interface NotificationPanelProps {
   notifications: Notification[];
@@ -48,6 +40,10 @@ const notificationIcons = {
   event: Calendar,
   achievement: Award,
   job: Briefcase,
+  attendance: Calendar,
+  project: Briefcase,
+  task: CheckCircle,
+  system: Info,
 };
 
 const notificationColors = {
@@ -60,6 +56,10 @@ const notificationColors = {
   event: "text-pink-500",
   achievement: "text-orange-500",
   job: "text-teal-500",
+  attendance: "text-blue-500",
+  project: "text-green-500",
+  task: "text-blue-500",
+  system: "text-gray-500",
 };
 
 export function NotificationPanel({
@@ -91,9 +91,9 @@ export function NotificationPanel({
               variant="ghost"
               size="sm"
               onClick={onMarkAllAsRead}
-              className="text-xs"
+              className="text-xs text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
             >
-              <Check className="mr-1 h-3 w-3" />
+              <Check className="mr-1 h-3 w-3 text-gray-700 dark:text-gray-300" />
               Mark all read
             </Button>
           )}
@@ -101,7 +101,7 @@ export function NotificationPanel({
             variant="ghost"
             size="sm"
             onClick={onClose}
-            className="h-8 w-8 p-0"
+            className="h-8 w-8 p-0 text-gray-700 hover:text-gray-900 dark:text-gray-300 dark:hover:text-white"
           >
             <X className="h-4 w-4" />
           </Button>
@@ -144,7 +144,10 @@ export function NotificationPanel({
                         {notification.message}
                       </p>
                       <p className="mt-1 text-xs text-gray-500 dark:text-gray-500">
-                        {formatDistanceToNow(notification.createdAt, { addSuffix: true })}
+                        {formatDistanceToNow(
+                          notification.createdAt || new Date(notification.created_at), 
+                          { addSuffix: true }
+                        )}
                       </p>
                     </div>
                   </div>
@@ -159,7 +162,7 @@ export function NotificationPanel({
                         className="h-6 w-6 p-0"
                         title="Mark as read"
                       >
-                        <Check className="h-3 w-3" />
+                        <Check className="h-3 w-3 text-gray-700 dark:text-gray-300" />
                       </Button>
                     )}
                     <Button
@@ -169,7 +172,7 @@ export function NotificationPanel({
                       className="h-6 w-6 p-0"
                       title="Archive"
                     >
-                      <Archive className="h-3 w-3" />
+                      <Archive className="h-3 w-3 text-gray-700 dark:text-gray-300" />
                     </Button>
                   </div>
                 </div>

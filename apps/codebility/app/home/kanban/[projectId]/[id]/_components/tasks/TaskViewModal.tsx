@@ -158,7 +158,7 @@ function AssigneeSelector({
       .includes(searchQuery.toLowerCase()),
   );
 
-  // ✅ FIXED: Restore proper removal functionality for AssigneeSelector
+  // Restore proper removal functionality for AssigneeSelector
   const handleRemove = () => {
     setLocalAssignee(null);
     onAssigneeChange([]); // Pass empty array to indicate no assignee
@@ -304,7 +304,8 @@ const TaskViewModal = ({
 }) => {
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const user = useUserStore((state) => state.user);
-  const { fetchBoardData } = useKanbanStore();
+  // Include removeTaskOptimistic in the destructured store methods
+  const { fetchBoardData, removeTaskOptimistic } = useKanbanStore();
 
   const [isLoading, setIsLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
@@ -324,7 +325,7 @@ const TaskViewModal = ({
   const [createdBy, setCreatedBy] = useState<CodevMember | null>(null);
   const [forceRefreshKey, setForceRefreshKey] = useState<string>("");
 
-  // ✅ FIXED: Enhanced state management for assignee changes
+  // Enhanced state management for assignee changes
   const [manualSaveChanges, setManualSaveChanges] = useState(false);
   const [isSavingChanges, setIsSavingChanges] = useState(false);
   const [pendingAssigneeId, setPendingAssigneeId] = useState<string | undefined>(undefined);
@@ -509,32 +510,51 @@ const TaskViewModal = ({
     setUpdateLoading(false);
   };
 
+  // Optimistic UI approach for task completion
   const handleMarkAsDone = async () => {
     if (!task) return;
 
     setIsLoading(true);
 
+    // Optimistically remove the task from UI immediately
+    removeTaskOptimistic(task.id);
+    
+    // Close modal immediately for better UX
+    onClose();
+    
+    // Show optimistic success message
+    toast.success("Completing task...");
+
     try {
       const result = await completeTask(task);
 
       if (result.success) {
+        // Update success message
         toast.success("Task completed and points awarded!");
 
+        // Call onComplete callback if provided
         if (onComplete) {
           onComplete(task.id);
         }
 
-        onClose();
-        await fetchBoardData();
+        // Optional: Fetch fresh data in background after a delay
+        // This ensures data consistency without blocking the UI
+        setTimeout(() => {
+          fetchBoardData();
+        }, 1000);
       } else {
+        // Revert optimistic update by refetching data
         toast.error(result.error || "Failed to complete task");
+        await fetchBoardData();
       }
     } catch (error) {
       console.error("Error completing task:", error);
       toast.error("Failed to complete task");
+      // Revert optimistic update by refetching data
+      await fetchBoardData();
+    } finally {
+      setIsLoading(false);
     }
-
-    setIsLoading(false);
   };
 
   const handleAssigneeChange = async (memberIds: string[]) => {
@@ -604,7 +624,7 @@ const TaskViewModal = ({
     onClose();
   };
 
-  // ✅ FIXED: Enhanced handleSaveChanges with assignee removal support
+  // Enhanced handleSaveChanges with assignee removal support
   const handleSaveChanges = async () => {
     if (!task || !supabase) return;
 
