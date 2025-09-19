@@ -38,6 +38,11 @@ const LeftSidebar = () => {
       : user.role_id;
   }, [user?.role_id, user?.internal_status, user?.availability_status]);
 
+  // Memoize sidebar data to avoid recalculation
+  const memoizedSidebarData = useMemo(() => {
+    return sidebarData;
+  }, [sidebarData]);
+
   useEffect(() => {
     const fetchSidebarData = async () => {
       if (roleId) {
@@ -164,7 +169,7 @@ const LeftSidebar = () => {
         role="navigation"
         aria-label="Main navigation"
       >
-        {sidebarData.map((section: SidebarSection) => (
+        {memoizedSidebarData.map((section: SidebarSection) => (
           <div
             key={section.id}
             role="group"
@@ -202,6 +207,7 @@ const LeftSidebar = () => {
                   <li key={link.route} role="none">
                     <Link
                       href={link.route}
+                      prefetch={true}
                       className={`${
                         isActive
                           ? "primary-gradient text-light-900 rounded-lg"
@@ -222,6 +228,7 @@ const LeftSidebar = () => {
                           height={28}
                           className={`${isActive ? "brightness-0 invert" : "brightness-0 dark:invert"} h-full w-full`}
                           aria-hidden="true"
+                          priority={isActive}
                         />
                       </div>
                       <span
