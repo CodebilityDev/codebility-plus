@@ -5,6 +5,19 @@ import { createNotification } from "@/lib/server/notification.service";
 
 const ABSENCE_WARNING_THRESHOLD = 3;
 
+// Helper function to check if a date is a scheduled meeting day
+function isScheduledMeetingDay(date: Date, meetingSchedule: { selectedDays: string[] } | null): boolean {
+  if (!meetingSchedule || !meetingSchedule.selectedDays || meetingSchedule.selectedDays.length === 0) {
+    // If no schedule, consider all weekdays as meeting days
+    const dayOfWeek = date.getDay();
+    return dayOfWeek !== 0 && dayOfWeek !== 6; // Not Sunday (0) or Saturday (6)
+  }
+  
+  const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+  const dayName = dayNames[date.getDay()];
+  return meetingSchedule.selectedDays.includes(dayName);
+}
+
 interface AttendanceWarningResult {
   success: boolean;
   warnings?: Array<{
@@ -44,6 +57,13 @@ export async function checkAttendanceWarnings(
       return { success: false, error: "Only team leads can check attendance warnings" };
     }
 
+    // Get the meeting schedule for the project
+    const { data: projectData } = await supabase
+      .from("projects")
+      .select("meeting_schedule")
+      .eq("id", projectId)
+      .single();
+
     // Get all members of the project
     const { data: members } = await supabase
       .from("project_members")
@@ -69,9 +89,10 @@ export async function checkAttendanceWarnings(
       return { success: false, error: "No attendance records found" };
     }
 
-    // Count absences per member (excluding future dates)
+    // Count absences per member (excluding future dates and non-scheduled days)
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset to start of day
+    const meetingSchedule = projectData?.meeting_schedule || null;
     
     const absenceCounts = new Map<string, number>();
     attendance.forEach(record => {
@@ -79,7 +100,8 @@ export async function checkAttendanceWarnings(
       const recordDate = new Date(record.date);
       if (recordDate > today) return;
       
-      if (record.status === "absent") {
+      // Only count absences on scheduled meeting days
+      if (isScheduledMeetingDay(recordDate, meetingSchedule) && record.status === "absent") {
         const current = absenceCounts.get(record.codev_id) || 0;
         absenceCounts.set(record.codev_id, current + 1);
       }
@@ -176,6 +198,13 @@ export async function getAttendanceWarningStatus(
   const supabase = await createClientServerComponent();
   
   try {
+    // Get the meeting schedule for the project
+    const { data: projectData } = await supabase
+      .from("projects")
+      .select("meeting_schedule")
+      .eq("id", projectId)
+      .single();
+      
     // Get all members
     const { data: members } = await supabase
       .from("project_members")
@@ -197,26 +226,29 @@ export async function getAttendanceWarningStatus(
       .gte("date", startDate)
       .lte("date", endDate);
 
-    // Count absences per member (excluding future dates)
+    // Count absences per member (excluding future dates and non-scheduled days)
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset to start of day
+    const meetingSchedule = projectData?.meeting_schedule || null;
     
     const memberStatus = members.map(member => {
       const memberAttendance = attendance?.filter(a => a.codev_id === member.codev_id) || [];
-      // Filter out future dates before counting absences
-      const pastAttendance = memberAttendance.filter(a => {
+      
+      // Filter out future dates and non-scheduled days
+      const scheduledMeetingAttendance = memberAttendance.filter(a => {
         const recordDate = new Date(a.date);
-        return recordDate <= today;
+        return recordDate <= today && isScheduledMeetingDay(recordDate, meetingSchedule);
       });
-      const absences = pastAttendance.filter(a => a.status === "absent").length;
+      
+      const absences = scheduledMeetingAttendance.filter(a => a.status === "absent").length;
       
       return {
         codevId: member.codev_id,
         name: `${member.codev.first_name} ${member.codev.last_name}`,
         absences,
         hasWarning: absences >= ABSENCE_WARNING_THRESHOLD,
-        attendancePercentage: pastAttendance.length > 0 
-          ? Math.round(((pastAttendance.length - absences) / pastAttendance.length) * 100)
+        attendancePercentage: scheduledMeetingAttendance.length > 0 
+          ? Math.round(((scheduledMeetingAttendance.length - absences) / scheduledMeetingAttendance.length) * 100)
           : 100
       };
     });
