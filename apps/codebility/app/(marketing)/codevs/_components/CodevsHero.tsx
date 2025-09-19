@@ -17,7 +17,7 @@ export default function Hero() {
   return (
     <section
       id="home"
-      className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-hidden bg-cover bg-no-repeat"
+      className="relative flex min-h-screen w-full flex-col items-center overflow-hidden bg-cover bg-no-repeat pt-24"
     >
       <SideNavMenu />
       <div
@@ -28,7 +28,7 @@ export default function Hero() {
         }}
       ></div>
       <OrbitingCirclesBackground />
-      <div className="z-10 flex w-full flex-col gap-3 p-4 text-center text-white">
+      <div className="z-10 flex w-full flex-1 flex-col items-center justify-center gap-3 p-4 text-center text-white">
         <p className="text-sm lg:text-xl">Find Your Next Developer</p>
         <div className="relative">
           <h1
