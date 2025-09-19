@@ -9,7 +9,7 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { Toaster } from "sonner";
 
 import ToastNotification from "./_components/HomeToastNotification";
-import LeftSidebar from "./_components/LeftSidebar";
+import LeftSidebarServer from "./_components/LeftSidebarServer";
 import Navbar from "./_components/Navbar";
 import PageTransitionWrapper from "./_components/PageTransitionWrapper";
 import { PageTransitionSettings } from "./_components/PageTransitionSettings";
@@ -54,7 +54,7 @@ export default async function HomeLayout({
                         <div className="w-16 bg-gray-100 dark:bg-gray-800" />
                       }
                     >
-                      <LeftSidebar />
+                      <LeftSidebarServer />
                     </ErrorBoundary>
                     <main className="background-lightsection_darksection flex-1 pt-[60px]">
                       <div className="mx-auto h-full max-w-8xl">
