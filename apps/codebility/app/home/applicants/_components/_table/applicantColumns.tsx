@@ -28,6 +28,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         }
         onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
         aria-label="Select all"
+        className="h-3 w-3"
       />
     ),
     cell: ({ row }) => (
@@ -35,27 +36,30 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         checked={row.getIsSelected()}
         onCheckedChange={(value) => row.toggleSelected(!!value)}
         aria-label="Select row"
-        className="mx-0 mt-8 px-0 xl:mt-0"
+        className="mx-0 mt-6 px-0 xl:mt-0 h-3 w-3"
       />
     ),
     enableSorting: false,
     enableHiding: false,
     meta: {
-      className: "align-top xl:align-middle",
+      className: "align-top xl:align-middle w-10",
     },
   },
   {
     id: "applicant",
     accessorKey: "first_name",
+    meta: {
+      className: "min-w-[250px] max-w-[350px]",
+    },
     header: ({ column }) => {
       return (
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-start gap-1 px-1 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200"
         >
           Applicant
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-1 h-3 w-3" />
         </Button>
       );
     },
@@ -76,10 +80,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-start gap-1 px-1 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200"
         >
           Position
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-1 h-3 w-3" />
         </Button>
       );
     },
@@ -87,10 +91,13 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="px-3 py-3 text-sm text-gray-700 dark:text-gray-300">
+        <div className="px-1 py-1 text-xs text-gray-700 dark:text-gray-300">
           {applicant.display_position || "Not specified"}
         </div>
       );
+    },
+    meta: {
+      className: "min-w-[120px] max-w-[150px]",
     },
   },
   {
@@ -100,10 +107,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-center gap-1 px-1 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200"
         >
           Exp
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-1 h-3 w-3" />
         </Button>
       );
     },
@@ -111,7 +118,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="px-3 py-3 text-center text-sm text-gray-700 dark:text-gray-300">
+        <div className="px-1 py-1 text-center text-xs text-gray-700 dark:text-gray-300">
           {applicant.years_of_experience !== undefined
             ? `${applicant.years_of_experience} ${
                 applicant.years_of_experience === 1 ? "yr" : "yrs"
@@ -121,7 +128,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       );
     },
     meta: {
-      className: "m-0 px-0",
+      className: "m-0 px-0 w-16",
     },
   },
   {
@@ -132,7 +139,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="px-3 py-3">
+        <div className="px-1 py-1">
           <div className="flex justify-center">
             {applicant.github ? (
               <Link
@@ -140,10 +147,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
                 target="_blank"
                 className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <IconGithub className="h-5 w-5 invert dark:invert-0" />
+                <IconGithub className="h-4 w-4 invert dark:invert-0" />
               </Link>
             ) : (
-              <span className="text-sm text-gray-600 dark:text-gray-500">
+              <span className="text-xs text-gray-600 dark:text-gray-500">
                 None
               </span>
             )}
@@ -160,7 +167,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="px-3 py-3">
+        <div className="px-1 py-1">
           <div className="flex justify-center">
             {applicant.portfolio_website ? (
               <Link
@@ -168,16 +175,19 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
                 target="_blank"
                 className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-200"
               >
-                <IconLink className="h-5 w-5 invert dark:invert-0" />
+                <IconLink className="h-4 w-4 invert dark:invert-0" />
               </Link>
             ) : (
-              <span className="text-sm text-gray-600 dark:text-gray-500">
+              <span className="text-xs text-gray-600 dark:text-gray-500">
                 None
               </span>
             )}
           </div>
         </div>
       );
+    },
+    meta: {
+      className: "w-20",
     },
   },
   {
@@ -188,10 +198,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-start gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-start gap-1 px-1 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200"
         >
           Tech Stacks
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-1 h-3 w-3" />
         </Button>
       );
     },
@@ -210,7 +220,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       );
     },
     meta: {
-      className: "m-0 px-0",
+      className: "m-0 px-0 w-36",
     },
   },
   {
@@ -220,10 +230,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-center gap-1 px-1 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200"
         >
           Date Applied
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-1 h-3 w-3" />
         </Button>
       );
     },
@@ -231,7 +241,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="py-3 text-center text-sm text-gray-700 dark:text-gray-300">
+        <div className="py-1 text-center text-xs text-gray-700 dark:text-gray-300">
           {applicant.date_applied
             ? new Date(applicant.date_applied).toLocaleDateString()
             : "N/A"}
@@ -250,10 +260,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-center gap-1 px-1 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200"
         >
           Test Taken
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-1 h-3 w-3" />
         </Button>
       );
     },
@@ -261,7 +271,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="py-3 text-center text-sm text-gray-700 dark:text-gray-300">
+        <div className="py-1 text-center text-xs text-gray-700 dark:text-gray-300">
           {applicant.applicant?.test_taken
             ? new Date(applicant.applicant.test_taken).toLocaleDateString()
             : "N/A"}
@@ -279,10 +289,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-center gap-1 px-1 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200"
         >
           Time
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-1 h-3 w-3" />
         </Button>
       );
     },
@@ -307,7 +317,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="flex items-center justify-center px-3 py-3 text-center">
+        <div className="flex items-center justify-center px-1 py-1 text-center">
           {applicant.applicant?.fork_url ? (
             <Link
               href={applicant.applicant.fork_url}
@@ -332,10 +342,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-2 text-sm font-medium text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-center gap-1 px-1 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200"
         >
           Reapply
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-1 h-3 w-3" />
         </Button>
       );
     },
@@ -361,10 +371,10 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
         <Button
           variant="ghost"
           onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex items-center justify-center gap-1 text-xs font-medium text-gray-700 dark:text-gray-200"
+          className="flex items-center justify-center gap-0.5 px-1 py-0.5 text-xs font-medium text-gray-700 dark:text-gray-200"
         >
           Reminded
-          <ArrowUpDown className="ml-2 h-4 w-4" />
+          <ArrowUpDown className="ml-1 h-3 w-3" />
         </Button>
       );
     },
@@ -398,10 +408,13 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       const applicant = row.original;
 
       return (
-        <div className="flex items-center justify-start gap-2 px-3 py-3">
+        <div className="flex items-center justify-start gap-1 px-1 py-1">
           <ApplicantActionButton applicant={applicant} />
         </div>
       );
+    },
+    meta: {
+      className: "w-16 max-w-[64px]",
     },
   },
 ];

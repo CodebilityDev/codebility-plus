@@ -4,9 +4,14 @@ import { useEffect, useRef } from "react";
 import { useNotificationStore } from "@/store/notification-store";
 import { NotificationIcon } from "./NotificationIcon";
 import { NotificationPanel } from "./NotificationPanel";
+import { createClientClientComponent } from "@/utils/supabase/client";
+import { useUserStore } from "@/store/codev-store";
+import { toast } from "sonner";
 
 export function NotificationContainer() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const supabase = createClientClientComponent();
+  const { user } = useUserStore();
   const {
     notifications,
     isOpen,
@@ -17,9 +22,66 @@ export function NotificationContainer() {
     archiveNotification,
     clearAll,
     getUnreadCount,
+    fetchNotifications,
+    addNotification,
   } = useNotificationStore();
 
   const unreadCount = getUnreadCount();
+
+  // Fetch notifications on mount and when user changes
+  useEffect(() => {
+    if (user?.id) {
+      fetchNotifications();
+    } else {
+    }
+  }, [user?.id]); // Remove fetchNotifications from deps to avoid circular dependency
+
+  // Also fetch when panel opens
+  useEffect(() => {
+    if (isOpen && user?.id) {
+      fetchNotifications();
+    }
+  }, [isOpen, user?.id]); // Remove fetchNotifications from deps
+
+  // Set up real-time subscription
+  useEffect(() => {
+    if (!user?.id || !supabase) return;
+
+    const channel = supabase
+      .channel(`notifications:${user.id}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "notifications",
+          filter: `recipient_id=eq.${user.id}`,
+        },
+        (payload) => {
+          const newNotification = {
+            ...payload.new,
+            createdAt: new Date(payload.new.created_at),
+          };
+          addNotification(newNotification as any);
+          
+          // Only show toast for notifications from other users
+          // Check if sender_id exists and is different from current user
+          if (payload.new.sender_id && payload.new.sender_id !== user.id) {
+            toast.info(payload.new.title, {
+              description: payload.new.message,
+              duration: 5000,
+            });
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      if (channel) {
+        supabase.removeChannel(channel);
+      }
+    };
+  }, [user?.id, addNotification, supabase]);
 
   // Close panel when clicking outside
   useEffect(() => {
@@ -46,6 +108,8 @@ export function NotificationContainer() {
     document.addEventListener("keydown", handleEscape);
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, setOpen]);
+
+  // Add debug info
 
   return (
     <div ref={containerRef} className="relative">

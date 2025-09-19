@@ -1,88 +1,113 @@
 import { create } from "zustand";
-import { persist } from "zustand/middleware";
-
-export interface Notification {
-  id: string;
-  title: string;
-  message: string;
-  type: "info" | "success" | "warning" | "error" | "message" | "user" | "event" | "achievement" | "job";
-  read: boolean;
-  createdAt: Date;
-  actionUrl?: string;
-}
+import type { Notification } from "@/types/notifications";
+import { 
+  fetchNotificationsAction,
+  markNotificationAsReadAction,
+  markAllNotificationsAsReadAction,
+  archiveNotificationAction,
+  clearAllNotificationsAction
+} from "@/lib/actions/notification.actions";
 
 interface NotificationStore {
   notifications: Notification[];
   isOpen: boolean;
-  addNotification: (notification: Omit<Notification, "id" | "read" | "createdAt">) => void;
-  markAsRead: (id: string) => void;
-  markAllAsRead: () => void;
-  archiveNotification: (id: string) => void;
-  clearAll: () => void;
+  isLoading: boolean;
+  error: string | null;
+  fetchNotifications: () => Promise<void>;
+  addNotification: (notification: Notification) => void;
+  markAsRead: (id: string) => Promise<void>;
+  markAllAsRead: () => Promise<void>;
+  archiveNotification: (id: string) => Promise<void>;
+  clearAll: () => Promise<void>;
   togglePanel: () => void;
   setOpen: (open: boolean) => void;
   getUnreadCount: () => number;
 }
 
-export const useNotificationStore = create<NotificationStore>()(
-  persist(
-    (set, get) => ({
-      notifications: [],
-      isOpen: false,
+export const useNotificationStore = create<NotificationStore>((set, get) => ({
+  notifications: [],
+  isOpen: false,
+  isLoading: false,
+  error: null,
 
-      addNotification: (notification) =>
-        set((state) => ({
-          notifications: [
-            {
-              ...notification,
-              id: crypto.randomUUID(),
-              read: false,
-              createdAt: new Date(),
-            },
-            ...state.notifications,
-          ],
-        })),
-
-      markAsRead: (id) =>
-        set((state) => ({
-          notifications: state.notifications.map((n) =>
-            n.id === id ? { ...n, read: true } : n
-          ),
-        })),
-
-      markAllAsRead: () =>
-        set((state) => ({
-          notifications: state.notifications.map((n) => ({ ...n, read: true })),
-        })),
-
-      archiveNotification: (id) =>
-        set((state) => ({
-          notifications: state.notifications.filter((n) => n.id !== id),
-        })),
-
-      clearAll: () =>
-        set(() => ({
-          notifications: [],
-        })),
-
-      togglePanel: () =>
-        set((state) => ({
-          isOpen: !state.isOpen,
-        })),
-
-      setOpen: (open) =>
-        set(() => ({
-          isOpen: open,
-        })),
-
-      getUnreadCount: () => {
-        const state = get();
-        return state.notifications.filter((n) => !n.read).length;
-      },
-    }),
-    {
-      name: "notification-storage",
-      partialize: (state) => ({ notifications: state.notifications }),
+  fetchNotifications: async () => {
+    set({ isLoading: true, error: null });
+    try {
+      const { data, error } = await fetchNotificationsAction();
+      if (error) {
+        set({ error, isLoading: false });
+      } else {
+        set({ notifications: data || [], isLoading: false });
+      }
+    } catch (error) {
+      set({ error: "Failed to fetch notifications", isLoading: false });
     }
-  )
-);
+  },
+
+  addNotification: (notification) =>
+    set((state) => {
+      // Check if notification already exists to prevent duplicates
+      const exists = state.notifications.some(n => n.id === notification.id);
+      if (exists) {
+        return state;
+      }
+      return {
+        notifications: [notification, ...state.notifications],
+      };
+    }),
+
+  markAsRead: async (id) => {
+    const { error } = await markNotificationAsReadAction(id);
+    if (!error) {
+      set((state) => ({
+        notifications: state.notifications.map((n) =>
+          n.id === id ? { ...n, read: true, read_at: new Date().toISOString() } : n
+        ),
+      }));
+    }
+  },
+
+  markAllAsRead: async () => {
+    const { error } = await markAllNotificationsAsReadAction();
+    if (!error) {
+      set((state) => ({
+        notifications: state.notifications.map((n) => ({ 
+          ...n, 
+          read: true,
+          read_at: new Date().toISOString()
+        })),
+      }));
+    }
+  },
+
+  archiveNotification: async (id) => {
+    const { error } = await archiveNotificationAction(id);
+    if (!error) {
+      set((state) => ({
+        notifications: state.notifications.filter((n) => n.id !== id),
+      }));
+    }
+  },
+
+  clearAll: async () => {
+    const { error } = await clearAllNotificationsAction();
+    if (!error) {
+      set({ notifications: [] });
+    }
+  },
+
+  togglePanel: () =>
+    set((state) => ({
+      isOpen: !state.isOpen,
+    })),
+
+  setOpen: (open) =>
+    set(() => ({
+      isOpen: open,
+    })),
+
+  getUnreadCount: () => {
+    const state = get();
+    return state.notifications.filter((n) => !n.read).length;
+  },
+}));

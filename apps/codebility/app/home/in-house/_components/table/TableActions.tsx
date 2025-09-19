@@ -52,8 +52,8 @@ export function TableActions({ item, onEdit, onDelete }: TableActionsProps) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="ghost" size="sm">
-            <MoreHorizontal className="h-4 w-4  dark:text-white" />
+          <Button variant="ghost" size="sm" className="h-7 w-7 p-0">
+            <MoreHorizontal className="h-3 w-3  dark:text-white" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent
@@ -68,19 +68,19 @@ export function TableActions({ item, onEdit, onDelete }: TableActionsProps) {
     dark:text-white
   "
         >
-          <DropdownMenuItem onClick={onEdit}>
-            <Edit2 className="mr-2 h-4 w-4" />
+          <DropdownMenuItem onClick={onEdit} className="text-xs">
+            <Edit2 className="mr-2 h-3 w-3" />
             Edit
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <Eye className="mr-2 h-4 w-4" />
+          <DropdownMenuItem className="text-xs">
+            <Eye className="mr-2 h-3 w-3" />
             View Profile
           </DropdownMenuItem>
           <DropdownMenuItem
             onClick={() => setShowDeleteDialog(true)}
-            className="text-red-500 focus:text-red-500"
+            className="text-xs text-red-500 focus:text-red-500"
           >
-            <Trash2 className="mr-2 h-4 w-4" />
+            <Trash2 className="mr-2 h-3 w-3" />
             Delete
           </DropdownMenuItem>
         </DropdownMenuContent>

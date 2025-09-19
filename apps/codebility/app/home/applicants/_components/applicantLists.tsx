@@ -59,7 +59,7 @@ function ApplicantLists({
   );
 
   return (
-    <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
+    <div className="mx-auto flex max-w-full flex-col gap-6">
       <ApplicantFilterHeaders
         applicants={applicants}
         setApplicants={setFilteredApplicants}
@@ -73,7 +73,7 @@ function ApplicantLists({
         }}
         className="w-full"
       >
-        <TabsList className="!grid !h-auto w-full grid-cols-2 gap-0.5 md:grid-cols-4 md:gap-0">
+        <TabsList className="!grid !h-auto w-full max-w-xl grid-cols-2 gap-0.5 md:grid-cols-4 md:gap-0">
           <TabsTrigger value="applying" className="!flex !h-auto flex-col gap-0.5 px-1 py-1.5 text-xs md:flex-row md:gap-2 md:px-3 md:py-1.5 md:text-sm">
             <span className="truncate text-xs md:text-sm">Applicants</span>
             {applicantsApplying.length > 0 && (
@@ -107,25 +107,25 @@ function ApplicantLists({
             )}
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="applying" className="mt-10 md:mt-4">
+        <TabsContent value="applying" className="mt-4">
           <ApplicantDataTable
             data={applicantsApplying}
             columns={applicantsColumns}
           />
         </TabsContent>
-        <TabsContent value="testing" className="mt-10 md:mt-4">
+        <TabsContent value="testing" className="mt-4">
           <ApplicantDataTable
             data={applicantsTesting}
             columns={applicantsColumns}
           />
         </TabsContent>
-        <TabsContent value="onboarding" className="mt-10 md:mt-4">
+        <TabsContent value="onboarding" className="mt-4">
           <ApplicantDataTable
             data={applicantsOnboarding}
             columns={applicantsColumns}
           />
         </TabsContent>
-        <TabsContent value="denied" className="mt-10 md:mt-4">
+        <TabsContent value="denied" className="mt-4">
           <ApplicantDataTable
             data={applicantsDenied}
             columns={applicantsColumns}

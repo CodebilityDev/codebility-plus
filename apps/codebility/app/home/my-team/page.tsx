@@ -3,7 +3,7 @@ import { getMembers, getTeamLead, getUserProjects } from "../projects/actions";
 import MyTeamView from "./_components/MyTeamView";
 
 export const dynamic = "force-dynamic";
-export const revalidate = 0;
+export const revalidate = 1800; // Revalidate every 30 minutes
 
 const MyTeamPage = async () => {
   try {

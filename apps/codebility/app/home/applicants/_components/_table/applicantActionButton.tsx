@@ -394,10 +394,10 @@ export default function ApplicantActionButton({
         <DropdownMenuTrigger asChild>
           <Button
             variant="ghost"
-            className="h-8 w-8 p-0 text-gray-400 hover:text-gray-300"
+            className="h-6 w-6 p-0 text-gray-400 hover:text-gray-300"
           >
             <span className="sr-only">More actions</span>
-            <MoreHorizontalIcon className="h-4 w-4" />
+            <MoreHorizontalIcon className="h-3 w-3" />
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent

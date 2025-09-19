@@ -144,7 +144,7 @@ export const createNewTask = async (
       return { success: false, error: error.message };
     }
 
-    // FIXED: Sequential queries to avoid nested join TypeScript issues
+    // Sequential queries to avoid nested join TypeScript issues
     const { data: columnData } = await supabase
       .from("kanban_columns")
       .select("board_id")
@@ -180,7 +180,7 @@ export const updateTask = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // FIXED: Handle BOTH UUID fields properly
+    // Handle BOTH UUID fields properly
     const rawCodevId = formData.get("codev_id")?.toString();
     const codev_id = rawCodevId === "" || rawCodevId === "null" ? null : rawCodevId;
 
@@ -243,7 +243,7 @@ export const deleteTask = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // FIXED: Sequential queries instead of nested joins
+    // Sequential queries instead of nested joins
     const { data: taskData } = await supabase
       .from("tasks")
       .select("kanban_column_id")
@@ -458,19 +458,134 @@ const updateDeveloperLevels = async (codevId?: string) => {
   }
 };
 
+// RESOLVED: Comprehensive completeTask implementation with RPC fallback
 export const completeTask = async (
   task: Task,
 ): Promise<{ success: boolean; error?: string }> => {
   const supabase = await createClientServerComponent();
 
   try {
-    const { data, error } = await supabase.rpc('new_complete_task', {
+    // Try to use the RPC function first for better performance
+    const { data, error } = await supabase.rpc('complete_task', {
       task_id: task.id,
       task_points: task.points || 0,
       primary_codev_id: task.codev?.id,
-      skill_category_id: task.skill_category?.id,
+      p_skill_category_id: task.skill_category?.id,
       sidekick_ids: task.sidekick_ids || null
     });
+
+    // If RPC function doesn't exist, fall back to manual implementation
+    if (error && error.message.includes('function complete_task')) {
+      
+      // 1. Archive the task instead of deleting for data preservation
+      const { error: archiveError } = await supabase
+        .from("tasks")
+        .update({ 
+          is_archive: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", task.id);
+
+      if (archiveError) throw archiveError;
+
+      // 2. Award points to primary assignee
+      if (task.codev?.id && task.skill_category?.id && task.points) {
+        const { data: existingPoints } = await supabase
+          .from("codev_points")
+          .select("*")
+          .eq("codev_id", task.codev.id)
+          .eq("skill_category_id", task.skill_category.id)
+          .single();
+
+        if (existingPoints) {
+          await supabase
+            .from("codev_points")
+            .update({
+              points: existingPoints.points + task.points,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existingPoints.id);
+        } else {
+          await supabase
+            .from("codev_points")
+            .insert({
+              codev_id: task.codev.id,
+              skill_category_id: task.skill_category.id,
+              points: task.points,
+            });
+        }
+
+        // 3. Award points to sidekicks (50% of task points)
+        if (task.sidekick_ids?.length) {
+          const sidekickPoints = Math.floor(task.points * 0.5);
+          
+          for (const sidekickId of task.sidekick_ids) {
+            const { data: sidekickExisting } = await supabase
+              .from("codev_points")
+              .select("*")
+              .eq("codev_id", sidekickId)
+              .eq("skill_category_id", task.skill_category.id)
+              .single();
+
+            if (sidekickExisting) {
+              await supabase
+                .from("codev_points")
+                .update({
+                  points: sidekickExisting.points + sidekickPoints,
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", sidekickExisting.id);
+            } else {
+              await supabase
+                .from("codev_points")
+                .insert({
+                  codev_id: sidekickId,
+                  skill_category_id: task.skill_category.id,
+                  points: sidekickPoints,
+                });
+            }
+          }
+        }
+
+        // 4. Update developer levels for all participants
+        await updateDeveloperLevels(task.codev.id);
+        
+        if (task.sidekick_ids?.length) {
+          for (const sidekickId of task.sidekick_ids) {
+            await updateDeveloperLevels(sidekickId);
+          }
+        }
+      }
+
+      // Sequential queries for revalidation path
+      const { data: taskData } = await supabase
+        .from("tasks")
+        .select("kanban_column_id")
+        .eq("id", task.id)
+        .single();
+
+      if (taskData?.kanban_column_id) {
+        const { data: columnData } = await supabase
+          .from("kanban_columns")
+          .select("board_id")
+          .eq("id", taskData.kanban_column_id)
+          .single();
+          
+        if (columnData?.board_id) {
+          const { data: boardData } = await supabase
+            .from("kanban_boards")
+            .select("project_id")
+            .eq("id", columnData.board_id)
+            .single();
+            
+          if (boardData?.project_id) {
+            revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+          }
+        }
+      }
+      
+      return { success: true };
+    }
 
     if (error) {
       throw error;
@@ -485,7 +600,7 @@ export const completeTask = async (
       };
     }
 
-    // FIXED: Sequential queries for revalidation
+    // Sequential queries for revalidation when using RPC
     const { data: taskData } = await supabase
       .from("tasks")
       .select("kanban_column_id")
@@ -564,7 +679,7 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
       return { success: false, error: error.message };
     }
 
-    // FIXED: Sequential queries for revalidation
+    // Sequential queries for revalidation
     const { data: taskData } = await supabase
       .from("tasks")
       .select("kanban_column_id")
@@ -617,7 +732,7 @@ export async function unarchiveTask(taskId: string) {
       return { success: false, error: error.message };
     }
 
-    // FIXED: Sequential queries for revalidation
+    // Sequential queries for revalidation
     const { data: taskData } = await supabase
       .from("tasks")
       .select("kanban_column_id")
