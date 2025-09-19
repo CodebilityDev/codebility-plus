@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { toast } from "react-hot-toast";
 import type { Notification } from "@/types/notifications";
 import { 
   fetchNotificationsAction,
@@ -68,8 +69,17 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
   },
 
   markAllAsRead: async () => {
-    const { error } = await markAllNotificationsAsReadAction();
-    if (!error) {
+    try {
+      const { data, error } = await markAllNotificationsAsReadAction();
+      if (error) {
+        console.error("Failed to mark all notifications as read:", error);
+        toast.error("Failed to mark notifications as read. Please try again.");
+        return;
+      }
+      
+      // Count unread notifications before updating
+      const unreadCount = get().notifications.filter(n => !n.read).length;
+      
       set((state) => ({
         notifications: state.notifications.map((n) => ({ 
           ...n, 
@@ -77,6 +87,14 @@ export const useNotificationStore = create<NotificationStore>((set, get) => ({
           read_at: new Date().toISOString()
         })),
       }));
+      
+      if (unreadCount > 0) {
+        toast.success(`Marked ${unreadCount} notifications as read`);
+      }
+      console.log("Successfully marked all notifications as read");
+    } catch (error) {
+      console.error("Error in markAllAsRead:", error);
+      toast.error("An error occurred while marking notifications as read");
     }
   },
 
