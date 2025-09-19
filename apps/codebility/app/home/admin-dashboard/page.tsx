@@ -13,6 +13,8 @@ import AdminDashboardTotalInactiveIntern from "./_components/AdminDashboardTotal
 import AdminDashboardTotalMentor from "./_components/AdminDashboardTotalMentor";
 import AdminDashboardTotalProjects from "./_components/AdminDashboardTotalProject";
 
+// Force dynamic rendering to avoid prerender errors with Supabase env vars
+export const dynamic = "force-dynamic";
 // Use ISR with 60 second revalidation for dashboard stats
 export const revalidate = 60;
 
