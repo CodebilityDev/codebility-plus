@@ -48,7 +48,7 @@ interface AttendanceRecord {
   codev_id: string;
   project_id: string;
   date: string;
-  status: "present" | "absent" | "late" | "holiday" | "weekend";
+  status: "present" | "absent" | "late" | "holiday" | "weekend" | "excused";
   check_in?: string;
   check_out?: string;
   notes?: string;
@@ -97,11 +97,11 @@ export async function saveAttendance(record: AttendanceRecord) {
     }
 
     // Manually update attendance points (in case trigger isn't working)
-    if (record.status === "present" || record.status === "late") {
+    if (record.status === "present" || record.status === "late" || record.status === "excused") {
       await updateAttendancePoints(record.codev_id, 2);
-    } else if (existing && (existing.status === "present" || existing.status === "late") && 
-               record.status !== "present" && record.status !== "late") {
-      // Deduct points if changing from present/late to absent
+    } else if (existing && (existing.status === "present" || existing.status === "late" || existing.status === "excused") && 
+               record.status !== "present" && record.status !== "late" && record.status !== "excused") {
+      // Deduct points if changing from present/late/excused to absent
       await updateAttendancePoints(record.codev_id, -2);
     }
 
