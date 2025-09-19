@@ -11,6 +11,7 @@ import { Toaster } from "sonner";
 import ToastNotification from "./_components/HomeToastNotification";
 import LeftSidebarServer from "./_components/LeftSidebarServer";
 import Navbar from "./_components/Navbar";
+import { NavigationOptimizer } from "./_components/NavigationOptimizer";
 import PageTransitionWrapper from "./_components/PageTransitionWrapper";
 import { PageTransitionSettings } from "./_components/PageTransitionSettings";
 import { MuiStyleRoot } from "./(dashboard)/_components/DashboardRoadmapStyleRoot";
@@ -29,6 +30,7 @@ export default async function HomeLayout({
             <ModalProviderHome />
             <ToastNotification />
             <PageTransitionSettings />
+            <NavigationOptimizer />
             <Toaster 
               richColors
               position="top-right"

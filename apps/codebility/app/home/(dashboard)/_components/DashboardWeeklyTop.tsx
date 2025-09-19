@@ -129,7 +129,6 @@ export default function WeeklyTop() {
     const fetchTopCodevs = async () => {
       setIsLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
         let query = supabase
           .from("codev_points")
           .select(

@@ -8,8 +8,8 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 
 import { TimeLog } from "./_types/time-log";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// Time tracker data changes frequently, use 30 second revalidation
+export const revalidate = 30;
 
 export default async function TimeTracker() {
   const supabase = await createClientServerComponent();
