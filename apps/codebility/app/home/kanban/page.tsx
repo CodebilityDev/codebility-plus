@@ -21,8 +21,8 @@ import PageContainer from "../_components/PageContainer";
 
 import KanbanBoardsSearch from "./_components/KanbanBoardsSearch";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// Kanban boards update frequently, use 30 second revalidation
+export const revalidate = 30;
 // Types
 interface SearchParams {
   query?: string;

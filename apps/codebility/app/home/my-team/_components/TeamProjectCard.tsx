@@ -34,17 +34,18 @@ const MemberAvatar = ({ member, size = 40 }: { member: SimpleMemberData; size?: 
   const displayName = formatName(member.first_name, member.last_name);
 
   return (
-    <div className="relative" style={{ width: size, height: size }}>
+    <div className="relative overflow-hidden rounded-full" style={{ width: size, height: size, minWidth: size, minHeight: size }}>
       {member.image_url ? (
         <Image
           src={imageUrl}
           alt={displayName}
           width={size}
           height={size}
-          className="rounded-full object-cover ring-2 ring-white dark:ring-gray-700"
+          className="h-full w-full rounded-full object-cover ring-2 ring-white dark:ring-gray-700"
+          style={{ width: size, height: size }}
         />
       ) : (
-        <div className="rounded-full ring-2 ring-white dark:ring-gray-700">
+        <div className="h-full w-full rounded-full ring-2 ring-white dark:ring-gray-700">
           <DefaultAvatar size={size} />
         </div>
       )}
@@ -134,13 +135,13 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
               {/* Show avatars in a row */}
               <div className="flex -space-x-2">
                 {members.data.slice(0, 5).map((member) => (
-                  <div key={member.id} className="relative">
+                  <div key={member.id} className="relative flex-shrink-0">
                     <MemberAvatar member={member} size={32} />
                   </div>
                 ))}
                 {members.data.length > 5 && (
                   <div 
-                    className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-xs font-medium text-gray-600 ring-2 ring-white dark:bg-gray-600 dark:text-gray-300 dark:ring-gray-800"
+                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-medium text-gray-600 ring-2 ring-white dark:bg-gray-600 dark:text-gray-300 dark:ring-gray-800"
                   >
                     +{members.data.length - 5}
                   </div>

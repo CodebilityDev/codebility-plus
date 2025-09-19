@@ -5,8 +5,8 @@ import PageContainer from "../_components/PageContainer";
 
 import CodevContainer from "./_components/CodevContainer";
 
-export const dynamic = "force-dynamic";
-export const revalidate = 0;
+// Codevs list updates periodically, use 60 second revalidation
+export const revalidate = 60;
 
 export default async function CodevsPage() {
   const { data: allCodevs, error } = await getOrSetCache(
