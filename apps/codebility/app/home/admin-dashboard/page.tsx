@@ -129,46 +129,37 @@ export default async function AdminDashboard() {
   );
 
   return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4 pt-6">
-      <H1>Dashboard</H1>
-      {/* <p>{JSON.stringify(dashboardData, null, 2)}</p> */}
-      <div className="flex flex-col gap-4 md:flex-row">
-        <div className="flex-1">
-          <AdminDashboardTotalActiveIntern
-            count={dashboardData?.activeInterns}
-          />
-        </div>
-        <div className="flex-1">
-          <AdminDashboardTotalInactiveIntern
-            count={dashboardData?.inactiveInterns}
-          />
-        </div>
-        <div className="flex-1">
-          <AdminDashboardTotalCodev count={dashboardData?.codevs} />
-        </div>
-        <div className="flex-1">
-          <AdminDashboardTotalAdmin count={dashboardData?.admins} />
-        </div>
-        <div className="flex-1">
-          <AdminDashboardTotalMentor count={dashboardData?.mentors} />
-        </div>
-        <div className="flex-1">
-          <AdminDashboardTotalProjects
-            count={dashboardData?.projectTotalCount}
-          />
-        </div>
+    <div className="mx-auto max-w-screen-2xl space-y-6 p-6">
+      <div className="flex items-center justify-between">
+        <H1>Dashboard</H1>
       </div>
-      <div className="flex flex-col gap-4 md:flex-row">
-        <div className="flex-1">
-          <AdminDashboardApplicantStatusPie
-            data={dashboardData?.applicantStatusCounts}
-          />
-        </div>
-        <div className="flex-1">
-          <AdminDashboardProjectsPie data={dashboardData?.projectCounts} />
-        </div>
+
+      {/* Metrics Grid */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+        <AdminDashboardTotalActiveIntern
+          count={dashboardData?.activeInterns}
+        />
+        <AdminDashboardTotalInactiveIntern
+          count={dashboardData?.inactiveInterns}
+        />
+        <AdminDashboardTotalCodev count={dashboardData?.codevs} />
+        <AdminDashboardTotalAdmin count={dashboardData?.admins} />
+        <AdminDashboardTotalMentor count={dashboardData?.mentors} />
+        <AdminDashboardTotalProjects
+          count={dashboardData?.projectTotalCount}
+        />
       </div>
-      <div>
+
+      {/* Charts Section */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        <AdminDashboardApplicantStatusPie
+          data={dashboardData?.applicantStatusCounts}
+        />
+        <AdminDashboardProjectsPie data={dashboardData?.projectCounts} />
+      </div>
+
+      {/* Line Chart */}
+      <div className="w-full">
         <AdminDashboardMonthlyApplicantsLineChart
           dateApplied={dashboardData?.dateApplied}
         />
