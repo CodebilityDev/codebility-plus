@@ -10,7 +10,7 @@ export const revalidate = 0;
 
 export default async function NewApplicants() {
   return (
-    <PageContainer>
+    <PageContainer maxWidth="full">
       <AsyncErrorBoundary
         fallback={
           <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
