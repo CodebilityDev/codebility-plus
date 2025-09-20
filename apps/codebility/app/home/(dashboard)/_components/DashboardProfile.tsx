@@ -88,7 +88,7 @@ export default function DashboardProfile() {
           {user && <DashboardCertificate />}
           <div className="relative mx-auto flex flex-col items-center gap-4">
             <div className="text-center">
-              <h2 className="to-customBlue-600 mt-2 bg-gradient-to-r from-purple-600 bg-clip-text text-2xl font-bold text-transparent sm:mt-4 sm:text-3xl md:mt-0">
+              <h2 className="to-blue-600 mt-2 bg-gradient-to-r from-purple-600 bg-clip-text text-2xl font-bold text-transparent sm:mt-4 sm:text-3xl md:mt-0">
                 Hello, {user?.first_name ?? ""}!
               </h2>
               <p className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">

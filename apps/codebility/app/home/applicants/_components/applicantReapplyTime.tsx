@@ -82,30 +82,22 @@ export default function ApplicantReapplyTime({
 
   // Show loading state during SSR
   if (!timeLeft) {
-    return isMobile ? (
-      <span className="text-gray-300">--</span>
-    ) : (
-      <div className="py-3 text-center text-sm">
-        <span className="text-gray-300">--</span>
-      </div>
+    return (
+      <span className="text-sm text-gray-500">--</span>
     );
   }
 
   const content = !timeLeft.isExpired ? (
-    <div className="text-gray-300">
-      <div className="flex justify-center space-x-1">
-        <span>{timeLeft.days}d</span>
-        <span>{timeLeft.hours}h</span>
-        <span>{timeLeft.minutes}m</span>
-      </div>
+    <div className="flex items-center justify-center gap-1">
+      <span className="text-sm font-medium text-gray-900 dark:text-gray-100">
+        {timeLeft.days}d {timeLeft.hours}h {timeLeft.minutes}m
+      </span>
     </div>
   ) : (
-    <span className="font-medium text-green-500">Available now</span>
+    <span className="text-sm font-medium text-green-600 dark:text-green-400">
+      Available now
+    </span>
   );
 
-  return isMobile ? (
-    content
-  ) : (
-    <div className="py-3 text-center text-sm">{content}</div>
-  );
+  return content;
 }
