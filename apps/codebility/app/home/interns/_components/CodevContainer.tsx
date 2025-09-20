@@ -20,6 +20,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
   const [codevs, setCodevs] = useState<Codev[]>(data);
   const [activeTab, setActiveTab] = useState<"members" | "projects">("members");
   const [membersSubTab, setMembersSubTab] = useState<"active" | "inactive" | "all">("active");
+  const [isSearching, setIsSearching] = useState(false);
 
   // Calculate counts based on availability_status (same as in-house page)
   const activeCount = data.filter(codev => codev.availability_status === true).length;
@@ -93,6 +94,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
               allCodevs={data}
               codevs={codevs}
               setCodevs={setCodevs}
+              setIsSearching={setIsSearching}
             />
           </div>
           <div>
@@ -109,6 +111,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
           filters={filters} 
           data={codevs} 
           activeTab={membersSubTab}
+          isSearching={isSearching}
         />
       )}
     </div>

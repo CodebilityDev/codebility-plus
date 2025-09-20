@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState, useEffect } from "react";
 import DefaultPagination from "@/components/ui/pagination";
 import { pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
@@ -8,6 +8,7 @@ import { Codev } from "@/types/home/codev";
 import { getPrioritizedAndFilteredCodevs } from "@/utils/codev-priority"; // Import the utility
 
 import CodevCard from "./CodevCard";
+import AnimatedCodevCardSkeleton from "./AnimatedCodevCardSkeleton";
 
 interface CodevListProps {
   data: Codev[];
@@ -17,9 +18,22 @@ interface CodevListProps {
     availability: string[];
   };
   activeTab?: "all" | "active" | "inactive";
+  isSearching?: boolean;
 }
 
-export default function CodevList({ data, filters, activeTab = "active" }: CodevListProps) {
+export default function CodevList({ data, filters, activeTab = "active", isSearching = false }: CodevListProps) {
+  const [isFiltering, setIsFiltering] = useState(false);
+
+  // Add a small delay to show loading when filters change
+  useEffect(() => {
+    if (Object.values(filters).some(arr => arr.length > 0) || isSearching) {
+      setIsFiltering(true);
+      const timer = setTimeout(() => {
+        setIsFiltering(false);
+      }, 300);
+      return () => clearTimeout(timer);
+    }
+  }, [filters, isSearching]);
   // Use the new utility function to get prioritized and filtered codevs
   const filteredCodevs = useMemo(() => {
     // First filter by tab selection based on availability_status (same as in-house)
@@ -83,7 +97,14 @@ export default function CodevList({ data, filters, activeTab = "active" }: Codev
 
   return (
     <div className="space-y-8">
-      {paginatedData.length > 0 ? (
+      {isFiltering ? (
+        // Show skeleton while filtering
+        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+          {Array.from({ length: 8 }).map((_, index) => (
+            <AnimatedCodevCardSkeleton key={index} delay={index * 100} />
+          ))}
+        </div>
+      ) : paginatedData.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
           {paginatedData.map((codev) => (
             <CodevCard key={codev.id} codev={codev} />
@@ -102,7 +123,7 @@ export default function CodevList({ data, filters, activeTab = "active" }: Codev
         </div>
       )}
 
-      {filteredCodevs.length > pageSize.codevsList && (
+      {!isFiltering && filteredCodevs.length > pageSize.codevsList && (
         <div className="flex justify-center">
           <DefaultPagination
             currentPage={currentPage}
