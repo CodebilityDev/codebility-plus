@@ -81,6 +81,58 @@ const ApplicantSorters = ({
               <span>{sortDirection === "asc" ? "↑" : "↓"}</span>
             )}
           </DropdownMenuItem>
+          <DropdownMenuItem
+            className={`flex justify-between ${
+              sortField === "dateApplied"
+                ? "text-customBlue-500 dark:text-customBlue-300"
+                : "text-black-500 dark:text-light-800"
+            }`}
+            onClick={() => onToggleSort("dateApplied")}
+          >
+            Date Applied
+            {sortField === "dateApplied" && (
+              <span>{sortDirection === "asc" ? "↑" : "↓"}</span>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className={`flex justify-between ${
+              sortField === "testTaken"
+                ? "text-customBlue-500 dark:text-customBlue-300"
+                : "text-black-500 dark:text-light-800"
+            }`}
+            onClick={() => onToggleSort("testTaken")}
+          >
+            Test Taken
+            {sortField === "testTaken" && (
+              <span>{sortDirection === "asc" ? "↑" : "↓"}</span>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className={`flex justify-between ${
+              sortField === "reminderCount"
+                ? "text-customBlue-500 dark:text-customBlue-300"
+                : "text-black-500 dark:text-light-800"
+            }`}
+            onClick={() => onToggleSort("reminderCount")}
+          >
+            Reminders
+            {sortField === "reminderCount" && (
+              <span>{sortDirection === "asc" ? "↑" : "↓"}</span>
+            )}
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className={`flex justify-between ${
+              sortField === "techStackCount"
+                ? "text-customBlue-500 dark:text-customBlue-300"
+                : "text-black-500 dark:text-light-800"
+            }`}
+            onClick={() => onToggleSort("techStackCount")}
+          >
+            Tech Stacks
+            {sortField === "techStackCount" && (
+              <span>{sortDirection === "asc" ? "↑" : "↓"}</span>
+            )}
+          </DropdownMenuItem>
 
           <DropdownMenuSeparator className="dark:bg-dark-400 bg-gray-300" />
           {/* reset */}
