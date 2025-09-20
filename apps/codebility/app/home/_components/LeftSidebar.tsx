@@ -210,7 +210,7 @@ const LeftSidebar = () => {
                       prefetch={true}
                       className={`${
                         isActive
-                          ? "primary-gradient text-light-900 rounded-lg"
+                          ? "bg-gradient-to-r from-purple-800 via-customBlue-900 to-sky-500 text-light-900 rounded-lg"
                           : "text-dark300_light900"
                       } focus:ring-customBlue-500 mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-offset-2 dark:hover:bg-[#131417]`}
                       aria-current={isActive ? "page" : undefined}
