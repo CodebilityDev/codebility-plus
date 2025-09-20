@@ -78,11 +78,11 @@ export default async function HirePage() {
 
       {/* Stats Cards */}
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
+        <div className="rounded-lg border bg-card  dark:border-gray-800 dark:bg-gray-900/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Active Listings</p>
-              <p className="mt-1 text-2xl font-semibold text-white">
+              <p className="text-sm text-muted-foreground dark:text-gray-400">Active Listings</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
                 {stats.activeListings}
               </p>
             </div>
@@ -92,11 +92,11 @@ export default async function HirePage() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
+        <div className="rounded-lg border bg-card dark:border-gray-800 dark:bg-gray-900/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Total Applications</p>
-              <p className="mt-1 text-2xl font-semibold text-white">
+              <p className="text-sm text-muted-foreground dark:text-gray-400">Total Applications</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
                 {stats.totalApplications}
               </p>
             </div>
@@ -106,11 +106,11 @@ export default async function HirePage() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
+        <div className="rounded-lg border bg-card dark:border-gray-800 dark:bg-gray-900/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">New This Week</p>
-              <p className="mt-1 text-2xl font-semibold text-white">
+              <p className="text-sm text-muted-foreground dark:text-gray-400">New This Week</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
                 {stats.newThisWeek}
               </p>
             </div>
@@ -120,11 +120,11 @@ export default async function HirePage() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
+        <div className="rounded-lg border bg-card dark:border-gray-800 dark:bg-gray-900/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-400">Avg. Time to Hire</p>
-              <p className="mt-1 text-2xl font-semibold text-white">
+              <p className="text-sm text-muted-foreground dark:text-gray-400">Avg. Time to Hire</p>
+              <p className="mt-1 text-2xl font-semibold text-foreground">
                 {stats.avgTimeToHire}
               </p>
             </div>
