@@ -4,7 +4,7 @@ import { H1 } from "@/components/shared/dashboard";
 import { ExperienceRanges, NewApplicantType } from "../_service/types";
 import ApplicantFiltersComponent from "./applicantFilters";
 import ApplicantFiltersBadge from "./applicantFiltersBadge";
-import ApplicantSorters from "./applicantSorters";
+import ApplicantSorters, { SortOption } from "./applicantSorters";
 
 export type ApplicantFilters = {
   hasPortfolio: boolean;
@@ -63,8 +63,35 @@ export default function ApplicantFilterHeaders({
 
   const [sortField, setSortField] = useState<string | null>(null);
   const [sortDirection, setSortDirection] = useState<"asc" | "desc">("desc");
+  const [sortOptions, setSortOptions] = useState<SortOption[]>([]);
 
-  // Toggle sort
+  // Add a new sort option
+  const addSort = useCallback((field: string, label: string) => {
+    setSortOptions(prev => [...prev, { field, direction: "desc", label }]);
+  }, []);
+
+  // Remove a sort option
+  const removeSort = useCallback((field: string) => {
+    setSortOptions(prev => prev.filter(option => option.field !== field));
+  }, []);
+
+  // Toggle sort direction for a specific field
+  const toggleSortDirection = useCallback((field: string) => {
+    setSortOptions(prev => 
+      prev.map(option => 
+        option.field === field 
+          ? { ...option, direction: option.direction === "asc" ? "desc" : "asc" }
+          : option
+      )
+    );
+  }, []);
+
+  // Reorder sort options (for priority)
+  const reorderSorts = useCallback((newSortOptions: SortOption[]) => {
+    setSortOptions(newSortOptions);
+  }, []);
+
+  // Legacy toggle sort function (for backward compatibility)
   const toggleSort = useCallback(
     (field: string) => {
       if (sortField === field) {
@@ -240,7 +267,65 @@ export default function ApplicantFilterHeaders({
     });
 
     // Apply sorting
-    if (sortField) {
+    if (sortOptions.length > 0) {
+      filteredApplicants.sort((a, b) => {
+        // Apply multiple sorts in priority order
+        for (const sortOption of sortOptions) {
+          let valueA: any, valueB: any;
+
+          switch (sortOption.field) {
+            case "name":
+              valueA = `${a.first_name || ""} ${a.last_name || ""}`.toLowerCase();
+              valueB = `${b.first_name || ""} ${b.last_name || ""}`.toLowerCase();
+              break;
+            case "position":
+              valueA = (a.display_position || "").toLowerCase();
+              valueB = (b.display_position || "").toLowerCase();
+              break;
+            case "experience":
+              valueA = a.years_of_experience || 0;
+              valueB = b.years_of_experience || 0;
+              break;
+            case "dateApplied":
+              valueA = a.date_applied ? new Date(a.date_applied).getTime() : 0;
+              valueB = b.date_applied ? new Date(b.date_applied).getTime() : 0;
+              break;
+            case "testTaken":
+              valueA = a.applicant?.test_taken ? new Date(a.applicant.test_taken).getTime() : 0;
+              valueB = b.applicant?.test_taken ? new Date(b.applicant.test_taken).getTime() : 0;
+              break;
+            case "reminderCount":
+              valueA = a.applicant?.reminded_count || 0;
+              valueB = b.applicant?.reminded_count || 0;
+              break;
+            case "techStackCount":
+              valueA = a.tech_stacks?.length || 0;
+              valueB = b.tech_stacks?.length || 0;
+              break;
+            default:
+              continue; // Skip unknown fields
+          }
+
+          let comparison = 0;
+          
+          // For numeric values
+          if (typeof valueA === "number" && typeof valueB === "number") {
+            comparison = sortOption.direction === "asc" ? valueA - valueB : valueB - valueA;
+          } else {
+            // For string values
+            if (valueA < valueB) comparison = sortOption.direction === "asc" ? -1 : 1;
+            else if (valueA > valueB) comparison = sortOption.direction === "asc" ? 1 : -1;
+          }
+
+          // If this sort criteria produces a difference, return it
+          if (comparison !== 0) return comparison;
+        }
+        
+        // If all sort criteria are equal, maintain original order
+        return 0;
+      });
+    } else if (sortField) {
+      // Legacy single sort fallback
       filteredApplicants.sort((a, b) => {
         let valueA: any, valueB: any;
 
@@ -295,7 +380,7 @@ export default function ApplicantFilterHeaders({
     }
 
     setApplicants(filteredApplicants);
-  }, [filters, sortField, sortDirection, searchTerm, applicants]);
+  }, [filters, sortOptions, sortField, sortDirection, searchTerm, applicants]);
 
   const activeFilterCount = useMemo(() => {
     let count = 0;
@@ -473,6 +558,7 @@ export default function ApplicantFilterHeaders({
   const resetSort = () => {
     setSortField(null);
     setSortDirection("desc");
+    setSortOptions([]);
   };
 
   return (
@@ -493,9 +579,11 @@ export default function ApplicantFilterHeaders({
             />
             <div className="flex items-center justify-center gap-3">
               <ApplicantSorters
-                sortField={sortField}
-                sortDirection={sortDirection}
-                onToggleSort={toggleSort}
+                sortOptions={sortOptions}
+                onAddSort={addSort}
+                onRemoveSort={removeSort}
+                onToggleSortDirection={toggleSortDirection}
+                onReorderSorts={reorderSorts}
                 resetSort={resetSort}
               />
               <ApplicantFiltersComponent
@@ -525,9 +613,11 @@ export default function ApplicantFilterHeaders({
               className="h-11 w-full max-w-80 rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:outline-none focus:ring-1 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
             />
             <ApplicantSorters
-              sortField={sortField}
-              sortDirection={sortDirection}
-              onToggleSort={toggleSort}
+              sortOptions={sortOptions}
+              onAddSort={addSort}
+              onRemoveSort={removeSort}
+              onToggleSortDirection={toggleSortDirection}
+              onReorderSorts={reorderSorts}
               resetSort={resetSort}
             />
             <ApplicantFiltersComponent
