@@ -1,6 +1,5 @@
 import { Codev } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
-
 import { create } from "zustand";
 
 interface UserState {
@@ -31,21 +30,19 @@ export const useUserStore = create<UserState>((set) => ({
         return;
       }
 
-      // First check if we have a session
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
+      // FIXED: Use getUser() instead of getSession()
+      const { data: { user }, error: authError } = await supabase.auth.getUser();
 
-      if (!session?.user) {
+      if (authError || !user) {
         set({ user: null, isLoading: false });
         return;
       }
 
-      // If we have a session, fetch the user data
+      // If we have a user, fetch the user data
       const { data: userData, error } = await supabase
         .from("codev")
         .select("*")
-        .eq("id", session.user.id)
+        .eq("id", user.id)
         .single();
 
       if (error) throw error;

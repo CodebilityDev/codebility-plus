@@ -2,6 +2,7 @@ import { Briefcase, Users, TrendingUp, Clock } from "lucide-react";
 import HirePageClient from "./_components/HirePageClient";
 import CustomBreadcrumb from "@/components/shared/dashboard/CustomBreadcrumb";
 import { H1 } from "@/components/shared/dashboard";
+import PageContainer from "../_components/PageContainer";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -62,7 +63,7 @@ export default async function HirePage() {
   ];
 
   return (
-    <div className="container mx-auto max-w-7xl p-6">
+    <PageContainer>
       <div className="mb-6">
         <CustomBreadcrumb items={breadcrumbItems} />
       </div>
@@ -77,11 +78,11 @@ export default async function HirePage() {
 
       {/* Stats Cards */}
       <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border bg-card p-6">
+        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Active Listings</p>
-              <p className="mt-1 text-2xl font-semibold text-foreground">
+              <p className="text-sm text-gray-400">Active Listings</p>
+              <p className="mt-1 text-2xl font-semibold text-white">
                 {stats.activeListings}
               </p>
             </div>
@@ -91,11 +92,11 @@ export default async function HirePage() {
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card p-6">
+        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Total Applications</p>
-              <p className="mt-1 text-2xl font-semibold text-foreground">
+              <p className="text-sm text-gray-400">Total Applications</p>
+              <p className="mt-1 text-2xl font-semibold text-white">
                 {stats.totalApplications}
               </p>
             </div>
@@ -105,11 +106,11 @@ export default async function HirePage() {
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card p-6">
+        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">New This Week</p>
-              <p className="mt-1 text-2xl font-semibold text-foreground">
+              <p className="text-sm text-gray-400">New This Week</p>
+              <p className="mt-1 text-2xl font-semibold text-white">
                 {stats.newThisWeek}
               </p>
             </div>
@@ -119,16 +120,16 @@ export default async function HirePage() {
           </div>
         </div>
 
-        <div className="rounded-lg border bg-card p-6">
+        <div className="rounded-lg border border-gray-800 bg-gray-900/50 p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-muted-foreground">Avg. Time to Hire</p>
-              <p className="mt-1 text-2xl font-semibold text-foreground">
+              <p className="text-sm text-gray-400">Avg. Time to Hire</p>
+              <p className="mt-1 text-2xl font-semibold text-white">
                 {stats.avgTimeToHire}
               </p>
             </div>
             <div className="rounded-full bg-green-500/10 p-3">
-              <Clock className="h-6 w-6 text-green-400 dark:text-green-400" />
+              <Clock className="h-6 w-6 text-green-400" />
             </div>
           </div>
         </div>
@@ -136,6 +137,6 @@ export default async function HirePage() {
 
       {/* Client Components */}
       <HirePageClient />
-    </div>
+    </PageContainer>
   );
 }

@@ -12,43 +12,43 @@ export default function ApplicantTechStack({
 
   const displayStacks = showAll
     ? applicant.tech_stacks
-    : applicant.tech_stacks?.slice(0, 5);
+    : applicant.tech_stacks?.slice(0, 4);
 
-  const hasMoreStacks = (applicant.tech_stacks?.length || 0) > 5;
+  const hasMoreStacks = (applicant.tech_stacks?.length || 0) > 4;
 
   return (
-    <div className="px-3 py-3 text-sm">
-      <div className="flex w-40 flex-wrap justify-center gap-2 text-sm">
-        {applicant.tech_stacks &&
-        applicant.tech_stacks.length > 0 &&
-        !applicant.tech_stacks.includes("none") ? (
-          <div className="flex flex-wrap gap-2 text-sm">
-            {displayStacks?.map((stack) => (
+    <div className="flex flex-wrap items-center gap-1.5">
+      {applicant.tech_stacks &&
+      applicant.tech_stacks.length > 0 &&
+      !applicant.tech_stacks.includes("none") ? (
+        <>
+          {displayStacks?.map((stack) => (
+            <div 
+              key={stack}
+              className="group relative"
+              title={stack}
+            >
               <Image
-                key={stack}
                 src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
                 alt={stack}
-                width={22}
-                height={22}
-                className="h-6 w-6"
+                width={24}
+                height={24}
+                className="h-6 w-6 transition-transform group-hover:scale-110"
               />
-            ))}
-            {hasMoreStacks && (
-              <button
-                /*  variant="ghost" */
-                onClick={() => setShowAll(!showAll)}
-                className="text-sm text-gray-400 hover:text-gray-200"
-              >
-                {showAll
-                  ? "Show less"
-                  : `+${applicant.tech_stacks.length - 5} more`}
-              </button>
-            )}
-          </div>
-        ) : (
-          <span className="text-sm text-gray-500">None</span>
-        )}
-      </div>
+            </div>
+          ))}
+          {hasMoreStacks && (
+            <button
+              onClick={() => setShowAll(!showAll)}
+              className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-xs font-medium text-gray-600 transition-colors hover:bg-gray-200 dark:bg-gray-800 dark:text-gray-400 dark:hover:bg-gray-700"
+            >
+              {showAll ? "−" : `+${applicant.tech_stacks.length - 4}`}
+            </button>
+          )}
+        </>
+      ) : (
+        <span className="text-sm text-gray-500 dark:text-gray-500">None</span>
+      )}
     </div>
   );
 }

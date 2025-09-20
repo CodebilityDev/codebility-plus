@@ -141,7 +141,7 @@ const MobileNav = () => {
         id="mobile-navigation"
         aria-describedby="mobile-nav-description"
         side="left"
-        className="overflow-y-auto border-r border-zinc-300 bg-[#OEOEOE] bg-opacity-80 backdrop-blur-lg dark:border-zinc-800"
+        className="overflow-y-auto bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-800/50"
         role="dialog"
         aria-labelledby="mobile-nav-title"
       >

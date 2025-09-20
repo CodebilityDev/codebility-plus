@@ -18,6 +18,7 @@ import {
 } from "@codevs/ui/select";
 import { Switch } from "@codevs/ui/switch";
 import { useToast } from "@/components/ui/use-toast";
+import { updateJobListing } from "../actions";
 import {
   Dialog,
   DialogContent,
@@ -89,27 +90,32 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
         .map(req => req.trim())
         .filter(req => req.length > 0);
 
-      const updatedJob = {
-        ...job,
-        ...data,
+      // Use server action to update the job
+      const result = await updateJobListing(job.id, {
+        title: data.title,
+        department: data.department,
+        location: data.location,
+        type: data.type,
+        level: data.level,
+        description: data.description,
         requirements: requirementsArray,
-        updated_at: new Date().toISOString(),
-      };
+        salary_range: data.salary_range || null,
+        remote: data.remote,
+      });
 
-      // Here you would typically send to your backend
-      console.log("Updating job:", updatedJob);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      if (!result.success) {
+        throw new Error(result.error || "Failed to update job");
+      }
       
       toast({
         title: "Job Updated Successfully",
         description: `${data.title} has been updated.`,
       });
       
-      onClose();
       onJobUpdated?.();
+      onClose();
     } catch (error) {
+      console.error("Update error:", error);
       toast({
         title: "Failed to update job",
         description: "Please try again later.",
@@ -122,9 +128,27 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
 
   if (!job) return null;
 
+  const handleOpenChange = (open: boolean) => {
+    if (!open && !isSubmitting) {
+      onClose();
+    }
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto bg-gray-900 border-gray-800">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent 
+        className="max-h-[90vh] max-w-2xl overflow-y-auto bg-gray-900 border-gray-800"
+        onPointerDownOutside={(e) => {
+          if (isSubmitting) {
+            e.preventDefault();
+          }
+        }}
+        onEscapeKeyDown={(e) => {
+          if (isSubmitting) {
+            e.preventDefault();
+          }
+        }}
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl font-light text-white">
             Edit Job Listing

@@ -25,12 +25,16 @@ export default function AdminDashboardProjectsPie({
   data,
 }: AdminDashboardProjectsPieProps) {
   const title = "Projects";
+  
   if (!data)
     return (
-      <Card className="flex h-full flex-col bg-black">
+      <Card className="flex h-full flex-col">
         <CardHeader className="items-center pb-0">
-          <CardTitle>{title}</CardTitle>
+          <CardTitle className="text-lg">{title}</CardTitle>
         </CardHeader>
+        <CardContent className="flex flex-1 items-center justify-center">
+          <p className="text-muted-foreground">No data available</p>
+        </CardContent>
       </Card>
     );
 
@@ -58,18 +62,24 @@ export default function AdminDashboardProjectsPie({
   }, {} as ChartConfig);
 
   return (
-    <Card className="flex h-full flex-col bg-black">
+    <Card className="flex h-full flex-col">
       <CardHeader className="items-center pb-0">
-        <CardTitle>{title}</CardTitle>
-        {/* <CardDescription>All-time status data</CardDescription> */}
+        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardDescription className="text-center text-sm">
+          Distribution by project categories
+        </CardDescription>
       </CardHeader>
       <CardContent className="flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
-          className="mx-auto aspect-square max-h-[300px]"
+          className="mx-auto aspect-square max-h-[350px]"
         >
           <PieChart>
-            <Pie data={chartData} dataKey="projects" />
+            <Pie 
+              data={chartData} 
+              dataKey="projects" 
+              strokeWidth={2}
+            />
             <ChartLegend
               content={<ChartLegendContent nameKey="category" />}
               className="-translate-y-2 flex-wrap gap-2 [&>*]:basis-1/4 [&>*]:justify-center"

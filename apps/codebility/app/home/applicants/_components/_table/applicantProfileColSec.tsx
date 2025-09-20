@@ -41,28 +41,28 @@ export default function ApplicantProfileColSec({
       <div className="hidden xl:block">
         <HoverCard>
           <HoverCardTrigger asChild>
-            <div className="flex items-start gap-2">
-              <Avatar className="mt-1 h-8 w-8">
+            <div className="flex items-center gap-3 px-3 py-2">
+              <Avatar className="h-10 w-10 ring-2 ring-gray-100 dark:ring-gray-800">
                 {applicant.image_url ? (
                   <AvatarImage src={applicant.image_url} />
                 ) : (
-                  <DefaultAvatar size={32} />
+                  <DefaultAvatar size={40} />
                 )}
               </Avatar>
-              <div className="flex flex-col">
-                <p className="cursor-pointer text-sm font-medium text-gray-700 hover:underline dark:text-gray-200">
+              <div className="flex min-w-0 flex-col">
+                <p className="cursor-pointer truncate text-sm font-semibold text-gray-900 hover:underline dark:text-gray-100">
                   {applicant.first_name.charAt(0).toUpperCase() +
                     applicant.first_name.slice(1)}{" "}
                   {applicant.last_name.charAt(0).toUpperCase() +
                     applicant.last_name.slice(1)}
                 </p>
-                <p className="max-w-[170px] truncate text-xs text-gray-600 dark:text-gray-400">
+                <p className="truncate text-xs text-gray-500 dark:text-gray-400">
                   {applicant.email_address}
                 </p>
               </div>
             </div>
           </HoverCardTrigger>
-          <HoverCardContent className="background-box w-80 border border-gray-700 p-4 shadow-lg">
+          <HoverCardContent className="background-box w-80 border border-gray-200 p-4 shadow-lg dark:border-gray-700">
             <div className="flex gap-4">
               {applicant.image_url ? (
                 <Image
@@ -70,13 +70,13 @@ export default function ApplicantProfileColSec({
                   alt={`${applicant.first_name} avatar`}
                   width={80}
                   height={80}
-                  className="rounded-md"
+                  className="rounded-lg"
                 />
               ) : (
-                <DefaultAvatar size={80} className="rounded-md" />
+                <DefaultAvatar size={80} className="rounded-lg" />
               )}
               <div className="text-gray-700 dark:text-gray-200">
-                <h4 className="text-base font-medium">
+                <h4 className="text-base font-semibold">
                   {applicant.first_name.charAt(0).toUpperCase() +
                     applicant.first_name.slice(1)}{" "}
                   {applicant.last_name.charAt(0).toUpperCase() +
@@ -98,15 +98,6 @@ export default function ApplicantProfileColSec({
 
       {/* Mobile View */}
       <div className="flex w-full items-start justify-start gap-2 xl:hidden">
-        {/* <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-          aria-label="Select row"
-          onClick={(event) => {
-            event.stopPropagation();
-          }}
-          className="mr-2 mt-8 dark:border-none dark:ring-1 dark:ring-white"
-        /> */}
         <Accordion
           key={applicant.id}
           type="single"
@@ -117,22 +108,22 @@ export default function ApplicantProfileColSec({
             value={applicant.last_name}
             className="w-full min-w-full border-b-0"
           >
-            <AccordionTrigger className="flex w-full min-w-full pr-2 text-base hover:bg-muted/50 md:text-lg">
-              <div className="flex w-full max-w-full items-center justify-start gap-3 ">
-                <Avatar>
+            <AccordionTrigger className="flex w-full min-w-full rounded-lg px-4 py-3 text-base transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/50 md:text-lg">
+              <div className="flex w-full max-w-full items-center justify-start gap-3">
+                <Avatar className="h-12 w-12 ring-2 ring-gray-100 dark:ring-gray-800">
                   {applicant.image_url ? (
                     <AvatarImage src={applicant.image_url} />
                   ) : (
-                    <DefaultAvatar size={40} />
+                    <DefaultAvatar size={48} />
                   )}
                 </Avatar>
-                <div className="flex flex-col items-start">
+                <div className="flex min-w-0 flex-col items-start">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm capitalize">
+                    <p className="truncate text-sm font-semibold capitalize text-gray-900 dark:text-gray-100">
                       {applicant.first_name} {applicant.last_name}
                     </p>
                   </div>
-                  <p className="text-xs text-gray-600 dark:text-gray-400">
+                  <p className="truncate text-xs text-gray-600 dark:text-gray-400">
                     {applicant.display_position || "Not specified"}
                   </p>
                   {applicant.years_of_experience !== undefined && (
@@ -146,238 +137,164 @@ export default function ApplicantProfileColSec({
               </div>
             </AccordionTrigger>
             <AccordionContent className="m-0 p-0">
-              <Table className="text-dark100_light900 m-0 p-0">
-                <TableHeader>
-                  {/* Email Row */}
-                  <TableRow className="m-0 grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Email</TableCell>
-                    <TableCell>
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex items-center gap-2">
-                          {/*  <Link
-                              href={createGmailLink(applicant.email_address)}
-                              target="_blank"
-                            >
-                              <IconEmail className="h-[18px] w-[18px] invert dark:invert-0" />
-                            </Link> */}
-                          <span className="max-w-[150px] truncate text-xs">
-                            {applicant.email_address}
-                          </span>
-                        </div>
+              <div className="space-y-3 rounded-lg bg-gray-50 p-4 dark:bg-gray-800/50">
+                {/* Email Row */}
+                <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Email</span>
+                  <span className="max-w-[180px] truncate text-sm text-gray-900 dark:text-gray-100">
+                    {applicant.email_address}
+                  </span>
+                </div>
+
+                {/* GitHub Row */}
+                <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">GitHub</span>
+                  <div>
+                    {applicant.github ? (
+                      <Link href={applicant.github} target="_blank">
+                        <IconGithub className="h-5 w-5 invert dark:invert-0" />
+                      </Link>
+                    ) : (
+                      <span className="text-sm text-gray-500 dark:text-gray-500">
+                        None
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Portfolio Row */}
+                <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Portfolio</span>
+                  <div>
+                    {applicant.portfolio_website ? (
+                      <Link
+                        href={applicant.portfolio_website}
+                        target="_blank"
+                      >
+                        <IconLink className="h-5 w-5 invert dark:invert-0" />
+                      </Link>
+                    ) : (
+                      <span className="text-sm text-gray-500 dark:text-gray-500">
+                        None
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Tech Stack Row */}
+                <div className="flex items-start justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tech Stack</span>
+                  <div className="flex max-w-[200px] flex-wrap justify-end gap-1">
+                    {applicant.tech_stacks &&
+                    applicant.tech_stacks.length > 0 &&
+                    !applicant.tech_stacks.includes("none") ? (
+                      applicant.tech_stacks.slice(0, 4).map((stack, i) => (
+                        <Image
+                          key={i}
+                          src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                          alt={`${stack} icon`}
+                          width={24}
+                          height={24}
+                          title={stack}
+                          className="h-6 w-6 transition duration-300 hover:-translate-y-0.5"
+                        />
+                      ))
+                    ) : (
+                      <span className="text-sm text-gray-500 dark:text-gray-500">
+                        None
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Date Applied Row */}
+                <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Date Applied</span>
+                  <span className="text-sm text-gray-900 dark:text-gray-100">
+                    {applicant.date_applied
+                      ? new Date(applicant.date_applied).toLocaleDateString()
+                      : "N/A"}
+                  </span>
+                </div>
+
+                {/* Conditional Rows */}
+                {applicant.application_status === "testing" && (
+                  <>
+                    <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Test Taken</span>
+                      <span className="text-sm text-gray-900 dark:text-gray-100">
+                        {applicant.applicant?.test_taken
+                          ? new Date(applicant.applicant.test_taken).toLocaleDateString()
+                          : "N/A"}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Time</span>
+                      <div className="text-sm">
+                        <ApplicantTestTimeRemaining
+                          applicant={applicant}
+                          isMobile={true}
+                        />
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </div>
 
-                  {/* GitHub Row */}
-                  <TableRow className="grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Github</TableCell>
-                    <TableCell>
-                      {applicant.github ? (
-                        <Link href={applicant.github} target="_blank">
-                          <IconGithub className="h-[18px] w-[18px] invert dark:invert-0" />
-                        </Link>
-                      ) : (
-                        <span className="text-xs text-gray-600 dark:text-gray-500">
-                          None
-                        </span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-
-                  {/* Portfolio Row */}
-                  <TableRow className="grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Portfolio</TableCell>
-                    <TableCell>
-                      {applicant.portfolio_website ? (
-                        <Link
-                          href={applicant.portfolio_website}
-                          target="_blank"
-                        >
-                          <IconLink className="h-[18px] w-[18px] invert dark:invert-0" />
-                        </Link>
-                      ) : (
-                        <span className="text-xs text-gray-600 dark:text-gray-500">
-                          None
-                        </span>
-                      )}
-                    </TableCell>
-                  </TableRow>
-
-                  {/* Tech Stack Row */}
-                  <TableRow className="grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Tech Stack</TableCell>
-                    <TableCell>
-                      <div className="flex flex-wrap gap-2">
-                        {applicant.tech_stacks &&
-                        applicant.tech_stacks.length > 0 &&
-                        !applicant.tech_stacks.includes("none") ? (
-                          applicant.tech_stacks.map((stack, i) => (
-                            <Image
-                              key={i}
-                              src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
-                              alt={`${stack} icon`}
-                              width={25}
-                              height={25}
-                              title={stack}
-                              className="h-[25px] w-[25px] transition duration-300 hover:-translate-y-0.5"
-                            />
-                          ))
+                    <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Fork URL</span>
+                      <div>
+                        {applicant.applicant?.fork_url ? (
+                          <Link
+                            href={applicant.applicant.fork_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                          >
+                            <IconLink className="h-5 w-5 text-gray-600 dark:text-gray-200" />
+                          </Link>
                         ) : (
-                          <span className="text-xs text-gray-600 dark:text-gray-500">
-                            None
+                          <span className="text-sm text-gray-500 dark:text-gray-500">
+                            N/A
                           </span>
                         )}
                       </div>
-                    </TableCell>
-                  </TableRow>
+                    </div>
+                  </>
+                )}
 
-                  {/* Date Applied Row */}
-                  <TableRow className="grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Date Applied</TableCell>
-                    <TableCell>
-                      {" "}
-                      <div className="flex flex-col space-y-2">
-                        <div className="flex items-center gap-2">
-                          <span className="max-w-[150px] truncate text-xs">
-                            {applicant.date_applied
-                              ? new Date(
-                                  applicant.date_applied,
-                                ).toLocaleDateString()
-                              : "N/A"}
-                          </span>
-                        </div>
-                      </div>
-                    </TableCell>
-                  </TableRow>
+                {applicant.application_status === "denied" && (
+                  <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Reapply</span>
+                    <div className="text-sm">
+                      <ApplicantReapplyTime
+                        applicant={applicant}
+                        isMobile={true}
+                      />
+                    </div>
+                  </div>
+                )}
 
-                  {/* Test Taken Row */}
-                  {applicant.application_status === "testing" && (
-                    <TableRow className="grid grid-cols-2 p-2">
-                      <TableCell className="text-sm">Test Taken</TableCell>
-                      <TableCell>
-                        {" "}
-                        <div className="flex flex-col space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="max-w-[150px] truncate text-xs">
-                              {applicant.applicant?.test_taken
-                                ? new Date(
-                                    applicant.applicant.test_taken,
-                                  ).toLocaleDateString()
-                                : "N/A"}
-                            </span>
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
+                {applicant.application_status !== "denied" && (
+                  <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Reminded</span>
+                    <div className="flex items-center gap-2">
+                      <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 text-sm font-semibold text-gray-800 dark:bg-gray-800 dark:text-gray-100">
+                        {applicant.applicant?.reminded_count ?? 0}
+                      </span>
+                      {applicant.applicant?.last_reminded_date && (
+                        <span className="text-xs text-gray-500 dark:text-gray-400">
+                          {new Date(
+                            applicant.applicant.last_reminded_date,
+                          ).toLocaleDateString()}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                )}
 
-                  {/* Time Row */}
-                  {applicant.application_status === "testing" && (
-                    <TableRow className="grid grid-cols-2 p-2">
-                      <TableCell className="text-sm">Time</TableCell>
-                      <TableCell>
-                        {" "}
-                        <div className="flex flex-col space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="max-w-[150px] truncate text-xs">
-                              <>
-                                <ApplicantTestTimeRemaining
-                                  applicant={applicant}
-                                  isMobile={true}
-                                />
-                              </>
-                            </span>
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-
-                  {/* Fork URL Row */}
-                  {applicant.application_status === "testing" && (
-                    <TableRow className="grid grid-cols-2 p-2">
-                      <TableCell className="text-sm">Fork URL</TableCell>
-                      <TableCell>
-                        {" "}
-                        <div className="flex flex-col space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="max-w-[150px] truncate text-xs">
-                              {applicant.applicant?.fork_url ? (
-                                <Link
-                                  href={applicant.applicant.fork_url}
-                                  target="_blank"
-                                  rel="noopener noreferrer"
-                                >
-                                  <IconLink className="h-4 w-4 text-gray-600 dark:text-gray-200" />
-                                </Link>
-                              ) : (
-                                <span className="text-sm text-gray-600 dark:text-gray-500">
-                                  N/A
-                                </span>
-                              )}
-                            </span>
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-
-                  {/* Reapply Row */}
-                  {applicant.application_status === "denied" && (
-                    <TableRow className="grid grid-cols-2 p-2">
-                      <TableCell className="text-sm">Reapply</TableCell>
-                      <TableCell>
-                        {" "}
-                        <div className="flex flex-col space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="max-w-[150px] truncate text-xs">
-                              <ApplicantReapplyTime
-                                applicant={applicant}
-                                isMobile={true}
-                              />
-                            </span>
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-
-                  {/* Reminded Row */}
-                  {applicant.application_status !== "denied" && (
-                    <TableRow className="grid grid-cols-2 p-2">
-                      <TableCell className="text-sm">Reminded</TableCell>
-                      <TableCell>
-                        {" "}
-                        <div className="flex flex-col space-y-2">
-                          <div className="flex items-center gap-2">
-                            <span className="max-w-[150px] truncate text-xs">
-                              <div className="flex flex-col items-center gap-0.5">
-                                <span className="inline-flex h-5 items-center justify-center rounded-full bg-gray-100 px-1 text-xs font-medium text-gray-800 dark:bg-gray-800 dark:text-gray-100">
-                                  {applicant.applicant?.reminded_count ?? 0}
-                                </span>
-                                <span className="text-[10px] text-gray-500 dark:text-gray-400">
-                                  {applicant.applicant?.last_reminded_date &&
-                                    new Date(
-                                      applicant.applicant.last_reminded_date,
-                                    ).toLocaleDateString()}
-                                </span>
-                              </div>
-                            </span>
-                          </div>
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  )}
-
-                  <TableRow className="grid grid-cols-2 p-2">
-                    <TableCell className="text-sm">Actions</TableCell>
-
-                    <TableCell>
-                      <ApplicantActionButton applicant={applicant} />
-                    </TableCell>
-                  </TableRow>
-                </TableHeader>
-              </Table>
+                <div className="flex items-center justify-between pt-2">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Actions</span>
+                  <ApplicantActionButton applicant={applicant} />
+                </div>
+              </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>

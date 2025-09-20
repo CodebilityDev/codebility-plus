@@ -68,7 +68,6 @@ const ContactUsModal = () => {
         role="dialog"
       >
         <DialogTitle id="contact-modal-title" className="sr-only">Contact Us</DialogTitle>
-      >
         <div className="w-full flex-1 flex-col gap-4">
           <Image
             className="mx-auto mb-2 hidden h-auto p-10 md:w-[250px] lg:flex lg:w-[300px]"

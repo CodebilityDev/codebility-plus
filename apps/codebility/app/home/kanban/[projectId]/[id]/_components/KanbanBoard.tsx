@@ -31,7 +31,7 @@ interface KanbanBoardProps {
  */
 function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
   const user = useUserStore((state) => state.user);
-  
+
   // User permissions - simple boolean checks following YAGNI principle
   const canAddColumn = user?.role_id === 1 || user?.role_id === 5;
   const canAddMember = canAddColumn;
@@ -61,7 +61,7 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
         imageUrl: user.image_url,
         isActive: activeFilter === user.id,
       })),
-    [allMembers, activeFilter]
+    [allMembers, activeFilter],
   );
 
   // Filter handler using useCallback to prevent unnecessary re-renders
@@ -80,23 +80,28 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
     <div className="relative flex h-full w-full overflow-hidden">
       <div className="relative z-10 mx-auto h-full w-[calc(100vw-22rem)] flex-1 flex-col">
         <div className="flex h-full flex-col gap-6 p-6">
-          
           {/* Three-Level Breadcrumb Navigation */}
-          <nav className="flex flex-row items-center gap-3 text-sm" aria-label="Breadcrumb">
+          <nav
+            className="flex flex-row items-center gap-3 text-sm"
+            aria-label="Breadcrumb"
+          >
             {/* Level 1: Kanban Board Overview */}
-            <Link 
-              href={pathsConfig.app.kanban} 
+            <Link
+              href={pathsConfig.app.kanban}
               className="group transition-colors duration-200"
             >
               <span className="group-hover:text-customBlue-600 dark:group-hover:text-customBlue-400 text-gray-500 dark:text-gray-400">
                 📋 Kanban Board
               </span>
             </Link>
-            
-            <ArrowRightIcon className="text-gray-400 dark:text-gray-500" aria-hidden="true" />
-            
+
+            <ArrowRightIcon
+              className="text-gray-400 dark:text-gray-500"
+              aria-hidden="true"
+            />
+
             {/* Level 2: Project Sprint */}
-            <Link 
+            <Link
               href={`${pathsConfig.app.kanban}/${projectId}`}
               className="group transition-colors duration-200"
             >
@@ -104,11 +109,14 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
                 Kanban Sprint
               </span>
             </Link>
-            
-            <ArrowRightIcon className="text-gray-400 dark:text-gray-500" aria-hidden="true" />
-            
+
+            <ArrowRightIcon
+              className="text-gray-400 dark:text-gray-500"
+              aria-hidden="true"
+            />
+
             {/* Level 3: Current Board Name */}
-            <span 
+            <span
               className="to-customBlue-600 bg-gradient-to-r from-purple-600 bg-clip-text font-semibold text-gray-900 text-transparent dark:text-white"
               aria-current="page"
             >
@@ -120,7 +128,9 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
           <header className="flex flex-col gap-6 md:justify-between lg:flex-row">
             <div className="flex items-center gap-4">
               <div className="from-customBlue-500 shadow-customBlue-500/25 flex h-14 w-14 animate-pulse items-center justify-center rounded-full bg-gradient-to-br to-purple-500 shadow-xl [animation-duration:3s]">
-                <span className="text-2xl" aria-hidden="true">📋</span>
+                <span className="text-2xl" aria-hidden="true">
+                  📋
+                </span>
               </div>
               <div>
                 <h1 className="to-customBlue-600 bg-gradient-to-r from-purple-600 bg-clip-text text-2xl font-bold text-transparent drop-shadow-sm md:text-3xl">
@@ -139,7 +149,10 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
                 <label htmlFor="kanbanSearch" className="sr-only">
                   Search tasks
                 </label>
-                <IconSearch className="text-gray-400 transition-colors duration-200 dark:text-gray-500" aria-hidden="true" />
+                <IconSearch
+                  className="text-gray-400 transition-colors duration-200 dark:text-gray-500"
+                  aria-hidden="true"
+                />
                 <KanbanBoardsSearch
                   className="w-full bg-transparent font-medium text-gray-900 placeholder-gray-500 outline-none dark:text-white dark:placeholder-gray-400"
                   placeholder="🔍 Search tasks..."
@@ -163,7 +176,7 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
                     <KanbanColumnAddButton boardId={boardData.id} />
                   )}
                   {canAddMember && <KanbanAddMembersButton />}
-                  
+
                   {/* Archive Toggle Button */}
                   <Button
                     onClick={() => setShowArchive(!showArchive)}
@@ -194,15 +207,18 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
               // Empty State
               <div className="flex flex-1 items-center justify-center">
                 <div className="py-20 text-center">
-                  <div className="mb-6 animate-bounce text-6xl opacity-60 [animation-duration:2s]" aria-hidden="true">
+                  <div
+                    className="mb-6 animate-bounce text-6xl opacity-60 [animation-duration:2s]"
+                    aria-hidden="true"
+                  >
                     📋
                   </div>
                   <h2 className="mb-3 text-xl font-semibold text-gray-900 dark:text-white">
                     No columns found
                   </h2>
                   <p className="mx-auto max-w-md leading-relaxed text-gray-600 dark:text-gray-400">
-                    Get started by adding your first column to organize your tasks
-                    and boost productivity.
+                    Get started by adding your first column to organize your
+                    tasks and boost productivity.
                   </p>
                   {canAddColumn && (
                     <div className="mt-8">
@@ -216,7 +232,7 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
               <div className="flex h-full flex-1 overflow-hidden rounded-xl bg-transparent backdrop-blur-sm transition-all duration-300">
                 {!showArchive ? (
                   <KanbanBoardColumnContainer
-                    projectId={boardData.id}
+                    projectId={projectId}
                     columns={boardData.kanban_columns || []}
                     activeFilter={activeFilter}
                   />

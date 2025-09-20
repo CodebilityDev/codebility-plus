@@ -173,8 +173,9 @@
 .primary-gradient {
   background: linear-gradient(
     129deg,
-    var(--violet-color) 0%,
-    var(--teal-color) 100%
+    #0a0b1e 0%,
+    #1a0b2e 35%,
+    #2d1b3d 100%
   );
 }
 

@@ -12,6 +12,8 @@ import AccountSettingsChangePassword from "./_components/AccountSettingsChangePa
 import AccountSettingsDelete from "./_components/AccountSettingsDelete";
 import AccountSettingsHeader from "./_components/AccountSettingsHeader";
 
+export const dynamic = "force-dynamic";
+
 interface User {
   id: string;
   email?: string;
