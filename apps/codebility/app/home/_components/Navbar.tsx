@@ -14,7 +14,7 @@ import {
   IconProfile,
 } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
-// import { Bell } from "lucide-react"; // TODO: Uncomment when notification system is implemented
+import { NotificationContainer } from "@/components/notifications/NotificationContainer";
 
 import {
   DropdownMenu,
@@ -32,8 +32,8 @@ export const defaultMenuItems = [
 ];
 
 export const adminMenus = [
-  { href: "/home/account-settings", icon: IconCog, label: "Settings" },
   { href: "/home/settings/profile", icon: IconProfile, label: "Profile" },
+  { href: "/home/account-settings", icon: IconCog, label: "Settings" },
 ];
 
 const Navbar = () => {
@@ -55,10 +55,11 @@ const Navbar = () => {
   const menuItems = role_id === 1 ? adminMenus : defaultMenuItems;
 
   return (
-    <nav
-      className="background-navbar fixed top-0 z-20 w-full shadow-sm"
-      role="banner"
-    >
+    <>
+      <nav
+        className="fixed top-0 z-20 w-full bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-b border-gray-200/50 dark:border-gray-800/50 shadow-sm"
+        role="banner"
+      >
       <div className="flex w-full min-w-full items-center justify-end px-8 py-2">
         {/*   <div className="md flex items-center" role="navigation" aria-label="Logo">
           <Link
@@ -83,23 +84,7 @@ const Navbar = () => {
           role="navigation"
           aria-label="User menu"
         >
-          {/* 
-          TODO: Implement notification system functionality
-          - Add backend integration for notifications
-          - Implement notification count/status tracking
-          - Add click handler for notification dropdown
-          - Connect to real-time notification updates
-          
-          <button
-            className="relative rounded-lg p-2 transition-colors duration-200 hover:bg-gray-100 dark:hover:bg-gray-800"
-            aria-label="Notifications"
-          >
-            <Bell className="h-5 w-5 text-gray-600 dark:text-gray-300" />
-            <span className="absolute -right-1 -top-1 flex h-3 w-3 items-center justify-center rounded-full bg-red-500">
-              <span className="h-1.5 w-1.5 rounded-full bg-white"></span>
-            </span>
-          </button>
-          */}
+          <NotificationContainer />
           
           <div>
             <div className="md:hidden">
@@ -121,10 +106,10 @@ const Navbar = () => {
                 className="hidden flex-col items-end md:flex"
                 aria-hidden="true"
               >
-                <p className="capitalize dark:text-white">
+                <p className="capitalize text-gray-900 dark:text-gray-100">
                   {first_name} {last_name}
                 </p>
-                <p className="text-dark100_light900 text-sm">{email_address}</p>
+                <p className="text-gray-600 dark:text-gray-400 text-sm">{email_address}</p>
               </div>
               <div className="from-customViolet-300 to-customBlue-500 relative size-[44px] rounded-full bg-gradient-to-b p-[1.5px]">
                 <Image
@@ -137,7 +122,7 @@ const Navbar = () => {
                 />
               </div>
               <IconDropdown
-                className="hidden invert dark:invert-0 md:block"
+                className="hidden text-gray-600 dark:text-gray-400 md:block"
                 aria-hidden="true"
               />
               <span className="sr-only">
@@ -146,7 +131,7 @@ const Navbar = () => {
             </DropdownMenuTrigger>
 
             <DropdownMenuContent
-              className="dark:bg-dark-100 absolute -left-24 top-3 border-white dark:border-zinc-700 md:w-[200px]"
+              className="bg-white dark:bg-gray-800 absolute -left-24 top-3 border-gray-200 dark:border-gray-700 md:w-[200px] shadow-lg"
               role="menu"
               aria-label="User account options"
             >
@@ -193,6 +178,7 @@ const Navbar = () => {
         </div>
       </div>
     </nav>
+    </>
   );
 };
 

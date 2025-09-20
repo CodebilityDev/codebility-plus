@@ -87,11 +87,20 @@ const MobileDrawer = ({
   openSheet,
   setOpenSheet,
   handleLogout,
+  userData,
 }: {
   isLoggedIn: boolean;
   openSheet: boolean;
   setOpenSheet: (open: boolean) => void;
   handleLogout: () => void;
+  userData?: {
+    application_status: string;
+    role_id: number;
+    applicant: {
+      id: string;
+      codev_id: string;
+    } | null;
+  } | null;
 }) => (
   <Sheet open={openSheet} onOpenChange={setOpenSheet}>
     <SheetTrigger>
@@ -121,11 +130,33 @@ const MobileDrawer = ({
           </Link>
         );
       })}
+      
+      {/* User menu items */}
+      {isLoggedIn && userData && (
+        <>
+          <div className="border-t border-zinc-700 my-2" />
+          {getMenuItems(userData.application_status, userData.role_id, userData.applicant).map((item) => (
+            <Link
+              onClick={() => setOpenSheet(false)}
+              href={item.href}
+              key={item.label}
+            >
+              <div className="flex items-center gap-4 p-4 text-left text-xl font-semibold">
+                <item.icon className="h-6 w-6" style={{ color: "#ffffff" }} />
+                {item.label}
+              </div>
+            </Link>
+          ))}
+          <div className="border-t border-zinc-700 my-2" />
+        </>
+      )}
+      
       {isLoggedIn && (
         <button
           onClick={handleLogout}
-          className="w-full cursor-pointer border-none p-4 text-left text-xl font-semibold"
+          className="flex items-center gap-4 w-full cursor-pointer border-none p-4 text-left text-xl font-semibold"
         >
+          <IconLogout className="h-6 w-6 text-white" />
           Logout
         </button>
       )}
@@ -172,6 +203,7 @@ const UserMenu = ({
             alt="Avatar"
             src={image_url || defaultAvatar}
             fill
+            sizes="52px"
             title={`${first_name}'s Avatar`}
             className="rounded-full"
           />
@@ -221,7 +253,6 @@ const UserMenu = ({
 };
 
 const Navigation = () => {
-  /*  const supabase = createClientClientComponent(); */
   const { color } = useChangeBgNavigation();
   const pathname = usePathname();
   const [openSheet, setOpenSheet] = useState(false);
@@ -239,18 +270,16 @@ const Navigation = () => {
 
     async function fetchUser() {
       try {
-        const {
-          data: { session },
-          error: authError,
-        } = await supabase.auth.getSession();
+        // FIXED: Use getUser() instead of getSession()
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError) {
-          console.error("Auth error:", authError.message);
+          console.log("Auth error:", authError.message);
           setUserData(null);
           return;
         }
 
-        if (!session) {
+        if (!user) {
           // not logged in → silent
           setUserData(null);
           return;
@@ -259,7 +288,7 @@ const Navigation = () => {
         const { data: userRow, error: fetchError } = await supabase
           .from("codev")
           .select(`*, applicant (id, codev_id)`)
-          .eq("id", session.user.id)
+          .eq("id", user.id)
           .single();
 
         console.log("User Row:", userRow);
@@ -328,6 +357,7 @@ const Navigation = () => {
           openSheet={openSheet}
           setOpenSheet={setOpenSheet}
           handleLogout={handleLogout}
+          userData={userData}
         />
       </div>
     </div>

@@ -286,6 +286,9 @@ importers:
       sharp:
         specifier: ^0.33.4
         version: 0.33.5
+      sonner:
+        specifier: ^1.5.0
+        version: 1.7.4(react-dom@19.1.0)(react@19.1.0)
       tailwind-merge:
         specifier: ^2.6.0
         version: 2.6.0
@@ -17391,7 +17394,6 @@ packages:
 
   /metro-react-native-babel-preset@0.72.3(@babel/core@7.28.3):
     resolution: {integrity: sha512-uJx9y/1NIqoYTp6ZW1osJ7U5ZrXGAJbOQ/Qzl05BdGYvN1S7Qmbzid6xOirgK0EIT0pJKEEh1s8qbassYZe4cw==}
-    deprecated: Use @react-native/babel-preset instead
     peerDependencies:
       '@babel/core': '*'
     dependencies:

@@ -6,6 +6,7 @@ import SettingsCard from "@/app/home/settings/_components/SettingsCard";
 import { H1 } from "@/components/shared/dashboard";
 import { settingsCardData } from "@/constants/settings";
 import { createClientClientComponent } from "@/utils/supabase/client";
+import PageContainer from "../_components/PageContainer";
 
 import Loading from "./loading";
 
@@ -86,11 +87,19 @@ const Settings = () => {
   }, [supabase, roleId]);
 
   if (loading) {
-    return <Loading />;
+    return (
+      <PageContainer>
+        <Loading />
+      </PageContainer>
+    );
   }
 
   if (!rolePermissions) {
-    return <div className="mx-auto p-4">Unable to determine permissions.</div>;
+    return (
+      <PageContainer>
+        <div className="mx-auto p-4">Unable to determine permissions.</div>
+      </PageContainer>
+    );
   }
 
   // Filter settings cards based on role permissions.
@@ -102,9 +111,9 @@ const Settings = () => {
   });
 
   return (
-    <div className="mx-auto flex max-w-screen-xl flex-col gap-4 p-4">
+    <PageContainer maxWidth="xl">
       <H1>Settings</H1>
-      <div className="grid w-full max-w-7xl grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <div className="mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filteredCards.map((card) => (
           <Link key={card.path} href={card.path}>
             <SettingsCard
@@ -116,7 +125,7 @@ const Settings = () => {
           </Link>
         ))}
       </div>
-    </div>
+    </PageContainer>
   );
 };
 

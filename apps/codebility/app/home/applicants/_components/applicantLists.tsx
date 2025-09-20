@@ -59,7 +59,7 @@ function ApplicantLists({
   );
 
   return (
-    <div className="mx-auto flex max-w-[1600px] flex-col gap-10">
+    <div className="mx-auto flex max-w-full flex-col gap-6">
       <ApplicantFilterHeaders
         applicants={applicants}
         setApplicants={setFilteredApplicants}
@@ -73,59 +73,71 @@ function ApplicantLists({
         }}
         className="w-full"
       >
-        <TabsList className="!grid !h-auto w-full grid-cols-2 gap-0.5 md:grid-cols-4 md:gap-0">
-          <TabsTrigger value="applying" className="!flex !h-auto flex-col gap-0.5 px-1 py-1.5 text-xs md:flex-row md:gap-2 md:px-3 md:py-1.5 md:text-sm">
-            <span className="truncate text-xs md:text-sm">Applicants</span>
+        <TabsList className="!grid !h-auto w-full max-w-2xl grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 md:grid-cols-4 md:gap-1 dark:bg-gray-800">
+          <TabsTrigger 
+            value="applying" 
+            className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
+          >
+            <span className="truncate text-sm font-medium">Applicants</span>
             {applicantsApplying.length > 0 && (
-              <Badge className="h-3.5 min-w-3.5 bg-customBlue-500 px-1 text-xs text-white md:ml-2 md:h-auto md:min-w-0 md:px-2">
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-blue-500 px-2 text-xs font-semibold text-white">
                 {applicantsApplying.length}
-              </Badge>
+              </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="testing" className="!flex !h-auto flex-col gap-0.5 px-1 py-1.5 text-xs md:flex-row md:gap-2 md:px-3 md:py-1.5 md:text-sm">
-            <span className="truncate text-xs md:text-sm">Testing</span>
+          <TabsTrigger 
+            value="testing" 
+            className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
+          >
+            <span className="truncate text-sm font-medium">Testing</span>
             {applicantsTesting.length > 0 && (
-              <Badge className="h-3.5 min-w-3.5 bg-amber-500 px-1 text-xs text-white md:ml-2 md:h-auto md:min-w-0 md:px-2">
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-amber-500 px-2 text-xs font-semibold text-white">
                 {applicantsTesting.length}
-              </Badge>
+              </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="onboarding" className="!flex !h-auto flex-col gap-0.5 px-1 py-1.5 text-xs md:flex-row md:gap-2 md:px-3 md:py-1.5 md:text-sm">
-            <span className="truncate text-xs md:text-sm">Onboarding</span>
+          <TabsTrigger 
+            value="onboarding" 
+            className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
+          >
+            <span className="truncate text-sm font-medium">Onboarding</span>
             {applicantsOnboarding.length > 0 && (
-              <Badge className="bg-codeGreen h-3.5 min-w-3.5 px-1 text-xs text-white md:ml-2 md:h-auto md:min-w-0 md:px-2">
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-emerald-500 px-2 text-xs font-semibold text-white">
                 {applicantsOnboarding.length}
-              </Badge>
+              </span>
             )}
           </TabsTrigger>
-          <TabsTrigger value="denied" className="!flex !h-auto flex-col gap-0.5 px-1 py-1.5 text-xs md:flex-row md:gap-2 md:px-3 md:py-1.5 md:text-sm">
-            <span className="truncate text-xs md:text-sm">Denied</span>
+          <TabsTrigger 
+            value="denied" 
+            className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
+          >
+            <span className="truncate text-sm font-medium">Denied</span>
             {applicantsDenied.length > 0 && (
-              <Badge className="h-3.5 min-w-3.5 bg-red-500 px-1 text-xs text-white md:ml-2 md:h-auto md:min-w-0 md:px-2">
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-2 text-xs font-semibold text-white">
                 {applicantsDenied.length}
-              </Badge>
+              </span>
             )}
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="applying" className="mt-10 md:mt-4">
+        <TabsContent value="applying" className="mt-6">
           <ApplicantDataTable
             data={applicantsApplying}
             columns={applicantsColumns}
           />
         </TabsContent>
-        <TabsContent value="testing" className="mt-10 md:mt-4">
+        <TabsContent value="testing" className="mt-6">
           <ApplicantDataTable
             data={applicantsTesting}
             columns={applicantsColumns}
           />
         </TabsContent>
-        <TabsContent value="onboarding" className="mt-10 md:mt-4">
+        <TabsContent value="onboarding" className="mt-6">
           <ApplicantDataTable
             data={applicantsOnboarding}
             columns={applicantsColumns}
           />
         </TabsContent>
-        <TabsContent value="denied" className="mt-10 md:mt-4">
+        <TabsContent value="denied" className="mt-6">
           <ApplicantDataTable
             data={applicantsDenied}
             columns={applicantsColumns}

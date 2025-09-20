@@ -4,7 +4,6 @@ import { revalidatePath } from "next/cache";
 import { Task } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
-
 interface CodevMember {
   id: string;
   first_name: string;
@@ -37,37 +36,20 @@ export const updateTaskColumnId = async (
 };
 
 export const fetchAvailableMembers = async (
-  boardId: string,
+  projectId: string,
 ): Promise<CodevMember[]> => {
   const supabase = await createClientServerComponent();
 
-  // 1. Get the project_id from the kanban_boards table.
-  const { data: board, error: boardError } = await supabase
-    .from("kanban_boards")
-    .select("project_id")
-    .eq("id", boardId)
-    .single();
-
-  if (boardError || !board?.project_id) {
-    console.error("No project associated with this board");
-    return [];
-  }
-
-  // 2. Get all project members from project_members table.
   const { data: projectMembers, error: projectMembersError } = await supabase
     .from("project_members")
     .select("codev_id, role")
-    .eq("project_id", board.project_id);
+    .eq("project_id", projectId);
 
   if (projectMembersError || !projectMembers?.length) {
-    console.error(
-      "Error fetching project members:",
-      projectMembersError?.message,
-    );
+    console.error("Error fetching project members:", projectMembersError?.message);
     return [];
   }
 
-  // 3. Separate team leader and members
   let teamLeaderId: string | null = null;
   let memberIds: string[] = [];
 
@@ -79,7 +61,6 @@ export const fetchAvailableMembers = async (
     }
   });
 
-  // 4. Fetch team members' details from the codev table
   let members: CodevMember[] = [];
 
   if (memberIds.length > 0) {
@@ -97,7 +78,6 @@ export const fetchAvailableMembers = async (
     }
   }
 
-  // 5. Fetch the team leader details (if exists)
   if (teamLeaderId) {
     const { data: leaderData, error: leaderError } = await supabase
       .from("codev")
@@ -108,7 +88,7 @@ export const fetchAvailableMembers = async (
     if (leaderError) {
       console.error("Error fetching project leader:", leaderError.message);
     } else if (leaderData.availability_status === true) {
-      members.unshift(leaderData); // Add leader to the beginning of the list
+      members.unshift(leaderData);
     }
   }
 
@@ -125,13 +105,11 @@ export const createNewTask = async (
     const description = formData.get("description")?.toString();
     const priority = formData.get("priority")?.toString();
     const difficulty = formData.get("difficulty")?.toString();
-    const type = formData.get("type")?.toString()?.toUpperCase(); // Ensure type is uppercase (or adjust to your DB requirement)
+    const type = formData.get("type")?.toString()?.toUpperCase();
     const pr_link = formData.get("pr_link")?.toString();
-    const points = formData.get("points")
-      ? Number(formData.get("points"))
-      : null;
+    const points = formData.get("points") ? Number(formData.get("points")) : null;
     const kanban_column_id = formData.get("kanban_column_id")?.toString();
-    const codev_id = formData.get("codev_id")?.toString(); // primary assignee
+    const codev_id = formData.get("codev_id")?.toString();
     const sidekick_ids = formData
       .get("sidekick_ids")
       ?.toString()
@@ -140,8 +118,8 @@ export const createNewTask = async (
     const skill_category_id = formData.get("skill_category_id")?.toString();
     const created_by = formData.get("created_by")?.toString();
 
-    if (!title || !kanban_column_id) {
-      return { success: false, error: "Required fields are missing" };
+    if (!title || !kanban_column_id || !skill_category_id) {
+      return { success: false, error: "Required fields are missing (title, column, and skill category)" };
     }
 
     const { error } = await supabase.from("tasks").insert([
@@ -166,24 +144,26 @@ export const createNewTask = async (
       return { success: false, error: error.message };
     }
 
-    // Get the board and project info for specific revalidation
+    // Sequential queries to avoid nested join TypeScript issues
     const { data: columnData } = await supabase
       .from("kanban_columns")
-      .select(`
-        board_id,
-        kanban_boards!inner (
-          project_id
-        )
-      `)
+      .select("board_id")
       .eq("id", kanban_column_id)
       .single();
 
-    if (columnData?.kanban_boards?.project_id && columnData?.board_id) {
-      revalidatePath(`/home/kanban/${columnData.kanban_boards.project_id}/${columnData.board_id}`);
+    if (columnData?.board_id) {
+      const { data: boardData } = await supabase
+        .from("kanban_boards")
+        .select("project_id")
+        .eq("id", columnData.board_id)
+        .single();
+        
+      if (boardData?.project_id) {
+        revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+      }
     }
 
     return { success: true };
-
   } catch (error) {
     console.error("Error creating task:", error);
     return {
@@ -200,9 +180,12 @@ export const updateTask = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // handles codev.id being null
+    // Handle BOTH UUID fields properly
     const rawCodevId = formData.get("codev_id")?.toString();
     const codev_id = rawCodevId === "" || rawCodevId === "null" ? null : rawCodevId;
+
+    const rawSkillCategoryId = formData.get("skill_category_id")?.toString();
+    const skill_category_id = rawSkillCategoryId === "" || rawSkillCategoryId === "null" ? null : rawSkillCategoryId;
 
     const updateData = {
       title: formData.get("title")?.toString(),
@@ -214,13 +197,12 @@ export const updateTask = async (
       points: formData.get("points") ? Number(formData.get("points")) : null,
       sidekick_ids: formData.get("sidekick_ids")
         ? formData.get("sidekick_ids")?.toString().split(",").filter(Boolean)
-        : [], // Ensure it's always an array
-      skill_category_id: formData.get("skill_category_id")?.toString(),
+        : [],
+      skill_category_id: skill_category_id,
       codev_id: codev_id,
       updated_at: new Date().toISOString(),
     };
 
-    // First, validate that we can actually read the task
     const { data: existingTask, error: fetchError } = await supabase
       .from("tasks")
       .select("*")
@@ -232,30 +214,17 @@ export const updateTask = async (
       return { success: false, error: "Could not find task to update" };
     }
 
-    // Then perform the update
     const { error: updateError } = await supabase
       .from("tasks")
       .update({
         ...updateData,
-        sidekick_ids: updateData.sidekick_ids, // Explicitly set as array
+        sidekick_ids: updateData.sidekick_ids,
       })
       .eq("id", taskId);
 
     if (updateError) {
       console.error("Supabase update error:", updateError);
       return { success: false, error: updateError.message };
-    }
-
-    // Verify the update
-    const { data: updatedTask, error: verifyError } = await supabase
-      .from("tasks")
-      .select("*")
-      .eq("id", taskId)
-      .single();
-
-    if (verifyError) {
-      console.error("Error verifying update:", verifyError);
-      return { success: false, error: "Could not verify update" };
     }
 
     return { success: true };
@@ -274,17 +243,10 @@ export const deleteTask = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // Get task info before deletion for revalidation
+    // Sequential queries instead of nested joins
     const { data: taskData } = await supabase
       .from("tasks")
-      .select(`
-        kanban_column!inner (
-          board_id,
-          kanban_boards!inner (
-            project_id
-          )
-        )
-      `)
+      .select("kanban_column_id")
       .eq("id", taskId)
       .single();
 
@@ -295,10 +257,27 @@ export const deleteTask = async (
       return { success: false, error: error.message };
     }
 
-    // Revalidate only the specific board
-    if (taskData?.kanban_column?.kanban_boards?.project_id && taskData?.kanban_column?.board_id) {
-      revalidatePath(`/home/kanban/${taskData.kanban_column.kanban_boards.project_id}/${taskData.kanban_column.board_id}`);
+    // Get revalidation path data
+    if (taskData?.kanban_column_id) {
+      const { data: columnData } = await supabase
+        .from("kanban_columns")
+        .select("board_id")
+        .eq("id", taskData.kanban_column_id)
+        .single();
+        
+      if (columnData?.board_id) {
+        const { data: boardData } = await supabase
+          .from("kanban_boards")
+          .select("project_id")
+          .eq("id", columnData.board_id)
+          .single();
+          
+        if (boardData?.project_id) {
+          revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+        }
+      }
     }
+
     return { success: true };
   } catch (error) {
     console.error("Error deleting task:", error);
@@ -315,10 +294,9 @@ export const createNewColumn = async (
 ): Promise<{ success: boolean; error?: string }> => {
   const supabase = await createClientServerComponent();
   try {
-    // Fix the type for the select query
     const { data: existingColumns, error: queryError } = await supabase
       .from("kanban_columns")
-      .select("position") // Remove the type generics, just use string
+      .select("position")
       .eq("board_id", boardId)
       .order("position", { ascending: false })
       .limit(1);
@@ -327,7 +305,6 @@ export const createNewColumn = async (
       return { success: false, error: queryError.message };
     }
 
-    // Safely type the next position
     const nextPosition = (existingColumns?.[0]?.position ?? -1) + 1;
 
     const { error: insertError } = await supabase
@@ -379,10 +356,7 @@ export const updateColumnPosition = async (
     console.error("Error updating column position:", error);
     return {
       success: false,
-      error:
-        error instanceof Error
-          ? error.message
-          : "Failed to update column position",
+      error: error instanceof Error ? error.message : "Failed to update column position",
     };
   }
 };
@@ -433,8 +407,7 @@ export const updateColumnName = async (
   } catch (error) {
     return {
       success: false,
-      error:
-        error instanceof Error ? error.message : "Failed to update column name",
+      error: error instanceof Error ? error.message : "Failed to update column name",
     };
   }
 };
@@ -444,7 +417,6 @@ const updateDeveloperLevels = async (codevId?: string) => {
 
   const supabase = await createClientServerComponent();
 
-  // 1. Get all points for this developer across skill categories
   const { data: pointsData, error: pointsError } = await supabase
     .from("codev_points")
     .select("skill_category_id, points");
@@ -454,10 +426,8 @@ const updateDeveloperLevels = async (codevId?: string) => {
     return;
   }
 
-  // 2. Prepare levels object
   const levels: Record<string, number> = {};
 
-  // 3. For each skill category, determine the level
   for (const pointRecord of pointsData) {
     const { data: levelData, error: levelError } = await supabase
       .from("levels")
@@ -478,7 +448,6 @@ const updateDeveloperLevels = async (codevId?: string) => {
     }
   }
 
-  // 4. Update codev table's level column
   const { error: updateError } = await supabase
     .from("codev")
     .update({ level: levels })
@@ -489,138 +458,139 @@ const updateDeveloperLevels = async (codevId?: string) => {
   }
 };
 
-/* 
-old implementation
+// RESOLVED: Comprehensive completeTask implementation with RPC fallback
 export const completeTask = async (
   task: Task,
 ): Promise<{ success: boolean; error?: string }> => {
   const supabase = await createClientServerComponent();
 
   try {
-    // 1. Get primary assignee points record
-    const { data: existingPoints, error: pointsError } = await supabase
-      .from("codev_points")
-      .select("*")
-      .eq("codev_id", task.codev?.id)
-      .eq("skill_category_id", task.skill_category?.id)
-      .single();
-
-    // 2. Calculate new points
-    const taskPoints = task.points || 0;
-    const currentPoints = existingPoints?.points || 0;
-    const newPoints = currentPoints + taskPoints;
-
-    // 3. Update or insert points for primary assignee
-    if (existingPoints) {
-      const { error: updateError } = await supabase
-        .from("codev_points")
-        .update({
-          points: newPoints,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", existingPoints.id);
-
-      if (updateError) throw updateError;
-    } else {
-      const { error: insertError } = await supabase
-        .from("codev_points")
-        .insert({
-          codev_id: task.codev?.id,
-          skill_category_id: task.skill_category?.id,
-          points: taskPoints,
-          updated_at: new Date().toISOString(),
-          created_at: new Date().toISOString(),
-        });
-
-      if (insertError) throw insertError;
-    }
-
-    // 4. Handle sidekick points (50% of task points)
-    if (task.sidekick_ids?.length) {
-      const sidekickPoints = Math.floor(taskPoints * 0.5);
-
-      for (const sidekickId of task.sidekick_ids) {
-        const { data: sidekickExistingPoints, error: sidekickError } =
-          await supabase
-            .from("codev_points")
-            .select("*")
-            .eq("codev_id", sidekickId)
-            .eq("skill_category_id", task.skill_category?.id)
-            .single();
-
-        if (sidekickError && sidekickError.code !== "PGRST116") {
-          throw sidekickError;
-        }
-
-        if (sidekickExistingPoints) {
-          const { error: updateError } = await supabase
-            .from("codev_points")
-            .update({
-              points: sidekickExistingPoints.points + sidekickPoints,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", sidekickExistingPoints.id);
-
-          if (updateError) throw updateError;
-        } else {
-          const { error: insertError } = await supabase
-            .from("codev_points")
-            .insert({
-              codev_id: sidekickId,
-              skill_category_id: task.skill_category?.id,
-              points: sidekickPoints,
-              updated_at: new Date().toISOString(),
-              created_at: new Date().toISOString(),
-            });
-
-          if (insertError) throw insertError;
-        }
-      }
-    }
-
-    // 5. Update developer levels
-    await updateDeveloperLevels(task.codev?.id);
-
-    // 6. Delete the task
-    const { error: deleteError } = await supabase
-      .from("tasks")
-      .delete()
-      .eq("id", task.id);
-
-    if (deleteError) throw deleteError;
-
-    revalidatePath("/home/kanban/*");
-
-    return { success: true };
-  } catch (error) {
-    console.error("Error completing task:", error);
-    return {
-      success: false,
-      error: error instanceof Error ? error.message : "Failed to complete task",
-    };
-  }
-}; */
-
-export const completeTask = async (
-  task: Task,
-): Promise<{ success: boolean; error?: string }> => {
-  const supabase = await createClientServerComponent();
-
-  try {
-    // Call the NEW RPC function to award points and archive task
-    const { data, error } = await supabase.rpc('new_complete_task', {
+    // Try to use the RPC function first for better performance
+    const { data, error } = await supabase.rpc('complete_task', {
       task_id: task.id,
       task_points: task.points || 0,
       primary_codev_id: task.codev?.id,
-      skill_category_id: task.skill_category?.id,
+      p_skill_category_id: task.skill_category?.id,
       sidekick_ids: task.sidekick_ids || null
     });
+
+    // If RPC function doesn't exist, fall back to manual implementation
+    if (error && error.message.includes('function complete_task')) {
+      
+      // 1. Archive the task instead of deleting for data preservation
+      const { error: archiveError } = await supabase
+        .from("tasks")
+        .update({ 
+          is_archive: true,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", task.id);
+
+      if (archiveError) throw archiveError;
+
+      // 2. Award points to primary assignee
+      if (task.codev?.id && task.skill_category?.id && task.points) {
+        const { data: existingPoints } = await supabase
+          .from("codev_points")
+          .select("*")
+          .eq("codev_id", task.codev.id)
+          .eq("skill_category_id", task.skill_category.id)
+          .single();
+
+        if (existingPoints) {
+          await supabase
+            .from("codev_points")
+            .update({
+              points: existingPoints.points + task.points,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", existingPoints.id);
+        } else {
+          await supabase
+            .from("codev_points")
+            .insert({
+              codev_id: task.codev.id,
+              skill_category_id: task.skill_category.id,
+              points: task.points,
+            });
+        }
+
+        // 3. Award points to sidekicks (50% of task points)
+        if (task.sidekick_ids?.length) {
+          const sidekickPoints = Math.floor(task.points * 0.5);
+          
+          for (const sidekickId of task.sidekick_ids) {
+            const { data: sidekickExisting } = await supabase
+              .from("codev_points")
+              .select("*")
+              .eq("codev_id", sidekickId)
+              .eq("skill_category_id", task.skill_category.id)
+              .single();
+
+            if (sidekickExisting) {
+              await supabase
+                .from("codev_points")
+                .update({
+                  points: sidekickExisting.points + sidekickPoints,
+                  updated_at: new Date().toISOString(),
+                })
+                .eq("id", sidekickExisting.id);
+            } else {
+              await supabase
+                .from("codev_points")
+                .insert({
+                  codev_id: sidekickId,
+                  skill_category_id: task.skill_category.id,
+                  points: sidekickPoints,
+                });
+            }
+          }
+        }
+
+        // 4. Update developer levels for all participants
+        await updateDeveloperLevels(task.codev.id);
+        
+        if (task.sidekick_ids?.length) {
+          for (const sidekickId of task.sidekick_ids) {
+            await updateDeveloperLevels(sidekickId);
+          }
+        }
+      }
+
+      // Sequential queries for revalidation path
+      const { data: taskData } = await supabase
+        .from("tasks")
+        .select("kanban_column_id")
+        .eq("id", task.id)
+        .single();
+
+      if (taskData?.kanban_column_id) {
+        const { data: columnData } = await supabase
+          .from("kanban_columns")
+          .select("board_id")
+          .eq("id", taskData.kanban_column_id)
+          .single();
+          
+        if (columnData?.board_id) {
+          const { data: boardData } = await supabase
+            .from("kanban_boards")
+            .select("project_id")
+            .eq("id", columnData.board_id)
+            .single();
+            
+          if (boardData?.project_id) {
+            revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+          }
+        }
+      }
+      
+      return { success: true };
+    }
 
     if (error) {
       throw error;
     }
 
-    // The RPC function returns a JSON object with success/error info
     const result = data as { success: boolean; error?: string; message?: string };
 
     if (!result.success) {
@@ -630,23 +600,31 @@ export const completeTask = async (
       };
     }
 
-    // Get task info for revalidation
+    // Sequential queries for revalidation when using RPC
     const { data: taskData } = await supabase
       .from("tasks")
-      .select(`
-        kanban_column!inner (
-          board_id,
-          kanban_boards!inner (
-            project_id
-          )
-        )
-      `)
+      .select("kanban_column_id")
       .eq("id", task.id)
       .single();
 
-    // Revalidate only the specific board
-    if (taskData?.kanban_column?.kanban_boards?.project_id && taskData?.kanban_column?.board_id) {
-      revalidatePath(`/home/kanban/${taskData.kanban_column.kanban_boards.project_id}/${taskData.kanban_column.board_id}`);
+    if (taskData?.kanban_column_id) {
+      const { data: columnData } = await supabase
+        .from("kanban_columns")
+        .select("board_id")
+        .eq("id", taskData.kanban_column_id)
+        .single();
+        
+      if (columnData?.board_id) {
+        const { data: boardData } = await supabase
+          .from("kanban_boards")
+          .select("project_id")
+          .eq("id", columnData.board_id)
+          .single();
+          
+        if (boardData?.project_id) {
+          revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+        }
+      }
     }
 
     return { success: true };
@@ -677,9 +655,7 @@ export async function batchUpdateTasks(
     const errors = await Promise.all(updatePromises);
     return {
       success: !errors.some((error) => error !== null),
-      error: errors.some((error) => error !== null)
-        ? "Some updates failed"
-        : undefined,
+      error: errors.some((error) => error !== null) ? "Some updates failed" : undefined,
     };
   } catch (error) {
     console.error("Batch update error:", error);
@@ -690,7 +666,6 @@ export async function batchUpdateTasks(
   }
 }
 
-// for updating the pr_link
 export async function updateTaskPRLink(taskId: string, prLink: string) {
   const supabase = await createClientServerComponent();
   try {
@@ -704,23 +679,31 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
       return { success: false, error: error.message };
     }
 
-    // Get task info for revalidation
+    // Sequential queries for revalidation
     const { data: taskData } = await supabase
       .from("tasks")
-      .select(`
-        kanban_column!inner (
-          board_id,
-          kanban_boards!inner (
-            project_id
-          )
-        )
-      `)
+      .select("kanban_column_id")
       .eq("id", taskId)
       .single();
 
-    // Revalidate only the specific board
-    if (taskData?.kanban_column?.kanban_boards?.project_id && taskData?.kanban_column?.board_id) {
-      revalidatePath(`/home/kanban/${taskData.kanban_column.kanban_boards.project_id}/${taskData.kanban_column.board_id}`);
+    if (taskData?.kanban_column_id) {
+      const { data: columnData } = await supabase
+        .from("kanban_columns")
+        .select("board_id")
+        .eq("id", taskData.kanban_column_id)
+        .single();
+        
+      if (columnData?.board_id) {
+        const { data: boardData } = await supabase
+          .from("kanban_boards")
+          .select("project_id")
+          .eq("id", columnData.board_id)
+          .single();
+          
+        if (boardData?.project_id) {
+          revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+        }
+      }
     }
 
     return { success: true };
@@ -733,7 +716,6 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
   }
 }
 
-// for unarchiving tasks
 export async function unarchiveTask(taskId: string) {
   const supabase = await createClientServerComponent();
   try {
@@ -750,23 +732,31 @@ export async function unarchiveTask(taskId: string) {
       return { success: false, error: error.message };
     }
 
-    // Get task info for revalidation
+    // Sequential queries for revalidation
     const { data: taskData } = await supabase
       .from("tasks")
-      .select(`
-        kanban_column!inner (
-          board_id,
-          kanban_boards!inner (
-            project_id
-          )
-        )
-      `)
+      .select("kanban_column_id")
       .eq("id", taskId)
       .single();
 
-    // Revalidate only the specific board
-    if (taskData?.kanban_column?.kanban_boards?.project_id && taskData?.kanban_column?.board_id) {
-      revalidatePath(`/home/kanban/${taskData.kanban_column.kanban_boards.project_id}/${taskData.kanban_column.board_id}`);
+    if (taskData?.kanban_column_id) {
+      const { data: columnData } = await supabase
+        .from("kanban_columns")
+        .select("board_id")
+        .eq("id", taskData.kanban_column_id)
+        .single();
+        
+      if (columnData?.board_id) {
+        const { data: boardData } = await supabase
+          .from("kanban_boards")
+          .select("project_id")
+          .eq("id", columnData.board_id)
+          .single();
+          
+        if (boardData?.project_id) {
+          revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+        }
+      }
     }
 
     return { success: true };

@@ -129,7 +129,6 @@ export default function WeeklyTop() {
     const fetchTopCodevs = async () => {
       setIsLoading(true);
       try {
-        await new Promise((resolve) => setTimeout(resolve, 1000));
         let query = supabase
           .from("codev_points")
           .select(
@@ -307,7 +306,7 @@ export default function WeeklyTop() {
               <Trophy className="h-5 w-5 text-white" />
             </div>
             <div>
-              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent">
+              <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 🏆 Leaderboard
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">Compete and climb the ranks!</p>

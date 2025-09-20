@@ -6,7 +6,9 @@ import { Card } from "@codevs/ui/card";
 import { useUserStore } from "@/store/codev-store";
 import { ArrowLeft } from "lucide-react";
 import { useRouter } from "next/navigation";
-import Certificate, { CertificateProps, handleDownload } from "../(dashboard)/_components/DashboardDownloadCertificate";
+import Certificate, { CertificateProps } from "../(dashboard)/_components/DashboardDownloadCertificate";
+
+export const dynamic = "force-dynamic";
 
 export default function CertificatePreview() {
   const router = useRouter();
@@ -17,17 +19,28 @@ export default function CertificatePreview() {
   const [skillPoints, setSkillPoints] = useState<Record<string, number>>({});
   const [attendancePoints, setAttendancePoints] = useState(0);
   
+  // Admin-only state
+  const [allUsers, setAllUsers] = useState<any[]>([]);
+  const [selectedUserId, setSelectedUserId] = useState<string>("");
+  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUserLevel, setSelectedUserLevel] = useState(0);
+  
+  const isAdmin = user?.role_id === 1;
+  
   // Determine initial certificate type based on user role and points
   const getInitialCertType = () => {
     // Based on roadmap: 0-100pts = Intern, 100-200pts = Codev, 200+ = Mentor
-    if (!user) return "intern";
+    const currentUser = isAdmin && selectedUser ? selectedUser : user;
+    const currentLevel = isAdmin && selectedUser ? selectedUserLevel : userLevel;
+    
+    if (!currentUser) return "intern";
     
     // Check if user has mentor role
-    if (user.role_id === 5) return "mentor";
+    if (currentUser.role_id === 5) return "mentor";
     
     // For Codev role, check level
-    if (user.role_id === 10) {
-      return userLevel >= 2 ? "codev" : "intern";
+    if (currentUser.role_id === 10) {
+      return currentLevel >= 2 ? "codev" : "intern";
     }
     
     return "intern";
@@ -37,16 +50,41 @@ export default function CertificatePreview() {
   const [name, setName] = useState("");
   
   useEffect(() => {
-    if (user) {
-      setName(`${user.first_name} ${user.last_name}`);
+    const currentUser = isAdmin && selectedUser ? selectedUser : user;
+    if (currentUser) {
+      setName(`${currentUser.first_name} ${currentUser.last_name}`);
       setCertificateType(getInitialCertType());
     }
-  }, [user, userLevel]);
+  }, [user, userLevel, selectedUser, selectedUserLevel, isAdmin]);
+
+  // Load all users for admin selection
+  useEffect(() => {
+    const fetchUsers = async () => {
+      if (!isAdmin) return;
+      
+      const supabase = await import('@/utils/supabase/client').then(m => m.createClientClientComponent());
+      
+      try {
+        const { data: users } = await supabase
+          .from('codev')
+          .select('id, first_name, last_name, role_id, level')
+          .in('application_status', ['passed'])
+          .order('first_name');
+          
+        setAllUsers(users || []);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    };
+    
+    fetchUsers();
+  }, [isAdmin]);
   
   // Fetch user points
   useEffect(() => {
     const fetchPoints = async () => {
-      if (!user) return;
+      const currentUser = isAdmin && selectedUser ? selectedUser : user;
+      if (!currentUser) return;
       
       setLoading(true);
       const supabase = await import('@/utils/supabase/client').then(m => m.createClientClientComponent());
@@ -56,13 +94,13 @@ export default function CertificatePreview() {
         const { data: codevPoints } = await supabase
           .from('codev_points')
           .select('points, skill_category_id')
-          .eq('codev_id', user.id);
+          .eq('codev_id', currentUser.id);
           
         // Fetch attendance points
         const { data: attendanceData } = await supabase
           .from('attendance_summary')
           .select('total_points')
-          .eq('codev_id', user.id)
+          .eq('codev_id', currentUser.id)
           .single();
           
         const points = codevPoints?.reduce((acc, cp) => {
@@ -83,7 +121,15 @@ export default function CertificatePreview() {
     };
     
     fetchPoints();
-  }, [user]);
+  }, [user, selectedUser, isAdmin]);
+
+  // Handle user selection for admin
+  const handleUserSelect = (userId: string) => {
+    const selected = allUsers.find(u => u.id === userId);
+    setSelectedUserId(userId);
+    setSelectedUser(selected);
+    setSelectedUserLevel(selected?.level || 0);
+  };
 
   const getCertData = (): CertificateProps => {
     switch (certificateType) {
@@ -92,9 +138,9 @@ export default function CertificatePreview() {
           title: "ACHIEVEMENT",
           name: name,
           mainSentence: (
-            <p className="text-sm">
-              has achieved <strong>Codev Status</strong> at
-              <b> Codebility </b>
+            <p className="text-sm" style={{ wordSpacing: "0.1em" }}>
+              has achieved <strong>Codev Status</strong> at{" "}
+              <b>Codebility</b>
             </p>
           ),
           description1: (
@@ -110,9 +156,9 @@ export default function CertificatePreview() {
           title: "LEADERSHIP",
           name: name,
           mainSentence: (
-            <p className="text-sm">
-              has achieved <strong>Mentor Status</strong> at
-              <b> Codebility </b>
+            <p className="text-sm" style={{ wordSpacing: "0.1em" }}>
+              has achieved <strong>Mentor Status</strong> at{" "}
+              <b>Codebility</b>
             </p>
           ),
           description1: (
@@ -128,10 +174,10 @@ export default function CertificatePreview() {
           title: "GRADUATION",
           name: name,
           mainSentence: (
-            <p className="text-sm">
+            <p className="text-sm" style={{ wordSpacing: "0.1em" }}>
               has successfully completed the{" "}
-              <strong>Intern Graduate Path</strong> at
-              <b> Codebility </b>
+              <strong>Intern Graduate Path</strong> at{" "}
+              <b>Codebility</b>
             </p>
           ),
           description1: (
@@ -147,8 +193,8 @@ export default function CertificatePreview() {
 
   const certData = getCertData();
 
-  // Check if user has enough points
-  const hasEnoughPoints = totalPoints >= 100;
+  // Check if user has enough points (admins can bypass this requirement)
+  const hasEnoughPoints = isAdmin || totalPoints >= 100;
   const pointsNeeded = Math.max(0, 100 - totalPoints);
   
   // Determine which certificate level user has earned
@@ -172,7 +218,9 @@ export default function CertificatePreview() {
           <ArrowLeft className="h-4 w-4" />
           Back
         </Button>
-        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Certificate Preview</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
+          Certificate Preview {isAdmin && selectedUser && `- ${selectedUser.first_name} ${selectedUser.last_name}`}
+        </h1>
         <div className="w-20" />
       </div>
       
@@ -224,7 +272,30 @@ export default function CertificatePreview() {
           {/* Controls */}
           <Card className="p-6 mb-8 max-w-4xl mx-auto">
             <h2 className="text-xl font-semibold mb-6">Certificate Details</h2>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className={`grid grid-cols-1 ${isAdmin ? 'md:grid-cols-3' : 'md:grid-cols-2'} gap-6`}>
+              {isAdmin && (
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
+                    Select User <span className="text-customBlue-600">(Admin)</span>
+                  </label>
+                  <select
+                    value={selectedUserId}
+                    onChange={(e) => handleUserSelect(e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg 
+                             bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100
+                             focus:ring-2 focus:ring-customBlue-500 focus:border-transparent
+                             transition-all duration-200"
+                  >
+                    <option value="">Select a user...</option>
+                    {allUsers.map((u) => (
+                      <option key={u.id} value={u.id}>
+                        {u.first_name} {u.last_name} (Role: {u.role_id === 1 ? 'Admin' : u.role_id === 5 ? 'Mentor' : u.role_id === 10 ? 'Codev' : 'Intern'})
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              
               <div>
                 <label className="block text-sm font-medium mb-2 text-gray-700 dark:text-gray-300">
                   Recipient Name
@@ -253,9 +324,9 @@ export default function CertificatePreview() {
                            focus:ring-2 focus:ring-customBlue-500 focus:border-transparent
                            transition-all duration-200"
                 >
-                  <option value="intern" disabled={totalPoints < 100}>Intern (100 pts) {totalPoints < 100 ? '🔒' : '✓'}</option>
-                  <option value="codev" disabled={totalPoints < 200}>Codev (200 pts) {totalPoints < 200 ? '🔒' : '✓'}</option>
-                  <option value="mentor" disabled={totalPoints < 300}>Mentor (300 pts) {totalPoints < 300 ? '🔒' : '✓'}</option>
+                  <option value="intern" disabled={!isAdmin && totalPoints < 100}>Intern (100 pts) {(!isAdmin && totalPoints < 100) ? '🔒' : '✓'}</option>
+                  <option value="codev" disabled={!isAdmin && totalPoints < 200}>Codev (200 pts) {(!isAdmin && totalPoints < 200) ? '🔒' : '✓'}</option>
+                  <option value="mentor" disabled={!isAdmin && totalPoints < 300}>Mentor (300 pts) {(!isAdmin && totalPoints < 300) ? '🔒' : '✓'}</option>
                 </select>
               </div>
             </div>
@@ -268,17 +339,7 @@ export default function CertificatePreview() {
               </div>
             )}
             
-            <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-              <Button
-                onClick={() => handleDownload(certRef, certData.name)}
-                className="bg-customBlue-600 hover:bg-customBlue-700 text-white px-8 py-2.5"
-                size="lg"
-              >
-                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                </svg>
-                Download as PDF
-              </Button>
+            <div className="mt-8 flex justify-center">
               <Button
                 onClick={() => {
                   if (certRef.current) {
@@ -296,9 +357,8 @@ export default function CertificatePreview() {
                     });
                   }
                 }}
-                variant="outline"
+                className="bg-customBlue-600 hover:bg-customBlue-700 text-white px-8 py-2.5"
                 size="lg"
-                className="px-8 py-2.5"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />

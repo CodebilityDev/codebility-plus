@@ -38,6 +38,11 @@ const LeftSidebar = () => {
       : user.role_id;
   }, [user?.role_id, user?.internal_status, user?.availability_status]);
 
+  // Memoize sidebar data to avoid recalculation
+  const memoizedSidebarData = useMemo(() => {
+    return sidebarData;
+  }, [sidebarData]);
+
   useEffect(() => {
     const fetchSidebarData = async () => {
       if (roleId) {
@@ -94,7 +99,7 @@ const LeftSidebar = () => {
       initial={false}
       animate={isToggleOpen ? "open" : "closed"}
       variants={sidebarVariants}
-      className="background-navbar sticky left-0 top-0 z-40 hidden h-screen flex-col gap-8 overflow-hidden p-1 shadow-lg lg:flex"
+      className="sticky left-0 top-0 z-40 hidden h-screen flex-col gap-8 overflow-hidden p-1 bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-800/50 lg:flex"
       role="complementary"
       aria-label="Main navigation sidebar"
     >
@@ -164,7 +169,7 @@ const LeftSidebar = () => {
         role="navigation"
         aria-label="Main navigation"
       >
-        {sidebarData.map((section: SidebarSection) => (
+        {memoizedSidebarData.map((section: SidebarSection) => (
           <div
             key={section.id}
             role="group"
@@ -202,9 +207,10 @@ const LeftSidebar = () => {
                   <li key={link.route} role="none">
                     <Link
                       href={link.route}
+                      prefetch={true}
                       className={`${
                         isActive
-                          ? "primary-gradient text-light-900 rounded-lg"
+                          ? "bg-gradient-to-r from-purple-800 via-customBlue-900 to-sky-500 text-light-900 rounded-lg"
                           : "text-dark300_light900"
                       } focus:ring-customBlue-500 mt-2 flex items-center gap-4 rounded-sm px-4 py-4 transition duration-100 hover:bg-[#F5F5F5] focus:outline-none focus:ring-2 focus:ring-offset-2 dark:hover:bg-[#131417]`}
                       aria-current={isActive ? "page" : undefined}
@@ -222,6 +228,7 @@ const LeftSidebar = () => {
                           height={28}
                           className={`${isActive ? "brightness-0 invert" : "brightness-0 dark:invert"} h-full w-full`}
                           aria-hidden="true"
+                          priority={isActive}
                         />
                       </div>
                       <span

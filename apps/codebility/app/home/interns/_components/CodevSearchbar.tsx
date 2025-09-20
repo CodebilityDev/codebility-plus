@@ -7,16 +7,21 @@ export default function CodevSearchbar({
   allCodevs,
   codevs,
   setCodevs,
+  setIsSearching,
 }: {
   allCodevs: Codev[];
   codevs: Codev[];
   setCodevs: React.Dispatch<React.SetStateAction<Codev[]>>;
+  setIsSearching?: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   const [searchValue, setSearchValue] = React.useState("");
 
   const handleSearch = useDebouncedCallback((value: string) => {
+    setIsSearching?.(true);
+    
     if (value === "") {
       setCodevs(allCodevs);
+      setIsSearching?.(false);
       return;
     }
 
@@ -26,6 +31,7 @@ export default function CodevSearchbar({
     });
 
     setCodevs(filteredCodevs);
+    setIsSearching?.(false);
   }, 300);
 
   return (

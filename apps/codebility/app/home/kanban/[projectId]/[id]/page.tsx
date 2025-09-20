@@ -3,6 +3,7 @@
 import { use, useEffect, useMemo, useState } from "react";
 import { useKanbanStore } from "@/store/kanban-store";
 import { KanbanBoardType, KanbanColumnType, Task } from "@/types/home/codev";
+import PageContainer from "../../../_components/PageContainer";
 
 import KanbanBoard from "./_components/KanbanBoard";
 import KanbanLoadingSkeleton from "./loading";
@@ -102,12 +103,24 @@ export default function KanbanBoardPage(props: KanbanBoardPageProps) {
   }, [boardData, query]);
 
   if (loading) {
-    return <KanbanLoadingSkeleton />;
+    return (
+      <PageContainer maxWidth="full">
+        <KanbanLoadingSkeleton />
+      </PageContainer>
+    );
   }
 
   if (!processedBoardData) {
-    return <div>Board not found</div>;
+    return (
+      <PageContainer maxWidth="full">
+        <div>Board not found</div>
+      </PageContainer>
+    );
   }
 
-  return <KanbanBoard projectId={projectId} boardData={processedBoardData} />;
+  return (
+    <PageContainer maxWidth="full">
+      <KanbanBoard projectId={projectId} boardData={processedBoardData} />
+    </PageContainer>
+  );
 }
