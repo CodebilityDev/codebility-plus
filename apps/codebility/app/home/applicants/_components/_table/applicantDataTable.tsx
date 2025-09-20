@@ -147,46 +147,49 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
   }, [data.length, pagination.pageIndex, pagination.pageSize]);
 
   return (
-    <div className="overflow-hidden rounded-md">
-      <Box className="p-2">
-        {/* if rows selected */}
-
-        <div className="flex w-full items-center justify-between">
-          <div className="flex w-full items-center gap-2 px-1 pb-1">
-            <p className="text-sm text-gray-500">
-              {Object.keys(rowSelection).length} selected
-            </p>
-
+    <div className="space-y-4">
+      {/* Selection and actions bar */}
+      {Object.keys(rowSelection).length > 0 && (
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-4 dark:border-blue-800 dark:bg-blue-900/20">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-800">
+                <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
+                  {Object.keys(rowSelection).length}
+                </span>
+              </div>
+              <p className="text-sm font-medium text-blue-900 dark:text-blue-100">
+                {Object.keys(rowSelection).length} applicant{Object.keys(rowSelection).length !== 1 ? 's' : ''} selected
+              </p>
+            </div>
             <ApplicantRowActionButton
               applicants={table
                 .getFilteredSelectedRowModel()
                 .rows.map((row) => row.original)}
             />
           </div>
-
-          {/* <div>
-            
-            {data[0]?.application_status !== "denied" && (
-              <ApplicantEmailAction applicants={data} />
-            )}
-          </div> */}
         </div>
+      )}
 
-        {/* Table for larger screens */}
-        <Table className="hidden xl:table table-auto">
+      {/* Table for larger screens */}
+      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+        <Table className="hidden xl:table">
           {/* Table header */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
+              <TableRow 
+                key={headerGroup.id}
+                className="border-b border-gray-200 bg-gray-50 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-800"
+              >
                 {headerGroup.headers.map((header) => {
                   return (
-                    <TableHead
-                      key={header.id}
-                      className={cn(
-                        "whitespace-nowrap px-2 py-1 text-xs",
-                        (header.column.columnDef.meta as any)?.className,
-                      )}
-                    >
+                                          <TableHead
+                        key={header.id}
+                        className={cn(
+                          "h-12 whitespace-nowrap px-0 py-0",
+                          (header.column.columnDef.meta as any)?.className,
+                        )}
+                      >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -206,22 +209,24 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                   key={`${row.id}-${row.index}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
+                    "border-b border-gray-100 transition-colors hover:bg-gray-50/50 dark:border-gray-800 dark:hover:bg-gray-800/50",
+                    row.getIsSelected() && "bg-blue-50 dark:bg-blue-900/20",
                     row.original.application_status === "testing" &&
                       row.original.applicant?.fork_url &&
-                      "bg-green bg-opacity-5",
+                      "bg-green-50 hover:bg-green-100/50 dark:bg-green-900/20 dark:hover:bg-green-900/30",
                     row.original.application_status === "testing" &&
                       toBeFailed(
                         row.original.applicant?.test_taken,
                         row.original.applicant?.fork_url,
                       ) &&
-                      "bg-customRed-100 bg-opacity-5",
+                      "bg-red-50 hover:bg-red-100/50 dark:bg-red-900/20 dark:hover:bg-red-900/30",
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        "px-2 py-1",
+                        "px-0 py-3",
                         (cell.column.columnDef.meta as any)?.className,
                       )}
                     >
@@ -234,36 +239,43 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
+              <TableRow className="hover:bg-transparent">
                 <TableCell
                   colSpan={columns.length}
-                  className="h-24 text-center"
+                  className="h-32 text-center"
                 >
-                  No results.
+                  <div className="flex flex-col items-center justify-center space-y-2">
+                    <div className="rounded-full bg-gray-100 p-3 dark:bg-gray-800">
+                      <svg className="h-6 w-6 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                      </svg>
+                    </div>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">No applicants found</p>
+                  </div>
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
+      </div>
 
-        {/* Table for smaller screens */}
-        <div className="xl:hidden">
-          <ApplicantMobileTable table={table} />
-        </div>
+      {/* Table for smaller screens */}
+      <div className="xl:hidden">
+        <ApplicantMobileTable table={table} />
+      </div>
 
-        {/* Table pagination integrated with DefaultPagination component */}
-        <div className="relative w-full">
-          {data.length > pagination.pageSize && (
-            <DefaultPagination
-              currentPage={table.getState().pagination.pageIndex + 1}
-              handleNextPage={handleNextPage}
-              handlePreviousPage={handlePreviousPage}
-              setCurrentPage={setCurrentPage}
-              totalPages={totalPages}
-            />
-          )}
-        </div>
-      </Box>
+      {/* Table pagination integrated with DefaultPagination component */}
+      <div className="relative w-full">
+        {data.length > pagination.pageSize && (
+          <DefaultPagination
+            currentPage={table.getState().pagination.pageIndex + 1}
+            handleNextPage={handleNextPage}
+            handlePreviousPage={handlePreviousPage}
+            setCurrentPage={setCurrentPage}
+            totalPages={totalPages}
+          />
+        )}
+      </div>
     </div>
   );
 }

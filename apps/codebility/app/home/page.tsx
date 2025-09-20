@@ -43,7 +43,7 @@ export default function DashboardPage() {
               <span className="text-2xl">🏠</span>
             </div>
             <div>
-              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-customBlue-600 bg-clip-text text-transparent">
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 Welcome Home
               </h1>
               <p className="text-gray-600 dark:text-gray-400">Track your progress and climb the leaderboards</p>

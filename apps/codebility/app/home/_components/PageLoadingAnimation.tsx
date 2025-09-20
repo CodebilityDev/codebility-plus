@@ -1,6 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
+import Image from "next/image";
 
 export default function PageLoadingAnimation() {
   return (
@@ -63,42 +64,29 @@ export default function PageLoadingAnimation() {
               <motion.div
                 animate={{
                   scale: [1, 1.2, 1],
+                  rotate: 360,
                 }}
                 transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
+                  scale: {
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  },
+                  rotate: {
+                    duration: 4,
+                    repeat: Infinity,
+                    ease: "linear",
+                  },
                 }}
               >
-                <svg
-                  width="40"
-                  height="40"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  className="text-customBlue-500"
-                >
-                  <path
-                    d="M12 2L2 7L12 12L22 7L12 2Z"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M2 17L12 22L22 17"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                  <path
-                    d="M2 12L12 17L22 12"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                <Image
+                  src="/assets/svgs/icon-codebility.svg"
+                  alt=""
+                  width={50}
+                  height={50}
+                  style={{ width: "100%", height: "100%" }}
+                  aria-hidden="true"
+                />
               </motion.div>
             </div>
           </motion.div>
@@ -124,14 +112,33 @@ export default function PageLoadingAnimation() {
           </div>
 
           {/* Loading text */}
-          <motion.p
-            className="text-sm font-medium text-gray-600 dark:text-gray-400"
+          <motion.div
+            className="flex items-center text-sm font-medium text-gray-600 dark:text-gray-400"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
           >
-            Loading your workspace...
-          </motion.p>
+            <span>console.log(loading)</span>
+            <div className="ml-2 flex">
+              {[0, 1, 2].map((i) => (
+                <motion.span
+                  key={i}
+                  className="inline-block"
+                  animate={{
+                    opacity: [0, 1, 0],
+                  }}
+                  transition={{
+                    duration: 1.5,
+                    repeat: Infinity,
+                    delay: i * 0.3,
+                    ease: "easeInOut",
+                  }}
+                >
+                  .
+                </motion.span>
+              ))}
+            </div>
+          </motion.div>
         </div>
 
         {/* Progress bar */}
