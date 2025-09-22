@@ -46,7 +46,7 @@ export default function Post({ post, isMentor, onDelete }: PostProps) {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   return (
-    <>
+    <div>
       <Box
         className="group relative flex h-[400px] cursor-pointer flex-col justify-between p-3"
         onClick={openModal}
@@ -110,6 +110,6 @@ export default function Post({ post, isMentor, onDelete }: PostProps) {
         onClose={closeModal}
         postId={post.id}
       />
-    </>
+    </div>
   );
 }
