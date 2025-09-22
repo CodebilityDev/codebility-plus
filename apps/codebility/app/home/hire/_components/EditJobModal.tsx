@@ -140,6 +140,7 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
       <DialogContent
         className="max-h-[90vh] max-w-2xl overflow-y-auto border bg-card dark:bg-gray dark:border-gray-700"
+
         onPointerDownOutside={(e) => {
           if (isSubmitting) {
             e.preventDefault();

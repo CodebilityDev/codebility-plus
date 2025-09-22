@@ -77,17 +77,17 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         currentDate.getMonth()
       );
 
+      
       if (result.success) {
-        console.log("result:", result)
         setMonthlyAttendancePoints({
           totalPoints: result.totalPoints,
           presentDays: result.presentDays
         });
       }
     };
-
+    
     loadAttendancePoints();
-
+    
     // Refresh when view mode changes to/from attendance
     if (viewMode === 'team') {
       loadAttendancePoints();
@@ -135,6 +135,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         currentDate.getFullYear(),
         currentDate.getMonth()
       );
+
       if (result.success) {
         setMonthlyAttendancePoints({
           totalPoints: result.totalPoints,
@@ -231,12 +232,13 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       <div className="space-y-6">
         {/* Attendance Warning Banner */}
         {viewMode === "attendance" && (
-          <AttendanceWarningBanner
-            projectId={projectInfo.id}
+
+          <AttendanceWarningBanner 
+            projectId={projectInfo.id} 
             isTeamLead={isTeamLead || !currentUserId}
           />
         )}
-
+        
         {/* Meeting Schedule Banner */}
         {formatSchedule() && (
           <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4">
@@ -264,8 +266,11 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               variant={viewMode === "team" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("team")}
-              className={`flex items-center gap-2 ${viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
-                }`}
+
+              className={`flex items-center gap-2 ${
+                viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
+              }`}
+
             >
               <Users className="h-4 w-4" />
               Team View
@@ -275,8 +280,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 variant={viewMode === "attendance" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setViewMode("attendance")}
-                className={`flex items-center gap-2 ${viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
-                  }`}
+
+                className={`flex items-center gap-2 ${
+                  viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
+                }`}
               >
                 <Table className="h-4 w-4" />
                 Attendance
@@ -297,9 +304,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                     Save Changes
                   </Button>
                 )}
-                <SyncAllAttendance
-                  projectId={projectInfo.id}
-                  isTeamLead={isTeamLead || !currentUserId}
+
+                <SyncAllAttendance 
+                  projectId={projectInfo.id} 
+                  isTeamLead={isTeamLead || !currentUserId} 
                 />
               </>
             )}
@@ -312,6 +320,18 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               >
                 <UserPlus className="h-3.5 w-3.5" />
                 {isLoadingMembers ? 'Loading...' : 'Manage Members'}
+              </Button>
+            )}
+            {isTeamLead && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                title="Schedule Meetings"
+                onClick={() => setShowScheduleMeetingModal(true)}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Schedule Meeting
               </Button>
             )}
             {isTeamLead && (
@@ -403,6 +423,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 members={members?.data || []}
                 teamLead={teamLead?.data || null}
                 projectId={projectInfo.id || null}
+
               />
             ) : (
               <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 py-12 dark:border-gray-700">
