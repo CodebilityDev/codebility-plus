@@ -21,6 +21,7 @@ import { useSprintStore } from "@/store/sprints-store";
 import { KanbanBoardType, KanbanSprintType } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { format } from "date-fns";
+import PageContainer from "../../_components/PageContainer";
 
 import { TableActions } from "../_components/TableActions";
 import AddSprintButton from "./_components/AddSprintButton";
@@ -259,55 +260,57 @@ export default function KanbanSprintPage({ params }: PageProps) {
   };
 
   return (
-    <div className="mx-auto flex max-w-7xl flex-col gap-4 p-4">
-      {/* Breadcrumb */}
-      <nav className="flex flex-row items-center gap-3 pb-2 text-sm">
-        <Link
-          href={pathsConfig.app.kanban}
-          className="group transition-colors duration-200"
-        >
-          <span className="group-hover:text-customBlue-600 dark:group-hover:text-customBlue-400 text-gray-500 dark:text-gray-400">
-            📋 Kanban Board
+    <PageContainer>
+      <div className="flex flex-col gap-4">
+        {/* Breadcrumb */}
+        <nav className="flex flex-row items-center gap-3 pb-2 text-sm">
+          <Link
+            href={pathsConfig.app.kanban}
+            className="group transition-colors duration-200"
+          >
+            <span className="group-hover:text-customBlue-600 dark:group-hover:text-customBlue-400 text-gray-500 dark:text-gray-400">
+              📋 Kanban Board
+            </span>
+          </Link>
+          <ArrowRightIcon
+            className="text-gray-400 dark:text-gray-500"
+            aria-hidden="true"
+          />
+          <span className="to-customBlue-600 bg-gradient-to-r from-purple-600 bg-clip-text font-semibold text-gray-900 text-transparent dark:text-white">
+            {sprintsData?.name || (loading ? "Loading..." : "Error")}
           </span>
-        </Link>
-        <ArrowRightIcon
-          className="text-gray-400 dark:text-gray-500"
-          aria-hidden="true"
-        />
-        <span className="to-customBlue-600 bg-gradient-to-r from-purple-600 bg-clip-text font-semibold text-gray-900 text-transparent dark:text-white">
-          {sprintsData?.name || (loading ? "Loading..." : "Error")}
-        </span>
-      </nav>
+        </nav>
 
-      {/* Header */}
-      <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <H1>Kanban Sprints - {sprintsData?.name || "Loading..."}</H1>
-        <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
-          <AddSprintButton projectId={projectId} />
-        </div>
-      </header>
+        {/* Header */}
+        <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+          <H1>Kanban Sprints - {sprintsData?.name || "Loading..."}</H1>
+          <div className="flex flex-col items-end gap-4 md:flex-row md:items-center">
+            <AddSprintButton projectId={projectId} />
+          </div>
+        </header>
 
-      {/* Table */}
-      <main className="overflow-hidden rounded-lg border border-gray-200 shadow-sm dark:border-gray-700">
-        <Table>
-          <TableHeader className="hidden md:table-header-group">
-            <TableRow className="border-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
-              <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
-                🏃‍♂️ Sprint
-              </TableHead>
-              <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
-                📅 Timeline
-              </TableHead>
-              <TableHead className="w-[10%] text-center font-semibold text-gray-900 dark:text-white">
-                ⚡ Actions
-              </TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody className="bg-white dark:bg-gray-950">
-            {renderTableContent()}
-          </TableBody>
-        </Table>
-      </main>
-    </div>
+        {/* Table */}
+        <main className="overflow-hidden rounded-lg border border-gray-200 shadow-sm dark:border-gray-700">
+          <Table>
+            <TableHeader className="hidden md:table-header-group">
+              <TableRow className="border-0 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900">
+                <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
+                  🏃‍♂️ Sprint
+                </TableHead>
+                <TableHead className="w-[45%] font-semibold text-gray-900 dark:text-white">
+                  📅 Timeline
+                </TableHead>
+                <TableHead className="w-[10%] text-center font-semibold text-gray-900 dark:text-white">
+                  ⚡ Actions
+                </TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody className="bg-white dark:bg-gray-950">
+              {renderTableContent()}
+            </TableBody>
+          </Table>
+        </main>
+      </div>
+    </PageContainer>
   );
 }

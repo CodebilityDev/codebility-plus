@@ -20,6 +20,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
   const [codevs, setCodevs] = useState<Codev[]>(data);
   const [activeTab, setActiveTab] = useState<"members" | "projects">("members");
   const [membersSubTab, setMembersSubTab] = useState<"active" | "inactive" | "all">("active");
+  const [isSearching, setIsSearching] = useState(false);
 
   // Calculate counts based on availability_status (same as in-house page)
   const activeCount = data.filter(codev => codev.availability_status === true).length;
@@ -46,9 +47,9 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
           <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-800">
             <TabsTrigger value="members" className="flex items-center gap-2">
               Members
-              <span className="rounded-full bg-customBlue-600/20 px-2 py-0.5 text-xs font-semibold text-customBlue-600 dark:bg-customBlue-400/20 dark:text-customBlue-300">
-                {data.length}
-              </span>
+                <span className="rounded-full bg-blue-600/20 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-700/30 dark:text-blue-100">
+                  {data.length}
+                </span>
             </TabsTrigger>
             <TabsTrigger value="projects">
               Projects
@@ -64,22 +65,22 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
             <TabsList className="grid w-full grid-cols-3 bg-gray-50 dark:bg-gray-900">
               <TabsTrigger value="active" className="flex items-center gap-2">
                 Active
-                <span className="rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs font-semibold text-emerald-600 dark:bg-emerald-400/20 dark:text-emerald-300">
+                <span className="rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs font-semibold text-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-100">
                   {activeCount}
                 </span>
               </TabsTrigger>
-              <TabsTrigger value="inactive" className="flex items-center gap-2">
+                <TabsTrigger value="inactive" className="flex items-center gap-2">
                 Inactive
-                <span className="rounded-full bg-red-600/20 px-2 py-0.5 text-xs font-semibold text-red-600 dark:bg-red-400/20 dark:text-red-300">
+                <span className="rounded-full bg-red-600/20 px-2 py-0.5 text-xs font-semibold text-red-700 dark:bg-red-700/40 dark:text-red-200">
                   {inactiveCount}
                 </span>
-              </TabsTrigger>
-              <TabsTrigger value="all" className="flex items-center gap-2">
+                </TabsTrigger>
+                <TabsTrigger value="all" className="flex items-center gap-2">
                 All
-                <span className="rounded-full bg-gray-600/20 px-2 py-0.5 text-xs font-semibold text-gray-600 dark:bg-gray-400/20 dark:text-gray-300">
+                <span className="rounded-full bg-gray-600/20 px-2 py-0.5 text-xs font-semibold text-gray-800 dark:bg-gray-700/40 dark:text-white">
                   {data.length}
                 </span>
-              </TabsTrigger>
+                </TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -93,6 +94,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
               allCodevs={data}
               codevs={codevs}
               setCodevs={setCodevs}
+              setIsSearching={setIsSearching}
             />
           </div>
           <div>
@@ -109,6 +111,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
           filters={filters} 
           data={codevs} 
           activeTab={membersSubTab}
+          isSearching={isSearching}
         />
       )}
     </div>
