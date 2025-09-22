@@ -24,6 +24,7 @@ import {
   Phone,
   Trash2,
   User,
+  MoreHorizontal,
 } from "lucide-react";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
@@ -525,19 +526,19 @@ export default function JobApplicationsClient({
               <AccordionItem key={application.id} value={application.id}>
                 <AccordionTrigger className="px-4 py-3 text-left [&>svg]:text-white" >
                   <div>
-                    <p className="font-medium text-white">
+                    <p className="font-medium text-foreground">
                       {application.first_name} {application.last_name}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <p className="text-xs text-muted-foreground">
                       {application.email}
                     </p>
-                    <p className="text-xs text-gray-400">
+                    <span className="text-xs text-muted-foreground">
                       {application.linkedin && (
                         <a
                           href={application.linkedin}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-white flex-shrink-0"
+                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground flex-shrink-0"
                         >
                           <Linkedin className="h-3 w-3" />
                         </a>
@@ -547,7 +548,7 @@ export default function JobApplicationsClient({
                           href={application.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-white flex-shrink-0"
+                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground flex-shrink-0"
                         >
                           <Github className="h-3 w-3" />
                         </a>
@@ -557,40 +558,50 @@ export default function JobApplicationsClient({
                           href={application.portfolio}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-1 text-xs text-gray-400 hover:text-white flex-shrink-0"
+                          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground flex-shrink-0"
                         >
                           <Globe className="h-3 w-3" />
                         </a>
                       )}
                       {application.notes && (
-                        <p className="mt-1 text-xs text-gray-500 truncate">
+                        <p className="mt-1 text-xs text-muted-foreground truncate">
                           {application.notes}
                         </p>
                       )}
-                    </p>
+                    </span>
                   </div>
                 </AccordionTrigger>
-                <AccordionContent className="px-4 py-3 space-y-3 text-sm text-gray-300">
-                  <div>
-                    <span className="block text-gray-400 text-xs">Phone</span>
-                    <span>{application.phone}</span>
+                <AccordionContent className="px-4 py-3 space-y-3 text-sm text-muted-foreground">
+                  <div className="row-span-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+
+                    <div>
+                      <span className="block text-foreground text-xs">Phone</span>
+                      <span>{application.phone}</span>
+                    </div>
+                    <div>
+                      <span className="block text-foreground text-xs">Email</span>
+                      <span>{application.email}</span>
+                    </div>
+                    <div>
+                      <span className="block text-foreground text-xs">Applied</span>
+                      <span>{new Date(application.applied_at).toLocaleDateString()}</span>
+                    </div>
+
                   </div>
+
+
                   <div>
-                    <span className="block text-gray-400 text-xs">Applied</span>
-                    <span>{new Date(application.applied_at).toLocaleDateString()}</span>
-                  </div>
-                  <div>
-                    <span className="block text-gray-400 text-xs">Status</span>
+                    <span className="block text-foreground text-xs">Status</span>
                     <Select
                       defaultValue={application.status}
                       onValueChange={(value) =>
                         handleStatusChange(application.id, value)
                       }
                     >
-                      <SelectTrigger className="h-8 w-full border-gray-700 bg-gray-800 text-xs text-white">
+                      <SelectTrigger className="h-8 w-full border bg-card/80 text-xs text-foreground">
                         <SelectValue />
                       </SelectTrigger>
-                      <SelectContent className="border-gray-700 bg-gray-800 text-white">
+                      <SelectContent className="border bg-card text-muted-foreground/90">
                         <SelectItem value="pending">Pending</SelectItem>
                         <SelectItem value="reviewing">Reviewing</SelectItem>
                         <SelectItem value="shortlisted">Shortlisted</SelectItem>
@@ -609,7 +620,7 @@ export default function JobApplicationsClient({
                         setSelectedApplication(application)
                         setIsDetailsModalOpen(true)
                       }}
-                      className="h-8 text-xs text-gray-400 hover:text-white"
+                      className="h-8 text-xs text-foreground border hover:bg-muted-foreground/25"
                     >
                       View Details
                     </Button>
@@ -618,12 +629,12 @@ export default function JobApplicationsClient({
                         <Button
                           variant="ghost"
                           size="sm"
-                          className="h-8 text-xs text-gray-400 hover:text-white"
+                          className="h-8 text-xs text-foreground hover:bg-muted-foreground/25"
                         >
-                          <MoreVertical className="h-4 w-4" />
+                          <MoreHorizontal className="h-4 w-4" />
                         </Button>
                       </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="border-gray-800 bg-gray-900">
+                      <DropdownMenuContent align="end" className="border bg-card/90">
                         <DropdownMenuItem
                           onClick={async () => {
                             if (application.resume_url) {
@@ -643,7 +654,7 @@ export default function JobApplicationsClient({
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDeleteApplication(application.id)}
-                          className="text-red-400 hover:text-red-300"
+                          className="text-destructive hover:destructive"
                         >
                           <Trash2 className="mr-2 h-4 w-4" />
                           Delete Application
@@ -662,7 +673,7 @@ export default function JobApplicationsClient({
 
       {
         filteredApplications.length === 0 && applications.length > 0 && (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-gray-800 bg-gray-900/50 py-16">
+          <div className="flex flex-col items-center justify-center rounded-lg border bg-card dark:border-gray-800 dark:bg-gray-900/50 py-16">
             <User className="mb-4 h-12 w-12 text-gray-600" />
             <p className="text-lg text-gray-400">No applications match your filters</p>
             <p className="mt-2 text-sm text-gray-500">
@@ -674,7 +685,7 @@ export default function JobApplicationsClient({
 
       {
         applications.length === 0 && (
-          <div className="flex flex-col items-center justify-center rounded-lg border border-gray-800 bg-gray-900/50 py-16">
+          <div className="flex flex-col items-center justify-center rounded-lg border bg-card dark:border-gray-800 dark:bg-gray-900/50 py-16">
             <User className="mb-4 h-12 w-12 text-gray-600" />
             <p className="text-lg text-gray-400">No applications yet</p>
             <p className="mt-2 text-sm text-gray-500">
