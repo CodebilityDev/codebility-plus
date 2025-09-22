@@ -1,7 +1,7 @@
 import React from "react";
 import BlueBg from "./LandingBlueBg";
 import Section from "../MarketingSection";
-import LandingInternPagination from "./LandingInternPagination";
+import LandingInternPagination from "./LandingIntern-CodevPagination";
 
 export default async function InternSectionContainer(){
     return (
