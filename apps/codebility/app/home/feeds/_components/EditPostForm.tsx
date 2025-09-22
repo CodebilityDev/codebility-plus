@@ -11,6 +11,7 @@ import { Textarea } from "@codevs/ui/textarea";
 import { addPost, editPost } from "../_services/action";
 import { PostType } from "../_services/query";
 import MarkdownEditor from "./MarkdownEditor";
+import ThumbnailUpload from "./ThumbnailUpload";
 
 const EditPostForm = ({
   post,
@@ -28,6 +29,7 @@ const EditPostForm = ({
   const { user } = useUserStore();
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
+  const fetchPosts = useFeedsStore((state) => state.fetchPosts);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -60,6 +62,7 @@ const EditPostForm = ({
       if (onSuccess) onSuccess();
 
       //Refresh post
+      await fetchPosts();
       onPostUpdated();
 
       // Reset form
@@ -89,17 +92,7 @@ const EditPostForm = ({
 
       {/* Optional image input */}
 
-      <Input
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          if (e.target.files && e.target.files[0]) {
-            setImage(e.target.files[0]);
-          } else {
-            setImage(null);
-          }
-        }}
-      />
+      <ThumbnailUpload onChange={setImage} defaultImage={post.image_url} />
 
       <MarkdownEditor
         initialValue={content}

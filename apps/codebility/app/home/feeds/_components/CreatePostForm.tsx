@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 
 import { addPost } from "../_services/action";
 import MarkdownEditor from "./MarkdownEditor";
+import ThumbnailUpload from "./ThumbnailUpload";
 
 const CreatePostForm = ({
   className,
@@ -79,17 +80,7 @@ const CreatePostForm = ({
 
       {/* Optional image input */}
 
-      <Input
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          if (e.target.files && e.target.files[0]) {
-            setImage(e.target.files[0]);
-          } else {
-            setImage(null);
-          }
-        }}
-      />
+      <ThumbnailUpload onChange={setImage} />
 
       <MarkdownEditor
         initialValue={"# Hello"}
