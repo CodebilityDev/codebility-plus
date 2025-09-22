@@ -44,6 +44,7 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
+
               className="border-b border-gray-200 bg-gray-50 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-800"
             >
               {headerGroup.headers

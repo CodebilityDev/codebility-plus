@@ -99,8 +99,10 @@ export async function saveAttendance(record: AttendanceRecord) {
     // Manually update attendance points (in case trigger isn't working)
     if (record.status === "present" || record.status === "late" || record.status === "excused") {
       await updateAttendancePoints(record.codev_id, 2);
-    } else if (existing && (existing.status === "present" || existing.status === "late" || existing.status === "excused") &&
-      record.status !== "present" && record.status !== "late" && record.status !== "excused") {
+
+    } else if (existing && (existing.status === "present" || existing.status === "late" || existing.status === "excused") && 
+               record.status !== "present" && record.status !== "late" && record.status !== "excused") {
+
       // Deduct points if changing from present/late/excused to absent
       await updateAttendancePoints(record.codev_id, -2);
     }
@@ -301,7 +303,7 @@ export async function saveMeetingSchedule(
     }
 
     revalidatePath(`/home/my-team/${projectId}`);
-
+    
     return { success: true, data };
   } catch (error) {
     console.error("Error in saveMeetingSchedule:", error);
@@ -324,8 +326,9 @@ export async function getMeetingSchedule(projectId: string) {
       return { success: false, error: error.message };
     }
 
-    return {
-      success: true,
+    
+    return { 
+      success: true, 
       schedule: data?.meeting_schedule || null
     };
   } catch (error) {
@@ -384,6 +387,7 @@ export async function getTeamMonthlyAttendancePoints(
       presentDays: data?.length || 0,
       uniqueMembers: new Set(data?.map(record => record.codev_id)).size,
       uniqueCodevIdsPresentDays
+
     };
   } catch (error) {
     console.error("Error in getTeamMonthlyAttendancePoints:", error);

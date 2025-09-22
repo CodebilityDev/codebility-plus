@@ -485,7 +485,7 @@ export default function JobListingsTable() {
                     <Eye className="mr-2 h-3 w-3" />
                     Applications
                   </Button>
-                  <DropdownMenu>
+                  <DropdownMenu modal={false}>
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
@@ -495,21 +495,38 @@ export default function JobListingsTable() {
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="bg-popover border-border">
-                      <DropdownMenuItem
-                        onClick={() => handleEdit(job)}
-                        className="text-foreground hover:text-foreground hover:bg-accent"
-                      >
-                        <Edit className="mr-2 h-4 w-4" />
-                        Edit Listing
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        onClick={() => handleDelete(job.id)}
-                        className="text-destructive hover:text-destructive hover:bg-accent"
-                      >
-                        <Trash2 className="mr-2 h-4 w-4" />
-                        Delete
-                      </DropdownMenuItem>
+                    <DropdownMenuContent align="end" className="bg-popover border-border dark:bg-gray-900 dark:border-gray-800">
+                      {(isAdmin || job.created_by === user?.id) && (
+                        <>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleEdit(job);
+                            }}
+                            className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
+                          >
+                            <Edit className="mr-2 h-4 w-4" />
+                            Edit Listing
+                          </DropdownMenuItem>
+                          <DropdownMenuItem
+                            onClick={(e) => {
+                              e.preventDefault();
+                              e.stopPropagation();
+                              handleDelete(job.id);
+                            }}
+                            className="text-red-400 hover:text-red-300 hover:bg-gray-800 cursor-pointer"
+                          >
+                            <Trash2 className="mr-2 h-4 w-4" />
+                            Delete
+                          </DropdownMenuItem>
+                        </>
+                      )}
+                      {!isAdmin && job.created_by !== user?.id && (
+                        <DropdownMenuItem disabled className="text-gray-500">
+                          No actions available
+                        </DropdownMenuItem>
+                      )}
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>

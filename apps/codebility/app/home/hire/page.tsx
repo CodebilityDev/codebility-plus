@@ -88,6 +88,7 @@ export default async function HirePage() {
             </div>
             <div className="rounded-full bg-customViolet-100/10 p-3">
               <Briefcase className="h-6 w-6 text-customViolet-100" />
+
             </div>
           </div>
         </div>
