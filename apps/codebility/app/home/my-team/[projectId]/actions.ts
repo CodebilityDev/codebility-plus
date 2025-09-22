@@ -8,7 +8,7 @@ const ATTENDANCE_POINTS_PER_DAY = 2;
 
 async function updateAttendancePoints(codevId: string, pointsDelta: number) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     // Check if attendance points record exists
     const { data: existing } = await supabase
@@ -56,7 +56,7 @@ interface AttendanceRecord {
 
 export async function saveAttendance(record: AttendanceRecord) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     // Check if attendance record exists for this date
     const { data: existing } = await supabase
@@ -99,27 +99,29 @@ export async function saveAttendance(record: AttendanceRecord) {
     // Manually update attendance points (in case trigger isn't working)
     if (record.status === "present" || record.status === "late" || record.status === "excused") {
       await updateAttendancePoints(record.codev_id, 2);
+
     } else if (existing && (existing.status === "present" || existing.status === "late" || existing.status === "excused") && 
                record.status !== "present" && record.status !== "late" && record.status !== "excused") {
+
       // Deduct points if changing from present/late/excused to absent
       await updateAttendancePoints(record.codev_id, -2);
     }
 
     revalidatePath(`/home/my-team/${record.project_id}`);
     revalidatePath(`/home`);
-    
+
     // Create notification for attendance update (only for present status)
     if (record.status === "present") {
       try {
         const supabase = await createClientServerComponent();
-        
+
         // Get project name for notification
         const { data: project } = await supabase
           .from("projects")
           .select("name")
           .eq("id", record.project_id)
           .single();
-        
+
         // Create notification using raw SQL to bypass triggers
         await supabase.rpc('create_notification', {
           p_recipient_id: record.codev_id,
@@ -140,7 +142,7 @@ export async function saveAttendance(record: AttendanceRecord) {
         console.error("Error creating attendance notification:", notificationError);
       }
     }
-    
+
     return { success: true, data: result.data };
   } catch (error) {
     console.error("Error in saveAttendance:", error);
@@ -154,7 +156,7 @@ export async function getMonthlyAttendance(
   month: number
 ) {
   const supabase = await createClientServerComponent();
-  
+
   // Create date range for the month
   const startDate = new Date(year, month, 1).toISOString().split('T')[0];
   const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
@@ -176,7 +178,7 @@ export async function getMonthlyAttendance(
 
 export async function getCodevAttendancePoints(codevId: string) {
   const supabase = await createClientServerComponent();
-  
+
   const { data, error } = await supabase
     .from("attendance_points")
     .select("*")
@@ -188,8 +190,8 @@ export async function getCodevAttendancePoints(codevId: string) {
     return { success: false, error: error.message, points: 0 };
   }
 
-  return { 
-    success: true, 
+  return {
+    success: true,
     points: data?.points || 0,
     lastUpdated: data?.last_updated
   };
@@ -197,31 +199,31 @@ export async function getCodevAttendancePoints(codevId: string) {
 
 export async function bulkSaveAttendance(records: AttendanceRecord[]) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     const results = await Promise.all(
       records.map(record => saveAttendance(record))
     );
-    
+
     const failed = results.filter(r => !r.success);
     if (failed.length > 0) {
       console.error("Some attendance records failed to save:", failed);
-      return { 
-        success: false, 
+      return {
+        success: false,
         error: `Failed to save ${failed.length} records`,
-        results 
+        results
       };
     }
-    
+
     if (records.length > 0) {
       revalidatePath(`/home/my-team/${records[0].project_id}`);
       revalidatePath(`/home`);
-      
+
       // Also sync attendance points for all unique codevs
       const uniqueCodevIds = [...new Set(records.map(r => r.codev_id))];
       await Promise.all(uniqueCodevIds.map(id => syncAttendancePointsTotal(id)));
     }
-    
+
     return { success: true, results };
   } catch (error) {
     console.error("Error in bulkSaveAttendance:", error);
@@ -231,7 +233,7 @@ export async function bulkSaveAttendance(records: AttendanceRecord[]) {
 
 async function syncAttendancePointsTotal(codevId: string) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     // Count all present/late attendance records
     const { count, error: countError } = await supabase
@@ -239,20 +241,20 @@ async function syncAttendancePointsTotal(codevId: string) {
       .select("*", { count: 'exact', head: true })
       .eq("codev_id", codevId)
       .in("status", ["present", "late"]);
-    
+
     if (countError) {
       console.error("Error counting attendance:", countError);
     }
-    
+
     const totalPoints = (count || 0) * ATTENDANCE_POINTS_PER_DAY;
-    
+
     // Update attendance points
     const { data: existing } = await supabase
       .from("attendance_points")
       .select("*")
       .eq("codev_id", codevId)
       .single();
-    
+
     if (existing) {
       await supabase
         .from("attendance_points")
@@ -283,7 +285,7 @@ export async function saveMeetingSchedule(
   }
 ) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     // Save meeting schedule to project metadata or a dedicated table
     const { data, error } = await supabase
@@ -294,12 +296,12 @@ export async function saveMeetingSchedule(
       .eq("id", projectId)
       .select()
       .single();
-    
+
     if (error) {
       console.error("Error saving meeting schedule:", error);
       return { success: false, error: error.message };
     }
-    
+
     revalidatePath(`/home/my-team/${projectId}`);
     
     return { success: true, data };
@@ -311,18 +313,19 @@ export async function saveMeetingSchedule(
 
 export async function getMeetingSchedule(projectId: string) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     const { data, error } = await supabase
       .from("projects")
       .select("id, name, meeting_schedule")
       .eq("id", projectId)
       .single();
-    
+
     if (error && error.code !== 'PGRST116') {
       console.error("Error fetching meeting schedule:", error);
       return { success: false, error: error.message };
     }
+
     
     return { 
       success: true, 
@@ -340,12 +343,12 @@ export async function getTeamMonthlyAttendancePoints(
   month: number
 ) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     // Get the start and end dates for the month
     const startDate = new Date(year, month, 1).toISOString().split('T')[0];
     const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
-    
+
     // Get all attendance records for the project for this month
     const { data, error } = await supabase
       .from("attendance")
@@ -354,23 +357,37 @@ export async function getTeamMonthlyAttendancePoints(
       .gte("date", startDate)
       .lte("date", endDate)
       .in("status", ["present", "late"]);
-    
+
     if (error) {
       console.error("Error fetching team attendance points:", error);
       return { success: false, error: error.message, totalPoints: 0, presentDays: 0 };
     }
-    
+
     // Calculate total points (2 points per present/late day)
     const totalPoints = (data?.length || 0) * ATTENDANCE_POINTS_PER_DAY;
-    
+
     // Count unique member-days
     const uniqueMemberDays = new Set(data?.map(record => `${record.codev_id}-${record.status}`)).size;
-    
-    return { 
-      success: true, 
+
+
+    // Count present days per codev_id
+    const counts = {};
+    (data || []).forEach(record => {
+      counts[record.codev_id] = (counts[record.codev_id] || 0) + 1;
+    });
+
+    const uniqueCodevIdsPresentDays = Object.keys(counts).map(codevId => ({
+      codevId,
+      presentDays: counts[codevId]
+    }));
+
+    return {
+      success: true,
       totalPoints,
       presentDays: data?.length || 0,
-      uniqueMembers: new Set(data?.map(record => record.codev_id)).size
+      uniqueMembers: new Set(data?.map(record => record.codev_id)).size,
+      uniqueCodevIdsPresentDays
+
     };
   } catch (error) {
     console.error("Error in getTeamMonthlyAttendancePoints:", error);

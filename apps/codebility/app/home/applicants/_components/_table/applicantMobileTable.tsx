@@ -42,8 +42,9 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
         {/* Table header */}
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow 
-              key={headerGroup.id} 
+            <TableRow
+              key={headerGroup.id}
+
               className="border-b border-gray-200 bg-gray-50 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-800"
             >
               {headerGroup.headers
@@ -59,9 +60,9 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 ))}
             </TableRow>
@@ -78,16 +79,16 @@ function ApplicantMobileTable<TData extends NewApplicantType>({
                   "border-b border-gray-100 transition-colors hover:bg-gray-50/50 dark:border-gray-800 dark:hover:bg-gray-800/50",
                   row.getIsSelected() && "bg-blue-50 dark:bg-blue-900/20",
                   (row.original as NewApplicantType).application_status ===
-                    "testing" &&
-                    (row.original as NewApplicantType).applicant?.fork_url &&
-                    "bg-green-50 hover:bg-green-100/50 dark:bg-green-900/20 dark:hover:bg-green-900/30",
+                  "testing" &&
+                  (row.original as NewApplicantType).applicant?.fork_url &&
+                  "bg-green-50 hover:bg-green-100/50 dark:bg-green-900/20 dark:hover:bg-green-900/30",
                   (row.original as NewApplicantType).application_status ===
-                    "testing" &&
-                    toBeFailed(
-                      (row.original as NewApplicantType).applicant?.test_taken,
-                      (row.original as NewApplicantType).applicant?.fork_url,
-                    ) &&
-                    "bg-red-50 hover:bg-red-100/50 dark:bg-red-900/20 dark:hover:bg-red-900/30",
+                  "testing" &&
+                  toBeFailed(
+                    (row.original as NewApplicantType).applicant?.test_taken,
+                    (row.original as NewApplicantType).applicant?.fork_url,
+                  ) &&
+                  "bg-red-50 hover:bg-red-100/50 dark:bg-red-900/20 dark:hover:bg-red-900/30",
                 )}
               >
                 {row

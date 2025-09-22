@@ -6,7 +6,8 @@ import { ThemeProvider } from "@/context/ThemeProvider";
 import ReactQueryProvider from "@/hooks/reactQuery";
 import { UserProvider } from "@/store/UserProvider";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
-import { Toaster } from "sonner";
+import { Toaster } from "@codevs/ui/sonner/toast";
+
 
 import ToastNotification from "./_components/HomeToastNotification";
 import LeftSidebarServer from "./_components/LeftSidebarServer";
@@ -34,7 +35,8 @@ export default async function HomeLayout({
             <ToastNotification />
             <PageTransitionSettings />
             <NavigationOptimizer />
-            <Toaster 
+            <Toaster
+
               richColors
               position="top-right"
               toastOptions={{

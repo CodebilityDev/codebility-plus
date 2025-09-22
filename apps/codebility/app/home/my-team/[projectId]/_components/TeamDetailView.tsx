@@ -2,11 +2,11 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { 
-  getMembers, 
-  getTeamLead, 
+import {
+  getMembers,
+  getTeamLead,
   updateProjectMembers,
-  SimpleMemberData 
+  SimpleMemberData
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
@@ -52,7 +52,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
   const { project: projectInfo, teamLead, members, currentUserId } = project;
   const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
-  
+
   // Check if current user is the team lead
   const isTeamLead = currentUserId && teamLead?.data && teamLead.data.id === currentUserId;
 
@@ -76,6 +76,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         currentDate.getFullYear(),
         currentDate.getMonth()
       );
+
       
       if (result.success) {
         setMonthlyAttendancePoints({
@@ -96,7 +97,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   // Format schedule for display
   const formatSchedule = () => {
     if (!currentSchedule || !currentSchedule.selectedDays || currentSchedule.selectedDays.length === 0) return null;
-    
+
     const weekDays = [
       { value: "monday", label: "Monday", short: "Mon" },
       { value: "tuesday", label: "Tuesday", short: "Tue" },
@@ -106,12 +107,12 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       { value: "saturday", label: "Saturday", short: "Sat" },
       { value: "sunday", label: "Sunday", short: "Sun" },
     ];
-    
+
     const selectedDaysDisplay = currentSchedule.selectedDays
       .map(day => weekDays.find(d => d.value === day)?.short)
       .filter(Boolean)
       .join(", ");
-      
+
     return `${selectedDaysDisplay} at ${currentSchedule.time} @ Discord`;
   };
 
@@ -126,7 +127,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const handleSaveAttendance = useCallback(async () => {
     if (attendanceGridRef.current?.saveAllAttendance) {
       await attendanceGridRef.current.saveAllAttendance();
-      
+
       // Refresh attendance points after saving
       const currentDate = new Date();
       const result = await getTeamMonthlyAttendancePoints(
@@ -134,7 +135,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         currentDate.getFullYear(),
         currentDate.getMonth()
       );
-      
+
       if (result.success) {
         setMonthlyAttendancePoints({
           totalPoints: result.totalPoints,
@@ -147,11 +148,11 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const handleUpdateMembers = async (selectedMembers: Codev[]) => {
     try {
       setIsLoadingMembers(true);
-      
+
       // Get current team lead
       const teamLeadResult = await getTeamLead(projectInfo.id);
       const teamLead = teamLeadResult.data;
-      
+
       if (!teamLead) {
         throw new Error('Team leader not found');
       }
@@ -181,7 +182,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
       if (result.success) {
         toast.success("Project members updated successfully.");
-        
+
         // Update local state
         const updatedProjectMembers: SimpleMemberData[] = selectedMembers
           .filter(member => member.id !== teamLead.id)
@@ -200,7 +201,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           ...prev,
           members: { data: updatedProjectMembers }
         }));
-        
+
         handleCloseModal();
       } else {
         toast.error(result.error || "Failed to update project members.");
@@ -216,7 +217,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const handleScheduleUpdate = async () => {
     // Close modal and reload schedule
     setShowScheduleMeetingModal(false);
-    
+
     // Reload the schedule after a short delay to ensure the save is complete
     setTimeout(async () => {
       const result = await getMeetingSchedule(projectInfo.id);
@@ -231,6 +232,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       <div className="space-y-6">
         {/* Attendance Warning Banner */}
         {viewMode === "attendance" && (
+
           <AttendanceWarningBanner 
             projectId={projectInfo.id} 
             isTeamLead={isTeamLead || !currentUserId}
@@ -264,9 +266,11 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               variant={viewMode === "team" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("team")}
+
               className={`flex items-center gap-2 ${
                 viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
               }`}
+
             >
               <Users className="h-4 w-4" />
               Team View
@@ -276,6 +280,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 variant={viewMode === "attendance" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setViewMode("attendance")}
+
                 className={`flex items-center gap-2 ${
                   viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
                 }`}
@@ -299,6 +304,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                     Save Changes
                   </Button>
                 )}
+
                 <SyncAllAttendance 
                   projectId={projectInfo.id} 
                   isTeamLead={isTeamLead || !currentUserId} 
@@ -313,7 +319,19 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto max-w-[200px]"
               >
                 <UserPlus className="h-3.5 w-3.5" />
-                {isLoadingMembers ? 'Loading...' : 'Add Members'}
+                {isLoadingMembers ? 'Loading...' : 'Manage Members'}
+              </Button>
+            )}
+            {isTeamLead && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                title="Schedule Meetings"
+                onClick={() => setShowScheduleMeetingModal(true)}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Schedule Meeting
               </Button>
             )}
             {isTeamLead && (
@@ -401,9 +419,11 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
             {/* Team Members Grid */}
             {totalMembers > 0 ? (
-              <CompactMemberGrid 
+              <CompactMemberGrid
                 members={members?.data || []}
                 teamLead={teamLead?.data || null}
+                projectId={projectInfo.id || null}
+
               />
             ) : (
               <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 py-12 dark:border-gray-700">

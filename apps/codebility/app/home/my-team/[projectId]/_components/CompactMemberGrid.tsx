@@ -5,11 +5,14 @@ import Image from "next/image";
 import { SimpleMemberData } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Mail, Phone, Calendar, MapPin, Briefcase, Trophy } from "lucide-react";
+import { multipleMoveApplicantToOnboardingAction } from "@/app/home/applicants/_service/action";
 const ATTENDANCE_POINTS_PER_DAY = 2;
+import { getTeamMonthlyAttendancePoints } from "../actions";
 
 interface CompactMemberGridProps {
   members: SimpleMemberData[];
   teamLead: SimpleMemberData | null;
+  projectId: string;
 }
 
 interface MemberPoints {
@@ -19,33 +22,34 @@ interface MemberPoints {
   };
 }
 
-const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
+const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridProps) => {
   const allMembers = teamLead ? [teamLead, ...members] : members;
   const [memberPoints, setMemberPoints] = useState<MemberPoints>({});
   const [isLoadingPoints, setIsLoadingPoints] = useState(true);
+  const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ uniqueCodevIdsPresentDays: { codevId: string; presentDays: number }[]; }>({ uniqueCodevIdsPresentDays: [] });
 
   // Load points for all members
   useEffect(() => {
     const loadAllPoints = async () => {
       setIsLoadingPoints(true);
       const pointsData: MemberPoints = {};
-      
+
       try {
         const pointsPromises = allMembers.map(async (member) => {
           const response = await fetch(`/api/codev/${member.id}/points`);
           const data = await response.json();
           return { memberId: member.id, data };
         });
-        
+
         const results = await Promise.all(pointsPromises);
-        
+
         results.forEach(({ memberId, data }) => {
           pointsData[memberId] = {
             totalPoints: data.totalPoints || 0,
             attendancePoints: data.attendancePoints || 0
           };
         });
-        
+
         setMemberPoints(pointsData);
       } catch (error) {
         console.error("Error loading points:", error);
@@ -53,11 +57,33 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
         setIsLoadingPoints(false);
       }
     };
-    
+
     if (allMembers.length > 0) {
       loadAllPoints();
     }
   }, [allMembers.length]);
+
+  useEffect(() => {
+    const loadAttendancePoints = async () => {
+      const currentDate = new Date();
+      const result = await getTeamMonthlyAttendancePoints(
+        projectId,
+        currentDate.getFullYear(),
+        currentDate.getMonth()
+      );
+
+      if (result.success) {
+        // console.log("Monthly attendance points:", result);
+        setMonthlyAttendancePoints({
+          uniqueCodevIdsPresentDays: result.uniqueCodevIdsPresentDays || []
+        });
+      }
+    };
+
+    loadAttendancePoints();
+  }, [projectId]);
+
+
 
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
@@ -72,7 +98,7 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
           >
             {/* Status indicator */}
             <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-green-500" title="Active" />
-            
+
             <div className="flex items-start gap-3">
               {/* Avatar */}
               <div className="relative flex-shrink-0">
@@ -98,11 +124,14 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
               <div className="min-w-0 flex-1">
                 <h4 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white truncate">
                   {member.first_name} {member.last_name}
+
+
                 </h4>
+
                 <p className="text-xs sm:text-sm text-gray-600 dark:text-gray-400 truncate">
                   {member.display_position || "Team Member"}
                 </p>
-                
+
                 {/* Quick stats */}
                 <div className="mt-2 flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-3 text-xs text-gray-500 dark:text-gray-400">
                   <span className="flex items-center gap-1">
@@ -130,7 +159,12 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
                 <div className="text-xs">
                   <span className="text-gray-500">Attendance:</span>
                   <span className="ml-1 font-medium text-green-600 dark:text-green-400">
-                    +{memberPoints[member.id]?.attendancePoints || 0}
+                    +{(() => {
+                      const found = monthlyAttendancePoints.uniqueCodevIdsPresentDays.find(
+                        item => item.codevId === member.id
+                      );
+                      return found ? found.presentDays * ATTENDANCE_POINTS_PER_DAY : 0;
+                    })()}
                   </span>
                 </div>
               </div>
@@ -138,7 +172,9 @@ const CompactMemberGrid = ({ members, teamLead }: CompactMemberGridProps) => {
                 <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
                   <span>This month: </span>
                   <span className="font-medium text-green-600 dark:text-green-400">
-                    {Math.floor((memberPoints[member.id]?.attendancePoints || 0) / 2)}d
+                    {monthlyAttendancePoints.uniqueCodevIdsPresentDays.find(
+                      item => item.codevId === member.id
+                    )?.presentDays || 0}d
                   </span>
                   <span>present</span>
                 </div>

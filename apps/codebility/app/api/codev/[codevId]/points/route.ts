@@ -7,7 +7,7 @@ export async function GET(
 ) {
   try {
     const { codevId } = await params;
-    
+
     if (!codevId) {
       return NextResponse.json(
         { error: "Codev ID is required" },
@@ -16,7 +16,7 @@ export async function GET(
     }
 
     const supabase = await createClientServerComponent();
-    
+
     // Fetch skill points with skill category details
     const { data: skillPoints, error: skillError } = await supabase
       .from("codev_points")
@@ -35,7 +35,7 @@ export async function GET(
       .single();
 
     let attendancePoints = 0;
-    
+
     // If no attendance points record exists, calculate from attendance table
     if (attendanceError && attendanceError.code === 'PGRST116') {
       const { data: attendanceCount } = await supabase
@@ -43,9 +43,9 @@ export async function GET(
         .select("*", { count: 'exact', head: true })
         .eq("codev_id", codevId)
         .in("status", ["present", "late"]);
-      
+
       attendancePoints = (attendanceCount?.count || 0) * 2;
-      
+
       // Create attendance_points record if there are attendance records
       if (attendancePoints > 0) {
         const { data: newRecord } = await supabase
@@ -57,7 +57,7 @@ export async function GET(
           })
           .select()
           .single();
-        
+
         if (newRecord) {
           attendancePoints = newRecord.points;
         }
@@ -72,7 +72,7 @@ export async function GET(
     const totalSkillPoints = skillPoints?.reduce((sum, record) => sum + (record.points || 0), 0) || 0;
     const totalPoints = totalSkillPoints + attendancePoints;
 
-    return NextResponse.json({ 
+    return NextResponse.json({
       skillPoints: skillPoints || [],
       attendancePoints,
       totalSkillPoints,
