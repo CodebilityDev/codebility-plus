@@ -121,14 +121,28 @@ export default async function KanbanPage(props: PageProps) {
 
     // Loading state
     if (!typedProjects) {
-      return Array.from({ length: 3 }).map((_, index) => (
-        <TableRow key={`loading-${index}`}>
-          <TableCell colSpan={4}>
-            <Box className="flex-1">
-              <div className="flex flex-col items-center gap-3">
-                <Skeleton className="h-8 w-full" />
-              </div>
-            </Box>
+      return Array.from({ length: 5 }).map((_, index) => (
+        <TableRow key={`loading-${index}`} className="grid grid-cols-1 md:table-row">
+          {/* Project Name Column */}
+          <TableCell className="md:table-cell">
+            <div className="flex items-center gap-3">
+              <Skeleton className="h-5 w-24 md:w-32" />
+            </div>
+          </TableCell>
+          
+          {/* Team Lead Column */}
+          <TableCell className="md:table-cell">
+            <div className="flex items-center gap-2">
+              <Skeleton className="h-8 w-8 rounded-full" />
+              <Skeleton className="h-4 w-28 md:w-36" />
+            </div>
+          </TableCell>
+          
+          {/* Actions Column */}
+          <TableCell className="text-center md:table-cell">
+            <div className="flex justify-center">
+              <Skeleton className="h-9 w-24 md:w-28 rounded-md" />
+            </div>
           </TableCell>
         </TableRow>
       ));

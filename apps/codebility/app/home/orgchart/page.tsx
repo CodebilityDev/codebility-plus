@@ -1,11 +1,13 @@
+import { Suspense } from "react";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
 import OrgCharts from "./_components/OrgChart";
+import OrgChartSkeleton from "./_components/OrgChartSkeleton";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-const Page = async () => {
+async function OrgChartData() {
   const supabase = await createClientServerComponent();
   const { data: orgChartData, error } = await supabase
     .from("codev")
@@ -33,6 +35,10 @@ const Page = async () => {
       (positionOrder[b.display_position] || 99),
   );
 
+  return <OrgCharts data={sortedData} />;
+}
+
+const Page = () => {
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-7xl px-6 py-16">
@@ -49,7 +55,9 @@ const Page = async () => {
         </div>
         
         <div className="relative">
-          <OrgCharts data={sortedData} />
+          <Suspense fallback={<OrgChartSkeleton />}>
+            <OrgChartData />
+          </Suspense>
         </div>
       </div>
     </div>

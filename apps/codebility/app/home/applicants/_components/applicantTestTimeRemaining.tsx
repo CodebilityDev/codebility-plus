@@ -89,44 +89,42 @@ export default function ApplicantTestTimeRemaining({
     return isMobile ? (
       <span className="text-sm text-gray-500">--</span>
     ) : (
-      <div className="py-3 text-center text-sm text-gray-300">--</div>
+      <div className="text-sm text-gray-500">--</div>
     );
   }
 
   console.log("timeleft", timeLeft);
 
+  const getStatusColor = () => {
+    if (timeLeft.isExpired) {
+      return isSubmitted ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400";
+    }
+    if (timeLeft.days === 0 && timeLeft.hours < 2) {
+      return "text-orange-600 dark:text-orange-400";
+    }
+    return "text-gray-900 dark:text-gray-100";
+  };
+
   const content =
     timeLeft.isExpired === false ? (
-      <>
+      <span className={`text-sm font-medium ${getStatusColor()}`}>
         {/* if days left */}
-        {timeLeft.days > 0 && (
-          <span>{`${timeLeft.days}d ${timeLeft.hours}h`}</span>
-        )}
+        {timeLeft.days > 0 && `${timeLeft.days}d ${timeLeft.hours}h`}
 
         {/* if hours left */}
-        {timeLeft.days === 0 && timeLeft.hours > 0 && (
-          <span>{`${timeLeft.hours}h`}</span>
-        )}
+        {timeLeft.days === 0 && timeLeft.hours > 0 && `${timeLeft.hours}h ${timeLeft.minutes}m`}
 
         {/* if minutes left */}
-        {timeLeft.hours === 0 && timeLeft.minutes > 0 && (
-          <span>{`${timeLeft.minutes}m`}</span>
-        )}
+        {timeLeft.hours === 0 && timeLeft.minutes > 0 && `${timeLeft.minutes}m`}
 
-        {/* if secongs left */}
-        {timeLeft.minutes === 0 && timeLeft.seconds > 0 && (
-          <span>{`${timeLeft.seconds}s`}</span>
-        )}
-      </>
+        {/* if seconds left */}
+        {timeLeft.minutes === 0 && timeLeft.seconds > 0 && `${timeLeft.seconds}s`}
+      </span>
     ) : (
-      <span className="text-sm text-gray-500">
-        {isSubmitted ? "Submitted test" : "Expired"}
+      <span className={`text-sm font-medium ${getStatusColor()}`}>
+        {isSubmitted ? "Submitted" : "Expired"}
       </span>
     );
 
-  return isMobile ? (
-    content
-  ) : (
-    <div className="py-3 text-center text-sm text-gray-300">{content}</div>
-  );
+  return content;
 }
