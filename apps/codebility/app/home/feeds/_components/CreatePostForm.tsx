@@ -6,9 +6,8 @@ import { useFeedsStore } from "@/store/feeds-store";
 import { uploadImage } from "@/utils/uploadImage";
 import toast from "react-hot-toast";
 
-import { Textarea } from "@codevs/ui/textarea";
-
 import { addPost } from "../_services/action";
+import MarkdownEditor from "./MarkdownEditor";
 
 const CreatePostForm = ({
   className,
@@ -77,12 +76,7 @@ const CreatePostForm = ({
         required
         className="w-full"
       />
-      <Textarea
-        name="content"
-        placeholder="Enter content"
-        required
-        className="h-[600px] w-full"
-      />
+
       {/* Optional image input */}
 
       <Input
@@ -96,6 +90,19 @@ const CreatePostForm = ({
           }
         }}
       />
+
+      <MarkdownEditor
+        initialValue={"# Hello"}
+        onChange={(v) => {
+          // update hidden input
+          const hiddenInput = document.querySelector<HTMLInputElement>(
+            'input[name="content"]',
+          );
+          if (hiddenInput) hiddenInput.value = v;
+        }}
+      />
+
+      <input type="hidden" name="content" value={""} />
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : "Create Post"}
