@@ -1,4 +1,14 @@
 // components/landing/LandingIntern-CodevPagination.tsx
+// 
+// This component displays a paginated list of team members (Interns and Codevs) 
+// with prioritization applied using the prioritizeCodevs utility function.
+// Team members are automatically sorted by:
+// 1. Total codev points (highest first)
+// 2. Level 2+ badges (prioritized)
+// 3. Number of valid badges
+// 4. Has profile image
+// 5. Has work experience
+// 6. Years of experience
 
 "use client";
 
@@ -7,23 +17,46 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import InternCards from "./LandingIntern-CodevCard";
+import { prioritizeCodevs } from "@/utils/codev-priority";
 
 // Type definitions for the two roles from database
 type PersonRole = 'Intern' | 'Codev';
 
 type TeamMember = {
+  id: string;
   name: string;
   role: PersonRole; // Either Intern or Codev from roles table
   image?: string;
   display_position?: string;
+  years_of_experience?: number;
+  internal_status?: string;
+  level?: Record<string, any>;
+  codev_points?: Array<{
+    id: string;
+    codev_id?: string;
+    skill_category_id?: string;
+    points: number;
+  }>;
+  work_experience?: Array<any>;
 };
 
 interface TeamMembersApiResponse {
-  INTERNS: { // Keep as INTERNS to match current API response, you may modify later
+  TEAM_MEMBERS: { // Changed from INTERNS to TEAM_MEMBERS to match new API
+    id: string;
     name: string; 
     role: string; 
     image?: string; 
-    display_position?: string 
+    display_position?: string;
+    years_of_experience?: number;
+    internal_status?: string;
+    level?: Record<string, any>;
+    codev_points?: Array<{
+      id: string;
+      codev_id?: string;
+      skill_category_id?: string;
+      points: number;
+    }>;
+    work_experience?: Array<any>;
   }[];
   error?: string;
 }
@@ -57,7 +90,7 @@ export default function TeamMembersPagination() {
       setFetchError(null);
 
       try {
-        const response = await fetch("/api/all-active-interns-codev");
+        const response = await fetch("/api/all-active-interns-codev-prioritized");
         if (!response.ok) {
           const errorText = await response.text();
           throw new Error(`Failed to fetch team members: ${response.status} ${errorText}`);
@@ -65,17 +98,23 @@ export default function TeamMembersPagination() {
 
         const apiData = (await response.json()) as TeamMembersApiResponse;
 
-        if (!apiData || !Array.isArray(apiData.INTERNS)) {
-          console.warn("Unexpected API response shape for /api/all-active-interns-codev:", apiData);
+        if (!apiData || !Array.isArray(apiData.TEAM_MEMBERS)) {
+          console.warn("Unexpected API response shape for /api/all-active-interns-codev-prioritized:", apiData);
           if (!isMounted) return;
           setAllTeamMembers([]);
         } else {
           // Map API response to TeamMember objects with proper role validation
-          const mappedTeamMembers = apiData.INTERNS.map((member) => ({
+          const mappedTeamMembers = apiData.TEAM_MEMBERS.map((member) => ({
+            id: member.id,
             name: member.name,
             role: validateTeamRole(member.role), // Ensures only Intern or Codev roles
             image: member.image,
             display_position: member.display_position,
+            years_of_experience: member.years_of_experience,
+            internal_status: member.internal_status,
+            level: member.level,
+            codev_points: member.codev_points,
+            work_experience: member.work_experience,
           }));
           
           if (!isMounted) return;
@@ -135,12 +174,13 @@ export default function TeamMembersPagination() {
     goToNextPage();
   };
 
-  // Debug: Log the current pagination state
-  console.log('Debug pagination state:', { 
+  // Debug: Log the current pagination state with prioritization info
+  console.log('Debug pagination state (prioritized):', { 
     currentPage, 
     totalPages, 
     isLoading,
-    totalTeamMembers: allTeamMembers.length 
+    totalTeamMembers: allTeamMembers.length,
+    teamMembersArePrioritized: true // Team members are now prioritized using codev-priority.ts
   });
 
   // Button disabled states
@@ -158,10 +198,11 @@ export default function TeamMembersPagination() {
   const internMembers = allTeamMembers.filter(member => isInternRole(member.role));
   const codevMembers = allTeamMembers.filter(member => isCodevRole(member.role));
 
-  console.log('Team composition:', { 
+  console.log('Team composition (prioritized):', { 
     totalInterns: internMembers.length, 
     totalCodevs: codevMembers.length, 
-    totalMembers: allTeamMembers.length 
+    totalMembers: allTeamMembers.length,
+    note: 'Team members are sorted by priority using codev-priority.ts utility'
   });
 
   return (
