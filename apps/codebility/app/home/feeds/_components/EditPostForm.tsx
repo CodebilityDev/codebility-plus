@@ -10,6 +10,7 @@ import { Textarea } from "@codevs/ui/textarea";
 
 import { addPost, editPost } from "../_services/action";
 import { PostType } from "../_services/query";
+import MarkdownEditor from "./MarkdownEditor";
 
 const EditPostForm = ({
   post,
@@ -86,14 +87,6 @@ const EditPostForm = ({
         onChange={(e) => setTitle(e.target.value)}
       />
 
-      <Textarea
-        name="content"
-        placeholder="Enter content"
-        required
-        className="h-[600px] w-full"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
       {/* Optional image input */}
 
       <Input
@@ -107,6 +100,19 @@ const EditPostForm = ({
           }
         }}
       />
+
+      <MarkdownEditor
+        initialValue={content}
+        onChange={(v) => {
+          // update hidden input
+          const hiddenInput = document.querySelector<HTMLInputElement>(
+            'input[name="content"]',
+          );
+          if (hiddenInput) hiddenInput.value = v;
+        }}
+      />
+
+      <input type="hidden" name="content" value={""} />
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Editing..." : "Edit Post"}
