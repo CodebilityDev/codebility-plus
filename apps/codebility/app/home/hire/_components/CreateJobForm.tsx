@@ -74,6 +74,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
     const fetchPositions = async () => {
       const supabase = createClientClientComponent();
 
+
       // Fetch distinct display_positions from codev table
       const { data, error } = await supabase
         .from('codev')
@@ -98,11 +99,14 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
   const onSubmit = async (data: JobFormData) => {
     setIsSubmitting(true);
 
+
     try {
       const supabase = createClientClientComponent();
 
+
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
+
 
       if (!user) {
         throw new Error("You must be logged in to create a job listing");
@@ -136,10 +140,12 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
         throw error;
       }
 
+
       toast({
         title: "Job Posted Successfully",
         description: `${data.title} has been posted and is now live.`,
       });
+
 
       reset();
       setIsOpen(false);
@@ -161,7 +167,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
       <Button
         onClick={() => setIsOpen(true)}
         variant="purple"
-        className="flex items-center gap-2 max-w-[200px]"
+        className="flex items-center gap-2 max-w-[200px] hover:bg-purple-800"
       >
         <Plus className="h-4 w-4" />
         Create Job Listing
@@ -326,6 +332,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
 
             {/* Job Details */}
             <div className="space-y-4">
+
               <h3 className="text-lg font-medium text-foreground">Job Details</h3>
 
               <div className="space-y-2">
@@ -368,7 +375,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
                 type="submit"
                 variant="purple"
                 disabled={isSubmitting}
-                className="flex-1"
+                className="flex-1 hover:bg-purple-800"
               >
                 {isSubmitting ? (
                   <>

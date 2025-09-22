@@ -82,7 +82,9 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
   const onSubmit = async (data: JobFormData) => {
     if (!job) return;
 
+
     setIsSubmitting(true);
+
 
     try {
       const requirementsArray = data.requirements
@@ -323,7 +325,7 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
               type="submit"
               variant="purple"
               disabled={isSubmitting}
-              className="flex-1"
+              className="flex-1 hover:bg-purple-800"
             >
               {isSubmitting ? (
                 <>
