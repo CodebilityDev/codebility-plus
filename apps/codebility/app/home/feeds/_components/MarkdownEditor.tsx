@@ -24,6 +24,14 @@ export default function MarkdownEditor({
     if (onChange) onChange(value);
   }, [value, onChange]);
 
+  useEffect(() => {
+    // Auto-resize textarea for nicer UX
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "0px";
+    ta.style.height = Math.min(ta.scrollHeight, 800) + "px"; // limit max-height
+  }, [value, tab]);
+
   // notify parent whenever uploadedIds changes
   useEffect(() => {
     if (onImagesUploaded) onImagesUploaded(uploadedIds);
