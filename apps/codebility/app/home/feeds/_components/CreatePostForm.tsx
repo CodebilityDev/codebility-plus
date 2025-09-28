@@ -34,7 +34,6 @@ const CreatePostForm = ({
 
       const title = formData.get("title") as string;
       const content = formData.get("content") as string;
-      console.log("CONTENT: ", content);
       const imageFile = image;
 
       let image_url;

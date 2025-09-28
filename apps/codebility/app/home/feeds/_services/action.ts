@@ -92,6 +92,9 @@ export const addPost = async ({
 
 export const deletePost = async (post_id: string) => {
   try {
+    //delete content images
+    await deletePostContentImages (post_id);
+
     const supabase = await createClientServerComponent();
 
     const { data: postData, error: fetchError } = await supabase
@@ -368,16 +371,38 @@ export async function uploadPostContentImage(
 }
 
 
-export async function deletePostContentImage(
-  filePath: string,
+export async function deletePostContentImages(
+  post_id: string,
   bucket: string = "codebility",
 ) {
   const supabase = await createClientServerComponent();
+
   try {
-    const { error } = await supabase.storage.from(bucket).remove([filePath]);
-    if (error) {
-      throw error;
+    // 1. Get all image URLs for this post
+    const { data: images, error: fetchError } = await supabase
+      .from("post_content_images")
+      .select("image_url")
+      .eq("post_id", post_id);
+
+    if (fetchError) throw fetchError;
+    if (!images || images.length === 0) {
+      return false; // no images to delete
     }
+
+    // 2. Extract storage file paths (await async getImagePath)
+    const filePaths = (
+      await Promise.all(images.map((img) => getImagePath(img.image_url)))
+    ).filter((p): p is string => !!p); // remove nulls
+
+    if (filePaths.length === 0) return false;
+
+    // 3. Delete from storage bucket
+    const { error: deleteError } = await supabase.storage
+      .from(bucket)
+      .remove(filePaths);
+
+    if (deleteError) throw deleteError;
+
     return true;
   } catch (error) {
     console.error("Image deletion failed:", error);
