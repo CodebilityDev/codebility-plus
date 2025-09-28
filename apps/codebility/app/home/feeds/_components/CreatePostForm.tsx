@@ -19,6 +19,7 @@ const CreatePostForm = ({
 }) => {
   const [image, setImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadedImageIds, setUploadedImageIds] = useState<string[]>([]);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
   const { user } = useUserStore();
 
@@ -33,6 +34,7 @@ const CreatePostForm = ({
 
       const title = formData.get("title") as string;
       const content = formData.get("content") as string;
+      console.log("CONTENT: ", content);
       const imageFile = image;
 
       let image_url;
@@ -44,7 +46,13 @@ const CreatePostForm = ({
         });
       }
 
-      const newPost = await addPost(title, content, user?.id, image_url!);
+      const newPost = await addPost({
+        title,
+        content,
+        author_id: user?.id,
+        image_url,
+        content_image_ids: uploadedImageIds,
+      });
 
       // Refresh Posts
       await fetchPosts();
@@ -91,6 +99,7 @@ const CreatePostForm = ({
           );
           if (hiddenInput) hiddenInput.value = v;
         }}
+        onImagesUploaded={setUploadedImageIds}
       />
 
       <input type="hidden" name="content" value={""} />

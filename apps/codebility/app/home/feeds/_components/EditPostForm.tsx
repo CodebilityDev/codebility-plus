@@ -29,6 +29,7 @@ const EditPostForm = ({
   const { user } = useUserStore();
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
+  const [uploadedImageIds, setUploadedImageIds] = useState<string[]>([]);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -53,7 +54,13 @@ const EditPostForm = ({
         });
       }
 
-      const newPost = await editPost(post.id, title, content, image_url!);
+      const newPost = await editPost({
+        id: post.id,
+        title,
+        content,
+        image_url: image_url!,
+        content_image_ids: uploadedImageIds,
+      });
 
       // Notify
       toast.success("Post edited successfully!");
@@ -103,6 +110,7 @@ const EditPostForm = ({
           );
           if (hiddenInput) hiddenInput.value = v;
         }}
+        onImagesUploaded={setUploadedImageIds}
       />
 
       <input type="hidden" name="content" value={""} />
