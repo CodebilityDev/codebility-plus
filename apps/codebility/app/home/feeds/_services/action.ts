@@ -114,6 +114,7 @@ export const editPost = async (
     if (content !== undefined) updates.content = content;
     if (author_id !== undefined) updates.author_id = author_id;
     if (image_url !== undefined) updates.image_url = image_url;
+    if (image_url == null) updates.image_url = null;
 
     const { data: updatedPost, error: editError } = await supabase
       .from("posts")
@@ -124,12 +125,10 @@ export const editPost = async (
     if (editError) throw editError;
 
     // Delete previous image from bucket
-    if (image_url) {
-      const imagePath = await getImagePath(post.image_url);
+    const imagePath = await getImagePath(post.image_url);
 
     deleteImage(imagePath!);
 
-    }
 
     return updatedPost;
   } catch (error) {

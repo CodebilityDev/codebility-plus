@@ -49,7 +49,7 @@ const EditPostForm = ({
       if (imageFile) {
         image_url = await uploadImage(imageFile, {
           bucket: "codebility",
-          folder: "postImage",
+          folder: "postImage/thumbnail",
         });
       }
 
