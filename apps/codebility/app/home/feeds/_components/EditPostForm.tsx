@@ -10,6 +10,8 @@ import { Textarea } from "@codevs/ui/textarea";
 
 import { addPost, editPost } from "../_services/action";
 import { PostType } from "../_services/query";
+import MarkdownEditor from "./MarkdownEditor";
+import ThumbnailUpload from "./ThumbnailUpload";
 
 const EditPostForm = ({
   post,
@@ -27,6 +29,8 @@ const EditPostForm = ({
   const { user } = useUserStore();
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
+  const [uploadedImageIds, setUploadedImageIds] = useState<string[]>([]);
+  const fetchPosts = useFeedsStore((state) => state.fetchPosts);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -46,11 +50,17 @@ const EditPostForm = ({
       if (imageFile) {
         image_url = await uploadImage(imageFile, {
           bucket: "codebility",
-          folder: "postImage",
+          folder: "postImage/thumbnail",
         });
       }
 
-      const newPost = await editPost(post.id, title, content, image_url!);
+      const newPost = await editPost({
+        id: post.id,
+        title,
+        content,
+        image_url: image_url!,
+        content_image_ids: uploadedImageIds,
+      });
 
       // Notify
       toast.success("Post edited successfully!");
@@ -59,6 +69,7 @@ const EditPostForm = ({
       if (onSuccess) onSuccess();
 
       //Refresh post
+      await fetchPosts();
       onPostUpdated();
 
       // Reset form
@@ -86,27 +97,23 @@ const EditPostForm = ({
         onChange={(e) => setTitle(e.target.value)}
       />
 
-      <Textarea
-        name="content"
-        placeholder="Enter content"
-        required
-        className="h-[600px] w-full"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-      />
       {/* Optional image input */}
 
-      <Input
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          if (e.target.files && e.target.files[0]) {
-            setImage(e.target.files[0]);
-          } else {
-            setImage(null);
-          }
+      <ThumbnailUpload onChange={setImage} defaultImage={post.image_url} />
+
+      <MarkdownEditor
+        initialValue={content}
+        onChange={(v) => {
+          // update hidden input
+          const hiddenInput = document.querySelector<HTMLInputElement>(
+            'input[name="content"]',
+          );
+          if (hiddenInput) hiddenInput.value = v;
         }}
+        onImagesUploaded={setUploadedImageIds}
       />
+
+      <input type="hidden" name="content" value={""} />
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Editing..." : "Edit Post"}

@@ -6,9 +6,9 @@ import { useFeedsStore } from "@/store/feeds-store";
 import { uploadImage } from "@/utils/uploadImage";
 import toast from "react-hot-toast";
 
-import { Textarea } from "@codevs/ui/textarea";
-
 import { addPost } from "../_services/action";
+import MarkdownEditor from "./MarkdownEditor";
+import ThumbnailUpload from "./ThumbnailUpload";
 
 const CreatePostForm = ({
   className,
@@ -19,6 +19,7 @@ const CreatePostForm = ({
 }) => {
   const [image, setImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [uploadedImageIds, setUploadedImageIds] = useState<string[]>([]);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
   const { user } = useUserStore();
 
@@ -40,11 +41,17 @@ const CreatePostForm = ({
       if (imageFile) {
         image_url = await uploadImage(imageFile, {
           bucket: "codebility",
-          folder: "postImage",
+          folder: "postImage/thumbnail",
         });
       }
 
-      const newPost = await addPost(title, content, user?.id, image_url!);
+      const newPost = await addPost({
+        title,
+        content,
+        author_id: user?.id,
+        image_url,
+        content_image_ids: uploadedImageIds,
+      });
 
       // Refresh Posts
       await fetchPosts();
@@ -77,25 +84,24 @@ const CreatePostForm = ({
         required
         className="w-full"
       />
-      <Textarea
-        name="content"
-        placeholder="Enter content"
-        required
-        className="h-[600px] w-full"
-      />
+
       {/* Optional image input */}
 
-      <Input
-        type="file"
-        accept="image/*"
-        onChange={(e) => {
-          if (e.target.files && e.target.files[0]) {
-            setImage(e.target.files[0]);
-          } else {
-            setImage(null);
-          }
+      <ThumbnailUpload onChange={setImage} />
+
+      <MarkdownEditor
+        initialValue={"# Hello"}
+        onChange={(v) => {
+          // update hidden input
+          const hiddenInput = document.querySelector<HTMLInputElement>(
+            'input[name="content"]',
+          );
+          if (hiddenInput) hiddenInput.value = v;
         }}
+        onImagesUploaded={setUploadedImageIds}
       />
+
+      <input type="hidden" name="content" value={""} />
 
       <Button type="submit" className="w-full" disabled={isSubmitting}>
         {isSubmitting ? "Creating..." : "Create Post"}
