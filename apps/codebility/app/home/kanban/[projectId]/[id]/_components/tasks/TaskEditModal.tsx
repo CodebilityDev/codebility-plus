@@ -694,7 +694,7 @@ const TaskEditModal = () => {
                   }}
               disabled={loading}
             >
-              {loading ? "Saving..." : "Saved Changes"}
+              {loading ? "Saving..." : "Save Changes"}
             </Button>
           </DialogFooter>
         </form>
