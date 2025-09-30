@@ -664,14 +664,34 @@ const TaskEditModal = () => {
               type="button"
               variant="outline"
               onClick={onClose}
-              className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              // className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              style={{
+                    backgroundColor: "#2563EB",
+                    color: "white",
+                    padding: "6px 16px",
+                    fontSize: "14px",
+                    borderRadius: "4px",
+                    border: "none",
+                    minWidth: "auto",
+                    width: "auto",
+                  }}
               disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              // className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
+              style={{
+                    backgroundColor: "#2563EB",
+                    color: "white",
+                    padding: "6px 16px",
+                    fontSize: "14px",
+                    borderRadius: "4px",
+                    border: "none",
+                    minWidth: "auto",
+                    width: "auto",
+                  }}
               disabled={loading}
             >
               {loading ? "Saving..." : "Save Changes"}
