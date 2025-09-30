@@ -3,6 +3,7 @@ import type { Config } from "tailwindcss";
 import baseConfig from "@codevs/tailwind-config/web";
 import { green } from "@mui/material/colors";
 import { custom } from "zod";
+import typography from "@tailwindcss/typography";
 
 const svgToDataUri = require("mini-svg-data-uri");
 const {
@@ -284,6 +285,7 @@ const config: Config = {
   },
   plugins: [
     require("tailwindcss-animate"),
+    typography,
     addVariablesForColors,
     function ({ matchUtilities, theme }: PluginFunctionParams) {
       try {

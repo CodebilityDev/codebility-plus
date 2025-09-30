@@ -11,6 +11,8 @@ import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { format } from "date-fns";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import type { PostType } from "../_services/query";
 import PostUpvote from "../_components/PostUpvote";
@@ -117,14 +119,12 @@ export default function PostView({ postId }: PostViewProps) {
 
       <PostUpvote post={post} />
 
-      <img
-        src={post.image_url || "/assets/images/bg-certificate.png"}
-        alt="Post image"
-        className="h-full w-full object-cover"
-      />
-      <p className="mb-4 mt-4 text-justify text-gray-600 dark:text-gray-400">
-        {post.content}
-      </p>
+      <div className="prose prose-sm dark:prose-invert max-h-[800px] min-h-[160px] max-w-none overflow-y-auto p-4 text-sm">
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>
+          {`![Post image](${post.image_url || "/assets/images/bg-certificate.png"})\n\n${post.content}`}
+        </ReactMarkdown>
+      </div>
+
       {isMentor && (
         <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
           Edit Post
