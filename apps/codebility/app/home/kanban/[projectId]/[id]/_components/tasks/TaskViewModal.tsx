@@ -944,13 +944,14 @@ const TaskViewModal = ({
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2 sm:justify-end">
+          <DialogFooter className="flex justify-end mt-4"> 
+            {/*Previous style: flex gap-6 sm:justify-end */}
             {/* VIEWING MODE: Show Close when just viewing (no changes) */}
             {!hasUnsavedChanges && (
               <Button
                 onClick={onClose}
                 style={{
-                  backgroundColor: "#3B82F6",
+                  backgroundColor: "#2563EB",
                   color: "white",
                   padding: "6px 16px",
                   fontSize: "14px",
@@ -970,7 +971,7 @@ const TaskViewModal = ({
                 <Button
                   onClick={handleClose}
                   style={{
-                    backgroundColor: "#3B82F6",
+                    backgroundColor: "#2563EB",
                     color: "white",
                     padding: "6px 16px",
                     fontSize: "14px",
