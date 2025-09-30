@@ -81,9 +81,11 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
 
   const onSubmit = async (data: JobFormData) => {
     if (!job) return;
-    
+
+
     setIsSubmitting(true);
-    
+
+
     try {
       const requirementsArray = data.requirements
         .split('\n')
@@ -106,12 +108,12 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
       if (!result.success) {
         throw new Error(result.error || "Failed to update job");
       }
-      
+
       toast({
         title: "Job Updated Successfully",
         description: `${data.title} has been updated.`,
       });
-      
+
       onJobUpdated?.();
       onClose();
     } catch (error) {
@@ -136,8 +138,9 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
 
   return (
     <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogContent 
-        className="max-h-[90vh] max-w-2xl overflow-y-auto bg-gray-900 border-gray-800"
+      <DialogContent
+        className="max-h-[90vh] max-w-2xl overflow-y-auto border bg-card dark:bg-gray dark:border-gray-700"
+
         onPointerDownOutside={(e) => {
           if (isSubmitting) {
             e.preventDefault();
@@ -150,7 +153,7 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
         }}
       >
         <DialogHeader>
-          <DialogTitle className="text-2xl font-light text-white">
+          <DialogTitle className="text-2xl font-light text-foreground">
             Edit Job Listing
           </DialogTitle>
         </DialogHeader>
@@ -158,16 +161,16 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 py-4">
           {/* Basic Information */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-white">Basic Information</h3>
-            
+            <h3 className="text-lg font-medium text-foreground">Basic Information</h3>
+
             <div className="space-y-2">
-              <Label htmlFor="title" className="text-gray-300">
-                Job Title *
+              <Label htmlFor="title" className="text-foreground dark:text-gray-300">
+                Job Title <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="title"
                 {...register("title")}
-                className="bg-gray-800 border-gray-700 text-white"
+                className="border bg-card dark:bg-gray dark:border-gray-700 text-foreground"
                 placeholder="e.g., Senior Full Stack Developer"
               />
               {errors.title && (
@@ -177,13 +180,13 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="department" className="text-gray-300">
-                  Department *
+                <Label htmlFor="department" className="text-foreground dark:text-gray-300">
+                  Department <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="department"
                   {...register("department")}
-                  className="bg-gray-800 border-gray-700 text-white"
+                  className="border bg-card dark:bg-gray dark:border-gray-600 text-foreground"
                   placeholder="e.g., Engineering"
                 />
                 {errors.department && (
@@ -192,13 +195,13 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="location" className="text-gray-300">
-                  Location *
+                <Label htmlFor="location" className="text-foreground dark:text-gray-300">
+                  Location <span className="text-red-500">*</span>
                 </Label>
                 <Input
                   id="location"
                   {...register("location")}
-                  className="bg-gray-800 border-gray-700 text-white"
+                  className="border bg-card dark:bg-gray dark:border-gray-600 text-foreground"
                   placeholder="e.g., Manila, Philippines"
                 />
                 {errors.location && (
@@ -209,17 +212,17 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label htmlFor="type" className="text-gray-300">
-                  Job Type *
+                <Label htmlFor="type" className="text-foreground dark:text-gray-300">
+                  Job Type <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   onValueChange={(value: any) => setValue("type", value)}
                   defaultValue={job.type}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                  <SelectTrigger className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectContent className="border bg-card dark:bg-gray-800 dark:border-gray-700">
                     <SelectItem value="Full-time">Full-time</SelectItem>
                     <SelectItem value="Part-time">Part-time</SelectItem>
                     <SelectItem value="Contract">Contract</SelectItem>
@@ -229,17 +232,17 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="level" className="text-gray-300">
-                  Experience Level *
+                <Label htmlFor="level" className="text-foreground dark:text-gray-300">
+                  Experience Level <span className="text-red-500">*</span>
                 </Label>
                 <Select
                   onValueChange={(value: any) => setValue("level", value)}
                   defaultValue={job.level}
                 >
-                  <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                  <SelectTrigger className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground">
                     <SelectValue />
                   </SelectTrigger>
-                  <SelectContent className="bg-gray-800 border-gray-700">
+                  <SelectContent className="border bg-card dark:bg-gray-800 dark:border-gray-700">
                     <SelectItem value="Entry">Entry</SelectItem>
                     <SelectItem value="Mid">Mid</SelectItem>
                     <SelectItem value="Senior">Senior</SelectItem>
@@ -250,23 +253,23 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="salary_range" className="text-gray-300">
+              <Label htmlFor="salary_range" className="text-foreground dark:text-gray-300">
                 Salary Range (Optional)
               </Label>
               <Input
                 id="salary_range"
                 {...register("salary_range")}
-                className="bg-gray-800 border-gray-700 text-white"
+                className="border bg-card dark:bg-gray dark:border-gray-600 text-foreground"
                 placeholder="e.g., ₱80,000 - ₱120,000"
               />
             </div>
 
-            <div className="flex items-center justify-between rounded-lg border border-gray-700 p-4">
+            <div className="flex items-center justify-between rounded-lg border dark:border-gray-600 p-4">
               <div className="space-y-0.5">
-                <Label htmlFor="remote" className="text-gray-300">
+                <Label htmlFor="remote" className="text-foreground dark:text-gray-300">
                   Remote Position
                 </Label>
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-foreground  dark:text-gray-500">
                   This position allows remote work
                 </p>
               </div>
@@ -274,23 +277,23 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
                 id="remote"
                 checked={watchRemote}
                 onCheckedChange={(checked) => setValue("remote", checked)}
-                className="data-[state=checked]:bg-customViolet-100"
+                className="data-[state=checked]:bg-customViolet-100 [&>span]:bg-muted-foreground dark:[&>span]:bg-foreground"
               />
             </div>
           </div>
 
           {/* Job Details */}
           <div className="space-y-4">
-            <h3 className="text-lg font-medium text-white">Job Details</h3>
-            
+            <h3 className="text-lg font-medium text-foreground">Job Details</h3>
+
             <div className="space-y-2">
-              <Label htmlFor="description" className="text-gray-300">
-                Job Description *
+              <Label htmlFor="description" className="text-foreground dark:text-gray-300">
+                Job Description <span className="text-red-500">*</span>
               </Label>
               <Textarea
                 id="description"
                 {...register("description")}
-                className="bg-gray-800 border-gray-700 text-white min-h-[120px]"
+                className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground min-h-[120px]"
                 placeholder="Describe the role, responsibilities, and what makes this position exciting..."
               />
               {errors.description && (
@@ -299,19 +302,19 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="requirements" className="text-gray-300">
-                Requirements * (One per line)
+              <Label htmlFor="requirements" className="text-foreground dark:text-gray-300">
+                Requirements <span className="text-red-500">*</span> (One per line)
               </Label>
               <Textarea
                 id="requirements"
                 {...register("requirements")}
-                className="bg-gray-800 border-gray-700 text-white min-h-[120px]"
+                className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground min-h-[120px]"
                 placeholder="5+ years experience&#10;React/Next.js&#10;Node.js&#10;PostgreSQL"
               />
               {errors.requirements && (
                 <p className="text-sm text-red-400">{errors.requirements.message}</p>
               )}
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-foreground dark:text-gray-500">
                 Enter each requirement on a new line
               </p>
             </div>
@@ -323,7 +326,7 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
               type="submit"
               variant="purple"
               disabled={isSubmitting}
-              className="flex-1"
+              className="flex-1 hover:bg-purple-800"
             >
               {isSubmitting ? (
                 <>
@@ -339,7 +342,7 @@ export default function EditJobModal({ job, isOpen, onClose, onJobUpdated }: Edi
               variant="outline"
               onClick={onClose}
               disabled={isSubmitting}
-              className="border-gray-700 bg-gray-800 text-white hover:bg-gray-700"
+              className="border border-gray-300 dark:border-gray-600 bg-accent hover:bg-gray-300 dark:bg-gray-800 text-foreground dark:hover:bg-gray-700"
             >
               Cancel
             </Button>
