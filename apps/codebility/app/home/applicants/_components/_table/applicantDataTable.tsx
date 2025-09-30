@@ -177,25 +177,26 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
           {/* Table header */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow 
+              <TableRow
+
                 key={headerGroup.id}
                 className="border-b border-gray-200 bg-gray-50 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-800"
               >
                 {headerGroup.headers.map((header) => {
                   return (
-                                          <TableHead
-                        key={header.id}
-                        className={cn(
-                          "h-12 whitespace-nowrap px-0 py-0",
-                          (header.column.columnDef.meta as any)?.className,
-                        )}
-                      >
-                      {header.isPlaceholder
+                    <TableHead
+                      key={header.id}
+                      className={cn(
+                        "h-12 whitespace-nowrap px-0 py-0",
+                        (header.column.columnDef.meta as any)?.className,
+                      )}
+                    >
+      {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
+                          header.column.columnDef.header,
+                          header.getContext(),
+                        )}
                     </TableHead>
                   );
                 })}
@@ -212,14 +213,15 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                     "border-b border-gray-100 transition-colors hover:bg-gray-50/50 dark:border-gray-800 dark:hover:bg-gray-800/50",
                     row.getIsSelected() && "bg-blue-50 dark:bg-blue-900/20",
                     row.original.application_status === "testing" &&
-                      row.original.applicant?.fork_url &&
-                      "bg-green-50 hover:bg-green-100/50 dark:bg-green-900/20 dark:hover:bg-green-900/30",
+                    row.original.applicant?.fork_url &&
+                    "bg-green-50 hover:bg-green-100/50 dark:bg-green-900/20 dark:hover:bg-green-900/30",
                     row.original.application_status === "testing" &&
-                      toBeFailed(
-                        row.original.applicant?.test_taken,
-                        row.original.applicant?.fork_url,
-                      ) &&
-                      "bg-red-50 hover:bg-red-100/50 dark:bg-red-900/20 dark:hover:bg-red-900/30",
+                    toBeFailed(
+                      row.original.applicant?.test_taken,
+                      row.original.applicant?.fork_url,
+                    ) &&
+                    "bg-red-50 hover:bg-red-100/50 dark:bg-red-900/20 dark:hover:bg-red-900/30",
+
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
