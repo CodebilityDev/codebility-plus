@@ -466,7 +466,7 @@ const TaskAddModal = () => {
             {/* NEW: Deadline Input */}
             <div className="space-y-2">
               <Label htmlFor="deadline" className="text-sm font-medium">
-                Deadline <span className="text-gray-500 text-xs">(Optional)</span>
+                Deadline
               </Label>
               <Input
                 id="deadline"
