@@ -290,9 +290,6 @@ function AssigneeSelector({
         )}
       </div>
 
-      <div className="text-xs text-gray-400">
-        Members loaded: {availableMembers.length} | Local assignee: {localAssignee?.first_name || 'None'}
-      </div>
     </div>
   );
 }
