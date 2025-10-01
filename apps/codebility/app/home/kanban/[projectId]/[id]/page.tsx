@@ -22,6 +22,7 @@ const mapTask = (task: any): Task => ({
   difficulty: task.difficulty,
   type: task.type,
   due_date: task.due_date,
+  deadline: task.deadline,
   kanban_column_id: task.kanban_column_id,
   codev_id: task.codev_id,
   created_by: task.created_by,

@@ -55,7 +55,7 @@ interface CodevMember {
   image_url?: string | null;
 }
 
-// Fetch available members function - from TaskViewModal
+// Fetch available members
 const fetchAvailableMembers = async (
   projectId: string,
 ): Promise<CodevMember[]> => {
@@ -314,6 +314,7 @@ const TaskAddModal = () => {
   const [isPending, startTransition] = useTransition();
   const [description, setDescription] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
+  const [deadline, setDeadline] = useState<string>(""); // NEW: deadline state
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
 
@@ -338,6 +339,7 @@ const TaskAddModal = () => {
     setDescription("");
     setMainAssignee("");
     setSidekicks([]);
+    setDeadline(""); // NEW: reset deadline
     onClose();
   };
 
@@ -382,6 +384,11 @@ const TaskAddModal = () => {
       const calculatedPoints = getPointsFromDifficulty(selectedDifficulty);
       formData.set("points", calculatedPoints.toString());
 
+      // NEW: Add deadline to formData
+      if (deadline) {
+        formData.append("deadline", deadline);
+      }
+
       const image = formData.get("image");
       if (image && image instanceof File) {
         formData.append("image", image);
@@ -400,8 +407,6 @@ const TaskAddModal = () => {
       if (response.success) {
         toast.success("Task created successfully");
         handleClose();
-
-        // Refetch the board data
         await fetchBoardData();
       } else {
         toast.error(response.error || "Failed to create task");
@@ -458,6 +463,21 @@ const TaskAddModal = () => {
               />
             </div>
 
+            {/* NEW: Deadline Input */}
+            <div className="space-y-2">
+              <Label htmlFor="deadline" className="text-sm font-medium">
+                Deadline <span className="text-gray-500 text-xs">(Optional)</span>
+              </Label>
+              <Input
+                id="deadline"
+                name="deadline"
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300"
+              />
+            </div>
+
             <div className="space-y-2">
               <div className="flex items-center gap-2">
                 <Label htmlFor="points" className="text-sm font-medium">
@@ -476,6 +496,7 @@ const TaskAddModal = () => {
                 readOnly
               />
             </div>
+
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority</Label>
               <Select name="priority">

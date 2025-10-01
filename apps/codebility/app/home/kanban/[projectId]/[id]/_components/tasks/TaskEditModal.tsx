@@ -299,9 +299,9 @@ const TaskEditModal = () => {
     skill_category_id: "",
     codev_id: "",
     projectId: "",
+    deadline: "",
   });
 
-  // Calculate points based on difficulty
   const getPointsFromDifficulty = (difficulty: string): number => {
     return DIFFICULTY_POINTS[difficulty as keyof typeof DIFFICULTY_POINTS] || 0;
   };
@@ -311,12 +311,12 @@ const TaskEditModal = () => {
     content: taskData.description || "",
     immediatelyRender: false,
   });
+
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
     setSupabase(supabaseClient);
   }, []);
 
-  // Fetch skill categories
   useEffect(() => {
     if (!supabase) return;
 
@@ -341,7 +341,6 @@ const TaskEditModal = () => {
     if (isModalOpen && data) {
       const fetchProjectData = async () => {
         try {
-          // Get board_id from kanban_column
           const { data: column } = await supabase
             .from("kanban_columns")
             .select("board_id")
@@ -349,9 +348,8 @@ const TaskEditModal = () => {
             .single();
 
           if (column?.board_id) {
-            setBoardId(column.board_id); // Store the board ID
+            setBoardId(column.board_id);
 
-            // Get project_id from kanban_board
             const { data: board } = await supabase
               .from("kanban_boards")
               .select("project_id")
@@ -376,6 +374,7 @@ const TaskEditModal = () => {
                 skill_category_id: data.skill_category?.id || "",
                 codev_id: data.codev?.id || "",
                 projectId: board.project_id,
+                deadline: data.deadline || "",
               });
             }
           }
@@ -395,7 +394,6 @@ const TaskEditModal = () => {
   ) => {
     setTaskData((prev) => {
       const updated = { ...prev, [key]: value };
-      // Auto-calculate points when difficulty changes
       if (key === "difficulty" && typeof value === "string") {
         updated.points = getPointsFromDifficulty(value);
       }
@@ -430,6 +428,7 @@ const TaskEditModal = () => {
       formData.append("points", String(taskData.points || 0));
       formData.append("skill_category_id", taskData.skill_category_id);
       formData.append("codev_id", taskData.codev_id ?? "null");
+      formData.append("deadline", taskData.deadline || "null");
 
       if (taskData.sidekick_ids && taskData.sidekick_ids.length > 0) {
         formData.append("sidekick_ids", taskData.sidekick_ids.join(","));
@@ -480,6 +479,20 @@ const TaskEditModal = () => {
                 onChange={(e) => handleInputChange("title", e.target.value)}
                 className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700"
                 required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deadline" className="text-sm font-medium">
+                Deadline <span className="text-gray-500 text-xs">(Optional)</span>
+              </Label>
+              <Input
+                id="deadline"
+                name="deadline"
+                type="date"
+                value={taskData.deadline || ""}
+                onChange={(e) => handleInputChange("deadline", e.target.value)}
+                className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700"
               />
             </div>
 
@@ -664,34 +677,32 @@ const TaskEditModal = () => {
               type="button"
               variant="outline"
               onClick={onClose}
-              // className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               style={{
-                    backgroundColor: "#2563EB",
-                    color: "white",
-                    padding: "6px 16px",
-                    fontSize: "14px",
-                    borderRadius: "4px",
-                    border: "none",
-                    minWidth: "auto",
-                    width: "auto",
-                  }}
+                backgroundColor: "#2563EB",
+                color: "white",
+                padding: "6px 16px",
+                fontSize: "14px",
+                borderRadius: "4px",
+                border: "none",
+                minWidth: "auto",
+                width: "auto",
+              }}
               disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              // className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               style={{
-                    backgroundColor: "#2563EB",
-                    color: "white",
-                    padding: "6px 16px",
-                    fontSize: "14px",
-                    borderRadius: "4px",
-                    border: "none",
-                    minWidth: "auto",
-                    width: "auto",
-                  }}
+                backgroundColor: "#2563EB",
+                color: "white",
+                padding: "6px 16px",
+                fontSize: "14px",
+                borderRadius: "4px",
+                border: "none",
+                minWidth: "auto",
+                width: "auto",
+              }}
               disabled={loading}
             >
               {loading ? "Saving..." : "Save Changes"}
