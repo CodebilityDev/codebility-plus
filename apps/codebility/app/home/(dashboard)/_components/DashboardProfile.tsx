@@ -155,7 +155,7 @@ export default function DashboardProfile() {
                   </div>
                 </Badge>
 
-                <SwitchStatusButton
+                {/* <SwitchStatusButton
                   isActive={active}
                   disabled={activeloading}
                   handleSwitch={handleStatusSwitch}
@@ -163,7 +163,7 @@ export default function DashboardProfile() {
 
                 <p className="hidden max-w-[80px] text-center text-[10px] leading-tight text-gray-500 dark:text-gray-400 sm:block sm:text-xs">
                   {active ? "Available for work" : "Away"}
-                </p>
+                </p> */}
               </div>
             )}
           </div>
