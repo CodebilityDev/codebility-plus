@@ -17,6 +17,7 @@ import UploadPhotoModal from "./UploadPhotoModal";
 
 type PhotoProps = {
   data: {
+    id?: string;
     image_url: string | null;
   };
 };
@@ -24,6 +25,7 @@ type PhotoProps = {
 const Photo = ({ data }: PhotoProps) => {
   const [avatar, setAvatar] = useState<string | StaticImageData>(defaultAvatar);
   const [isUploading, setIsUploading] = useState(false);
+  const [hasImagePoints, setHasImagePoints] = useState(false);
   const { onOpen } = useModal();
 
   const [croppedAvatar, setCroppedAvatar] = useState<string | null>(null);
@@ -34,6 +36,31 @@ const Photo = ({ data }: PhotoProps) => {
       setAvatar(data.image_url);
     }
   }, [data?.image_url]);
+
+  // Check if user has earned points for uploading a photo
+  useEffect(() => {
+    async function checkImagePoints() {
+      if (!data.id) return;
+
+      try {
+        const res = await fetch(`/api/profile-points/${data.id}`);
+        if (res.ok) {
+          const pointsData: { points?: { category: string; points: number }[] } = 
+            await res.json() as { points?: { category: string; points: number }[] };
+          
+          const imagePoint = pointsData?.points?.find(
+            (point) => point.category === 'image_url'
+          );
+          
+          setHasImagePoints(!!imagePoint && imagePoint.points > 0);
+        }
+      } catch (error) {
+        console.error("Failed to check image points:", error);
+      }
+    }
+
+    checkImagePoints();
+  }, [data.id, data.image_url]);
 
   const handleUploadAvatar = async (
     event: React.ChangeEvent<HTMLInputElement>,
@@ -73,9 +100,32 @@ const Photo = ({ data }: PhotoProps) => {
     onOpen("deleteWarningModal", {}, {}, handleRemoveAvatar);
   };
 
+  // Check if user has an image (either from points API or directly from data)
+  const hasImage = !!data.image_url || hasImagePoints;
+
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
-      <p className="text-lg">Your Photo</p>
+      <div className="flex items-center justify-between">
+        <p className="text-lg">Your Photo</p>
+        
+        {!hasImage && (
+          <span className="text-xs text-green-600 flex items-center gap-1">
+              <svg 
+                className="h-3 w-3" 
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
+              Upload your Photo to earn points
+            </span>
+        )}
+      </div>
+
       <Paragraph className="py-4">
         Upload your photo to make your profile stand out. We recommend an image
         of 200x200 pixels in JPG or PNG format.

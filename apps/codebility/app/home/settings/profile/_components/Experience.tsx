@@ -18,6 +18,7 @@ import {
 
 interface ExperienceProps {
   data: WorkExperience[];
+  codevId?: string;
 }
 
 interface EditModePerItem {
@@ -39,10 +40,36 @@ interface ExperienceFormProps {
   isLoadingMain: boolean;
 }
 
-const Experience = ({ data }: ExperienceProps) => {
+const Experience = ({ data, codevId }: ExperienceProps) => {
   const [experienceData, setExperienceData] = useState<WorkExperience[]>(data);
   const [isLoadingMain, setIsLoadingMain] = useState(false);
+  const [hasWorkExperiencePoints, setHasWorkExperiencePoints] = useState(false);
   const editModePerItem = useRef<EditModePerItem>({});
+
+  // Check if user has earned points for work experience
+  useEffect(() => {
+    async function checkWorkExperiencePoints() {
+      if (!codevId) return;
+
+      try {
+        const res = await fetch(`/api/profile-points/${codevId}`);
+        if (res.ok) {
+          const pointsData: { points?: { category: string; points: number }[] } = 
+            await res.json() as { points?: { category: string; points: number }[] };
+          
+          const workExpPoint = pointsData?.points?.find(
+            (point) => point.category === 'work_experience'
+          );
+          
+          setHasWorkExperiencePoints(!!workExpPoint && workExpPoint.points > 0);
+        }
+      } catch (error) {
+        console.error("Failed to check work experience points:", error);
+      }
+    }
+
+    checkWorkExperiencePoints();
+  }, [codevId, experienceData.length]);
 
   const handleUpdateExperience = (
     itemNo: number,
@@ -98,7 +125,26 @@ const Experience = ({ data }: ExperienceProps) => {
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
-      <p className="text-lg">Experience</p>
+      <div className="flex items-center justify-between">
+        <p className="text-lg">Experience</p>
+
+        {!hasWorkExperiencePoints && (
+          <span className="text-xs text-green-600 flex items-center gap-1">
+              <svg 
+                className="h-3 w-3" 
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
+              Add your work experiences to earn points
+            </span>
+        )}
+      </div>
 
       <Button
         onClick={() => {
