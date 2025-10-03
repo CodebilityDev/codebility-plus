@@ -20,6 +20,7 @@ export default async function Index() {
     <div
       className={`bg-black-400 relative flex w-full flex-col overflow-x-hidden overflow-y-hidden `}
     >
+      
       <Navigation /> 
       <Hero />
       <CodevLandingHero />
@@ -33,6 +34,8 @@ export default async function Index() {
       <Testimonials />
       <Calendly />
       <Footer /> 
+      
+
     </div>
   );
-}
+} 
