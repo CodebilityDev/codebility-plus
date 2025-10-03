@@ -469,7 +469,7 @@ const TaskEditModal = () => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="title" className="text-sm font-medium">
-                Task Title
+                Task Title <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="title"
@@ -479,20 +479,6 @@ const TaskEditModal = () => {
                 onChange={(e) => handleInputChange("title", e.target.value)}
                 className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700"
                 required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="deadline" className="text-sm font-medium">
-                Deadline <span className="text-gray-500 text-xs">(Optional)</span>
-              </Label>
-              <Input
-                id="deadline"
-                name="deadline"
-                type="date"
-                value={taskData.deadline || ""}
-                onChange={(e) => handleInputChange("deadline", e.target.value)}
-                className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700"
               />
             </div>
 
@@ -516,7 +502,7 @@ const TaskEditModal = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Priority</Label>
+              <Label className="text-sm font-medium">Priority <span className="text-red-500">*</span></Label>
               <Select
                 value={taskData.priority}
                 onValueChange={(value) => handleInputChange("priority", value)}
@@ -542,7 +528,7 @@ const TaskEditModal = () => {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Difficulty</Label>
+                <Label className="text-sm font-medium">Difficulty <span className="text-red-500">*</span></Label>
                 <DifficultyPointsTooltip />
               </div>
               <Select
@@ -577,7 +563,7 @@ const TaskEditModal = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Task Type</Label>
+              <Label className="text-sm font-medium">Task Type <span className="text-red-500">*</span></Label>
               <Select
                 value={taskData.type}
                 onValueChange={(value) => handleInputChange("type", value)}
@@ -603,7 +589,7 @@ const TaskEditModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-900 dark:text-white">
-                Skill Category
+                Skill Category <span className="text-red-500">*</span>
               </Label>
               <Select
                 value={taskData.skill_category_id}
@@ -625,6 +611,20 @@ const TaskEditModal = () => {
                   </SelectGroup>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deadline" className="text-sm font-medium">
+                Deadline
+              </Label>
+              <Input
+                id="deadline"
+                name="deadline"
+                type="date"
+                value={taskData.deadline || ""}
+                onChange={(e) => handleInputChange("deadline", e.target.value)}
+                className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700"
+              />
             </div>
           </div>
 

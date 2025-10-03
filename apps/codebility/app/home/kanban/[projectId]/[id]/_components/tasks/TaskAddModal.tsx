@@ -424,7 +424,7 @@ const TaskAddModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px] h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
+      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full h-auto max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -452,7 +452,7 @@ const TaskAddModal = () => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="title" className="text-sm font-medium">
-                Task Title
+                Task Title  <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="title"
@@ -460,21 +460,6 @@ const TaskAddModal = () => {
                 placeholder="Enter task title"
                 className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300 "
                 required
-              />
-            </div>
-
-            {/* NEW: Deadline Input */}
-            <div className="space-y-2">
-              <Label htmlFor="deadline" className="text-sm font-medium">
-                Deadline
-              </Label>
-              <Input
-                id="deadline"
-                name="deadline"
-                type="date"
-                value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
-                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300"
               />
             </div>
 
@@ -498,7 +483,7 @@ const TaskAddModal = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Priority</Label>
+              <Label className="text-sm font-medium">Priority  <span className="text-red-500">*</span></Label>
               <Select name="priority">
                 <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select priority" />
@@ -521,7 +506,7 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Difficulty</Label>
+                <Label className="text-sm font-medium">Difficulty  <span className="text-red-500">*</span></Label>
                 <DifficultyPointsTooltip />
               </div>
               <Select
@@ -555,7 +540,7 @@ const TaskAddModal = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Task Type</Label>
+              <Label className="text-sm font-medium">Task Type  <span className="text-red-500">*</span></Label>
               <Select name="type">
                 <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select type" />
@@ -578,7 +563,7 @@ const TaskAddModal = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Skill Category</Label>
+              <Label className="text-sm font-medium">Skill Category  <span className="text-red-500">*</span></Label>
               <Select name="skill_category_id" required>
                 <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select skill category" />
@@ -593,6 +578,21 @@ const TaskAddModal = () => {
                   </SelectGroup>
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* NEW: Deadline Input */}
+            <div className="">
+              <Label htmlFor="deadline" className="text-sm font-medium">
+                Deadline
+              </Label>
+              <Input
+                id="deadline"
+                name="deadline"
+                type="date"
+                value={deadline}
+                onChange={(e) => setDeadline(e.target.value)}
+                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300"
+              />
             </div>
           </div>
 
