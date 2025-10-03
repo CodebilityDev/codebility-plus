@@ -299,9 +299,9 @@ const TaskEditModal = () => {
     skill_category_id: "",
     codev_id: "",
     projectId: "",
+    deadline: "",
   });
 
-  // Calculate points based on difficulty
   const getPointsFromDifficulty = (difficulty: string): number => {
     return DIFFICULTY_POINTS[difficulty as keyof typeof DIFFICULTY_POINTS] || 0;
   };
@@ -311,12 +311,12 @@ const TaskEditModal = () => {
     content: taskData.description || "",
     immediatelyRender: false,
   });
+
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
     setSupabase(supabaseClient);
   }, []);
 
-  // Fetch skill categories
   useEffect(() => {
     if (!supabase) return;
 
@@ -341,7 +341,6 @@ const TaskEditModal = () => {
     if (isModalOpen && data) {
       const fetchProjectData = async () => {
         try {
-          // Get board_id from kanban_column
           const { data: column } = await supabase
             .from("kanban_columns")
             .select("board_id")
@@ -349,9 +348,8 @@ const TaskEditModal = () => {
             .single();
 
           if (column?.board_id) {
-            setBoardId(column.board_id); // Store the board ID
+            setBoardId(column.board_id);
 
-            // Get project_id from kanban_board
             const { data: board } = await supabase
               .from("kanban_boards")
               .select("project_id")
@@ -376,6 +374,7 @@ const TaskEditModal = () => {
                 skill_category_id: data.skill_category?.id || "",
                 codev_id: data.codev?.id || "",
                 projectId: board.project_id,
+                deadline: data.deadline || "",
               });
             }
           }
@@ -395,7 +394,6 @@ const TaskEditModal = () => {
   ) => {
     setTaskData((prev) => {
       const updated = { ...prev, [key]: value };
-      // Auto-calculate points when difficulty changes
       if (key === "difficulty" && typeof value === "string") {
         updated.points = getPointsFromDifficulty(value);
       }
@@ -430,6 +428,7 @@ const TaskEditModal = () => {
       formData.append("points", String(taskData.points || 0));
       formData.append("skill_category_id", taskData.skill_category_id);
       formData.append("codev_id", taskData.codev_id ?? "null");
+      formData.append("deadline", taskData.deadline || "null");
 
       if (taskData.sidekick_ids && taskData.sidekick_ids.length > 0) {
         formData.append("sidekick_ids", taskData.sidekick_ids.join(","));
@@ -459,7 +458,7 @@ const TaskEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full h-auto max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
+      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px] h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
@@ -470,7 +469,7 @@ const TaskEditModal = () => {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label htmlFor="title" className="text-sm font-medium">
-                Task Title
+                Task Title <span className="text-red-500">*</span>
               </Label>
               <Input
                 id="title"
@@ -503,7 +502,7 @@ const TaskEditModal = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Priority</Label>
+              <Label className="text-sm font-medium">Priority <span className="text-red-500">*</span></Label>
               <Select
                 value={taskData.priority}
                 onValueChange={(value) => handleInputChange("priority", value)}
@@ -529,7 +528,7 @@ const TaskEditModal = () => {
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Difficulty</Label>
+                <Label className="text-sm font-medium">Difficulty <span className="text-red-500">*</span></Label>
                 <DifficultyPointsTooltip />
               </div>
               <Select
@@ -564,7 +563,7 @@ const TaskEditModal = () => {
             </div>
 
             <div className="space-y-2">
-              <Label className="text-sm font-medium">Task Type</Label>
+              <Label className="text-sm font-medium">Task Type <span className="text-red-500">*</span></Label>
               <Select
                 value={taskData.type}
                 onValueChange={(value) => handleInputChange("type", value)}
@@ -590,7 +589,7 @@ const TaskEditModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-900 dark:text-white">
-                Skill Category
+                Skill Category <span className="text-red-500">*</span>
               </Label>
               <Select
                 value={taskData.skill_category_id}
@@ -612,6 +611,20 @@ const TaskEditModal = () => {
                   </SelectGroup>
                 </SelectContent>
               </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="deadline" className="text-sm font-medium">
+                Deadline
+              </Label>
+              <Input
+                id="deadline"
+                name="deadline"
+                type="date"
+                value={taskData.deadline || ""}
+                onChange={(e) => handleInputChange("deadline", e.target.value)}
+                className="focus:border-customBlue-500 border-gray-300 dark:border-gray-700"
+              />
             </div>
           </div>
 
@@ -664,34 +677,32 @@ const TaskEditModal = () => {
               type="button"
               variant="outline"
               onClick={onClose}
-              // className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               style={{
-                  backgroundColor: "#2563EB",
-                  color: "white",
-                  padding: "6px 16px",
-                  fontSize: "14px",
-                  borderRadius: "4px",
-                  border: "none",
-                  minWidth: "auto",
-                  width: "auto",
-                }}
+                backgroundColor: "#2563EB",
+                color: "white",
+                padding: "6px 16px",
+                fontSize: "14px",
+                borderRadius: "4px",
+                border: "none",
+                minWidth: "auto",
+                width: "auto",
+              }}
               disabled={loading}
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              // className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               style={{
-                  backgroundColor: "#2563EB",
-                  color: "white",
-                  padding: "6px 16px",
-                  fontSize: "14px",
-                  borderRadius: "4px",
-                  border: "none",
-                  minWidth: "auto",
-                  width: "auto",
-                }}
+                backgroundColor: "#2563EB",
+                color: "white",
+                padding: "6px 16px",
+                fontSize: "14px",
+                borderRadius: "4px",
+                border: "none",
+                minWidth: "auto",
+                width: "auto",
+              }}
               disabled={loading}
             >
               {loading ? "Saving..." : "Save Changes"}

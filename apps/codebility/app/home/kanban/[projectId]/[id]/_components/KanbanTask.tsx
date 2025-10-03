@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useMemo, memo } from "react";
-import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import {
   IconPriority1,
@@ -15,24 +14,16 @@ import { CSS } from "@dnd-kit/utilities";
 
 import KanbanTaskViewEditModal from "./kanban_modals/KanbanTaskViewEditModal";
 
-interface CodevMember {
+// Local interface for fetched sidekick data
+interface SidekickMember {
   id: string;
   first_name: string;
   last_name: string;
   image_url?: string | null;
 }
 
-interface SkillCategory {
-  name: string;
-}
-
-interface ExtendedTask extends Task {
-  codev?: CodevMember;
-  skill_category?: SkillCategory;
-}
-
 interface Props {
-  task: ExtendedTask;
+  task: Task; // Use the global Task type, not ExtendedTask
   columnId?: string;
   onComplete?: (taskId: string) => void;
 }
@@ -77,8 +68,35 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
       : IconPriority5
   , [task.priority, PriorityIconMap]);
 
-  const [sidekickDetails, setSidekickDetails] = useState<CodevMember[]>([]);
+  const [sidekickDetails, setSidekickDetails] = useState<SidekickMember[]>([]);
   const [supabase, setSupabase] = useState<any>(null);
+
+  // Calculate deadline urgency
+  const getDeadlineStatus = useMemo(() => {
+    if (!task.deadline) return null;
+    
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    
+    const deadlineDate = new Date(task.deadline);
+    deadlineDate.setHours(0, 0, 0, 0);
+    
+    const diffTime = deadlineDate.getTime() - today.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    if (diffDays < 0) {
+      return { status: 'overdue', text: 'Overdue', color: 'bg-red-600 text-white border-red-700' };
+    } else if (diffDays === 0) {
+      return { status: 'today', text: 'Due Today', color: 'bg-orange-600 text-white border-orange-700' };
+    } else if (diffDays <= 3) {
+      return { status: 'urgent', text: `${diffDays}d left`, color: 'bg-yellow-500 text-gray-900 border-yellow-600' };
+    } else if (diffDays <= 7) {
+      return { status: 'soon', text: `${diffDays}d left`, color: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/40 dark:text-blue-300' };
+    } else {
+      const dateStr = deadlineDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      return { status: 'normal', text: dateStr, color: 'bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-800 dark:text-gray-300' };
+    }
+  }, [task.deadline]);
 
   // Get priority-based styles
   const priorityStyles = useMemo(() => {
@@ -151,7 +169,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
       if (error) {
         console.error("Error fetching sidekick details:", error.message);
       } else if (data) {
-        setSidekickDetails(data as CodevMember[]);
+        setSidekickDetails(data as SidekickMember[]);
       }
     }
     fetchSidekickDetails();
@@ -205,7 +223,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
               <span className="capitalize">{task.priority ?? "Low"}</span>
               <PriorityIcon className="h-3 w-3 md:h-4 md:w-4" />
             </div>
-            {/* PRIMARY AVATAR - Fixed alignment */}
+            {/* PRIMARY AVATAR */}
             <div
               className="flex h-7 w-7 items-center justify-center overflow-hidden rounded-full border-2 border-white shadow-sm transition-all duration-200 
               group-hover:border-customBlue-300 group-hover:scale-110 dark:border-gray-700 md:h-8 md:w-8"
@@ -265,9 +283,18 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
               {task.type}
             </span>
           )}
+          {/* Deadline Badge */}
+          {getDeadlineStatus && (
+            <span
+              className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-medium shadow-sm border md:px-2.5 md:py-1 ${getDeadlineStatus.color} transition-all duration-200`}
+              title={`Deadline: ${new Date(task.deadline!).toLocaleDateString()}`}
+            >
+              📅 {getDeadlineStatus.text}
+            </span>
+          )}
         </div>
 
-        {/* Sidekicks - Fixed alignment */}
+        {/* Sidekicks */}
         {sidekicks.length > 0 && (
           <div className="flex -space-x-1.5 pt-1 md:-space-x-2 md:pt-2">
             {sidekicks.slice(0, 3).map((sidekickId) => {

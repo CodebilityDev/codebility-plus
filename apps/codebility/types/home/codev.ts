@@ -295,28 +295,29 @@ export interface KanbanSprintType {
 }
 
 export interface Task {
-  id: string; // UUID
+  id: string;
   title: string;
   description?: string;
   priority?: string;
   difficulty?: string;
   type?: string;
   due_date?: string;
-  kanban_column_id?: string; // UUID
-  codev_id?: string; // UUID (primary assignee)
-  created_by?: string; // UUID
-  sidekick_ids?: string[]; // UUID array
+  deadline?: string; // ADD THIS
+  kanban_column_id?: string; // This is already optional - that's correct
+  codev_id?: string;
+  created_by?: string;
+  sidekick_ids?: string[];
   points?: number;
-  is_archive?: boolean; // Defaults to false
+  is_archive?: boolean;
   pr_link?: string;
-  created_at?: string;
+  created_at: string; // CHANGE: Make this required (remove ?)
   updated_at?: string;
-  skill_category_id?: string; // NEW: Link to the skill category table
+  skill_category_id?: string;
   codev?: {
     id: string;
     first_name: string;
     last_name: string;
-    image_url?: string;
+    image_url?: string | null; // CRITICAL: Add | null here
   };
   skill_category?: {
     id: string;
