@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import H1 from "@/components/shared/dashboard/H1";
 import AsyncErrorBoundary from "@/components/AsyncErrorBoundary";
+import H1 from "@/components/shared/dashboard/H1";
 import { useUserStore } from "@/store/codev-store";
 import { Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
@@ -34,31 +34,32 @@ export default function TaskPage() {
           .from("tasks")
           .select(
             `
-            id,
-            title,
-            description,
-            priority,
-            difficulty,
-            type,
-            due_date,
-            points,
-            codev_id,
-            kanban_column:kanban_columns (
-              id,
-              name,
-              board:kanban_boards (
-                id,
-                name,
-                project:projects (
-                  id,
-                  name
-                )
-              )
-            ),
-            created_by,
-            created_at,
-            updated_at
-          `,
+    id,
+    title,
+    description,
+    priority,
+    difficulty,
+    type,
+    due_date,
+    deadline,
+    points,
+    codev_id,
+    kanban_column:kanban_columns (
+      id,
+      name,
+      board:kanban_boards (
+        id,
+        name,
+        project:projects (
+          id,
+          name
+        )
+      )
+    ),
+    created_by,
+    created_at,
+    updated_at
+  `,
           )
           .eq("codev_id", user.id);
 
@@ -161,7 +162,8 @@ export default function TaskPage() {
           <div className="mb-4 text-4xl">📝</div>
           <h2 className="mb-2 text-xl font-semibold">Unable to load tasks</h2>
           <p className="text-gray-600 dark:text-gray-400">
-            Something went wrong while fetching your tasks. Please refresh to try again.
+            Something went wrong while fetching your tasks. Please refresh to
+            try again.
           </p>
         </div>
       }
