@@ -459,7 +459,7 @@ const TaskEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full laptop:h-[90vh] laptop:max-h-[800px] h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
+      <DialogContent className="phone:h-full phone:w-full tablet:h-full tablet:w-full h-auto max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <form onSubmit={handleSubmit} className="flex flex-col gap-6">
           <DialogHeader>
             <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
@@ -666,15 +666,15 @@ const TaskEditModal = () => {
               onClick={onClose}
               // className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               style={{
-                    backgroundColor: "#2563EB",
-                    color: "white",
-                    padding: "6px 16px",
-                    fontSize: "14px",
-                    borderRadius: "4px",
-                    border: "none",
-                    minWidth: "auto",
-                    width: "auto",
-                  }}
+                  backgroundColor: "#2563EB",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
               disabled={loading}
             >
               Cancel
@@ -683,15 +683,15 @@ const TaskEditModal = () => {
               type="submit"
               // className="text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg"
               style={{
-                    backgroundColor: "#2563EB",
-                    color: "white",
-                    padding: "6px 16px",
-                    fontSize: "14px",
-                    borderRadius: "4px",
-                    border: "none",
-                    minWidth: "auto",
-                    width: "auto",
-                  }}
+                  backgroundColor: "#2563EB",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
               disabled={loading}
             >
               {loading ? "Saving..." : "Save Changes"}
