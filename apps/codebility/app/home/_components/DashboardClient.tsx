@@ -7,6 +7,7 @@ import DashboardCurrentProject from "../(dashboard)/_components/DashboardCurrent
 import Profile from "../(dashboard)/_components/DashboardProfile";
 import TokenPoints from "../(dashboard)/_components/DashboardTokenPoints";
 import WeeklyTop from "../(dashboard)/_components/DashboardWeeklyTop";
+import DashboardCompleteProfile from "../(dashboard)/_components/DashboardCompleteProfile";
 
 export default function DashboardClient() {
   const { user } = useUserStore();
@@ -34,6 +35,13 @@ export default function DashboardClient() {
             <DashboardCurrentProject />
             <TokenPoints />
             {/* <DashboardRoadmap /> Hide Temporarily */}
+            {user?.id ? (
+              <DashboardCompleteProfile codevId={user.id} />
+            ) : (
+              <div className="text-center text-gray-400 py-4">
+                Loading profile...
+              </div>
+            )}
           </div>
         </div>
         <div className="md:basis-[50%] xl:basis-[40%]">
