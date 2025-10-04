@@ -100,15 +100,15 @@ const Photo = ({ data }: PhotoProps) => {
     onOpen("deleteWarningModal", {}, {}, handleRemoveAvatar);
   };
 
-  // Check if user has an image (either from points API or directly from data)
-  const hasImage = !!data.image_url || hasImagePoints;
+  // Show message only if: no image_url AND hasn't earned points yet
+  const shouldShowMessage = !data.image_url && !hasImagePoints;
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <p className="text-lg">Your Photo</p>
         
-        {!hasImage && (
+        {shouldShowMessage && (
           <span className="text-xs text-green-600 flex items-center gap-1">
               <svg 
                 className="h-3 w-3" 
