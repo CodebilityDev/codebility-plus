@@ -38,6 +38,8 @@ const About = ({ data }: AboutProps) => {
     },
   });
 
+  const currentAboutValue = watch("about");
+
   // Check if user has earned points for the 'about' field
   useEffect(() => {
     async function checkAboutPoints() {
@@ -94,13 +96,16 @@ const About = ({ data }: AboutProps) => {
     setIsEditMode(false);
   };
 
+  // Show message only if: field is empty OR (field has content but no points earned yet)
+  const shouldShowMessage = !currentAboutValue || (!hasAboutPoints && currentAboutValue);
+
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <p className="text-lg">About</p>
         
         <div className="flex items-center gap-2">
-          {!hasAboutPoints && (
+          {!hasAboutPoints && !currentAboutValue && (
             <span className="text-xs text-green-600 flex items-center gap-1">
               <svg 
                 className="h-3 w-3" 

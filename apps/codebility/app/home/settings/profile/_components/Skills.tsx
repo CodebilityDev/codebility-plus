@@ -104,8 +104,11 @@ const Skills = ({ data }: SkillsProps) => {
     }
   };
 
-  // Check if user has skills (either from data or points API)
-  const hasSkills = (data?.tech_stacks && data.tech_stacks.length > 0) || hasTechStackPoints;
+  // Check if there are no skills added
+  const hasNoSkills = !data?.tech_stacks || data.tech_stacks.length === 0;
+
+  // Show message only if: no skills AND hasn't earned points yet
+  const shouldShowMessage = hasNoSkills && !hasTechStackPoints;
 
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative">
@@ -113,7 +116,7 @@ const Skills = ({ data }: SkillsProps) => {
         <p className="text-lg">Skills</p>
 
         <div className="flex items-center gap-2">
-          {!hasSkills && (
+          {shouldShowMessage && (
             <span className="text-xs text-green-600 flex items-center gap-1">
               <svg 
                 className="h-3 w-3" 

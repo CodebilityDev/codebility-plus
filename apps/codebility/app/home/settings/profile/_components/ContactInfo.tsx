@@ -43,6 +43,7 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
     handleSubmit,
     reset,
     control,
+    watch,
     formState: { isDirty },
   } = useForm<FormValues>({
     defaultValues: {
@@ -54,6 +55,9 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
       discord: data.discord || "",
     },
   });
+
+  // Watch all contact fields
+  const watchedFields = watch();
 
   // Check if user has earned points for any contact field
   useEffect(() => {
@@ -124,13 +128,24 @@ const ContactInfo = ({ data }: ContactInfoProps) => {
     setIsEditMode(false);
   };
 
+  // Check if any field is empty
+  const hasEmptyFields = !watchedFields.phone_number || 
+                         !watchedFields.portfolio_website || 
+                         !watchedFields.github || 
+                         !watchedFields.linkedin || 
+                         !watchedFields.facebook || 
+                         !watchedFields.discord;
+
+  // Show message only if: has empty fields AND hasn't earned points yet
+  const shouldShowMessage = hasEmptyFields && !hasContactPoints;
+
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-6">
       <div className="flex items-center justify-between">
         <p className="text-lg">Contact Info</p>
 
         <div className="flex items-center gap-2">
-          {!hasContactPoints && (
+          {shouldShowMessage && (
             <span className="text-xs text-green-600 flex items-center gap-1">
               <svg 
                 className="h-3 w-3" 
