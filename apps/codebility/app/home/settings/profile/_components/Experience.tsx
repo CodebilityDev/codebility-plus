@@ -123,12 +123,18 @@ const Experience = ({ data, codevId }: ExperienceProps) => {
     return true;
   }, [experienceData]);
 
+  // Check if there are no experiences or all are empty
+  const hasNoExperience = experienceData.length === 0;
+
+  // Show message only if: no experiences added AND hasn't earned points yet
+  const shouldShowMessage = hasNoExperience && !hasWorkExperiencePoints;
+
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
       <div className="flex items-center justify-between">
         <p className="text-lg">Experience</p>
 
-        {!hasWorkExperiencePoints && (
+        {shouldShowMessage && (
           <span className="text-xs text-green-600 flex items-center gap-1">
               <svg 
                 className="h-3 w-3" 

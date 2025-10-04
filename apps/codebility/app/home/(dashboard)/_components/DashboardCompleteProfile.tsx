@@ -80,6 +80,8 @@ export default function DashboardCompleteProfile({
     workExperience: false,
   });
 
+  const [removedTasks, setRemovedTasks] = useState<Record<string, boolean>>({});
+
   const [loading, setLoading] = useState(true);
   const [totalPoints, setTotalPoints] = useState(0);
 
@@ -172,7 +174,7 @@ export default function DashboardCompleteProfile({
             return acc;
           }, {});
 
-          setCompletedTasks({
+          const newCompletedTasks = {
             profilePhoto: !!pointsMap.image_url,
             skillsList: !!pointsMap.tech_stacks,
             aboutUser: !!pointsMap.about,
@@ -184,8 +186,16 @@ export default function DashboardCompleteProfile({
               !!pointsMap.discord,
             portfolioWorks: !!pointsMap.portfolio_website,
             workExperience: !!pointsMap.work_experience,
+          };
+
+          // Check for newly completed tasks and remove them immediately
+          Object.keys(newCompletedTasks).forEach((taskId) => {
+            if (newCompletedTasks[taskId] && !completedTasks[taskId]) {
+              setRemovedTasks((prev) => ({ ...prev, [taskId]: true }));
+            }
           });
 
+          setCompletedTasks(newCompletedTasks);
           setTotalPoints(data.totalPoints);
         }
       } catch (error) {
@@ -202,17 +212,37 @@ export default function DashboardCompleteProfile({
   const totalTasks = tasks.length;
   const progressPercentage = (totalCompleted / totalTasks) * 100;
 
+  // Filter out removed tasks
+  const visibleTasks = tasks.filter((task) => !removedTasks[task.id]);
+
+  const allTasksCompleted = totalCompleted === totalTasks;
+
   /* ------------------- Render ------------------- */
   if (loading) {
     return (
       <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-semibold text-white tracking-tight">
-              Complete Your Profile
-            </h2>
+            <div className="h-7 w-48 bg-gray-700/50 rounded animate-pulse"></div>
+            <div className="h-6 w-12 bg-gray-700/50 rounded-full animate-pulse"></div>
           </div>
-          <div className="text-center text-gray-400 py-8">Loading...</div>
+
+          <div className="w-full bg-gray-700/50 rounded-full h-2 animate-pulse"></div>
+
+          <div className="space-y-3">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="rounded-lg border border-gray-700 bg-gray-800/50 p-4 animate-pulse"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="w-4 h-4 rounded-full bg-gray-700"></div>
+                  <div className="h-5 flex-1 bg-gray-700/50 rounded"></div>
+                  <div className="h-5 w-16 bg-gray-700/50 rounded-full"></div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </Box>
     );
@@ -223,7 +253,7 @@ export default function DashboardCompleteProfile({
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-white tracking-tight">
-            Complete Your Profile
+            {allTasksCompleted ? "You're All Set! 🎉" : "Complete Your Profile"}
           </h2>
           <Badge variant="secondary" className="text-sm font-semibold">
             {totalCompleted}/{totalTasks}
@@ -232,8 +262,16 @@ export default function DashboardCompleteProfile({
 
         <Progress value={progressPercentage} className="h-2" />
 
+        {allTasksCompleted && visibleTasks.length === 0 && (
+          <div className="text-center py-8 space-y-2">
+            <p className="text-lg font-medium text-green-400">
+              Congratulations! Your profile is all set.
+            </p>
+          </div>
+        )}
+
         <div className="space-y-3">
-          {tasks.map((task) => (
+          {visibleTasks.map((task) => (
             <div
               key={task.id}
               className="rounded-lg border border-gray-700 bg-gray-800/50 overflow-hidden"
@@ -244,7 +282,7 @@ export default function DashboardCompleteProfile({
               >
                 <div className="flex items-center gap-3 flex-1">
                   <div
-                    className={`w-4 h-4 rounded-full border ${
+                    className={`w-4 h-4 rounded-full border transition-all duration-300 ${
                       completedTasks[task.id]
                         ? "bg-green-500 border-green-500"
                         : "bg-gray-700 border-gray-600"
