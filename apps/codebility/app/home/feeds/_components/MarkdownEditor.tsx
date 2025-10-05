@@ -25,11 +25,7 @@ export default function MarkdownEditor({
   }, [value, onChange]);
 
   useEffect(() => {
-    // Auto-resize textarea for nicer UX
-    const ta = textareaRef.current;
-    if (!ta) return;
-    ta.style.height = "0px";
-    ta.style.height = Math.min(ta.scrollHeight, 800) + "px"; // limit max-height
+    // No auto-resize needed - textarea now uses flex to fill available space
   }, [value, tab]);
 
   // notify parent whenever uploadedIds changes
@@ -76,8 +72,11 @@ export default function MarkdownEditor({
   };
 
   return (
-    <div className="mx-auto w-full max-w-4xl rounded-2xl bg-white p-4 shadow dark:bg-gray-900">
-      <div className="mb-3 flex items-center justify-between">
+    <div
+      className="flex w-full max-w-4xl flex-col rounded-2xl bg-white p-4 shadow dark:bg-gray-900"
+      style={{ height: "calc(100vh - 36rem)" }}
+    >
+      <div className="mb-3 flex flex-shrink-0 items-center justify-between">
         <div className="flex gap-1 rounded-md bg-gray-100 p-1 dark:bg-gray-800">
           <button
             type="button"
@@ -107,20 +106,20 @@ export default function MarkdownEditor({
         </div>
       </div>
 
-      <div className="overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
+      <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700">
         {tab === "write" ? (
-          <div className="p-4">
+          <div className="flex flex-1 flex-col overflow-hidden p-4">
             <textarea
               ref={textareaRef}
               value={value}
               onChange={(e) => setValue(e.target.value)}
               onPaste={handlePaste}
               placeholder="# Start typing markdown..."
-              className="max-h-[600px] min-h-[160px] w-full resize-none bg-transparent text-sm leading-relaxed text-gray-900 outline-none dark:text-gray-100"
+              className="h-full w-full resize-none bg-transparent text-sm leading-relaxed text-gray-900 outline-none dark:text-gray-100"
             />
           </div>
         ) : (
-          <div className="prose prose-sm dark:prose-invert max-h-[600px] min-h-[160px] max-w-none overflow-y-auto p-4 text-sm">
+          <div className="prose prose-sm dark:prose-invert h-full max-w-none overflow-y-auto p-4 text-sm">
             {value.trim() ? (
               <ReactMarkdown remarkPlugins={[remarkGfm]}>{value}</ReactMarkdown>
             ) : (
@@ -133,7 +132,7 @@ export default function MarkdownEditor({
         )}
       </div>
 
-      <div className="mt-3 flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+      <div className="mt-3 flex flex-shrink-0 items-center justify-between text-xs text-gray-500 dark:text-gray-400">
         <div>Characters: {value.length}</div>
         <div className="flex gap-2">
           <button
