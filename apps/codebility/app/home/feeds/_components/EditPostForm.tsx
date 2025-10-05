@@ -86,7 +86,7 @@ const EditPostForm = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`flex flex-col gap-4 ${className}`}
+      className={`flex max-h-[calc(90vh-8rem)] flex-col gap-4 overflow-y-auto ${className}`}
     >
       <Input
         name="title"
@@ -98,8 +98,9 @@ const EditPostForm = ({
       />
 
       {/* Optional image input */}
-
-      <ThumbnailUpload onChange={setImage} defaultImage={post.image_url} />
+      <div className="flex-none">
+        <ThumbnailUpload onChange={setImage} defaultImage={post.image_url} />
+      </div>
 
       <MarkdownEditor
         initialValue={content}
