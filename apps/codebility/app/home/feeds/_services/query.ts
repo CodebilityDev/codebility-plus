@@ -11,6 +11,7 @@ export const getPosts = async () => {
     .select(`
       *,
       author_id(
+        id,
         first_name,
         last_name,
         image_url
@@ -32,6 +33,7 @@ export type PostType = {
   title: string;
   content: string;
   author_id?: {
+    id: string;
     first_name: string;
     last_name: string;
     image_url?: string;
