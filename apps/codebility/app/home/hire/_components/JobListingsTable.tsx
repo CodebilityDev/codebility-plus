@@ -74,7 +74,9 @@ export default function JobListingsTable() {
     try {
       setLoading(true);
       const supabase = createClientClientComponent();
-
+      if (!supabase) {
+        return null;
+      }
       // Fetch job listings with creator details
       const { data: jobsData, error: jobsError } = await supabase
         .from('job_listings')
@@ -102,6 +104,9 @@ export default function JobListingsTable() {
       // Fetch application counts for each job
       const jobsWithCounts = await Promise.all(
         (jobsData || []).map(async (job) => {
+          if (!supabase) {
+            return null;
+          }
           const { count } = await supabase
             .from('job_applications')
             .select('*', { count: 'exact', head: true })
