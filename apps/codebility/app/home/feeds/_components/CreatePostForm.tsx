@@ -76,7 +76,7 @@ const CreatePostForm = ({
   return (
     <form
       onSubmit={handleSubmit}
-      className={`flex flex-col gap-4 ${className}`}
+      className={`flex max-h-[calc(90vh-8rem)] flex-col gap-4 overflow-y-auto ${className}`}
     >
       <Input
         name="title"
@@ -86,8 +86,9 @@ const CreatePostForm = ({
       />
 
       {/* Optional image input */}
-
-      <ThumbnailUpload onChange={setImage} />
+      <div className="flex-none">
+        <ThumbnailUpload onChange={setImage} />
+      </div>
 
       <MarkdownEditor
         initialValue={"# Hello"}
