@@ -178,7 +178,6 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
-
                 key={headerGroup.id}
                 className="border-b border-gray-200 bg-gray-50 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-800"
               >
@@ -191,7 +190,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                         (header.column.columnDef.meta as any)?.className,
                       )}
                     >
-      {header.isPlaceholder
+                      {header.isPlaceholder
                         ? null
                         : flexRender(
                           header.column.columnDef.header,
@@ -221,7 +220,6 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                       row.original.applicant?.fork_url,
                     ) &&
                     "bg-red-50 hover:bg-red-100/50 dark:bg-red-900/20 dark:hover:bg-red-900/30",
-
                   )}
                 >
                   {row.getVisibleCells().map((cell) => (
