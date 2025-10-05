@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import FeedPostModal from "@/components/modals/FeedPostModal";
 import { Box } from "@/components/shared/dashboard";
 import { defaultAvatar } from "@/public/assets/images";
+import { useUserStore } from "@/store/codev-store";
 import { format } from "date-fns";
 import { ArrowBigUp } from "lucide-react";
 import toast from "react-hot-toast";
@@ -14,12 +15,29 @@ import PostUpvote from "./PostUpvote";
 
 interface PostProps {
   post: PostType;
-  isMentor?: boolean;
+  isAdmin?: boolean;
   onDelete?: (deletedPostId: string | number) => void;
 }
 
-export default function Post({ post, isMentor, onDelete }: PostProps) {
+export default function Post({ post, isAdmin, onDelete }: PostProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isAuthor, setIsAuthor] = useState(false);
+  const { user } = useUserStore();
+
+  useEffect(() => {
+    const checkIfAuthor = async () => {
+      if (!user) return;
+      if (user.id === post.author_id?.id) {
+        setIsAuthor(true);
+      } else {
+        setIsAuthor(false);
+      }
+    };
+
+    if (user) {
+      checkIfAuthor();
+    }
+  }, [user]);
 
   const handleDelete = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -37,12 +55,6 @@ export default function Post({ post, isMentor, onDelete }: PostProps) {
     }
   };
 
-  const handleUpvote = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    e.preventDefault();
-    // You can add upvote logic here
-  };
-
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
   return (
@@ -52,7 +64,7 @@ export default function Post({ post, isMentor, onDelete }: PostProps) {
         onClick={openModal}
       >
         {/* Delete Button in top-right */}
-        {isMentor && (
+        {(isAdmin || isAuthor) && (
           <button
             className="invisible absolute right-2 top-2 rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600 group-hover:visible"
             onClick={handleDelete}
