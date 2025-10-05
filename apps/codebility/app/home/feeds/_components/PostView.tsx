@@ -33,20 +33,36 @@ export default function PostView({ postId }: PostViewProps) {
   const [post, setPost] = useState<PostType | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [isMentor, setIsMentor] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(true);
+  const [isAuthor, setIsAuthor] = useState(false);
   const { user } = useUserStore();
 
   useEffect(() => {
     const fetchRole = async () => {
       if (!user) return;
       const role = await getUserRole(user.role_id ?? null);
-      setIsMentor(role === "Mentor" || role === "Admin");
+      setIsAdmin(role === "Admin");
+    };
+
+    const checkIfAuthor = async () => {
+      console.log(
+        "CHECKING USER ID AND AUTHOR ID: ",
+        user?.id,
+        post?.author_id?.id,
+      );
+      if (!user) return;
+      if (user.id === post?.author_id?.id) {
+        setIsAuthor(true);
+      } else {
+        setIsAuthor(false);
+      }
     };
 
     if (user) {
       fetchRole();
+      checkIfAuthor();
     }
-  }, [user]);
+  }, [user, post]);
 
   const fetchPost = async () => {
     if (!supabase) return;
@@ -56,6 +72,7 @@ export default function PostView({ postId }: PostViewProps) {
         .select(
           `*,
           author_id(
+            id,
             first_name,
             last_name,
             image_url
@@ -125,7 +142,7 @@ export default function PostView({ postId }: PostViewProps) {
         </ReactMarkdown>
       </div>
 
-      {isMentor && (
+      {(isAdmin || isAuthor) && (
         <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
           Edit Post
         </Button>

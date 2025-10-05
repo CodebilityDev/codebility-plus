@@ -7,11 +7,11 @@ import { useFeedsStore } from "@/store/feeds-store"; // Adjust path as needed
 import Post from "./Post";
 
 interface FeedProp {
-  isMentor: boolean;
+  isAdmin: boolean;
   onCreatePost?: () => void;
 }
 
-export default function Feed({ isMentor }: FeedProp) {
+export default function Feed({ isAdmin }: FeedProp) {
   const posts = useFeedsStore((state) => state.posts);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
 
@@ -47,7 +47,7 @@ export default function Feed({ isMentor }: FeedProp) {
           <Post
             key={post.id}
             post={post}
-            isMentor={isMentor}
+            isAdmin={isAdmin}
             onDelete={handleDeletePost}
           />
         ))}
