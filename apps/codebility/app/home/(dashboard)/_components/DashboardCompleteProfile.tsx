@@ -248,6 +248,10 @@ export default function DashboardCompleteProfile({
     );
   }
 
+  if (allTasksCompleted && visibleTasks.length === 0) {
+    return null; // Don't render anything if all tasks are completed and none are visible
+  }
+
   return (
     <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
       <div className="space-y-4">
