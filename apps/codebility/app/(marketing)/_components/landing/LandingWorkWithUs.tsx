@@ -3,130 +3,132 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 
 import Container from "../MarketingContainer";
-import Section from "../MarketingSection";
 
-// Card data array for DRY principle - Single source of truth for card content
 const WORK_WITH_US_CARDS = [
   {
     id: "portfolio",
     title: "Our Portfolio",
     image: {
       src: "https://codebility-cdn.pages.dev/assets/images/index/projects-large.jpg",
-      alt: "portfolio projects"
+      alt: "portfolio projects",
     },
-    description: "Build your own website with us today and ensure a reliable, cutting-edge online presence.",
+    description:
+      "Build your next digital experience with a team that delivers reliable, cutting-edge work from discovery to launch.",
     link: {
       href: "/services",
-      text: "Our Portfolio"
-    }
+      text: "Explore Work",
+    },
   },
   {
-    id: "hire-developers", 
+    id: "hire-developers",
     title: "Hire Developers",
     image: {
       src: "https://codebility-cdn.pages.dev/assets/images/index/codevs-large.jpg",
-      alt: "professional developers"
+      alt: "professional developers",
     },
-    description: "Connect with the best developer to meet your needs through our top-rated professionals.",
+    description:
+      "Accelerate delivery with vetted engineers, designers, and strategists who integrate seamlessly with your roadmap.",
     link: {
       href: "/codevs",
-      text: "Hire a CoDev"
-    }
+      text: "Meet CoDevs",
+    },
   },
   {
     id: "developer-journey",
-    title: "Developer Journey", 
+    title: "Developer Journey",
     image: {
       src: "/assets/images/index/image.png",
-      alt: "developer learning journey phases"
+      alt: "developer learning journey phases",
     },
-    description: "Connect with our developer community and explore exciting career opportunities in tech.",
+    description:
+      "Join our community, sharpen your craft through real projects, and unlock career opportunities across the globe.",
     link: {
       href: "/auth/onboarding",
-      text: "Apply as Codev"
-    }
-  }
+      text: "Join the Program",
+    },
+  },
+  {
+    id: "careers",
+    title: "Career Opportunities",
+    image: {
+      src: "https://codebility-cdn.pages.dev/assets/images/index/careers.jpg",
+      alt: "career opportunities and job openings",
+    },
+    description:
+      "Explore exciting career opportunities with our team. Join a dynamic environment where innovation meets collaboration.",
+    link: {
+      href: "/careers",
+      text: "Apply as a Dev",
+    },
+  },
 ];
 
-// Reusable card component following Single Responsibility Principle
-const WorkWithUsCard = ({ card }: { card: typeof WORK_WITH_US_CARDS[0] }) => (
-  <Container className="relative z-10 mx-auto max-w-[600px] px-4 text-white">
-    <div className="border-light-900/5 bg-light-700/10 flex h-full flex-col gap-4 rounded-lg border-2 p-6 md:p-8">
-      {/* Image section with consistent aspect ratio */}
-      <div className="aspect-[500/359] w-full overflow-hidden rounded-xl">
-        <Image
-          src={card.image.src}
-          alt={card.image.alt}
-          width={500}
-          height={359}
-          className="h-full w-full object-cover"
-          priority={card.id === "portfolio"} // Prioritize first image loading
-        />
+const WorkWithUsCard = ({ card, index }: { card: (typeof WORK_WITH_US_CARDS)[number]; index: number }) => (
+  <div className="group relative w-full">
+    <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/60 via-purple-400/40 to-purple-900/20 opacity-80 blur-2xl transition-all duration-500 group-hover:opacity-100" />
+    <div className="relative flex h-full flex-col overflow-hidden rounded-3xl border border-white/10 bg-white/5 bg-gradient-to-br from-white/10 via-white/5 to-purple-950/20 p-6 shadow-xl backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:border-purple-300/60 hover:shadow-purple-500/20 md:p-8">
+      <div className="relative overflow-hidden rounded-2xl">
+        <div className="relative aspect-[16/9] w-full">
+          <Image
+            src={card.image.src}
+            alt={card.image.alt}
+            fill
+            sizes="(max-width: 768px) 100vw, 70vw"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            priority={index === 0}
+          />
+        </div>
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-purple-950/70 via-transparent to-transparent" />
+        <span className="absolute left-4 top-4 inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold uppercase tracking-[0.2em] text-white/80 backdrop-blur">
+          {String(index + 1).padStart(2, "0")}
+        </span>
       </div>
-      
-      {/* Content section with consistent spacing */}
-      <div className="flex flex-col gap-6">
-        <p className="text-center text-sm leading-relaxed md:text-base">
-          {card.description}
-        </p>
-        
-        {/* Button section - centered for single section layout */}
-        <div className="flex justify-center">
-          <Link href={card.link.href}>
-            <Button variant="purple" size="lg" rounded="full">
+
+      <div className="mt-8 flex flex-col gap-6 text-white md:mt-10">
+        <h3 className="text-2xl font-semibold md:text-3xl">{card.title}</h3>
+        <p className="text-base leading-relaxed text-white/75 md:text-lg">{card.description}</p>
+        <div className="pt-2">
+          <Link href={card.link.href} className="inline-block">
+            <Button variant="purple" size="lg" rounded="full" className="shadow-lg shadow-purple-500/20">
               {card.link.text}
             </Button>
           </Link>
         </div>
       </div>
     </div>
-  </Container>
-);
-
-// Background decoration component for DRY principle
-const BackgroundDecoration = () => (
-  <div
-    aria-hidden="true"
-    className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 transform overflow-hidden blur-3xl"
-  >
-    <div
-      style={{
-        clipPath: "polygon(22.1% 28.3%, 6% 40.5%, 0.8% 63.5%, 9.3% 84.8%, 23.6% 88.5%, 48.9% 88.8%, 77.2% 88.5%, 92.4% 71.5%, 93.9% 51.5%, 85.9% 36.8%, 70% 29.5%, 46.1% 29%)",
-      }}
-      className="relative aspect-[855/678] w-[40rem] bg-gradient-to-r from-[#00738B] via-[#0C3FDB] to-[#9707DD] opacity-20 sm:w-[72.1875rem]"
-    />
   </div>
 );
 
 const WorkWithUs = () => {
   return (
-    <>
-      {/* Main title section */}
-      <Section
-        id="workwithus"
-        className="border-light-900/5 bg-light-900/5 relative w-full border-t-4"
-      >
-        <Container className="relative z-10 mx-auto max-w-[1100px] px-4 text-white">
-          <h2 className="text-center text-xl md:text-3xl pt-1 pb-0 mb-0 -mb-16">Work With Us</h2>
-        </Container>
-        <BackgroundDecoration />
-      </Section>
+    <section
+      id="workwithus"
+      className="relative flex min-h-[90vh] w-full items-center overflow-hidden py-16 md:py-24"
+    >
+      <div className="pointer-events-none absolute -left-32 top-16 hidden h-64 w-64 rounded-full bg-purple-600/30 blur-3xl md:block" aria-hidden="true" />
+      <div className="pointer-events-none absolute -bottom-24 right-12 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" aria-hidden="true" />
 
-      {/* Three separate sections - each card gets its own section */}
-      {WORK_WITH_US_CARDS.map((card, index) => (
-        <Section
-          key={card.id}
-          className={`border-light-900/5 bg-light-900/5 relative w-full ${
-            index === WORK_WITH_US_CARDS.length - 1 ? 'border-b-4' : ''
-          }`}
-        >
-          <div className="pt-0 pb-0 -mt-20">
-            <WorkWithUsCard card={card} />
-          </div>
-          <BackgroundDecoration />
-        </Section>
-      ))}
-    </>
+      <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 text-white md:px-6 lg:px-8">
+        <div className="flex w-full max-w-4xl flex-col items-center gap-6 text-center md:gap-8">
+          <span className="inline-flex items-center gap-2 rounded-full border border-purple-400/40 bg-purple-500/10 px-4 py-1 text-xs font-medium uppercase tracking-[0.3em] text-purple-200">
+            Work With Us
+          </span>
+          <h2 className="text-3xl font-semibold leading-tight md:text-4xl">
+            Build meaningful products with a partner that keeps momentum high.
+          </h2>
+          <p className="max-w-3xl text-sm leading-relaxed text-white/70 md:text-base">
+            Whether you need a seasoned project team, specialist talent, or a launchpad for your own journey, Codebility brings
+            world-class execution, mentorship, and community to every collaboration.
+          </p>
+        </div>
+
+        <div className="mt-14 grid w-full grid-cols-1 gap-8 md:mt-20 md:grid-cols-2 md:gap-10 lg:gap-12">
+          {WORK_WITH_US_CARDS.map((card, index) => (
+            <WorkWithUsCard key={card.id} card={card} index={index} />
+          ))}
+        </div>
+      </div>
+    </section>
   );
 };
 

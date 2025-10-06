@@ -21,7 +21,7 @@ export default async function Index() {
       className={`bg-black-400 relative flex w-full flex-col overflow-x-hidden overflow-y-hidden `}
     >
       
-      <Navigation /> 
+      <Navigation />
       <Hero />
       <CodevLandingHero />
       <Features />

@@ -29,7 +29,7 @@ export default function CodevHero() {
       ></div>
       <OrbitingCirclesBackground />
       <div className="z-10 flex w-full flex-col gap-3 p-4 text-center text-white">
-        <p className="text-sm lg:text-xl">Be part of our Community</p>
+        <p className="text-sm lg:text-xl">Build Your Career With Us</p>
         <div className="relative">
           <h1
             className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
@@ -37,23 +37,23 @@ export default function CodevHero() {
             Codebility
           </h1>
           <h2 className="text-xl font-semibold lg:text-5xl">
-            Join Our Inclusive Community{" "}
+            Advance Your Tech Career{" "}
           </h2>
         </div>
         <p className="text-xs md:text-sm lg:text-2xl">
-          Where Diversity Flourishes and Connections Thrive
+          Where Innovation Meets Opportunity and Talent Thrives
         </p>
         <div className="mx-auto mt-6 flex w-full flex-col justify-center gap-6 md:flex-row">
-          <Link href={pathsConfig.auth.onboarding}>
-            <Button
-              variant="purple"
-              size="lg"
-              rounded="full"
-              className="md:w-40"
-            >
-              Join
-            </Button>
-          </Link>
+          <button
+            onClick={() => {
+              document.getElementById('open-positions')?.scrollIntoView({ 
+                behavior: 'smooth' 
+              });
+            }}
+            className="inline-flex h-11 items-center justify-center rounded-full bg-customViolet-100 px-8 py-2 text-sm font-medium text-white ring-offset-background transition-colors hover:bg-customViolet-100/90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 md:w-40"
+          >
+            View Jobs
+          </button>
         </div>
       </div>
 

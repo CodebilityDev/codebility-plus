@@ -1,13 +1,11 @@
 import Footer from "../_components/MarketingFooter";
 import Navigation from "../_components/MarketingNavigation";
 import Profiles from "../profiles/page";
-import CTA from "../_shared/CodevsCta";
-import FeaturedSection from "../_shared/CodevsFeaturedCection";
+import WorkplaceCulture from "./_components/WorkplaceCulture";
 import CodevHero from "./_components/CodevsHero";
 import JobListings from "./_components/JobListings";
-import MissionVision from "./_components/CodevsMissionVision";
-import Project from "./_components/CodevsProject";
-import Roadmap from "./_components/CodevsRoadmap";
+import TechStack from "./_components/TechStack";
+import CareerGrowthPath from "./_components/CareerGrowthPath";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -19,11 +17,9 @@ export default function Codevs() {
       <CodevHero />
       {/*     <Profiles /> */}
       <JobListings />
-      <FeaturedSection />
-      <Project />
-      <Roadmap />
-      <MissionVision />
-      <CTA />
+      <WorkplaceCulture />
+      <TechStack />
+      <CareerGrowthPath />
       <Footer />
     </div>
   );
