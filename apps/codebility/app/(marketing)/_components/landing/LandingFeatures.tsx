@@ -19,7 +19,7 @@ const Features = () => {
           </h2>
           <p className="text-gray">
             Our programs go beyond skill acquisition, 
-            because we believe in the trans-formative power of coding
+            because we believe in the transformative power of coding
           </p>
         </div>
 

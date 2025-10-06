@@ -3,7 +3,11 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+import { ensureSupabaseEnv } from "./ensure-env";
+
 export const createAdminClient = async () => {
+  ensureSupabaseEnv();
+
   const cookieStore = await cookies();
 
   return createServerClient(
