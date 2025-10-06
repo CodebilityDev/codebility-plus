@@ -9,13 +9,14 @@ import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 import { CodevPoints, Level, SkillCategory } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { Zap, Target, TrendingUp, Award, Star, ArrowUp, Calendar } from "lucide-react";
+import { Zap, Target, TrendingUp, Award, Star, ArrowUp, Calendar, UserRoundPen } from "lucide-react";
 
 export default function TokenPoints() {
   const { user } = useUserStore();
   const [points, setPoints] = useState<Record<string, number>>({});
   const [levels, setLevels] = useState<Record<string, number>>({});
   const [attendancePoints, setAttendancePoints] = useState(0);
+  const [profilePoints, setProfilePoints] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [supabase, setSupabase] = useState<any>(null);
@@ -121,6 +122,22 @@ export default function TokenPoints() {
           setAttendancePoints(0);
         }
 
+        // Fetch profile points from the API
+        if (user?.id) {
+          try {
+            const res = await fetch(`/api/profile-points/${user.id}`);
+            if (res.ok) {
+              const data = (await res.json()) as { success?: boolean; totalPoints?: number } | undefined;
+              if (data?.success) {
+                setProfilePoints(data.totalPoints ?? 0);
+              }
+            }
+          } catch (error) {
+            console.error("Failed to fetch profile points:", error);
+            setProfilePoints(0);
+          }
+        }
+
         // Fetch levels for all categories
         const { data: levelsData, error: levelsError } = await supabase
           .from("levels")
@@ -192,14 +209,48 @@ export default function TokenPoints() {
 
   if (loading) {
     return (
-      <Box className="flex w-full flex-1 flex-col gap-4">
-        <p className="text-2xl">Token Points</p>
-        <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
-          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
-          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
-          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
-          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
-          <Skeleton className="flex h-52 w-full flex-col items-center justify-between gap-6 rounded-lg border border-zinc-200 p-4 dark:border-zinc-700"></Skeleton>
+      <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/30 to-purple-50/30 dark:from-customBlue-950/10 dark:to-purple-950/10" />
+        <div className="absolute -top-4 -right-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl" />
+        
+        <div className="relative">
+          {/* Header skeleton */}
+          <div className="flex items-center gap-3 mb-4">
+            <Skeleton className="h-10 w-10 rounded-full" />
+            <div className="space-y-2">
+              <Skeleton className="h-7 w-48" />
+              <Skeleton className="h-4 w-64" />
+            </div>
+          </div>
+          
+          {/* Cards skeleton */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
+            {[1, 2, 3, 4, 5, 6].map((i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 shadow-sm"
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Skeleton className="h-12 w-12 rounded-lg" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-20" />
+                    </div>
+                  </div>
+                  <div className="text-right space-y-1">
+                    <Skeleton className="h-8 w-16 ml-auto" />
+                    <Skeleton className="h-3 w-12 ml-auto" />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-full" />
+                  <Skeleton className="h-3 w-3/4" />
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </Box>
     );
@@ -241,7 +292,7 @@ export default function TokenPoints() {
   };
 
   const totalSkillPoints = Object.values(points).reduce((sum, point) => sum + point, 0);
-  const totalPoints = totalSkillPoints + attendancePoints;
+  const totalPoints = totalSkillPoints + attendancePoints + profilePoints;
 
   return (
     <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
@@ -259,7 +310,7 @@ export default function TokenPoints() {
               ⚡ Points Overview
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Total: {totalPoints} points (Skills: {totalSkillPoints} + Attendance: {attendancePoints})
+              Total: {totalPoints} points (Skills: {totalSkillPoints} + Attendance: {attendancePoints} + Profile: {profilePoints})
             </p>
           </div>
         </div>
@@ -292,6 +343,38 @@ export default function TokenPoints() {
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500">
                   +2 points per day present
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* Profile Points Card */}
+          <div className="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+            <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-500 opacity-5 group-hover:opacity-10 transition-opacity" />
+            <div className="relative">
+              <div className="flex items-center justify-between mb-3">
+                <div className="flex items-center gap-2">
+                  <div className="rounded-lg p-2 bg-gradient-to-br from-yellow-500 to-orange-500 text-white">
+                    <UserRoundPen className="h-6 w-6" />
+                  </div>
+                  <div> 
+                    <p className="text-sm font-medium text-gray-600 dark:text-gray-300">Profile Completion</p>
+                    <p className="text-xs text-gray-500">Completion Points</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-2xl font-bold bg-gradient-to-r from-yellow-600 to-orange-600 bg-clip-text text-transparent">
+                    {profilePoints}
+                  </p>
+                  <p className="text-xs text-gray-500">points</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Earned by completing your profile information 
+                </p>
+                <p className="text-xs text-gray-400 dark:text-gray-500">
+                  Points vary based on completeness
                 </p>
               </div>
             </div>

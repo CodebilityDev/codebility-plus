@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Box from "@/components/shared/dashboard/Box";
 import { Button } from "@/components/ui/button";
 import { IconEdit } from "@/public/assets/svgs";
@@ -24,6 +24,7 @@ type FormValues = {
 const About = ({ data }: AboutProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [hasAboutPoints, setHasAboutPoints] = useState(false);
 
   const {
     register,
@@ -37,6 +38,30 @@ const About = ({ data }: AboutProps) => {
     },
   });
 
+  const currentAboutValue = watch("about");
+
+  // Check if user has earned points for the 'about' field
+  useEffect(() => {
+    async function checkAboutPoints() {
+      if (!data.id) return;
+
+      try {
+        const res = await fetch(`/api/profile-points/${data.id}`);
+        if (res.ok) {
+            const pointsData: { points?: { category: string; points: number }[] } = await res.json() as { points?: { category: string; points: number }[] };
+            const aboutPoint = pointsData?.points?.find(
+              (point) => point.category === 'about'
+            );
+            setHasAboutPoints(!!aboutPoint && aboutPoint.points > 0);
+          }
+      } catch (error) {
+        console.error("Failed to check about points:", error);
+      }
+    }
+
+    checkAboutPoints();
+  }, [data.id, data.about]); // Re-check when about field changes
+
   const onSubmit = async (formData: FormValues) => {
     const toastId = toast.loading("Your info is being updated");
     try {
@@ -44,6 +69,16 @@ const About = ({ data }: AboutProps) => {
       await updateCodev(formData);
       toast.success("Your about was successfully updated!", { id: toastId });
       setIsEditMode(false);
+      
+      // Re-check points after update
+            const res = await fetch(`/api/profile-points/${data.id}`);
+            if (res.ok) {
+              const pointsData: { points?: { category: string; points: number }[] } = await res.json() as { points?: { category: string; points: number }[] };
+              const aboutPoint = pointsData?.points?.find(
+                (point) => point.category === 'about'
+              );
+              setHasAboutPoints(!!aboutPoint && aboutPoint.points > 0);
+            }
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong, please try again later!");
@@ -61,18 +96,42 @@ const About = ({ data }: AboutProps) => {
     setIsEditMode(false);
   };
 
+  // Show message only if: field is empty OR (field has content but no points earned yet)
+  const shouldShowMessage = !currentAboutValue || (!hasAboutPoints && currentAboutValue);
+
   return (
     <Box className="bg-light-900 dark:bg-dark-100 relative flex flex-col gap-2">
-      <IconEdit
-        className={`${
-          isEditMode
-            ? "hidden"
-            : "h-15 w-15 absolute right-6 top-6 cursor-pointer invert dark:invert-0"
-        }`}
-        onClick={() => setIsEditMode(true)}
-      />
-
-      <p className="text-lg">About</p>
+      <div className="flex items-center justify-between">
+        <p className="text-lg">About</p>
+        
+        <div className="flex items-center gap-2">
+          {!hasAboutPoints && !currentAboutValue && (
+            <span className="text-xs text-green-600 flex items-center gap-1">
+              <svg 
+                className="h-3 w-3" 
+                fill="currentColor" 
+                viewBox="0 0 20 20"
+              >
+                <path 
+                  fillRule="evenodd" 
+                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" 
+                  clipRule="evenodd" 
+                />
+              </svg>
+              Write something about yourself to earn points
+            </span>
+          )}
+          
+          <IconEdit
+            className={`${
+              isEditMode
+                ? "hidden"
+                : "h-15 w-15 cursor-pointer invert dark:invert-0"
+            }`}
+            onClick={() => setIsEditMode(true)}
+          />
+        </div>
+      </div>
 
       <div className="flex flex-col gap-6">
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -81,17 +140,17 @@ const About = ({ data }: AboutProps) => {
 
             <div>
               <Textarea
-              variant="resume"
-              placeholder="Write something about yourself..."
-              id="about_me"
-              {...register("about")}
-              disabled={!isEditMode}
-              value={watch("about") || ""}
-              className={`placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
-                isEditMode
-                ? "border-lightgray text-black dark:text-white bg-white dark:bg-dark-200 border dark:border-zinc-700"
-                : "text-gray-500 dark:text-gray-400 bg-white dark:bg-dark-200 border-none"
-              }`}
+                variant="resume"
+                placeholder="Write something about yourself..."
+                id="about_me"
+                {...register("about")}
+                disabled={!isEditMode}
+                value={watch("about") || ""}
+                className={`placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
+                  isEditMode
+                    ? "border-lightgray text-black dark:text-white bg-white dark:bg-dark-200 border dark:border-zinc-700"
+                    : "text-gray-500 dark:text-gray-400 bg-white dark:bg-dark-200 border-none"
+                }`}
               />
             </div>
           </div>
