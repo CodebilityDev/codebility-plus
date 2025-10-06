@@ -5,29 +5,20 @@ interface HeroCardProps {
   title: string;
   description: string;
   url?: string;
+  category?: string;
 }
 
-const HeroCard: React.FC<HeroCardProps> = ({
-  title,
-  description,
-  url = "#",
-}) => {
+const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", category }) => {
   return (
-    <Link href={url} className="hero-card">
-      <div className="border-light-900/5 bg-light-700/10 hover:bg-light-700/30 flex min-h-[140px] w-full flex-col gap-3 rounded-md border-2 p-4 text-white backdrop-blur-lg duration-300 sm:gap-2 sm:p-6 md:min-h-[160px] lg:p-8">
-        <div className="flex w-full flex-row items-start justify-between gap-3">
-          <h3 className="text-lg font-medium leading-tight sm:text-xl md:text-2xl">{title}</h3>
-          <span className="hero-change-bg-button flex size-8 flex-shrink-0 flex-col items-center justify-center rounded-full border-2 border-white/5 bg-white/5 sm:size-10">
-            <Image
-              src="/assets/svgs/icon-arrow-up-right.svg"
-              width={12}
-              height={12}
-              alt="arrow up"
-              className="sm:h-[15px] sm:w-[15px]"
-            />
-          </span>
+    <Link href={url} className="hero-card block h-full">
+      <div className="border-light-900/5 bg-light-700/10 hover:bg-light-700/30 flex h-[220px] flex-col justify-between rounded-xl border-2 p-8 text-white backdrop-blur-lg duration-300 sm:h-[240px] sm:p-10">
+        <div className="flex w-full flex-col gap-3">
+          {category && (
+            <p className="text-[10px] uppercase tracking-[0.3em] text-white/60 sm:text-xs">{category}</p>
+          )}
+          <h3 className="text-lg font-semibold leading-tight sm:text-xl line-clamp-2">{title}</h3>
         </div>
-        <p className="text-sm leading-relaxed sm:text-base">{description}</p>
+        <p className="text-sm leading-relaxed text-white/80 sm:text-base line-clamp-4 mt-auto">{description}</p>
       </div>
     </Link>
   );
