@@ -29,21 +29,21 @@ const WORK_WITH_US_CARDS = [
     description:
       "Accelerate delivery with vetted engineers, designers, and strategists who integrate seamlessly with your roadmap.",
     link: {
-      href: "/codevs",
-      text: "Meet CoDevs",
+      href: "/hire-a-codev",
+      text: "Hire CoDevs",
     },
   },
   {
     id: "developer-journey",
-    title: "Developer Journey",
+    title: "Be a Codev",
     image: {
       src: "/assets/images/index/image.png",
-      alt: "developer learning journey phases",
+      alt: "become a codev developer",
     },
     description:
       "Join our community, sharpen your craft through real projects, and unlock career opportunities across the globe.",
     link: {
-      href: "/auth/onboarding",
+      href: "/codevs",
       text: "Join the Program",
     },
   },
@@ -58,7 +58,7 @@ const WORK_WITH_US_CARDS = [
       "Explore exciting career opportunities with our team. Join a dynamic environment where innovation meets collaboration.",
     link: {
       href: "/careers",
-      text: "Apply as a Dev",
+      text: "View Careers",
     },
   },
 ];

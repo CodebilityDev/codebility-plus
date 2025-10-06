@@ -39,7 +39,7 @@ const NAV_ITEMS = [
   { id: "1", title: "Our Services", path: "/services" },
   { id: "2", title: "About Us", path: "/#whychooseus" },
   { id: "3", title: "Book a Call", path: "/bookacall" },
-  { id: "4", title: "Hire a CoDevs", path: "/codevs" },
+  { id: "4", title: "Hire a CoDevs", path: "/hire-a-codev" },
 ] as const;
 
 const getMenuItems = (

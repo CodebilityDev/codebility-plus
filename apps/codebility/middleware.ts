@@ -13,6 +13,7 @@ const PUBLIC_ROUTES = [
   "/terms",
   "/auth/password-reset",
   "/codevs",
+  "/hire-a-codev",
   "/bookacall",
   "/services",
   "/",
