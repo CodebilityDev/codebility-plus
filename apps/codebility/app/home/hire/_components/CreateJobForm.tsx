@@ -73,7 +73,8 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
   useEffect(() => {
     const fetchPositions = async () => {
       const supabase = createClientClientComponent();
-      
+
+
       // Fetch distinct display_positions from codev table
       const { data, error } = await supabase
         .from('codev')
@@ -97,13 +98,16 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
 
   const onSubmit = async (data: JobFormData) => {
     setIsSubmitting(true);
-    
+
+
     try {
       const supabase = createClientClientComponent();
-      
+
+
       // Get current user
       const { data: { user } } = await supabase.auth.getUser();
-      
+
+
       if (!user) {
         throw new Error("You must be logged in to create a job listing");
       }
@@ -135,12 +139,14 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
       if (error) {
         throw error;
       }
-      
+
+
       toast({
         title: "Job Posted Successfully",
         description: `${data.title} has been posted and is now live.`,
       });
-      
+
+
       reset();
       setIsOpen(false);
       onJobCreated?.();
@@ -161,16 +167,16 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
       <Button
         onClick={() => setIsOpen(true)}
         variant="purple"
-        className="flex items-center gap-2 max-w-[200px]"
+        className="flex items-center gap-2 max-w-[200px] hover:bg-purple-800"
       >
         <Plus className="h-4 w-4" />
         Create Job Listing
       </Button>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto bg-gray-900 border-gray-800">
+        <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto border bg-card dark:bg-gray-900 dark:border-gray-800">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-light text-white">
+            <DialogTitle className="text-2xl font-light text-foreground">
               Create New Job Listing
             </DialogTitle>
           </DialogHeader>
@@ -178,15 +184,15 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 py-4">
             {/* Basic Information */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-white">Basic Information</h3>
-              
+              <h3 className="text-lg font-medium text-foreground">Basic Information</h3>
+
               {/* Job Title Selection */}
               <div className="space-y-2">
-                <Label className="text-gray-300">
-                  Job Title Type *
+                <Label className="text-foreground dark:text-gray-300">
+                  Job Title Type <span className="text-red-500">*</span>
                 </Label>
                 <div className="flex gap-4 mb-2">
-                  <label className="flex items-center gap-2 text-sm text-gray-300">
+                  <label className="flex items-center gap-2 text-sm text-foreground dark:text-gray-300">
                     <input
                       type="radio"
                       value="existing"
@@ -199,7 +205,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
                     />
                     Select from existing positions
                   </label>
-                  <label className="flex items-center gap-2 text-sm text-gray-300">
+                  <label className="flex items-center gap-2 text-sm text-foreground dark:text-gray-300">
                     <input
                       type="radio"
                       value="custom"
@@ -216,23 +222,23 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="title" className="text-gray-300">
-                  Job Title *
+                <Label htmlFor="title" className="text-foreground dark:text-gray-300">
+                  Job Title <span className="text-red-500">*</span>
                 </Label>
                 {watchTitleType === "existing" ? (
                   <Select
                     onValueChange={(value) => setValue("title", value)}
                     {...register("title")}
                   >
-                    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                    <SelectTrigger className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground">
                       <SelectValue placeholder="Select a position" />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
+                    <SelectContent className="border bg-card dark:bg-gray-800 dark:border-gray-700">
                       {positions.map((position) => (
-                        <SelectItem 
-                          key={position} 
+                        <SelectItem
+                          key={position}
                           value={position}
-                          className="text-gray-300 hover:bg-gray-700"
+                          className="text-muted-foreground hover:bg-gray-700"
                         >
                           {position}
                         </SelectItem>
@@ -243,7 +249,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
                   <Input
                     id="title"
                     {...register("title")}
-                    className="bg-gray-800 border-gray-700 text-white"
+                    className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground"
                     placeholder="e.g., Senior Full Stack Developer"
                   />
                 )}
@@ -254,17 +260,17 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="type" className="text-gray-300">
-                    Job Type *
+                  <Label htmlFor="type" className="text-foreground dark:text-gray-300">
+                    Job Type <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     onValueChange={(value: any) => setValue("type", value)}
                     defaultValue="Full-time"
                   >
-                    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                    <SelectTrigger className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
+                    <SelectContent className="border bg-card dark:bg-gray-800 dark:border-gray-700">
                       <SelectItem value="Full-time">Full-time</SelectItem>
                       <SelectItem value="Part-time">Part-time</SelectItem>
                       <SelectItem value="Contract">Contract</SelectItem>
@@ -274,17 +280,17 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="level" className="text-gray-300">
-                    Experience Level *
+                  <Label htmlFor="level" className="text-foreground dark:text-gray-300">
+                    Experience Level <span className="text-red-500">*</span>
                   </Label>
                   <Select
                     onValueChange={(value: any) => setValue("level", value)}
                     defaultValue="Mid"
                   >
-                    <SelectTrigger className="bg-gray-800 border-gray-700 text-white">
+                    <SelectTrigger className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent className="bg-gray-800 border-gray-700">
+                    <SelectContent className="border bg-card dark:bg-gray-800 dark:border-gray-700">
                       <SelectItem value="Entry">Entry</SelectItem>
                       <SelectItem value="Mid">Mid</SelectItem>
                       <SelectItem value="Senior">Senior</SelectItem>
@@ -295,20 +301,20 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="salary_range" className="text-gray-300">
+                <Label htmlFor="salary_range" className="text-foreground dark:text-gray-300">
                   Salary Range (Optional)
                 </Label>
                 <Input
                   id="salary_range"
                   {...register("salary_range")}
-                  className="bg-gray-800 border-gray-700 text-white"
+                  className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground"
                   placeholder="e.g., ₱80,000 - ₱120,000"
                 />
               </div>
 
-              <div className="flex items-center justify-between rounded-lg border border-gray-700 p-4">
+              <div className="flex items-center justify-between rounded-lg border dark:border-gray-700 p-4">
                 <div className="space-y-0.5">
-                  <Label htmlFor="remote" className="text-gray-300">
+                  <Label htmlFor="remote" className="text-foreground dark:text-gray-300">
                     Remote Position
                   </Label>
                   <p className="text-sm text-gray-500">
@@ -319,23 +325,24 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
                   id="remote"
                   checked={watchRemote}
                   onCheckedChange={(checked) => setValue("remote", checked)}
-                  className="data-[state=checked]:bg-customViolet-100"
+                  className="data-[state=checked]:bg-customViolet-100 dark:[&>span]:bg-foreground [&>span]:bg-muted-foreground"
                 />
               </div>
             </div>
 
             {/* Job Details */}
             <div className="space-y-4">
-              <h3 className="text-lg font-medium text-white">Job Details</h3>
-              
+
+              <h3 className="text-lg font-medium text-foreground">Job Details</h3>
+
               <div className="space-y-2">
-                <Label htmlFor="description" className="text-gray-300">
-                  Job Description *
+                <Label htmlFor="description" className="text-foreground dark:text-gray-300">
+                  Job Description <span className="text-red-500">*</span>
                 </Label>
                 <Textarea
                   id="description"
                   {...register("description")}
-                  className="bg-gray-800 border-gray-700 text-white min-h-[120px]"
+                  className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground min-h-[120px]"
                   placeholder="Describe the role, responsibilities, and what makes this position exciting..."
                 />
                 {errors.description && (
@@ -344,19 +351,19 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="requirements" className="text-gray-300">
+                <Label htmlFor="requirements" className="text-foreground dark:text-gray-300">
                   Requirements * (One per line)
                 </Label>
                 <Textarea
                   id="requirements"
                   {...register("requirements")}
-                  className="bg-gray-800 border-gray-700 text-white min-h-[120px]"
+                  className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground min-h-[120px]"
                   placeholder="5+ years experience&#10;React/Next.js&#10;Node.js&#10;PostgreSQL"
                 />
                 {errors.requirements && (
                   <p className="text-sm text-red-400">{errors.requirements.message}</p>
                 )}
-                <p className="text-xs text-gray-500">
+                <p className="text-xs text-muted-foreground">
                   Enter each requirement on a new line
                 </p>
               </div>
@@ -368,7 +375,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
                 type="submit"
                 variant="purple"
                 disabled={isSubmitting}
-                className="flex-1"
+                className="flex-1 hover:bg-purple-800"
               >
                 {isSubmitting ? (
                   <>
@@ -384,7 +391,7 @@ export default function CreateJobForm({ onJobCreated }: CreateJobFormProps) {
                 variant="outline"
                 onClick={() => setIsOpen(false)}
                 disabled={isSubmitting}
-                className="border-gray-700 bg-gray-800 text-white hover:bg-gray-700"
+                className="border border-gray-300 bg-accent hover:bg-gray-300 dark:border-gray-700 dark:bg-gray-800 text-foreground dark:hover:bg-gray-700"
               >
                 Cancel
               </Button>

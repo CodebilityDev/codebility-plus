@@ -12,6 +12,7 @@ import PersonalInfo from "./_components/PersonalInfo";
 import Photo from "./_components/Photo";
 import Skills from "./_components/Skills";
 import TimeSchedule from "./_components/TimeSchedule";
+import ProfileCompletionGuide from "./_components/ProfileCompletionGuide";
 import Loading from "./loading";
 
 // Prevent static generation at build time
@@ -91,6 +92,10 @@ async function ProfileComponent() {
       <Toaster position="top-center" reverseOrder={false} />
       <div className="flex flex-col gap-4 pt-4">
         <H1>Profile Settings</H1>
+        <span className="text-sm text-gray-400">
+          Complete your profile details to gain more additional points. 
+        </span>
+        <ProfileCompletionGuide />
         <div className="flex flex-col gap-8 md:flex-row">
           <div className="flex w-full basis-[70%] flex-col gap-8 2xl:basis-[60%]">
             <PersonalInfo data={codevData} />

@@ -328,7 +328,9 @@ const TaskViewModal = ({
   // Enhanced state management for assignee changes
   const [manualSaveChanges, setManualSaveChanges] = useState(false);
   const [isSavingChanges, setIsSavingChanges] = useState(false);
-  const [pendingAssigneeId, setPendingAssigneeId] = useState<string | undefined>(undefined);
+  const [pendingAssigneeId, setPendingAssigneeId] = useState<
+    string | undefined
+  >(undefined);
 
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task | null;
@@ -385,12 +387,12 @@ const TaskViewModal = ({
       setManualSaveChanges(false);
       setPendingAssigneeId(undefined);
       setForceRefreshKey(Date.now().toString());
-      
+
       // Force reset the AssigneeSelector local state by resetting primaryAssignee
       setTimeout(() => {
         // Fetch actual assignee from task after reset
         if (task.codev_id || task?.codev?.id) {
-          const assigneeId = task.codev_id || (task.codev?.id || "");
+          const assigneeId = task.codev_id || task.codev?.id || "";
           if (supabase && assigneeId) {
             supabase
               .from("codev")
@@ -518,10 +520,10 @@ const TaskViewModal = ({
 
     // Optimistically remove the task from UI immediately
     removeTaskOptimistic(task.id);
-    
+
     // Close modal immediately for better UX
     onClose();
-    
+
     // Show optimistic success message
     toast.success("Completing task...");
 
@@ -592,17 +594,17 @@ const TaskViewModal = ({
       setManualSaveChanges(false);
       setPendingAssigneeId(undefined);
       setPrLink(originalPrLink);
-      
+
       // Force complete reset by setting primary assignee to null first
       setPrimaryAssignee(null);
-      
+
       // Then set a unique force refresh key to reset AssigneeSelector
       setForceRefreshKey(`close-reset-${Date.now()}-${Math.random()}`);
-      
+
       // Reset to original task assignee after a brief delay
       setTimeout(() => {
         if (task?.codev_id || task?.codev?.id) {
-          const assigneeId = task.codev_id || (task.codev?.id || "");
+          const assigneeId = task.codev_id || task.codev?.id || "";
           if (supabase && assigneeId) {
             supabase
               .from("codev")
@@ -653,7 +655,7 @@ const TaskViewModal = ({
               task.codev = undefined;
             }
           }
-          
+
           if (pendingAssigneeId && primaryAssignee) {
             toast.success(
               `Task assigned to ${primaryAssignee.first_name} ${primaryAssignee.last_name}`,
@@ -684,7 +686,7 @@ const TaskViewModal = ({
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-[95vh] max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
+      <DialogContent className="h-auto max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <DialogHeader>
@@ -829,6 +831,14 @@ const TaskViewModal = ({
               )}
             </div>
 
+            {/* deadline */}
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Deadline</Label>
+              <div className="rounded-md bg-blue-50 p-2 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
+                {task?.deadline ? new Date(task.deadline).toLocaleString() : "Not Set"}
+              </div>
+            </div>
+
             <div className="space-y-2">
               <Label className="text-sm font-medium">Primary Assignee</Label>
               {canModifyTask && !primaryAssignee ? (
@@ -922,35 +932,48 @@ const TaskViewModal = ({
             />
           </div>
 
-          <div className="space-y-2">
-            <Label className="text-sm font-medium">Created By</Label>
-            <div className="flex items-center gap-2">
-              {createdBy?.image_url ? (
-                <Image
-                  src={createdBy.image_url}
-                  alt={`${createdBy.first_name} ${createdBy.last_name}`}
-                  width={32}
-                  height={32}
-                  className="rounded-full"
-                />
-              ) : (
-                <DefaultAvatar size={32} />
-              )}
-              <span>
-                {createdBy
-                  ? `${createdBy.first_name} ${createdBy.last_name}`
-                  : "Unknown"}
-              </span>
+          {/* created by - created at */}
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Created By</Label>
+              <div className="flex items-center gap-2">
+                {createdBy?.image_url ? (
+                  <Image
+                    src={createdBy.image_url}
+                    alt={`${createdBy.first_name} ${createdBy.last_name}`}
+                    width={32}
+                    height={32}
+                    className="rounded-full"
+                  />
+                ) : (
+                  <DefaultAvatar size={32} />
+                )}
+                <span>
+                  {createdBy
+                    ? `${createdBy.first_name} ${createdBy.last_name}`
+                    : "Unknown"}
+                </span>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-sm font-medium">Created At</Label>
+              <div className="rounded-md bg-light-900 px-3 py-2 text-sm text-gray-700  dark:bg-gray-800 dark:text-gray-200">
+              {task?.created_at
+                ? new Date(task.created_at).toLocaleString()
+                : "Unknown"}
+              </div>
             </div>
           </div>
 
-          <DialogFooter className="flex gap-2 sm:justify-end">
+          <DialogFooter className="mt-4 flex justify-end">
+            {/*Previous style: flex gap-6 sm:justify-end */}
             {/* VIEWING MODE: Show Close when just viewing (no changes) */}
             {!hasUnsavedChanges && (
               <Button
                 onClick={onClose}
                 style={{
-                  backgroundColor: "#3B82F6",
+                  backgroundColor: "#2563EB",
                   color: "white",
                   padding: "6px 16px",
                   fontSize: "14px",
@@ -970,7 +993,7 @@ const TaskViewModal = ({
                 <Button
                   onClick={handleClose}
                   style={{
-                    backgroundColor: "#3B82F6",
+                    backgroundColor: "#2563EB",
                     color: "white",
                     padding: "6px 16px",
                     fontSize: "14px",

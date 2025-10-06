@@ -19,6 +19,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useModal } from "@/hooks/use-modal";
+import { IconPlus } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { useKanbanStore } from "@/store/kanban-store";
 import { SkillCategory, Task } from "@/types/home/codev";
@@ -36,9 +37,12 @@ import {
 } from "@codevs/ui/dropdown-menu";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { IconPlus } from "@/public/assets/svgs";
 
-import { completeTask, updateTaskPRLink, fetchAvailableMembers } from "../../actions";
+import {
+  completeTask,
+  fetchAvailableMembers,
+  updateTaskPRLink,
+} from "../../actions";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
 } from "../DifficultyPointsTooltip";
@@ -49,8 +53,10 @@ import DifficultyPointsTooltip, {
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 
 const BUTTON_STYLES = {
-  primary: "text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg",
-  secondary: "text-grey-100 bg-light-900 dark:bg-black-200 mt-4 w-full border-2 border-gray-300 py-4 text-black hover:bg-green-700 sm:w-auto"
+  primary:
+    "text-md bg-customBlue-100 hover:bg-customBlue-200 focus-visible:ring-customBlue-100 flex h-10 w-full items-center justify-center gap-2 whitespace-nowrap rounded-md px-6 py-1 text-white ring-offset-background transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 sm:w-auto lg:text-lg",
+  secondary:
+    "text-grey-100 bg-light-900 dark:bg-black-200 mt-4 w-full border-2 border-gray-300 py-4 text-black hover:bg-green-700 sm:w-auto",
 };
 
 // ============================================================================
@@ -76,7 +82,7 @@ function AssigneeSelector({
   onAssigneeChange,
   boardId,
   user,
-  forceRefreshKey // Add this to force complete re-render when needed
+  forceRefreshKey, // Add this to force complete re-render when needed
 }: {
   primaryAssignee: CodevMember | null;
   onAssigneeChange: (memberIds: string[]) => void;
@@ -87,7 +93,9 @@ function AssigneeSelector({
   const [availableMembers, setAvailableMembers] = useState<CodevMember[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
-  const [localAssignee, setLocalAssignee] = useState<CodevMember | null>(primaryAssignee);
+  const [localAssignee, setLocalAssignee] = useState<CodevMember | null>(
+    primaryAssignee,
+  );
 
   // Sync with prop changes but prioritize local state for immediate feedback
   useEffect(() => {
@@ -101,14 +109,14 @@ function AssigneeSelector({
       setIsLoading(false);
       return;
     }
-    
+
     const loadMembers = async () => {
       setIsLoading(true);
       try {
         console.log("=== LOADING MEMBERS FOR BOARD:", boardId, "===");
         const members = await fetchAvailableMembers(boardId);
         console.log("=== FETCHED MEMBERS:", members, "===");
-        
+
         if (Array.isArray(members) && members.length > 0) {
           setAvailableMembers(members);
           console.log("=== SET AVAILABLE MEMBERS:", members.length, "===");
@@ -142,9 +150,9 @@ function AssigneeSelector({
 
   // IMMEDIATE SELECTION - Updates UI instantly
   const handleSelect = (memberId: string) => {
-    const selectedMember = availableMembers.find(m => m.id === memberId);
+    const selectedMember = availableMembers.find((m) => m.id === memberId);
     console.log("=== SELECTING MEMBER IMMEDIATELY:", selectedMember, "===");
-    
+
     if (selectedMember) {
       setLocalAssignee(selectedMember); // IMMEDIATE UI UPDATE
       onAssigneeChange([memberId]); // Trigger parent update
@@ -157,7 +165,7 @@ function AssigneeSelector({
         id: user.id,
         first_name: user.first_name || "You",
         last_name: user.last_name || "",
-        image_url: user.image_url
+        image_url: user.image_url,
       };
       console.log("=== SELF ASSIGNING IMMEDIATELY:", userAsMember, "===");
       setLocalAssignee(userAsMember); // IMMEDIATE UI UPDATE
@@ -229,7 +237,9 @@ function AssigneeSelector({
               </div>
             ) : filteredMembers.length === 0 ? (
               <div className="py-4 text-center text-sm text-gray-500">
-                {availableMembers.length === 0 ? "No members available" : "No members found"}
+                {availableMembers.length === 0
+                  ? "No members available"
+                  : "No members found"}
               </div>
             ) : (
               filteredMembers.map((member) => (
@@ -273,11 +283,6 @@ function AssigneeSelector({
           </button>
         )}
       </div>
-
-      {/* Debug info - remove in production */}
-      <div className="text-xs text-gray-400">
-        Members loaded: {availableMembers.length} | Local assignee: {localAssignee?.first_name || 'None'}
-      </div>
     </div>
   );
 }
@@ -296,35 +301,43 @@ const TaskViewModal = ({
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const user = useUserStore((state) => state.user);
   const { fetchBoardData } = useKanbanStore();
-  
+
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
   const [updateLoading, setUpdateLoading] = useState(false);
-  
+
   // Component state
   const [prLink, setPrLink] = useState("");
   const [supabase, setSupabase] = useState<any>(null);
   const [boardId, setBoardId] = useState<string>("");
-  
+
   // Data states
-  const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(null);
+  const [skillCategory, setSkillCategory] = useState<SkillCategory | null>(
+    null,
+  );
   const [sidekickDetails, setSidekickDetails] = useState<CodevMember[]>([]);
-  const [primaryAssignee, setPrimaryAssignee] = useState<CodevMember | null>(null);
+  const [primaryAssignee, setPrimaryAssignee] = useState<CodevMember | null>(
+    null,
+  );
   const [createdBy, setCreatedBy] = useState<CodevMember | null>(null);
   const [forceRefreshKey, setForceRefreshKey] = useState<string>("");
-  
+
   // Derived state
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task | null;
-  
+
   // Permission checks
-  const canModifyTask = user?.role_id === 1 || user?.role_id === 5 || user?.role_id === 4 || user?.role_id === 10;
+  const canModifyTask =
+    user?.role_id === 1 ||
+    user?.role_id === 5 ||
+    user?.role_id === 4 ||
+    user?.role_id === 10;
   const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
 
   // ============================================================================
   // EFFECTS
   // ============================================================================
-  
+
   // Initialize Supabase client
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -337,16 +350,20 @@ const TaskViewModal = ({
       setBoardId("");
       return;
     }
-    
+
     const fetchBoardId = async () => {
       try {
-        console.log("=== FETCHING BOARD ID FOR COLUMN:", task.kanban_column_id, "===");
+        console.log(
+          "=== FETCHING BOARD ID FOR COLUMN:",
+          task.kanban_column_id,
+          "===",
+        );
         const { data, error } = await supabase
           .from("kanban_columns")
           .select("board_id")
           .eq("id", task.kanban_column_id)
           .single();
-        
+
         if (error) {
           console.error("=== ERROR FETCHING BOARD ID:", error, "===");
           setBoardId("");
@@ -359,7 +376,7 @@ const TaskViewModal = ({
         setBoardId("");
       }
     };
-    
+
     fetchBoardId();
   }, [task?.kanban_column_id, supabase]);
 
@@ -412,9 +429,9 @@ const TaskViewModal = ({
 
     const fetchPrimaryAssignee = async () => {
       const assigneeId = task?.codev_id || task?.codev?.id;
-      
+
       console.log("=== FETCHING PRIMARY ASSIGNEE, ID:", assigneeId, "===");
-      
+
       // Always reset first
       setPrimaryAssignee(null);
 
@@ -468,7 +485,7 @@ const TaskViewModal = ({
   // ============================================================================
   // EVENT HANDLERS
   // ============================================================================
-  
+
   const handleUpdate = async () => {
     if (!task) return;
 
@@ -544,15 +561,21 @@ const TaskViewModal = ({
             .select("id, first_name, last_name, image_url")
             .eq("id", newAssigneeId)
             .single();
-          
+
           if (assigneeData) {
-            console.log("=== UPDATING TASK OBJECT WITH NEW ASSIGNEE:", assigneeData, "===");
+            console.log(
+              "=== UPDATING TASK OBJECT WITH NEW ASSIGNEE:",
+              assigneeData,
+              "===",
+            );
             setPrimaryAssignee(assigneeData);
             if (task) {
               task.codev_id = newAssigneeId;
               task.codev = assigneeData as any;
             }
-            toast.success(`Task assigned to ${assigneeData.first_name} ${assigneeData.last_name}`);
+            toast.success(
+              `Task assigned to ${assigneeData.first_name} ${assigneeData.last_name}`,
+            );
           }
         } else {
           console.log("=== REMOVING ASSIGNEE FROM TASK ===");
@@ -566,7 +589,7 @@ const TaskViewModal = ({
 
         // Force refresh key to trigger component re-render
         setForceRefreshKey(Date.now().toString());
-        
+
         // Refresh board data
         await fetchBoardData();
       } else {
@@ -652,7 +675,11 @@ const TaskViewModal = ({
                 </SelectTrigger>
                 <SelectContent>
                   {PRIORITY_LEVELS.map((level) => (
-                    <SelectItem key={level} value={level} className="capitalize">
+                    <SelectItem
+                      key={level}
+                      value={level}
+                      className="capitalize"
+                    >
                       {level}
                     </SelectItem>
                   ))}
@@ -672,7 +699,11 @@ const TaskViewModal = ({
                 </SelectTrigger>
                 <SelectContent>
                   {DIFFICULTY_LEVELS.map((level) => (
-                    <SelectItem key={level} value={level} className="capitalize">
+                    <SelectItem
+                      key={level}
+                      value={level}
+                      className="capitalize"
+                    >
                       {capitalize(level)}
                     </SelectItem>
                   ))}
@@ -754,7 +785,9 @@ const TaskViewModal = ({
                       forceRefreshKey={forceRefreshKey}
                     />
                   ) : (
-                    <div className="text-sm text-gray-500">Loading board...</div>
+                    <div className="text-sm text-gray-500">
+                      Loading board...
+                    </div>
                   )}
                 </div>
               ) : primaryAssignee ? (

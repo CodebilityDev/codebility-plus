@@ -34,11 +34,26 @@ export const getUserRole = async (userId: Number | null): Promise<string | null>
   return role.name;
 };
 
-export const addPost = async ( title, content, author_id?, image_url?) => {
+type AddPostParams = {
+  title: string;
+  content: string;
+  author_id?: string | null;
+  image_url?: string | null;
+  content_image_ids?: string[] | null;
+};
+
+export const addPost = async ({
+  title,
+  content,
+  author_id,
+  image_url,
+  content_image_ids,
+}: AddPostParams) => {
   try {
     const supabase = await createClientServerComponent();
 
-    const { data: newPost, error } = await supabase
+    // 1. Insert the post
+    const { data: newPosts, error: insertError } = await supabase
       .from("posts")
       .insert([
         {
@@ -46,20 +61,40 @@ export const addPost = async ( title, content, author_id?, image_url?) => {
           content,
           ...(author_id !== undefined && { author_id }),
           ...(image_url !== undefined && { image_url }),
-        }
+        },
       ])
-      .select();
-    if (error) throw error;
+      .select("id, title, content, author_id, image_url")
+      .single();
+
+    if (insertError) throw insertError;
+
+    const newPost = newPosts;
+
+    // 2. If content_image_ids exist, update their post_id
+    if (content_image_ids && content_image_ids.length > 0) {
+      const { error: updateError } = await supabase
+        .from("post_content_images")
+        .update({ post_id: newPost.id })
+        .in("id", content_image_ids);
+
+      if (updateError) {
+        console.error("Failed to update post_content_images:", updateError);
+        throw updateError;
+      }
+    }
 
     return newPost;
   } catch (error) {
-    console.error(error);
+    console.error("Error in addPost:", error);
     throw error;
   }
 };
 
 export const deletePost = async (post_id: string) => {
   try {
+    //delete content images
+    await deletePostContentImages (post_id);
+
     const supabase = await createClientServerComponent();
 
     const { data: postData, error: fetchError } = await supabase
@@ -91,49 +126,79 @@ export const deletePost = async (post_id: string) => {
   }
 };
 
-export const editPost = async (
-  id: string,
-  title?: string,
-  content?: string,
-  image_url?: string,
-  author_id?: number,
-) => {
+type EditPostParams = {
+  id: string;
+  title?: string;
+  content?: string;
+  author_id?: string | null;
+  image_url?: string | null;
+  content_image_ids?: string[] | null;
+};
+
+export const editPost = async ({
+  id,
+  title,
+  content,
+  author_id,
+  image_url,
+  content_image_ids,
+}: EditPostParams) => {
   try {
     const supabase = await createClientServerComponent();
 
-    const { data: post, error } = await supabase
+    // 1. Fetch existing post for old image cleanup
+    const { data: post, error: fetchError } = await supabase
       .from("posts")
       .select("image_url")
       .eq("id", id)
       .single();
 
-    if (error) throw error;
+    if (fetchError) throw fetchError;
 
+    // 2. Build update payload
     const updates: Record<string, any> = {};
     if (title !== undefined) updates.title = title;
     if (content !== undefined) updates.content = content;
     if (author_id !== undefined) updates.author_id = author_id;
     if (image_url !== undefined) updates.image_url = image_url;
+    if (image_url === null) updates.image_url = null;
 
-    const { data: updatedPost, error: editError } = await supabase
+    // 3. Update post
+    const { data: updatedPosts, error: editError } = await supabase
       .from("posts")
       .update(updates)
       .eq("id", id)
-      .select();
+      .select()
+      .single();
 
     if (editError) throw editError;
 
-    // Delete previous image from bucket
-    if (image_url) {
+    const updatedPost = updatedPosts;
+
+    // 4. Update post_content_images (attach uploaded images to this post)
+    if (content_image_ids && content_image_ids.length > 0) {
+      const { error: updateError } = await supabase
+        .from("post_content_images")
+        .update({ post_id: id })
+        .in("id", content_image_ids);
+
+      if (updateError) {
+        console.error("Failed to update post_content_images:", updateError);
+        throw updateError;
+      }
+    }
+
+    // 5. Delete previous image from bucket if replaced
+    if (post.image_url && post.image_url !== image_url) {
       const imagePath = await getImagePath(post.image_url);
-
-    deleteImage(imagePath!);
-
+      if (imagePath) {
+        await deleteImage(imagePath);
+      }
     }
 
     return updatedPost;
   } catch (error) {
-    console.error(error);
+    console.error("Error editing post:", error);
     throw error;
   }
 };
@@ -235,3 +300,112 @@ export const hasUserUpvoted = async (postId: string, userId: string): Promise<bo
   }
 };
 
+interface UploadPostContentImageOptions {
+  bucket?: string;
+  folder?: string;
+  cacheControl?: string;
+  upsert?: boolean;
+}
+
+const defaultOptions: UploadPostContentImageOptions = {
+  bucket: "codebility",
+  folder: "postImage/content",
+  cacheControl: "3600",
+  upsert: true,
+};
+
+export async function uploadPostContentImage(
+  file: File,
+) {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { bucket, folder } = defaultOptions;
+
+    // Generate a cleaner file path
+    const fileExtension = file.name.split(".").pop() || "";
+    const fileName = `${Date.now()}.${fileExtension}`;
+    const filePath = `${folder}/${fileName}`;
+
+    // Upload image to storage
+    const { error: uploadError } = await supabase.storage
+      .from(bucket!)
+      .upload(filePath, file, {
+        cacheControl: defaultOptions.cacheControl || "3600",
+        upsert: defaultOptions.upsert ?? true,
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: publicUrlData } = supabase.storage
+      .from(bucket!)
+      .getPublicUrl(filePath);
+
+    if (!publicUrlData?.publicUrl) {
+      throw new Error("Failed to get public URL");
+    }
+
+    const imageUrl = publicUrlData.publicUrl.toString();
+
+    // Insert new row and return it
+    const { data: insertedRows, error: insertError } = await supabase
+      .from("post_content_images")
+      .insert({ image_url: imageUrl })
+      .select("id, image_url") // select to return inserted data
+      .single(); // because we're inserting one row
+
+    if (insertError) {
+      console.error("Failed to insert post_content_images row:", insertError);
+      throw insertError;
+    }
+
+    return {
+      id: insertedRows.id,
+      image_url: insertedRows.image_url,
+    };
+  } catch (error) {
+    console.error("Image upload failed:", error);
+    throw error;
+  }
+}
+
+
+export async function deletePostContentImages(
+  post_id: string,
+  bucket: string = "codebility",
+) {
+  const supabase = await createClientServerComponent();
+
+  try {
+    // 1. Get all image URLs for this post
+    const { data: images, error: fetchError } = await supabase
+      .from("post_content_images")
+      .select("image_url")
+      .eq("post_id", post_id);
+
+    if (fetchError) throw fetchError;
+    if (!images || images.length === 0) {
+      return false; // no images to delete
+    }
+
+    // 2. Extract storage file paths (await async getImagePath)
+    const filePaths = (
+      await Promise.all(images.map((img) => getImagePath(img.image_url)))
+    ).filter((p): p is string => !!p); // remove nulls
+
+    if (filePaths.length === 0) return false;
+
+    // 3. Delete from storage bucket
+    const { error: deleteError } = await supabase.storage
+      .from(bucket)
+      .remove(filePaths);
+
+    if (deleteError) throw deleteError;
+
+    return true;
+  } catch (error) {
+    console.error("Image deletion failed:", error);
+    throw error;
+  }
+}
