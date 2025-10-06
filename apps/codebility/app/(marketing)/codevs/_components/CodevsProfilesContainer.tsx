@@ -4,10 +4,9 @@ import { fadeInOutDownToUp } from "@/components/FramerAnimation/Framer";
 import H2 from "@/components/shared/home/H2";
 import Heading3 from "@/components/shared/home/Heading3";
 import IntroText from "@/components/shared/home/IntroText";
-import { Codev } from "@/types/home/codev";
 import { motion } from "framer-motion";
 
-export default function CodevContainer() {
+export default function CodevsProfilesContainer() {
   return (
     <div className="flex flex-col gap-4">
       <motion.div
@@ -16,7 +15,7 @@ export default function CodevContainer() {
         whileInView="visible"
         className="mx-auto"
       >
-        <H2 className="text-white">Codevs</H2>
+        <H2 className="text-white">Meet Our CoDevs</H2>
       </motion.div>
       <motion.div
         variants={fadeInOutDownToUp}
@@ -24,11 +23,11 @@ export default function CodevContainer() {
         whileInView="visible"
         className="text-gray mx-auto max-w-[650px] text-center"
       >
-        <Heading3>Meet Our Skilled Developer Network</Heading3>
+        <Heading3>See Who You'll Be Working With</Heading3>
         <IntroText>
-          Discover our carefully vetted CoDevs ready to join your team. Each developer 
-          brings proven expertise, strong communication skills, and a passion for delivering 
-          exceptional results on your projects.
+          Get inspired by our current CoDevs who started their journey just like you. 
+          These talented developers have grown their skills through real-world projects 
+          and are now contributing to amazing products worldwide.
         </IntroText>
       </motion.div>
     </div>

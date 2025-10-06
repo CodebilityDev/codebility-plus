@@ -29,7 +29,7 @@ export default function Hero() {
       ></div>
       <OrbitingCirclesBackground />
       <div className="z-10 flex w-full flex-1 flex-col items-center justify-center gap-3 p-4 text-center text-white">
-        <p className="text-sm lg:text-xl">Join Our Community</p>
+        <p className="text-sm lg:text-xl">Find Your Next Developer</p>
         <div className="relative">
           <h1
             className={`absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-5xl uppercase tracking-widest opacity-5 md:text-6xl lg:text-9xl ${rowdies.className}`}
@@ -37,17 +37,17 @@ export default function Hero() {
             Codebility
           </h1>
           <h2 className="text-xl font-semibold lg:text-5xl">
-            Become a CoDevs
+            Hire Talented Codevs
           </h2>
         </div>
         <p className="text-xs md:text-sm lg:text-2xl">
-          Start your journey as a developer and grow with real-world projects
+          Connect with skilled developers ready to bring your projects to life
         </p>
         <div className="mx-auto mt-6 flex w-full justify-center">
-          <Link href={pathsConfig.auth.onboarding}>
+          <Link href="#codevs">
             <Button className="from-customTeal to-customViolet-100 h-12 rounded-full bg-gradient-to-r via-customBlue-100 p-0.5 hover:bg-gradient-to-br md:w-40">
               <span className="bg-black-500 flex h-full w-full items-center justify-center rounded-full text-sm text-white lg:text-lg">
-                Join Now
+                Hire Codevs
               </span>
             </Button>
           </Link>

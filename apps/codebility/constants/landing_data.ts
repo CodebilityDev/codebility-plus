@@ -48,7 +48,7 @@ export const aboutUsData: AboutUsData[] = [
   { id: "1", title: "Services", href: "/services" },
   { id: "2", title: "Why Choose Us", href: "/#whychooseus" },
   { id: "3", title: "Our Admins", href: "/#admins" },
-  { id: "4", title: "CoDevs", href: "/codevs" },
+  { id: "4", title: "CoDevs", href: "/hire-a-codev" },
   { id: "5", title: "Projects", href: "/services" },
   { id: "6", title: "Contact", href: "mailto:codebility.dev@gmail.com" },
    {
