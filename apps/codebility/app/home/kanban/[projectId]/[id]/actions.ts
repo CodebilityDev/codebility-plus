@@ -95,6 +95,7 @@ export const fetchAvailableMembers = async (
   return members.sort((a, b) => a.first_name.localeCompare(b.first_name));
 };
 
+// UPDATED: Now handles deadline field
 export const createNewTask = async (
   formData: FormData,
 ): Promise<{ success: boolean; error?: string }> => {
@@ -117,6 +118,9 @@ export const createNewTask = async (
       .filter(Boolean);
     const skill_category_id = formData.get("skill_category_id")?.toString();
     const created_by = formData.get("created_by")?.toString();
+    
+    // NEW: Extract deadline field
+    const deadline = formData.get("deadline")?.toString() || null;
 
     if (!title || !kanban_column_id || !skill_category_id) {
       return { success: false, error: "Required fields are missing (title, column, and skill category)" };
@@ -136,6 +140,8 @@ export const createNewTask = async (
         sidekick_ids,
         skill_category_id,
         created_by,
+        deadline, // NEW: Include deadline
+        // created_at is auto-set by database DEFAULT NOW()
       },
     ]);
 
@@ -173,6 +179,7 @@ export const createNewTask = async (
   }
 };
 
+// UPDATED: Now handles deadline field
 export const updateTask = async (
   formData: FormData,
   taskId: string,
@@ -180,12 +187,15 @@ export const updateTask = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // Handle BOTH UUID fields properly
     const rawCodevId = formData.get("codev_id")?.toString();
     const codev_id = rawCodevId === "" || rawCodevId === "null" ? null : rawCodevId;
 
     const rawSkillCategoryId = formData.get("skill_category_id")?.toString();
     const skill_category_id = rawSkillCategoryId === "" || rawSkillCategoryId === "null" ? null : rawSkillCategoryId;
+
+    // NEW: Extract deadline (can be null)
+    const rawDeadline = formData.get("deadline")?.toString();
+    const deadline = rawDeadline === "" || rawDeadline === "null" ? null : rawDeadline;
 
     const updateData = {
       title: formData.get("title")?.toString(),
@@ -200,6 +210,7 @@ export const updateTask = async (
         : [],
       skill_category_id: skill_category_id,
       codev_id: codev_id,
+      deadline: deadline, // NEW: Include deadline
       updated_at: new Date().toISOString(),
     };
 
@@ -243,7 +254,6 @@ export const deleteTask = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // Sequential queries instead of nested joins
     const { data: taskData } = await supabase
       .from("tasks")
       .select("kanban_column_id")
@@ -257,7 +267,6 @@ export const deleteTask = async (
       return { success: false, error: error.message };
     }
 
-    // Get revalidation path data
     if (taskData?.kanban_column_id) {
       const { data: columnData } = await supabase
         .from("kanban_columns")
@@ -458,14 +467,12 @@ const updateDeveloperLevels = async (codevId?: string) => {
   }
 };
 
-// RESOLVED: Comprehensive completeTask implementation with RPC fallback
 export const completeTask = async (
   task: Task,
 ): Promise<{ success: boolean; error?: string }> => {
   const supabase = await createClientServerComponent();
 
   try {
-    // Try to use the RPC function first for better performance
     const { data, error } = await supabase.rpc('complete_task', {
       task_id: task.id,
       task_points: task.points || 0,
@@ -474,10 +481,8 @@ export const completeTask = async (
       sidekick_ids: task.sidekick_ids || null
     });
 
-    // If RPC function doesn't exist, fall back to manual implementation
     if (error && error.message.includes('function complete_task')) {
       
-      // 1. Archive the task instead of deleting for data preservation
       const { error: archiveError } = await supabase
         .from("tasks")
         .update({ 
@@ -488,7 +493,6 @@ export const completeTask = async (
 
       if (archiveError) throw archiveError;
 
-      // 2. Award points to primary assignee
       if (task.codev?.id && task.skill_category?.id && task.points) {
         const { data: existingPoints } = await supabase
           .from("codev_points")
@@ -515,7 +519,6 @@ export const completeTask = async (
             });
         }
 
-        // 3. Award points to sidekicks (50% of task points)
         if (task.sidekick_ids?.length) {
           const sidekickPoints = Math.floor(task.points * 0.5);
           
@@ -547,7 +550,6 @@ export const completeTask = async (
           }
         }
 
-        // 4. Update developer levels for all participants
         await updateDeveloperLevels(task.codev.id);
         
         if (task.sidekick_ids?.length) {
@@ -557,7 +559,6 @@ export const completeTask = async (
         }
       }
 
-      // Sequential queries for revalidation path
       const { data: taskData } = await supabase
         .from("tasks")
         .select("kanban_column_id")
@@ -600,7 +601,6 @@ export const completeTask = async (
       };
     }
 
-    // Sequential queries for revalidation when using RPC
     const { data: taskData } = await supabase
       .from("tasks")
       .select("kanban_column_id")
@@ -679,7 +679,6 @@ export async function updateTaskPRLink(taskId: string, prLink: string) {
       return { success: false, error: error.message };
     }
 
-    // Sequential queries for revalidation
     const { data: taskData } = await supabase
       .from("tasks")
       .select("kanban_column_id")
@@ -732,7 +731,6 @@ export async function unarchiveTask(taskId: string) {
       return { success: false, error: error.message };
     }
 
-    // Sequential queries for revalidation
     const { data: taskData } = await supabase
       .from("tasks")
       .select("kanban_column_id")
