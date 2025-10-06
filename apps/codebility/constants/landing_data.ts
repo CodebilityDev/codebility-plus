@@ -35,6 +35,7 @@ export interface MarketingCardData {
   title: string;
   description: string;
   url: string;
+  category?: string;
 }
 
 export interface Service {
@@ -173,24 +174,28 @@ export const MarketingCardData: MarketingCardData[] = [
     description:
       "Develop your personalized AI assistant or seamlessly integrate AI into your existing tech website.",
     url: "/ai-integration",
+    category: "Technology",
   },
   {
     title: "Web App Development",
     description:
       "Discover the best in the industry and turn your ideas into powerful digital solutions.",
     url: "/services#web-application",
+    category: "Engineering",
   },
   {
     title: "Mobile App Development",
     description:
       "Experience top-notch mobile app development with our expert team.",
     url: "/services#mobile-application",
+    category: "Engineering",
   },
   {
     title: "Product Design",
     description:
       "Encounter excellence in development with our skilled team, masters of UI/UX design.",
     url: "/services#product-design",
+    category: "Product",
   },
 ];
 
