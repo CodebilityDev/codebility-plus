@@ -3,14 +3,15 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 
+import { ensureSupabaseEnv } from "./ensure-env";
+
 export const createClientServerComponent = async () => {
-  // Check if environment variables exist
+  ensureSupabaseEnv();
+
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
   if (!supabaseUrl || !supabaseAnonKey) {
-    // During build time on Vercel, environment variables might not be available
-    // Return a mock client or throw a more specific error
     console.warn("Supabase environment variables not available during build");
     throw new Error("Supabase environment variables not configured");
   }
@@ -29,8 +30,6 @@ export const createClientServerComponent = async () => {
           );
         } catch {
           // The `setAll` method was called from a Server Component.
-          // This can be ignored if you have middleware refreshing
-          // user sessions.
         }
       },
     },

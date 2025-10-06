@@ -1,7 +1,41 @@
+import { existsSync, readFileSync } from "fs";
+import path from "path";
+
 import withBundleAnalyzer from "@next/bundle-analyzer";
 import withPlugins from "next-compose-plugins";
 
 import { env } from "./env.mjs";
+
+const loadEnvForRuntime = () => {
+  const vercelEnv = process.env.VERCEL_ENV ?? process.env.NODE_ENV;
+  const envFileMap = {
+    production: ".env.production",
+    preview: ".env.staging",
+  };
+
+  const envFilename = envFileMap[vercelEnv];
+
+  if (!envFilename) return;
+
+  const envPath = path.resolve(process.cwd(), "apps", "codebility", envFilename);
+
+  if (!existsSync(envPath)) return;
+
+  const content = readFileSync(envPath, "utf-8");
+  content.split(/\r?\n/).forEach((line) => {
+    if (!line || line.trim().startsWith("#")) return;
+
+    const [key, ...rest] = line.split("=");
+    if (!key || rest.length === 0) return;
+
+    const value = rest.join("=").trim().replace(/^"|"$/g, "");
+    if (!process.env[key]) {
+      process.env[key] = value;
+    }
+  });
+};
+
+loadEnvForRuntime();
 
 /**
  * @type {import('next').NextConfig}
