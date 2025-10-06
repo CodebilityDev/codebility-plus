@@ -16,13 +16,29 @@ export default function JobListings() {
   const [jobListings, setJobListings] = useState<JobListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<string>("All");
+  const [selectedType, setSelectedType] = useState<string>("All");
+  const [selectedLevel, setSelectedLevel] = useState<string>("All");
   
   const itemsPerPage = 4;
-  const totalPages = Math.ceil(jobListings.length / itemsPerPage);
 
+  // Filter jobs based on selected categories
+  const filteredJobs = jobListings.filter(job => {
+    const categoryMatch = selectedCategory === "All" || job.department === selectedCategory;
+    const typeMatch = selectedType === "All" || job.type === selectedType;
+    const levelMatch = selectedLevel === "All" || job.level === selectedLevel;
+    return categoryMatch && typeMatch && levelMatch;
+  });
+
+  const totalPages = Math.ceil(filteredJobs.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const currentJobs = jobListings.slice(startIndex, endIndex);
+  const currentJobs = filteredJobs.slice(startIndex, endIndex);
+
+  // Get unique categories from job listings
+  const categories = ["All", ...Array.from(new Set(jobListings.map(job => job.department)))];
+  const types = ["All", "Full-time", "Part-time", "Contract", "Internship"];
+  const levels = ["All", "Entry", "Mid", "Senior", "Lead"];
 
   useEffect(() => {
     fetchJobListings();
@@ -64,6 +80,13 @@ export default function JobListings() {
     setSelectedJob(null);
   };
 
+  const handleCategoryChange = (category: string, type: "department" | "type" | "level") => {
+    setCurrentPage(1); // Reset to first page when filter changes
+    if (type === "department") setSelectedCategory(category);
+    if (type === "type") setSelectedType(category);
+    if (type === "level") setSelectedLevel(category);
+  };
+
   const getLevelColor = (level: string) => {
     switch (level) {
       case "Entry":
@@ -95,7 +118,7 @@ export default function JobListings() {
   };
 
   return (
-    <section className="relative py-20 border-y border-gray-800">
+    <section id="open-positions" className="relative py-20 border-y border-gray-800">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-4xl font-light tracking-tight text-white">
@@ -104,6 +127,92 @@ export default function JobListings() {
           <p className="text-lg text-gray-400">
             Join our team and help shape the future of technology
           </p>
+        </div>
+
+        {/* Category Filters */}
+        <div className="mb-8 rounded-lg border border-gray-800 bg-gray-900/30 p-6">
+          <h3 className="mb-4 text-lg font-medium text-white">Filter by Category</h3>
+          <div className="space-y-4">
+            {/* Department Filter */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300">Department</label>
+              <div className="flex flex-wrap gap-2">
+                {categories.map((category) => (
+                  <button
+                    key={category}
+                    onClick={() => handleCategoryChange(category, "department")}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedCategory === category
+                        ? "bg-customViolet-100 text-white"
+                        : "bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-white"
+                    }`}
+                  >
+                    {category}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Job Type Filter */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300">Job Type</label>
+              <div className="flex flex-wrap gap-2">
+                {types.map((type) => (
+                  <button
+                    key={type}
+                    onClick={() => handleCategoryChange(type, "type")}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedType === type
+                        ? "bg-customTeal text-white"
+                        : "bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-white"
+                    }`}
+                  >
+                    {type}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Experience Level Filter */}
+            <div>
+              <label className="mb-2 block text-sm font-medium text-gray-300">Experience Level</label>
+              <div className="flex flex-wrap gap-2">
+                {levels.map((level) => (
+                  <button
+                    key={level}
+                    onClick={() => handleCategoryChange(level, "level")}
+                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                      selectedLevel === level
+                        ? "bg-purple-500 text-white"
+                        : "bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-white"
+                    }`}
+                  >
+                    {level}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* Results Count */}
+            <div className="flex items-center justify-between border-t border-gray-800 pt-4">
+              <span className="text-sm text-gray-400">
+                {filteredJobs.length} position{filteredJobs.length !== 1 ? 's' : ''} found
+              </span>
+              {(selectedCategory !== "All" || selectedType !== "All" || selectedLevel !== "All") && (
+                <button
+                  onClick={() => {
+                    setSelectedCategory("All");
+                    setSelectedType("All");
+                    setSelectedLevel("All");
+                    setCurrentPage(1);
+                  }}
+                  className="text-sm text-customViolet-100 hover:text-customViolet-200 transition-colors"
+                >
+                  Clear all filters
+                </button>
+              )}
+            </div>
+          </div>
         </div>
 
         {loading ? (
@@ -128,6 +237,21 @@ export default function JobListings() {
         ) : jobListings.length === 0 ? (
           <div className="text-center py-12">
             <p className="text-gray-400">No open positions at the moment. Please check back later.</p>
+          </div>
+        ) : filteredJobs.length === 0 ? (
+          <div className="text-center py-12">
+            <p className="text-gray-400">No positions match your current filters. Try adjusting your criteria.</p>
+            <button
+              onClick={() => {
+                setSelectedCategory("All");
+                setSelectedType("All");
+                setSelectedLevel("All");
+                setCurrentPage(1);
+              }}
+              className="mt-4 text-customViolet-100 hover:text-customViolet-200 transition-colors"
+            >
+              Clear all filters
+            </button>
           </div>
         ) : (
           <>
