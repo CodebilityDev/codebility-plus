@@ -9,7 +9,6 @@ import Calendly from "./_components/MarketingCalendly";
 import Footer from "./_components/MarketingFooter";
 import Navigation from "./_components/MarketingNavigation";
 import Testimonials from "./_components/testimonial/Testimonials";
-import CodevLandingHero from "./careers/_components/CodevLandingHero";
 import InternSectionContainer from "./_components/landing/LandingInternSection";
 
 export const dynamic = "force-dynamic";
@@ -23,7 +22,6 @@ export default async function Index() {
       
       <Navigation />
       <Hero />
-      <CodevLandingHero />
       <Features />
       <Parallax />
       <WhyChooseUs />
