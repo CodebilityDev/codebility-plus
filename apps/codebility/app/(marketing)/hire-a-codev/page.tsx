@@ -1,27 +1,23 @@
 import Footer from "../_components/MarketingFooter";
 import Navigation from "../_components/MarketingNavigation";
+import Profiles from "../profiles/page";
 import FeaturedSection from "../_shared/CodevsFeaturedCection";
 import Hero from "./_components/CodevsHero";
 import Project from "./_components/CodevsProject";
-import Roadmap from "./_components/CodevsRoadmap";
-import MissionVision from "./_components/CodevsMissionVision";
-import CTA from "../_shared/CodevsCta";
-import CodevsProfiles from "./_components/CodevsProfiles";
+import HiringProcess from "./_components/HiringProcess";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
-export default function Codevs() {
+export default function HireACodev() {
   return (
     <div className="bg-black-400 relative flex w-full flex-col">
       <Navigation />
       <Hero />
-      <CodevsProfiles />
+      <HiringProcess />
+      <Profiles />
       <FeaturedSection />
       <Project />
-      <Roadmap />
-      <MissionVision />
-      <CTA />
       <Footer />
     </div>
   );

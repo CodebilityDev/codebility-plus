@@ -72,12 +72,17 @@ const EmblaCarousel: React.FC<PropType> = (props) => {
                   alt="Project Image"
                   width={1000}
                   height={500}
-                  
+                  onError={(e) => {
+                    console.error('Failed to load image:', src);
+                    // Replace with fallback image
+                    const target = e.target as HTMLImageElement;
+                    target.src = '/assets/images/index/projects-large.jpg';
+                  }}
                   className={`${
                     index === activeIndex
-                      ? "lg:h-[35rem]"
-                      : "lg:mt-14 lg:h-[25rem] "
-                  } border-black-800 bg-black-600 h-[20rem]  w-full  rounded-lg border object-cover p-4`}
+                      ? "lg:h-[30rem]"
+                      : "lg:mt-10 lg:h-[22rem] "
+                  } border-black-800 bg-black-600 h-[18rem]  w-full  rounded-lg border object-cover p-4`}
                 />
               </div>
             </div>
