@@ -64,10 +64,10 @@ export default async function HomeLayout({
                       <LeftSidebarServer />
                     </ErrorBoundary>
                     <main className="background-lightsection_darksection flex-1 pt-[60px] overflow-y-auto overflow-x-hidden min-h-screen ml-20 lg:ml-20">
-                      <div className="mx-auto h-full max-w-8xl">
+                      <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                         <PageTransitionWrapper>
                           <Suspense fallback={
-                            <div className="mx-auto max-w-screen-xl">
+                            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                               <div className="flex h-64 items-center justify-center">
                                 <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-customBlue-500"></div>
                               </div>
