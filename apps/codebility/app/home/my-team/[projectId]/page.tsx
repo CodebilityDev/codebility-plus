@@ -71,13 +71,13 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
         }
       >
         <div className="mx-auto max-w-screen-xl">
-          <div className="mb-4">
-            <CustomBreadcrumb items={[
-              { label: "My Team", href: "/home/my-team" },
-              { label: project.project.name }
-            ]} />
-          </div>
-          <div className="flex flex-col gap-4 pt-4">
+          <div className="flex flex-col gap-4 pt-6">
+            <div className="mb-2">
+              <CustomBreadcrumb items={[
+                { label: "My Team", href: "/home/my-team" },
+                { label: project.project.name }
+              ]} />
+            </div>
             <H1>{project.project.name} Team</H1>
             <TeamDetailView projectData={projectData} />
           </div>
