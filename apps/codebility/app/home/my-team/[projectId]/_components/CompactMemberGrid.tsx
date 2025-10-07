@@ -25,24 +25,35 @@ interface MemberPoints {
 const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridProps) => {
   const allMembers = teamLead ? [teamLead, ...members] : members;
   const [memberPoints, setMemberPoints] = useState<MemberPoints>({});
-  const [isLoadingPoints, setIsLoadingPoints] = useState(true);
+  const [isLoadingPoints, setIsLoadingPoints] = useState(false); // Start as false, load on demand
   const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ uniqueCodevIdsPresentDays: { codevId: string; presentDays: number }[]; }>({ uniqueCodevIdsPresentDays: [] });
 
-  // Load points for all members
-  useEffect(() => {
-    const loadAllPoints = async () => {
-      setIsLoadingPoints(true);
-      const pointsData: MemberPoints = {};
+  // Load points for all members - made more efficient and optional
+  const loadAllPoints = async () => {
+    if (isLoadingPoints) return; // Prevent multiple simultaneous calls
+    
+    setIsLoadingPoints(true);
+    const pointsData: MemberPoints = {};
 
-      try {
-        const pointsPromises = allMembers.map(async (member) => {
-          const response = await fetch(`/api/codev/${member.id}/points`);
-          const data = await response.json();
-          return { memberId: member.id, data };
+    try {
+      // Load points in smaller batches to improve perceived performance
+      const batchSize = 3;
+      for (let i = 0; i < allMembers.length; i += batchSize) {
+        const batch = allMembers.slice(i, i + batchSize);
+        const pointsPromises = batch.map(async (member) => {
+          try {
+            const response = await fetch(`/api/codev/${member.id}/points`);
+            if (!response.ok) throw new Error('Failed to fetch');
+            const data = await response.json();
+            return { memberId: member.id, data };
+          } catch (error) {
+            console.warn(`Failed to load points for ${member.id}:`, error);
+            return { memberId: member.id, data: { totalPoints: 0, attendancePoints: 0 } };
+          }
         });
 
         const results = await Promise.all(pointsPromises);
-
+        
         results.forEach(({ memberId, data }) => {
           pointsData[memberId] = {
             totalPoints: data.totalPoints || 0,
@@ -50,18 +61,15 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
           };
         });
 
-        setMemberPoints(pointsData);
-      } catch (error) {
-        console.error("Error loading points:", error);
-      } finally {
-        setIsLoadingPoints(false);
+        // Update state after each batch for progressive loading
+        setMemberPoints(prev => ({ ...prev, ...pointsData }));
       }
-    };
-
-    if (allMembers.length > 0) {
-      loadAllPoints();
+    } catch (error) {
+      console.error("Error loading points:", error);
+    } finally {
+      setIsLoadingPoints(false);
     }
-  }, [allMembers.length]);
+  };
 
   useEffect(() => {
     const loadAttendancePoints = async () => {
@@ -73,7 +81,6 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
       );
 
       if (result.success) {
-        // console.log("Monthly attendance points:", result);
         setMonthlyAttendancePoints({
           uniqueCodevIdsPresentDays: result.uniqueCodevIdsPresentDays || []
         });
@@ -85,17 +92,43 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
 
 
 
-  return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-      {allMembers.map((member) => {
-        const isLead = teamLead?.id === member.id;
-        const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
+  const hasPointsData = Object.keys(memberPoints).length > 0;
+  const showLoadPointsButton = !hasPointsData && !isLoadingPoints && allMembers.length > 0;
 
-        return (
-          <div
-            key={member.id}
-            className="relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 overflow-hidden"
+  return (
+    <div className="space-y-4">
+      {/* Load Points Button */}
+      {showLoadPointsButton && (
+        <div className="flex justify-center">
+          <button
+            onClick={loadAllPoints}
+            className="px-4 py-2 text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-blue-700 transition-colors"
           >
+            <Trophy className="h-4 w-4 inline mr-2" />
+            Load Member Points & Stats
+          </button>
+        </div>
+      )}
+
+      {/* Loading indicator */}
+      {isLoadingPoints && (
+        <div className="flex items-center justify-center py-4 text-sm text-gray-500">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
+          Loading member statistics...
+        </div>
+      )}
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {allMembers.map((member) => {
+          const isLead = teamLead?.id === member.id;
+          const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
+          const memberHasPoints = memberPoints[member.id];
+
+          return (
+            <div
+              key={member.id}
+              className="relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 overflow-hidden"
+            >
             {/* Status indicator */}
             <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-green-500" title="Active" />
 
@@ -147,28 +180,32 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
             </div>
 
             {/* Points and Attendance summary */}
-            <div className="mt-3 border-t border-gray-100 pt-2 dark:border-gray-700">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-xs">
-                  <Trophy className="h-3 w-3 text-yellow-500" />
-                  <span className="text-gray-500">Total Points:</span>
-                  <span className="font-semibold text-gray-900 dark:text-white">
-                    {memberPoints[member.id]?.totalPoints || 0}
-                  </span>
+            {(memberHasPoints || hasPointsData) && (
+              <div className="mt-3 border-t border-gray-100 pt-2 dark:border-gray-700">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-xs">
+                    <Trophy className="h-3 w-3 text-yellow-500" />
+                    <span className="text-gray-500">Total Points:</span>
+                    {memberHasPoints ? (
+                      <span className="font-semibold text-gray-900 dark:text-white">
+                        {memberPoints[member.id].totalPoints}
+                      </span>
+                    ) : (
+                      <div className="w-8 h-3 bg-gray-200 animate-pulse rounded"></div>
+                    )}
+                  </div>
+                  <div className="text-xs">
+                    <span className="text-gray-500">Attendance:</span>
+                    <span className="ml-1 font-medium text-green-600 dark:text-green-400">
+                      +{(() => {
+                        const found = monthlyAttendancePoints.uniqueCodevIdsPresentDays.find(
+                          item => item.codevId === member.id
+                        );
+                        return found ? found.presentDays * ATTENDANCE_POINTS_PER_DAY : 0;
+                      })()}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-xs">
-                  <span className="text-gray-500">Attendance:</span>
-                  <span className="ml-1 font-medium text-green-600 dark:text-green-400">
-                    +{(() => {
-                      const found = monthlyAttendancePoints.uniqueCodevIdsPresentDays.find(
-                        item => item.codevId === member.id
-                      );
-                      return found ? found.presentDays * ATTENDANCE_POINTS_PER_DAY : 0;
-                    })()}
-                  </span>
-                </div>
-              </div>
-              {!isLoadingPoints && (
                 <div className="mt-1 flex items-center gap-2 text-xs text-gray-500">
                   <span>This month: </span>
                   <span className="font-medium text-green-600 dark:text-green-400">
@@ -178,11 +215,12 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
                   </span>
                   <span>present</span>
                 </div>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         );
       })}
+      </div>
     </div>
   );
 };

@@ -67,7 +67,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     loadSchedule();
   }, [projectInfo.id]);
 
-  // Load monthly attendance points
+  // Load monthly attendance points only when needed
   useEffect(() => {
     const loadAttendancePoints = async () => {
       const currentDate = new Date();
@@ -77,7 +77,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         currentDate.getMonth()
       );
 
-      
       if (result.success) {
         setMonthlyAttendancePoints({
           totalPoints: result.totalPoints,
@@ -86,9 +85,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       }
     };
     
-    loadAttendancePoints();
-    
-    // Refresh when view mode changes to/from attendance
+    // Only load on initial mount or when switching to team view
     if (viewMode === 'team') {
       loadAttendancePoints();
     }
