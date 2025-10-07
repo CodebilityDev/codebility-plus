@@ -22,7 +22,7 @@ const Hero = () => {
       <section className="relative flex min-h-[90vh] w-full flex-col items-center justify-center overflow-hidden text-white">
         <SideNavMenu />
 
-        <Container className="relative z-10 flex w-full max-w-[1400px] flex-col gap-20 px-6 py-20 md:px-10 md:py-24 lg:flex-row lg:items-center lg:gap-28 lg:pl-[13rem] xl:pl-[16rem]">
+        <Container className="relative z-10 flex w-full max-w-[1400px] flex-col gap-20 px-8 py-20 md:px-12 md:py-24 lg:flex-row lg:items-center lg:gap-20 lg:px-16">
           <div className="flex w-full flex-col items-center gap-12 text-center lg:w-[58%] lg:items-start lg:text-left">
             <div className="flex flex-col gap-6">
               <span className="inline-flex items-center gap-2 self-center rounded-full border border-purple-300/30 bg-purple-500/10 px-4 py-1 text-xs font-semibold uppercase tracking-[0.3em] text-purple-100 md:self-start">
@@ -69,7 +69,7 @@ const Hero = () => {
           </div>
 
           <div className="relative flex w-full max-w-[520px] flex-col gap-8 self-center lg:w-[45%] lg:self-start">
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-8">
+            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-10">
               {MarketingCardData.slice(0, 4).map((data, index) => (
                 <HeroCard
                   key={index}

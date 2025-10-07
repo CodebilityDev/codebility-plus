@@ -29,7 +29,7 @@ const SideNavMenu = () => {
 
   return (
     <div className="fixed left-0 top-20 z-50 hidden w-60 flex-col gap-4 ps-5 pt-24 text-sm lg:flex xl:text-base">
-      <ScrollToHash />
+      {/* <ScrollToHash /> */}
       {links.map((link, index) => (
         <Link
           key={index}
