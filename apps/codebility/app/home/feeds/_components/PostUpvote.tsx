@@ -7,6 +7,7 @@ import { ArrowBigUp } from "lucide-react";
 
 import {
   AddPostUpvote,
+  countUpvotes,
   hasUserUpvoted,
   removePostUpvote,
 } from "../_services/action";
@@ -21,7 +22,7 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
   const { addSocialPoints } = useAddSocialPoints();
 
   const [isUpvoted, setIsUpvoted] = useState(false);
-  const [upvotes, setUpvotes] = useState(post.upvoters_id?.length || 0);
+  const [upvotes, setUpvotes] = useState(0);
 
   useEffect(() => {
     const checkUpvote = async () => {
@@ -36,8 +37,16 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
       } else {
         setIsUpvoted(false);
       }
-    };
 
+      if (post?.id) {
+        try {
+          const upvotesCount = await countUpvotes(post.id);
+          setUpvotes(upvotesCount);
+        } catch (error) {
+          console.error("Error counting upvotes:", error);
+        }
+      }
+    };
     checkUpvote();
   }, [user?.id, post?.id]);
 
@@ -47,16 +56,15 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
       e.preventDefault();
 
       if (!isUpvoted) {
-        AddPostUpvote(post.id, user.id);
+        const postUpvote = await AddPostUpvote(post.id, user.id);
+        //Add social points to author
+        await addSocialPoints(post?.author_id?.id, "2", postUpvote.id);
       } else {
         removePostUpvote(post.id, user.id);
       }
 
       setIsUpvoted((prev) => !prev);
       setUpvotes((prev) => prev + (isUpvoted ? -1 : 1));
-
-      //Add social points to author
-      await addSocialPoints(post?.author_id?.id, "2");
     }
   };
 
