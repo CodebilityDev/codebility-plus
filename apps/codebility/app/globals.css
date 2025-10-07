@@ -17,6 +17,24 @@
     @apply flex items-center justify-start;
   }
 
+  .no-horizontal-scroll {
+    overflow-x: hidden;
+  }
+
+  /* 3D perspective utilities */
+  .perspective-1000 {
+    perspective: 1000px;
+  }
+
+  .preserve-3d {
+    transform-style: preserve-3d;
+  }
+
+  .transform-gpu {
+    transform: translateZ(0);
+    backface-visibility: hidden;
+  }
+
   .card-wrapper {
     @apply dark:dark-gradient bg-light-900 shadow-light-100 dark:shadow-dark-100;
   }
@@ -179,8 +197,13 @@
   );
 }
 
+html {
+  overflow-x: hidden;
+}
+
 body {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 /* Scroll bar */
