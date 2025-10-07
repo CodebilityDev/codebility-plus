@@ -9,7 +9,7 @@ import Feed from "./_components/Feed";
 import { getUserRole } from "./_services/action";
 
 export default function FeedsPage() {
-  const [isMentor, setIsMentor] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const { user } = useUserStore();
 
@@ -17,7 +17,7 @@ export default function FeedsPage() {
     const fetchRole = async () => {
       if (!user) return;
       const role = await getUserRole(user.role_id ?? null);
-      setIsMentor(role === "Mentor" || role === "Admin");
+      setIsAdmin(role === "Admin");
     };
 
     if (user) {
@@ -37,12 +37,10 @@ export default function FeedsPage() {
             Codebility community.
           </p>
         </div>
-        {isMentor && (
-          <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
-            Create Post
-          </Button>
-        )}
-        <Feed isMentor={isMentor} />
+        <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
+          Create Post
+        </Button>
+        <Feed isAdmin={isAdmin} />
       </div>
 
       <CreatePostModal isOpen={isModalOpen} onClose={closeModal} />
