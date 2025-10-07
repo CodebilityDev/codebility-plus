@@ -8,7 +8,6 @@ import { JobListing } from "../_types/job-listings";
 import JobApplicationModal from "./JobApplicationModal";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
-import Image from "next/image";
 
 export default function JobListings() {
   const [currentPage, setCurrentPage] = useState(1);
@@ -122,22 +121,6 @@ export default function JobListings() {
     <section id="open-positions" className="relative py-20 border-y border-gray-800">
       <div className="mx-auto max-w-7xl px-6">
         <div className="mb-12 text-center">
-          <div className="relative mb-8 flex justify-center">
-            <div className="relative overflow-hidden rounded-lg">
-              <Image
-                src="/assets/images/index/man-sitting.jpg"
-                alt="Professional developer working at desk - Join our team"
-                width={400}
-                height={300}
-                className="rounded-lg object-cover"
-                priority
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-              <div className="absolute bottom-4 left-4 text-white">
-                <p className="text-sm font-medium">Your Next Career Move</p>
-              </div>
-            </div>
-          </div>
           <h2 className="mb-4 text-4xl font-light tracking-tight text-white">
             Open Positions
           </h2>
