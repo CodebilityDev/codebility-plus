@@ -21,20 +21,24 @@ export default async function InHousePage() {
   // Check for errors or missing data
   if (error || !data) {
     return (
-      <PageContainer>
-        <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
-          <div className="mb-4 text-4xl">⚠️</div>
-          <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">Error fetching in-house data</h3>
-          <p className="text-gray-600 dark:text-gray-400">Failed to load the in-house team members.</p>
+      <div className="mx-auto max-w-screen-xl">
+        <div className="flex flex-col gap-4 pt-4">
+          <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+            <div className="mb-4 text-4xl">⚠️</div>
+            <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">Error fetching in-house data</h3>
+            <p className="text-gray-600 dark:text-gray-400">Failed to load the in-house team members.</p>
+          </div>
         </div>
-      </PageContainer>
+      </div>
     );
   }
 
   // Pass the fully prepared data to the view
   return (
-    <PageContainer maxWidth="full">
-      <InHouseView initialData={data} />
-    </PageContainer>
+    <div className="mx-auto max-w-screen-xl">
+      <div className="flex flex-col gap-4 pt-4">
+        <InHouseView initialData={data} />
+      </div>
+    </div>
   );
 }

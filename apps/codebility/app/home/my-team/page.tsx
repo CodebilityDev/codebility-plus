@@ -95,12 +95,12 @@ async function TeamData() {
 
 export default function MyTeamPage() {
   return (
-    <div className="min-h-screen bg-white dark:bg-gray-950">
-      <div className="mx-auto max-w-6xl px-6 py-16">
+    <div className="mx-auto max-w-screen-xl">
+      <div className="flex flex-col gap-4 pt-4">
         {/* Header - Always visible */}
-        <div className="mb-20 text-center">
+        <div className="mb-12 text-center">
           <div className="mb-6">
-            <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
+            <h1 className="text-4xl font-light tracking-tight text-gray-900 dark:text-white">
               My Team
             </h1>
             <div className="mx-auto mt-6 h-px w-32 bg-gradient-to-r from-transparent via-customBlue-400 to-transparent"></div>

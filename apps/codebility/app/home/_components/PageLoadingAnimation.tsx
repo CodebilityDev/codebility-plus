@@ -61,7 +61,7 @@ export default function PageLoadingAnimation() {
       <motion.div
         className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-transparent via-customBlue-500 to-transparent opacity-80"
         animate={{
-          y: [0, window.innerHeight || 800],
+          y: [0, 800],
         }}
         transition={{
           duration: 6,
