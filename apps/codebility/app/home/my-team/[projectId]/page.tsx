@@ -70,17 +70,17 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
           </div>
         }
       >
-        <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+        <div className="mx-auto max-w-screen-xl">
           <div className="mb-4">
             <CustomBreadcrumb items={[
               { label: "My Team", href: "/home/my-team" },
               { label: project.project.name }
             ]} />
           </div>
-          <div className="flex flex-row justify-between gap-4">
+          <div className="flex flex-col gap-4 pt-4">
             <H1>{project.project.name} Team</H1>
+            <TeamDetailView projectData={projectData} />
           </div>
-          <TeamDetailView projectData={projectData} />
         </div>
       </AsyncErrorBoundary>
     );
@@ -89,7 +89,7 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
     console.error('TeamDetailPage error:', error);
     
     return (
-      <div className="mx-auto flex max-w-screen-2xl flex-col gap-4 px-4 py-4 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-screen-xl">
         <H1>Team Details</H1>
         <div className="flex flex-col items-center justify-center gap-4 py-8">
           <div className="text-4xl">⚠️</div>
