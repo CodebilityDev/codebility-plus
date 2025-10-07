@@ -26,7 +26,7 @@ export default function PageContainer({
 
   return (
     <div className={cn(
-      "min-h-screen bg-white dark:bg-gray-950",
+      "min-h-screen background-lightsection_darksection",
       className
     )}>
       <div className={cn(

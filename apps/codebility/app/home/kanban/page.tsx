@@ -254,22 +254,23 @@ export default async function KanbanPage(props: PageProps) {
 
   // Render the full page
   return (
-    <PageContainer>
-      <AsyncErrorBoundary
-        fallback={
-          <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
-            <div className="mb-4 text-4xl">📋</div>
-            <h2 className="mb-2 text-xl font-semibold">
-              Unable to load Kanban boards
-            </h2>
-            <p className="text-gray-600 dark:text-gray-400">
-              There was an issue loading your Kanban boards. Please try refreshing
-              the page.
-            </p>
-          </div>
-        }
-      >
-        <div className="flex flex-col gap-6">
+    <div className="mx-auto max-w-screen-xl">
+      <div className="flex flex-col gap-4 pt-4">
+        <AsyncErrorBoundary
+          fallback={
+            <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
+              <div className="mb-4 text-4xl">📋</div>
+              <h2 className="mb-2 text-xl font-semibold">
+                Unable to load Kanban boards
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400">
+                There was an issue loading your Kanban boards. Please try refreshing
+                the page.
+              </p>
+            </div>
+          }
+        >
+          <div className="flex flex-col gap-6">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-3">
             <div className="from-customBlue-500 flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br to-purple-500 shadow-lg">
@@ -315,8 +316,9 @@ export default async function KanbanPage(props: PageProps) {
             </TableBody>
           </Table>
         </div>
+          </div>
+        </AsyncErrorBoundary>
       </div>
-      </AsyncErrorBoundary>
-    </PageContainer>
+    </div>
   );
 }
