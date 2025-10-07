@@ -343,108 +343,133 @@ export default function WeeklyTop() {
             <span>Top Performers</span>
           </div>
         </div>
-        <div className="flex gap-4">
-          <Select
-            value={timePeriod}
-            onValueChange={(value: TimePeriod) => setTimePeriod(value)}
-          >
-            <SelectTrigger className="w-[120px]">
-              <SelectValue placeholder="Time period" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Time</SelectItem>
-              <SelectItem value="weekly">Weekly</SelectItem>
-              <SelectItem value="monthly">Monthly</SelectItem>
-            </SelectContent>
-          </Select>
-          <Tabs
-            value={selectedCategory}
-            onValueChange={setSelectedCategory}
-            className="w-fit"
-          >
-            <TabsList className={`grid h-10 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg`} style={{gridTemplateColumns: `repeat(${allCategories.length}, minmax(0, 1fr))`}}>
-              {allCategories.map((category) => {
-                const getCategoryStyle = () => {
-                  if (selectedCategory !== category) return "";
-                  
-                  switch (category) {
-                    case "Frontend Developer":
-                      return "data-[state=active]:bg-customBlue-600 data-[state=active]:text-white";
-                    case "Backend Developer":
-                      return "data-[state=active]:bg-green-600 data-[state=active]:text-white";
-                    case "UI/UX Designer":
-                      return "data-[state=active]:bg-purple-600 data-[state=active]:text-white";
-                    case "Mobile Developer":
-                      return "data-[state=active]:bg-orange-600 data-[state=active]:text-white";
-                    case "QA Engineer":
-                      return "data-[state=active]:bg-indigo-600 data-[state=active]:text-white";
-                    case "Soft Skills":
-                      return "data-[state=active]:bg-pink-600 data-[state=active]:text-white";
-                    default:
-                      return "data-[state=active]:bg-gray-600 data-[state=active]:text-white";
-                  }
-                };
+        {allCategories.length > 0 && (
+          <div className="flex gap-4">
+            <Select
+              value={timePeriod}
+              onValueChange={(value: TimePeriod) => setTimePeriod(value)}
+            >
+              <SelectTrigger className="w-[120px]">
+                <SelectValue placeholder="Time period" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Time</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="monthly">Monthly</SelectItem>
+              </SelectContent>
+            </Select>
+            <Tabs
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+              className="w-fit"
+            >
+              <TabsList className={`grid h-10 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg`} style={{gridTemplateColumns: `repeat(${allCategories.length}, minmax(0, 1fr))`}}>
+                {allCategories.map((category) => {
+                  const getCategoryStyle = () => {
+                    if (selectedCategory !== category) return "";
+                    
+                    switch (category) {
+                      case "Frontend Developer":
+                        return "data-[state=active]:bg-customBlue-600 data-[state=active]:text-white";
+                      case "Backend Developer":
+                        return "data-[state=active]:bg-green-600 data-[state=active]:text-white";
+                      case "UI/UX Designer":
+                        return "data-[state=active]:bg-purple-600 data-[state=active]:text-white";
+                      case "Mobile Developer":
+                        return "data-[state=active]:bg-orange-600 data-[state=active]:text-white";
+                      case "QA Engineer":
+                        return "data-[state=active]:bg-indigo-600 data-[state=active]:text-white";
+                      case "Soft Skills":
+                        return "data-[state=active]:bg-pink-600 data-[state=active]:text-white";
+                      default:
+                        return "data-[state=active]:bg-gray-600 data-[state=active]:text-white";
+                    }
+                  };
 
-                return (
-                  <TabsTrigger
-                    key={category}
-                    value={category}
-                    className={`px-3 rounded-md font-medium transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 ${getCategoryStyle()}`}
-                    title={category}
-                  >
-                    {getCategoryInitial(category)}
-                  </TabsTrigger>
-                );
-              })}
-            </TabsList>
-          </Tabs>
-        </div>
+                  return (
+                    <TabsTrigger
+                      key={category}
+                      value={category}
+                      className={`px-3 rounded-md font-medium transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 ${getCategoryStyle()}`}
+                      title={category}
+                    >
+                      {getCategoryInitial(category)}
+                    </TabsTrigger>
+                  );
+                })}
+              </TabsList>
+            </Tabs>
+          </div>
+        )}
 
-        {selectedCategory && (
-          <>
-            {isLoading ? (
-              <LoadingTable />
-            ) : (
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-lg">
-                <Table>
-                  <TableHeader className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900">
-                    <TableRow className="border-0">
-                      <TableHead className="text-white font-semibold">
-                        <div className="flex items-center gap-2">
-                          <Trophy className="h-4 w-4" />
-                          Rank
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-white font-semibold">
-                        <div className="flex items-center gap-2">
-                          {selectedCategory === "Soft Skills" ? (
-                            <>
-                              <Heart className="h-4 w-4" />
-                              Codev
-                            </>
-                          ) : (
-                            <>
-                              <Star className="h-4 w-4" />
-                              Developer
-                            </>
-                          )}
-                        </div>
-                      </TableHead>
-                      <TableHead className="text-white font-semibold">
-                        <div className="flex items-center gap-2">
-                          <Zap className="h-4 w-4" />
-                          Points
-                        </div>
-                      </TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody className="bg-white dark:bg-gray-950">
-                    {generateTableRows(selectedCategory)}
-                  </TableBody>
-                </Table>
+        {/* Always show content, even if no categories */}
+        {allCategories.length > 0 ? (
+          selectedCategory && (
+            <>
+              {isLoading ? (
+                <LoadingTable />
+              ) : (
+                <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-lg">
+                  <Table>
+                    <TableHeader className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900">
+                      <TableRow className="border-0">
+                        <TableHead className="text-white font-semibold">
+                          <div className="flex items-center gap-2">
+                            <Trophy className="h-4 w-4" />
+                            Rank
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-white font-semibold">
+                          <div className="flex items-center gap-2">
+                            {selectedCategory === "Soft Skills" ? (
+                              <>
+                                <Heart className="h-4 w-4" />
+                                Codev
+                              </>
+                            ) : (
+                              <>
+                                <Star className="h-4 w-4" />
+                                Developer
+                              </>
+                            )}
+                          </div>
+                        </TableHead>
+                        <TableHead className="text-white font-semibold">
+                          <div className="flex items-center gap-2">
+                            <Zap className="h-4 w-4" />
+                            Points
+                          </div>
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody className="bg-white dark:bg-gray-950">
+                      {generateTableRows(selectedCategory)}
+                    </TableBody>
+                  </Table>
+                </div>
+              )}
+            </>
+          )
+        ) : (
+          // Show message when no categories are available
+          <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
+            <div className="flex flex-col items-center gap-4">
+              <div className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <Trophy className="h-8 w-8 text-gray-400" />
               </div>
-            )}
-          </>
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
+                  Leaderboard Coming Soon!
+                </h3>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
+                  Categories are being set up. Check back soon to see the rankings!
+                </p>
+                <div className="text-xs text-gray-400">
+                  {!supabase ? "Connecting to database..." : "Loading categories..."}
+                </div>
+              </div>
+            </div>
+          </div>
         )}
       </div>
     </Box>
