@@ -51,7 +51,7 @@ const WORK_WITH_US_CARDS = [
     id: "careers",
     title: "Career Opportunities",
     image: {
-      src: "/assets/images/index/man-sitting.jpg",
+      src: "/assets/images/services/black-and-purple-abstract.png",
       alt: "career opportunities and job openings04",
     },
     description:
