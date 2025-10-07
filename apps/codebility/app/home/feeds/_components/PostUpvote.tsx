@@ -1,11 +1,13 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAddSocialPoints } from "@/hooks/useAddSocialPoints";
 import { useUserStore } from "@/store/codev-store";
 import { ArrowBigUp } from "lucide-react";
 
 import {
   AddPostUpvote,
+  countUpvotes,
   hasUserUpvoted,
   removePostUpvote,
 } from "../_services/action";
@@ -17,9 +19,10 @@ interface PostUpvoteProps {
 
 export default function PostUpvote({ post }: PostUpvoteProps) {
   const { user } = useUserStore();
+  const { addSocialPoints } = useAddSocialPoints();
 
   const [isUpvoted, setIsUpvoted] = useState(false);
-  const [upvotes, setUpvotes] = useState(post.upvoters_id?.length || 0);
+  const [upvotes, setUpvotes] = useState(0);
 
   useEffect(() => {
     const checkUpvote = async () => {
@@ -34,18 +37,28 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
       } else {
         setIsUpvoted(false);
       }
-    };
 
+      if (post?.id) {
+        try {
+          const upvotesCount = await countUpvotes(post.id);
+          setUpvotes(upvotesCount);
+        } catch (error) {
+          console.error("Error counting upvotes:", error);
+        }
+      }
+    };
     checkUpvote();
   }, [user?.id, post?.id]);
 
-  const handleUpvote = (e: React.MouseEvent) => {
+  const handleUpvote = async (e: React.MouseEvent) => {
     if (user) {
       e.stopPropagation();
       e.preventDefault();
 
       if (!isUpvoted) {
-        AddPostUpvote(post.id, user.id);
+        const postUpvote = await AddPostUpvote(post.id, user.id);
+        //Add social points to author
+        await addSocialPoints(post?.author_id?.id, "2", postUpvote.id);
       } else {
         removePostUpvote(post.id, user.id);
       }
