@@ -14,7 +14,7 @@ export function useAddSocialPoints() {
   }, []);
 
   const addSocialPoints = useCallback(
-    async (codevId: string | undefined, categoryId: string) => {
+    async (codevId: string | undefined, categoryId: string, postUpvoteId?: string) => {
       if (!supabase) return null;
 
       try {
@@ -39,6 +39,7 @@ export function useAddSocialPoints() {
               codev_id: codevId,
               category_id: categoryId,
               points: category.points,
+              ...(postUpvoteId && { post_upvote_id: postUpvoteId }),
             },
           ])
           .select()
