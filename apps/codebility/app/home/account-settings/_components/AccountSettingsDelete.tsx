@@ -192,42 +192,44 @@ export default function AccountSettingsDelete() {
                     your account and remove your data from our servers.
                   </DialogDescription>
                 </DialogHeader>
-                <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-                  <FormField
-                    control={form.control}
-                    name="confirmation"
-                    render={({ field }) => (
-                      <FormItem>
-                        <FormControl>
-                          <Input
-                            placeholder="Type DELETE to confirm"
-                            labelClassName="sm:text-base text-sm"
-                            label="To confirm, type DELETE in the box below:"
-                            parentClassName="flex flex-col gap-2"
-                            variant="lightgray"
-                            disabled={isLoading}
-                            {...field}
-                          />
-                        </FormControl>
-                        <FormMessage className="text-red-600" />
-                      </FormItem>
-                    )}
-                  />
-                  <DialogFooter className="mt-4 gap-2">
-                    <DialogClose asChild>
-                      <Button variant="outline" disabled={isLoading}>
-                        Cancel
+                <Form {...form}>
+                  <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+                    <FormField
+                      control={form.control}
+                      name="confirmation"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Input
+                              placeholder="Type DELETE to confirm"
+                              labelClassName="sm:text-base text-sm"
+                              label="To confirm, type DELETE in the box below:"
+                              parentClassName="flex flex-col gap-2"
+                              variant="lightgray"
+                              disabled={isLoading}
+                              {...field}
+                            />
+                          </FormControl>
+                          <FormMessage className="text-red-600" />
+                        </FormItem>
+                      )}
+                    />
+                    <DialogFooter className="mt-4 gap-2">
+                      <DialogClose asChild>
+                        <Button variant="outline" disabled={isLoading}>
+                          Cancel
+                        </Button>
+                      </DialogClose>
+                      <Button
+                        variant="destructive"
+                        type="submit"
+                        disabled={!form.formState.isValid || isLoading}
+                      >
+                        {isLoading ? "Deleting..." : "Delete Account"}
                       </Button>
-                    </DialogClose>
-                    <Button
-                      variant="destructive"
-                      type="submit"
-                      disabled={!form.formState.isValid || isLoading}
-                    >
-                      {isLoading ? "Deleting..." : "Delete Account"}
-                    </Button>
-                  </DialogFooter>
-                </form>
+                    </DialogFooter>
+                  </form>
+                </Form>
               </DialogContent>
             </Dialog>
           

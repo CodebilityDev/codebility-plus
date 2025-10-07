@@ -3,6 +3,7 @@
 import { useEffect, useState, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
+import { useNavStore } from "@/hooks/use-sidebar";
 import PageLoadingAnimation from "./PageLoadingAnimation";
 
 interface PageTransitionWrapperProps {
@@ -11,10 +12,11 @@ interface PageTransitionWrapperProps {
 
 export default function PageTransitionWrapper({ children }: PageTransitionWrapperProps) {
   const pathname = usePathname();
+  const { isToggleOpen } = useNavStore();
   const [isLoading, setIsLoading] = useState(true);
   const [displayedPathname, setDisplayedPathname] = useState(pathname);
   const [animationEnabled, setAnimationEnabled] = useState(true);
-  const [animationDuration, setAnimationDuration] = useState(800);
+  const [animationDuration, setAnimationDuration] = useState(3000);
 
   // Load user preferences
   useEffect(() => {
@@ -67,7 +69,7 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
   }, [pathname, displayedPathname, animationEnabled, animationDuration]);
 
   return (
-    <div className="relative min-h-[400px]">
+    <div className="relative min-h-screen">
       <AnimatePresence mode="wait">
         {isLoading && (
           <motion.div
@@ -77,7 +79,11 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
               opacity: 0,
               transition: { duration: 0.3, ease: "easeOut" }
             }}
-            className="absolute inset-0"
+            className="fixed top-0 right-0 bottom-0 z-50"
+            style={{
+              left: isToggleOpen ? "16rem" : "5rem", // Dynamic sidebar width
+              width: isToggleOpen ? "calc(100vw - 16rem)" : "calc(100vw - 5rem)"
+            }}
           >
             <PageLoadingAnimation />
           </motion.div>
@@ -95,6 +101,7 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
           delay: isLoading ? 0 : 0.2,
           ease: "easeOut"
         }}
+        className={isLoading ? "invisible" : "visible"}
       >
         {children}
       </motion.div>

@@ -51,9 +51,14 @@ const LeftSidebarClient = ({ initialSidebarData }: LeftSidebarClientProps) => {
       initial={false}
       animate={isToggleOpen ? "open" : "closed"}
       variants={sidebarVariants}
-      className="sticky left-0 top-0 z-40 hidden h-screen flex-col gap-8 overflow-hidden p-1 bg-white/80 dark:bg-gray-950/90 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-800/50 lg:flex"
+      className="fixed left-0 top-0 z-40 hidden h-screen flex-col gap-8 overflow-hidden p-1 bg-white/80 dark:bg-gray-950/90 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-800/50 lg:flex flex-shrink-0"
       role="complementary"
       aria-label="Main navigation sidebar"
+      style={{ 
+        minWidth: isToggleOpen ? "16rem" : "5rem",
+        maxWidth: isToggleOpen ? "16rem" : "5rem",
+        width: isToggleOpen ? "16rem" : "5rem"
+      }}
     >
       {/* Logo and Toggle Button */}
       <div className="flex items-center justify-center px-4 pt-2">

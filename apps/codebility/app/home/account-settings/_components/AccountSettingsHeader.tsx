@@ -14,11 +14,11 @@ export default function AccountSettingsHeader({
 }) {
   return (
     <>
-      <CardHeader className="px-0 sm:p-6">
-        <CardTitle className="flex items-center text-sm sm:text-2xl">
-          <Lock className="mr-2" /> Account Security
+      <CardHeader className="px-0 py-2">
+        <CardTitle className="flex items-center text-lg">
+          <Lock className="mr-2 h-4 w-4" /> Account Security
         </CardTitle>
-        <CardDescription className="text-xs sm:text-sm">
+        <CardDescription className="text-xs">
           Manage your account credentials and security settings.
         </CardDescription>
       </CardHeader>
@@ -26,9 +26,10 @@ export default function AccountSettingsHeader({
         <Input
           readOnly
           label="Email Address"
-          parentClassName="flex justify-center flex-col gap-2 w-full"
+          parentClassName="flex justify-center flex-col gap-1 w-full"
           variant="lightgray"
           defaultValue={email}
+          className="text-sm"
         />
         <AccountSettingsDialog />
       </div>
