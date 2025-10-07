@@ -9,19 +9,65 @@ export const revalidate = 300;
 // Loading component for team data
 function TeamDataSkeleton() {
   return (
-    <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
-      {[1, 2, 3].map((i) => (
-        <div key={i} className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-          <div className="space-y-4">
-            <div className="h-6 w-32 bg-gray-200 dark:bg-gray-800 rounded"></div>
+    <>
+      {/* Stats skeleton */}
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="animate-pulse rounded-xl bg-gray-100 p-4 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
             <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-gray-200 dark:bg-gray-800 rounded-full"></div>
-              <div className="h-5 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
+              <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+              <div className="space-y-2">
+                <div className="h-6 w-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+              </div>
             </div>
           </div>
-        </div>
-      ))}
-    </div>
+        ))}
+      </div>
+      
+      {/* Cards skeleton */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-3">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+            <div className="space-y-6">
+              {/* Header */}
+              <div className="flex items-start justify-between">
+                <div className="space-y-3 flex-1">
+                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                  <div className="h-6 w-40 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                  <div className="h-4 w-32 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                </div>
+                <div className="h-8 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
+              </div>
+              
+              {/* Team lead */}
+              <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-800/50">
+                <div className="flex items-center gap-4">
+                  <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                  <div className="space-y-2">
+                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                    <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  </div>
+                </div>
+              </div>
+              
+              {/* Members */}
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                  <div className="h-4 w-16 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                </div>
+                <div className="flex gap-2">
+                  {[1, 2, 3, 4].map((j) => (
+                    <div key={j} className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </>
   );
 }
 
@@ -100,13 +146,20 @@ export default function MyTeamPage() {
         {/* Header - Always visible */}
         <div className="mb-12 text-center">
           <div className="mb-6">
-            <h1 className="text-4xl font-light tracking-tight text-gray-900 dark:text-white">
-              My Team
+            <div className="flex items-center justify-center gap-3 mb-4">
+              <div className="rounded-full bg-gradient-to-r from-blue-500 to-purple-600 p-3">
+                <svg className="h-6 w-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+              </div>
+            </div>
+            <h1 className="text-4xl font-bold bg-gradient-to-r from-gray-900 via-blue-800 to-purple-800 bg-clip-text text-transparent dark:from-white dark:via-blue-200 dark:to-purple-200">
+              My Teams
             </h1>
-            <div className="mx-auto mt-6 h-px w-32 bg-gradient-to-r from-transparent via-customBlue-400 to-transparent"></div>
+            <div className="mx-auto mt-6 h-px w-32 bg-gradient-to-r from-transparent via-blue-500 to-transparent"></div>
           </div>
-          <p className="mx-auto max-w-3xl text-lg font-light text-gray-600 dark:text-gray-300">
-            Connect and collaborate with your project team members
+          <p className="mx-auto max-w-3xl text-lg text-gray-600 dark:text-gray-300">
+            Manage and collaborate with your project teams. View team members, track progress, and strengthen connections.
           </p>
         </div>
         
