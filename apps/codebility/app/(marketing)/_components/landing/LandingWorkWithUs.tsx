@@ -51,8 +51,8 @@ const WORK_WITH_US_CARDS = [
     id: "careers",
     title: "Career Opportunities",
     image: {
-      src: "https://codebility-cdn.pages.dev/assets/images/index/careers.jpg",
-      alt: "career opportunities and job openings",
+      src: "/assets/images/index/man-sitting.jpg",
+      alt: "career opportunities and job openings04",
     },
     description:
       "Explore exciting career opportunities with our team. Join a dynamic environment where innovation meets collaboration.",
