@@ -4,6 +4,7 @@ import { useEffect, useState, useMemo, memo } from "react";
 import { Box } from "@/components/shared/dashboard";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
+import { Task } from "@/types/database";
 
 import { logUserTime } from "../actions";
 import TimeTrackerSchedule from "./DashboardTimeTrackerSchedule";
@@ -46,7 +47,7 @@ function TimeTracker() {
   }
 
   const tasks = useMemo(() => 
-    data.codev.codev_task.map((item: { task: any }) => item.task)
+    data.codev.codev_task.map((item: { task: Task }) => item.task)
   , [data.codev.codev_task]);
   
   const timerStartAt = data.codev.task_timer_start_at;

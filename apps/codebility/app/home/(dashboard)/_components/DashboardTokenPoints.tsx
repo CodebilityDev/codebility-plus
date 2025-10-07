@@ -19,20 +19,14 @@ export default function TokenPoints() {
   const [profilePoints, setProfilePoints] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [supabase, setSupabase] = useState<any>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roleToBePromoted, setRoleToBePromoted] = useState<string | null>(null);
   const [promotionAccepted, setPromotionAccepted] = useState(false);
   const setUserLevel = useUserStore((state) => state.setUserLevel);
 
-  // Initialize Supabase client safely
   useEffect(() => {
-    const client = createClientClientComponent();
-    setSupabase(client);
-  }, []);
-
-  useEffect(() => {
-    if (!supabase) return;
+    let isMounted = true;
+    const supabase = createClientClientComponent();
 
     const fetchPointsAndCategories = async () => {
       setLoading(true);
@@ -41,9 +35,13 @@ export default function TokenPoints() {
       // FIXED: Use getUser() instead of getSession()
       const { data: { user: authUser }, error: authError } = await supabase.auth.getUser();
       
+      if (!isMounted) return;
+
       if (authError || !authUser) {
-        setError("No authenticated user found.");
-        setLoading(false);
+        if (isMounted) {
+          setError("No authenticated user found.");
+          setLoading(false);
+        }
         return;
       }
 
@@ -52,6 +50,8 @@ export default function TokenPoints() {
         const { data: categories, error: categoriesError } = await supabase
           .from("skill_category")
           .select("id, name");
+
+        if (!isMounted) return;
 
         if (categoriesError) throw categoriesError;
 
@@ -63,6 +63,8 @@ export default function TokenPoints() {
           .from("codev_points")
           .select("id, codev_id, skill_category_id, points")
           .eq("codev_id", authUser.id);
+
+        if (!isMounted) return;
 
         if (pointsError) throw pointsError;
 
@@ -80,7 +82,9 @@ export default function TokenPoints() {
           {} as Record<string, number>,
         );
 
-        setPoints(pointsByCategory);
+        if (isMounted) {
+          setPoints(pointsByCategory);
+        }
 
         // Fetch attendance points from separate table
         const { data: attendanceData, error: attendanceError } = await supabase
@@ -112,15 +116,23 @@ export default function TokenPoints() {
               .select()
               .single();
             
-            setAttendancePoints(newAttendancePoints?.points || 0);
+            if (isMounted) {
+              setAttendancePoints(newAttendancePoints?.points || 0);
+            }
           } else {
-            setAttendancePoints(0);
+            if (isMounted) {
+              setAttendancePoints(0);
+            }
           }
         } else if (!attendanceError) {
-          setAttendancePoints(attendanceData?.points || 0);
+          if (isMounted) {
+            setAttendancePoints(attendanceData?.points || 0);
+          }
         } else {
           console.error("Error fetching attendance points:", attendanceError);
-          setAttendancePoints(0);
+          if (isMounted) {
+            setAttendancePoints(0);
+          }
         }
 
         // Fetch profile points from the API
@@ -129,13 +141,15 @@ export default function TokenPoints() {
             const res = await fetch(`/api/profile-points/${user.id}`);
             if (res.ok) {
               const data = (await res.json()) as { success?: boolean; totalPoints?: number } | undefined;
-              if (data?.success) {
+              if (data?.success && isMounted) {
                 setProfilePoints(data.totalPoints ?? 0);
               }
             }
           } catch (error) {
             console.error("Failed to fetch profile points:", error);
-            setProfilePoints(0);
+            if (isMounted) {
+              setProfilePoints(0);
+            }
           }
         }
 
@@ -144,6 +158,8 @@ export default function TokenPoints() {
           .from("levels")
           .select("id, skill_category_id, level, min_points, max_points")
           .order("level", { ascending: true });
+
+        if (!isMounted) return;
 
         if (levelsError) throw levelsError;
 
@@ -171,36 +187,48 @@ export default function TokenPoints() {
           {} as Record<string, number>,
         );
 
-        setLevels(levelsByCategory);
-
-        if (
-          user?.role_id == 4 &&
-          Object.values(levelsByCategory).some((value) => value >= 2) &&
-          !promotionAccepted // Don't show if promotion was already accepted
-        ) {
-          setRoleToBePromoted("Codev");
-          if (!user?.promote_declined) setIsModalOpen(true);
+        if (isMounted) {
+          setLevels(levelsByCategory);
         }
-        //Codev ready to be promoted to Mentor
-        else if (
-          user?.role_id == 10 &&
-          Object.values(levelsByCategory).some((value) => value >= 3) &&
-          !promotionAccepted // Don't show if promotion was already accepted
-        ) {
-          setUserLevel(2);
-          setRoleToBePromoted("Mentor");
-          if (!user?.promote_declined) setIsModalOpen(true);
+
+        if (isMounted) {
+          if (
+            user?.role_id == 4 &&
+            Object.values(levelsByCategory).some((value) => value >= 2) &&
+            !promotionAccepted // Don't show if promotion was already accepted
+          ) {
+            setRoleToBePromoted("Codev");
+            if (!user?.promote_declined) setIsModalOpen(true);
+          }
+          //Codev ready to be promoted to Mentor
+          else if (
+            user?.role_id == 10 &&
+            Object.values(levelsByCategory).some((value) => value >= 3) &&
+            !promotionAccepted // Don't show if promotion was already accepted
+          ) {
+            setUserLevel(2);
+            setRoleToBePromoted("Mentor");
+            if (!user?.promote_declined) setIsModalOpen(true);
+          }
         }
       } catch (err) {
-        console.error("Error fetching data:", err);
-        setError("Failed to fetch data. Please try again.");
+        if (isMounted) {
+          console.error("Error fetching data:", err);
+          setError("Failed to fetch data. Please try again.");
+        }
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
     fetchPointsAndCategories();
-  }, [supabase, user, promotionAccepted]); // Add promotionAccepted to dependencies
+
+    return () => {
+      isMounted = false;
+    };
+  }, [user, promotionAccepted]); // Add promotionAccepted to dependencies
 
   const handlePromotionAccepted = () => {
     setPromotionAccepted(true);
