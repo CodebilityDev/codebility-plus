@@ -29,7 +29,7 @@ const Status = ({
     setSupabase(supabaseClient);
   }, []);
 
-  const updateSupabaseField = async (field: string, value: any) => {
+  const updateSupabaseField = async (field: string, value: string | boolean) => {
     try {
       setIsLoading(true);
       const { error } = await supabase

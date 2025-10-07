@@ -1,6 +1,7 @@
 // app/api/profile-points/[codevId]/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { z } from "zod";
 
 // Define point rules - category now matches codev table column names
 const POINT_RULES = {
@@ -22,6 +23,9 @@ function isFieldFilled(value: any): boolean {
   return true;
 }
 
+// Validation schemas
+const codevIdSchema = z.string().uuid("Invalid codev ID format");
+
 // Type for profile points insertion
 interface ProfilePointInsert {
   codev_id: string;
@@ -37,20 +41,52 @@ export async function GET(
     // Await params (Next.js 15 requirement)
     const { codevId } = await params;
     
-    if (!codevId) {
+    // Validate codevId format
+    const validationResult = codevIdSchema.safeParse(codevId);
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: "Codev ID is required" },
+        { 
+          error: "Invalid codev ID format",
+          details: validationResult.error.errors.map(e => e.message).join(", ")
+        },
         { status: 400 }
       );
     }
 
+    const validCodevId = validationResult.data;
     const supabase = await createClientServerComponent();
 
-    // First, get the numeric ID from the codev table using the UUID
+    // Verify user authentication and authorization
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
+    
+    if (authError || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    // Check if user can access this profile (own profile or admin)
+    const { data: userRole, error: roleError } = await supabase
+      .from("codev")
+      .select("id, role_id")
+      .eq("id", user.id)
+      .single();
+
+    if (roleError || !userRole) {
+      return NextResponse.json({ error: "Failed to verify user permissions" }, { status: 403 });
+    }
+
+    // Allow access if it's the user's own profile or if user has admin role (assuming role_id 1 is admin)
+    const isAdmin = userRole.role_id === 1;
+    const isOwnProfile = user.id === validCodevId;
+    
+    if (!isAdmin && !isOwnProfile) {
+      return NextResponse.json({ error: "Access denied" }, { status: 403 });
+    }
+
+    // First, get the numeric ID from the codev table using the validated UUID
     const { data: codevData, error: codevError } = await supabase
       .from("codev")
       .select("id, image_url, tech_stacks, about, phone_number, github, facebook, linkedin, discord, portfolio_website")
-      .eq('id', codevId)
+      .eq('id', validCodevId)
       .single();
 
     if (codevError) {
@@ -69,7 +105,7 @@ export async function GET(
     const { data: workExperiences, error: workExpError } = await supabase
       .from("work_experience")
       .select("id, position, company_name")
-      .eq('codev_id', codevId);
+      .eq('codev_id', validCodevId);
 
     if (workExpError) {
       console.error("Error fetching work experiences:", workExpError);
@@ -83,7 +119,7 @@ export async function GET(
     for (const [field, config] of Object.entries(POINT_RULES)) {
       if (isFieldFilled(codevData[field])) {
         pointsToInsert.push({
-          codev_id: codevId,
+          codev_id: validCodevId,
           category: field,
           points: config.points,
         });
@@ -101,7 +137,7 @@ export async function GET(
       
       if (skillCount > 0) {
         pointsToInsert.push({
-          codev_id: codevId,
+          codev_id: validCodevId,
           category: 'tech_stacks',
           points: skillCount,
         });
@@ -113,7 +149,7 @@ export async function GET(
     if (workExperiences && workExperiences.length > 0) {
       const workExpPoints = workExperiences.length * 5;
       pointsToInsert.push({
-        codev_id: codevId,
+        codev_id: validCodevId,
         category: 'work_experience',
         points: workExpPoints,
       });
@@ -124,7 +160,7 @@ export async function GET(
     const { error: deleteError } = await supabase
       .from("profile_points")
       .delete()
-      .eq('codev_id', codevId);
+      .eq('codev_id', validCodevId);
 
     if (deleteError) {
       console.error("Error deleting old points:", deleteError);
@@ -160,7 +196,7 @@ export async function GET(
     const { data: savedPoints, error: fetchError } = await supabase
       .from("profile_points")
       .select("*")
-      .eq('codev_id', codevId)
+      .eq('codev_id', validCodevId)
       .order('created_at', { ascending: false });
 
     if (fetchError) {

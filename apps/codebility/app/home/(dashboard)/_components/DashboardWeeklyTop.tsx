@@ -93,16 +93,10 @@ export default function WeeklyTop() {
   const [softSkillsLeaders, setSoftSkillsLeaders] = useState<SoftSkillsLeader[]>([]);
   const [projectLeaders, setProjectLeaders] = useState<ProjectLeader[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [supabase, setSupabase] = useState<any>(null);
-
-  // Initialize Supabase client safely
-  useEffect(() => {
-    const client = createClientClientComponent();
-    setSupabase(client);
-  }, []);
 
   useEffect(() => {
-    if (!supabase) return;
+    let isMounted = true;
+    const supabase = createClientClientComponent();
 
     const fetchCategories = async () => {
       try {
@@ -110,6 +104,8 @@ export default function WeeklyTop() {
           .from("skill_category")
           .select("name")
           .order("name");
+
+        if (!isMounted) return; // Prevent state update if component unmounted
 
         if (error) {
           console.error("Error fetching categories:", error);
@@ -140,16 +136,24 @@ export default function WeeklyTop() {
           }
         }
       } catch (error) {
-        console.error("Error in fetchCategories:", error);
+        if (isMounted) {
+          console.error("Error in fetchCategories:", error);
+        }
       }
     };
 
     fetchCategories();
-  }, [supabase, selectedCategory]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedCategory]);
 
   // Fetch soft skills leaderboard
   useEffect(() => {
-    if (!supabase || leaderboardType !== "soft-skills") return;
+    if (leaderboardType !== "soft-skills") return;
+
+    let isMounted = true;
 
     const fetchSoftSkillsLeaderboard = async () => {
       setIsLoading(true);
@@ -161,21 +165,34 @@ export default function WeeklyTop() {
         }
         
         const data = await response.json();
-        setSoftSkillsLeaders(data.leaders || []);
+        if (isMounted) {
+          setSoftSkillsLeaders(data.leaders || []);
+        }
       } catch (error) {
-        console.error("Error fetching soft skills leaderboard:", error);
-        setSoftSkillsLeaders([]);
+        if (isMounted) {
+          console.error("Error fetching soft skills leaderboard:", error);
+          setSoftSkillsLeaders([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchSoftSkillsLeaderboard();
-  }, [supabase, leaderboardType]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [leaderboardType]);
 
   // Fetch projects leaderboard
   useEffect(() => {
-    if (!supabase || leaderboardType !== "projects") return;
+    if (leaderboardType !== "projects") return;
+
+    let isMounted = true;
+    const supabase = createClientClientComponent();
 
     const fetchProjectsLeaderboard = async () => {
       setIsLoading(true);
@@ -202,6 +219,8 @@ export default function WeeklyTop() {
 
         const { data, error } = await query;
 
+        if (!isMounted) return;
+
         if (error) {
           console.error("Error fetching project points:", error);
           return;
@@ -215,6 +234,8 @@ export default function WeeklyTop() {
             .from("projects")
             .select("id, name");
 
+          if (!isMounted) return;
+
           if (projectsError) {
             console.error("Error fetching projects:", projectsError);
             setProjectLeaders([]);
@@ -225,6 +246,8 @@ export default function WeeklyTop() {
           const { data: projectMembers, error: membersError } = await supabase
             .from("project_members")
             .select("codev_id, project_id");
+
+          if (!isMounted) return;
 
           if (membersError) {
             console.error("Error fetching project members:", membersError);
@@ -287,21 +310,34 @@ export default function WeeklyTop() {
             .sort((a, b) => b.total_points - a.total_points)
             .slice(0, 10);
 
-          setProjectLeaders(projectsArray);
+          if (isMounted) {
+            setProjectLeaders(projectsArray);
+          }
         }
       } catch (error) {
-        console.error("Error fetching projects leaderboard:", error);
-        setProjectLeaders([]);
+        if (isMounted) {
+          console.error("Error fetching projects leaderboard:", error);
+          setProjectLeaders([]);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchProjectsLeaderboard();
-  }, [supabase, leaderboardType, timePeriod]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [leaderboardType, timePeriod]);
 
   useEffect(() => {
-    if (!supabase || allCategories.length === 0 || leaderboardType !== "technical") return;
+    if (allCategories.length === 0 || leaderboardType !== "technical") return;
+
+    let isMounted = true;
+    const supabase = createClientClientComponent();
 
     const fetchTopCodevs = async () => {
       setIsLoading(true);
@@ -351,17 +387,27 @@ export default function WeeklyTop() {
             }
           });
 
-          setCategoryData(groupedData);
+          if (isMounted) {
+            setCategoryData(groupedData);
+          }
         }
       } catch (error) {
-        console.error("Error in fetchTopCodevs:", error);
+        if (isMounted) {
+          console.error("Error in fetchTopCodevs:", error);
+        }
       } finally {
-        setIsLoading(false);
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     };
 
     fetchTopCodevs();
-  }, [supabase, timePeriod, allCategories, leaderboardType]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [timePeriod, allCategories, leaderboardType]);
 
   const getRankIcon = (rank: number, isTraditional: boolean = true) => {
     if (!isTraditional) {
@@ -823,7 +869,7 @@ export default function WeeklyTop() {
                     Skill categories are being set up. Check back soon to see the rankings!
                   </p>
                   <div className="text-xs text-gray-400">
-                    {!supabase ? "Connecting to database..." : "Loading categories..."}
+                    Loading categories...
                   </div>
                 </div>
               </div>
