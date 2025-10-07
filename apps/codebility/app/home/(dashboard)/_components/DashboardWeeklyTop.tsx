@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { startOfMonth, startOfWeek, subDays } from "date-fns";
-import { Trophy, Medal, Award, Star, Zap } from "lucide-react";
+import { Trophy, Medal, Award, Star, Zap, Heart, Users } from "lucide-react";
 
 import {
   Select,
@@ -99,15 +99,25 @@ export default function WeeklyTop() {
         if (data) {
           const categories = data.map((cat: { name: string }) => cat.name);
 
-          // Reorder categories to put Frontend Developer first
+          // Reorder categories to put important ones first
           const reorderedCategories = [...categories];
+          
+          // Move Frontend Developer to first position
           const feIndex = reorderedCategories.findIndex(
             (cat) => cat === "Frontend Developer",
           );
-
           if (feIndex !== -1) {
             const [frontendDev] = reorderedCategories.splice(feIndex, 1);
             reorderedCategories.unshift(frontendDev);
+          }
+          
+          // Move Soft Skills to second position if it exists
+          const softSkillsIndex = reorderedCategories.findIndex(
+            (cat) => cat === "Soft Skills",
+          );
+          if (softSkillsIndex !== -1) {
+            const [softSkills] = reorderedCategories.splice(softSkillsIndex, 1);
+            reorderedCategories.splice(1, 0, softSkills);
           }
 
           setAllCategories(reorderedCategories);
@@ -186,7 +196,21 @@ export default function WeeklyTop() {
     fetchTopCodevs();
   }, [supabase, timePeriod, allCategories]);
 
-  const getRankIcon = (rank: number) => {
+  const getRankIcon = (rank: number, category?: string) => {
+    if (category === "Soft Skills") {
+      switch (rank) {
+        case 1:
+          return <Heart className="h-5 w-5 text-pink-500" />;
+        case 2:
+          return <Heart className="h-5 w-5 text-pink-400" />;
+        case 3:
+          return <Heart className="h-5 w-5 text-pink-300" />;
+        default:
+          return <Heart className="h-4 w-4 text-gray-400" />;
+      }
+    }
+    
+    // Default technical skills icons
     switch (rank) {
       case 1:
         return <Trophy className="h-5 w-5 text-yellow-500" />;
@@ -247,7 +271,7 @@ export default function WeeklyTop() {
       rows.push(
         <TableRow key={i} className={`${getRowStyle(i + 1)} transition-all duration-200 hover:scale-[1.01] hover:shadow-md ${i <= 2 ? 'animate-pulse [animation-duration:3s]' : ''}`}>
           <TableCell className="flex items-center gap-2">
-            {getRankIcon(i + 1)}
+            {getRankIcon(i + 1, category)}
             <span className="font-semibold">{i + 1}</span>
           </TableCell>
           <TableCell className="font-medium">
@@ -287,6 +311,8 @@ export default function WeeklyTop() {
         return "MD";
       case "QA Engineer":
         return "QA";
+      case "Soft Skills":
+        return "SS";
       default:
         return category.substring(0, 2);
     }
@@ -309,7 +335,7 @@ export default function WeeklyTop() {
               <h2 className="text-2xl font-bold bg-gradient-to-r from-purple-600 to-blue-600 bg-clip-text text-transparent">
                 🏆 Leaderboard
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">Compete and climb the ranks!</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Technical skills, soft skills & more!</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
@@ -336,7 +362,7 @@ export default function WeeklyTop() {
             onValueChange={setSelectedCategory}
             className="w-fit"
           >
-            <TabsList className="grid h-10 grid-cols-5 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg">
+            <TabsList className={`grid h-10 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg`} style={{gridTemplateColumns: `repeat(${allCategories.length}, minmax(0, 1fr))`}}>
               {allCategories.map((category) => {
                 const getCategoryStyle = () => {
                   if (selectedCategory !== category) return "";
@@ -352,6 +378,8 @@ export default function WeeklyTop() {
                       return "data-[state=active]:bg-orange-600 data-[state=active]:text-white";
                     case "QA Engineer":
                       return "data-[state=active]:bg-indigo-600 data-[state=active]:text-white";
+                    case "Soft Skills":
+                      return "data-[state=active]:bg-pink-600 data-[state=active]:text-white";
                     default:
                       return "data-[state=active]:bg-gray-600 data-[state=active]:text-white";
                   }
@@ -389,8 +417,17 @@ export default function WeeklyTop() {
                       </TableHead>
                       <TableHead className="text-white font-semibold">
                         <div className="flex items-center gap-2">
-                          <Star className="h-4 w-4" />
-                          Developer
+                          {selectedCategory === "Soft Skills" ? (
+                            <>
+                              <Heart className="h-4 w-4" />
+                              Codev
+                            </>
+                          ) : (
+                            <>
+                              <Star className="h-4 w-4" />
+                              Developer
+                            </>
+                          )}
                         </div>
                       </TableHead>
                       <TableHead className="text-white font-semibold">
