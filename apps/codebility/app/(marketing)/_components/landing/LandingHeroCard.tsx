@@ -41,7 +41,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
   return (
     <Link href={url} className="hero-card block h-full perspective-1000">
       <motion.div 
-        className="border-light-900/5 bg-light-700/10 hover:bg-light-700/30 flex h-[320px] flex-col justify-between rounded-xl border-2 p-8 text-white backdrop-blur-lg duration-300 sm:h-[340px] sm:p-10 relative overflow-hidden transform-gpu"
+        className="border-light-900/5 bg-light-700/10 hover:bg-light-700/30 flex h-[320px] flex-col rounded-xl border-2 p-8 text-white backdrop-blur-lg duration-300 sm:h-[340px] sm:p-10 relative overflow-hidden transform-gpu"
         style={{
           rotateX,
           rotateY,
@@ -76,7 +76,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
         />
         
         <motion.div 
-          className="flex w-full flex-col gap-3 relative z-10"
+          className="flex w-full flex-col gap-3 relative z-10 flex-shrink-0"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -95,7 +95,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
             </motion.p>
           )}
           <motion.h3 
-            className="text-lg font-semibold leading-tight sm:text-xl line-clamp-2"
+            className="text-lg font-semibold leading-tight sm:text-xl line-clamp-2 min-h-[3.5rem] flex items-start"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -104,17 +104,19 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
           </motion.h3>
         </motion.div>
         
-        <motion.p 
-          className="text-sm leading-relaxed text-white/80 sm:text-base line-clamp-6 mt-auto relative z-10"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          style={{
-            transform: "translateZ(15px)",
-          }}
-        >
-          {description}
-        </motion.p>
+        <div className="flex-1 flex items-end">
+          <motion.p 
+            className="text-sm leading-relaxed text-white/80 sm:text-base line-clamp-4 relative z-10 w-full"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.5 }}
+            style={{
+              transform: "translateZ(15px)",
+            }}
+          >
+            {description}
+          </motion.p>
+        </div>
       </motion.div>
     </Link>
   );
