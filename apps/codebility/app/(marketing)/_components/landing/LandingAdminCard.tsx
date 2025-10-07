@@ -14,7 +14,7 @@ const capitalizeWords = (text: string) => {
 		.join(" ");
 };
 
-const AdminCard = ({ admin, color }: { admin: Codev; color: string }) => {
+const AdminCard = ({ admin }: { admin: Codev }) => {
 	const [imageLoaded, setImageLoaded] = useState(false);
 	const defaultImage = "/assets/svgs/icon-codebility-black.svg";
 
@@ -23,10 +23,7 @@ const AdminCard = ({ admin, color }: { admin: Codev; color: string }) => {
 			className="h-full"
 		>
 			<div className="flex h-full w-full flex-col gap-4 rounded-lg">
-				<div className={cn("relative h-[250px] w-full rounded-lg overflow-hidden", color)}>
-					{/* Background gradient overlay */}
-					<div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent z-10" />
-					
+				<div className="relative h-[250px] w-full rounded-lg overflow-hidden bg-gray-100 dark:bg-gray-800">
 					{/* Image */}
 					<div className="relative w-full h-full">
 						<Image

@@ -35,12 +35,6 @@ const AnimatedAdminsSection = ({
             {members.map((member: Codev, index: number) => (
               <div key={member.id} className="h-full relative">
                 <AdminCard
-                  color={`bg-gradient-to-br ${
-                    index % 4 === 0 ? 'from-purple-500/80 to-pink-500/80' :
-                    index % 4 === 1 ? 'from-cyan-500/80 to-blue-500/80' :
-                    index % 4 === 2 ? 'from-green-500/80 to-teal-500/80' :
-                    'from-orange-500/80 to-red-500/80'
-                  }`}
                   admin={member}
                 />
               </div>

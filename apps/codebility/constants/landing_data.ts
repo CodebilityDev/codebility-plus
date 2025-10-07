@@ -172,7 +172,7 @@ export const MarketingCardData: MarketingCardData[] = [
   {
     title: "AI Development",
     description:
-      "Develop your personalized AI assistant or seamlessly integrate AI into your existing tech website.",
+      "Build intelligent AI solutions and integrate them seamlessly into your applications.",
     url: "/ai-integration",
     category: "Technology",
   },
