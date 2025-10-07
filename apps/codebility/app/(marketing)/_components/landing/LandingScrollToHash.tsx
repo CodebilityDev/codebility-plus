@@ -4,6 +4,17 @@ import { useEffect } from "react";
 
 const ScrollToHash = () => {
   useEffect(() => {
+    // Force scroll to top on initial page load
+    window.scrollTo(0, 0);
+    
+    // Clear any hash on initial page load to prevent auto-scrolling
+    if (window.location.hash) {
+      history.replaceState(null, null, window.location.pathname);
+      // Force scroll to top again after clearing hash
+      setTimeout(() => window.scrollTo(0, 0), 100);
+      return;
+    }
+
     const jumpToHash = () => {
       const hash = window.location.hash;
 
@@ -16,7 +27,7 @@ const ScrollToHash = () => {
           try {
             const element = document.querySelector(hash);
             if (element) {
-              element.scrollIntoView({ behavior: "auto" });
+              element.scrollIntoView({ behavior: "smooth" });
             }
           } catch (error) {
             // Silently catch any invalid selector errors
@@ -26,12 +37,13 @@ const ScrollToHash = () => {
       }
     };
 
-    jumpToHash();
-
+    // Only listen for hash changes after initial load
     window.addEventListener("popstate", jumpToHash);
+    window.addEventListener("hashchange", jumpToHash);
 
     return () => {
       window.removeEventListener("popstate", jumpToHash);
+      window.removeEventListener("hashchange", jumpToHash);
     };
   }, []);
 
