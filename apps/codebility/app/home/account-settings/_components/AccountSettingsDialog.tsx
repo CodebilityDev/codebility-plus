@@ -124,45 +124,47 @@ export default function AccountSettingsDialog() {
                 this email before the change takes effect.
               </DialogDescription>
             </DialogHeader>
-            <form
-              className="space-y-4 py-4"
-              noValidate
-              onSubmit={form.handleSubmit(onSubmit)}
-            >
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormControl>
-                      <Input
-                        variant="lightgray"
-                        label="New Email Address"
-                        parentClassName="flex flex-col gap-2"
-                        {...field}
-                        placeholder="Enter new email address"
-                        disabled={isLoading}
-                      />
-                    </FormControl>
-                    <FormMessage className="text-red-600" />
-                  </FormItem>
-                )}
-              />
-              <DialogFooter className="gap-2">
-                <DialogClose asChild>
-                  <Button variant="outline" disabled={isLoading}>
-                    Cancel
+            <Form {...form}>
+              <form
+                className="space-y-4 py-4"
+                noValidate
+                onSubmit={form.handleSubmit(onSubmit)}
+              >
+                <FormField
+                  control={form.control}
+                  name="email"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormControl>
+                        <Input
+                          variant="lightgray"
+                          label="New Email Address"
+                          parentClassName="flex flex-col gap-2"
+                          {...field}
+                          placeholder="Enter new email address"
+                          disabled={isLoading}
+                        />
+                      </FormControl>
+                      <FormMessage className="text-red-600" />
+                    </FormItem>
+                  )}
+                />
+                <DialogFooter className="gap-2">
+                  <DialogClose asChild>
+                    <Button variant="outline" disabled={isLoading}>
+                      Cancel
+                    </Button>
+                  </DialogClose>
+                  <Button
+                    type="submit"
+                    className="text-dark100_light900 bg-customBlue-200 duration-300 hover:bg-customBlue-300"
+                    disabled={!form.formState.isValid || isLoading}
+                  >
+                    {isLoading ? "Updating..." : "Change Email"}
                   </Button>
-                </DialogClose>
-                <Button
-                  type="submit"
-                  className="text-dark100_light900 bg-customBlue-200 duration-300 hover:bg-customBlue-300"
-                  disabled={!form.formState.isValid || isLoading}
-                >
-                  {isLoading ? "Updating..." : "Change Email"}
-                </Button>
-              </DialogFooter>
-            </form>
+                </DialogFooter>
+              </form>
+            </Form>
           </DialogContent>
         </Dialog>
       
