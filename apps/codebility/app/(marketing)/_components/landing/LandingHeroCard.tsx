@@ -76,7 +76,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
         />
         
         <motion.div 
-          className="flex w-full flex-col gap-3 relative z-10 flex-shrink-0"
+          className="flex w-full flex-col gap-1 relative z-10 flex-shrink-0"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
@@ -95,7 +95,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
             </motion.p>
           )}
           <motion.h3 
-            className="text-lg font-semibold leading-tight sm:text-xl line-clamp-2 min-h-[3.5rem] flex items-start"
+            className="text-lg font-semibold leading-tight sm:text-xl min-h-[3rem] flex items-start"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.4 }}
@@ -106,7 +106,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
         
         <div className="flex-1 flex items-end">
           <motion.p 
-            className="text-sm leading-relaxed text-white/80 sm:text-base line-clamp-4 relative z-10 w-full"
+            className="text-xs leading-relaxed text-white/80 sm:text-sm relative z-10 w-full"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.5 }}
