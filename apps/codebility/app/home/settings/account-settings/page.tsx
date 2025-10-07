@@ -11,11 +11,11 @@ const items = [
 export default function SettingsAccount() {
   return (
     <div className="mx-auto max-w-screen-xl">
-      <div className="pb-4">
+      <div className="pb-4 pt-12">
         <CustomBreadcrumb items={items} />
       </div>
 
-      <AccountSettingsPage />
+      <AccountSettingsPage showBreadcrumb={false} />
     </div>
   );
 }
