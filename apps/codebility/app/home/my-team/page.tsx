@@ -9,65 +9,47 @@ export const revalidate = 300;
 // Loading component for team data
 function TeamDataSkeleton() {
   return (
-    <>
-      {/* Stats skeleton */}
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse rounded-xl bg-gray-100 p-4 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              <div className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-              <div className="space-y-2">
-                <div className="h-6 w-12 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                <div className="h-4 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
+    <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-3">
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
+          <div className="space-y-6">
+            {/* Header */}
+            <div className="flex items-start justify-between">
+              <div className="space-y-3 flex-1">
+                <div className="h-4 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                <div className="h-6 w-40 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                <div className="h-4 w-32 bg-gray-200 dark:bg-gray-800 rounded"></div>
               </div>
+              <div className="h-8 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
             </div>
-          </div>
-        ))}
-      </div>
-      
-      {/* Cards skeleton */}
-      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-3">
-        {[1, 2, 3].map((i) => (
-          <div key={i} className="animate-pulse rounded-2xl border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-800 dark:bg-gray-900">
-            <div className="space-y-6">
-              {/* Header */}
-              <div className="flex items-start justify-between">
-                <div className="space-y-3 flex-1">
-                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
-                  <div className="h-6 w-40 bg-gray-200 dark:bg-gray-800 rounded"></div>
-                  <div className="h-4 w-32 bg-gray-200 dark:bg-gray-800 rounded"></div>
-                </div>
-                <div className="h-8 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
-              </div>
-              
-              {/* Team lead */}
-              <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-800/50">
-                <div className="flex items-center gap-4">
-                  <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-                  <div className="space-y-2">
-                    <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                    <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
-                  </div>
-                </div>
-              </div>
-              
-              {/* Members */}
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
-                  <div className="h-4 w-16 bg-gray-200 dark:bg-gray-800 rounded"></div>
-                </div>
-                <div className="flex gap-2">
-                  {[1, 2, 3, 4].map((j) => (
-                    <div key={j} className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
-                  ))}
+            
+            {/* Team lead */}
+            <div className="rounded-xl bg-gray-50 p-4 dark:bg-gray-800/50">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                <div className="space-y-2">
+                  <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded"></div>
+                  <div className="h-3 w-20 bg-gray-200 dark:bg-gray-700 rounded"></div>
                 </div>
               </div>
             </div>
+            
+            {/* Members */}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <div className="h-4 w-24 bg-gray-200 dark:bg-gray-800 rounded"></div>
+                <div className="h-4 w-16 bg-gray-200 dark:bg-gray-800 rounded"></div>
+              </div>
+              <div className="flex gap-2">
+                {[1, 2, 3, 4].map((j) => (
+                  <div key={j} className="h-10 w-10 bg-gray-200 dark:bg-gray-700 rounded-full"></div>
+                ))}
+              </div>
+            </div>
           </div>
-        ))}
-      </div>
-    </>
+        </div>
+      ))}
+    </div>
   );
 }
 
