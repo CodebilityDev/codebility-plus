@@ -45,7 +45,7 @@ export default async function HomeLayout({
             />
             <AppRouterCacheProvider>
               <MuiStyleRoot>
-                <div className="background-light850_dark100 flex min-h-screen flex-col">
+                <div className="background-light850_dark100 flex min-h-screen flex-col overflow-hidden">
                   <ErrorBoundary
                     fallback={
                       <div className="p-4 text-center">
@@ -55,20 +55,22 @@ export default async function HomeLayout({
                   >
                     <Navbar />
                   </ErrorBoundary>
-                  <div className="flex flex-1">
+                  <div className="flex flex-1 overflow-hidden">
                     <ErrorBoundary
                       fallback={
-                        <div className="w-16 bg-gray-100 dark:bg-gray-800" />
+                        <div className="w-16 bg-gray-100 dark:bg-gray-800 flex-shrink-0" />
                       }
                     >
                       <LeftSidebarServer />
                     </ErrorBoundary>
-                    <main className="background-lightsection_darksection flex-1 pt-[60px]">
+                    <main className="background-lightsection_darksection flex-1 pt-[60px] overflow-y-auto overflow-x-hidden min-h-screen ml-20 lg:ml-20">
                       <div className="mx-auto h-full max-w-8xl">
                         <PageTransitionWrapper>
                           <Suspense fallback={
-                            <div className="flex h-64 items-center justify-center">
-                              <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-customBlue-500"></div>
+                            <div className="mx-auto max-w-screen-xl">
+                              <div className="flex h-64 items-center justify-center">
+                                <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-t-2 border-customBlue-500"></div>
+                              </div>
                             </div>
                           }>
                             <AsyncErrorBoundary>{children}</AsyncErrorBoundary>
