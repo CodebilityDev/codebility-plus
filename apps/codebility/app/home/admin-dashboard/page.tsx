@@ -130,55 +130,57 @@ export default async function AdminDashboard() {
   );
 
   return (
-    <PageContainer maxWidth="2xl">
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
-              <span className="text-xl">📊</span>
-            </div>
-            <div>
-              <H1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">
-                Dashboard
-              </H1>
-              <p className="text-gray-600 dark:text-gray-400">
-                Monitor your platform metrics and analytics
-              </p>
+    <div className="mx-auto max-w-screen-xl">
+      <div className="flex flex-col gap-4 pt-4">
+        <div className="space-y-6">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-purple-500 shadow-lg">
+                <span className="text-xl">📊</span>
+              </div>
+              <div>
+                <H1 className="bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-3xl font-bold text-transparent">
+                  Dashboard
+                </H1>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Monitor your platform metrics and analytics
+                </p>
+              </div>
             </div>
           </div>
-        </div>
 
-        {/* Metrics Grid */}
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-          <AdminDashboardTotalActiveIntern
-            count={dashboardData?.activeInterns}
-          />
-          <AdminDashboardTotalInactiveIntern
-            count={dashboardData?.inactiveInterns}
-          />
-          <AdminDashboardTotalCodev count={dashboardData?.codevs} />
-          <AdminDashboardTotalAdmin count={dashboardData?.admins} />
-          <AdminDashboardTotalMentor count={dashboardData?.mentors} />
-          <AdminDashboardTotalProjects
-            count={dashboardData?.projectTotalCount}
-          />
-        </div>
+          {/* Metrics Grid */}
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+            <AdminDashboardTotalActiveIntern
+              count={dashboardData?.activeInterns}
+            />
+            <AdminDashboardTotalInactiveIntern
+              count={dashboardData?.inactiveInterns}
+            />
+            <AdminDashboardTotalCodev count={dashboardData?.codevs} />
+            <AdminDashboardTotalAdmin count={dashboardData?.admins} />
+            <AdminDashboardTotalMentor count={dashboardData?.mentors} />
+            <AdminDashboardTotalProjects
+              count={dashboardData?.projectTotalCount}
+            />
+          </div>
 
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
-          <AdminDashboardApplicantStatusPie
-            data={dashboardData?.applicantStatusCounts}
-          />
-          <AdminDashboardProjectsPie data={dashboardData?.projectCounts} />
-        </div>
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <AdminDashboardApplicantStatusPie
+              data={dashboardData?.applicantStatusCounts}
+            />
+            <AdminDashboardProjectsPie data={dashboardData?.projectCounts} />
+          </div>
 
-        {/* Line Chart */}
-        <div className="w-full">
-          <AdminDashboardMonthlyApplicantsLineChart
-            dateApplied={dashboardData?.dateApplied}
-          />
+          {/* Line Chart */}
+          <div className="w-full">
+            <AdminDashboardMonthlyApplicantsLineChart
+              dateApplied={dashboardData?.dateApplied}
+            />
+          </div>
         </div>
       </div>
-    </PageContainer>
+    </div>
   );
 }

@@ -105,23 +105,29 @@ export default function KanbanBoardPage(props: KanbanBoardPageProps) {
 
   if (loading) {
     return (
-      <PageContainer maxWidth="full">
-        <KanbanLoadingSkeleton />
-      </PageContainer>
+      <div className="mx-auto max-w-screen-xl">
+        <div className="flex flex-col gap-4 pt-4">
+          <KanbanLoadingSkeleton />
+        </div>
+      </div>
     );
   }
 
   if (!processedBoardData) {
     return (
-      <PageContainer maxWidth="full">
-        <div>Board not found</div>
-      </PageContainer>
+      <div className="mx-auto max-w-screen-xl">
+        <div className="flex flex-col gap-4 pt-4">
+          <div>Board not found</div>
+        </div>
+      </div>
     );
   }
 
   return (
-    <PageContainer maxWidth="full">
-      <KanbanBoard projectId={projectId} boardData={processedBoardData} />
-    </PageContainer>
+    <div className="mx-auto max-w-screen-xl">
+      <div className="flex flex-col gap-4 pt-4">
+        <KanbanBoard projectId={projectId} boardData={processedBoardData} />
+      </div>
+    </div>
   );
 }

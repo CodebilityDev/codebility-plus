@@ -63,21 +63,22 @@ export default async function HirePage() {
   ];
 
   return (
-    <PageContainer>
-      <div className="mb-6">
-        <CustomBreadcrumb items={breadcrumbItems} />
-      </div>
+    <div className="mx-auto max-w-screen-xl">
+      <div className="flex flex-col gap-4 pt-4">
+        <div className="mb-6">
+          <CustomBreadcrumb items={breadcrumbItems} />
+        </div>
 
-      {/* Header */}
-      <div className="mb-8">
-        <H1>Job Management</H1>
-        <p className="mt-2 text-muted-foreground">
-          Create and manage job listings, review applications
-        </p>
-      </div>
+        {/* Header */}
+        <div className="mb-8">
+          <H1>Job Management</H1>
+          <p className="mt-2 text-muted-foreground">
+            Create and manage job listings, review applications
+          </p>
+        </div>
 
-      {/* Stats Cards */}
-      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        {/* Stats Cards */}
+        <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <div className="rounded-lg border bg-card  dark:border-gray-800 dark:bg-gray-900/50 p-6">
           <div className="flex items-center justify-between">
             <div>
@@ -134,10 +135,11 @@ export default async function HirePage() {
             </div>
           </div>
         </div>
-      </div>
+        </div>
 
-      {/* Client Components */}
-      <HirePageClient />
-    </PageContainer>
+        {/* Client Components */}
+        <HirePageClient />
+      </div>
+    </div>
   );
 }
