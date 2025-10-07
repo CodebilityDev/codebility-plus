@@ -41,7 +41,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
   return (
     <Link href={url} className="hero-card block h-full perspective-1000">
       <motion.div 
-        className="border-light-900/5 bg-light-700/10 hover:bg-light-700/30 flex h-[320px] flex-col rounded-xl border-2 p-8 text-white backdrop-blur-lg duration-300 sm:h-[340px] sm:p-10 relative overflow-hidden transform-gpu"
+        className="border-light-900/5 bg-light-700/10 hover:bg-light-700/30 flex h-[320px] flex-col rounded-xl border-2 p-6 text-white backdrop-blur-lg duration-300 sm:h-[340px] sm:p-8 relative overflow-hidden transform-gpu"
         style={{
           rotateX,
           rotateY,
@@ -76,7 +76,7 @@ const HeroCard: React.FC<HeroCardProps> = ({ title, description, url = "#", cate
         />
         
         <motion.div 
-          className="flex w-full flex-col gap-1 relative z-10 flex-shrink-0"
+          className="flex w-full flex-col relative z-10 flex-shrink-0"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
