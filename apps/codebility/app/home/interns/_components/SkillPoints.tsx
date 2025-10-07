@@ -40,6 +40,10 @@ export default function SkillPoints({
       name: "Frontend Developer",
       badge_prefix: "fe",
     },
+    "be4a2221-325a-4046-92bb-91d30a239cd8": {
+      name: "Project Manager",
+      badge_prefix: "pm",
+    },
   };
 
   const getLevelInfo = useCallback(

@@ -27,7 +27,7 @@ export const revalidate = 3600; // Revalidate every hour for fresh data
 
 export default function DashboardPage() {
   return (
-    <div className="mx-auto max-w-screen-xl">
+    <div className="w-full">
       <div className="flex flex-col gap-4 pt-4 relative">
         {/* Background decorations - contained within content area */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
