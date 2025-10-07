@@ -10,6 +10,7 @@ import Footer from "./_components/MarketingFooter";
 import Navigation from "./_components/MarketingNavigation";
 import Testimonials from "./_components/testimonial/Testimonials";
 import InternSectionContainer from "./_components/landing/LandingInternSection";
+import ForceScrollTop from "./_components/landing/ForceScrollTop";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -17,9 +18,10 @@ export const revalidate = 0;
 export default async function Index() {
   return (
     <div
-      className={`bg-black-400 relative flex w-full flex-col overflow-x-hidden overflow-y-hidden `}
+      className={`bg-black-400 relative flex w-full flex-col overflow-x-hidden`}
+      style={{ scrollBehavior: 'auto' }}
     >
-      
+      <ForceScrollTop />
       <Navigation />
       <Hero />
       <Features />
