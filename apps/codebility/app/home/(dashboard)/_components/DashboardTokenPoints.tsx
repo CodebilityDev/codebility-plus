@@ -55,7 +55,8 @@ export default function TokenPoints() {
 
         if (categoriesError) throw categoriesError;
 
-        const skillCategories = categories as SkillCategory[];
+        const skillCategories = (categories as SkillCategory[])
+          .filter(category => category.name !== "Project Manager"); // Exclude PM from points overview
 
         // Fetch user's points
         const { data: pointsData, error: pointsError } = await supabase
