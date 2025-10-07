@@ -1,7 +1,6 @@
 import Admins from "./_components/landing/LandingAdmins";
 import Features from "./_components/landing/LandingFeatures";
 import Hero from "./_components/landing/LandingHero";
-import Parallax from "./_components/landing/LandingParallax";
 import Partners from "./_components/landing/LandingPartners";
 import WhyChooseUs from "./_components/landing/LandingWhyChoose-us";
 import WorkWithUs from "./_components/landing/LandingWorkWithUs";
@@ -17,15 +16,11 @@ export const revalidate = 0;
 
 export default async function Index() {
   return (
-    <div
-      className={`bg-black-400 relative flex w-full flex-col overflow-x-hidden`}
-      style={{ scrollBehavior: 'auto' }}
-    >
-      <ForceScrollTop />
+    <div className="bg-black-400 relative w-full overflow-x-hidden">
+  
       <Navigation />
       <Hero />
       <Features />
-      <Parallax />
       <WhyChooseUs />
       <WorkWithUs />
       <Admins />
@@ -33,7 +28,7 @@ export default async function Index() {
       <Partners />
       <Testimonials />
       <Calendly />
-      <Footer /> 
+      <Footer />
       
 
     </div>

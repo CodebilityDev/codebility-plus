@@ -6,6 +6,7 @@ import { Codev } from "@/types/home/codev";
 import Section from "../MarketingSection";
 import AdminCard from "./LandingAdminCard";
 import BlueBg from "./LandingBlueBg";
+import AnimatedAdminsSection from "./AnimatedAdminsSection";
 
 const FOUNDER_USER_ID = process.env.NEXT_PUBLIC_FOUNDER_USER_ID || "";
 
@@ -98,60 +99,30 @@ export default async function Admins() {
 
   return (
     <Section id="admins" className="text-light-900 relative w-full pt-10">
-      <div className="w-full">
-        <h1 className="text-center text-3xl font-bold">Codebility Admins</h1>
-        <div className="flex flex-col items-center justify-center">
-          <div className="max-w-[1100px] px-4">
-            <p className="pt-8 text-center md:px-44">
-              Uncover what powers our platform&apos;s success. Our Admin team,
-              with strategic skills and unyielding commitment, ensures CODEVS
-              moves forward seamlessly towards greatness.
-            </p>
-            <BlueBg className="h-[300px] w-full max-w-[1200px] lg:top-[45%]" />
-            <div className="grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4">
-              {sortedAdmins.map((admin: Codev) => (
-                <AdminCard
-                  color={getRandomColor() as string}
-                  key={admin.id}
-                  admin={{
-                    ...admin,
-                    display_position: admin.display_position
-                      ? formatPosition(admin.display_position)
-                      : admin.display_position,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
+      <AnimatedAdminsSection
+        title="Codebility Admins"
+        description="Uncover what powers our platform's success. Our Admin team, with strategic skills and unyielding commitment, ensures CODEVS moves forward seamlessly towards greatness."
+        members={sortedAdmins.map((admin: Codev) => ({
+          ...admin,
+          display_position: admin.display_position
+            ? formatPosition(admin.display_position)
+            : admin.display_position,
+        }))}
+        sectionId="admins"
+      />
 
-      <div className="w-full">
-        <h1 className="text-center text-3xl font-bold">Codebility Mentors</h1>
-        <div className="flex flex-col items-center justify-center">
-          <div className="max-w-[1100px] px-4">
-            <p className="pt-8 text-center md:px-44">
-              Meet our dedicated mentors who guide and support our developers on
-              their journey to excellence. Their expertise and leadership help
-              shape the future of our community.
-            </p>
-            <BlueBg className="h-[300px] w-full max-w-[1200px] lg:top-[45%]" />
-            <div className="grid grid-cols-2 gap-2 pb-5 pt-20 md:grid-cols-4">
-              {sortedMentors.map((mentor: Codev) => (
-                <AdminCard
-                  color={getRandomColor() || ""}
-                  key={mentor.id}
-                  admin={{
-                    ...mentor,
-                    display_position: mentor.display_position
-                      ? formatPosition(mentor.display_position)
-                      : mentor.display_position,
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-        </div>
+      <div className="mt-20">
+        <AnimatedAdminsSection
+          title="Codebility Mentors"
+          description="Meet our dedicated mentors who guide and support our developers on their journey to excellence. Their expertise and leadership help shape the future of our community."
+          members={sortedMentors.map((mentor: Codev) => ({
+            ...mentor,
+            display_position: mentor.display_position
+              ? formatPosition(mentor.display_position)
+              : mentor.display_position,
+          }))}
+          sectionId="mentors"
+        />
       </div>
     </Section>
   );
