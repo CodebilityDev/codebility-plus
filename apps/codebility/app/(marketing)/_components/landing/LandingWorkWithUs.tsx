@@ -103,10 +103,10 @@ const WorkWithUs = () => {
   return (
     <section
       id="workwithus"
-      className="relative flex min-h-[90vh] w-full items-center overflow-hidden py-16 md:py-24"
+      className="relative flex w-full items-center py-16 md:py-24 overflow-hidden"
     >
-      <div className="pointer-events-none absolute -left-32 top-16 hidden h-64 w-64 rounded-full bg-purple-600/30 blur-3xl md:block" aria-hidden="true" />
-      <div className="pointer-events-none absolute -bottom-24 right-12 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" aria-hidden="true" />
+      <div className="pointer-events-none absolute left-0 top-16 hidden h-64 w-64 rounded-full bg-purple-600/30 blur-3xl md:block" aria-hidden="true" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-72 w-72 rounded-full bg-blue-500/20 blur-3xl" aria-hidden="true" />
 
       <div className="relative z-10 mx-auto flex w-full max-w-6xl flex-1 flex-col items-center px-4 text-white md:px-6 lg:px-8">
         <div className="flex w-full max-w-4xl flex-col items-center gap-6 text-center md:gap-8">
