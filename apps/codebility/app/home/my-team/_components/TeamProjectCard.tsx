@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { SimpleMemberData } from "@/app/home/projects/actions";
-import { Users, UserPlus, ArrowRight } from "lucide-react";
+import { Users, UserPlus, ArrowRight, Crown, Calendar } from "lucide-react";
 import DefaultAvatar from "@/components/DefaultAvatar";
 
 interface ProjectData {
@@ -29,23 +29,26 @@ interface TeamProjectCardProps {
 const formatName = (firstName: string, lastName: string): string => 
   `${firstName.charAt(0).toUpperCase()}${firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}${lastName.slice(1).toLowerCase()}`;
 
-const MemberAvatar = ({ member, size = 40 }: { member: SimpleMemberData; size?: number }) => {
+const MemberAvatar = ({ member, size = 40, showBorder = true }: { member: SimpleMemberData; size?: number; showBorder?: boolean }) => {
   const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
   const displayName = formatName(member.first_name, member.last_name);
 
   return (
-    <div className="relative overflow-hidden rounded-full" style={{ width: size, height: size, minWidth: size, minHeight: size }}>
+    <div 
+      className={`relative overflow-hidden rounded-full ${showBorder ? 'ring-2 ring-white dark:ring-gray-800' : ''}`} 
+      style={{ width: size, height: size, minWidth: size, minHeight: size }}
+    >
       {member.image_url ? (
         <Image
           src={imageUrl}
           alt={displayName}
           width={size}
           height={size}
-          className="h-full w-full rounded-full object-cover ring-2 ring-white dark:ring-gray-700"
+          className="h-full w-full rounded-full object-cover"
           style={{ width: size, height: size }}
         />
       ) : (
-        <div className="h-full w-full rounded-full ring-2 ring-white dark:ring-gray-700">
+        <div className="h-full w-full rounded-full">
           <DefaultAvatar size={size} />
         </div>
       )}
@@ -58,7 +61,10 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
   const totalMembers = members.data.length + (teamLead.data ? 1 : 0);
 
   return (
-    <div className="group relative overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm transition-all duration-300 hover:shadow-xl hover:shadow-customBlue-500/10 hover:border-customBlue-300 hover:-translate-y-1 hover:bg-customBlue-50/50 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-customBlue-500 dark:hover:bg-gray-750 dark:hover:shadow-customBlue-500/20 cursor-pointer">
+    <div className="group relative overflow-hidden rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-300/40 hover:-translate-y-2 hover:bg-gradient-to-br hover:from-blue-50/30 hover:to-purple-50/20 dark:border-gray-700/60 dark:bg-gray-800/80 dark:hover:border-blue-500/40 dark:hover:bg-gradient-to-br dark:hover:from-gray-800 dark:hover:to-gray-700 dark:hover:shadow-blue-500/20 cursor-pointer">
+      {/* Gradient overlay on hover */}
+      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      
       {/* Clickable area for navigation */}
       <Link 
         href={`/home/my-team/${projectInfo.id}`}
@@ -66,16 +72,27 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
         aria-label={`View ${projectInfo.name} team details`}
       />
       
-      <div className="p-5">
+      <div className="relative p-6">
         {/* Header */}
-        <div className="mb-5 flex items-start justify-between">
+        <div className="mb-6 flex items-start justify-between">
           <div className="min-w-0 flex-1">
-            <h3 className="text-lg font-semibold text-gray-900 group-hover:text-customBlue-600 dark:text-white dark:group-hover:text-customBlue-100">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></div>
+              <span className="text-xs font-medium text-green-600 dark:text-green-400">Active Project</span>
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 dark:text-white dark:group-hover:text-blue-100 transition-colors duration-300 leading-tight">
               {projectInfo.name}
             </h3>
-            <div className="mt-2 flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
-              <Users className="h-4 w-4" />
-              <span>{totalMembers} member{totalMembers !== 1 ? 's' : ''}</span>
+            <div className="mt-3 flex items-center gap-3 text-sm text-gray-600 dark:text-gray-400">
+              <div className="flex items-center gap-1.5">
+                <Users className="h-4 w-4" />
+                <span className="font-medium">{totalMembers}</span>
+                <span>member{totalMembers !== 1 ? 's' : ''}</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <Calendar className="h-4 w-4" />
+                <span>Active</span>
+              </div>
             </div>
           </div>
           <div className="flex items-center gap-2">
@@ -88,29 +105,34 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
               disabled={isLoading}
               size="sm"
               variant="outline"
-              className="relative z-20 shrink-0"
+              className="relative z-20 shrink-0 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-600 transition-all duration-300"
             >
               <UserPlus className="mr-2 h-4 w-4" />
-              {isLoading ? 'Loading...' : 'Add'}
+              {isLoading ? 'Adding...' : 'Add Member'}
             </Button>
-            <ArrowRight className="h-4 w-4 text-gray-400 transition-transform group-hover:translate-x-1" />
           </div>
         </div>
 
         {/* Team Lead Section */}
         {teamLead.data && (
-          <div className="mb-5">
-            <div className="mb-3 text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              Team Lead
+          <div className="mb-6">
+            <div className="mb-3 flex items-center gap-2">
+              <Crown className="h-4 w-4 text-yellow-500" />
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Team Lead</span>
             </div>
-            <div className="flex items-center gap-3 rounded-md bg-gray-50 p-3 dark:bg-gray-700/50">
-              <MemberAvatar member={teamLead.data} size={40} />
+            <div className="flex items-center gap-4 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 p-4 border border-yellow-200/50 dark:from-yellow-900/20 dark:to-orange-900/20 dark:border-yellow-700/50">
+              <div className="relative">
+                <MemberAvatar member={teamLead.data} size={48} showBorder={false} />
+                <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-yellow-400 border-2 border-white dark:border-gray-800 flex items-center justify-center">
+                  <Crown className="h-2.5 w-2.5 text-yellow-800" />
+                </div>
+              </div>
               <div className="min-w-0 flex-1">
-                <p className="font-medium text-gray-900 dark:text-white">
+                <p className="font-semibold text-gray-900 dark:text-white">
                   {formatName(teamLead.data.first_name, teamLead.data.last_name)}
                 </p>
                 {teamLead.data.display_position && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
                     {teamLead.data.display_position}
                   </p>
                 )}
@@ -121,56 +143,75 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
 
         {/* Team Members Preview */}
         <div>
-          <div className="mb-3 flex items-center justify-between">
-            <div className="text-xs font-medium uppercase tracking-wide text-gray-500 dark:text-gray-400">
-              Team Members
+          <div className="mb-4 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-blue-500" />
+              <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Team Members</span>
             </div>
-            <span className="text-xs text-gray-500 dark:text-gray-400">
+            <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
               {members.data.length} member{members.data.length !== 1 ? 's' : ''}
             </span>
           </div>
           
           {members.data.length > 0 ? (
-            <div className="space-y-2">
-              {/* Show avatars in a row */}
-              <div className="flex -space-x-2">
-                {members.data.slice(0, 5).map((member) => (
-                  <div key={member.id} className="relative flex-shrink-0">
-                    <MemberAvatar member={member} size={32} />
+            <div className="space-y-4">
+              {/* Avatars Grid */}
+              <div className="flex flex-wrap gap-2">
+                {members.data.slice(0, 6).map((member) => (
+                  <div key={member.id} className="relative group/member">
+                    <MemberAvatar member={member} size={40} />
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/member:opacity-100 transition-opacity whitespace-nowrap z-30">
+                      {formatName(member.first_name, member.last_name)}
+                    </div>
                   </div>
                 ))}
-                {members.data.length > 5 && (
-                  <div 
-                    className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-gray-200 text-xs font-medium text-gray-600 ring-2 ring-white dark:bg-gray-600 dark:text-gray-300 dark:ring-gray-800"
-                  >
-                    +{members.data.length - 5}
+                {members.data.length > 6 && (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-blue-100 to-purple-100 text-sm font-semibold text-blue-700 border-2 border-white dark:from-blue-900 dark:to-purple-900 dark:text-blue-300 dark:border-gray-800">
+                    +{members.data.length - 6}
                   </div>
                 )}
               </div>
               
-              {/* Member names preview */}
-              <div className="text-sm text-gray-600 dark:text-gray-400">
-                {members.data.slice(0, 2).map((member) => 
-                  formatName(member.first_name, member.last_name)
-                ).join(', ')}
-                {members.data.length > 2 && ` and ${members.data.length - 2} more`}
+              {/* Quick member list */}
+              <div className="bg-gray-50/50 rounded-lg p-3 dark:bg-gray-800/50">
+                <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                  <span className="font-medium">Recent: </span>
+                  {members.data.slice(0, 3).map((member) => 
+                    formatName(member.first_name, member.last_name)
+                  ).join(', ')}
+                  {members.data.length > 3 && (
+                    <span className="text-blue-600 dark:text-blue-400 font-medium">
+                      {` and ${members.data.length - 3} more`}
+                    </span>
+                  )}
+                </div>
               </div>
             </div>
           ) : (
-            <div className="flex items-center justify-center rounded-md border-2 border-dashed border-gray-200 py-4 dark:border-gray-700">
+            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 py-8 dark:border-gray-600 bg-gray-50/30 dark:bg-gray-800/30">
               <div className="text-center">
-                <UserPlus className="mx-auto h-8 w-8 text-gray-400" />
-                <p className="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                <div className="mx-auto h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-3">
+                  <UserPlus className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+                </div>
+                <p className="text-sm font-medium text-gray-900 dark:text-gray-100 mb-1">
                   No team members yet
+                </p>
+                <p className="text-xs text-gray-500 dark:text-gray-400">
+                  Start building your team
                 </p>
               </div>
             </div>
           )}
         </div>
 
-        {/* Click to view indicator */}
-        <div className="mt-4 flex items-center justify-center text-xs text-gray-500 opacity-0 transition-opacity group-hover:opacity-100 dark:text-gray-400">
-          Click to view team details
+        {/* View Details CTA */}
+        <div className="mt-6 pt-4 border-t border-gray-200/50 dark:border-gray-700/50">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-500 dark:text-gray-400 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors duration-300">
+              Click to view details
+            </span>
+            <ArrowRight className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-all duration-300 group-hover:translate-x-1" />
+          </div>
         </div>
       </div>
     </div>

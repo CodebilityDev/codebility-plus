@@ -10,6 +10,7 @@ import {
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
+import { Crown, Users } from "lucide-react";
 import TeamProjectCard from "./TeamProjectCard";
 import AddMembersModal from "../AddMembersModal";
 
@@ -132,7 +133,59 @@ const MyTeamView = ({ projectData }: MyTeamViewProps) => {
 
   return (
     <>
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+      {/* Stats Overview */}
+      <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="rounded-xl bg-gradient-to-br from-blue-50 to-blue-100 p-4 border border-blue-200/50 dark:from-blue-900/20 dark:to-blue-800/20 dark:border-blue-700/50">
+          <div className="flex items-center gap-3">
+            <div className="rounded-full bg-blue-500 p-2">
+              <Users className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-blue-700 dark:text-blue-300">
+                {projects.length}
+              </p>
+              <p className="text-sm text-blue-600 dark:text-blue-400">
+                Active Project{projects.length !== 1 ? 's' : ''}
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="rounded-xl bg-gradient-to-br from-green-50 to-green-100 p-4 border border-green-200/50 dark:from-green-900/20 dark:to-green-800/20 dark:border-green-700/50">
+          <div className="flex items-center gap-3">
+            <div className="rounded-full bg-green-500 p-2">
+              <Users className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-green-700 dark:text-green-300">
+                {projects.reduce((acc, p) => acc + p.members.data.length + (p.teamLead.data ? 1 : 0), 0)}
+              </p>
+              <p className="text-sm text-green-600 dark:text-green-400">
+                Total Members
+              </p>
+            </div>
+          </div>
+        </div>
+        
+        <div className="rounded-xl bg-gradient-to-br from-purple-50 to-purple-100 p-4 border border-purple-200/50 dark:from-purple-900/20 dark:to-purple-800/20 dark:border-purple-700/50">
+          <div className="flex items-center gap-3">
+            <div className="rounded-full bg-purple-500 p-2">
+              <Crown className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-2xl font-bold text-purple-700 dark:text-purple-300">
+                {projects.filter(p => p.teamLead.data).length}
+              </p>
+              <p className="text-sm text-purple-600 dark:text-purple-400">
+                Team Leads
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Projects Grid */}
+      <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 xl:grid-cols-3">
         {projects.map((projectItem) => (
           <TeamProjectCard
             key={projectItem.project.id}
