@@ -98,8 +98,8 @@ export default function CertificatePreview() {
           
         // Fetch attendance points
         const { data: attendanceData } = await supabase
-          .from('attendance_summary')
-          .select('total_points')
+          .from('attendance_points')
+          .select('points')
           .eq('codev_id', currentUser.id)
           .single();
           
@@ -109,10 +109,10 @@ export default function CertificatePreview() {
         }, {} as Record<string, number>) || {};
         
         setSkillPoints(points);
-        setAttendancePoints(attendanceData?.total_points || 0);
+        setAttendancePoints(attendanceData?.points || 0);
         
         const totalSkillPoints = Object.values(points).reduce((sum, point) => sum + point, 0);
-        setTotalPoints(totalSkillPoints + (attendanceData?.total_points || 0));
+        setTotalPoints(totalSkillPoints + (attendanceData?.points || 0));
       } catch (error) {
         console.error('Error fetching points:', error);
       } finally {
