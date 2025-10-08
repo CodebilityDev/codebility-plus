@@ -124,7 +124,7 @@ export default function KanbanBoardPage(props: KanbanBoardPageProps) {
   }
 
   return (
-    <div className="mx-auto max-w-screen-xl">
+    <div className="w-full">
       <div className="flex flex-col gap-4 pt-4">
         <KanbanBoard projectId={projectId} boardData={processedBoardData} />
       </div>
