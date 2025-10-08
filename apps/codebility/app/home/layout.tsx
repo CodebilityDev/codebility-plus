@@ -16,6 +16,7 @@ import { NavigationOptimizer } from "./_components/NavigationOptimizer";
 import PageTransitionWrapper from "./_components/PageTransitionWrapper";
 import { PageTransitionSettings } from "./_components/PageTransitionSettings";
 import { MuiStyleRoot } from "./(dashboard)/_components/DashboardRoadmapStyleRoot";
+import ConditionalMainWrapper from "./_components/ConditionalMainWrapper";
 
 // Force dynamic rendering for layout due to server-side Supabase usage
 export const dynamic = "force-dynamic";
@@ -64,7 +65,7 @@ export default async function HomeLayout({
                       <LeftSidebarServer />
                     </ErrorBoundary>
                     <main className="background-lightsection_darksection flex-1 pt-[60px] overflow-y-auto overflow-x-hidden min-h-screen ml-20 lg:ml-20">
-                      <div className="h-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                      <ConditionalMainWrapper>
                         <PageTransitionWrapper>
                           <Suspense fallback={
                             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -76,7 +77,7 @@ export default async function HomeLayout({
                             <AsyncErrorBoundary>{children}</AsyncErrorBoundary>
                           </Suspense>
                         </PageTransitionWrapper>
-                      </div>
+                      </ConditionalMainWrapper>
                     </main>
                   </div>
                 </div>
