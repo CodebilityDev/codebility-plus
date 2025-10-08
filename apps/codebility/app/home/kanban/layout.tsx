@@ -6,7 +6,7 @@ export default function KanbanLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div className="min-h-screen bg-black">
+    <div className="relative h-full w-full bg-black">
       {/* Background decorations */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div className="from-customBlue-400/10 absolute -left-4 -top-4 h-72 w-72 rounded-full bg-gradient-to-br to-purple-400/10 blur-3xl" />
