@@ -331,18 +331,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 Schedule Meeting
               </Button>
             )}
-            {isTeamLead && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-                title="Schedule Meetings"
-                onClick={() => setShowScheduleMeetingModal(true)}
-              >
-                <CalendarDays className="h-3.5 w-3.5" />
-                Schedule Meeting
-              </Button>
-            )}
           </div>
         </div>
 
