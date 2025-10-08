@@ -78,7 +78,7 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
 
   return (
     <div className="relative flex h-full w-full overflow-hidden">
-      <div className="relative z-10 mx-auto h-full w-[calc(100vw-22rem)] flex-1 flex-col">
+      <div className="relative z-10 h-full w-full flex-1 flex-col">
         <div className="flex h-full flex-col gap-6 p-6">
           {/* Three-Level Breadcrumb Navigation */}
           <nav
