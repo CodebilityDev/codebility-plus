@@ -545,16 +545,16 @@ const AddMembersModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] p-0 flex flex-col bg-gray-800">
-        <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1 border-b border-gray-700 bg-gray-800">
+      <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] p-0 flex flex-col bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20">
+        <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1 border-b border-white/30 dark:border-white/20 bg-white/10 backdrop-blur-sm dark:bg-white/5">
           <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
             Add Members
           </DialogTitle>
         </DialogHeader>
 
-        <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden bg-gray-800">
+        <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
           {/* Left Panel - 60% on Desktop */}
-          <div className="w-full lg:w-3/5 border-b lg:border-b-0 lg:border-r border-gray-700 bg-gray-800">
+          <div className="w-full lg:w-3/5 border-b lg:border-b-0 lg:border-r border-white/30 dark:border-white/20">
             <ProjectPreview 
               projectName={project.name}
               teamLead={teamLeadData}
@@ -565,7 +565,7 @@ const AddMembersModal = ({
           </div>
 
           {/* Right Panel - 40% on Desktop */}
-          <div className="w-full lg:w-2/5 flex flex-col min-h-0 bg-gray-800">
+          <div className="w-full lg:w-2/5 flex flex-col min-h-0">
             <div className="flex-shrink-0 px-3 sm:px-6 pt-3 sm:pt-6 pb-4">
               <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
                 <Users className="h-4 w-4 sm:h-5 sm:w-5 text-customBlue-400" />
@@ -579,7 +579,7 @@ const AddMembersModal = ({
                   placeholder="Search members..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 sm:py-3 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:border-transparent transition-colors text-sm sm:text-base"
+                  className="w-full pl-10 pr-4 py-2 sm:py-3 bg-white/20 backdrop-blur-sm dark:bg-white/10 border border-white/30 dark:border-white/20 rounded-lg text-white placeholder-gray-300 focus:outline-none focus:ring-2 focus:ring-customBlue-500 focus:border-white/50 transition-colors text-sm sm:text-base"
                 />
               </div>
             </div>

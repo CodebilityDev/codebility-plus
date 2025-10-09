@@ -51,14 +51,14 @@ export default function CodevList({ codevs }: Props) {
   }
 
   return (
-    <div className="m-auto h-full w-full max-w-6xl">
+    <div className="m-auto h-full w-full max-w-7xl px-4 sm:px-6 lg:px-8">
       <CodevListFilter
         selectedPosition={selectedPosition}
         setSelectedPosition={setSelectedPosition}
         users={codevs}
       />
       <div
-        className={`grid h-full w-full grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${
+        className={`grid h-full w-full grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 ${
           paginatedUsers.length < 5 ? "xl:grid-cols-4" : "xl:grid-cols-5"
         }`}
       >

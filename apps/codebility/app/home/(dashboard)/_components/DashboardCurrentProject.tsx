@@ -116,7 +116,7 @@ const DashboardCurrentProject = () => {
   // Loading state
   if (isLoading) {
     return (
-      <Box className="flex w-full flex-1 flex-col gap-4">
+      <Box className="flex w-full flex-1 flex-col gap-4 !bg-white/5 !backdrop-blur-2xl !border-white/10 !shadow-2xl dark:!bg-slate-900/5 dark:!border-slate-400/10 !before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none relative overflow-hidden">
         <p className="text-2xl">Current Projects</p>
         <div className="flex flex-col gap-4 md:flex-row lg:flex-col xl:flex-row">
           <Skeleton className="flex h-12 w-full gap-2 rounded-md p-2"></Skeleton>
@@ -137,7 +137,7 @@ const DashboardCurrentProject = () => {
       case "inprogress":
         return "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400 border-green-300 dark:border-green-700";
       default:
-        return "bg-gray-100 text-gray-700 dark:bg-gray-900/20 dark:text-gray-400 border-gray-300 dark:border-gray-700";
+        return "bg-white/20 text-gray-700 dark:bg-white/10 dark:text-gray-300 border-white/30 dark:border-white/20 backdrop-blur-sm";
     }
   }
   
@@ -156,7 +156,7 @@ const DashboardCurrentProject = () => {
   }
 
   return (
-    <Box className="flex w-full flex-1 flex-col gap-5">
+    <Box className="flex w-full flex-1 flex-col gap-5 !bg-white/5 !backdrop-blur-2xl !border-white/10 !shadow-2xl dark:!bg-slate-900/5 dark:!border-slate-400/10 !before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none relative overflow-hidden">
       <div className="flex items-center justify-between">
         <h2 className="text-2xl font-semibold">Current Projects</h2>
         <span className="text-sm text-muted-foreground">
@@ -171,11 +171,11 @@ const DashboardCurrentProject = () => {
               key={involvement.project.id}
               projectId={involvement.project.id}
             >
-              <div className="group relative overflow-hidden rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 transition-all duration-200 hover:border-customBlue-400 dark:hover:border-customBlue-600 hover:shadow-md">
+              <div className="group relative overflow-hidden rounded-lg border border-white/20 dark:border-white/10 bg-white/10 backdrop-blur-sm dark:bg-white/5 transition-all duration-200 hover:border-customBlue-400/50 dark:hover:border-customBlue-600/50 hover:shadow-md hover:bg-white/20 dark:hover:bg-white/10">
                 <div className="p-4">
                   <div className="flex items-center gap-3">
                     {/* Project Image */}
-                    <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-gray-100 dark:bg-gray-800">
+                    <div className="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-lg bg-white/20 backdrop-blur-sm dark:bg-white/10">
                       <Image
                         src={getProjectImageSrc(involvement.project)}
                         alt={`${involvement.project.name} project icon`}
@@ -220,8 +220,8 @@ const DashboardCurrentProject = () => {
           ))}
         </div>
       ) : (
-        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-gray-300 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-900/50 py-12 px-6 text-center">
-          <div className="mb-3 rounded-full bg-gray-100 dark:bg-gray-800 p-3">
+        <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-white/30 dark:border-white/20 bg-white/10 backdrop-blur-sm dark:bg-white/5 py-12 px-6 text-center">
+          <div className="mb-3 rounded-full bg-white/20 backdrop-blur-sm dark:bg-white/10 p-3">
             <svg className="h-6 w-6 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
             </svg>

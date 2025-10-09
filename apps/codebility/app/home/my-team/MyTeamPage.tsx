@@ -390,7 +390,7 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
 
   if (!projects?.length) {
     return (
-      <div className="flex min-h-screen items-center justify-center rounded-xl bg-white dark:bg-gray-900 p-6">
+      <div className="flex min-h-screen items-center justify-center rounded-xl bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg p-6">
         <div className="text-center max-w-md">
           <p className="text-gray-600 dark:text-gray-400">
             You are not assigned to any projects yet
@@ -405,7 +405,7 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
 
   return (
     <>
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+      <div className="min-h-screen bg-gradient-to-br from-customBlue-50 via-white to-purple-50 dark:bg-gradient-to-br dark:from-gray-900 dark:via-customBlue-950 dark:to-purple-950 transition-colors duration-200">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <div className="mb-2">
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 dark:text-white tracking-tight transition-colors duration-200">
@@ -420,7 +420,7 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
               return (
                 <div
                   key={project.id}
-                  className="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-dark-200 p-3 sm:p-4 md:p-5 lg:p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-gray-300 dark:hover:border-gray-600 h-full"
+                  className="rounded-xl bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20 p-3 sm:p-4 md:p-5 lg:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white/30 dark:hover:bg-white/15 hover:border-white/40 dark:hover:border-white/30 h-full">
                 >
                   <div className="space-y-4 sm:space-y-5 md:space-y-6">
                     

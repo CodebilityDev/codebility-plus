@@ -238,7 +238,7 @@ export default function TokenPoints() {
 
   if (loading) {
     return (
-      <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
+      <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden !bg-white/5 !backdrop-blur-2xl !border-white/10 !shadow-2xl dark:!bg-slate-900/5 dark:!border-slate-400/10 !before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none">
         {/* Background decoration */}
         <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/30 to-purple-50/30 dark:from-customBlue-950/10 dark:to-purple-950/10" />
         <div className="absolute -top-4 -right-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl" />
@@ -324,7 +324,7 @@ export default function TokenPoints() {
   const totalPoints = totalSkillPoints + attendancePoints + profilePoints;
 
   return (
-    <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
+    <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden !bg-white/5 !backdrop-blur-2xl !border-white/10 !shadow-2xl dark:!bg-slate-900/5 dark:!border-slate-400/10 !before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/30 to-purple-50/30 dark:from-customBlue-950/10 dark:to-purple-950/10" />
       <div className="absolute -top-4 -right-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl" />
@@ -346,7 +346,7 @@ export default function TokenPoints() {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2 gap-4">
           {/* Attendance Points Card */}
-          <div className="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+          <div className="group relative overflow-hidden rounded-xl border border-white/10 dark:border-white/5 bg-white/5 backdrop-blur-sm dark:bg-white/3 p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:bg-white/10 dark:hover:bg-white/5">
             <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 opacity-5 group-hover:opacity-10 transition-opacity" />
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
@@ -378,7 +378,7 @@ export default function TokenPoints() {
           </div>
 
           {/* Profile Points Card */}
-          <div className="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02]">
+          <div className="group relative overflow-hidden rounded-xl border border-white/10 dark:border-white/5 bg-white/5 backdrop-blur-sm dark:bg-white/3 p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:bg-white/10 dark:hover:bg-white/5">
             <div className="absolute inset-0 bg-gradient-to-br from-yellow-500 to-orange-500 opacity-5 group-hover:opacity-10 transition-opacity" />
             <div className="relative">
               <div className="flex items-center justify-between mb-3">
@@ -417,7 +417,7 @@ export default function TokenPoints() {
             return (
               <div
                 key={category}
-                className="group relative overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02]"
+                className="group relative overflow-hidden rounded-xl border border-white/10 dark:border-white/5 bg-white/5 backdrop-blur-sm dark:bg-white/3 p-4 shadow-sm transition-all duration-300 hover:shadow-lg hover:scale-[1.02] hover:bg-white/10 dark:hover:bg-white/5"
               >
                 {/* Background gradient */}
                 <div className={`absolute inset-0 bg-gradient-to-br ${getCategoryColor(category)} opacity-5 group-hover:opacity-10 transition-opacity`} />
@@ -447,7 +447,7 @@ export default function TokenPoints() {
                       <span className="text-xs text-gray-500">Progress to Level {currentLevel + 1}</span>
                       <span className="text-xs text-gray-500">{Math.round(progress)}%</span>
                     </div>
-                    <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden">
+                    <div className="h-2 bg-white/20 dark:bg-white/10 rounded-full overflow-hidden">
                       <div 
                         className={`h-full bg-gradient-to-r ${getCategoryColor(category)} transition-all duration-500 ease-out`}
                         style={{ width: `${progress}%` }}

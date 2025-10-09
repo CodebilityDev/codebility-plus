@@ -17,29 +17,27 @@ const DashboardCertificate = () => {
 	}
 
 	return (
-		<div className="absolute left-4 top-4 z-10">
-			<Tooltip>
-				<TooltipTrigger asChild>
-					<Button
-						size="icon"
-						variant="ghost"
-						className={cn(
-							"rounded-full inline-flex items-center justify-center",
-							"transition-colors duration-200",
-							"hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
-						)}
-						onClick={() => {
-							router.push("/home/certificate-preview");
-						}}
-					>
-						<CertificateIcon className="h-6 w-6 text-[#9747FF]" />
-					</Button>
-				</TooltipTrigger>
-				<TooltipContent side="bottom" align="start">
-					{user?.role_id === 1 ? "View certificates (Admin)" : "View your certificate"}
-				</TooltipContent>
-			</Tooltip>
-		</div>
+		<Tooltip>
+			<TooltipTrigger asChild>
+				<Button
+					size="icon"
+					variant="ghost"
+					className={cn(
+						"rounded-full inline-flex items-center justify-center",
+						"transition-colors duration-200",
+						"hover:bg-gray-100 dark:hover:bg-gray-800 cursor-pointer"
+					)}
+					onClick={() => {
+						router.push("/home/certificate-preview");
+					}}
+				>
+					<CertificateIcon className="h-6 w-6 text-[#9747FF]" />
+				</Button>
+			</TooltipTrigger>
+			<TooltipContent side="bottom" align="start">
+				{user?.role_id === 1 ? "View certificates (Admin)" : "View your certificate"}
+			</TooltipContent>
+		</Tooltip>
 	);
 };
 

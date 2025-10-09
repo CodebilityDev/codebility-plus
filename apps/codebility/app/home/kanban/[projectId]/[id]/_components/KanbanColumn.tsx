@@ -44,6 +44,10 @@ interface Props {
   projectId: string;
   tasks?: ExtendedTask[];
   onTaskComplete: (taskId: string) => void;
+  availableColumns: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
 export default function KanbanColumn({
@@ -51,6 +55,7 @@ export default function KanbanColumn({
   projectId,
   tasks,
   onTaskComplete,
+  availableColumns,
 }: Props) {
   const { user } = useUserStore();
   const canModifyColumn = user?.role_id === 1 || user?.role_id === 5;
@@ -180,18 +185,18 @@ export default function KanbanColumn({
             ? "border-customBlue-500 shadow-customBlue-500/15 scale-[1.02] opacity-95 shadow-lg"
             : isOver
               ? "border-customBlue-400 bg-customBlue-50/50 dark:border-customBlue-500 dark:bg-customBlue-950/20"
-              : "border-gray-300 shadow-sm hover:shadow-md dark:border-gray-600"
+              : "border-white/20 shadow-sm hover:shadow-md dark:border-white/10"
         }
-        bg-gray-50/90 backdrop-blur-sm transition-all duration-200 ease-out dark:bg-gray-800/90
+        bg-white/10 backdrop-blur-sm transition-all duration-200 ease-out dark:bg-white/5
       `}
       {...attributes}
     >
       {/* Column Header */}
       <div
-        className="flex items-center justify-between border-b border-gray-300 bg-gradient-to-r from-gray-100 to-gray-200 p-3 dark:border-gray-600 dark:from-gray-700 dark:to-gray-800 md:p-4"
+        className="flex items-center justify-between border-b border-white/30 bg-gradient-to-r from-white/20 to-white/30 backdrop-blur-sm p-3 dark:border-white/20 dark:from-white/10 dark:to-white/15 md:p-4"
         {...listeners}
       >
-        <div className="flex items-center gap-2 text-gray-800 dark:text-gray-200 md:gap-3">
+        <div className="flex items-center gap-2 text-white dark:text-gray-200 md:gap-3">
           {isEditing ? (
             <div className="flex items-center gap-1 md:gap-2">
               <Input
@@ -219,11 +224,11 @@ export default function KanbanColumn({
             </div>
           ) : (
             <>
-              <GripVertical className="hidden h-5 w-5 cursor-grab text-gray-400 transition-colors hover:text-gray-600 dark:hover:text-gray-300 md:block" />
-              <span className="text-base font-semibold text-gray-900 dark:text-white md:text-lg">
+              <GripVertical className="hidden h-5 w-5 cursor-grab text-gray-300 transition-colors hover:text-white dark:hover:text-gray-200 md:block" />
+              <span className="text-base font-semibold text-white dark:text-white md:text-lg">
                 {column.name}
               </span>
-              <div className="bg-customBlue-100 dark:bg-customBlue-900/30 dark:text-customBlue-100 flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium text-blue-100">
+              <div className="bg-white/30 dark:bg-white/20 backdrop-blur-sm flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium text-white dark:text-gray-200 border border-white/40 dark:border-white/30">
                 {safeTasks.length}
               </div>
             </>
@@ -237,7 +242,7 @@ export default function KanbanColumn({
               <Button
                 size="icon"
                 variant="hollow"
-                className="h-6 w-6 !p-0 hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                className="h-6 w-6 !p-0 hover:bg-white/30 dark:hover:bg-white/20 backdrop-blur-sm border border-white/20 dark:border-white/10"
               >
                 <MoreHorizontal className="h-3 w-3" />
               </Button>
@@ -269,7 +274,7 @@ export default function KanbanColumn({
           className={`
             flex min-h-[100px] flex-col gap-2 rounded-md p-1 transition-colors duration-200
             md:gap-4 md:p-2
-            ${isOver ? "border-customBlue-200 bg-customBlue-50 dark:bg-customBlue-900/20 border-2" : ""}
+            ${isOver ? "border-customBlue-300 bg-customBlue-50/30 dark:bg-customBlue-900/20 border-2 backdrop-blur-sm" : ""}
           `}
         >
           <SortableContext
@@ -277,7 +282,7 @@ export default function KanbanColumn({
             strategy={verticalListSortingStrategy}
           >
             {sortedTasks.length === 0 ? (
-              <div className="py-4 text-center text-xs text-gray-400 md:text-sm">
+              <div className="py-4 text-center text-xs text-gray-300 dark:text-gray-400 md:text-sm">
                 No tasks in this column
               </div>
             ) : (
@@ -287,6 +292,7 @@ export default function KanbanColumn({
                   task={task}
                   columnId={column.id}
                   onComplete={onTaskComplete}
+                  availableColumns={availableColumns}
                 />
               ))
             )}

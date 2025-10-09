@@ -54,7 +54,7 @@
   }
 
   .background-lightsection_darksection {
-    @apply bg-[#F4F4F4] dark:bg-[#131417];
+    @apply bg-[#F4F4F4] dark:bg-slate-950;
   }
 
   .background-lightsmallbox_darksmallbox {
