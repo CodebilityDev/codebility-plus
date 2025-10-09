@@ -254,7 +254,7 @@ export default async function KanbanPage(props: PageProps) {
 
   // Render the full page
   return (
-    <div className="mx-auto max-w-screen-xl">
+    <div className="w-full px-4 sm:px-6 lg:px-8">
       <div className="flex flex-col gap-4 pt-4">
         <AsyncErrorBoundary
           fallback={

@@ -54,6 +54,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
       <DialogContent
         className={`mobile:max-w-[95vw] flex max-h-[75vh] min-h-[75vh] flex-col
         overflow-y-auto sm:max-w-[90vw] lg:max-w-[80vw] xl:max-w-[70vw] 2xl:max-w-[60vw]
+        bg-white/30 backdrop-blur-md dark:bg-white/15 border border-white/30 dark:border-white/20 shadow-2xl
         `}
       >
         <DialogHeader>
@@ -182,7 +183,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
 
         {/* Content Tabs */}
         <Tabs defaultValue="about" className="mobile:mt-2 flex flex-col gap-10">
-          <TabsList className="mobile:text-sm mobile:gap-2 mobile:grid-cols-2 grid w-full grid-cols-4">
+          <TabsList className="mobile:text-sm mobile:gap-2 mobile:grid-cols-2 grid w-full grid-cols-4 bg-white/20 backdrop-blur-sm dark:bg-white/10 border border-white/30 dark:border-white/20">
             <TabsTrigger value="about">About</TabsTrigger>
             <TabsTrigger value="experience">Experience</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -191,50 +192,20 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
           {/* About Tab */}
           <TabsContent value="about" className="space-y-6">
             {/* About Section */}
-            {codev.about && (
-              <Section title="About">
-                <p className="text-gray-600 dark:text-gray-300">
-                  {codev.about}
-                </p>
-              </Section>
-            )}
+            <Section title="About">
+              <p className="text-gray-600 dark:text-gray-300">
+                {codev.about || "None"}
+              </p>
+            </Section>
 
-            {/* Education */}
-            {hasItems(codev.education) && (
-              <Section title="Education">
-                <div className="space-y-4">
-                  {codev.education.map((edu) => (
-                    <div key={edu.id} className="rounded-lg border p-4">
-                      <h4 className="font-medium">{edu.institution}</h4>
-                      {edu.degree && (
-                        <p className="text-gray-600">{edu.degree}</p>
-                      )}
-                      {edu.description && (
-                        <p className="mt-2 text-sm text-gray-500">
-                          {edu.description}
-                        </p>
-                      )}
-                      {edu.start_date && (
-                        <p className="mt-1 text-sm text-gray-500">
-                          {new Date(edu.start_date).getFullYear()} -
-                          {edu.end_date
-                            ? new Date(edu.end_date).getFullYear()
-                            : "Present"}
-                        </p>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </Section>
-            )}
           </TabsContent>
 
           {/* Experience Tab */}
           <TabsContent value="experience" className="mt-4 space-y-6">
-            {hasItems(codev.work_experience) && (
+            {hasItems(codev.work_experience) ? (
               <div className="space-y-4">
                 {codev.work_experience.map((exp) => (
-                  <div key={exp.id} className="rounded-lg border p-4">
+                  <div key={exp.id} className="rounded-lg bg-white/20 backdrop-blur-sm dark:bg-white/10 border border-white/30 dark:border-white/20 p-4">
                     <h4 className="font-medium">{exp.position}</h4>
                     <p className="text-gray-600">{exp.company_name}</p>
                     <p className="text-sm text-gray-500">
@@ -249,6 +220,8 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                   </div>
                 ))}
               </div>
+            ) : (
+              <p className="text-gray-600 dark:text-gray-300">None</p>
             )}
           </TabsContent>
 
@@ -271,7 +244,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                     const uniqueKey = project.id || `project-${index}`;
 
                     return (
-                      <div key={uniqueKey} className="rounded-lg border">
+                      <div key={uniqueKey} className="rounded-lg bg-white/20 backdrop-blur-sm dark:bg-white/10 border border-white/30 dark:border-white/20">
                         {project.main_image ? (
                           <div className="relative h-48 w-full">
                             <Image
@@ -351,15 +324,15 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                   .filter(Boolean)} {/* ✅ Remove null entries */}
               </div>
             ) : (
-              <p className="text-center text-gray-500">No projects available</p>
+              <p className="text-gray-600 dark:text-gray-300">None</p>
             )}
           </TabsContent>
 
           {/* Skills Tab */}
           <TabsContent value="skills" className="mt-4 space-y-6">
             {/* Tech Stacks */}
-            {hasItems(codev.tech_stacks) && (
-              <div>
+            <Section title="Tech Stacks">
+              {hasItems(codev.tech_stacks) ? (
                 <div className="flex flex-wrap gap-2">
                   {codev.tech_stacks.map((tech, index) =>
                     tech ? (
@@ -379,8 +352,10 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                     ) : null,
                   )}
                 </div>
-              </div>
-            )}
+              ) : (
+                <p className="text-gray-600 dark:text-gray-300">None</p>
+              )}
+            </Section>
 
             {/* Skill Points */}
             <Section title="Skill Points">

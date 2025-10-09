@@ -61,9 +61,9 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
   const totalMembers = members.data.length + (teamLead.data ? 1 : 0);
 
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-gray-200/60 bg-white/80 backdrop-blur-sm shadow-sm transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/10 hover:border-blue-300/40 hover:-translate-y-2 hover:bg-gradient-to-br hover:from-blue-50/30 hover:to-purple-50/20 dark:border-gray-700/60 dark:bg-gray-800/80 dark:hover:border-blue-500/40 dark:hover:bg-gradient-to-br dark:hover:from-gray-800 dark:hover:to-gray-700 dark:hover:shadow-blue-500/20 cursor-pointer">
+    <div className="group relative overflow-hidden rounded-2xl bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-500 hover:shadow-2xl hover:shadow-customBlue-500/20 hover:border-white/50 dark:hover:border-white/30 hover:-translate-y-2 hover:bg-white/30 dark:hover:bg-white/15 cursor-pointer">
       {/* Gradient overlay on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 via-transparent to-purple-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+      <div className="absolute inset-0 bg-gradient-to-br from-customBlue-500/10 via-transparent to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
       
       {/* Clickable area for navigation */}
       <Link 
@@ -120,7 +120,7 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
               <Crown className="h-4 w-4 text-yellow-500" />
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Team Lead</span>
             </div>
-            <div className="flex items-center gap-4 rounded-xl bg-gradient-to-r from-yellow-50 to-orange-50 p-4 border border-yellow-200/50 dark:from-yellow-900/20 dark:to-orange-900/20 dark:border-yellow-700/50">
+            <div className="flex items-center gap-4 rounded-xl bg-white/30 backdrop-blur-sm dark:bg-white/10 p-4 border border-white/40 dark:border-white/20">
               <div className="relative">
                 <MemberAvatar member={teamLead.data} size={48} showBorder={false} />
                 <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-yellow-400 border-2 border-white dark:border-gray-800 flex items-center justify-center">
@@ -173,7 +173,7 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
               </div>
               
               {/* Quick member list */}
-              <div className="bg-gray-50/50 rounded-lg p-3 dark:bg-gray-800/50">
+              <div className="bg-white/30 backdrop-blur-sm dark:bg-white/10 rounded-lg p-3 border border-white/20 dark:border-white/10">
                 <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   <span className="font-medium">Recent: </span>
                   {members.data.slice(0, 3).map((member) => 
@@ -188,9 +188,9 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
               </div>
             </div>
           ) : (
-            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-gray-300 py-4 dark:border-gray-600 bg-gray-50/30 dark:bg-gray-800/30">
+            <div className="flex flex-col items-center justify-center rounded-xl border-2 border-dashed border-white/40 dark:border-white/20 py-4 bg-white/20 backdrop-blur-sm dark:bg-white/5">
               <div className="text-center">
-                <div className="mx-auto h-8 w-8 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center mb-2">
+                <div className="mx-auto h-8 w-8 rounded-full bg-white/40 backdrop-blur-sm dark:bg-white/20 border border-white/30 dark:border-white/10 flex items-center justify-center mb-2">
                   <UserPlus className="h-4 w-4 text-blue-600 dark:text-blue-400" />
                 </div>
                 <p className="text-xs font-medium text-gray-900 dark:text-gray-100 mb-1">

@@ -12,6 +12,7 @@ import {
   Sheet,
   SheetClose,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -149,9 +150,9 @@ const MobileNav = () => {
           <SheetTitle id="mobile-nav-title" className="sr-only">
             Mobile Navigation Menu
           </SheetTitle>
-          <div id="mobile-nav-description" className="sr-only">
+          <SheetDescription id="mobile-nav-description" className="sr-only">
             Navigate through the application pages using the links below
-          </div>
+          </SheetDescription>
         </SheetHeader>
         <div className="mb-4">
           <Link

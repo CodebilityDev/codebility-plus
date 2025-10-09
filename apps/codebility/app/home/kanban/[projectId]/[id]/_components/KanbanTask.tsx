@@ -13,6 +13,7 @@ import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 import KanbanTaskViewEditModal from "./kanban_modals/KanbanTaskViewEditModal";
+import MobileTaskMoveModal from "./kanban_modals/MobileTaskMoveModal";
 
 // Local interface for fetched sidekick data
 interface SidekickMember {
@@ -26,9 +27,13 @@ interface Props {
   task: Task; // Use the global Task type, not ExtendedTask
   columnId?: string;
   onComplete?: (taskId: string) => void;
+  availableColumns?: Array<{
+    id: string;
+    name: string;
+  }>;
 }
 
-function KanbanTask({ task, columnId, onComplete }: Props) {
+function KanbanTask({ task, columnId, onComplete, availableColumns = [] }: Props) {
   const {
     setNodeRef,
     attributes,
@@ -182,14 +187,14 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         style={style}
         {...attributes}
         {...listeners}
-        className={`group relative mt-1 flex cursor-grab flex-col gap-2 rounded-xl bg-white dark:bg-gray-800
+        className={`group relative mt-1 flex cursor-grab flex-col gap-2 rounded-xl bg-white/10 backdrop-blur-sm dark:bg-white/5
           p-3 md:mt-2 md:gap-3 md:p-4 
           ${
             isDragging
               ? "rotate-1 scale-[1.01] shadow-lg shadow-customBlue-500/15 ring-1 ring-customBlue-400 z-40"
-              : "hover:shadow-md hover:shadow-gray-300/30 dark:hover:shadow-gray-900/30 hover:-translate-y-0.5 hover:bg-gray-50 dark:hover:bg-gray-750 z-10"
+              : "hover:shadow-md hover:shadow-customBlue-300/30 dark:hover:shadow-customBlue-900/30 hover:-translate-y-0.5 hover:bg-white/20 dark:hover:bg-white/10 z-10"
           } 
-          border border-gray-200 dark:border-gray-600 shadow-sm
+          border border-white/20 dark:border-white/10 shadow-sm
           transform transition-all duration-200 ease-out`}
         data-type="Task"
       >
@@ -206,6 +211,14 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
             {task.title}
           </h3>
           <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
+            {/* Mobile Move Button */}
+            {columnId && availableColumns.length > 0 && (
+              <MobileTaskMoveModal
+                task={task}
+                currentColumnId={columnId}
+                availableColumns={availableColumns}
+              />
+            )}
             <div
               className={`flex h-6 w-auto items-center justify-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium shadow-sm transition-all duration-200 md:h-7 md:text-sm
     ${
@@ -245,7 +258,7 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         {task.skill_category && (
           <div>
             <span
-              className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium shadow-sm border md:px-3 md:py-1 ${getSkillCategoryColor(
+              className={`inline-block rounded-full px-2.5 py-1 text-xs font-medium shadow-sm border backdrop-blur-sm md:px-3 md:py-1 ${getSkillCategoryColor(
                 task.skill_category.name,
               )} transition-all duration-200 hover:scale-105`}
             >
@@ -258,18 +271,18 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
         <div className="flex flex-wrap gap-1 text-xs text-gray-600 dark:text-gray-400 md:gap-2 md:text-sm">
           {task.difficulty && (
             <span
-              className="inline-flex items-center rounded-md bg-purple-100 border border-purple-200
+              className="inline-flex items-center rounded-md bg-purple-100/80 backdrop-blur-sm border border-purple-200/50
               px-2 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/40 
-              dark:text-purple-300 dark:border-purple-800 shadow-sm md:px-2.5 md:py-1"
+              dark:text-purple-300 dark:border-purple-800/50 shadow-sm md:px-2.5 md:py-1"
             >
               {task.difficulty}
             </span>
           )}
           {typeof task.points === "number" && (
             <span
-              className="inline-flex items-center rounded-md bg-green-100 border border-green-200
+              className="inline-flex items-center rounded-md bg-green-100/80 backdrop-blur-sm border border-green-200/50
               px-2 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/40 
-              dark:text-green-300 dark:border-green-800 shadow-sm md:px-2.5 md:py-1"
+              dark:text-green-300 dark:border-green-800/50 shadow-sm md:px-2.5 md:py-1"
             >
               {task.points} pts
             </span>
@@ -323,8 +336,8 @@ function KanbanTask({ task, columnId, onComplete }: Props) {
             })}
             {sidekicks.length > 3 && (
               <div
-                className="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100 border border-gray-200
-                text-[10px] font-medium text-gray-700 dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 shadow-sm md:h-7 md:w-7 md:text-xs"
+                className="flex h-6 w-6 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm border border-white/30
+                text-[10px] font-medium text-gray-700 dark:bg-white/10 dark:border-white/20 dark:text-gray-300 shadow-sm md:h-7 md:w-7 md:text-xs"
               >
                 +{sidekicks.length - 3}
               </div>

@@ -125,7 +125,7 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
           </nav>
 
           {/* Header Section */}
-          <header className="flex flex-col gap-6 md:justify-between lg:flex-row">
+          <header className="flex flex-col gap-6">
             <div className="flex items-center gap-4">
               <div className="from-customBlue-500 shadow-customBlue-500/25 flex h-14 w-14 animate-pulse items-center justify-center rounded-full bg-gradient-to-br to-purple-500 shadow-xl [animation-duration:3s]">
                 <span className="text-2xl" aria-hidden="true">
@@ -142,36 +142,30 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
               </div>
             </div>
 
-            {/* Search and Controls Section */}
-            <div className="flex flex-col gap-4">
-              {/* Search Input */}
-              <div className="focus-within:ring-customBlue-500 focus-within:border-customBlue-300 flex w-full items-center gap-3 rounded-xl border border-gray-200 bg-white/80 p-3 shadow-lg backdrop-blur-sm transition-all duration-300 focus-within:shadow-xl focus-within:ring-2 hover:bg-white dark:border-gray-600 dark:bg-gray-800/80">
-                <label htmlFor="kanbanSearch" className="sr-only">
-                  Search tasks
-                </label>
-                <IconSearch
-                  className="text-gray-400 transition-colors duration-200 dark:text-gray-500"
-                  aria-hidden="true"
-                />
-                <KanbanBoardsSearch
-                  className="w-full bg-transparent font-medium text-gray-900 placeholder-gray-500 outline-none dark:text-white dark:placeholder-gray-400"
-                  placeholder="🔍 Search tasks..."
-                  id="kanbanSearch"
-                />
-              </div>
-
-              {/* Controls Section */}
-              <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-                {/* User Filter */}
-                <div className="h-10 overflow-visible">
-                  <UserTaskFilter
-                    members={members}
-                    onFilterClick={handleFilterClick}
+            {/* Desktop Layout: Search Left, Controls Right */}
+            <div className="flex flex-col gap-6 lg:flex-row lg:gap-8 lg:items-start">
+              {/* Left: Search Input */}
+              <div className="flex-1">
+                <div className="focus-within:ring-customBlue-500 focus-within:border-customBlue-300 flex w-full items-center gap-3 rounded-xl border border-white/20 bg-white/10 p-3 shadow-lg backdrop-blur-sm transition-all duration-300 focus-within:shadow-xl focus-within:ring-2 hover:bg-white/20 dark:border-white/10 dark:bg-white/5">
+                  <label htmlFor="kanbanSearch" className="sr-only">
+                    Search tasks
+                  </label>
+                  <IconSearch
+                    className="text-gray-300 transition-colors duration-200 dark:text-gray-400"
+                    aria-hidden="true"
+                  />
+                  <KanbanBoardsSearch
+                    className="w-full bg-transparent font-medium text-white placeholder-gray-300 outline-none dark:text-white dark:placeholder-gray-400"
+                    placeholder="🔍 Search tasks..."
+                    id="kanbanSearch"
                   />
                 </div>
+              </div>
 
-                {/* Action Buttons */}
-                <div className="flex flex-col gap-2 md:flex-row md:gap-3">
+              {/* Right: Buttons and Members */}
+              <div className="flex flex-col gap-4 lg:flex-col lg:items-end">
+                {/* Action Buttons Section */}
+                <div className="flex flex-col gap-2 sm:flex-row sm:gap-3">
                   {canAddColumn && (
                     <KanbanColumnAddButton boardId={boardData.id} />
                   )}
@@ -184,7 +178,7 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
                     className={`flex transform items-center gap-2 whitespace-nowrap px-3 py-2 text-sm transition-all duration-300 hover:scale-105 ${
                       showArchive
                         ? "bg-customBlue-600 hover:bg-customBlue-700 shadow-customBlue-500/30 text-white shadow-lg"
-                        : "border-gray-300 text-gray-700 hover:border-gray-400 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                        : "border-white/30 text-white hover:border-white/50 hover:bg-white/20 dark:border-white/20 dark:text-gray-300 dark:hover:bg-white/10 backdrop-blur-sm"
                     }`}
                     aria-pressed={showArchive}
                   >
@@ -196,6 +190,14 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
                       {showArchive ? "Hide" : "Archive"}
                     </span>
                   </Button>
+                </div>
+
+                {/* User Filter Section */}
+                <div className="min-h-10 overflow-visible">
+                  <UserTaskFilter
+                    members={members}
+                    onFilterClick={handleFilterClick}
+                  />
                 </div>
               </div>
             </div>
