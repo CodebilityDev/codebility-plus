@@ -6,8 +6,9 @@ import { useEffect, useState } from "react";
 
 export default function PageLoadingAnimation() {
   const [particles, setParticles] = useState<Array<{ id: number; x: number; y: number; delay: number }>>([]);
+  const [isMobile, setIsMobile] = useState(false);
 
-  // Generate random particles for background effect
+  // Generate random particles for background effect and check if mobile
   useEffect(() => {
     const newParticles = Array.from({ length: 50 }, (_, i) => ({
       id: i,
@@ -16,10 +17,19 @@ export default function PageLoadingAnimation() {
       delay: Math.random() * 3,
     }));
     setParticles(newParticles);
+    
+    // Check if mobile
+    const checkIsMobile = () => {
+      setIsMobile(window.innerWidth < 640);
+    };
+    
+    checkIsMobile();
+    window.addEventListener('resize', checkIsMobile);
+    return () => window.removeEventListener('resize', checkIsMobile);
   }, []);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-gray-900 via-gray-950 to-black overflow-hidden">
+    <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-950 via-slate-950 to-customBlue-950 overflow-hidden">
       {/* Animated grid background */}
       <div className="absolute inset-0 opacity-20">
         <div 
@@ -77,13 +87,13 @@ export default function PageLoadingAnimation() {
           className="relative"
           initial={{ scale: 0, rotate: -180 }}
           animate={{ scale: 1, rotate: 0 }}
-          transition={{ duration: 2.5, ease: "easeOut" }}
+          transition={{ duration: 1.2, ease: "easeOut" }}
         >
           {/* Outer hexagon ring */}
           <motion.div
             className="absolute -inset-8"
             animate={{ rotate: 360 }}
-            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 20, repeat: Infinity, ease: "linear" }}
           >
             <svg width="200" height="200" viewBox="0 0 200 200" className="drop-shadow-lg">
               <defs>
@@ -116,7 +126,7 @@ export default function PageLoadingAnimation() {
                 }}
                 animate={{ rotate: ring % 2 === 0 ? 360 : -360 }}
                 transition={{
-                  duration: 8 + ring * 2,
+                  duration: 4 + ring * 1,
                   repeat: Infinity,
                   ease: "linear",
                 }}
@@ -141,7 +151,7 @@ export default function PageLoadingAnimation() {
                 scale: [1, 1.1, 1],
               }}
               transition={{
-                duration: 4,
+                duration: 2,
                 repeat: Infinity,
                 ease: "easeInOut",
               }}
@@ -175,7 +185,7 @@ export default function PageLoadingAnimation() {
                   filter: ['hue-rotate(0deg)', 'hue-rotate(360deg)'],
                 }}
                 transition={{
-                  duration: 8,
+                  duration: 4,
                   repeat: Infinity,
                   ease: "linear",
                 }}
@@ -208,9 +218,9 @@ export default function PageLoadingAnimation() {
                 opacity: [0, 0.6, 0],
               }}
               transition={{
-                duration: 6,
+                duration: 3,
                 repeat: Infinity,
-                delay: i * 0.8,
+                delay: i * 0.4,
                 ease: "linear",
               }}
             >
@@ -236,32 +246,32 @@ export default function PageLoadingAnimation() {
 
         {/* Advanced loading text with typewriter effect */}
         <motion.div
-          className="absolute -bottom-20 left-1/2 transform -translate-x-1/2"
+          className="absolute -bottom-20 left-1/2 transform -translate-x-1/2 w-full max-w-xs sm:max-w-sm md:max-w-md px-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 1 }}
         >
           <div className="text-center">
             {/* Typewriter loading text */}
-            <motion.div className="text-lg font-mono text-customBlue-400 mb-4">
+            <motion.div className="text-sm sm:text-base md:text-lg font-mono text-customBlue-400 mb-4">
               <motion.span
                 initial={{ width: 0 }}
                 animate={{ width: "auto" }}
-                transition={{ duration: 4, ease: "easeOut" }}
+                transition={{ duration: 2, ease: "easeOut" }}
                 className="inline-block overflow-hidden whitespace-nowrap border-r-2 border-customBlue-400"
               >
-                Initializing quantum framework...
+                {isMobile ? "Loading..." : "Initializing quantum framework..."}
               </motion.span>
             </motion.div>
 
             {/* Holographic progress bar */}
-            <div className="relative w-64 h-2 bg-gray-800 rounded-full overflow-hidden border border-customBlue-500/30">
+            <div className="relative w-48 sm:w-56 md:w-64 h-2 bg-gray-800 rounded-full overflow-hidden border border-customBlue-500/30 mx-auto">
               <motion.div
                 className="absolute inset-0 bg-gradient-to-r from-customBlue-500 via-purple-500 to-cyan-400"
                 initial={{ x: "-100%" }}
                 animate={{ x: "100%" }}
                 transition={{
-                  duration: 4,
+                  duration: 2,
                   repeat: Infinity,
                   ease: "easeInOut",
                 }}
@@ -275,7 +285,7 @@ export default function PageLoadingAnimation() {
                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent opacity-30"
                 animate={{ x: ["-100%", "100%"] }}
                 transition={{
-                  duration: 3,
+                  duration: 1.5,
                   repeat: Infinity,
                   ease: "linear",
                 }}
@@ -283,7 +293,7 @@ export default function PageLoadingAnimation() {
             </div>
 
             {/* Status indicators */}
-            <div className="flex justify-center gap-4 mt-4">
+            <div className="flex justify-center gap-2 sm:gap-4 mt-4">
               {['CPU', 'GPU', 'RAM'].map((label, i) => (
                 <motion.div
                   key={label}

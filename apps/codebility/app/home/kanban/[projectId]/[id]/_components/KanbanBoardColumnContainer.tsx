@@ -318,6 +318,7 @@ export default function KanbanBoardColumnContainer({
                 projectId={projectId}
                 tasks={column.tasks ?? []}
                 onTaskComplete={handleTaskComplete}
+                availableColumns={boardData.map(col => ({ id: col.id, name: col.name }))}
               />
             ))}
           </ol>

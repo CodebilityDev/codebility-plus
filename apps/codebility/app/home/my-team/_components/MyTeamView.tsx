@@ -120,7 +120,7 @@ const MyTeamView = ({ projectData }: MyTeamViewProps) => {
 
   if (!projects?.length) {
     return (
-      <div className="flex flex-col items-center justify-center gap-4 py-8">
+      <div className="flex flex-col items-center justify-center gap-4 py-8 bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20 rounded-2xl shadow-lg">
         <div className="text-4xl">👥</div>
         <h2 className="text-xl font-semibold text-gray-900 dark:text-gray-100">No teams found</h2>
         <p className="text-gray-600 dark:text-gray-400">

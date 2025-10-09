@@ -95,10 +95,10 @@ export default function FilterCodevs({
         size="sm"
         onClick={toggleFilter}
         className={cn(
-          "text-white transition-colors",
+          "text-white transition-all duration-300 backdrop-blur-sm border shadow-lg",
           showFilter
-        ? "bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700"
-        : "bg-gradient-to-r from-customBlue-500 to-indigo-500 hover:from-customBlue-600 hover:to-indigo-600"
+        ? "bg-gradient-to-r from-pink-500/80 to-rose-600/80 hover:from-pink-600 hover:to-rose-700 border-pink-400/50"
+        : "bg-gradient-to-r from-customBlue-500/80 to-indigo-500/80 hover:from-customBlue-600 hover:to-indigo-600 border-customBlue-400/50"
         )}
       >
         {showFilter ? "Close filter" : "Filter"}
@@ -106,22 +106,22 @@ export default function FilterCodevs({
 
       <div
         className={`absolute right-0 top-12 z-[1] max-h-[calc(100vh-20rem)] min-h-[300px] w-[300%] overflow-auto
-          sm:-right-3/4 sm:w-96 md:right-0 md:w-80 rounded-2xl bg-white/90 p-6 shadow-xl backdrop-blur-sm dark:bg-gray-800/90
+          sm:-right-3/4 sm:w-96 md:right-0 md:w-80 rounded-2xl bg-white/10 backdrop-blur-md p-6 shadow-2xl dark:bg-white/5 border border-white/20 dark:border-white/10
           ${!showFilter && "hidden"}
         `}
       >
         <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-semibold text-white">Filters</h3>
+          <h3 className="font-semibold text-white drop-shadow-sm">Filters</h3>
           <button
             onClick={clearFilter}
-            className="text-sm text-customBlue-600 hover:text-customBlue-800 dark:text-customBlue-400 dark:hover:text-customBlue-500"
+            className="text-sm text-customBlue-300 hover:text-customBlue-100 dark:text-customBlue-400 dark:hover:text-customBlue-200 transition-colors duration-200 px-2 py-1 rounded-md hover:bg-white/20 dark:hover:bg-white/10"
           >
             Clear all
           </button>
         </div>
 
         <Tabs defaultValue="position" className="w-full">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm border border-white/20 dark:border-white/10">
             <TabsTrigger value="position">Position</TabsTrigger>
             <TabsTrigger value="status">Status</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
@@ -131,7 +131,7 @@ export default function FilterCodevs({
             {positions.map((pos) => (
               <div
                 key={pos.id}
-                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-gray-100/60 dark:hover:bg-gray-700/60"
+                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-white/20 dark:hover:bg-white/10"
               >
                 <Checkbox
                   id={`pos-${pos.id}`}
@@ -140,7 +140,7 @@ export default function FilterCodevs({
                     handleCheckedChange("positions", pos.name || "")
                   }
                 />
-                <label htmlFor={`pos-${pos.id}`} className="text-sm cursor-pointer text-gray-700 dark:text-gray-300">
+                <label htmlFor={`pos-${pos.id}`} className="text-sm cursor-pointer text-white dark:text-gray-200">
                   {pos.name}
                 </label>
               </div>
@@ -151,7 +151,7 @@ export default function FilterCodevs({
             {AVAILABILITY_STATUS.map((status) => (
               <div
                 key={status}
-                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-gray-100/60 dark:hover:bg-gray-700/60"
+                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-white/20 dark:hover:bg-white/10"
               >
                 <Checkbox
                   id={`status-${status}`}
@@ -160,7 +160,7 @@ export default function FilterCodevs({
                     handleCheckedChange("availability", status)
                   }
                 />
-                <label htmlFor={`status-${status}`} className="text-sm cursor-pointer text-gray-700 dark:text-gray-300">
+                <label htmlFor={`status-${status}`} className="text-sm cursor-pointer text-white dark:text-gray-200">
                   {status}
                 </label>
               </div>
@@ -171,7 +171,7 @@ export default function FilterCodevs({
             {projects.map((project) => (
               <div
                 key={project.id}
-                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-gray-100/60 dark:hover:bg-gray-700/60"
+                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-white/20 dark:hover:bg-white/10"
               >
                 <Checkbox
                   id={project.id}
@@ -180,7 +180,7 @@ export default function FilterCodevs({
                     handleCheckedChange("projects", project.id)
                   }
                 />
-                <label htmlFor={project.name} className="text-sm cursor-pointer text-gray-700 dark:text-gray-300">
+                <label htmlFor={project.name} className="text-sm cursor-pointer text-white dark:text-gray-200">
                   {project.name}
                 </label>
               </div>

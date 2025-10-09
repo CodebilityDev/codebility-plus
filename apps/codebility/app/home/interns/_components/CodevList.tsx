@@ -99,19 +99,19 @@ export default function CodevList({ data, filters, activeTab = "active", isSearc
     <div className="space-y-8">
       {isFiltering ? (
         // Show skeleton while filtering
-        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4">
           {Array.from({ length: 8 }).map((_, index) => (
             <AnimatedCodevCardSkeleton key={index} delay={index * 100} />
           ))}
         </div>
       ) : paginatedData.length > 0 ? (
-        <div className="grid gap-4 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5">
+        <div className="grid gap-6 sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-4">
           {paginatedData.map((codev) => (
             <CodevCard key={codev.id} codev={codev} />
           ))}
         </div>
       ) : (
-        <div className="mx-auto max-w-md rounded-2xl bg-gray-50/80 p-12 text-center backdrop-blur-sm dark:bg-gray-800/60">
+        <div className="mx-auto max-w-md rounded-2xl bg-white/10 backdrop-blur-sm p-12 text-center dark:bg-white/5 border border-white/20 dark:border-white/10 shadow-xl">
           <div className="mb-6 text-6xl">👥</div>
           <h3 className="mb-4 text-2xl font-light text-gray-900 dark:text-white">
             No developers found
