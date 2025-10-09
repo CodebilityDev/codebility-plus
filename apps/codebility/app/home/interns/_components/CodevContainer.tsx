@@ -27,7 +27,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
   const inactiveCount = data.filter(codev => codev.availability_status !== true).length;
 
   return (
-    <div className="flex flex-col gap-12">
+    <div className="flex flex-col gap-12 px-4 sm:px-6 lg:px-8">
       {/* Header Section */}
       <div className="text-center">
         <div className="mb-6">
@@ -44,7 +44,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
       {/* Main Tabs for Members/Projects */}
       <div className="flex justify-center">
         <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as "members" | "projects")} className="w-full max-w-2xl">
-          <TabsList className="grid w-full grid-cols-2 bg-gray-100 dark:bg-gray-800">
+          <TabsList className="grid w-full grid-cols-2 bg-white/10 backdrop-blur-sm dark:bg-white/5 border border-white/20 dark:border-white/10">
             <TabsTrigger value="members" className="flex items-center gap-2">
               Members
                 <span className="rounded-full bg-blue-600/20 px-2 py-0.5 text-xs font-semibold text-blue-800 dark:bg-blue-700/30 dark:text-blue-100">
@@ -62,7 +62,7 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
       {activeTab === "members" && (
         <div className="flex justify-center">
           <Tabs value={membersSubTab} onValueChange={(value) => setMembersSubTab(value as "active" | "inactive" | "all")} className="w-full max-w-xl">
-            <TabsList className="grid w-full grid-cols-3 bg-gray-50 dark:bg-gray-900">
+            <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm dark:bg-white/5 border border-white/20 dark:border-white/10">
               <TabsTrigger value="active" className="flex items-center gap-2">
                 Active
                 <span className="rounded-full bg-emerald-600/20 px-2 py-0.5 text-xs font-semibold text-emerald-100 dark:bg-emerald-900/20 dark:text-emerald-100">
@@ -88,17 +88,19 @@ export default function CodevContainer({ data }: { data: Codev[] }) {
 
       {/* Controls Section - Only show for members tab */}
       {activeTab === "members" && (
-        <div className="flex flex-col items-center gap-6 md:flex-row md:justify-end">
-          <div className="w-full max-w-md">
-            <CodevSearchbar
-              allCodevs={data}
-              codevs={codevs}
-              setCodevs={setCodevs}
-              setIsSearching={setIsSearching}
-            />
-          </div>
-          <div>
-            <FilterCodevs filters={filters} setFilters={setFilters} />
+        <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 dark:border-white/10 shadow-lg">
+          <div className="flex flex-col items-stretch gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div className="flex-1 max-w-md mx-auto lg:mx-0">
+              <CodevSearchbar
+                allCodevs={data}
+                codevs={codevs}
+                setCodevs={setCodevs}
+                setIsSearching={setIsSearching}
+              />
+            </div>
+            <div className="flex justify-center lg:justify-end">
+              <FilterCodevs filters={filters} setFilters={setFilters} />
+            </div>
           </div>
         </div>
       )}

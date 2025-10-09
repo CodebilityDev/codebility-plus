@@ -6,6 +6,23 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useNavStore } from "@/hooks/use-sidebar";
 import PageLoadingAnimation from "./PageLoadingAnimation";
 
+// Hook to detect if we're on desktop
+function useIsDesktop() {
+  const [isDesktop, setIsDesktop] = useState(false);
+  
+  useEffect(() => {
+    const checkIsDesktop = () => {
+      setIsDesktop(window.innerWidth >= 1024);
+    };
+    
+    checkIsDesktop();
+    window.addEventListener('resize', checkIsDesktop);
+    return () => window.removeEventListener('resize', checkIsDesktop);
+  }, []);
+  
+  return isDesktop;
+}
+
 interface PageTransitionWrapperProps {
   children: React.ReactNode;
 }
@@ -13,10 +30,11 @@ interface PageTransitionWrapperProps {
 export default function PageTransitionWrapper({ children }: PageTransitionWrapperProps) {
   const pathname = usePathname();
   const { isToggleOpen } = useNavStore();
+  const isDesktop = useIsDesktop();
   const [isLoading, setIsLoading] = useState(true);
   const [displayedPathname, setDisplayedPathname] = useState(pathname);
   const [animationEnabled, setAnimationEnabled] = useState(true);
-  const [animationDuration, setAnimationDuration] = useState(3000);
+  const [animationDuration, setAnimationDuration] = useState(1500);
 
   // Load user preferences
   useEffect(() => {
@@ -81,8 +99,7 @@ export default function PageTransitionWrapper({ children }: PageTransitionWrappe
             }}
             className="fixed top-0 right-0 bottom-0 z-50"
             style={{
-              left: isToggleOpen ? "16rem" : "5rem", // Dynamic sidebar width
-              width: isToggleOpen ? "calc(100vw - 16rem)" : "calc(100vw - 5rem)"
+              left: isDesktop ? (isToggleOpen ? "16rem" : "5rem") : "0"
             }}
           >
             <PageLoadingAnimation />

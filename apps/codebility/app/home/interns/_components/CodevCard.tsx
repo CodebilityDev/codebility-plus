@@ -29,23 +29,23 @@ const STATUS_CONFIG: Record<
 > = {
   applying: {
     label: "Applying",
-    className: "bg-customBlue-100 text-customBlue-800 dark:bg-customBlue-900 dark:text-customBlue-200",
+    className: "bg-customBlue-500/20 backdrop-blur-sm text-customBlue-200 border border-customBlue-500/30 dark:bg-customBlue-500/10 dark:text-customBlue-300",
   },
   testing: {
     label: "Testing",
-    className: "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200",
+    className: "bg-orange-500/20 backdrop-blur-sm text-orange-200 border border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300",
   },
   onboarding: {
     label: "Onboarding",
-    className: "bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200",
+    className: "bg-purple-500/20 backdrop-blur-sm text-purple-200 border border-purple-500/30 dark:bg-purple-500/10 dark:text-purple-300",
   },
   denied: {
     label: "Denied",
-    className: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200",
+    className: "bg-red-500/20 backdrop-blur-sm text-red-200 border border-red-500/30 dark:bg-red-500/10 dark:text-red-300",
   },
   passed: {
     label: "Passed",
-    className: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200",
+    className: "bg-green-500/20 backdrop-blur-sm text-green-200 border border-green-500/30 dark:bg-green-500/10 dark:text-green-300",
   },
 };
 
@@ -84,8 +84,11 @@ export default function CodevCard({ codev }: CodevCardProps) {
       onMouseMove={handleMouseMove}
     >
       <div
-        className="group relative h-full rounded-2xl bg-white/70 p-4 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/80 hover:shadow-xl dark:bg-gray-800/70 dark:hover:bg-gray-800/80"
+        className="group relative h-full rounded-2xl bg-white/10 backdrop-blur-md p-4 shadow-lg transition-all duration-300 hover:bg-white/20 hover:shadow-xl dark:bg-white/5 dark:hover:bg-white/10 border border-white/20 dark:border-white/10 overflow-hidden"
       >
+        {/* Background decoration */}
+        <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/20 to-purple-50/20 dark:from-customBlue-950/10 dark:to-purple-950/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        <div className="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
         <div
           className="flex h-full cursor-pointer flex-col justify-start gap-4"
           onClick={() => onOpen("profileModal", codev)}
@@ -128,7 +131,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
                       whiteSpace: "nowrap",
                     }}
                     className={cn(
-                      `absolute -top-12 left-1/2 z-50 flex -translate-x-1/2
+                      `absolute -top-16 left-1/2 z-[100] flex -translate-x-1/2
                        transform flex-col items-center justify-center rounded-xl px-3 py-2 shadow-xl 
                         ${statusConfig?.className || ''}
                        `,

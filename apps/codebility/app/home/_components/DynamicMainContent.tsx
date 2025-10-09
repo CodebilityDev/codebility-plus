@@ -10,8 +10,8 @@ interface DynamicMainContentProps {
 export default function DynamicMainContent({ children }: DynamicMainContentProps) {
   const { isToggleOpen } = useNavStore();
   
-  // Dynamic margin based on sidebar state
-  const marginClass = isToggleOpen ? "ml-64" : "ml-20"; // 16rem = ml-64, 5rem = ml-20
+  // Dynamic margin based on sidebar state - only apply on desktop (lg screens and up)
+  const marginClass = isToggleOpen ? "lg:ml-64" : "lg:ml-20"; // 16rem = ml-64, 5rem = ml-20
   
   return (
     <main 

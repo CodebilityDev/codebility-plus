@@ -686,7 +686,7 @@ const TaskViewModal = ({
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-auto max-h-[900px] w-[95vw] max-w-3xl overflow-y-auto bg-white p-4 dark:bg-gray-900">
+      <DialogContent className="h-auto max-h-[90vh] sm:max-h-[900px] w-[95vw] sm:w-[90vw] max-w-3xl overflow-y-auto bg-white p-3 sm:p-4 dark:bg-gray-900">
         <div className="flex flex-col gap-6">
           <div className="flex items-center justify-between">
             <DialogHeader>

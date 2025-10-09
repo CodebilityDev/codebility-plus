@@ -80,60 +80,72 @@ export default function DashboardProfile() {
         onClose={() => setIsModalOpen(false)}
       />
       {!isLoading ? (
-        <Box className="relative flex-1 overflow-hidden">
+        <Box className="relative flex-1 overflow-hidden !bg-white/5 !backdrop-blur-2xl !border-white/10 !shadow-2xl dark:!bg-slate-900/5 dark:!border-slate-400/10 !before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none">
           {/* Background decoration */}
           <div className="from-customBlue-50/30 dark:from-customBlue-950/10 absolute inset-0 bg-gradient-to-br to-purple-50/30 dark:to-purple-950/10" />
           <div className="absolute -left-4 -top-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl" />
 
-          {user && <DashboardCertificate />}
-          <div className="relative mx-auto flex flex-col items-center gap-4">
-            <div className="text-center">
-              <h2 className="to-blue-600 mt-2 bg-gradient-to-r from-purple-600 bg-clip-text text-2xl font-bold text-transparent sm:mt-4 sm:text-3xl md:mt-0">
-                Hello, {user?.first_name ?? ""}!
-              </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400 sm:text-sm">
-                Ready to level up today?
-              </p>
-            </div>
-
-            <div className="relative">
-              {/* Profile picture with enhanced styling */}
-              <div className="group relative">
-                <div className="from-customBlue-500 absolute inset-0 rounded-2xl bg-gradient-to-br to-purple-500 opacity-75 blur-sm transition-opacity group-hover:opacity-100"></div>
-                <div className="relative rounded-2xl bg-white p-1 dark:bg-gray-800">
-                  <Image
-                    alt={`Profile picture of ${user?.first_name} ${user?.last_name || ""}, ${user?.display_position || "team member"}`}
-                    src={user?.image_url ? `${user.image_url}` : defaultAvatar}
-                    width={100}
-                    height={100}
-                    title={`${user?.first_name}'s Profile Picture`}
-                    className="h-[100px] w-[100px] rounded-xl object-cover transition-transform duration-300 group-hover:scale-105"
-                  />
+          {/* Dynamic layout with profile picture as hero */}
+          <div className="relative flex flex-col gap-6">
+            {/* Hero Profile Section */}
+            <div className="relative flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+              {/* Profile picture - responsive sizing */}
+              <div className="flex flex-col items-center gap-3 shrink-0">
+                <div className="group relative">
+                  <div className="from-customBlue-500 absolute inset-0 rounded-3xl bg-gradient-to-br to-purple-500 opacity-75 blur-lg transition-all duration-300 group-hover:opacity-100 group-hover:scale-110"></div>
+                  <div className="relative rounded-3xl bg-white/80 p-1.5 backdrop-blur-sm dark:bg-gray-800/80">
+                    <Image
+                      alt={`Profile picture of ${user?.first_name} ${user?.last_name || ""}, ${user?.display_position || "team member"}`}
+                      src={user?.image_url ? `${user.image_url}` : defaultAvatar}
+                      width={120}
+                      height={120}
+                      title={`${user?.first_name}'s Profile Picture`}
+                      className="h-[100px] w-[100px] sm:h-[120px] sm:w-[120px] rounded-2xl object-cover transition-all duration-500 group-hover:scale-105 group-hover:rotate-2"
+                    />
+                  </div>
+                  {/* Enhanced online status indicator */}
+                  <div className="absolute -bottom-2 -right-2 flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-white/90 backdrop-blur-sm dark:bg-gray-800/90 shadow-lg">
+                    <div className="h-4 w-4 sm:h-5 sm:w-5 animate-pulse rounded-full bg-green-500 shadow-lg shadow-green-500/50"></div>
+                  </div>
                 </div>
-                {/* Online status indicator */}
-                <div className="absolute -bottom-1 -right-1 flex h-6 w-6 items-center justify-center rounded-full bg-white dark:bg-gray-800">
-                  <div className="h-4 w-4 animate-pulse rounded-full bg-green-500"></div>
+                
+                {/* Badges section - under profile pic with no background */}
+                <div className="flex justify-center">
+                  <Badges />
                 </div>
               </div>
-            </div>
 
-            <div className="text-center">
-              <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-                {user?.display_position}
-              </p>
-              <div className="mt-2">
-                <Badges />
+              {/* Welcome content - responsive layout */}
+              <div className="flex-1 space-y-3 text-center sm:text-left w-full">
+                <div className="pr-16 sm:pr-20">
+                  <h2 className="to-blue-600 bg-gradient-to-r from-purple-600 bg-clip-text text-xl font-bold text-transparent sm:text-2xl md:text-3xl leading-tight">
+                    Hey {user?.first_name ?? ""}! 👋
+                  </h2>
+                  <p className="text-sm font-medium text-gray-600 dark:text-gray-300 mt-1">
+                    Ready to conquer today?
+                  </p>
+                </div>
+                
+                {/* Position badge */}
+                <div className="inline-block">
+                  <div className="rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 px-4 py-2 backdrop-blur-sm border border-blue-300/30 dark:border-blue-600/30">
+                    <p className="text-base font-bold text-gray-800 dark:text-gray-100">
+                      {user?.display_position}
+                    </p>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Enhanced status switch */}
-          <div className="absolute right-2 top-2 sm:right-4 sm:top-4">
-            {active !== null && (
-              <div className="flex flex-col items-end gap-1 sm:gap-2">
+          {/* Certificate and Active Status - Always top-right */}
+          <div className="absolute right-2 top-2 sm:right-4 sm:top-4 z-20">
+            <div className="flex items-center gap-2">
+              {/* Active status */}
+              {active !== null && (
                 <Badge
                   className={cn(
-                    "px-2 py-1 text-xs font-medium transition-all duration-300 sm:text-sm",
+                    "px-2 py-1 text-xs font-medium transition-all duration-300",
                     active
                       ? "border border-green-200 bg-green-100 text-green-800 dark:border-green-800 dark:bg-green-900/30 dark:text-green-400"
                       : "border border-red-200 bg-red-100 text-red-800 dark:border-red-800 dark:bg-red-900/30 dark:text-red-400",
@@ -154,19 +166,13 @@ export default function DashboardProfile() {
                     <span className="sm:hidden">{active ? "On" : "Off"}</span>
                   </div>
                 </Badge>
-
-                {/* <SwitchStatusButton
-                  isActive={active}
-                  disabled={activeloading}
-                  handleSwitch={handleStatusSwitch}
-                />
-
-                <p className="hidden max-w-[80px] text-center text-[10px] leading-tight text-gray-500 dark:text-gray-400 sm:block sm:text-xs">
-                  {active ? "Available for work" : "Away"}
-                </p> */}
-              </div>
-            )}
+              )}
+              
+              {/* Certificate button */}
+              {user && <DashboardCertificate />}
+            </div>
           </div>
+
         </Box>
       ) : (
         <Box className="flex-1">

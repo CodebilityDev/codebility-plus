@@ -60,7 +60,7 @@ interface CategoryData {
 const LoadingTable = () => {
   return (
     <Table>
-      <TableHeader className="bg-[#1e1f26]">
+      <TableHeader className="bg-slate-800/80 backdrop-blur-sm dark:bg-slate-900/60">
         <TableRow>
           <TableHead>Rank</TableHead>
           <TableHead>Name</TableHead>
@@ -464,7 +464,7 @@ export default function WeeklyTop() {
   const getPointsBar = (points: number, maxPoints: number) => {
     const percentage = maxPoints > 0 ? (points / maxPoints) * 100 : 0;
     return (
-      <div className="relative h-2 w-20 rounded-full bg-gray-200 dark:bg-gray-700">
+      <div className="relative h-2 w-20 rounded-full bg-white/30 dark:bg-white/20">
         <div 
           className="h-full rounded-full bg-gradient-to-r from-customBlue-500 to-purple-500 transition-all duration-300"
           style={{ width: `${Math.min(percentage, 100)}%` }}
@@ -563,7 +563,7 @@ export default function WeeklyTop() {
                     {hasData ? leader.total_points : 0}
                   </span>
                   {hasData && (
-                    <div className="relative h-1 w-8 rounded-full bg-gray-200 dark:bg-gray-700">
+                    <div className="relative h-1 w-8 rounded-full bg-white/30 dark:bg-white/20">
                       <div 
                         className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 transition-all duration-300"
                         style={{ width: `${Math.min((leader.total_points / maxPoints) * 100, 100)}%` }}
@@ -610,7 +610,7 @@ export default function WeeklyTop() {
                 {hasData ? project.total_points : 0}
               </span>
               {hasData && (
-                <div className="relative h-2 w-16 rounded-full bg-gray-200 dark:bg-gray-700">
+                <div className="relative h-2 w-16 rounded-full bg-white/30 dark:bg-white/20">
                   <div 
                     className="h-full rounded-full bg-gradient-to-r from-customBlue-500 to-purple-500 transition-all duration-300"
                     style={{ width: `${Math.min((project.total_points / maxPoints) * 100, 100)}%` }}
@@ -649,7 +649,7 @@ export default function WeeklyTop() {
   };
 
   return (
-    <Box className="relative overflow-hidden">
+    <Box className="relative overflow-hidden !bg-white/5 !backdrop-blur-2xl !border-white/10 !shadow-2xl dark:!bg-slate-900/5 dark:!border-slate-400/10 !before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none">
       {/* Background decoration */}
       <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/50 to-purple-50/50 dark:from-customBlue-950/20 dark:to-purple-950/20" />
       <div className="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-br from-yellow-400/20 to-orange-400/20 blur-xl" />
@@ -704,10 +704,10 @@ export default function WeeklyTop() {
             onValueChange={(value: LeaderboardType) => setLeaderboardType(value)}
             className="w-fit"
           >
-            <TabsList className="grid h-10 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg w-fit grid-cols-3">
+            <TabsList className="grid h-10 bg-white/10 backdrop-blur-sm dark:bg-white/5 border border-white/20 dark:border-white/10 p-1 rounded-lg w-fit grid-cols-3">
               <TabsTrigger
                 value="technical"
-                className="px-3 rounded-md font-medium transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 data-[state=active]:bg-customBlue-600 data-[state=active]:text-white"
+                className="px-3 rounded-md font-medium transition-all duration-200 hover:bg-white/20 dark:hover:bg-white/10 data-[state=active]:bg-customBlue-600 data-[state=active]:text-white"
               >
                 <Star className="h-4 w-4 mr-1" />
                 <span className="hidden sm:inline">Technical</span>
@@ -715,7 +715,7 @@ export default function WeeklyTop() {
               </TabsTrigger>
               <TabsTrigger
                 value="projects"
-                className="px-3 rounded-md font-medium transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
+                className="px-3 rounded-md font-medium transition-all duration-200 hover:bg-white/20 dark:hover:bg-white/10 data-[state=active]:bg-purple-600 data-[state=active]:text-white"
               >
                 <Trophy className="h-4 w-4 mr-1" />
                 <span className="hidden sm:inline">Projects</span>
@@ -723,7 +723,7 @@ export default function WeeklyTop() {
               </TabsTrigger>
               <TabsTrigger
                 value="soft-skills"
-                className="px-3 rounded-md font-medium transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
+                className="px-3 rounded-md font-medium transition-all duration-200 hover:bg-white/20 dark:hover:bg-white/10 data-[state=active]:bg-emerald-600 data-[state=active]:text-white"
               >
                 <Users className="h-4 w-4 mr-1" />
                 <span className="hidden sm:inline">Soft Skills</span>
@@ -753,7 +753,7 @@ export default function WeeklyTop() {
               onValueChange={setSelectedCategory}
               className="w-fit"
             >
-              <TabsList className={`grid h-10 bg-gray-100 dark:bg-gray-800 p-1 rounded-lg`} style={{gridTemplateColumns: `repeat(${allCategories.length}, minmax(0, 1fr))`}}>
+              <TabsList className={`grid h-10 bg-white/10 backdrop-blur-sm dark:bg-white/5 border border-white/20 dark:border-white/10 p-1 rounded-lg`} style={{gridTemplateColumns: `repeat(${allCategories.length}, minmax(0, 1fr))`}}>
                 {allCategories.map((category) => {
                   const getCategoryStyle = () => {
                     if (selectedCategory !== category) return "";
@@ -784,7 +784,7 @@ export default function WeeklyTop() {
                     <TabsTrigger
                       key={category}
                       value={category}
-                      className={`px-3 rounded-md font-medium transition-all duration-200 hover:bg-gray-200 dark:hover:bg-gray-700 ${getCategoryStyle()}`}
+                      className={`px-3 rounded-md font-medium transition-all duration-200 hover:bg-white/20 dark:hover:bg-white/10 ${getCategoryStyle()}`}
                       title={category}
                     >
                       {getCategoryInitial(category)}
@@ -823,9 +823,9 @@ export default function WeeklyTop() {
                 {isLoading ? (
                   <LoadingTable />
                 ) : (
-                  <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-lg">
+                  <div className="rounded-lg border border-white/20 dark:border-white/10 overflow-hidden shadow-lg backdrop-blur-sm">
                     <Table>
-                      <TableHeader className="bg-gradient-to-r from-gray-900 to-gray-800 dark:from-gray-800 dark:to-gray-900">
+                      <TableHeader className="bg-gradient-to-r from-slate-800/80 to-slate-900/80 dark:from-slate-800/60 dark:to-slate-900/60 backdrop-blur-sm">
                         <TableRow className="border-0">
                           <TableHead className="text-white font-semibold">
                             <div className="flex items-center gap-2">
@@ -847,7 +847,7 @@ export default function WeeklyTop() {
                           </TableHead>
                         </TableRow>
                       </TableHeader>
-                      <TableBody className="bg-white dark:bg-gray-950">
+                      <TableBody className="bg-white/10 backdrop-blur-sm dark:bg-white/5">
                         {generateTableRows(selectedCategory)}
                       </TableBody>
                     </Table>
@@ -856,9 +856,9 @@ export default function WeeklyTop() {
               </>
             )
           ) : (
-            <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
+            <div className="rounded-lg border border-white/20 dark:border-white/10 bg-white/10 backdrop-blur-sm dark:bg-white/5 p-8 text-center">
               <div className="flex flex-col items-center gap-4">
-                <div className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center">
+                <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm dark:bg-white/10 flex items-center justify-center">
                   <Trophy className="h-8 w-8 text-gray-400" />
                 </div>
                 <div>
@@ -881,9 +881,9 @@ export default function WeeklyTop() {
             {isLoading ? (
               <LoadingTable />
             ) : projectLeaders.length > 0 ? (
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-lg">
+              <div className="rounded-lg border border-white/20 dark:border-white/10 overflow-hidden shadow-lg backdrop-blur-sm">
                 <Table>
-                  <TableHeader className="bg-gradient-to-r from-purple-900 to-indigo-800 dark:from-purple-800 dark:to-indigo-900">
+                  <TableHeader className="bg-gradient-to-r from-purple-800/80 to-indigo-800/80 dark:from-purple-800/60 dark:to-indigo-900/60 backdrop-blur-sm">
                     <TableRow className="border-0">
                       <TableHead className="text-white font-semibold">
                         <div className="flex items-center gap-2">
@@ -905,13 +905,13 @@ export default function WeeklyTop() {
                       </TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody className="bg-white dark:bg-gray-950">
+                  <TableBody className="bg-white/10 backdrop-blur-sm dark:bg-white/5">
                     {generateProjectTableRows()}
                   </TableBody>
                 </Table>
               </div>
             ) : (
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
+              <div className="rounded-lg border border-white/20 dark:border-white/10 bg-white/10 backdrop-blur-sm dark:bg-white/5 p-8 text-center">
                 <div className="flex flex-col items-center gap-4">
                   <div className="h-16 w-16 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
                     <Trophy className="h-8 w-8 text-purple-400" />
@@ -933,7 +933,7 @@ export default function WeeklyTop() {
           <>
             {isLoading ? (
               <Table>
-                <TableHeader className="bg-gradient-to-r from-emerald-900 to-teal-800 dark:from-emerald-800 dark:to-teal-900">
+                <TableHeader className="bg-gradient-to-r from-emerald-800/80 to-teal-800/80 dark:from-emerald-800/60 dark:to-teal-900/60 backdrop-blur-sm">
                   <TableRow className="border-0">
                     <TableHead className="text-white font-semibold">Rank</TableHead>
                     <TableHead className="text-white font-semibold">Name</TableHead>
@@ -959,9 +959,9 @@ export default function WeeklyTop() {
                 </TableBody>
               </Table>
             ) : softSkillsLeaders.length > 0 ? (
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 overflow-hidden shadow-lg">
+              <div className="rounded-lg border border-white/20 dark:border-white/10 overflow-hidden shadow-lg backdrop-blur-sm">
                 <Table>
-                  <TableHeader className="bg-gradient-to-r from-emerald-900 to-teal-800 dark:from-emerald-800 dark:to-teal-900">
+                  <TableHeader className="bg-gradient-to-r from-emerald-800/80 to-teal-800/80 dark:from-emerald-800/60 dark:to-teal-900/60 backdrop-blur-sm">
                     <TableRow className="border-0">
                       <TableHead className="text-white font-semibold">
                         <div className="flex items-center gap-2">
@@ -983,13 +983,13 @@ export default function WeeklyTop() {
                       </TableHead>
                     </TableRow>
                   </TableHeader>
-                  <TableBody className="bg-white dark:bg-gray-950">
+                  <TableBody className="bg-white/10 backdrop-blur-sm dark:bg-white/5">
                     {generateSoftSkillsTableRows()}
                   </TableBody>
                 </Table>
               </div>
             ) : (
-              <div className="rounded-lg border border-gray-200 dark:border-gray-700 p-8 text-center">
+              <div className="rounded-lg border border-white/20 dark:border-white/10 bg-white/10 backdrop-blur-sm dark:bg-white/5 p-8 text-center">
                 <div className="flex flex-col items-center gap-4">
                   <div className="h-16 w-16 rounded-full bg-emerald-100 dark:bg-emerald-900/20 flex items-center justify-center">
                     <Users className="h-8 w-8 text-emerald-400" />
@@ -1025,7 +1025,7 @@ const getRowStyle = (rank: number) => {
     return `${baseStyle} border border-l-4`;
   }
   
-  return "hover:bg-gray-50 dark:hover:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800";
+  return "hover:bg-white/20 dark:hover:bg-white/10 border-b border-white/20 dark:border-white/10";
 };
 
 const getSoftSkillsRowStyle = (rank: number) => {
@@ -1041,5 +1041,5 @@ const getSoftSkillsRowStyle = (rank: number) => {
     return `${baseStyle} border border-l-4`;
   }
   
-  return "hover:bg-gray-50 dark:hover:bg-gray-800/50 border-b border-gray-100 dark:border-gray-800";
+  return "hover:bg-white/20 dark:hover:bg-white/10 border-b border-white/20 dark:border-white/10";
 };

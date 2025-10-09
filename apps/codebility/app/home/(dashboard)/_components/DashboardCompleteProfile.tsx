@@ -14,9 +14,9 @@ const Progress = ({ value, className }: { value?: number; className?: string }) 
       aria-valuemin={0}
       aria-valuemax={100}
     >
-      <div className="w-full bg-gray-700 rounded-full h-2">
+      <div className="w-full bg-white/20 dark:bg-white/10 rounded-full h-2">
         <div
-          className="bg-blue-500 h-2 rounded-full transition-all duration-300"
+          className="bg-gradient-to-r from-customBlue-500 to-purple-500 h-2 rounded-full transition-all duration-300"
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -36,8 +36,8 @@ const Badge = ({
   const base =
     "inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold";
   const variants: Record<string, string> = {
-    secondary: "bg-gray-700 text-gray-200",
-    outline: "border border-gray-600 text-gray-300",
+    secondary: "bg-white/20 backdrop-blur-sm text-white dark:bg-white/10 dark:text-gray-200",
+    outline: "border border-white/30 text-white backdrop-blur-sm dark:border-white/20 dark:text-gray-300",
   };
   const variantClass = variant ? variants[variant] ?? "" : "";
   return (
@@ -220,25 +220,25 @@ export default function DashboardCompleteProfile({
   /* ------------------- Render ------------------- */
   if (loading) {
     return (
-      <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
+      <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden !bg-white/5 !backdrop-blur-2xl !border-white/10 !shadow-2xl dark:!bg-slate-900/5 dark:!border-slate-400/10 !before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none">
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <div className="h-7 w-48 bg-gray-700/50 rounded animate-pulse"></div>
-            <div className="h-6 w-12 bg-gray-700/50 rounded-full animate-pulse"></div>
+            <div className="h-7 w-48 bg-white/20 dark:bg-white/10 rounded animate-pulse"></div>
+            <div className="h-6 w-12 bg-white/20 dark:bg-white/10 rounded-full animate-pulse"></div>
           </div>
 
-          <div className="w-full bg-gray-700/50 rounded-full h-2 animate-pulse"></div>
+          <div className="w-full bg-white/20 dark:bg-white/10 rounded-full h-2 animate-pulse"></div>
 
           <div className="space-y-3">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="rounded-lg border border-gray-700 bg-gray-800/50 p-4 animate-pulse"
+                className="rounded-lg border border-white/20 dark:border-white/10 bg-white/10 backdrop-blur-sm dark:bg-white/5 p-4 animate-pulse"
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-4 h-4 rounded-full bg-gray-700"></div>
-                  <div className="h-5 flex-1 bg-gray-700/50 rounded"></div>
-                  <div className="h-5 w-16 bg-gray-700/50 rounded-full"></div>
+                  <div className="w-4 h-4 rounded-full bg-white/30 dark:bg-white/20"></div>
+                  <div className="h-5 flex-1 bg-white/20 dark:bg-white/10 rounded"></div>
+                  <div className="h-5 w-16 bg-white/20 dark:bg-white/10 rounded-full"></div>
                 </div>
               </div>
             ))}
@@ -253,7 +253,7 @@ export default function DashboardCompleteProfile({
   }
 
   return (
-    <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden">
+    <Box className="flex w-full flex-1 flex-col gap-6 relative overflow-hidden !bg-white/5 !backdrop-blur-2xl !border-white/10 !shadow-2xl dark:!bg-slate-900/5 dark:!border-slate-400/10 !before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none">
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-xl font-semibold text-white tracking-tight">
@@ -278,10 +278,10 @@ export default function DashboardCompleteProfile({
           {visibleTasks.map((task) => (
             <div
               key={task.id}
-              className="rounded-lg border border-gray-700 bg-gray-800/50 overflow-hidden"
+              className="rounded-lg border border-white/20 dark:border-white/10 bg-white/10 backdrop-blur-sm dark:bg-white/5 overflow-hidden"
             >
               <div
-                className="flex items-center justify-between p-4 cursor-pointer hover:bg-gray-700/50 transition-colors"
+                className="flex items-center justify-between p-4 cursor-pointer hover:bg-white/20 dark:hover:bg-white/10 transition-colors"
                 onClick={() => toggleDropdown(task.id)}
               >
                 <div className="flex items-center gap-3 flex-1">
@@ -289,15 +289,15 @@ export default function DashboardCompleteProfile({
                     className={`w-4 h-4 rounded-full border transition-all duration-300 ${
                       completedTasks[task.id]
                         ? "bg-green-500 border-green-500"
-                        : "bg-gray-700 border-gray-600"
+                        : "bg-white/20 border-white/30 dark:bg-white/10 dark:border-white/20"
                     }`}
                   />
 
                   <span
                     className={`font-medium ${
                       completedTasks[task.id]
-                        ? "text-gray-500 line-through"
-                        : "text-gray-200"
+                        ? "text-gray-400 line-through"
+                        : "text-white dark:text-gray-200"
                     }`}
                   >
                     {task.title}
@@ -316,8 +316,8 @@ export default function DashboardCompleteProfile({
               </div>
 
               {openDropdowns[task.id] && (
-                <div className="px-4 pb-4 pt-2 bg-gray-900/30 border-t border-gray-700">
-                  <p className="text-sm text-gray-400">{task.description}</p>
+                <div className="px-4 pb-4 pt-2 bg-white/5 backdrop-blur-sm border-t border-white/20 dark:border-white/10">
+                  <p className="text-sm text-gray-300 dark:text-gray-400">{task.description}</p>
                 </div>
               )}
             </div>
