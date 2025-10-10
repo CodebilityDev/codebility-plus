@@ -1,0 +1,596 @@
+[
+  {
+    "id": "27dc0ce4-590b-40ed-b1c6-498ade7f9409",
+    "codev_id": "9d6b5aca-82da-4901-942b-a173c68008b3",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 27,
+    "created_at": "2025-03-16T11:26:53.595+00:00",
+    "updated_at": "2025-06-03T11:37:36.307+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "23e6ab5b-b716-4561-af58-8723cc012c46",
+    "codev_id": "e2f7af7e-8e57-469e-a332-20685033b89d",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 42,
+    "created_at": "2025-07-15T08:55:43.74057+00:00",
+    "updated_at": "2025-09-16T09:45:26.42454+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "b2dee95c-82a8-4b86-b0c1-006cc0a22aad",
+    "codev_id": "232e7f51-abf4-4fba-b4cc-2ecdd294490d",
+    "skill_category_id": "059261f5-be65-4872-beaf-0c09524c98eb",
+    "points": 8,
+    "created_at": "2025-09-08T05:37:23.966202+00:00",
+    "updated_at": "2025-09-08T05:37:23.966202+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "a1296238-5bf3-46b1-9bb8-b5a81e74d6cb",
+    "codev_id": "3996c773-f2d8-4e7f-a52e-c2c72736700d",
+    "skill_category_id": "13bf852a-9bca-411f-8643-fbac8b8dd533",
+    "points": 9,
+    "created_at": "2025-01-06T15:33:56.680807+00:00",
+    "updated_at": "2025-06-03T11:41:15.94+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "cca99cf4-1325-4386-80e8-eb800b4d034c",
+    "codev_id": "ce596387-28c1-40f6-8162-aa86e3bbb519",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 3,
+    "created_at": "2025-06-03T11:41:39.023+00:00",
+    "updated_at": "2025-06-03T11:41:39.023+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "75c5913d-d092-4671-85c7-45a32518867a",
+    "codev_id": "8cf1eaa7-1b4d-439d-9e12-2bf67b3a9693",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 3,
+    "created_at": "2025-06-03T11:42:19.253+00:00",
+    "updated_at": "2025-06-03T11:42:19.253+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "f85c7fc3-9be6-47c9-9624-dc02d25b07f3",
+    "codev_id": "f797f36f-2103-4a2d-9f39-b4e796ffb25c",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 8,
+    "created_at": "2025-09-08T05:37:33.868535+00:00",
+    "updated_at": "2025-09-08T05:37:33.868535+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "640ea8d3-1854-4a58-b4f6-499cb31be080",
+    "codev_id": "b2159563-38ea-47aa-8e75-e765e04073c9",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 7,
+    "created_at": "2025-09-10T03:13:31.952573+00:00",
+    "updated_at": "2025-09-10T03:18:01.364725+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "d142737c-e7cb-4b6d-9d9a-5b0a7f69dbea",
+    "codev_id": "7b4af9b8-1e80-4e56-afcf-ab21a088c335",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 20,
+    "created_at": "2025-06-05T11:09:14.11+00:00",
+    "updated_at": "2025-06-11T14:00:49.049+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "616d9b12-0cb9-4468-b6d9-4672570636cf",
+    "codev_id": "09cda080-a1e4-4f7f-b6ec-09bee70e0961",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 162,
+    "created_at": "2025-05-30T14:41:26.548+00:00",
+    "updated_at": "2025-07-30T03:11:15.236505+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "a56920a2-5bee-4dc2-90d3-5699c660927d",
+    "codev_id": "6a0f98f5-0d20-4d7b-9d6b-a8e814db5b66",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 23,
+    "created_at": "2025-09-08T05:35:53.931773+00:00",
+    "updated_at": "2025-10-08T14:04:09.294618+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "012cefa8-4db5-4204-92e0-af09f422971d",
+    "codev_id": "9b471c66-c923-42c2-a3fe-c806f5d9f6c9",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 7,
+    "created_at": "2025-09-08T05:37:00.590725+00:00",
+    "updated_at": "2025-09-08T05:37:57.372654+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "089e4751-f9c9-49af-b9db-0e1074828d33",
+    "codev_id": "1d1d3e8f-9fbb-4c84-b972-17a61bfdbe36",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 26,
+    "created_at": "2025-09-10T03:06:53.540719+00:00",
+    "updated_at": "2025-10-10T01:54:28.019979+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "8c949491-de13-4301-a537-3c6c0dcd8179",
+    "codev_id": "5ecb19c6-b0f5-4f59-8774-6a606cb7bbb3",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 10,
+    "created_at": "2025-06-05T11:09:12.527+00:00",
+    "updated_at": "2025-06-05T11:09:12.527+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "6adb93cc-1c1b-4b88-8d00-f1989483808c",
+    "codev_id": "8bd1e183-2c6a-4dd5-8b54-9973028532a5",
+    "skill_category_id": "27dbaa4f-d5f1-41c0-898a-ba19cfe06367",
+    "points": 14,
+    "created_at": "2025-03-09T02:45:39.570235+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "273940fc-b784-48d0-9c9c-b012e7b077bb",
+    "codev_id": "3996c773-f2d8-4e7f-a52e-c2c72736700d",
+    "skill_category_id": "059261f5-be65-4872-beaf-0c09524c98eb",
+    "points": 0,
+    "created_at": "2025-03-09T07:19:34.176056+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "4a78d260-e35e-41d7-b03a-86667f46cd93",
+    "codev_id": "399c0cb0-5f37-4890-b584-1976b8e516d5",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 61,
+    "created_at": "2025-05-31T03:40:15.71+00:00",
+    "updated_at": "2025-08-08T10:24:04.709201+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "6d584f41-e6ba-41b6-b43e-9964e79bb799",
+    "codev_id": "5d1a6fea-6fa4-4766-a2a0-e58d0f2a34b0",
+    "skill_category_id": "13bf852a-9bca-411f-8643-fbac8b8dd533",
+    "points": 9,
+    "created_at": "2025-03-05T01:55:42.61609+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "602d6ff4-bf71-4e42-9ea7-cc5b7a8c2f50",
+    "codev_id": "f855ae10-9b88-48fa-9547-1f97f81d800f",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 20,
+    "created_at": "2025-09-08T05:38:08.571115+00:00",
+    "updated_at": "2025-10-02T07:18:02.115239+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "726900ce-d021-4232-ae47-b4b932b69db3",
+    "codev_id": "5d1a6fea-6fa4-4766-a2a0-e58d0f2a34b0",
+    "skill_category_id": "27dbaa4f-d5f1-41c0-898a-ba19cfe06367",
+    "points": 2,
+    "created_at": "2025-02-19T22:29:54.543465+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "92a83f8e-c8f4-45d6-a56f-57bafc971a55",
+    "codev_id": "3996c773-f2d8-4e7f-a52e-c2c72736700d",
+    "skill_category_id": "27dbaa4f-d5f1-41c0-898a-ba19cfe06367",
+    "points": 2,
+    "created_at": "2025-02-14T03:56:41.499643+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "95091f92-5bfd-41e9-a3d9-9d391edbd8b3",
+    "codev_id": "9d6b5aca-82da-4901-942b-a173c68008b3",
+    "skill_category_id": "059261f5-be65-4872-beaf-0c09524c98eb",
+    "points": 0,
+    "created_at": "2025-03-01T13:43:15.585863+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "887aa27f-23a4-4903-a61d-46741efa2d30",
+    "codev_id": "9d6b5aca-82da-4901-942b-a173c68008b3",
+    "skill_category_id": "13bf852a-9bca-411f-8643-fbac8b8dd533",
+    "points": 4,
+    "created_at": "2025-02-23T03:37:34.280487+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "fd06c971-ffb0-4305-9d3c-bc773cf86364",
+    "codev_id": "09cda080-a1e4-4f7f-b6ec-09bee70e0961",
+    "skill_category_id": "13bf852a-9bca-411f-8643-fbac8b8dd533",
+    "points": 56,
+    "created_at": "2025-07-16T10:59:51.003723+00:00",
+    "updated_at": "2025-08-29T02:26:42.563699+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "307fc66a-1692-45f1-b6f7-b1a76635c04c",
+    "codev_id": "0087445c-8405-4193-b63e-92d5950c9559",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 10,
+    "created_at": "2025-09-08T05:33:32.352021+00:00",
+    "updated_at": "2025-10-02T07:18:11.918432+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "f7763b40-cd8b-4f20-9fa3-b6d37e72f1f6",
+    "codev_id": "c8ff6006-2001-4b46-91b7-217440771228",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 36,
+    "created_at": "2025-09-09T07:21:10.511625+00:00",
+    "updated_at": "2025-09-30T12:07:33.181068+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "e1da854d-02e7-4e62-a8a0-0564d89dd630",
+    "codev_id": "9d6b5aca-82da-4901-942b-a173c68008b3",
+    "skill_category_id": "27dbaa4f-d5f1-41c0-898a-ba19cfe06367",
+    "points": 22,
+    "created_at": "2025-03-01T03:58:41.031337+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "8dc81a9f-1077-4aa4-9918-64da14520420",
+    "codev_id": "4f848e88-82f1-4cc2-b134-d7f47b3ad34d",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 7,
+    "created_at": "2025-09-08T05:36:35.77736+00:00",
+    "updated_at": "2025-10-02T07:17:48.18228+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "c118a624-eb3f-417b-a522-d6ba702d17ba",
+    "codev_id": "cbe05550-011e-4780-8faa-89fa957a0677",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 9,
+    "created_at": "2025-07-30T03:11:02.09799+00:00",
+    "updated_at": "2025-08-29T02:26:55.515071+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "ae034be0-c037-447e-aef6-eb228c2faf3b",
+    "codev_id": "13774e18-3dcb-4d52-afb9-d908010a2328",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 38,
+    "created_at": "2025-09-09T07:20:31.865567+00:00",
+    "updated_at": "2025-09-29T09:37:14.850517+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "255d7405-1083-4b34-9395-9dd34d66477e",
+    "codev_id": "9f8d226b-99f4-4ad2-9c33-5f073aed48bb",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 53,
+    "created_at": "2025-05-30T14:41:27.147+00:00",
+    "updated_at": "2025-06-20T09:28:06.13063+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "9acca3b4-66ca-4fd2-b571-39226a196cf8",
+    "codev_id": "8bd1e183-2c6a-4dd5-8b54-9973028532a5",
+    "skill_category_id": "13bf852a-9bca-411f-8643-fbac8b8dd533",
+    "points": 20,
+    "created_at": "2025-02-15T02:36:48.306712+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "8e6cfe7e-3edf-4713-892e-8d9fa4f4b4c5",
+    "codev_id": "40ea8f9f-5286-4001-b659-3178d3155b63",
+    "skill_category_id": "13bf852a-9bca-411f-8643-fbac8b8dd533",
+    "points": 6,
+    "created_at": "2025-07-30T03:11:06.95424+00:00",
+    "updated_at": "2025-08-29T02:27:00.407544+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "98d772eb-49ce-4314-8b97-9b2030ef146b",
+    "codev_id": "399c0cb0-5f37-4890-b584-1976b8e516d5",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 26,
+    "created_at": "2025-06-03T10:59:40.051+00:00",
+    "updated_at": "2025-09-01T09:38:30.592499+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "fbe5b616-299d-44b2-86bd-1f30c12257d8",
+    "codev_id": "28d75dd0-03c2-4c7c-97cf-98d14603791e",
+    "skill_category_id": "13bf852a-9bca-411f-8643-fbac8b8dd533",
+    "points": 2,
+    "created_at": "2024-12-18T08:58:44.063427+00:00",
+    "updated_at": "2025-03-12T06:49:09.926876+00:00",
+    "period_type": "all"
+  },
+  {
+    "id": "42093fc9-6c06-44eb-9163-af66749eb773",
+    "codev_id": "8bd1e183-2c6a-4dd5-8b54-9973028532a5",
+    "skill_category_id": "059261f5-be65-4872-beaf-0c09524c98eb",
+    "points": 1,
+    "created_at": "2025-03-10T16:54:59.735859+00:00",
+    "updated_at": "2025-03-12T07:00:59.324+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "b046ba54-d00b-431b-bce4-bbd4ec57e029",
+    "codev_id": "60b1bd9c-7ad6-414c-96c1-a3cc59bbccb4",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 1,
+    "created_at": "2025-05-03T08:21:24.513+00:00",
+    "updated_at": "2025-05-03T08:21:24.513+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "651d9b25-0439-4ba1-8ac3-e8d611752821",
+    "codev_id": "3996c773-f2d8-4e7f-a52e-c2c72736700d",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 64,
+    "created_at": "2025-03-10T09:30:54.137708+00:00",
+    "updated_at": "2025-07-29T23:16:52.865886+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "71f4f494-231a-4034-9400-d41987df17eb",
+    "codev_id": "b2159563-38ea-47aa-8e75-e765e04073c9",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 5,
+    "created_at": "2025-09-29T07:44:03.19951+00:00",
+    "updated_at": "2025-09-29T07:44:03.19951+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "a3d6edfd-2d8d-42dd-920e-38f938369225",
+    "codev_id": "7a3df452-7796-49ee-b984-28f7b99b0029",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 8,
+    "created_at": "2025-09-16T09:44:25.135487+00:00",
+    "updated_at": "2025-09-16T09:44:25.135487+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "0fbb5b17-d354-4079-86fb-306c70609e7a",
+    "codev_id": "9c8c6529-4323-4fba-be8d-a28ac56269d4",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 20,
+    "created_at": "2025-09-08T05:36:13.897367+00:00",
+    "updated_at": "2025-10-02T07:17:36.800015+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "8a25ac70-67a3-42b9-9081-bf2ad7d3177b",
+    "codev_id": "8bd1e183-2c6a-4dd5-8b54-9973028532a5",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 3,
+    "created_at": "2025-03-12T06:59:18.46+00:00",
+    "updated_at": "2025-05-20T11:00:48.077+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "a0eebd14-a753-42ee-8607-383eae36ede9",
+    "codev_id": "28d75dd0-03c2-4c7c-97cf-98d14603791e",
+    "skill_category_id": "27dbaa4f-d5f1-41c0-898a-ba19cfe06367",
+    "points": 5,
+    "created_at": "2025-08-22T05:12:35.738334+00:00",
+    "updated_at": "2025-08-22T05:12:35.738334+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "6603288b-73bf-43f9-aca4-f15641525730",
+    "codev_id": "7a3df452-7796-49ee-b984-28f7b99b0029",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 79,
+    "created_at": "2025-06-24T10:13:38.825205+00:00",
+    "updated_at": "2025-09-30T12:08:19.477077+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "5f6cc2b0-84c2-496b-b9ae-06dec70d56dd",
+    "codev_id": "b480f79a-9f92-4060-9697-2fa3eeaf78a3",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 10,
+    "created_at": "2025-09-10T03:16:10.864883+00:00",
+    "updated_at": "2025-09-10T03:16:10.864883+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "f8e1139c-aefe-4af3-a63a-afd83e54b3f9",
+    "codev_id": "887d120d-07dd-4ec5-aea3-7e7177f0aacf",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 20,
+    "created_at": "2025-07-15T09:04:31.972335+00:00",
+    "updated_at": "2025-09-16T09:43:28.178506+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "4fa38256-bc49-415b-9292-131ffc0ccb85",
+    "codev_id": "b480f79a-9f92-4060-9697-2fa3eeaf78a3",
+    "skill_category_id": "059261f5-be65-4872-beaf-0c09524c98eb",
+    "points": 0,
+    "created_at": "2025-09-10T03:17:34.264573+00:00",
+    "updated_at": "2025-09-10T03:17:34.264573+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "1a56d992-e650-4f16-b62c-619d9acb56d6",
+    "codev_id": "c389df7c-3255-4189-bc59-9665f0466a61",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 15,
+    "created_at": "2025-09-16T09:45:53.126301+00:00",
+    "updated_at": "2025-09-30T12:06:53.015274+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "b5474dd8-ce63-43ad-87a0-d48beeee6bc0",
+    "codev_id": "995a2a48-df0d-4b28-82e5-57259c5e903c",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 5,
+    "created_at": "2025-09-10T03:21:40.306484+00:00",
+    "updated_at": "2025-09-10T03:21:40.306484+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "f1bd2cbc-2e4c-4683-98b3-4513560d055a",
+    "codev_id": "5d1a6fea-6fa4-4766-a2a0-e58d0f2a34b0",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 23,
+    "created_at": "2025-02-01T07:40:55.204266+00:00",
+    "updated_at": "2025-09-12T01:51:28.291527+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "9b2a5b1d-4b9a-4217-9a3f-1e7599ec9830",
+    "codev_id": "995a2a48-df0d-4b28-82e5-57259c5e903c",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 114,
+    "created_at": "2025-06-01T11:06:02.794+00:00",
+    "updated_at": "2025-09-18T07:24:43.144788+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "988663e0-3bb0-4eef-ac9d-c05215fdc868",
+    "codev_id": "28d75dd0-03c2-4c7c-97cf-98d14603791e",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 31,
+    "created_at": "2024-12-15T17:18:02.16234+00:00",
+    "updated_at": "2025-09-19T04:25:56.748766+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "9c03ffb0-b9ce-4141-96ef-e2da521932df",
+    "codev_id": "28d75dd0-03c2-4c7c-97cf-98d14603791e",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 119,
+    "created_at": "2025-01-13T19:10:42.543317+00:00",
+    "updated_at": "2025-09-19T06:50:47.357533+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "cef5cdaf-a3ee-4bed-85e3-10eb8f1595ea",
+    "codev_id": "9bd7024f-5aff-4deb-87ea-8d3932da170b",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 8,
+    "created_at": "2025-09-29T09:37:56.831574+00:00",
+    "updated_at": "2025-09-29T09:38:34.096098+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "ff5a7790-d497-4af8-8b12-24890ae9f77c",
+    "codev_id": "887d120d-07dd-4ec5-aea3-7e7177f0aacf",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 126,
+    "created_at": "2025-05-20T10:36:48.107+00:00",
+    "updated_at": "2025-09-30T12:06:39.996598+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "7c2cdce4-7e10-4b66-b4de-1c24ea0e2b72",
+    "codev_id": "c1b794a2-3c0a-47b4-9e3b-12d073f217c8",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 10,
+    "created_at": "2025-09-08T05:36:48.587632+00:00",
+    "updated_at": "2025-10-02T07:18:31.966053+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "93059670-b833-4666-a38c-5f8d43ee8ccd",
+    "codev_id": "838c1cdc-8fc9-4f77-97ba-1f3f3e939f37",
+    "skill_category_id": "13bf852a-9bca-411f-8643-fbac8b8dd533",
+    "points": 5,
+    "created_at": "2025-10-07T03:35:13.980243+00:00",
+    "updated_at": "2025-10-07T03:35:13.980243+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "b8fee065-7e0b-40c0-beb1-e572f070dd35",
+    "codev_id": "70de3ce2-f686-4282-a917-b0bce29efcf8",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 6,
+    "created_at": "2025-09-10T03:11:11.5155+00:00",
+    "updated_at": "2025-10-07T05:29:37.360002+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "e32003c7-065f-4d14-bb39-e1049870ab7e",
+    "codev_id": "c166fbf9-11f0-41f6-888d-a3f17eaae764",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 3,
+    "created_at": "2025-10-07T11:13:14.490989+00:00",
+    "updated_at": "2025-10-07T11:13:14.490989+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "29786482-06e9-4681-b67a-123cf3853f0d",
+    "codev_id": "734bad12-52d1-4714-8d7d-be37b064f00a",
+    "skill_category_id": "be4a2221-325a-4046-92bb-91d30a239cd8",
+    "points": 11,
+    "created_at": "2025-10-08T03:48:02.165049+00:00",
+    "updated_at": "2025-10-09T07:10:33.639154+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "65272bb3-e797-44f4-a637-dec5e8b4c0cc",
+    "codev_id": "aefb9e7a-fb61-4d99-813c-e75b482f9873",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 3,
+    "created_at": "2025-10-09T12:20:19.151777+00:00",
+    "updated_at": "2025-10-09T12:20:19.151777+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "0927a3bc-aba9-4337-90d6-9038dd1e7a33",
+    "codev_id": "c166fbf9-11f0-41f6-888d-a3f17eaae764",
+    "skill_category_id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "points": 20,
+    "created_at": "2025-09-08T05:35:53.931773+00:00",
+    "updated_at": "2025-10-09T12:26:25.439467+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "3c43c214-453e-4759-aadc-58b2dc85d3c2",
+    "codev_id": "9bd7024f-5aff-4deb-87ea-8d3932da170b",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 14,
+    "created_at": "2025-09-18T07:24:47.531318+00:00",
+    "updated_at": "2025-10-10T01:54:02.803541+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "34b9018b-ed42-49f4-88c3-ed2d6547e22e",
+    "codev_id": "1d1d3e8f-9fbb-4c84-b972-17a61bfdbe36",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 87,
+    "created_at": "2025-09-10T03:06:46.293416+00:00",
+    "updated_at": "2025-10-10T01:54:29.607541+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "ab00ad99-e0f4-4e81-9acb-ba6f89745dfa",
+    "codev_id": "b480f79a-9f92-4060-9697-2fa3eeaf78a3",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 204,
+    "created_at": "2025-06-02T11:39:03.837+00:00",
+    "updated_at": "2025-10-10T01:54:38.644927+00:00",
+    "period_type": "weekly,monthly,all"
+  },
+  {
+    "id": "e7f58ed4-47dd-45fd-bc3c-98dbf5863b64",
+    "codev_id": "aefb9e7a-fb61-4d99-813c-e75b482f9873",
+    "skill_category_id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "points": 7,
+    "created_at": "2025-10-09T14:00:49.076347+00:00",
+    "updated_at": "2025-10-09T14:01:09.942267+00:00",
+    "period_type": "weekly,monthly,all"
+  }
+]

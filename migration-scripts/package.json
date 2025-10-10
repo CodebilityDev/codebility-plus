@@ -1,0 +1,20 @@
+{
+  "name": "supabase-migration-scripts",
+  "version": "1.0.0",
+  "description": "Scripts to migrate data between Supabase projects",
+  "main": "migrate-data.js",
+  "scripts": {
+    "export": "node migrate-data.js export",
+    "import": "node migrate-data.js import",
+    "migrate": "node migrate-data.js migrate",
+    "install-deps": "npm install"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.0.0",
+    "csv-parser": "^3.0.0",
+    "csv-writer": "^1.6.0"
+  },
+  "keywords": ["supabase", "migration", "database"],
+  "author": "Codebility Team",
+  "license": "MIT"
+}
