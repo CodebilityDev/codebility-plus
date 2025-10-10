@@ -1,0 +1,653 @@
+[
+  {
+    "id": "7ad366a5-8274-4495-9c8c-f33a11d858bb",
+    "project_id": "91d4ecd6-404b-4a95-8b39-dd7f99c22613",
+    "codev_id": "afd5e450-eb1a-463b-93ba-3e4a0965bfca",
+    "role": "team_leader",
+    "joined_at": "2025-10-06T07:51:20.857577"
+  },
+  {
+    "id": "2b0e6111-fc7a-48db-8d86-5654d48c8c93",
+    "project_id": "e0124447-1978-400f-bfc7-7ea2f974d100",
+    "codev_id": "28d75dd0-03c2-4c7c-97cf-98d14603791e",
+    "role": "team_leader",
+    "joined_at": "2025-10-07T07:45:39.239"
+  },
+  {
+    "id": "0038f1f2-ddd9-47ad-8570-65f56a105622",
+    "project_id": "e0124447-1978-400f-bfc7-7ea2f974d100",
+    "codev_id": "5d1a6fea-6fa4-4766-a2a0-e58d0f2a34b0",
+    "role": "member",
+    "joined_at": "2025-10-07T07:45:39.239"
+  },
+  {
+    "id": "685aa971-5cde-459f-964a-805ef5189a35",
+    "project_id": "e0124447-1978-400f-bfc7-7ea2f974d100",
+    "codev_id": "c8ff6006-2001-4b46-91b7-217440771228",
+    "role": "member",
+    "joined_at": "2025-10-07T07:45:39.239"
+  },
+  {
+    "id": "2b758bae-c5f9-47ac-b30e-3b5366355546",
+    "project_id": "e0124447-1978-400f-bfc7-7ea2f974d100",
+    "codev_id": "3b95d4c2-bac9-401d-acfb-6b89fea69fae",
+    "role": "member",
+    "joined_at": "2025-10-07T07:45:39.239"
+  },
+  {
+    "id": "7f139cad-f430-4167-8b2e-a8904996512e",
+    "project_id": "e0124447-1978-400f-bfc7-7ea2f974d100",
+    "codev_id": "887d120d-07dd-4ec5-aea3-7e7177f0aacf",
+    "role": "member",
+    "joined_at": "2025-10-07T07:45:39.239"
+  },
+  {
+    "id": "47abf02a-d231-4da7-b208-38b64c655fb4",
+    "project_id": "e0124447-1978-400f-bfc7-7ea2f974d100",
+    "codev_id": "7a3df452-7796-49ee-b984-28f7b99b0029",
+    "role": "member",
+    "joined_at": "2025-10-07T07:45:39.239"
+  },
+  {
+    "id": "776ddd97-b4d2-41a5-bf93-a30624781989",
+    "project_id": "e0124447-1978-400f-bfc7-7ea2f974d100",
+    "codev_id": "c389df7c-3255-4189-bc59-9665f0466a61",
+    "role": "member",
+    "joined_at": "2025-10-07T07:45:39.239"
+  },
+  {
+    "id": "9a276b17-4379-4201-8a31-9a3515c136f4",
+    "project_id": "9aff799f-253c-479f-a903-ade87fecdedc",
+    "codev_id": "5d1a6fea-6fa4-4766-a2a0-e58d0f2a34b0",
+    "role": "team_leader",
+    "joined_at": "2025-04-25T03:46:03.265"
+  },
+  {
+    "id": "2f94d873-252d-4f08-8698-b988c0fb0c7b",
+    "project_id": "89560cf4-b76d-44de-8bed-5087297d6375",
+    "codev_id": "5d1a6fea-6fa4-4766-a2a0-e58d0f2a34b0",
+    "role": "team_leader",
+    "joined_at": "2025-05-18T14:19:06.701"
+  },
+  {
+    "id": "73c25177-c8f1-4833-997a-5bc68ac98636",
+    "project_id": "6a07fa62-2155-47bd-bd7f-09ded626e8a4",
+    "codev_id": "eefc87c1-9926-4c54-9143-fb199faaae90",
+    "role": "team_leader",
+    "joined_at": "2025-07-18T06:46:53.190994"
+  },
+  {
+    "id": "f41210c6-2e1b-4724-9ab2-f4422ce10dd3",
+    "project_id": "0759128e-8161-439b-8dc8-f9fa757937cd",
+    "codev_id": "eefc87c1-9926-4c54-9143-fb199faaae90",
+    "role": "team_leader",
+    "joined_at": "2025-07-18T06:46:53.599317"
+  },
+  {
+    "id": "a53ea9cd-3de0-4e15-93f2-73eb0627459c",
+    "project_id": "f108335a-fba8-4266-9621-80f25d0dedd4",
+    "codev_id": "88ef2158-841a-4be6-b65a-80d17388eba4",
+    "role": "team_leader",
+    "joined_at": "2025-07-18T06:47:35.593413"
+  },
+  {
+    "id": "91dc0750-2d9d-4846-ba0a-d48d087b02a3",
+    "project_id": "13fa1ec8-3e9e-4df3-8161-3c78ce9ad384",
+    "codev_id": "69f25135-436d-4e3e-90c5-be46b232ea79",
+    "role": "team_leader",
+    "joined_at": "2025-05-06T06:17:05.528"
+  },
+  {
+    "id": "a112d25b-91ef-4ee6-8de0-91038fcec474",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "c166fbf9-11f0-41f6-888d-a3f17eaae764",
+    "role": "team_leader",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "e222718e-b181-434a-abb4-98b6648c8bba",
+    "project_id": "0ac36cfd-00e4-4253-b401-4fd9ef0e7707",
+    "codev_id": "60b1bd9c-7ad6-414c-96c1-a3cc59bbccb4",
+    "role": "team_leader",
+    "joined_at": "2025-07-18T06:49:26.328795"
+  },
+  {
+    "id": "be1ba40f-f71e-4321-bffa-dd8ccc1c54c3",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "f855ae10-9b88-48fa-9547-1f97f81d800f",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "862b42cf-0523-47ed-b57f-c9ab13d40257",
+    "project_id": "f108335a-fba8-4266-9621-80f25d0dedd4",
+    "codev_id": "734bad12-52d1-4714-8d7d-be37b064f00a",
+    "role": "member",
+    "joined_at": "2025-07-18T06:49:47.611125"
+  },
+  {
+    "id": "d1a447e1-de68-4480-b1a6-3d7f61030815",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "4f848e88-82f1-4cc2-b134-d7f47b3ad34d",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "6c77ddf6-9e82-4dac-b956-bcf8e15614c0",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "f797f36f-2103-4a2d-9f39-b4e796ffb25c",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "08adaa6a-675a-4afa-a0c6-f7504b102f26",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "0087445c-8405-4193-b63e-92d5950c9559",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "96c388bf-fa15-4701-bca3-f2af940ed565",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "dccc530b-bfbd-4c1d-b3a7-5fd11cb49042",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "2a7a6c00-5d8e-48b7-abc3-2846dacc7b9e",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "6a0f98f5-0d20-4d7b-9d6b-a8e814db5b66",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "fd003993-6e16-4fc1-8999-0b2af0759695",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "c1b794a2-3c0a-47b4-9e3b-12d073f217c8",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "95df776f-ba78-4d08-9282-620fb9f87c49",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "232e7f51-abf4-4fba-b4cc-2ecdd294490d",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "da5dec7f-8d0a-4231-91b5-35a65a3a17ca",
+    "project_id": "8d1a1bbe-35da-4795-9d2a-c9cc982bba0e",
+    "codev_id": "ce18a735-360b-49b8-84ef-d16aa675bfad",
+    "role": "member",
+    "joined_at": "2025-07-10T16:00:24.264"
+  },
+  {
+    "id": "0212d6c8-dcdb-434c-9c97-a5fb341ae69f",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "9c8c6529-4323-4fba-be8d-a28ac56269d4",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "b59b6ce8-32da-43d1-b065-90335404f5cf",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "9b471c66-c923-42c2-a3fe-c806f5d9f6c9",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "9ab4d9ce-dac9-4f38-ba33-f9d8e9d06c05",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "aefb9e7a-fb61-4d99-813c-e75b482f9873",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "76fa2273-34e5-41b9-b645-c5c9452194b0",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "caa4234c-4a91-4ccc-902c-429225d613c4",
+    "role": "member",
+    "joined_at": "2025-09-25T13:31:23.997"
+  },
+  {
+    "id": "61748b55-642c-4b69-972b-9d2bc223c838",
+    "project_id": "83d7e386-23d1-4fdb-90dd-bc99bb58107a",
+    "codev_id": "0e592634-e3a5-4b4d-b0f3-2b314c199115",
+    "role": "team_leader",
+    "joined_at": "2025-07-18T06:49:55.639916"
+  },
+  {
+    "id": "98c45428-901e-40cc-a20b-98b94e831802",
+    "project_id": "77fc0f68-7828-4a91-9928-6ba4ad35e5e2",
+    "codev_id": "734bad12-52d1-4714-8d7d-be37b064f00a",
+    "role": "team_leader",
+    "joined_at": "2025-09-26T13:26:38.272"
+  },
+  {
+    "id": "ff9f0a06-2783-43dd-8077-741675745c46",
+    "project_id": "77fc0f68-7828-4a91-9928-6ba4ad35e5e2",
+    "codev_id": "28cca29c-0018-4dee-babd-f8aecb1af469",
+    "role": "member",
+    "joined_at": "2025-09-26T13:26:38.272"
+  },
+  {
+    "id": "73fc0e89-c800-40ca-8cd5-f3b9234820ca",
+    "project_id": "77fc0f68-7828-4a91-9928-6ba4ad35e5e2",
+    "codev_id": "bd8175ca-7207-48da-99a4-70e864469a1d",
+    "role": "member",
+    "joined_at": "2025-09-26T13:26:38.272"
+  },
+  {
+    "id": "b8a41400-2d97-422a-a511-bc88cf129cbc",
+    "project_id": "77fc0f68-7828-4a91-9928-6ba4ad35e5e2",
+    "codev_id": "09cda080-a1e4-4f7f-b6ec-09bee70e0961",
+    "role": "member",
+    "joined_at": "2025-09-26T13:26:38.272"
+  },
+  {
+    "id": "1f598e84-5694-4668-8e74-8ced1e962325",
+    "project_id": "77fc0f68-7828-4a91-9928-6ba4ad35e5e2",
+    "codev_id": "838c1cdc-8fc9-4f77-97ba-1f3f3e939f37",
+    "role": "member",
+    "joined_at": "2025-09-26T13:26:38.272"
+  },
+  {
+    "id": "fd77ea86-7387-4d66-b85a-6ec72b424d35",
+    "project_id": "77fc0f68-7828-4a91-9928-6ba4ad35e5e2",
+    "codev_id": "7697d9cb-bcd2-469d-aaba-c90369e78b4d",
+    "role": "member",
+    "joined_at": "2025-09-26T13:26:38.272"
+  },
+  {
+    "id": "9983003b-49d8-4c6e-989b-13383955e670",
+    "project_id": "77fc0f68-7828-4a91-9928-6ba4ad35e5e2",
+    "codev_id": "bdad2670-3b4f-4f54-bb19-bfb0157634b2",
+    "role": "member",
+    "joined_at": "2025-09-26T13:26:38.272"
+  },
+  {
+    "id": "05b00294-7560-47ef-8da7-e649a2963824",
+    "project_id": "34c5b1d1-fe42-48cd-8ce2-64ec9aa58559",
+    "codev_id": "7e62f63a-b5b8-4484-936b-d42479ada811",
+    "role": "member",
+    "joined_at": "2025-09-30T10:29:44.77465"
+  },
+  {
+    "id": "c3567321-7bdc-4d21-9e3d-223d55185005",
+    "project_id": "0709e46a-8357-4b87-aab2-ca5357bdf2e6",
+    "codev_id": "e2f7af7e-8e57-469e-a332-20685033b89d",
+    "role": "team_leader",
+    "joined_at": "2025-09-30T13:10:02.367"
+  },
+  {
+    "id": "2c6235db-279c-4464-b9d3-609c3c0f7aea",
+    "project_id": "0709e46a-8357-4b87-aab2-ca5357bdf2e6",
+    "codev_id": "6430e79f-b0ae-4fc7-8cf7-b74a59096ccc",
+    "role": "member",
+    "joined_at": "2025-09-30T13:10:02.367"
+  },
+  {
+    "id": "68f36f52-607e-41c0-bec1-38bbd252cc08",
+    "project_id": "0709e46a-8357-4b87-aab2-ca5357bdf2e6",
+    "codev_id": "02da54da-99b6-4dfb-8465-fd692c5c24d1",
+    "role": "member",
+    "joined_at": "2025-09-30T13:10:02.367"
+  },
+  {
+    "id": "b5fe52e0-f8a0-4e82-90f6-c4caf4ee1f98",
+    "project_id": "0709e46a-8357-4b87-aab2-ca5357bdf2e6",
+    "codev_id": "1f223e26-367a-47bd-94f7-ac506f511519",
+    "role": "member",
+    "joined_at": "2025-09-30T13:10:02.367"
+  },
+  {
+    "id": "16f3678f-939a-4fc6-b587-5e0772147279",
+    "project_id": "0709e46a-8357-4b87-aab2-ca5357bdf2e6",
+    "codev_id": "5ca87aa8-93db-4663-aad6-c51df27a5241",
+    "role": "member",
+    "joined_at": "2025-09-30T13:10:02.367"
+  },
+  {
+    "id": "de139f10-e932-4609-9ebd-eac7f287a29d",
+    "project_id": "0709e46a-8357-4b87-aab2-ca5357bdf2e6",
+    "codev_id": "9050aab4-8524-4ca5-9c97-e679fa1086ec",
+    "role": "member",
+    "joined_at": "2025-09-30T13:10:02.367"
+  },
+  {
+    "id": "19414743-a365-4c5e-896b-761546a0783b",
+    "project_id": "0709e46a-8357-4b87-aab2-ca5357bdf2e6",
+    "codev_id": "8a62ad27-f5b0-4cb5-91c5-913430bffee0",
+    "role": "member",
+    "joined_at": "2025-09-30T13:10:02.367"
+  },
+  {
+    "id": "f039fe60-7f0f-4d78-a6e7-acda20e105a8",
+    "project_id": "f87efce9-d97f-4df2-9f2f-bc19d507a5c4",
+    "codev_id": "cc89d256-54ba-49b8-85a1-a3cb7531a939",
+    "role": "team_leader",
+    "joined_at": "2025-09-08T05:30:53.256"
+  },
+  {
+    "id": "0f7df29d-d284-4171-970c-134c00f89098",
+    "project_id": "f87efce9-d97f-4df2-9f2f-bc19d507a5c4",
+    "codev_id": "5ecb19c6-b0f5-4f59-8774-6a606cb7bbb3",
+    "role": "member",
+    "joined_at": "2025-09-08T05:30:53.256"
+  },
+  {
+    "id": "88266651-1fc2-48be-b16e-9b3c4ff368b1",
+    "project_id": "89ae2349-6e0e-4e1d-bbf9-d97cf114d1e1",
+    "codev_id": "e2d6cbfe-ab79-4d21-a6f2-7ece29d6593c",
+    "role": "team_leader",
+    "joined_at": "2025-09-08T11:45:16.276596"
+  },
+  {
+    "id": "4d075f36-de46-4fc1-8723-afa987125ace",
+    "project_id": "f87efce9-d97f-4df2-9f2f-bc19d507a5c4",
+    "codev_id": "e64307d1-9353-47a8-aa75-a53a10737301",
+    "role": "Developer",
+    "joined_at": "2025-09-10T10:14:09.197863"
+  },
+  {
+    "id": "b9f0bd6b-2d4d-40bf-a906-0ed5a634ce7d",
+    "project_id": "8d1a1bbe-35da-4795-9d2a-c9cc982bba0e",
+    "codev_id": "6430e79f-b0ae-4fc7-8cf7-b74a59096ccc",
+    "role": "Developer",
+    "joined_at": "2025-09-11T05:04:10.594629"
+  },
+  {
+    "id": "6b6b62a8-6ece-4ed6-a4ea-6643667c0f83",
+    "project_id": "f87efce9-d97f-4df2-9f2f-bc19d507a5c4",
+    "codev_id": "afd5e450-eb1a-463b-93ba-3e4a0965bfca",
+    "role": "member",
+    "joined_at": "2025-10-06T07:51:21.054139"
+  },
+  {
+    "id": "3a7bff7b-331b-4423-a26a-ab78742fd331",
+    "project_id": "34c5b1d1-fe42-48cd-8ce2-64ec9aa58559",
+    "codev_id": "babc3352-c16b-407c-bdd5-c1bc1f6736dd",
+    "role": "team_leader",
+    "joined_at": "2025-09-13T09:25:38.785"
+  },
+  {
+    "id": "9645693e-7be9-48b8-85f3-166981fa10a0",
+    "project_id": "c15e6826-026b-4949-9efe-447ac7e3b0a3",
+    "codev_id": "ad1fbd70-caaf-4999-b93d-d884f2b8c1ff",
+    "role": "team_leader",
+    "joined_at": "2025-10-07T08:47:36.838"
+  },
+  {
+    "id": "d0d27d74-efad-4be7-b6e9-e1b2eb4f523b",
+    "project_id": "c15e6826-026b-4949-9efe-447ac7e3b0a3",
+    "codev_id": "1264a078-741b-496d-a577-5392223f0b71",
+    "role": "member",
+    "joined_at": "2025-10-07T08:47:36.839"
+  },
+  {
+    "id": "758a9726-ef9d-4cd0-b335-4c8812b5d199",
+    "project_id": "c15e6826-026b-4949-9efe-447ac7e3b0a3",
+    "codev_id": "28cca29c-0018-4dee-babd-f8aecb1af469",
+    "role": "member",
+    "joined_at": "2025-10-07T08:47:36.839"
+  },
+  {
+    "id": "a712ac23-2638-4dba-b3a1-7b2bbd9df181",
+    "project_id": "34c5b1d1-fe42-48cd-8ce2-64ec9aa58559",
+    "codev_id": "4b199a4d-c364-4093-bf2a-b3a081e010eb",
+    "role": "member",
+    "joined_at": "2025-09-13T09:25:38.785"
+  },
+  {
+    "id": "fe7d81f2-b4b4-47bb-ab3b-068c35d0eed1",
+    "project_id": "34c5b1d1-fe42-48cd-8ce2-64ec9aa58559",
+    "codev_id": "473d581c-5006-4a3a-9212-9b8c1822145c",
+    "role": "member",
+    "joined_at": "2025-09-13T09:25:38.785"
+  },
+  {
+    "id": "40c93d45-24c4-4855-81c2-4377b99f0010",
+    "project_id": "34c5b1d1-fe42-48cd-8ce2-64ec9aa58559",
+    "codev_id": "1e9dea68-6547-4078-aa86-e904fbae523a",
+    "role": "member",
+    "joined_at": "2025-09-13T09:25:38.785"
+  },
+  {
+    "id": "f54de809-fde8-4945-a1f0-5fd2caee4f72",
+    "project_id": "c15e6826-026b-4949-9efe-447ac7e3b0a3",
+    "codev_id": "5022cbc4-0960-4b3e-bd63-d41a89932762",
+    "role": "member",
+    "joined_at": "2025-10-07T08:47:36.839"
+  },
+  {
+    "id": "4facc282-24be-4aca-9f19-892459242fd1",
+    "project_id": "c15e6826-026b-4949-9efe-447ac7e3b0a3",
+    "codev_id": "d73acb50-c0a8-4fcb-8749-22698beaa728",
+    "role": "member",
+    "joined_at": "2025-10-07T08:47:36.839"
+  },
+  {
+    "id": "3861663c-655a-4633-a8e4-5a879e1ded36",
+    "project_id": "c15e6826-026b-4949-9efe-447ac7e3b0a3",
+    "codev_id": "60b1bd9c-7ad6-414c-96c1-a3cc59bbccb4",
+    "role": "member",
+    "joined_at": "2025-10-07T08:47:36.839"
+  },
+  {
+    "id": "83624941-e767-472a-86be-520ebe928302",
+    "project_id": "33135575-d0f7-455d-994e-ac7c61d41fc3",
+    "codev_id": "4ae90e64-c2ce-488e-b864-e72179e3ce99",
+    "role": "member",
+    "joined_at": "2025-07-03T13:47:57.719674"
+  },
+  {
+    "id": "e1dd5da5-a835-438f-9736-ba00eebf9f55",
+    "project_id": "8d1a1bbe-35da-4795-9d2a-c9cc982bba0e",
+    "codev_id": "8a7e6881-2a4a-402e-9277-43c9d393b496",
+    "role": "Developer",
+    "joined_at": "2025-09-11T03:15:36.152519"
+  },
+  {
+    "id": "36b232f0-d460-4e08-b218-b03ced46d748",
+    "project_id": "8d1a1bbe-35da-4795-9d2a-c9cc982bba0e",
+    "codev_id": "d959291f-0254-4d46-af6f-8a59ff4fa153",
+    "role": "team_leader",
+    "joined_at": "2025-08-02T06:28:35.45461"
+  },
+  {
+    "id": "b65de717-a62b-4369-985a-bd74e53bc753",
+    "project_id": "f108335a-fba8-4266-9621-80f25d0dedd4",
+    "codev_id": "6ed34864-3b8f-45ec-8c2a-c1d013b65064",
+    "role": "member",
+    "joined_at": "2025-08-15T02:33:09.419104"
+  },
+  {
+    "id": "89f0d090-169a-4a87-af43-0c68955f136d",
+    "project_id": "3f2e9901-621b-4dc9-9b0f-3f569a6036c4",
+    "codev_id": "26bc881b-f176-4e10-a953-bb3740e60e4e",
+    "role": "Developer",
+    "joined_at": "2025-09-30T10:33:56.175154"
+  },
+  {
+    "id": "a3ec8730-ff3b-4319-8963-7bf2d2fac712",
+    "project_id": "d1d0ee01-74d1-4dce-a62b-bba65d2e5adc",
+    "codev_id": "eefc87c1-9926-4c54-9143-fb199faaae90",
+    "role": "team_leader",
+    "joined_at": "2025-07-18T06:46:53.38155"
+  },
+  {
+    "id": "5aa9af0d-3e4a-4143-a2ad-5ef8c2eb7e6a",
+    "project_id": "05c1d605-ac91-4351-846f-9edb3f92ba2b",
+    "codev_id": "eefc87c1-9926-4c54-9143-fb199faaae90",
+    "role": "team_leader",
+    "joined_at": "2025-07-18T06:46:53.489365"
+  },
+  {
+    "id": "e852ea54-97fc-4e4a-a60c-44d36b1dd521",
+    "project_id": "33135575-d0f7-455d-994e-ac7c61d41fc3",
+    "codev_id": "734bad12-52d1-4714-8d7d-be37b064f00a",
+    "role": "team_leader",
+    "joined_at": "2025-07-18T06:49:47.842125"
+  },
+  {
+    "id": "ec022192-c459-472b-8c87-ec26ae30b531",
+    "project_id": "6dfa9d96-82f5-4c10-b9b8-fe8dc2cb222c",
+    "codev_id": "70de3ce2-f686-4282-a917-b0bce29efcf8",
+    "role": "team_leader",
+    "joined_at": "2025-07-18T06:50:11.989604"
+  },
+  {
+    "id": "056b1538-810f-4828-b102-6b704915a943",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "70de3ce2-f686-4282-a917-b0bce29efcf8",
+    "role": "team_leader",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "ca0794df-3759-42ed-b25e-ca0e40e11b72",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "bf2472ef-81f4-4f90-882a-23dc6c700800",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "5a6db382-1263-48b6-9236-8977a74f4760",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "c8df4953-0f35-4f61-84ca-69e5306e2d06",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "ca563a96-7063-41dd-99ca-7079fdcc9b54",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "4fa32727-3f02-4a08-9ac8-a283addd8f1d",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "bccb6a5e-673c-437a-a6fe-16acac4fe90f",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "5c447af0-db6f-4096-a919-ee9bb9a02e33",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "3ab88ebc-e84b-4b8e-a776-c57793bbd06e",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "b480f79a-9f92-4060-9697-2fa3eeaf78a3",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "d927e6d0-d161-4291-b85e-b9e612d39317",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "5d1a6fea-6fa4-4766-a2a0-e58d0f2a34b0",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "d8c6916f-ca61-4c4c-bb00-44ceb568b83b",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "bb8c719e-9acf-45dc-a9e0-ba8d8c867fad",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "dc124178-89bf-4423-bb3c-7bebafd05511",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "7697d9cb-bcd2-469d-aaba-c90369e78b4d",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "3fc6c797-6019-44a3-92bf-25bb2995a905",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "23bbdbcf-44bf-44ef-aec3-c4c3bbbde1af",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "a89b2be0-d8f5-4aa6-973b-3020c9873e20",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "995a2a48-df0d-4b28-82e5-57259c5e903c",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "76cf5b37-34eb-4e0c-be7a-38adba95abb1",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "13774e18-3dcb-4d52-afb9-d908010a2328",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "bcd78acf-0437-4e8b-a21c-3e66384bc4f0",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "1d1d3e8f-9fbb-4c84-b972-17a61bfdbe36",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "1473613b-ab0b-42d6-bddb-12c8422fee81",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "b2159563-38ea-47aa-8e75-e765e04073c9",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "d60aed36-4c1f-4d45-af9f-07fc7956719d",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "a26b15af-7a44-49aa-bb04-fce2ee3512c0",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "058fdbcc-fe82-48d5-9159-945c7c541968",
+    "project_id": "e2e1a591-3032-4ece-9b81-570a358190bc",
+    "codev_id": "9bd7024f-5aff-4deb-87ea-8d3932da170b",
+    "role": "member",
+    "joined_at": "2025-10-02T11:31:29.634"
+  },
+  {
+    "id": "b0bcc149-8a4e-4c53-8f3b-103bd2322f77",
+    "project_id": "1a053d2d-56f2-46a5-95be-906fb9388404",
+    "codev_id": "5183561a-0ba7-4d64-abf5-6d89e08ca656",
+    "role": "team_leader",
+    "joined_at": "2025-10-09T10:03:27.907"
+  },
+  {
+    "id": "119fed74-ad9b-414a-9c12-d32794d7f0ca",
+    "project_id": "1a053d2d-56f2-46a5-95be-906fb9388404",
+    "codev_id": "a9b2b755-56b8-4a24-bded-b4a9858f81f3",
+    "role": "member",
+    "joined_at": "2025-10-09T10:03:27.907"
+  },
+  {
+    "id": "a556174e-790e-43d5-8220-8b8e4b0901ca",
+    "project_id": "1a053d2d-56f2-46a5-95be-906fb9388404",
+    "codev_id": "e69e6476-11f4-4de8-ae42-da6995b8c64c",
+    "role": "member",
+    "joined_at": "2025-10-09T10:03:27.907"
+  },
+  {
+    "id": "a7347ea3-d4bb-48cd-9e60-7e30f604d93d",
+    "project_id": "1a053d2d-56f2-46a5-95be-906fb9388404",
+    "codev_id": "ef41ce34-78fe-4dec-9d2b-4bc04b12f64e",
+    "role": "member",
+    "joined_at": "2025-10-09T10:03:27.907"
+  },
+  {
+    "id": "08bdf5b4-4898-49b1-ba40-9ec209d31817",
+    "project_id": "1a053d2d-56f2-46a5-95be-906fb9388404",
+    "codev_id": "dd15ef1a-07d7-4eae-ad2c-93365661f860",
+    "role": "member",
+    "joined_at": "2025-10-09T10:03:27.907"
+  },
+  {
+    "id": "2abf6b4a-908d-4256-8d4c-33399f0980c4",
+    "project_id": "1a053d2d-56f2-46a5-95be-906fb9388404",
+    "codev_id": "aa686664-353b-4848-b4e0-ed44d38358b9",
+    "role": "member",
+    "joined_at": "2025-10-09T10:03:27.907"
+  }
+]

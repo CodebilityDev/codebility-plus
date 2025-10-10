@@ -1,0 +1,32 @@
+[
+  {
+    "id": "96da3c02-a270-4fe7-b079-72642ff9e93e",
+    "name": "Frontend Developer",
+    "description": "Specializes in building user interfaces and web design."
+  },
+  {
+    "id": "0dde069d-71fd-4240-b38e-d7c197b4bf1b",
+    "name": "Backend Developer",
+    "description": "Focuses on server-side logic, APIs, and databases."
+  },
+  {
+    "id": "059261f5-be65-4872-beaf-0c09524c98eb",
+    "name": "UI/UX Designer",
+    "description": "Designs user experiences and interfaces for applications."
+  },
+  {
+    "id": "27dbaa4f-d5f1-41c0-898a-ba19cfe06367",
+    "name": "QA Engineer",
+    "description": "Ensures the quality and performance of applications."
+  },
+  {
+    "id": "13bf852a-9bca-411f-8643-fbac8b8dd533",
+    "name": "Mobile Developer",
+    "description": "Builds applications for mobile platforms like iOS and Android."
+  },
+  {
+    "id": "be4a2221-325a-4046-92bb-91d30a239cd8",
+    "name": "Project Manager",
+    "description": "Interpersonal and communication skills, teamwork, leadership, and other non-technical competencies"
+  }
+]
