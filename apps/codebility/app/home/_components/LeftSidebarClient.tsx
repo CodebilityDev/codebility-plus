@@ -16,6 +16,9 @@ interface LeftSidebarClientProps {
 const LeftSidebarClient = ({ initialSidebarData }: LeftSidebarClientProps) => {
   const { isToggleOpen, toggleNav } = useNavStore();
   const pathname = usePathname();
+  
+  // Check if we're in staging environment
+  const isStaging = process.env.NEXT_PUBLIC_APP_BASE_URL?.includes('staging');
 
   const sidebarVariants = {
     closed: {
@@ -71,17 +74,25 @@ const LeftSidebarClient = ({ initialSidebarData }: LeftSidebarClientProps) => {
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -20 }}
                   transition={{ duration: 0.3 }}
+                  className="flex items-center gap-2"
                 >
-                  <img
-                    src="/assets/svgs/codebility-black.svg"
-                    alt="Codebility Logo"
-                    className="h-8 w-auto dark:hidden"
-                  />
-                  <img
-                    src="/assets/svgs/codebility-white.svg"
-                    alt="Codebility Logo"
-                    className="hidden h-8 w-auto dark:block"
-                  />
+                  <div>
+                    <img
+                      src="/assets/svgs/codebility-black.svg"
+                      alt="Codebility Logo"
+                      className="h-8 w-auto dark:hidden"
+                    />
+                    <img
+                      src="/assets/svgs/codebility-white.svg"
+                      alt="Codebility Logo"
+                      className="hidden h-8 w-auto dark:block"
+                    />
+                  </div>
+                  {isStaging && (
+                    <span className="bg-orange-500 text-white text-xs font-semibold px-2 py-1 rounded-full">
+                      STAGING
+                    </span>
+                  )}
                 </motion.div>
               )}
             </AnimatePresence>

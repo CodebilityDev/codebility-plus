@@ -74,6 +74,9 @@ const config = withPlugins([[withBundleAnalyzer({ enabled: env.ANALYZE })]], {
         hostname: "hibnlysaokybrsufrdwp.supabase.co",
       },
       {
+        hostname: "mynmukpnttyyjimymgrk.supabase.co",
+      },
+      {
         hostname: "res.cloudinary.com",
       },
       {
