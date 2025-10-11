@@ -5,6 +5,7 @@ const ALLOWED_DOMAINS = [
   "qqjfmtpmprefkqneerkg.supabase.co",
   "qwmazrujcjuhhdipnywa.supabase.co",
   "hibnlysaokybrsufrdwp.supabase.co",
+  "mynmukpnttyyjimymgrk.supabase.co",
   "res.cloudinary.com",
   "lh3.googleusercontent.com",
   "images.unsplash.com",
