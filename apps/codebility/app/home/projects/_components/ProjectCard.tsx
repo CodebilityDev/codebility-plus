@@ -9,7 +9,8 @@ import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { ModalType } from "@/hooks/use-modal-projects";
 import { defaultAvatar } from "@/public/assets/images";
-import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
+import { IconGithub, IconLink } from "@/public/assets/svgs";
+import { IconFigma } from "@/public/assets/svgs/techstack";
 import { Project } from "@/types/home/codev";
 import { getValidImageUrl } from "@/utils/imageValidation";
 
@@ -41,10 +42,10 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
   return (
     <div
       onClick={() => onOpen("projectViewModal", project)}
-      className="background-box flex cursor-pointer flex-col overflow-hidden rounded-xl border border-zinc-200 transition-all hover:shadow-lg dark:border-zinc-700 dark:shadow-slate-700 "
+      className="group relative flex cursor-pointer flex-col overflow-hidden rounded-2xl bg-white border border-gray-200 transition-all duration-300 hover:shadow-2xl hover:shadow-blue-500/10 hover:-translate-y-1 hover:border-blue-300 dark:bg-gray-900/50 dark:border-gray-700 dark:hover:border-blue-500/50 backdrop-blur-sm"
     >
       {/* Project Image */}
-      <div className="relative aspect-video w-full overflow-hidden">
+      <div className="relative aspect-[4/3] w-full overflow-hidden">
         <Image
           alt={`${project.name} image`}
           src={project.main_image || defaultAvatar}
@@ -54,9 +55,9 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
           loading="eager"
           priority
         />
-        <div className="absolute right-2 top-2">
+        <div className="absolute right-3 top-3">
           <span
-            className={`rounded-full px-4 py-2 text-sm font-medium text-white ${bgProjectStatus}`}
+            className={`inline-flex items-center px-3 py-1.5 text-xs font-semibold text-white rounded-full backdrop-blur-sm shadow-lg ${bgProjectStatus}`}
           >
             {project.status === "inprogress"
               ? "In Progress"
@@ -64,7 +65,7 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
           </span>
         </div>
 
-        <div className="absolute left-2 top-2">
+        <div className="absolute left-3 top-3">
           <BookmarkButton
             project={project}
             categoryId={categoryId}
@@ -74,32 +75,30 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
       </div>
 
       {/* Content */}
-      <div className="flex flex-1 flex-col gap-4 p-6">
-        {/* Project Name & Description */}
-        <div className="space-y-2">
-          <div className="flex px-1">
-            <div className="w-1/2">
-              <h3 className="text-dark100_light900 line-clamp-1 text-xl font-semibold">
-                {project.name}
-              </h3>
-            </div>
-            <div className="flex w-1/2 justify-end">
-              <ProjectOptionsMenu
-                project={project}
-                onOpen={onOpen}
-                categoryId={categoryId}
-              />
-            </div>
+      <div className="flex flex-1 flex-col justify-between p-4">
+        {/* Main Content */}
+        <div className="space-y-3">
+          {/* Project Name & Description */}
+          <div className="space-y-2">
+          <div className="flex items-start justify-between">
+            <h3 className="text-gray-900 dark:text-white line-clamp-1 text-lg font-bold group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+              {project.name}
+            </h3>
+            <ProjectOptionsMenu
+              project={project}
+              onOpen={onOpen}
+              categoryId={categoryId}
+            />
           </div>
-          <div className="h-12 p-1">
-            <p className="text-dark100_light900 line-clamp-2 text-sm">
+          <div className="h-10">
+            <p className="text-gray-600 dark:text-gray-300 line-clamp-2 text-sm leading-relaxed">
               {project.description || "No description provided"}
             </p>
           </div>
         </div>
 
         {/* Team Section */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* Team Lead */}
           {useMemo(() => {
             const teamLead = project.project_members?.find(
@@ -109,8 +108,8 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
             if (!teamLead || !teamLead.codev) return null;
 
             return (
-              <div className="flex items-center gap-2">
-                <div className="relative h-8 w-8">
+              <div className="flex items-center gap-3">
+                <div className="relative h-8 w-8 ring-2 ring-blue-100 dark:ring-blue-900 rounded-full">
                   {(() => {
                     const validUrl = getValidImageUrl(teamLead.codev.image_url);
                     return validUrl ? (
@@ -127,10 +126,10 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
                   })()}
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-dark100_light900 text-xs font-medium">
+                  <span className="text-blue-600 dark:text-blue-400 text-xs font-semibold uppercase tracking-wide">
                     Team Lead
                   </span>
-                  <span className="text-dark100_light900 text-sm">
+                  <span className="text-gray-900 dark:text-white text-sm font-medium">
                     {`${teamLead.codev.first_name} ${teamLead.codev.last_name}`}
                   </span>
                 </div>
@@ -189,36 +188,61 @@ const ProjectCard = ({ project, onOpen, categoryId }: ProjectCardProps) => {
           )}
         </div>
 
+        {/* Tech Stack */}
+        {project.tech_stack && project.tech_stack.length > 0 && (
+          <div className="space-y-2">
+            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide">
+              Tech Stack
+            </h4>
+            <div className="flex flex-wrap gap-1.5">
+              {project.tech_stack.slice(0, 4).map((tech, index) => (
+                <span
+                  key={index}
+                  className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200 hover:shadow-sm transition-shadow dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-300 dark:border-blue-700"
+                >
+                  {tech}
+                </span>
+              ))}
+              {project.tech_stack.length > 4 && (
+                <span className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-gray-50 to-gray-100 text-gray-600 border border-gray-200 dark:from-gray-800 dark:to-gray-700 dark:text-gray-300 dark:border-gray-600">
+                  +{project.tech_stack.length - 4} more
+                </span>
+              )}
+            </div>
+          </div>
+        )}
+        </div>
+
         {/* Links */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 pt-3 mt-auto">
           {project.github_link && (
             <Link
               href={project.github_link}
               target="_blank"
-              className="group"
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-110"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconGithub className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-customBlue-500 dark:invert-0" />
+              <IconGithub className="size-4 text-gray-600 dark:text-gray-300" />
             </Link>
           )}
           {project.website_url && (
             <Link
               href={project.website_url}
               target="_blank"
-              className="group"
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-110"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconLink className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-customBlue-500 dark:invert-0" />
+              <IconLink className="size-4 text-gray-600 dark:text-gray-300" />
             </Link>
           )}
           {project.figma_link && (
             <Link
               href={project.figma_link}
               target="_blank"
-              className="group"
+              className="inline-flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-110"
               onClick={(e) => e.stopPropagation()}
             >
-              <IconFigma className="size-5 invert transition-all group-hover:-translate-y-1 group-hover:text-customBlue-500 dark:invert-0" />
+              <IconFigma className="size-4 text-gray-600 dark:text-gray-300" />
             </Link>
           )}
         </div>

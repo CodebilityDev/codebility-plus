@@ -3,7 +3,7 @@ import {
   IconNodeJS,
   IconReact,
   IconTailwind,
-} from "@/public/assets/svgs";
+} from "@/public/assets/svgs/techstack";
 
 import OrbitingCircles from "./CodevsOrbitingCircles";
 

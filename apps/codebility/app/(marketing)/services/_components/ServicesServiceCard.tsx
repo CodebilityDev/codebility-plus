@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, memo, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DefaultAvatar from "@/components/DefaultAvatar";
@@ -33,13 +33,14 @@ interface ServiceProject {
   created_at?: string;
   updated_at?: string;
   website_url?: string;
+  tech_stack?: string[];
 }
 
 interface Props {
   service: ServiceProject;
 }
 
-export default function ServiceCard({ service }: Props) {
+function ServiceCard({ service }: Props) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   const {
@@ -49,81 +50,150 @@ export default function ServiceCard({ service }: Props) {
     members = [],
     website_url,
     project_category_name,
+    tech_stack = [],
   } = service;
 
-  const imageUrl = main_image
-    ? main_image.startsWith("public")
-      ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/services-image/${main_image}`
-      : main_image
-    : "https://codebility-cdn.pages.dev/assets/images/default-avatar-1248x845.jpg";
+  const imageUrl = useMemo(() => 
+    main_image
+      ? main_image.startsWith("public")
+        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/services-image/${main_image}`
+        : main_image
+      : "https://codebility-cdn.pages.dev/assets/images/default-avatar-1248x845.jpg"
+  , [main_image]);
 
-  const hasValidWebsite =
+  const hasValidWebsite = useMemo(() =>
     website_url &&
     website_url !== "" &&
     website_url.toLowerCase() !== "n/a" &&
-    website_url !== ".";
+    website_url !== "."
+  , [website_url]);
 
-  const teamLeader = members.length > 0 ? members[0] : null;
-  const teamMembers = members.length > 1 ? members.slice(1) : [];
-  const isDescriptionLong = description && description.length > 120;
+  const { teamLeader, teamMembers, isDescriptionLong } = useMemo(() => ({
+    teamLeader: members.length > 0 ? members[0] : null,
+    teamMembers: members.length > 1 ? members.slice(1) : [],
+    isDescriptionLong: description && description.length > 120
+  }), [members, description]);
 
   return (
-    <div className="border-light-900/5 bg-light-700/10 flex h-full flex-1 flex-col rounded-lg border-2 p-4 text-white">
-      <div className="relative aspect-video w-full overflow-hidden rounded-lg">
+    <div 
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:border-blue-400/30 hover:bg-white/10 transform-gpu hover:-translate-y-2 hover:scale-105"
+      style={{
+        transformStyle: 'preserve-3d',
+        perspective: '1000px',
+      }}
+      onMouseEnter={(e) => {
+        const card = e.currentTarget;
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / 25;
+        const rotateY = (centerX - x) / 25;
+        
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px) scale(1.01)`;
+      }}
+      onMouseLeave={(e) => {
+        const card = e.currentTarget;
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)';
+      }}
+    >
+      <div className="relative aspect-[4/3] w-full overflow-hidden">
         <Image
           src={imageUrl}
           alt={name}
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
-          className="object-cover"
-          priority
-          quality={90}
+          className="object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-105"
+          loading="lazy"
+          quality={75}
         />
         {project_category_name && (
-          <div className="absolute left-2 top-2 rounded-md bg-customBlue-600/80 px-2 py-1 text-xs text-white">
+          <div className="absolute left-3 top-3 inline-flex items-center px-3 py-1.5 text-xs font-semibold text-white rounded-full backdrop-blur-sm shadow-lg bg-blue-600/80 transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-blue-500/20">
             {project_category_name}
           </div>
         )}
+        
+        {/* 3D Overlay Effect */}
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       </div>
 
-      <div className="flex flex-1 flex-col pt-4">
-        <h3 className="mb-3 line-clamp-1 text-lg font-medium lg:text-2xl">
-          {name}
-        </h3>
+      <div className="flex flex-1 flex-col p-4 text-white transition-all duration-500 group-hover:translate-z-4">
+        {/* Main Content */}
+        <div className="flex-1 space-y-3">
+          <h3 className="line-clamp-1 text-lg font-bold group-hover:text-blue-300 transition-colors lg:text-xl">
+            {name}
+          </h3>
 
-        <div className="mb-4 min-h-[4.5rem]">
-          <p
-            className={`text-gray text-sm ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
-          >
-            {description || "No description available."}
-          </p>
-          {isDescriptionLong && (
-            <button
-              onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-              className="mt-1 text-xs text-customBlue-400 hover:text-customBlue-300"
+          <div className="min-h-[4rem]">
+            <p
+              className={`text-gray-300 text-sm leading-relaxed ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
             >
-              {isDescriptionExpanded ? "Show less" : "Read more"}
-            </button>
+              {description || "No description available."}
+            </p>
+            {isDescriptionLong && (
+              <button
+                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                className="mt-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                {isDescriptionExpanded ? "Show less" : "Read more"}
+              </button>
+            )}
+          </div>
+
+          {/* Tech Stack */}
+          {tech_stack && tech_stack.length > 0 && (
+            <div className="space-y-2">
+              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                Tech Stack
+              </h4>
+              <div className="flex flex-wrap gap-1.5">
+                {tech_stack.slice(0, 4).map((tech, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-300 border border-blue-500/30 hover:shadow-sm hover:shadow-blue-500/20 transition-all duration-300 hover:scale-105 hover:bg-gradient-to-r hover:from-blue-500/30 hover:to-indigo-500/30 hover:border-blue-400/40 animate-fade-in-up group-hover:translate-y-[-1px]"
+                    style={{
+                      animationDelay: `${index * 100}ms`,
+                      animationFillMode: 'both'
+                    }}
+                  >
+                    {tech}
+                  </span>
+                ))}
+                {tech_stack.length > 4 && (
+                  <span 
+                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-gray-600/20 to-gray-500/20 text-gray-300 border border-gray-500/30 hover:scale-110 transition-all duration-300 animate-fade-in-up"
+                    style={{
+                      animationDelay: `${4 * 100}ms`,
+                      animationFillMode: 'both'
+                    }}
+                  >
+                    +{tech_stack.length - 4} more
+                  </span>
+                )}
+              </div>
+            </div>
           )}
         </div>
 
-        <div className="mb-4 h-10">
+        {/* Bottom Section */}
+        <div className="space-y-4 mt-auto">
+          {/* Website Link */}
           {hasValidWebsite && (
             <Link
               href={website_url!}
               target="_blank"
-              className="inline-flex items-center gap-2 rounded-md bg-customBlue-600 px-4 py-2 text-sm transition-colors hover:bg-customBlue-700"
+              className="inline-flex items-center gap-2 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-blue-500/15 hover:to-indigo-500/15 border border-white/20 hover:border-blue-400/30 px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 hover:shadow-md hover:shadow-blue-500/15 hover:translate-y-[-1px]"
             >
               <IconLink className="size-4" />
               <span>View Website</span>
             </Link>
           )}
-        </div>
 
-        <div className="mt-auto min-h-[80px]">
+          {/* Team Section */}
           {members.length > 0 ? (
             <div>
-              <p className="mb-2 text-sm text-gray-400">Team</p>
+              <p className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Team</p>
               <div className="flex flex-wrap items-end">
                 {teamLeader && (
                   <Tooltip>
@@ -198,3 +268,5 @@ export default function ServiceCard({ service }: Props) {
     </div>
   );
 }
+
+export default memo(ServiceCard);

@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/dialog";
 import SwitchStatusButton from "@/components/ui/SwitchStatusButton";
 import { useModal } from "@/hooks/use-modal-users";
-import { IconFigma, IconGithub, IconLink } from "@/public/assets/svgs";
+import { IconGithub, IconLink } from "@/public/assets/svgs";
+import { IconFigma } from "@/public/assets/svgs/techstack";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import {
   Briefcase,

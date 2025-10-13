@@ -41,6 +41,7 @@ export interface Project {
   github_link?: string;
   figma_link?: string;
   client_id?: string;
+  tech_stack?: string[];
   created_at?: string;
   updated_at?: string;
 }
