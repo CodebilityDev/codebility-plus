@@ -159,6 +159,7 @@ export interface Project {
   figma_link?: string;
   client_id?: string;
   project_category_id?: number;
+  tech_stack?: string[];
   created_at?: string;
   updated_at?: string;
   role?: string;

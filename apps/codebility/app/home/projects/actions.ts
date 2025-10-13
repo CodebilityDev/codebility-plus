@@ -156,6 +156,17 @@ export async function createProject(
   const supabase = await createClientServerComponent();
 
   try {
+    // Parse tech stack if provided
+    const techStackData = formData.get("tech_stack");
+    let techStack = null;
+    if (techStackData) {
+      try {
+        techStack = JSON.parse(techStackData as string);
+      } catch (error) {
+        console.warn("Invalid tech stack data:", error);
+      }
+    }
+
     // Create project
     const { data: project, error: projectError } = await supabase
       .from("projects")
@@ -171,6 +182,7 @@ export async function createProject(
           ? parseInt(formData.get("project_category_id") as string)
           : null,
         main_image: formData.get("main_image"),
+        tech_stack: techStack,
         status: "pending",
       })
       .select()
@@ -303,14 +315,30 @@ export async function updateProject(projectId: string, formData: FormData) {
       ? (JSON.parse(projectMembersData as string) as ProjectMemberData[])
       : null;
 
+    // Parse tech stack if provided
+    const techStackData = formData.get("tech_stack");
+    let techStack = null;
+    if (techStackData) {
+      try {
+        techStack = JSON.parse(techStackData as string);
+      } catch (error) {
+        console.warn("Invalid tech stack data:", error);
+      }
+    }
+
     // Update project details
     const updateData: any = {};
     for (const [key, value] of formData.entries()) {
-      if (key !== "project_members") {
+      if (key !== "project_members" && key !== "tech_stack") {
         // Log the key-value pairs to debug
         console.log(`Processing form field: ${key} = ${value}`);
         updateData[key] = value;
       }
+    }
+    
+    // Add tech stack if provided
+    if (techStack) {
+      updateData.tech_stack = techStack;
     }
 
     // Log the final update data before sending to Supabase
