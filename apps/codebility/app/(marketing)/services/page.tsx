@@ -8,6 +8,7 @@ import Footer from "../_components/MarketingFooter";
 import Navigation from "../_components/MarketingNavigation";
 import Hero from "./_components/ServicesHero";
 import ServicesTab from "./_components/ServicesTab";
+import TechyBackground from "./_components/TechyBackground";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -36,6 +37,7 @@ interface ProjectData {
   project_category_name?: string;
   created_at?: string;
   updated_at?: string;
+  tech_stack?: string[];
 }
 
 const ServicesPage = async () => {
@@ -60,15 +62,19 @@ const ServicesPage = async () => {
     client_id: item.client_id,
     members:
       item.project_members?.map((pm: any) => pm.codev).filter(Boolean) || [],
+    tech_stack: item.tech_stack || [],
   }));
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
-      <Navigation />
-      <Hero />
-      <ServicesTab servicesData={mappedData} />
-      <Calendly />
-      <Footer />
+      <TechyBackground />
+      <div className="relative z-10">
+        <Navigation />
+        <Hero />
+        <ServicesTab servicesData={mappedData} />
+        <Calendly />
+        <Footer />
+      </div>
     </div>
   );
 };

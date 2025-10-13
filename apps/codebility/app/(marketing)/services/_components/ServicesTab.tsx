@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo, memo } from "react";
 import DefaultPagination from "@/components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
@@ -34,6 +34,7 @@ interface ProjectData {
   project_category_name?: string;
   created_at?: string;
   updated_at?: string;
+  tech_stack?: string[];
 }
 
 interface Props {
@@ -43,15 +44,10 @@ interface Props {
 // Define a special ID for the "All" category
 const ALL_CATEGORY_ID = 0;
 
-export default function ServicesTab({ servicesData }: Props) {
+function ServicesTab({ servicesData }: Props) {
   // Initialize with "All" category
   const [currentCategory, setCurrentCategory] =
     useState<number>(ALL_CATEGORY_ID);
-
-  const [projects, setProjects] = useState(() => {
-    // Start with all projects for the "All" category
-    return servicesData;
-  });
 
   const [tabPages, setTabPages] = useState(() => {
     const pages: Record<number, number> = {
@@ -63,6 +59,15 @@ export default function ServicesTab({ servicesData }: Props) {
     return pages;
   });
 
+  // Memoize filtered projects to prevent unnecessary recalculations
+  const projects = useMemo(() => {
+    return currentCategory === ALL_CATEGORY_ID
+      ? servicesData
+      : servicesData.filter(
+          (project) => project.project_category_id === currentCategory,
+        );
+  }, [currentCategory, servicesData]);
+
   const {
     paginatedData: paginatedProjects,
     currentPage,
@@ -72,20 +77,10 @@ export default function ServicesTab({ servicesData }: Props) {
     setCurrentPage,
   } = usePagination(projects, pageSize.services);
 
-  // Update projects when category changes
+  // Update current page when category changes
   useEffect(() => {
-    // If "All" category is selected, show all projects
-    // Otherwise, filter by the selected category
-    const filteredData =
-      currentCategory === ALL_CATEGORY_ID
-        ? servicesData
-        : servicesData.filter(
-            (project) => project.project_category_id === currentCategory,
-          );
-
-    setProjects(filteredData);
     setCurrentPage(tabPages[currentCategory] || 1);
-  }, [currentCategory, servicesData]);
+  }, [currentCategory, setCurrentPage, tabPages]);
 
   const handleTabClick = (categoryId: number) => {
     setTabPages((prev) => ({
@@ -98,39 +93,48 @@ export default function ServicesTab({ servicesData }: Props) {
   return (
     <Section className="relative">
       <Container className="relative z-0">
-        <div className="flex flex-col gap-10">
+        <div className="flex flex-col gap-4">
           {/* Category Tabs with "All" option */}
-          <div className="mx-auto flex flex-wrap justify-center gap-5 xl:gap-16">
-            <p
+          <div className="mx-auto flex flex-wrap justify-center gap-2 p-1 bg-white/10 dark:bg-white/5 rounded-2xl backdrop-blur-sm border border-white/20">
+            <button
               onClick={() => handleTabClick(ALL_CATEGORY_ID)}
-              className={`cursor-pointer px-2 pb-2 text-customViolet-200 xl:text-xl ${
+              className={`px-3 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 currentCategory === ALL_CATEGORY_ID
-                  ? "border-customViolet-100 text-customViolet-100border-b-2"
-                  : "text-white"
+                  ? "bg-white text-gray-900 shadow-lg"
+                  : "text-white hover:bg-white/20 hover:text-white"
               }`}
             >
               All
-            </p>
+            </button>
             {CATEGORIES.map((cat) => (
-              <p
+              <button
                 key={cat.id}
                 onClick={() => handleTabClick(cat.id)}
-                className={`cursor-pointer px-2 pb-2 text-customViolet-200 xl:text-xl ${
+                className={`px-3 py-1.5 rounded-xl text-sm font-semibold transition-all duration-200 ${
                   currentCategory === cat.id
-                    ? "border-customViolet-100 text-customViolet-100 border-b-2"
-                    : "text-white"
+                    ? "bg-white text-gray-900 shadow-lg"
+                    : "text-white hover:bg-white/20 hover:text-white"
                 }`}
               >
                 {cat.name}
-              </p>
+              </button>
             ))}
           </div>
 
           {/* Projects Grid */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {paginatedProjects && paginatedProjects.length > 0 ? (
-              paginatedProjects.map((project) => (
-                <ServiceCard key={project.id} service={project} />
+              paginatedProjects.map((project, index) => (
+                <div 
+                  key={project.id} 
+                  className="animate-fade-in-up"
+                  style={{
+                    animationDelay: `${index * 150}ms`,
+                    animationFillMode: 'both'
+                  }}
+                >
+                  <ServiceCard service={project} />
+                </div>
               ))
             ) : (
               <div className="col-span-full text-center text-white">
@@ -156,3 +160,5 @@ export default function ServicesTab({ servicesData }: Props) {
     </Section>
   );
 }
+
+export default memo(ServicesTab);

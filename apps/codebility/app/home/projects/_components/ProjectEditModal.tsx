@@ -21,6 +21,8 @@ import {
 import { MemberSelection } from "@/components/ui/MemberSelection";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useModal } from "@/hooks/use-modal-projects";
+import { useModal as useGlobalModal } from "@/hooks/use-modal";
+import { useTechStackStore } from "@/hooks/use-techstack";
 import { Client, Codev, Project, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
@@ -54,10 +56,13 @@ export interface ProjectFormData {
   client_id?: string;
   status?: string;
   main_image?: string;
+  tech_stack?: string[];
 }
 
 const ProjectEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
+  const { onOpen: openGlobalModal } = useGlobalModal();
+  const { stack: selectedTechStack, clearStack, setStack } = useTechStackStore();
   const isModalOpen = isOpen && type === "projectEditModal";
   const queryClient = useQueryClient();
 
@@ -90,44 +95,42 @@ const ProjectEditModal = () => {
     formState: { errors },
   } = useForm<ProjectFormData>({ mode: "onChange" });
 
-  // Fetch users data with React Query
+  // Fetch users data with React Query - always keep this data cached
   const { data: users = [], isLoading: isUsersLoading } = useQuery({
     queryKey: ["projectCodevs"],
     queryFn: async () => {
       const result = await getProjectCodevs();
       return result || [];
     },
-    enabled: isModalOpen,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
   });
 
-  // Fetch clients data with React Query
+  // Fetch clients data with React Query - always keep this data cached
   const { data: clients = [], isLoading: isClientsLoading } = useQuery({
     queryKey: ["projectClients"],
     queryFn: async () => {
       const result = await getProjectClients();
       return result || [];
     },
-    enabled: isModalOpen,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
   });
 
-  // Fetch categories data with React Query
+  // Fetch categories data with React Query - always keep this data cached
   const { data: categories = [], isLoading: isCategoriesLoading } = useQuery({
     queryKey: ["projectCategories"],
     queryFn: async () => {
       const result = await getProjectCategories();
       return result || [];
     },
-    enabled: isModalOpen,
-    staleTime: 5 * 60 * 1000,
+    staleTime: 10 * 60 * 1000, // 10 minutes
     refetchOnWindowFocus: false,
   });
 
-  const isDataLoading =
-    isUsersLoading || isClientsLoading || isCategoriesLoading;
+  // Only show loading for essential data that blocks form interaction
+  const isDataLoading = false; // Allow form to show immediately
+  const isSelectDataLoading = isUsersLoading || isClientsLoading || isCategoriesLoading;
 
   // Prepare select options using useMemo
   const userOptions = useMemo(
@@ -165,14 +168,14 @@ const ProjectEditModal = () => {
     [categories],
   );
 
-  // When project data is available, set initial form values
+  // Populate form fields immediately when modal opens with project data
   useEffect(() => {
-    if (data && users.length > 0) {
+    if (data && isModalOpen) {
       // Reset image loading state
       setImageLoaded(false);
 
-      // Set form values
-      setValue("name", data.name);
+      // Set form values immediately - don't wait for users to load
+      setValue("name", data.name || "");
       setValue("description", data.description || "");
       setValue("github_link", data.github_link || "");
       setValue("website_url", data.website_url || "");
@@ -189,7 +192,19 @@ const ProjectEditModal = () => {
       setProjectImage(data.main_image || null);
       setCroppedImage(data.main_image || null);
       setSelectedStatus(data.status || "pending");
+      
+      // Set tech stack if available
+      if (data.tech_stack && Array.isArray(data.tech_stack)) {
+        setStack(data.tech_stack);
+      } else {
+        clearStack();
+      }
+    }
+  }, [data, setValue, isModalOpen, setStack, clearStack]);
 
+  // Separate useEffect for team member initialization when users data becomes available
+  useEffect(() => {
+    if (data && users.length > 0 && isModalOpen) {
       // Initialize project members and team leader from project_members
       if (data.project_members && data.project_members.length > 0) {
         // Find team leader
@@ -217,7 +232,7 @@ const ProjectEditModal = () => {
         setSelectedMembers(memberCodevs);
       }
     }
-  }, [data, setValue, users]);
+  }, [data, users, isModalOpen]);
 
   // Handler for image change with optimized loading
   const handleImageChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -255,45 +270,51 @@ const ProjectEditModal = () => {
     setSelectedMembers([]);
     setCurrentTeamLeader(null);
     setImageLoaded(false);
+    clearStack(); // Clear tech stack selection
     onClose();
   };
 
   // Subcomponent: ImageUploadSection with optimized loading
   const ImageUploadSection = () => (
-    <div className="flex flex-col items-center gap-4">
-      <div className="relative h-48 w-full overflow-hidden rounded-lg">
+    <div className="flex flex-col items-center gap-6">
+      {/* Image Preview */}
+      <div className="relative w-full max-w-md">
         {croppedImage ? (
-          <>
+          <div className="relative h-48 w-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 overflow-hidden">
             {!imageLoaded && (
-              <div className="absolute inset-0 flex items-center justify-center bg-gray-200">
+              <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
                 <Skeleton className="h-full w-full" />
               </div>
             )}
             <Image
               src={croppedImage}
-              alt="Project"
-              className={`h-full w-full cursor-pointer object-cover transition-opacity duration-300 ${
+              alt="Project Preview"
+              fill
+              className={`object-cover cursor-pointer hover:opacity-80 transition-opacity ${
                 imageLoaded ? "opacity-100" : "opacity-0"
               }`}
               onClick={() => setOpenImageCropper(true)}
-              width={408}
-              height={192}
               onLoad={() => setImageLoaded(true)}
-              style={{ width: "auto", height: "auto" }}
             />
-          </>
+            <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+              <span className="text-white text-sm font-medium">Click to edit</span>
+            </div>
+          </div>
         ) : (
-          <div className="flex h-full w-full items-center justify-center bg-gray-100">
+          <div className="h-48 w-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-3">
             <ProjectAvatar size={64} />
+            <p className="text-sm text-gray-500 dark:text-gray-400">No image selected</p>
           </div>
         )}
       </div>
-      <div className="flex gap-2">
+      
+      {/* Upload Controls */}
+      <div className="flex gap-3">
         <label
           htmlFor="image-upload"
-          className="cursor-pointer text-sm text-customBlue-600 hover:text-customBlue-800 dark:text-white dark:hover:text-customBlue-100"
+          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
         >
-          Upload Image
+          {croppedImage ? 'Change Image' : 'Upload Image'}
         </label>
         <input
           id="image-upload"
@@ -302,93 +323,113 @@ const ProjectEditModal = () => {
           className="hidden"
           onChange={handleImageChange}
         />
-        {openImageCropper && (
-          <ImageCrop
-            image={projectImage || ""}
-            setImage={setCroppedImage}
-            setFile={setCroppedFile}
-            open={openImageCropper}
-            setOpen={setOpenImageCropper}
-          />
-        )}
         {projectImage && (
           <button
             type="button"
             onClick={handleRemoveImage}
-            className="text-sm text-red-600 hover:text-red-800"
+            className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
           >
-            Remove Image
+            Remove
           </button>
         )}
       </div>
+      
+      <ImageCrop
+        image={projectImage || ""}
+        setImage={setCroppedImage}
+        setFile={setCroppedFile}
+        open={openImageCropper}
+        setOpen={setOpenImageCropper}
+      />
     </div>
   );
 
   // Subcomponent: ProjectDetailsSection
   const ProjectDetailsSection = () => (
-    <div className="grid gap-4">
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Project Name</label>
-        <Input
-          type="text"
-          placeholder="Enter project name"
-          {...register("name", { required: "Project name is required" })}
-          className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
-        />
-        {errors.name && (
-          <p className="text-sm text-red-500">{errors.name.message}</p>
-        )}
-      </div>
-      <div className="space-y-2">
-        <label className="text-sm font-medium">Project Description</label>
-        <Input
-          type="text"
-          placeholder="Enter project description"
-          {...register("description")}
-          className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
-        />
-      </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div className="space-y-6">
+      {/* Basic Information */}
+      <div className="grid gap-4">
         <div className="space-y-2">
-          <label className="text-sm font-medium">GitHub Link (optional)</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Name *</label>
           <Input
             type="text"
-            placeholder="Enter GitHub link"
-            {...register("github_link")}
-            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+            placeholder="Enter a descriptive project name"
+            {...register("name", { required: "Project name is required" })}
+            className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
           />
+          {errors.name && (
+            <p className="text-sm text-red-500 flex items-center gap-1">
+              <span className="w-4 h-4 text-red-500">⚠</span>
+              {errors.name.message}
+            </p>
+          )}
         </div>
+        
         <div className="space-y-2">
-          <label className="text-sm font-medium">Website URL (optional)</label>
-          <Input
-            type="text"
-            placeholder="Enter website URL"
-            {...register("website_url")}
-            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Description *</label>
+          <textarea
+            placeholder="Describe what this project is about, its goals, and key features"
+            {...register("description", {
+              required: "Project description is required",
+            })}
+            rows={3}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white dark:bg-gray-800"
           />
+          {errors.description && (
+            <p className="text-sm text-red-500 flex items-center gap-1">
+              <span className="w-4 h-4 text-red-500">⚠</span>
+              {errors.description.message}
+            </p>
+          )}
         </div>
-      </div>
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        
         <div className="space-y-2">
-          <label className="text-sm font-medium">Figma Link (optional)</label>
-          <Input
-            type="text"
-            placeholder="Enter Figma link"
-            {...register("figma_link")}
-            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
-          />
-        </div>
-        <div className="space-y-2">
-          <label className="text-sm font-medium">Start Date</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Start Date *</label>
           <Input
             type="date"
-            placeholder="Select start date"
             {...register("start_date", { required: "Start date is required" })}
-            className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+            className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
           />
           {errors.start_date && (
-            <p className="text-sm text-red-500">{errors.start_date.message}</p>
+            <p className="text-sm text-red-500 flex items-center gap-1">
+              <span className="w-4 h-4 text-red-500">⚠</span>
+              {errors.start_date.message}
+            </p>
           )}
+        </div>
+      </div>
+      
+      {/* External Links */}
+      <div className="border-t pt-3">
+        <h4 className="text-xs font-medium text-gray-900 dark:text-gray-100 mb-2">External Links (Optional)</h4>
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">GitHub Repository</label>
+            <Input
+              type="url"
+              placeholder="https://github.com/..."
+              {...register("github_link")}
+              className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Live Website</label>
+            <Input
+              type="url"
+              placeholder="https://yourproject.com"
+              {...register("website_url")}
+              className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+            />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Figma Design</label>
+            <Input
+              type="url"
+              placeholder="https://figma.com/..."
+              {...register("figma_link")}
+              className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -396,59 +437,130 @@ const ProjectEditModal = () => {
 
   // Subcomponent: SelectSection
   const SelectSection = () => (
-    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-      <CustomSelect
-        label="Team Leader"
-        options={userOptions.filter(
-          (user) => !selectedMembers.find((member) => member.id === user.value),
-        )}
-        value={currentTeamLeader?.id || ""}
-        onChange={(value) => {
-          const leader = users.find((u) => u.id === value);
-          if (leader) setCurrentTeamLeader(leader);
-        }}
-        placeholder="Select Team Leader"
-        disabled={isDataLoading}
-        searchable
-      />
-      <CustomSelect
-        label="Project Category"
-        options={categoryOptions}
-        onChange={(value) => setValue("project_category_id", value)}
-        value={data?.project_category_id?.toString() || ""}
-        placeholder="Select Project Category"
-        variant="simple"
-        searchable
-      />
-      <CustomSelect
-        label="Client"
-        options={clientOptions}
-        onChange={(value) => setValue("client_id", value)}
-        value={data?.client_id || ""}
-        placeholder="Select Client"
-        disabled={isDataLoading}
-        searchable
-      />
-      <CustomSelect
-        label="Status"
-        options={PROJECT_STATUSES}
-        value={selectedStatus}
-        onChange={(value) => setSelectedStatus(value)}
-        placeholder="Select Status"
-        variant="simple"
-      />
-      <div className="md:col-span-2">
-        <MemberSelection
-          users={users.filter((user) => user.id !== currentTeamLeader?.id)}
-          selectedMembers={selectedMembers}
-          onMemberAdd={(member) =>
-            setSelectedMembers((prev) => [...prev, member])
-          }
-          onMemberRemove={(memberId) =>
-            setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
-          }
-          excludeMembers={currentTeamLeader ? [currentTeamLeader.id] : []}
-        />
+    <div className="space-y-6">
+      {/* Project Configuration */}
+      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Category *</label>
+          <CustomSelect
+            options={categoryOptions}
+            onChange={(value) => setValue("project_category_id", value)}
+            value={data?.project_category_id?.toString() || ""}
+            placeholder="Select Project Category"
+            variant="simple"
+            searchable
+          />
+        </div>
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Client *</label>
+          <CustomSelect
+            options={clientOptions}
+            onChange={(value) => setValue("client_id", value)}
+            value={data?.client_id || ""}
+            placeholder={isClientsLoading ? "Loading clients..." : "Select Client"}
+            disabled={isClientsLoading}
+            searchable
+          />
+        </div>
+      </div>
+      
+      {/* Project Status */}
+      <div className="border-t pt-6">
+        <h4 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Project Status</h4>
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Status *</label>
+          <CustomSelect
+            options={PROJECT_STATUSES}
+            value={selectedStatus}
+            onChange={(value) => setSelectedStatus(value)}
+            placeholder="Select Status"
+            variant="simple"
+          />
+        </div>
+      </div>
+      
+      {/* Team Configuration */}
+      <div className="border-t pt-6">
+        <h4 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Team Configuration</h4>
+        <div className="space-y-6">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Team Leader *</label>
+            <CustomSelect
+              options={userOptions.filter(
+                (user) => !selectedMembers.find((member) => member.id === user.value),
+              )}
+              value={currentTeamLeader?.id || ""}
+              onChange={(value) => {
+                const leader = users.find((u) => u.id === value);
+                if (leader) setCurrentTeamLeader(leader);
+              }}
+              placeholder={isUsersLoading ? "Loading users..." : "Select Team Leader"}
+              disabled={isUsersLoading}
+              searchable
+            />
+          </div>
+          
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Team Members</label>
+            {isUsersLoading ? (
+              <div className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg">
+                <div className="flex items-center gap-2 text-sm text-gray-500">
+                  <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                  Loading team members...
+                </div>
+              </div>
+            ) : (
+              <MemberSelection
+                users={users.filter((user) => user.id !== currentTeamLeader?.id)}
+                selectedMembers={selectedMembers}
+                onMemberAdd={(member) =>
+                  setSelectedMembers((prev) => [...prev, member])
+                }
+                onMemberRemove={(memberId) =>
+                  setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
+                }
+                excludeMembers={currentTeamLeader ? [currentTeamLeader.id] : []}
+              />
+            )}
+          </div>
+        </div>
+      </div>
+      
+      {/* Tech Stack Selection */}
+      <div className="border-t pt-6">
+        <h4 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Technology Stack</h4>
+        <div className="space-y-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => openGlobalModal("techStackModal")}
+            className="w-full h-12 justify-start text-left border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+          >
+            <div className="flex items-center gap-3">
+              <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">+</span>
+              {selectedTechStack.length > 0 
+                ? `${selectedTechStack.length} technology(ies) selected` 
+                : "Select Technologies Used"
+              }
+            </div>
+          </Button>
+          
+          {/* Display selected tech stack */}
+          {selectedTechStack.length > 0 && (
+            <div className="bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4">
+              <div className="flex flex-wrap gap-2">
+                {selectedTechStack.map((tech, index) => (
+                  <span
+                    key={index}
+                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
@@ -505,6 +617,11 @@ const ProjectEditModal = () => {
           form.append(key, value);
         }
       });
+      
+      // Add tech stack
+      if (selectedTechStack.length > 0) {
+        form.append("tech_stack", JSON.stringify(selectedTechStack));
+      }
 
       // Add status
       form.set("status", selectedStatus);
@@ -551,48 +668,80 @@ const ProjectEditModal = () => {
   };
 
   return (
-    <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="max-h-[90vh] max-w-2xl overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Edit Project</DialogTitle>
+    <Dialog open={isModalOpen} onOpenChange={resetForm}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
+        <DialogHeader className="border-b pb-2">
+          <DialogTitle className="text-lg font-bold">Edit Project</DialogTitle>
+          <p className="text-xs text-gray-600 dark:text-gray-400">
+            Update the project details below to modify your project.
+          </p>
         </DialogHeader>
-        <div className="px-1" style={{ maxHeight: "calc(100vh - 200px)" }}>
-          {isDataLoading ? (
-            <div className="space-y-4 py-4">
-              <Skeleton className="h-48 w-full rounded-lg" />
-              <Skeleton className="h-10 w-full rounded-lg" />
-              <Skeleton className="h-10 w-full rounded-lg" />
-              <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                <Skeleton className="h-10 w-full rounded-lg" />
-                <Skeleton className="h-10 w-full rounded-lg" />
-              </div>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+        
+        <div className="overflow-y-auto flex-1 p-3" style={{ maxHeight: "calc(80vh - 200px)" }}>
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Project Image Section */}
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+                Project Image
+              </h3>
               <ImageUploadSection />
+            </div>
+            
+            {/* Project Details Section */}
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+                Project Information
+              </h3>
               <ProjectDetailsSection />
+            </div>
+            
+            {/* Team & Configuration Section */}
+            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
+              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
+                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+                Team & Configuration
+                {isSelectDataLoading && (
+                  <div className="ml-2 flex items-center gap-2 text-sm text-gray-500">
+                    <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                    Loading...
+                  </div>
+                )}
+              </h3>
               <SelectSection />
-            </form>
-          )}
-          <DialogFooter className="pb-10">
+            </div>
+          </form>
+        </div>
+        
+        <DialogFooter className="border-t pt-4 bg-gray-50 dark:bg-gray-800/30">
+          <div className="flex justify-end gap-3 w-full">
             <Button
               type="button"
               variant="outline"
-              onClick={() => onClose()}
-              className="bg-light-800 dark:bg-dark-200 border-light-700 dark:border-dark-200 dark:text-light-900 text-black"
+              onClick={resetForm}
+              disabled={isLoading}
+              className="min-w-[100px]"
             >
               Cancel
             </Button>
             <Button
               type="submit"
-              disabled={isLoading || isDataLoading}
+              disabled={isLoading}
               onClick={handleSubmit(onSubmit)}
-              className="text-white"
+              className="min-w-[120px] bg-blue-600 hover:bg-blue-700 text-white"
             >
-              {isLoading ? "Updating..." : "Update Project"}
+              {isLoading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  Updating...
+                </div>
+              ) : (
+                "Update Project"
+              )}
             </Button>
-          </DialogFooter>
-        </div>
+          </div>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

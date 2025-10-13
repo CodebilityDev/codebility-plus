@@ -83,34 +83,34 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
       <Container className="relative z-0">
         <div className="flex flex-col gap-10">
           {/* Category Tabs - Added "All" category */}
-          <div className="mx-auto flex flex-wrap justify-center gap-5 xl:gap-16 ">
-            <p
+          <div className="mx-auto flex flex-wrap justify-center gap-2 p-2 bg-gray-100/50 dark:bg-gray-800/50 rounded-2xl backdrop-blur-sm border border-gray-200/50 dark:border-gray-700/50">
+            <button
               onClick={() => handleTabClick(ALL_CATEGORY_ID)}
-              className={`cursor-pointer border-b-2 px-2 pb-2 transition-colors xl:text-xl ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
               currentCategory === ALL_CATEGORY_ID
-                ? "border-customBlue-300 text-customBlue-300 dark:border-customBlue-200 dark:text-customBlue-200"
-                : "hover:text-customBlue-300 dark:hover:text-customBlue-200 border-transparent text-gray-700 dark:text-gray-300"
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
+                : "text-gray-600 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-700/50 hover:text-blue-600 dark:hover:text-blue-400"
               }`}
             >
               All
-            </p>
+            </button>
             {CATEGORIES.map((category) => (
-              <p
+              <button
               key={category.id}
               onClick={() => handleTabClick(category.id)}
-              className={`cursor-pointer border-b-2 px-2 pb-2 transition-colors xl:text-xl ${
+              className={`px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 ${
                 currentCategory === category.id
-                ? "border-customBlue-300 text-customBlue-300 dark:border-customBlue-200 dark:text-customBlue-200"
-                : "hover:text-customBlue-300 dark:hover:text-customBlue-200 border-transparent text-gray-700 dark:text-gray-300"
+                ? "bg-blue-600 text-white shadow-lg shadow-blue-600/25"
+                : "text-gray-600 dark:text-gray-300 hover:bg-white/80 dark:hover:bg-gray-700/50 hover:text-blue-600 dark:hover:text-blue-400"
               }`}
               >
               {category.name}
-              </p>
+              </button>
             ))}
           </div>
 
           {/* Projects Grid */}
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3 lg:gap-5">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {Array.isArray(paginatedProjects) &&
             paginatedProjects.length > 0 ? (
               paginatedProjects.map((project) => {

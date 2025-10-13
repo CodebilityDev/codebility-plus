@@ -40,19 +40,20 @@ const TechStackModal = () => {
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogContent
         aria-describedby={undefined}
-        className="bg-light-900 dark:bg-dark-100 h-auto w-[90%] max-w-md overflow-y-auto py-8 sm:max-w-2xl sm:px-12 sm:py-16"
+        className="bg-light-900 dark:bg-dark-100 h-auto w-[90%] max-w-md max-h-[85vh] overflow-y-auto py-4 sm:max-w-xl sm:px-6 sm:py-6"
       >
         <button onClick={onClose} className="absolute right-4 top-4">
           <IconClose />
         </button>
         <DialogHeader>
-          <DialogTitle className="text-md mb-4 text-center text-black dark:text-white md:text-xl">
+          <DialogTitle className="text-sm mb-2 text-center text-black dark:text-white md:text-base">
             Select your Tech Stack
           </DialogTitle>
         </DialogHeader>
         {/* Tabs for grouping tech stacks by category */}
-        <Tabs defaultValue="all" className="w-full">
-          <TabsList className="mb-12 flex flex-wrap justify-center ">
+        <div className="flex flex-col h-full min-h-0">
+        <Tabs defaultValue="all" className="w-full flex flex-col flex-1 min-h-0">
+          <TabsList className="mb-3 flex flex-wrap justify-center flex-shrink-0 gap-1 h-8">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="frontend">Frontend</TabsTrigger>
             <TabsTrigger value="backend">Backend</TabsTrigger>
@@ -64,263 +65,264 @@ const TechStackModal = () => {
           </TabsList>
 
           {/* All */}
-          <TabsContent value="all">
-            <div className="grid w-full grid-cols-3 gap-2">
+          <TabsContent value="all" className="flex-1 overflow-y-auto">
+            <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {techstacks.map((stackItem, i) => (
                 <div
                   key={`stack-item-all-${i}`}
-                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded border p-1.5 text-black hover:bg-white dark:text-white min-h-[32px] items-center text-xs ${
                     checkArray(stackItem.name.toLowerCase()) &&
                     "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
-                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                  <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
                       src={
                         stackItem.alias
-                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
                       }
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                  <p className="hidden pl-2 sm:block text-xs">{stackItem.name}</p>
                 </div>
               ))}
             </div>
           </TabsContent>
 
           {/* Frontend */}
-          <TabsContent value="frontend">
-            <div className="grid w-full grid-cols-3 gap-2">
+          <TabsContent value="frontend" className="flex-1 overflow-y-auto">
+            <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Frontend").map((stackItem, i) => (
                 <div
                   key={`stack-item-frontend-${i}`}
-                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded border p-1.5 text-black hover:bg-white dark:text-white min-h-[32px] items-center text-xs ${
                     checkArray(stackItem.name.toLowerCase()) &&
                     "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
-                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                  <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
                       src={
                         stackItem.alias
-                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
                       }
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                  <p className="hidden pl-2 sm:block text-xs">{stackItem.name}</p>
                 </div>
               ))}
             </div>
           </TabsContent>
 
           {/* Backend */}
-          <TabsContent value="backend">
-            <div className="grid w-full grid-cols-3 gap-2">
+          <TabsContent value="backend" className="flex-1 overflow-y-auto">
+            <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Backend").map((stackItem, i) => (
                 <div
                   key={`stack-item-backend-${i}`}
-                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded border p-1.5 text-black hover:bg-white dark:text-white min-h-[32px] items-center text-xs ${
                     checkArray(stackItem.name.toLowerCase()) &&
                     "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
-                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                  <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
                       src={
                         stackItem.alias
-                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
                       }
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                  <p className="hidden pl-2 sm:block text-xs">{stackItem.name}</p>
                 </div>
               ))}
             </div>
           </TabsContent>
 
           {/* Mobile */}
-          <TabsContent value="mobile">
-            <div className="grid w-full grid-cols-3 gap-2">
+          <TabsContent value="mobile" className="flex-1 overflow-y-auto">
+            <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Mobile").map((stackItem, i) => (
                 <div
                   key={`stack-item-mobile-${i}`}
-                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded border p-1.5 text-black hover:bg-white dark:text-white min-h-[32px] items-center text-xs ${
                     checkArray(stackItem.name.toLowerCase()) &&
                     "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
-                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                  <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
                       src={
                         stackItem.alias
-                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
                       }
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                  <p className="hidden pl-2 sm:block text-xs">{stackItem.name}</p>
                 </div>
               ))}
             </div>
           </TabsContent>
 
           {/* Blockchain */}
-          <TabsContent value="blockchain">
-            <div className="grid w-full grid-cols-3 gap-2">
+          <TabsContent value="blockchain" className="flex-1 overflow-y-auto">
+            <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Blockchain").map((stackItem, i) => (
                 <div
                   key={`stack-item-blockchain-${i}`}
-                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded border p-1.5 text-black hover:bg-white dark:text-white min-h-[32px] items-center text-xs ${
                     checkArray(stackItem.name.toLowerCase()) &&
                     "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
-                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                  <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
                       src={
                         stackItem.alias
-                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
                       }
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                  <p className="hidden pl-2 sm:block text-xs">{stackItem.name}</p>
                 </div>
               ))}
             </div>
           </TabsContent>
 
           {/* Server */}
-          <TabsContent value="server">
-            <div className="grid w-full grid-cols-3 gap-2">
+          <TabsContent value="server" className="flex-1 overflow-y-auto">
+            <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Server").map((stackItem, i) => (
                 <div
                   key={`stack-item-server-${i}`}
-                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded border p-1.5 text-black hover:bg-white dark:text-white min-h-[32px] items-center text-xs ${
                     checkArray(stackItem.name.toLowerCase()) &&
                     "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
-                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                  <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
                       src={
                         stackItem.alias
-                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
                       }
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                  <p className="hidden pl-2 sm:block text-xs">{stackItem.name}</p>
                 </div>
               ))}
             </div>
           </TabsContent>
 
           {/* CMS */}
-          <TabsContent value="cms">
-            <div className="grid w-full grid-cols-3 gap-2">
+          <TabsContent value="cms" className="flex-1 overflow-y-auto">
+            <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("CMS").map((stackItem, i) => (
                 <div
                   key={`stack-item-cms-${i}`}
-                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded border p-1.5 text-black hover:bg-white dark:text-white min-h-[32px] items-center text-xs ${
                     checkArray(stackItem.name.toLowerCase()) &&
                     "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
-                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                  <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
                       src={
                         stackItem.alias
-                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
                       }
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                  <p className="hidden pl-2 sm:block text-xs">{stackItem.name}</p>
                 </div>
               ))}
             </div>
           </TabsContent>
 
           {/* Design */}
-          <TabsContent value="design">
-            <div className="grid w-full grid-cols-3 gap-2">
+          <TabsContent value="design" className="flex-1 overflow-y-auto">
+            <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Design").map((stackItem, i) => (
                 <div
                   key={`stack-item-design-${i}`}
-                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded-md border p-2 text-black hover:bg-white dark:text-white ${
+                  className={`border-darkgray hover:text-black-500 dark:hover:text-black-100 flex cursor-pointer rounded border p-1.5 text-black hover:bg-white dark:text-white min-h-[32px] items-center text-xs ${
                     checkArray(stackItem.name.toLowerCase()) &&
                     "bg-customBlue-100 text-white"
                   } ${nonTech && "pointer-events-none saturate-0"}`}
                   onClick={() => addRemoveStack(stackItem.name.toLowerCase())}
                 >
-                  <div className="relative mx-auto h-5 w-5 sm:mx-0 sm:h-6 sm:w-6">
+                  <div className="relative mx-auto h-4 w-4 sm:mx-0 sm:h-5 sm:w-5">
                     <Image
                       src={
                         stackItem.alias
-                          ? `/assets/svgs/icon-${stackItem.alias.toLowerCase()}.svg`
-                          : `/assets/svgs/icon-${stackItem.name.toLowerCase()}.svg`
+                          ? `/assets/svgs/techstack/icon-${stackItem.alias.toLowerCase()}.svg`
+                          : `/assets/svgs/techstack/icon-${stackItem.name.toLowerCase()}.svg`
                       }
                       alt={`${stackItem.name} icon`}
                       fill
                       sizes="(min-width: 640px) 24px, 20px"
                       title={stackItem.name}
-                      className="object-cover"
+                      className="object-contain"
                     />
                   </div>
-                  <p className="hidden pl-4 sm:block">{stackItem.name}</p>
+                  <p className="hidden pl-2 sm:block text-xs">{stackItem.name}</p>
                 </div>
               ))}
             </div>
           </TabsContent>
         </Tabs>
+        </div>
 
-        <DialogFooter className="mt-4 flex w-full items-center justify-between gap-2">
+        <DialogFooter className="mt-2 flex w-full items-center justify-between gap-2 flex-shrink-0">
           <div className="flex flex-1 items-center gap-2">
             <ToggleSwitch enabled={!nonTech} onClick={() => setNonTech()} />
             <span>I&apos;m applying for a non-tech role. </span>
