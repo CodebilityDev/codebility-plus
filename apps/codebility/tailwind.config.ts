@@ -264,6 +264,48 @@ const config: Config = {
           "0%": { transform: "translateX(-100%)" },
           "100%": { transform: "translateX(100%)" },
         },
+        "fade-in-up": {
+          "0%": {
+            opacity: "0",
+            transform: "translateY(10px)",
+          },
+          "100%": {
+            opacity: "1",
+            transform: "translateY(0)",
+          },
+        },
+        "pulse-glow": {
+          "0%, 100%": {
+            boxShadow: "0 0 5px rgba(59, 130, 246, 0.3)",
+          },
+          "50%": {
+            boxShadow: "0 0 20px rgba(59, 130, 246, 0.6)",
+          },
+        },
+        floating: {
+          "0%, 100%": {
+            transform: "translateY(0px)",
+          },
+          "50%": {
+            transform: "translateY(-5px)",
+          },
+        },
+        "card-3d": {
+          "0%": {
+            transform: "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)",
+          },
+          "100%": {
+            transform: "perspective(1000px) rotateX(-5deg) rotateY(3deg) translateY(-8px) scale(1.02)",
+          },
+        },
+        "card-glow": {
+          "0%": {
+            boxShadow: "0 4px 20px rgba(59, 130, 246, 0.1)",
+          },
+          "100%": {
+            boxShadow: "0 20px 40px rgba(59, 130, 246, 0.3), 0 0 0 1px rgba(59, 130, 246, 0.1)",
+          },
+        },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
@@ -276,6 +318,11 @@ const config: Config = {
         "slide-down": "slide-down 0.3s ease-out",
         ping: "ping 1s cubic-bezier(0, 0, 0.2, 1) infinite",
         shimmer: "shimmer 2s infinite",
+        "fade-in-up": "fade-in-up 0.6s ease-out",
+        "pulse-glow": "pulse-glow 2s ease-in-out infinite",
+        floating: "floating 3s ease-in-out infinite",
+        "card-3d": "card-3d 0.3s ease-out forwards",
+        "card-glow": "card-glow 0.3s ease-out forwards",
       },
       perspective: {
         800: "800px",
