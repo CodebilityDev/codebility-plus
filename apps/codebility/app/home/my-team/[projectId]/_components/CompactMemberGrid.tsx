@@ -8,6 +8,7 @@ import { Mail, Phone, Calendar, MapPin, Briefcase, Trophy } from "lucide-react";
 import { multipleMoveApplicantToOnboardingAction } from "@/app/home/applicants/_service/action";
 const ATTENDANCE_POINTS_PER_DAY = 2;
 import { getTeamMonthlyAttendancePoints } from "../actions";
+import MemberDetailModal from "../../_components/MemberDetailModal";
 
 interface CompactMemberGridProps {
   members: SimpleMemberData[];
@@ -27,6 +28,8 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
   const [memberPoints, setMemberPoints] = useState<MemberPoints>({});
   const [isLoadingPoints, setIsLoadingPoints] = useState(false); // Start as false, load on demand
   const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ uniqueCodevIdsPresentDays: { codevId: string; presentDays: number }[]; }>({ uniqueCodevIdsPresentDays: [] });
+  const [selectedMember, setSelectedMember] = useState<SimpleMemberData | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Load points for all members - made more efficient and optional
   const loadAllPoints = async () => {
@@ -44,7 +47,7 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
           try {
             const response = await fetch(`/api/codev/${member.id}/points`);
             if (!response.ok) throw new Error('Failed to fetch');
-            const data = await response.json();
+            const data = await response.json() as { totalPoints?: number; attendancePoints?: number };
             return { memberId: member.id, data };
           } catch (error) {
             console.warn(`Failed to load points for ${member.id}:`, error);
@@ -95,6 +98,16 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
   const hasPointsData = Object.keys(memberPoints).length > 0;
   const showLoadPointsButton = !hasPointsData && !isLoadingPoints && allMembers.length > 0;
 
+  const handleMemberClick = (member: SimpleMemberData) => {
+    setSelectedMember(member);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedMember(null);
+  };
+
   return (
     <div className="space-y-4">
       {/* Load Points Button */}
@@ -127,7 +140,8 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
           return (
             <div
               key={member.id}
-              className="relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md dark:border-gray-700 dark:bg-gray-800 overflow-hidden"
+              onClick={() => handleMemberClick(member)}
+              className="relative rounded-lg border border-gray-200 bg-white p-4 shadow-sm transition-all duration-200 hover:shadow-md hover:scale-105 hover:border-blue-300 dark:border-gray-700 dark:bg-gray-800 dark:hover:border-blue-600 overflow-hidden cursor-pointer"
             >
             {/* Status indicator */}
             <div className="absolute top-2 right-2 h-2 w-2 rounded-full bg-green-500" title="Active" />
@@ -188,7 +202,7 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
                     <span className="text-gray-500">Total Points:</span>
                     {memberHasPoints ? (
                       <span className="font-semibold text-gray-900 dark:text-white">
-                        {memberPoints[member.id].totalPoints}
+                        {memberPoints[member.id]?.totalPoints || 0}
                       </span>
                     ) : (
                       <div className="w-8 h-3 bg-gray-200 animate-pulse rounded"></div>
@@ -221,6 +235,15 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
         );
       })}
       </div>
+
+      {/* Member Detail Modal */}
+      <MemberDetailModal
+        isOpen={isModalOpen}
+        member={selectedMember}
+        isTeamLead={selectedMember?.id === teamLead?.id}
+        projectId={projectId}
+        onClose={handleCloseModal}
+      />
     </div>
   );
 };
