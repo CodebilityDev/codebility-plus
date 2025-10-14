@@ -76,7 +76,7 @@ function ServiceCard({ service }: Props) {
 
   return (
     <div 
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:border-blue-400/30 hover:bg-white/10 transform-gpu hover:-translate-y-2 hover:scale-105"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:border-blue-400/30 hover:bg-white/10 transform-gpu hover:-translate-y-2 hover:scale-105 aspect-[3/4]"
       style={{
         transformStyle: 'preserve-3d',
         perspective: '1000px',
@@ -98,7 +98,7 @@ function ServiceCard({ service }: Props) {
         card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)';
       }}
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden">
+      <div className="relative aspect-[4/3] w-full overflow-hidden flex-shrink-0">
         <Image
           src={imageUrl}
           alt={name}
@@ -176,20 +176,8 @@ function ServiceCard({ service }: Props) {
           )}
         </div>
 
-        {/* Bottom Section */}
-        <div className="space-y-4 mt-auto">
-          {/* Website Link */}
-          {hasValidWebsite && (
-            <Link
-              href={website_url!}
-              target="_blank"
-              className="inline-flex items-center gap-2 rounded-xl bg-white/10 hover:bg-gradient-to-r hover:from-blue-500/15 hover:to-indigo-500/15 border border-white/20 hover:border-blue-400/30 px-4 py-2 text-sm font-medium transition-all duration-300 hover:scale-105 hover:shadow-md hover:shadow-blue-500/15 hover:translate-y-[-1px]"
-            >
-              <IconLink className="size-4" />
-              <span>View Website</span>
-            </Link>
-          )}
-
+        {/* Bottom Section with Website Button Absolute Positioned */}
+        <div className="relative space-y-4 mt-auto">
           {/* Team Section */}
           {members.length > 0 ? (
             <div>
@@ -198,7 +186,7 @@ function ServiceCard({ service }: Props) {
                 {teamLeader && (
                   <Tooltip>
                     <TooltipTrigger>
-                      <div className="relative mb-2 mr-4">
+                      <div className="relative mb-2 mr-2">
                         <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-customBlue-500">
                           {teamLeader.image_url ? (
                             <Image
@@ -229,7 +217,7 @@ function ServiceCard({ service }: Props) {
                 {teamMembers.map((member, index) => (
                   <Tooltip key={`${member.id}${index}`}>
                     <TooltipTrigger>
-                      <div className="mb-2 mr-2">
+                      <div className="mb-2 mr-1">
                         <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-gray-700">
                           {member.image_url ? (
                             <Image
@@ -264,6 +252,18 @@ function ServiceCard({ service }: Props) {
             </div>
           )}
         </div>
+
+        {/* Website Button - Absolute positioned at bottom right */}
+        {hasValidWebsite && (
+          <Link
+            href={website_url!}
+            target="_blank"
+            className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-blue-400/30 hover:border-blue-300/50 px-3 py-2 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 hover:translate-y-[-1px] backdrop-blur-sm"
+          >
+            <IconLink className="size-4" />
+            <span>View</span>
+          </Link>
+        )}
       </div>
     </div>
   );

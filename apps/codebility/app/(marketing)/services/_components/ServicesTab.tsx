@@ -122,12 +122,12 @@ function ServicesTab({ servicesData }: Props) {
           </div>
 
           {/* Projects Grid */}
-          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 mx-[-4px]">
             {paginatedProjects && paginatedProjects.length > 0 ? (
               paginatedProjects.map((project, index) => (
                 <div 
                   key={project.id} 
-                  className="animate-fade-in-up"
+                  className="animate-fade-in-up px-1"
                   style={{
                     animationDelay: `${index * 150}ms`,
                     animationFillMode: 'both'
