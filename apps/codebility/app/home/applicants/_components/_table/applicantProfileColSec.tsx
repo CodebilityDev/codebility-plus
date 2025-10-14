@@ -191,7 +191,7 @@ export default function ApplicantProfileColSec({
                       applicant.tech_stacks.slice(0, 4).map((stack, i) => (
                         <Image
                           key={i}
-                          src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                          src={`/assets/svgs/techstack/icon-${stack.toLowerCase()}.svg`}
                           alt={`${stack} icon`}
                           width={24}
                           height={24}

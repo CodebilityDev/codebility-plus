@@ -25,7 +25,7 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
           tech ? (
             <div className="flex items-center" key={`${tech}-${idx}`}>
               <Image
-                src={`/assets/svgs/icon-${tech.toLowerCase()}.svg`}
+                src={`/assets/svgs/techstack/icon-${tech.toLowerCase()}.svg`}
                 alt={`${tech} icon`}
                 width={20}
                 height={20}
@@ -65,7 +65,7 @@ export default function TechStacks({ techStacks }: TechStacksProps) {
                 {hiddenTech.map((tech, idx) => (
                   <div className="flex items-center" key={`${tech}-${idx}`}>
                     <Image
-                      src={`/assets/svgs/icon-${tech.toLowerCase()}.svg`}
+                      src={`/assets/svgs/techstack/icon-${tech.toLowerCase()}.svg`}
                       alt={`${tech} icon`}
                       width={20}
                       height={20}
