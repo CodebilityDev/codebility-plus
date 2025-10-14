@@ -29,7 +29,7 @@ export default function ApplicantTechStack({
               title={stack}
             >
               <Image
-                src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                src={`/assets/svgs/techstack/icon-${stack.toLowerCase()}.svg`}
                 alt={stack}
                 width={24}
                 height={24}

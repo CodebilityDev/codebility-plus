@@ -148,7 +148,7 @@ export function CodevCard({ data, onEdit, onDelete, roles }: CodevCardProps) {
               {cleanTechStackData.slice(0, 24).map((stack) => (
                 <Image
                   key={stack}
-                  src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+                  src={`/assets/svgs/techstack/icon-${stack.toLowerCase()}.svg`}
                   alt={stack}
                   width={25}
                   height={25}

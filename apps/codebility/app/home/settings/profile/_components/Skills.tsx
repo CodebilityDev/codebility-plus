@@ -148,7 +148,7 @@ const Skills = ({ data }: SkillsProps) => {
             item && (
               <div key={`${item}-${index}`} className="flex items-center">
                 <Image
-                  src={`/assets/svgs/icon-${item.toLowerCase()}.svg`}
+                  src={`/assets/svgs/techstack/icon-${item.toLowerCase()}.svg`}
                   alt={`${item} icon`}
                   width={40}
                   height={40}
