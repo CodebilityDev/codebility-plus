@@ -33,6 +33,7 @@ yarn-error.log*
 .env.production
 .env.sample
 .env.local
+.env.staging
 
 /test-results/
 /playwright-report/
