@@ -118,92 +118,94 @@ function ServiceCard({ service }: Props) {
         <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
       </div>
 
-      <div className="flex flex-1 flex-col p-4 text-white transition-all duration-500 group-hover:translate-z-4">
-        {/* Main Content */}
-        <div className="space-y-3">
-          <h3 className="line-clamp-1 text-lg font-bold group-hover:text-blue-300 transition-colors lg:text-xl">
-            {name}
-          </h3>
+      <div className="flex flex-1 flex-col text-white transition-all duration-500 group-hover:translate-z-4">
+        {/* Scrollable Content Area */}
+        <div className="flex-1 overflow-y-auto p-4 pb-2">
+          <div className="space-y-3">
+            <h3 className="line-clamp-1 text-lg font-bold group-hover:text-blue-300 transition-colors lg:text-xl">
+              {name}
+            </h3>
 
-          <div className="min-h-[3rem] max-h-[6rem] overflow-y-auto">
-            <p
-              className={`text-gray-300 text-sm leading-relaxed ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
-            >
-              {description || "No description available."}
-            </p>
-            {isDescriptionLong && (
-              <button
-                onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                className="mt-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+            <div>
+              <p
+                className={`text-gray-300 text-sm leading-relaxed ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
               >
-                {isDescriptionExpanded ? "Show less" : "Read more"}
-              </button>
+                {description || "No description available."}
+              </p>
+              {isDescriptionLong && (
+                <button
+                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                  className="mt-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                >
+                  {isDescriptionExpanded ? "Show less" : "Read more"}
+                </button>
+              )}
+            </div>
+
+            {/* Tech Stack */}
+            {tech_stack && tech_stack.length > 0 && (
+              <div className="space-y-2">
+                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                  Tech Stack
+                </h4>
+                <div className="flex flex-wrap gap-1.5">
+                  {tech_stack.slice(0, 3).map((tech, index) => (
+                    <span
+                      key={index}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-300 border border-blue-500/30 hover:shadow-sm hover:shadow-blue-500/20 transition-all duration-300 hover:scale-105 hover:bg-gradient-to-r hover:from-blue-500/30 hover:to-indigo-500/30 hover:border-blue-400/40 animate-fade-in-up group-hover:translate-y-[-1px]"
+                      style={{
+                        animationDelay: `${index * 100}ms`,
+                        animationFillMode: 'both'
+                      }}
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                  {tech_stack.length > 3 && (
+                    <span 
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-gray-600/20 to-gray-500/20 text-gray-300 border border-gray-500/30 hover:scale-110 transition-all duration-300 animate-fade-in-up"
+                      style={{
+                        animationDelay: `${3 * 100}ms`,
+                        animationFillMode: 'both'
+                      }}
+                    >
+                      +{tech_stack.length - 3}
+                    </span>
+                  )}
+                </div>
+              </div>
             )}
           </div>
-
-          {/* Tech Stack */}
-          {tech_stack && tech_stack.length > 0 && (
-            <div className="space-y-2">
-              <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
-                Tech Stack
-              </h4>
-              <div className="flex flex-wrap gap-1.5">
-                {tech_stack.slice(0, 4).map((tech, index) => (
-                  <span
-                    key={index}
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-300 border border-blue-500/30 hover:shadow-sm hover:shadow-blue-500/20 transition-all duration-300 hover:scale-105 hover:bg-gradient-to-r hover:from-blue-500/30 hover:to-indigo-500/30 hover:border-blue-400/40 animate-fade-in-up group-hover:translate-y-[-1px]"
-                    style={{
-                      animationDelay: `${index * 100}ms`,
-                      animationFillMode: 'both'
-                    }}
-                  >
-                    {tech}
-                  </span>
-                ))}
-                {tech_stack.length > 4 && (
-                  <span 
-                    className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-gray-600/20 to-gray-500/20 text-gray-300 border border-gray-500/30 hover:scale-110 transition-all duration-300 animate-fade-in-up"
-                    style={{
-                      animationDelay: `${4 * 100}ms`,
-                      animationFillMode: 'both'
-                    }}
-                  >
-                    +{tech_stack.length - 4} more
-                  </span>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
-        {/* Bottom Section with Website Button Absolute Positioned */}
-        <div className="relative space-y-3 mt-auto flex-shrink-0">
+        {/* Fixed Bottom Section - Always Visible */}
+        <div className="relative px-4 pb-4 pt-2 flex-shrink-0 border-t border-white/10">
           {/* Team Section */}
           {members.length > 0 ? (
             <div>
-              <p className="mb-2 text-xs font-semibold text-gray-400 uppercase tracking-wide">Team</p>
-              <div className="flex flex-wrap items-end">
+              <p className="mb-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Team</p>
+              <div className="flex flex-wrap items-center gap-1">
                 {teamLeader && (
                   <Tooltip>
                     <TooltipTrigger>
-                      <div className="relative mb-2 mr-2">
-                        <div className="relative h-14 w-14 overflow-hidden rounded-full border-2 border-customBlue-500">
+                      <div className="relative">
+                        <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-customBlue-500">
                           {teamLeader.image_url ? (
                             <Image
                               src={teamLeader.image_url}
                               alt={`${teamLeader.first_name} ${teamLeader.last_name}`}
                               fill
-                              sizes="56px"
+                              sizes="32px"
                               className="object-cover"
                             />
                           ) : (
                             <DefaultAvatar
-                              size={56}
+                              size={32}
                               className="h-full w-full"
                             />
                           )}
                         </div>
-                        <Crown className="absolute -right-2 -top-2 h-4 w-6 rotate-45 text-yellow-400 drop-shadow-lg" />
+                        <Crown className="absolute -right-1 -top-1 h-3 w-3 rotate-45 text-yellow-400 drop-shadow-lg" />
                       </div>
                     </TooltipTrigger>
                     <TooltipContent>
@@ -217,19 +219,19 @@ function ServiceCard({ service }: Props) {
                 {teamMembers.map((member, index) => (
                   <Tooltip key={`${member.id}${index}`}>
                     <TooltipTrigger>
-                      <div className="mb-2 mr-1">
-                        <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-gray-700">
+                      <div>
+                        <div className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-gray-700">
                           {member.image_url ? (
                             <Image
                               src={member.image_url}
                               alt={`${member.first_name} ${member.last_name}`}
                               fill
-                              sizes="40px"
+                              sizes="32px"
                               className="object-cover"
                             />
                           ) : (
                             <DefaultAvatar
-                              size={40}
+                              size={32}
                               className="h-full w-full"
                             />
                           )}
