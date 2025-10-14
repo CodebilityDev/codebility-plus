@@ -97,7 +97,7 @@ export const techstacks = [
   { name: "Vue", icon: IconVue, category: "Frontend" },
   { name: "Svelte", icon: IconSvelte, category: "Frontend" },
   { name: "SvelteKit", icon: IconSvelteKit, category: "Frontend" },
-  { name: "Nuxt.js", icon: IconNuxtJS, category: "Frontend" },
+  { name: "Nuxt.js", alias: "nuxtjs", icon: IconNuxtJS, category: "Frontend" },
   { name: "MUI", icon: IconMUI, category: "Frontend" },
   { name: "ShadcnUI", icon: IconShadcnUI, category: "Frontend" },
 
