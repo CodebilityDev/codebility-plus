@@ -342,7 +342,7 @@ const ProfileModal = ({ user }: { user?: Codev | null }) => {
                         className="flex items-center"
                       >
                         <Image
-                          src={`/assets/svgs/icon-${tech.toLowerCase()}.svg`}
+                          src={`/assets/svgs/techstack/icon-${tech.toLowerCase()}.svg`}
                           alt={`${tech} icon`}
                           width={32}
                           height={32}

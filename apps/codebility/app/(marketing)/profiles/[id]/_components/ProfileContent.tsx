@@ -216,7 +216,7 @@ export default function ProfileContent({
 									transition={{ duration: 0.3 }}
 								>
 									<Image
-										src={`/assets/svgs/icon-${stack.toLowerCase()}.svg`}
+										src={`/assets/svgs/techstack/icon-${stack.toLowerCase()}.svg`}
 										alt={stack}
 										width={25}
 										height={25}
