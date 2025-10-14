@@ -97,7 +97,7 @@ const TechStackModal = () => {
           </TabsContent>
 
           {/* Frontend */}
-          <TabsContent value="frontend" className="flex-1 overflow-y-auto mt-0"
+          <TabsContent value="frontend" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Frontend").map((stackItem, i) => (
                 <div
@@ -289,7 +289,7 @@ const TechStackModal = () => {
           </TabsContent>
 
           {/* Design */}
-          <TabsContent value="design" className="flex-1 overflow-y-auto mt-0"
+          <TabsContent value="design" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Design").map((stackItem, i) => (
                 <div
