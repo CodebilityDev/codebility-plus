@@ -40,7 +40,7 @@ const TechStackModal = () => {
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogContent
         aria-describedby={undefined}
-        className="bg-light-900 dark:bg-dark-100 h-auto w-[90%] max-w-md max-h-[85vh] py-4 sm:max-w-xl sm:px-6 sm:py-6"
+        className="bg-light-900 dark:bg-dark-100 w-[90%] max-w-md h-[600px] max-h-[85vh] py-4 sm:max-w-xl sm:px-6 sm:py-6 flex flex-col"
       >
         <button onClick={onClose} className="absolute right-4 top-4">
           <IconClose />
@@ -51,9 +51,9 @@ const TechStackModal = () => {
           </DialogTitle>
         </DialogHeader>
         {/* Tabs for grouping tech stacks by category */}
-        <div className="flex flex-col h-full min-h-0">
-        <Tabs defaultValue="all" className="w-full flex flex-col flex-1 min-h-0 h-[400px]">
-          <TabsList className="mb-3 flex flex-wrap justify-center flex-shrink-0 gap-1 h-8">
+        <div className="flex flex-col flex-1 min-h-0">
+        <Tabs defaultValue="all" className="w-full flex flex-col flex-1 min-h-0">
+          <TabsList className="mb-3 flex flex-wrap justify-center flex-shrink-0 gap-1 h-auto">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="frontend">Frontend</TabsTrigger>
             <TabsTrigger value="backend">Backend</TabsTrigger>
@@ -65,7 +65,7 @@ const TechStackModal = () => {
           </TabsList>
 
           {/* All */}
-          <TabsContent value="all" className="flex-1 overflow-y-auto">
+          <TabsContent value="all" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {techstacks.map((stackItem, i) => (
                 <div
@@ -97,7 +97,7 @@ const TechStackModal = () => {
           </TabsContent>
 
           {/* Frontend */}
-          <TabsContent value="frontend" className="flex-1 overflow-y-auto">
+          <TabsContent value="frontend" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Frontend").map((stackItem, i) => (
                 <div
@@ -129,7 +129,7 @@ const TechStackModal = () => {
           </TabsContent>
 
           {/* Backend */}
-          <TabsContent value="backend" className="flex-1 overflow-y-auto">
+          <TabsContent value="backend" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Backend").map((stackItem, i) => (
                 <div
@@ -161,7 +161,7 @@ const TechStackModal = () => {
           </TabsContent>
 
           {/* Mobile */}
-          <TabsContent value="mobile" className="flex-1 overflow-y-auto">
+          <TabsContent value="mobile" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Mobile").map((stackItem, i) => (
                 <div
@@ -193,7 +193,7 @@ const TechStackModal = () => {
           </TabsContent>
 
           {/* Blockchain */}
-          <TabsContent value="blockchain" className="flex-1 overflow-y-auto">
+          <TabsContent value="blockchain" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Blockchain").map((stackItem, i) => (
                 <div
@@ -225,7 +225,7 @@ const TechStackModal = () => {
           </TabsContent>
 
           {/* Server */}
-          <TabsContent value="server" className="flex-1 overflow-y-auto">
+          <TabsContent value="server" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Server").map((stackItem, i) => (
                 <div
@@ -257,7 +257,7 @@ const TechStackModal = () => {
           </TabsContent>
 
           {/* CMS */}
-          <TabsContent value="cms" className="flex-1 overflow-y-auto">
+          <TabsContent value="cms" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("CMS").map((stackItem, i) => (
                 <div
@@ -289,7 +289,7 @@ const TechStackModal = () => {
           </TabsContent>
 
           {/* Design */}
-          <TabsContent value="design" className="flex-1 overflow-y-auto">
+          <TabsContent value="design" className="flex-1 overflow-y-auto mt-0">
             <div className="grid w-full grid-cols-3 sm:grid-cols-4 gap-1 pb-2">
               {filterByCategory("Design").map((stackItem, i) => (
                 <div
@@ -322,7 +322,7 @@ const TechStackModal = () => {
         </Tabs>
         </div>
 
-        <DialogFooter className="mt-2 flex w-full items-center justify-between gap-2 flex-shrink-0">
+        <DialogFooter className="mt-4 flex w-full items-center justify-between gap-2 flex-shrink-0">
           <div className="flex flex-1 items-center gap-2">
             <ToggleSwitch enabled={!nonTech} onClick={() => setNonTech()} />
             <span>I&apos;m applying for a non-tech role. </span>
