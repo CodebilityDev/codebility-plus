@@ -120,12 +120,12 @@ function ServiceCard({ service }: Props) {
 
       <div className="flex flex-1 flex-col p-4 text-white transition-all duration-500 group-hover:translate-z-4">
         {/* Main Content */}
-        <div className="flex-1 space-y-3">
+        <div className="space-y-3">
           <h3 className="line-clamp-1 text-lg font-bold group-hover:text-blue-300 transition-colors lg:text-xl">
             {name}
           </h3>
 
-          <div className="min-h-[4rem]">
+          <div className="min-h-[3rem] max-h-[6rem] overflow-y-auto">
             <p
               className={`text-gray-300 text-sm leading-relaxed ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
             >
@@ -177,7 +177,7 @@ function ServiceCard({ service }: Props) {
         </div>
 
         {/* Bottom Section with Website Button Absolute Positioned */}
-        <div className="relative space-y-4 mt-auto">
+        <div className="relative space-y-3 mt-auto flex-shrink-0">
           {/* Team Section */}
           {members.length > 0 ? (
             <div>
