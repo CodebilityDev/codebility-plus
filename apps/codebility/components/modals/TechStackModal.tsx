@@ -40,7 +40,7 @@ const TechStackModal = () => {
     <Dialog open={isModalOpen} onOpenChange={() => onClose()}>
       <DialogContent
         aria-describedby={undefined}
-        className="bg-light-900 dark:bg-dark-100 h-auto w-[90%] max-w-md max-h-[85vh] overflow-y-auto py-4 sm:max-w-xl sm:px-6 sm:py-6"
+        className="bg-light-900 dark:bg-dark-100 h-auto w-[90%] max-w-md max-h-[85vh] py-4 sm:max-w-xl sm:px-6 sm:py-6"
       >
         <button onClick={onClose} className="absolute right-4 top-4">
           <IconClose />
@@ -52,7 +52,7 @@ const TechStackModal = () => {
         </DialogHeader>
         {/* Tabs for grouping tech stacks by category */}
         <div className="flex flex-col h-full min-h-0">
-        <Tabs defaultValue="all" className="w-full flex flex-col flex-1 min-h-0">
+        <Tabs defaultValue="all" className="w-full flex flex-col flex-1 min-h-0 h-[400px]">
           <TabsList className="mb-3 flex flex-wrap justify-center flex-shrink-0 gap-1 h-8">
             <TabsTrigger value="all">All</TabsTrigger>
             <TabsTrigger value="frontend">Frontend</TabsTrigger>
