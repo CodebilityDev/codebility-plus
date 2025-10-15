@@ -15,6 +15,8 @@ interface TeamMember {
   first_name: string;
   last_name: string;
   image_url?: string | null;
+  role?: string;
+  joined_at?: string;
 }
 
 interface ServiceProject {
@@ -68,11 +70,16 @@ function ServiceCard({ service }: Props) {
     website_url !== "."
   , [website_url]);
 
-  const { teamLeader, teamMembers, isDescriptionLong } = useMemo(() => ({
-    teamLeader: members.length > 0 ? members[0] : null,
-    teamMembers: members.length > 1 ? members.slice(1) : [],
-    isDescriptionLong: description && description.length > 120
-  }), [members, description]);
+  const { teamLeader, teamMembers, isDescriptionLong } = useMemo(() => {
+    const leader = members.find(member => member.role === 'team_leader');
+    const regularMembers = members.filter(member => member.role === 'member');
+    
+    return {
+      teamLeader: leader || null,
+      teamMembers: regularMembers,
+      isDescriptionLong: description && description.length > 120
+    };
+  }, [members, description]);
 
   return (
     <div 
