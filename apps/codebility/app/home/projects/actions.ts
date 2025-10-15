@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import { Client, Codev, Project } from "@/types/home/codev";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { invalidateCache } from "@/lib/server/redis-cache";
+import { cacheKeys } from "@/lib/server/redis-cache-keys";
 
 interface DbProjectMember {
   project: {
@@ -300,7 +302,12 @@ export async function updatePublicDisplaySwitch(
   if (projectError)
     console.error("Error in updating projects and kanban board:", projectError);
 
+  // Invalidate Redis cache for projects
+  await invalidateCache(cacheKeys.projects.all);
+  
+  // Revalidate both home projects and services pages
   revalidatePath("/home/projects");
+  revalidatePath("/services");
 
   return { success: true, projectId, publicDisplay };
 }
