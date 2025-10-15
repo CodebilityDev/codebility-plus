@@ -181,7 +181,7 @@ function ServiceCard({ service }: Props) {
         </div>
 
         {/* Fixed Bottom Section - Always Visible */}
-        <div className="relative px-4 pb-4 pt-2 flex-shrink-0 border-t border-white/10 min-h-[80px]">
+        <div className="relative px-4 pb-4 pt-2 flex-shrink-0 min-h-[80px]">
           {/* Team Section */}
           {members.length > 0 ? (
             <div>
