@@ -18,6 +18,8 @@ interface TeamMember {
   first_name: string;
   last_name: string;
   image_url?: string | null;
+  role?: string;
+  joined_at?: string;
 }
 
 interface ProjectData {
@@ -61,7 +63,11 @@ const ServicesPage = async () => {
     project_category_name: item.projects_category?.name || "",
     client_id: item.client_id,
     members:
-      item.project_members?.map((pm: any) => pm.codev).filter(Boolean) || [],
+      item.project_members?.map((pm: any) => ({
+        ...pm.codev,
+        role: pm.role,
+        joined_at: pm.joined_at
+      })).filter(Boolean) || [],
     tech_stack: item.tech_stack || [],
   }));
 
