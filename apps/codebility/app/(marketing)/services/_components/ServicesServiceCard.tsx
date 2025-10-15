@@ -76,7 +76,7 @@ function ServiceCard({ service }: Props) {
 
   return (
     <div 
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:border-blue-400/30 hover:bg-white/10 transform-gpu hover:-translate-y-2 hover:scale-105 aspect-[3/4]"
+      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:border-blue-400/30 hover:bg-white/10 transform-gpu hover:-translate-y-2 hover:scale-105 aspect-[3/5] min-h-[480px]"
       style={{
         transformStyle: 'preserve-3d',
         perspective: '1000px',
@@ -126,16 +126,18 @@ function ServiceCard({ service }: Props) {
               {name}
             </h3>
 
-            <div>
-              <p
-                className={`text-gray-300 text-sm leading-relaxed ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
-              >
-                {description || "No description available."}
-              </p>
+            <div className="relative">
+              <div className={`${isDescriptionExpanded ? 'max-h-24 overflow-y-auto pr-2' : ''}`}>
+                <p
+                  className={`text-gray-300 text-sm leading-relaxed ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
+                >
+                  {description || "No description available."}
+                </p>
+              </div>
               {isDescriptionLong && (
                 <button
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                  className="mt-1 text-xs text-blue-400 hover:text-blue-300 transition-colors"
+                  className="mt-1 text-xs text-blue-400 hover:text-blue-300 transition-colors sticky bottom-0 bg-gradient-to-t from-black/50 to-transparent px-1 py-0.5 rounded"
                 >
                   {isDescriptionExpanded ? "Show less" : "Read more"}
                 </button>
@@ -179,7 +181,7 @@ function ServiceCard({ service }: Props) {
         </div>
 
         {/* Fixed Bottom Section - Always Visible */}
-        <div className="relative px-4 pb-4 pt-2 flex-shrink-0 border-t border-white/10">
+        <div className="relative px-4 pb-4 pt-2 flex-shrink-0 border-t border-white/10 min-h-[80px]">
           {/* Team Section */}
           {members.length > 0 ? (
             <div>
