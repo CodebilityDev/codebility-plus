@@ -73,7 +73,7 @@ interface FormFieldProps {
 }
 
 const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
-  <div className="space-y-2 min-h-[90px]">
+  <div className="space-y-2">
     <Label className="text-white text-base font-medium">
       {label} {required && "*"}
     </Label>
@@ -81,40 +81,36 @@ const FormField = ({ label, name, type = "text", placeholder, register, errors, 
       type={type}
       {...register(name)}
       placeholder={placeholder}
-      className={`bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${className || ""}`}
+      className={`bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm ${className || ""}`}
     />
-    <div className="min-h-[20px]">
-      {errors[name] && (
-        <p className="text-sm text-red-400">{errors[name].message}</p>
-      )}
-    </div>
+    {errors[name] && (
+      <p className="text-sm text-red-400">{errors[name].message}</p>
+    )}
   </div>
 );
 
 // Password field component
 const PasswordField = ({ label, name, placeholder, register, errors, showPassword, toggleShow }: any) => (
-  <div className="space-y-2 min-h-[90px]">
+  <div className="space-y-2">
     <Label className="text-white text-base font-medium">{label} *</Label>
     <div className="relative">
       <Input
         type={showPassword ? "text" : "password"}
         {...register(name)}
         placeholder={placeholder}
-        className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 pr-12"
+        className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm pr-12"
       />
       <button
         type="button"
         onClick={toggleShow}
-        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white"
+        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-white transition-colors"
       >
         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
       </button>
     </div>
-    <div className="min-h-[20px]">
-      {errors[name] && (
-        <p className="text-sm text-red-400">{errors[name].message}</p>
-      )}
-    </div>
+    {errors[name] && (
+      <p className="text-sm text-red-400">{errors[name].message}</p>
+    )}
   </div>
 );
 
@@ -314,34 +310,48 @@ export default function SignUpForm() {
         <TechStackModal />
         <PrivacyPolicyModal />
       
-      <div className="bg-dark-300 flex min-h-screen w-full text-white">
-        <div className="bg-login hidden w-full flex-1 bg-cover bg-center lg:flex" />
-        <div className="flex flex-1 flex-col justify-start px-4 py-8 overflow-y-auto">
-          <div className="flex justify-center mb-8">
-            <Image
-              src="/assets/svgs/logos/codebility-light.svg"
-              alt="Codebility"
-              width={200}
-              height={60}
-              className=""
-            />
-          </div>
-          <div className="text-center mb-8">
-            <p className="text-2xl font-semibold text-white mb-2">Create new account</p>
-            <p className="text-gray-300 mb-1">To use Codebility, please enter your details</p>
-            <p className="text-gray-400 text-sm">All fields not labeled optional are required.</p>
-          </div>
+      <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+        {/* Animated Background Elements */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating orbs */}
+          <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute bottom-32 left-32 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+          <div className="absolute bottom-20 right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-3000"></div>
+          
+          {/* Subtle dots pattern */}
+          <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
+          
+          {/* Gradient overlays */}
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent"></div>
+        </div>
 
-          <div className="mx-auto w-full max-w-2xl">
+        <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
+          <div className="w-full max-w-4xl mx-auto">
+            <div className="text-center mb-8">
+              <Image
+                src="/assets/svgs/logos/codebility-light.svg"
+                alt="Codebility"
+                width={200}
+                height={60}
+                className="mx-auto mb-6"
+              />
+              <h1 className="text-3xl font-bold text-white mb-3">Create new account</h1>
+              <p className="text-gray-300 mb-2">To use Codebility, please enter your details</p>
+              <p className="text-gray-400 text-sm">All fields not labeled optional are required.</p>
+            </div>
+
+            <div className="bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 rounded-2xl p-8 shadow-2xl">
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Profile Image Upload */}
-            <div className="flex flex-col items-center mb-10">
-              <div className="bg-gray-700 flex h-24 w-24 items-center justify-center rounded-full mb-4">
+            <div className="flex flex-col items-center mb-8">
+              <div className="bg-gray-700/50 backdrop-blur-sm border border-gray-600 flex h-24 w-24 items-center justify-center rounded-full mb-4 hover:bg-gray-700/70 transition-colors">
                 <svg className="h-10 w-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
                 </svg>
               </div>
-              <label htmlFor="profileImage" className="text-white text-base font-medium cursor-pointer">
+              <label htmlFor="profileImage" className="text-white text-base font-medium cursor-pointer hover:text-blue-400 transition-colors">
                 Upload picture
               </label>
               <input
@@ -421,12 +431,12 @@ export default function SignUpForm() {
 
               {/* Column 2 - Professional Info */}
               <div className="space-y-6">
-                {/* FIXED: Positions Dropdown */}
-                <div className="space-y-2 min-h-[90px]">
+                {/* Positions Dropdown */}
+                <div className="space-y-2">
                   <Label className="text-white text-base font-medium">Positions *</Label>
                   <div className="relative">
                     <select
-                      value={selectedPositions[0]?.id?.toString() || ""} // FIXED: Added optional chaining
+                      value={selectedPositions[0]?.id?.toString() || ""}
                       onChange={(e) => {
                         const position = POSITIONS.find(p => p.id === parseInt(e.target.value));
                         if (position) {
@@ -438,8 +448,8 @@ export default function SignUpForm() {
                           form.setValue("positions", []);
                         }
                       }}
-                      className="bg-gray-700 border-gray-600 text-white h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 w-full px-3 appearance-none cursor-pointer"
-                      style={{ appearance: 'none' }} // FIXED: Removes double arrows
+                      className="bg-gray-700/50 border-gray-600 text-white h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm w-full px-3 appearance-none cursor-pointer"
+                      style={{ appearance: 'none' }}
                     >
                       <option value="" className="text-gray-400">Select applicable positions</option>
                       {POSITIONS.map((position) => (
@@ -450,17 +460,15 @@ export default function SignUpForm() {
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
                   </div>
-                  <div className="min-h-[20px]">
-                    {selectedPositions[0] && (
-                      <p className="text-sm text-green-400">Selected: {selectedPositions[0].name}</p>
-                    )}
-                    {form.formState.errors.positions && (
-                      <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
-                    )}
-                  </div>
+                  {selectedPositions[0] && (
+                    <p className="text-sm text-green-400">Selected: {selectedPositions[0].name}</p>
+                  )}
+                  {form.formState.errors.positions && (
+                    <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
+                  )}
                 </div>
 
-                <div className="space-y-2 min-h-[90px]">
+                <div className="space-y-2">
                   <Label className="text-white text-base font-medium">Years of Experience *</Label>
                   <Input
                     type="number"
@@ -471,23 +479,21 @@ export default function SignUpForm() {
                       form.clearErrors("years_of_experience");
                     }}
                     placeholder="0"
-                    className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
+                    className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm"
                   />
-                  <div className="min-h-[20px]">
-                    {form.formState.errors.years_of_experience && (
-                      <p className="text-sm text-red-400">{form.formState.errors.years_of_experience.message}</p>
-                    )}
-                  </div>
+                  {form.formState.errors.years_of_experience && (
+                    <p className="text-sm text-red-400">{form.formState.errors.years_of_experience.message}</p>
+                  )}
                 </div>
 
                 {/* Tech Stack Section */}
-                <div className="space-y-2 min-h-[90px]">
+                <div className="space-y-2">
                   <Label className="text-white text-base font-medium">Tech Stack *</Label>
                   <Button
                     type="button"
                     variant="outline"
                     role="combobox"
-                    className={`md:text-md bg-gray-700 border-gray-600 text-gray-100 flex justify-between border-b-2 p-2 text-sm font-normal focus:outline-none lg:text-lg h-12 rounded-lg w-full ${
+                    className={`bg-gray-700/50 border-gray-600 text-gray-100 flex justify-between p-2 text-sm font-normal focus:outline-none h-12 rounded-lg w-full backdrop-blur-sm hover:bg-gray-700/70 transition-colors ${
                       form.formState.errors.tech_stacks ? "border-red-400" : "border-gray-600"
                     }`}
                     onClick={() => onOpen("techStackModal")}
@@ -500,21 +506,19 @@ export default function SignUpForm() {
                     <ChevronDown className="h-5 w-5" />
                   </Button>
                   
-                  <div className="min-h-[20px]">
-                    {stack && stack.length > 0 && !stack.includes("none") && (
-                      <div className="text-xs text-gray-400 flex flex-wrap gap-1">
-                        {stack.map((tech) => (
-                          <span key={tech} className="bg-blue-600 text-white px-2 py-1 rounded">
-                            {tech.charAt(0).toUpperCase() + tech.slice(1)}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                    
-                    {form.formState.errors.tech_stacks && (
-                      <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
-                    )}
-                  </div>
+                  {stack && stack.length > 0 && !stack.includes("none") && (
+                    <div className="text-xs text-gray-400 flex flex-wrap gap-1">
+                      {stack.map((tech) => (
+                        <span key={tech} className="bg-blue-600/80 text-white px-2 py-1 rounded backdrop-blur-sm">
+                          {tech.charAt(0).toUpperCase() + tech.slice(1)}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                  
+                  {form.formState.errors.tech_stacks && (
+                    <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
+                  )}
                 </div>
 
                 <FormField
@@ -526,19 +530,17 @@ export default function SignUpForm() {
                   errors={form.formState.errors}
                 />
 
-                <div className="space-y-2 min-h-[130px]">
+                <div className="space-y-2">
                   <Label className="text-white text-base font-medium">About (Optional)</Label>
                   <Textarea
                     {...form.register("about")}
                     placeholder="Tell us about yourself"
                     rows={4}
-                    className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
+                    className="bg-gray-700/50 border-gray-600 text-white placeholder:text-gray-400 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 backdrop-blur-sm resize-none"
                   />
-                  <div className="min-h-[20px]">
-                    {form.formState.errors.about && (
-                      <p className="text-sm text-red-400">{form.formState.errors.about.message}</p>
-                    )}
-                  </div>
+                  {form.formState.errors.about && (
+                    <p className="text-sm text-red-400">{form.formState.errors.about.message}</p>
+                  )}
                 </div>
               </div>
 
@@ -687,11 +689,12 @@ export default function SignUpForm() {
               Already have an account?{" "}
               <a
                 href="/auth/sign-in"
-                className="text-customBlue-100 hover:underline"
+                className="text-blue-400 hover:underline transition-colors"
               >
                 Sign in
               </a>
             </p>
+            </div>
           </div>
         </div>
       </div>
