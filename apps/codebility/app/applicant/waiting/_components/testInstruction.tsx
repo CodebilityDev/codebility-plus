@@ -132,7 +132,13 @@ export default function TestInstruction({
                   </li>
                   <li>
                     If you need an extension, or run into any issues, just let
-                    us know.
+                    us know at{" "}
+                    <a
+                      href="mailto:codebilitydev@gmail.com"
+                      className="text-customBlue-500 underline"
+                    >
+                      codebilitydev@gmail.com
+                    </a>
                   </li>
                 </ul>
               </TabsContent>
