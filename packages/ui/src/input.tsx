@@ -41,7 +41,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     ref,
   ) => {
     return (
-      <div className={cn("pt-4", parentClassName)}>
+      <div className={cn(parentClassName)}>
         <label className={cn(labelClassName)}>{label}</label>
         <input
           type={type}

@@ -314,15 +314,15 @@ export default function SignUpForm() {
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Background texture */}
-          <div className="absolute inset-0 opacity-15" style={{
+          <div className="absolute inset-0 opacity-20" style={{
             backgroundImage: `
-              linear-gradient(45deg, rgba(106, 120, 242, 0.15) 25%, transparent 25%),
-              linear-gradient(-45deg, rgba(106, 120, 242, 0.15) 25%, transparent 25%),
-              linear-gradient(45deg, transparent 75%, rgba(106, 120, 242, 0.15) 75%),
-              linear-gradient(-45deg, transparent 75%, rgba(106, 120, 242, 0.15) 75%)
+              radial-gradient(circle at 25% 25%, rgba(106, 120, 242, 0.3) 1px, transparent 1px),
+              radial-gradient(circle at 75% 75%, rgba(106, 120, 242, 0.2) 1px, transparent 1px),
+              linear-gradient(90deg, rgba(106, 120, 242, 0.1) 1px, transparent 1px),
+              linear-gradient(0deg, rgba(106, 120, 242, 0.1) 1px, transparent 1px)
             `,
-            backgroundSize: '30px 30px',
-            backgroundPosition: '0 0, 0 15px, 15px -15px, -15px 0px'
+            backgroundSize: '40px 40px, 40px 40px, 20px 20px, 20px 20px',
+            backgroundPosition: '0 0, 20px 20px, 0 0, 0 0'
           }}></div>
           
           {/* Large floating orbs with visible animations */}
