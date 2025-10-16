@@ -68,7 +68,7 @@ export async function GET(request: Request) {
       await supabase.auth.exchangeCodeForSession(code);
 
       // Redirect to waiting page after successful operation
-      return NextResponse.redirect(new URL("/auth/waiting", requestUrl.origin));
+      return NextResponse.redirect(new URL("/applicant/waiting", requestUrl.origin));
     } catch (error) {
       console.error("Error during role assignment or authentication:", error);
       return NextResponse.redirect(new URL("/auth/sign-in", requestUrl.origin));
