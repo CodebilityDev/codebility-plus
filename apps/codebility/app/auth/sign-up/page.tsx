@@ -310,39 +310,43 @@ export default function SignUpForm() {
         <TechStackModal />
         <PrivacyPolicyModal />
       
-      <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
+      <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-customBlue-600 via-customBlue-800 to-customBlue-900">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Background texture */}
-          <div className="absolute inset-0 opacity-20" style={{
+          <div className="absolute inset-0 opacity-15" style={{
             backgroundImage: `
-              linear-gradient(45deg, rgba(30, 58, 138, 0.1) 25%, transparent 25%),
-              linear-gradient(-45deg, rgba(30, 58, 138, 0.1) 25%, transparent 25%),
-              linear-gradient(45deg, transparent 75%, rgba(30, 58, 138, 0.1) 75%),
-              linear-gradient(-45deg, transparent 75%, rgba(30, 58, 138, 0.1) 75%)
+              linear-gradient(45deg, rgba(106, 120, 242, 0.15) 25%, transparent 25%),
+              linear-gradient(-45deg, rgba(106, 120, 242, 0.15) 25%, transparent 25%),
+              linear-gradient(45deg, transparent 75%, rgba(106, 120, 242, 0.15) 75%),
+              linear-gradient(-45deg, transparent 75%, rgba(106, 120, 242, 0.15) 75%)
             `,
             backgroundSize: '30px 30px',
             backgroundPosition: '0 0, 0 15px, 15px -15px, -15px 0px'
           }}></div>
           
-          {/* Floating orbs with different animations */}
-          <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-32 left-32 w-56 h-56 bg-slate-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
-          <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-3000"></div>
+          {/* Large floating orbs with visible animations */}
+          <div className="absolute top-20 left-10 w-80 h-80 bg-customBlue-400/20 rounded-full blur-3xl animate-floating"></div>
+          <div className="absolute top-40 right-20 w-64 h-64 bg-customBlue-100/25 rounded-full blur-3xl animate-floating" style={{animationDelay: '1s'}}></div>
+          <div className="absolute bottom-32 left-32 w-72 h-72 bg-customBlue-500/15 rounded-full blur-3xl animate-floating" style={{animationDelay: '2s'}}></div>
+          <div className="absolute bottom-20 right-10 w-56 h-56 bg-customBlue-300/20 rounded-full blur-3xl animate-floating" style={{animationDelay: '3s'}}></div>
           
-          {/* Moving gradient circles */}
-          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-r from-blue-500/8 to-indigo-500/8 rounded-full blur-2xl animate-bounce"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-gradient-to-r from-slate-500/8 to-blue-500/8 rounded-full blur-2xl animate-bounce delay-2000"></div>
+          {/* Moving gradient circles with better animations */}
+          <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-gradient-to-r from-customBlue-400/15 to-customBlue-100/15 rounded-full blur-2xl animate-floatY"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-gradient-to-r from-customBlue-500/15 to-customBlue-300/15 rounded-full blur-2xl animate-floatY" style={{animationDelay: '2s'}}></div>
+          
+          {/* Additional moving orbs for more animation */}
+          <div className="absolute top-3/4 left-10 w-24 h-24 bg-customBlue-200/20 rounded-full blur-xl animate-ping" style={{animationDuration: '3s'}}></div>
+          <div className="absolute top-10 right-1/3 w-20 h-20 bg-customBlue-400/25 rounded-full blur-xl animate-ping" style={{animationDuration: '4s', animationDelay: '1s'}}></div>
           
           {/* Noise texture overlay */}
-          <div className="absolute inset-0 opacity-[0.03]" style={{
+          <div className="absolute inset-0 opacity-[0.04]" style={{
             backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
           }}></div>
           
-          {/* Gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-950/30 via-transparent to-slate-950/30"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/20 to-transparent"></div>
+          {/* Enhanced gradient overlays */}
+          <div className="absolute inset-0 bg-gradient-to-r from-customBlue-600/40 via-transparent to-customBlue-800/40"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-customBlue-700/25 to-transparent"></div>
         </div>
 
         <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
