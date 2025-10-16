@@ -421,7 +421,6 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
                 <div
                   key={project.id}
                   className="rounded-xl bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20 p-3 sm:p-4 md:p-5 lg:p-6 shadow-lg transition-all duration-300 hover:shadow-xl hover:bg-white/30 dark:hover:bg-white/15 hover:border-white/40 dark:hover:border-white/30 h-full">
-                >
                   <div className="space-y-4 sm:space-y-5 md:space-y-6">
                     
                     {/* Project Header */}
