@@ -73,7 +73,7 @@ interface FormFieldProps {
 }
 
 const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
-  <div className="space-y-2">
+  <div className="space-y-2 min-h-[90px]">
     <Label className="text-white text-base font-medium">
       {label} {required && "*"}
     </Label>
@@ -83,15 +83,17 @@ const FormField = ({ label, name, type = "text", placeholder, register, errors, 
       placeholder={placeholder}
       className={`bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 ${className || ""}`}
     />
-    {errors[name] && (
-      <p className="text-sm text-red-400">{errors[name].message}</p>
-    )}
+    <div className="min-h-[20px]">
+      {errors[name] && (
+        <p className="text-sm text-red-400">{errors[name].message}</p>
+      )}
+    </div>
   </div>
 );
 
 // Password field component
 const PasswordField = ({ label, name, placeholder, register, errors, showPassword, toggleShow }: any) => (
-  <div className="space-y-2">
+  <div className="space-y-2 min-h-[90px]">
     <Label className="text-white text-base font-medium">{label} *</Label>
     <div className="relative">
       <Input
@@ -108,9 +110,11 @@ const PasswordField = ({ label, name, placeholder, register, errors, showPasswor
         {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
       </button>
     </div>
-    {errors[name] && (
-      <p className="text-sm text-red-400">{errors[name].message}</p>
-    )}
+    <div className="min-h-[20px]">
+      {errors[name] && (
+        <p className="text-sm text-red-400">{errors[name].message}</p>
+      )}
+    </div>
   </div>
 );
 
@@ -311,6 +315,7 @@ export default function SignUpForm() {
         <PrivacyPolicyModal />
       
       <div className="bg-dark-300 flex min-h-screen w-full text-white">
+        <div className="bg-login hidden w-full flex-1 bg-cover bg-center lg:flex" />
         <div className="flex flex-1 flex-col justify-start px-4 py-8 overflow-y-auto">
           <div className="flex justify-center mb-8">
             <Image
@@ -417,7 +422,7 @@ export default function SignUpForm() {
               {/* Column 2 - Professional Info */}
               <div className="space-y-6">
                 {/* FIXED: Positions Dropdown */}
-                <div className="space-y-2">
+                <div className="space-y-2 min-h-[90px]">
                   <Label className="text-white text-base font-medium">Positions *</Label>
                   <div className="relative">
                     <select
@@ -445,15 +450,17 @@ export default function SignUpForm() {
                     </select>
                     <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 pointer-events-none" />
                   </div>
-                  {selectedPositions[0] && (
-                    <p className="text-sm text-green-400">Selected: {selectedPositions[0].name}</p>
-                  )}
-                  {form.formState.errors.positions && (
-                    <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
-                  )}
+                  <div className="min-h-[20px]">
+                    {selectedPositions[0] && (
+                      <p className="text-sm text-green-400">Selected: {selectedPositions[0].name}</p>
+                    )}
+                    {form.formState.errors.positions && (
+                      <p className="text-sm text-red-400">{form.formState.errors.positions.message}</p>
+                    )}
+                  </div>
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-2 min-h-[90px]">
                   <Label className="text-white text-base font-medium">Years of Experience *</Label>
                   <Input
                     type="number"
@@ -466,13 +473,15 @@ export default function SignUpForm() {
                     placeholder="0"
                     className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 h-12 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
                   />
-                  {form.formState.errors.years_of_experience && (
-                    <p className="text-sm text-red-400">{form.formState.errors.years_of_experience.message}</p>
-                  )}
+                  <div className="min-h-[20px]">
+                    {form.formState.errors.years_of_experience && (
+                      <p className="text-sm text-red-400">{form.formState.errors.years_of_experience.message}</p>
+                    )}
+                  </div>
                 </div>
 
                 {/* Tech Stack Section */}
-                <div className="space-y-2">
+                <div className="space-y-2 min-h-[90px]">
                   <Label className="text-white text-base font-medium">Tech Stack *</Label>
                   <Button
                     type="button"
@@ -491,19 +500,21 @@ export default function SignUpForm() {
                     <ChevronDown className="h-5 w-5" />
                   </Button>
                   
-                  {stack && stack.length > 0 && !stack.includes("none") && (
-                    <div className="text-xs text-gray-400 flex flex-wrap gap-1">
-                      {stack.map((tech) => (
-                        <span key={tech} className="bg-blue-600 text-white px-2 py-1 rounded">
-                          {tech.charAt(0).toUpperCase() + tech.slice(1)}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                  
-                  {form.formState.errors.tech_stacks && (
-                    <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
-                  )}
+                  <div className="min-h-[20px]">
+                    {stack && stack.length > 0 && !stack.includes("none") && (
+                      <div className="text-xs text-gray-400 flex flex-wrap gap-1">
+                        {stack.map((tech) => (
+                          <span key={tech} className="bg-blue-600 text-white px-2 py-1 rounded">
+                            {tech.charAt(0).toUpperCase() + tech.slice(1)}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                    
+                    {form.formState.errors.tech_stacks && (
+                      <p className="text-sm text-red-400">{form.formState.errors.tech_stacks.message}</p>
+                    )}
+                  </div>
                 </div>
 
                 <FormField
@@ -515,7 +526,7 @@ export default function SignUpForm() {
                   errors={form.formState.errors}
                 />
 
-                <div className="space-y-2">
+                <div className="space-y-2 min-h-[130px]">
                   <Label className="text-white text-base font-medium">About (Optional)</Label>
                   <Textarea
                     {...form.register("about")}
@@ -523,6 +534,11 @@ export default function SignUpForm() {
                     rows={4}
                     className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
                   />
+                  <div className="min-h-[20px]">
+                    {form.formState.errors.about && (
+                      <p className="text-sm text-red-400">{form.formState.errors.about.message}</p>
+                    )}
+                  </div>
                 </div>
               </div>
 
@@ -678,7 +694,6 @@ export default function SignUpForm() {
             </p>
           </div>
         </div>
-        <div className="bg-login hidden w-full flex-1 bg-cover bg-center lg:flex" />
       </div>
       </FormProvider>
     </>
