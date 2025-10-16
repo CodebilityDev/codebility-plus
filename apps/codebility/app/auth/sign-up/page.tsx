@@ -28,8 +28,9 @@ const POSITIONS = [
   { id: 1, name: "Frontend Developer" },
   { id: 2, name: "Backend Developer" },
   { id: 3, name: "Full Stack Developer" },
-  { id: 4, name: "UI/UX Designer" },
-  { id: 5, name: "QA Engineer" },
+  { id: 4, name: "Mobile Developer" },
+  { id: 5, name: "UI/UX Designer" },
+  { id: 6, name: "QA Engineer" },
 ];
 
 // Validation schema
@@ -265,7 +266,7 @@ export default function SignUpForm() {
         localStorage.removeItem("ndaSignature");
         localStorage.removeItem("ndaDocument");
         
-        toast.success("Account created successfully! Please check your email to verify your account.");
+        toast.success("Account created! Check your email to verify, then you'll receive assessment instructions.");
         toast.success("Redirecting to sign-in page...", { duration: 2000 });
         
         setTimeout(() => {
