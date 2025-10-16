@@ -73,7 +73,7 @@ interface FormFieldProps {
 }
 
 const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
-  <div className="space-y-2">
+  <div className="space-y-1">
     <Label className="text-white text-base font-medium">
       {label} {required && "*"}
     </Label>
@@ -91,7 +91,7 @@ const FormField = ({ label, name, type = "text", placeholder, register, errors, 
 
 // Password field component
 const PasswordField = ({ label, name, placeholder, register, errors, showPassword, toggleShow }: any) => (
-  <div className="space-y-2">
+  <div className="space-y-1">
     <Label className="text-white text-base font-medium">{label} *</Label>
     <div className="relative">
       <Input
@@ -310,21 +310,25 @@ export default function SignUpForm() {
         <TechStackModal />
         <PrivacyPolicyModal />
       
-      <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900">
+      <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          {/* Floating orbs */}
-          <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-48 h-48 bg-purple-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-32 left-32 w-56 h-56 bg-cyan-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
-          <div className="absolute bottom-20 right-10 w-40 h-40 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-3000"></div>
+          {/* Floating orbs with different animations */}
+          <div className="absolute top-20 left-10 w-64 h-64 bg-blue-400/15 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-48 h-48 bg-cyan-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute bottom-32 left-32 w-56 h-56 bg-indigo-400/15 rounded-full blur-3xl animate-pulse delay-2000"></div>
+          <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-300/15 rounded-full blur-3xl animate-pulse delay-3000"></div>
+          
+          {/* Moving gradient circles */}
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-r from-blue-400/10 to-cyan-400/10 rounded-full blur-2xl animate-bounce"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-gradient-to-r from-indigo-400/10 to-blue-400/10 rounded-full blur-2xl animate-bounce delay-2000"></div>
           
           {/* Subtle dots pattern */}
-          <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.02) 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
+          <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle, rgba(59, 130, 246, 0.05) 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
           
           {/* Gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/5 via-transparent to-purple-500/5"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/5 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-transparent to-indigo-600/10"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/8 to-transparent"></div>
         </div>
 
         <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
@@ -432,7 +436,7 @@ export default function SignUpForm() {
               {/* Column 2 - Professional Info */}
               <div className="space-y-6">
                 {/* Positions Dropdown */}
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Label className="text-white text-base font-medium">Positions *</Label>
                   <div className="relative">
                     <select
@@ -468,7 +472,7 @@ export default function SignUpForm() {
                   )}
                 </div>
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Label className="text-white text-base font-medium">Years of Experience *</Label>
                   <Input
                     type="number"
@@ -487,7 +491,7 @@ export default function SignUpForm() {
                 </div>
 
                 {/* Tech Stack Section */}
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Label className="text-white text-base font-medium">Tech Stack *</Label>
                   <Button
                     type="button"
@@ -530,7 +534,7 @@ export default function SignUpForm() {
                   errors={form.formState.errors}
                 />
 
-                <div className="space-y-2">
+                <div className="space-y-1">
                   <Label className="text-white text-base font-medium">About (Optional)</Label>
                   <Textarea
                     {...form.register("about")}
