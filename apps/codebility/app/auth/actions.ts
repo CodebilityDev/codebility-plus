@@ -91,6 +91,10 @@ export const signupUser = async (formData: FormData) => {
       : null;
 
     // Create auth user
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://www.codebility.tech' 
+      : process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000';
+      
     const {
       data: { user },
       error: authError,
@@ -98,7 +102,7 @@ export const signupUser = async (formData: FormData) => {
       email: email_address,
       password,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/auth/callback`,
+        emailRedirectTo: `${baseUrl}/auth/callback`,
       },
     });
 
@@ -310,12 +314,16 @@ export const resendVerificationEmail = async (email: string) => {
     
     // Normalize email to lowercase
     const normalizedEmail = email.toLowerCase();
+    
+    const baseUrl = process.env.NODE_ENV === 'production' 
+      ? 'https://www.codebility.tech' 
+      : process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000';
 
     const { error } = await supabase.auth.resend({
       type: 'signup',
       email: normalizedEmail,
       options: {
-        emailRedirectTo: `${process.env.NEXT_PUBLIC_APP_BASE_URL}/auth/callback`,
+        emailRedirectTo: `${baseUrl}/auth/callback`,
       }
     });
 
