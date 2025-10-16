@@ -310,25 +310,39 @@ export default function SignUpForm() {
         <TechStackModal />
         <PrivacyPolicyModal />
       
-      <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-blue-950 via-blue-900 to-indigo-950">
+      <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-slate-950 via-blue-950 to-slate-900">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
+          {/* Background texture */}
+          <div className="absolute inset-0 opacity-20" style={{
+            backgroundImage: `
+              linear-gradient(45deg, rgba(30, 58, 138, 0.1) 25%, transparent 25%),
+              linear-gradient(-45deg, rgba(30, 58, 138, 0.1) 25%, transparent 25%),
+              linear-gradient(45deg, transparent 75%, rgba(30, 58, 138, 0.1) 75%),
+              linear-gradient(-45deg, transparent 75%, rgba(30, 58, 138, 0.1) 75%)
+            `,
+            backgroundSize: '30px 30px',
+            backgroundPosition: '0 0, 0 15px, 15px -15px, -15px 0px'
+          }}></div>
+          
           {/* Floating orbs with different animations */}
-          <div className="absolute top-20 left-10 w-64 h-64 bg-blue-400/15 rounded-full blur-3xl animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-48 h-48 bg-cyan-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
-          <div className="absolute bottom-32 left-32 w-56 h-56 bg-indigo-400/15 rounded-full blur-3xl animate-pulse delay-2000"></div>
-          <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-300/15 rounded-full blur-3xl animate-pulse delay-3000"></div>
+          <div className="absolute top-20 left-10 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute top-40 right-20 w-48 h-48 bg-indigo-500/10 rounded-full blur-3xl animate-pulse delay-1000"></div>
+          <div className="absolute bottom-32 left-32 w-56 h-56 bg-slate-500/10 rounded-full blur-3xl animate-pulse delay-2000"></div>
+          <div className="absolute bottom-20 right-10 w-40 h-40 bg-blue-400/10 rounded-full blur-3xl animate-pulse delay-3000"></div>
           
           {/* Moving gradient circles */}
-          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-r from-blue-400/10 to-cyan-400/10 rounded-full blur-2xl animate-bounce"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-gradient-to-r from-indigo-400/10 to-blue-400/10 rounded-full blur-2xl animate-bounce delay-2000"></div>
+          <div className="absolute top-1/4 left-1/4 w-32 h-32 bg-gradient-to-r from-blue-500/8 to-indigo-500/8 rounded-full blur-2xl animate-bounce"></div>
+          <div className="absolute bottom-1/4 right-1/4 w-24 h-24 bg-gradient-to-r from-slate-500/8 to-blue-500/8 rounded-full blur-2xl animate-bounce delay-2000"></div>
           
-          {/* Subtle dots pattern */}
-          <div className="absolute inset-0" style={{backgroundImage: 'radial-gradient(circle, rgba(59, 130, 246, 0.05) 1px, transparent 1px)', backgroundSize: '20px 20px'}}></div>
+          {/* Noise texture overlay */}
+          <div className="absolute inset-0 opacity-[0.03]" style={{
+            backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='1' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`
+          }}></div>
           
           {/* Gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-r from-blue-600/10 via-transparent to-indigo-600/10"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-cyan-500/8 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-blue-950/30 via-transparent to-slate-950/30"></div>
+          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-blue-950/20 to-transparent"></div>
         </div>
 
         <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
@@ -373,7 +387,7 @@ export default function SignUpForm() {
             {/* Main Form Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Column 1 - Basic Info */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 <FormField
                   label="First Name"
                   name="first_name"
@@ -434,7 +448,7 @@ export default function SignUpForm() {
               </div>
 
               {/* Column 2 - Professional Info */}
-              <div className="space-y-6">
+              <div className="space-y-4">
                 {/* Positions Dropdown */}
                 <div className="space-y-1">
                   <Label className="text-white text-base font-medium">Positions *</Label>
@@ -551,9 +565,9 @@ export default function SignUpForm() {
             </div>
 
             {/* Social Links Section */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               <h3 className="text-lg font-semibold text-white">Social Links (Optional)</h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <FormField
                   label="Facebook"
                   name="facebook"
