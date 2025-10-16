@@ -311,25 +311,40 @@ export default function SignUpForm() {
         <PrivacyPolicyModal />
       
       <div className="min-h-screen w-full relative overflow-hidden bg-dark-100">
-        {/* Animated Background Elements */}
+        {/* Modern Tech Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
-          {/* Large floating orbs with visible animations */}
-          <div className="absolute top-20 left-10 w-80 h-80 bg-customBlue-400/20 rounded-full blur-3xl animate-floating"></div>
-          <div className="absolute top-40 right-20 w-64 h-64 bg-customBlue-100/25 rounded-full blur-3xl animate-floating" style={{animationDelay: '1s'}}></div>
-          <div className="absolute bottom-32 left-32 w-72 h-72 bg-customBlue-500/15 rounded-full blur-3xl animate-floating" style={{animationDelay: '2s'}}></div>
-          <div className="absolute bottom-20 right-10 w-56 h-56 bg-customBlue-300/20 rounded-full blur-3xl animate-floating" style={{animationDelay: '3s'}}></div>
+          {/* Animated geometric shapes */}
+          <div className="absolute top-20 left-20 w-2 h-32 bg-customBlue-100/30 animate-pulse" style={{animationDuration: '2s'}}></div>
+          <div className="absolute top-40 right-32 w-32 h-2 bg-customBlue-300/40 animate-pulse" style={{animationDuration: '3s', animationDelay: '0.5s'}}></div>
+          <div className="absolute bottom-40 left-40 w-2 h-24 bg-customBlue-400/35 animate-pulse" style={{animationDuration: '2.5s', animationDelay: '1s'}}></div>
           
-          {/* Moving gradient circles with better animations */}
-          <div className="absolute top-1/4 left-1/4 w-40 h-40 bg-gradient-to-r from-customBlue-400/15 to-customBlue-100/15 rounded-full blur-2xl animate-floatY"></div>
-          <div className="absolute bottom-1/4 right-1/4 w-32 h-32 bg-gradient-to-r from-customBlue-500/15 to-customBlue-300/15 rounded-full blur-2xl animate-floatY" style={{animationDelay: '2s'}}></div>
+          {/* Modern floating elements */}
+          <div className="absolute top-32 right-20 w-4 h-4 bg-customBlue-100 rounded-full animate-ping" style={{animationDuration: '3s'}}></div>
+          <div className="absolute bottom-32 left-16 w-3 h-3 bg-customBlue-300 rounded-full animate-ping" style={{animationDuration: '4s', animationDelay: '1s'}}></div>
+          <div className="absolute top-2/3 right-1/4 w-2 h-2 bg-customBlue-500 rounded-full animate-ping" style={{animationDuration: '5s', animationDelay: '2s'}}></div>
           
-          {/* Additional moving orbs for more animation */}
-          <div className="absolute top-3/4 left-10 w-24 h-24 bg-customBlue-200/20 rounded-full blur-xl animate-ping" style={{animationDuration: '3s'}}></div>
-          <div className="absolute top-10 right-1/3 w-20 h-20 bg-customBlue-400/25 rounded-full blur-xl animate-ping" style={{animationDuration: '4s', animationDelay: '1s'}}></div>
+          {/* Tech grid lines */}
+          <div className="absolute inset-0" style={{
+            backgroundImage: `
+              linear-gradient(90deg, rgba(106, 120, 242, 0.1) 1px, transparent 1px),
+              linear-gradient(0deg, rgba(106, 120, 242, 0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '80px 80px',
+            animation: 'shimmer 8s ease-in-out infinite'
+          }}></div>
           
-          {/* Enhanced gradient overlays */}
-          <div className="absolute inset-0 bg-gradient-to-r from-customBlue-600/40 via-transparent to-customBlue-800/40"></div>
-          <div className="absolute inset-0 bg-gradient-to-b from-transparent via-customBlue-700/25 to-transparent"></div>
+          {/* Floating hexagons */}
+          <div className="absolute top-1/4 left-1/3 w-8 h-8 border border-customBlue-200/50 transform rotate-45 animate-floating"></div>
+          <div className="absolute bottom-1/3 right-1/4 w-6 h-6 border border-customBlue-400/40 transform rotate-12 animate-floating" style={{animationDelay: '1s'}}></div>
+          <div className="absolute top-1/2 left-16 w-4 h-4 border border-customBlue-300/60 transform -rotate-45 animate-floating" style={{animationDelay: '2s'}}></div>
+          
+          {/* Modern gradient overlays */}
+          <div className="absolute inset-0 bg-gradient-to-br from-customBlue-600/30 via-transparent to-customBlue-800/20"></div>
+          <div className="absolute inset-0 bg-gradient-to-tr from-transparent via-customBlue-400/10 to-customBlue-600/20"></div>
+          
+          {/* Pulsing circles */}
+          <div className="absolute top-1/3 right-1/3 w-64 h-64 border border-customBlue-100/20 rounded-full animate-ping" style={{animationDuration: '6s'}}></div>
+          <div className="absolute bottom-1/4 left-1/4 w-48 h-48 border border-customBlue-300/15 rounded-full animate-ping" style={{animationDuration: '8s', animationDelay: '2s'}}></div>
         </div>
 
         <div className="relative z-10 flex min-h-screen items-center justify-center px-4 py-8">
