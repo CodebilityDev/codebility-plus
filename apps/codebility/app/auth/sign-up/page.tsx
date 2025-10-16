@@ -329,8 +329,7 @@ export default function SignUpForm() {
               linear-gradient(90deg, rgba(106, 120, 242, 0.1) 1px, transparent 1px),
               linear-gradient(0deg, rgba(106, 120, 242, 0.1) 1px, transparent 1px)
             `,
-            backgroundSize: '80px 80px',
-            animation: 'shimmer 8s ease-in-out infinite'
+            backgroundSize: '80px 80px'
           }}></div>
           
           {/* Floating hexagons */}
