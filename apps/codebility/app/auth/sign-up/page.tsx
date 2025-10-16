@@ -310,7 +310,7 @@ export default function SignUpForm() {
         <TechStackModal />
         <PrivacyPolicyModal />
       
-      <div className="min-h-screen w-full relative overflow-hidden bg-gradient-to-br from-customBlue-600 via-customBlue-800 to-customBlue-900">
+      <div className="min-h-screen w-full relative overflow-hidden bg-dark-100">
         {/* Animated Background Elements */}
         <div className="absolute inset-0 overflow-hidden">
           {/* Background texture */}
@@ -608,7 +608,7 @@ export default function SignUpForm() {
 
             {/* NDA Section */}
             {ndaSigned ? (
-              <div className="bg-green-900/20 border border-green-600/30 p-4 rounded-lg">
+              <div className="bg-green-900/20 border border-green-600/30 p-3 rounded-lg">
                 <div className="flex items-center gap-2 text-green-400 mb-2">
                   <CheckCircle className="h-5 w-5" />
                   <span className="font-medium">NDA Signed</span>
@@ -687,7 +687,7 @@ export default function SignUpForm() {
             </div>
 
             {/* Action Buttons */}
-            <div className="flex justify-end space-x-4 pt-4">
+            <div className="flex justify-end space-x-4 pt-3">
               <Button
                 type="button"
                 variant="outline"
