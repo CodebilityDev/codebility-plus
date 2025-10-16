@@ -75,7 +75,7 @@ interface FormFieldProps {
 const FormField = ({ label, name, type = "text", placeholder, register, errors, required, className }: FormFieldProps) => (
   <div className="space-y-1">
     <Label className="text-white text-base font-medium">
-      {label} {required && "*"}
+      {label} {required && <span className="text-red-400">*</span>}
     </Label>
     <Input
       type={type}
@@ -92,7 +92,7 @@ const FormField = ({ label, name, type = "text", placeholder, register, errors, 
 // Password field component
 const PasswordField = ({ label, name, placeholder, register, errors, showPassword, toggleShow }: any) => (
   <div className="space-y-1">
-    <Label className="text-white text-base font-medium">{label} *</Label>
+    <Label className="text-white text-base font-medium">{label} <span className="text-red-400">*</span></Label>
     <div className="relative">
       <Input
         type={showPassword ? "text" : "password"}
@@ -452,7 +452,7 @@ export default function SignUpForm() {
               <div className="space-y-4">
                 {/* Positions Dropdown */}
                 <div className="space-y-1">
-                  <Label className="text-white text-base font-medium">Positions *</Label>
+                  <Label className="text-white text-base font-medium">Positions <span className="text-red-400">*</span></Label>
                   <div className="relative">
                     <select
                       value={selectedPositions[0]?.id?.toString() || ""}
@@ -488,7 +488,7 @@ export default function SignUpForm() {
                 </div>
 
                 <div className="space-y-1">
-                  <Label className="text-white text-base font-medium">Years of Experience *</Label>
+                  <Label className="text-white text-base font-medium">Years of Experience <span className="text-red-400">*</span></Label>
                   <Input
                     type="number"
                     value={form.watch("years_of_experience") || 0}
@@ -507,7 +507,7 @@ export default function SignUpForm() {
 
                 {/* Tech Stack Section */}
                 <div className="space-y-1">
-                  <Label className="text-white text-base font-medium">Tech Stack *</Label>
+                  <Label className="text-white text-base font-medium">Tech Stack <span className="text-red-400">*</span></Label>
                   <Button
                     type="button"
                     variant="outline"
@@ -618,7 +618,7 @@ export default function SignUpForm() {
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <Label className="text-white text-base font-medium">
-                    Non-Disclosure Agreement (NDA) *
+                    Non-Disclosure Agreement (NDA) <span className="text-red-400">*</span>
                   </Label>
                   <div className="flex items-center gap-2 text-orange-400 text-sm">
                     <AlertCircle className="h-4 w-4" />
@@ -655,7 +655,7 @@ export default function SignUpForm() {
                     onClick={() => onOpen("privacyPolicyModal")}
                   >
                     Privacy Policy
-                  </span> *
+                  </span> <span className="text-red-400">*</span>
                 </Label>
               </div>
               {form.formState.errors.privacyPolicy && (
@@ -672,7 +672,7 @@ export default function SignUpForm() {
                   style={{ pointerEvents: 'auto' }} // FIXED: Ensures clickability
                 />
                 <Label htmlFor="ndaAgreement" className="text-white text-sm leading-relaxed">
-                  I agree to the <span className="text-blue-400 underline cursor-pointer">Non-Disclosure Agreement</span> *
+                  I agree to the <span className="text-blue-400 underline cursor-pointer">Non-Disclosure Agreement</span> <span className="text-red-400">*</span>
                   {!ndaSigned && (
                     <span className="text-yellow-400 ml-2">(Please sign the NDA first)</span>
                   )}
