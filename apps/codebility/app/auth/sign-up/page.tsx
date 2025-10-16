@@ -267,11 +267,11 @@ export default function SignUpForm() {
         localStorage.removeItem("ndaSignature");
         localStorage.removeItem("ndaDocument");
         
-        toast.success("Account created! Check your email to verify, then you'll receive assessment instructions.");
-        toast.success("Redirecting to sign-in page...", { duration: 2000 });
+        toast.success("Account created! Check your email to verify your account.");
+        toast.success("Redirecting to verification page...", { duration: 2000 });
         
         setTimeout(() => {
-          router.push('/auth/signin');
+          router.push('/auth/verify');
         }, 2000);
       } else {
         toast.error(result.error || "Failed to create account");
