@@ -14,6 +14,7 @@ import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 import { Checkbox } from "@codevs/ui/checkbox";
 import { Textarea } from "@codevs/ui/textarea";
+import { Toaster } from "@/components/ui/toaster";
 
 import { signupUser } from "@/app/auth/actions";
 import { useModal } from "@/hooks/use-modal";
@@ -303,26 +304,31 @@ export default function SignUpForm() {
   };
 
   return (
-    <FormProvider {...form}>
-      <TechStackModal />
-      <PrivacyPolicyModal />
+    <>
+      <Toaster />
+      <FormProvider {...form}>
+        <TechStackModal />
+        <PrivacyPolicyModal />
       
-      <div className="min-h-screen relative bg-gray-900 flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-5xl mx-auto">
-          <div className="text-center mb-12">
+      <div className="bg-dark-300 flex min-h-screen w-full text-white">
+        <div className="flex flex-1 flex-col justify-start px-4 py-8 overflow-y-auto">
+          <div className="flex justify-center mb-8">
             <Image
               src="/assets/svgs/logos/codebility-light.svg"
               alt="Codebility"
-              width={300}
-              height={80}
-              className="mx-auto mb-8"
+              width={200}
+              height={60}
+              className=""
             />
-            <h1 className="text-3xl font-bold text-white mb-4">Create new account</h1>
-            <p className="text-gray-400 text-lg mb-2">To use Codebility, please enter your details</p>
-            <p className="text-gray-500 text-sm">All fields not labeled optional are required.</p>
+          </div>
+          <div className="text-center mb-8">
+            <p className="text-2xl font-semibold text-white mb-2">Create new account</p>
+            <p className="text-gray-300 mb-1">To use Codebility, please enter your details</p>
+            <p className="text-gray-400 text-sm">All fields not labeled optional are required.</p>
           </div>
 
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <div className="mx-auto w-full max-w-2xl">
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             {/* Profile Image Upload */}
             <div className="flex flex-col items-center mb-10">
               <div className="bg-gray-700 flex h-24 w-24 items-center justify-center rounded-full mb-4">
@@ -346,7 +352,7 @@ export default function SignUpForm() {
             </div>
 
             {/* Main Form Grid */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               {/* Column 1 - Personal Info */}
               <div className="space-y-6">
                 <FormField
@@ -520,10 +526,14 @@ export default function SignUpForm() {
                 />
               </div>
 
-              {/* Column 3 - Social Links */}
-              <div className="space-y-6">
+            </div>
+
+            {/* Social Links Section */}
+            <div className="space-y-6">
+              <h3 className="text-lg font-semibold text-white">Social Links (Optional)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <FormField
-                  label="Facebook (Optional)"
+                  label="Facebook"
                   name="facebook"
                   placeholder="Enter your Facebook profile"
                   register={form.register}
@@ -531,7 +541,7 @@ export default function SignUpForm() {
                 />
 
                 <FormField
-                  label="LinkedIn (Optional)"
+                  label="LinkedIn"
                   name="linkedin"
                   placeholder="Enter your LinkedIn profile"
                   register={form.register}
@@ -539,7 +549,7 @@ export default function SignUpForm() {
                 />
 
                 <FormField
-                  label="GitHub (Optional)"
+                  label="GitHub"
                   name="github"
                   placeholder="Enter your GitHub profile"
                   register={form.register}
@@ -547,7 +557,7 @@ export default function SignUpForm() {
                 />
 
                 <FormField
-                  label="Discord (Optional)"
+                  label="Discord"
                   name="discord"
                   placeholder="username#1234"
                   register={form.register}
@@ -655,9 +665,22 @@ export default function SignUpForm() {
                 {isSubmitting ? "Processing..." : "Apply"}
               </Button>
             </div>
-          </form>
+            </form>
+
+            <p className="text-center mt-6 text-gray-300">
+              Already have an account?{" "}
+              <a
+                href="/auth/sign-in"
+                className="text-customBlue-100 hover:underline"
+              >
+                Sign in
+              </a>
+            </p>
+          </div>
         </div>
+        <div className="bg-login hidden w-full flex-1 bg-cover bg-center lg:flex" />
       </div>
-    </FormProvider>
+      </FormProvider>
+    </>
   );
 }
