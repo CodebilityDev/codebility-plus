@@ -42,7 +42,7 @@ interface MemberRatingProps {
 const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
   // Supabase client and user state
   const [supabase, setSupabase] = useState<any>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
+  const [currentCodevId, setCurrentCodevId] = useState<string | null>(null); // Changed from currentUserId
   const [isTeamLead, setIsTeamLead] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -59,16 +59,35 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
   const [feedback, setFeedback] = useState("");
   const [existingRatingId, setExistingRatingId] = useState<string | null>(null);
 
-  // Initialize Supabase client and get current user
+  // Initialize Supabase client and get current user's codev_id
   useEffect(() => {
     const client = createClientClientComponent();
     setSupabase(client);
     
     if (client) {
-      // Get current user session
-      client.auth.getSession().then(({ data: { session } }) => {
-        if (session?.user?.id) {
-          setCurrentUserId(session.user.id);
+      // Get current user session and map to codev_id
+      client.auth.getSession().then(async ({ data: { session } }) => {
+        console.log("🔐 Auth session:", session?.user?.email);
+        
+        if (session?.user?.email) {
+          // Map auth user email to codev_id
+          const { data: codevData, error } = await client
+            .from("codev")
+            .select("id")
+            .eq("email_address", session.user.email)
+            .single();
+          
+          console.log("👤 Codev mapping:", { 
+            email: session.user.email, 
+            codevId: codevData?.id,
+            error: error?.message 
+          });
+          
+          if (codevData) {
+            setCurrentCodevId(codevData.id);
+          } else {
+            console.error("❌ Failed to map email to codev_id");
+          }
         }
       });
     }
@@ -76,52 +95,80 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
 
   // Check if current user is team lead and load existing ratings
   useEffect(() => {
-    if (!supabase || !currentUserId || !projectId) return;
+    if (!supabase || !currentCodevId || !projectId) {
+      console.log("⚠️ Missing dependencies:", { supabase: !!supabase, currentCodevId, projectId });
+      return;
+    }
 
     const checkPermissionsAndLoadRatings = async () => {
       setIsLoading(true);
       
       try {
+        console.log("🔍 Checking permissions for:", { currentCodevId, projectId, memberId });
+        
         // Check if current user is team lead for this project
-        const { data: projectMember } = await supabase
+        const { data: projectMember, error: roleError } = await supabase
           .from("project_members")
           .select("role")
           .eq("project_id", projectId)
-          .eq("codev_id", currentUserId)
+          .eq("codev_id", currentCodevId) // Now using correct codev_id
           .single();
+
+        console.log("👤 Current user role:", projectMember?.role, roleError ? `Error: ${roleError.message}` : "");
 
         const isLead = projectMember?.role === "team_leader";
         setIsTeamLead(isLead);
 
-        // Load existing ratings (for both team leads and regular members to view)
-        const { data: existingRating } = await supabase
+        // Load existing ratings for this member in this project
+        console.log("📊 Fetching ratings for member:", memberId);
+        
+        const { data: existingRatings, error: ratingError } = await supabase
           .from("member_ratings")
           .select("*")
           .eq("member_id", memberId)
           .eq("project_id", projectId)
-          .single();
+          .order("updated_at", { ascending: false })
+          .limit(1);
 
-        if (existingRating) {
+        console.log("📊 Rating query result:", {
+          found: existingRatings?.length || 0,
+          error: ratingError?.message,
+          data: existingRatings
+        });
+
+        if (existingRatings && existingRatings.length > 0) {
+          const rating = existingRatings[0];
+          console.log("✅ Loading ratings:", rating);
+          
           // Load existing ratings into state
           setRatings({
-            punctuality: existingRating.punctuality || 0,
-            accountability: existingRating.accountability || 0,
-            responsiveness: existingRating.responsiveness || 0,
-            initiative: existingRating.initiative || 0,
-            reliability: existingRating.reliability || 0,
+            punctuality: rating.punctuality || 0,
+            accountability: rating.accountability || 0,
+            responsiveness: rating.responsiveness || 0,
+            initiative: rating.initiative || 0,
+            reliability: rating.reliability || 0,
           });
-          setFeedback(existingRating.feedback || "");
-          setExistingRatingId(existingRating.id);
+          setFeedback(rating.feedback || "");
+          
+          // Only set existingRatingId if current user is the one who rated
+          if (rating.rated_by === currentCodevId) {
+            setExistingRatingId(rating.id);
+            console.log("🔑 Current user can edit this rating");
+          } else {
+            console.log("👁️ Current user can only view (rated by someone else)");
+          }
+        } else {
+          console.log("❌ No ratings found for this member");
         }
       } catch (error) {
-        console.error("Error checking permissions:", error);
+        console.error("❌ Error checking permissions:", error);
       } finally {
         setIsLoading(false);
       }
     };
 
     checkPermissionsAndLoadRatings();
-  }, [supabase, currentUserId, projectId, memberId]);
+  }, [supabase, currentCodevId, projectId, memberId]);
 
   // Calculate overall performance (average of all criteria)
   const calculateOverall = (): number => {
@@ -178,7 +225,7 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
 
   // Save or update rating in database
   const handleSaveRating = async () => {
-    if (!supabase || !currentUserId || !isTeamLead) {
+    if (!supabase || !currentCodevId || !isTeamLead) {
       toast.error("You don't have permission to rate this member");
       return;
     }
@@ -196,7 +243,7 @@ const MemberRating = ({ memberId, projectId }: MemberRatingProps) => {
       const ratingData: Partial<MemberRating> = {
         member_id: memberId,
         project_id: projectId,
-        rated_by: currentUserId,
+        rated_by: currentCodevId, // Now using correct codev_id
         punctuality: ratings.punctuality,
         accountability: ratings.accountability,
         responsiveness: ratings.responsiveness,
