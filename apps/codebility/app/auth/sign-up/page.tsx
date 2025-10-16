@@ -353,7 +353,7 @@ export default function SignUpForm() {
 
             {/* Main Form Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Column 1 - Personal Info */}
+              {/* Column 1 - Basic Info */}
               <div className="space-y-6">
                 <FormField
                   label="First Name"
@@ -373,6 +373,49 @@ export default function SignUpForm() {
                   required
                 />
 
+                <FormField
+                  label="Email"
+                  name="email_address"
+                  type="email"
+                  placeholder="Enter your email"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  required
+                />
+
+                <FormField
+                  label="Phone Number"
+                  name="phone_number"
+                  type="tel"
+                  placeholder="+63 or 0 followed by your number"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  required
+                />
+
+                <PasswordField
+                  label="Password"
+                  name="password"
+                  placeholder="Enter your password"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  showPassword={showPassword}
+                  toggleShow={() => setShowPassword(!showPassword)}
+                />
+
+                <PasswordField
+                  label="Confirm Password"
+                  name="confirmPassword"
+                  placeholder="Confirm your password"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  showPassword={showConfirmPassword}
+                  toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
+                />
+              </div>
+
+              {/* Column 2 - Professional Info */}
+              <div className="space-y-6">
                 {/* FIXED: Positions Dropdown */}
                 <div className="space-y-2">
                   <Label className="text-white text-base font-medium">Positions *</Label>
@@ -463,6 +506,15 @@ export default function SignUpForm() {
                   )}
                 </div>
 
+                <FormField
+                  label="Portfolio Website (Optional)"
+                  name="portfolio_website"
+                  type="url"
+                  placeholder="Enter your portfolio URL"
+                  register={form.register}
+                  errors={form.formState.errors}
+                />
+
                 <div className="space-y-2">
                   <Label className="text-white text-base font-medium">About (Optional)</Label>
                   <Textarea
@@ -472,58 +524,6 @@ export default function SignUpForm() {
                     className="bg-gray-700 border-gray-600 text-white placeholder:text-gray-400 rounded-lg focus:border-blue-500 focus:ring-1 focus:ring-blue-500 resize-none"
                   />
                 </div>
-              </div>
-
-              {/* Column 2 - Contact & Auth */}
-              <div className="space-y-6">
-                <FormField
-                  label="Email"
-                  name="email_address"
-                  type="email"
-                  placeholder="Enter your email"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  required
-                />
-
-                <FormField
-                  label="Phone Number"
-                  name="phone_number"
-                  type="tel"
-                  placeholder="+63 or 0 followed by your number"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  required
-                />
-
-                <PasswordField
-                  label="Password"
-                  name="password"
-                  placeholder="Enter your password"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  showPassword={showPassword}
-                  toggleShow={() => setShowPassword(!showPassword)}
-                />
-
-                <PasswordField
-                  label="Confirm Password"
-                  name="confirmPassword"
-                  placeholder="Confirm your password"
-                  register={form.register}
-                  errors={form.formState.errors}
-                  showPassword={showConfirmPassword}
-                  toggleShow={() => setShowConfirmPassword(!showConfirmPassword)}
-                />
-
-                <FormField
-                  label="Portfolio Website (Optional)"
-                  name="portfolio_website"
-                  type="url"
-                  placeholder="Enter your portfolio URL"
-                  register={form.register}
-                  errors={form.formState.errors}
-                />
               </div>
 
             </div>
