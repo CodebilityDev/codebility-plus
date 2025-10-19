@@ -1,3 +1,4 @@
+// apps/codebility/app/home/my-team/_components/MemberDetailModal.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -42,7 +43,7 @@ const MemberDetailModal = ({
   const [memberPoints, setMemberPoints] = useState<MemberPoints | null>(null);
   const [isLoadingPoints, setIsLoadingPoints] = useState(false);
 
-  // Load member points (keeping this for the header display)
+  // Load member points for the header display
   useEffect(() => {
     if (isOpen && member) {
       loadMemberPoints();
@@ -76,8 +77,6 @@ const MemberDetailModal = ({
 
   const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
   const displayName = formatName(member.first_name, member.last_name);
-
-
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -174,7 +173,7 @@ const MemberDetailModal = ({
             <TabsTrigger value="checklist">Checklist</TabsTrigger>
           </TabsList>
 
-          {/* Rating Tab */}
+          {/* Rating Tab - 10-Star Rating System */}
           <TabsContent value="rating" className="space-y-6">
             <MemberRating memberId={member.id} projectId={projectId || ''} />
           </TabsContent>
@@ -189,7 +188,7 @@ const MemberDetailModal = ({
   );
 };
 
-// Helper Component
+// Helper Component for displaying info items
 const InfoItem = ({
   icon,
   label,
