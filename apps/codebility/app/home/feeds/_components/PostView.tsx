@@ -17,6 +17,8 @@ import remarkGfm from "remark-gfm";
 import type { PostType } from "../_services/query";
 import PostUpvote from "../_components/PostUpvote";
 import { getUserRole } from "../_services/action";
+import PostViewCommentList from "./PostViewCommentList";
+import PostViewCreateComment from "./PostViewCreateComment";
 
 interface PostViewProps {
   postId: string;
@@ -36,6 +38,11 @@ export default function PostView({ postId }: PostViewProps) {
   const [isAdmin, setIsAdmin] = useState(true);
   const [isAuthor, setIsAuthor] = useState(false);
   const { user } = useUserStore();
+  const [refreshComments, setRefreshComments] = useState(0);
+
+  const triggerRefreshComments = () => {
+    setRefreshComments((prev) => prev + 1);
+  };
 
   useEffect(() => {
     const fetchRole = async () => {
@@ -136,17 +143,31 @@ export default function PostView({ postId }: PostViewProps) {
 
       <PostUpvote post={post} />
 
-      <div className="prose prose-sm dark:prose-invert max-h-[800px] min-h-[160px] max-w-none overflow-y-auto p-4 text-sm">
-        <ReactMarkdown remarkPlugins={[remarkGfm]}>
-          {`![Post image](${post.image_url || "/assets/images/bg-certificate.png"})\n\n${post.content}`}
-        </ReactMarkdown>
-      </div>
+      {/* Scrollable group */}
+      <div className="max-h-[90vh] overflow-y-auto">
+        <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
+          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+            {`![Post image](${post.image_url || "/assets/images/bg-certificate.png"})\n\n${post.content}`}
+          </ReactMarkdown>
+        </div>
 
-      {(isAdmin || isAuthor) && (
-        <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
-          Edit Post
-        </Button>
-      )}
+        {(isAdmin || isAuthor) && (
+          <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
+            Edit Post
+          </Button>
+        )}
+        <div className="mb-1 mt-1 border-t border-gray-200 dark:border-gray-700" />
+        <PostViewCommentList
+          postId={postId}
+          refresh={refreshComments}
+          hasDeleteCommentPrivilege={isAdmin || isAuthor}
+        />
+      </div>
+      <PostViewCreateComment
+        postId={postId}
+        onCommentCreated={triggerRefreshComments}
+      />
+
       <EditPostModal
         post={post}
         isOpen={isModalOpen}
