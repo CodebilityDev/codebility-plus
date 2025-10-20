@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, useMotionValue, useTransform } from "framer-motion";
+import { useMemo } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
 const codeTags = [
   "const",
@@ -15,80 +15,142 @@ const codeTags = [
   "=>",
 ];
 
+/** Seeded RNG so positions/timings are stable */
+function mulberry32(seed: number) {
+  let t = seed >>> 0;
+  return () => {
+    t += 0x6d2b79f5;
+    let r = Math.imul(t ^ (t >>> 15), 1 | t);
+    r ^= r + Math.imul(r ^ (r >>> 7), 61 | r);
+    return ((r ^ (r >>> 14)) >>> 0) / 4294967296;
+  };
+}
+type Pos = { top: number; left: number };
+type CornerIndex = 0 | 1 | 2 | 3;
+
+function placeAwayFromCenter(rand: () => number): Pos {
+  let top = rand() * 90 + 5;
+  let left = rand() * 90 + 5;
+
+  const inCenter = top > 30 && top < 70 && left > 30 && left < 70;
+  if (inCenter) {
+    const cornerIndex = Math.min(
+      3,
+      Math.max(0, Math.floor(rand() * 4)),
+    ) as CornerIndex;
+
+    // Tuple of exactly 4 positions
+    const ranges: readonly [Pos, Pos, Pos, Pos] = [
+      { top: rand() * 25 + 5, left: rand() * 25 + 5 }, // TL
+      { top: rand() * 25 + 5, left: rand() * 25 + 75 }, // TR
+      { top: rand() * 25 + 75, left: rand() * 25 + 5 }, // BL
+      { top: rand() * 25 + 75, left: rand() * 25 + 75 }, // BR
+    ] as const;
+
+    const chosen: Pos = ranges[cornerIndex]; // always defined with tuple indexing
+    top = chosen.top;
+    left = chosen.left;
+  }
+
+  return { top, left };
+}
 export function FloatingCodeTags() {
-  const [windowSize, setWindowSize] = useState({ width: 1000, height: 800 });
+  const reduceMotion = useReducedMotion();
 
-  const mouseX = useMotionValue(0);
-  const mouseY = useMotionValue(0);
+  const configs = useMemo(() => {
+    return codeTags.map((tag, i) => {
+      const seed =
+        Array.from((tag + i).toString()).reduce(
+          (a, c) => a + c.charCodeAt(0),
+          0,
+        ) +
+        i * 99991;
+      const rnd = mulberry32(seed);
 
-  useEffect(() => {
-    if (typeof window === "undefined") return;
+      const { top, left } = placeAwayFromCenter(rnd);
+      const floatDuration = 10 + Math.floor(rnd() * 6); // 10–15s
+      const floatDelay = rnd() * 2; // 0–2s
+      const floatAmplitude = 8 + rnd() * 6; // 8–14px
 
-    setWindowSize({ width: window.innerWidth, height: window.innerHeight });
+      // add a very subtle horizontal drift to avoid uniformity (no parallax)
+      const drift = 4 + rnd() * 4; // 4–8px
+      const driftDuration = 12 + Math.floor(rnd() * 6); // 12–17s
+      const driftDelay = rnd() * 2;
 
-    const handleMouseMove = (e: MouseEvent) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-    };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
-  }, [mouseX, mouseY]);
+      return {
+        key: `${tag}-${i}`,
+        tag,
+        topPct: top,
+        leftPct: left,
+        floatDuration,
+        floatDelay,
+        floatAmplitude,
+        drift,
+        driftDuration,
+        driftDelay,
+      };
+    });
+  }, []);
 
   return (
-    <div className="pointer-events-none absolute inset-0 z-[1] overflow-hidden">
-      {codeTags.map((tag, i) => {
-        const x = useTransform(mouseX, [0, windowSize.width], [-8, 8]);
-        const y = useTransform(mouseY, [0, windowSize.height], [-8, 8]);
-        
-        // Avoid placing tags in the center area where logo/text is
-        let top = Math.random() * 90 + 5;
-        let left = Math.random() * 90 + 5;
-        
-        // Keep tags away from center area (30%-70% both horizontally and vertically)
-        if (top > 30 && top < 70 && left > 30 && left < 70) {
-          // Randomly place in corners instead
-          const corners = [
-            { top: Math.random() * 25 + 5, left: Math.random() * 25 + 5 }, // top-left
-            { top: Math.random() * 25 + 5, left: Math.random() * 25 + 75 }, // top-right
-            { top: Math.random() * 25 + 75, left: Math.random() * 25 + 5 }, // bottom-left
-            { top: Math.random() * 25 + 75, left: Math.random() * 25 + 75 }, // bottom-right
-          ];
-          const corner = corners[Math.floor(Math.random() * corners.length)];
-          if (corner) {
-            top = corner.top;
-            left = corner.left;
-          }
-        }
-        
-        const delay = Math.random() * 2;
-
-        return (
+    <div
+      className="pointer-events-none absolute inset-0 z-[1] overflow-hidden"
+      aria-hidden
+    >
+      {configs.map(
+        ({
+          key,
+          tag,
+          topPct,
+          leftPct,
+          floatDuration,
+          floatDelay,
+          floatAmplitude,
+          drift,
+          driftDuration,
+          driftDelay,
+        }) => (
           <motion.span
-            key={tag + i}
-            className="absolute select-none font-mono text-xs text-white opacity-15 blur-[0.3px] lg:text-sm"
-            style={{
-              top: `${top}%`,
-              left: `${left}%`,
-              x,
-              y,
-            }}
-            initial={{ opacity: 0, scale: 0.6 }}
-            animate={{
-              opacity: [0.1, 0.2, 0.1],
-              scale: [0.8, 1, 0.8],
-              y: ["0%", "-8%", "0%"],
-            }}
-            transition={{
-              duration: 8 + Math.random() * 4,
-              repeat: Infinity,
-              delay,
-              ease: "easeInOut",
-            }}
+            key={key}
+            className="absolute select-none font-mono text-xs text-white/20 will-change-transform lg:text-sm"
+            style={{ top: `${topPct}%`, left: `${leftPct}%` }}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={
+              reduceMotion
+                ? { opacity: 0.2, scale: 1 }
+                : {
+                    opacity: 0.2, // steady (no flicker)
+                    scale: 1,
+                    // gentle vertical bob + slow horizontal drift
+                    translateY: [0, -floatAmplitude, 0],
+                    translateX: [0, drift, 0, -drift, 0],
+                  }
+            }
+            transition={
+              reduceMotion
+                ? { opacity: { duration: 0.6, ease: "easeOut" } }
+                : {
+                    opacity: { duration: 0.8, ease: "easeOut" },
+                    scale: { duration: 0.8, ease: "easeOut" },
+                    translateY: {
+                      duration: floatDuration,
+                      repeat: Infinity,
+                      delay: floatDelay,
+                      ease: "easeInOut",
+                    },
+                    translateX: {
+                      duration: driftDuration,
+                      repeat: Infinity,
+                      delay: driftDelay,
+                      ease: "easeInOut",
+                    },
+                  }
+            }
           >
             {tag}
           </motion.span>
-        );
-      })}
+        ),
+      )}
     </div>
   );
 }

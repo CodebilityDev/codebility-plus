@@ -7,122 +7,132 @@ const items = [
   {
     number: "01",
     text: "A self-driven attitude — you’re responsible for your own learning",
-    color: "bg-cyan-500",
+    color: "bg-cyan-400",
   },
   {
     number: "02",
     text: "Professionalism in communication, time management, and behavior",
-    color: "bg-emerald-500",
+    color: "bg-emerald-400",
   },
   {
     number: "03",
     text: "Active participation in tasks, meetings, and community discussions",
-    color: "bg-rose-500",
+    color: "bg-rose-400",
   },
   {
     number: "04",
     text: "Respect for team members, deadlines, and project goals",
-    color: "bg-indigo-500",
+    color: "bg-indigo-400",
   },
   {
     number: "05",
     text: "Willingness to grow from feedback and mistakes",
-    color: "bg-amber-500",
+    color: "bg-amber-400",
   },
   {
     number: "06",
     text: "Transparency — especially if you’re unavailable, struggling, or need support",
-    color: "bg-fuchsia-500",
+    color: "bg-fuchsia-400",
   },
 ];
 
-export default function ExpectSection() {
+export default function ExpectSectionLight() {
   const lineRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
 
   useEffect(() => {
+    const target = sectionRef.current;
+    const line = lineRef.current;
+    if (!target || !line) return;
+
     const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry?.isIntersecting && lineRef.current) {
-          lineRef.current.style.height = "100%";
-        }
+      (entries) => {
+        const [entry] = entries;
+        if (entry?.isIntersecting) line.style.height = "100%";
       },
-      { threshold: 0.2 },
+      { threshold: 0.25 },
     );
 
-    if (lineRef.current) observer.observe(lineRef.current);
+    observer.observe(target);
     return () => observer.disconnect();
   }, []);
 
   return (
-    <section className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-950 to-black px-6 py-24 text-white lg:min-h-screen">
-      {/* soft pastel glows for light motif */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.15),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.15),transparent_60%)]" />
+    <section
+      ref={sectionRef}
+      className="relative flex w-full items-center justify-center overflow-hidden bg-white px-6 py-24 text-zinc-800 lg:min-h-screen"
+    >
+      {/* very soft background accents */}
+      <div className="pointer-events-none absolute inset-0 opacity-70">
+        <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-cyan-100 blur-2xl" />
+        <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-pink-100 blur-2xl" />
+      </div>
 
       <div className="w-full max-w-5xl">
         {/* Heading */}
         <motion.h2
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 24 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.6 }}
           viewport={{ once: true }}
-          className="mb-20 text-center text-4xl font-bold leading-tight text-purple-500 md:text-5xl"
+          className="mb-14 text-center text-3xl font-extrabold tracking-tight"
         >
           What we expect from{" "}
-          <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-teal-600 bg-clip-text text-[3.5rem] font-black text-transparent drop-shadow-lg md:text-[4.5rem]">
+          <span className="bg-gradient-to-r from-purple-600 via-fuchsia-600 to-cyan-600 bg-clip-text font-extrabold text-transparent">
             YOU
           </span>
         </motion.h2>
 
         {/* Timeline */}
         <div className="relative">
-          {/* Glowing vertical line */}
+          {/* Subtle vertical line */}
           <motion.div
             ref={lineRef}
             initial={{ height: 0 }}
             animate={{ height: "100%" }}
-            transition={{ duration: 1.2, ease: "easeInOut" }}
-            className="absolute left-1/2 hidden w-[5px] -translate-x-1/2 animate-pulse bg-cyan-400 shadow-[0_0_12px_3px_rgba(34,211,238,0.7)] md:block"
+            transition={{ duration: 0.9, ease: "easeInOut" }}
+            className="absolute left-1/2 hidden w-px -translate-x-1/2 bg-zinc-200 md:block"
           />
 
           {/* Steps */}
-          <div className="flex flex-col gap-14">
+          <div className="flex flex-col gap-12">
             {items.map((item, i) => {
               const isLeft = i % 2 === 0;
 
               return (
                 <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 30 }}
+                  key={item.number}
+                  initial={{ opacity: 0, y: 18 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.5, delay: i * 0.1 }}
-                  viewport={{ once: true }}
+                  transition={{ duration: 0.45, delay: i * 0.05 }}
+                  viewport={{ once: true, amount: 0.3 }}
                   className={`relative flex flex-col items-center md:flex-row ${
                     isLeft ? "md:justify-start" : "md:justify-end"
                   }`}
                 >
-                  {/* Connector line above */}
+                  {/* Connector (super soft) */}
                   {i !== 0 && (
-                    <div className="absolute left-1/2 top-[-24px] z-0 hidden h-full w-1 -translate-x-1/2 bg-white/20 md:block" />
+                    <div className="absolute left-1/2 top-[-18px] z-0 hidden h-full w-px -translate-x-1/2 bg-zinc-100 md:block" />
                   )}
 
-                  {/* Content wrapper with flex gap */}
+                  {/* Row */}
                   <div
-                    className={`z-10 flex w-full flex-col items-center gap-4 md:w-[calc(50%-1.5rem)] md:flex-row ${
+                    className={`z-10 flex w-full flex-col items-center gap-4 md:w-[calc(50%-1rem)] md:flex-row ${
                       isLeft
-                        ? "md:order-2 md:ml-0 md:mr-auto"
-                        : "flex-row-reverse md:order-1 md:ml-auto md:mr-0"
+                        ? "md:order-2 md:mr-auto"
+                        : "flex-row-reverse md:order-1 md:ml-auto"
                     }`}
                   >
-                    {/* Number bubble */}
+                    {/* Number badge (light, with border) */}
                     <div
-                      className={`flex h-16 w-16 items-center justify-center rounded-full text-2xl font-bold text-white shadow-xl ${item.color}`}
+                      className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold text-white ${item.color} shadow-sm ring-1 ring-white/60`}
                     >
                       {item.number}
                     </div>
 
-                    {/* Card */}
+                    {/* Card (light, subtle shadow) */}
                     <div
-                      className={`mt-4 w-full rounded-xl bg-white/5 p-5 text-center text-sm md:mt-0 lg:text-left ${
+                      className={`mt-2 w-full rounded-xl border border-zinc-200 bg-white/80 p-5 text-center text-sm leading-relaxed shadow-sm backdrop-blur-sm md:mt-0 ${
                         isLeft ? "md:text-left" : "md:text-right"
                       }`}
                     >
