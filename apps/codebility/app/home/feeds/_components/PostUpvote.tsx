@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useAddSocialPoints } from "@/hooks/useAddSocialPoints";
 import { useUserStore } from "@/store/codev-store";
 import { ArrowBigUp } from "lucide-react";
 
@@ -19,7 +18,6 @@ interface PostUpvoteProps {
 
 export default function PostUpvote({ post }: PostUpvoteProps) {
   const { user } = useUserStore();
-  const { addSocialPoints } = useAddSocialPoints();
 
   const [isUpvoted, setIsUpvoted] = useState(false);
   const [upvotes, setUpvotes] = useState(0);
@@ -57,8 +55,6 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
 
       if (!isUpvoted) {
         const postUpvote = await AddPostUpvote(post.id, user.id);
-        //Add social points to author
-        await addSocialPoints(post?.author_id?.id, "2", postUpvote.id);
       } else {
         removePostUpvote(post.id, user.id);
       }
