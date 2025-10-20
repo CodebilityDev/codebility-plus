@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Input } from "@/components/shared/dashboard/input";
 import { Button } from "@/components/ui/button";
-import { useAddSocialPoints } from "@/hooks/useAddSocialPoints";
 import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
 import { uploadImage } from "@/utils/uploadImage";
@@ -22,7 +21,6 @@ const CreatePostForm = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedImageIds, setUploadedImageIds] = useState<string[]>([]);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
-  const { addSocialPoints } = useAddSocialPoints();
   const { user } = useUserStore();
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -67,9 +65,6 @@ const CreatePostForm = ({
       // Reset form
       form.reset();
       setImage(null);
-
-      //Add social points
-      await addSocialPoints(user?.id, "1");
     } catch (error) {
       console.error("Error creating post:", error);
       toast.error("Failed to create post.");
