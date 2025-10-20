@@ -25,11 +25,11 @@ export default function OnboardingPage() {
     <main className="relative min-h-screen">
       <OnboardingClientWrapper />
       <SoftwareSectionWrapper />
-      <MindsetSectionWrapper />
+      {/* <MindsetSectionWrapper /> */}
       <ExpectSectionWrapper />
-      <IsAndIsntSectionWrapper />
-      <IsNotSectionWrapper />
-      <ExpectFromUsWrapper />
+      {/* <IsAndIsntSectionWrapper /> */}
+      {/* <IsNotSectionWrapper /> */}
+      {/* <ExpectFromUsWrapper /> */}
       <RoadMapWrapper roadmapRef={roadmapRef} />
       <HouseRulesSectionWrapper />
       <TeamSectionWrapper />
