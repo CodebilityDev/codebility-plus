@@ -64,7 +64,7 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
       if (!isUpvoted) {
         const postUpvote = await AddPostUpvote(post.id, user.id);
       } else {
-        removePostUpvote(post.id, user.id);
+        await removePostUpvote(post.id, user.id);
       }
 
       await fetchPosts();
