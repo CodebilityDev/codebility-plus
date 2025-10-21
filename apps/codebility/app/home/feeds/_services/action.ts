@@ -409,3 +409,74 @@ export async function deletePostContentImages(
     throw error;
   }
 }
+
+
+export async function createComment(
+  post_id: string,
+  commenter_id: string,
+  content: string,
+) {
+  const supabase = await createClientServerComponent();
+
+try {
+    const { data, error } = await supabase
+      .from("post_comments")
+      .insert([{ post_id, commenter_id, content }])
+      .select()
+      .single();
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    console.error("Comment creation failed:", error);
+    throw error;
+  }
+}
+
+export async function getPostComments(post_id: string) {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { data, error } = await supabase
+      .from("post_comments")
+      .select(`
+        id,
+        content,
+        created_at,
+        commenter: commenter_id!inner (
+          id,
+          first_name,
+          last_name,
+          image_url
+        )
+      `)
+      .eq("post_id", post_id)
+      .order("created_at", { ascending: true });
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch post comments:", error);
+    throw error;
+  }
+}
+
+export async function deletePostComment(comment_id: string) {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { error } = await supabase
+      .from("post_comments")
+      .delete()
+      .eq("id", comment_id);
+
+    if (error) throw error;
+
+    return { success: true };
+  } catch (error) {
+    console.error("Failed to delete post comment:", error);
+    throw error;
+  }
+}
