@@ -414,26 +414,26 @@ export default function WeeklyTop() {
       // Soft skills icons
       switch (rank) {
         case 1:
-          return <Trophy className="h-5 w-5 text-emerald-500" />;
+          return <Trophy className="h-5 w-5 text-emerald-500 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />;
         case 2:
-          return <Medal className="h-5 w-5 text-teal-400" />;
+          return <Medal className="h-5 w-5 text-teal-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />;
         case 3:
-          return <Award className="h-5 w-5 text-cyan-400" />;
+          return <Award className="h-5 w-5 text-cyan-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />;
         default:
-          return <Users className="h-4 w-4 text-gray-400" />;
+          return <Users className="h-4 w-4 text-gray-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />;
       }
     }
     
     // Technical skills icons
     switch (rank) {
       case 1:
-        return <Trophy className="h-5 w-5 text-yellow-500" />;
+        return <Trophy className="h-5 w-5 text-yellow-500 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />;
       case 2:
-        return <Medal className="h-5 w-5 text-gray-400" />;
+        return <Medal className="h-5 w-5 text-slate-300 dark:text-slate-200 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />;
       case 3:
-        return <Award className="h-5 w-5 text-amber-600" />;
+        return <Award className="h-5 w-5 text-amber-600 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]" />;
       default:
-        return <Star className="h-4 w-4 text-gray-400" />;
+        return <Star className="h-4 w-4 text-gray-400 drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />;
     }
   };
 
@@ -859,7 +859,7 @@ export default function WeeklyTop() {
             <div className="rounded-lg border border-white/20 dark:border-white/10 bg-white/10 backdrop-blur-sm dark:bg-white/5 p-8 text-center">
               <div className="flex flex-col items-center gap-4">
                 <div className="h-16 w-16 rounded-full bg-white/20 backdrop-blur-sm dark:bg-white/10 flex items-center justify-center">
-                  <Trophy className="h-8 w-8 text-gray-400" />
+                  <Trophy className="h-8 w-8 text-slate-400 dark:text-slate-300 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
                 </div>
                 <div>
                   <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">
@@ -914,7 +914,7 @@ export default function WeeklyTop() {
               <div className="rounded-lg border border-white/20 dark:border-white/10 bg-white/10 backdrop-blur-sm dark:bg-white/5 p-8 text-center">
                 <div className="flex flex-col items-center gap-4">
                   <div className="h-16 w-16 rounded-full bg-purple-100 dark:bg-purple-900/20 flex items-center justify-center">
-                    <Trophy className="h-8 w-8 text-purple-400" />
+                    <Trophy className="h-8 w-8 text-purple-400 drop-shadow-[0_2px_4px_rgba(0,0,0,0.8)]" />
                   </div>
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">

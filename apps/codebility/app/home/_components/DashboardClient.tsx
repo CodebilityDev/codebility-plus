@@ -8,6 +8,7 @@ import Profile from "../(dashboard)/_components/DashboardProfile";
 import TokenPoints from "../(dashboard)/_components/DashboardTokenPoints";
 import WeeklyTop from "../(dashboard)/_components/DashboardWeeklyTop";
 import DashboardCompleteProfile from "../(dashboard)/_components/DashboardCompleteProfile";
+import DashboardCareerOpportunities from "../(dashboard)/_components/DashboardCareerOpportunities";
 
 export default function DashboardClient() {
   const { user } = useUserStore();
@@ -45,7 +46,10 @@ export default function DashboardClient() {
           </div>
         </div>
         <div className="md:basis-[50%] xl:basis-[40%]">
-          <WeeklyTop />
+          <div className="flex flex-col gap-4">
+            <WeeklyTop />
+            <DashboardCareerOpportunities />
+          </div>
         </div>
       </div>
       {userIsInactive && (
