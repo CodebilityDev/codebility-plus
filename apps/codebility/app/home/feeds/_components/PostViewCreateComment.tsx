@@ -22,9 +22,10 @@ export default function PostViewCreateComment({
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && comment.trim() && !isSubmitting) {
+      if (!user || !user.id) return;
       try {
         setIsSubmitting(true);
-        await createComment(postId, user?.id!, comment);
+        await createComment(postId, user.id, comment);
         setComment("");
         onCommentCreated?.();
       } finally {
