@@ -260,7 +260,7 @@ export const hasUserUpvoted = async (postId: string, userId: string): Promise<bo
     try {
     const supabase = await createClientServerComponent();
 
-    const { data: postUpvote, error} = await supabase
+    const { data: postUpvote, error } = await supabase
       .from("post_upvotes")
       .select("*")
       .eq("post_id", postId)
@@ -284,7 +284,7 @@ export const countUpvotes = async (postId: string): Promise<number> => {
     try {
     const supabase = await createClientServerComponent();
 
-    const { count, error} = await supabase
+    const { count, error } = await supabase
       .from("post_upvotes")
       .select("*", { count: "exact", head: true })
       .eq("post_id", postId);
