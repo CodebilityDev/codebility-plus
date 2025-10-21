@@ -2,10 +2,12 @@
 
 import { useEffect, useState } from "react";
 import { useUserStore } from "@/store/codev-store";
+import { useFeedsStore } from "@/store/feeds-store";
 import { ArrowBigUp } from "lucide-react";
 
 import {
   AddPostUpvote,
+  countUpvotes,
   hasUserUpvoted,
   removePostUpvote,
 } from "../_services/action";
@@ -19,7 +21,11 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
   const { user } = useUserStore();
 
   const [isUpvoted, setIsUpvoted] = useState(false);
-  const [upvotes, setUpvotes] = useState(post.upvoters_id?.length || 0);
+  const [upvotes, setUpvotes] = useState(0);
+  const { posts, fetchPosts } = useFeedsStore((state) => ({
+    posts: state.posts,
+    fetchPosts: state.fetchPosts,
+  }));
 
   useEffect(() => {
     const checkUpvote = async () => {
@@ -34,24 +40,34 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
       } else {
         setIsUpvoted(false);
       }
+
+      if (post?.id) {
+        try {
+          const upvotesCount = await countUpvotes(post.id);
+          setUpvotes(upvotesCount);
+        } catch (error) {
+          console.error("Error counting upvotes:", error);
+        }
+      }
     };
-
     checkUpvote();
-  }, [user?.id, post?.id]);
+  }, [user?.id, post?.id, posts]);
 
-  const handleUpvote = (e: React.MouseEvent) => {
+  const handleUpvote = async (e: React.MouseEvent) => {
     if (user) {
       e.stopPropagation();
       e.preventDefault();
 
-      if (!isUpvoted) {
-        AddPostUpvote(post.id, user.id);
-      } else {
-        removePostUpvote(post.id, user.id);
-      }
-
       setIsUpvoted((prev) => !prev);
       setUpvotes((prev) => prev + (isUpvoted ? -1 : 1));
+
+      if (!isUpvoted) {
+        const postUpvote = await AddPostUpvote(post.id, user.id);
+      } else {
+        await removePostUpvote(post.id, user.id);
+      }
+
+      await fetchPosts();
     }
   };
 
@@ -59,8 +75,8 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
     <button
       className={`flex items-center space-x-1 ${
         isUpvoted
-          ? "text-customBlue-500 dark:text-customBlue-400"
-          : "hover:text-customBlue-500 dark:hover:text-customBlue-400"
+          ? "text-customBlue-300 dark:text-customBlue-200"
+          : "hover:text-customBlue-300 dark:hover:text-customBlue-200"
       }`}
       onClick={handleUpvote}
     >

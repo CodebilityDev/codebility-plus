@@ -207,93 +207,92 @@ export const AddPostUpvote = async (postId: string, userId: string) => {
   try {
     const supabase = await createClientServerComponent();
 
-    // Fetch current upvoters_id array
-    const { data: post, error: fetchError } = await supabase
-      .from("posts")
-      .select("upvoters_id")
-      .eq("id", postId)
-      .single();
+    const { data: postUpvote, error: fetchError } = await supabase
+      .from("post_upvotes")
+      .select("*")
+      .eq("post_id", postId)
+      .eq("upvoter_id", userId)
+      .maybeSingle();
 
     if (fetchError) throw fetchError;
 
-    const currentUpvoters = post.upvoters_id || [];
-
     // Avoid duplicate upvotes
-    if (currentUpvoters.includes(userId)) {
+    if (postUpvote) {
       return { message: "User has already upvoted this post." };
     }
 
-    const updatedUpvoters = [...currentUpvoters, userId];
+    // Add post upvote
+    const { data: newUpvote, error: insertError } = await supabase
+    .from("post_upvotes")
+    .insert([{ post_id: postId, upvoter_id: userId }])
+    .select()
+    .single();
 
-    // Update the post with new upvoter
-    const { data: updatedPost, error: updateError } = await supabase
-      .from("posts")
-      .update({ upvoters_id: updatedUpvoters })
-      .eq("id", postId)
-      .select();
+    if (insertError) throw insertError;
 
-    if (updateError) throw updateError;
-
-    return updatedPost;
+    return newUpvote;
   } catch (error) {
-    console.error(error);
+    console.error("Failed to add upvote:", error);
     throw error;
   }
 };
 
 export const removePostUpvote = async (postId: string, userId: string) => {
-  try {
+   try {
     const supabase = await createClientServerComponent();
 
-    // Fetch current upvoters_id array
-    const { data: post, error: fetchError } = await supabase
-      .from("posts")
-      .select("upvoters_id")
-      .eq("id", postId)
-      .single();
+  const { error } = await supabase
+    .from("post_upvotes")
+    .delete()
+    .eq("post_id", postId)
+    .eq("upvoter_id", userId);
 
-    if (fetchError) throw fetchError;
+  if (error) throw error;
 
-    const currentUpvoters = post.upvoters_id || [];
 
-    // If user hasn't upvoted, nothing to remove
-    if (!currentUpvoters.includes(userId)) {
-      return { message: "User hasn't upvoted this post." };
+  } catch (error) {
+    console.error("Failed to remove upvote:", error);
+    throw error;
+  }
+};
+
+export const hasUserUpvoted = async (postId: string, userId: string): Promise<boolean> => {
+    try {
+    const supabase = await createClientServerComponent();
+
+    const { data: postUpvote, error } = await supabase
+      .from("post_upvotes")
+      .select("*")
+      .eq("post_id", postId)
+      .eq("upvoter_id", userId)
+      .maybeSingle();
+
+    if (error) throw error;
+
+    if (postUpvote) {
+      return true;
+    } else {
+      return false;
     }
-
-    const updatedUpvoters = currentUpvoters.filter(id => id !== userId);
-
-    // Update the post with new upvoter array
-    const { data: updatedPost, error: updateError } = await supabase
-      .from("posts")
-      .update({ upvoters_id: updatedUpvoters })
-      .eq("id", postId)
-      .select();
-
-    if (updateError) throw updateError;
-
-    return updatedPost;
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
 
-export const hasUserUpvoted = async (postId: string, userId: string): Promise<boolean> => {
-  try {
+export const countUpvotes = async (postId: string): Promise<number> => {
+    try {
     const supabase = await createClientServerComponent();
 
-    const { data: post, error } = await supabase
-      .from("posts")
-      .select("upvoters_id")
-      .eq("id", postId)
-      .single();
+    const { count, error } = await supabase
+      .from("post_upvotes")
+      .select("*", { count: "exact", head: true })
+      .eq("post_id", postId);
 
     if (error) throw error;
 
-    const upvoters: string[] = post.upvoters_id || [];
-
-    return upvoters.includes(userId);
+    if (count) return count
+    else return 0;
   } catch (error) {
     console.error(error);
     throw error;
