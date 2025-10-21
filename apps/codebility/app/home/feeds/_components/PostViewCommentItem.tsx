@@ -25,7 +25,12 @@ export default function PostViewCommentItem({
 
   const handleDelete = async () => {
     setIsVisible(false);
-    await deletePostComment(commenntId);
+    try {
+      await deletePostComment(commenntId);
+    } catch (error) {
+      setIsVisible(true);
+      // Optionally, you could log the error or show a message to the user
+    }
   };
 
   if (!isVisible) return null;
