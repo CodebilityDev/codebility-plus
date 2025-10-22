@@ -50,6 +50,7 @@
     "@tiptap/pm": "^2.11.9",
     "@tiptap/react": "^2.11.9",
     "@tiptap/starter-kit": "^2.11.9",
+    "@types/jspdf": "^2.0.0",
     "@types/react-signature-canvas": "^1.0.7",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
