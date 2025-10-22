@@ -18,7 +18,9 @@ export default function HirePageClient() {
         <h2 className="text-xl font-light text-white">Active Job Listings</h2>
         <CreateJobForm onJobCreated={handleJobCreated} />
       </div>
-      <JobListingsTable />
+      <div className="mb-8">
+        <JobListingsTable />
+      </div>
     </>
   );
 }
