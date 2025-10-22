@@ -7,9 +7,9 @@ import {
   Routes,
   Collection,
 } from "discord.js";
-import dotenv from "dotenv";
-import path from "path";
-import fs from "fs";
+import * as dotenv from "dotenv";
+import * as path from "path";
+import * as fs from "fs";
 import { handleXP } from "./utils/xpSystem";
 
 // Load environment variables

@@ -1,7 +1,7 @@
 // utils/supabase.bot.ts
 import { createClient } from "@supabase/supabase-js";
-import dotenv from "dotenv";
-import path from "path";
+import * as dotenv from "dotenv"; 
+import * as path from "path";
 
 // Load environment variables from the correct path
 // Adjust the path based on where your .env file is located

@@ -4,6 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  metro: ~0.80.8
+  metro-resolver: ~0.80.8
+  react: 19.1.0
+  react-dom: 19.1.0
+  react-signature-canvas: npm:react-signature-canvas@1.1.0-alpha.1
+  reactjs-qr-code-reader: npm:reactjs-qr-code-reader@1.0.3
+  react-smooth: npm:react-smooth@4.0.4
+  react-overlays: npm:react-overlays@5.2.1
+
 importers:
 
   .:
@@ -29,7 +39,7 @@ importers:
         version: link:tooling/prettier
       '@turbo/gen':
         specifier: ^2.1.1
-        version: 2.5.5(@types/node@20.19.10)(typescript@5.9.2)
+        version: 2.5.5(@types/node@24.8.1)(typescript@5.9.2)
       '@types/react':
         specifier: 19.1.5
         version: 19.1.5
@@ -53,6 +63,34 @@ importers:
         version: 2.5.5
       typescript:
         specifier: ^5.5.4
+        version: 5.9.2
+
+  apps/bot:
+    dependencies:
+      '@supabase/supabase-js':
+        specifier: ^2.55.0
+        version: 2.55.0
+      canvas:
+        specifier: ^3.2.0
+        version: 3.2.0
+      discord.js:
+        specifier: ^14.23.2
+        version: 14.23.2
+      dotenv:
+        specifier: ^17.2.3
+        version: 17.2.3
+      node-fetch:
+        specifier: ^3.3.2
+        version: 3.3.2
+    devDependencies:
+      '@types/node':
+        specifier: ^24.8.1
+        version: 24.8.1
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@24.8.1)(typescript@5.9.2)
+      typescript:
+        specifier: ^5.9.2
         version: 5.9.2
 
   apps/codebility:
@@ -4342,7 +4380,7 @@ packages:
     dev: false
     optional: true
 
-  /@inquirer/external-editor@1.0.1(@types/node@20.19.10):
+  /@inquirer/external-editor@1.0.1(@types/node@24.8.1):
     resolution: {integrity: sha512-Oau4yL24d2B5IL4ma4UpbQigkVhzPDXLoqy1ggK4gnHg/stmkffJE4oOXHXF3uz0UEpywG68KcyXsyYpA1Re/Q==}
     engines: {node: '>=18'}
     peerDependencies:
@@ -4351,7 +4389,7 @@ packages:
       '@types/node':
         optional: true
     dependencies:
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       chardet: 2.1.0
       iconv-lite: 0.6.3
     dev: true
@@ -4399,7 +4437,7 @@ packages:
     dependencies:
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       jest-mock: 29.7.0
 
   /@jest/fake-timers@29.7.0:
@@ -4408,7 +4446,7 @@ packages:
     dependencies:
       '@jest/types': 29.6.3
       '@sinonjs/fake-timers': 10.3.0
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       jest-message-util: 29.7.0
       jest-mock: 29.7.0
       jest-util: 29.7.0
@@ -4434,7 +4472,7 @@ packages:
     dependencies:
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       '@types/yargs': 15.0.19
       chalk: 4.1.2
 
@@ -4445,7 +4483,7 @@ packages:
       '@jest/schemas': 29.6.3
       '@types/istanbul-lib-coverage': 2.0.6
       '@types/istanbul-reports': 3.0.4
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       '@types/yargs': 17.0.33
       chalk: 4.1.2
 
@@ -9138,19 +9176,19 @@ packages:
   /@tsconfig/node16@1.0.4:
     resolution: {integrity: sha512-vxhUy4J8lyeyinH7Azl1pdd43GJhZH/tP2weN8TntQblOY+A0XbT8DJk1/oCPuOOyg/Ja757rG0CgHcWC8OfMA==}
 
-  /@turbo/gen@2.5.5(@types/node@20.19.10)(typescript@5.9.2):
+  /@turbo/gen@2.5.5(@types/node@24.8.1)(typescript@5.9.2):
     resolution: {integrity: sha512-8zay4rVILdeTRLBR3rVVRLmLpvQrektMPXjwK9aze86nVwcLYxrCBYghRs88SOxk2r1qlwgg/e8UNzdkGB2UdA==}
     hasBin: true
     dependencies:
-      '@turbo/workspaces': 2.5.5(@types/node@20.19.10)
+      '@turbo/workspaces': 2.5.5(@types/node@24.8.1)
       commander: 10.0.1
       fs-extra: 10.1.0
-      inquirer: 8.2.7(@types/node@20.19.10)
+      inquirer: 8.2.7(@types/node@24.8.1)
       minimatch: 9.0.5
       node-plop: 0.26.3
       picocolors: 1.0.1
       proxy-agent: 6.5.0
-      ts-node: 10.9.2(@types/node@20.19.10)(typescript@5.9.2)
+      ts-node: 10.9.2(@types/node@24.8.1)(typescript@5.9.2)
       update-check: 1.5.4
       validate-npm-package-name: 5.0.1
     transitivePeerDependencies:
@@ -9161,7 +9199,7 @@ packages:
       - typescript
     dev: true
 
-  /@turbo/workspaces@2.5.5(@types/node@20.19.10):
+  /@turbo/workspaces@2.5.5(@types/node@24.8.1):
     resolution: {integrity: sha512-Gye68+szmOp96xMvmondTRQYcYvevDqUP9JuN9jC6kqzFel7U1pJ/hoPvyD3WGQNxyKsdF+wJ5fvNaYXkzr6tQ==}
     hasBin: true
     dependencies:
@@ -9170,7 +9208,7 @@ packages:
       fast-glob: 3.3.3
       fs-extra: 10.1.0
       gradient-string: 2.0.2
-      inquirer: 8.2.7(@types/node@20.19.10)
+      inquirer: 8.2.7(@types/node@24.8.1)
       js-yaml: 4.1.0
       ora: 4.1.1
       picocolors: 1.0.1
@@ -9439,7 +9477,7 @@ packages:
     resolution: {integrity: sha512-ZUxbzKl0IfJILTS6t7ip5fQQM/J3TJYubDm3nMbgubNNYS62eXeUpoLUC8/7fJNiFYHTrGPQn7hspDUzIHX3UA==}
     dependencies:
       '@types/minimatch': 6.0.0
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
     dev: true
 
   /@types/globalize@1.5.5:
@@ -9455,7 +9493,7 @@ packages:
   /@types/hellosign-sdk@1.6.15:
     resolution: {integrity: sha512-quURkJ5zmTtrHI7SQU2O+ht/R9teoZWxHGd6FaX/m6L8YUu5a6swhnaN2lFy+vDAeocMGM9Vj4QU7DEIDdL9Ww==}
     dependencies:
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
     dev: true
 
   /@types/hoist-non-react-statics@3.3.7(@types/react@19.1.5):
@@ -9553,7 +9591,7 @@ packages:
   /@types/node-forge@1.3.13:
     resolution: {integrity: sha512-zePQJSW5QkwSHKRApqWCVKeKoSOt4xvEnLENZPjyvm9Ezdf/EyDeJM7jqLzOwjVICQQzvLZ63T55MKdJB5H6ww==}
     dependencies:
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
 
   /@types/node@17.0.21:
     resolution: {integrity: sha512-DBZCJbhII3r90XbQxI8Y9IjjiiOGlZ0Hr32omXIZvwwZ7p4DMMXGrKXVyPfuoBOri9XNtL0UK69jYIBIsRX3QQ==}
@@ -9577,7 +9615,7 @@ packages:
   /@types/nodemailer@6.4.17:
     resolution: {integrity: sha512-I9CCaIp6DTldEg7vyUTZi8+9Vo0hi1/T8gv3C89yk1rSAAzoKQ8H8ki/jBYJSFoH/BisgLP8tkZMlQ91CIquww==}
     dependencies:
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
     dev: true
 
   /@types/normalize-package-data@2.4.4:
@@ -9698,7 +9736,7 @@ packages:
   /@types/through@0.0.33:
     resolution: {integrity: sha512-HsJ+z3QuETzP3cswwtzt2vEIiHBk/dCcHGhbmG5X3ecnwFD/lPrMpliGXxSCg03L9AhrdwA4Oz/qfspkDW+xGQ==}
     dependencies:
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
     dev: true
 
   /@types/tinycolor2@1.4.6:
@@ -11720,7 +11758,7 @@ packages:
     engines: {node: '>=12.13.0'}
     hasBin: true
     dependencies:
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       escape-string-regexp: 4.0.0
       is-wsl: 2.2.0
       lighthouse-logger: 1.4.2
@@ -15935,11 +15973,11 @@ packages:
       through: 2.3.8
     dev: true
 
-  /inquirer@8.2.7(@types/node@20.19.10):
+  /inquirer@8.2.7(@types/node@24.8.1):
     resolution: {integrity: sha512-UjOaSel/iddGZJ5xP/Eixh6dY1XghiBw4XK13rCCIJcJfyhhoul/7KhLLUGtebEj6GDYM6Vnx/mVsjx2L/mFIA==}
     engines: {node: '>=12.0.0'}
     dependencies:
-      '@inquirer/external-editor': 1.0.1(@types/node@20.19.10)
+      '@inquirer/external-editor': 1.0.1(@types/node@24.8.1)
       ansi-escapes: 4.3.2
       chalk: 4.1.2
       cli-cursor: 3.1.0
@@ -16435,7 +16473,7 @@ packages:
       '@jest/environment': 29.7.0
       '@jest/fake-timers': 29.7.0
       '@jest/types': 29.6.3
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       jest-mock: 29.7.0
       jest-util: 29.7.0
 
@@ -16462,7 +16500,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       jest-util: 29.7.0
 
   /jest-util@29.7.0:
@@ -16470,7 +16508,7 @@ packages:
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
       '@jest/types': 29.6.3
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       chalk: 4.1.2
       ci-info: 3.9.0
       graceful-fs: 4.2.11
@@ -16491,7 +16529,7 @@ packages:
     resolution: {integrity: sha512-7vuh85V5cdDofPyxn58nrPjBktZo0u9x1g8WtjQol+jZDaE+fhN+cIvTj11GndBnMnyfrUOG1sZQxCdjKh+DKg==}
     engines: {node: '>= 10.13.0'}
     dependencies:
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -16499,7 +16537,7 @@ packages:
     resolution: {integrity: sha512-eIz2msL/EzL9UFTFFx7jBTkeZfku0yUAyZZZmJ93H2TYEiroIx2PQjEXcwYtYl8zXCxb+PAmA2hLIt/6ZEkPHw==}
     engines: {node: ^14.15.0 || ^16.10.0 || >=18.0.0}
     dependencies:
-      '@types/node': 20.19.10
+      '@types/node': 24.8.1
       jest-util: 29.7.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
