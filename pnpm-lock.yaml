@@ -166,6 +166,9 @@ importers:
       '@tiptap/starter-kit':
         specifier: ^2.11.9
         version: 2.26.1
+      '@types/jspdf':
+        specifier: ^2.0.0
+        version: 2.0.0
       '@types/react-signature-canvas':
         specifier: ^1.0.7
         version: 1.0.7
@@ -9438,6 +9441,13 @@ packages:
 
   /@types/json5@0.0.29:
     resolution: {integrity: sha512-dRLjCWHYg4oaA77cxO64oO+7JwCwnIzkZPdrrC71jQmQtlhM556pwKo5bUzqvZndkVbeFLIIi+9TC40JNF5hNQ==}
+
+  /@types/jspdf@2.0.0:
+    resolution: {integrity: sha512-oonYDXI4GegGaG7FFVtriJ+Yqlh4YR3L3NVDiwCEBVG7sbya19SoGx4MW4kg1MCMRPgkbbFTck8YKJL8PrkDfA==}
+    deprecated: This is a stub types definition. jspdf provides its own type definitions, so you do not need this installed.
+    dependencies:
+      jspdf: 3.0.1
+    dev: false
 
   /@types/linkify-it@5.0.0:
     resolution: {integrity: sha512-sVDA58zAw4eWAffKOaQH5/5j3XeayukzDk+ewSsnv3p4yJEZHCCzMDiZM8e0OUrRvmpGZ85jf4yDHkHsgBNr9Q==}

@@ -12,7 +12,10 @@ import {
   MapPin,
   DollarSign,
   User,
-  MoreHorizontal
+  MoreHorizontal,
+  CheckCircle,
+  XCircle,
+  RotateCcw
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@codevs/ui/badge";
@@ -36,7 +39,7 @@ import EditJobModal from "./EditJobModal";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
-import { deleteJobListing } from "../actions";
+import { deleteJobListing, updateJobListingStatus } from "../actions";
 
 import {
   Accordion,
@@ -46,6 +49,7 @@ import {
 } from "@codevs/ui/accordion"
 interface JobWithApplicationCount extends JobListing {
   application_count?: number;
+  status?: "active" | "closed" | "draft";
   created_by_details?: {
     id: string;
     first_name: string;
@@ -62,9 +66,16 @@ export default function JobListingsTable() {
   const [loading, setLoading] = useState(true);
   const [editingJob, setEditingJob] = useState<JobListing | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+  const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'closed' | 'draft'>('all');
 
   // Check if user is admin (role_id 1 or 4)
   const isAdmin = user?.role_id === 1 || user?.role_id === 4;
+
+  // Filter jobs based on status
+  const filteredJobs = jobs.filter(job => {
+    if (statusFilter === 'all') return true;
+    return (job.status || 'active') === statusFilter;
+  });
 
   useEffect(() => {
     fetchJobListings();
@@ -183,6 +194,38 @@ export default function JobListingsTable() {
     router.push(`/home/hire/applications/${jobId}`);
   };
 
+  const handleStatusChange = async (jobId: string, newStatus: "active" | "closed" | "draft") => {
+    try {
+      const result = await updateJobListingStatus(jobId, newStatus);
+
+      if (!result.success) {
+        throw new Error(result.error || "Failed to update job status");
+      }
+
+      // Update local state
+      setJobs(prevJobs => 
+        prevJobs.map(job => 
+          job.id === jobId 
+            ? { ...job, status: newStatus }
+            : job
+        )
+      );
+
+      const statusText = newStatus === 'closed' ? 'closed' : 'reopened';
+      toast({
+        title: `Job ${statusText}`,
+        description: `The job listing has been ${statusText} successfully.`,
+      });
+    } catch (error) {
+      console.error('Status update error:', error);
+      toast({
+        title: "Failed to update status",
+        description: error instanceof Error ? error.message : "Please try again later.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const getLevelColor = (level: string) => {
     switch (level) {
       case "Entry":
@@ -213,6 +256,19 @@ export default function JobListingsTable() {
     }
   };
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "active":
+        return "bg-green-500/10 text-green-400 border-green-500/20";
+      case "closed":
+        return "bg-red-500/10 text-red-400 border-red-500/20";
+      case "draft":
+        return "bg-gray-500/10 text-gray-400 border-gray-500/20";
+      default:
+        return "bg-gray-500/10 text-muted-foreground border-gray-500/20";
+    }
+  };
+
   if (loading) {
     return (
       <div className="rounded-lg border border-gray-800 bg-gray-900/50 overflow-hidden p-8">
@@ -236,7 +292,42 @@ export default function JobListingsTable() {
   }
 
   return (
-    <div className="rounded-lg border bg-card dark:bg-blue-50/5  overflow-hidden">
+    <div className="space-y-4">
+      {/* Filter Bar */}
+      <div className="flex items-center gap-2 p-4 bg-card dark:bg-blue-50/5 rounded-lg border">
+        <span className="text-sm font-medium text-foreground mr-2">Filter by status:</span>
+        <div className="flex gap-2">
+          {[
+            { value: 'all', label: 'All', count: jobs.length },
+            { value: 'active', label: 'Active', count: jobs.filter(j => (j.status || 'active') === 'active').length },
+            { value: 'closed', label: 'Closed', count: jobs.filter(j => j.status === 'closed').length },
+            { value: 'draft', label: 'Draft', count: jobs.filter(j => j.status === 'draft').length }
+          ].map(({ value, label, count }) => (
+            <Button
+              key={value}
+              variant={statusFilter === value ? "default" : "outline"}
+              size="sm"
+              onClick={() => setStatusFilter(value as 'all' | 'active' | 'closed' | 'draft')}
+              className="text-xs"
+            >
+              {label} ({count})
+            </Button>
+          ))}
+        </div>
+      </div>
+
+      {/* Jobs Table */}
+      {filteredJobs.length === 0 ? (
+        <div className="rounded-lg border bg-card dark:border-gray-800 dark:bg-gray-900/50 p-12 text-center">
+          <p className="text-muted-foreground">
+            {statusFilter === 'all' 
+              ? "No job listings yet. Create your first job listing to get started."
+              : `No ${statusFilter} job listings found.`
+            }
+          </p>
+        </div>
+      ) : (
+      <div className="rounded-lg border bg-card dark:bg-blue-50/5 overflow-hidden">
       <div className="hidden xl:block">
         <Table className="border dark:border-gray-700">
           <TableHeader>
@@ -244,6 +335,7 @@ export default function JobListingsTable() {
               <TableHead className="text-foreground">Position</TableHead>
               <TableHead className="text-foreground">Location</TableHead>
               <TableHead className="text-foreground">Type</TableHead>
+              <TableHead className="text-foreground">Status</TableHead>
               <TableHead className="text-foreground text-center">Applications</TableHead>
               <TableHead className="text-foreground">Created By</TableHead>
               <TableHead className="text-foreground">Posted</TableHead>
@@ -251,7 +343,7 @@ export default function JobListingsTable() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {jobs.map((job) => (
+            {filteredJobs.map((job) => (
               <TableRow key={job.id} className="border-border hover:bg-muted/30 transition-colors dark:border-gray-700">
                 <TableCell>
                   <div>
@@ -277,6 +369,11 @@ export default function JobListingsTable() {
                 <TableCell>
                   <Badge variant="outline" className={getTypeColor(job.type)}>
                     {job.type}
+                  </Badge>
+                </TableCell>
+                <TableCell>
+                  <Badge variant="outline" className={getStatusColor(job.status || 'active')}>
+                    {job.status || 'active'}
                   </Badge>
                 </TableCell>
                 <TableCell className="text-center">
@@ -328,20 +425,46 @@ export default function JobListingsTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-popover border-border">
-                        <DropdownMenuItem
-                          onClick={() => handleEdit(job)}
-                          className="text-foreground hover:text-foreground hover:bg-accent"
-                        >
-                          <Edit className="mr-2 h-4 w-4" />
-                          Edit Listing
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(job.id)}
-                          className="text-destructive hover:text-destructive hover:bg-accent "
-                        >
-                          <Trash2 className="mr-2 h-4 w-4" />
-                          Delete
-                        </DropdownMenuItem>
+                        {(isAdmin || job.created_by?.id === user?.id) && (
+                          <>
+                            <DropdownMenuItem
+                              onClick={() => handleEdit(job)}
+                              className="text-foreground hover:text-foreground hover:bg-accent"
+                            >
+                              <Edit className="mr-2 h-4 w-4" />
+                              Edit Listing
+                            </DropdownMenuItem>
+                            {job.status === 'active' ? (
+                              <DropdownMenuItem
+                                onClick={() => handleStatusChange(job.id, 'closed')}
+                                className="text-orange-500 hover:text-orange-400 hover:bg-accent"
+                              >
+                                <XCircle className="mr-2 h-4 w-4" />
+                                Mark as Closed
+                              </DropdownMenuItem>
+                            ) : (
+                              <DropdownMenuItem
+                                onClick={() => handleStatusChange(job.id, 'active')}
+                                className="text-green-500 hover:text-green-400 hover:bg-accent"
+                              >
+                                <RotateCcw className="mr-2 h-4 w-4" />
+                                Reopen Position
+                              </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(job.id)}
+                              className="text-destructive hover:text-destructive hover:bg-accent "
+                            >
+                              <Trash2 className="mr-2 h-4 w-4" />
+                              Delete
+                            </DropdownMenuItem>
+                          </>
+                        )}
+                        {!isAdmin && job.created_by?.id !== user?.id && (
+                          <DropdownMenuItem disabled className="text-gray-500">
+                            No actions available
+                          </DropdownMenuItem>
+                        )}
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </div>
@@ -355,7 +478,7 @@ export default function JobListingsTable() {
       {/* Mobile Accordion */}
       <div className="xl:hidden">
         <Accordion type="single" collapsible className="w-full">
-          {jobs.map((job) => (
+          {filteredJobs.map((job) => (
             <AccordionItem key={job.id} value={job.id}>
               <AccordionTrigger className="px-4 py-3 text-left [&>svg]:text-foreground">
                 <div className="w-full">
@@ -367,6 +490,9 @@ export default function JobListingsTable() {
                     </Badge>
                     <Badge variant="outline" className={getTypeColor(job.type)} >
                       {job.type}
+                    </Badge>
+                    <Badge variant="outline" className={getStatusColor(job.status || 'active')} >
+                      {job.status || 'active'}
                     </Badge>
                     {job.remote && (
                       <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20" >
@@ -496,7 +622,7 @@ export default function JobListingsTable() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-popover border-border dark:bg-gray-900 dark:border-gray-800">
-                      {(isAdmin || job.created_by === user?.id) && (
+                      {(isAdmin || job.created_by?.id === user?.id) && (
                         <>
                           <DropdownMenuItem
                             onClick={(e) => {
@@ -509,6 +635,31 @@ export default function JobListingsTable() {
                             <Edit className="mr-2 h-4 w-4" />
                             Edit Listing
                           </DropdownMenuItem>
+                          {job.status === 'active' ? (
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleStatusChange(job.id, 'closed');
+                              }}
+                              className="text-orange-400 hover:text-orange-300 hover:bg-gray-800 cursor-pointer"
+                            >
+                              <XCircle className="mr-2 h-4 w-4" />
+                              Mark as Closed
+                            </DropdownMenuItem>
+                          ) : (
+                            <DropdownMenuItem
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleStatusChange(job.id, 'active');
+                              }}
+                              className="text-green-400 hover:text-green-300 hover:bg-gray-800 cursor-pointer"
+                            >
+                              <RotateCcw className="mr-2 h-4 w-4" />
+                              Reopen Position
+                            </DropdownMenuItem>
+                          )}
                           <DropdownMenuItem
                             onClick={(e) => {
                               e.preventDefault();
@@ -522,7 +673,7 @@ export default function JobListingsTable() {
                           </DropdownMenuItem>
                         </>
                       )}
-                      {!isAdmin && job.created_by !== user?.id && (
+                      {!isAdmin && job.created_by?.id !== user?.id && (
                         <DropdownMenuItem disabled className="text-gray-500">
                           No actions available
                         </DropdownMenuItem>
@@ -543,6 +694,8 @@ export default function JobListingsTable() {
         onClose={handleEditModalClose}
         onJobUpdated={handleJobUpdated}
       />
+      </div>
+      )}
     </div>
   );
 }
