@@ -1,0 +1,32 @@
+// utils/supabase.bot.ts
+import { createClient } from "@supabase/supabase-js";
+import dotenv from "dotenv";
+import path from "path";
+
+// Load environment variables from the correct path
+// Adjust the path based on where your .env file is located
+dotenv.config({ path: path.resolve(__dirname, "../.env") });
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseServiceRole = process.env.DB_SERVICE_ROLE;
+
+// Validate environment variables
+if (!supabaseUrl) {
+  console.error("❌ Missing NEXT_PUBLIC_SUPABASE_URL in .env file");
+  throw new Error("NEXT_PUBLIC_SUPABASE_URL is required in environment variables");
+}
+
+if (!supabaseServiceRole) {
+  console.error("❌ Missing DB_SERVICE_ROLE in .env file");
+  throw new Error("DB_SERVICE_ROLE is required in environment variables");
+}
+
+// Create and export Supabase client
+export const supabaseBot = createClient(supabaseUrl, supabaseServiceRole, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false,
+  },
+});
+
+console.log("✅ Supabase bot client initialized successfully");
