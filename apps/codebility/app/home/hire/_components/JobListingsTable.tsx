@@ -622,7 +622,7 @@ export default function JobListingsTable() {
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-popover border-border dark:bg-gray-900 dark:border-gray-800">
-                      {(isAdmin || job.created_by === user?.id) && (
+                      {(isAdmin || job.created_by?.id === user?.id) && (
                         <>
                           <DropdownMenuItem
                             onClick={(e) => {
@@ -673,7 +673,7 @@ export default function JobListingsTable() {
                           </DropdownMenuItem>
                         </>
                       )}
-                      {!isAdmin && job.created_by !== user?.id && (
+                      {!isAdmin && job.created_by?.id !== user?.id && (
                         <DropdownMenuItem disabled className="text-gray-500">
                           No actions available
                         </DropdownMenuItem>
