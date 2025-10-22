@@ -278,3 +278,69 @@ export async function deleteJobApplication(applicationId: string, jobId: string)
     return { success: false, error: "An unexpected error occurred" };
   }
 }
+
+export async function updateJobListingStatus(
+  jobId: string, 
+  status: "active" | "closed" | "draft"
+) {
+  try {
+    const supabase = await createClientServerComponent();
+
+    // Get the current user
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return { success: false, error: "Unauthorized" };
+    }
+
+    // Get user details to check role
+    const { data: userData } = await supabase
+      .from('codev')
+      .select('id, role_id')
+      .eq('id', user.id)
+      .single();
+
+    if (!userData) {
+      return { success: false, error: "User not found" };
+    }
+
+    // Check if user is admin (role_id 1 or 4)
+    const isAdmin = userData.role_id === 1 || userData.role_id === 4;
+
+    // Get the job to check ownership
+    const { data: job } = await supabase
+      .from('job_listings')
+      .select('created_by, status')
+      .eq('id', jobId)
+      .single();
+
+    if (!job) {
+      return { success: false, error: "Job not found" };
+    }
+
+    // Check permissions
+    if (!isAdmin && job.created_by !== userData.id) {
+      return { success: false, error: "You don't have permission to update this job" };
+    }
+
+    // Update the job status
+    const { data: updatedJob, error } = await supabase
+      .from('job_listings')
+      .update({
+        status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', jobId)
+      .select()
+      .single();
+
+    if (error) {
+      console.error("Update status error:", error);
+      return { success: false, error: error.message };
+    }
+
+    return { success: true, data: updatedJob };
+  } catch (error) {
+    console.error("Server action error:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}

@@ -29,6 +29,13 @@ export const settingsCardData: SettingsCardDataProps[] = [
     description: "Manage news and announcements displayed on home page.",
   },
   {
+    path: "/home/settings/services",
+    imageName: "icon-paper-plane",
+    imageAlt: "Icon Services",
+    title: "Services",
+    description: "View all services and download as PDF.",
+  },
+  {
     path: "/home/settings/account-settings",
     imageName: "icon-cog",
     imageAlt: "Icon Account",
