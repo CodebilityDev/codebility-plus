@@ -359,6 +359,7 @@
 │   │   ├── (dashboard)
 │   │   │   ├── _components
 │   │   │   │   ├── DashboardCalendar.tsx
+│   │   │   │   ├── DashboardCareerOpportunities.tsx
 │   │   │   │   ├── DashboardCertificate.tsx
 │   │   │   │   ├── DashboardCertificateIcons.tsx
 │   │   │   │   ├── DashboardCompleteProfile.tsx
@@ -391,6 +392,7 @@
 │   │   │   ├── Navbar.tsx
 │   │   │   ├── NavbarContent.tsx
 │   │   │   ├── NavigationOptimizer.tsx
+│   │   │   ├── NewsBanner.tsx
 │   │   │   ├── OptimizedLayout.tsx
 │   │   │   ├── PageContainer.tsx
 │   │   │   ├── PageLoadingAnimation.tsx
@@ -484,9 +486,12 @@
 │   │   │   │   ├── EditPostForm.tsx
 │   │   │   │   ├── Feed.tsx
 │   │   │   │   ├── MarkdownEditor.tsx
-│   │   │   │   ├── Post.tsx
+│   │   │   │   ├── PostCard.tsx
 │   │   │   │   ├── PostUpvote.tsx
 │   │   │   │   ├── PostView.tsx
+│   │   │   │   ├── PostViewCommentItem.tsx
+│   │   │   │   ├── PostViewCommentList.tsx
+│   │   │   │   ├── PostViewCreateComment.tsx
 │   │   │   │   └── ThumbnailUpload.tsx
 │   │   │   ├── _services
 │   │   │   │   ├── action.ts
@@ -676,6 +681,12 @@
 │   │   │   ├── _components
 │   │   │   │   └── SettingsCard.tsx
 │   │   │   ├── account-settings
+│   │   │   │   └── page.tsx
+│   │   │   ├── news-banners
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── BannerImageUpload.tsx
+│   │   │   │   │   └── NewsBannerForm.tsx
+│   │   │   │   ├── actions.ts
 │   │   │   │   └── page.tsx
 │   │   │   ├── profile
 │   │   │   │   ├── _components
@@ -958,6 +969,9 @@
 │       ├── 20250118_fix_notification_preferences.sql
 │       ├── 20250119_add_excused_status_to_attendance.sql
 │       ├── 20250119_create_meetings_table.sql
+│       ├── add_dummy_news_banners.sql
+│       ├── add_image_url_to_news_banners.sql
+│       ├── create_news_banner_system.sql
 │       ├── create_notification_system.sql
 │       ├── fix_notification_rls_policies.sql
 │       └── simple_notification_fix.sql
@@ -999,4 +1013,4 @@
 ├── tree_output.txt
 └── tsconfig.json
 
-226 directories, 774 files
+228 directories, 786 files

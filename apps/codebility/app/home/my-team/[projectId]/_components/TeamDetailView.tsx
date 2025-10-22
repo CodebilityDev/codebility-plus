@@ -10,8 +10,9 @@ import {
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock } from "lucide-react";
+import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock, CheckSquare } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
+import ChecklistCreateModal from "../../_components/ChecklistCreateModal"; // NEW
 import AttendanceGrid from "./AttendanceGrid";
 import MeetingBasedAttendance from "./MeetingBasedAttendance";
 import CompactMemberGrid from "./CompactMemberGrid";
@@ -41,10 +42,11 @@ interface TeamDetailViewProps {
 const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [project, setProject] = useState(projectData);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showChecklistModal, setShowChecklistModal] = useState(false); // NEW
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
   const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
-  const [useMeetingBasedAttendance, setUseMeetingBasedAttendance] = useState(true); // Use meeting-based attendance by default
+  const [useMeetingBasedAttendance, setUseMeetingBasedAttendance] = useState(true);
   const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
   const [currentSchedule, setCurrentSchedule] = useState<{ selectedDays: string[]; time: string } | null>(null);
   const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ totalPoints: number; presentDays: number }>({ totalPoints: 0, presentDays: 0 });
@@ -85,7 +87,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       }
     };
     
-    // Only load on initial mount or when switching to team view
     if (viewMode === 'team') {
       loadAttendancePoints();
     }
@@ -121,11 +122,24 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     setShowAddModal(false);
   };
 
+  // NEW: Handle checklist modal
+  const handleOpenChecklistModal = () => {
+    setShowChecklistModal(true);
+  };
+
+  const handleCloseChecklistModal = () => {
+    setShowChecklistModal(false);
+  };
+
+  const handleChecklistSuccess = () => {
+    toast.success("Task created successfully!");
+    handleCloseChecklistModal();
+  };
+
   const handleSaveAttendance = useCallback(async () => {
     if (attendanceGridRef.current?.saveAllAttendance) {
       await attendanceGridRef.current.saveAllAttendance();
 
-      // Refresh attendance points after saving
       const currentDate = new Date();
       const result = await getTeamMonthlyAttendancePoints(
         projectInfo.id,
@@ -146,7 +160,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     try {
       setIsLoadingMembers(true);
 
-      // Get current team lead
       const teamLeadResult = await getTeamLead(projectInfo.id);
       const teamLead = teamLeadResult.data;
 
@@ -154,7 +167,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         throw new Error('Team leader not found');
       }
 
-      // Prepare updated members array
       const updatedMembers = [
         {
           ...teamLead,
@@ -170,7 +182,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           })),
       ];
 
-      // Update project members
       const result = await updateProjectMembers(
         projectInfo.id,
         updatedMembers,
@@ -180,7 +191,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       if (result.success) {
         toast.success("Project members updated successfully.");
 
-        // Update local state
         const updatedProjectMembers: SimpleMemberData[] = selectedMembers
           .filter(member => member.id !== teamLead.id)
           .map(member => ({
@@ -212,10 +222,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   };
 
   const handleScheduleUpdate = async () => {
-    // Close modal and reload schedule
     setShowScheduleMeetingModal(false);
 
-    // Reload the schedule after a short delay to ensure the save is complete
     setTimeout(async () => {
       const result = await getMeetingSchedule(projectInfo.id);
       if (result.success && result.schedule) {
@@ -229,7 +237,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       <div className="space-y-6">
         {/* Attendance Warning Banner */}
         {viewMode === "attendance" && (
-
           <AttendanceWarningBanner 
             projectId={projectInfo.id} 
             isTeamLead={isTeamLead || !currentUserId}
@@ -256,28 +263,27 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           </div>
         )}
 
-        {/* Header */}
+        {/* Header with Tab Buttons */}
         <div className="flex items-center justify-between">
+          {/* LEFT: View Mode Tabs + Checklist Button */}
           <div className="flex items-center gap-2">
             <Button
               variant={viewMode === "team" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("team")}
-
               className={`flex items-center gap-2 ${
                 viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
               }`}
-
             >
               <Users className="h-4 w-4" />
               Team View
             </Button>
+            
             {(isTeamLead || !currentUserId) && (
               <Button
                 variant={viewMode === "attendance" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setViewMode("attendance")}
-
                 className={`flex items-center gap-2 ${
                   viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
                 }`}
@@ -286,7 +292,22 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 Attendance
               </Button>
             )}
+
+            {/* NEW: Checklist Button - Only for team leads */}
+            {isTeamLead && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleOpenChecklistModal}
+                className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+              >
+                <CheckSquare className="h-4 w-4" />
+                Checklist
+              </Button>
+            )}
           </div>
+
+          {/* RIGHT: Action Buttons */}
           <div className="flex gap-2">
             {viewMode === "attendance" && (
               <>
@@ -408,7 +429,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 members={members?.data || []}
                 teamLead={teamLead?.data || null}
                 projectId={projectInfo.id || null}
-
               />
             ) : (
               <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 py-12 dark:border-gray-700">
@@ -480,6 +500,21 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         teamLead={teamLead?.data || null}
         currentSchedule={currentSchedule}
       />
+
+      {/* NEW: Checklist Create Modal */}
+      {isTeamLead && (
+        <ChecklistCreateModal
+          isOpen={showChecklistModal}
+          projectId={projectInfo.id}
+          projectName={projectInfo.name}
+          teamMembers={[
+            ...(teamLead?.data ? [teamLead.data] : []),
+            ...(members?.data || [])
+          ]}
+          onClose={handleCloseChecklistModal}
+          onSuccess={handleChecklistSuccess}
+        />
+      )}
     </>
   );
 };
