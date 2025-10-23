@@ -1,4 +1,4 @@
-// app/bot/events/guildMemberRemove.ts
+// apps/bot/events/guildMemberRemove.ts
 import { Events, GuildMember, PartialGuildMember } from "discord.js";
 import { supabaseBot } from "../utils/supabase.bot";
 

@@ -1,4 +1,4 @@
-// app/bot/commands/resetXP.ts
+// apps/bot/commands/resetXP.ts
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,

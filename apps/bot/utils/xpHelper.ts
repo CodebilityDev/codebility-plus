@@ -1,9 +1,11 @@
-// app/bot/utils/xpHelper.ts
+// apps/bot/utils/xpHelper.ts
 import { supabaseBot } from "./supabase.bot";
+import { xpForLevel } from "./xpConstants"; // ✅ shared XP formula
 
-/**
- * XP Configuration interface matching database schema
- */
+// ---------------------------
+// Types
+// ---------------------------
+
 export interface XPConfig {
   id: number;
   guild_id: string;
@@ -16,9 +18,6 @@ export interface XPConfig {
   created_at?: string;
 }
 
-/**
- * User Stats interface matching database schema
- */
 export interface UserStats {
   id: number;
   guild_id: string;
@@ -31,22 +30,16 @@ export interface UserStats {
   active: boolean;
 }
 
-/**
- * Get or create guild XP configuration
- */
-export async function getOrCreateXPConfig(
-  guild_id: string
-): Promise<XPConfig | null> {
-  if (!guild_id) {
-    console.error("❌ xpHelper: guild_id is required");
-    return null;
-  }
+// ---------------------------
+// Guild XP Config
+// ---------------------------
+export async function getOrCreateXPConfig(guild_id: string): Promise<XPConfig | null> {
+  if (!guild_id) return null;
 
-  // Try to get existing config
   const { data, error } = await supabaseBot
     .from("xp_config_discord")
     .select("*")
-    .eq("guild_id", guild_id) // String, not BigInt
+    .eq("guild_id", guild_id)
     .maybeSingle();
 
   if (error) {
@@ -56,9 +49,9 @@ export async function getOrCreateXPConfig(
 
   if (data) return data as XPConfig;
 
-  // Create default config
+  // Create default
   const defaultConfig = {
-    guild_id, // String, not BigInt
+    guild_id,
     min_xp: 5,
     max_xp: 15,
     cooldown: 60,
@@ -81,25 +74,20 @@ export async function getOrCreateXPConfig(
   return newConfig as XPConfig;
 }
 
-/**
- * Get or create user XP stats
- */
+// ---------------------------
+// User XP
+// ---------------------------
 export async function getUserXP(
   guild_id: string,
-  user_id: string,
-  username?: string
+  user_id: string
 ): Promise<UserStats | null> {
-  if (!guild_id || !user_id) {
-    console.error("❌ xpHelper: guild_id and user_id are required");
-    return null;
-  }
+  if (!guild_id || !user_id) return null;
 
-  // Try to get existing stats
   const { data, error } = await supabaseBot
     .from("user_stats_discord")
     .select("*")
-    .eq("guild_id", guild_id) // String, not BigInt
-    .eq("user_id", user_id)   // String, not BigInt
+    .eq("guild_id", guild_id)
+    .eq("user_id", user_id)
     .maybeSingle();
 
   if (error) {
@@ -109,12 +97,12 @@ export async function getUserXP(
 
   if (data) return data as UserStats;
 
-  // Create new stats entry
-  const newData = {
-    guild_id, // String, not BigInt
-    user_id,  // String, not BigInt
+  // Create new user stats
+  const newData: Omit<UserStats, "id" | "updated_at"> = {
+    guild_id,
+    user_id,
     xp: 0,
-    level: 1, // Start at level 1, not 0
+    level: 0,
     total_messages: 0,
     last_message_at: new Date().toISOString(),
     active: true,
@@ -135,30 +123,25 @@ export async function getUserXP(
   return newStats as UserStats;
 }
 
-/**
- * Update user XP and level
- */
+// ---------------------------
+// Update User XP
+// ---------------------------
 export async function updateUserXP(
   guild_id: string,
   user_id: string,
   xp: number,
   level: number,
-  incrementMessages: boolean = true
+  incrementMessages = true
 ): Promise<boolean> {
-  if (!guild_id || !user_id) {
-    console.error("❌ xpHelper: guild_id and user_id are required");
-    return false;
-  }
+  if (!guild_id || !user_id) return false;
 
-  const updateData: any = {
+  const updateData: Partial<UserStats> = {
     xp,
     level,
     last_message_at: new Date().toISOString(),
   };
 
-  // Optionally increment message count
   if (incrementMessages) {
-    // Get current message count first
     const { data: currentStats } = await supabaseBot
       .from("user_stats_discord")
       .select("total_messages")
@@ -172,8 +155,8 @@ export async function updateUserXP(
   const { error } = await supabaseBot
     .from("user_stats_discord")
     .update(updateData)
-    .eq("guild_id", guild_id) // String, not BigInt
-    .eq("user_id", user_id);  // String, not BigInt
+    .eq("guild_id", guild_id)
+    .eq("user_id", user_id);
 
   if (error) {
     console.error("❌ xpHelper: Error updating user XP:", error.message);
@@ -183,89 +166,50 @@ export async function updateUserXP(
   return true;
 }
 
-/**
- * Calculate XP needed for next level
- */
+// ---------------------------
+// XP & Level calculations
+// ---------------------------
 export function getXPForLevel(level: number): number {
-  return 100 * (level + 1);
+  return xpForLevel(level);
 }
 
-/**
- * Calculate level from total XP
- */
 export function getLevelFromXP(totalXP: number): number {
-  let level = 1;
-  let xpNeeded = getXPForLevel(level);
-  let currentXP = totalXP;
-
-  while (currentXP >= xpNeeded) {
-    currentXP -= xpNeeded;
+  let level = 0;
+  let remaining = totalXP;
+  while (remaining >= xpForLevel(level)) {
+    remaining -= xpForLevel(level);
     level++;
-    xpNeeded = getXPForLevel(level);
   }
-
   return level;
 }
 
-/**
- * Check if user has leveled up
- */
-export function checkLevelUp(currentXP: number, currentLevel: number): {
-  leveledUp: boolean;
-  newLevel: number;
-  newXP: number;
-} {
-  const xpNeeded = getXPForLevel(currentLevel);
-
-  if (currentXP >= xpNeeded) {
-    return {
-      leveledUp: true,
-      newLevel: currentLevel + 1,
-      newXP: currentXP, // Keep total XP
-    };
-  }
-
+export function checkLevelUp(currentXP: number, currentLevel: number) {
+  const xpNeeded = xpForLevel(currentLevel);
+  const leveledUp = currentXP >= xpNeeded;
   return {
-    leveledUp: false,
-    newLevel: currentLevel,
+    leveledUp,
+    newLevel: leveledUp ? currentLevel + 1 : currentLevel,
     newXP: currentXP,
   };
 }
 
-/**
- * Get random XP gain within min and max range
- */
 export function getRandomXP(minXP: number, maxXP: number): number {
   return Math.floor(Math.random() * (maxXP - minXP + 1)) + minXP;
 }
 
-/**
- * Check if user is on cooldown
- */
-export function isOnCooldown(
-  lastMessageAt: string | null,
-  cooldownSeconds: number
-): boolean {
+export function isOnCooldown(lastMessageAt: string | null, cooldownSeconds: number): boolean {
   if (!lastMessageAt) return false;
-
-  const lastMessageTime = new Date(lastMessageAt).getTime();
-  const now = Date.now();
-  const cooldownMs = cooldownSeconds * 1000;
-
-  return now - lastMessageTime < cooldownMs;
+  return Date.now() - new Date(lastMessageAt).getTime() < cooldownSeconds * 1000;
 }
 
-/**
- * Get user's rank in a guild
- */
+// ---------------------------
+// User Rank
+// ---------------------------
 export async function getUserRank(
   guild_id: string,
   user_id: string
 ): Promise<{ rank: number; totalUsers: number } | null> {
-  if (!guild_id || !user_id) {
-    console.error("❌ xpHelper: guild_id and user_id are required");
-    return null;
-  }
+  if (!guild_id || !user_id) return null;
 
   const { data: allUsers, error } = await supabaseBot
     .from("user_stats_discord")
@@ -280,12 +224,29 @@ export async function getUserRank(
     return null;
   }
 
-  if (!allUsers || allUsers.length === 0) {
-    return { rank: 0, totalUsers: 0 };
-  }
+  if (!allUsers || allUsers.length === 0) return { rank: 0, totalUsers: 0 };
 
   const rank = allUsers.findIndex((u) => u.user_id === user_id) + 1;
-  const totalUsers = allUsers.length;
+  return { rank, totalUsers: allUsers.length };
+}
 
-  return { rank, totalUsers };
+
+
+
+
+export function getLevelProgress(totalXP: number) {
+  let level = 0;
+  let remainingXP = totalXP;
+
+  while (remainingXP >= xpForLevel(level)) {
+    remainingXP -= xpForLevel(level);
+    level++;
+  }
+
+  return {
+    level,
+    xpIntoLevel: remainingXP,
+    xpToNextLevel: xpForLevel(level) - remainingXP,
+    totalXP,
+  };
 }

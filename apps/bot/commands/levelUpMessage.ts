@@ -1,4 +1,4 @@
-// app/bot/commands/levelUpMessage.ts
+// apps/bot/commands/levelUpMessage.ts
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,

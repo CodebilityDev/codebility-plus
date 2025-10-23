@@ -1,4 +1,4 @@
-// app/bot/commands/leaderboard.ts
+// apps/bot/commands/leaderboard.ts
 import { 
   SlashCommandBuilder, 
   ChatInputCommandInteraction, 

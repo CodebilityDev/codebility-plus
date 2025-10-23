@@ -1,4 +1,4 @@
-// app/bot/events/messageCreate.ts
+// apps/bot/events/messageCreate.ts
 import { Events, Client, Message } from "discord.js";
 import { handleXP } from "../utils/xpSystem";
 

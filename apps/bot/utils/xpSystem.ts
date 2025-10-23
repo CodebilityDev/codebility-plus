@@ -1,7 +1,9 @@
-// app/bot/utils/xpSystem.ts
+// apps/bot/utils/xpSystem.ts
 import { supabaseBot } from "./supabase.bot";
 import { Message, TextChannel } from "discord.js";
+import { getLevelProgress } from "./xpHelper"; // ✅ updated import
 
+/** XP configuration for each guild */
 interface XPConfig {
   minXP: number;
   maxXP: number;
@@ -10,11 +12,12 @@ interface XPConfig {
   levelUpMessage?: string;
 }
 
+// In-memory cooldown map
 const cooldowns = new Map<string, number>();
 
-/**
- * Ensures user exists in users_discord table
- */
+// ---------------------------
+// Ensure User Exists
+// ---------------------------
 async function ensureUserExists(
   userId: string,
   username: string,
@@ -45,9 +48,9 @@ async function ensureUserExists(
   }
 }
 
-/**
- * Ensures guild exists in guilds_discord table
- */
+// ---------------------------
+// Ensure Guild Exists
+// ---------------------------
 async function ensureGuildExists(
   guildId: string,
   guildName: string,
@@ -79,6 +82,9 @@ async function ensureGuildExists(
   }
 }
 
+// ---------------------------
+// Handle XP
+// ---------------------------
 export async function handleXP(message: Message) {
   if (message.author.bot || !message.guild) return;
 
@@ -87,19 +93,10 @@ export async function handleXP(message: Message) {
   const username = message.author.username;
   const avatarUrl = message.author.displayAvatarURL();
   const guildName = message.guild.name;
-
-  console.log("🎯 handleXP called:", {
-    userId,
-    username,
-    guildId,
-    messageId: message.id,
-  });
-
   const now = Date.now();
 
   try {
-    // Ensure user and guild exist (for foreign key constraints)
-    console.log("👤 Ensuring user and guild exist...");
+    // Ensure user and guild exist
     const [userExists, guildExists] = await Promise.all([
       ensureUserExists(
         userId,
@@ -115,14 +112,9 @@ export async function handleXP(message: Message) {
       ),
     ]);
 
-    if (!userExists || !guildExists) {
-      console.error("❌ Failed to ensure user or guild exists");
-      return;
-    }
-    console.log("✅ User and guild ensured");
+    if (!userExists || !guildExists) return;
 
     // Fetch XP config
-    console.log("⚙️ Fetching XP config...");
     const { data: configData, error: configError } = await supabaseBot
       .from("xp_config_discord")
       .select("*")
@@ -137,14 +129,10 @@ export async function handleXP(message: Message) {
       cooldown: configData?.cooldown ?? 60,
       levelUpChannel: configData?.levelup_channel ?? null,
       levelUpMessage:
-        configData?.levelup_message ??
-        "🎉 {user} leveled up to **Level {level}**!",
+        configData?.levelup_message ?? "🎉 {user} leveled up to **Level {level}**!",
     };
 
-    console.log("📋 Config:", config);
-
     // Fetch user stats
-    console.log("📊 Fetching user stats...");
     const { data: userData, error: statsError } = await supabaseBot
       .from("user_stats_discord")
       .select("*")
@@ -155,47 +143,33 @@ export async function handleXP(message: Message) {
     if (statsError) console.error("❌ Error fetching user stats:", statsError);
 
     const currentXP = userData?.xp ?? 0;
-    const currentLevel = userData?.level ?? 1;
+    const currentLevel = userData?.level ?? 0;
     const totalMessages = (userData?.total_messages ?? 0) + 1;
-    const lastMessageAt = userData?.last_message_at
-      ? new Date(userData.last_message_at).getTime()
-      : 0;
 
-    // Cooldown
-    const timeSinceLastMessage = now - lastMessageAt;
-    const cooldownMs = config.cooldown * 1000;
-    if (timeSinceLastMessage < cooldownMs) {
-      console.log("⏭️ Skipping XP: User is on cooldown");
-      return;
-    }
+    // Cooldown check
+    const cooldownKey = `${guildId}:${userId}`;
+    const lastAction = cooldowns.get(cooldownKey) ?? 0;
+    if (now - lastAction < config.cooldown * 1000) return;
+    cooldowns.set(cooldownKey, now);
 
-    // Calculate XP gain
+    // XP gain
     const gainedXP =
       Math.floor(Math.random() * (config.maxXP - config.minXP + 1)) +
       config.minXP;
-    const newXP = currentXP + gainedXP;
-    let newLevel = currentLevel;
-    let leveledUp = false;
-    const nextLevelXP = 100 * (currentLevel + 1);
+    const totalXP = currentXP + gainedXP;
 
-    if (newXP >= nextLevelXP) {
-      leveledUp = true;
-      newLevel++;
-    }
+    const progress = getLevelProgress(totalXP);
+    const newLevel = progress.level;
+    const leveledUp = newLevel > currentLevel;
 
-    console.log(
-      `💎 XP gained: ${gainedXP} | ${currentXP} → ${newXP} | Level: ${currentLevel} → ${newLevel}`
-    );
-
-    // ✅ FIX: Remove username (belongs to users_discord, not user_stats_discord)
-    console.log("💾 Updating user stats...");
+    // Update stats
     const { error: updateError } = await supabaseBot
       .from("user_stats_discord")
       .upsert(
         {
           guild_id: guildId,
           user_id: userId,
-          xp: newXP,
+          xp: totalXP,
           level: newLevel,
           total_messages: totalMessages,
           last_message_at: new Date().toISOString(),
@@ -204,118 +178,46 @@ export async function handleXP(message: Message) {
         { onConflict: "guild_id,user_id" }
       );
 
-    if (updateError) {
-      console.error("❌ Error updating user stats:", updateError);
-      return;
-    }
-    console.log("✅ User stats updated successfully");
+    if (updateError) console.error("❌ Error updating user stats:", updateError);
 
-    // Log XP gain
-    console.log("📝 Logging XP gain...");
-    const logPayload = {
-      guild_id: guildId,
-      user_id: userId,
-      message_id: message.id,
-      xp_earned: gainedXP,
-      reason: "Message XP",
-    };
-
-    const { error: logError, data: logData } = await supabaseBot
+    // Log XP
+    const { error: logError } = await supabaseBot
       .from("xp_logs_discord")
-      .insert(logPayload)
-      .select();
+      .insert({
+        guild_id: guildId,
+        user_id: userId,
+        message_id: message.id,
+        xp_earned: gainedXP,
+        reason: "Message XP",
+      });
 
-    if (logError) {
-      console.error("❌ Error logging XP:", logError);
-    } else {
-      console.log("✅ XP logged successfully:", logData);
-    }
-
-    // Level-up handler
+    if (logError) console.error("❌ Error logging XP:", logError);
+    
+    // Handle level-up
     if (leveledUp) {
-      console.log(`🎉 ${username} leveled up to ${newLevel}!`);
+      // Use the level-up message from config, default if missing
+      const template =
+        config.levelUpMessage || "🎉 {user} leveled up to **Level {level}**!";
+      
+      const announcement = template
+        .replace("{user}", `<@${userId}>`)
+        .replace("{level}", newLevel.toString());
 
-      const { data: levelupConfig } = await supabaseBot
-        .from("levelup_messages_discord")
-        .select("*")
-        .eq("guild_id", guildId)
-        .maybeSingle();
+      try {
+        let targetChannel: TextChannel | null = null;
+        const channelId = config.levelUpChannel ?? null;
 
-      if (levelupConfig && levelupConfig.is_enabled) {
-        const template =
-          levelupConfig.message_template || config.levelUpMessage;
-        const announcement = template
-          .replace("{user}", `<@${userId}>`)
-          .replace("{level}", newLevel.toString());
-
-        try {
-          let targetChannel: TextChannel | null = null;
-          if (levelupConfig.channel_id) {
-            const configuredChannel = message.guild.channels.cache.get(
-              levelupConfig.channel_id
-            );
-            if (configuredChannel?.isTextBased()) {
-              targetChannel = configuredChannel as TextChannel;
-            }
-          }
-
-          if (!targetChannel && message.channel.isTextBased()) {
-            targetChannel = message.channel as TextChannel;
-          }
-
-          if (targetChannel) {
-            await targetChannel.send(announcement);
-            console.log("✅ Level-up message sent");
-          }
-        } catch (err) {
-          console.error("❌ Error sending level-up message:", err);
+        if (channelId) {
+          const ch = message.guild.channels.cache.get(channelId);
+          if (ch?.isTextBased()) targetChannel = ch as TextChannel;
         }
-      }
 
-      // Rewards
-      const { data: rewards, error: rewardsError } = await supabaseBot
-        .from("level_rewards_discord")
-        .select("*")
-        .eq("guild_id", guildId)
-        .eq("level", newLevel);
+        if (!targetChannel && message.channel.isTextBased())
+          targetChannel = message.channel as TextChannel;
 
-      if (rewardsError) {
-        console.error("❌ Error fetching rewards:", rewardsError);
-      } else if (rewards && rewards.length > 0) {
-        const member = await message.guild.members
-          .fetch(userId)
-          .catch(() => null);
-
-        if (member) {
-          for (const reward of rewards) {
-            if (reward.reward_type === "role") {
-              const role = message.guild.roles.cache.get(reward.reward_value);
-              if (role) {
-                await member.roles.add(role).catch((err) => {
-                  console.error(`❌ Error adding role ${role.name}:`, err);
-                });
-                console.log(
-                  `✅ Awarded role ${role.name} to ${username} (Level ${newLevel})`
-                );
-              }
-            } else if (reward.reward_type === "badge") {
-              const { error: badgeError } = await supabaseBot
-                .from("user_badges_discord")
-                .insert({
-                  user_id: userId,
-                  badge_id: parseInt(reward.reward_value),
-                });
-
-              if (badgeError && badgeError.code !== "23505") {
-                console.error("❌ Error awarding badge:", badgeError.message);
-              } else if (!badgeError) {
-                console.log(
-                  `✅ Awarded badge ${reward.reward_value} to ${username}`
-                );
-              }
-            }
-          }
-        }
+        if (targetChannel) await targetChannel.send(announcement);
+      } catch (err) {
+        console.error("❌ Error sending level-up message:", err);
       }
     }
   } catch (error) {

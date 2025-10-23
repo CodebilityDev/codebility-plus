@@ -1,4 +1,4 @@
-// app/bot/index.ts
+// apps/bot/index.ts
 import {
   Client,
   GatewayIntentBits,
@@ -12,10 +12,22 @@ import * as path from "path";
 import * as fs from "fs";
 import { handleXP } from "./utils/xpSystem";
 
-// Load environment variables
-dotenv.config({ path: path.resolve(__dirname, "../../.env") });
+// =============================
+// ✅ Load environment variables reliably
+// =============================
+const envPath =
+  process.env.ENV_PATH ||
+  path.resolve(process.cwd(), ".env"); // Load from current working directory
 
-// Extend Client to include command collection
+if (!fs.existsSync(envPath)) {
+  console.warn(`⚠️ .env file not found at ${envPath}. Environment variables may be missing.`);
+}
+
+dotenv.config({ path: envPath });
+
+// =============================
+// 🔹 Extend Client to include command collection
+// =============================
 declare module "discord.js" {
   interface Client {
     commands: Collection<string, any>;

@@ -1,4 +1,4 @@
-// app/bot/commands/rankCard.ts
+// apps/bot/commands/rankCard.ts
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,

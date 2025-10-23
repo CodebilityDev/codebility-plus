@@ -1,4 +1,4 @@
-// app/bot/events/guildCreate.ts
+// apps/bot/events/guildCreate.ts
 import { Events, Guild } from "discord.js";
 import { supabaseBot } from "../utils/supabase.bot";
 

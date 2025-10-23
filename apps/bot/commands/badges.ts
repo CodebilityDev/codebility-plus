@@ -1,4 +1,4 @@
-// app/bot/commands/badges.ts
+// apps/bot/commands/badges.ts
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,

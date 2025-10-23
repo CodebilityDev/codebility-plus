@@ -1,4 +1,4 @@
-// app/bot/utils/configStore.ts
+// apps/bot/utils/configStore.ts
 import { supabaseBot } from "./supabase.bot";
 
 export interface XPConfig {

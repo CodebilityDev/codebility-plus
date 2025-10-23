@@ -1,4 +1,4 @@
-// app/bot/commands/configXP.ts
+// apps/bot/commands/configXP.ts
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
