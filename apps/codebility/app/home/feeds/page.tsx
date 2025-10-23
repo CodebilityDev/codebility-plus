@@ -7,22 +7,28 @@ import { useUserStore } from "@/store/codev-store";
 import { MessageSquareText } from "lucide-react";
 
 import Feed from "./_components/Feed";
-import { getUserRole } from "./_services/action";
+import { getSocialPoints, getUserRole } from "./_services/action";
 
 export default function FeedsPage() {
   const [isAdmin, setIsAdmin] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [socialPoints, setSocialPoints] = useState(0);
   const { user } = useUserStore();
 
   useEffect(() => {
     const fetchRole = async () => {
-      if (!user) return;
-      const role = await getUserRole(user.role_id ?? null);
+      const role = await getUserRole(user!.role_id ?? null);
       setIsAdmin(role === "Admin");
+    };
+
+    const fetchSocialPoints = async () => {
+      const socialPoints = await getSocialPoints(user!.id);
+      setSocialPoints(socialPoints || 0);
     };
 
     if (user) {
       fetchRole();
+      fetchSocialPoints();
     }
   }, [user]);
 
@@ -58,7 +64,7 @@ export default function FeedsPage() {
               </div>
               <div className="text-right">
                 <p className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-2xl font-bold text-transparent">
-                  {10}
+                  {socialPoints}
                 </p>
                 <p className="text-xs text-gray-500">points</p>
               </div>
