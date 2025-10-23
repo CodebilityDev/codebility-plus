@@ -8,7 +8,7 @@ import {
 } from "discord.js";
 import { supabaseBot } from "../utils/supabase.bot";
 
-// Define the slash command
+//Slash command
 const slashCommand = new SlashCommandBuilder()
   .setName("badges")
   .setDescription("View your badges or award a badge (admin only).")
@@ -25,7 +25,7 @@ const slashCommand = new SlashCommandBuilder()
       .setRequired(false)
   );
 
-// Export the command definition
+// Export the command 
 export const command = {
   name: "badges",
   data: slashCommand,
