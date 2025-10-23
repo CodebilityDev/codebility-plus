@@ -12,7 +12,7 @@ import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
 import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock, CheckSquare } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
-import ChecklistCreateModal from "../../_components/ChecklistCreateModal"; // NEW
+import ChecklistManageModal from "../../_components/ChecklistManageModal"; // ← NEW: Simplified checklist modal
 import AttendanceGrid from "./AttendanceGrid";
 import MeetingBasedAttendance from "./MeetingBasedAttendance";
 import CompactMemberGrid from "./CompactMemberGrid";
@@ -42,7 +42,7 @@ interface TeamDetailViewProps {
 const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [project, setProject] = useState(projectData);
   const [showAddModal, setShowAddModal] = useState(false);
-  const [showChecklistModal, setShowChecklistModal] = useState(false); // NEW
+  const [showChecklistModal, setShowChecklistModal] = useState(false); // ← Checklist modal state
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
   const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
@@ -122,18 +122,13 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     setShowAddModal(false);
   };
 
-  // NEW: Handle checklist modal
+  // ← Checklist modal handlers
   const handleOpenChecklistModal = () => {
     setShowChecklistModal(true);
   };
 
   const handleCloseChecklistModal = () => {
     setShowChecklistModal(false);
-  };
-
-  const handleChecklistSuccess = () => {
-    toast.success("Task created successfully!");
-    handleCloseChecklistModal();
   };
 
   const handleSaveAttendance = useCallback(async () => {
@@ -265,8 +260,9 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
         {/* Header with Tab Buttons */}
         <div className="flex items-center justify-between">
-          {/* LEFT: View Mode Tabs + Checklist Button */}
+          {/* ← LEFT: View Mode Tabs + Checklist Button (Team Lead Only) */}
           <div className="flex items-center gap-2">
+            {/* Team View Tab */}
             <Button
               variant={viewMode === "team" ? "default" : "outline"}
               size="sm"
@@ -279,6 +275,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               Team View
             </Button>
             
+            {/* Attendance Tab - Only for Team Leads */}
             {(isTeamLead || !currentUserId) && (
               <Button
                 variant={viewMode === "attendance" ? "default" : "outline"}
@@ -293,8 +290,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               </Button>
             )}
 
-            {/* NEW: Checklist Button - Only for team leads */}
-            {isTeamLead && (
+            {/* ← NEW: Checklist Button - Only for Team Leads, at Tab Level */}
+            {(isTeamLead || !currentUserId) && (
               <Button
                 variant="outline"
                 size="sm"
@@ -501,18 +498,13 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         currentSchedule={currentSchedule}
       />
 
-      {/* NEW: Checklist Create Modal */}
-      {isTeamLead && (
-        <ChecklistCreateModal
+      {/* ← NEW: Simplified Checklist Management Modal (Team Lead Only) */}
+      {(isTeamLead || !currentUserId) && (
+        <ChecklistManageModal
           isOpen={showChecklistModal}
           projectId={projectInfo.id}
           projectName={projectInfo.name}
-          teamMembers={[
-            ...(teamLead?.data ? [teamLead.data] : []),
-            ...(members?.data || [])
-          ]}
           onClose={handleCloseChecklistModal}
-          onSuccess={handleChecklistSuccess}
         />
       )}
     </>
