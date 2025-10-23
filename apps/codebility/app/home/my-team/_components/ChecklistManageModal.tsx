@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, FormEvent, useMemo } from "react";
-import { X, Plus, Edit2, Trash2, Check } from "lucide-react";
+import { X, Plus, Edit2, Trash2, Check, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import Input from "@/components/ui/forms/input";
@@ -9,12 +9,27 @@ import toast from "react-hot-toast";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { SimpleMemberData } from "@/app/home/projects/actions";
 
+/**
+ * ChecklistManageModal - FINAL FIXED VERSION
+ * 
+ * FIXES:
+ * 1. Enhanced permission debugging
+ * 2. Handles undefined currentUserId gracefully
+ * 3. Clear console logging for troubleshooting
+ * 
+ * PERMISSION RULES:
+ * - ALL members can VIEW all checklist items
+ * - ONLY team leads can add, edit, or delete items
+ * - Toast notifications for all actions with item names
+ */
+
 interface ChecklistManageModalProps {
   isOpen: boolean;
   projectId: string;
   projectName: string;
   teamMembers: SimpleMemberData[];
   teamLeadId: string;
+  currentUserId?: string;  // Made optional with fallback
   onClose: () => void;
 }
 
@@ -24,6 +39,7 @@ const ChecklistManageModal = ({
   projectName,
   teamMembers,
   teamLeadId,
+  currentUserId,
   onClose
 }: ChecklistManageModalProps) => {
   const [items, setItems] = useState<string[]>([]);
@@ -34,11 +50,40 @@ const ChecklistManageModal = ({
   const [isFetching, setIsFetching] = useState(false);
   const [supabase, setSupabase] = useState<any>(null);
 
-  // FIXED: Get all member IDs with proper validation
+  // ENHANCED: Check if current user is team lead with detailed logging
+  const isTeamLead = useMemo(() => {
+    console.log('=== PERMISSION CHECK ===');
+    console.log('currentUserId:', currentUserId);
+    console.log('teamLeadId:', teamLeadId);
+    console.log('Match:', currentUserId === teamLeadId);
+    console.log('currentUserId type:', typeof currentUserId);
+    console.log('teamLeadId type:', typeof teamLeadId);
+    
+    // Handle undefined/null cases
+    if (!currentUserId) {
+      console.warn('WARNING: currentUserId is undefined/null - treating as non-team-lead');
+      return false;
+    }
+    
+    if (!teamLeadId) {
+      console.warn('WARNING: teamLeadId is undefined/null');
+      return false;
+    }
+    
+    const result = currentUserId === teamLeadId;
+    console.log('isTeamLead result:', result);
+    console.log('========================');
+    
+    return result;
+  }, [currentUserId, teamLeadId]);
+
+  // Get all member IDs (team lead + members)
   const allMemberIds = useMemo(() => {
     console.log('=== COMPUTING MEMBER IDS ===');
     console.log('teamLeadId:', teamLeadId);
     console.log('teamMembers:', teamMembers);
+    console.log('currentUserId:', currentUserId);
+    console.log('isTeamLead:', isTeamLead);
     
     if (!teamLeadId) {
       console.error('ERROR: teamLeadId is missing!');
@@ -55,9 +100,10 @@ const ChecklistManageModal = ({
     
     const allIds = [teamLeadId, ...memberIds];
     console.log('All member IDs (lead + members):', allIds);
+    console.log('============================');
     
     return allIds;
-  }, [teamLeadId, teamMembers]);
+  }, [teamLeadId, teamMembers, currentUserId, isTeamLead]);
 
   useEffect(() => {
     const client = createClientClientComponent();
@@ -87,7 +133,7 @@ const ChecklistManageModal = ({
         setItems([]);
       } else {
         const uniqueTitles = [...new Set(data.map((item: any) => String(item.title)))] as string[];
-
+        console.log('Loaded unique titles:', uniqueTitles);
         setItems(uniqueTitles);
       }
     } catch (error) {
@@ -102,6 +148,13 @@ const ChecklistManageModal = ({
   const handleAddItem = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    // Permission check
+    if (!isTeamLead) {
+      console.error('ADD BLOCKED: User is not team lead');
+      toast.error("🔒 Only team leads can add checklist items");
+      return;
+    }
+
     if (!newItemTitle.trim()) {
       toast.error("Please enter a checklist item");
       return;
@@ -112,11 +165,8 @@ const ChecklistManageModal = ({
       return;
     }
 
-    // CRITICAL CHECK
     if (allMemberIds.length === 0) {
       console.error('FATAL ERROR: allMemberIds is empty!');
-      console.error('teamLeadId:', teamLeadId);
-      console.error('teamMembers:', teamMembers);
       toast.error("Cannot create item: No team members found");
       return;
     }
@@ -129,6 +179,7 @@ const ChecklistManageModal = ({
     setIsLoading(true);
     try {
       console.log('=== ADDING ITEM ===');
+      console.log('Item title:', newItemTitle.trim());
       console.log('Creating items for members:', allMemberIds);
       
       const itemsToInsert = allMemberIds.map(memberId => ({
@@ -156,7 +207,7 @@ const ChecklistManageModal = ({
         toast.error(`Failed: ${error.message}`);
       } else {
         console.log('Insert success:', data);
-        toast.success("Checklist item added!");
+        toast.success(`✅ "${newItemTitle.trim()}" added to checklist`);
         setItems(prev => [...prev, newItemTitle.trim()]);
         setNewItemTitle("");
       }
@@ -169,11 +220,25 @@ const ChecklistManageModal = ({
   };
 
   const handleStartEdit = (title: string) => {
+    // Permission check
+    if (!isTeamLead) {
+      console.error('EDIT BLOCKED: User is not team lead');
+      toast.error("🔒 Only team leads can edit checklist items");
+      return;
+    }
+    
     setEditingTitle(title);
     setEditingNewTitle(title);
   };
 
   const handleSaveEdit = async (oldTitle: string) => {
+    // Permission check
+    if (!isTeamLead) {
+      console.error('UPDATE BLOCKED: User is not team lead');
+      toast.error("🔒 Only team leads can edit checklist items");
+      return;
+    }
+
     if (!editingNewTitle.trim()) {
       toast.error("Checklist item cannot be empty");
       return;
@@ -191,6 +256,10 @@ const ChecklistManageModal = ({
 
     setIsLoading(true);
     try {
+      console.log('=== UPDATING ITEM ===');
+      console.log('Old title:', oldTitle);
+      console.log('New title:', editingNewTitle.trim());
+      
       const { error } = await supabase
         .from("member_checklists")
         .update({ 
@@ -204,7 +273,8 @@ const ChecklistManageModal = ({
         console.error("Error updating:", error);
         toast.error("Failed to update checklist item");
       } else {
-        toast.success("Checklist item updated!");
+        console.log('Update success');
+        toast.success(`✅ Updated "${oldTitle}" to "${editingNewTitle.trim()}"`);
         setItems(prev => prev.map(title => title === oldTitle ? editingNewTitle.trim() : title));
         setEditingTitle(null);
         setEditingNewTitle("");
@@ -223,7 +293,14 @@ const ChecklistManageModal = ({
   };
 
   const handleDeleteItem = async (title: string) => {
-    if (!confirm(`Delete "${title}"?`)) return;
+    // Permission check
+    if (!isTeamLead) {
+      console.error('DELETE BLOCKED: User is not team lead');
+      toast.error("🔒 Only team leads can delete checklist items");
+      return;
+    }
+
+    if (!confirm(`Delete "${title}"?\n\nThis will remove this item for ALL team members.`)) return;
 
     if (!supabase) {
       toast.error("Database not initialized");
@@ -232,6 +309,10 @@ const ChecklistManageModal = ({
 
     setIsLoading(true);
     try {
+      console.log('=== DELETING ITEM ===');
+      console.log('Title:', title);
+      console.log('Project ID:', projectId);
+      
       const { error } = await supabase
         .from("member_checklists")
         .delete()
@@ -242,7 +323,8 @@ const ChecklistManageModal = ({
         console.error("Error deleting:", error);
         toast.error("Failed to delete checklist item");
       } else {
-        toast.success("Checklist item deleted!");
+        console.log('Delete success');
+        toast.success(`🗑️ "${title}" deleted from checklist`);
         setItems(prev => prev.filter(item => item !== title));
       }
     } catch (error) {
@@ -277,6 +359,7 @@ const ChecklistManageModal = ({
             </p>
             <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs overflow-auto">
 {`teamLeadId: ${teamLeadId || 'MISSING'}
+currentUserId: ${currentUserId || 'MISSING'}
 teamMembers: ${teamMembers ? `Array(${teamMembers.length})` : 'MISSING'}`}
             </pre>
             <Button onClick={handleClose} className="w-full mt-4">Close</Button>
@@ -299,26 +382,49 @@ teamMembers: ${teamMembers ? `Array(${teamMembers.length})` : 'MISSING'}`}
           <p className="text-xs text-blue-600 dark:text-blue-400">
             ℹ️ These items will be visible to all {allMemberIds.length} team members
           </p>
+          
+          {/* Permission indicator for non-team leads */}
+          {!isTeamLead && (
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded mt-2">
+              <p className="text-xs text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
+                <Lock className="h-4 w-4" />
+                <span>You are viewing in read-only mode. Only team leads can add, edit, or delete items.</span>
+              </p>
+            </div>
+          )}
+          
+          {/* DEBUG INFO - Remove in production */}
+          {process.env.NODE_ENV === 'development' && (
+            <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded mt-2 text-xs font-mono">
+              <div>currentUserId: {currentUserId || 'UNDEFINED'}</div>
+              <div>teamLeadId: {teamLeadId || 'UNDEFINED'}</div>
+              <div>isTeamLead: {isTeamLead ? 'TRUE' : 'FALSE'}</div>
+            </div>
+          )}
         </DialogHeader>
 
         <div className="space-y-4 mt-4">
-          <form onSubmit={handleAddItem} className="flex gap-2">
-            <Input
-              value={newItemTitle}
-              onChange={(e) => setNewItemTitle(e.target.value)}
-              placeholder="Enter checklist item..."
-              className="flex-1 bg-light-900 dark:bg-dark-200 dark:text-light-900"
-              disabled={isLoading || isFetching}
-            />
-            <Button
-              type="submit"
-              disabled={isLoading || isFetching || !newItemTitle.trim()}
-              className="bg-blue-500 hover:bg-blue-600 text-white px-4"
-            >
-              <Plus className="h-5 w-5" />
-            </Button>
-          </form>
+          {/* Add Item Form - Only visible to team leads */}
+          {isTeamLead && (
+            <form onSubmit={handleAddItem} className="flex gap-2">
+              <Input
+                value={newItemTitle}
+                onChange={(e) => setNewItemTitle(e.target.value)}
+                placeholder="Enter checklist item..."
+                className="flex-1 bg-light-900 dark:bg-dark-200 dark:text-light-900"
+                disabled={isLoading || isFetching}
+              />
+              <Button
+                type="submit"
+                disabled={isLoading || isFetching || !newItemTitle.trim()}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-4"
+              >
+                <Plus className="h-5 w-5" />
+              </Button>
+            </form>
+          )}
 
+          {/* Items List */}
           <div className="space-y-2">
             {isFetching ? (
               <div className="flex items-center justify-center py-8">
@@ -331,13 +437,19 @@ teamMembers: ${teamMembers ? `Array(${teamMembers.length})` : 'MISSING'}`}
               <div className="flex flex-col items-center justify-center py-8 text-center">
                 <div className="text-4xl mb-2">📝</div>
                 <p className="text-gray-600 dark:text-gray-400">No checklist items yet</p>
-                <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Add your first item above</p>
+                {isTeamLead && (
+                  <p className="text-sm text-gray-500 dark:text-gray-500 mt-1">Add your first item above</p>
+                )}
               </div>
             ) : (
               items.map((title) => (
-                <div key={title} className="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800">
+                <div 
+                  key={title} 
+                  className="flex items-center gap-2 p-3 rounded-lg border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800"
+                >
                   {editingTitle === title ? (
                     <>
+                      {/* EDITING MODE - Team lead only */}
                       <Input
                         value={editingNewTitle}
                         onChange={(e) => setEditingNewTitle(e.target.value)}
@@ -345,22 +457,60 @@ teamMembers: ${teamMembers ? `Array(${teamMembers.length})` : 'MISSING'}`}
                         disabled={isLoading}
                         autoFocus
                       />
-                      <Button onClick={() => handleSaveEdit(title)} disabled={isLoading || !editingNewTitle.trim()} size="sm" className="bg-green-500 hover:bg-green-600 text-white">
+                      <Button 
+                        onClick={() => handleSaveEdit(title)} 
+                        disabled={isLoading || !editingNewTitle.trim()} 
+                        size="sm" 
+                        className="bg-green-500 hover:bg-green-600 text-white w-10 h-10 p-0"
+                      >
                         <Check className="h-4 w-4" />
                       </Button>
-                      <Button onClick={handleCancelEdit} disabled={isLoading} size="sm" variant="outline">
+                      <Button 
+                        onClick={handleCancelEdit} 
+                        disabled={isLoading} 
+                        size="sm" 
+                        variant="outline"
+                        className="w-10 h-10 p-0"
+                      >
                         <X className="h-4 w-4" />
                       </Button>
                     </>
                   ) : (
                     <>
+                      {/* VIEW MODE */}
                       <span className="flex-1 text-gray-900 dark:text-white">{title}</span>
-                      <Button onClick={() => handleStartEdit(title)} disabled={isLoading} size="sm" variant="outline" className="border-blue-300 text-blue-600">
-                        <Edit2 className="h-4 w-4" />
-                      </Button>
-                      <Button onClick={() => handleDeleteItem(title)} disabled={isLoading} size="sm" variant="outline" className="border-red-300 text-red-600">
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
+                      
+                      {/* Action buttons - visible to all, but disabled for non-team leads */}
+                      <div className="flex gap-2">
+                        <Button 
+                          onClick={() => handleStartEdit(title)} 
+                          disabled={isLoading || !isTeamLead}
+                          size="sm" 
+                          variant="outline" 
+                          className={`w-10 h-10 p-0 ${
+                            !isTeamLead 
+                              ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400' 
+                              : 'border-blue-300 text-blue-600 hover:bg-blue-50'
+                          }`}
+                          title={!isTeamLead ? "Only team leads can edit" : "Edit item"}
+                        >
+                          <Edit2 className="h-4 w-4" />
+                        </Button>
+                        <Button 
+                          onClick={() => handleDeleteItem(title)} 
+                          disabled={isLoading || !isTeamLead}
+                          size="sm" 
+                          variant="outline" 
+                          className={`w-10 h-10 p-0 ${
+                            !isTeamLead 
+                              ? 'opacity-50 cursor-not-allowed border-gray-300 text-gray-400' 
+                              : 'border-red-300 text-red-600 hover:bg-red-50'
+                          }`}
+                          title={!isTeamLead ? "Only team leads can delete" : "Delete item"}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
                     </>
                   )}
                 </div>

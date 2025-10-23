@@ -1,17 +1,23 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle2, Circle } from "lucide-react";
+import { CheckCircle2, Circle, Lock } from "lucide-react";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
 
 /**
- * MemberChecklist - Shows ALL project checklist items with THIS member's completion status
+ * MemberChecklist - FINAL FIXED VERSION
  * 
- * KEY FIX: 
- * - Loads ALL items for the project (not filtered by member on load)
- * - Shows THIS member's specific completion status
- * - Each member sees the same items, but can toggle their own completion independently
+ * FIXES:
+ * 1. Shows ALL checklist items (completed AND incomplete)
+ * 2. Shows completion status for THIS member
+ * 3. Team leads can toggle anyone's completion
+ * 4. Regular members see read-only view
+ * 
+ * KEY FEATURES:
+ * - Loads ALL unique items for the project
+ * - Gets THIS member's completion status for each item
+ * - Team leads can toggle, regular members cannot
  */
 
 interface ChecklistItem {
@@ -27,7 +33,7 @@ interface ChecklistItem {
 interface MemberChecklistProps {
   memberId: string;
   projectId: string;
-  isTeamLead?: boolean;
+  isTeamLead?: boolean;  // Made optional with fallback
 }
 
 const MemberChecklist = ({ 
@@ -53,16 +59,18 @@ const MemberChecklist = ({
   }, [memberId, projectId, supabase]);
 
   /**
-   * CORRECTED: Load ALL unique items for project, then get THIS member's completion status
+   * FIXED: Load ALL unique items for project, then get THIS member's completion status
+   * This ensures ALL items show up (both completed and incomplete)
    */
   const loadChecklistItems = async () => {
     if (!memberId || !projectId || !supabase) return;
     
     setIsLoading(true);
     try {
-      console.log('=== LOADING CHECKLIST ===');
+      console.log('=== LOADING MEMBER CHECKLIST ===');
       console.log('Member ID:', memberId);
       console.log('Project ID:', projectId);
+      console.log('Is Team Lead:', isTeamLead);
       
       // Step 1: Get ALL unique titles for this project
       const { data: allItems, error: allItemsError } = await supabase
@@ -79,8 +87,8 @@ const MemberChecklist = ({
       console.log('All items in project:', allItems);
 
       // Get unique titles
-      const uniqueTitles = [...new Set(allItems.map((item: any) => item.title))];
-      console.log('Unique titles:', uniqueTitles);
+      const uniqueTitles = [...new Set(allItems.map((item: any) => item.title as string))];
+      console.log('Unique titles found:', uniqueTitles);
 
       // Step 2: For each unique title, get THIS member's row
       const memberItemsPromises = uniqueTitles.map(async (title) => {
@@ -97,12 +105,14 @@ const MemberChecklist = ({
           return null;
         }
 
+        console.log(`Item "${title}" for this member:`, data);
         return data;
       });
 
       const memberItems = (await Promise.all(memberItemsPromises)).filter(Boolean) as ChecklistItem[];
       
-      console.log('Member-specific items:', memberItems);
+      console.log('Final member-specific items:', memberItems);
+      console.log(`Showing ${memberItems.length} total items (completed + incomplete)`);
       setChecklistItems(memberItems);
 
     } catch (error) {
@@ -115,12 +125,22 @@ const MemberChecklist = ({
   };
 
   /**
-   * Toggle task completion status for THIS member only
+   * Toggle checklist completion status - TEAM LEADS ONLY
    */
-  const toggleComplete = async (itemId: string, currentStatus: boolean) => {
+  const toggleComplete = async (itemId: string, currentStatus: boolean, itemTitle: string) => {
+    // PERMISSION CHECK
+    if (!isTeamLead) {
+      console.error('TOGGLE BLOCKED: User is not team lead');
+      toast.error("🔒 Only team leads can toggle checklist completion");
+      return;
+    }
+
     if (!supabase) return;
 
-    console.log('Toggling item:', itemId, 'from', currentStatus, 'to', !currentStatus);
+    console.log('=== TOGGLING COMPLETION ===');
+    console.log('Item ID:', itemId);
+    console.log('Current status:', currentStatus);
+    console.log('New status:', !currentStatus);
 
     // Optimistic UI update
     setChecklistItems(prev =>
@@ -139,8 +159,8 @@ const MemberChecklist = ({
         .eq("id", itemId);
 
       if (error) {
-        console.error("Error updating task:", error);
-        toast.error("Failed to update task");
+        console.error("Error updating checklist item:", error);
+        toast.error("Failed to update checklist item");
         // Revert optimistic update
         setChecklistItems(prev =>
           prev.map(item =>
@@ -148,12 +168,17 @@ const MemberChecklist = ({
           )
         );
       } else {
-        console.log('Successfully toggled completion');
-        toast.success(!currentStatus ? "Task completed! ✓" : "Task marked incomplete");
+        console.log('Toggle success');
+        // Show toast with item name
+        if (!currentStatus) {
+          toast.success(`✅ "${itemTitle}" marked as completed`);
+        } else {
+          toast.success(`↩️ "${itemTitle}" marked as incomplete`);
+        }
       }
     } catch (error) {
       console.error("Error toggling complete:", error);
-      toast.error("Failed to update task");
+      toast.error("Failed to update checklist item");
       // Revert optimistic update
       setChecklistItems(prev =>
         prev.map(item =>
@@ -163,11 +188,11 @@ const MemberChecklist = ({
     }
   };
 
-  // Calculate progress statistics
-  const completedTasks = checklistItems.filter(item => item.completed).length;
-  const totalTasks = checklistItems.length;
-  const completionPercentage = totalTasks > 0 
-    ? Math.round((completedTasks / totalTasks) * 100) 
+  // Calculate progress statistics - ALL items (completed + incomplete)
+  const completedChecklists = checklistItems.filter(item => item.completed).length;
+  const totalChecklists = checklistItems.length;
+  const completionPercentage = totalChecklists > 0 
+    ? Math.round((completedChecklists / totalChecklists) * 100) 
     : 0;
 
   // Loading state
@@ -184,8 +209,18 @@ const MemberChecklist = ({
 
   return (
     <div className="space-y-6">
-      {/* Progress Overview */}
-      {totalTasks > 0 && (
+      {/* Permission Banner for Non-Team Leads */}
+      {!isTeamLead && totalChecklists > 0 && (
+        <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded">
+          <p className="text-xs text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
+            <Lock className="h-4 w-4" />
+            <span>You are viewing in read-only mode. Only team leads can mark items as complete.</span>
+          </p>
+        </div>
+      )}
+
+      {/* Progress Overview - Shows ALL items */}
+      {totalChecklists > 0 && (
         <div className="space-y-3">
           <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
             Progress Overview
@@ -200,7 +235,7 @@ const MemberChecklist = ({
             </div>
             <div className="flex-1">
               <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                <span>{completedTasks} of {totalTasks} tasks completed</span>
+                <span>{completedChecklists} of {totalChecklists} checklist{totalChecklists !== 1 ? 's' : ''} completed</span>
               </div>
               <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                 <div 
@@ -213,22 +248,20 @@ const MemberChecklist = ({
         </div>
       )}
 
-      {/* Task List */}
+      {/* Checklist List - Shows ALL items (completed AND incomplete) */}
       <div className="space-y-3">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Task List
+          All Checklist Items
         </h3>
         
-        {totalTasks === 0 ? (
+        {totalChecklists === 0 ? (
           <div className="flex items-center justify-center py-8">
             <div className="text-center">
               <CheckCircle2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
               <p className="text-gray-600 dark:text-gray-300">No checklist items yet</p>
-              {isTeamLead && (
-                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                  Navigate to project detail page to create shared tasks
-                </p>
-              )}
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                Navigate to project detail page to view or create checklist items
+              </p>
             </div>
           </div>
         ) : (
@@ -243,20 +276,33 @@ const MemberChecklist = ({
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  {/* Checkbox */}
+                  {/* Checkbox - Interactive only for team leads */}
                   <button
-                    onClick={() => toggleComplete(item.id, item.completed)}
-                    className="flex-shrink-0 mt-0.5 hover:scale-110 transition-transform"
-                    title="Toggle completion"
+                    onClick={() => toggleComplete(item.id, item.completed, item.title)}
+                    disabled={!isTeamLead}
+                    className={`flex-shrink-0 mt-0.5 transition-transform ${
+                      isTeamLead 
+                        ? 'hover:scale-110 cursor-pointer' 
+                        : 'cursor-not-allowed opacity-60'
+                    }`}
+                    title={
+                      isTeamLead 
+                        ? "Toggle completion" 
+                        : "Only team leads can toggle completion"
+                    }
                   >
                     {item.completed ? (
                       <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
                     ) : (
-                      <Circle className="h-6 w-6 text-gray-400 hover:text-green-500" />
+                      <Circle className={`h-6 w-6 ${
+                        isTeamLead 
+                          ? 'text-gray-400 hover:text-green-500' 
+                          : 'text-gray-400'
+                      }`} />
                     )}
                   </button>
 
-                  {/* Task Content - TITLE ONLY */}
+                  {/* Checklist Item Content */}
                   <div className="flex-1 min-w-0">
                     <h4 className={`font-medium ${
                       item.completed 
@@ -274,10 +320,13 @@ const MemberChecklist = ({
       </div>
 
       {/* Info Banner */}
-      {totalTasks > 0 && (
+      {totalChecklists > 0 && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-3 rounded">
           <p className="text-xs text-blue-700 dark:text-blue-300">
-            ℹ️ This is a shared checklist for all team members. Check off items as you complete them.
+            ℹ️ Showing all {totalChecklists} checklist items for this member. 
+            {isTeamLead 
+              ? " Check off items as team members complete them." 
+              : " Team leads will mark items as complete."}
           </p>
         </div>
       )}
