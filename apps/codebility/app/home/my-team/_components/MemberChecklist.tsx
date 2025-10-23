@@ -1,22 +1,25 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { CheckCircle2, Circle, Calendar, Plus } from "lucide-react";
+import { CheckCircle2, Circle } from "lucide-react";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { Button } from "@/components/ui/button";
 import toast from "react-hot-toast";
 
-// Checklist item structure matching database schema
+/**
+ * MemberChecklist - Shows ALL project checklist items with THIS member's completion status
+ * 
+ * KEY FIX: 
+ * - Loads ALL items for the project (not filtered by member on load)
+ * - Shows THIS member's specific completion status
+ * - Each member sees the same items, but can toggle their own completion independently
+ */
+
 interface ChecklistItem {
   id: string;
   member_id: string;
   project_id: string;
   title: string;
-  description: string | null;
-  priority: "low" | "medium" | "high";
   completed: boolean;
-  due_date: string | null;
-  created_by: string;
   created_at: string;
   updated_at: string;
 }
@@ -24,10 +27,14 @@ interface ChecklistItem {
 interface MemberChecklistProps {
   memberId: string;
   projectId: string;
-  isTeamLead?: boolean; // NEW: To show/hide create button
+  isTeamLead?: boolean;
 }
 
-const MemberChecklist = ({ memberId, projectId, isTeamLead = false }: MemberChecklistProps) => {
+const MemberChecklist = ({ 
+  memberId, 
+  projectId, 
+  isTeamLead = false 
+}: MemberChecklistProps) => {
   const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [supabase, setSupabase] = useState<any>(null);
@@ -38,41 +45,89 @@ const MemberChecklist = ({ memberId, projectId, isTeamLead = false }: MemberChec
     setSupabase(client);
   }, []);
 
-  // Load checklist items from database
+  // Load checklist items when component mounts
   useEffect(() => {
-    loadChecklistItems();
+    if (supabase && memberId && projectId) {
+      loadChecklistItems();
+    }
   }, [memberId, projectId, supabase]);
 
+  /**
+   * CORRECTED: Load ALL unique items for project, then get THIS member's completion status
+   */
   const loadChecklistItems = async () => {
     if (!memberId || !projectId || !supabase) return;
     
     setIsLoading(true);
     try {
-      const { data, error } = await supabase
+      console.log('=== LOADING CHECKLIST ===');
+      console.log('Member ID:', memberId);
+      console.log('Project ID:', projectId);
+      
+      // Step 1: Get ALL unique titles for this project
+      const { data: allItems, error: allItemsError } = await supabase
         .from("member_checklists")
-        .select("*")
-        .eq("member_id", memberId)
+        .select("title, created_at")
         .eq("project_id", projectId)
-        .order("created_at", { ascending: false });
+        .order("created_at", { ascending: true });
 
-      if (error) {
-        console.error("Error loading checklist items:", error);
-        toast.error("Failed to load checklist items");
-        setChecklistItems([]);
-      } else {
-        setChecklistItems(data || []);
+      if (allItemsError) {
+        console.error("Error loading all items:", allItemsError);
+        throw allItemsError;
       }
+
+      console.log('All items in project:', allItems);
+
+      // Get unique titles
+      const uniqueTitles = [...new Set(allItems.map((item: any) => item.title))];
+      console.log('Unique titles:', uniqueTitles);
+
+      // Step 2: For each unique title, get THIS member's row
+      const memberItemsPromises = uniqueTitles.map(async (title) => {
+        const { data, error } = await supabase
+          .from("member_checklists")
+          .select("id, member_id, project_id, title, completed, created_at, updated_at")
+          .eq("project_id", projectId)
+          .eq("member_id", memberId)
+          .eq("title", title)
+          .single();
+
+        if (error) {
+          console.error(`Error loading item "${title}" for member:`, error);
+          return null;
+        }
+
+        return data;
+      });
+
+      const memberItems = (await Promise.all(memberItemsPromises)).filter(Boolean) as ChecklistItem[];
+      
+      console.log('Member-specific items:', memberItems);
+      setChecklistItems(memberItems);
+
     } catch (error) {
       console.error("Error loading checklist items:", error);
+      toast.error("Failed to load checklist items");
       setChecklistItems([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Toggle task completion status
+  /**
+   * Toggle task completion status for THIS member only
+   */
   const toggleComplete = async (itemId: string, currentStatus: boolean) => {
     if (!supabase) return;
+
+    console.log('Toggling item:', itemId, 'from', currentStatus, 'to', !currentStatus);
+
+    // Optimistic UI update
+    setChecklistItems(prev =>
+      prev.map(item =>
+        item.id === itemId ? { ...item, completed: !currentStatus } : item
+      )
+    );
 
     try {
       const { error } = await supabase
@@ -86,18 +141,25 @@ const MemberChecklist = ({ memberId, projectId, isTeamLead = false }: MemberChec
       if (error) {
         console.error("Error updating task:", error);
         toast.error("Failed to update task");
-      } else {
-        // Optimistic UI update
+        // Revert optimistic update
         setChecklistItems(prev =>
           prev.map(item =>
-            item.id === itemId ? { ...item, completed: !currentStatus } : item
+            item.id === itemId ? { ...item, completed: currentStatus } : item
           )
         );
+      } else {
+        console.log('Successfully toggled completion');
         toast.success(!currentStatus ? "Task completed! ✓" : "Task marked incomplete");
       }
     } catch (error) {
       console.error("Error toggling complete:", error);
       toast.error("Failed to update task");
+      // Revert optimistic update
+      setChecklistItems(prev =>
+        prev.map(item =>
+          item.id === itemId ? { ...item, completed: currentStatus } : item
+        )
+      );
     }
   };
 
@@ -107,20 +169,6 @@ const MemberChecklist = ({ memberId, projectId, isTeamLead = false }: MemberChec
   const completionPercentage = totalTasks > 0 
     ? Math.round((completedTasks / totalTasks) * 100) 
     : 0;
-
-  // Get priority badge styling
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case "high": 
-        return "bg-red-100 text-red-700 border-red-200 dark:bg-red-900/20 dark:text-red-300 dark:border-red-800";
-      case "medium": 
-        return "bg-yellow-100 text-yellow-700 border-yellow-200 dark:bg-yellow-900/20 dark:text-yellow-300 dark:border-yellow-800";
-      case "low": 
-        return "bg-green-100 text-green-700 border-green-200 dark:bg-green-900/20 dark:text-green-300 dark:border-green-800";
-      default: 
-        return "bg-gray-100 text-gray-700 border-gray-200 dark:bg-gray-900/20 dark:text-gray-300 dark:border-gray-800";
-    }
-  };
 
   // Loading state
   if (isLoading) {
@@ -137,12 +185,12 @@ const MemberChecklist = ({ memberId, projectId, isTeamLead = false }: MemberChec
   return (
     <div className="space-y-6">
       {/* Progress Overview */}
-      <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          Progress Overview
-        </h3>
-        
-        {totalTasks > 0 ? (
+      {totalTasks > 0 && (
+        <div className="space-y-3">
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+            Progress Overview
+          </h3>
+          
           <div className="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
             <div className="text-center">
               <div className="text-3xl font-bold text-green-600 dark:text-green-400">
@@ -162,20 +210,28 @@ const MemberChecklist = ({ memberId, projectId, isTeamLead = false }: MemberChec
               </div>
             </div>
           </div>
-        ) : (
-          <div className="p-6 rounded-lg bg-gray-50 dark:bg-gray-800/50 border border-gray-200 dark:border-gray-700 text-center">
-            <p className="text-gray-500 dark:text-gray-400">No tasks yet. {isTeamLead ? 'Click the Checklist button to create tasks!' : 'Your mentor will assign tasks soon.'}</p>
-          </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Task List */}
-      {totalTasks > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Task List
-          </h3>
-          
+      <div className="space-y-3">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          Task List
+        </h3>
+        
+        {totalTasks === 0 ? (
+          <div className="flex items-center justify-center py-8">
+            <div className="text-center">
+              <CheckCircle2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
+              <p className="text-gray-600 dark:text-gray-300">No checklist items yet</p>
+              {isTeamLead && (
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                  Navigate to project detail page to create shared tasks
+                </p>
+              )}
+            </div>
+          </div>
+        ) : (
           <div className="space-y-3">
             {checklistItems.map((item) => (
               <div 
@@ -191,6 +247,7 @@ const MemberChecklist = ({ memberId, projectId, isTeamLead = false }: MemberChec
                   <button
                     onClick={() => toggleComplete(item.id, item.completed)}
                     className="flex-shrink-0 mt-0.5 hover:scale-110 transition-transform"
+                    title="Toggle completion"
                   >
                     {item.completed ? (
                       <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
@@ -199,42 +256,29 @@ const MemberChecklist = ({ memberId, projectId, isTeamLead = false }: MemberChec
                     )}
                   </button>
 
-                  {/* Task Content */}
+                  {/* Task Content - TITLE ONLY */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-2 flex-wrap">
-                      <h4 className={`font-medium ${
-                        item.completed 
-                          ? 'text-green-800 dark:text-green-200 line-through' 
-                          : 'text-gray-900 dark:text-white'
-                      }`}>
-                        {item.title}
-                      </h4>
-                      <span className={`px-2 py-1 text-xs font-medium rounded-full border ${getPriorityColor(item.priority)}`}>
-                        {item.priority}
-                      </span>
-                    </div>
-                    
-                    {item.description && (
-                      <p className={`text-sm mt-1 ${
-                        item.completed 
-                          ? 'text-green-700 dark:text-green-300' 
-                          : 'text-gray-600 dark:text-gray-400'
-                      }`}>
-                        {item.description}
-                      </p>
-                    )}
-                    
-                    {item.due_date && (
-                      <p className="text-xs text-gray-500 dark:text-gray-400 mt-2 flex items-center gap-1">
-                        <Calendar className="h-3 w-3" />
-                        Due: {new Date(item.due_date).toLocaleDateString()}
-                      </p>
-                    )}
+                    <h4 className={`font-medium ${
+                      item.completed 
+                        ? 'text-green-800 dark:text-green-200 line-through' 
+                        : 'text-gray-900 dark:text-white'
+                    }`}>
+                      {item.title}
+                    </h4>
                   </div>
                 </div>
               </div>
             ))}
           </div>
+        )}
+      </div>
+
+      {/* Info Banner */}
+      {totalTasks > 0 && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-3 rounded">
+          <p className="text-xs text-blue-700 dark:text-blue-300">
+            ℹ️ This is a shared checklist for all team members. Check off items as you complete them.
+          </p>
         </div>
       )}
     </div>
