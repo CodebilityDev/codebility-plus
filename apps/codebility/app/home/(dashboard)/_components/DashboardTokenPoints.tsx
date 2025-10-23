@@ -483,7 +483,7 @@ export default function TokenPoints() {
                   Earned by contributing posts to the community feed
                 </p>
                 <p className="text-xs text-gray-400 dark:text-gray-500">
-                  Extra points for received likes or comments.
+                  Extra points for received likes or comments
                 </p>
               </div>
             </div>
