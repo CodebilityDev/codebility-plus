@@ -1,108 +1,119 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-
+import { Plus, MoreHorizontal } from "lucide-react";
+import { useToast } from "@/components/ui/use-toast";
 import PostQuestionModal from "./PostQuestionModal";
 import QuestionCard from "./QuestionCard";
+import { fetchQuestions, Question, postQuestion } from '../actions';
 
-// Mock data for now - this would come from your database
-const mockQuestions = [
-  {
-    id: "1",
-    title: "How to handle async state in React with TypeScript?",
-    content: "I'm having trouble managing async state in my React components when using TypeScript. The types seem to get confused when dealing with loading states and error handling. Any best practices?",
-    author: {
-      id: "user1",
-      name: "John Doe",
-      image_url: null,
-    },
-    tags: ["React", "TypeScript", "Async"],
-    images: [],
-    likes: 5,
-    comments: 3,
-    created_at: "2024-01-15T10:30:00Z",
-    updated_at: "2024-01-15T10:30:00Z",
-  },
-  {
-    id: "2",
-    title: "Tailwind CSS not working with Next.js 14",
-    content: "After upgrading to Next.js 14, my Tailwind CSS classes aren't being applied properly. I've checked my configuration files but can't figure out what's wrong.",
-    author: {
-      id: "user2",
-      name: "Jane Smith",
-      image_url: null,
-    },
-    tags: ["Next.js", "Tailwind CSS", "Configuration"],
-    images: [],
-    likes: 8,
-    comments: 7,
-    created_at: "2024-01-14T15:45:00Z",
-    updated_at: "2024-01-14T15:45:00Z",
-  },
-  {
-    id: "3",
-    title: "Database connection timeout in Node.js",
-    content: "My Node.js application keeps timing out when connecting to PostgreSQL. It works fine locally but fails in production. Connection pool settings seem correct.",
-    author: {
-      id: "user3",
-      name: "Mike Johnson",
-      image_url: null,
-    },
-    tags: ["Node.js", "PostgreSQL", "Database"],
-    images: [],
-    likes: 12,
-    comments: 9,
-    created_at: "2024-01-13T09:20:00Z",
-    updated_at: "2024-01-13T09:20:00Z",
-  },
-];
+type Author = {
+  id: string;
+  name: string;
+  image_url: string | null;
+};
 
-export default function OverflowView() {
+interface OverflowViewProps {
+  author: Author;
+}
+
+export default function OverflowView({ author }: OverflowViewProps) {
+  const { toast } = useToast();
   const [isPostModalOpen, setIsPostModalOpen] = useState(false);
-  const [questions, setQuestions] = useState(mockQuestions);
-  const [sortBy, setSortBy] = useState<"newest" | "popular">("newest");
+  const [questions, setQuestions] = useState<Question[]>([]);
+  const [sortBy, setSortBy] = useState<"newest" | "popular" | "myPosts">("newest");
+  const [forms, setForms] = useState<Question[]>([]);
+  const [isPosting, setIsPosting] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const sortedQuestions = [...questions].sort((a, b) => {
-    if (sortBy === "newest") {
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    } else {
-      return b.likes - a.likes;
+
+  useEffect(() => {
+    setIsLoading(true);
+    fetchQuestions()
+      .then((result) => {
+        setQuestions(result);
+      })
+      .catch((error) => {
+        console.error('Fetch error:', error);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
+
+
+  const sortedQuestions = [...questions]
+    .filter((q) => {
+      // Filter by logged-in user's posts if "myPosts" is selected
+      if (sortBy === "myPosts") {
+        return q.author.id === author.id;
+      }
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === "newest" || sortBy === "myPosts") {
+        return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+      } else {
+        return b.likes - a.likes;
+      }
+    });
+
+
+  const handlePostQuestion = async (questionData: {
+  title: string;
+  content: string;
+  tags: string[];
+  images: string[];
+}) => {
+  setIsPosting(true);
+
+  try {
+    // Call the server action to post the question
+    const result = await postQuestion({
+      title: questionData.title,
+      content: questionData.content,
+      tags: questionData.tags,
+      images: questionData.images,
+      authorId: author.id,
+    });
+
+     if (result.success && result.question) {
+        fetchQuestions().then((result) => {
+        setQuestions(result);
+      })
+        setIsPostModalOpen(false);
+        toast({
+          title: "Success!",
+          description: "Your question has been posted successfully.",
+          variant: "default",
+          className: "bg-green-500 text-white border-green-600",
+        });
+    }  else {
+        toast({
+          title: "Failed to post question",
+          description: result.error || "Please try again.",
+          variant: "destructive",
+          className: "bg-red-500 text-white border-red-600",
+        });
     }
-  });
-
-  const handlePostQuestion = (questionData: {
-    title: string;
-    content: string;
-    tags: string[];
-    images: string[];
-  }) => {
-    const newQuestion = {
-      id: Date.now().toString(),
-      ...questionData,
-      author: {
-        id: "current_user",
-        name: "Current User", // This would come from your auth system
-        image_url: null,
-      },
-      likes: 0,
-      comments: 0,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    
-    setQuestions([newQuestion, ...questions]);
-    setIsPostModalOpen(false);
-  };
+  } catch (error) {
+    console.error('Error posting question:', error);
+      toast({
+        title: "Error",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+        className: "bg-red-500 text-white border-red-600",
+      });
+  } finally {
+    setIsPosting(false);
+  }
+};
 
   const handleLike = (questionId: string) => {
-    setQuestions(questions.map(q => 
-      q.id === questionId 
-        ? { ...q, likes: q.likes + 1 }
-        : q
-    ));
+    alert(`Question ID: ${questionId}`);
   };
+
 
   return (
     <div className="flex flex-col gap-8">
@@ -113,11 +124,10 @@ export default function OverflowView() {
             variant="ghost"
             size="sm"
             onClick={() => setSortBy("newest")}
-            className={`rounded-full px-4 py-2 transition-all duration-200 ${
-              sortBy === "newest" 
-                ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600" 
-                : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
+            className={`rounded-full px-4 py-2 transition-all duration-200 ${sortBy === "newest"
+              ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600"
+              : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              }`}
           >
             Newest
           </Button>
@@ -125,17 +135,27 @@ export default function OverflowView() {
             variant="ghost"
             size="sm"
             onClick={() => setSortBy("popular")}
-            className={`rounded-full px-4 py-2 transition-all duration-200 ${
-              sortBy === "popular" 
-                ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600" 
-                : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-            }`}
+            className={`rounded-full px-4 py-2 transition-all duration-200 ${sortBy === "popular"
+              ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600"
+              : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              }`}
           >
             Popular
           </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => setSortBy("myPosts")}
+            className={`rounded-full px-4 py-2 transition-all duration-200 ${sortBy === "myPosts"
+              ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600"
+              : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+              }`}
+          >
+            My Posts
+          </Button>
         </div>
-        
-        <Button 
+
+        <Button
           onClick={() => setIsPostModalOpen(true)}
           className="rounded-full bg-gradient-to-r from-customBlue-500 to-indigo-500 px-6 py-2 text-white shadow-lg transition-all duration-200 hover:from-customBlue-600 hover:to-indigo-600 hover:shadow-xl"
         >
@@ -146,12 +166,24 @@ export default function OverflowView() {
 
       {/* Questions list */}
       <div className="space-y-6">
-        {sortedQuestions.length > 0 ? (
+        {isLoading ? (
+          <div className="mx-auto max-w-md rounded-2xl bg-accent p-12 text-center backdrop-blur-sm dark:bg-gray-800/60">
+            <div className="mb-6 flex justify-center">
+              <div className="h-16 w-16 animate-spin rounded-full border-4 border-gray-200 border-t-customBlue-500 dark:border-gray-700 dark:border-t-customBlue-400"></div>
+            </div>
+            <h3 className="mb-4 text-2xl font-light text-gray-900 dark:text-white">Loading questions...</h3>
+            <p className="text-gray-600 dark:text-gray-400">
+              Please wait while we fetch the latest questions.
+            </p>
+          </div>
+        ) : sortedQuestions.length > 0 ? (
           sortedQuestions.map((question) => (
             <QuestionCard
               key={question.id}
               question={question}
               onLike={handleLike}
+              loggedIn={author}
+              setQuestions={setQuestions}
             />
           ))
         ) : (
@@ -161,8 +193,8 @@ export default function OverflowView() {
             <p className="mb-8 text-gray-600 dark:text-gray-400">
               Be the first to ask a question and help build our knowledge base!
             </p>
-            <Button 
-              className="rounded-full bg-gradient-to-r from-customBlue-500 to-indigo-500 px-8 py-3 text-white shadow-lg transition-all duration-200 hover:from-customBlue-600 hover:to-indigo-600 hover:shadow-xl" 
+            <Button
+              className="rounded-full bg-gradient-to-r from-customBlue-500 to-indigo-500 px-8 py-3 text-white shadow-lg transition-all duration-200 hover:from-customBlue-600 hover:to-indigo-600 hover:shadow-xl"
               onClick={() => setIsPostModalOpen(true)}
             >
               <Plus className="mr-2 h-4 w-4" />

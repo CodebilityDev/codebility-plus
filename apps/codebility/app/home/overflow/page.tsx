@@ -1,11 +1,31 @@
 import { H1 } from "@/components/shared/dashboard";
 
 import OverflowView from "./_components/OverflowView";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
+
+
 export default async function OverflowPage() {
+  const supabase = await createClientServerComponent();
+
+  // Get current user
+  const {
+    data: { user: authUser },
+  } = await supabase.auth.getUser();
+
+  const { data: user, error: userError } = await supabase
+    .from("codev")
+    .select("*")
+    .eq("id", authUser?.id)
+    .single();
+
+  const codevData = {
+    ...user
+  };
+
   return (
     <div className="min-h-screen bg-white dark:bg-gray-950">
       <div className="mx-auto max-w-6xl px-6 py-12">
@@ -20,9 +40,9 @@ export default async function OverflowPage() {
             A community-driven platform where developers collaborate, share knowledge, and solve problems together
           </p>
         </div>
-        
+
         <div className="relative">
-          <OverflowView />
+          <OverflowView author={codevData} />
         </div>
       </div>
     </div>
