@@ -13,17 +13,22 @@ import * as fs from "fs";
 import { handleXP } from "./utils/xpSystem";
 
 // =============================
-// ✅ Load environment variables reliably
+// ✅ Load environment variables safely
 // =============================
-const envPath =
-  process.env.ENV_PATH ||
-  path.resolve(process.cwd(), ".env"); // Load from current working directory
+const envPath = process.env.ENV_PATH || path.resolve(process.cwd(), ".env");
 
 if (!fs.existsSync(envPath)) {
-  console.warn(`⚠️ .env file not found at ${envPath}. Environment variables may be missing.`);
+  console.warn(
+    `⚠️ .env file not found at ${envPath}. Make sure to create one with required variables.`
+  );
 }
 
 dotenv.config({ path: envPath });
+
+if (!process.env.DISCORD_TOKEN) {
+  console.error("❌ DISCORD_TOKEN is missing in environment variables!");
+  process.exit(1);
+}
 
 // =============================
 // 🔹 Extend Client to include command collection
@@ -68,7 +73,9 @@ declare module "discord.js" {
       const executeFn = commandModule.execute;
 
       if (!command || !executeFn) {
-        console.warn(`⚠️ Command file ${file} missing 'command' or 'execute' export.`);
+        console.warn(
+          `⚠️ Command file ${file} missing 'command' or 'execute' export.`
+        );
         continue;
       }
 
@@ -126,7 +133,9 @@ declare module "discord.js" {
     console.log(`🤖 Logged in as ${client.user?.tag}`);
 
     try {
-      const rest = new REST({ version: "10" }).setToken(process.env.DISCORD_TOKEN!);
+      const rest = new REST({ version: "10" }).setToken(
+        process.env.DISCORD_TOKEN!
+      );
 
       if (commandsData.length === 0) {
         console.warn("⚠️ No commands found to register.");
