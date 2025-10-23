@@ -13,6 +13,7 @@ import {
   ArrowUp,
   Award,
   Calendar,
+  MessageSquareText,
   Star,
   Target,
   TrendingUp,
@@ -462,7 +463,7 @@ export default function TokenPoints() {
               <div className="mb-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="rounded-lg bg-gradient-to-br from-blue-500 to-cyan-500 p-2 text-white">
-                    <Calendar className="h-6 w-6" />
+                    <MessageSquareText className="h-6 w-6" />
                   </div>
                   <div>
                     <p className="text-sm font-medium text-gray-600 dark:text-gray-300">
