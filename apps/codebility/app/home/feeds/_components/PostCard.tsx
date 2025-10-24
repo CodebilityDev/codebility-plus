@@ -60,7 +60,7 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
   return (
     <div>
       <Box
-        className="group relative flex h-[400px] cursor-pointer flex-col justify-between p-3"
+        className="group relative flex h-[400px] cursor-pointer flex-col justify-between rounded-xl p-3"
         onClick={openModal}
       >
         {/* Delete Button in top-right */}
