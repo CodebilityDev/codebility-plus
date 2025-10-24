@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import { useUserStore } from "@/store/codev-store";  // ← ADD THIS IMPORT
 import {
   getMembers,
   getTeamLead,
@@ -52,11 +53,31 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ totalPoints: number; presentDays: number }>({ totalPoints: 0, presentDays: 0 });
   const attendanceGridRef = useRef<any>(null);
 
+  // ← ADD THIS LINE: Get current user from store
+  const user = useUserStore((state) => state.user);
+
   const { project: projectInfo, teamLead, members, currentUserId } = project;
   const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
 
+  // 🔍 DEBUG LOGGING - Add this temporarily
+console.log('=== TEAMDETAILVIEW DEBUG ===');
+console.log('projectData:', projectData);
+console.log('currentUserId from props:', currentUserId);
+console.log('user from store:', user);
+console.log('user?.id from store:', user?.id);
+console.log('teamLead?.data?.id:', teamLead?.data?.id);
+console.log('===========================');
+
+
   // Check if current user is the team lead
-  const isTeamLead = currentUserId && teamLead?.data && teamLead.data.id === currentUserId;
+  // ← MODIFIED: Use user from store if currentUserId is not available
+  const actualCurrentUserId = currentUserId || user?.id;
+  const isTeamLead = actualCurrentUserId && teamLead?.data && teamLead.data.id === actualCurrentUserId;
+
+  console.log('=== COMPUTED VALUES ===');
+console.log('actualCurrentUserId:', actualCurrentUserId);
+console.log('isTeamLead:', isTeamLead);
+console.log('======================');
 
   // Load meeting schedule on component mount
   useEffect(() => {
@@ -233,7 +254,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         {viewMode === "attendance" && (
           <AttendanceWarningBanner 
             projectId={projectInfo.id} 
-            isTeamLead={isTeamLead || !currentUserId}
+            isTeamLead={isTeamLead || !actualCurrentUserId}
           />
         )}
         
@@ -275,7 +296,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             </Button>
             
             {/* Attendance Tab - Only for Team Leads */}
-            {(isTeamLead || !currentUserId) && (
+            {(isTeamLead || !actualCurrentUserId) && (
               <Button
                 variant={viewMode === "attendance" ? "default" : "outline"}
                 size="sm"
@@ -290,7 +311,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             )}
 
             {/* Checklist Button - Only for Team Leads */}
-            {(isTeamLead || !currentUserId) && (
+            {(isTeamLead || !actualCurrentUserId) && (
               <Button
                 variant="outline"
                 size="sm"
@@ -321,7 +342,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
                 <SyncAllAttendance 
                   projectId={projectInfo.id} 
-                  isTeamLead={isTeamLead || !currentUserId} 
+                  isTeamLead={isTeamLead || !actualCurrentUserId} 
                 />
               </>
             )}
@@ -497,14 +518,15 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         currentSchedule={currentSchedule}
       />
 
-      {/* Checklist Management Modal - FIXED: Added required props */}
-      {(isTeamLead || !currentUserId) && (
+      {/* Checklist Management Modal - FIXED: Added currentUserId prop */}
+      {(isTeamLead || !actualCurrentUserId) && (
         <ChecklistManageModal
           isOpen={showChecklistModal}
           projectId={projectInfo.id}
           projectName={projectInfo.name}
           teamMembers={members?.data || []}
           teamLeadId={teamLead?.data?.id || ""}
+          currentUserId={actualCurrentUserId || ""}  // ← ADDED THIS LINE
           onClose={handleCloseChecklistModal}
         />
       )}

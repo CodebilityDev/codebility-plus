@@ -19,13 +19,32 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
   const { projectId } = await params;
 
   try {
-    // Get current user
+    // Get current user from auth
     const supabase = await createClientServerComponent();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
       notFound();
     }
+
+    // ← CRITICAL FIX: Map auth user to codev user by email
+    // Auth user.id ≠ codev.id, so we need to look up by email
+    const { data: codevUser, error: codevError } = await supabase
+      .from('codev')
+      .select('id')
+      .eq('email_address', user.email)
+      .single();
+
+    if (codevError || !codevUser) {
+      console.error('Failed to find codev user:', codevError);
+      notFound();
+    }
+
+    console.log('=== USER ID MAPPING ===');
+    console.log('Auth user.id:', user.id);
+    console.log('Auth user.email:', user.email);
+    console.log('Codev user.id:', codevUser.id);
+    console.log('=======================');
 
     // Fetch user projects to verify access
     const userProjectsResponse = await getUserProjects();
@@ -51,11 +70,12 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       throw new Error("Failed to load team data");
     }
 
+    // ← CRITICAL FIX: Use codev.id instead of auth user.id
     const projectData = {
       project: project.project,
       teamLead: teamLead,
       members: members,
-      currentUserId: user.id
+      currentUserId: codevUser.id  // ← This is the codev table ID (7a3df452...)
     };
 
     return (
