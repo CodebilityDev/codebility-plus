@@ -409,7 +409,6 @@ export async function deletePostContentImages(
   }
 }
 
-<<<<<<< HEAD
 export const getSocialPoints = async (userId: string): Promise<number|null> => {
   const supabase = await createClientServerComponent();
 
@@ -428,7 +427,6 @@ export const getSocialPoints = async (userId: string): Promise<number|null> => {
             throw error;
           }
 };
-=======
 
 export async function createComment(
   post_id: string,
@@ -499,4 +497,3 @@ export async function deletePostComment(comment_id: string) {
     throw error;
   }
 }
->>>>>>> dev
