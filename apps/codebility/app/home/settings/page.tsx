@@ -33,6 +33,7 @@ const settingsPermissionMap: Record<string, PermissionKey> = {
   "/home/settings/profile": "resume",
   "/home/settings/permissions": "permissions",
   "/home/settings/roles": "roles",
+  "/home/settings/news-banners": "settings", // Admin-only feature
 };
 
 const Settings = () => {
