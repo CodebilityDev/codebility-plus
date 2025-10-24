@@ -64,7 +64,7 @@ export default async function HirePage() {
 
   return (
     <div className="mx-auto max-w-screen-xl">
-      <div className="flex flex-col gap-4 pt-4">
+      <div className="flex flex-col gap-4 pt-4 pb-8">
         <div className="mb-6">
           <CustomBreadcrumb items={breadcrumbItems} />
         </div>

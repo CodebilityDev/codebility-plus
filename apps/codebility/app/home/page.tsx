@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import H1 from "@/components/shared/dashboard/H1";
 import PageContainer from "./_components/PageContainer";
 import DashboardClient from "./_components/DashboardClient";
+import NewsBanner from "./_components/NewsBanner";
 
 // Loading component for better UX
 function DashboardLoading() {
@@ -37,6 +38,9 @@ export default function DashboardPage() {
         </div>
         
         <div className="relative z-10 flex flex-col gap-6">
+        {/* News Banner */}
+        <NewsBanner />
+        
         {/* Enhanced Header */}
         <div className="mb-6">
           <div className="flex items-center gap-4 mb-2">
