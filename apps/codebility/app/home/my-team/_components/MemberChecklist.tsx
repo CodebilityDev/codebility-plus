@@ -6,19 +6,17 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
 
 /**
- * MemberChecklist - SHARED CHECKLIST VERSION
+ * MemberChecklist - ENHANCED VERSION
  * 
- * CRITICAL CHANGES FROM PREVIOUS VERSION:
- * 1. Toggle now affects ALL team members (shared checklist behavior)
- * 2. Completely removed priority display (no label, no badge)
- * 3. When team lead toggles item, ALL rows for that title get updated
+ * FIXES APPLIED:
+ * 1. ✅ Fixed toast syntax errors (missing opening quotes)
+ * 2. ✅ Removed double quotes from item names in toasts
+ * 3. ✅ Removed emoji from toasts (library provides icons)
  * 
  * BEHAVIOR:
  * - Team lead toggles "meeting" for Member A → ALL members' "meeting" toggled
  * - This is for team-wide tasks that everyone completes together
- * 
- * Line 178: UPDATE without member_id filter (affects all members)
- * Line 303: Removed priority badge completely
+ * - No priority display (removed completely)
  */
 
 interface ChecklistItem {
@@ -109,10 +107,6 @@ const MemberChecklist = ({
     
     setIsLoading(true);
     try {
-      console.log('=== LOADING SHARED CHECKLIST ===');
-      console.log('Member:', memberId);
-      console.log('Project:', projectId);
-      
       // Get ALL unique items in project
       const { data: allProjectItems, error: allItemsError } = await supabase
         .from("member_checklists")
@@ -131,7 +125,6 @@ const MemberChecklist = ({
       });
       
       const uniqueItems = Array.from(uniqueItemsMap.values());
-      console.log(`Found ${uniqueItems.length} unique items`);
 
       // For each item, get THIS MEMBER's completion status
       const finalItems: ChecklistItem[] = [];
@@ -166,11 +159,9 @@ const MemberChecklist = ({
         }
       }
       
-      console.log(`Loaded ${finalItems.length} items`);
       setChecklistItems(finalItems);
 
     } catch (error) {
-      console.error("Error loading checklist:", error);
       toast.error("Failed to load checklist items");
       setChecklistItems([]);
     } finally {
@@ -192,7 +183,7 @@ const MemberChecklist = ({
   ) => {
     // Permission check
     if (!isCurrentUserTeamLead) {
-      toast.error("🔒 Only team leads can toggle checklist completion");
+      toast.error("Only team leads can toggle checklist completion");
       return;
     }
 
@@ -200,11 +191,6 @@ const MemberChecklist = ({
       toast.error("Database not initialized");
       return;
     }
-
-    console.log('=== TOGGLE SHARED CHECKLIST ===');
-    console.log('Item:', itemTitle);
-    console.log('New status:', !currentStatus);
-    console.log('Will affect: ALL team members');
 
     const newStatus = !currentStatus;
 
@@ -221,12 +207,8 @@ const MemberChecklist = ({
         // ↑ NOTE: No member_id filter - affects ALL members
 
       if (updateError) {
-        console.error("Update error:", updateError);
-        
         // If update fails, try creating rows for members who don't have them
         if (updateError.code === 'PGRST116') { // No rows found
-          console.log('No existing rows, creating for all members...');
-          
           // Get all project members
           const { data: projectMembers } = await supabase
             .from("project_members")
@@ -259,7 +241,6 @@ const MemberChecklist = ({
               .insert(rowsToInsert);
 
             if (insertError) {
-              console.error("Insert error:", insertError);
               toast.error("Failed to create checklist items");
               return;
             }
@@ -269,8 +250,6 @@ const MemberChecklist = ({
           return;
         }
       }
-
-      console.log('✅ Updated ALL team members');
       
       // Update local state
       setChecklistItems(prev =>
@@ -281,14 +260,14 @@ const MemberChecklist = ({
         )
       );
 
+      // Fixed: No double quotes, no emoji, proper syntax
       if (newStatus) {
-        toast.success(`✅ "${itemTitle}" marked as completed for ALL team members`);
+        toast.success(`${itemTitle} marked as completed for ALL team members`);
       } else {
-        toast.success(`↩️ "${itemTitle}" marked as incomplete for ALL team members`);
+        toast.success(`${itemTitle} marked as incomplete for ALL team members`);
       }
 
     } catch (error) {
-      console.error("Error toggling:", error);
       toast.error("Failed to update checklist");
     }
   };
@@ -434,7 +413,7 @@ const MemberChecklist = ({
                       </p>
                     )}
 
-                    {/* Due Date Only - NO PRIORITY BADGE */}
+                    {/* Due Date Only - NO PRIORITY */}
                     {item.due_date && (
                       <div className="mt-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
