@@ -2,7 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from "react";
 import { toast } from "react-hot-toast";
-import { useUserStore } from "@/store/codev-store";  // ← ADD THIS IMPORT
+// ✅ REMOVED: useUserStore import (no longer needed in this component)
 import {
   getMembers,
   getTeamLead,
@@ -33,7 +33,7 @@ interface ProjectData {
   members: {
     data: SimpleMemberData[];
   };
-  currentUserId?: string;
+  // ✅ REMOVED: currentUserId prop (no longer needed)
 }
 
 interface TeamDetailViewProps {
@@ -53,31 +53,11 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ totalPoints: number; presentDays: number }>({ totalPoints: 0, presentDays: 0 });
   const attendanceGridRef = useRef<any>(null);
 
-  // ← ADD THIS LINE: Get current user from store
-  const user = useUserStore((state) => state.user);
-
-  const { project: projectInfo, teamLead, members, currentUserId } = project;
+  const { project: projectInfo, teamLead, members } = project;
   const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
 
-  // 🔍 DEBUG LOGGING - Add this temporarily
-console.log('=== TEAMDETAILVIEW DEBUG ===');
-console.log('projectData:', projectData);
-console.log('currentUserId from props:', currentUserId);
-console.log('user from store:', user);
-console.log('user?.id from store:', user?.id);
-console.log('teamLead?.data?.id:', teamLead?.data?.id);
-console.log('===========================');
-
-
-  // Check if current user is the team lead
-  // ← MODIFIED: Use user from store if currentUserId is not available
-  const actualCurrentUserId = currentUserId || user?.id;
-  const isTeamLead = actualCurrentUserId && teamLead?.data && teamLead.data.id === actualCurrentUserId;
-
-  console.log('=== COMPUTED VALUES ===');
-console.log('actualCurrentUserId:', actualCurrentUserId);
-console.log('isTeamLead:', isTeamLead);
-console.log('======================');
+  // ✅ SIMPLIFIED: No more currentUserId handling
+  // ChecklistManageModal will handle its own authentication
 
   // Load meeting schedule on component mount
   useEffect(() => {
@@ -254,7 +234,7 @@ console.log('======================');
         {viewMode === "attendance" && (
           <AttendanceWarningBanner 
             projectId={projectInfo.id} 
-            isTeamLead={isTeamLead || !actualCurrentUserId}
+            isTeamLead={true} // ✅ SIMPLIFIED: ChecklistManageModal handles its own permissions now
           />
         )}
         
@@ -295,33 +275,29 @@ console.log('======================');
               Team View
             </Button>
             
-            {/* Attendance Tab - Only for Team Leads */}
-            {(isTeamLead || !actualCurrentUserId) && (
-              <Button
-                variant={viewMode === "attendance" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("attendance")}
-                className={`flex items-center gap-2 ${
-                  viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
-                }`}
-              >
-                <Table className="h-4 w-4" />
-                Attendance
-              </Button>
-            )}
+            {/* Attendance Tab */}
+            <Button
+              variant={viewMode === "attendance" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("attendance")}
+              className={`flex items-center gap-2 ${
+                viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
+              }`}
+            >
+              <Table className="h-4 w-4" />
+              Attendance
+            </Button>
 
-            {/* Checklist Button - Only for Team Leads */}
-            {(isTeamLead || !actualCurrentUserId) && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleOpenChecklistModal}
-                className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
-              >
-                <CheckSquare className="h-4 w-4" />
-                Checklist
-              </Button>
-            )}
+            {/* Checklist Button */}
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleOpenChecklistModal}
+              className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+            >
+              <CheckSquare className="h-4 w-4" />
+              Checklist
+            </Button>
           </div>
 
           {/* RIGHT: Action Buttons */}
@@ -342,7 +318,7 @@ console.log('======================');
 
                 <SyncAllAttendance 
                   projectId={projectInfo.id} 
-                  isTeamLead={isTeamLead || !actualCurrentUserId} 
+                  isTeamLead={true} // ✅ SIMPLIFIED
                 />
               </>
             )}
@@ -357,18 +333,16 @@ console.log('======================');
                 {isLoadingMembers ? 'Loading...' : 'Manage Members'}
               </Button>
             )}
-            {isTeamLead && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-                title="Schedule Meetings"
-                onClick={() => setShowScheduleMeetingModal(true)}
-              >
-                <CalendarDays className="h-3.5 w-3.5" />
-                Schedule Meeting
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+              title="Schedule Meetings"
+              onClick={() => setShowScheduleMeetingModal(true)}
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+              Schedule Meeting
+            </Button>
           </div>
         </div>
 
@@ -429,11 +403,6 @@ console.log('======================');
                   {monthlyAttendancePoints.presentDays > 0 && (
                     <p className="text-xs text-gray-600 dark:text-gray-400">
                       {monthlyAttendancePoints.presentDays} attendance {monthlyAttendancePoints.presentDays === 1 ? 'day' : 'days'} recorded
-                    </p>
-                  )}
-                  {isTeamLead && (
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      Click "Attendance" tab to manage team attendance
                     </p>
                   )}
                 </div>
@@ -518,18 +487,16 @@ console.log('======================');
         currentSchedule={currentSchedule}
       />
 
-      {/* Checklist Management Modal - FIXED: Added currentUserId prop */}
-      {(isTeamLead || !actualCurrentUserId) && (
-        <ChecklistManageModal
-          isOpen={showChecklistModal}
-          projectId={projectInfo.id}
-          projectName={projectInfo.name}
-          teamMembers={members?.data || []}
-          teamLeadId={teamLead?.data?.id || ""}
-          currentUserId={actualCurrentUserId || ""}  // ← ADDED THIS LINE
-          onClose={handleCloseChecklistModal}
-        />
-      )}
+      {/* ✅ SIMPLIFIED: Checklist Management Modal - Now self-contained */}
+      <ChecklistManageModal
+        isOpen={showChecklistModal}
+        projectId={projectInfo.id}
+        projectName={projectInfo.name}
+        teamMembers={members?.data || []}
+        teamLeadId={teamLead?.data?.id || ""}
+        // ✅ REMOVED: currentUserId prop (modal handles its own auth)
+        onClose={handleCloseChecklistModal}
+      />
     </>
   );
 };

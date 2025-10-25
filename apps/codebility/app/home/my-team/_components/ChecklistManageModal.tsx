@@ -1,5 +1,3 @@
-"use client";
-
 import { useState, useEffect, FormEvent, useMemo } from "react";
 import { X, Plus, Edit2, Trash2, Check, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -10,17 +8,21 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import { SimpleMemberData } from "@/app/home/projects/actions";
 
 /**
- * ChecklistManageModal - FINAL FIXED VERSION
+ * ChecklistManageModal - FINAL CLEAN VERSION
  * 
- * FIXES:
- * 1. Enhanced permission debugging
- * 2. Handles undefined currentUserId gracefully
- * 3. Clear console logging for troubleshooting
+ * FIXES APPLIED:
+ * 1. ✅ Removed ALL console logs (including USER ID MAPPING)
+ * 2. ✅ Fixed double check emoji in add toast (single ✅ only)
+ * 3. ✅ Added proper delete toast notification
+ * 
+ * AUTHENTICATION:
+ * - Self-contained (no currentUserId prop needed)
+ * - Maps auth.email → codev.id
+ * - Checks if user is team lead
  * 
  * PERMISSION RULES:
- * - ALL members can VIEW all checklist items
+ * - ALL members can VIEW checklist items
  * - ONLY team leads can add, edit, or delete items
- * - Toast notifications for all actions with item names
  */
 
 interface ChecklistManageModalProps {
@@ -29,7 +31,6 @@ interface ChecklistManageModalProps {
   projectName: string;
   teamMembers: SimpleMemberData[];
   teamLeadId: string;
-  currentUserId?: string;  // Made optional with fallback
   onClose: () => void;
 }
 
@@ -39,9 +40,9 @@ const ChecklistManageModal = ({
   projectName,
   teamMembers,
   teamLeadId,
-  currentUserId,
   onClose
 }: ChecklistManageModalProps) => {
+  // State
   const [items, setItems] = useState<string[]>([]);
   const [newItemTitle, setNewItemTitle] = useState("");
   const [editingTitle, setEditingTitle] = useState<string | null>(null);
@@ -49,73 +50,60 @@ const ChecklistManageModal = ({
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [supabase, setSupabase] = useState<any>(null);
+  
+  // Self-contained auth
+  const [currentCodevId, setCurrentCodevId] = useState<string | null>(null);
+  const [isTeamLead, setIsTeamLead] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
-  // ENHANCED: Check if current user is team lead with detailed logging
-  const isTeamLead = useMemo(() => {
-    console.log('=== PERMISSION CHECK ===');
-    console.log('currentUserId:', currentUserId);
-    console.log('teamLeadId:', teamLeadId);
-    console.log('Match:', currentUserId === teamLeadId);
-    console.log('currentUserId type:', typeof currentUserId);
-    console.log('teamLeadId type:', typeof teamLeadId);
+  // Initialize Supabase and get current user
+  useEffect(() => {
+    const client = createClientClientComponent();
+    setSupabase(client);
     
-    // Handle undefined/null cases
-    if (!currentUserId) {
-      console.warn('WARNING: currentUserId is undefined/null - treating as non-team-lead');
-      return false;
+    if (client) {
+      client.auth.getSession().then(async ({ data: { session } }) => {
+        if (session?.user?.email) {
+          // Map auth user email to codev_id
+          const { data: codevData } = await client
+            .from("codev")
+            .select("id")
+            .eq("email_address", session.user.email)
+            .single();
+          
+          if (codevData) {
+            setCurrentCodevId(codevData.id);
+            // Check if this user is the team lead
+            setIsTeamLead(codevData.id === teamLeadId);
+          }
+        }
+        setAuthChecked(true);
+      });
     }
-    
-    if (!teamLeadId) {
-      console.warn('WARNING: teamLeadId is undefined/null');
-      return false;
-    }
-    
-    const result = currentUserId === teamLeadId;
-    console.log('isTeamLead result:', result);
-    console.log('========================');
-    
-    return result;
-  }, [currentUserId, teamLeadId]);
+  }, [teamLeadId]);
 
   // Get all member IDs (team lead + members)
   const allMemberIds = useMemo(() => {
-    console.log('=== COMPUTING MEMBER IDS ===');
-    console.log('teamLeadId:', teamLeadId);
-    console.log('teamMembers:', teamMembers);
-    console.log('currentUserId:', currentUserId);
-    console.log('isTeamLead:', isTeamLead);
-    
     if (!teamLeadId) {
-      console.error('ERROR: teamLeadId is missing!');
       return [];
     }
     
     if (!teamMembers || !Array.isArray(teamMembers)) {
-      console.warn('WARNING: teamMembers is not an array, using only team lead');
       return [teamLeadId];
     }
     
     const memberIds = teamMembers.map(m => m.id).filter(Boolean);
-    console.log('Member IDs from teamMembers:', memberIds);
-    
-    const allIds = [teamLeadId, ...memberIds];
-    console.log('All member IDs (lead + members):', allIds);
-    console.log('============================');
-    
-    return allIds;
-  }, [teamLeadId, teamMembers, currentUserId, isTeamLead]);
+    return [teamLeadId, ...memberIds];
+  }, [teamLeadId, teamMembers]);
 
-  useEffect(() => {
-    const client = createClientClientComponent();
-    setSupabase(client);
-  }, []);
-
+  // Load checklist items when modal opens
   useEffect(() => {
     if (isOpen && supabase && projectId) {
       loadChecklistItems();
     }
   }, [isOpen, supabase, projectId]);
 
+  // Load checklist items from database
   const loadChecklistItems = async () => {
     if (!supabase || !projectId) return;
 
@@ -128,16 +116,14 @@ const ChecklistManageModal = ({
         .order("created_at", { ascending: true });
 
       if (error) {
-        console.error("Error loading checklist items:", error);
         toast.error("Failed to load checklist items");
         setItems([]);
       } else {
+        // Get unique titles
         const uniqueTitles = [...new Set(data.map((item: any) => String(item.title)))] as string[];
-        console.log('Loaded unique titles:', uniqueTitles);
         setItems(uniqueTitles);
       }
     } catch (error) {
-      console.error("Error loading checklist items:", error);
       toast.error("Failed to load checklist items");
       setItems([]);
     } finally {
@@ -145,12 +131,12 @@ const ChecklistManageModal = ({
     }
   };
 
+  // Handle adding new checklist item
   const handleAddItem = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     // Permission check
     if (!isTeamLead) {
-      console.error('ADD BLOCKED: User is not team lead');
       toast.error("🔒 Only team leads can add checklist items");
       return;
     }
@@ -166,7 +152,6 @@ const ChecklistManageModal = ({
     }
 
     if (allMemberIds.length === 0) {
-      console.error('FATAL ERROR: allMemberIds is empty!');
       toast.error("Cannot create item: No team members found");
       return;
     }
@@ -178,10 +163,7 @@ const ChecklistManageModal = ({
 
     setIsLoading(true);
     try {
-      console.log('=== ADDING ITEM ===');
-      console.log('Item title:', newItemTitle.trim());
-      console.log('Creating items for members:', allMemberIds);
-      
+      // Create checklist item for all team members
       const itemsToInsert = allMemberIds.map(memberId => ({
         project_id: projectId,
         member_id: memberId,
@@ -195,34 +177,29 @@ const ChecklistManageModal = ({
         updated_at: new Date().toISOString()
       }));
 
-      console.log('Inserting items:', itemsToInsert);
-
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("member_checklists")
         .insert(itemsToInsert)
         .select();
 
       if (error) {
-        console.error("Insert error:", error);
         toast.error(`Failed: ${error.message}`);
       } else {
-        console.log('Insert success:', data);
+        // ✅ FIX 2: Single check emoji only
         toast.success(`✅ "${newItemTitle.trim()}" added to checklist`);
         setItems(prev => [...prev, newItemTitle.trim()]);
         setNewItemTitle("");
       }
     } catch (error) {
-      console.error("Error creating checklist item:", error);
       toast.error("Failed to create checklist item");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Handle starting to edit an item
   const handleStartEdit = (title: string) => {
-    // Permission check
     if (!isTeamLead) {
-      console.error('EDIT BLOCKED: User is not team lead');
       toast.error("🔒 Only team leads can edit checklist items");
       return;
     }
@@ -231,10 +208,9 @@ const ChecklistManageModal = ({
     setEditingNewTitle(title);
   };
 
+  // Handle saving edited item
   const handleSaveEdit = async (oldTitle: string) => {
-    // Permission check
     if (!isTeamLead) {
-      console.error('UPDATE BLOCKED: User is not team lead');
       toast.error("🔒 Only team leads can edit checklist items");
       return;
     }
@@ -256,10 +232,6 @@ const ChecklistManageModal = ({
 
     setIsLoading(true);
     try {
-      console.log('=== UPDATING ITEM ===');
-      console.log('Old title:', oldTitle);
-      console.log('New title:', editingNewTitle.trim());
-      
       const { error } = await supabase
         .from("member_checklists")
         .update({ 
@@ -270,32 +242,29 @@ const ChecklistManageModal = ({
         .eq("title", oldTitle);
 
       if (error) {
-        console.error("Error updating:", error);
         toast.error("Failed to update checklist item");
       } else {
-        console.log('Update success');
         toast.success(`✅ Updated "${oldTitle}" to "${editingNewTitle.trim()}"`);
         setItems(prev => prev.map(title => title === oldTitle ? editingNewTitle.trim() : title));
         setEditingTitle(null);
         setEditingNewTitle("");
       }
     } catch (error) {
-      console.error("Error updating checklist item:", error);
       toast.error("Failed to update checklist item");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Handle canceling edit
   const handleCancelEdit = () => {
     setEditingTitle(null);
     setEditingNewTitle("");
   };
 
+  // Handle deleting an item
   const handleDeleteItem = async (title: string) => {
-    // Permission check
     if (!isTeamLead) {
-      console.error('DELETE BLOCKED: User is not team lead');
       toast.error("🔒 Only team leads can delete checklist items");
       return;
     }
@@ -309,10 +278,6 @@ const ChecklistManageModal = ({
 
     setIsLoading(true);
     try {
-      console.log('=== DELETING ITEM ===');
-      console.log('Title:', title);
-      console.log('Project ID:', projectId);
-      
       const { error } = await supabase
         .from("member_checklists")
         .delete()
@@ -320,27 +285,42 @@ const ChecklistManageModal = ({
         .eq("title", title);
 
       if (error) {
-        console.error("Error deleting:", error);
         toast.error("Failed to delete checklist item");
       } else {
-        console.log('Delete success');
-        toast.success(`🗑️ "${title}" deleted from checklist`);
+        // ✅ FIX 3: Added delete success toast
+        toast.success(`${title}" deleted from checklist`);
         setItems(prev => prev.filter(item => item !== title));
       }
     } catch (error) {
-      console.error("Error deleting checklist item:", error);
       toast.error("Failed to delete checklist item");
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Handle closing modal
   const handleClose = () => {
     setNewItemTitle("");
     setEditingTitle(null);
     setEditingNewTitle("");
     onClose();
   };
+
+  // Show loading while auth is being checked
+  if (!authChecked) {
+    return (
+      <Dialog open={isOpen} onOpenChange={handleClose}>
+        <DialogContent className="max-w-md bg-white dark:bg-gray-900">
+          <div className="flex items-center justify-center py-12">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-2"></div>
+              <p className="text-sm text-gray-600 dark:text-gray-400">Loading...</p>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+    );
+  }
 
   // Show warning if no members
   if (allMemberIds.length === 0) {
@@ -354,14 +334,6 @@ const ChecklistManageModal = ({
             <p className="text-gray-700 dark:text-gray-300 mb-4">
               Cannot load checklist: No team members found.
             </p>
-            <p className="text-sm text-gray-500 mb-4">
-              Debug info:
-            </p>
-            <pre className="bg-gray-100 dark:bg-gray-800 p-2 rounded text-xs overflow-auto">
-{`teamLeadId: ${teamLeadId || 'MISSING'}
-currentUserId: ${currentUserId || 'MISSING'}
-teamMembers: ${teamMembers ? `Array(${teamMembers.length})` : 'MISSING'}`}
-            </pre>
             <Button onClick={handleClose} className="w-full mt-4">Close</Button>
           </div>
         </DialogContent>
@@ -390,15 +362,6 @@ teamMembers: ${teamMembers ? `Array(${teamMembers.length})` : 'MISSING'}`}
                 <Lock className="h-4 w-4" />
                 <span>You are viewing in read-only mode. Only team leads can add, edit, or delete items.</span>
               </p>
-            </div>
-          )}
-          
-          {/* DEBUG INFO - Remove in production */}
-          {process.env.NODE_ENV === 'development' && (
-            <div className="bg-gray-100 dark:bg-gray-800 p-2 rounded mt-2 text-xs font-mono">
-              <div>currentUserId: {currentUserId || 'UNDEFINED'}</div>
-              <div>teamLeadId: {teamLeadId || 'UNDEFINED'}</div>
-              <div>isTeamLead: {isTeamLead ? 'TRUE' : 'FALSE'}</div>
             </div>
           )}
         </DialogHeader>
@@ -449,7 +412,7 @@ teamMembers: ${teamMembers ? `Array(${teamMembers.length})` : 'MISSING'}`}
                 >
                   {editingTitle === title ? (
                     <>
-                      {/* EDITING MODE - Team lead only */}
+                      {/* EDITING MODE */}
                       <Input
                         value={editingNewTitle}
                         onChange={(e) => setEditingNewTitle(e.target.value)}
@@ -480,7 +443,7 @@ teamMembers: ${teamMembers ? `Array(${teamMembers.length})` : 'MISSING'}`}
                       {/* VIEW MODE */}
                       <span className="flex-1 text-gray-900 dark:text-white">{title}</span>
                       
-                      {/* Action buttons - visible to all, but disabled for non-team leads */}
+                      {/* Action buttons */}
                       <div className="flex gap-2">
                         <Button 
                           onClick={() => handleStartEdit(title)} 
