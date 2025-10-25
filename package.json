@@ -4,13 +4,16 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@codevs/prettier-config": "workspace:^",
+    "@codevs/tailwind-config": "workspace:*",
+    "@codevs/tsconfig": "workspace:*",
     "@turbo/gen": "^2.1.1",
+    "@types/minimatch": "^6.0.0",
     "@types/react": "19.1.5",
     "@types/react-dom": "19.1.5",
     "eslint": "^8.57.0",
     "prettier": "^3.3.3",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "19.2.0",
+    "react-dom": "19.2.0",
     "turbo": "^2.1.1",
     "typescript": "^5.5.4"
   },
@@ -54,8 +57,12 @@
   "dependencies": {
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.55.0",
+    "@tailwindcss/postcss": "^4.1.16",
     "axios": "^1.7.3",
     "date-fns": "^3.6.0",
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "next": "^16.0.0",
+    "postcss": "^8",
+    "tailwindcss": "^4.1.16"
   }
 }

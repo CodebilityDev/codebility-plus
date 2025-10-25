@@ -37,7 +37,7 @@
     "**/*.mjs",
     ".next/types/**/*.ts",
     "public/assets/svgs/index.js",
-    "svgr.d.ts",
+    "svgr.d.ts"
   ],
   "exclude": [
     "node_modules"

@@ -1,0 +1,22 @@
+{
+  "name": "bot",
+  "version": "1.0.0",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "npx ts-node --project tsconfig.bot.json index.ts",
+    "build": "npx tsc --project tsconfig.bot.json",
+    "start": "node dist/index.js"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.55.0",
+    "canvas": "^3.2.0",
+    "discord.js": "^14.24.0",
+    "dotenv": "^17.2.3",
+    "node-fetch": "^3.3.2"
+  },
+  "devDependencies": {
+    "@types/node": "^24.8.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.9.2"
+  }
+}
