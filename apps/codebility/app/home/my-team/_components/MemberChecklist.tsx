@@ -6,21 +6,19 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
 
 /**
- * MemberChecklist - FIXED VERSION
+ * MemberChecklist - SHARED CHECKLIST VERSION
  * 
- * KEY FIX: Shows ALL project checklist items, even if member doesn't have a row
+ * CRITICAL CHANGES FROM PREVIOUS VERSION:
+ * 1. Toggle now affects ALL team members (shared checklist behavior)
+ * 2. Completely removed priority display (no label, no badge)
+ * 3. When team lead toggles item, ALL rows for that title get updated
  * 
- * CHANGES:
- * 1. Loads all unique checklist items from the project
- * 2. For each item, checks if member has a row (completed status)
- * 3. If no row exists, shows item as incomplete (placeholder)
- * 4. Team leads can toggle (creates row if needed)
- * 5. Regular members see all items in read-only mode
+ * BEHAVIOR:
+ * - Team lead toggles "meeting" for Member A → ALL members' "meeting" toggled
+ * - This is for team-wide tasks that everyone completes together
  * 
- * Line-by-line guidance:
- * - Lines 42-95: Fixed loadChecklistItems() - now shows ALL items
- * - Lines 97-165: Enhanced toggleComplete() - creates rows for placeholders
- * - Lines 167+: UI remains the same
+ * Line 178: UPDATE without member_id filter (affects all members)
+ * Line 303: Removed priority badge completely
  */
 
 interface ChecklistItem {
@@ -35,13 +33,13 @@ interface ChecklistItem {
   due_date: string | null;
   created_at: string;
   updated_at: string;
-  isPlaceholder?: boolean; // NEW: Marks items without database rows
+  isPlaceholder?: boolean;
 }
 
 interface MemberChecklistProps {
-  memberId: string;      // The member whose checklist we're viewing
+  memberId: string;
   projectId: string;
-  isTeamLead?: boolean;  // IGNORED - will check internally
+  isTeamLead?: boolean;
 }
 
 const MemberChecklist = ({ 
@@ -95,7 +93,7 @@ const MemberChecklist = ({
     checkTeamLeadStatus();
   }, [supabase, currentCodevId, projectId]);
 
-  // Load checklist items when component mounts
+  // Load checklist items
   useEffect(() => {
     if (supabase && memberId && projectId) {
       loadChecklistItems();
@@ -103,37 +101,28 @@ const MemberChecklist = ({
   }, [memberId, projectId, supabase]);
 
   /**
-   * FIXED: Load ALL unique checklist items for project
-   * Creates placeholders for items member doesn't have rows for
-   * 
-   * OLD BEHAVIOR: Only showed items where member had a row
-   * NEW BEHAVIOR: Shows ALL project items, marks missing rows as placeholders
+   * Load ALL project checklist items
+   * Shows status for the member being viewed
    */
   const loadChecklistItems = async () => {
     if (!memberId || !projectId || !supabase) return;
     
     setIsLoading(true);
     try {
-      console.log('=== LOADING CHECKLIST (FIXED) ===');
-      console.log('Member being viewed:', memberId);
-      console.log('Project ID:', projectId);
+      console.log('=== LOADING SHARED CHECKLIST ===');
+      console.log('Member:', memberId);
+      console.log('Project:', projectId);
       
-      // STEP 1: Get ALL unique items in this project
-      // We need the template data (title, description, priority, etc.)
+      // Get ALL unique items in project
       const { data: allProjectItems, error: allItemsError } = await supabase
         .from("member_checklists")
         .select("title, description, priority, due_date, created_by, created_at")
         .eq("project_id", projectId)
         .order("created_at", { ascending: true });
 
-      if (allItemsError) {
-        console.error("Error loading project items:", allItemsError);
-        throw allItemsError;
-      }
+      if (allItemsError) throw allItemsError;
 
-      console.log('Total rows in project:', allProjectItems?.length || 0);
-
-      // STEP 2: Get unique items by title (use Map to deduplicate)
+      // Deduplicate by title
       const uniqueItemsMap = new Map();
       allProjectItems?.forEach((item: any) => {
         if (!uniqueItemsMap.has(item.title)) {
@@ -142,51 +131,46 @@ const MemberChecklist = ({
       });
       
       const uniqueItems = Array.from(uniqueItemsMap.values());
-      console.log('Unique items found:', uniqueItems.length);
+      console.log(`Found ${uniqueItems.length} unique items`);
 
-      // STEP 3: For each unique item, check if THIS MEMBER has a row
+      // For each item, get THIS MEMBER's completion status
       const finalItems: ChecklistItem[] = [];
       
       for (const templateItem of uniqueItems) {
-        // Try to find this member's row for this item
-        const { data: memberRow, error } = await supabase
+        const { data: memberRow } = await supabase
           .from("member_checklists")
           .select("*")
           .eq("project_id", projectId)
           .eq("member_id", memberId)
           .eq("title", templateItem.title)
-          .maybeSingle(); // Use maybeSingle to avoid error if not found
+          .maybeSingle();
 
         if (memberRow) {
-          // Member has a row - use it
-          console.log(`✅ Found row for "${templateItem.title}"`);
           finalItems.push(memberRow);
         } else {
-          // Member doesn't have a row - create placeholder
-          console.log(`⚠️ No row for "${templateItem.title}" - creating placeholder`);
+          // Create placeholder
           finalItems.push({
-            id: `placeholder-${templateItem.title}`, // Temporary ID
+            id: `placeholder-${memberId}-${templateItem.title}`,
             member_id: memberId,
             project_id: projectId,
             title: templateItem.title,
             description: templateItem.description,
             priority: templateItem.priority,
-            completed: false, // Default to incomplete
+            completed: false,
             created_by: templateItem.created_by,
             due_date: templateItem.due_date,
             created_at: templateItem.created_at,
             updated_at: templateItem.created_at,
-            isPlaceholder: true // Mark as placeholder
+            isPlaceholder: true
           });
         }
       }
       
-      console.log(`Final items (with placeholders): ${finalItems.length}`);
-      console.log(`Showing ALL ${finalItems.length} project items`);
+      console.log(`Loaded ${finalItems.length} items`);
       setChecklistItems(finalItems);
 
     } catch (error) {
-      console.error("Error loading checklist items:", error);
+      console.error("Error loading checklist:", error);
       toast.error("Failed to load checklist items");
       setChecklistItems([]);
     } finally {
@@ -195,10 +179,10 @@ const MemberChecklist = ({
   };
 
   /**
-   * ENHANCED: Toggle checklist completion
-   * Now handles placeholders by creating database rows
+   * Toggle checklist - SHARED VERSION
    * 
-   * NEW: If item is a placeholder (no DB row), creates the row first
+   * CRITICAL: Updates ALL team members at once
+   * This is for team-wide tasks (meeting, standup, etc.)
    */
   const toggleComplete = async (
     itemId: string, 
@@ -208,7 +192,6 @@ const MemberChecklist = ({
   ) => {
     // Permission check
     if (!isCurrentUserTeamLead) {
-      console.error('❌ TOGGLE BLOCKED: Current user is not team lead');
       toast.error("🔒 Only team leads can toggle checklist completion");
       return;
     }
@@ -218,114 +201,99 @@ const MemberChecklist = ({
       return;
     }
 
-    console.log('=== TOGGLING COMPLETION ===');
-    console.log('Item title:', itemTitle);
-    console.log('Is placeholder:', isPlaceholder);
-    console.log('Current status:', currentStatus);
+    console.log('=== TOGGLE SHARED CHECKLIST ===');
+    console.log('Item:', itemTitle);
     console.log('New status:', !currentStatus);
+    console.log('Will affect: ALL team members');
 
-    // CASE 1: Placeholder item (no database row exists)
-    // We need to CREATE the row first
-    if (isPlaceholder) {
-      console.log('📝 Creating new row for placeholder item');
-      
-      const item = checklistItems.find(i => i.title === itemTitle);
-      if (!item) {
-        toast.error("Item not found");
-        return;
-      }
+    const newStatus = !currentStatus;
 
-      try {
-        const { data, error } = await supabase
-          .from("member_checklists")
-          .insert({
-            member_id: memberId,
-            project_id: projectId,
-            title: item.title,
-            description: item.description,
-            priority: item.priority,
-            completed: true, // Set to true since we're toggling from false→true
-            created_by: item.created_by,
-            due_date: item.due_date,
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString()
-          })
-          .select()
-          .single();
-
-        if (error) {
-          console.error("Error creating row:", error);
-          toast.error("Failed to create checklist item");
-          return;
-        }
-
-        console.log('✅ Row created successfully');
-        
-        // Update local state with the new real row
-        setChecklistItems(prev =>
-          prev.map(i =>
-            i.title === itemTitle 
-              ? { ...data, completed: true, isPlaceholder: false } 
-              : i
-          )
-        );
-
-        toast.success(`✅ "${itemTitle}" marked as completed`);
-      } catch (error) {
-        console.error("Error creating item:", error);
-        toast.error("Failed to create checklist item");
-      }
-      return;
-    }
-
-    // CASE 2: Regular item (database row exists)
-    // Normal toggle operation
     try {
-      // Optimistic UI update
-      setChecklistItems(prev =>
-        prev.map(item =>
-          item.id === itemId ? { ...item, completed: !currentStatus } : item
-        )
-      );
-
-      const { error } = await supabase
+      // STEP 1: Update ALL members' rows for this item
+      const { error: updateError } = await supabase
         .from("member_checklists")
         .update({ 
-          completed: !currentStatus,
+          completed: newStatus,
           updated_at: new Date().toISOString()
         })
-        .eq("id", itemId);
+        .eq("project_id", projectId)
+        .eq("title", itemTitle);
+        // ↑ NOTE: No member_id filter - affects ALL members
 
-      if (error) {
-        console.error("Error updating:", error);
-        toast.error("Failed to update checklist item");
-        // Revert optimistic update
-        setChecklistItems(prev =>
-          prev.map(item =>
-            item.id === itemId ? { ...item, completed: currentStatus } : item
-          )
-        );
-      } else {
-        console.log('✅ Toggle success');
-        if (!currentStatus) {
-          toast.success(`✅ "${itemTitle}" marked as completed`);
+      if (updateError) {
+        console.error("Update error:", updateError);
+        
+        // If update fails, try creating rows for members who don't have them
+        if (updateError.code === 'PGRST116') { // No rows found
+          console.log('No existing rows, creating for all members...');
+          
+          // Get all project members
+          const { data: projectMembers } = await supabase
+            .from("project_members")
+            .select("codev_id")
+            .eq("project_id", projectId);
+
+          if (projectMembers && projectMembers.length > 0) {
+            const item = checklistItems.find(i => i.title === itemTitle);
+            if (!item) {
+              toast.error("Item not found");
+              return;
+            }
+
+            // Create rows for all members
+            const rowsToInsert = projectMembers.map(pm => ({
+              member_id: pm.codev_id,
+              project_id: projectId,
+              title: item.title,
+              description: item.description,
+              priority: item.priority,
+              completed: newStatus,
+              created_by: item.created_by,
+              due_date: item.due_date,
+              created_at: new Date().toISOString(),
+              updated_at: new Date().toISOString()
+            }));
+
+            const { error: insertError } = await supabase
+              .from("member_checklists")
+              .insert(rowsToInsert);
+
+            if (insertError) {
+              console.error("Insert error:", insertError);
+              toast.error("Failed to create checklist items");
+              return;
+            }
+          }
         } else {
-          toast.success(`↩️ "${itemTitle}" marked as incomplete`);
+          toast.error("Failed to update checklist");
+          return;
         }
       }
-    } catch (error) {
-      console.error("Error toggling:", error);
-      toast.error("Failed to update checklist item");
-      // Revert optimistic update
+
+      console.log('✅ Updated ALL team members');
+      
+      // Update local state
       setChecklistItems(prev =>
         prev.map(item =>
-          item.id === itemId ? { ...item, completed: currentStatus } : item
+          item.title === itemTitle 
+            ? { ...item, completed: newStatus, isPlaceholder: false } 
+            : item
         )
       );
+
+      if (newStatus) {
+        toast.success(`✅ "${itemTitle}" marked as completed for ALL team members`);
+      } else {
+        toast.success(`↩️ "${itemTitle}" marked as incomplete for ALL team members`);
+      }
+
+    } catch (error) {
+      console.error("Error toggling:", error);
+      toast.error("Failed to update checklist");
     }
   };
 
-  // Calculate progress statistics
+  // Calculate progress
   const completedChecklists = checklistItems.filter(item => item.completed).length;
   const totalChecklists = checklistItems.length;
   const completionPercentage = totalChecklists > 0 
@@ -346,7 +314,7 @@ const MemberChecklist = ({
 
   return (
     <div className="space-y-6">
-      {/* Permission Banner for Non-Team Leads */}
+      {/* Permission Banner */}
       {!isCurrentUserTeamLead && totalChecklists > 0 && (
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded">
           <p className="text-sm text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
@@ -385,7 +353,7 @@ const MemberChecklist = ({
         </div>
       )}
 
-      {/* Checklist Items List */}
+      {/* Checklist Items */}
       <div className="space-y-3">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
           All Checklist Items
@@ -415,7 +383,7 @@ const MemberChecklist = ({
                 }`}
               >
                 <div className="flex items-start gap-3">
-                  {/* Checkbox - Interactive only for team leads */}
+                  {/* Checkbox */}
                   <button
                     onClick={() => toggleComplete(
                       item.id, 
@@ -431,7 +399,7 @@ const MemberChecklist = ({
                     }`}
                     title={
                       isCurrentUserTeamLead 
-                        ? "Click to toggle completion" 
+                        ? "Click to toggle for ALL team members" 
                         : "Only team leads can toggle completion"
                     }
                   >
@@ -446,23 +414,15 @@ const MemberChecklist = ({
                     )}
                   </button>
 
-                  {/* Checklist Item Content */}
+                  {/* Item Content */}
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <h4 className={`font-medium ${
-                        item.completed 
-                          ? 'text-green-800 dark:text-green-200 line-through' 
-                          : 'text-gray-900 dark:text-white'
-                      }`}>
-                        {item.title}
-                      </h4>
-                      {/* Placeholder indicator - only visible in dev mode */}
-                      {item.isPlaceholder && process.env.NODE_ENV === 'development' && (
-                        <span className="text-xs bg-orange-100 dark:bg-orange-900/30 text-orange-700 dark:text-orange-300 px-2 py-0.5 rounded">
-                          New
-                        </span>
-                      )}
-                    </div>
+                    <h4 className={`font-medium ${
+                      item.completed 
+                        ? 'text-green-800 dark:text-green-200 line-through' 
+                        : 'text-gray-900 dark:text-white'
+                    }`}>
+                      {item.title}
+                    </h4>
                     
                     {item.description && (
                       <p className={`text-sm mt-1 ${
@@ -474,24 +434,14 @@ const MemberChecklist = ({
                       </p>
                     )}
 
-                    {/* Priority Badge */}
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className={`inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
-                        item.priority === 'high' 
-                          ? 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
-                          : item.priority === 'medium'
-                          ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300'
-                          : 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300'
-                      }`}>
-                        {item.priority.charAt(0).toUpperCase() + item.priority.slice(1)} Priority
-                      </span>
-
-                      {item.due_date && (
+                    {/* Due Date Only - NO PRIORITY BADGE */}
+                    {item.due_date && (
+                      <div className="mt-2">
                         <span className="text-xs text-gray-500 dark:text-gray-400">
                           Due: {new Date(item.due_date).toLocaleDateString()}
                         </span>
-                      )}
-                    </div>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -504,10 +454,7 @@ const MemberChecklist = ({
       {totalChecklists > 0 && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-3 rounded">
           <p className="text-sm text-blue-700 dark:text-blue-300">
-            ℹ️ Showing all {totalChecklists} checklist item{totalChecklists !== 1 ? 's' : ''} for this project. 
-            {isCurrentUserTeamLead 
-              ? " Check off items as this team member completes them." 
-              : " Team leads will mark items as complete."}
+            ℹ️ Shared checklist: When team lead toggles an item, it affects ALL team members.
           </p>
         </div>
       )}
