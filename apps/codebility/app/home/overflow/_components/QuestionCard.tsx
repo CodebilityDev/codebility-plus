@@ -46,7 +46,7 @@ interface QuestionCardProps {
   setQuestions : React.Dispatch<React.SetStateAction<Question[]>>;
 }
 
-function TimeAgo({ dateString }: { dateString: string }) {
+function TimeAgo({ dateString, isEdited }: { dateString: string; isEdited?: boolean }) {
   const [timeAgoText, setTimeAgoText] = useState<string>("");
 
   useEffect(() => {
@@ -70,7 +70,12 @@ function TimeAgo({ dateString }: { dateString: string }) {
     setTimeAgoText(calculateTimeAgo());
   }, [dateString]);
 
-  return <>{timeAgoText}</>;
+  return (
+    <>
+      {timeAgoText}
+      {isEdited && <span className="text-gray-400 dark:text-gray-500"> (edited)</span>}
+    </>
+  );
 }
 
 export default function QuestionCard({ question, onLike, loggedIn, setQuestions}: QuestionCardProps) {
@@ -83,6 +88,10 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
 
   const isOwner = question.author.id === loggedIn.id;
   const { toast } = useToast();
+  
+  // Check if the post has been edited
+  const isEdited = question.created_at !== question.updated_at;
+  const displayDate = isEdited ? question.updated_at : question.created_at;
 
   // Check if user has already liked this post on mount
   useEffect(() => {
@@ -288,7 +297,7 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
               </p>
               <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
                 <Clock className="h-3 w-3 flex-shrink-0" />
-                <TimeAgo dateString={question.created_at} />
+                <TimeAgo dateString={displayDate} isEdited={isEdited} />
               </div>
             </div>
           </div>
