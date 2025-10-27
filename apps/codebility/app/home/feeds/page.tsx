@@ -17,12 +17,14 @@ export default function FeedsPage() {
 
   useEffect(() => {
     const fetchRole = async () => {
-      const role = await getUserRole(user!.role_id ?? null);
+      if (!user) return;
+      const role = await getUserRole(user.role_id ?? null);
       setIsAdmin(role === "Admin");
     };
 
     const fetchSocialPoints = async () => {
-      const socialPoints = await getSocialPoints(user!.id);
+      if (!user) return;
+      const socialPoints = await getSocialPoints(user.id);
       setSocialPoints(socialPoints || 0);
     };
 
@@ -47,8 +49,6 @@ export default function FeedsPage() {
         </div>
         {/* Social Points Card*/}
         <div className="dark:bg-white/3 relative mt-4 w-full rounded-xl border border-white/10 bg-gray-800 p-4 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/10 hover:shadow-lg dark:border-white/5 xl:fixed xl:right-6 xl:top-20 xl:z-50 xl:mt-0 xl:w-64">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 opacity-5 transition-opacity hover:opacity-10 xl:rounded-xl" />
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-cyan-500 opacity-5 transition-opacity hover:opacity-10" />
           <div className="relative">
             <div className="mb-3 flex items-center justify-between">
               <div className="flex items-center gap-2">

@@ -409,23 +409,23 @@ export async function deletePostContentImages(
   }
 }
 
-export const getSocialPoints = async (userId: string): Promise<number|null> => {
+export const getSocialPoints = async (userId: string): Promise<number | null> => {
   const supabase = await createClientServerComponent();
 
-         try {
-            // Fetch user's points
-            const { data , error} = await supabase.rpc(
-              "calculate_social_points",
-              { codev_id: userId},
-            );
+  try {
+    // Fetch user's points
+    const { data, error } = await supabase.rpc(
+      "calculate_social_points",
+      { codev_id: userId },
+    );
 
-            if (error) throw error;
+    if (error) throw error;
 
-            return data;
-          } catch (error) {
-            console.error("Failed to fetch social points:", error);
-            throw error;
-          }
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch social points:", error);
+    throw error;
+  }
 };
 
 export async function createComment(
