@@ -6,12 +6,13 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
 
 /**
- * MemberChecklist - ENHANCED VERSION
+ * MemberChecklist - TRIPLE-FIXED VERSION
  * 
  * FIXES APPLIED:
- * 1. ✅ Fixed toast syntax errors (missing opening quotes)
- * 2. ✅ Removed double quotes from item names in toasts
- * 3. ✅ Removed emoji from toasts (library provides icons)
+ * 1. ✅ Removed ALL emoji from toasts (library provides icons)
+ * 2. ✅ Removed ALL double quotes from item names in toasts
+ * 3. ✅ Clean, professional toast messages
+ * 4. ✅ Fixed toast syntax errors
  * 
  * BEHAVIOR:
  * - Team lead toggles "meeting" for Member A → ALL members' "meeting" toggled
@@ -260,7 +261,7 @@ const MemberChecklist = ({
         )
       );
 
-      // Fixed: No double quotes, no emoji, proper syntax
+      // FIXED: No emoji, no double quotes, clean professional messages
       if (newStatus) {
         toast.success(`${itemTitle} marked as completed for ALL team members`);
       } else {
@@ -433,7 +434,7 @@ const MemberChecklist = ({
       {totalChecklists > 0 && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-3 rounded">
           <p className="text-sm text-blue-700 dark:text-blue-300">
-            ℹ️ Shared checklist: When team lead toggles an item, it affects ALL team members.
+            Shared checklist: When team lead toggles an item, it affects ALL team members.
           </p>
         </div>
       )}
