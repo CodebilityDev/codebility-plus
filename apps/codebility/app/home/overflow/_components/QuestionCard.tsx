@@ -14,8 +14,8 @@ import {
 } from "@codevs/ui/carousel"
 import CommentSection from "./CommentSection";
 import QuestionImagePreview from "./QuestionImagePreview"
-import PostQuestionModal from "./PostQuestionModal"; // Import the modal
-import { updateQuestion, deletePostAndImages} from "../actions";
+import PostQuestionModal from "./PostQuestionModal";
+import { updateQuestion, deletePostAndImages, togglePostLike, checkPostLike } from "../actions";
 import { useToast } from "@/components/ui/use-toast";
 
 interface Question {
@@ -78,14 +78,80 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
   const [isLiked, setIsLiked] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [isLiking, setIsLiking] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   const isOwner = question.author.id === loggedIn.id;
   const { toast } = useToast();
 
-  const handleLike = () => {
+  // Check if user has already liked this post on mount
+  useEffect(() => {
+    const checkLikeStatus = async () => {
+      const result = await checkPostLike(question.id, loggedIn.id);
+      if (result.success) {
+        setIsLiked(result.liked);
+      }
+    };
+    checkLikeStatus();
+  }, [question.id, loggedIn.id]);
+
+  const handleLike = async () => {
+    if (isLiking) return; // Prevent double clicks
+    
+    setIsLiking(true);
+    
+    // Optimistic UI update
+    const previousLikeState = isLiked;
+    const previousLikeCount = question.likes;
+    
     setIsLiked(!isLiked);
-    onLike(question.id);
+    setQuestions(prevQuestions =>
+      prevQuestions.map(q =>
+        q.id === question.id
+          ? { ...q, likes: isLiked ? q.likes - 1 : q.likes + 1 }
+          : q
+      )
+    );
+
+    try {
+      const result = await togglePostLike(question.id, loggedIn.id);
+
+      if (!result.success) {
+        // Revert on failure
+        setIsLiked(previousLikeState);
+        setQuestions(prevQuestions =>
+          prevQuestions.map(q =>
+            q.id === question.id
+              ? { ...q, likes: previousLikeCount }
+              : q
+          )
+        );
+        
+        toast({
+          title: "Error",
+          description: "Failed to update like. Please try again.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      // Revert on error
+      setIsLiked(previousLikeState);
+      setQuestions(prevQuestions =>
+        prevQuestions.map(q =>
+          q.id === question.id
+            ? { ...q, likes: previousLikeCount }
+            : q
+        )
+      );
+      
+      toast({
+        title: "Error",
+        description: "An error occurred. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLiking(false);
+    }
   };
 
   const [selectedImage, setSelectedImage] = useState<{
@@ -124,8 +190,7 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
     authorId: string;
   }) => {
     try {
-      // TODO: Replace with your actual API call
-       const result = await updateQuestion({
+      const result = await updateQuestion({
             question_id: data.id,
             title: data.title,
             content: data.content,
@@ -134,11 +199,10 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
             authorId: data.authorId
           });
 
-  if (result.success && result.question) {
-      const updatedQuestion = result;
-      };
+      if (result.success && result.question) {
+        const updatedQuestion = result;
+      }
 
-      // Update the question in the parent component
       setQuestions(prevQuestions =>
         prevQuestions.map(q =>
           q.id === question.id
@@ -155,7 +219,7 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
           className: "bg-green-500 text-white border-green-600",
         });
     } catch (error) {
-       toast({
+      toast({
           title: "Failed to post question",
           description: "An error occured, please try again.",
           variant: "destructive",
@@ -164,35 +228,44 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
     }
   };
 
- const handleDelete = async () => {
-  if (window.confirm("Are you sure you want to delete this question?")) {
-    try {
-      
-      const result = await deletePostAndImages(parseInt(question.id));
+  const handleDelete = async () => {
+    if (window.confirm("Are you sure you want to delete this question?")) {
+      try {
+        const result = await deletePostAndImages(parseInt(question.id));
 
-      if (!result.success) {
-        throw new Error(result.error || 'Failed to delete question');
+        if (!result.success) {
+          throw new Error(result.error || 'Failed to delete question');
+        }
+
+        setQuestions(prevQuestions =>
+          prevQuestions.filter(q => q.id !== question.id)
+        );
+
+        toast({
+          title: "Success!",
+          description: "Question deleted successfully!",
+          variant: "default",
+          className: "bg-green-500 text-white border-green-600",
+        });
+      } catch (error) {
+        console.error('Error deleting question:', error);
+        toast({
+          title: "Error",
+          description: "Failed to delete question. Please try again.",
+          variant: "destructive",
+        });
       }
-
-      setQuestions(prevQuestions =>
-        prevQuestions.filter(q => q.id !== question.id)
-      );
-
-      alert('Question deleted successfully!');
-    } catch (error) {
-      console.error('Error deleting question:', error);
-      alert('Failed to delete question. Please try again.');
+      setShowMenu(false);
     }
-    setShowMenu(false);
-  }
-};
+  };
 
   return (
-      <div className="rounded-2xl bg-white/70 p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/80 hover:shadow-xl dark:bg-gray-800/70 dark:hover:bg-gray-800/80">
+      <div className="rounded-xl sm:rounded-2xl bg-white/70 p-4 sm:p-6 shadow-lg backdrop-blur-sm transition-all duration-300 hover:bg-white/80 hover:shadow-xl dark:bg-gray-800/70 dark:hover:bg-gray-800/80">
         {/* Question Header */}
-        <div className="mb-4 flex items-start justify-between">
-          <div className="flex items-center gap-4">
-            <div className="h-10 w-10 overflow-hidden rounded-full bg-gradient-to-br from-customBlue-100 to-purple-100 p-0.5 dark:from-customBlue-900 dark:to-purple-900">
+        <div className="mb-3 sm:mb-4 flex items-start justify-between gap-2">
+          <div className="flex items-center gap-2.5 sm:gap-4 min-w-0 flex-1">
+            {/* Avatar - Responsive sizing */}
+            <div className="h-9 w-9 sm:h-10 sm:w-10 flex-shrink-0 overflow-hidden rounded-full bg-gradient-to-br from-customBlue-100 to-purple-100 p-0.5 dark:from-customBlue-900 dark:to-purple-900">
               <div className="h-full w-full overflow-hidden rounded-full bg-white dark:bg-gray-800">
                 {question.author.image_url ? (
                   <Image
@@ -207,12 +280,14 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
                 )}
               </div>
             </div>
-            <div>
-              <p className="font-medium text-gray-900 dark:text-white">
+            
+            {/* Author info */}
+            <div className="min-w-0 flex-1">
+              <p className="text-sm sm:text-base font-medium text-gray-900 dark:text-white truncate">
                 {question.author.name}
               </p>
-              <div className="flex items-center gap-1.5 text-sm text-gray-500 dark:text-gray-400">
-                <Clock className="h-3 w-3" />
+              <div className="flex items-center gap-1 sm:gap-1.5 text-xs sm:text-sm text-gray-500 dark:text-gray-400">
+                <Clock className="h-3 w-3 flex-shrink-0" />
                 <TimeAgo dateString={question.created_at} />
               </div>
             </div>
@@ -220,30 +295,30 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
 
           {/* Three-dot menu for owner */}
           {isOwner && (
-            <div className="relative" ref={menuRef}>
+            <div className="relative flex-shrink-0" ref={menuRef}>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowMenu(!showMenu)}
-                className="rounded-full p-2 text-gray-600 transition-all duration-200 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+                className="rounded-full p-1.5 sm:p-2 text-gray-600 transition-all duration-200 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
               >
-                <MoreHorizontal className="h-5 w-5" />
+                <MoreHorizontal className="h-4 w-4 sm:h-5 sm:w-5" />
               </Button>
 
               {showMenu && (
-                <div className="absolute right-0 top-10 z-10 w-48 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
+                <div className="absolute right-0 top-9 sm:top-10 z-10 w-40 sm:w-48 rounded-xl border border-gray-200 bg-white shadow-lg dark:border-gray-700 dark:bg-gray-800">
                   <button
                     onClick={handleEdit}
-                    className="flex w-full items-center gap-3 rounded-t-xl px-4 py-3 text-left text-sm text-gray-700 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
+                    className="flex w-full items-center gap-2 sm:gap-3 rounded-t-xl px-3 sm:px-4 py-2.5 sm:py-3 text-left text-xs sm:text-sm text-gray-700 transition-colors hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700"
                   >
-                    <Pencil className="h-4 w-4" />
+                    <Pencil className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     Edit
                   </button>
                   <button
                     onClick={handleDelete}
-                    className="flex w-full items-center gap-3 rounded-b-xl px-4 py-3 text-left text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
+                    className="flex w-full items-center gap-2 sm:gap-3 rounded-b-xl px-3 sm:px-4 py-2.5 sm:py-3 text-left text-xs sm:text-sm text-red-600 transition-colors hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900/20"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash2 className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     Delete
                   </button>
                 </div>
@@ -252,19 +327,19 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
           )}
         </div>
 
-        {/* Question Title */}
-        <h3 className="mb-3 text-xl font-medium leading-tight text-gray-900 dark:text-white">
+        {/* Question Title - Responsive text */}
+        <h3 className="mb-2 sm:mb-3 text-lg sm:text-xl font-medium leading-tight text-gray-900 dark:text-white break-words">
           {question.title}
         </h3>
 
-        {/* Question Content */}
-        <p className="mb-4 leading-relaxed text-gray-700 dark:text-gray-300">
+        {/* Question Content - Responsive text */}
+        <p className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words">
           {question.content}
         </p>
 
-        {/* Images */}
+        {/* Images - Responsive carousel */}
         {question.images && question.images.length > 0 && (
-          <div className="mb-4 px-12">
+          <div className="mb-3 sm:mb-4 px-0 sm:px-8 md:px-12">
             <Carousel
               opts={{
                 align: "start",
@@ -284,7 +359,7 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
                       }`}
                   >
                     <div
-                      className="group relative overflow-hidden rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-shadow duration-300 hover:shadow-md cursor-pointer"
+                      className="group relative overflow-hidden rounded-lg sm:rounded-xl border border-gray-200 bg-gray-50 shadow-sm transition-shadow duration-300 hover:shadow-md cursor-pointer"
                       onClick={() => setSelectedImage({
                         src: image,
                         alt: `Screenshot ${index + 1}`
@@ -316,7 +391,7 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
               </CarouselContent>
               {question.images.length > 1 && (
                 <>
-                  <div className="sm:hidden flex text-xs text-muted-foreground">
+                  <div className="sm:hidden flex text-xs text-muted-foreground mt-2">
                     Swipe to check for more images.
                   </div>
                   <CarouselPrevious className="hidden sm:flex text-foreground border-foreground" />
@@ -327,13 +402,13 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
           </div>
         )}
 
-        {/* Tags */}
+        {/* Tags - Responsive sizing */}
         {question.tags.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
+          <div className="mb-3 sm:mb-4 flex flex-wrap gap-1.5 sm:gap-2">
             {question.tags.map((tag, index) => (
               <span
                 key={index}
-                className="rounded-full bg-gradient-to-r from-customBlue-50 to-indigo-50 px-3 py-1 text-sm font-medium text-customBlue-700 dark:from-customBlue-900/30 dark:to-indigo-900/30 dark:text-customBlue-300"
+                className="rounded-full bg-gradient-to-r from-customBlue-50 to-indigo-50 px-2.5 sm:px-3 py-0.5 sm:py-1 text-xs sm:text-sm font-medium text-customBlue-700 dark:from-customBlue-900/30 dark:to-indigo-900/30 dark:text-customBlue-300"
               >
                 {tag}
               </span>
@@ -341,46 +416,49 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
           </div>
         )}
 
-        {/* Actions */}
-        <div className="flex items-center justify-between border-t border-gray-100 pt-4 dark:border-gray-700">
-          <div className="flex items-center gap-6">
+        {/* Actions - Responsive layout */}
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-0 border-t border-gray-100 pt-3 sm:pt-4 dark:border-gray-700">
+          {/* Like and Comment buttons */}
+          <div className="flex items-center gap-3 sm:gap-6">
             <Button
               variant="ghost"
               size="sm"
               onClick={handleLike}
-              className={`flex items-center gap-2 rounded-full px-3 py-2 transition-all duration-200 ${isLiked
+              disabled={isLiking}
+              className={`flex items-center gap-1.5 sm:gap-2 rounded-full px-2.5 sm:px-3 py-1.5 sm:py-2 transition-all duration-200 ${isLiked
                 ? "bg-red-50 text-red-600 hover:bg-red-100 dark:bg-red-900/20 dark:text-red-400"
                 : "text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
-                }`}
+                } ${isLiking ? "opacity-50 cursor-not-allowed" : ""}`}
             >
               <Heart className={`h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
-              <span className="text-sm font-medium">{question.likes}</span>
+              <span className="text-xs sm:text-sm font-medium">{question.likes}</span>
             </Button>
 
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center gap-2 rounded-full px-3 py-2 text-gray-600 transition-all duration-200 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
+              className="flex items-center gap-1.5 sm:gap-2 rounded-full px-2.5 sm:px-3 py-1.5 sm:py-2 text-gray-600 transition-all duration-200 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700"
             >
               <MessageCircle className="h-4 w-4" />
-              <span className="text-sm font-medium">{question.comments}</span>
+              <span className="text-xs sm:text-sm font-medium">{question.comments}</span>
             </Button>
           </div>
 
+          {/* View/Hide Comments button */}
           <Button
             variant="ghost"
             size="sm"
             onClick={() => setShowComments(!showComments)}
-          className="rounded-full bg-gray-50 px-4 py-2 text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
-        >
-          {showComments ? "Hide Comments" : "View Comments"}
-        </Button>
-      </div>
+            className="w-full sm:w-auto rounded-full bg-gray-50 px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium text-gray-700 transition-all duration-200 hover:bg-gray-100 dark:bg-gray-700 dark:text-gray-300 dark:hover:bg-gray-600"
+          >
+            {showComments ? "Hide Comments" : "View Comments"}
+          </Button>
+        </div>
 
       {/* Comments Section */}
       {showComments && (
-        <div className="mt-6 border-t border-gray-100 pt-6 dark:border-gray-700">
+        <div className="mt-4 sm:mt-6 border-t border-gray-100 pt-4 sm:pt-6 dark:border-gray-700">
           <CommentSection 
             questionId={question.id} 
             loggedIn={loggedIn} 
@@ -398,7 +476,7 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
         />
       )}
 
-       {/* Edit Modal */}
+      {/* Edit Modal */}
       {showEditModal && (
         <PostQuestionModal
           isOpen={showEditModal}

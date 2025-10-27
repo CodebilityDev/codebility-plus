@@ -21,7 +21,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Heart, Send, Clock, MoreVertical, Pencil, Trash2, X, Check } from "lucide-react";
-import { fetchComments, postComment, toggleCommentLike, updateComment, deleteComment, type Comment } from "../actions";
+import { 
+  fetchComments, 
+  postComment, 
+  toggleCommentLike, 
+  updateComment, 
+  deleteComment, 
+  fetchCommentLikes,
+  type Comment 
+} from "../actions";
 import { Question, fetchQuestions } from "../actions";
 
 interface CommentSectionProps {
@@ -95,21 +103,21 @@ const CommentItem = memo(
 
     const handleDelete = () => {
       onDelete(comment.id);
-      // Use setTimeout to ensure modal opens before dropdown closes
       setTimeout(() => {
         setDropdownOpen(false);
       }, 0);
     };
 
     return (
-      <div className="flex gap-3">
-        <div className="h-10 w-10 mt-3 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+      <div className="flex gap-2 sm:gap-3">
+        {/* Avatar - Responsive sizing */}
+        <div className="h-8 w-8 sm:h-10 sm:w-10 mt-2 sm:mt-3 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
           {comment.author.image_url ? (
             <Image
               src={comment.author.image_url}
               alt={comment.author.name}
-              width={32}
-              height={32}
+              width={40}
+              height={40}
               className="h-full w-full object-cover"
             />
           ) : (
@@ -117,64 +125,65 @@ const CommentItem = memo(
           )}
         </div>
 
-        <div className="flex-1 rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
-          <div className="mb-2 flex items-start justify-between">
-            <div className="flex items-center gap-2">
-              <div>
-                <span className="text-sm font-medium text-gray-900 dark:text-white">
-                  {comment.author.name}
-                </span>
-                <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-white">
-                  <Clock className="h-3 w-3" />
-                  {comment.created_at === comment.updated_at ? (
-                    <TimeAgo date={comment.created_at} />
-                  ) : (
-                    <span className="flex items-center gap-1">
-                      <span>edited</span>
-                      <TimeAgo date={comment.updated_at} />
-                    </span>
-                  )}
-                </div>
+        {/* Comment content */}
+        <div className="flex-1 min-w-0 rounded-lg border border-gray-200 bg-gray-50 p-2.5 sm:p-3 dark:border-gray-700 dark:bg-gray-800">
+          <div className="mb-2 flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <span className="text-xs sm:text-sm font-medium text-gray-900 dark:text-white block truncate">
+                {comment.author.name}
+              </span>
+              <div className="flex items-center gap-1 text-xs text-gray-600 dark:text-white">
+                <Clock className="h-3 w-3 flex-shrink-0" />
+                {comment.created_at === comment.updated_at ? (
+                  <TimeAgo date={comment.created_at} />
+                ) : (
+                  <span className="flex items-center gap-1">
+                    <span>edited</span>
+                    <TimeAgo date={comment.updated_at} />
+                  </span>
+                )}
               </div>
             </div>
-            <div className="flex items-center gap-1">
+            
+            {/* Action buttons - Responsive */}
+            <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => onLike(comment.id)}
-                className={`flex items-center gap-1 px-2 py-1 ${
+                className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 h-auto ${
                   isLiked
                     ? "text-red-600 hover:text-red-700"
                     : "text-gray-600 hover:text-gray-700 dark:text-white dark:hover:text-gray-200"
                 }`}
               >
-                <Heart className={`h-5 w-5 ${isLiked ? "fill-current" : ""}`} />
-                <span className="text-sm">{comment.likes}</span>
+                <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isLiked ? "fill-current" : ""}`} />
+                <span className="text-xs sm:text-sm">{comment.likes}</span>
               </Button>
 
               {!isEditing && (
                 <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
                   <DropdownMenuTrigger asChild>
                     <Button
-                    disabled={!isOwner}
                       variant="ghost"
+                      disabled={!isOwner}
                       size="sm"
-                      className="px-2 py-1 text-gray-600 hover:text-gray-700 dark:text-white dark:hover:text-gray-200"
+                      className="px-1.5 sm:px-2 py-1 h-auto text-gray-600 hover:text-gray-700 dark:text-white dark:hover:text-gray-200"
                     >
-                      <MoreVertical className="h-5 w-5" />
+                      <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5" />
                     </Button>
                   </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end">
-                    <DropdownMenuItem onClick={handleStartEdit}>
-                      <Pencil className="mr-2 h-4 w-4" />
+                  <DropdownMenuContent align="end" className="w-32 sm:w-auto">
+                    <DropdownMenuItem onClick={handleStartEdit} className="text-xs sm:text-sm">
+                      <Pencil className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem 
                       onClick={handleDelete}
                       onSelect={(e) => e.preventDefault()}
-                      className="text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
+                      className="text-xs sm:text-sm text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
                     >
-                      <Trash2 className="mr-2 h-4 w-4" />
+                      <Trash2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                       Delete
                     </DropdownMenuItem>
                   </DropdownMenuContent>
@@ -189,7 +198,7 @@ const CommentItem = memo(
                 value={editContent}
                 onChange={(e) => setEditContent(e.target.value)}
                 rows={3}
-                className="resize-none border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
+                className="resize-none border-gray-300 bg-white text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
                 autoFocus
               />
               <div className="flex justify-end gap-2">
@@ -197,23 +206,24 @@ const CommentItem = memo(
                   variant="ghost"
                   size="sm"
                   onClick={handleCancelEdit}
-                  className="text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200"
+                  className="text-xs sm:text-sm h-8 sm:h-9 text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200"
                 >
-                  <X className="mr-1 h-4 w-4" />
+                  <X className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                   Cancel
                 </Button>
                 <Button
                   size="sm"
                   onClick={handleSaveEdit}
                   disabled={!editContent.trim() || editContent === comment.content}
+                  className="text-xs sm:text-sm h-8 sm:h-9"
                 >
-                  <Check className="mr-1 h-4 w-4" />
+                  <Check className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
                   Save
                 </Button>
               </div>
             </div>
           ) : (
-            <p className="text-sm leading-relaxed text-gray-700 dark:text-white">
+            <p className="text-xs sm:text-sm leading-relaxed text-gray-700 dark:text-white break-words">
               {comment.content}
             </p>
           )}
@@ -240,8 +250,13 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
   const loadComments = async () => {
     setIsLoading(true);
     try {
-      const fetchedComments = await fetchComments(questionId);
+      const [fetchedComments, likedCommentIds] = await Promise.all([
+        fetchComments(questionId),
+        fetchCommentLikes(loggedIn.id, questionId)
+      ]);
+      
       setComments(fetchedComments);
+      setLikedComments(new Set(likedCommentIds));
     } catch (error) {
       console.error("Error loading comments:", error);
     } finally {
@@ -289,6 +304,7 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
     const wasLiked = likedComments.has(commentId);
     const newLikedComments = new Set(likedComments);
 
+    // Optimistic update
     if (wasLiked) {
       newLikedComments.delete(commentId);
       setComments((prev) =>
@@ -301,12 +317,13 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
       );
     }
 
-    setLikedComments(new Set(newLikedComments));
+    setLikedComments(newLikedComments);
 
     try {
-      const result = await toggleCommentLike(commentId, !wasLiked);
+      const result = await toggleCommentLike(commentId, loggedIn.id);
 
       if (!result.success) {
+        // Revert on failure
         if (wasLiked) {
           newLikedComments.add(commentId);
           setComments((prev) =>
@@ -318,22 +335,34 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
             prev.map((c) => (c.id === commentId ? { ...c, likes: c.likes - 1 } : c))
           );
         }
-        setLikedComments(new Set(newLikedComments));
+        setLikedComments(newLikedComments);
+        console.error("Failed to toggle like:", result.error);
       }
     } catch (error) {
+      // Revert on error
+      if (wasLiked) {
+        newLikedComments.add(commentId);
+        setComments((prev) =>
+          prev.map((c) => (c.id === commentId ? { ...c, likes: c.likes + 1 } : c))
+        );
+      } else {
+        newLikedComments.delete(commentId);
+        setComments((prev) =>
+          prev.map((c) => (c.id === commentId ? { ...c, likes: c.likes - 1 } : c))
+        );
+      }
+      setLikedComments(newLikedComments);
       console.error("Error toggling like:", error);
     }
   };
 
   const handleEditComment = async (commentId: string, newContent: string) => {
-    // Store original comment for potential revert
     const originalComment = comments.find(c => c.id === commentId);
     if (!originalComment) return;
 
     const originalContent = originalComment.content;
     const originalUpdatedAt = originalComment.updated_at;
 
-    // Optimistically update the UI with current timestamp
     const newUpdatedAt = new Date().toISOString();
     setComments(prev =>
       prev.map(c => c.id === commentId 
@@ -349,7 +378,6 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
       });
 
       if (!result.success) {
-        // Revert on failure
         setComments(prev =>
           prev.map(c => c.id === commentId 
             ? { ...c, content: originalContent, updated_at: originalUpdatedAt } 
@@ -358,14 +386,12 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
         );
         alert("Failed to update comment. Please try again.");
       } else if (result.comment) {
-        // Update with actual server response
         setComments(prev =>
           prev.map(c => c.id === commentId ? result.comment! : c)
         );
       }
     } catch (error) {
       console.error("Error editing comment:", error);
-      // Revert on error
       setComments(prev =>
         prev.map(c => c.id === commentId 
           ? { ...c, content: originalContent, updated_at: originalUpdatedAt } 
@@ -390,10 +416,8 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
       const result = await deleteComment(commentToDelete);
 
       if (result.success) {
-        // Remove comment from UI
         setComments(prev => prev.filter(c => c.id !== commentToDelete));
         
-        // Update question count
         fetchQuestions()
           .then((result) => {
             setQuestions(result);
@@ -416,13 +440,13 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
   };
 
   const cancelDelete = () => {
-    if (isDeleting) return; // Prevent closing while deleting
+    if (isDeleting) return;
     setDeleteModalOpen(false);
     setCommentToDelete(null);
   };
 
   const handleDialogChange = (open: boolean) => {
-    if (!open && isDeleting) return; // Prevent closing while deleting
+    if (!open && isDeleting) return;
     setDeleteModalOpen(open);
     if (!open) {
       setCommentToDelete(null);
@@ -433,36 +457,37 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
     return (
       <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-800">
         <div className="mb-3 flex justify-center">
-          <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-200 border-t-customBlue-500 dark:border-gray-700 dark:border-t-customBlue-400"></div>
+          <div className="h-6 w-6 sm:h-8 sm:w-8 animate-spin rounded-full border-2 border-gray-200 border-t-customBlue-500 dark:border-gray-700 dark:border-t-customBlue-400"></div>
         </div>
-        <p className="text-sm text-gray-600 dark:text-white">Loading comments...</p>
+        <p className="text-xs sm:text-sm text-gray-600 dark:text-white">Loading comments...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3 sm:space-y-4">
       {/* Delete Confirmation Modal */}
       <Dialog open={deleteModalOpen} onOpenChange={handleDialogChange}>
-        <DialogContent className="sm:max-w-[425px]">
+        <DialogContent className="w-[90vw] max-w-[425px] rounded-lg">
           <DialogHeader>
-            <DialogTitle>Delete Comment</DialogTitle>
-            <DialogDescription>
+            <DialogTitle className="text-base sm:text-lg">Delete Comment</DialogTitle>
+            <DialogDescription className="text-xs sm:text-sm">
               Are you sure you want to delete this comment? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
-          <DialogFooter>
+          <DialogFooter className="gap-2 sm:gap-0">
             <Button
               variant="ghost"
               onClick={cancelDelete}
               disabled={isDeleting}
+              className="text-xs sm:text-sm h-9"
             >
               Cancel
             </Button>
             <Button
               onClick={confirmDelete}
               disabled={isDeleting}
-              className="bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
+              className="text-xs sm:text-sm h-9 bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600"
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </Button>
@@ -472,7 +497,7 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
 
       {/* Comments List */}
       {comments.length > 0 && (
-        <div className="space-y-3">
+        <div className="space-y-2.5 sm:space-y-3">
           {comments.map((comment) => (
             <CommentItem
               key={comment.id}
@@ -488,14 +513,14 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
       )}
 
       {/* Add Comment Form */}
-      <form onSubmit={handleSubmitComment} className="space-y-3">
+      <form onSubmit={handleSubmitComment} className="space-y-2 sm:space-y-3">
         <Textarea
           placeholder="Write a helpful comment..."
           value={newComment}
           onChange={(e) => setNewComment(e.target.value)}
           disabled={isSubmitting}
           rows={3}
-          className="resize-none border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
+          className="resize-none text-sm sm:text-base border-gray-300 bg-gray-50 text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
         />
 
         <div className="flex justify-end">
@@ -503,8 +528,9 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
             type="submit"
             size="sm"
             disabled={isSubmitting || !newComment.trim()}
+            className="text-xs sm:text-sm h-9"
           >
-            <Send className="mr-2 h-5 w-5" />
+            <Send className="mr-1.5 sm:mr-2 h-4 w-4" />
             {isSubmitting ? "Posting..." : "Post Comment"}
           </Button>
         </div>
@@ -512,7 +538,7 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
 
       {comments.length === 0 && (
         <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-800">
-          <p className="text-sm text-gray-600 dark:text-white">
+          <p className="text-xs sm:text-sm text-gray-600 dark:text-white">
             No comments yet. Be the first to help!
           </p>
         </div>

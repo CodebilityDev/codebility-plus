@@ -365,6 +365,9 @@ export default function PostQuestionModal({
                   ))}
                 </div>
               )}
+              <p className="text-xs text-gray-500">
+                  Tap on the image to remove.
+                </p>
             </div>
           </div>
         </div>
