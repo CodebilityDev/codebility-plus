@@ -652,43 +652,43 @@ export async function postComment(data: PostCommentData) {
   }
 }
 
-// Toggle like on a comment
-export async function toggleCommentLike(commentId: string, increment: boolean) {
-  try {
-    const supabase = await createClientServerComponent();
+// // Toggle like on a comment
+// export async function toggleCommentLike(commentId: string, increment: boolean) {
+//   try {
+//     const supabase = await createClientServerComponent();
 
-    const { data: currentComment, error: fetchError } = await supabase
-      .from('overflow_post_comment')
-      .select('likes')
-      .eq('id', commentId)
-      .single();
+//     const { data: currentComment, error: fetchError } = await supabase
+//       .from('overflow_post_comment')
+//       .select('likes')
+//       .eq('id', commentId)
+//       .single();
 
-    if (fetchError) {
-      console.error('Error fetching comment:', fetchError);
-      throw new Error('Failed to fetch comment');
-    }
+//     if (fetchError) {
+//       console.error('Error fetching comment:', fetchError);
+//       throw new Error('Failed to fetch comment');
+//     }
 
-    const newLikes = increment 
-      ? (currentComment.likes || 0) + 1 
-      : Math.max((currentComment.likes || 0) - 1, 0);
+//     const newLikes = increment 
+//       ? (currentComment.likes || 0) + 1 
+//       : Math.max((currentComment.likes || 0) - 1, 0);
 
-    const { error: updateError } = await supabase
-      .from('overflow_post_comment')
-      .update({ likes: newLikes })
-      .eq('id', commentId);
+//     const { error: updateError } = await supabase
+//       .from('overflow_post_comment')
+//       .update({ likes: newLikes })
+//       .eq('id', commentId);
 
-    if (updateError) {
-      console.error('Error updating comment likes:', updateError);
-      throw new Error('Failed to update likes');
-    }
+//     if (updateError) {
+//       console.error('Error updating comment likes:', updateError);
+//       throw new Error('Failed to update likes');
+//     }
 
-    revalidatePath('/home/overflow');
-    return { success: true, likes: newLikes };
-  } catch (error) {
-    console.error('Error in toggleCommentLike:', error);
-    return { success: false, error: 'Failed to toggle like' };
-  }
-}
+//     revalidatePath('/home/overflow');
+//     return { success: true, likes: newLikes };
+//   } catch (error) {
+//     console.error('Error in toggleCommentLike:', error);
+//     return { success: false, error: 'Failed to toggle like' };
+//   }
+// }
 
 
 
@@ -832,5 +832,208 @@ export async function deleteComment(commentId: string) {
       success: false, 
       error: error instanceof Error ? error.message : 'Failed to delete comment' 
     };
+  }
+}
+
+
+// like for posts and comments 
+
+
+// Toggle like for a post
+export async function togglePostLike(postId: string, userId: string) {
+  try {
+    const supabase = await createClientServerComponent();
+
+    // Check if user already liked this post
+    const { data: existingLike, error: checkError } = await supabase
+      .from("overflow_likes")
+      .select("id")
+      .eq("codev_id", userId)
+      .eq("target_type", "post")
+      .eq("target_id", postId)
+      .single();
+
+    if (checkError && checkError.code !== "PGRST116") {
+      // PGRST116 = no rows returned (not an error in this case)
+      throw checkError;
+    }
+
+    if (existingLike) {
+      // Unlike: Delete the like
+      const { error: deleteError } = await supabase
+        .from("overflow_likes")
+        .delete()
+        .eq("id", existingLike.id);
+
+      if (deleteError) throw deleteError;
+
+      // Decrement like count in overflow_post
+      const { error: updateError } = await supabase.rpc("decrement_post_likes", {
+        post_id: parseInt(postId),
+      });
+
+      if (updateError) throw updateError;
+
+      return { success: true, action: "unliked", liked: false };
+    } else {
+      // Like: Insert new like
+      const { error: insertError } = await supabase
+        .from("overflow_likes")
+        .insert({
+          codev_id: userId,
+          target_type: "post",
+          target_id: parseInt(postId),
+        });
+
+      if (insertError) throw insertError;
+
+      // Increment like count in overflow_post
+      const { error: updateError } = await supabase.rpc("increment_post_likes", {
+        post_id: parseInt(postId),
+      });
+
+      if (updateError) throw updateError;
+
+      return { success: true, action: "liked", liked: true };
+    }
+  } catch (error) {
+    console.error("Error toggling like:", error);
+    return { success: false, error: "Failed to toggle like" };
+  }
+}
+
+// Check if user has liked a post
+export async function checkPostLike(postId: string, userId: string) {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { data, error } = await supabase
+      .from("overflow_likes")
+      .select("id")
+      .eq("codev_id", userId)
+      .eq("target_type", "post")
+      .eq("target_id", postId)
+      .single();
+
+    if (error && error.code !== "PGRST116") {
+      throw error;
+    }
+
+    return { success: true, liked: !!data };
+  } catch (error) {
+    console.error("Error checking like:", error);
+    return { success: false, liked: false };
+  }
+}
+
+// Get all posts liked by a user (useful for initializing UI state)
+export async function getUserLikedPosts(userId: string) {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { data, error } = await supabase
+      .from("overflow_likes")
+      .select("target_id")
+      .eq("codev_id", userId)
+      .eq("target_type", "post");
+
+    if (error) throw error;
+
+    const likedPostIds = data.map((like) => like.target_id.toString());
+    return { success: true, likedPostIds };
+  } catch (error) {
+    console.error("Error fetching liked posts:", error);
+    return { success: false, likedPostIds: [] };
+  }
+}
+// Fetch comment likes for the logged-in user
+export async function fetchCommentLikes(userId: string, questionId: string): Promise<string[]> {
+  try {
+    const supabase = await createClientServerComponent();
+
+    // First get all comment IDs for this question
+    const { data: comments, error: commentsError } = await supabase
+      .from("overflow_comments")
+      .select("id")
+      .eq("post_id", questionId);
+
+    if (commentsError) throw commentsError;
+    if (!comments || comments.length === 0) return [];
+
+    const commentIds = comments.map(c => c.id);
+
+    // Fetch likes for these comments by this user
+    const { data: likes, error: likesError } = await supabase
+      .from("overflow_likes")
+      .select("target_id")
+      .eq("codev_id", userId)
+      .eq("target_type", "comment")
+      .in("target_id", commentIds);
+
+    if (likesError) throw likesError;
+
+    return likes ? likes.map(like => like.target_id.toString()) : [];
+  } catch (error) {
+    console.error("Error fetching comment likes:", error);
+    return [];
+  }
+}
+
+// Toggle like for a comment
+export async function toggleCommentLike(commentId: string, userId: string) {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { data: existingLike, error: checkError } = await supabase
+      .from("overflow_likes")
+      .select("id")
+      .eq("codev_id", userId)
+      .eq("target_type", "comment")
+      .eq("target_id", parseInt(commentId))
+      .single();
+
+    if (checkError && checkError.code !== "PGRST116") {
+      throw checkError;
+    }
+
+    if (existingLike) {
+      // Unlike
+      const { error: deleteError } = await supabase
+        .from("overflow_likes")
+        .delete()
+        .eq("id", existingLike.id);
+
+      if (deleteError) throw deleteError;
+
+      const { error: updateError } = await supabase.rpc("decrement_comment_likes", {
+        comment_id: parseInt(commentId),
+      });
+
+      if (updateError) throw updateError;
+
+      return { success: true, action: "unliked", liked: false };
+    } else {
+      // Like
+      const { error: insertError } = await supabase
+        .from("overflow_likes")
+        .insert({
+          codev_id: userId,
+          target_type: "comment",
+          target_id: parseInt(commentId),
+        });
+
+      if (insertError) throw insertError;
+
+      const { error: updateError } = await supabase.rpc("increment_comment_likes", {
+        comment_id: parseInt(commentId),
+      });
+
+      if (updateError) throw updateError;
+
+      return { success: true, action: "liked", liked: true };
+    }
+  } catch (error) {
+    console.error("Error toggling comment like:", error);
+    return { success: false, error: "Failed to toggle comment like" };
   }
 }
