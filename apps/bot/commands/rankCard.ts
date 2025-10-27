@@ -1,4 +1,5 @@
 // apps/bot/commands/rankCard.ts
+
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,

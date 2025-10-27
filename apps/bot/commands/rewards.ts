@@ -1,4 +1,5 @@
 // apps/bot/commands/rewards.ts
+
 import {
   SlashCommandBuilder,
   ChatInputCommandInteraction,
