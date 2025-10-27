@@ -27,7 +27,7 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       notFound();
     }
 
-    // ← CRITICAL FIX: Map auth user to codev user by email
+    // Map auth user to codev user by email
     // Auth user.id ≠ codev.id, so we need to look up by email
     const { data: codevUser, error: codevError } = await supabase
       .from('codev')
@@ -39,12 +39,6 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       console.error('Failed to find codev user:', codevError);
       notFound();
     }
-
-    console.log('=== USER ID MAPPING ===');
-    console.log('Auth user.id:', user.id);
-    console.log('Auth user.email:', user.email);
-    console.log('Codev user.id:', codevUser.id);
-    console.log('=======================');
 
     // Fetch user projects to verify access
     const userProjectsResponse = await getUserProjects();
@@ -70,12 +64,12 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       throw new Error("Failed to load team data");
     }
 
-    // ← CRITICAL FIX: Use codev.id instead of auth user.id
+    // ✅ FIXED: Pass currentUserId to determine team lead status
     const projectData = {
       project: project.project,
       teamLead: teamLead,
       members: members,
-      currentUserId: codevUser.id  // ← This is the codev table ID (7a3df452...)
+      currentUserId: codevUser.id  // This is the codev table ID
     };
 
     return (
