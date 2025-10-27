@@ -37,7 +37,12 @@ export default function TokenPoints() {
 
   useEffect(() => {
     let isMounted = true;
-    const supabase = createClientClientComponent()!;
+    const supabase = createClientClientComponent();
+    if (!supabase) {
+      setError("Failed to initialize Supabase client.");
+      setLoading(false);
+      return;
+    }
 
     const fetchPointsAndCategories = async () => {
       setLoading(true);
@@ -363,7 +368,8 @@ export default function TokenPoints() {
     (sum, point) => sum + point,
     0,
   );
-  const totalPoints = totalSkillPoints + attendancePoints + profilePoints;
+  const totalPoints =
+    totalSkillPoints + attendancePoints + profilePoints + socialPoints;
 
   return (
     <Box className="!before:absolute !before:inset-0 !before:bg-gradient-to-br !before:from-white/10 !before:to-transparent !before:pointer-events-none relative flex w-full flex-1 flex-col gap-6 overflow-hidden !border-white/10 !bg-white/5 !shadow-2xl !backdrop-blur-2xl dark:!border-slate-400/10 dark:!bg-slate-900/5">
@@ -382,7 +388,8 @@ export default function TokenPoints() {
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
               Total: {totalPoints} points (Skills: {totalSkillPoints} +
-              Attendance: {attendancePoints} + Profile: {profilePoints})
+              Attendance: {attendancePoints} + Profile: {profilePoints} +
+              Social: {socialPoints})
             </p>
           </div>
         </div>
