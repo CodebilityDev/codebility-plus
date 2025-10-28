@@ -6,17 +6,17 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
 
 /**
- * MemberChecklist - TRIPLE-FIXED VERSION
+ * MemberChecklist - INDIVIDUAL MEMBER VERSION
  * 
- * FIXES APPLIED:
- * 1. ✅ Removed ALL emoji from toasts (library provides icons)
- * 2. ✅ Removed ALL double quotes from item names in toasts
- * 3. ✅ Clean, professional toast messages
- * 4. ✅ Fixed toast syntax errors
+ * FEATURES:
+ * 1. ✅ Individual member checklist updates
+ * 2. ✅ Clean, professional toast messages
+ * 3. ✅ Team lead can toggle specific member's checklist
+ * 4. ✅ Member-specific completion tracking
  * 
  * BEHAVIOR:
- * - Team lead toggles "meeting" for Member A → ALL members' "meeting" toggled
- * - This is for team-wide tasks that everyone completes together
+ * - Team lead toggles "meeting" for Member A → Only Member A's "meeting" toggled
+ * - Each member has their own independent checklist status
  * - No priority display (removed completely)
  */
 
@@ -171,10 +171,10 @@ const MemberChecklist = ({
   };
 
   /**
-   * Toggle checklist - SHARED VERSION
+   * Toggle checklist - INDIVIDUAL MEMBER VERSION
    * 
-   * CRITICAL: Updates ALL team members at once
-   * This is for team-wide tasks (meeting, standup, etc.)
+   * UPDATED: Only affects the specific member being viewed
+   * This allows individual tracking per team member
    */
   const toggleComplete = async (
     itemId: string, 
@@ -196,77 +196,78 @@ const MemberChecklist = ({
     const newStatus = !currentStatus;
 
     try {
-      // STEP 1: Update ALL members' rows for this item
+      // Handle placeholder (item doesn't exist in DB yet)
+      if (isPlaceholder) {
+        const item = checklistItems.find(i => i.title === itemTitle);
+        if (!item) {
+          toast.error("Item not found");
+          return;
+        }
+
+        // Create new row for THIS specific member
+        const { data: newItem, error: insertError } = await supabase
+          .from("member_checklists")
+          .insert({
+            member_id: memberId,
+            project_id: projectId,
+            title: item.title,
+            description: item.description,
+            priority: item.priority,
+            completed: newStatus,
+            created_by: item.created_by,
+            due_date: item.due_date,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          })
+          .select()
+          .single();
+
+        if (insertError) {
+          toast.error("Failed to create checklist item");
+          return;
+        }
+
+        // Update local state with real item
+        setChecklistItems(prev =>
+          prev.map(i =>
+            i.title === itemTitle 
+              ? { ...newItem, isPlaceholder: false } 
+              : i
+          )
+        );
+
+        toast.success(`${itemTitle} marked as ${newStatus ? 'completed' : 'incomplete'}`);
+        return;
+      }
+
+      // Update existing item for THIS specific member only
       const { error: updateError } = await supabase
         .from("member_checklists")
         .update({ 
           completed: newStatus,
           updated_at: new Date().toISOString()
         })
-        .eq("project_id", projectId)
-        .eq("title", itemTitle);
-        // ↑ NOTE: No member_id filter - affects ALL members
+        .eq("id", itemId)
+        .eq("member_id", memberId)
+        .eq("project_id", projectId);
+        // ↑ NOTE: Filters by member_id - affects ONLY this member
 
       if (updateError) {
-        // If update fails, try creating rows for members who don't have them
-        if (updateError.code === 'PGRST116') { // No rows found
-          // Get all project members
-          const { data: projectMembers } = await supabase
-            .from("project_members")
-            .select("codev_id")
-            .eq("project_id", projectId);
-
-          if (projectMembers && projectMembers.length > 0) {
-            const item = checklistItems.find(i => i.title === itemTitle);
-            if (!item) {
-              toast.error("Item not found");
-              return;
-            }
-
-            // Create rows for all members
-            const rowsToInsert = projectMembers.map(pm => ({
-              member_id: pm.codev_id,
-              project_id: projectId,
-              title: item.title,
-              description: item.description,
-              priority: item.priority,
-              completed: newStatus,
-              created_by: item.created_by,
-              due_date: item.due_date,
-              created_at: new Date().toISOString(),
-              updated_at: new Date().toISOString()
-            }));
-
-            const { error: insertError } = await supabase
-              .from("member_checklists")
-              .insert(rowsToInsert);
-
-            if (insertError) {
-              toast.error("Failed to create checklist items");
-              return;
-            }
-          }
-        } else {
-          toast.error("Failed to update checklist");
-          return;
-        }
+        toast.error("Failed to update checklist");
+        return;
       }
       
       // Update local state
       setChecklistItems(prev =>
         prev.map(item =>
-          item.title === itemTitle 
-            ? { ...item, completed: newStatus, isPlaceholder: false } 
+          item.id === itemId 
+            ? { ...item, completed: newStatus } 
             : item
         )
       );
 
-      // FIXED: No emoji, no double quotes, clean professional messages
-      if (newStatus) {
-        toast.success(`${itemTitle} marked as completed for ALL team members`);
-      } else {
-        toast.success(`${itemTitle} marked as incomplete for ALL team members`);
-      }
+      // Clean professional messages
+      toast.success(`${itemTitle} marked as ${newStatus ? 'completed' : 'incomplete'}`);
 
     } catch (error) {
       toast.error("Failed to update checklist");
@@ -379,7 +380,7 @@ const MemberChecklist = ({
                     }`}
                     title={
                       isCurrentUserTeamLead 
-                        ? "Click to toggle for ALL team members" 
+                        ? "Click to toggle for this member" 
                         : "Only team leads can toggle completion"
                     }
                   >
@@ -434,7 +435,7 @@ const MemberChecklist = ({
       {totalChecklists > 0 && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-3 rounded">
           <p className="text-sm text-blue-700 dark:text-blue-300">
-            Shared checklist: When team lead toggles an item, it affects ALL team members.
+            Individual checklist: Changes only affect this specific team member.
           </p>
         </div>
       )}
