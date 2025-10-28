@@ -180,7 +180,7 @@ const MemberDetailModal = ({
 
           {/* Checklist Tab */}
           <TabsContent value="checklist" className="space-y-6">
-            <MemberChecklist memberId={member.id} projectId={projectId || ''} />
+            <MemberChecklist memberId={member.id} projectId={projectId || ''} isTeamLead={isTeamLead} />
           </TabsContent>
         </Tabs>
       </DialogContent>

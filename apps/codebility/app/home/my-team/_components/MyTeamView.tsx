@@ -12,6 +12,8 @@ import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
 import TeamProjectCard from "./TeamProjectCard";
 import AddMembersModal from "../AddMembersModal";
+// NOTE: ChecklistManageModal is REMOVED from project card view
+// It will only be accessible from project detail page
 
 interface ProjectData {
   project: {

@@ -10,8 +10,9 @@ import {
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock } from "lucide-react";
+import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock, CheckSquare } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
+import ChecklistManageModal from "../../_components/ChecklistManageModal";
 import AttendanceGrid from "./AttendanceGrid";
 import MeetingBasedAttendance from "./MeetingBasedAttendance";
 import CompactMemberGrid from "./CompactMemberGrid";
@@ -19,6 +20,21 @@ import SyncAllAttendance from "./SyncAllAttendance";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
 import AttendanceWarningBanner from "./AttendanceWarningBanner";
 import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "../actions";
+
+/**
+ * TeamDetailView - ENHANCED VERSION
+ * 
+ * VISIBILITY RULES:
+ * ✅ Team View tab: Always visible to everyone
+ * ✅ Attendance tab: Only visible to team leads
+ * ✅ Checklist button: Only visible to team leads
+ * ✅ Schedule Meeting button: Always visible
+ * ✅ Manage Members button: Always visible (in Team View)
+ * 
+ * BEHAVIOR:
+ * - Regular members: See only Team View tab
+ * - Team leads: See Team View + Attendance tabs + Checklist button
+ */
 
 interface ProjectData {
   project: {
@@ -31,7 +47,7 @@ interface ProjectData {
   members: {
     data: SimpleMemberData[];
   };
-  currentUserId?: string;
+  currentUserId: string;  // ✅ RESTORED: Needed to check team lead status
 }
 
 interface TeamDetailViewProps {
@@ -41,10 +57,11 @@ interface TeamDetailViewProps {
 const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const [project, setProject] = useState(projectData);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showChecklistModal, setShowChecklistModal] = useState(false);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
   const [viewMode, setViewMode] = useState<"team" | "attendance">("team");
   const [hasAttendanceChanges, setHasAttendanceChanges] = useState(false);
-  const [useMeetingBasedAttendance, setUseMeetingBasedAttendance] = useState(true); // Use meeting-based attendance by default
+  const [useMeetingBasedAttendance, setUseMeetingBasedAttendance] = useState(true);
   const [showScheduleMeetingModal, setShowScheduleMeetingModal] = useState(false);
   const [currentSchedule, setCurrentSchedule] = useState<{ selectedDays: string[]; time: string } | null>(null);
   const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ totalPoints: number; presentDays: number }>({ totalPoints: 0, presentDays: 0 });
@@ -53,8 +70,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const { project: projectInfo, teamLead, members, currentUserId } = project;
   const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
 
-  // Check if current user is the team lead
-  const isTeamLead = currentUserId && teamLead?.data && teamLead.data.id === currentUserId;
+  // ✅ CRITICAL: Determine if current user is team lead
+  const isCurrentUserTeamLead = currentUserId === teamLead?.data?.id;
 
   // Load meeting schedule on component mount
   useEffect(() => {
@@ -85,7 +102,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       }
     };
     
-    // Only load on initial mount or when switching to team view
     if (viewMode === 'team') {
       loadAttendancePoints();
     }
@@ -121,11 +137,18 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     setShowAddModal(false);
   };
 
+  const handleOpenChecklistModal = () => {
+    setShowChecklistModal(true);
+  };
+
+  const handleCloseChecklistModal = () => {
+    setShowChecklistModal(false);
+  };
+
   const handleSaveAttendance = useCallback(async () => {
     if (attendanceGridRef.current?.saveAllAttendance) {
       await attendanceGridRef.current.saveAllAttendance();
 
-      // Refresh attendance points after saving
       const currentDate = new Date();
       const result = await getTeamMonthlyAttendancePoints(
         projectInfo.id,
@@ -146,7 +169,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     try {
       setIsLoadingMembers(true);
 
-      // Get current team lead
       const teamLeadResult = await getTeamLead(projectInfo.id);
       const teamLead = teamLeadResult.data;
 
@@ -154,7 +176,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         throw new Error('Team leader not found');
       }
 
-      // Prepare updated members array
       const updatedMembers = [
         {
           ...teamLead,
@@ -170,7 +191,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           })),
       ];
 
-      // Update project members
       const result = await updateProjectMembers(
         projectInfo.id,
         updatedMembers,
@@ -180,7 +200,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       if (result.success) {
         toast.success("Project members updated successfully.");
 
-        // Update local state
         const updatedProjectMembers: SimpleMemberData[] = selectedMembers
           .filter(member => member.id !== teamLead.id)
           .map(member => ({
@@ -212,10 +231,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   };
 
   const handleScheduleUpdate = async () => {
-    // Close modal and reload schedule
     setShowScheduleMeetingModal(false);
 
-    // Reload the schedule after a short delay to ensure the save is complete
     setTimeout(async () => {
       const result = await getMeetingSchedule(projectInfo.id);
       if (result.success && result.schedule) {
@@ -227,12 +244,11 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   return (
     <>
       <div className="space-y-6">
-        {/* Attendance Warning Banner */}
-        {viewMode === "attendance" && (
-
+        {/* Attendance Warning Banner - Only shown for team leads in attendance view */}
+        {viewMode === "attendance" && isCurrentUserTeamLead && (
           <AttendanceWarningBanner 
             projectId={projectInfo.id} 
-            isTeamLead={isTeamLead || !currentUserId}
+            isTeamLead={isCurrentUserTeamLead}
           />
         )}
         
@@ -256,28 +272,29 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           </div>
         )}
 
-        {/* Header */}
+        {/* Header with Tab Buttons */}
         <div className="flex items-center justify-between">
+          {/* LEFT: View Mode Tabs + Checklist Button */}
           <div className="flex items-center gap-2">
+            {/* Team View Tab - Always visible */}
             <Button
               variant={viewMode === "team" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("team")}
-
               className={`flex items-center gap-2 ${
                 viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
               }`}
-
             >
               <Users className="h-4 w-4" />
               Team View
             </Button>
-            {(isTeamLead || !currentUserId) && (
+            
+            {/* Attendance Tab - ONLY VISIBLE TO TEAM LEADS */}
+            {isCurrentUserTeamLead && (
               <Button
                 variant={viewMode === "attendance" ? "default" : "outline"}
                 size="sm"
                 onClick={() => setViewMode("attendance")}
-
                 className={`flex items-center gap-2 ${
                   viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
                 }`}
@@ -286,9 +303,25 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 Attendance
               </Button>
             )}
+
+            {/* Checklist Button - ONLY VISIBLE TO TEAM LEADS */}
+            {isCurrentUserTeamLead && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleOpenChecklistModal}
+                className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+              >
+                <CheckSquare className="h-4 w-4" />
+                Checklist
+              </Button>
+            )}
           </div>
+
+          {/* RIGHT: Action Buttons */}
           <div className="flex gap-2">
-            {viewMode === "attendance" && (
+            {/* Save & Sync buttons - Only for team leads in attendance view */}
+            {viewMode === "attendance" && isCurrentUserTeamLead && (
               <>
                 {hasAttendanceChanges && (
                   <Button
@@ -304,10 +337,12 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
                 <SyncAllAttendance 
                   projectId={projectInfo.id} 
-                  isTeamLead={isTeamLead || !currentUserId} 
+                  isTeamLead={isCurrentUserTeamLead}
                 />
               </>
             )}
+            
+            {/* Manage Members - Only in team view */}
             {viewMode === "team" && (
               <Button
                 onClick={handleOpenAddModal}
@@ -319,18 +354,18 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 {isLoadingMembers ? 'Loading...' : 'Manage Members'}
               </Button>
             )}
-            {isTeamLead && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-                title="Schedule Meetings"
-                onClick={() => setShowScheduleMeetingModal(true)}
-              >
-                <CalendarDays className="h-3.5 w-3.5" />
-                Schedule Meeting
-              </Button>
-            )}
+            
+            {/* Schedule Meeting - Always visible */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+              title="Schedule Meetings"
+              onClick={() => setShowScheduleMeetingModal(true)}
+            >
+              <CalendarDays className="h-3.5 w-3.5" />
+              Schedule Meeting
+            </Button>
           </div>
         </div>
 
@@ -393,11 +428,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                       {monthlyAttendancePoints.presentDays} attendance {monthlyAttendancePoints.presentDays === 1 ? 'day' : 'days'} recorded
                     </p>
                   )}
-                  {isTeamLead && (
-                    <p className="text-xs text-gray-600 dark:text-gray-400">
-                      Click "Attendance" tab to manage team attendance
-                    </p>
-                  )}
                 </div>
               </div>
             </div>
@@ -407,8 +437,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               <CompactMemberGrid
                 members={members?.data || []}
                 teamLead={teamLead?.data || null}
-                projectId={projectInfo.id || null}
-
+                projectId={projectInfo.id || ""}
               />
             ) : (
               <div className="flex flex-col items-center justify-center rounded-lg border-2 border-dashed border-gray-200 py-12 dark:border-gray-700">
@@ -432,7 +461,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             )}
           </>
         ) : (
-          /* Attendance Grid View */
+          /* Attendance Grid View - Only accessible by team leads */
           <div className="w-full overflow-x-hidden">
             {useMeetingBasedAttendance && currentSchedule ? (
               <MeetingBasedAttendance
@@ -479,6 +508,16 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         teamMembers={members?.data || []}
         teamLead={teamLead?.data || null}
         currentSchedule={currentSchedule}
+      />
+
+      {/* Checklist Management Modal */}
+      <ChecklistManageModal
+        isOpen={showChecklistModal}
+        projectId={projectInfo.id}
+        projectName={projectInfo.name}
+        teamMembers={members?.data || []}
+        teamLeadId={teamLead?.data?.id || ""}
+        onClose={handleCloseChecklistModal}
       />
     </>
   );
