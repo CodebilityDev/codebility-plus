@@ -146,6 +146,21 @@ export interface ProjectMember {
   };
 }
 
+export interface ProjectCategory {
+  id: number;
+  name: string;
+  description?: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export interface ProjectCategoryJunction {
+  id: string;
+  project_id: string;
+  category_id: number;
+  created_at?: string;
+}
+
 export interface Project {
   id: string;
   name: string;
@@ -158,7 +173,7 @@ export interface Project {
   website_url?: string;
   figma_link?: string;
   client_id?: string;
-  project_category_id?: number;
+  categories?: ProjectCategory[]; // Changed from project_category_id to support multiple categories
   tech_stack?: string[];
   created_at?: string;
   updated_at?: string;

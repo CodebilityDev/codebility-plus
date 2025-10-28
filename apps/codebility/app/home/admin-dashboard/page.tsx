@@ -27,9 +27,10 @@ async function getDashboardData() {
       "internal_status, availability_status, role_id, application_status, date_applied",
     );
 
-  const { data: projects, error: projectsError } = await supabase
-    .from("projects")
-    .select("project_category_id");
+  // Fetch project categories junction table to count projects per category
+  const { data: projectCategories, error: projectCategoriesError } = await supabase
+    .from("project_categories")
+    .select("project_id, category_id");
 
   const { data: categories, error: categoriesError } = await supabase
     .from("projects_category")
@@ -40,8 +41,8 @@ async function getDashboardData() {
     console.error("Failed to fetch codevs:", codevError.message);
     return;
   }
-  if (projectsError) {
-    console.error("Failed to fetch projects:", projectsError.message);
+  if (projectCategoriesError) {
+    console.error("Failed to fetch project categories:", projectCategoriesError.message);
     return;
   }
   if (categoriesError) {
@@ -54,8 +55,8 @@ async function getDashboardData() {
     console.warn("No codevs data found.");
     return;
   }
-  if (!projects) {
-    console.warn("No projects data found.");
+  if (!projectCategories) {
+    console.warn("No project categories data found.");
     return;
   }
   if (!categories) {
@@ -97,11 +98,12 @@ async function getDashboardData() {
   //Admins
   const admins = codev.filter((c) => c.role_id === 1).length;
 
-  //Projects
+  //Projects - Count unique projects per category (many-to-many relationship)
   const projectCounts = categories.reduce(
     (acc, category) => {
-      const count = projects.filter(
-        (p) => p.project_category_id === category.id,
+      // Count unique project_ids that have this category
+      const count = projectCategories.filter(
+        (pc) => pc.category_id === category.id,
       ).length;
       acc[category.name] = count;
       return acc;
@@ -109,7 +111,9 @@ async function getDashboardData() {
     {} as Record<string, number>,
   );
 
-  const projectTotalCount = projects.length;
+  // Count total unique projects
+  const uniqueProjectIds = new Set(projectCategories.map((pc) => pc.project_id));
+  const projectTotalCount = uniqueProjectIds.size;
 
   return {
     applicantStatusCounts,

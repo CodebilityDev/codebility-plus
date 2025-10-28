@@ -63,7 +63,13 @@ export async function GET() {
             website_url,
             figma_link,
             client_id,
-            project_category_id,
+            categories:project_categories(
+              projects_category(
+                id,
+                name,
+                description
+              )
+            ),
             kanban_display,
             public_display
           )
@@ -87,6 +93,10 @@ export async function GET() {
         ...pm.projects,
         role: pm.role,
         joined_at: pm.joined_at,
+        // Flatten categories from nested structure
+        categories: (pm.projects?.categories || []).map(
+          (cat: any) => cat.projects_category
+        ).filter(Boolean),
       })) || [];
 
       return {

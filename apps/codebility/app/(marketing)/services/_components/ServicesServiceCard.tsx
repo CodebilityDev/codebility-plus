@@ -29,8 +29,11 @@ interface ServiceProject {
   start_date?: string;
   end_date?: string;
   members?: TeamMember[];
-  project_category_id?: number;
-  project_category_name?: string;
+  categories?: Array<{
+    id: number;
+    name: string;
+    description?: string;
+  }>;
   client_id?: string;
   created_at?: string;
   updated_at?: string;
@@ -51,7 +54,7 @@ function ServiceCard({ service }: Props) {
     description,
     members = [],
     website_url,
-    project_category_name,
+    categories = [],
     tech_stack = [],
   } = service;
 
@@ -115,9 +118,16 @@ function ServiceCard({ service }: Props) {
           loading="lazy"
           quality={75}
         />
-        {project_category_name && (
-          <div className="absolute left-3 top-3 inline-flex items-center px-3 py-1.5 text-xs font-semibold text-white rounded-full backdrop-blur-sm shadow-lg bg-blue-600/80 transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-blue-500/20">
-            {project_category_name}
+        {categories.length > 0 && (
+          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 max-w-[calc(100%-1.5rem)]">
+            {categories.map((category) => (
+              <div
+                key={category.id}
+                className="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-white rounded-full backdrop-blur-sm shadow-lg bg-blue-600/80 transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-blue-500/20"
+              >
+                {category.name}
+              </div>
+            ))}
           </div>
         )}
         
