@@ -23,12 +23,8 @@ import { IconFigma } from "@/public/assets/svgs/techstack";
 import { useQuery } from "@tanstack/react-query";
 import { format, parseISO } from "date-fns";
 
-// Map project category id to a label.
-const PROJECT_CATEGORIES: Record<string, string> = {
-  "1": "Web Development",
-  "2": "Mobile Development",
-  "3": "Design",
-};
+// Note: Project categories are now fetched directly from the project data
+// No need for hardcoded mapping since categories are included in the project object
 
 const ProjectViewModal = () => {
   const { isOpen, type, onClose, onOpen, data } = useModal();
@@ -203,12 +199,21 @@ const ProjectViewModal = () => {
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Project Category</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">
-                      {data?.project_category_id
-                        ? PROJECT_CATEGORIES[data.project_category_id.toString()]
-                        : "Not specified"}
-                    </p>
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Project Categories</h4>
+                    {data?.categories && data.categories.length > 0 ? (
+                      <div className="flex flex-wrap gap-2 mt-1">
+                        {data.categories.map((category) => (
+                          <span
+                            key={category.id}
+                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200 dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-300 dark:border-blue-700"
+                          >
+                            {category.name}
+                          </span>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Not specified</p>
+                    )}
                   </div>
 
                   <div>
