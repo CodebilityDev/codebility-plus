@@ -52,7 +52,7 @@ export interface ProjectFormData {
   website_url?: string;
   figma_link?: string;
   start_date: string;
-  project_category_id?: string;
+  category_ids?: number[]; // Changed from project_category_id to support multiple categories
   client_id?: string;
   status?: string;
   main_image?: string;
@@ -67,6 +67,7 @@ const ProjectEditModal = () => {
   const queryClient = useQueryClient();
 
   // Data states
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [currentTeamLeader, setCurrentTeamLeader] = useState<Codev | null>(
     null,
   );
@@ -157,17 +158,6 @@ const ProjectEditModal = () => {
     [clients],
   );
 
-  const categoryOptions = useMemo(
-    () =>
-      categories.map((category) => ({
-        id: category.id.toString(),
-        value: category.id.toString(),
-        label: category.name,
-        subLabel: category.description,
-      })),
-    [categories],
-  );
-
   // Populate form fields immediately when modal opens with project data
   useEffect(() => {
     if (data && isModalOpen) {
@@ -181,10 +171,14 @@ const ProjectEditModal = () => {
       setValue("website_url", data.website_url || "");
       setValue("figma_link", data.figma_link || "");
       setValue("client_id", data.client_id || "");
-      setValue(
-        "project_category_id",
-        data.project_category_id ? data.project_category_id.toString() : "",
-      );
+
+      // Set selected categories from the data
+      if (data.categories && Array.isArray(data.categories)) {
+        setSelectedCategoryIds(data.categories.map(cat => cat.id));
+      } else {
+        setSelectedCategoryIds([]);
+      }
+
       setValue("status", data.status || "pending");
       if (data.start_date) {
         setValue("start_date", data.start_date);
@@ -192,7 +186,7 @@ const ProjectEditModal = () => {
       setProjectImage(data.main_image || null);
       setCroppedImage(data.main_image || null);
       setSelectedStatus(data.status || "pending");
-      
+
       // Set tech stack if available
       if (data.tech_stack && Array.isArray(data.tech_stack)) {
         setStack(data.tech_stack);
@@ -439,17 +433,31 @@ const ProjectEditModal = () => {
   const SelectSection = () => (
     <div className="space-y-6">
       {/* Project Configuration */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4">
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Category *</label>
-          <CustomSelect
-            options={categoryOptions}
-            onChange={(value) => setValue("project_category_id", value)}
-            value={data?.project_category_id?.toString() || ""}
-            placeholder="Select Project Category"
-            variant="simple"
-            searchable
-          />
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Categories * (Select at least one)</label>
+          <div className="grid grid-cols-2 gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+            {categories.map((category) => (
+              <label
+                key={category.id}
+                className="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedCategoryIds.includes(category.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedCategoryIds([...selectedCategoryIds, category.id]);
+                    } else {
+                      setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== category.id));
+                    }
+                  }}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-600"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">{category.name}</span>
+              </label>
+            ))}
+          </div>
         </div>
         <div className="space-y-2">
           <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Client *</label>
@@ -581,8 +589,8 @@ const ProjectEditModal = () => {
       return;
     }
 
-    if (!formData.project_category_id) {
-      toast.error("Project category is required");
+    if (!selectedCategoryIds || selectedCategoryIds.length === 0) {
+      toast.error("At least one project category is required");
       return;
     }
 
@@ -617,7 +625,10 @@ const ProjectEditModal = () => {
           form.append(key, value);
         }
       });
-      
+
+      // Add category IDs as JSON array
+      form.append("category_ids", JSON.stringify(selectedCategoryIds));
+
       // Add tech stack
       if (selectedTechStack.length > 0) {
         form.append("tech_stack", JSON.stringify(selectedTechStack));
