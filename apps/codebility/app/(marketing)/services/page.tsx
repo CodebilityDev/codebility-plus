@@ -35,8 +35,11 @@ interface ProjectData {
   figma_link?: string;
   client_id?: string;
   members?: TeamMember[];
-  project_category_id?: number;
-  project_category_name?: string;
+  categories?: Array<{
+    id: number;
+    name: string;
+    description?: string;
+  }>;
   created_at?: string;
   updated_at?: string;
   tech_stack?: string[];
@@ -59,8 +62,7 @@ const ServicesPage = async () => {
     figma_link: item.figma_link || "",
     start_date: item.start_date || "",
     end_date: item.end_date || "",
-    project_category_id: item.projects_category?.id || 0,
-    project_category_name: item.projects_category?.name || "",
+    categories: item.categories || [],
     client_id: item.client_id,
     members:
       item.project_members?.map((pm: any) => ({

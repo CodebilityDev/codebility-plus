@@ -160,16 +160,27 @@ export async function createProject(
   try {
     // Parse tech stack if provided
     const techStackData = formData.get("tech_stack");
-    let techStack = null;
+    let techStack: string[] | null = null;
     if (techStackData) {
       try {
-        techStack = JSON.parse(techStackData as string);
+        techStack = JSON.parse(techStackData as string) as string[];
       } catch (error) {
         console.warn("Invalid tech stack data:", error);
       }
     }
 
-    // Create project
+    // Parse category IDs if provided
+    const categoryIdsData = formData.get("category_ids");
+    let categoryIds: number[] = [];
+    if (categoryIdsData) {
+      try {
+        categoryIds = JSON.parse(categoryIdsData as string) as number[];
+      } catch (error) {
+        console.warn("Invalid category IDs data:", error);
+      }
+    }
+
+    // Create project (removed project_category_id as it no longer exists)
     const { data: project, error: projectError } = await supabase
       .from("projects")
       .insert({
@@ -180,9 +191,6 @@ export async function createProject(
         figma_link: formData.get("figma_link"),
         client_id: formData.get("client_id"),
         start_date: formData.get("start_date"),
-        project_category_id: formData.get("project_category_id")
-          ? parseInt(formData.get("project_category_id") as string)
-          : null,
         main_image: formData.get("main_image"),
         tech_stack: techStack,
         status: "pending",
@@ -191,6 +199,23 @@ export async function createProject(
       .single();
 
     if (projectError) throw projectError;
+
+    // Insert project categories into junction table
+    if (categoryIds.length > 0) {
+      const categoryInserts = categoryIds.map((categoryId) => ({
+        project_id: project.id,
+        category_id: categoryId,
+      }));
+
+      const { error: categoryError } = await supabase
+        .from("project_categories")
+        .insert(categoryInserts);
+
+      if (categoryError) {
+        console.error("Error inserting project categories:", categoryError);
+        // Don't throw - allow project creation to succeed even if categories fail
+      }
+    }
 
     // Create project members including team leader
     const memberInserts = [
@@ -227,7 +252,11 @@ export async function createProject(
 
     if (boardError) throw boardError;
 
+    // Invalidate Redis cache for projects
+    await invalidateCache(cacheKeys.projects.all);
+
     revalidatePath("/projects");
+    revalidatePath("/services");
     return { success: true, data: project };
   } catch (error) {
     console.error("Error creating project:", error);
@@ -263,6 +292,12 @@ export async function updateStatus(
 
   if (projectError)
     console.error("Error in updating projects and kanban board:", projectError);
+
+  // Invalidate Redis cache for projects
+  await invalidateCache(cacheKeys.projects.all);
+
+  revalidatePath("/home/projects");
+  revalidatePath("/services");
 
   return { success: true, projectId, status };
 }
@@ -324,19 +359,30 @@ export async function updateProject(projectId: string, formData: FormData) {
 
     // Parse tech stack if provided
     const techStackData = formData.get("tech_stack");
-    let techStack = null;
+    let techStack: string[] | null = null;
     if (techStackData) {
       try {
-        techStack = JSON.parse(techStackData as string);
+        techStack = JSON.parse(techStackData as string) as string[];
       } catch (error) {
         console.warn("Invalid tech stack data:", error);
+      }
+    }
+
+    // Parse category IDs if provided
+    const categoryIdsData = formData.get("category_ids");
+    let categoryIds: number[] | null = null;
+    if (categoryIdsData) {
+      try {
+        categoryIds = JSON.parse(categoryIdsData as string) as number[];
+      } catch (error) {
+        console.warn("Invalid category IDs data:", error);
       }
     }
 
     // Update project details
     const updateData: any = {};
     for (const [key, value] of formData.entries()) {
-      if (key !== "project_members" && key !== "tech_stack") {
+      if (key !== "project_members" && key !== "tech_stack" && key !== "category_ids") {
         // Log the key-value pairs to debug
         console.log(`Processing form field: ${key} = ${value}`);
         updateData[key] = value;
@@ -405,10 +451,45 @@ export async function updateProject(projectId: string, formData: FormData) {
       if (insertError) throw insertError;
     }
 
+    // Handle project categories update
+    if (categoryIds !== null) {
+      // Delete existing project categories
+      const { error: deleteCategoriesError } = await supabase
+        .from("project_categories")
+        .delete()
+        .eq("project_id", projectId);
+
+      if (deleteCategoriesError) {
+        console.error("Error deleting project categories:", deleteCategoriesError);
+        // Don't throw - allow project update to succeed even if categories fail
+      }
+
+      // Insert new project categories
+      if (categoryIds.length > 0) {
+        const categoryInserts = categoryIds.map((categoryId) => ({
+          project_id: projectId,
+          category_id: categoryId,
+        }));
+
+        const { error: insertCategoriesError } = await supabase
+          .from("project_categories")
+          .insert(categoryInserts);
+
+        if (insertCategoriesError) {
+          console.error("Error inserting project categories:", insertCategoriesError);
+          // Don't throw - allow project update to succeed even if categories fail
+        }
+      }
+    }
+
     // Log success with the returned project data
     console.log("Project updated successfully:", projectData);
 
+    // Invalidate Redis cache for projects
+    await invalidateCache(cacheKeys.projects.all);
+
     revalidatePath("/projects");
+    revalidatePath("/services");
     return { success: true, data: projectData };
   } catch (error) {
     console.error("Error updating project:", error);
@@ -448,7 +529,11 @@ export async function deleteProject(projectId: string) {
 
     if (deleteError) throw deleteError;
 
+    // Invalidate Redis cache for projects
+    await invalidateCache(cacheKeys.projects.all);
+
     revalidatePath("/projects");
+    revalidatePath("/services");
     return { success: true };
   } catch (error) {
     console.error("Error deleting project:", error);
@@ -708,6 +793,121 @@ export const getProjectCategories = async () => {
   return data || [];
 };
 
+/**
+ * Get all categories for a specific project
+ */
+export const getProjectCategoriesForProject = async (projectId: string) => {
+  const supabase = await createClientServerComponent();
+  const { data, error } = await supabase
+    .from("project_categories")
+    .select(`
+      category_id,
+      projects_category (
+        id,
+        name,
+        description
+      )
+    `)
+    .eq("project_id", projectId);
+
+  if (error) {
+    console.error("Error fetching project categories:", error);
+    throw new Error("Failed to fetch project categories");
+  }
+
+  // Flatten the structure
+  return data?.map((item: any) => item.projects_category).filter(Boolean) || [];
+};
+
+/**
+ * Add categories to a project
+ */
+export const addCategoriesToProject = async (
+  projectId: string,
+  categoryIds: number[]
+) => {
+  const supabase = await createClientServerComponent();
+
+  const inserts = categoryIds.map((categoryId) => ({
+    project_id: projectId,
+    category_id: categoryId,
+  }));
+
+  const { error } = await supabase
+    .from("project_categories")
+    .insert(inserts);
+
+  if (error) {
+    console.error("Error adding categories to project:", error);
+    throw new Error("Failed to add categories to project");
+  }
+
+  return { success: true };
+};
+
+/**
+ * Remove a category from a project
+ */
+export const removeCategoryFromProject = async (
+  projectId: string,
+  categoryId: number
+) => {
+  const supabase = await createClientServerComponent();
+
+  const { error } = await supabase
+    .from("project_categories")
+    .delete()
+    .eq("project_id", projectId)
+    .eq("category_id", categoryId);
+
+  if (error) {
+    console.error("Error removing category from project:", error);
+    throw new Error("Failed to remove category from project");
+  }
+
+  return { success: true };
+};
+
+/**
+ * Replace all categories for a project
+ */
+export const replaceProjectCategories = async (
+  projectId: string,
+  categoryIds: number[]
+) => {
+  const supabase = await createClientServerComponent();
+
+  // Delete existing categories
+  const { error: deleteError } = await supabase
+    .from("project_categories")
+    .delete()
+    .eq("project_id", projectId);
+
+  if (deleteError) {
+    console.error("Error deleting project categories:", deleteError);
+    throw new Error("Failed to delete project categories");
+  }
+
+  // Insert new categories if any
+  if (categoryIds.length > 0) {
+    const inserts = categoryIds.map((categoryId) => ({
+      project_id: projectId,
+      category_id: categoryId,
+    }));
+
+    const { error: insertError } = await supabase
+      .from("project_categories")
+      .insert(inserts);
+
+    if (insertError) {
+      console.error("Error inserting project categories:", insertError);
+      throw new Error("Failed to insert project categories");
+    }
+  }
+
+  return { success: true };
+};
+
 // Get all projects with kanban boards display is true
 export async function getAllProjects(kanbanBoardId?: string) {
   const supabase = await createClientServerComponent();
@@ -764,16 +964,25 @@ export async function getProjectByID(id: string) {
             image_url
           )
         ),
-        projects_category (
-          id,
-          name
+        categories:project_categories(
+          projects_category(
+            id,
+            name,
+            description
+          )
         )
       `
     )
     .eq("id", id)
-    .single();    
+    .single();
 
   if (error) throw error;
 
-  return data;
+  // Flatten the categories structure for easier consumption
+  const projectWithCategories = data ? {
+    ...data,
+    categories: data.categories?.map((cat: any) => cat.projects_category).filter(Boolean) || [],
+  } : null;
+
+  return projectWithCategories;
 }

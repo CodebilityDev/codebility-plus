@@ -195,7 +195,7 @@ const Hero = () => {
       >
         <SideNavMenu />
 
-        <Container className="relative z-10 flex w-full max-w-[1400px] flex-col gap-20 px-8 py-20 md:px-12 md:py-24 lg:flex-row lg:items-center lg:gap-20 lg:px-16">
+        <Container className="relative z-10 flex w-full max-w-[1400px] flex-col gap-20 px-8 py-20 md:px-12 md:py-24 lg:flex-row lg:items-start lg:gap-20 lg:px-16">
           <motion.div 
             className="flex w-full flex-col items-center gap-12 text-center lg:w-[58%] lg:items-start lg:text-left"
             variants={containerVariants}
@@ -314,7 +314,7 @@ const Hero = () => {
               className="grid grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-10"
               variants={containerVariants}
             >
-              {MarketingCardData.slice(0, 4).map((data, index) => (
+              {MarketingCardData.slice(0, 5).map((data, index) => (
                 <motion.div
                   key={index}
                   variants={itemVariants}
