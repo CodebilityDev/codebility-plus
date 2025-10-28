@@ -252,7 +252,11 @@ export async function createProject(
 
     if (boardError) throw boardError;
 
+    // Invalidate Redis cache for projects
+    await invalidateCache(cacheKeys.projects.all);
+
     revalidatePath("/projects");
+    revalidatePath("/services");
     return { success: true, data: project };
   } catch (error) {
     console.error("Error creating project:", error);
@@ -288,6 +292,12 @@ export async function updateStatus(
 
   if (projectError)
     console.error("Error in updating projects and kanban board:", projectError);
+
+  // Invalidate Redis cache for projects
+  await invalidateCache(cacheKeys.projects.all);
+
+  revalidatePath("/home/projects");
+  revalidatePath("/services");
 
   return { success: true, projectId, status };
 }
@@ -475,7 +485,11 @@ export async function updateProject(projectId: string, formData: FormData) {
     // Log success with the returned project data
     console.log("Project updated successfully:", projectData);
 
+    // Invalidate Redis cache for projects
+    await invalidateCache(cacheKeys.projects.all);
+
     revalidatePath("/projects");
+    revalidatePath("/services");
     return { success: true, data: projectData };
   } catch (error) {
     console.error("Error updating project:", error);
@@ -515,7 +529,11 @@ export async function deleteProject(projectId: string) {
 
     if (deleteError) throw deleteError;
 
+    // Invalidate Redis cache for projects
+    await invalidateCache(cacheKeys.projects.all);
+
     revalidatePath("/projects");
+    revalidatePath("/services");
     return { success: true };
   } catch (error) {
     console.error("Error deleting project:", error);
