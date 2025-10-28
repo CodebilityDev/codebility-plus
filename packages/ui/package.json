@@ -15,10 +15,63 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "default": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./accordion": "./src/accordion.tsx",
+    "./alert": "./src/alert.tsx",
+    "./alert-dialog": "./src/alert-dialog.tsx",
+    "./aspect-ratio": "./src/aspect-ratio.tsx",
+    "./avatar": "./src/avatar.tsx",
+    "./badge": "./src/badge.tsx",
+    "./breadcrumb": "./src/breadcrumb.tsx",
+    "./button": "./src/button.tsx",
+    "./calendar": "./src/calendar.tsx",
+    "./card": "./src/card.tsx",
+    "./carousel": "./src/carousel.tsx",
+    "./checkbox": "./src/checkbox.tsx",
+    "./collapsible": "./src/collapsible.tsx",
+    "./command": "./src/command.tsx",
+    "./context-menu": "./src/context-menu.tsx",
+    "./dialog": "./src/dialog.tsx",
+    "./drawer": "./src/drawer.tsx",
+    "./dropdown-menu": "./src/dropdown-menu.tsx",
+    "./form": "./src/form.tsx",
+    "./hover-card": "./src/hover-card.tsx",
+    "./input": "./src/input.tsx",
+    "./input-otp": "./src/input-otp.tsx",
+    "./label": "./src/label.tsx",
+    "./menubar": "./src/menubar.tsx",
+    "./navigation-menu": "./src/navigation-menu.tsx",
+    "./popover": "./src/popover.tsx",
+    "./progress": "./src/progress.tsx",
+    "./radio-group": "./src/radio-group.tsx",
+    "./resizable": "./src/resizable.tsx",
+    "./scroll-area": "./src/scroll-area.tsx",
+    "./select": "./src/select.tsx",
+    "./separator": "./src/separator.tsx",
+    "./sheet": "./src/sheet.tsx",
+    "./skeleton": "./src/skeleton.tsx",
+    "./slider": "./src/slider.tsx",
+    "./switch": "./src/switch.tsx",
+    "./table": "./src/table.tsx",
+    "./tabs": "./src/tabs.tsx",
+    "./textarea": "./src/textarea.tsx",
+    "./toast": "./src/toast.tsx",
+    "./toaster": "./src/toaster.tsx",
+    "./toggle": "./src/toggle.tsx",
+    "./toggle-group": "./src/toggle-group.tsx",
+    "./tooltip": "./src/tooltip.tsx",
+    "./use-toast": "./src/use-toast.ts"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "import": "./dist/index.js"
+      },
+      "./*": {
+        "types": "./dist/*.d.ts",
+        "import": "./dist/*.js"
+      }
     }
   },
   "files": [

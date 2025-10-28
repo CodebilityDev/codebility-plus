@@ -1,6 +1,7 @@
 {
   "extends": "@codevs/tsconfig/base.json",
   "compilerOptions": {
+    "types": [],
     "lib": [
       "dom",
       "dom.iterable",
