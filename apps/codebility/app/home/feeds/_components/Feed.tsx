@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import DefaultPagination from "@/components/ui/pagination";
-import { useFeedsStore } from "@/store/feeds-store"; // Adjust path as needed
+import { useFeedsStore } from "@/store/feeds-store";
 
 import Post from "./PostCard";
 
@@ -24,7 +24,7 @@ export default function Feed({ isAdmin }: FeedProp) {
 
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts]);
+  }, []);
 
   const handleDeletePost = (deletedPostId: string | number) => {
     useFeedsStore.setState((state) => ({
