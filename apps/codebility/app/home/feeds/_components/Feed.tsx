@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import DefaultPagination from "@/components/ui/pagination";
 import { useFeedsStore } from "@/store/feeds-store";
 
@@ -8,23 +8,50 @@ import Post from "./PostCard";
 
 interface FeedProp {
   isAdmin: boolean;
-  onCreatePost?: () => void;
+  searchQuery?: string;
 }
 
-export default function Feed({ isAdmin }: FeedProp) {
+export default function Feed({ isAdmin, searchQuery }: FeedProp) {
   const posts = useFeedsStore((state) => state.posts);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
 
   const [currentPage, setCurrentPage] = useState(1);
 
-  const postsPerPage = 6;
-  const totalPages = Math.ceil(posts.length / postsPerPage);
-  const startIndex = (currentPage - 1) * postsPerPage;
-  const currentPosts = posts.slice(startIndex, startIndex + postsPerPage);
-
   useEffect(() => {
     fetchPosts();
-  }, []);
+  }, [fetchPosts]);
+
+  // Filter posts by title or author's first/last name (case-insensitive)
+  const filteredPosts = useMemo(() => {
+    if (!searchQuery || searchQuery.trim() === "") return posts;
+
+    const query = searchQuery.toLowerCase();
+
+    return posts.filter((post) => {
+      const titleMatch = post.title?.toLowerCase().includes(query);
+      const firstNameMatch = post.author_id?.first_name
+        ?.toLowerCase()
+        .includes(query);
+      const lastNameMatch = post.author_id?.last_name
+        ?.toLowerCase()
+        .includes(query);
+
+      return titleMatch || firstNameMatch || lastNameMatch;
+    });
+  }, [posts, searchQuery]);
+
+  const postsPerPage = 6;
+  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
+  const startIndex = (currentPage - 1) * postsPerPage;
+  const currentPosts = filteredPosts.slice(
+    startIndex,
+    startIndex + postsPerPage,
+  );
+
+  // Reset to first page when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   const handleDeletePost = (deletedPostId: string | number) => {
     useFeedsStore.setState((state) => ({
@@ -52,13 +79,16 @@ export default function Feed({ isAdmin }: FeedProp) {
           />
         ))}
       </div>
-      <DefaultPagination
-        totalPages={totalPages}
-        currentPage={currentPage}
-        handleNextPage={handleNextPage}
-        handlePreviousPage={handlePreviousPage}
-        setCurrentPage={setCurrentPage}
-      />
+
+      {filteredPosts.length > 0 && (
+        <DefaultPagination
+          totalPages={totalPages}
+          currentPage={currentPage}
+          handleNextPage={handleNextPage}
+          handlePreviousPage={handlePreviousPage}
+          setCurrentPage={setCurrentPage}
+        />
+      )}
     </>
   );
 }

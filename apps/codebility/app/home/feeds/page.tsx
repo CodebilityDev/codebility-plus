@@ -12,6 +12,8 @@ import { getUserRole } from "./_services/action";
 export default function FeedsPage() {
   const [isAdmin, setIsAdmin] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState("");
   const { user } = useUserStore();
 
   useEffect(() => {
@@ -23,6 +25,14 @@ export default function FeedsPage() {
 
     if (user) fetchRole();
   }, [user]);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 500); // triggers after 500ms of inactivity
+
+    return () => clearTimeout(handler);
+  }, [searchQuery]);
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
@@ -45,7 +55,19 @@ export default function FeedsPage() {
           Create Post
         </Button>
 
-        <Feed isAdmin={isAdmin} />
+        {/* Search bar */}
+        <div className="mb-6">
+          <input
+            type="text"
+            placeholder="Search by title or author name..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="focus:border-customBlue-500 focus:ring-customBlue-500 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400 h-11 w-full rounded-lg border border-gray-300 bg-gray-50 px-4 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-1 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-400"
+          />
+        </div>
+
+        {/* Feed component with live search */}
+        <Feed isAdmin={isAdmin} searchQuery={debouncedQuery} />
       </div>
 
       <CreatePostModal isOpen={isModalOpen} onClose={closeModal} />
