@@ -11,13 +11,22 @@ import { getSocialPoints } from "../_services/action";
 export default function SocialPointsCard() {
   const posts = useFeedsStore((state) => state.posts, shallow);
   const { user } = useUserStore();
-  const [points, setPoints] = useState(0);
+  const [points, setPoints] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchSocialPoints = async () => {
-      if (!user) return;
-      const fetchedPoints = await getSocialPoints(user.id);
-      setPoints(fetchedPoints || 0);
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+      setLoading(true);
+      try {
+        const fetchedPoints = await getSocialPoints(user.id);
+        setPoints(fetchedPoints || 0);
+      } finally {
+        setLoading(false);
+      }
     };
 
     if (user) fetchSocialPoints();
@@ -36,13 +45,23 @@ export default function SocialPointsCard() {
               <p className="text-xs text-gray-500">Feed Engagement</p>
             </div>
           </div>
+
           <div className="text-right">
-            <p className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-2xl font-bold text-transparent">
-              {points}
-            </p>
-            <p className="text-xs text-gray-500">points</p>
+            {loading ? (
+              <div className="flex justify-end">
+                <div className="h-5 w-5 animate-spin rounded-full border-2 border-cyan-500 border-t-transparent" />
+              </div>
+            ) : (
+              <>
+                <p className="bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-2xl font-bold text-transparent">
+                  {points ?? 0}
+                </p>
+                <p className="text-xs text-gray-500">points</p>
+              </>
+            )}
           </div>
         </div>
+
         <div className="space-y-1">
           <p className="text-xs text-gray-500 dark:text-gray-400">
             Earn more points by posting and getting likes and comments!
