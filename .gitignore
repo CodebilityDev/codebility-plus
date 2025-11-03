@@ -81,4 +81,5 @@ build/**
 !.yarn/sdks
 !.yarn/versions
 
-dist
+distapps/bot/.env
+.env
