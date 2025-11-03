@@ -9,7 +9,7 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             bcc: emails, // Use BCC for mass sending
-            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
             to: "Codebility.dev@gmail.com", // Use BCC for mass sending
             subject: "Application Reminder - Codebility",
             text: `
@@ -163,7 +163,7 @@ export const sendTestReminder = async ({ email, name }: { email: string, name: s
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
-            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
                 'X-Priority': '3',
@@ -321,7 +321,7 @@ export const sendMultipleOnboardingReminder = async (emails: string[]) => {
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             bcc: emails, // Use BCC for mass sending
-            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
             to: "Codebility.dev@gmail.com", // Use BCC for mass sending
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
@@ -486,7 +486,7 @@ export const sendOnboardingReminder = async ({ email, name }: { email: string, n
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
-            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
                 'X-Priority': '3',
@@ -655,7 +655,7 @@ export const sendMultiplePassedTestEmail = async (Applicant: { email: string, na
             const { data, error } = await resend.emails.send({
                 from: "Codebility Team <Codebility.dev@codebility.tech>",
                 to: email, // Single recipient
-                cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+                cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
                 replyTo: 'Codebility.dev@gmail.com',
                 headers: {
                     'X-Priority': '3',
@@ -823,7 +823,7 @@ export const sendPassedTestEmail = async ({ email, name }: { email: string, name
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
-            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
                 'X-Priority': '3',
@@ -991,7 +991,7 @@ export const sendMultipleFailedTestEmail = async (Applicant: { email: string, na
                 from: "Codebility Team <Codebility.dev@codebility.tech>",
                 to: email, // Single recipient
                 replyTo: 'Codebility.dev@gmail.com',
-                cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+                cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
                 headers: {
                     'X-Priority': '3',
                     'X-MSMail-Priority': 'Normal',
@@ -1131,7 +1131,7 @@ export const sendFailedTestEmail = async ({ email, name }: { email: string, name
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
             replyTo: 'Codebility.dev@gmail.com',
-            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
             headers: {
                 'X-Priority': '3',
                 'X-MSMail-Priority': 'Normal',
@@ -1273,7 +1273,7 @@ export const sendMultipleDenyEmail = async (Applicant: { email: string, name: st
                 from: "Codebility Team <Codebility.dev@codebility.tech>",
                 to: email, // Single recipient
                 replyTo: 'Codebility.dev@gmail.com',
-                cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+                cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
                 headers: {
                     'X-Priority': '3',
                     'X-MSMail-Priority': 'Normal',
@@ -1406,7 +1406,7 @@ export const sendDenyEmail = async ({ email, name }: { email: string, name: stri
         const { data, error } = await resend.emails.send({
             from: "Codebility Team <Codebility.dev@codebility.tech>",
             to: email, // Single recipient
-            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com'],
+            cc: ['christian.codebility@gmail.com', 'kyla.codebility@gmail.com', 'allana.codebility@gmail.com'],
             replyTo: 'Codebility.dev@gmail.com',
             headers: {
                 'X-Priority': '3',
