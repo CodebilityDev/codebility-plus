@@ -6,8 +6,8 @@ import { Check } from "lucide-react";
 
 // Section configuration - maps to each wrapper component
 const SECTIONS = [
-  { id: "software", label: "Software Development" },
   { id: "about-section", label: "About Us" },
+  { id: "software", label: "Software Development" },
   { id: "expect", label: "What to Expect" },
   { id: "roadmap", label: "Your Roadmap" },
   { id: "house-rules", label: "House Rules" },
@@ -17,7 +17,7 @@ const SECTIONS = [
 ];
 
 export default function OnboardingStepper() {
-  const [activeSection, setActiveSection] = useState<string>(SECTIONS[0]?.id || "software");
+  const [activeSection, setActiveSection] = useState<string>(SECTIONS[0]?.id || "about-section");
 
   useEffect(() => {
     // Intersection Observer to track which section is in view
