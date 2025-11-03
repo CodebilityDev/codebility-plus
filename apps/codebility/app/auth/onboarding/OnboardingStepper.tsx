@@ -7,6 +7,7 @@ import { Check } from "lucide-react";
 // Section configuration - maps to each wrapper component
 const SECTIONS = [
   { id: "software", label: "Software Development" },
+  { id: "about-section", label: "About Us" },
   { id: "expect", label: "What to Expect" },
   { id: "roadmap", label: "Your Roadmap" },
   { id: "house-rules", label: "House Rules" },
