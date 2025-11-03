@@ -5,7 +5,7 @@ import CodevBadge from "@/components/CodevBadge";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import Box from "@/components/shared/dashboard/Box";
 import { useModal } from "@/hooks/use-modal-users";
-import { Codev, CodevPoints, ApplicantStatus } from "@/types/home/codev";
+import { ApplicantStatus, Codev, CodevPoints } from "@/types/home/codev";
 import {
   AnimatePresence,
   motion,
@@ -29,23 +29,28 @@ const STATUS_CONFIG: Record<
 > = {
   applying: {
     label: "Applying",
-    className: "bg-customBlue-500/20 backdrop-blur-sm text-customBlue-200 border border-customBlue-500/30 dark:bg-customBlue-500/10 dark:text-customBlue-300",
+    className:
+      "bg-customBlue-500/20 backdrop-blur-sm text-customBlue-200 border border-customBlue-500/30 dark:bg-customBlue-500/10 dark:text-customBlue-300",
   },
   testing: {
     label: "Testing",
-    className: "bg-orange-500/20 backdrop-blur-sm text-orange-200 border border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300",
+    className:
+      "bg-orange-500/20 backdrop-blur-sm text-orange-200 border border-orange-500/30 dark:bg-orange-500/10 dark:text-orange-300",
   },
   onboarding: {
     label: "Onboarding",
-    className: "bg-purple-500/20 backdrop-blur-sm text-purple-200 border border-purple-500/30 dark:bg-purple-500/10 dark:text-purple-300",
+    className:
+      "bg-purple-500/20 backdrop-blur-sm text-purple-200 border border-purple-500/30 dark:bg-purple-500/10 dark:text-purple-300",
   },
   denied: {
     label: "Denied",
-    className: "bg-red-500/20 backdrop-blur-sm text-red-200 border border-red-500/30 dark:bg-red-500/10 dark:text-red-300",
+    className:
+      "bg-red-500/20 backdrop-blur-sm text-red-200 border border-red-500/30 dark:bg-red-500/10 dark:text-red-300",
   },
   passed: {
     label: "Passed",
-    className: "bg-green-500/20 backdrop-blur-sm text-green-200 border border-green-500/30 dark:bg-green-500/10 dark:text-green-300",
+    className:
+      "bg-green-500/20 backdrop-blur-sm text-green-200 border border-green-500/30 dark:bg-green-500/10 dark:text-green-300",
   },
 };
 
@@ -61,7 +66,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
   const springConfig = { stiffness: 100, damping: 5 };
   const x = useMotionValue(0);
   const rotate = useSpring(
-    useTransform(x, [-100, 100], [-45, 45]),
+    useTransform(x, [-100, 100], [-20, 20]),
     springConfig,
   );
   const translateX = useSpring(
@@ -75,7 +80,9 @@ export default function CodevCard({ codev }: CodevCardProps) {
   };
 
   const applicationStatus = codev.application_status || "applying";
-  const statusConfig = STATUS_CONFIG[applicationStatus as ApplicantStatus] || STATUS_CONFIG.applying;
+  const statusConfig =
+    STATUS_CONFIG[applicationStatus as ApplicantStatus] ||
+    STATUS_CONFIG.applying;
 
   return (
     <div
@@ -83,12 +90,10 @@ export default function CodevCard({ codev }: CodevCardProps) {
       onMouseLeave={() => setHovered(false)}
       onMouseMove={handleMouseMove}
     >
-      <div
-        className="group relative h-full rounded-2xl bg-white/10 backdrop-blur-md p-4 shadow-lg transition-all duration-300 hover:bg-white/20 hover:shadow-xl dark:bg-white/5 dark:hover:bg-white/10 border border-white/20 dark:border-white/10 overflow-hidden"
-      >
+      <div className="group relative h-full rounded-2xl border border-white/20 bg-white/10 p-4 shadow-lg backdrop-blur-md transition-all duration-300 hover:bg-white/20 hover:shadow-xl dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
         {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/20 to-purple-50/20 dark:from-customBlue-950/10 dark:to-purple-950/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="absolute -top-4 -right-4 h-24 w-24 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="from-customBlue-50/20 dark:from-customBlue-950/10 absolute inset-0 bg-gradient-to-br to-purple-50/20 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:to-purple-950/10" />
+        <div className="absolute -right-4 -top-4 h-24 w-24 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100" />
         <div
           className="flex h-full cursor-pointer flex-col justify-start gap-4"
           onClick={() => onOpen("profileModal", codev)}
@@ -96,7 +101,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
           {/* Header Section */}
           <div className="relative flex items-start justify-start gap-4">
             <div className="relative">
-              <div className="h-16 w-16 overflow-hidden rounded-full bg-gradient-to-br from-customBlue-100 to-purple-100 p-0.5 dark:from-customBlue-900 dark:to-purple-900">
+              <div className="from-customBlue-100 dark:from-customBlue-900 h-16 w-16 overflow-hidden rounded-full bg-gradient-to-br to-purple-100 p-0.5 dark:to-purple-900">
                 <div className="h-full w-full overflow-hidden rounded-full bg-white dark:bg-gray-800">
                   {codev.image_url ? (
                     <img
@@ -120,8 +125,8 @@ export default function CodevCard({ codev }: CodevCardProps) {
                       scale: 1,
                       transition: {
                         type: "spring",
-                        stiffness: 260,
-                        damping: 10,
+                        stiffness: 120,
+                        damping: 20,
                       },
                     }}
                     exit={{ opacity: 0, y: 20, scale: 0.6 }}
@@ -131,14 +136,13 @@ export default function CodevCard({ codev }: CodevCardProps) {
                       whiteSpace: "nowrap",
                     }}
                     className={cn(
-                      `absolute -top-16 left-1/2 z-[100] flex -translate-x-1/2
-                       transform flex-col items-center justify-center rounded-xl px-3 py-2 shadow-xl 
-                        ${statusConfig?.className || ''}
+                      `right-1/8 -translate-x-1/8 absolute -top-8 z-50 flex transform flex-col items-center justify-center rounded-lg px-4 py-2 shadow-xl 
+                        ${statusConfig?.className || ""}
                        `,
                     )}
                   >
                     <div className="relative z-30 text-sm font-medium">
-                      {statusConfig?.label || 'Applying'}
+                      {statusConfig?.label || "Applying"}
                     </div>
                   </motion.div>
                 )}
@@ -148,7 +152,9 @@ export default function CodevCard({ codev }: CodevCardProps) {
                 <div
                   className={cn(
                     "h-4 w-4 rounded-full border-2 border-white dark:border-gray-800",
-                    codev.availability_status === true ? "bg-green-500" : "bg-red-500",
+                    codev.availability_status === true
+                      ? "bg-green-500"
+                      : "bg-red-500",
                   )}
                 ></div>
               </div>
@@ -158,14 +164,15 @@ export default function CodevCard({ codev }: CodevCardProps) {
               <h3 className="text-xl font-medium text-gray-900 dark:text-white">
                 {codev.first_name} {codev.last_name}
               </h3>
-              <p className="text-sm font-medium text-customBlue-300 dark:text-customBlue-100">
+              <p className="text-customBlue-300 dark:text-customBlue-100 text-sm font-medium">
                 {codev.display_position || "No Position"}
               </p>
               {/* Years of Experience */}
               {codev.years_of_experience !== undefined && (
                 <div className="text-sm text-gray-500 dark:text-gray-400">
                   {codev.years_of_experience}{" "}
-                  {codev.years_of_experience === 1 ? "year" : "years"} experience
+                  {codev.years_of_experience === 1 ? "year" : "years"}{" "}
+                  experience
                 </div>
               )}
               {/* Add CodevBadge here */}
@@ -199,8 +206,8 @@ export default function CodevCard({ codev }: CodevCardProps) {
                 <Badge
                   variant="info"
                   key={project.id}
-                  className="rounded-full bg-gradient-to-r from-customBlue-600 to-indigo-600 px-3 py-1 text-xs font-medium text-white transition-all duration-300
-                    hover:from-customBlue-700 hover:to-indigo-700 dark:from-customBlue-500 dark:to-indigo-500 dark:hover:from-customBlue-600 dark:hover:to-indigo-600
+                  className="from-customBlue-600 hover:from-customBlue-700 dark:from-customBlue-500 dark:hover:from-customBlue-600 rounded-full bg-gradient-to-r to-indigo-600 px-3 py-1 text-xs font-medium
+                    text-white transition-all duration-300 hover:to-indigo-700 dark:to-indigo-500 dark:hover:to-indigo-600
                   "
                 >
                   {project.name}
