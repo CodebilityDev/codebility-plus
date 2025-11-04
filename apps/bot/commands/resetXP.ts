@@ -114,7 +114,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       .from("user_stats_discord")
       .update({
         xp: 0,
-        level: 1, // Reset to level 1 (most bots start at level 1, not 0)
+        level: 0, // Reset to level 1 (most bots start at level 1, not 0)
         total_messages: 0,
       })
       .eq("user_id", targetUser.id)
