@@ -39,7 +39,7 @@ export interface ProjectFormData {
   website_url?: string;
   figma_link?: string;
   start_date: string;
-  project_category_id?: string;
+  category_ids?: number[]; // Changed from project_category_id to support multiple categories
   client_id?: string;
   main_image?: string;
   tech_stack?: string[];
@@ -57,6 +57,7 @@ const ProjectAddModal = () => {
   const [users, setUsers] = useState<Codev[]>([]);
   const [clients, setClients] = useState<Client[]>([]);
   const [categories, setCategories] = useState<SkillCategory[]>([]);
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
   const [currentTeamLeader, setCurrentTeamLeader] = useState<Codev | null>(
     null,
   );
@@ -105,17 +106,6 @@ const ProjectAddModal = () => {
     [clients],
   );
 
-  const categoryOptions = useMemo(
-    () =>
-      categories.map((category) => ({
-        id: category.id.toString(),
-        value: category.id.toString(),
-        label: category.name,
-        subLabel: category.description,
-      })),
-    [categories],
-  );
-
   // Handler for team leader selection
   const handleTeamLeaderSelect = useCallback(
     (value: string) => {
@@ -162,6 +152,7 @@ const ProjectAddModal = () => {
     setCroppedFile(null);
     setSelectedMembers([]);
     setCurrentTeamLeader(null);
+    setSelectedCategoryIds([]); // Clear selected categories
     clearStack(); // Clear tech stack selection
     onClose();
   };
@@ -170,16 +161,31 @@ const ProjectAddModal = () => {
   const SelectSection = () => (
     <div className="space-y-6">
       {/* Project Configuration */}
-      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div className="grid grid-cols-1 gap-4">
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Category *</label>
-          <CustomSelect
-            options={categoryOptions}
-            onChange={(value) => setValue("project_category_id", value)}
-            placeholder="Select Project Category"
-            variant="simple"
-            searchable
-          />
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Categories * (Select at least one)</label>
+          <div className="grid grid-cols-2 gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+            {categories.map((category) => (
+              <label
+                key={category.id}
+                className="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+              >
+                <input
+                  type="checkbox"
+                  checked={selectedCategoryIds.includes(category.id)}
+                  onChange={(e) => {
+                    if (e.target.checked) {
+                      setSelectedCategoryIds([...selectedCategoryIds, category.id]);
+                    } else {
+                      setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== category.id));
+                    }
+                  }}
+                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-600"
+                />
+                <span className="text-sm text-gray-700 dark:text-gray-300">{category.name}</span>
+              </label>
+            ))}
+          </div>
         </div>
         <div className="space-y-2">
           <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Client *</label>
@@ -276,8 +282,8 @@ const ProjectAddModal = () => {
       toast.error("Client is required");
       return;
     }
-    if (!formData.project_category_id) {
-      toast.error("Project category is required");
+    if (!selectedCategoryIds || selectedCategoryIds.length === 0) {
+      toast.error("At least one project category is required");
       return;
     }
     if (!croppedFile) {
@@ -306,7 +312,10 @@ const ProjectAddModal = () => {
         }
       });
       form.append("main_image", publicUrl);
-      
+
+      // Add category IDs as JSON array
+      form.append("category_ids", JSON.stringify(selectedCategoryIds));
+
       // Add tech stack
       if (selectedTechStack.length > 0) {
         form.append("tech_stack", JSON.stringify(selectedTechStack));

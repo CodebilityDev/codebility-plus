@@ -197,6 +197,13 @@ export const MarketingCardData: MarketingCardData[] = [
     url: "/services#product-design",
     category: "Product",
   },
+  {
+    title: "CMS",
+    description:
+      "Create and manage your content effortlessly with our custom CMS solutions tailored to your needs.",
+    url: "/services#cms",
+    category: "Technology",
+  },
 ];
 
 export const services: Service[] = [

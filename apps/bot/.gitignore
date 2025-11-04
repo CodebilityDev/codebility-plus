@@ -1,2 +1,6 @@
+<<<<<<< HEAD
 ## Ignore environment variable files
+=======
+## Ignore environment variable files
+>>>>>>> 109c65d674b3a05390ea718f72346bc8818a8fe2
 apps/bot/.env

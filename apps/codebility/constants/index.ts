@@ -25,4 +25,6 @@ export const CATEGORIES = [
   { id: 1, name: "Web Application" },
   { id: 2, name: "Mobile Application" },
   { id: 3, name: "Product Design" },
+  { id: 4, name: "AI Development" },
+  { id: 5, name: "CMS" },
 ] as const;

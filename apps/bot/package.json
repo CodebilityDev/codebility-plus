@@ -1,7 +1,14 @@
 {
+<<<<<<< HEAD
   "name": "bot",
   "version": "1.0.0",
   "type": "commonjs",
+=======
+  "type": "commonjs",
+  "name": "bot",
+  "version": "1.0.0",
+  "main": "dist/index.js",
+>>>>>>> 109c65d674b3a05390ea718f72346bc8818a8fe2
   "scripts": {
     "dev": "npx ts-node --project tsconfig.bot.json index.ts",
     "build": "npx tsc --project tsconfig.bot.json",
@@ -19,4 +26,8 @@
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 109c65d674b3a05390ea718f72346bc8818a8fe2

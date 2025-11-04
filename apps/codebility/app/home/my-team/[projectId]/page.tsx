@@ -19,11 +19,24 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
   const { projectId } = await params;
 
   try {
-    // Get current user
+    // Get current user from auth
     const supabase = await createClientServerComponent();
     const { data: { user } } = await supabase.auth.getUser();
     
     if (!user) {
+      notFound();
+    }
+
+    // Map auth user to codev user by email
+    // Auth user.id ≠ codev.id, so we need to look up by email
+    const { data: codevUser, error: codevError } = await supabase
+      .from('codev')
+      .select('id')
+      .eq('email_address', user.email)
+      .single();
+
+    if (codevError || !codevUser) {
+      console.error('Failed to find codev user:', codevError);
       notFound();
     }
 
@@ -51,11 +64,12 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
       throw new Error("Failed to load team data");
     }
 
+    // ✅ FIXED: Pass currentUserId to determine team lead status
     const projectData = {
       project: project.project,
       teamLead: teamLead,
       members: members,
-      currentUserId: user.id
+      currentUserId: codevUser.id  // This is the codev table ID
     };
 
     return (

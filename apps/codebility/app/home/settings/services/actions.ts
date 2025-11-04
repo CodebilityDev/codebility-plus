@@ -19,11 +19,11 @@ export interface RealProject {
   tech_stack?: string[];
   client_id?: string;
   created_at?: string;
-  project_category_id?: number;
-  projects_category?: {
-    id: string;
+  categories?: {
+    id: number;
     name: string;
-  };
+    description?: string;
+  }[];
 }
 
 // Fetch Real Projects from database
@@ -34,20 +34,22 @@ export async function getRealProjects() {
     const { data, error } = await supabase
       .from('projects')  // Fixed table name
       .select(`
-        id, 
-        name, 
-        description, 
-        status, 
-        main_image, 
-        website_url, 
-        github_link, 
-        figma_link, 
-        tech_stack, 
+        id,
+        name,
+        description,
+        status,
+        main_image,
+        website_url,
+        github_link,
+        figma_link,
+        tech_stack,
         created_at,
-        project_category_id,
-        projects_category(
-          id,
-          name
+        categories:project_categories(
+          projects_category(
+            id,
+            name,
+            description
+          )
         )
       `)
       .eq('public_display', true)
@@ -57,8 +59,16 @@ export async function getRealProjects() {
     if (error) {
       throw error;
     }
-    
-    return { data: data as RealProject[], error: null };
+
+    // Flatten categories from nested structure
+    const normalizedData = (data || []).map((project: any) => ({
+      ...project,
+      categories: (project.categories || []).map(
+        (cat: any) => cat.projects_category
+      ).filter(Boolean),
+    }));
+
+    return { data: normalizedData as RealProject[], error: null };
   } catch (error) {
     console.error('Error fetching real projects:', error);
     return { data: null, error: 'Failed to fetch real projects' };

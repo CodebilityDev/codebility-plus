@@ -30,8 +30,11 @@ interface ProjectData {
   team_leader?: TeamMember;
   client_id?: string;
   members?: TeamMember[];
-  project_category_id?: number;
-  project_category_name?: string;
+  categories?: Array<{
+    id: number;
+    name: string;
+    description?: string;
+  }>;
   created_at?: string;
   updated_at?: string;
   tech_stack?: string[];
@@ -64,7 +67,7 @@ function ServicesTab({ servicesData }: Props) {
     return currentCategory === ALL_CATEGORY_ID
       ? servicesData
       : servicesData.filter(
-          (project) => project.project_category_id === currentCategory,
+          (project) => project.categories?.some(cat => cat.id === currentCategory),
         );
   }, [currentCategory, servicesData]);
 

@@ -17,16 +17,25 @@ export default async function getProjects() {
             image_url
           )
         ),
-        projects_category(
-          id,
-          name
+        categories:project_categories(
+          projects_category(
+            id,
+            name,
+            description
+          )
         )
       `,
   );
 
   if (error) throw error;
 
-  return data;
+  // Flatten the categories structure for easier consumption
+  const projectsWithCategories = data?.map((project) => ({
+    ...project,
+    categories: project.categories?.map((cat: any) => cat.projects_category).filter(Boolean) || [],
+  }));
+
+  return projectsWithCategories;
 }
 
 export async function getPublicProjects() {
@@ -47,9 +56,12 @@ export async function getPublicProjects() {
             image_url
           )
         ),
-        projects_category(
-          id,
-          name
+        categories:project_categories(
+          projects_category(
+            id,
+            name,
+            description
+          )
         )
       `,
     )
@@ -57,5 +69,11 @@ export async function getPublicProjects() {
 
   if (error) throw error;
 
-  return data;
+  // Flatten the categories structure for easier consumption
+  const projectsWithCategories = data?.map((project) => ({
+    ...project,
+    categories: project.categories?.map((cat: any) => cat.projects_category).filter(Boolean) || [],
+  }));
+
+  return projectsWithCategories;
 }

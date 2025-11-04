@@ -34,11 +34,11 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
   // Memoize filtered projects to prevent unnecessary recalculation
   const filteredProjectsMemo = useMemo(() => {
     // If "All" category is selected, show all projects
-    // Otherwise, filter by the selected category
+    // Otherwise, filter by the selected category (supports many-to-many)
     return currentCategory === ALL_CATEGORY_ID
       ? projects
       : projects.filter(
-          (project) => project.project_category_id === currentCategory,
+          (project) => project.categories?.some(cat => cat.id === currentCategory),
         );
   }, [currentCategory, projects]);
 
@@ -122,7 +122,7 @@ const ProjectCardContainer = ({ projects }: ProjectCardContainerProps) => {
                     onOpen={onOpen}
                     categoryId={
                       currentCategory === ALL_CATEGORY_ID
-                        ? project.project_category_id
+                        ? project.categories?.[0]?.id
                         : currentCategory
                     }
                   />

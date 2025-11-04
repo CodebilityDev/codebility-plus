@@ -88,7 +88,13 @@ export const getCodevs = async ({
         website_url,
         figma_link,
         client_id,
-        project_category_id,
+        categories:project_categories(
+          projects_category(
+            id,
+            name,
+            description
+          )
+        ),
         created_at,
         updated_at,
         project_members (
@@ -140,6 +146,10 @@ export const getCodevs = async ({
           role: member.role,
           joined_at: member.joined_at,
           project_members: member.project?.project_members || [],
+          // Flatten categories from nested structure
+          categories: (member.project?.categories || []).map(
+            (cat: any) => cat.projects_category
+          ).filter(Boolean),
         }) as Project & { role: string; joined_at: string },
     ),
   })) as unknown as Codev[];
