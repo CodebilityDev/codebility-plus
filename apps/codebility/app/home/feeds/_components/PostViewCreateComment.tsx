@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
+import { useFeedsStore } from "@/store/feeds-store";
 
 import { createComment } from "../_services/action";
 
@@ -18,6 +19,7 @@ export default function PostViewCreateComment({
 }: CreateCommentProps) {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const fetchPosts = useFeedsStore((state) => state.fetchPosts);
   const { user } = useUserStore();
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -28,6 +30,7 @@ export default function PostViewCreateComment({
         await createComment(postId, user.id, comment);
         setComment("");
         onCommentCreated?.();
+        fetchPosts();
       } finally {
         setIsSubmitting(false);
       }
