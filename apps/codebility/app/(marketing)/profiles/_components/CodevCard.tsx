@@ -37,30 +37,36 @@ const STATUS_CONFIG: Record<
 > = {
   TRAINING: {
     label: "Training",
-    className: "bg-yellow-500/20 backdrop-blur-sm text-yellow-200 border border-yellow-500/30 dark:bg-yellow-500/10 dark:text-yellow-300",
+    className:
+      "bg-yellow-500/20 backdrop-blur-sm text-yellow-200 border border-yellow-500/30 dark:bg-yellow-500/10 dark:text-yellow-300",
   },
   GRADUATED: {
     label: "Graduated",
-    className: "bg-green-500/20 backdrop-blur-sm text-green-200 border border-green-500/30 dark:bg-green-500/10 dark:text-green-300",
+    className:
+      "bg-green-500/20 backdrop-blur-sm text-green-200 border border-green-500/30 dark:bg-green-500/10 dark:text-green-300",
   },
   INACTIVE: {
     label: "Inactive",
-    className: "bg-gray-500/20 backdrop-blur-sm text-gray-200 border border-gray-500/30 dark:bg-gray-500/10 dark:text-gray-300",
+    className:
+      "bg-gray-500/20 backdrop-blur-sm text-gray-200 border border-gray-500/30 dark:bg-gray-500/10 dark:text-gray-300",
   },
   MENTOR: {
     label: "Mentor",
-    className: "bg-purple-500/20 backdrop-blur-sm text-purple-200 border border-purple-500/30 dark:bg-purple-500/10 dark:text-purple-300",
+    className:
+      "bg-purple-500/20 backdrop-blur-sm text-purple-200 border border-purple-500/30 dark:bg-purple-500/10 dark:text-purple-300",
   },
   ADMIN: {
     label: "Admin",
-    className: "bg-blue-500/20 backdrop-blur-sm text-blue-200 border border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300",
+    className:
+      "bg-blue-500/20 backdrop-blur-sm text-blue-200 border border-blue-500/30 dark:bg-blue-500/10 dark:text-blue-300",
   },
   DEPLOYED: {
     label: "Deployed",
-    className: "bg-indigo-500/20 backdrop-blur-sm text-indigo-200 border border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300",
+    className:
+      "bg-indigo-500/20 backdrop-blur-sm text-indigo-200 border border-indigo-500/30 dark:bg-indigo-500/10 dark:text-indigo-300",
   },
 };
- 
+
 const CodevCard = ({ codev, color }: Props) => {
   const [hovered, setHovered] = useState(false);
   const springConfig = { stiffness: 100, damping: 5 };
@@ -118,10 +124,10 @@ const CodevCard = ({ codev, color }: Props) => {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div className="bg-white/10 backdrop-blur-md dark:bg-white/5 hover:bg-white/20 dark:hover:bg-white/10 flex h-full w-full flex-col items-center justify-between rounded-lg p-4 shadow-2xl transition-all duration-300 border border-white/20 dark:border-white/10 relative overflow-hidden group">
+      <div className="group relative flex h-full w-full flex-col items-center justify-between rounded-lg border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-md transition-all duration-300 hover:bg-white/20 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10">
         {/* Background decoration */}
-        <div className="absolute inset-0 bg-gradient-to-br from-customBlue-50/30 to-purple-50/30 dark:from-customBlue-950/10 dark:to-purple-950/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-        <div className="absolute -top-4 -right-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+        <div className="from-customBlue-50/30 dark:from-customBlue-950/10 absolute inset-0 bg-gradient-to-br to-purple-50/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:to-purple-950/10" />
+        <div className="absolute -right-4 -top-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
         <div className="grid w-full grid-cols-4 gap-2">
           <div className="col-span-1" />
           <div className="relative col-span-2 flex justify-center">
@@ -180,9 +186,9 @@ const CodevCard = ({ codev, color }: Props) => {
               <p
                 className={cn(
                   "rounded-full border-2 p-2 text-[9px]",
-                  codev.availability_status 
-                    ? "bg-green-500 border-green-600" 
-                    : "bg-red-500 border-red-600",
+                  codev.availability_status
+                    ? "border-green-600 bg-green-500"
+                    : "border-red-600 bg-red-500",
                 )}
               ></p>
             </div>
@@ -195,13 +201,13 @@ const CodevCard = ({ codev, color }: Props) => {
                     <Button
                       variant="outline"
                       size="icon"
-                      className="bg-white/20 backdrop-blur-sm dark:bg-white/10 hover:bg-white/30 dark:hover:bg-white/20 border-white/30 dark:border-white/20 h-8 w-8 rounded-full transition-all duration-300"
+                      className="h-8 w-8 rounded-full border-white/30 bg-white/20 backdrop-blur-sm transition-all duration-300 hover:bg-white/30 dark:border-white/20 dark:bg-white/10 dark:hover:bg-white/20"
                     >
                       <BookOpenIcon className="h-3.5 w-3.5" />
                     </Button>
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent className="bg-white/10 backdrop-blur-md dark:bg-white/5 border border-white/20 dark:border-white/10 px-2 py-1 text-xs text-white">
+                <TooltipContent className="border border-white/20 bg-white/10 px-2 py-1 text-xs text-white backdrop-blur-md dark:border-white/10 dark:bg-white/5">
                   Read Bio
                 </TooltipContent>
               </Tooltip>
@@ -210,13 +216,15 @@ const CodevCard = ({ codev, color }: Props) => {
         </div>
         <div className="flex flex-col items-center gap-0.5">
           <div className="flex flex-col gap-1 text-center">
-            <p className="md:text-md text-sm capitalize text-white dark:text-white lg:text-base relative z-10">
+            <p className="md:text-md relative z-10 text-sm capitalize text-white dark:text-white lg:text-base">
               {codev.first_name} {codev.last_name}
             </p>
             {codev.display_position ? (
-              <p className="text-sm text-gray-200 dark:text-gray-300 relative z-10">{codev.display_position}</p>
+              <p className="relative z-10 text-sm text-gray-200 dark:text-gray-300">
+                {codev.display_position}
+              </p>
             ) : (
-              <div className="text-sm lg:text-base relative z-10">&nbsp;</div>
+              <div className="relative z-10 text-sm lg:text-base">&nbsp;</div>
             )}
           </div>
         </div>
