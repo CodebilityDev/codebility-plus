@@ -1,9 +1,6 @@
 {
-  "ui": "tui",
+  "$schema": "https://turbo.build/schema.json",
   "tasks": {
-    "topo": {
-      "dependsOn": ["^topo"]
-    },
     "build": {
       "dependsOn": ["^build"],
       "outputs": [".next/**", "dist/**"]
@@ -22,13 +19,9 @@
       "outputLogs": "new-only"
     },
     "lint": {
-      "dependsOn": ["^topo"],
       "outputs": ["node_modules/.cache/.eslintcache"]
     },
     "clean": {
-      "cache": false
-    },
-    "//#clean": {
       "cache": false
     },
     "ui-add": {
