@@ -15,11 +15,14 @@
     "typecheck": "tsc --noEmit"
   },
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./src/index.ts"
+    },
     "./accordion": "./src/accordion.tsx",
     "./alert": "./src/alert.tsx",
     "./alert-dialog": "./src/alert-dialog.tsx",
-    "./aspect-ratio": "./src/aspect-ratio.tsx",
     "./avatar": "./src/avatar.tsx",
     "./badge": "./src/badge.tsx",
     "./breadcrumb": "./src/breadcrumb.tsx",
@@ -41,6 +44,7 @@
     "./label": "./src/label.tsx",
     "./menubar": "./src/menubar.tsx",
     "./navigation-menu": "./src/navigation-menu.tsx",
+    "./pagination": "./src/pagination.tsx",
     "./popover": "./src/popover.tsx",
     "./progress": "./src/progress.tsx",
     "./radio-group": "./src/radio-group.tsx",
@@ -51,28 +55,16 @@
     "./sheet": "./src/sheet.tsx",
     "./skeleton": "./src/skeleton.tsx",
     "./slider": "./src/slider.tsx",
+    "./sonner/toast": "./src/sonner/toast.tsx",
     "./switch": "./src/switch.tsx",
     "./table": "./src/table.tsx",
     "./tabs": "./src/tabs.tsx",
     "./textarea": "./src/textarea.tsx",
     "./toast": "./src/toast.tsx",
-    "./toaster": "./src/toaster.tsx",
     "./toggle": "./src/toggle.tsx",
     "./toggle-group": "./src/toggle-group.tsx",
     "./tooltip": "./src/tooltip.tsx",
-    "./use-toast": "./src/use-toast.ts"
-  },
-  "publishConfig": {
-    "exports": {
-      ".": {
-        "types": "./dist/index.d.ts",
-        "import": "./dist/index.js"
-      },
-      "./*": {
-        "types": "./dist/*.d.ts",
-        "import": "./dist/*.js"
-      }
-    }
+    "./use-toast": "./src/use-toast.tsx"
   },
   "files": [
     "dist",
