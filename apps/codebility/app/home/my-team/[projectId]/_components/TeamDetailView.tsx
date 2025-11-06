@@ -28,12 +28,12 @@ import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "../actions";
  * ✅ Team View tab: Always visible to everyone
  * ✅ Attendance tab: Only visible to team leads
  * ✅ Checklist button: Only visible to team leads
- * ✅ Schedule Meeting button: Always visible
- * ✅ Manage Members button: Always visible (in Team View)
+ * ✅ Schedule Meeting button: Only visible to team leads
+ * ✅ Manage Members button: Only visible to team leads (in Team View)
  * 
  * BEHAVIOR:
- * - Regular members: See only Team View tab
- * - Team leads: See Team View + Attendance tabs + Checklist button
+ * - Regular members: See only Team View tab (read-only)
+ * - Team leads: Full control over all team management features
  */
 
 interface ProjectData {
@@ -342,8 +342,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               </>
             )}
             
-            {/* Manage Members - Only in team view */}
-            {viewMode === "team" && (
+            {/* Manage Members - ONLY VISIBLE TO TEAM LEADS in Team View */}
+            {viewMode === "team" && isCurrentUserTeamLead && (
               <Button
                 onClick={handleOpenAddModal}
                 disabled={isLoadingMembers}
@@ -355,17 +355,19 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               </Button>
             )}
             
-            {/* Schedule Meeting - Always visible */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-              title="Schedule Meetings"
-              onClick={() => setShowScheduleMeetingModal(true)}
-            >
-              <CalendarDays className="h-3.5 w-3.5" />
-              Schedule Meeting
-            </Button>
+            {/* Schedule Meeting - ONLY VISIBLE TO TEAM LEADS */}
+            {isCurrentUserTeamLead && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                title="Schedule Meetings"
+                onClick={() => setShowScheduleMeetingModal(true)}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Schedule Meeting
+              </Button>
+            )}
           </div>
         </div>
 
