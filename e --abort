@@ -1,0 +1,339 @@
+[33m96d68d84[m[33m ([m[1;32malyssa-jecomo/bot-deployment[m[33m)[m Fixes commit changes file conflict
+[33mb86cea9b[m[33m ([m[1;31morigin/alyssa-jecomo/discord-bot-deployment[m[33m, [m[1;31morigin/alyssa-jecomo/bot-deployment[m[33m, [m[1;32malyssa-jecomo/discord-bot-deployment[m[33m)[m Fixes files conflicts
+[33m475f9120[m[33m ([m[1;32mdev[m[33m)[m Merge pull request #439 from CodebilityDev/alyssa-jecomo/codebilitybot
+[33maa71b13f[m Merge pull request #444 from CodebilityDev/miguel/feeds-improvement
+[33m0a24de16[m Merge pull request #446 from CodebilityDev/fix/status-tooltip-overflow
+[33mb2842b6a[m Fix codebility build issues
+[33m77e64b2d[m fix turbo related errors
+[33m6a22ba09[m Update pnpm lockfile
+[33mbaa0482b[m[33m ([m[1;32malyssa-jecomo/bot-discord-fixes[m[33m)[m Update pnpm lockfile
+[33m787a0984[m new roadmap ui
+[33md4be3428[m added new cc in application email
+[33me9e16a36[m[33m ([m[1;31morigin/fix/status-tooltip-overflow[m[33m)[m fix: allow tooltip to display outside card boundary (hire-a-codev and intern section)
+[33m109c65d6[m Resolved merge conflict in onboarding page
+[33me92696ea[m fix: tooltip to display outside card boundary (hire-a-codev)
+[33mde8e2091[m Remove .env file and add to .gitignore
+[33mf34e03f7[m Add Discord bot with PM2 configuration
+[33md5790ce2[m Merge pull request #443 from CodebilityDev/onboarding-stepper-01
+[33mcf007d69[m[33m ([m[1;31morigin/onboarding-stepper-01[m[33m)[m Reorder stepper sections to make About Us first
+[33mc94a37b8[m Add missing 'About Us' section to onboarding stepper
+[33m62091153[m Enhance onboarding stepper UI with improved visual design
+[33m19a6cae3[m[33m ([m[1;31morigin/miguel/feeds-improvement[m[33m)[m add search bar in feeds page
+[33m05af6476[m add loading animation in social points card
+[33maa0cece9[m revalidate social points on add/delete post/comment
+[33m6408916f[m add delete confirmation for posts
+[33m80790e3c[m Add vertical scroll navigation ton onboarding page
+[33mebb8e6fa[m added cms card, project can be viewed in multi category in /services
+[33m3161b968[m added cms card, project can be viewed in multi category in /services
+[33mc2ef3d06[m feat: update frontend to support multiple project categories
+[33m6da0cb23[m feat: update frontend to support multiple project categories
+[33m9b6ce798[m made project to have multiple categories
+[33m2bb18054[m made project to have multiple categories
+[33m61b6b3e5[m Merge pull request #430 from CodebilityDev/kris/codev-overflow
+[33m33a7bde8[m Merge pull request #430 from CodebilityDev/kris/codev-overflow
+[33mde597769[m Merge pull request #436 from CodebilityDev/miguel/social-points
+[33m7b999c41[m Merge pull request #436 from CodebilityDev/miguel/social-points
+[33mcc02a47c[m[33m ([m[1;31morigin/alyssa-jecomo/bot-discord-fixes[m[33m)[m bot fixes
+[33mf93b5f89[m[33m ([m[1;31morigin/alyssa-jecomo/codebilitybot[m[33m)[m fix build error
+[33m6156efe1[m fix build error
+[33m05014bc8[m Merge pull request #440 from CodebilityDev/member-checklist-01
+[33m40b48420[m Merge pull request #440 from CodebilityDev/member-checklist-01
+[33m07795593[m fix toggle to only update the specific member instead of updating all
+[33m67af8964[m[33m ([m[1;31morigin/member-checklist-01[m[33m)[m fix toggle to only update the specific member instead of updating all
+[33mb6388123[m view attendance tab
+[33mad2395d6[m view attendance tab
+[33mf30c45bc[m Added edited mark for posts
+[33mb86fb4b3[m[33m ([m[1;31morigin/kris/codev-overflow[m[33m)[m Added edited mark for posts
+[33m2a4cae2d[m Likes for coments and posts, responsive ui edit
+[33mbcfc8778[m Likes for coments and posts, responsive ui edit
+[33m2a0b5b0f[m fix issues
+[33mddd38648[m[33m ([m[1;31morigin/miguel/social-points[m[33m)[m fix issues
+[33me8eb9bd4[m[33m ([m[1;32malyssa-jecomo/codebilitybot[m[33m)[m codebility bot fixes
+[33mebd26a76[m[33m ([m[1;31morigin/alyssa-jecomo/bot[m[33m, [m[1;32malyssa-jecomo/bot[m[33m)[m updated fixes on codebility bot
+[33m5f24119d[m updated fixes on bot
+[33m69997398[m toast message syntax errors
+[33mb3e8acd2[m toast message syntax errors
+[33mfc984135[m shared checklist behavior + no priority display
+[33mc1b0c280[m shared checklist behavior + no priority display
+[33mc7406637[m updated fixes on codebility discord bot
+[33mdcb19084[m members see all checklist items
+[33m46963a05[m members see all checklist items
+[33m92e804f0[m resolve conflicts
+[33m42d6a063[m resolve conflicts
+[33m56cf3ae7[m resolve conflicts
+[33m571c0161[m resolve conflicts
+[33m5a1a401c[m resolve conflicts
+[33mad037c82[m resolve conflicts
+[33m946670c9[m resolve conflicts
+[33m694367c2[m resolve conflicts
+[33m5d4e3499[m continue fixing checklist toggle & visibility issues
+[33m293308b1[m continue fixing checklist toggle & visibility issues
+[33m94827e5c[m issue currentuserid undefined/null
+[33m4a2c5110[m issue currentuserid undefined/null
+[33m55c01eb6[m teamdetail view enhanced
+[33ma2278f9b[m teamdetail view enhanced
+[33ma563a7b3[m connect social points display to db
+[33m06fc36fc[m connect social points display to db
+[33m7fc81a90[m change post card corner roundness
+[33m26eb6958[m change post card corner roundness
+[33m50e47cc0[m display social points in feeds
+[33me3db6ce2[m display social points in feeds
+[33m20fd5ca8[m change icon
+[33md124eafe[m change icon
+[33m826a6f34[m fix sentence
+[33m6b4362f3[m fix sentence
+[33m7ef19a5e[m display social points in dashboard
+[33mf91505d9[m display social points in dashboard
+[33me28b07f3[m Merge pull request #433 from CodebilityDev/feat/tech-animation-increase-icon-size
+[33m94f37cc5[m Merge pull request #433 from CodebilityDev/feat/tech-animation-increase-icon-size
+[33mec016a1a[m in-progress
+[33mec326875[m in-progress
+[33m1cc092c3[m feat(TechAnimation): increase icon size for improved visibility
+[33mc357defe[m[33m ([m[1;31morigin/feat/tech-animation-increase-icon-size[m[33m)[m feat(TechAnimation): increase icon size for improved visibility
+[33mc8d24cca[m fix(AdminDashboard): remove unintended gray background
+[33mc869b7f2[m[33m ([m[1;31morigin/fix/admin-dashboard-remove-gray-bg[m[33m)[m fix(AdminDashboard): remove unintended gray background
+[33m6d62436d[m ChecklistCreateModal opens → Select member → Fill form → Createpagination and monthly report
+[33m77433aee[m ChecklistCreateModal opens → Select member → Fill form → Createpagination and monthly report
+[33m70c6ed5d[m fix: Add bottom padding to hire page for better scrolling
+[33ma59202ba[m fix: Add bottom padding to hire page for better scrolling
+[33mb9b2e0b9[m Merge branch 'dev'
+[33m16743f81[m Merge branch 'dev'
+[33ma847da8d[m Merge branch 'main' into dev
+[33m76457cc2[m Merge branch 'main' into dev
+[33m074ea809[m fix: Complete mobile permission check fix for job actions
+[33m44bff244[m fix: Complete mobile permission check fix for job actions
+[33m8548bdf2[m fix: Fix mobile permission check for job listing actions
+[33mf57f13d9[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32malyssa-jecomo/bot-deployment-clean[m[33m, [m[1;31morigin/main[m[33m)[m fix: Fix mobile permission check for job listing actions
+[33m1f0e54e7[m feat: Add comprehensive services catalog and job listing status management
+[33m4b4f8d1d[m feat: Add comprehensive services catalog and job listing status management
+[33m1bc401e9[m Latest codev overflow changes
+[33m50dd13c0[m Latest codev overflow changes
+[33mb245599c[m Merge pull request #429 from CodebilityDev/dev
+[33mfb5c86ef[m Merge pull request #429 from CodebilityDev/dev
+[33m74d11b09[m fix permession bug in /home/hire page
+[33m73ec409d[m fix permession bug in /home/hire page
+[33m83e46e76[m Merge pull request #428 from CodebilityDev/miguel/fix-upvote-implementation
+[33m21c8c91c[m Merge pull request #428 from CodebilityDev/miguel/fix-upvote-implementation
+[33mf15a381a[m Apply suggestions from code review
+[33m4c8126c3[m[33m ([m[1;31morigin/miguel/fix-upvote-implementation[m[33m)[m Apply suggestions from code review
+[33mcb06ae0b[m Merge pull request #427 from CodebilityDev/miguel/feed-comments
+[33m853d8750[m Merge pull request #427 from CodebilityDev/miguel/feed-comments
+[33mf3d58464[m Apply suggestions from code review
+[33mb156b2d2[m[33m ([m[1;31morigin/miguel/feed-comments[m[33m)[m Apply suggestions from code review
+[33maa804d1d[m feat: Add news banner system and career opportunities section
+[33m9379eae4[m feat: Add news banner system and career opportunities section
+[33m48d89059[m fix feed revalidation on upvote, change upvoted color
+[33m27229b1e[m fix feed revalidation on upvote, change upvoted color
+[33m664ad79e[m undo social points, keep changes in upvote
+[33mbc6819d2[m undo social points, keep changes in upvote
+[33m0dd3053e[m Add post comments list, add comment with revalidation, and delete with priviledge checking
+[33m6a4fdad5[m Add post comments list, add comment with revalidation, and delete with priviledge checking
+[33m97d09cb2[m rename Post component to PostCard
+[33m56e23c08[m rename Post component to PostCard
+[33m54969f2f[m Merge pull request #426 from CodebilityDev/deo/onboarding
+[33m69955eb0[m Merge pull request #426 from CodebilityDev/deo/onboarding
+[33m5cd10efa[m wip: continue onboarding work
+[33me7088e3d[m[33m ([m[1;31morigin/deo/onboarding[m[33m)[m wip: continue onboarding work
+[33mb7f0c826[m Merge pull request #425 from CodebilityDev/member-star-rating-01
+[33mda74790e[m Merge pull request #425 from CodebilityDev/member-star-rating-01
+[33me61b6d53[m member rating ui
+[33ma24276fd[m[33m ([m[1;31morigin/member-star-rating-01[m[33m)[m member rating ui
+[33m5ce5ab29[m feat: add contact email to assessment instructions
+[33m3ce3c0fe[m feat: add contact email to assessment instructions
+[33m8db4027b[m fix: use correct base URL for email verification in production
+[33m2807bc86[m fix: use correct base URL for email verification in production
+[33m06641c5d[m fix: redirect email verification to /applicant/waiting
+[33m2be2ff9c[m fix: redirect email verification to /applicant/waiting
+[33m728e62ec[m fix: redirect to verify page after signup instead of sign-in
+[33m275a9f85[m fix: redirect to verify page after signup instead of sign-in
+[33m4de07772[m feat: make required field asterisks red for better visibility
+[33mfc48d1eb[m feat: make required field asterisks red for better visibility
+[33m013c4d95[m fix: remove grid animation, keep static grid pattern
+[33m47f61e44[m fix: remove grid animation, keep static grid pattern
+[33mbeebf86a[m feat: implement super modern techy animated background
+[33meebcc698[m feat: implement super modern techy animated background
+[33m76849200[m feat: remove background textures, keep clean dark blue
+[33m1711139f[m feat: remove background textures, keep clean dark blue
+[33m8734dff8[m feat: enhance background texture with modern dot pattern
+[33md13301b3[m feat: enhance background texture with modern dot pattern
+[33m066df58d[m fix: match exact home background color and remove remaining pt-4
+[33mf7175444[m fix: match exact home background color and remove remaining pt-4
+[33m93506469[m feat: apply customBlue color palette and enhance animations
+[33mb9114ec0[m feat: apply customBlue color palette and enhance animations
+[33m088a8f22[m fix: reduce action buttons top padding from pt-6 to pt-4
+[33m4319f353[m fix: reduce action buttons top padding from pt-6 to pt-4
+[33m42fb2b24[m  member rating ui
+[33m0ed0c5cb[m  member rating ui
+[33m4acff98f[m feat: darker blue background with textures and reduced form spacing
+[33m8ecedea8[m feat: darker blue background with textures and reduced form spacing
+[33m7b11a094[m fix: reduce field spacing and change background to dark blue
+[33m5f1032b7[m fix: reduce field spacing and change background to dark blue
+[33m9c4fb36d[m feat: redesign signup with centered form and animated background
+[33mdc914f4c[m feat: redesign signup with centered form and animated background
+[33m15ccec11[m fix: swap layout and improve field alignment in signup form
+[33mc2ac7211[m fix: swap layout and improve field alignment in signup form
+[33m0db30b16[m feat: reorganize signup form fields for better logical grouping
+[33m2317f57d[m feat: reorganize signup form fields for better logical grouping
+[33m73d03584[m fix: redesign signup page to match sign-in page layout
+[33m5cfdeb85[m fix: redesign signup page to match sign-in page layout
+[33m2e1e03da[m Merge branch 'dev'
+[33m3a63f926[m Merge branch 'dev'
+[33m4a36d066[m feat: improve signup flow and fix UI issues
+[33m89153985[m feat: improve signup flow and fix UI issues
+[33m0b2f347a[m fix: add cache invalidation when toggling project bookmark
+[33m39fff5b4[m fix: add cache invalidation when toggling project bookmark
+[33m8c7759be[m fix: add cache invalidation when toggling project bookmark
+[33md4432d28[m fix: add cache invalidation when toggling project bookmark
+[33mfc514fdb[m fix: implement role-based team member logic in services page
+[33mac793343[m fix: implement role-based team member logic in services page
+[33m5b3a4271[m fix: implement role-based team member logic in services page
+[33mdab3fae9[m fix: implement role-based team member logic in services page
+[33mb4bdad02[m fix: remove horizontal border line above team section
+[33m21aedd47[m fix: remove horizontal border line above team section
+[33me8b168a0[m fix: remove horizontal border line above team section
+[33m2e6edd05[m fix: remove horizontal border line above team section
+[33m8e243b1d[m fix: improve service card height and description button accessibility
+[33m528ed529[m fix: improve service card height and description button accessibility
+[33mefe9348e[m fix: improve service card height and description button accessibility
+[33m4c78f276[m fix: improve service card height and description button accessibility
+[33m5d5ab368[m fix: redesign service card layout to ensure team members always visible
+[33ma6fdba6c[m fix: redesign service card layout to ensure team members always visible
+[33m57c968ad[m fix: redesign service card layout to ensure team members always visible
+[33m85546934[m fix: redesign service card layout to ensure team members always visible
+[33meccebfe2[m fix: prevent team members from being cut off with long descriptions
+[33m81062f52[m fix: prevent team members from being cut off with long descriptions
+[33m5f09e30a[m fix: prevent team members from being cut off with long descriptions
+[33m03ce6d25[m fix: prevent team members from being cut off with long descriptions
+[33mdca00000[m Merge branch 'dev'
+[33me9b47fab[m Merge branch 'dev'
+[33m0efd9e61[m feat: enhance services page layout and styling
+[33mcac3071e[m feat: enhance services page layout and styling
+[33m328ebbca[m feat: enhance services page layout and styling
+[33mc63d2d90[m feat: enhance services page layout and styling
+[33m44c0e56b[m resolve: merge dev branch layout fixes to master
+[33m275aecee[m resolve: merge dev branch layout fixes to master
+[33m080cfa0a[m fix: resolve missing closing bracket in TabsContent
+[33m94abe594[m fix: resolve missing closing bracket in TabsContent
+[33m21e5a81a[m fix: improve techstack modal layout and positioning
+[33m81e0e662[m fix: improve techstack modal layout and positioning
+[33mffbe3cdd[m fix: resolve Nuxt.js icon loading and modal size issues
+[33m16613052[m fix: resolve Nuxt.js icon loading and modal size issues
+[33m798c9faf[m fix: resolve Nuxt.js icon loading and modal size issues
+[33mb3e39bbf[m fix: resolve Nuxt.js icon loading and modal size issues
+[33m17af1b85[m Merge branch 'dev'
+[33ma615ab00[m Merge branch 'dev'
+[33mc23a64ae[m fix: update techstack icon paths to use correct directory structure
+[33m72bd41ff[m fix: update techstack icon paths to use correct directory structure
+[33ma2402c4c[m Remove .env.staging from git tracking
+[33mb367adaa[m Remove .env.staging from git tracking
+[33m147a8bfa[m update gitignore
+[33mc000bc12[m update gitignore
+[33me664094c[m Merge pull request #424 from CodebilityDev/ian/dev
+[33m90e9d334[m Merge pull request #424 from CodebilityDev/ian/dev
+[33m1bab020f[m my-team: added memers modal
+[33m5aaf5187[m[33m ([m[1;31morigin/ian/dev[m[33m)[m my-team: added memers modal
+[33mcf1afc4a[m Merge branch 'dev'
+[33me0f81ce1[m Merge branch 'dev'
+[33mff7325c3[m feat: add minimalist techy background animation to services page
+[33m8352e440[m feat: add minimalist techy background animation to services page
+[33m2863feb9[m Merge branch 'dev'
+[33m322fe456[m Merge branch 'dev'
+[33m2db1a513[m fix: resolve staging environment configuration and password reset issues
+[33me81aba38[m fix: resolve staging environment configuration and password reset issues
+[33m1018267b[m feat: Update staging environment variables for new Supabase project
+[33m73131ce8[m feat: Update staging environment variables for new Supabase project
+[33m2e97323b[m Merge branch 'dev' into master
+[33mcda964a1[m Merge branch 'dev' into master
+[33m88cf16d5[m feat: implement glassmorphism design and fix mobile UX issues
+[33mdad974e0[m feat: implement glassmorphism design and fix mobile UX issues
+[33mf4014ffe[m fix: Make main content margin dynamic to respect sidebar state
+[33mfc32068f[m fix: Make main content margin dynamic to respect sidebar state
+[33m0055213b[m feat: Update kanban page styling - black background and full width
+[33mad39de0a[m feat: Update kanban page styling - black background and full width
+[33md51a296e[m fix: Update certificate preview to use correct attendance_points table
+[33me872e8b9[m fix: Update certificate preview to use correct attendance_points table
+[33m960e2548[m feat: Add modern profile completion progress bar with real-time API integration
+[33mcfe43090[m feat: Add modern profile completion progress bar with real-time API integration
+[33m85b3b1e4[m Update Career Opportunities image to match theme colors
+[33mcb7e11ad[m Update Career Opportunities image to match theme colors
+[33m9b20b8c9[m Fix Career Opportunities placeholder image in landing page
+[33mcb9474da[m Fix Career Opportunities placeholder image in landing page
+[33m400d1ac5[m Revert "Add career-related placeholder image to job listings section"
+[33me73fe8e9[m Revert "Add career-related placeholder image to job listings section"
+[33me3c20702[m Add career-related placeholder image to job listings section
+[33m0fa542ba[m Add career-related placeholder image to job listings section
+[33m90c9f6db[m Clean up unused components and legacy files
+[33m90dbf6f4[m Clean up unused components and legacy files
+[33mdec2b7f4[m Implement comprehensive leaderboard system and dashboard optimizations
+[33mcf9b1e75[m Implement comprehensive leaderboard system and dashboard optimizations
+[33mf98710d1[m Change restriction of edit/delete post to admin or author only. Remove restrictions of create post
+[33m073b5a10[m Change restriction of edit/delete post to admin or author only. Remove restrictions of create post
+[33m65dd3943[m fix markdown editor and form responsiveness
+[33m7a38c9cc[m fix markdown editor and form responsiveness
+[33m5453389d[m Implement unified leaderboard system with technical, soft skills, and project rankings
+[33mc7282bc3[m Implement unified leaderboard system with technical, soft skills, and project rankings
+[33mb7b9bcca[m Correct soft skills category setup for leaderboard
+[33m95b1783b[m Correct soft skills category setup for leaderboard
+[33ma121653d[m Fix leaderboard visibility when no categories exist
+[33m90c429f0[m Fix leaderboard visibility when no categories exist
+[33mcbe31474[m Add Soft Skills category to leaderboard system
+[33maca7ec06[m Add Soft Skills category to leaderboard system
+[33m94ec3b6a[m Optimize team detail page loading performance
+[33m09086cad[m Optimize team detail page loading performance
+[33m2e402aac[m Remove irrelevant stats overview section from my-team page
+[33m108bfdfc[m Remove irrelevant stats overview section from my-team page
+[33m90ac0c09[m Fix breadcrumb positioning in team detail page
+[33mbd73a4f4[m Fix breadcrumb positioning in team detail page
+[33md6a93082[m Reduce height of empty team members section
+[33md835ee20[m Reduce height of empty team members section
+[33meae93b5c[m Redesign my-team page with modern UI and better UX
+[33m92088c44[m Redesign my-team page with modern UI and better UX
+[33m00eda9a6[m Reduce hero card height and restore justify-between layout
+[33mf751a7d8[m Reduce hero card height and restore justify-between layout
+[33m7f823d7c[m Fix hero cards text justification by removing flex gap
+[33m9d92f0f8[m Fix hero cards text justification by removing flex gap
+[33mf2f9eb83[m fix: reduce hero card padding and eliminate gap between title and description
+[33me619f1aa[m fix: reduce hero card padding and eliminate gap between title and description
+[33mb43b3135[m fix: adjust hero card text spacing and font sizes to prevent ellipsis
+[33m428b829a[m fix: adjust hero card text spacing and font sizes to prevent ellipsis
+[33ma0a21644[m fix: improve landing page hero cards and remove glow effects
+[33m08499ab6[m fix: improve landing page hero cards and remove glow effects
+[33m33cb6c24[m fix: update all pages to respect sidebar layout and fix SSR error
+[33m353775b9[m fix: update all pages to respect sidebar layout and fix SSR error
+[33mae6a4972[m feat: implement advanced techy loading animation and fix layout issues
+[33mb2550733[m feat: implement advanced techy loading animation and fix layout issues
+[33mbdd478ab[m feat: implement comprehensive landing page animations and improvements
+[33m60be270c[m feat: implement comprehensive landing page animations and improvements
+[33mc8852dfe[m fix: resolve page loading position and improve hero cards
+[33m655e2bb4[m fix: resolve page loading position and improve hero cards
+[33md916a574[m fix: improve hero section design and text sizing
+[33m9839c32b[m fix: improve hero section design and text sizing
+[33m64aca79b[m feat: add developer profiles to /codevs page and improve UX
+[33m521bfb69[m feat: add developer profiles to /codevs page and improve UX
+[33m5da4e3c0[m feat: enhance careers page and landing work with us section
+[33m6aed8d7e[m feat: enhance careers page and landing work with us section
+[33m7c089155[m chore: add staging env file
+[33m5c643e46[m chore: add staging env file
+[33me94d9347[m fix: Make main content margin dynamic to respect sidebar state
+[33m84f3a0ea[m fix: Make main content margin dynamic to respect sidebar state
+[33m528c2bbd[m feat: Update kanban page styling - black background and full width
+[33m7368f1d8[m feat: Update kanban page styling - black background and full width
+[33m3afb1f91[m fix: Update certificate preview to use correct attendance_points table
+[33mdcaf71e5[m fix: Update certificate preview to use correct attendance_points table
+[33m97e4a68f[m feat: Add modern profile completion progress bar with real-time API integration
+[33m04cb9a75[m feat: Add modern profile completion progress bar with real-time API integration
+[33m05e515d7[m Update Career Opportunities image to match theme colors
+[33me3639042[m Update Career Opportunities image to match theme colors
+[33m988968c4[m Fix Career Opportunities placeholder image in landing page
+[33me0dfaed9[m Fix Career Opportunities placeholder image in landing page
+[33md5977e91[m Revert "Add career-related placeholder image to job listings section"
+[33mfb583870[m Revert "Add career-related placeholder image to job listings section"
+[33m8db5dae7[m Add career-related placeholder image to job listings section
+[33m0f8023a2[m Add career-related placeholder image to job listings section
+[33m9ea8e92f[m Clean up unused components and legacy files
+[33m972441ac[m Clean up unused components and legacy files
+[33m6782976a[m Implement comprehensive leaderboard system and dashboard optimizations
+[33m9c29ab6f[m Implement comprehensive leaderboard system and dashboard optimizations
+[33mb5114c72[m Merge pull request #421 from CodebilityDev/miguel/fix-feeds-restriction
+[33m07955068[m Merge pull request #421 from CodebilityDev/miguel/fix-feeds-restriction
+[33mf2d85f74[m Merge pull request #420 from CodebilityDev/miguel/fi

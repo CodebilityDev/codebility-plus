@@ -73,6 +73,7 @@ export default function InternalProjects() {
           .or('name.ilike.%tapup%,name.ilike.%applete%,name.ilike.%codebility%,name.ilike.%portal%,name.ilike.%sariverse%')
           .not('name', 'ilike', '%design%')
           .not('name', 'ilike', '%product%')
+          .not('project_category_id', 'eq', 3)
           .order('created_at', { ascending: false });
 
         if (projectsError) {
@@ -108,6 +109,7 @@ export default function InternalProjects() {
         .eq('client_id', codebilityClientId)
         .not('name', 'ilike', '%design%')
         .not('name', 'ilike', '%product%')
+        .not('project_category_id', 'eq', 3)
         .order('created_at', { ascending: false });
 
       if (projectError) {

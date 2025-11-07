@@ -1,6 +1,6 @@
 // apps/bot/utils/xpHelper.ts
-import { supabaseBot } from "./supabase.bot";
-import { xpForLevel } from "./xpConstants"; // ✅ shared XP formula
+import { supabaseBot } from "./supabase.bot.js";
+import { xpForLevel } from "./xpConstants.js"; // ✅ shared XP formula
 
 // ---------------------------
 // Types

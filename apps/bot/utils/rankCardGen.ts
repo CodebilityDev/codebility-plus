@@ -1,6 +1,6 @@
 // apps/bot/utils/rankCardGen.ts
 import { createCanvas, loadImage, CanvasRenderingContext2D } from "canvas";
-import { supabaseBot } from "./supabase.bot";
+import { supabaseBot } from "./supabase.bot.js";
 import * as https from "https";
 
 const WIDTH = 900;

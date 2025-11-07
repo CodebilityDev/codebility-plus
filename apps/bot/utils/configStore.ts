@@ -1,5 +1,5 @@
 // apps/bot/utils/configStore.ts
-import { supabaseBot } from "./supabase.bot";
+import { supabaseBot } from "./supabase.bot.js";
 
 export interface XPConfig {
   minXP: number;
