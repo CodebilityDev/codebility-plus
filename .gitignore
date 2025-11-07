@@ -88,3 +88,5 @@ build/**
 
 distapps/bot/.env
 .env
+dist/
+get-pip.py
