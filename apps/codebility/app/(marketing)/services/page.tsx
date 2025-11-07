@@ -3,12 +3,10 @@ import { getOrSetCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
-import Calendly from "../_components/MarketingCalendly";
-import Footer from "../_components/MarketingFooter";
 import Navigation from "../_components/MarketingNavigation";
-import Hero from "./_components/ServicesHero";
-import ServicesTab from "./_components/ServicesTab";
-import TechyBackground from "./_components/TechyBackground";
+import ClientTechyBackground from "./_components/ClientTechyBackground";
+import { ServicesPageContent } from "./_components/ServicesPageContent";
+import { servicesData } from "./_lib/dummy-data";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -65,23 +63,22 @@ const ServicesPage = async () => {
     categories: item.categories || [],
     client_id: item.client_id,
     members:
-      item.project_members?.map((pm: any) => ({
-        ...pm.codev,
-        role: pm.role,
-        joined_at: pm.joined_at
-      })).filter(Boolean) || [],
+      item.project_members
+        ?.map((pm: any) => ({
+          ...pm.codev,
+          role: pm.role,
+          joined_at: pm.joined_at,
+        }))
+        .filter(Boolean) || [],
     tech_stack: item.tech_stack || [],
   }));
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
-      <TechyBackground />
+      <ClientTechyBackground />
       <div className="relative z-10">
         <Navigation />
-        <Hero />
-        <ServicesTab servicesData={mappedData} />
-        <Calendly />
-        <Footer />
+        <ServicesPageContent servicesData={mappedData} />
       </div>
     </div>
   );

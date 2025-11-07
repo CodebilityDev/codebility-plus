@@ -1,4 +1,6 @@
-import { useState, memo, useMemo } from "react";
+"use client";
+
+import { memo, useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import DefaultAvatar from "@/components/DefaultAvatar";
@@ -19,7 +21,7 @@ interface TeamMember {
   joined_at?: string;
 }
 
-interface ServiceProject {
+export interface ServiceProject {
   id: string;
   name: string;
   description?: string;
@@ -43,9 +45,10 @@ interface ServiceProject {
 
 interface Props {
   service: ServiceProject;
+  onSelect?: (service: ServiceProject) => void;
 }
 
-function ServiceCard({ service }: Props) {
+function ServiceCard({ service, onSelect }: Props) {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
 
   const {
@@ -58,38 +61,42 @@ function ServiceCard({ service }: Props) {
     tech_stack = [],
   } = service;
 
-  const imageUrl = useMemo(() => 
-    main_image
-      ? main_image.startsWith("public")
-        ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/services-image/${main_image}`
-        : main_image
-      : "https://codebility-cdn.pages.dev/assets/images/default-avatar-1248x845.jpg"
-  , [main_image]);
+  const imageUrl = useMemo(
+    () =>
+      main_image
+        ? main_image.startsWith("public")
+          ? `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/services-image/${main_image}`
+          : main_image
+        : "https://codebility-cdn.pages.dev/assets/images/default-avatar-1248x845.jpg",
+    [main_image],
+  );
 
-  const hasValidWebsite = useMemo(() =>
-    website_url &&
-    website_url !== "" &&
-    website_url.toLowerCase() !== "n/a" &&
-    website_url !== "."
-  , [website_url]);
+  const hasValidWebsite = useMemo(
+    () =>
+      website_url &&
+      website_url !== "" &&
+      website_url.toLowerCase() !== "n/a" &&
+      website_url !== ".",
+    [website_url],
+  );
 
   const { teamLeader, teamMembers, isDescriptionLong } = useMemo(() => {
-    const leader = members.find(member => member.role === 'team_leader');
-    const regularMembers = members.filter(member => member.role === 'member');
-    
+    const leader = members.find((member) => member.role === "team_leader");
+    const regularMembers = members.filter((member) => member.role === "member");
+
     return {
       teamLeader: leader || null,
       teamMembers: regularMembers,
-      isDescriptionLong: description && description.length > 120
+      isDescriptionLong: description && description.length > 120,
     };
   }, [members, description]);
 
   return (
-    <div 
-      className="group relative flex h-full flex-col overflow-hidden rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm transition-all duration-500 hover:shadow-2xl hover:shadow-blue-500/20 hover:border-blue-400/30 hover:bg-white/10 transform-gpu hover:-translate-y-2 hover:scale-105 aspect-[3/5] min-h-[480px]"
+    <div
+      className="group relative flex aspect-[3/5] h-full min-h-[480px] transform-gpu  flex-col overflow-hidden rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm transition-all duration-500 hover:-translate-y-2 hover:scale-105 hover:border-blue-400/30 hover:bg-white/10 hover:shadow-2xl hover:shadow-blue-500/20"
       style={{
-        transformStyle: 'preserve-3d',
-        perspective: '1000px',
+        transformStyle: "preserve-3d",
+        perspective: "1000px",
       }}
       onMouseEnter={(e) => {
         const card = e.currentTarget;
@@ -100,61 +107,73 @@ function ServiceCard({ service }: Props) {
         const centerY = rect.height / 2;
         const rotateX = (y - centerY) / 25;
         const rotateY = (centerX - x) / 25;
-        
+
         card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-4px) scale(1.01)`;
       }}
       onMouseLeave={(e) => {
         const card = e.currentTarget;
-        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)';
+        card.style.transform =
+          "perspective(1000px) rotateX(0deg) rotateY(0deg) translateY(0px) scale(1)";
       }}
     >
-      <div className="relative aspect-[4/3] w-full overflow-hidden flex-shrink-0">
+      {/* Project Image */}
+      <div
+        className="relative aspect-[4/3] w-full flex-shrink-0 cursor-pointer overflow-hidden"
+        onClick={() => {
+          console.log("Image clicked, service:", service.name);
+          onSelect?.(service);
+        }}
+      >
         <Image
           src={imageUrl}
           alt={name}
           fill
           sizes="(min-width: 1024px) 33vw, (min-width: 640px) 50vw, 100vw"
           className="object-cover transition-all duration-500 group-hover:scale-105 group-hover:brightness-105"
-          loading="lazy"
+          priority
           quality={75}
         />
         {categories.length > 0 && (
-          <div className="absolute left-3 top-3 flex flex-wrap gap-1.5 max-w-[calc(100%-1.5rem)]">
+          <div className="absolute left-3 top-3 flex max-w-[calc(100%-1.5rem)] flex-wrap gap-1.5">
             {categories.map((category) => (
               <div
                 key={category.id}
-                className="inline-flex items-center px-3 py-1.5 text-xs font-semibold text-white rounded-full backdrop-blur-sm shadow-lg bg-blue-600/80 transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-blue-500/20"
+                className="inline-flex items-center rounded-full bg-blue-600/80 px-3 py-1.5 text-xs font-semibold text-white shadow-lg backdrop-blur-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-blue-500/20"
               >
                 {category.name}
               </div>
             ))}
           </div>
         )}
-        
+
         {/* 3D Overlay Effect */}
-        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-transparent via-transparent to-blue-500/5 opacity-0 transition-opacity duration-500 group-hover:opacity-100"></div>
       </div>
 
-      <div className="flex flex-1 flex-col text-white transition-all duration-500 group-hover:translate-z-4">
+      <div className="group-hover:translate-z-4 flex flex-1 flex-col text-white transition-all duration-500">
         {/* Scrollable Content Area */}
         <div className="flex-1 overflow-y-auto p-4 pb-2">
           <div className="space-y-3">
-            <h3 className="line-clamp-1 text-lg font-bold group-hover:text-blue-300 transition-colors lg:text-xl">
+            <h3 className="line-clamp-1 text-lg font-bold transition-colors group-hover:text-blue-300 lg:text-xl">
               {name}
             </h3>
 
             <div className="relative">
-              <div className={`${isDescriptionExpanded ? 'max-h-24 overflow-y-auto pr-2' : ''}`}>
+              <div
+                className={`${isDescriptionExpanded ? "max-h-24 overflow-y-auto pr-2" : ""}`}
+              >
                 <p
-                  className={`text-gray-300 text-sm leading-relaxed ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
+                  className={`text-sm leading-relaxed text-gray-300 ${!isDescriptionExpanded ? "line-clamp-3" : ""}`}
                 >
                   {description || "No description available."}
                 </p>
               </div>
               {isDescriptionLong && (
                 <button
-                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                  className="mt-1 text-xs text-blue-400 hover:text-blue-300 transition-colors sticky bottom-0 bg-gradient-to-t from-black/50 to-transparent px-1 py-0.5 rounded"
+                  onClick={() =>
+                    setIsDescriptionExpanded(!isDescriptionExpanded)
+                  }
+                  className="sticky bottom-0 mt-1 rounded bg-gradient-to-t from-black/50 to-transparent px-1 py-0.5 text-xs text-blue-400 transition-colors hover:text-blue-300"
                 >
                   {isDescriptionExpanded ? "Show less" : "Read more"}
                 </button>
@@ -164,28 +183,28 @@ function ServiceCard({ service }: Props) {
             {/* Tech Stack */}
             {tech_stack && tech_stack.length > 0 && (
               <div className="space-y-2">
-                <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                <h4 className="text-xs font-semibold uppercase tracking-wide text-gray-400">
                   Tech Stack
                 </h4>
                 <div className="flex flex-wrap gap-1.5">
                   {tech_stack.slice(0, 3).map((tech, index) => (
                     <span
                       key={index}
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-500/20 to-indigo-500/20 text-blue-300 border border-blue-500/30 hover:shadow-sm hover:shadow-blue-500/20 transition-all duration-300 hover:scale-105 hover:bg-gradient-to-r hover:from-blue-500/30 hover:to-indigo-500/30 hover:border-blue-400/40 animate-fade-in-up group-hover:translate-y-[-1px]"
+                      className="animate-fade-in-up inline-flex items-center rounded-full border border-blue-500/30 bg-gradient-to-r from-blue-500/20 to-indigo-500/20 px-2 py-1 text-xs font-medium text-blue-300 transition-all duration-300 hover:scale-105 hover:border-blue-400/40 hover:bg-gradient-to-r hover:from-blue-500/30 hover:to-indigo-500/30 hover:shadow-sm hover:shadow-blue-500/20 group-hover:translate-y-[-1px]"
                       style={{
                         animationDelay: `${index * 100}ms`,
-                        animationFillMode: 'both'
+                        animationFillMode: "both",
                       }}
                     >
                       {tech}
                     </span>
                   ))}
                   {tech_stack.length > 3 && (
-                    <span 
-                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-gray-600/20 to-gray-500/20 text-gray-300 border border-gray-500/30 hover:scale-110 transition-all duration-300 animate-fade-in-up"
+                    <span
+                      className="animate-fade-in-up inline-flex items-center rounded-full border border-gray-500/30 bg-gradient-to-r from-gray-600/20 to-gray-500/20 px-2 py-1 text-xs font-medium text-gray-300 transition-all duration-300 hover:scale-110"
                       style={{
                         animationDelay: `${3 * 100}ms`,
-                        animationFillMode: 'both'
+                        animationFillMode: "both",
                       }}
                     >
                       +{tech_stack.length - 3}
@@ -198,18 +217,21 @@ function ServiceCard({ service }: Props) {
         </div>
 
         {/* Fixed Bottom Section - Always Visible */}
-        <div className="relative px-4 pb-4 pt-2 flex-shrink-0 min-h-[80px]">
+        <div className="relative min-h-[80px] flex-shrink-0 px-4 pb-4 pt-2">
           {/* Team Section */}
           {members.length > 0 ? (
             <div>
-              <p className="mb-1.5 text-xs font-semibold text-gray-400 uppercase tracking-wide">Team</p>
+              <p className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-400">
+                Team
+              </p>
               <div className="flex flex-wrap items-center gap-1">
                 {teamLeader && (
                   <Tooltip>
                     <TooltipTrigger>
                       <div className="relative">
-                        <div className="relative h-10 w-10 overflow-hidden rounded-full border-2 border-customBlue-500">
-                          {teamLeader.image_url ? (
+                        <div className="border-customBlue-500 relative h-10 w-10 overflow-hidden rounded-full border-2">
+                          {teamLeader.image_url &&
+                          teamLeader.image_url.trim() !== "" ? (
                             <Image
                               src={teamLeader.image_url}
                               alt={`${teamLeader.first_name} ${teamLeader.last_name}`}
@@ -240,7 +262,8 @@ function ServiceCard({ service }: Props) {
                     <TooltipTrigger>
                       <div>
                         <div className="relative h-8 w-8 overflow-hidden rounded-full border-2 border-gray-700">
-                          {member.image_url ? (
+                          {member.image_url &&
+                          member.image_url.trim() !== "" ? (
                             <Image
                               src={member.image_url}
                               alt={`${member.first_name} ${member.last_name}`}
@@ -279,7 +302,7 @@ function ServiceCard({ service }: Props) {
           <Link
             href={website_url!}
             target="_blank"
-            className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 border border-blue-400/30 hover:border-blue-300/50 px-3 py-2 text-sm font-semibold text-white shadow-lg hover:shadow-xl hover:shadow-blue-500/25 transition-all duration-300 hover:scale-105 hover:translate-y-[-1px] backdrop-blur-sm"
+            className="absolute bottom-3 right-3 inline-flex items-center gap-2 rounded-lg border border-blue-400/30 bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:translate-y-[-1px] hover:scale-105 hover:border-blue-300/50 hover:from-blue-500 hover:to-indigo-500 hover:shadow-xl hover:shadow-blue-500/25"
           >
             <IconLink className="size-4" />
             <span>View</span>
