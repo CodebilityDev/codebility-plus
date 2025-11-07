@@ -21,6 +21,7 @@ import {
   ResponsiveContainer,
   XAxis,
 } from "recharts";
+import { cn } from "@/lib/utils";
 
 interface AdminDashboardMonthlyApplicantsLineChartProp {
   dateApplied?: string[];
@@ -74,10 +75,17 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
   } satisfies ChartConfig;
 
   return (
-    <Card>
+    <Card 
+      className={cn(
+        // Light mode - clean white
+        "bg-white border-gray-200",
+        // Dark mode - Home's gold gradient
+        "dark:bg-gradient-to-r dark:from-[#9c813b] dark:to-[#ecc258]"
+      )}
+    >
       <CardHeader>
-        <CardTitle className="text-lg">Monthly Applicants</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        <CardTitle className="text-lg dark:text-white">Monthly Applicants</CardTitle>
+        <CardDescription className="dark:text-white/70">{description}</CardDescription>
       </CardHeader>
       <CardContent className="h-80">
         <ResponsiveContainer width="100%" height="100%">
@@ -125,7 +133,7 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
         </ResponsiveContainer>
       </CardContent>
       <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="leading-none text-muted-foreground">
+        <div className="leading-none text-muted-foreground dark:text-white/70">
           Showing monthly applicants for the current and previous 5 months
         </div>
       </CardFooter>

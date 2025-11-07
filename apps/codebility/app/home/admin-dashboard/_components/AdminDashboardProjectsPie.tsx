@@ -14,6 +14,7 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Pie, PieChart } from "recharts";
+import { cn } from "@/lib/utils";
 
 interface ProjectCategoryCounts extends Record<string, number> {}
 
@@ -28,12 +29,20 @@ export default function AdminDashboardProjectsPie({
   
   if (!data)
     return (
-      <Card className="flex h-full flex-col">
+      <Card 
+        className={cn(
+          "flex h-full flex-col",
+          // Light mode - clean white
+          "bg-white border-gray-200",
+          // Dark mode - Home's bronze gradient
+          "dark:bg-gradient-to-r dark:from-[#563c1e] dark:to-[#ba8240]"
+        )}
+      >
         <CardHeader className="items-center pb-0">
-          <CardTitle className="text-lg">{title}</CardTitle>
+          <CardTitle className="text-lg dark:text-white">{title}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-1 items-center justify-center">
-          <p className="text-muted-foreground">No data available</p>
+          <p className="text-muted-foreground dark:text-white/70">No data available</p>
         </CardContent>
       </Card>
     );
@@ -62,10 +71,18 @@ export default function AdminDashboardProjectsPie({
   }, {} as ChartConfig);
 
   return (
-    <Card className="flex h-full flex-col">
+    <Card 
+      className={cn(
+        "flex h-full flex-col",
+        // Light mode - clean white
+        "bg-white border-gray-200",
+        // Dark mode - Home's bronze gradient
+        "dark:bg-gradient-to-r dark:from-[#563c1e] dark:to-[#ba8240]"
+      )}
+    >
       <CardHeader className="items-center pb-0">
-        <CardTitle className="text-lg">{title}</CardTitle>
-        <CardDescription className="text-center text-sm">
+        <CardTitle className="text-lg dark:text-white">{title}</CardTitle>
+        <CardDescription className="text-center text-sm dark:text-white/70">
           Distribution by project categories
         </CardDescription>
       </CardHeader>
