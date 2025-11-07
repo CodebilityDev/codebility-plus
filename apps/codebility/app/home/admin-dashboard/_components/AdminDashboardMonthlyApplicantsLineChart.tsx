@@ -74,12 +74,15 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
   } satisfies ChartConfig;
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className="relative overflow-hidden">
+      {/* Gradient background - only visible in dark mode */}
+      <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/10 to-purple-950/10 dark:block hidden" />
+      
+      <CardHeader className="relative">
         <CardTitle className="text-lg">Monthly Applicants</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="h-80">
+      <CardContent className="relative h-80">
         <ResponsiveContainer width="100%" height="100%">
           <ChartContainer config={chartConfig}>
             <LineChart
@@ -124,7 +127,7 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
           </ChartContainer>
         </ResponsiveContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
+      <CardFooter className="relative flex-col items-start gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
           Showing monthly applicants for the current and previous 5 months
         </div>
