@@ -21,7 +21,6 @@ import {
   ResponsiveContainer,
   XAxis,
 } from "recharts";
-import { cn } from "@/lib/utils";
 
 interface AdminDashboardMonthlyApplicantsLineChartProp {
   dateApplied?: string[];
@@ -75,19 +74,15 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
   } satisfies ChartConfig;
 
   return (
-    <Card 
-      className={cn(
-        // Light mode - clean white
-        "bg-white border-gray-200",
-        // Dark mode - Home's gold gradient
-        "dark:bg-gradient-to-r dark:from-[#9c813b] dark:to-[#ecc258]"
-      )}
-    >
-      <CardHeader>
-        <CardTitle className="text-lg dark:text-white">Monthly Applicants</CardTitle>
-        <CardDescription className="dark:text-white/70">{description}</CardDescription>
+    <Card className="relative overflow-hidden">
+      {/* Gradient background - only visible in dark mode */}
+      <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/10 to-purple-950/10 dark:block hidden" />
+      
+      <CardHeader className="relative">
+        <CardTitle className="text-lg">Monthly Applicants</CardTitle>
+        <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="h-80">
+      <CardContent className="relative h-80">
         <ResponsiveContainer width="100%" height="100%">
           <ChartContainer config={chartConfig}>
             <LineChart
@@ -132,8 +127,8 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
           </ChartContainer>
         </ResponsiveContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
-        <div className="leading-none text-muted-foreground dark:text-white/70">
+      <CardFooter className="relative flex-col items-start gap-2 text-sm">
+        <div className="leading-none text-muted-foreground">
           Showing monthly applicants for the current and previous 5 months
         </div>
       </CardFooter>

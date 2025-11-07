@@ -14,7 +14,6 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Pie, PieChart } from "recharts";
-import { cn } from "@/lib/utils";
 
 interface ProjectCategoryCounts extends Record<string, number> {}
 
@@ -29,20 +28,15 @@ export default function AdminDashboardProjectsPie({
   
   if (!data)
     return (
-      <Card 
-        className={cn(
-          "flex h-full flex-col",
-          // Light mode - clean white
-          "bg-white border-gray-200",
-          // Dark mode - Home's bronze gradient
-          "dark:bg-gradient-to-r dark:from-[#563c1e] dark:to-[#ba8240]"
-        )}
-      >
-        <CardHeader className="items-center pb-0">
-          <CardTitle className="text-lg dark:text-white">{title}</CardTitle>
+      <Card className="flex h-full flex-col relative overflow-hidden">
+        {/* Gradient background - only visible in dark mode */}
+        <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/10 to-purple-950/10 dark:block hidden" />
+        
+        <CardHeader className="relative items-center pb-0">
+          <CardTitle className="text-lg">{title}</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center">
-          <p className="text-muted-foreground dark:text-white/70">No data available</p>
+        <CardContent className="relative flex flex-1 items-center justify-center">
+          <p className="text-muted-foreground">No data available</p>
         </CardContent>
       </Card>
     );
@@ -71,22 +65,17 @@ export default function AdminDashboardProjectsPie({
   }, {} as ChartConfig);
 
   return (
-    <Card 
-      className={cn(
-        "flex h-full flex-col",
-        // Light mode - clean white
-        "bg-white border-gray-200",
-        // Dark mode - Home's bronze gradient
-        "dark:bg-gradient-to-r dark:from-[#563c1e] dark:to-[#ba8240]"
-      )}
-    >
-      <CardHeader className="items-center pb-0">
-        <CardTitle className="text-lg dark:text-white">{title}</CardTitle>
-        <CardDescription className="text-center text-sm dark:text-white/70">
+    <Card className="flex h-full flex-col relative overflow-hidden">
+      {/* Gradient background - only visible in dark mode */}
+      <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/10 to-purple-950/10 dark:block hidden" />
+      
+      <CardHeader className="relative items-center pb-0">
+        <CardTitle className="text-lg">{title}</CardTitle>
+        <CardDescription className="text-center text-sm">
           Distribution by project categories
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent className="relative flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square max-h-[350px]"
