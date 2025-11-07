@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 
 import { deletePost } from "../_services/action";
 import { PostType } from "../_services/query";
+import { DeleteDialog } from "./DeleteDialog";
 import PostUpvote from "./PostUpvote";
 
 interface PostProps {
@@ -22,6 +23,8 @@ interface PostProps {
 export default function Post({ post, isAdmin, onDelete }: PostProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAuthor, setIsAuthor] = useState(false);
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const { user } = useUserStore();
 
   useEffect(() => {
@@ -38,20 +41,26 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
       checkIfAuthor();
     }
   }, [user]);
-
-  const handleDelete = async (e: React.MouseEvent) => {
+  const openDeleteDialog = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
-    try {
-      await deletePost(post.id);
-      toast.success("Post deleted successfully!");
+    setShowDeleteDialog(true);
+  };
 
+  const handleDelete = async () => {
+    try {
+      setIsDeleting(true);
+      await deletePost(post.id);
       if (onDelete) {
         onDelete(post.id);
       }
+      toast.success("Post deleted successfully!");
     } catch (error) {
       toast.error("Failed to delete post.");
       console.error("Failed to delete post:", error);
+    } finally {
+      setIsDeleting(false);
+      setShowDeleteDialog(false);
     }
   };
 
@@ -67,7 +76,7 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
         {(isAdmin || isAuthor) && (
           <button
             className="invisible absolute right-2 top-2 rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600 group-hover:visible"
-            onClick={handleDelete}
+            onClick={openDeleteDialog}
             aria-label="Delete post"
           >
             ✕
@@ -121,6 +130,12 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
         isOpen={isModalOpen}
         onClose={closeModal}
         postId={post.id}
+      />
+      <DeleteDialog
+        isOpen={showDeleteDialog}
+        onClose={() => setShowDeleteDialog(false)}
+        onConfirm={handleDelete}
+        isLoading={isDeleting}
       />
     </div>
   );

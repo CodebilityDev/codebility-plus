@@ -1,0 +1,976 @@
+src/accordion.tsx(14,6): error TS2339: Property 'className' does not exist on type 'Omit<AccordionItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/accordion.tsx(17,5): error TS2322: Type '{ key?: Key; disabled?: boolean; value: string; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AccordionItemProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AccordionItemProps & RefAttributes<HTMLDivElement>'.
+src/accordion.tsx(26,6): error TS2339: Property 'className' does not exist on type 'Omit<AccordionTriggerProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/accordion.tsx(26,17): error TS2339: Property 'children' does not exist on type 'Omit<AccordionTriggerProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/accordion.tsx(27,4): error TS2322: Type '{ children: Element; className: string; }' is not assignable to type 'IntrinsicAttributes & AccordionHeaderProps & RefAttributes<HTMLHeadingElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & AccordionHeaderProps & RefAttributes<HTMLHeadingElement>'.
+src/accordion.tsx(28,6): error TS2322: Type '{ children: any[]; key?: Key; ref: ForwardedRef<HTMLButtonElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AccordionTriggerProps & RefAttributes<HTMLButtonElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & AccordionTriggerProps & RefAttributes<HTMLButtonElement>'.
+src/accordion.tsx(37,8): error TS2786: 'ChevronDown' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/accordion.tsx(46,6): error TS2339: Property 'className' does not exist on type 'Omit<AccordionContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/accordion.tsx(46,17): error TS2339: Property 'children' does not exist on type 'Omit<AccordionContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/accordion.tsx(47,4): error TS2322: Type '{ children: Element; key?: Key; forceMount?: true; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AccordionContentProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & AccordionContentProps & RefAttributes<HTMLDivElement>'.
+src/alert-dialog.tsx(18,6): error TS2339: Property 'className' does not exist on type 'Omit<AlertDialogOverlayProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/alert-dialog.tsx(20,5): error TS2322: Type '{ ref: ForwardedRef<HTMLDivElement>; key?: Key; className: string; }' is not assignable to type 'IntrinsicAttributes & AlertDialogOverlayProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AlertDialogOverlayProps & RefAttributes<HTMLDivElement>'.
+src/alert-dialog.tsx(33,6): error TS2339: Property 'className' does not exist on type 'Omit<AlertDialogContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/alert-dialog.tsx(38,7): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AlertDialogContentProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AlertDialogContentProps & RefAttributes<HTMLDivElement>'.
+src/alert-dialog.tsx(79,6): error TS2339: Property 'className' does not exist on type 'Omit<AlertDialogTitleProps & RefAttributes<HTMLHeadingElement>, "ref">'.
+src/alert-dialog.tsx(82,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLHeadingElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AlertDialogTitleProps & RefAttributes<HTMLHeadingElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AlertDialogTitleProps & RefAttributes<HTMLHeadingElement>'.
+src/alert-dialog.tsx(91,6): error TS2339: Property 'className' does not exist on type 'Omit<AlertDialogDescriptionProps & RefAttributes<HTMLParagraphElement>, "ref">'.
+src/alert-dialog.tsx(94,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLParagraphElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AlertDialogDescriptionProps & RefAttributes<HTMLParagraphElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AlertDialogDescriptionProps & RefAttributes<HTMLParagraphElement>'.
+src/alert-dialog.tsx(104,6): error TS2339: Property 'className' does not exist on type 'Omit<AlertDialogActionProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/alert-dialog.tsx(107,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLButtonElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AlertDialogActionProps & RefAttributes<HTMLButtonElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AlertDialogActionProps & RefAttributes<HTMLButtonElement>'.
+src/alert-dialog.tsx(116,6): error TS2339: Property 'className' does not exist on type 'Omit<AlertDialogCancelProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/alert-dialog.tsx(119,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLButtonElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AlertDialogCancelProps & RefAttributes<HTMLButtonElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AlertDialogCancelProps & RefAttributes<HTMLButtonElement>'.
+src/avatar.tsx(11,6): error TS2339: Property 'className' does not exist on type 'Omit<AvatarProps & RefAttributes<HTMLSpanElement>, "ref">'.
+src/avatar.tsx(14,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLSpanElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AvatarProps & RefAttributes<HTMLSpanElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AvatarProps & RefAttributes<HTMLSpanElement>'.
+src/avatar.tsx(26,6): error TS2339: Property 'className' does not exist on type 'Omit<AvatarImageProps & RefAttributes<HTMLImageElement>, "ref">'.
+src/avatar.tsx(29,5): error TS2322: Type '{ key?: Key; onLoadingStatusChange?: (status: ImageLoadingStatus) => void; ref: ForwardedRef<HTMLImageElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AvatarImageProps & RefAttributes<HTMLImageElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AvatarImageProps & RefAttributes<HTMLImageElement>'.
+src/avatar.tsx(38,6): error TS2339: Property 'className' does not exist on type 'Omit<AvatarFallbackProps & RefAttributes<HTMLSpanElement>, "ref">'.
+src/avatar.tsx(41,5): error TS2322: Type '{ key?: Key; delayMs?: number; ref: ForwardedRef<HTMLSpanElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & AvatarFallbackProps & RefAttributes<HTMLSpanElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & AvatarFallbackProps & RefAttributes<HTMLSpanElement>'.
+src/breadcrumb.tsx(51,6): error TS2786: 'Comp' cannot be used as a JSX component.
+  Its type '"a" | ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not assignable to type 'ElementType'.
+      Type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+        Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+          Type 'bigint' is not assignable to type 'ReactNode'.
+src/breadcrumb.tsx(86,19): error TS2786: 'ChevronRight' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/breadcrumb.tsx(101,6): error TS2786: 'MoreHorizontal' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/button.tsx(50,8): error TS2786: 'Comp' cannot be used as a JSX component.
+  Its type '"button" | ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not assignable to type 'ElementType'.
+      Type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+        Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+          Type 'bigint' is not assignable to type 'ReactNode'.
+src/calendar.tsx(57,38): error TS2786: 'ChevronLeft' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/calendar.tsx(58,39): error TS2786: 'ChevronRight' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/carousel.tsx(219,8): error TS2786: 'ArrowLeft' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/carousel.tsx(248,8): error TS2786: 'ArrowRight' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/checkbox.tsx(11,6): error TS2339: Property 'className' does not exist on type 'Omit<CheckboxProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/checkbox.tsx(12,4): error TS2322: Type '{ children: Element; key?: Key; defaultChecked?: CheckedState; checked?: CheckedState; required?: boolean; onCheckedChange?: (checked: CheckedState) => void; ref: ForwardedRef<...>; className: string; }' is not assignable to type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLButtonElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & CheckboxProps & RefAttributes<HTMLButtonElement>'.
+src/checkbox.tsx(20,6): error TS2322: Type '{ children: Element; className: string; }' is not assignable to type 'IntrinsicAttributes & CheckboxIndicatorProps & RefAttributes<HTMLSpanElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & CheckboxIndicatorProps & RefAttributes<HTMLSpanElement>'.
+src/command.tsx(31,8): error TS2322: Type '{ children: Element; className: string; }' is not assignable to type 'IntrinsicAttributes & DialogContentProps & RefAttributes<never>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & DialogContentProps & RefAttributes<never>'.
+src/command.tsx(33,11): error TS2322: Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@radix-ui/react-accordion/node_modules/@types/react/index").ReactNode'.
+  Type 'bigint' is not assignable to type 'ReactNode'.
+src/command.tsx(45,6): error TS2786: 'Search' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/context-menu.tsx(26,6): error TS2339: Property 'className' does not exist on type 'Omit<ContextMenuSubTriggerProps & RefAttributes<HTMLDivElement>, "ref"> & { inset?: boolean; }'.
+src/context-menu.tsx(26,24): error TS2339: Property 'children' does not exist on type 'Omit<ContextMenuSubTriggerProps & RefAttributes<HTMLDivElement>, "ref"> & { inset?: boolean; }'.
+src/context-menu.tsx(27,4): error TS2322: Type '{ children: any[]; key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ContextMenuSubTriggerProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & ContextMenuSubTriggerProps & RefAttributes<HTMLDivElement>'.
+src/context-menu.tsx(37,6): error TS2786: 'ChevronRight' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/context-menu.tsx(45,6): error TS2339: Property 'className' does not exist on type 'Omit<ContextMenuSubContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/context-menu.tsx(48,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ContextMenuSubContentProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ContextMenuSubContentProps & RefAttributes<HTMLDivElement>'.
+src/context-menu.tsx(60,6): error TS2339: Property 'className' does not exist on type 'Omit<ContextMenuContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/context-menu.tsx(64,7): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ContextMenuContentProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ContextMenuContentProps & RefAttributes<HTMLDivElement>'.
+src/context-menu.tsx(79,6): error TS2339: Property 'className' does not exist on type 'Omit<ContextMenuItemProps & RefAttributes<HTMLDivElement>, "ref"> & { inset?: boolean; }'.
+src/context-menu.tsx(82,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ContextMenuItemProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ContextMenuItemProps & RefAttributes<HTMLDivElement>'.
+src/context-menu.tsx(95,6): error TS2339: Property 'className' does not exist on type 'Omit<ContextMenuCheckboxItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/context-menu.tsx(95,17): error TS2339: Property 'children' does not exist on type 'Omit<ContextMenuCheckboxItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/context-menu.tsx(95,27): error TS2339: Property 'checked' does not exist on type 'Omit<ContextMenuCheckboxItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/context-menu.tsx(96,4): error TS2322: Type '{ children: any[]; key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; checked: any; }' is not assignable to type 'IntrinsicAttributes & ContextMenuCheckboxItemProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & ContextMenuCheckboxItemProps & RefAttributes<HTMLDivElement>'.
+src/context-menu.tsx(107,10): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/context-menu.tsx(119,6): error TS2339: Property 'className' does not exist on type 'Omit<ContextMenuRadioItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/context-menu.tsx(119,17): error TS2339: Property 'children' does not exist on type 'Omit<ContextMenuRadioItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/context-menu.tsx(120,4): error TS2322: Type '{ children: any[]; key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ContextMenuRadioItemProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & ContextMenuRadioItemProps & RefAttributes<HTMLDivElement>'.
+src/context-menu.tsx(130,10): error TS2786: 'Circle' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/context-menu.tsx(143,6): error TS2339: Property 'className' does not exist on type 'Omit<ContextMenuLabelProps & RefAttributes<HTMLDivElement>, "ref"> & { inset?: boolean; }'.
+src/context-menu.tsx(146,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ContextMenuLabelProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ContextMenuLabelProps & RefAttributes<HTMLDivElement>'.
+src/context-menu.tsx(159,6): error TS2339: Property 'className' does not exist on type 'Omit<ContextMenuSeparatorProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/context-menu.tsx(162,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ContextMenuSeparatorProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ContextMenuSeparatorProps & RefAttributes<HTMLDivElement>'.
+src/dialog.tsx(10,4): error TS2786: 'DialogPrimitive.Root' cannot be used as a JSX component.
+  Its type 'FC<DialogProps>' is not a valid JSX element type.
+    Type 'FunctionComponent<DialogProps>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactNode | Promise<ReactNode>' is not assignable to type 'ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(21,20): error TS2344: Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(22,34): error TS2344: Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(23,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/dialog.tsx(24,4): error TS2786: 'DialogPrimitive.Overlay' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(36,42): error TS2344: Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(41,20): error TS2344: Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(43,6): error TS2339: Property 'className' does not exist on type 'DialogContentProps'.
+src/dialog.tsx(43,17): error TS2339: Property 'children' does not exist on type 'DialogContentProps'.
+src/dialog.tsx(44,4): error TS2786: 'DialogPortal' cannot be used as a JSX component.
+  Its type 'FC<DialogPortalProps>' is not a valid JSX element type.
+    Type 'FunctionComponent<DialogPortalProps>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactNode | Promise<ReactNode>' is not assignable to type 'ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(46,6): error TS2786: 'DialogPrimitive.Content' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(58,8): error TS2786: 'DialogPrimitive.Close' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogCloseProps & RefAttributes<HTMLButtonElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogCloseProps & RefAttributes<HTMLButtonElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(96,20): error TS2344: Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(97,34): error TS2344: Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(98,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/dialog.tsx(99,4): error TS2786: 'DialogPrimitive.Title' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(111,20): error TS2344: Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(112,34): error TS2344: Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dialog.tsx(113,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/dialog.tsx(114,4): error TS2786: 'DialogPrimitive.Description' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(28,20): error TS2344: Type 'ForwardRefExoticComponent<Omit<DialogOverlayProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<Omit<DialogOverlayProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(29,34): error TS2344: Type 'ForwardRefExoticComponent<Omit<DialogOverlayProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<Omit<DialogOverlayProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(30,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/drawer.tsx(31,4): error TS2786: 'DrawerPrimitive.Overlay' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<DialogOverlayProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<DialogOverlayProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(40,20): error TS2344: Type 'ForwardRefExoticComponent<Omit<DialogContentProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<Omit<DialogContentProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(41,34): error TS2344: Type 'ForwardRefExoticComponent<Omit<DialogContentProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<Omit<DialogContentProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(42,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/drawer.tsx(42,17): error TS2339: Property 'children' does not exist on type '{}'.
+src/drawer.tsx(45,6): error TS2786: 'DrawerPrimitive.Content' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<DialogContentProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<DialogContentProps & RefAttributes<HTMLDivElement>, "ref"> & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(83,20): error TS2344: Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(84,34): error TS2344: Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(85,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/drawer.tsx(86,4): error TS2786: 'DrawerPrimitive.Title' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(98,20): error TS2344: Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(99,34): error TS2344: Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/drawer.tsx(100,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/drawer.tsx(101,4): error TS2786: 'DrawerPrimitive.Description' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(11,34): error TS2344: Type 'FC<DropdownMenuProps>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'FunctionComponent<DropdownMenuProps>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'ReactNode | Promise<ReactNode>' is not assignable to type 'ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(12,6): error TS2339: Property 'modal' does not exist on type '{}'.
+src/dropdown-menu.tsx(13,4): error TS2786: 'DropdownMenuPrimitive.Root' cannot be used as a JSX component.
+  Its type 'FC<DropdownMenuProps>' is not a valid JSX element type.
+    Type 'FunctionComponent<DropdownMenuProps>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactNode | Promise<ReactNode>' is not assignable to type 'ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(28,20): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuSubTriggerProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DropdownMenuSubTriggerProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(29,34): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuSubTriggerProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DropdownMenuSubTriggerProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(32,6): error TS2339: Property 'className' does not exist on type '{ inset?: boolean; }'.
+src/dropdown-menu.tsx(32,24): error TS2339: Property 'children' does not exist on type '{ inset?: boolean; }'.
+src/dropdown-menu.tsx(33,4): error TS2786: 'DropdownMenuPrimitive.SubTrigger' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuSubTriggerProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuSubTriggerProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(43,6): error TS2786: 'ChevronRight' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(50,20): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuSubContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DropdownMenuSubContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(51,34): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuSubContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DropdownMenuSubContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(52,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/dropdown-menu.tsx(53,4): error TS2786: 'DropdownMenuPrimitive.SubContent' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuSubContentProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuSubContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(66,20): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DropdownMenuContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(67,34): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DropdownMenuContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(68,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/dropdown-menu.tsx(68,17): error TS2339: Property 'sideOffset' does not exist on type '{}'.
+src/dropdown-menu.tsx(69,4): error TS2786: 'DropdownMenuPrimitive.Portal' cannot be used as a JSX component.
+  Its type 'FC<DropdownMenuPortalProps>' is not a valid JSX element type.
+    Type 'FunctionComponent<DropdownMenuPortalProps>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactNode | Promise<ReactNode>' is not assignable to type 'ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(70,6): error TS2786: 'DropdownMenuPrimitive.Content' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuContentProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(84,20): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuItemProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DropdownMenuItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(85,34): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuItemProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DropdownMenuItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(88,6): error TS2339: Property 'className' does not exist on type '{ inset?: boolean; }'.
+src/dropdown-menu.tsx(89,4): error TS2786: 'DropdownMenuPrimitive.Item' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuItemProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(102,20): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuCheckboxItemProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DropdownMenuCheckboxItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(103,34): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuCheckboxItemProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DropdownMenuCheckboxItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(104,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/dropdown-menu.tsx(104,17): error TS2339: Property 'children' does not exist on type '{}'.
+src/dropdown-menu.tsx(104,27): error TS2339: Property 'checked' does not exist on type '{}'.
+src/dropdown-menu.tsx(105,4): error TS2786: 'DropdownMenuPrimitive.CheckboxItem' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuCheckboxItemProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuCheckboxItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(115,8): error TS2786: 'DropdownMenuPrimitive.ItemIndicator' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuItemIndicatorProps & RefAttributes<HTMLSpanElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuItemIndicatorProps & RefAttributes<HTMLSpanElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(116,10): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(126,20): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuRadioItemProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DropdownMenuRadioItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(127,34): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuRadioItemProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DropdownMenuRadioItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(128,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/dropdown-menu.tsx(128,17): error TS2339: Property 'children' does not exist on type '{}'.
+src/dropdown-menu.tsx(129,4): error TS2741: Property 'value' is missing in type '{ children: any[]; ref: ForwardedRef<never>; className: string; }' but required in type 'Omit<MenuRadioItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/dropdown-menu.tsx(129,4): error TS2786: 'DropdownMenuPrimitive.RadioItem' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuRadioItemProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuRadioItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(138,8): error TS2786: 'DropdownMenuPrimitive.ItemIndicator' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuItemIndicatorProps & RefAttributes<HTMLSpanElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuItemIndicatorProps & RefAttributes<HTMLSpanElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(139,10): error TS2786: 'Circle' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(148,20): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuLabelProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DropdownMenuLabelProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(149,34): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuLabelProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DropdownMenuLabelProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(152,6): error TS2339: Property 'className' does not exist on type '{ inset?: boolean; }'.
+src/dropdown-menu.tsx(153,4): error TS2786: 'DropdownMenuPrimitive.Label' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuLabelProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuLabelProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(166,20): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuSeparatorProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DropdownMenuSeparatorProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(167,34): error TS2344: Type 'ForwardRefExoticComponent<DropdownMenuSeparatorProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DropdownMenuSeparatorProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/dropdown-menu.tsx(168,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/dropdown-menu.tsx(169,4): error TS2786: 'DropdownMenuPrimitive.Separator' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DropdownMenuSeparatorProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DropdownMenuSeparatorProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/form.tsx(40,8): error TS2786: 'Controller' cannot be used as a JSX component.
+  Its type '<TFieldValues extends FieldValues = FieldValues, TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>, TTransformedValues = TFieldValues>(props: ControllerProps<TFieldValues, TName, TTransformedValues>) => ReactElement<...>' is not a valid JSX element type.
+    Type '<TFieldValues extends FieldValues = FieldValues, TName extends FieldPath<TFieldValues> = FieldPath<TFieldValues>, TTransformedValues = TFieldValues>(props: ControllerProps<TFieldValues, TName, TTransformedValues>) => ReactElement<...>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<unknown, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+        Property 'children' is missing in type 'ReactElement<unknown, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+src/form.tsx(93,6): error TS2339: Property 'className' does not exist on type 'Omit<LabelProps & RefAttributes<HTMLLabelElement>, "ref">'.
+src/form.tsx(99,7): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLLabelElement>; className: string; htmlFor: string; }' is not assignable to type 'IntrinsicAttributes & Omit<LabelProps & RefAttributes<HTMLLabelElement>, "ref"> & VariantProps<(props?: ClassProp) => string> & RefAttributes<...>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & Omit<LabelProps & RefAttributes<HTMLLabelElement>, "ref"> & VariantProps<(props?: ClassProp) => string> & RefAttributes<...>'.
+src/form.tsx(108,20): error TS2344: Type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/form.tsx(109,34): error TS2344: Type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/form.tsx(115,6): error TS2786: 'Slot' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SlotProps & RefAttributes<HTMLElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/hover-card.tsx(13,20): error TS2344: Type 'ForwardRefExoticComponent<HoverCardContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<HoverCardContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/hover-card.tsx(14,34): error TS2344: Type 'ForwardRefExoticComponent<HoverCardContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<HoverCardContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/hover-card.tsx(15,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/hover-card.tsx(15,17): error TS2339: Property 'align' does not exist on type '{}'.
+src/hover-card.tsx(15,35): error TS2339: Property 'sideOffset' does not exist on type '{}'.
+src/hover-card.tsx(16,4): error TS2786: 'HoverCardPrimitive.Content' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<HoverCardContentProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<HoverCardContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/input-otp.tsx(10,20): error TS2344: Type 'ForwardRefExoticComponent<OTPInputProps & RefAttributes<HTMLInputElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<OTPInputProps & RefAttributes<HTMLInputElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/input-otp.tsx(11,34): error TS2344: Type 'ForwardRefExoticComponent<OTPInputProps & RefAttributes<HTMLInputElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<OTPInputProps & RefAttributes<HTMLInputElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/input-otp.tsx(12,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/input-otp.tsx(12,17): error TS2339: Property 'containerClassName' does not exist on type '{}'.
+src/input-otp.tsx(13,4): error TS2322: Type '{ ref: ForwardedRef<never>; containerClassName: string; className: string; }' is not assignable to type 'IntrinsicAttributes & (OTPInputProps & RefAttributes<HTMLInputElement>)'.
+  Property 'maxLength' is missing in type '{ ref: ForwardedRef<never>; containerClassName: string; className: string; }' but required in type '{ value?: string; onChange?: (newValue: string) => unknown; maxLength: number; textAlign?: "center" | "left" | "right"; onComplete?: (...args: any[]) => unknown; pushPasswordManagerStrategy?: "none" | "increase-width"; pasteTransformer?: (pasted: string) => string; containerClassName?: string; noScriptCSSFallback?: ...'.
+src/input-otp.tsx(13,4): error TS2786: 'OTPInput' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<OTPInputProps & RefAttributes<HTMLInputElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<OTPInputProps & RefAttributes<HTMLInputElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/input-otp.tsx(37,44): error TS2345: Argument of type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").Context<import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/input-otp/dist/index").RenderProps>' is not assignable to parameter of type 'React.Context<import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/input-otp/dist/index").RenderProps>'.
+  The types returned by 'Provider(...)' are incompatible between these types.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/input-otp.tsx(66,6): error TS2786: 'Dot' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/label.tsx(18,6): error TS2339: Property 'className' does not exist on type 'Omit<LabelProps & RefAttributes<HTMLLabelElement>, "ref"> & VariantProps<(props?: ClassProp) => string>'.
+src/label.tsx(21,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLLabelElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & LabelProps & RefAttributes<HTMLLabelElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & LabelProps & RefAttributes<HTMLLabelElement>'.
+src/menubar.tsx(22,6): error TS2339: Property 'className' does not exist on type 'Omit<MenubarProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(25,5): error TS2322: Type '{ key?: Key; defaultValue?: string; dir?: Direction; value?: string; loop?: boolean; onValueChange?: (value: string) => void; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & MenubarProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & MenubarProps & RefAttributes<HTMLDivElement>'.
+src/menubar.tsx(37,6): error TS2339: Property 'className' does not exist on type 'Omit<MenubarTriggerProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/menubar.tsx(40,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLButtonElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & MenubarTriggerProps & RefAttributes<HTMLButtonElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & MenubarTriggerProps & RefAttributes<HTMLButtonElement>'.
+src/menubar.tsx(54,6): error TS2339: Property 'className' does not exist on type 'Omit<MenubarSubTriggerProps & RefAttributes<HTMLDivElement>, "ref"> & { inset?: boolean; }'.
+src/menubar.tsx(54,24): error TS2339: Property 'children' does not exist on type 'Omit<MenubarSubTriggerProps & RefAttributes<HTMLDivElement>, "ref"> & { inset?: boolean; }'.
+src/menubar.tsx(55,4): error TS2322: Type '{ children: any[]; key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & MenubarSubTriggerProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & MenubarSubTriggerProps & RefAttributes<HTMLDivElement>'.
+src/menubar.tsx(65,6): error TS2786: 'ChevronRight' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/menubar.tsx(73,6): error TS2339: Property 'className' does not exist on type 'Omit<MenubarSubContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(76,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & MenubarSubContentProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & MenubarSubContentProps & RefAttributes<HTMLDivElement>'.
+src/menubar.tsx(90,7): error TS2339: Property 'className' does not exist on type 'Omit<MenubarContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(90,18): error TS2339: Property 'align' does not exist on type 'Omit<MenubarContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(90,35): error TS2339: Property 'alignOffset' does not exist on type 'Omit<MenubarContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(90,53): error TS2339: Property 'sideOffset' does not exist on type 'Omit<MenubarContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(96,9): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; align: any; alignOffset: any; sideOffset: any; className: string; }' is not assignable to type 'IntrinsicAttributes & MenubarContentProps & RefAttributes<HTMLDivElement>'.
+  Property 'align' does not exist on type 'IntrinsicAttributes & MenubarContentProps & RefAttributes<HTMLDivElement>'.
+src/menubar.tsx(115,6): error TS2339: Property 'className' does not exist on type 'Omit<MenubarItemProps & RefAttributes<HTMLDivElement>, "ref"> & { inset?: boolean; }'.
+src/menubar.tsx(118,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & MenubarItemProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & MenubarItemProps & RefAttributes<HTMLDivElement>'.
+src/menubar.tsx(131,6): error TS2339: Property 'className' does not exist on type 'Omit<MenubarCheckboxItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(131,17): error TS2339: Property 'children' does not exist on type 'Omit<MenubarCheckboxItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(131,27): error TS2339: Property 'checked' does not exist on type 'Omit<MenubarCheckboxItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(132,4): error TS2322: Type '{ children: any[]; key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; checked: any; }' is not assignable to type 'IntrinsicAttributes & MenubarCheckboxItemProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & MenubarCheckboxItemProps & RefAttributes<HTMLDivElement>'.
+src/menubar.tsx(143,10): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/menubar.tsx(154,6): error TS2339: Property 'className' does not exist on type 'Omit<MenubarRadioItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(154,17): error TS2339: Property 'children' does not exist on type 'Omit<MenubarRadioItemProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(155,4): error TS2322: Type '{ children: any[]; key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & MenubarRadioItemProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & MenubarRadioItemProps & RefAttributes<HTMLDivElement>'.
+src/menubar.tsx(165,10): error TS2786: 'Circle' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/menubar.tsx(178,6): error TS2339: Property 'className' does not exist on type 'Omit<MenubarLabelProps & RefAttributes<HTMLDivElement>, "ref"> & { inset?: boolean; }'.
+src/menubar.tsx(181,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & MenubarLabelProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & MenubarLabelProps & RefAttributes<HTMLDivElement>'.
+src/menubar.tsx(194,6): error TS2339: Property 'className' does not exist on type 'Omit<MenubarSeparatorProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/menubar.tsx(197,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & MenubarSeparatorProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & MenubarSeparatorProps & RefAttributes<HTMLDivElement>'.
+src/navigation-menu.tsx(11,6): error TS2339: Property 'className' does not exist on type 'Omit<NavigationMenuProps & RefAttributes<HTMLElement>, "ref">'.
+src/navigation-menu.tsx(11,17): error TS2339: Property 'children' does not exist on type 'Omit<NavigationMenuProps & RefAttributes<HTMLElement>, "ref">'.
+src/navigation-menu.tsx(12,4): error TS2322: Type '{ children: any[]; key?: Key; defaultValue?: string; dir?: Direction; value?: string; orientation?: Orientation; onValueChange?: (value: string) => void; delayDuration?: number; skipDelayDuration?: number; ref: ForwardedRef<...>; className: string; }' is not assignable to type 'IntrinsicAttributes & NavigationMenuProps & RefAttributes<HTMLElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & NavigationMenuProps & RefAttributes<HTMLElement>'.
+src/navigation-menu.tsx(29,6): error TS2339: Property 'className' does not exist on type 'Omit<NavigationMenuListProps & RefAttributes<HTMLUListElement>, "ref">'.
+src/navigation-menu.tsx(32,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLUListElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & NavigationMenuListProps & RefAttributes<HTMLUListElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & NavigationMenuListProps & RefAttributes<HTMLUListElement>'.
+src/navigation-menu.tsx(50,6): error TS2339: Property 'className' does not exist on type 'Omit<NavigationMenuTriggerProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/navigation-menu.tsx(50,17): error TS2339: Property 'children' does not exist on type 'Omit<NavigationMenuTriggerProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/navigation-menu.tsx(51,4): error TS2322: Type '{ children: any[]; key?: Key; ref: ForwardedRef<HTMLButtonElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & NavigationMenuTriggerProps & RefAttributes<HTMLButtonElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & NavigationMenuTriggerProps & RefAttributes<HTMLButtonElement>'.
+src/navigation-menu.tsx(57,6): error TS2786: 'ChevronDown' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/navigation-menu.tsx(68,6): error TS2339: Property 'className' does not exist on type 'Omit<NavigationMenuContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/navigation-menu.tsx(71,5): error TS2322: Type '{ key?: Key; forceMount?: true; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & NavigationMenuContentProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & NavigationMenuContentProps & RefAttributes<HTMLDivElement>'.
+src/navigation-menu.tsx(85,6): error TS2339: Property 'className' does not exist on type 'Omit<NavigationMenuViewportProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/navigation-menu.tsx(88,7): error TS2322: Type '{ key?: Key; forceMount?: true; className: string; ref: ForwardedRef<HTMLDivElement>; }' is not assignable to type 'IntrinsicAttributes & NavigationMenuViewportProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & NavigationMenuViewportProps & RefAttributes<HTMLDivElement>'.
+src/navigation-menu.tsx(103,6): error TS2339: Property 'className' does not exist on type 'Omit<NavigationMenuIndicatorProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/navigation-menu.tsx(104,4): error TS2322: Type '{ children: Element; key?: Key; forceMount?: true; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & NavigationMenuIndicatorProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & NavigationMenuIndicatorProps & RefAttributes<HTMLDivElement>'.
+src/pagination.tsx(72,6): error TS2786: 'ChevronLeft' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/pagination.tsx(89,6): error TS2786: 'ChevronRight' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/pagination.tsx(103,6): error TS2786: 'MoreHorizontal' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/popover.tsx(15,6): error TS2339: Property 'className' does not exist on type 'Omit<PopoverContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/popover.tsx(15,17): error TS2339: Property 'align' does not exist on type 'Omit<PopoverContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/popover.tsx(15,35): error TS2339: Property 'sideOffset' does not exist on type 'Omit<PopoverContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/popover.tsx(19,7): error TS2322: Type '{ key?: Key; forceMount?: true; onOpenAutoFocus?: any; onCloseAutoFocus?: any; ref: ForwardedRef<HTMLDivElement>; align: any; sideOffset: any; className: string; }' is not assignable to type 'IntrinsicAttributes & PopoverContentProps & RefAttributes<HTMLDivElement>'.
+  Property 'align' does not exist on type 'IntrinsicAttributes & PopoverContentProps & RefAttributes<HTMLDivElement>'.
+src/progress.tsx(11,6): error TS2339: Property 'className' does not exist on type 'Omit<ProgressProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/progress.tsx(12,4): error TS2322: Type '{ children: Element; key?: Key; max?: number; getValueLabel?: (value: number, max: number) => string; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ProgressProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & ProgressProps & RefAttributes<HTMLDivElement>'.
+src/progress.tsx(21,7): error TS2322: Type '{ className: string; style: { transform: string; }; }' is not assignable to type 'IntrinsicAttributes & ProgressIndicatorProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ProgressIndicatorProps & RefAttributes<HTMLDivElement>'.
+src/radio-group.tsx(12,6): error TS2339: Property 'className' does not exist on type 'Omit<RadioGroupProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/radio-group.tsx(15,7): error TS2322: Type '{ ref: ForwardedRef<HTMLDivElement>; key?: Key; defaultValue?: string; dir?: Direction; disabled?: any; value?: string; name?: string; orientation?: "horizontal" | "vertical"; required?: boolean; loop?: boolean; onValueChange?: (value: string) => void; className: string; }' is not assignable to type 'IntrinsicAttributes & RadioGroupProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & RadioGroupProps & RefAttributes<HTMLDivElement>'.
+src/radio-group.tsx(26,6): error TS2339: Property 'className' does not exist on type 'Omit<RadioGroupItemProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/radio-group.tsx(28,6): error TS2322: Type '{ children: Element; key?: Key; value: string; checked?: boolean; required?: boolean; ref: ForwardedRef<HTMLButtonElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & RadioGroupItemProps & RefAttributes<HTMLButtonElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & RadioGroupItemProps & RefAttributes<HTMLButtonElement>'.
+src/radio-group.tsx(36,8): error TS2322: Type '{ children: Element; className: string; }' is not assignable to type 'IntrinsicAttributes & RadioGroupIndicatorProps & RefAttributes<HTMLSpanElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & RadioGroupIndicatorProps & RefAttributes<HTMLSpanElement>'.
+src/radio-group.tsx(37,10): error TS2786: 'Circle' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/resizable.tsx(9,3): error TS2339: Property 'className' does not exist on type '{}'.
+src/resizable.tsx(11,25): error TS2344: Type 'ForwardRefExoticComponent<Omit<HTMLAttributes<keyof HTMLElementTagNameMap>, "id"> & { autoSaveId?: string; className?: string; direction: Direction; ... 6 more ...; dir?: "auto" | ... 1 more ... | "rtl"; } & { ...; } & RefAttributes<...>>' does not satisfy the constraint 'JSXElementConstructor<any> | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<Omit<HTMLAttributes<keyof HTMLElementTagNameMap>, "id"> & { autoSaveId?: string; className?: string; direction: Direction; ... 6 more ...; dir?: "auto" | ... 1 more ... | "rtl"; } & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/resizable.tsx(12,4): error TS2741: Property 'direction' is missing in type '{ className: string; }' but required in type '{ autoSaveId?: string; className?: string; direction: Direction; id?: string; keyboardResizeBy?: number; onLayout?: PanelGroupOnLayout; storage?: PanelGroupStorage; style?: CSSProperties; tagName?: keyof HTMLElementTagNameMap; dir?: "auto" | ... 1 more ... | "rtl"; }'.
+src/resizable.tsx(12,4): error TS2786: 'ResizablePrimitive.PanelGroup' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<HTMLAttributes<keyof HTMLElementTagNameMap>, "id"> & { autoSaveId?: string; className?: string; direction: Direction; ... 6 more ...; dir?: "auto" | ... 1 more ... | "rtl"; } & { ...; } & RefAttributes<...>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<HTMLAttributes<keyof HTMLElementTagNameMap>, "id"> & { autoSaveId?: string; className?: string; direction: Direction; ... 6 more ...; dir?: "auto" | ... 1 more ... | "rtl"; } & { ...; } & RefAttributes<...>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/resizable.tsx(25,3): error TS2339: Property 'className' does not exist on type '{ withHandle?: boolean; }'.
+src/resizable.tsx(27,25): error TS2344: Type 'typeof PanelResizeHandle' does not satisfy the constraint 'JSXElementConstructor<any> | keyof IntrinsicElements'.
+  Type 'typeof PanelResizeHandle' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+    Type 'ReactElement<unknown, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+      Property 'children' is missing in type 'ReactElement<unknown, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+src/resizable.tsx(30,4): error TS2786: 'ResizablePrimitive.PanelResizeHandle' cannot be used as a JSX component.
+  Its type 'typeof PanelResizeHandle' is not a valid JSX element type.
+    Type 'typeof PanelResizeHandle' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactElement<unknown, string | JSXElementConstructor<any>>' is not assignable to type 'ReactNode'.
+        Property 'children' is missing in type 'ReactElement<unknown, string | JSXElementConstructor<any>>' but required in type 'ReactPortal'.
+src/resizable.tsx(39,10): error TS2786: 'GripVertical' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/scroll-area.tsx(11,6): error TS2339: Property 'className' does not exist on type 'Omit<ScrollAreaProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/scroll-area.tsx(11,17): error TS2339: Property 'children' does not exist on type 'Omit<ScrollAreaProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/scroll-area.tsx(12,4): error TS2322: Type '{ children: Element[]; key?: Key; dir?: Direction; type?: "auto" | "scroll" | "always" | "hover"; scrollHideDelay?: number; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ScrollAreaProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & ScrollAreaProps & RefAttributes<HTMLDivElement>'.
+src/scroll-area.tsx(17,6): error TS2322: Type '{ children: any; className: string; }' is not assignable to type 'IntrinsicAttributes & ScrollAreaViewportProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & ScrollAreaViewportProps & RefAttributes<HTMLDivElement>'.
+src/scroll-area.tsx(29,6): error TS2339: Property 'className' does not exist on type 'Omit<ScrollAreaScrollbarProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/scroll-area.tsx(30,4): error TS2322: Type '{ children: Element; key?: Key; forceMount?: true; ref: ForwardedRef<HTMLDivElement>; orientation: "horizontal" | "vertical"; className: string; }' is not assignable to type 'IntrinsicAttributes & ScrollAreaScrollbarProps & RefAttributes<HTMLDivElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & ScrollAreaScrollbarProps & RefAttributes<HTMLDivElement>'.
+src/scroll-area.tsx(43,42): error TS2322: Type '{ className: string; }' is not assignable to type 'IntrinsicAttributes & ScrollAreaThumbProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ScrollAreaThumbProps & RefAttributes<HTMLDivElement>'.
+src/select.tsx(16,20): error TS2344: Type 'ForwardRefExoticComponent<SelectTriggerProps & RefAttributes<HTMLButtonElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<SelectTriggerProps & RefAttributes<HTMLButtonElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(17,34): error TS2344: Type 'ForwardRefExoticComponent<SelectTriggerProps & RefAttributes<HTMLButtonElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<SelectTriggerProps & RefAttributes<HTMLButtonElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(18,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/select.tsx(18,17): error TS2339: Property 'children' does not exist on type '{}'.
+src/select.tsx(19,4): error TS2786: 'SelectPrimitive.Trigger' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectTriggerProps & RefAttributes<HTMLButtonElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectTriggerProps & RefAttributes<HTMLButtonElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(28,6): error TS2786: 'SelectPrimitive.Icon' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectIconProps & RefAttributes<HTMLSpanElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectIconProps & RefAttributes<HTMLSpanElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(29,8): error TS2786: 'ChevronDown' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(36,20): error TS2344: Type 'ForwardRefExoticComponent<SelectScrollUpButtonProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<SelectScrollUpButtonProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(37,34): error TS2344: Type 'ForwardRefExoticComponent<SelectScrollUpButtonProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<SelectScrollUpButtonProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(38,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/select.tsx(39,4): error TS2786: 'SelectPrimitive.ScrollUpButton' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectScrollUpButtonProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectScrollUpButtonProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(47,6): error TS2786: 'ChevronUp' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(53,20): error TS2344: Type 'ForwardRefExoticComponent<SelectScrollDownButtonProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<SelectScrollDownButtonProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(54,34): error TS2344: Type 'ForwardRefExoticComponent<SelectScrollDownButtonProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<SelectScrollDownButtonProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(55,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/select.tsx(56,4): error TS2786: 'SelectPrimitive.ScrollDownButton' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectScrollDownButtonProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectScrollDownButtonProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(64,6): error TS2786: 'ChevronDown' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(71,20): error TS2344: Type 'ForwardRefExoticComponent<SelectContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<SelectContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(72,34): error TS2344: Type 'ForwardRefExoticComponent<SelectContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<SelectContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(73,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/select.tsx(73,17): error TS2339: Property 'children' does not exist on type '{}'.
+src/select.tsx(73,27): error TS2339: Property 'position' does not exist on type '{}'.
+src/select.tsx(74,4): error TS2786: 'SelectPrimitive.Portal' cannot be used as a JSX component.
+  Its type 'FC<SelectPortalProps>' is not a valid JSX element type.
+    Type 'FunctionComponent<SelectPortalProps>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactNode | Promise<ReactNode>' is not assignable to type 'ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(75,6): error TS2786: 'SelectPrimitive.Content' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectContentProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(87,8): error TS2786: 'SelectPrimitive.Viewport' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectViewportProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectViewportProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(103,20): error TS2344: Type 'ForwardRefExoticComponent<SelectLabelProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<SelectLabelProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(104,34): error TS2344: Type 'ForwardRefExoticComponent<SelectLabelProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<SelectLabelProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(105,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/select.tsx(106,4): error TS2786: 'SelectPrimitive.Label' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectLabelProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectLabelProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(115,20): error TS2344: Type 'ForwardRefExoticComponent<SelectItemProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<SelectItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(116,34): error TS2344: Type 'ForwardRefExoticComponent<SelectItemProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<SelectItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(117,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/select.tsx(117,17): error TS2339: Property 'children' does not exist on type '{}'.
+src/select.tsx(118,4): error TS2741: Property 'value' is missing in type '{ children: Element[]; ref: ForwardedRef<never>; className: string; }' but required in type 'SelectItemProps'.
+src/select.tsx(118,4): error TS2786: 'SelectPrimitive.Item' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectItemProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectItemProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(127,8): error TS2786: 'SelectPrimitive.ItemIndicator' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectItemIndicatorProps & RefAttributes<HTMLSpanElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectItemIndicatorProps & RefAttributes<HTMLSpanElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(128,10): error TS2786: 'Check' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(132,6): error TS2786: 'SelectPrimitive.ItemText' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectItemTextProps & RefAttributes<HTMLSpanElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectItemTextProps & RefAttributes<HTMLSpanElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(138,20): error TS2344: Type 'ForwardRefExoticComponent<SelectSeparatorProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<SelectSeparatorProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(139,34): error TS2344: Type 'ForwardRefExoticComponent<SelectSeparatorProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<SelectSeparatorProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/select.tsx(140,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/select.tsx(141,4): error TS2786: 'SelectPrimitive.Separator' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SelectSeparatorProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SelectSeparatorProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/separator.tsx(13,7): error TS2339: Property 'className' does not exist on type 'Omit<SeparatorProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/separator.tsx(20,7): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; decorative: boolean; orientation: "horizontal" | "vertical"; className: string; }' is not assignable to type 'IntrinsicAttributes & SeparatorProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & SeparatorProps & RefAttributes<HTMLDivElement>'.
+src/sheet.tsx(20,20): error TS2344: Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(21,34): error TS2344: Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(22,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/sheet.tsx(23,4): error TS2786: 'SheetPrimitive.Overlay' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogOverlayProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(54,42): error TS2344: Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(58,20): error TS2344: Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(60,21): error TS2339: Property 'className' does not exist on type 'SheetContentProps'.
+src/sheet.tsx(60,32): error TS2339: Property 'children' does not exist on type 'SheetContentProps'.
+src/sheet.tsx(61,4): error TS2786: 'SheetPortal' cannot be used as a JSX component.
+  Its type 'FC<DialogPortalProps>' is not a valid JSX element type.
+    Type 'FunctionComponent<DialogPortalProps>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'ReactNode | Promise<ReactNode>' is not assignable to type 'ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(63,6): error TS2786: 'SheetPrimitive.Content' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(69,8): error TS2786: 'SheetPrimitive.Close' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogCloseProps & RefAttributes<HTMLButtonElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogCloseProps & RefAttributes<HTMLButtonElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(70,10): error TS2786: 'X' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(107,20): error TS2344: Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(108,34): error TS2344: Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(109,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/sheet.tsx(110,4): error TS2786: 'SheetPrimitive.Title' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogTitleProps & RefAttributes<HTMLHeadingElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(119,20): error TS2344: Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(120,34): error TS2344: Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/sheet.tsx(121,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/sheet.tsx(122,4): error TS2786: 'SheetPrimitive.Description' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<DialogDescriptionProps & RefAttributes<HTMLParagraphElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/slider.tsx(9,20): error TS2344: Type 'ForwardRefExoticComponent<SliderProps & RefAttributes<HTMLSpanElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<SliderProps & RefAttributes<HTMLSpanElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/slider.tsx(10,34): error TS2344: Type 'ForwardRefExoticComponent<SliderProps & RefAttributes<HTMLSpanElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<SliderProps & RefAttributes<HTMLSpanElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/slider.tsx(11,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/slider.tsx(12,4): error TS2786: 'SliderPrimitive.Root' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SliderProps & RefAttributes<HTMLSpanElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SliderProps & RefAttributes<HTMLSpanElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/slider.tsx(20,6): error TS2786: 'SliderPrimitive.Track' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SliderTrackProps & RefAttributes<HTMLSpanElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SliderTrackProps & RefAttributes<HTMLSpanElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/slider.tsx(21,8): error TS2786: 'SliderPrimitive.Range' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SliderRangeProps & RefAttributes<HTMLSpanElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SliderRangeProps & RefAttributes<HTMLSpanElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/slider.tsx(23,6): error TS2786: 'SliderPrimitive.Thumb' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<SliderThumbProps & RefAttributes<HTMLSpanElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<SliderThumbProps & RefAttributes<HTMLSpanElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/switch.tsx(11,6): error TS2339: Property 'className' does not exist on type 'Omit<SwitchProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/switch.tsx(12,4): error TS2322: Type '{ children: Element; ref: ForwardedRef<HTMLButtonElement>; key?: Key; defaultChecked?: boolean; checked?: boolean; required?: boolean; onCheckedChange?: (checked: boolean) => void; className: string; }' is not assignable to type 'IntrinsicAttributes & SwitchProps & RefAttributes<HTMLButtonElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & SwitchProps & RefAttributes<HTMLButtonElement>'.
+src/switch.tsx(21,7): error TS2322: Type '{ className: string; }' is not assignable to type 'IntrinsicAttributes & SwitchThumbProps & RefAttributes<HTMLSpanElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & SwitchThumbProps & RefAttributes<HTMLSpanElement>'.
+src/tabs.tsx(13,6): error TS2339: Property 'className' does not exist on type 'Omit<TabsListProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/tabs.tsx(16,5): error TS2322: Type '{ key?: Key; loop?: boolean; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & TabsListProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & TabsListProps & RefAttributes<HTMLDivElement>'.
+src/tabs.tsx(28,6): error TS2339: Property 'className' does not exist on type 'Omit<TabsTriggerProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/tabs.tsx(31,5): error TS2322: Type '{ key?: Key; value: string; ref: ForwardedRef<HTMLButtonElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & TabsTriggerProps & RefAttributes<HTMLButtonElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & TabsTriggerProps & RefAttributes<HTMLButtonElement>'.
+src/tabs.tsx(43,6): error TS2339: Property 'className' does not exist on type 'Omit<TabsContentProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/tabs.tsx(46,5): error TS2322: Type '{ key?: Key; value: string; forceMount?: true; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & TabsContentProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & TabsContentProps & RefAttributes<HTMLDivElement>'.
+src/toast.tsx(17,6): error TS2339: Property 'className' does not exist on type 'Omit<ToastViewportProps & RefAttributes<HTMLOListElement>, "ref">'.
+src/toast.tsx(20,5): error TS2322: Type '{ label?: string; key?: Key; hotkey?: string[]; ref: ForwardedRef<HTMLOListElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ToastViewportProps & RefAttributes<HTMLOListElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ToastViewportProps & RefAttributes<HTMLOListElement>'.
+src/toast.tsx(49,6): error TS2339: Property 'className' does not exist on type 'Omit<ToastProps & RefAttributes<HTMLLIElement>, "ref"> & VariantProps<(props?: ConfigVariants<{ variant: { default: string; destructive: string; }; }> & ClassProp) => string>'.
+src/toast.tsx(53,7): error TS2322: Type '{ key?: Key; onPause?: () => void; defaultOpen?: boolean; open?: boolean; onOpenChange?: (open: boolean) => void; type?: "foreground" | "background"; forceMount?: true; duration?: number; onEscapeKeyDown?: any; ... 6 more ...; className: string; }' is not assignable to type 'IntrinsicAttributes & ToastProps & RefAttributes<HTMLLIElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ToastProps & RefAttributes<HTMLLIElement>'.
+src/toast.tsx(63,6): error TS2339: Property 'className' does not exist on type 'Omit<ToastActionProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/toast.tsx(66,5): error TS2322: Type '{ key?: Key; altText: string; ref: ForwardedRef<HTMLButtonElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ToastActionProps & RefAttributes<HTMLButtonElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ToastActionProps & RefAttributes<HTMLButtonElement>'.
+src/toast.tsx(78,6): error TS2339: Property 'className' does not exist on type 'Omit<ToastCloseProps & RefAttributes<HTMLButtonElement>, "ref">'.
+src/toast.tsx(79,4): error TS2322: Type '{ children: Element; key?: Key; ref: ForwardedRef<HTMLButtonElement>; className: string; "toast-close": string; }' is not assignable to type 'IntrinsicAttributes & ToastCloseProps & RefAttributes<HTMLButtonElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & ToastCloseProps & RefAttributes<HTMLButtonElement>'.
+src/toast.tsx(88,6): error TS2786: 'X' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<Omit<LucideProps, "ref"> & RefAttributes<SVGSVGElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/toast.tsx(96,6): error TS2339: Property 'className' does not exist on type 'Omit<ToastTitleProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/toast.tsx(99,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ToastTitleProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ToastTitleProps & RefAttributes<HTMLDivElement>'.
+src/toast.tsx(108,6): error TS2339: Property 'className' does not exist on type 'Omit<ToastDescriptionProps & RefAttributes<HTMLDivElement>, "ref">'.
+src/toast.tsx(111,5): error TS2322: Type '{ key?: Key; ref: ForwardedRef<HTMLDivElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ToastDescriptionProps & RefAttributes<HTMLDivElement>'.
+  Property 'className' does not exist on type 'IntrinsicAttributes & ToastDescriptionProps & RefAttributes<HTMLDivElement>'.
+src/toggle-group.tsx(21,6): error TS2339: Property 'className' does not exist on type '(Omit<ToggleGroupSingleProps & RefAttributes<HTMLDivElement>, "ref"> | Omit<ToggleGroupMultipleProps & RefAttributes<...>, "ref">) & VariantProps<...>'.
+src/toggle-group.tsx(21,32): error TS2339: Property 'children' does not exist on type '(Omit<ToggleGroupSingleProps & RefAttributes<HTMLDivElement>, "ref"> | Omit<ToggleGroupMultipleProps & RefAttributes<...>, "ref">) & VariantProps<...>'.
+src/toggle-group.tsx(22,4): error TS2322: Type '{ children: Element; key?: Key; defaultValue?: string; dir?: Direction; disabled?: boolean; value?: string; type: "single"; orientation?: "horizontal" | "vertical"; ... 4 more ...; className: string; } | { ...; }' is not assignable to type 'IntrinsicAttributes & ((ToggleGroupSingleProps | ToggleGroupMultipleProps) & RefAttributes<HTMLDivElement>)'.
+  Type '{ children: Element; key?: Key; defaultValue?: string; dir?: Direction; disabled?: boolean; value?: string; type: "single"; orientation?: "horizontal" | "vertical"; loop?: boolean; onValueChange?: (value: string) => void; rovingFocus?: boolean; ref: ForwardedRef<...>; className: string; }' is not assignable to type 'IntrinsicAttributes & ((ToggleGroupSingleProps | ToggleGroupMultipleProps) & RefAttributes<HTMLDivElement>)'.
+    Property 'children' does not exist on type 'IntrinsicAttributes & ToggleGroupSingleProps & RefAttributes<HTMLDivElement>'.
+src/toggle-group.tsx(39,6): error TS2339: Property 'className' does not exist on type 'Omit<ToggleGroupItemProps & RefAttributes<HTMLButtonElement>, "ref"> & VariantProps<(props?: ConfigVariants<{ variant: { default: string; outline: string; }; size: { ...; }; }> & ClassProp) => string>'.
+src/toggle-group.tsx(39,17): error TS2339: Property 'children' does not exist on type 'Omit<ToggleGroupItemProps & RefAttributes<HTMLButtonElement>, "ref"> & VariantProps<(props?: ConfigVariants<{ variant: { default: string; outline: string; }; size: { ...; }; }> & ClassProp) => string>'.
+src/toggle-group.tsx(43,6): error TS2322: Type '{ children: any; key?: Key; value: string; ref: ForwardedRef<HTMLButtonElement>; className: string; }' is not assignable to type 'IntrinsicAttributes & ToggleGroupItemProps & RefAttributes<HTMLButtonElement>'.
+  Property 'children' does not exist on type 'IntrinsicAttributes & ToggleGroupItemProps & RefAttributes<HTMLButtonElement>'.
+src/toggle.tsx(32,20): error TS2344: Type 'ForwardRefExoticComponent<ToggleProps & RefAttributes<HTMLButtonElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<ToggleProps & RefAttributes<HTMLButtonElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/toggle.tsx(33,34): error TS2344: Type 'ForwardRefExoticComponent<ToggleProps & RefAttributes<HTMLButtonElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<ToggleProps & RefAttributes<HTMLButtonElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/toggle.tsx(35,6): error TS2339: Property 'className' does not exist on type 'VariantProps<(props?: ConfigVariants<{ variant: { default: string; outline: string; }; size: { default: string; sm: string; lg: string; }; }> & ClassProp) => string>'.
+src/toggle.tsx(36,4): error TS2786: 'TogglePrimitive.Root' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<ToggleProps & RefAttributes<HTMLButtonElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<ToggleProps & RefAttributes<HTMLButtonElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.
+src/tooltip.tsx(15,20): error TS2344: Type 'ForwardRefExoticComponent<TooltipContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ForwardRefExoticComponent<any> | (new (props: any) => Component<any, {}, any>) | ((props: any, deprecatedLegacyContext?: any) => ReactNode) | keyof IntrinsicElements'.
+  Type 'ForwardRefExoticComponent<TooltipContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'ForwardRefExoticComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/tooltip.tsx(16,34): error TS2344: Type 'ForwardRefExoticComponent<TooltipContentProps & RefAttributes<HTMLDivElement>>' does not satisfy the constraint 'ElementType<any, keyof IntrinsicElements>'.
+  Type 'ForwardRefExoticComponent<TooltipContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type 'FunctionComponent<any>'.
+    Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+      Type 'bigint' is not assignable to type 'ReactNode'.
+src/tooltip.tsx(17,6): error TS2339: Property 'className' does not exist on type '{}'.
+src/tooltip.tsx(17,17): error TS2339: Property 'sideOffset' does not exist on type '{}'.
+src/tooltip.tsx(18,4): error TS2786: 'TooltipPrimitive.Content' cannot be used as a JSX component.
+  Its type 'ForwardRefExoticComponent<TooltipContentProps & RefAttributes<HTMLDivElement>>' is not a valid JSX element type.
+    Type 'ForwardRefExoticComponent<TooltipContentProps & RefAttributes<HTMLDivElement>>' is not assignable to type '(props: any, deprecatedLegacyContext?: any) => ReactNode'.
+      Type 'import("C:/Users/Alyssa Guo/Desktop/My Projects/codebility-plus/node_modules/@types/react/index").ReactNode' is not assignable to type 'React.ReactNode'.
+        Type 'bigint' is not assignable to type 'ReactNode'.

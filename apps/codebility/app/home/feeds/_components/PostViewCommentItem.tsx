@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
+import { useFeedsStore } from "@/store/feeds-store";
 import { X } from "lucide-react";
 
 import { deletePostComment } from "../_services/action";
@@ -21,15 +22,16 @@ export default function PostViewCommentItem({
   content,
   userCanDelete,
 }: PostViewCommentItemProps) {
+  const fetchPosts = useFeedsStore((state) => state.fetchPosts);
   const [isVisible, setIsVisible] = useState(true);
 
   const handleDelete = async () => {
     setIsVisible(false);
     try {
       await deletePostComment(commenntId);
+      fetchPosts();
     } catch (error) {
       setIsVisible(true);
-      // Optionally, you could log the error or show a message to the user
     }
   };
 

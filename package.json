@@ -4,20 +4,24 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@codevs/prettier-config": "workspace:^",
+    "@codevs/tailwind-config": "workspace:*",
+    "@codevs/tsconfig": "workspace:*",
     "@turbo/gen": "^2.1.1",
-    "@types/react": "19.1.5",
-    "@types/react-dom": "19.1.5",
+    "@types/minimatch": "^6.0.0",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
     "eslint": "^8.57.0",
     "prettier": "^3.3.3",
-    "react": "19.1.0",
-    "react-dom": "19.1.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "rimraf": "^6.0.1",
     "turbo": "^2.1.1",
     "typescript": "^5.5.4"
   },
   "scripts": {
     "native": "cd apps/expo && pnpm run start",
     "web": "cd apps/next && pnpm run next",
-    "clean": "rm -rf node_modules",
+    "clean": "rimraf node_modules .turbo .next dist",
     "clean:workspaces": "turbo clean",
     "dev": "turbo watch dev",
     "codebility": "turbo run dev -F codebility...",
@@ -33,13 +37,15 @@
   "resolutions": {
     "metro": "~0.80.8",
     "metro-resolver": "~0.80.8",
-    "react": "19.1.0",
-    "react-dom": "19.1.0"
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
   },
   "pnpm": {
     "overrides": {
-      "react": "19.1.0",
-      "react-dom": "19.1.0",
+      "@types/react": "18.3.3",
+      "@types/react-dom": "18.3.0",
+      "react": "^18.3.1",
+      "react-dom": "^18.3.1",
       "react-signature-canvas": "npm:react-signature-canvas@1.1.0-alpha.1",
       "reactjs-qr-code-reader": "npm:reactjs-qr-code-reader@1.0.3",
       "react-smooth": "npm:react-smooth@4.0.4",
@@ -52,10 +58,17 @@
   ],
   "packageManager": "pnpm@8.11.0",
   "dependencies": {
+    "@radix-ui/react-alert-dialog": "^1.1.1",
     "@supabase/ssr": "^0.5.2",
     "@supabase/supabase-js": "^2.55.0",
+    "@tailwindcss/postcss": "^4.1.16",
     "axios": "^1.7.3",
     "date-fns": "^3.6.0",
-    "dotenv": "^17.2.3"
+    "dotenv": "^17.2.3",
+    "lucide-react": "^0.427.0",
+    "next": "^16.0.0",
+    "postcss": "^8",
+    "react-day-picker": "8.10.1",
+    "tailwindcss": "^4.1.16"
   }
 }
