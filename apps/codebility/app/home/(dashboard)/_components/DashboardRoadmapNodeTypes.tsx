@@ -17,7 +17,7 @@ export const RoadmapPhaseCard = ({
   return (
     <>
       <div
-        className={`w-[380px] rounded-xl border p-6 shadow-xl backdrop-blur-sm transition-all duration-300 ${
+        className={`w-[380px] cursor-pointer rounded-xl border p-6 shadow-xl backdrop-blur-sm transition-all duration-300 hover:scale-105 ${
           isCurrent
             ? "border-customBlue-400 bg-gradient-to-br from-customBlue-500/20 to-purple-500/20 dark:border-customBlue-500"
             : isCompleted

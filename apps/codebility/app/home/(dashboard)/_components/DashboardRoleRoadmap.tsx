@@ -27,6 +27,7 @@ import {
   RoadmapDecorativeIcon,
   RoadmapPhaseCard,
 } from "./DashboardRoadmapNodeTypes";
+import { PhaseDetailsModal } from "./PhaseDetailsModal";
 
 const nodeTypes: NodeTypes = {
   phaseCard: RoadmapPhaseCard,
@@ -42,6 +43,8 @@ export default function DashboardRoleRoadmap() {
   const supabase = createClientClientComponent();
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedPhase, setSelectedPhase] = useState<string | null>(null);
 
   const roadmapData = [
     {
@@ -85,6 +88,17 @@ export default function DashboardRoleRoadmap() {
       ],
     },
   ];
+
+  // Handler functions for modal
+  const handlePhaseClick = (phaseId: string) => {
+    setSelectedPhase(phaseId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPhase(null);
+  };
 
   // Determine the current phase based on total points
   const currentPhaseIndex = roadmapData.findIndex(
@@ -154,6 +168,15 @@ export default function DashboardRoleRoadmap() {
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
+  );
+
+  const onNodeClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      // Extract phase id from node id (format: "phase-1", "phase-2", etc.)
+      const phaseId = node.id.replace("phase-", "");
+      handlePhaseClick(phaseId);
+    },
+    [],
   );
 
   useEffect(() => {
@@ -279,6 +302,7 @@ export default function DashboardRoleRoadmap() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onNodeClick={onNodeClick}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             defaultViewport={{ x: 60, y: 20, zoom: 0.7 }}
@@ -297,10 +321,16 @@ export default function DashboardRoleRoadmap() {
         </div>
 
         <p className="mt-4 text-center text-xs text-gray-500 dark:text-gray-400">
-          💡 Drag and zoom to explore your roadmap • Click and drag nodes to
-          rearrange
+          💡 Drag and zoom to explore your roadmap • Click phase cards to view details
         </p>
       </div>
+
+      {/* Phase Details Modal */}
+      <PhaseDetailsModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        phaseId={selectedPhase}
+      />
     </Box>
   );
 }
