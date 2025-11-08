@@ -100,10 +100,21 @@ export default function DashboardRoleRoadmap() {
     setSelectedPhase(null);
   };
 
-  // Determine the current phase based on total points
-  const currentPhaseIndex = roadmapData.findIndex(
-    (phase) => totalPoints >= phase.minPoints && totalPoints < phase.maxPoints,
-  );
+  // Determine the current phase based on user's role_id
+  // role_id: 4 = Intern (Phase 1), 10 = Codev (Phase 2), 5 = Mentor (Phase 3)
+  const getCurrentPhaseIndex = () => {
+    const roleId = user?.role_id;
+    if (roleId === 4) return 0; // Intern - Phase 1
+    if (roleId === 10) return 1; // Codev - Phase 2
+    if (roleId === 5) return 2; // Mentor - Phase 3
+
+    // Fallback to points-based if role_id is not set
+    return roadmapData.findIndex(
+      (phase) => totalPoints >= phase.minPoints && totalPoints < phase.maxPoints,
+    );
+  };
+
+  const currentPhaseIndex = getCurrentPhaseIndex();
 
   // Create initial nodes
   const createInitialNodes = (): Node[] => {
