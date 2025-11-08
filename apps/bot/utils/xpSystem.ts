@@ -1,7 +1,7 @@
 // apps/bot/utils/xpSystem.ts
-import { supabaseBot } from "./supabase.bot.js";
+import { supabaseBot } from "./supabase.bot";
 import { Message, TextChannel } from "discord.js";
-import { getLevelProgress } from "./xpHelper.js"; // ✅ updated import
+import { getLevelProgress } from "./xpHelper"; // ✅ updated import
 
 /** XP configuration for each guild */
 interface XPConfig {
