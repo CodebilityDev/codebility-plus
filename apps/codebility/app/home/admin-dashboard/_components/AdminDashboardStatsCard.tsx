@@ -99,7 +99,7 @@ export default function AdminDashboardStatsCard({
       {/* Header */}
       <div className="relative flex flex-row items-center justify-between space-y-0 p-6 pb-2">
         <div className="space-y-1">
-          <p className="text-sm font-medium text-muted-foreground">
+          <p className="text-sm font-medium text-muted-foreground dark:text-white">
             {title}
           </p>
         </div>
@@ -114,7 +114,7 @@ export default function AdminDashboardStatsCard({
       
       {/* Content */}
       <div className="relative p-6 pt-0">
-        <div className="text-2xl font-bold">
+        <div className="text-2xl font-bold dark:text-white">
           {count !== undefined ? count.toLocaleString() : "N/A"}
         </div>
         <p className="text-xs text-muted-foreground">
