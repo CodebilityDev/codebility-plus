@@ -1,7 +1,7 @@
 "use strict";
+// apps/bot/commands/configXP.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = exports.command = void 0;
-// apps/bot/commands/configXP.ts
 const discord_js_1 = require("discord.js");
 const supabase_bot_1 = require("../utils/supabase.bot");
 const slashCommand = new discord_js_1.SlashCommandBuilder()

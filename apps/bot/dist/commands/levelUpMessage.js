@@ -1,7 +1,7 @@
 "use strict";
+// apps/bot/commands/levelUpMessage.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = exports.command = void 0;
-// apps/bot/commands/levelUpMessage.ts
 const discord_js_1 = require("discord.js");
 const supabase_bot_1 = require("../utils/supabase.bot");
 // ===== Slash Command Definition =====

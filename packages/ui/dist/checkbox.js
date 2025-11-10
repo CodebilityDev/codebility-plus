@@ -1,9 +1,0 @@
-"use client";
-import { jsx as _jsx } from "react/jsx-runtime";
-import * as React from "react";
-import * as CheckboxPrimitive from "@radix-ui/react-checkbox";
-import { cn } from "@codevs/ui";
-const Checkbox = React.forwardRef(({ className, ...props }, ref) => (_jsx(CheckboxPrimitive.Root, { ref: ref, className: cn("peer h-4 w-4 shrink-0 rounded-sm border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-950 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 data-[state=checked]:bg-blue-600 data-[state=checked]:text-white data-[state=checked]:border-blue-600 dark:data-[state=checked]:bg-blue-500 dark:data-[state=checked]:text-white dark:data-[state=checked]:border-blue-500 transition-all duration-200", className), ...props, children: _jsx(CheckboxPrimitive.Indicator, { className: cn("flex items-center justify-center"), children: _jsx("svg", { xmlns: "http://www.w3.org/2000/svg", viewBox: "0 0 24 24", fill: "none", stroke: "white", strokeWidth: "4", strokeLinecap: "round", strokeLinejoin: "round", className: "h-3 w-3", children: _jsx("polyline", { points: "20 6 9 17 4 12" }) }) }) })));
-Checkbox.displayName = CheckboxPrimitive.Root.displayName;
-export { Checkbox };
-//# sourceMappingURL=checkbox.js.map

@@ -39,7 +39,7 @@ const dotenv = __importStar(require("dotenv"));
 const path = __importStar(require("path"));
 // ✅ Load .env from the bot folder (same directory as index.ts)
 dotenv.config({
-    path: path.resolve(__dirname, "../.env"),
+    path: path.resolve(process.cwd(), ".env"),
 });
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceRole = process.env.DB_SERVICE_ROLE;
