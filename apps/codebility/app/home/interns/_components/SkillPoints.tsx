@@ -2,9 +2,7 @@
 
 import React, { memo, useCallback } from "react";
 import Image from "next/image";
-import CodevBadge from "@/components/CodevBadge";
-import { Codev, CodevPoints } from "@/types/home/codev";
-
+import { CodevPoints } from "@/types/home/codev";
 import { cn } from "@codevs/ui";
 
 export default function SkillPoints({
@@ -61,35 +59,32 @@ export default function SkillPoints({
 
   if (type === "small") {
     return (
-      <div
-        className="flex flex-wrap gap-2"
-      >
+      <div className="flex flex-wrap gap-2">
         {Object.keys(skillCategories).map((categoryId) => {
           const point = points.find((p) => p.skill_category_id === categoryId);
           return (
             <div
               key={categoryId}
               style={{
-              background: `linear-gradient(to top, var(--level-color, #1e40af) ${
-                ((getLevelInfo(point?.points || 0).next -
-                getLevelInfo(point?.points || 0).remaining) /
-                getLevelInfo(point?.points || 0).next) *
-                100
-              }%, var(--bg-color, #f3f4f6) 0%)`,
+                background: `linear-gradient(to top, var(--level-color, #1e40af) ${
+                  ((getLevelInfo(point?.points || 0).next -
+                    getLevelInfo(point?.points || 0).remaining) /
+                    getLevelInfo(point?.points || 0).next) *
+                  100
+                }%, var(--bg-color, #f3f4f6) 0%)`,
               }}
               className={cn(
-              "dark:bg-black-200 flex h-14 w-14 flex-col items-center justify-center gap-1 rounded-md p-1 [--bg-color:#f3f4f6] [--level-color:#3b82f6] dark:[--bg-color:#1e293b] dark:[--level-color:#3F37C9]",
-              !point?.points ? "opacity-40" : "opacity-100"
+                "dark:bg-black-200 flex h-14 w-14 flex-col items-center justify-center gap-1 rounded-md p-1 [--bg-color:#f3f4f6] [--level-color:#3b82f6] dark:[--bg-color:#1e293b] dark:[--level-color:#3F37C9]",
+                !point?.points ? "opacity-40" : "opacity-100"
               )}
             >
-              {/* skill points */}
-              <p className="text-center text-xs font-semibold text-gray-700 dark:text-gray-300">
-              {point ? point.points : 0}
+              {/* ✅ ENHANCED: Brighter text */}
+              <p className="text-center text-xs font-semibold text-gray-900 dark:text-white">
+                {point ? point.points : 0}
               </p>
 
-              {/* skill category */}
-              <p className="text-center text-[0.7rem] text-gray-600 dark:text-gray-400 opacity-60">
-              {skillCategories[categoryId]?.name.split(" ")[0] ?? "Unknown"}
+              <p className="text-center text-[0.7rem] text-gray-700 dark:text-gray-200">
+                {skillCategories[categoryId]?.name.split(" ")[0] ?? "Unknown"}
               </p>
             </div>
           );
@@ -98,6 +93,7 @@ export default function SkillPoints({
     );
   }
 
+  // Default type - grid layout
   return (
     <div className="grid gap-4 overflow-x-clip sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
       {Object.keys(skillCategories).map((categoryId) => {
@@ -120,28 +116,30 @@ export default function SkillPoints({
               }%, var(--bg-color, #f3f4f6) 0%)`,
             }}
             className={cn(
-              "flex h-[20rem] flex-col items-center justify-center rounded-lg p-2 text-black shadow-md [--bg-color:#f3f4f6] [--level-color:#3b82f6] dark:text-white dark:[--bg-color:#1e293b] dark:[--level-color:#3F37C9]",
+              "flex h-[20rem] flex-col items-center justify-center rounded-lg p-2 shadow-md [--bg-color:#f3f4f6] [--level-color:#3b82f6] dark:[--bg-color:#1e293b] dark:[--level-color:#3F37C9]",
               !point?.points ? "opacity-40" : "opacity-100",
             )}
           >
             <div className="flex flex-col items-center justify-center gap-4">
-              {/* points */}
-              <div className="text-lg">{point?.points || 0}</div>
+              {/* ✅ ENHANCED: Brighter points text - increased size and weight */}
+              <div className="text-2xl font-bold text-gray-900 dark:text-white">
+                {point?.points || 0}
+              </div>
 
-              {/* skill name */}
-              <div className="text-wrap text-center text-lg">
+              {/* ✅ ENHANCED: Brighter skill name - increased contrast */}
+              <div className="text-wrap text-center text-lg font-semibold text-gray-800 dark:text-gray-100">
                 <p>{skillCategories[categoryId]?.name} </p>
                 <p>points</p>
               </div>
             </div>
 
             <div className="flex flex-col items-center justify-center gap-2">
-              {/* level */}
-              <div className="pt-10 text-center">
+              {/* ✅ ENHANCED: Brighter level text */}
+              <div className="pt-10 text-center text-base font-semibold text-gray-800 dark:text-gray-100">
                 <p>level {level}</p>
               </div>
 
-              {/* Add CodevBadge here */}
+              {/* Badge */}
               <div className="">
                 {point?.points ? (
                   <Image
@@ -155,8 +153,8 @@ export default function SkillPoints({
                 )}
               </div>
 
-              {/* remaining points */}
-              <div className="text-center text-xs font-medium opacity-60">
+              {/* ✅ ENHANCED: Brighter remaining points text - removed opacity */}
+              <div className="text-center text-sm font-medium text-gray-700 dark:text-gray-200">
                 {getLevelInfo(point?.points || 0).level === "Max" ? (
                   <p>get a life lol</p>
                 ) : (
