@@ -39,6 +39,8 @@ yarn-error.log
 ## Ignore environment variable files
 apps/bot/.env
 
+.next
+
 # BUCK
 buck-out/
 \.buckd/
@@ -84,4 +86,5 @@ build/**
 !.yarn/sdks
 !.yarn/versions
 
-dist
+distapps/bot/.env
+.env

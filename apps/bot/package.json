@@ -1,7 +1,8 @@
 {
+  "type": "commonjs",
   "name": "bot",
   "version": "1.0.0",
-  "type": "commonjs",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "npx ts-node --project tsconfig.bot.json index.ts",
     "build": "npx tsc --project tsconfig.bot.json",
