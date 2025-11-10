@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, forwardRef, useImperativeHandle } from "react";
-import { ChevronLeft, ChevronRight, Circle, Save, Trophy, AlertTriangle } from "lucide-react";
+import { ChevronLeft, ChevronRight, Circle, Save, Trophy, AlertTriangle, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SimpleMemberData } from "@/app/home/projects/actions";
 import {
@@ -28,11 +28,19 @@ interface AttendanceGridProps {
   teamMembers: SimpleMemberData[];
   teamLead: SimpleMemberData | null;
   projectId: string;
+  readOnly?: boolean;
   onHasChangesUpdate?: (hasChanges: boolean) => void;
   allowWeekendMeetings?: boolean;
 }
 
-const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, teamLead, projectId, onHasChangesUpdate, allowWeekendMeetings = false }, ref) => {
+const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ 
+  teamMembers, 
+  teamLead, 
+  projectId, 
+  readOnly = false,
+  onHasChangesUpdate, 
+  allowWeekendMeetings = false 
+}, ref) => {
   const currentDate = new Date();
   const [selectedMonth, setSelectedMonth] = useState(currentDate.getMonth());
   const [selectedYear, setSelectedYear] = useState(currentDate.getFullYear());
@@ -126,6 +134,11 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
 
   // Toggle attendance status
   const toggleAttendance = (memberId: string, day: number) => {
+    if (readOnly) {
+      toast.error("You don't have permission to edit attendance. Only team leaders can make changes.");
+      return;
+    }
+
     const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     const currentStatus = attendanceData[dateKey] || "absent";
     const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);
@@ -149,6 +162,11 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
 
   // Save all attendance changes
   const saveAllAttendance = useCallback(async () => {
+    if (readOnly) {
+      toast.error("You don't have permission to save attendance.");
+      return;
+    }
+
     setIsSaving(true);
     try {
       const records: any[] = [];
@@ -170,8 +188,8 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
             project_id: projectId,
             date: dateStr,
             status: status as any,
-            check_in: status === "present" || status === "late" ? "09:00" : undefined,
-            check_out: status === "present" || status === "late" ? "18:00" : undefined
+            check_in: status === "present" ? "09:00" : undefined,
+            check_out: status === "present" ? "18:00" : undefined
           });
         });
       });
@@ -187,7 +205,10 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
         if (warningResult.success && warningResult.warnings && warningResult.warnings.length > 0) {
           const warningCount = warningResult.warnings.filter(w => w.notificationSent).length;
           if (warningCount > 0) {
-            toast.warning(`${warningCount} member${warningCount > 1 ? 's' : ''} received attendance warnings`);
+            toast.error(`${warningCount} member${warningCount > 1 ? 's' : ''} received attendance warnings`, {
+              icon: '⚠️',
+              duration: 5000,
+            });
           }
         }
       } else {
@@ -199,7 +220,7 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
     } finally {
       setIsSaving(false);
     }
-  }, [allMembers, monthDays, selectedYear, selectedMonth, attendanceData, projectId, allowWeekendMeetings]);
+  }, [readOnly, allMembers, monthDays, selectedYear, selectedMonth, attendanceData, projectId, allowWeekendMeetings]);
 
   // Expose save function to parent via ref
   useImperativeHandle(ref, () => ({
@@ -227,7 +248,7 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
   const countAbsentDays = (memberId: string) => {
     let count = 0;
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
+    today.setHours(0, 0, 0, 0);
     
     monthDays.forEach(day => {
       // Skip future dates
@@ -310,6 +331,11 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
               {allowWeekendMeetings && (
                 <span className="text-xs bg-blue-100 text-blue-700 dark:bg-blue-900/20 dark:text-blue-300 px-2 py-0.5 rounded-full">
                   Weekend meetings enabled
+                </span>
+              )}
+              {readOnly && (
+                <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300 px-2 py-0.5 rounded-full">
+                  View Only
                 </span>
               )}
             </div>
@@ -453,14 +479,15 @@ const AttendanceGrid = forwardRef<any, AttendanceGridProps>(({ teamMembers, team
                         }`}
                       >
                         <div className="flex items-center justify-center p-1">
-                          {isWeekend && !allowWeekendMeetings ? (
-                            <div className="cursor-not-allowed">
+                          {(isWeekend && !allowWeekendMeetings) || readOnly ? (
+                            <div className={readOnly ? "cursor-not-allowed opacity-70" : "cursor-not-allowed"}>
                               {getStatusIcon(status)}
                             </div>
                           ) : (
                             <button
                               onClick={() => toggleAttendance(member.id, day)}
                               className="hover:scale-110 transition-transform p-1"
+                              disabled={readOnly}
                             >
                               {getStatusIcon(status)}
                             </button>
