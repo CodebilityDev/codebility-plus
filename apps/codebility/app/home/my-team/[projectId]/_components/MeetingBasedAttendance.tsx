@@ -32,6 +32,7 @@ interface MeetingSchedule {
 interface MeetingBasedAttendanceProps {
   teamMembers: SimpleMemberData[];
   teamLead: SimpleMemberData | null;
+  readOnly?: boolean; // ✅ ADDED: Controls edit access
   projectId: string;
   meetingSchedule: MeetingSchedule[] | null;
   onHasChangesUpdate?: (hasChanges: boolean) => void;
@@ -41,6 +42,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
   teamMembers, 
   teamLead, 
   projectId, 
+  readOnly = false, 
   meetingSchedule,
   onHasChangesUpdate 
 }, ref) => {
@@ -72,7 +74,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
   // Get day name from day of week
   const getDayName = (dayOfWeek: number): string => {
     const days = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
-    return days[dayOfWeek];
+    return days[dayOfWeek]!;
   };
 
   // Month names
@@ -144,6 +146,12 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
 
   // Toggle attendance status
   const toggleAttendance = (memberId: string, day: number) => {
+    // Prevent editing in read-only mode
+    if (readOnly) {
+      toast.error("You don't have permission to edit attendance.");
+      return;
+    }
+
     const scheduledMeeting = hasScheduledMeeting(day);
     
     // Only allow changes for scheduled meeting days
@@ -167,6 +175,12 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
 
   // Save all attendance changes
   const saveAllAttendance = useCallback(async () => {
+    // Prevent saving in read-only mode
+    if (readOnly) {
+      toast.error("You don't have permission to save attendance.");
+      return;
+    }
+
     setIsSaving(true);
     try {
       const records: any[] = [];
@@ -186,14 +200,20 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
           
           const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
           
+          const checkOutTime = (status === "present" || status === "excused") && scheduledMeeting.time
+          ? (() => {
+              const [hours, minutes] = scheduledMeeting.time.split(':');
+              // ...
+            })()
+          : undefined;
+
           records.push({
             codev_id: member.id,
             project_id: projectId,
             date: dateStr,
             status: status as any,
             check_in: status === "present" || status === "excused" ? scheduledMeeting.time : undefined,
-            check_out: status === "present" || status === "excused" ? 
-              `${parseInt(scheduledMeeting.time.split(':')[0]) + 1}:${scheduledMeeting.time.split(':')[1]}` : undefined
+            check_out: checkOutTime 
           });
         });
       });
@@ -209,7 +229,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
         if (warningResult.success && warningResult.warnings && warningResult.warnings.length > 0) {
           const warningCount = warningResult.warnings.filter(w => w.notificationSent).length;
           if (warningCount > 0) {
-            toast.warning(`${warningCount} member${warningCount > 1 ? 's' : ''} received attendance warnings`);
+            toast.error(`⚠️ ${warningCount} member${warningCount > 1 ? 's' : ''} received attendance warnings`);
           }
         }
       } else {
@@ -221,7 +241,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
     } finally {
       setIsSaving(false);
     }
-  }, [allMembers, monthDays, selectedYear, selectedMonth, attendanceData, projectId, meetingSchedule]);
+  }, [readOnly, allMembers, monthDays, selectedYear, selectedMonth, attendanceData, projectId, meetingSchedule]);
 
   // Expose save function to parent via ref
   useImperativeHandle(ref, () => ({
@@ -383,9 +403,17 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
         {/* Header */}
         <div className="bg-gray-50 dark:bg-gray-900 p-2 sm:p-3 border-b border-gray-200 dark:border-gray-700">
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
-            <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
-              Meeting Attendance Tracker
-            </h3>
+            <div className="flex items-center gap-3">
+              <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
+                Meeting Attendance Tracker
+              </h3>
+              {/* Read-only indicator badge */}
+              {readOnly && (
+                <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300 px-2 py-0.5 rounded-full">
+                  View Only
+                </span>
+              )}
+            </div>
             <div className="flex items-center gap-1 sm:gap-2">
               <Button
                 variant="ghost"
@@ -439,6 +467,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
 
         {/* Attendance Grid */}
         <div className="overflow-x-auto max-w-full">
+        <TooltipProvider> 
           <table className="w-full table-auto">
             <thead>
               <tr className="border-b border-gray-200 dark:border-gray-700">
@@ -452,8 +481,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
                   const dayName = getDayName(dayOfWeek);
                   
                   return (
-                    <TooltipProvider key={day}>
-                      <Tooltip>
+                      <Tooltip key={day}>
                         <TooltipTrigger asChild>
                           <th
                             className={`p-0 text-center text-[9px] font-medium w-7 sm:w-8 ${
@@ -477,7 +505,6 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
                           </p>
                         </TooltipContent>
                       </Tooltip>
-                    </TooltipProvider>
                   );
                 })}
                 <th className="sticky right-0 z-10 bg-green-50 dark:bg-green-900/20 text-center p-1 text-[9px] font-medium text-gray-700 dark:text-gray-300 w-14 sm:w-16">
@@ -540,7 +567,8 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
                           }`}
                         >
                           <div className="flex items-center justify-center p-1">
-                            {scheduledMeeting ? (
+                            {/* Disable interaction in read-only mode */}
+                            {scheduledMeeting && !readOnly ? (
                               <button
                                 onClick={() => toggleAttendance(member.id, day)}
                                 className="hover:scale-110 transition-transform p-1"
@@ -549,8 +577,8 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
                                 {getStatusIcon(status, true)}
                               </button>
                             ) : (
-                              <div className="cursor-not-allowed">
-                                {getStatusIcon("not_scheduled", false)}
+                              <div className={readOnly && scheduledMeeting ? "cursor-not-allowed opacity-70" : "cursor-not-allowed"}>
+                                {getStatusIcon(scheduledMeeting ? status : "not_scheduled", !!scheduledMeeting)}
                               </div>
                             )}
                           </div>
@@ -577,6 +605,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
               })}
             </tbody>
           </table>
+        </TooltipProvider>
         </div>
 
         {/* Legend */}

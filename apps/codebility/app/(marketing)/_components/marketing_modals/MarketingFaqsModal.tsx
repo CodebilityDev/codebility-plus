@@ -3,7 +3,8 @@
 import React, { ReactNode, useState } from "react";
 import { useModal } from "@/hooks/use-modal";
 
-import { Dialog, DialogContent, DialogTitle } from "@codevs/ui/dialog";
+import { Dialog, DialogContent as DialogContentPrimitive, DialogTitle } from "@codevs/ui";
+import { DialogContent } from "@radix-ui/react-dialog";
 
 function FaqsModal() {
   const { isOpen, onClose, type } = useModal();
@@ -11,10 +12,11 @@ function FaqsModal() {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className=" bg-black-800 flex max-w-[1260px] flex-col justify-between gap-4 text-white">
-        <DialogTitle className="sr-only">Frequently Asked Questions</DialogTitle>
-        
-        <div className="flex max-h-[500px] flex-col gap-2 overflow-hidden overflow-y-scroll ">
+      <DialogContent className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] bg-black-800 max-w-[1260px]">
+        <div className="flex flex-col justify-between gap-4 text-white">
+          <DialogTitle className="sr-only">Frequently Asked Questions</DialogTitle>
+          
+          <div className="flex max-h-[500px] flex-col gap-2 overflow-hidden overflow-y-scroll ">
          
           <h1 className="mb-8 text-center text-4xl font-semibold ">
             Frequently Asked Questions
@@ -57,22 +59,23 @@ function FaqsModal() {
             est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
             amet, luctus vitae lorem.
           </Accordion>
-        </div>
+          </div>
 
 
-        <div className="flex gap-4 self-end">
-          <button
-            onClick={onClose}
-            className="text-semibold rounded-[100px] border border-[#1D1D1E] bg-[#ffffff0D] px-12 py-5"
-          >
-            Close
-          </button>
-          <button
-            onClick={onClose}
-            className="text-semibold rounded-[100px] bg-[#9747FF] px-14 py-5"
-          >
-            Ask Question
-          </button>
+          <div className="flex gap-4 self-end">
+            <button
+              onClick={onClose}
+              className="text-semibold rounded-[100px] border border-[#1D1D1E] bg-[#ffffff0D] px-12 py-5"
+            >
+              Close
+            </button>
+            <button
+              onClick={onClose}
+              className="text-semibold rounded-[100px] bg-[#9747FF] px-14 py-5"
+            >
+              Ask Question
+            </button>
+          </div>
         </div>
       </DialogContent>
     </Dialog>

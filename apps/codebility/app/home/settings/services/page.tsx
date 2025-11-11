@@ -557,57 +557,55 @@ export default function ServicesPage() {
         const projectDesc = (project.description || '').toLowerCase();
         const techStack = (project.tech_stack || []).join(' ').toLowerCase();
         const searchTerms = `${projectName} ${projectDesc} ${techStack}`;
-
-        // Get category info from the new categories array
-        const categories = project.categories || [];
-        const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-        const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
-
+        const categoryName = project.projects_category?.name?.toLowerCase() || '';
+        const categoryId = project.project_category_id;
+        
+        
         switch (serviceName) {
           case 'Web Application Development':
-            // Category ID 1 = "Web Application"
-            const isWeb = hasCategoryId(1) ||
-                   categoryNames.includes('web') ||
-                   searchTerms.includes('web') ||
-                   searchTerms.includes('website') ||
+            // Category ID 1 = "Web Application" 
+            const isWeb = categoryId === 1 || 
+                   categoryName.includes('web') || 
+                   searchTerms.includes('web') || 
+                   searchTerms.includes('website') || 
                    searchTerms.includes('react') ||
                    searchTerms.includes('next') ||
                    searchTerms.includes('vue') ||
                    searchTerms.includes('angular') ||
-                   (!searchTerms.includes('mobile') && !categoryNames.includes('mobile') && !hasCategoryId(2));
+                   (!searchTerms.includes('mobile') && !categoryName.includes('mobile') && categoryId !== 2);
             return isWeb;
           case 'Mobile Application Development':
             // Category ID 2 = "Mobile Application" - STRICT filtering for mobile only
             // First priority: exact category ID match
-            if (hasCategoryId(2)) {
+            if (categoryId === 2) {
               return true;
             }
             // Second priority: explicit mobile keywords
-            return categoryNames.includes('mobile') ||
-                   searchTerms.includes('mobile') ||
+            return categoryName.includes('mobile') ||
+                   searchTerms.includes('mobile') || 
                    searchTerms.includes('react native') ||
                    searchTerms.includes('flutter') ||
                    searchTerms.includes('ios') ||
                    searchTerms.includes('android');
           case 'Product Design':
             // Category ID 3 = "Product Design"
-            const isDesign = hasCategoryId(3) ||
-                   categoryNames.includes('design') ||
-                   searchTerms.includes('design') ||
-                   searchTerms.includes('ui') ||
+            const isDesign = categoryId === 3 ||
+                   categoryName.includes('design') ||
+                   searchTerms.includes('design') || 
+                   searchTerms.includes('ui') || 
                    searchTerms.includes('ux') ||
                    searchTerms.includes('figma');
             return isDesign;
           case 'E-commerce Solutions':
-            return categoryNames.includes('ecommerce') || categoryNames.includes('commerce') ||
-                   searchTerms.includes('ecommerce') ||
-                   searchTerms.includes('shop') ||
+            return categoryName.includes('ecommerce') || categoryName.includes('commerce') ||
+                   searchTerms.includes('ecommerce') || 
+                   searchTerms.includes('shop') || 
                    searchTerms.includes('store') ||
                    searchTerms.includes('commerce') ||
                    searchTerms.includes('marketplace');
           case 'Consulting & Training':
-            return categoryNames.includes('consulting') || categoryNames.includes('training') ||
-                   searchTerms.includes('consulting') ||
+            return categoryName.includes('consulting') || categoryName.includes('training') ||
+                   searchTerms.includes('consulting') || 
                    searchTerms.includes('training') ||
                    searchTerms.includes('tutorial') ||
                    searchTerms.includes('learning');
@@ -691,41 +689,38 @@ export default function ServicesPage() {
         const projectDesc = (project.description || '').toLowerCase();
         const techStack = (project.tech_stack || []).join(' ').toLowerCase();
         const searchTerms = `${projectName} ${projectDesc} ${techStack}`;
-
-        // Get category info from the new categories array
-        const categories = project.categories || [];
-        const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-        const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
-
+        const categoryName = project.projects_category?.name?.toLowerCase() || '';
+        const categoryId = project.project_category_id;
+        
         switch (serviceName) {
           case 'Web Application Development':
-            // Category ID 1 = "Web Application"
-            return hasCategoryId(1) ||
-                   categoryNames.includes('web') ||
-                   searchTerms.includes('web') ||
-                   searchTerms.includes('website') ||
+            // Category ID 1 = "Web Application" 
+            return categoryId === 1 || 
+                   categoryName.includes('web') || 
+                   searchTerms.includes('web') || 
+                   searchTerms.includes('website') || 
                    searchTerms.includes('react') ||
-                   (!searchTerms.includes('mobile') && !categoryNames.includes('mobile') && !hasCategoryId(2));
+                   (!searchTerms.includes('mobile') && !categoryName.includes('mobile') && categoryId !== 2);
           case 'Mobile Application Development':
             // Category ID 2 = "Mobile Application" - STRICT filtering for mobile only
-            if (hasCategoryId(2)) {
+            if (categoryId === 2) {
               return true;
             }
-            return categoryNames.includes('mobile') ||
-                   searchTerms.includes('mobile') ||
+            return categoryName.includes('mobile') ||
+                   searchTerms.includes('mobile') || 
                    searchTerms.includes('react native') ||
                    searchTerms.includes('flutter') ||
                    searchTerms.includes('ios') ||
                    searchTerms.includes('android');
           case 'Product Design':
             // Category ID 3 = "Product Design"
-            return hasCategoryId(3) ||
-                   categoryNames.includes('design') ||
-                   searchTerms.includes('design') ||
-                   searchTerms.includes('ui') ||
+            return categoryId === 3 ||
+                   categoryName.includes('design') ||
+                   searchTerms.includes('design') || 
+                   searchTerms.includes('ui') || 
                    searchTerms.includes('ux');
           case 'E-commerce Solutions':
-            return categoryNames.includes('ecommerce') || categoryNames.includes('commerce') || searchTerms.includes('ecommerce') || searchTerms.includes('shop') || searchTerms.includes('store');
+            return categoryName.includes('ecommerce') || categoryName.includes('commerce') || searchTerms.includes('ecommerce') || searchTerms.includes('shop') || searchTerms.includes('store');
           default:
             return true;
         }
@@ -822,15 +817,14 @@ export default function ServicesPage() {
               {(() => {
                 // Get ALL mobile projects
                 const mobileProjects = realProjects.filter(project => {
-                  const categories = project.categories || [];
-                  const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-                  const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
+                  const categoryId = project.project_category_id;
+                  const categoryName = project.projects_category?.name?.toLowerCase() || '';
                   const searchTerms = `${project.name} ${project.description || ''} ${(project.tech_stack || []).join(' ')}`.toLowerCase();
-
+                  
                   // STRICT mobile filtering - only show true mobile projects
-                  return hasCategoryId(2) ||
-                         categoryNames.includes('mobile') ||
-                         searchTerms.includes('mobile') ||
+                  return categoryId === 2 || 
+                         categoryName.includes('mobile') ||
+                         searchTerms.includes('mobile') || 
                          searchTerms.includes('react native') ||
                          searchTerms.includes('flutter') ||
                          searchTerms.includes('ios') ||
@@ -947,17 +941,16 @@ export default function ServicesPage() {
                 // For Web Application Development - show ALL web projects
                 if (service.name === 'Web Application Development') {
                   const webProjects = realProjects.filter(project => {
-                    const categories = project.categories || [];
-                    const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-                    const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
+                    const categoryId = project.project_category_id;
+                    const categoryName = project.projects_category?.name?.toLowerCase() || '';
                     const searchTerms = `${project.name} ${project.description || ''} ${(project.tech_stack || []).join(' ')}`.toLowerCase();
-
-                    return hasCategoryId(1) ||
-                           categoryNames.includes('web') ||
-                           searchTerms.includes('web') ||
-                           searchTerms.includes('website') ||
+                    
+                    return categoryId === 1 || 
+                           categoryName.includes('web') || 
+                           searchTerms.includes('web') || 
+                           searchTerms.includes('website') || 
                            searchTerms.includes('react') ||
-                           (!searchTerms.includes('mobile') && !categoryNames.includes('mobile') && !hasCategoryId(2));
+                           (!searchTerms.includes('mobile') && !categoryName.includes('mobile') && categoryId !== 2);
                   });
                   projectsToShow = webProjects.filter(p => p.main_image && p.main_image.trim() !== '');
                   imagesToShow = projectsToShow.map(p => p.main_image!);
@@ -1007,15 +1000,14 @@ export default function ServicesPage() {
                 // For Product Design - show ALL real Product Design projects
                 else if (service.name === 'Product Design') {
                   const designProjects = realProjects.filter(project => {
-                    const categories = project.categories || [];
-                    const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-                    const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
+                    const categoryId = project.project_category_id;
+                    const categoryName = project.projects_category?.name?.toLowerCase() || '';
                     const searchTerms = `${project.name} ${project.description || ''} ${(project.tech_stack || []).join(' ')}`.toLowerCase();
-
-                    return hasCategoryId(3) ||
-                           categoryNames.includes('design') ||
-                           searchTerms.includes('design') ||
-                           searchTerms.includes('ui') ||
+                    
+                    return categoryId === 3 || 
+                           categoryName.includes('design') ||
+                           searchTerms.includes('design') || 
+                           searchTerms.includes('ui') || 
                            searchTerms.includes('ux') ||
                            searchTerms.includes('figma');
                   });
