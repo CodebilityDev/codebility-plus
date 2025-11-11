@@ -14,6 +14,7 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Pie, PieChart } from "recharts";
+import { cn } from "@/lib/utils";
 
 interface ApplicantStatusCounts extends Record<string, number> {}
 
@@ -28,9 +29,12 @@ export default function AdminDashboardApplicantStatusPie({
   
   if (!data)
     return (
-      <Card className="flex h-full flex-col relative overflow-hidden">
-        {/* Gradient background - only visible in dark mode */}
-        <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/10 to-purple-950/10 dark:block hidden" />
+      <Card className={cn(
+        "flex h-full flex-col relative overflow-hidden",
+        "bg-white dark:bg-gradient-to-br dark:from-blue-950 dark:via-slate-900 dark:to-slate-950",
+        "border-gray-200 dark:border-blue-900/30"
+      )}>
+        <div className="absolute inset-0 bg-gradient-to-br to-transparent pointer-events-none opacity-0 dark:opacity-100 dark:from-blue-500/10" />
         
         <CardHeader className="relative items-center pb-0">
           <CardTitle className="text-lg">{title}</CardTitle>
@@ -60,9 +64,12 @@ export default function AdminDashboardApplicantStatusPie({
   );
 
   return (
-    <Card className="flex h-full flex-col relative overflow-hidden">
-      {/* Gradient background - only visible in dark mode */}
-      <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/10 to-purple-950/10 dark:block hidden" />
+    <Card className={cn(
+      "flex h-full flex-col relative overflow-hidden",
+      "bg-white dark:bg-gradient-to-br dark:from-blue-950 dark:via-slate-900 dark:to-slate-950",
+      "border-gray-200 dark:border-blue-900/30"
+    )}>
+      <div className="absolute inset-0 bg-gradient-to-br to-transparent pointer-events-none opacity-0 dark:opacity-100 dark:from-blue-500/10" />
       
       <CardHeader className="relative items-center pb-0">
         <CardTitle className="text-lg">{title}</CardTitle>

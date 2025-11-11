@@ -21,6 +21,7 @@ import {
   ResponsiveContainer,
   XAxis,
 } from "recharts";
+import { cn } from "@/lib/utils";
 
 interface AdminDashboardMonthlyApplicantsLineChartProp {
   dateApplied?: string[];
@@ -29,7 +30,6 @@ interface AdminDashboardMonthlyApplicantsLineChartProp {
 export default function AdminDashboardMonthlyApplicantsLineChart({
   dateApplied = [],
 }: AdminDashboardMonthlyApplicantsLineChartProp) {
-  // Get current and previous 5 months
   const getLastSixMonths = () => {
     const now = new Date();
     const months: { month: string; year: number }[] = [];
@@ -74,9 +74,12 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
   } satisfies ChartConfig;
 
   return (
-    <Card className="relative overflow-hidden">
-      {/* Gradient background - only visible in dark mode */}
-      <div className="absolute inset-0 bg-gradient-to-br from-customBlue-950/10 to-purple-950/10 dark:block hidden" />
+    <Card className={cn(
+      "relative overflow-hidden",
+      "bg-white dark:bg-gradient-to-br dark:from-green-950 dark:via-slate-900 dark:to-slate-950",
+      "border-gray-200 dark:border-green-900/30"
+    )}>
+      <div className="absolute inset-0 bg-gradient-to-br to-transparent pointer-events-none opacity-0 dark:opacity-100 dark:from-green-500/10" />
       
       <CardHeader className="relative">
         <CardTitle className="text-lg">Monthly Applicants</CardTitle>
