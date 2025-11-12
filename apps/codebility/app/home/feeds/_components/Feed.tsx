@@ -1,7 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
-import DefaultPagination from "@/components/ui/pagination";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useFeedsStore } from "@/store/feeds-store";
 
 import Post from "./PostCard";
@@ -15,7 +14,8 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
   const posts = useFeedsStore((state) => state.posts);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
 
-  const [currentPage, setCurrentPage] = useState(1);
+  const [visibleCount, setVisibleCount] = useState(6);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchPosts();
@@ -40,18 +40,37 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
     });
   }, [posts, searchQuery]);
 
-  const postsPerPage = 6;
-  const totalPages = Math.ceil(filteredPosts.length / postsPerPage);
-  const startIndex = (currentPage - 1) * postsPerPage;
-  const currentPosts = filteredPosts.slice(
-    startIndex,
-    startIndex + postsPerPage,
-  );
+  const visiblePosts = filteredPosts.slice(0, visibleCount);
 
-  // Reset to first page when search changes
+  // Reset visible count when search changes
   useEffect(() => {
-    setCurrentPage(1);
+    setVisibleCount(6);
   }, [searchQuery]);
+
+  // Infinite scroll logic
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const entry = entries[0];
+        if (entry && entry.isIntersecting) {
+          setVisibleCount((prev) => {
+            if (prev < filteredPosts.length) {
+              return Math.min(prev + 6, filteredPosts.length);
+            }
+            return prev;
+          });
+        }
+      },
+      { threshold: 1 },
+    );
+
+    const currentLoader = loaderRef.current;
+    if (currentLoader) observer.observe(currentLoader);
+
+    return () => {
+      if (currentLoader) observer.unobserve(currentLoader);
+    };
+  }, [filteredPosts.length]);
 
   const handleDeletePost = (deletedPostId: string | number) => {
     useFeedsStore.setState((state) => ({
@@ -59,18 +78,10 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
     }));
   };
 
-  const handleNextPage = () => {
-    if (currentPage < totalPages) setCurrentPage((p) => p + 1);
-  };
-
-  const handlePreviousPage = () => {
-    if (currentPage > 1) setCurrentPage((p) => p - 1);
-  };
-
   return (
     <>
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {currentPosts.map((post) => (
+        {visiblePosts.map((post) => (
           <Post
             key={post.id}
             post={post}
@@ -80,14 +91,22 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
         ))}
       </div>
 
-      {filteredPosts.length > 0 && (
-        <DefaultPagination
-          totalPages={totalPages}
-          currentPage={currentPage}
-          handleNextPage={handleNextPage}
-          handlePreviousPage={handlePreviousPage}
-          setCurrentPage={setCurrentPage}
-        />
+      {/* Loader / sentinel div for infinite scroll */}
+      {visibleCount < filteredPosts.length && (
+        <div
+          ref={loaderRef}
+          className="mt-6 flex justify-center text-sm text-gray-500"
+        >
+          <div className="flex items-center gap-2">
+            <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-400 border-t-transparent" />
+            Loading more posts...
+          </div>
+        </div>
+      )}
+
+      {/* Empty state */}
+      {filteredPosts.length === 0 && (
+        <div className="mt-8 text-center text-gray-500">No posts found.</div>
       )}
     </>
   );
