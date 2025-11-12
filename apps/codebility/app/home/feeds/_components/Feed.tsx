@@ -8,9 +8,16 @@ import Post from "./PostCard";
 interface FeedProp {
   isAdmin: boolean;
   searchQuery?: string;
+  sortField: "title" | "date" | "upvotes";
+  sortOrder: "asc" | "desc";
 }
 
-export default function Feed({ isAdmin, searchQuery }: FeedProp) {
+export default function Feed({
+  isAdmin,
+  searchQuery,
+  sortField,
+  sortOrder,
+}: FeedProp) {
   const posts = useFeedsStore((state) => state.posts);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
 
@@ -21,12 +28,10 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
     fetchPosts();
   }, [fetchPosts]);
 
-  // Filter posts by title or author's first/last name (case-insensitive)
+  // Filter posts
   const filteredPosts = useMemo(() => {
     if (!searchQuery || searchQuery.trim() === "") return posts;
-
     const query = searchQuery.toLowerCase();
-
     return posts.filter((post) => {
       const titleMatch = post.title?.toLowerCase().includes(query);
       const firstNameMatch = post.author_id?.first_name
@@ -35,30 +40,52 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
       const lastNameMatch = post.author_id?.last_name
         ?.toLowerCase()
         .includes(query);
-
       return titleMatch || firstNameMatch || lastNameMatch;
     });
   }, [posts, searchQuery]);
 
-  const visiblePosts = filteredPosts.slice(0, visibleCount);
+  // Sort posts
+  const sortedPosts = useMemo(() => {
+    const sorted = [...filteredPosts];
+    sorted.sort((a, b) => {
+      let aVal: string | number = "";
+      let bVal: string | number = "";
 
-  // Reset visible count when search changes
+      switch (sortField) {
+        case "title":
+          aVal = a.title?.toLowerCase() || "";
+          bVal = b.title?.toLowerCase() || "";
+          break;
+        case "date":
+          aVal = new Date(a.created_at).getTime();
+          bVal = new Date(b.created_at).getTime();
+          break;
+        case "upvotes":
+          aVal = a.upvote_count ?? 0;
+          bVal = b.upvote_count ?? 0;
+          break;
+      }
+
+      if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
+      if (aVal > bVal) return sortOrder === "asc" ? 1 : -1;
+      return 0;
+    });
+    return sorted;
+  }, [filteredPosts, sortField, sortOrder]);
+
+  const visiblePosts = sortedPosts.slice(0, visibleCount);
+
   useEffect(() => {
     setVisibleCount(6);
   }, [searchQuery]);
 
-  // Infinite scroll logic
+  // Infinite scroll
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         const entry = entries[0];
-        if (entry && entry.isIntersecting) {
-          setVisibleCount((prev) => {
-            if (prev < filteredPosts.length) {
-              return Math.min(prev + 6, filteredPosts.length);
-            }
-            return prev;
-          });
+        if (entry?.isIntersecting) {
+          setVisibleCount((prev) => Math.min(prev + 6, sortedPosts.length));
         }
       },
       { threshold: 1 },
@@ -66,12 +93,10 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
 
     const currentLoader = loaderRef.current;
     if (currentLoader) observer.observe(currentLoader);
-
     return () => {
       if (currentLoader) observer.unobserve(currentLoader);
     };
-  }, [filteredPosts.length]);
-
+  }, [sortedPosts.length]);
   const handleDeletePost = (deletedPostId: string | number) => {
     useFeedsStore.setState((state) => ({
       posts: state.posts.filter((post) => post.id !== deletedPostId),
@@ -80,6 +105,7 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
 
   return (
     <>
+      {/* Posts grid */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
         {visiblePosts.map((post) => (
           <Post
@@ -91,8 +117,8 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
         ))}
       </div>
 
-      {/* Loader / sentinel div for infinite scroll */}
-      {visibleCount < filteredPosts.length && (
+      {/* Loader */}
+      {visibleCount < sortedPosts.length && (
         <div
           ref={loaderRef}
           className="mt-6 flex justify-center text-sm text-gray-500"
@@ -105,7 +131,7 @@ export default function Feed({ isAdmin, searchQuery }: FeedProp) {
       )}
 
       {/* Empty state */}
-      {filteredPosts.length === 0 && (
+      {sortedPosts.length === 0 && (
         <div className="mt-8 text-center text-gray-500">No posts found.</div>
       )}
     </>
