@@ -12,6 +12,8 @@ import {
 import { IconLink } from "@/public/assets/svgs";
 import { Crown } from "lucide-react";
 
+import { useServiceContext } from "../../_context";
+
 interface TeamMember {
   id: string;
   first_name: string;
@@ -48,8 +50,9 @@ interface Props {
   onSelect?: (service: ServiceProject) => void;
 }
 
-function ServiceCard({ service, onSelect }: Props) {
+export const ServicesServiceCard = memo(({ service, onSelect }: Props) => {
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const { setActiveService } = useServiceContext();
 
   const {
     name,
@@ -120,8 +123,11 @@ function ServiceCard({ service, onSelect }: Props) {
       <div
         className="relative aspect-[4/3] w-full flex-shrink-0 cursor-pointer overflow-hidden"
         onClick={() => {
-          console.log("Image clicked, service:", service.name);
-          onSelect?.(service);
+          if (onSelect) {
+            onSelect(service);
+          } else {
+            setActiveService(service);
+          }
         }}
       >
         <Image
@@ -311,6 +317,4 @@ function ServiceCard({ service, onSelect }: Props) {
       </div>
     </div>
   );
-}
-
-export default memo(ServiceCard);
+});

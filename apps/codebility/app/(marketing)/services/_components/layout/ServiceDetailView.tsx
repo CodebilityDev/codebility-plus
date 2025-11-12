@@ -1,15 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { defaultAvatar } from "@/public/assets/images";
 import { motion } from "framer-motion";
 
 import { Button } from "@codevs/ui";
 
 export const ServiceDetailView = ({ service, onBack }) => {
-  console.log("ServiceDetailView rendered with service:", service);
-
   return (
     <div className="mx-auto w-full max-w-[1200px] px-4 py-8 pb-24 sm:px-6 md:pb-8">
       {/* Back Button */}

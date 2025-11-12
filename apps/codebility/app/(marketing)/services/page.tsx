@@ -3,10 +3,11 @@ import { getOrSetCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
+import Footer from "../_components/MarketingFooter";
 import Navigation from "../_components/MarketingNavigation";
-import ClientTechyBackground from "./_components/ClientTechyBackground";
-import { ServicesPageContent } from "./_components/ServicesPageContent";
-import { servicesData } from "./_lib/dummy-data";
+import { ServicesPageContent } from "./_components/layout";
+import { ClientTechyBackground } from "./_components/visuals";
+import { ServiceProvider } from "./_context";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -78,8 +79,11 @@ const ServicesPage = async () => {
       <ClientTechyBackground />
       <div className="relative z-10">
         <Navigation />
-        <ServicesPageContent servicesData={mappedData} />
+        <ServiceProvider>
+          <ServicesPageContent servicesData={mappedData} />
+        </ServiceProvider>
       </div>
+      <Footer />
     </div>
   );
 };

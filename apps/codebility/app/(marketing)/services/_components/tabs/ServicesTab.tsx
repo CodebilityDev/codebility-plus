@@ -1,14 +1,14 @@
 "use client";
 
 import { memo, useEffect, useMemo, useState } from "react";
+import Container from "@/app/(marketing)/_components/MarketingContainer";
+import Section from "@/app/(marketing)/_components/MarketingSection";
 import DefaultPagination from "@/components/ui/pagination";
 import { CATEGORIES, pageSize } from "@/constants";
 import usePagination from "@/hooks/use-pagination";
 
-import type { ServiceProject } from "./ServicesServiceCard";
-import Container from "../../_components/MarketingContainer";
-import Section from "../../_components/MarketingSection";
-import ServiceCard from "./ServicesServiceCard";
+import type { ServiceProject } from "../ui/ServicesServiceCard";
+import { ServicesServiceCard } from "../ui";
 
 interface TeamMember {
   id: string;
@@ -46,17 +46,14 @@ interface Props {
   onServiceSelect?: (service: ServiceProject) => void;
 }
 
-// Define a special ID for the "All" category
 const ALL_CATEGORY_ID = 0;
 
-function ServicesTab({ servicesData, onServiceSelect }: Props) {
-  // Initialize with "All" category
+export const ServicesTab = memo(({ servicesData, onServiceSelect }: Props) => {
   const [currentCategory, setCurrentCategory] =
     useState<number>(ALL_CATEGORY_ID);
-
   const [tabPages, setTabPages] = useState(() => {
     const pages: Record<number, number> = {
-      [ALL_CATEGORY_ID]: 1, // Add "All" category to tracked pages
+      [ALL_CATEGORY_ID]: 1,
     };
     CATEGORIES.forEach((cat) => {
       pages[cat.id] = 1;
@@ -64,7 +61,6 @@ function ServicesTab({ servicesData, onServiceSelect }: Props) {
     return pages;
   });
 
-  // Memoize filtered projects to prevent unnecessary recalculations
   const projects = useMemo(() => {
     return currentCategory === ALL_CATEGORY_ID
       ? servicesData
@@ -82,7 +78,6 @@ function ServicesTab({ servicesData, onServiceSelect }: Props) {
     setCurrentPage,
   } = usePagination(projects, pageSize.services);
 
-  // Update current page when category changes
   useEffect(() => {
     setCurrentPage(tabPages[currentCategory] || 1);
   }, [currentCategory, setCurrentPage, tabPages]);
@@ -99,7 +94,7 @@ function ServicesTab({ servicesData, onServiceSelect }: Props) {
     <Section className="relative">
       <Container className="relative z-0">
         <div className="flex flex-col gap-4">
-          {/* Category Tabs with "All" option */}
+          {/* Tabs */}
           <div className="mx-auto flex flex-wrap justify-center gap-2 rounded-2xl border border-white/20 bg-white/10 p-1 backdrop-blur-sm dark:bg-white/5">
             <button
               onClick={() => handleTabClick(ALL_CATEGORY_ID)}
@@ -138,7 +133,10 @@ function ServicesTab({ servicesData, onServiceSelect }: Props) {
                     animationFillMode: "both",
                   }}
                 >
-                  <ServiceCard service={project} onSelect={onServiceSelect} />
+                  <ServicesServiceCard
+                    service={project}
+                    onSelect={onServiceSelect}
+                  />
                 </div>
               ))
             ) : (
@@ -164,6 +162,4 @@ function ServicesTab({ servicesData, onServiceSelect }: Props) {
       </Container>
     </Section>
   );
-}
-
-export default memo(ServicesTab);
+});

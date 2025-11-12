@@ -2,7 +2,7 @@ import { Navigation } from "lucide-react";
 
 import Calendly from "../_components/MarketingCalendly";
 import Footer from "../_components/MarketingFooter";
-import Hero from "./_components/ServicesHero";
+import { Hero } from "./_components/layout/ServicesHero";
 
 export default function ServicesLoading() {
   return (
