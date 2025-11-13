@@ -6,7 +6,7 @@ import { ThemeProvider } from "@/context/ThemeProvider";
 import ReactQueryProvider from "@/hooks/reactQuery";
 import { UserProvider } from "@/store/UserProvider";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
-import { Toaster } from "@codevs/ui/sonner/toast";
+import { Toaster } from "sonner";
 
 
 import ToastNotification from "./_components/HomeToastNotification";
@@ -18,6 +18,7 @@ import { PageTransitionSettings } from "./_components/PageTransitionSettings";
 import { MuiStyleRoot } from "./(dashboard)/_components/DashboardRoadmapStyleRoot";
 import ConditionalMainWrapper from "./_components/ConditionalMainWrapper";
 import DynamicMainContent from "./_components/DynamicMainContent";
+import { Toast } from "@codevs/ui/toast";
 
 // Force dynamic rendering for layout due to server-side Supabase usage
 export const dynamic = "force-dynamic";

@@ -1,13 +1,15 @@
 {
+  "type": "commonjs",
   "name": "bot",
   "version": "1.0.0",
-  "type": "commonjs",
+  "main": "dist/index.js",
   "scripts": {
     "dev": "npx ts-node --project tsconfig.bot.json index.ts",
     "build": "npx tsc --project tsconfig.bot.json",
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.82",
     "@supabase/supabase-js": "^2.55.0",
     "canvas": "^3.2.0",
     "discord.js": "^14.24.0",

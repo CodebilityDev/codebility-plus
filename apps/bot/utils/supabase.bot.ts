@@ -4,7 +4,7 @@ import * as path from "path";
 
 // ✅ Load .env from the bot folder (same directory as index.ts)
 dotenv.config({
-  path: path.resolve(__dirname, "../.env"),
+  path: path.resolve(process.cwd(), ".env"),
 });
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;

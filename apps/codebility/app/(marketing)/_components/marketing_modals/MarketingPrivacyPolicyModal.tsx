@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { useModal } from "@/hooks/use-modal";
 
-import { Dialog, DialogContent, DialogTitle } from "@codevs/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@codevs/ui";
 
 function PrivacyPolicyModal() {
   const { isOpen, onClose, type } = useModal();
@@ -12,15 +12,17 @@ function PrivacyPolicyModal() {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="bg-black-800 flex max-h-full max-w-[1260px] flex-col justify-between text-white">
-        <DialogTitle className="sr-only">Privacy Policy</DialogTitle>
-        <div className="flex h-full overflow-hidden rounded-[10px] border border-[#1D1D1E]">
-          <div className="hidden sm:flex">
-          <NavBar />
+      <DialogContent className="p-0 border-none">
+        <div className="bg-black-800 flex max-h-full max-w-[1260px] flex-col justify-between text-white">
+          <DialogTitle className="sr-only">Privacy Policy</DialogTitle>
+          <div className="flex h-full overflow-hidden rounded-[10px] border border-[#1D1D1E]">
+            <div className="hidden sm:flex">
+              <NavBar />
+            </div>
+            <Content />
           </div>
-          <Content />
+          <Footer onClose={onClose} />
         </div>
-        <Footer onClose={onClose} />
       </DialogContent>
     </Dialog>
   );
