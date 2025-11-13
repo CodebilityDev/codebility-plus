@@ -9,6 +9,7 @@
     "start": "node dist/index.js"
   },
   "dependencies": {
+    "@napi-rs/canvas": "^0.1.82",
     "@supabase/supabase-js": "^2.55.0",
     "canvas": "^3.2.0",
     "discord.js": "^14.24.0",
