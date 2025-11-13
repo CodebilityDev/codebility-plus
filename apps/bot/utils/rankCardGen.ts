@@ -1,348 +1,223 @@
 // apps/bot/utils/rankCardGen.ts
-import { createCanvas, loadImage, registerFont, Canvas } from "canvas";
-import { supabaseBot } from "./supabase.bot";
+
+import { createCanvas, loadImage, GlobalFonts } from '@napi-rs/canvas';
 import { User } from "discord.js";
-import { getLevelProgress } from "./xpHelper"; 
-import * as https from "https";
-import * as path from "path";
+import { supabaseBot } from "./supabase.bot";
+import { getLevelProgress } from "./xpHelper";
 
-type CanvasContext = ReturnType<Canvas['getContext']>;
-
-const WIDTH = 900;
-const HEIGHT = 280;
-const AVATAR_SIZE = 180;
-const PADDING = 24;
-const BAR_WIDTH = WIDTH - AVATAR_SIZE - PADDING * 3;
-const BAR_HEIGHT = 28;
-
-/** Fetch image buffer using native https */
-async function fetchImageBuffer(url: string): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    const timeout = setTimeout(() => reject(new Error('Image fetch timeout')), 10000);
-    
-    https.get(url, (res) => {
-      if (res.statusCode !== 200) {
-        clearTimeout(timeout);
-        return reject(new Error(`HTTP ${res.statusCode}`));
-      }
-      
-      const data: Uint8Array[] = [];
-      res.on("data", (chunk) => data.push(chunk));
-      res.on("end", () => {
-        clearTimeout(timeout);
-        resolve(Buffer.concat(data));
-      });
-      res.on("error", (err) => {
-        clearTimeout(timeout);
-        reject(err);
-      });
-    }).on("error", (err) => {
-      clearTimeout(timeout);
-      reject(err);
-    });
-  });
+interface RewardRole {
+  id: string;
+  name: string;
+  color: string;
+  levelRequirement: number;
 }
 
-/** Get user's XP, level, and rank from Supabase */
-async function getUserData(userId: string, guildId: string) {
-  console.log(`📊 Fetching data for user ${userId} in guild ${guildId}`);
-
-  if (!userId || !guildId) {
-    console.error("❌ rankCardGen: Missing userId or guildId");
-    return { xp: 0, level: 0, rank: 0, totalUsers: 0 };
-  }
-
-  // Fetch user stats
-  const { data: userData, error } = await supabaseBot
-    .from("user_stats_discord")
-    .select("xp, level")
-    .eq("user_id", userId)
-    .eq("guild_id", guildId)
-    .eq("active", true)
-    .maybeSingle();
-
-  if (error) {
-    console.error("❌ rankCardGen: Supabase fetch error:", error.message);
-    return { xp: 0, level: 0, rank: 0, totalUsers: 0 };
-  }
-
-  if (!userData) {
-    console.warn(`⚠️ No user data found for ${userId}`);
-    return { xp: 0, level: 0, rank: 0, totalUsers: 0 };
-  }
-
-  console.log(`✅ User data: Level ${userData.level}, XP ${userData.xp}`);
-
-  // Fetch all users for ranking
-  const { data: allUsers, error: rankError } = await supabaseBot
-    .from("user_stats_discord")
-    .select("user_id, level, xp")
-    .eq("guild_id", guildId)
-    .eq("active", true)
-    .order("level", { ascending: false })
-    .order("xp", { ascending: false });
-
-  if (rankError) {
-    console.error("❌ rankCardGen: Rank query error:", rankError.message);
-    return { 
-      xp: userData.xp ?? 0, 
-      level: userData.level ?? 0, 
-      rank: 0, 
-      totalUsers: 0 
-    };
-  }
-
-  const rank = (allUsers?.findIndex((u) => u.user_id === userId) ?? -1) + 1;
-  const totalUsers = allUsers?.length ?? 0;
-
-  console.log(`✅ Rank: #${rank} of ${totalUsers}`);
-
-  return {
-    xp: userData.xp ?? 0,
-    level: userData.level ?? 0,
-    rank,
-    totalUsers,
-  };
+interface UserStatsDiscord {
+  user_id: string;
+  xp: number;
+  level: number;
 }
 
-function roundRect(
-  ctx: CanvasContext,  
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  r: number,
-  fill = true,
-  stroke = false
-) {
-  if (w < 2 * r) r = w / 2;
-  if (h < 2 * r) r = h / 2;
-  
-  ctx.beginPath();
-  ctx.moveTo(x + r, y);
-  ctx.lineTo(x + w - r, y);
-  ctx.arc(x + w - r, y + r, r, Math.PI * 1.5, Math.PI * 2);
-  ctx.lineTo(x + w, y + h - r);
-  ctx.arc(x + w - r, y + h - r, r, 0, Math.PI * 0.5);
-  ctx.lineTo(x + r, y + h);
-  ctx.arc(x + r, y + h - r, r, Math.PI * 0.5, Math.PI);
-  ctx.lineTo(x, y + r);
-  ctx.arc(x + r, y + r, r, Math.PI, Math.PI * 1.5);
-  ctx.closePath();
-  
-  if (fill) ctx.fill();
-  if (stroke) ctx.stroke();
-}
-
-/** Generate the rank card image for a Discord user */
 export async function generateRankCard(
   user: User,
-  guildId: string
+  guildId: string,
+  rewardRoles: RewardRole[] = []
 ): Promise<Buffer | null> {
-  console.log(`🎨 Starting rank card generation for ${user.username} (${user.id})`);
-
   try {
-    // Create canvas
-    const canvas = createCanvas(WIDTH, HEIGHT);
-    const ctx = canvas.getContext("2d");
+    // Fetch user stats
+    const { data: userData, error } = await supabaseBot
+      .from("user_stats_discord")
+      .select("xp, level")
+      .eq("guild_id", guildId)
+      .eq("user_id", user.id)
+      .maybeSingle();
 
-    if (!ctx) {
-      throw new Error("Canvas context could not be created.");
-    }
-
-    // Enable text antialiasing
-    ctx.textBaseline = "top";
-    ctx.textAlign = "left";
-
-    // === BACKGROUND GRADIENT ===
-    const gradient = ctx.createLinearGradient(0, 0, WIDTH, HEIGHT);
-    gradient.addColorStop(0, "#0f172a");
-    gradient.addColorStop(1, "#1e293b");
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, WIDTH, HEIGHT);
-
-    // === OUTER CARD WITH SHADOW ===
-    ctx.shadowColor = "rgba(0, 0, 0, 0.45)";
-    ctx.shadowBlur = 16;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 4;
-    ctx.fillStyle = "#0b1220";
-    roundRect(ctx, PADDING / 2, PADDING / 2, WIDTH - PADDING, HEIGHT - PADDING, 18, true);
-    
-    // Reset shadow
-    ctx.shadowColor = "transparent";
-    ctx.shadowBlur = 0;
-    ctx.shadowOffsetX = 0;
-    ctx.shadowOffsetY = 0;
-
-    // === FETCH USER DATA ===
-    const { xp, level, rank, totalUsers } = await getUserData(user.id, guildId);
-
-    if (xp === 0 && level === 0) {
-      console.warn(`⚠️ rankCardGen: No XP data for user ${user.id}`);
+    if (error || !userData) {
+      console.error("❌ Error fetching user data for rank card:", error);
       return null;
     }
 
-    const progressInfo = getLevelProgress(xp);
-    const displayLevel = level ?? progressInfo.level;
-    const xpIntoLevel = progressInfo.xpIntoLevel;
-    const xpNext = progressInfo.xpToNextLevel;
-    const progressRatio = Math.min(1, xpIntoLevel / xpNext);
+    // Use the SAME progress calculation as rankCard.ts
+    const progress = getLevelProgress(userData.xp);
 
-    console.log(`📈 Progress: ${xpIntoLevel}/${xpNext} (${Math.round(progressRatio * 100)}%)`);
+    // Fetch rank
+    const { data: allUsers } = await supabaseBot
+      .from("user_stats_discord")
+      .select("user_id, xp, level")
+      .eq("guild_id", guildId)
+      .eq("active", true)
+      .order("level", { ascending: false })
+      .order("xp", { ascending: false });
 
-    // === USERNAME ===
-    const textX = PADDING + AVATAR_SIZE + 24;
-    let textY = PADDING + 30;
+    let rank = 0;
+    let totalUsers = 0;
+    
+    if (allUsers && allUsers.length > 0) {
+      totalUsers = allUsers.length;
+      const position = (allUsers as UserStatsDiscord[]).findIndex((u) => u.user_id === user.id);
+      rank = position !== -1 ? position + 1 : 0;
+    }
 
-    ctx.font = "bold 32px sans-serif";
+    // Canvas setup - more spacious
+    const width = 620;
+    const height = 220;
+    const canvas = createCanvas(width, height);
+    const ctx = canvas.getContext("2d");
+
+    // Background - dark navy
+    ctx.fillStyle = "#1a1f2e";
+    ctx.fillRect(0, 0, width, height);
+
+    // Outer border with rounded corners - cyan/teal
+    ctx.strokeStyle = "#2dd4bf";
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.roundRect(10, 10, width - 20, height - 20, 15);
+    ctx.stroke();
+
+    // === Avatar ===
+    const avatarX = 80;
+    const avatarY = height / 2;
+    const avatarRadius = 60;
+
+    // Avatar with circular clip
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2);
+    ctx.closePath();
+    ctx.clip();
+
+    const avatar = await loadImage(
+      user.displayAvatarURL({ extension: "png", size: 256 })
+    );
+    ctx.drawImage(
+      avatar,
+      avatarX - avatarRadius,
+      avatarY - avatarRadius,
+      avatarRadius * 2,
+      avatarRadius * 2
+    );
+    ctx.restore();
+
+    // Avatar border - cyan/teal
+    ctx.strokeStyle = "#2dd4bf";
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.arc(avatarX, avatarY, avatarRadius, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // === Username ===
     ctx.fillStyle = "#ffffff";
-    const username = user.username || "Unknown User";
-    ctx.fillText(username, textX, textY);
-    console.log(`✏️ Drew username: ${username}`);
+    ctx.font = "bold 26px Arial";
+    ctx.fillText(user.username, 165, 50);
 
-    // === RANK ===
-    if (rank > 0) {
-      textY += 38;
-      ctx.font = "bold 20px sans-serif";
-      ctx.fillStyle = "#fbbf24";
-      const rankText = `#${rank} of ${totalUsers}`;
-      ctx.fillText(rankText, textX, textY);
-      console.log(`✏️ Drew rank: ${rankText}`);
-    }
+    // === Rank Badge (yellow/gold) ===
+    ctx.fillStyle = "#fbbf24";
+    ctx.font = "bold 17px Arial";
+    const rankText = rank > 0 ? `#${rank} of ${totalUsers}` : "Unranked";
+    ctx.fillText(rankText, 165, 78);
 
-    // === LEVEL ===
-    textY += (rank > 0 ? 32 : 38);
-    ctx.font = "bold 24px sans-serif";
-    ctx.fillStyle = "#10b981";
-    const levelText = `Level ${displayLevel}`;
-    ctx.fillText(levelText, textX, textY);
-    console.log(`✏️ Drew level: ${levelText}`);
+    // === Level (cyan/teal) ===
+    ctx.fillStyle = "#2dd4bf";
+    ctx.font = "bold 19px Arial";
+    ctx.fillText(`Level ${progress.level}`, 165, 105);
 
-    // === XP TEXT ===
-    textY += 32;
-    ctx.font = "18px sans-serif";
-    ctx.fillStyle = "#cbd5e1";
-    const xpText = `${xpIntoLevel.toLocaleString()} / ${xpNext.toLocaleString()} XP`;
-    ctx.fillText(xpText, textX, textY);
-    console.log(`✏️ Drew XP: ${xpText}`);
+    // === XP Progress Text ===
+    const progressText = `${progress.xpIntoLevel} / ${progress.xpToNextLevel} XP`;
+    ctx.fillStyle = "#9ca3af";
+    ctx.font = "15px Arial";
+    ctx.fillText(progressText, 165, 128);
 
-    // === XP PROGRESS BAR ===
-    const barX = textX;
-    const barY = textY + 28;
-    const actualBarWidth = BAR_WIDTH - 100;
-    const progressWidth = Math.floor(actualBarWidth * progressRatio);
+    // === Progress Bar ===
+    const barX = 165;
+    const barY = 140;
+    const barWidth = 400;
+    const barHeight = 22;
+    // Calculate percentage and cap at 100% to prevent overflow
+    const progressPercent = Math.min(progress.xpIntoLevel / progress.xpToNextLevel, 1);
 
-    // Bar background
-    ctx.fillStyle = "#1e293b";
-    roundRect(ctx, barX, barY, actualBarWidth, BAR_HEIGHT, 14, true);
+    // Bar background - dark gray
+    ctx.fillStyle = "#374151";
+    ctx.beginPath();
+    ctx.roundRect(barX, barY, barWidth, barHeight, 11);
+    ctx.fill();
 
-    // Bar progress with gradient
-    if (progressWidth > 0) {
-      const barGradient = ctx.createLinearGradient(barX, barY, barX + progressWidth, barY);
-      barGradient.addColorStop(0, "#10b981");
-      barGradient.addColorStop(1, "#059669");
-      ctx.fillStyle = barGradient;
-      roundRect(ctx, barX, barY, progressWidth, BAR_HEIGHT, 14, true);
-    }
+    // Bar fill - cyan/teal
+    ctx.fillStyle = "#2dd4bf";
+    ctx.beginPath();
+    ctx.roundRect(barX, barY, barWidth * progressPercent, barHeight, 11);
+    ctx.fill();
 
     // Progress percentage
-    ctx.font = "bold 16px sans-serif";
     ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 14px Arial";
+    ctx.textAlign = "right";
+    ctx.fillText(`${Math.round(progressPercent * 100)}%`, width - 25, barY + 16);
     ctx.textAlign = "left";
-    const percentText = `${Math.round(progressRatio * 100)}%`;
-    ctx.fillText(percentText, barX + actualBarWidth + 12, barY + 6);
-    console.log(`✏️ Drew progress: ${percentText}`);
 
-    // === TOTAL XP BADGE ===
-    const badgeX = WIDTH - PADDING - 95;
-    const badgeY = PADDING + 20;
-    const badgeWidth = 90;
-    const badgeHeight = 65;
-
-    ctx.fillStyle = "#1e293b";
-    roundRect(ctx, badgeX, badgeY, badgeWidth, badgeHeight, 12, true);
-
-    ctx.fillStyle = "#f59e0b";
-    ctx.font = "bold 11px sans-serif";
-    ctx.textAlign = "left";
-    ctx.fillText("TOTAL XP", badgeX + 8, badgeY + 12);
-
+    // === Total XP Badge (Top Right - orange/yellow) ===
+    ctx.fillStyle = "#fb923c";
+    ctx.font = "12px Arial";
+    ctx.textAlign = "right";
+    ctx.fillText("TOTAL XP", width - 25, 32);
     ctx.fillStyle = "#fbbf24";
-    ctx.font = "bold 16px sans-serif";
-    const totalXpText = xp.toLocaleString();
-    ctx.fillText(totalXpText, badgeX + 8, badgeY + 32);
-    console.log(`✏️ Drew total XP: ${totalXpText}`);
+    ctx.font = "bold 24px Arial";
+    ctx.fillText(userData.xp.toString(), width - 25, 58);
+    ctx.textAlign = "left";
 
-    // === AVATAR ===
-    try {
-      // Use correct Discord.js v14 method
-      const avatarUrl = user.displayAvatarURL({ 
-        extension: "png", 
-        size: 256 
-      });
+    // === Bottom tagline ===
+    ctx.fillStyle = "#6b7280";
+    ctx.font = "13px Arial";
+    ctx.fillText("Keep chatting to level up!", 165, 178);
 
-      console.log(`🖼️ Loading avatar from: ${avatarUrl}`);
-
-      const buffer = await fetchImageBuffer(avatarUrl);
-      const img = await loadImage(buffer);
-
-      const cx = PADDING + AVATAR_SIZE / 2;
-      const cy = HEIGHT / 2;
-      const r = AVATAR_SIZE / 2;
-
-      // Draw avatar border (ring)
-      ctx.strokeStyle = "#10b981";
-      ctx.lineWidth = 6;
-      ctx.beginPath();
-      ctx.arc(cx, cy, r + 4, 0, Math.PI * 2);
-      ctx.stroke();
-
-      // Clip and draw avatar
-      ctx.save();
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.clip();
-      ctx.drawImage(img, PADDING, cy - r, AVATAR_SIZE, AVATAR_SIZE);
-      ctx.restore();
-
-      console.log(`✅ Avatar drawn successfully`);
-    } catch (err) {
-      console.error("❌ Failed to load avatar:", err);
+    // === Reward Roles Section ===
+    if (rewardRoles.length > 0) {
+      // "Reward Roles:" label
+      ctx.fillStyle = "#fbbf24";
+      ctx.font = "bold 14px Arial";
+      ctx.fillText("Reward Roles:", 165, 198);
       
-      // Draw fallback circle with initial
-      const cx = PADDING + AVATAR_SIZE / 2;
-      const cy = HEIGHT / 2;
-      const r = AVATAR_SIZE / 2;
+      // Display role badges
+      let roleX = 265;
+      const roleY = 198;
+      const maxWidth = width - 30;
       
-      ctx.fillStyle = "#334155";
-      ctx.beginPath();
-      ctx.arc(cx, cy, r, 0, Math.PI * 2);
-      ctx.fill();
-      
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 64px sans-serif";
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(username[0]?.toUpperCase() || "?", cx, cy);
-      
-      // Reset text properties
-      ctx.textAlign = "left";
-      ctx.textBaseline = "top";
+      for (let i = 0; i < Math.min(rewardRoles.length, 4); i++) {
+        const role = rewardRoles[i];
+        
+        // Measure text
+        ctx.font = "13px Arial";
+        const roleText = ctx.measureText(role.name);
+        const rolePadding = 10;
+        const roleWidth = roleText.width + rolePadding * 2;
+        
+        // Check if we have space
+        if (roleX + roleWidth > maxWidth) {
+          if (i < rewardRoles.length) {
+            ctx.fillStyle = "#9ca3af";
+            ctx.fillText(`+${rewardRoles.length - i}`, roleX, roleY);
+          }
+          break;
+        }
+        
+        // Role badge background with rounded corners
+        const roleColor = role.color !== "#000000" ? role.color : "#6b7280";
+        ctx.fillStyle = roleColor;
+        ctx.beginPath();
+        ctx.roundRect(roleX, roleY - 15, roleWidth, 20, 10);
+        ctx.fill();
+        
+        // Role text
+        ctx.fillStyle = "#ffffff";
+        ctx.fillText(role.name, roleX + rolePadding, roleY);
+        
+        roleX += roleWidth + 8;
+      }
     }
 
-    // === FOOTER TEXT ===
-    ctx.font = "14px sans-serif";
-    ctx.fillStyle = "#64748b";
-    ctx.textAlign = "left";
-    ctx.fillText("Keep chatting to level up!", textX, HEIGHT - PADDING - 20);
-
-    console.log(`✅ Rank card generation complete`);
-
-    // Return PNG buffer
     return canvas.toBuffer("image/png");
   } catch (error) {
-    console.error("❌ rankCardGen: Error generating rank card:", error);
+    console.error("❌ Error generating rank card:", error);
     return null;
   }
 }

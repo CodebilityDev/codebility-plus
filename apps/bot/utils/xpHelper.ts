@@ -230,23 +230,27 @@ export async function getUserRank(
   return { rank, totalUsers: allUsers.length };
 }
 
-
-
-
-
+// ---------------------------
+// FIXED: Level Progress Calculation
+// ---------------------------
 export function getLevelProgress(totalXP: number) {
   let level = 0;
   let remainingXP = totalXP;
 
+  // Calculate current level and XP into that level
   while (remainingXP >= xpForLevel(level)) {
     remainingXP -= xpForLevel(level);
     level++;
   }
 
+  // Fixed: xpToNextLevel should be the TOTAL XP needed for the next level
+  // not the remaining XP needed
+  const xpRequiredForNextLevel = xpForLevel(level);
+
   return {
     level,
     xpIntoLevel: remainingXP,
-    xpToNextLevel: xpForLevel(level) - remainingXP,
+    xpToNextLevel: xpRequiredForNextLevel, // ✅ Fixed: Total XP needed, not remaining
     totalXP,
   };
 }
