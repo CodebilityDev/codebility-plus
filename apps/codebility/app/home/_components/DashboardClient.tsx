@@ -3,12 +3,15 @@
 import { useEffect, useState } from "react";
 import UserInactiveModal from "@/components/modals/UserInactiveModal";
 import { useUserStore } from "@/store/codev-store";
+
+import DashboardCareerOpportunities from "../(dashboard)/_components/DashboardCareerOpportunities";
+import DashboardCompleteProfile from "../(dashboard)/_components/DashboardCompleteProfile";
 import DashboardCurrentProject from "../(dashboard)/_components/DashboardCurrentProject";
 import Profile from "../(dashboard)/_components/DashboardProfile";
+
 import TokenPoints from "../(dashboard)/_components/DashboardTokenPoints";
 import WeeklyTop from "../(dashboard)/_components/DashboardWeeklyTop";
-import DashboardCompleteProfile from "../(dashboard)/_components/DashboardCompleteProfile";
-import DashboardCareerOpportunities from "../(dashboard)/_components/DashboardCareerOpportunities";
+import DashboardRoleRoadmap from "../(dashboard)/_components/DashboardRoleRoadmap";
 
 export default function DashboardClient() {
   const { user } = useUserStore();
@@ -35,11 +38,13 @@ export default function DashboardClient() {
             </div>
             <DashboardCurrentProject />
             <TokenPoints />
+            {/* Role-based Roadmap at the bottom */}
+            <DashboardRoleRoadmap />
             {/* <DashboardRoadmap /> Hide Temporarily */}
             {user?.id ? (
               <DashboardCompleteProfile codevId={user.id} />
             ) : (
-              <div className="text-center text-gray-400 py-4">
+              <div className="py-4 text-center text-gray-400">
                 Loading profile...
               </div>
             )}
@@ -52,6 +57,7 @@ export default function DashboardClient() {
           </div>
         </div>
       </div>
+
       {userIsInactive && (
         <UserInactiveModal isOpen={isModalOpen} onClose={closeModal} />
       )}

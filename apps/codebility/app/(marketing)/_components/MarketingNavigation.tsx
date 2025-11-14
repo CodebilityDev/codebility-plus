@@ -26,14 +26,15 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
+} from "@codevs/ui";
+
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetTitle,
   SheetTrigger,
-} from "@codevs/ui/sheet";
+} from "@codevs/ui";
 
 const NAV_ITEMS = [
   { id: "1", title: "Our Services", path: "/services" },

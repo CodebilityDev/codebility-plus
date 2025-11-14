@@ -1,43 +1,51 @@
 "use client";
 
-import React, { memo } from "react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { UserPlus } from "lucide-react";
+import { UserPen } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-interface AdminDashboardTotalCodevProps {
+interface AdminDashboardTotalMentorProps {
   count?: number;
   className?: string;
 }
 
-const AdminDashboardTotalCodev = memo(({
+export default function AdminDashboardTotalMentor({
   count,
   className,
-}: AdminDashboardTotalCodevProps) => {
+}: AdminDashboardTotalMentorProps) {
   return (
-    <Card className={cn("group transition-all hover:shadow-lg", className)}>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+    <Card 
+      className={cn(
+        "group relative overflow-hidden transition-all hover:shadow-lg",
+        // Dark mode gradient background - orange theme
+        "bg-gradient-to-br from-orange-950/40 via-slate-900/60 to-slate-950/40",
+        "dark:from-orange-950/30 dark:via-slate-900/50 dark:to-slate-950/30",
+        // Border for definition
+        "border border-orange-900/20 dark:border-orange-800/20",
+        className
+      )}
+    >
+      {/* Subtle overlay for depth */}
+      <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent pointer-events-none" />
+      
+      <CardHeader className="relative flex flex-row items-center justify-between space-y-0 pb-2">
         <div className="space-y-1">
           <p className="text-sm font-medium text-muted-foreground">
-            Total Codevs
+            Total Mentors
           </p>
         </div>
-        <div className="rounded-lg bg-green-500/10 p-2 text-green-500 transition-colors group-hover:bg-green-500/20">
-          <UserPlus className="h-4 w-4" />
+        <div className="rounded-lg bg-orange-500/10 p-2 text-orange-500 transition-colors group-hover:bg-orange-500/20">
+          <UserPen className="h-4 w-4" />
         </div>
       </CardHeader>
-      <CardContent>
+      <CardContent className="relative">
         <div className="text-2xl font-bold">
           {count !== undefined ? count.toLocaleString() : "N/A"}
         </div>
         <p className="text-xs text-muted-foreground">
-          Registered developers
+          Active mentors
         </p>
       </CardContent>
     </Card>
   );
-});
-
-AdminDashboardTotalCodev.displayName = "AdminDashboardTotalCodev";
-
-export default AdminDashboardTotalCodev;
+}

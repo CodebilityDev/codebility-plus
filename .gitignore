@@ -36,6 +36,11 @@ node_modules/
 npm-debug.log
 yarn-error.log
 
+## Ignore environment variable files
+apps/bot/.env
+
+.next
+
 # BUCK
 buck-out/
 \.buckd/
@@ -65,6 +70,7 @@ web-build/
 **/*/.expo
 
 **/*/.next
+packages/ui/dist/*
 
 **/*/ios
 **/*/android
@@ -81,4 +87,5 @@ build/**
 !.yarn/sdks
 !.yarn/versions
 
-dist
+distapps/bot/.env
+.env
