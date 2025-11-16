@@ -20,7 +20,7 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
             This is a friendly reminder to complete your application process with Codebility.
 
             Steps to complete your application:
-            1. Visit and Sign In to our and website: https://www.codebility.tech/careers
+            1. Visit and Sign In to our website: https://www.codebility.tech/auth/sign-in
             2. Once Signed In, Click on "Status" in the navigation menu
             3. Click "Take the Test" button
             4. Read the instructions carefully
@@ -112,7 +112,7 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
                 <div class="steps">
                 <h3>Steps to complete your application:</h3>
                 <ol>
-                    <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+                    <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/auth/sign-in">https://www.codebility.tech/auth/sign-in</a></li>
                     <li>Once Signed In, Click on "Status" in the navigation menu</li>
                     <li>Click "Take the Test" button</li>
                     <li>Read the instructions carefully</li>
@@ -179,7 +179,7 @@ export const sendTestReminder = async ({ email, name }: { email: string, name: s
                 This is a friendly reminder to complete your application process with Codebility.
 
                 Steps to complete your application:
-                1. Visit and Sign in to our and website: https://www.codebility.tech/careers
+                1. Visit and Sign in to our website: https://www.codebility.tech/auth/sign-in
                 2. Once Sign in, Click on "Status" in the navigation menu
                 3. Click "Take the Test" button
                 4. Read the instructions carefully
@@ -270,7 +270,7 @@ export const sendTestReminder = async ({ email, name }: { email: string, name: s
                           <div class="steps">
                               <h3>Steps to complete your application:</h3>
                               <ol>
-                                  <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+                                  <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/auth/sign-in">https://www.codebility.tech/auth/sign-in</a></li>
                                   <li>Once Signed, In Click on "Status" in the navigation menu</li>
                                   <li>Click "Take the Test" button</li>
                                   <li>Read the instructions carefully</li>
@@ -337,7 +337,7 @@ export const sendMultipleOnboardingReminder = async (emails: string[]) => {
             This is a friendly reminder to complete your onboarding process with Codebility.
 
             Steps to complete your onboarding:
-            1. Visit and Sign in to our and website: https://www.codebility.tech/careers
+            1. Visit and Sign in to our website: https://www.codebility.tech/auth/sign-in
             2. Once Sign in, Click on "Status" in the navigation menu
             3. Click the Join Waiting List and Join Discord Server
             
@@ -433,7 +433,7 @@ export const sendMultipleOnboardingReminder = async (emails: string[]) => {
             <div class="steps">
             <h3>Steps to complete your onboarding:</h3>
             <ol>
-                <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+                <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/auth/sign-in">https://www.codebility.tech/auth/sign-in</a></li>
                 <li>Once Signed In, Click on "Status" in the navigation menu</li>
                 <li>Click the Join Waiting List and Join Discord Server</li>
             </ol>
@@ -501,7 +501,7 @@ export const sendOnboardingReminder = async ({ email, name }: { email: string, n
             This is a friendly reminder to complete your onboarding process with Codebility.
 
             Steps to complete your onboarding:
-            1. Visit and Sign in to our and website: https://www.codebility.tech/careers
+            1. Visit and Sign in to our website: https://www.codebility.tech/auth/sign-in
             2. Once Sign in, Click on "Status" in the navigation menu
             3. Click the Join Waiting List and Join Discord Server
             
@@ -597,7 +597,7 @@ export const sendOnboardingReminder = async ({ email, name }: { email: string, n
             <div class="steps">
             <h3>Steps to complete your onboarding:</h3>
             <ol>
-                <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+                <li>Visit and Sign in to our website: <a href="https://www.codebility.tech/auth/sign-in">https://www.codebility.tech/auth/sign-in</a></li>
                 <li>Once Signed In, Click on "Status" in the navigation menu</li>
                 <li>Click the Join Waiting List and Join Discord Server</li>
             </ol>
@@ -671,7 +671,7 @@ export const sendMultiplePassedTestEmail = async (Applicant: { email: string, na
             For now, please visit our website and check the status of your application.
 
             Steps to check your application status:
-            1. Visit and Sign in to our website: https://www.codebility.tech/careers
+            1. Visit and Sign in to our website: https://www.codebility.tech/auth/sign-in
             2. Once Signed In, Click on "Status" in the navigation menu
             3. Click the Join Waiting List and Join Discord Server
 
@@ -767,7 +767,7 @@ export const sendMultiplePassedTestEmail = async (Applicant: { email: string, na
             <div class="steps">
             <h3>Steps to check your application status:</h3>
             <ol>
-            <li>Visit and Sign In our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+            <li>Visit and Sign In our website: <a href="https://www.codebility.tech/auth/sign-in">https://www.codebility.tech/auth/sign-in</a></li>
             <li>Once Signed In, Click on "Status" in the navigation menu</li>
             <li>Click the Join Waiting List and Join Discord Server</li>
             </ol>
@@ -839,7 +839,7 @@ export const sendPassedTestEmail = async ({ email, name }: { email: string, name
             For now, please visit our website and check the status of your application.
 
             Steps to check your application status:
-            1. Visit and Sign In our website: https://www.codebility.tech/careers
+            1. Visit and Sign In our website: https://www.codebility.tech/auth/sign-in
             2. Once Signed In, Click on "Status" in the navigation menu
             3. Click the Join Waiting List and Join Discord Server
 
@@ -935,7 +935,7 @@ export const sendPassedTestEmail = async ({ email, name }: { email: string, name
             <div class="steps">
             <h3>Steps to check your application status:</h3>
             <ol>
-            <li>Visit and Sign In our website: <a href="https://www.codebility.tech/careers">https://www.codebility.tech/careers</a></li>
+            <li>Visit and Sign In our website: <a href="https://www.codebility.tech/auth/sign-in">https://www.codebility.tech/auth/sign-in</a></li>
             <li>Once Signed In, Click on "Status" in the navigation menu</li>
             <li>Click the Join Waiting List and Join Discord Server</li>
             </ol>
