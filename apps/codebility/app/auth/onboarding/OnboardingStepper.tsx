@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 
 // Section configuration - maps to each wrapper component
+// Line 9-17: Section labels array
 const SECTIONS = [
   { id: "about-section", label: "About Us" },
   { id: "software", label: "Software Development" },
@@ -13,7 +14,7 @@ const SECTIONS = [
   { id: "house-rules", label: "House Rules" },
   { id: "team", label: "Meet the Team" },
   { id: "partners", label: "Our Partners" },
-  { id: "welcome", label: "Welcome Aboard" },
+  { id: "welcome", label: "Signup Now!" }, // ✅ CHANGED: "Welcome Aboard" → "Signup Now!"
 ];
 
 export default function OnboardingStepper() {
