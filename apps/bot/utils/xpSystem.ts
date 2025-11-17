@@ -32,6 +32,7 @@ const cooldowns = new Map<string, number>();
 async function ensureUserExists(
   userId: string,
   username: string,
+  displayName: string,  // ✅ ADD THIS
   avatarUrl?: string,
   discriminator?: string
 ) {
@@ -42,6 +43,7 @@ async function ensureUserExists(
         {
           id: userId,
           username: username || "Unknown User",
+          display_name: displayName || username || "Unknown User",  // ✅ ADD THIS
           avatar_url: avatarUrl || null,
           discriminator: discriminator || "0",
         },
@@ -399,6 +401,7 @@ export async function handleXP(message: Message) {
       ensureUserExists(
         userId,
         username,
+        message.author.displayName,  // ✅ ADD THIS
         avatarUrl,
         message.author.discriminator || "0"
       ),
