@@ -6,7 +6,7 @@ import { Box } from "@/components/shared/dashboard";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
 import { format } from "date-fns";
-import { ArrowBigUp } from "lucide-react";
+import { ArrowBigUp, MessageSquare } from "lucide-react";
 import toast from "react-hot-toast";
 
 import { deletePost } from "../_services/action";
@@ -124,6 +124,15 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
 
         <div className="mx-4 mt-4 flex items-center space-x-4 text-gray-600 dark:text-gray-400">
           <PostUpvote post={post} />
+
+          {/* Comment Count */}
+          <div className="flex items-center space-x-1">
+            <MessageSquare
+              size={20}
+              className="text-gray-600 dark:text-gray-400"
+            />
+            <span>{post.comment_count ?? 0}</span>
+          </div>
         </div>
       </Box>
       <FeedPostModal
