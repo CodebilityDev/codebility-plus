@@ -22,14 +22,14 @@ export default function Feed({
 }: FeedProp) {
   const posts = useFeedsStore((state) => state.posts);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
-  const isLoading = useFeedsStore((state) => state.isLoading);
+  const isFetchingPosts = useFeedsStore((state) => state.isFetchingPosts);
 
   const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts]);
+  }, []);
 
   // Filter posts
   const filteredPosts = useMemo(() => {
@@ -116,7 +116,7 @@ export default function Feed({
     <>
       {/* Posts grid */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {isLoading
+        {isFetchingPosts
           ? Array.from({ length: 6 }).map((_, i) => (
               <PostCardSkeleton key={i} />
             ))
@@ -131,7 +131,7 @@ export default function Feed({
       </div>
 
       {/* Loader */}
-      {!isLoading && visibleCount < sortedPosts.length && (
+      {!isFetchingPosts && visibleCount < sortedPosts.length && (
         <div
           ref={loaderRef}
           className="mt-6 flex justify-center text-sm text-gray-500"
@@ -144,7 +144,7 @@ export default function Feed({
       )}
 
       {/* Empty state */}
-      {!isLoading && sortedPosts.length === 0 && (
+      {!isFetchingPosts && sortedPosts.length === 0 && (
         <div className="mt-8 text-center text-gray-500">No posts found.</div>
       )}
     </>

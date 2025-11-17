@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import { deletePost } from "../_services/action";
 import { PostType } from "../_services/query";
 import { DeleteDialog } from "./DeleteDialog";
+import PostCommentCount from "./PostCommentCount";
 import PostUpvote from "./PostUpvote";
 
 interface PostProps {
@@ -125,14 +126,7 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
         <div className="mx-4 mt-4 flex items-center space-x-4 text-gray-600 dark:text-gray-400">
           <PostUpvote post={post} />
 
-          {/* Comment Count */}
-          <div className="flex items-center space-x-1">
-            <MessageSquare
-              size={20}
-              className="text-gray-600 dark:text-gray-400"
-            />
-            <span>{post.comment_count ?? 0}</span>
-          </div>
+          <PostCommentCount post={post} />
         </div>
       </Box>
       <FeedPostModal
