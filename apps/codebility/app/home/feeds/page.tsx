@@ -83,7 +83,7 @@ export default function FeedsPage() {
 
             {sortMenuOpen && (
               <div className="absolute right-0 z-50 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800 dark:shadow-black/20">
-                {["date", "title", "upvotes"].map((field) => (
+                {["date", "title", "upvotes", "comments"].map((field) => (
                   <button
                     key={field}
                     onClick={() => {

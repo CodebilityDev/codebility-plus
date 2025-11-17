@@ -8,7 +8,7 @@ import Post from "./PostCard";
 interface FeedProp {
   isAdmin: boolean;
   searchQuery?: string;
-  sortField: "title" | "date" | "upvotes";
+  sortField: "title" | "date" | "upvotes" | "comments";
   sortOrder: "asc" | "desc";
 }
 
@@ -63,6 +63,10 @@ export default function Feed({
         case "upvotes":
           aVal = a.upvote_count ?? 0;
           bVal = b.upvote_count ?? 0;
+          break;
+        case "comments":
+          aVal = a.comment_count ?? 0;
+          bVal = b.comment_count ?? 0;
           break;
       }
 
