@@ -65,6 +65,7 @@ export default function PostViewCommentList({
       {comments.map((c) => (
         <PostViewCommentItem
           key={c.id}
+          postId={postId}
           commenntId={c.id}
           userImage={c.commenter?.image_url || defaultAvatar}
           userName={`${c.commenter?.first_name} ${c.commenter?.last_name}`}

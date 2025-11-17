@@ -3,12 +3,14 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFeedsStore } from "@/store/feeds-store";
 
+import { POSTS_PER_PAGE } from "../_constants";
 import Post from "./PostCard";
+import PostCardSkeleton from "./PostCardSkeleton";
 
 interface FeedProp {
   isAdmin: boolean;
   searchQuery?: string;
-  sortField: "title" | "date" | "upvotes";
+  sortField: "title" | "date" | "upvotes" | "comments";
   sortOrder: "asc" | "desc";
 }
 
@@ -20,13 +22,14 @@ export default function Feed({
 }: FeedProp) {
   const posts = useFeedsStore((state) => state.posts);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
+  const isFetchingPosts = useFeedsStore((state) => state.isFetchingPosts);
 
-  const [visibleCount, setVisibleCount] = useState(6);
+  const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     fetchPosts();
-  }, [fetchPosts]);
+  }, []);
 
   // Filter posts
   const filteredPosts = useMemo(() => {
@@ -64,6 +67,10 @@ export default function Feed({
           aVal = a.upvote_count ?? 0;
           bVal = b.upvote_count ?? 0;
           break;
+        case "comments":
+          aVal = a.comment_count ?? 0;
+          bVal = b.comment_count ?? 0;
+          break;
       }
 
       if (aVal < bVal) return sortOrder === "asc" ? -1 : 1;
@@ -76,7 +83,7 @@ export default function Feed({
   const visiblePosts = sortedPosts.slice(0, visibleCount);
 
   useEffect(() => {
-    setVisibleCount(6);
+    setVisibleCount(POSTS_PER_PAGE);
   }, [searchQuery]);
 
   // Infinite scroll
@@ -85,7 +92,9 @@ export default function Feed({
       (entries) => {
         const entry = entries[0];
         if (entry?.isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + 6, sortedPosts.length));
+          setVisibleCount((prev) =>
+            Math.min(prev + POSTS_PER_PAGE, sortedPosts.length),
+          );
         }
       },
       { threshold: 1 },
@@ -107,18 +116,22 @@ export default function Feed({
     <>
       {/* Posts grid */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-        {visiblePosts.map((post) => (
-          <Post
-            key={post.id}
-            post={post}
-            isAdmin={isAdmin}
-            onDelete={handleDeletePost}
-          />
-        ))}
+        {isFetchingPosts
+          ? Array.from({ length: 6 }).map((_, i) => (
+              <PostCardSkeleton key={i} />
+            ))
+          : visiblePosts.map((post) => (
+              <Post
+                key={post.id}
+                post={post}
+                isAdmin={isAdmin}
+                onDelete={handleDeletePost}
+              />
+            ))}
       </div>
 
       {/* Loader */}
-      {visibleCount < sortedPosts.length && (
+      {!isFetchingPosts && visibleCount < sortedPosts.length && (
         <div
           ref={loaderRef}
           className="mt-6 flex justify-center text-sm text-gray-500"
@@ -131,7 +144,7 @@ export default function Feed({
       )}
 
       {/* Empty state */}
-      {sortedPosts.length === 0 && (
+      {!isFetchingPosts && sortedPosts.length === 0 && (
         <div className="mt-8 text-center text-gray-500">No posts found.</div>
       )}
     </>

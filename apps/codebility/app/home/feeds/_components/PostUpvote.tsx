@@ -63,11 +63,17 @@ export default function PostUpvote({ post }: PostUpvoteProps) {
 
       if (!isUpvoted) {
         const postUpvote = await AddPostUpvote(post.id, user.id);
+
+        useFeedsStore.getState().updatePost(post.id, {
+          upvote_count: post.comment_count! + 1,
+        });
       } else {
         await removePostUpvote(post.id, user.id);
-      }
 
-      await fetchPosts();
+        useFeedsStore.getState().updatePost(post.id, {
+          upvote_count: post.comment_count! - 1,
+        });
+      }
     }
   };
 

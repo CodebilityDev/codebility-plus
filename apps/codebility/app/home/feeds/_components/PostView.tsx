@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { useParams } from "next/navigation";
 import EditPostModal from "@/components/modals/EditPostModal";
 import { Box } from "@/components/shared/dashboard";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { defaultAvatar } from "@/public/assets/images";
 import { useUserStore } from "@/store/codev-store";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import { useFeedsStore } from "@/store/feeds-store";
 import { format } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -17,6 +16,7 @@ import remarkGfm from "remark-gfm";
 import type { PostType } from "../_services/query";
 import PostUpvote from "../_components/PostUpvote";
 import { getUserRole } from "../_services/action";
+import PostCommentCount from "./PostCommentCount";
 import PostViewCommentList from "./PostViewCommentList";
 import PostViewCreateComment from "./PostViewCreateComment";
 
@@ -25,25 +25,27 @@ interface PostViewProps {
 }
 
 export default function PostView({ postId }: PostViewProps) {
-  const [supabase, setSupabase] = useState<any>(null);
-
-  useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
-  }, []);
-
   const [post, setPost] = useState<PostType | null>(null);
-  const [error, setError] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(true);
   const [isAuthor, setIsAuthor] = useState(false);
   const { user } = useUserStore();
   const [refreshComments, setRefreshComments] = useState(0);
 
+  const { posts } = useFeedsStore();
+
+  // Trigger comment refresh
   const triggerRefreshComments = () => {
     setRefreshComments((prev) => prev + 1);
   };
 
+  // Find the post in the store
+  useEffect(() => {
+    const foundPost = posts.find((p) => p.id === postId) || null;
+    setPost(foundPost);
+  }, [posts, postId]);
+
+  // Check roles
   useEffect(() => {
     const fetchRole = async () => {
       if (!user) return;
@@ -51,18 +53,9 @@ export default function PostView({ postId }: PostViewProps) {
       setIsAdmin(role === "Admin");
     };
 
-    const checkIfAuthor = async () => {
-      console.log(
-        "CHECKING USER ID AND AUTHOR ID: ",
-        user?.id,
-        post?.author_id?.id,
-      );
+    const checkIfAuthor = () => {
       if (!user) return;
-      if (user.id === post?.author_id?.id) {
-        setIsAuthor(true);
-      } else {
-        setIsAuthor(false);
-      }
+      setIsAuthor(user.id === post?.author_id?.id);
     };
 
     if (user) {
@@ -70,40 +63,6 @@ export default function PostView({ postId }: PostViewProps) {
       checkIfAuthor();
     }
   }, [user, post]);
-
-  const fetchPost = async () => {
-    if (!supabase) return;
-    try {
-      const { data, error } = await supabase
-        .from("posts")
-        .select(
-          `*,
-          author_id(
-            id,
-            first_name,
-            last_name,
-            image_url
-          )`,
-        )
-        .eq("id", postId)
-        .single();
-
-      if (error) throw error;
-      setPost(data || null);
-    } catch (error) {
-      console.error("Error fetching post:", error);
-    }
-  };
-
-  useEffect(() => {
-    if (supabase) {
-      fetchPost();
-    }
-  }, [postId, supabase]);
-
-  if (error) {
-    return <div className="p-4 text-red-500">Error loading post: {error}</div>;
-  }
 
   if (!post) {
     return (
@@ -141,9 +100,11 @@ export default function PostView({ postId }: PostViewProps) {
         </p>
       </div>
 
-      <PostUpvote post={post} />
+      <div className="mb-4 flex items-center gap-4">
+        <PostUpvote post={post} />
+        <PostCommentCount post={post} />
+      </div>
 
-      {/* Scrollable group */}
       <div className="max-h-[90vh] overflow-y-auto">
         <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
@@ -156,6 +117,7 @@ export default function PostView({ postId }: PostViewProps) {
             Edit Post
           </Button>
         )}
+
         <div className="mb-1 mt-1 border-t border-gray-200 dark:border-gray-700" />
         <PostViewCommentList
           postId={postId}
@@ -164,7 +126,7 @@ export default function PostView({ postId }: PostViewProps) {
         />
       </div>
       <PostViewCreateComment
-        postId={postId}
+        post={post}
         onCommentCreated={triggerRefreshComments}
       />
 
@@ -172,7 +134,7 @@ export default function PostView({ postId }: PostViewProps) {
         post={post}
         isOpen={isModalOpen}
         onClose={closeModal}
-        onPostUpdated={fetchPost}
+        onPostUpdated={() => {}}
       />
     </>
   );
