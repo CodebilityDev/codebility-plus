@@ -14,7 +14,7 @@ type SortField = "title" | "date" | "upvotes";
 type SortOrder = "asc" | "desc";
 
 export default function FeedsPage() {
-  const [isAdmin, setIsAdmin] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
