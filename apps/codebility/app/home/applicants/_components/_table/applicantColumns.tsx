@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { IconGithub, IconLink } from "@/public/assets/svgs";
+import { IconFacebook, IconGithub, IconLink } from "@/public/assets/svgs";
 import { ColumnDef } from "@tanstack/react-table";
 import { ArrowUpDown } from "lucide-react";
 
@@ -142,6 +142,18 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
           ) : (
             <div className="w-7 h-7"></div>
           )}
+          {applicant.facebook ? (
+            <Link
+              href={applicant.facebook}
+              target="_blank"
+              className="rounded-full p-1.5 text-gray-600 transition-colors hover:bg-gray-100 hover:text-gray-900 dark:text-gray-400 dark:hover:bg-gray-800 dark:hover:text-gray-200"
+              title="Facebook"
+            >
+              <IconFacebook className="h-4 w-4 invert dark:invert-0" />
+            </Link>
+          ) : (
+            <div className="w-7 h-7"></div>
+          )}
           {applicant.portfolio_website ? (
             <Link
               href={applicant.portfolio_website}
@@ -154,7 +166,7 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
           ) : (
             <div className="w-7 h-7"></div>
           )}
-          {!applicant.github && !applicant.portfolio_website && (
+          {!applicant.github && !applicant.facebook && !applicant.portfolio_website && (
             <span className="text-sm text-gray-500 dark:text-gray-500">
               None
             </span>
