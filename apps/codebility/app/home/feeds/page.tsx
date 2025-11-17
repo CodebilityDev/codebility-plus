@@ -8,6 +8,7 @@ import { ChevronDown } from "lucide-react";
 
 import Feed from "./_components/Feed";
 import SocialPointsCard from "./_components/SocialPointsCard";
+import { SEARCH_DEBOUNCE_MS } from "./_constants";
 import { getUserRole } from "./_services/action";
 
 type SortField = "title" | "date" | "upvotes";
@@ -33,7 +34,10 @@ export default function FeedsPage() {
   }, [user]);
 
   useEffect(() => {
-    const handler = setTimeout(() => setDebouncedQuery(searchQuery), 500);
+    const handler = setTimeout(
+      () => setDebouncedQuery(searchQuery),
+      SEARCH_DEBOUNCE_MS,
+    );
     return () => clearTimeout(handler);
   }, [searchQuery]);
 

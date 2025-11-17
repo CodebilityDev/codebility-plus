@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useFeedsStore } from "@/store/feeds-store";
 
+import { POSTS_PER_PAGE } from "../_constants";
 import Post from "./PostCard";
 
 interface FeedProp {
@@ -21,7 +22,7 @@ export default function Feed({
   const posts = useFeedsStore((state) => state.posts);
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
 
-  const [visibleCount, setVisibleCount] = useState(6);
+  const [visibleCount, setVisibleCount] = useState(POSTS_PER_PAGE);
   const loaderRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -80,7 +81,7 @@ export default function Feed({
   const visiblePosts = sortedPosts.slice(0, visibleCount);
 
   useEffect(() => {
-    setVisibleCount(6);
+    setVisibleCount(POSTS_PER_PAGE);
   }, [searchQuery]);
 
   // Infinite scroll
@@ -89,7 +90,9 @@ export default function Feed({
       (entries) => {
         const entry = entries[0];
         if (entry?.isIntersecting) {
-          setVisibleCount((prev) => Math.min(prev + 6, sortedPosts.length));
+          setVisibleCount((prev) =>
+            Math.min(prev + POSTS_PER_PAGE, sortedPosts.length),
+          );
         }
       },
       { threshold: 1 },
