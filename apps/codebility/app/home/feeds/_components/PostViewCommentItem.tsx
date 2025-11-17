@@ -6,8 +6,10 @@ import { useFeedsStore } from "@/store/feeds-store";
 import { X } from "lucide-react";
 
 import { deletePostComment } from "../_services/action";
+import { PostType } from "../_services/query";
 
 interface PostViewCommentItemProps {
+  postId: string;
   commenntId: string;
   userImage: string;
   userName: string;
@@ -16,6 +18,7 @@ interface PostViewCommentItemProps {
 }
 
 export default function PostViewCommentItem({
+  postId,
   commenntId,
   userImage,
   userName,
@@ -29,7 +32,15 @@ export default function PostViewCommentItem({
     setIsVisible(false);
     try {
       await deletePostComment(commenntId);
-      fetchPosts();
+      // Get current post from store
+      const currentPost = useFeedsStore
+        .getState()
+        .posts.find((p) => p.id === postId);
+      if (currentPost) {
+        useFeedsStore.getState().updatePost(postId, {
+          comment_count: (currentPost.comment_count ?? 0) - 1,
+        });
+      }
     } catch (error) {
       setIsVisible(true);
     }

@@ -16,24 +16,27 @@ export const getPosts = async () => {
           last_name,
           image_url
         ),
-        post_upvotes (id)
+        post_upvotes (id),
+        post_comments (id)
       `)
       .order("created_at", { ascending: false });
 
     if (error) throw error;
 
-    // compute upvote count based on the joined array
-    const postsWithUpvoteCount = posts.map((post) => ({
+    // compute upvote & comment counts
+    const postsWithCounts = posts.map((post) => ({
       ...post,
       upvote_count: post.post_upvotes ? post.post_upvotes.length : 0,
+      comment_count: post.post_comments ? post.post_comments.length : 0,
     }));
 
-    return postsWithUpvoteCount;
+    return postsWithCounts;
   } catch (error) {
     console.error(error);
     throw error;
   }
 };
+
 
 export type PostType = {
   id: string;
@@ -48,4 +51,5 @@ export type PostType = {
   };
   image_url?: string;
   upvote_count?: number;
+  comment_count?: number;
 };

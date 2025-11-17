@@ -4,10 +4,10 @@ This document outlines potential improvements for the feeds feature based on cod
 
 ## Performance & Optimization
 
-1. **Implement infinite scroll** instead of traditional pagination
+<!-- 1. **Implement infinite scroll** instead of traditional pagination
    - Better UX for feed browsing
    - Reduces cognitive load on users
-   - More engaging scrolling experience
+   - More engaging scrolling experience -->
 
 2. **Add optimistic updates** for upvotes/comments
    - Instant UI feedback before server response
@@ -19,17 +19,12 @@ This document outlines potential improvements for the feeds feature based on cod
    - Automatic background refetching
    - Built-in stale-while-revalidate pattern
 
-4. **Add real-time updates** using Supabase subscriptions
-   - New posts appear automatically without manual refresh
-   - Live upvote/comment count updates
-   - Better collaboration experience
-
-5. **Optimize image loading**
+4. **Optimize image loading**
    - Add blur placeholders (Next.js Image component supports this)
    - Lazy loading for images below the fold
    - Progressive image loading
 
-6. **Memoize filtered posts computation**
+5. **Memoize filtered posts computation**
    - Already using `useMemo` in Feed.tsx:25-41
    - Could optimize further with better dependency keys
    - Consider moving heavy filtering to server-side
@@ -41,11 +36,11 @@ This document outlines potential improvements for the feeds feature based on cod
    - Multiple categories per post
    - Visual category badges
 
-8. **Sort options**
+<!-- 8. **Sort options**
    - Newest first (current default)
    - Most upvoted
    - Trending (combination of recent + upvotes)
-   - Most commented
+   - Most commented -->
 
 9. **Bookmark/save posts**
    - Let users save posts for later reading
@@ -57,10 +52,10 @@ This document outlines potential improvements for the feeds feature based on cod
     - Show content excerpt with "Read more..."
     - Better preview of post content
 
-11. **Comment count display** on PostCard
+<!-- 11. **Comment count display** on PostCard
     - Show engagement metrics at a glance
     - Currently only shows upvote count
-    - Display next to upvote button
+    - Display next to upvote button -->
 
 12. **Share functionality**
     - Copy link to clipboard
@@ -72,22 +67,17 @@ This document outlines potential improvements for the feeds feature based on cod
     - Notify mentioned users
     - Highlight mentions in text
 
-14. **Image gallery view** for posts with multiple images
-    - Currently supports single thumbnail
-    - Carousel/gallery for multiple images
-    - Lightbox for full-size viewing
-
-15. **Draft posts**
+14. **Draft posts**
     - Save work in progress before publishing
     - Auto-save functionality
     - Resume editing later
 
 ## Code Quality & Architecture
 
-16. **Fix hardcoded admin check** (page.tsx:13)
+<!-- 16. **Fix hardcoded admin check** (page.tsx:13)
     - Currently: `const [isAdmin, setIsAdmin] = useState(true);`
     - Should initialize as `false`
-    - Security risk if not properly validated
+    - Security risk if not properly validated -->
 
 17. **Consolidate duplicate user role fetching**
     - Used in page.tsx:20-27 and PostView.tsx:48-52
@@ -110,15 +100,15 @@ This document outlines potential improvements for the feeds feature based on cod
     - Graceful degradation
     - User-friendly error messages
 
-21. **Loading skeletons** for individual post cards
+<!-- 21. **Loading skeletons** for individual post cards
     - Currently only in PostView.tsx:110-115
     - Add to Feed.tsx while posts are loading
-    - Better loading states
+    - Better loading states -->
 
-22. **Extract magic numbers** to constants
+<!-- 22. **Extract magic numbers** to constants
     - `postsPerPage: 6` (Feed.tsx:43)
     - Debounce delay `500ms` (page.tsx:32)
-    - Create `constants.ts` file
+    - Create `constants.ts` file -->
 
 23. **Consistent async/await error handling**
     - Some functions use try/catch, others don't
@@ -234,29 +224,29 @@ This document outlines potential improvements for the feeds feature based on cod
 
 These improvements can be implemented quickly and provide immediate value:
 
-- ✅ **Fix the `isAdmin` initialization bug** (page.tsx:13)
+<!-- - ✅ **Fix the `isAdmin` initialization bug** (page.tsx:13)
   - Change `useState(true)` to `useState(false)`
   - 1-line fix, important security improvement
 
 - ✅ **Add comment count to PostCard component**
   - Query comment count in getPosts
   - Display next to upvote count
-  - ~20 lines of code
+  - ~20 lines of code -->
 
-- ✅ **Extract constants**
+<!-- - ✅ **Extract constants**
   - Create `_constants/index.ts`
   - Move magic numbers: `POSTS_PER_PAGE = 6`, `SEARCH_DEBOUNCE_MS = 500`
-  - Better maintainability
+  - Better maintainability -->
 
-- ✅ **Add loading skeleton for post cards**
+<!-- - ✅ **Add loading skeleton for post cards**
   - Reuse existing Skeleton component
   - Show while `fetchPosts()` is loading
-  - ~15 lines of code
+  - ~15 lines of code -->
 
-- ✅ **Add empty state when no posts match search**
+<!-- - ✅ **Add empty state when no posts match search**
   - Simple conditional in Feed.tsx
   - Better UX than empty grid
-  - ~10 lines of code
+  - ~10 lines of code -->
 
 ## File References
 
