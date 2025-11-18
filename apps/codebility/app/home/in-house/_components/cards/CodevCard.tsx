@@ -95,6 +95,7 @@ export function CodevCard({ data, onEdit, onDelete, roles }: CodevCardProps) {
             alt={`${data.first_name} avatar`}
             width={80}
             height={80}
+            unoptimized={true}
             className="border-light-700 dark:border-dark-200 h-20 w-20 rounded-full border-2 object-cover"
           />
         </div>
@@ -182,10 +183,11 @@ export function CodevCard({ data, onEdit, onDelete, roles }: CodevCardProps) {
       </CardContent>
 
       <CardFooter className="border-light-700 dark:border-dark-200 flex justify-center gap-2 border-t py-1">
+        {/* Line 138: Enhanced View button with actual profile navigation */}
         <Button
           variant="ghost"
           size="sm"
-          onClick={() => alert("View action")}
+          onClick={() => window.location.href = `https://www.codebility.tech/profiles/${data.id}`}
           className="dark:text-light-900 hover:bg-light-800 dark:hover:bg-dark-200 p-1 text-black"
         >
           <Eye className="h-4 w-4" />
