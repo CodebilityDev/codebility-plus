@@ -87,6 +87,16 @@ export default function AccountSettingsDelete() {
         return;
       }
 
+      // Get the current session token for API authentication
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (!session) {
+        toast.error("No active session");
+        return;
+      }
+
       // Delete user data from your codev table first
       const { error: dbError } = await supabase
         .from("codev")
@@ -95,16 +105,37 @@ export default function AccountSettingsDelete() {
 
       if (dbError) {
         toast.error("Failed to delete user data");
+        console.error("Database deletion error:", dbError);
         return;
       }
 
-      // Delete the authentication user
-      const { error: authError } = await supabase.auth.admin.deleteUser(
-        user.id,
-      );
+      // Call the API route to delete the authentication user
+      const response = await fetch("/api/delete-auth-user", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({
+          userId: user.id,
+        }),
+      });
 
-      if (authError) {
-        toast.error("Failed to delete account");
+      // Parse response with proper type handling
+      const rawData: unknown = await response.json();
+      
+      // Type guard for API response
+      interface ApiResponse {
+        success?: boolean;
+        message?: string;
+        error?: string;
+      }
+      
+      const data = rawData as ApiResponse;
+
+      if (!response.ok) {
+        toast.error(data.error || "Failed to delete account");
+        console.error("API error:", data);
         return;
       }
 
@@ -163,76 +194,66 @@ export default function AccountSettingsDelete() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          {/*  <Alert className="background-box mb-4 border border-red-600 text-red-600">
-            <AlertCircle className="h-4 w-4" color="red" />
-            <AlertTitle>Warning</AlertTitle>
-            <AlertDescription className="text-xs sm:text-sm">
-              This action is irreversible. All your data will be permanently
-              deleted.
-            </AlertDescription>
-          </Alert> */}
-          
-            <Dialog
-              open={isOpen}
-              onOpenChange={(open) => {
-                setIsOpen(open);
-                if (!open) {
-                  form.reset();
-                }
-              }}
-            >
-              <DialogTrigger asChild>
-                <Button variant="destructive">Delete Account</Button>
-              </DialogTrigger>
-              <DialogContent className="text-dark100_light900 background-box w-[90%] sm:w-full">
-                <DialogHeader>
-                  <DialogTitle>Are you absolutely sure?</DialogTitle>
-                  <DialogDescription>
-                    This action cannot be undone. This will permanently delete
-                    your account and remove your data from our servers.
-                  </DialogDescription>
-                </DialogHeader>
-                <Form {...form}>
-                  <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
-                    <FormField
-                      control={form.control}
-                      name="confirmation"
-                      render={({ field }) => (
-                        <FormItem>
-                          <FormControl>
-                            <Input
-                              placeholder="Type DELETE to confirm"
-                              labelClassName="sm:text-base text-sm"
-                              label="To confirm, type DELETE in the box below:"
-                              parentClassName="flex flex-col gap-2"
-                              variant="lightgray"
-                              disabled={isLoading}
-                              {...field}
-                            />
-                          </FormControl>
-                          <FormMessage className="text-red-600" />
-                        </FormItem>
-                      )}
-                    />
-                    <DialogFooter className="mt-4 gap-2">
-                      <DialogClose asChild>
-                        <Button variant="outline" disabled={isLoading}>
-                          Cancel
-                        </Button>
-                      </DialogClose>
-                      <Button
-                        variant="destructive"
-                        type="submit"
-                        disabled={!form.formState.isValid || isLoading}
-                      >
-                        {isLoading ? "Deleting..." : "Delete Account"}
+          <Dialog
+            open={isOpen}
+            onOpenChange={(open) => {
+              setIsOpen(open);
+              if (!open) {
+                form.reset();
+              }
+            }}
+          >
+            <DialogTrigger asChild>
+              <Button variant="destructive">Delete Account</Button>
+            </DialogTrigger>
+            <DialogContent className="text-dark100_light900 background-box w-[90%] sm:w-full">
+              <DialogHeader>
+                <DialogTitle>Are you absolutely sure?</DialogTitle>
+                <DialogDescription>
+                  This action cannot be undone. This will permanently delete
+                  your account and remove your data from our servers.
+                </DialogDescription>
+              </DialogHeader>
+              <Form {...form}>
+                <form onSubmit={form.handleSubmit(onSubmit)} noValidate>
+                  <FormField
+                    control={form.control}
+                    name="confirmation"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormControl>
+                          <Input
+                            placeholder="Type DELETE to confirm"
+                            labelClassName="sm:text-base text-sm"
+                            label="To confirm, type DELETE in the box below:"
+                            parentClassName="flex flex-col gap-2"
+                            variant="lightgray"
+                            disabled={isLoading}
+                            {...field}
+                          />
+                        </FormControl>
+                        <FormMessage className="text-red-600" />
+                      </FormItem>
+                    )}
+                  />
+                  <DialogFooter className="mt-4 gap-2">
+                    <DialogClose asChild>
+                      <Button variant="outline" disabled={isLoading}>
+                        Cancel
                       </Button>
-                    </DialogFooter>
-                  </form>
-                </Form>
-              </DialogContent>
-            </Dialog>
-          
+                    </DialogClose>
+                    <Button
+                      variant="destructive"
+                      type="submit"
+                      disabled={!form.formState.isValid || isLoading}
+                    >
+                      {isLoading ? "Deleting..." : "Delete Account"}
+                    </Button>
+                  </DialogFooter>
+                </form>
+              </Form>
+            </DialogContent>
+          </Dialog>
         </CardContent>
       </Card>
     </>
