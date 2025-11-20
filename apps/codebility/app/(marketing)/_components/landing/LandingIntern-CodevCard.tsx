@@ -6,6 +6,7 @@ import { motion, useInView } from "framer-motion";
 import { Card, CardContent } from "@/components/ui/card";
 
 type Person = {
+  id: string; // ✅ Added id field for navigation
   name: string;
   role: 'Intern' | 'Codev'; // Only two possible roles from database
   image?: string; // image URL (optional)
@@ -231,6 +232,8 @@ export default function InternCards({ interns }: { interns: Person[] }) {
               }}
               whileTap={{ scale: 0.95 }}
               style={{ perspective: "1000px" }}
+              onClick={() => window.location.href = `https://www.codebility.tech/profiles/${intern.id}`}
+              className="cursor-pointer"
             >
               <motion.div
                 className="h-full relative"

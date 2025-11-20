@@ -155,55 +155,24 @@ export default function TeamMembersPagination() {
 
   // Navigation functions
   const goToPreviousPage = () => {
-    console.log('goToPreviousPage called, current page:', currentPage);
     setCurrentPage((prevPage) => Math.max(1, prevPage - 1));
   };
-  
+
   const goToNextPage = () => {
-    console.log('goToNextPage called, current page:', currentPage);
     setCurrentPage((prevPage) => Math.min(totalPages, prevPage + 1));
   };
 
   const handlePreviousPageClick = () => {
-    console.log('Previous page button clicked!');
     goToPreviousPage();
   };
 
   const handleNextPageClick = () => {
-    console.log('Next page button clicked!');
     goToNextPage();
   };
-
-  // Debug: Log the current pagination state with prioritization info
-  console.log('Debug pagination state (prioritized):', { 
-    currentPage, 
-    totalPages, 
-    isLoading,
-    totalTeamMembers: allTeamMembers.length,
-    teamMembersArePrioritized: true // Team members are now prioritized using codev-priority.ts
-  });
 
   // Button disabled states
   const isPreviousPageDisabled = currentPage <= 1 || isLoading;
   const isNextPageDisabled = currentPage >= totalPages || isLoading;
-
-  console.log('Pagination button states:', {
-    isPreviousPageDisabled,
-    isNextPageDisabled,
-    isFirstPage: currentPage <= 1,
-    isLastPage: currentPage >= totalPages
-  });
-
-  // Helper function to count each role type for debugging
-  const internMembers = allTeamMembers.filter(member => isInternRole(member.role));
-  const codevMembers = allTeamMembers.filter(member => isCodevRole(member.role));
-
-  console.log('Team composition (prioritized):', { 
-    totalInterns: internMembers.length, 
-    totalCodevs: codevMembers.length, 
-    totalMembers: allTeamMembers.length,
-    note: 'Team members are sorted by priority using codev-priority.ts utility'
-  });
 
   return (
     <div className="w-full flex flex-col items-center gap-6">

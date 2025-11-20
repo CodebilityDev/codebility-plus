@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import {
   getMembers,
@@ -10,7 +11,7 @@ import {
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock, CheckSquare } from "lucide-react";
+import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock, CheckSquare, Kanban } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
 import ChecklistManageModal from "../../_components/ChecklistManageModal";
 import AttendanceGrid from "./AttendanceGrid";
@@ -19,6 +20,7 @@ import CompactMemberGrid from "./CompactMemberGrid";
 import SyncAllAttendance from "./SyncAllAttendance";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
 import AttendanceWarningBanner from "./AttendanceWarningBanner";
+import ChecklistStatusBanner from "./ChecklistStatusBanner";
 import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "../actions";
 
 /**
@@ -60,6 +62,7 @@ interface TeamDetailViewProps {
 }
 
 const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
+  const router = useRouter();
   const [project, setProject] = useState(projectData);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showChecklistModal, setShowChecklistModal] = useState(false);
@@ -131,7 +134,18 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       .filter(Boolean)
       .join(", ");
 
-    return `${selectedDaysDisplay} at ${currentSchedule.time} @ Discord`;
+    // Convert military time to 12-hour format
+    const convertTo12Hour = (time24: string) => {
+      const [hours, minutes] = time24.split(':');
+      const hour = parseInt(hours, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
+      return `${hour12}:${minutes} ${ampm}`;
+    };
+
+    const formattedTime = convertTo12Hour(currentSchedule.time);
+
+    return `${selectedDaysDisplay} at ${formattedTime} @ Discord`;
   };
 
   const handleOpenAddModal = () => {
@@ -256,26 +270,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             isTeamLead={isCurrentUserTeamLead}
           />
         )}
-        
-        {/* Meeting Schedule Banner */}
-        {formatSchedule() && (
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2">
-                  <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">Meeting Schedule</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mt-0.5">
-                    <Clock className="h-3.5 w-3.5" />
-                    {formatSchedule()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Header with Tab Buttons */}
         <div className="flex items-center justify-between">
@@ -372,12 +366,56 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 Schedule Meeting
               </Button>
             )}
+
+            {/* Kanban Board Button - VISIBLE TO ALL MEMBERS */}
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+              title="Go to Kanban Board"
+              onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
+            >
+              <Kanban className="h-3.5 w-3.5" />
+              Kanban Board
+            </Button>
           </div>
         </div>
 
         {viewMode === "team" ? (
           <>
-            {/* Project stats */}
+            {/* Meeting Schedule and Checklist Status - Side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-start">
+              {/* Meeting Schedule - Takes 2 columns */}
+              {formatSchedule() && (
+                <div className="md:col-span-2 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2">
+                        <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Meeting Schedule</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mt-0.5">
+                          <Clock className="h-3.5 w-3.5" />
+                          {formatSchedule()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Checklist Status - Takes 1 column on the right */}
+              <div className={formatSchedule() ? "" : "md:col-span-3"}>
+                <ChecklistStatusBanner
+                  projectId={projectInfo.id}
+                  teamMembers={members?.data || []}
+                  teamLead={teamLead?.data || null}
+                />
+              </div>
+            </div>
+
+            {/* Team Overview and Attendance Points - Equal width */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               {/* Team Overview Card */}
               <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
