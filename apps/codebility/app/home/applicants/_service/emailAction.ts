@@ -19,6 +19,8 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
 
             This is a friendly reminder to complete your application process with Codebility.
 
+            ⏰ DEADLINE REMINDER: You have 5 days from the date of your application to complete the test. Please take action soon!
+
             Steps to complete your application:
             1. Visit and Sign In to our website: https://www.codebility.tech/auth/sign-in
             2. Once Signed In, Click on "Status" in the navigation menu
@@ -103,12 +105,16 @@ export const sendMultipleTestReminderEmail = async (emails: string[]) => {
             <div class="disclaimer">
                 <strong>Important:</strong> If you have already completed your application or received this email before, please disregard this message.
             </div>
-            
+
             <div class="content">
                 <p>Dear Applicant,</p>
-                
+
                 <p>This is a friendly reminder to complete your application process with Codebility.</p>
-                
+
+                <div class="disclaimer" style="background-color: #fff3cd; border: 2px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 5px;">
+                    <strong>⏰ DEADLINE REMINDER:</strong> You have <strong>5 days</strong> from the date of your application to complete the test. Please take action soon!
+                </div>
+
                 <div class="steps">
                 <h3>Steps to complete your application:</h3>
                 <ol>
@@ -177,6 +183,8 @@ export const sendTestReminder = async ({ email, name }: { email: string, name: s
                 IMPORTANT: If you have already completed your application or received this email before, please disregard this message.
 
                 This is a friendly reminder to complete your application process with Codebility.
+
+                ⏰ DEADLINE REMINDER: You have 5 days from the date of your application to complete the test. Please take action soon!
 
                 Steps to complete your application:
                 1. Visit and Sign in to our website: https://www.codebility.tech/auth/sign-in
@@ -261,12 +269,16 @@ export const sendTestReminder = async ({ email, name }: { email: string, name: s
                       <div class="disclaimer">
                           <strong>Important:</strong> If you have already completed your application or received this email before, please disregard this message.
                       </div>
-                      
+
                       <div class="content">
                           <p>Dear ${name},</p>
-                          
+
                           <p>This is a friendly reminder to complete your application process with Codebility.</p>
-                          
+
+                          <div class="disclaimer" style="background-color: #fff3cd; border: 2px solid #ff9800; padding: 15px; margin: 20px 0; border-radius: 5px;">
+                              <strong>⏰ DEADLINE REMINDER:</strong> You have <strong>5 days</strong> from the date of your application to complete the test. Please take action soon!
+                          </div>
+
                           <div class="steps">
                               <h3>Steps to complete your application:</h3>
                               <ol>
