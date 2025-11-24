@@ -11,6 +11,7 @@ import { Textarea } from "@codevs/ui/textarea";
 import { addPost, editPost } from "../_services/action";
 import { PostType } from "../_services/query";
 import MarkdownEditor from "./MarkdownEditor";
+import TagSelector from "./TagSelector";
 import ThumbnailUpload from "./ThumbnailUpload";
 
 const EditPostForm = ({
@@ -30,6 +31,10 @@ const EditPostForm = ({
   const [title, setTitle] = useState(post.title);
   const [content, setContent] = useState(post.content);
   const [uploadedImageIds, setUploadedImageIds] = useState<string[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>(
+    post.tags.map((t) => Number(t.tag_id)),
+  );
+
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -54,12 +59,13 @@ const EditPostForm = ({
         });
       }
 
-      const newPost = await editPost({
+      await editPost({
         id: post.id,
         title,
         content,
         image_url: image_url!,
         content_image_ids: uploadedImageIds,
+        tag_ids: selectedTagIds,
       });
 
       // Notify
@@ -112,6 +118,11 @@ const EditPostForm = ({
           if (hiddenInput) hiddenInput.value = v;
         }}
         onImagesUploaded={setUploadedImageIds}
+      />
+
+      <TagSelector
+        selectedTags={selectedTagIds}
+        onChange={(tags) => setSelectedTagIds(tags)}
       />
 
       <input type="hidden" name="content" value={""} />

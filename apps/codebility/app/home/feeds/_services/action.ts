@@ -40,6 +40,7 @@ type AddPostParams = {
   author_id?: string | null;
   image_url?: string | null;
   content_image_ids?: string[] | null;
+  tag_ids?: number[] | null;
 };
 
 export const addPost = async ({
@@ -48,6 +49,7 @@ export const addPost = async ({
   author_id,
   image_url,
   content_image_ids,
+  tag_ids,
 }: AddPostParams) => {
   try {
     const supabase = await createClientServerComponent();
@@ -80,6 +82,23 @@ export const addPost = async ({
       if (updateError) {
         console.error("Failed to update post_content_images:", updateError);
         throw updateError;
+      }
+    }
+
+    // 3. If tag_ids exist, create rows in post_tags
+    if (tag_ids && tag_ids.length > 0) {
+      const { error: tagError } = await supabase
+        .from("post_tags")
+        .insert(
+          tag_ids.map((tag_id) => ({
+            post_id: newPost.id,
+            tag_id,
+          }))
+        );
+
+      if (tagError) {
+        console.error("Failed to insert post_tags:", tagError);
+        throw tagError;
       }
     }
 
@@ -133,6 +152,7 @@ type EditPostParams = {
   author_id?: string | null;
   image_url?: string | null;
   content_image_ids?: string[] | null;
+  tag_ids?: number[] | null;
 };
 
 export const editPost = async ({
@@ -142,6 +162,7 @@ export const editPost = async ({
   author_id,
   image_url,
   content_image_ids,
+  tag_ids,
 }: EditPostParams) => {
   try {
     const supabase = await createClientServerComponent();
@@ -193,6 +214,41 @@ export const editPost = async ({
       const imagePath = await getImagePath(post.image_url);
       if (imagePath) {
         await deleteImage(imagePath);
+      }
+    }
+
+    // 6. Edit post_tags
+    if (tag_ids) {
+      // Fetch existing tags for this post
+      const { data: existingTags, error: fetchTagsError } = await supabase
+        .from("post_tags")
+        .select("tag_id")
+        .eq("post_id", id);
+
+      if (fetchTagsError) throw fetchTagsError;
+
+      const existingTagIds = existingTags?.map((t) => t.tag_id) ?? [];
+
+      // Tags to add
+      const tagsToAdd = tag_ids.filter((t) => !existingTagIds.includes(t));
+      if (tagsToAdd.length > 0) {
+        const { error: addError } = await supabase
+          .from("post_tags")
+          .insert(tagsToAdd.map((tag_id) => ({ post_id: id, tag_id })));
+
+        if (addError) throw addError;
+      }
+
+      // Tags to remove
+      const tagsToRemove = existingTagIds.filter((t) => !tag_ids.includes(t));
+      if (tagsToRemove.length > 0) {
+        const { error: removeError } = await supabase
+          .from("post_tags")
+          .delete()
+          .eq("post_id", id)
+          .in("tag_id", tagsToRemove);
+
+        if (removeError) throw removeError;
       }
     }
 

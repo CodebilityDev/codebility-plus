@@ -13,6 +13,7 @@ import { deletePost } from "../_services/action";
 import { PostType } from "../_services/query";
 import { DeleteDialog } from "./DeleteDialog";
 import PostCommentCount from "./PostCommentCount";
+import PostTags from "./PostTags";
 import PostUpvote from "./PostUpvote";
 
 interface PostProps {
@@ -70,7 +71,7 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
   return (
     <div>
       <Box
-        className="group relative flex h-[400px] cursor-pointer flex-col justify-between rounded-xl p-3"
+        className="group relative flex h-[440px] cursor-pointer flex-col justify-between rounded-xl p-3"
         onClick={openModal}
       >
         {/* Delete Button in top-right */}
@@ -105,9 +106,12 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
           </div>
 
           <div className="h-[60px] flex-grow">
-            <p className="mt-2 line-clamp-2 text-xl font-semibold text-gray-700 dark:text-gray-300">
+            <p className="mt-2 line-clamp-2 text-xl font-semibold leading-snug text-gray-700 dark:text-gray-300">
               {post.title}
             </p>
+          </div>
+          <div className="mb-2">
+            <PostTags post={post} minimal={true} />
           </div>
 
           <p className="text-sm text-gray-500 dark:text-gray-400">
@@ -115,7 +119,7 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
           </p>
         </div>
 
-        <div className="h-60 w-full overflow-hidden rounded-sm">
+        <div className="my-2 h-60 w-full overflow-hidden rounded-sm">
           <img
             src={post.image_url || "/assets/images/bg-certificate.png"}
             alt="Post image"
@@ -123,7 +127,7 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
           />
         </div>
 
-        <div className="mx-4 mt-4 flex items-center space-x-4 text-gray-600 dark:text-gray-400">
+        <div className="mx-4 flex items-center space-x-4 text-gray-600 dark:text-gray-400">
           <PostUpvote post={post} />
 
           <PostCommentCount post={post} />

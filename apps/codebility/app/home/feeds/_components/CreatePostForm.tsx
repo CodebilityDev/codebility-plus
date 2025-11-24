@@ -8,6 +8,7 @@ import toast from "react-hot-toast";
 
 import { addPost } from "../_services/action";
 import MarkdownEditor from "./MarkdownEditor";
+import TagSelector from "./TagSelector";
 import ThumbnailUpload from "./ThumbnailUpload";
 
 const CreatePostForm = ({
@@ -20,6 +21,8 @@ const CreatePostForm = ({
   const [image, setImage] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [uploadedImageIds, setUploadedImageIds] = useState<string[]>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<number[]>([]);
+
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
   const { user } = useUserStore();
 
@@ -45,12 +48,13 @@ const CreatePostForm = ({
         });
       }
 
-      const newPost = await addPost({
+      await addPost({
         title,
         content,
         author_id: user?.id,
         image_url,
         content_image_ids: uploadedImageIds,
+        tag_ids: selectedTagIds,
       });
 
       // Refresh Posts
@@ -101,6 +105,8 @@ const CreatePostForm = ({
         }}
         onImagesUploaded={setUploadedImageIds}
       />
+
+      <TagSelector onChange={(tags) => setSelectedTagIds(tags)} />
 
       <input type="hidden" name="content" value={""} />
 
