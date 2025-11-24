@@ -32,6 +32,7 @@ type PermissionKey = keyof RolePermissions;
 // Hidden from: Codev (10), Intern (4), HR (2), and all other non-admin roles
 const ADMIN_ONLY_PATHS = [
   "/home/settings/news-banners",
+  "/home/settings/surveys",
   "/home/settings/services",
 ];
 

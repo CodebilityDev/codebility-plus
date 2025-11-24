@@ -64,10 +64,10 @@ export async function checkAttendanceWarnings(
       .eq("id", projectId)
       .single();
 
-    // Get all members of the project
+    // Get all members of the project with their join dates
     const { data: members } = await supabase
       .from("project_members")
-      .select("codev_id, codev(first_name, last_name, email_address)")
+      .select("codev_id, created_at, codev(first_name, last_name, email_address)")
       .eq("project_id", projectId);
 
     if (!members) {
@@ -89,17 +89,29 @@ export async function checkAttendanceWarnings(
       return { success: false, error: "No attendance records found" };
     }
 
-    // Count absences per member (excluding future dates and non-scheduled days)
+    // Count absences per member (excluding future dates, non-scheduled days, and dates before joining)
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset to start of day
     const meetingSchedule = projectData?.meeting_schedule || null;
-    
+
+    // Create a map of member join dates for quick lookup
+    const memberJoinDates = new Map<string, Date>();
+    members.forEach(member => {
+      const joinDate = new Date(member.created_at);
+      joinDate.setHours(0, 0, 0, 0);
+      memberJoinDates.set(member.codev_id, joinDate);
+    });
+
     const absenceCounts = new Map<string, number>();
     attendance.forEach(record => {
       // Skip future dates
       const recordDate = new Date(record.date);
       if (recordDate > today) return;
-      
+
+      // Skip dates before member joined
+      const memberJoinDate = memberJoinDates.get(record.codev_id);
+      if (memberJoinDate && recordDate < memberJoinDate) return;
+
       // Only count absences on scheduled meeting days
       if (isScheduledMeetingDay(recordDate, meetingSchedule) && record.status === "absent") {
         const current = absenceCounts.get(record.codev_id) || 0;
@@ -205,10 +217,10 @@ export async function getAttendanceWarningStatus(
       .eq("id", projectId)
       .single();
       
-    // Get all members
+    // Get all members with their join dates
     const { data: members } = await supabase
       .from("project_members")
-      .select("codev_id, codev(first_name, last_name)")
+      .select("codev_id, created_at, codev(first_name, last_name)")
       .eq("project_id", projectId);
 
     if (!members) {
@@ -226,18 +238,23 @@ export async function getAttendanceWarningStatus(
       .gte("date", startDate)
       .lte("date", endDate);
 
-    // Count absences per member (excluding future dates and non-scheduled days)
+    // Count absences per member (excluding future dates, non-scheduled days, and dates before joining)
     const today = new Date();
     today.setHours(0, 0, 0, 0); // Reset to start of day
     const meetingSchedule = projectData?.meeting_schedule || null;
-    
+
     const memberStatus = members.map(member => {
+      const memberJoinDate = new Date(member.created_at);
+      memberJoinDate.setHours(0, 0, 0, 0);
+
       const memberAttendance = attendance?.filter(a => a.codev_id === member.codev_id) || [];
-      
-      // Filter out future dates and non-scheduled days
+
+      // Filter out future dates, non-scheduled days, and dates before member joined
       const scheduledMeetingAttendance = memberAttendance.filter(a => {
         const recordDate = new Date(a.date);
-        return recordDate <= today && isScheduledMeetingDay(recordDate, meetingSchedule);
+        return recordDate <= today &&
+               recordDate >= memberJoinDate &&
+               isScheduledMeetingDay(recordDate, meetingSchedule);
       });
       
       const absences = scheduledMeetingAttendance.filter(a => a.status === "absent").length;
