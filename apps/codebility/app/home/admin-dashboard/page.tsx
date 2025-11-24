@@ -2,17 +2,11 @@ import H1 from "@/components/shared/dashboard/H1";
 import { getOrSetCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { createClientServerComponent } from "@/utils/supabase/server";
-import PageContainer from "../_components/PageContainer";
 
 import AdminDashboardApplicantStatusPie from "./_components/AdminDashboardApplicantStatusPie";
 import AdminDashboardMonthlyApplicantsLineChart from "./_components/AdminDashboardMonthlyApplicantsLineChart";
 import AdminDashboardProjectsPie from "./_components/AdminDashboardProjectsPie";
-import AdminDashboardTotalActiveIntern from "./_components/AdminDashboardTotalActiveIntern";
-import AdminDashboardTotalAdmin from "./_components/AdminDashboardTotalAdmin";
-import AdminDashboardTotalCodev from "./_components/AdminDashboardTotalCodev";
-import AdminDashboardTotalInactiveIntern from "./_components/AdminDashboardTotalInactiveIntern";
-import AdminDashboardTotalMentor from "./_components/AdminDashboardTotalMentor";
-import AdminDashboardTotalProjects from "./_components/AdminDashboardTotalProject";
+import AdminDashboardStatsCard from "./_components/AdminDashboardStatsCard";
 
 // Force dynamic rendering to avoid prerender errors with Supabase env vars
 export const dynamic = "force-dynamic";
@@ -153,19 +147,54 @@ export default async function AdminDashboard() {
             </div>
           </div>
 
-          {/* Metrics Grid */}
+          {/* Metrics Grid - UPDATED TO USE SHARED COMPONENT */}
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            <AdminDashboardTotalActiveIntern
+            <AdminDashboardStatsCard
+              title="Total Active Interns"
               count={dashboardData?.activeInterns}
+              description="Currently active interns"
+              iconName="UserCheck"
+              colorTheme="blue"
             />
-            <AdminDashboardTotalInactiveIntern
+            
+            <AdminDashboardStatsCard
+              title="Total Inactive Interns"
               count={dashboardData?.inactiveInterns}
+              description="Currently inactive interns"
+              iconName="UserX"
+              colorTheme="red"
             />
-            <AdminDashboardTotalCodev count={dashboardData?.codevs} />
-            <AdminDashboardTotalAdmin count={dashboardData?.admins} />
-            <AdminDashboardTotalMentor count={dashboardData?.mentors} />
-            <AdminDashboardTotalProjects
+            
+            <AdminDashboardStatsCard
+              title="Total Codevs"
+              count={dashboardData?.codevs}
+              description="Registered developers"
+              iconName="Users"
+              colorTheme="green"
+            />
+            
+            <AdminDashboardStatsCard
+              title="Total Admins"
+              count={dashboardData?.admins}
+              description="System administrators"
+              iconName="UserCog"
+              colorTheme="purple"
+            />
+            
+            <AdminDashboardStatsCard
+              title="Total Mentors"
+              count={dashboardData?.mentors}
+              description="Active mentors"
+              iconName="UserPen"
+              colorTheme="orange"
+            />
+            
+            <AdminDashboardStatsCard
+              title="Total Projects"
               count={dashboardData?.projectTotalCount}
+              description="Active projects"
+              iconName="FolderKanban"
+              colorTheme="cyan"
             />
           </div>
 

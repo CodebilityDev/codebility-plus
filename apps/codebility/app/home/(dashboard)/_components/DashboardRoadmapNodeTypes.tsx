@@ -17,7 +17,7 @@ export const RoadmapPhaseCard = ({
   return (
     <>
       <div
-        className={`w-[380px] rounded-xl border p-6 shadow-xl backdrop-blur-sm transition-all duration-300 ${
+        className={`w-[380px] cursor-pointer rounded-xl border p-6 shadow-xl backdrop-blur-sm transition-all duration-300 hover:scale-105 ${
           isCurrent
             ? "border-customBlue-400 bg-gradient-to-br from-customBlue-500/20 to-purple-500/20 dark:border-customBlue-500"
             : isCompleted
@@ -66,7 +66,7 @@ export const RoadmapPhaseCard = ({
                 ? "text-customBlue-600 dark:text-customBlue-400"
                 : isCompleted
                   ? "text-green-600 dark:text-green-400"
-                  : "text-gray-500 dark:text-gray-400"
+                  : "text-gray-300 dark:text-gray-300"
             }`}
           >
             {phase}
@@ -77,7 +77,7 @@ export const RoadmapPhaseCard = ({
                 ? "bg-gradient-to-r from-customBlue-600 to-purple-600 bg-clip-text text-transparent"
                 : isCompleted
                   ? "text-green-600 dark:text-green-400"
-                  : "text-gray-700 dark:text-gray-400"
+                  : "text-white dark:text-white"
             }`}
           >
             {title}
@@ -88,7 +88,7 @@ export const RoadmapPhaseCard = ({
                 ? "text-customBlue-600 dark:text-customBlue-400"
                 : isCompleted
                   ? "text-green-600 dark:text-green-400"
-                  : "text-gray-500 dark:text-gray-400"
+                  : "text-gray-300 dark:text-gray-300"
             }`}
           >
             {pointsRange}
@@ -105,7 +105,7 @@ export const RoadmapPhaseCard = ({
                     ? "bg-gradient-to-r from-customBlue-500 to-purple-500 text-white"
                     : isCompleted
                       ? "bg-green-500 text-white"
-                      : "bg-gray-300 text-gray-600 dark:bg-gray-600 dark:text-gray-300"
+                      : "bg-gray-500 text-white dark:bg-gray-600 dark:text-white"
                 }`}
               >
                 0{step.id}
@@ -114,7 +114,7 @@ export const RoadmapPhaseCard = ({
                 className={`flex-1 text-base leading-relaxed ${
                   isCurrent || isCompleted
                     ? "font-medium text-gray-800 dark:text-gray-100"
-                    : "text-gray-600 dark:text-gray-400"
+                    : "font-medium text-gray-200 dark:text-gray-200"
                 }`}
               >
                 {step.step}

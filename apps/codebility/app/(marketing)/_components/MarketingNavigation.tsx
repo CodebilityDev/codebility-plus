@@ -26,22 +26,26 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@codevs/ui/dropdown-menu";
+} from "@codevs/ui";
+
 import {
   Sheet,
   SheetContent,
   SheetDescription,
   SheetTitle,
   SheetTrigger,
-} from "@codevs/ui/sheet";
+} from "@codevs/ui";
 
+// Navigation items for top navbar and mobile drawer
 const NAV_ITEMS = [
   { id: "1", title: "Our Services", path: "/services" },
   { id: "2", title: "About Us", path: "/#whychooseus" },
   { id: "3", title: "Book a Call", path: "/bookacall" },
-  { id: "4", title: "Hire a CoDevs", path: "/hire-a-codev" },
+  { id: "4", title: "Be a Codev", path: "/codevs" }, // ✅ ADDED: New link after Book a Call
+  { id: "5", title: "Hire a CoDevs", path: "/hire-a-codev" },
 ] as const;
 
+// Get menu items based on user application status
 const getMenuItems = (
   status: string,
   role_id: number,
@@ -270,7 +274,7 @@ const Navigation = () => {
 
     async function fetchUser() {
       try {
-        // FIXED: Use getUser() instead of getSession()
+        // Use getUser() for proper auth check
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError) {
@@ -280,7 +284,6 @@ const Navigation = () => {
         }
 
         if (!user) {
-          // not logged in → silent
           setUserData(null);
           return;
         }
@@ -313,8 +316,8 @@ const Navigation = () => {
   const handleLogout = async () => {
     try {
       await signOut();
-      setUserData(null); // Clear userData after logout
-      setOpenSheet(false); // Close the mobile drawer (if open)
+      setUserData(null);
+      setOpenSheet(false);
     } catch (error) {
       console.error("Failed to log out:", error);
     }

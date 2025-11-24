@@ -73,12 +73,12 @@ export default function ServicesPage() {
         "Team integration",
         "Ongoing support"
       ],
-      price: "Starting from $25/hour",
+      price: "Starting from $8/hour",
       duration: "Flexible"
     },
     {
       id: "4",
-      name: "Product Design", 
+      name: "Product Design",
       description: "Complete product design services from user research to final designs, creating intuitive and engaging digital experiences.",
       category: "Design",
       features: [
@@ -90,42 +90,42 @@ export default function ServicesPage() {
         "Usability testing",
         "Design handoff to developers"
       ],
-      price: "Starting from $3,000",
+      price: "Starting from $1,000",
       duration: "3-6 weeks"
     },
     {
       id: "5",
-      name: "E-commerce Solutions",
-      description: "Complete e-commerce platform development with payment integration, inventory management, and customer management systems.",
+      name: "CMS Service",
+      description: "Content Management System development and customization for easy content updates, multi-user access, and dynamic website management.",
       category: "Development",
       features: [
-        "Custom e-commerce platforms",
-        "Payment gateway integration",
-        "Inventory management",
-        "Customer management system",
-        "Order tracking",
-        "Admin dashboard",
-        "Multi-vendor support"
+        "Custom CMS development",
+        "WordPress & Headless CMS",
+        "Content workflow management",
+        "Multi-user permissions",
+        "SEO-friendly structure",
+        "Media library management",
+        "API integration support"
       ],
-      price: "Starting from $10,000",
-      duration: "8-12 weeks"
+      price: "Starting from $3,000",
+      duration: "6-10 weeks"
     },
     {
       id: "6",
-      name: "Consulting & Training",
-      description: "Technical consulting and training services to help your team adopt new technologies and improve development processes.",
-      category: "Consulting",
+      name: "AI Development",
+      description: "Artificial Intelligence and Machine Learning solutions to automate processes, enhance user experiences, and unlock data-driven insights.",
+      category: "AI & ML",
       features: [
-        "Technology assessment",
-        "Architecture consulting",
-        "Code review and optimization",
-        "Team training and workshops",
-        "Best practices implementation",
-        "Process improvement",
-        "Ongoing mentorship"
+        "Machine Learning model development",
+        "Natural Language Processing (NLP)",
+        "Computer Vision solutions",
+        "AI-powered chatbots",
+        "Predictive analytics",
+        "Data pipeline automation",
+        "Model deployment and monitoring"
       ],
-      price: "Starting from $150/hour",
-      duration: "Flexible"
+      price: "Starting from $12,000",
+      duration: "8-16 weeks"
     }
   ]);
 
@@ -140,13 +140,22 @@ export default function ServicesPage() {
         getRealProjects(),
         getCodevProfiles()
       ]);
-      
+
       if (projectsResult.data && !projectsResult.error) {
         setRealProjects(projectsResult.data);
+        console.log('✅ Fetched real projects:', projectsResult.data);
+        console.log('📊 Total projects with images:', projectsResult.data.filter(p => p.main_image).length);
+        console.log('📋 Projects by category:', {
+          web: projectsResult.data.filter(p => p.categories?.some((c: any) => c.id === 1)).length,
+          mobile: projectsResult.data.filter(p => p.categories?.some((c: any) => c.id === 2)).length,
+          design: projectsResult.data.filter(p => p.categories?.some((c: any) => c.id === 3)).length,
+          ai: projectsResult.data.filter(p => p.categories?.some((c: any) => c.id === 4)).length,
+          cms: projectsResult.data.filter(p => p.categories?.some((c: any) => c.id === 5)).length,
+        });
       } else {
         console.error('Error fetching projects:', projectsResult.error);
       }
-      
+
       if (codevsResult.data && !codevsResult.error) {
         setCodevProfiles(codevsResult.data);
       } else {
@@ -284,8 +293,7 @@ export default function ServicesPage() {
           'Mobile Application Development': ['Food Delivery App', 'Fitness Tracker', 'Social Chat App'],
           'Codev for Hire': ['React Developer', 'Node.js Expert', 'Full Stack Dev'],
           'UI/UX Design Services': ['Mobile App Design', 'Website Redesign', 'Brand Identity'],
-          'E-commerce Solutions': ['Multi-vendor Store', 'B2B Platform', 'Marketplace'],
-          'Consulting & Training': ['Code Review', 'Team Workshop', 'Architecture Audit']
+          'E-commerce Solutions': ['Multi-vendor Store', 'B2B Platform', 'Marketplace']
         };
         return projectMap[serviceName] || ['Custom Project', 'Client Solution', 'Team Delivery'];
       };
@@ -546,95 +554,72 @@ export default function ServicesPage() {
   const ServicePagePreview = ({ service, index }: { service: Service, index: number }) => {
     // Get real project images and data for service showcase
     const getServiceProjects = (serviceName: string) => {
+      console.log(`\n🔍 Getting projects for service: ${serviceName}`);
+
       // First get all projects with valid images
       const projectsWithImages = realProjects.filter(project => {
         return project.main_image && project.main_image.trim() !== '';
       });
-      
+      console.log(`📦 Total projects with images: ${projectsWithImages.length}`);
+
       // Filter projects based on service type and category
       const relevantProjects = projectsWithImages.filter(project => {
         const projectName = project.name.toLowerCase();
         const projectDesc = (project.description || '').toLowerCase();
         const techStack = (project.tech_stack || []).join(' ').toLowerCase();
         const searchTerms = `${projectName} ${projectDesc} ${techStack}`;
+        const hasCategory = (catId: number) => project.categories?.some((c: any) => c.id === catId);
 
-        // Get category info from the new categories array
-        const categories = project.categories || [];
-        const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-        const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
 
         switch (serviceName) {
           case 'Web Application Development':
-            // Category ID 1 = "Web Application"
-            const isWeb = hasCategoryId(1) ||
-                   categoryNames.includes('web') ||
-                   searchTerms.includes('web') ||
-                   searchTerms.includes('website') ||
-                   searchTerms.includes('react') ||
-                   searchTerms.includes('next') ||
-                   searchTerms.includes('vue') ||
-                   searchTerms.includes('angular') ||
-                   (!searchTerms.includes('mobile') && !categoryNames.includes('mobile') && !hasCategoryId(2));
-            return isWeb;
+            // Category ID 1 = "Web Application" - STRICT filtering for web only
+            return hasCategory(1);
           case 'Mobile Application Development':
             // Category ID 2 = "Mobile Application" - STRICT filtering for mobile only
-            // First priority: exact category ID match
-            if (hasCategoryId(2)) {
-              return true;
-            }
-            // Second priority: explicit mobile keywords
-            return categoryNames.includes('mobile') ||
-                   searchTerms.includes('mobile') ||
-                   searchTerms.includes('react native') ||
-                   searchTerms.includes('flutter') ||
-                   searchTerms.includes('ios') ||
-                   searchTerms.includes('android');
+            return hasCategory(2);
           case 'Product Design':
-            // Category ID 3 = "Product Design"
-            const isDesign = hasCategoryId(3) ||
-                   categoryNames.includes('design') ||
-                   searchTerms.includes('design') ||
-                   searchTerms.includes('ui') ||
-                   searchTerms.includes('ux') ||
-                   searchTerms.includes('figma');
-            return isDesign;
-          case 'E-commerce Solutions':
-            return categoryNames.includes('ecommerce') || categoryNames.includes('commerce') ||
-                   searchTerms.includes('ecommerce') ||
-                   searchTerms.includes('shop') ||
-                   searchTerms.includes('store') ||
-                   searchTerms.includes('commerce') ||
-                   searchTerms.includes('marketplace');
-          case 'Consulting & Training':
-            return categoryNames.includes('consulting') || categoryNames.includes('training') ||
-                   searchTerms.includes('consulting') ||
-                   searchTerms.includes('training') ||
-                   searchTerms.includes('tutorial') ||
-                   searchTerms.includes('learning');
+            // Category ID 3 = "Product Design" - STRICT filtering for design only
+            return hasCategory(3);
+          case 'CMS Service':
+            // Category ID 5 = "CMS" - STRICT filtering for CMS only
+            return hasCategory(5);
+          case 'AI Development':
+            // Category ID 4 = "AI Development" - STRICT filtering for AI only
+            return hasCategory(4);
           default:
             return true;
         }
       });
-      
-      // Use relevant projects first, then fallback based on service type
-      let projectsToUse = relevantProjects;
-      
+
+      console.log(`✨ Relevant projects found: ${relevantProjects.length}`);
+      if (relevantProjects.length > 0) {
+        console.log('Projects:', relevantProjects.map(p => ({
+          name: p.name,
+          categories: p.categories?.map((c: any) => c.name).join(', ') || 'None',
+          hasImage: !!p.main_image
+        })));
+      }
+
+      // STRICT: Only use projects from the specific category, no fallbacks
+      const projectsToUse = relevantProjects;
+
       // Service-specific dummy images when no real projects exist
       const getServiceDummyImages = (serviceName: string) => {
         const dummyImageMap: { [key: string]: string[] } = {
-          'E-commerce Solutions': [
-            'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=600&h=400&fit=crop', // E-commerce dashboard
-            'https://images.unsplash.com/photo-1563013544-824ae1b704d3?w=600&h=400&fit=crop', // Online shopping
-            'https://images.unsplash.com/photo-1556742111-a301076d9d18?w=600&h=400&fit=crop', // Product catalog
-            'https://images.unsplash.com/photo-1607083206869-4c7672e72a8a?w=600&h=400&fit=crop', // Shopping cart
-            'https://images.unsplash.com/photo-1512428559087-560fa5ceab42?w=600&h=400&fit=crop'  // Marketplace
+          'CMS Service': [
+            'https://images.unsplash.com/photo-1547658719-da2b51169166?w=600&h=400&fit=crop', // CMS dashboard
+            'https://images.unsplash.com/photo-1593720213428-28a5b9e94613?w=600&h=400&fit=crop', // Content editing
+            'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop', // Analytics dashboard
+            'https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?w=600&h=400&fit=crop', // Website management
+            'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=600&h=400&fit=crop'  // Team collaboration
           ],
-          'Consulting & Training': [
-            'https://images.unsplash.com/photo-1551434678-e076c223a692?w=600&h=400&fit=crop', // Team meeting
-            'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=400&fit=crop', // Training session
-            'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=600&h=400&fit=crop', // Code review
-            'https://images.unsplash.com/photo-1517180102446-f3ece451e9d8?w=600&h=400&fit=crop', // Workshop
-            'https://images.unsplash.com/photo-1531482615713-2afd69097998?w=600&h=400&fit=crop'  // Consulting
+          'AI Development': [
+            'https://images.unsplash.com/photo-1555421689-d68471e189f2?w=600&h=400&fit=crop', // AI/ML code
+            'https://images.unsplash.com/photo-1677442136019-21780ecad995?w=600&h=400&fit=crop', // AI brain
+            'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=600&h=400&fit=crop', // Neural network
+            'https://images.unsplash.com/photo-1531746790731-6c087fecd65a?w=600&h=400&fit=crop', // Data visualization
+            'https://images.unsplash.com/photo-1527474305487-b87b222841cc?w=600&h=400&fit=crop'  // Robot/AI
           ],
           'Product Design': [
             'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=400&fit=crop', // Design wireframes
@@ -654,20 +639,15 @@ export default function ServicesPage() {
         ];
       };
       
-      // If no relevant projects and it's a service without many real projects, use dummy images
-      if (projectsToUse.length === 0 && ['E-commerce Solutions', 'Consulting & Training'].includes(serviceName)) {
-        return getServiceDummyImages(serviceName);
-      }
-      
-      // Use relevant projects or fallback to all projects for services with real projects
-      projectsToUse = projectsToUse.length >= 3 ? projectsToUse : projectsWithImages;
-      
-      // Final fallback to dummy images if still no projects
+      // STRICT: If no projects in this category, use dummy images
       if (projectsToUse.length === 0) {
+        console.warn(`⚠️ No ${serviceName} projects found, using dummy images`);
         return getServiceDummyImages(serviceName);
       }
-      
-      const imageUrls = projectsToUse.map(project => project.main_image!).slice(0, 6);
+
+      // Return ONLY the real project images from this specific category
+      const imageUrls = projectsToUse.map(project => project.main_image!).slice(0, 12);
+      console.log(`✅ Returning ${imageUrls.length} real image URLs for ${serviceName} (category-specific)`);
       return imageUrls;
     };
 
@@ -680,74 +660,70 @@ export default function ServicesPage() {
     
     // Get actual project data for showcasing
     const getServiceProjectData = (serviceName: string) => {
+      console.log(`\n🎯 Getting project DATA for service: ${serviceName}`);
+
       if (serviceName === 'Codev for Hire') {
+        console.log(`👥 Returning ${codevProfiles.length} codev profiles`);
         return codevProfiles; // Return ALL codev profiles
       }
-      
-      const projectsWithImages = realProjects.filter(project => project.main_image && project.main_image.trim() !== '');
-      
-      const relevantProjects = projectsWithImages.filter(project => {
-        const projectName = project.name.toLowerCase();
-        const projectDesc = (project.description || '').toLowerCase();
-        const techStack = (project.tech_stack || []).join(' ').toLowerCase();
-        const searchTerms = `${projectName} ${projectDesc} ${techStack}`;
 
-        // Get category info from the new categories array
-        const categories = project.categories || [];
-        const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-        const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
+      const projectsWithImages = realProjects.filter(project => project.main_image && project.main_image.trim() !== '');
+      console.log(`📦 Projects with images: ${projectsWithImages.length}`);
+
+      const relevantProjects = projectsWithImages.filter(project => {
+        const hasCategory = (catId: number) => project.categories?.some((c: any) => c.id === catId);
 
         switch (serviceName) {
           case 'Web Application Development':
-            // Category ID 1 = "Web Application"
-            return hasCategoryId(1) ||
-                   categoryNames.includes('web') ||
-                   searchTerms.includes('web') ||
-                   searchTerms.includes('website') ||
-                   searchTerms.includes('react') ||
-                   (!searchTerms.includes('mobile') && !categoryNames.includes('mobile') && !hasCategoryId(2));
+            // Category ID 1 = "Web Application" - STRICT filtering for web only
+            return hasCategory(1);
           case 'Mobile Application Development':
             // Category ID 2 = "Mobile Application" - STRICT filtering for mobile only
-            if (hasCategoryId(2)) {
-              return true;
-            }
-            return categoryNames.includes('mobile') ||
-                   searchTerms.includes('mobile') ||
-                   searchTerms.includes('react native') ||
-                   searchTerms.includes('flutter') ||
-                   searchTerms.includes('ios') ||
-                   searchTerms.includes('android');
+            return hasCategory(2);
           case 'Product Design':
-            // Category ID 3 = "Product Design"
-            return hasCategoryId(3) ||
-                   categoryNames.includes('design') ||
-                   searchTerms.includes('design') ||
-                   searchTerms.includes('ui') ||
-                   searchTerms.includes('ux');
-          case 'E-commerce Solutions':
-            return categoryNames.includes('ecommerce') || categoryNames.includes('commerce') || searchTerms.includes('ecommerce') || searchTerms.includes('shop') || searchTerms.includes('store');
+            // Category ID 3 = "Product Design" - STRICT filtering for design only
+            return hasCategory(3);
+          case 'CMS Service':
+            // Category ID 5 = "CMS" - STRICT filtering for CMS only
+            return hasCategory(5);
+          case 'AI Development':
+            // Category ID 4 = "AI Development" - STRICT filtering for AI only
+            return hasCategory(4);
           default:
             return true;
         }
       });
-      
-      // Use relevant projects first, then fallback to all projects for better showcase
-      return relevantProjects.length >= 3 ? relevantProjects.slice(0, 6) : projectsWithImages.slice(0, 6);
+
+      console.log(`✨ Relevant project data found: ${relevantProjects.length}`);
+
+      // STRICT: Return ONLY projects from the specific category, no fallbacks
+      const result = relevantProjects.slice(0, 12);
+      console.log(`✅ Returning ${result.length} project data items for ${serviceName} (category-specific)`);
+      return result;
     };
-    
+
     const projectData = getServiceProjectData(service.name);
 
     return (
-      <div className="w-full min-h-[800px] bg-gradient-to-br from-gray-50 to-white relative overflow-y-auto">
-        {/* Background texture */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-0 w-full h-full" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-3.134-3-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3z' fill='%23000000' fill-opacity='0.02' fill-rule='evenodd'/%3E%3C/svg%3E")`
-          }}></div>
+      <div className="w-full min-h-[800px] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 relative overflow-y-auto">
+        {/* Animated background with shapes */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating gradient orbs */}
+          <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-0 w-full h-full" style={{
+              backgroundImage: `linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)`,
+              backgroundSize: '50px 50px'
+            }}></div>
+          </div>
         </div>
 
-        {/* Header with gradient */}
-        <div className="relative bg-gradient-to-r from-slate-800 to-blue-900 text-white p-4">
+        {/* Header with vibrant gradient */}
+        <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white p-4 shadow-xl">
           <div className="flex justify-between items-center">
             <div className="flex items-center gap-3">
               <Image
@@ -766,49 +742,64 @@ export default function ServicesPage() {
         </div>
         
         {/* Hero Section with Large Project Showcase or Codev Profile */}
-        <div className="relative h-64 bg-gradient-to-r from-blue-600 to-purple-600 overflow-hidden">
+        <div className="relative h-80 bg-gradient-to-br from-purple-600 via-pink-600 to-orange-500 overflow-hidden shadow-2xl">
           <div className="absolute inset-0">
             {isCodevHireService ? (
-              <div className="w-full h-full bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center">
-                <User className="w-20 h-20 text-white/70" />
+              <div className="w-full h-full bg-gradient-to-br from-indigo-600 via-purple-600 to-pink-500 flex items-center justify-center relative overflow-hidden">
+                {/* Decorative circles */}
+                <div className="absolute top-10 left-10 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+                <div className="absolute bottom-10 right-10 w-40 h-40 bg-blue-400/20 rounded-full blur-3xl"></div>
+                <img
+                  src="https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
+                  alt="Codev Placeholder"
+                  className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-2xl relative z-10"
+                />
               </div>
             ) : (
-              <img 
-                src={images[0]} 
-                alt={projectData[0]?.name || `${service.name} hero project`}
-                className="w-full h-full object-cover opacity-70"
-                loading="eager"
-                onError={(e) => {
-                  const target = e.target as HTMLImageElement;
-                  target.src = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop';
-                }}
-              />
+              <>
+                <img
+                  src={projectData[0]?.main_image || 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop'}
+                  alt={projectData[0]?.name || `${service.name} hero project`}
+                  className="w-full h-full object-cover"
+                  loading="eager"
+                  onError={(e) => {
+                    const target = e.target as HTMLImageElement;
+                    target.src = 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=400&fit=crop';
+                  }}
+                />
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-900/80 via-purple-900/70 to-pink-900/60"></div>
+              </>
             )}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/60"></div>
-            <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/40"></div>
           </div>
-          
+
           {/* Service Title Overlay */}
-          <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-6">
-            <div className="space-y-4">
-              <span className="inline-block bg-white/20 backdrop-blur-sm px-4 py-2 rounded-full text-sm font-medium border border-white/30">
+          <div className="absolute inset-0 flex flex-col justify-center items-center text-center text-white p-6 z-10">
+            <div className="space-y-4 backdrop-blur-sm bg-black/10 p-6 rounded-3xl border border-white/20">
+              <span className="inline-block bg-gradient-to-r from-blue-400 to-purple-400 px-5 py-2 rounded-full text-sm font-semibold shadow-lg">
                 {service.category}
               </span>
-              <h1 className="text-4xl font-bold leading-tight max-w-md">{service.name}</h1>
-              <div className="w-20 h-1 bg-gradient-to-r from-blue-400 to-purple-400 mx-auto"></div>
+              <h1 className="text-4xl md:text-5xl font-bold leading-tight max-w-md bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">
+                {service.name}
+              </h1>
+              <div className="w-24 h-1 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 mx-auto rounded-full shadow-lg"></div>
             </div>
           </div>
         </div>
         
         {/* Project Gallery Section / Codev Profiles Section */}
-        <div className="p-6 bg-white">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
+        <div className="relative p-6 bg-gradient-to-b from-slate-800/95 via-purple-900/90 to-slate-900/95 backdrop-blur-sm">
+          <div className="text-center mb-8 relative z-10">
+            <div className="inline-block bg-gradient-to-r from-blue-500/20 to-purple-500/20 backdrop-blur-sm border border-blue-400/30 px-4 py-1 rounded-full mb-3 shadow-lg">
+              <span className="text-sm font-semibold bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">
+                {isCodevHireService ? 'Our Team' : 'Portfolio'}
+              </span>
+            </div>
+            <h2 className="text-3xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-3">
               {isCodevHireService ? 'Available Codevs' : service.name === 'Mobile Application Development' ? 'Mobile App Showcase' : 'Recent Projects'}
             </h2>
-            <p className="text-gray-600">
-              {isCodevHireService 
-                ? 'Meet our talented developers ready to join your team' 
+            <p className="text-slate-300 max-w-2xl mx-auto">
+              {isCodevHireService
+                ? 'Meet our talented developers ready to join your team'
                 : service.name === 'Mobile Application Development'
                 ? 'Our mobile applications designed for iOS and Android'
                 : `Showcasing our expertise in ${service.category.toLowerCase()}`
@@ -816,25 +807,14 @@ export default function ServicesPage() {
             </p>
           </div>
           
-          {/* Special Mobile Layout with Phone Mockups - Render ALL mobile projects */}
+          {/* Mobile Layout with Phone Mockups - Render ALL mobile projects */}
           {service.name === 'Mobile Application Development' ? (
             <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
               {(() => {
                 // Get ALL mobile projects
                 const mobileProjects = realProjects.filter(project => {
-                  const categories = project.categories || [];
-                  const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-                  const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
-                  const searchTerms = `${project.name} ${project.description || ''} ${(project.tech_stack || []).join(' ')}`.toLowerCase();
-
-                  // STRICT mobile filtering - only show true mobile projects
-                  return hasCategoryId(2) ||
-                         categoryNames.includes('mobile') ||
-                         searchTerms.includes('mobile') ||
-                         searchTerms.includes('react native') ||
-                         searchTerms.includes('flutter') ||
-                         searchTerms.includes('ios') ||
-                         searchTerms.includes('android');
+                  // STRICT mobile filtering - only category 2 (Mobile Application)
+                  return project.categories?.some((c: any) => c.id === 2);
                 });
                 
                 const mobileProjectsWithImages = mobileProjects.filter(p => p.main_image && p.main_image.trim() !== '');
@@ -886,9 +866,9 @@ export default function ServicesPage() {
                       </div>
                       {/* Project info */}
                       <div className="mt-3 text-center max-w-28">
-                        <div className="text-xs font-medium text-gray-800 truncate">{projectName}</div>
+                        <div className="text-xs font-medium text-white truncate">{projectName}</div>
                         {project?.tech_stack && project.tech_stack.length > 0 && (
-                          <div className="text-xs text-gray-500 truncate">
+                          <div className="text-xs text-slate-300 truncate">
                             {project.tech_stack.slice(0, 1).join(', ')}
                           </div>
                         )}
@@ -907,13 +887,13 @@ export default function ServicesPage() {
                 const codevImage = codev?.image_url || null;
                 
                 return (
-                  <div key={idx} className="group relative overflow-hidden rounded-lg shadow-md hover:shadow-lg transition-all duration-300">
-                    <div className="w-full h-20 bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center group-hover:from-blue-600 group-hover:to-purple-600 transition-all duration-300 relative overflow-hidden">
+                  <div key={idx} className="group relative flex flex-col items-center justify-center p-4">
+                    <div className="relative">
                       {codevImage ? (
-                        <img 
-                          src={codevImage} 
+                        <img
+                          src={codevImage}
                           alt={codevName}
-                          className="w-full h-full object-cover"
+                          className="w-20 h-20 rounded-full object-cover border-3 border-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
                           loading="lazy"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
@@ -922,15 +902,17 @@ export default function ServicesPage() {
                           }}
                         />
                       ) : null}
-                      <div className={`${codevImage ? 'hidden' : 'flex'} items-center justify-center w-full h-full`}>
-                        <User className="w-6 h-6 text-white/80" />
+                      <div className={`${codevImage ? 'hidden' : 'flex'} items-center justify-center`}>
+                        <img
+                          src="https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
+                          alt="Codev Avatar Placeholder"
+                          className="w-20 h-20 rounded-full object-cover border-3 border-white shadow-xl hover:shadow-2xl transition-all duration-300 hover:scale-110"
+                        />
                       </div>
                     </div>
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                      <div className="absolute bottom-1 left-1 right-1 text-white">
-                        <div className="text-xs font-medium truncate">{codevName}</div>
-                        <div className="text-xs opacity-80 truncate">{codevSkills}</div>
-                      </div>
+                    <div className="mt-3 text-center">
+                      <div className="text-sm font-semibold text-white truncate max-w-[120px]">{codevName}</div>
+                      <div className="text-xs text-slate-300 truncate max-w-[120px]">{codevSkills}</div>
                     </div>
                   </div>
                 );
@@ -940,86 +922,184 @@ export default function ServicesPage() {
             /* Regular Project Grid or Dummy Images */
             <div className="grid grid-cols-3 gap-3 mb-6">
               {(() => {
-                let projectsToShow = projectData;
-                let imagesToShow = images;
-                let isDummyContent = false;
-                
-                // For Web Application Development - show ALL web projects
+                // STRICT: Use only category-specific projects, no mixing
+                const projectsToShow = projectData;
+                const imagesToShow = images;
+
+                // For Web Application Development - show ONLY category 1 projects
                 if (service.name === 'Web Application Development') {
                   const webProjects = realProjects.filter(project => {
-                    const categories = project.categories || [];
-                    const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-                    const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
-                    const searchTerms = `${project.name} ${project.description || ''} ${(project.tech_stack || []).join(' ')}`.toLowerCase();
-
-                    return hasCategoryId(1) ||
-                           categoryNames.includes('web') ||
-                           searchTerms.includes('web') ||
-                           searchTerms.includes('website') ||
-                           searchTerms.includes('react') ||
-                           (!searchTerms.includes('mobile') && !categoryNames.includes('mobile') && !hasCategoryId(2));
+                    // STRICT: Only category 1 (Web Application)
+                    return project.categories?.some((c: any) => c.id === 1);
                   });
-                  projectsToShow = webProjects.filter(p => p.main_image && p.main_image.trim() !== '');
-                  imagesToShow = projectsToShow.map(p => p.main_image!);
-                }
-                // For E-commerce Solutions - don't render images, just show text
-                else if (service.name === 'E-commerce Solutions') {
-                  return (
-                    <div className="text-center py-8">
-                      <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                        <div className="text-2xl">🛒</div>
-                      </div>
-                      <p className="text-gray-600 text-sm">
-                        Ready to deliver exceptional e-commerce solutions
-                      </p>
-                    </div>
-                  );
-                }
-                // For Consulting & Training - show dummy images
-                else if (service.name === 'Consulting & Training') {
-                  const dummyImages = getServiceProjects(service.name);
-                  
-                  return dummyImages.map((img, idx) => {
-                    const serviceName = `Training Session ${idx + 1}`;
-                    
-                    return (
-                      <div key={idx} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                        <img 
-                          src={img} 
-                          alt={serviceName}
-                          className="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                          onError={(e) => {
-                            const target = e.target as HTMLImageElement;
-                            target.src = `https://images.unsplash.com/photo-${1460925895917 + idx}-afdab827c52f?w=400&h=300&fit=crop`;
-                          }}
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                          <div className="absolute bottom-1 left-1 right-1 text-white">
-                            <div className="text-xs font-medium truncate">{serviceName}</div>
-                            <div className="text-xs opacity-80 truncate">Professional Training</div>
+                  const webProjectsWithImages = webProjects.filter(p => p.main_image && p.main_image.trim() !== '');
+
+                  if (webProjectsWithImages.length > 0) {
+                    return webProjectsWithImages.slice(0, 12).map((project, idx) => {
+                      return (
+                        <div key={idx} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                          <img
+                            src={project.main_image!}
+                            alt={project.name}
+                            className="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <div className="absolute bottom-1 left-1 right-1 text-white">
+                              <div className="text-xs font-medium truncate">{project.name}</div>
+                              {project.tech_stack && project.tech_stack.length > 0 && (
+                                <div className="text-xs opacity-80 truncate">
+                                  {project.tech_stack.slice(0, 1).join(', ')}
+                                </div>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    );
-                  });
+                      );
+                    });
+                  }
                 }
-                // For Product Design - show ALL real Product Design projects
+                // For CMS Service - show ONLY category 5 projects
+                else if (service.name === 'CMS Service') {
+                  const cmsProjects = realProjects.filter(project => {
+                    // STRICT: Only category 5 (CMS)
+                    return project.categories?.some((c: any) => c.id === 5);
+                  });
+
+                  const cmsProjectsWithImages = cmsProjects.filter(p => p.main_image && p.main_image.trim() !== '');
+
+                  if (cmsProjectsWithImages.length > 0) {
+                    return cmsProjectsWithImages.slice(0, 12).map((project, idx) => {
+                      const projectName = project.name || `CMS Project ${idx + 1}`;
+
+                      return (
+                        <div key={idx} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                          <img
+                            src={project.main_image!}
+                            alt={projectName}
+                            className="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = `https://images.unsplash.com/photo-${1460925895917 + idx}-afdab827c52f?w=400&h=300&fit=crop`;
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                            <div className="absolute bottom-1 left-1 right-1 text-white">
+                              <div className="text-xs font-medium truncate">{projectName}</div>
+                              {project?.tech_stack && project.tech_stack.length > 0 && (
+                                <div className="text-xs opacity-80 truncate">
+                                  {project.tech_stack.slice(0, 1).join(', ')}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    });
+                  } else {
+                    // Fallback to dummy CMS images if no real projects
+                    const dummyImages = getServiceProjects(service.name);
+                    return dummyImages.map((img, idx) => {
+                      const serviceName = `CMS Project ${idx + 1}`;
+
+                      return (
+                        <div key={idx} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                          <img
+                            src={img}
+                            alt={serviceName}
+                            className="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = `https://images.unsplash.com/photo-${1460925895917 + idx}-afdab827c52f?w=400&h=300&fit=crop`;
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                            <div className="absolute bottom-1 left-1 right-1 text-white">
+                              <div className="text-xs font-medium truncate">{serviceName}</div>
+                              <div className="text-xs opacity-80 truncate">Content Management</div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    });
+                  }
+                }
+                // For AI Development - show ONLY category 4 projects
+                else if (service.name === 'AI Development') {
+                  const aiProjects = realProjects.filter(project => {
+                    // STRICT: Only category 4 (AI Development)
+                    return project.categories?.some((c: any) => c.id === 4);
+                  });
+
+                  const aiProjectsWithImages = aiProjects.filter(p => p.main_image && p.main_image.trim() !== '');
+
+                  if (aiProjectsWithImages.length > 0) {
+                    return aiProjectsWithImages.slice(0, 12).map((project, idx) => {
+                      const projectName = project.name || `AI Project ${idx + 1}`;
+
+                      return (
+                        <div key={idx} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                          <img
+                            src={project.main_image!}
+                            alt={projectName}
+                            className="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = `https://images.unsplash.com/photo-${1555421689 + idx}-df2759f1ff84?w=400&h=300&fit=crop`;
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                            <div className="absolute bottom-1 left-1 right-1 text-white">
+                              <div className="text-xs font-medium truncate">{projectName}</div>
+                              {project?.tech_stack && project.tech_stack.length > 0 && (
+                                <div className="text-xs opacity-80 truncate">
+                                  {project.tech_stack.slice(0, 1).join(', ')}
+                                </div>
+                              )}
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    });
+                  } else {
+                    // Fallback to dummy AI images if no real projects
+                    const dummyImages = getServiceProjects(service.name);
+                    return dummyImages.map((img, idx) => {
+                      const serviceName = `AI Project ${idx + 1}`;
+
+                      return (
+                        <div key={idx} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                          <img
+                            src={img}
+                            alt={serviceName}
+                            className="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = `https://images.unsplash.com/photo-${1555421689 + idx}-df2759f1ff84?w=400&h=300&fit=crop`;
+                            }}
+                          />
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
+                            <div className="absolute bottom-1 left-1 right-1 text-white">
+                              <div className="text-xs font-medium truncate">{serviceName}</div>
+                              <div className="text-xs opacity-80 truncate">AI & Machine Learning</div>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    });
+                  }
+                }
+                // For Product Design - show ONLY category 3 projects
                 else if (service.name === 'Product Design') {
                   const designProjects = realProjects.filter(project => {
-                    const categories = project.categories || [];
-                    const categoryNames = categories.map(cat => cat.name.toLowerCase()).join(' ');
-                    const hasCategoryId = (id: number) => categories.some(cat => cat.id === id);
-                    const searchTerms = `${project.name} ${project.description || ''} ${(project.tech_stack || []).join(' ')}`.toLowerCase();
-
-                    return hasCategoryId(3) ||
-                           categoryNames.includes('design') ||
-                           searchTerms.includes('design') ||
-                           searchTerms.includes('ui') ||
-                           searchTerms.includes('ux') ||
-                           searchTerms.includes('figma');
+                    // STRICT: Only category 3 (Product Design)
+                    return project.categories?.some((c: any) => c.id === 3);
                   });
-                  
+
                   const designProjectsWithImages = designProjects.filter(p => p.main_image && p.main_image.trim() !== '');
                   
                   if (designProjectsWithImages.length > 0) {
@@ -1080,97 +1160,88 @@ export default function ServicesPage() {
                     });
                   }
                 }
-                
-                const finalImages = imagesToShow.length > 0 ? imagesToShow.slice(0, 12) : images.slice(0, 12);
-                
-                return finalImages.map((img, idx) => {
-                  const project = projectsToShow[idx];
-                  const projectName = project?.name || `Project ${idx + 1}`;
-                  
-                  return (
-                    <div key={idx} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
-                      <img 
-                        src={img} 
-                        alt={projectName}
-                        className="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                        onError={(e) => {
-                          const target = e.target as HTMLImageElement;
-                          target.src = `https://images.unsplash.com/photo-${1460925895917 + idx}-afdab827c52f?w=400&h=300&fit=crop`;
-                        }}
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none">
-                        <div className="absolute bottom-1 left-1 right-1 text-white">
-                          <div className="text-xs font-medium truncate">{projectName}</div>
-                          {project?.tech_stack && project.tech_stack.length > 0 && (
-                            <div className="text-xs opacity-80 truncate">
-                              {project.tech_stack.slice(0, 1).join(', ')}
-                            </div>
-                          )}
+
+                // For other services without specific projects - show dummy images
+                if (!projectsToShow || projectsToShow.length === 0) {
+                  const dummyImages = imagesToShow.length > 0 ? imagesToShow : [];
+                  return dummyImages.slice(0, 6).map((img, idx) => {
+                    return (
+                      <div key={idx} className="group relative overflow-hidden rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
+                        <img
+                          src={typeof img === 'string' ? img : ''}
+                          alt={`${service.name} ${idx + 1}`}
+                          className="w-full h-24 object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                          onError={(e) => {
+                            const target = e.target as HTMLImageElement;
+                            target.src = `https://images.unsplash.com/photo-${1460925895917 + idx}-afdab827c52f?w=400&h=300&fit=crop`;
+                          }}
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                          <div className="absolute bottom-1 left-1 right-1 text-white">
+                            <div className="text-xs font-medium truncate">{service.name}</div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                });
+                    );
+                  });
+                }
+
+                // This should not be reached for category-specific services
+                return null;
               })()}
             </div>
           )}
-          
-          {/* Client Testimonial Card */}
-          <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-2xl p-6 mb-6 border border-blue-100">
-            <div className="flex items-start gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center text-white font-bold text-lg">
-                "
-              </div>
-              <div className="flex-1">
-                <p className="text-gray-700 italic mb-3">
-                  "Exceptional work quality and professional delivery. The team exceeded our expectations."
-                </p>
-                <div className="flex items-center gap-3">
-                  <div className="w-8 h-8 bg-gray-300 rounded-full"></div>
-                  <div>
-                    <div className="font-semibold text-gray-800 text-sm">Happy Client</div>
-                    <div className="text-gray-600 text-xs">{service.category} Project</div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
         </div>
-        
+
         {/* Content Section */}
-        <div className="p-6 space-y-8 bg-gray-50">
+        <div className="relative p-6 space-y-6 bg-gradient-to-b from-slate-900/95 via-indigo-900/80 to-slate-900/95">
           {/* Price and Duration */}
           {(service.price || service.duration) && (
-            <div className="bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200 rounded-2xl p-6 shadow-sm">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 bg-gradient-to-br from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center shadow-lg">
-                  <span className="text-white text-2xl">💎</span>
+            <div className="relative overflow-hidden bg-gradient-to-br from-emerald-500 via-green-500 to-teal-600 rounded-3xl p-6 shadow-xl">
+              {/* Decorative elements */}
+              <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-3xl"></div>
+              <div className="absolute bottom-0 left-0 w-24 h-24 bg-black/10 rounded-full blur-2xl"></div>
+
+              <div className="relative flex items-center gap-4">
+                <div className="w-16 h-16 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center shadow-lg border border-white/30">
+                  <span className="text-white text-3xl">💎</span>
                 </div>
-                <div className="flex-1">
-                  <div className="font-bold text-2xl text-green-800 mb-1">{service.price || 'Contact for pricing'}</div>
-                  {service.duration && <div className="text-green-600 font-medium">{service.duration}</div>}
-                  <div className="text-sm text-green-700 mt-1">Professional service package</div>
+                <div className="flex-1 text-white">
+                  <div className="font-bold text-3xl mb-1 drop-shadow-md">{service.price || 'Contact for pricing'}</div>
+                  {service.duration && <div className="text-white/90 font-medium text-lg">{service.duration}</div>}
+                  <div className="text-sm text-white/80 mt-1">Premium service package</div>
                 </div>
               </div>
             </div>
           )}
-          
+
           {/* Description */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center">
-                <span className="text-white text-sm">📋</span>
+          <div className="relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 shadow-2xl hover:shadow-purple-500/20 transition-all duration-300 group">
+            {/* Decorative glow */}
+            <div className="absolute -top-20 -right-20 w-40 h-40 bg-purple-500/20 rounded-full blur-3xl group-hover:bg-purple-500/30 transition-all duration-500"></div>
+            <div className="relative z-10">
+              <div className="flex items-start gap-4 mb-4">
+                <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg shrink-0">
+                  <span className="text-white text-xl">📋</span>
+                </div>
+                <div>
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-blue-100 to-purple-100 bg-clip-text text-transparent mb-2">
+                    About This Service
+                  </h3>
+                  <div className="w-16 h-1 bg-gradient-to-r from-indigo-400 to-purple-400 rounded-full shadow-lg shadow-purple-500/50"></div>
+                </div>
               </div>
-              About This Service
-            </h3>
-            <p className="text-gray-700 leading-relaxed text-base">{service.description}</p>
+              <p className="text-slate-200 leading-relaxed text-base pl-16">{service.description}</p>
+            </div>
           </div>
-          
+
           {/* Technology Stack with Icons / Codev Skills */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+          <div className="relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl hover:shadow-orange-500/20 transition-all duration-300 group">
+            {/* Decorative glow */}
+            <div className="absolute -bottom-20 -left-20 w-40 h-40 bg-orange-500/20 rounded-full blur-3xl group-hover:bg-orange-500/30 transition-all duration-500"></div>
+            <h3 className="relative z-10 text-xl font-bold bg-gradient-to-r from-white to-orange-100 bg-clip-text text-transparent mb-4 flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-orange-500 to-red-500 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white text-sm">⚡</span>
               </div>
               {isCodevHireService ? 'Skills & Expertise' : 'Technologies We Use'}
@@ -1211,19 +1282,19 @@ export default function ServicesPage() {
                   if (techMatch) {
                     const IconComponent = techMatch.icon;
                     return (
-                      <div key={idx} className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg hover:shadow-sm transition-all">
-                        <IconComponent className="w-4 h-4" />
-                        <span className="text-gray-700 text-sm font-medium">{tech}</span>
+                      <div key={idx} className="relative z-10 flex items-center gap-2 px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 hover:shadow-lg hover:shadow-blue-500/20 transition-all hover:scale-105">
+                        <IconComponent className="w-4 h-4 text-white" />
+                        <span className="text-slate-100 text-sm font-medium">{tech}</span>
                       </div>
                     );
                   } else {
                     // Fallback for technologies without icons
                     return (
-                      <div key={idx} className="flex items-center gap-2 px-3 py-2 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg">
-                        <div className="w-4 h-4 bg-gradient-to-br from-blue-400 to-purple-400 rounded-sm flex items-center justify-center">
+                      <div key={idx} className="relative z-10 flex items-center gap-2 px-3 py-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg hover:bg-white/15 hover:shadow-lg hover:shadow-purple-500/20 transition-all hover:scale-105">
+                        <div className="w-4 h-4 bg-gradient-to-br from-blue-400 to-purple-400 rounded-sm flex items-center justify-center shadow-md">
                           <span className="text-white text-xs font-bold">{tech.charAt(0)}</span>
                         </div>
-                        <span className="text-gray-700 text-sm font-medium">{tech}</span>
+                        <span className="text-slate-100 text-sm font-medium">{tech}</span>
                       </div>
                     );
                   }
@@ -1231,51 +1302,65 @@ export default function ServicesPage() {
               })()}
             </div>
           </div>
-          
+
           {/* Features Grid */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
-                <span className="text-white text-sm">✨</span>
-              </div>
-              What's Included
-            </h3>
-            <div className="grid grid-cols-1 gap-3">
-              {service.features.map((feature, idx) => (
-                <div key={idx} className="flex items-center gap-4 p-4 bg-gradient-to-r from-gray-50 to-white border border-gray-100 rounded-xl hover:shadow-md transition-all duration-200 hover:border-blue-200">
-                  <div className="w-8 h-8 bg-gradient-to-br from-green-400 to-emerald-500 rounded-full flex items-center justify-center flex-shrink-0 shadow-sm">
-                    <span className="text-white text-sm font-bold">✓</span>
-                  </div>
-                  <span className="text-gray-700 font-medium">{feature}</span>
+          <div className="relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-3xl p-8 shadow-2xl hover:shadow-pink-500/20 transition-all duration-300 group">
+            {/* Decorative glow */}
+            <div className="absolute -top-20 -left-20 w-40 h-40 bg-pink-500/20 rounded-full blur-3xl group-hover:bg-pink-500/30 transition-all duration-500"></div>
+            <div className="relative z-10">
+              <div className="flex items-start gap-4 mb-6">
+                <div className="w-12 h-12 bg-gradient-to-br from-purple-500 via-pink-500 to-rose-500 rounded-2xl flex items-center justify-center shadow-lg shrink-0">
+                  <span className="text-white text-xl">✨</span>
                 </div>
-              ))}
+                <div>
+                  <h3 className="text-2xl font-bold bg-gradient-to-r from-white via-pink-100 to-purple-100 bg-clip-text text-transparent mb-2">
+                    What's Included
+                  </h3>
+                  <div className="w-16 h-1 bg-gradient-to-r from-purple-400 to-pink-400 rounded-full shadow-lg shadow-pink-500/50"></div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 gap-3">
+                {service.features.map((feature, idx) => (
+                  <div key={idx} className="group/item flex items-center gap-4 p-4 bg-white/5 backdrop-blur-sm border border-white/10 rounded-2xl hover:bg-white/10 hover:shadow-lg hover:shadow-emerald-500/20 transition-all duration-300 hover:border-emerald-400/30 hover:scale-[1.02]">
+                    <div className="w-10 h-10 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-xl flex items-center justify-center flex-shrink-0 shadow-lg group-hover/item:scale-110 transition-transform duration-300">
+                      <span className="text-white text-lg font-bold">✓</span>
+                    </div>
+                    <span className="text-slate-100 font-medium text-base">{feature}</span>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
-          
+
           {/* Process Timeline */}
-          <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-            <h3 className="text-xl font-bold text-gray-800 mb-4 flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center">
+          <div className="relative overflow-hidden bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-2xl hover:shadow-blue-500/20 transition-all duration-300 group">
+            {/* Decorative glow */}
+            <div className="absolute -bottom-20 -right-20 w-40 h-40 bg-blue-500/20 rounded-full blur-3xl group-hover:bg-blue-500/30 transition-all duration-500"></div>
+            <h3 className="relative z-10 text-xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent mb-4 flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-br from-indigo-500 to-blue-500 rounded-lg flex items-center justify-center shadow-lg">
                 <span className="text-white text-sm">🚀</span>
               </div>
               Our Process
             </h3>
-            <div className="space-y-3">
+            <div className="relative z-10 space-y-3">
               {['Discovery & Planning', 'Design & Development', 'Testing & Deployment', 'Maintenance & Support'].map((step, idx) => (
-                <div key={idx} className="flex items-center gap-4 p-3 rounded-lg border border-gray-100">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm">
+                <div key={idx} className="flex items-center gap-4 p-3 rounded-lg bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-blue-400/30 transition-all duration-300 hover:scale-[1.02]">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-indigo-500 rounded-full flex items-center justify-center text-white font-bold text-sm shadow-lg">
                     {idx + 1}
                   </div>
-                  <span className="text-gray-700 font-medium">{step}</span>
+                  <span className="text-slate-100 font-medium">{step}</span>
                 </div>
               ))}
             </div>
           </div>
         </div>
-        
+
         {/* Footer */}
-        <div className="bg-gradient-to-r from-gray-800 to-slate-800 text-white p-4">
-          <div className="flex items-center justify-between">
+        <div className="relative bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 text-white p-4 overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
+          <div className="relative z-10 flex items-center justify-between">
             <span className="text-sm font-medium">Professional Development Services</span>
             <span className="text-xs opacity-75">codebility.tech</span>
           </div>
@@ -1287,20 +1372,29 @@ export default function ServicesPage() {
   const SummaryPagePreview = () => {
     const totalServices = services.length;
     const categories = [...new Set(services.map(s => s.category))];
-    
+
     return (
-      <div className="w-full h-full bg-gradient-to-br from-slate-50 to-white relative overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 opacity-5">
-          <div className="absolute top-0 left-0 w-full h-full" style={{
-            backgroundImage: `url("data:image/svg+xml,%3Csvg width='80' height='80' viewBox='0 0 80 80' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23000000' fill-opacity='0.03'%3E%3Cpath d='M50 50c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zM10 10c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10zm60 60c0-5.5-4.5-10-10-10s-10 4.5-10 10 4.5 10 10 10 10-4.5 10-10z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E")`
-          }}></div>
+      <div className="w-full min-h-[800px] bg-gradient-to-br from-slate-900 via-purple-900 to-slate-800 relative overflow-hidden">
+        {/* Animated background with shapes */}
+        <div className="absolute inset-0 overflow-hidden">
+          {/* Floating gradient orbs */}
+          <div className="absolute top-20 left-10 w-72 h-72 bg-purple-500/20 rounded-full blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-20 right-10 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }}></div>
+          <div className="absolute top-1/2 left-1/2 w-80 h-80 bg-pink-500/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '2s' }}></div>
+
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-10">
+            <div className="absolute top-0 left-0 w-full h-full" style={{
+              backgroundImage: `linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.05) 1px, transparent 1px)`,
+              backgroundSize: '50px 50px'
+            }}></div>
+          </div>
         </div>
-        
+
         {/* Header */}
-        <div className="relative bg-gradient-to-r from-slate-800 to-blue-900 text-white p-8">
-          <div className="text-center">
-            <div className="w-20 h-20 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+        <div className="relative bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white p-8 shadow-xl">
+          <div className="text-center relative z-10">
+            <div className="w-20 h-20 bg-white/20 backdrop-blur-sm rounded-2xl flex items-center justify-center mx-auto mb-4 border border-white/30 shadow-2xl">
               <Image
                 src="/assets/svgs/codebility-white.svg"
                 alt="Codebility Logo"
@@ -1309,65 +1403,75 @@ export default function ServicesPage() {
                 className="w-12 h-12"
               />
             </div>
-            <h1 className="text-3xl font-bold mb-2">SERVICE OVERVIEW</h1>
-            <p className="text-white/80">Your Complete Solution Partner</p>
+            <h1 className="text-3xl font-bold mb-2 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">SERVICE OVERVIEW</h1>
+            <p className="text-white/90">Your Complete Solution Partner</p>
           </div>
         </div>
-        
+
         {/* Stats Grid */}
-        <div className="p-8 space-y-8">
+        <div className="relative p-8 space-y-8 z-10">
           <div className="grid grid-cols-3 gap-6">
-            <div className="text-center p-6 bg-gradient-to-br from-blue-50 to-blue-100 rounded-2xl border border-blue-200 shadow-lg">
-              <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+            <div className="text-center p-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl hover:bg-white/10 hover:shadow-blue-500/20 transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <span className="text-white text-xl font-bold">{totalServices}</span>
               </div>
-              <div className="text-sm text-blue-600 font-medium">Total Services</div>
+              <div className="text-sm text-blue-200 font-medium">Total Services</div>
             </div>
-            
-            <div className="text-center p-6 bg-gradient-to-br from-purple-50 to-purple-100 rounded-2xl border border-purple-200 shadow-lg">
-              <div className="w-12 h-12 bg-purple-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+
+            <div className="text-center p-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl hover:bg-white/10 hover:shadow-purple-500/20 transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-purple-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <span className="text-white text-xl font-bold">{categories.length}</span>
               </div>
-              <div className="text-sm text-purple-600 font-medium">Categories</div>
+              <div className="text-sm text-purple-200 font-medium">Categories</div>
             </div>
-            
-            <div className="text-center p-6 bg-gradient-to-br from-green-50 to-green-100 rounded-2xl border border-green-200 shadow-lg">
-              <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mx-auto mb-3">
+
+            <div className="text-center p-6 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl shadow-2xl hover:bg-white/10 hover:shadow-green-500/20 transition-all duration-300 group">
+              <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-green-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300">
                 <span className="text-white text-xl">🌟</span>
               </div>
-              <div className="text-sm text-green-600 font-medium">Premium Quality</div>
+              <div className="text-sm text-green-200 font-medium">Premium Quality</div>
             </div>
           </div>
-          
+
+
           {/* Service Categories */}
           <div className="space-y-4">
-            <h3 className="text-xl font-bold text-gray-800 text-center">Our Expertise</h3>
+            <h3 className="text-xl font-bold bg-gradient-to-r from-white to-blue-100 bg-clip-text text-transparent text-center">Our Expertise</h3>
             <div className="grid grid-cols-2 gap-4">
               {categories.map((category, idx) => (
-                <div key={idx} className="flex items-center gap-3 p-4 bg-white border border-gray-200 rounded-xl shadow-sm">
-                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center">
+                <div key={idx} className="flex items-center gap-3 p-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-xl shadow-lg hover:bg-white/10 hover:shadow-indigo-500/20 transition-all duration-300 hover:scale-[1.02]">
+                  <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-lg flex items-center justify-center shadow-md">
                     <span className="text-white text-sm font-bold">✓</span>
                   </div>
-                  <span className="font-medium text-gray-700">{category}</span>
+                  <span className="font-medium text-slate-100">{category}</span>
                 </div>
               ))}
             </div>
           </div>
-          
+
+
           {/* Call to Action */}
-          <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-8 rounded-2xl text-center shadow-2xl">
-            <h3 className="text-2xl font-bold mb-3">Ready to Transform Your Ideas?</h3>
-            <p className="text-lg mb-4 text-white/90">Let's discuss your project and bring it to life</p>
-            <div className="space-y-2">
-              <div className="text-white/80">📧 admin@codebility.tech</div>
-              <div className="text-white/80">🌐 www.codebility.tech</div>
+          <div className="relative overflow-hidden bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 text-white p-8 rounded-3xl text-center shadow-2xl">
+            {/* Decorative elements */}
+            <div className="absolute top-0 left-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+            <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-500/20 rounded-full blur-2xl"></div>
+            <div className="relative z-10">
+              <h3 className="text-2xl font-bold mb-3 bg-clip-text text-transparent bg-gradient-to-r from-white to-blue-100">Ready to Transform Your Ideas?</h3>
+              <p className="text-lg mb-4 text-white/90">Let's discuss your project and bring it to life</p>
+              <div className="space-y-2">
+                <div className="text-white/90 font-medium">📧 admin@codebility.tech</div>
+                <div className="text-white/90 font-medium">🌐 www.codebility.tech</div>
+              </div>
             </div>
           </div>
         </div>
-        
+
         {/* Footer */}
-        <div className="bg-gradient-to-r from-gray-800 to-slate-800 text-white p-4">
-          <div className="text-center">
+        <div className="relative bg-gradient-to-r from-indigo-900 via-purple-900 to-pink-900 text-white p-4 overflow-hidden">
+          {/* Decorative elements */}
+          <div className="absolute top-0 left-0 w-32 h-32 bg-white/5 rounded-full blur-2xl"></div>
+          <div className="absolute bottom-0 right-0 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl"></div>
+          <div className="relative z-10 text-center">
             <span className="text-sm">© {new Date().getFullYear()} Codebility • Professional Development Services</span>
           </div>
         </div>
@@ -1402,44 +1506,48 @@ export default function ServicesPage() {
     };
 
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-start justify-center z-50 p-2 sm:p-4 overflow-y-auto">
-        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-4xl min-h-[90vh] max-h-fit flex flex-col my-2 sm:my-4">
+      <div className="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-start justify-center z-50 overflow-y-auto sm:p-4">
+        <div className="bg-white dark:bg-gray-900 sm:rounded-2xl shadow-2xl w-full sm:max-w-4xl min-h-screen sm:min-h-[90vh] sm:max-h-[95vh] flex flex-col sm:my-4">
           {/* Modal Header */}
-          <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 dark:border-gray-700">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center p-1">
+          <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 flex items-center justify-between p-3 sm:p-6 border-b border-gray-200 dark:border-gray-700">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 bg-gradient-to-br from-blue-500 to-purple-500 rounded-lg flex items-center justify-center p-1">
                 <Image
                   src="/assets/svgs/codebility-white.svg"
                   alt="Codebility Logo"
                   width={20}
                   height={20}
-                  className="w-5 h-5"
+                  className="w-4 h-4 sm:w-5 sm:h-5"
                 />
               </div>
-              <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200">Services Catalog Preview</h2>
+              <h2 className="text-base sm:text-xl font-semibold text-gray-800 dark:text-gray-200 truncate">
+                <span className="hidden sm:inline">Services Catalog Preview</span>
+                <span className="sm:hidden">Preview</span>
+              </h2>
             </div>
-            <div className="flex items-center gap-4">
-              <span className="text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-3 py-1 rounded-full">
-                Page {currentPage + 1} of {totalPages}
+            <div className="flex items-center gap-2 sm:gap-4">
+              <span className="text-xs sm:text-sm text-gray-500 dark:text-gray-400 bg-gray-100 dark:bg-gray-800 px-2 py-1 sm:px-3 rounded-full whitespace-nowrap">
+                {currentPage + 1}/{totalPages}
               </span>
               <Button
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowPreview(false)}
-                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800"
+                className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 dark:text-gray-400 dark:hover:text-gray-200 dark:hover:bg-gray-800 h-8 w-8 p-0"
               >
                 <X className="h-4 w-4" />
               </Button>
             </div>
           </div>
-          
+
           {/* Page Content with A4 proportions */}
-          <div className="flex-1 bg-gradient-to-br from-gray-50 to-gray-100 p-4 flex justify-center items-start min-h-0 overflow-y-auto">
-            <div 
-              className="bg-white shadow-2xl rounded-lg overflow-hidden w-full max-w-[600px] my-4"
-              style={{ 
-                aspectRatio: '210/297', // A4 ratio
-                minHeight: '800px',
+          <div className="flex-1 bg-gradient-to-br from-gray-50 to-gray-100 p-2 sm:p-4 flex justify-center items-start min-h-0 overflow-y-auto pb-4">
+            <div
+              className="bg-white shadow-2xl sm:rounded-lg overflow-hidden w-full sm:max-w-[600px] my-2 sm:my-4 mb-8"
+              style={{
+                aspectRatio: window.innerWidth < 640 ? 'auto' : '210/297', // A4 ratio on desktop, auto on mobile
+                minHeight: window.innerWidth < 640 ? 'auto' : '800px',
+                maxHeight: window.innerWidth < 640 ? 'none' : '1200px',
                 height: 'auto'
               }}
             >
@@ -1450,45 +1558,77 @@ export default function ServicesPage() {
           </div>
           
           {/* Modal Footer */}
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-6 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800">
-            <Button
-              variant="outline"
-              onClick={prevPage}
-              disabled={currentPage === 0}
-              className="flex items-center gap-2 w-full sm:w-auto text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 dark:border-gray-600"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              <span className="hidden sm:inline">Previous</span>
-              <span className="sm:hidden">Prev</span>
-            </Button>
-            
-            <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
-              <Button
-                variant="outline"
-                onClick={() => setShowPreview(false)}
-                className="w-full sm:w-auto text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 dark:border-gray-600"
-              >
-                Close Preview
-              </Button>
+          <div className="sticky bottom-0 bg-gray-50 dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700 z-20 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)]">
+            {/* Mobile Layout */}
+            <div className="sm:hidden p-3 space-y-2">
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  onClick={prevPage}
+                  disabled={currentPage === 0}
+                  className="flex-1 flex items-center justify-center gap-1 text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 dark:border-gray-600 h-10"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Prev
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={nextPage}
+                  disabled={currentPage === totalPages - 1}
+                  className="flex-1 flex items-center justify-center gap-1 text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 dark:border-gray-600 h-10"
+                >
+                  Next
+                  <ChevronRight className="h-4 w-4" />
+                </Button>
+              </div>
               <Button
                 onClick={generateServicesPDF}
-                className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg w-full sm:w-auto"
+                className="w-full bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg h-10"
               >
                 <Download className="h-4 w-4 mr-2" />
                 Download PDF
               </Button>
             </div>
-            
-            <Button
-              variant="outline"
-              onClick={nextPage}
-              disabled={currentPage === totalPages - 1}
-              className="flex items-center gap-2 w-full sm:w-auto text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 dark:border-gray-600"
-            >
-              <span className="hidden sm:inline">Next</span>
-              <span className="sm:hidden">Next</span>
-              <ChevronRight className="h-4 w-4" />
-            </Button>
+
+            {/* Desktop Layout */}
+            <div className="hidden sm:flex items-center justify-between gap-4 p-6">
+              <Button
+                variant="outline"
+                onClick={prevPage}
+                disabled={currentPage === 0}
+                className="flex items-center gap-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 dark:border-gray-600"
+              >
+                <ChevronLeft className="h-4 w-4" />
+                Previous
+              </Button>
+
+              <div className="flex gap-3">
+                <Button
+                  variant="outline"
+                  onClick={() => setShowPreview(false)}
+                  className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 dark:border-gray-600"
+                >
+                  Close Preview
+                </Button>
+                <Button
+                  onClick={generateServicesPDF}
+                  className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Download PDF
+                </Button>
+              </div>
+
+              <Button
+                variant="outline"
+                onClick={nextPage}
+                disabled={currentPage === totalPages - 1}
+                className="flex items-center gap-2 text-gray-700 hover:text-gray-900 hover:bg-gray-100 dark:text-gray-300 dark:hover:text-gray-100 dark:hover:bg-gray-700 dark:border-gray-600"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -1574,16 +1714,6 @@ export default function ServicesPage() {
                   <p className="text-sm text-blue-700 dark:text-blue-300">
                     Categories: {[...new Set(services.map(s => s.category))].join(", ")}
                   </p>
-                </div>
-                <div className="flex gap-2">
-                  <Button
-                    onClick={generateServicesPDF}
-                    size="sm"
-                    className="bg-blue-600 hover:bg-blue-700 text-white"
-                  >
-                    <Download className="h-4 w-4 mr-2" />
-                    Export PDF
-                  </Button>
                 </div>
               </div>
             </div>

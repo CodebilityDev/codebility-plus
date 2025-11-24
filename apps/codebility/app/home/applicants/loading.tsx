@@ -32,7 +32,7 @@ export default function ApplicantsLoading() {
               key={index}
               className="mx-auto my-4 flex flex-col items-center gap-10"
             >
-              <Skeleton className="h-10 w-full" />
+              <Skeleton className="h-16 w-full" />
             </div>
           ))}
       </Box>

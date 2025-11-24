@@ -1,4 +1,4 @@
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, useMemo, useRef, useState } from "react";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import {
   Select,
@@ -43,6 +43,7 @@ export const CustomSelect = ({
 }: CustomSelectProps) => {
   // Keep track of the user's search term
   const [searchTerm, setSearchTerm] = useState("");
+  const searchInputRef = useRef<HTMLInputElement>(null);
 
   // Filter options based on the search term
   const filteredOptions = useMemo(() => {
@@ -76,12 +77,17 @@ export const CustomSelect = ({
           {searchable && (
             <div className="p-2">
               <input
+                ref={searchInputRef}
                 type="text"
                 placeholder="Search..."
                 value={searchTerm}
                 onChange={handleSearchChange}
                 onPointerDown={(e) => e.stopPropagation()} // Keep dropdown open
                 onFocus={(e) => e.stopPropagation()} // Keep dropdown open
+                onKeyDown={(e) => {
+                  e.stopPropagation(); // Prevent Select keyboard navigation
+                }}
+                autoFocus={false}
                 className="dark:bg-dark-100 w-full rounded-md bg-white p-2 text-sm dark:text-white"
               />
             </div>

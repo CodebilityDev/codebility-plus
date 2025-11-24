@@ -164,7 +164,7 @@ export const techstacks = [
   { name: "Cloudflare", icon: IconCloudflare, category: "Server" },
   { name: "Kubernetes", icon: IconKubernetes, category: "Server" },
   { name: "Git", icon: IconGit, category: "Server" },
-  { name: "GitHub Actions", icon: IconGitHubActions, category: "Server" },
+  { name: "GitHub Actions", alias: "github-actions", icon: IconGitHubActions, category: "Server" },
   { name: "Jenkins", icon: IconJenkins, category: "Server" },
   { name: "Nginx", icon: IconNginx, category: "Server" },
   { name: "Apache", icon: IconApache, category: "Server" },
@@ -179,3 +179,22 @@ export const techstacks = [
   // Design (or Other)
   { name: "Figma", icon: IconFigma, category: "Design" },
 ];
+
+/**
+ * Converts a tech stack name to its corresponding icon file name
+ * Handles special cases with aliases (e.g., "C++" → "cplus-plus", "React Native" → "react-native")
+ */
+export function getTechStackIconName(stackName: string): string {
+  // Find the tech stack in the array
+  const tech = techstacks.find(
+    (t) => t.name.toLowerCase() === stackName.toLowerCase()
+  );
+
+  // If found and has an alias, use the alias; otherwise use lowercase name
+  if (tech?.alias) {
+    return tech.alias;
+  }
+
+  // Default: convert to lowercase and replace spaces with hyphens
+  return stackName.toLowerCase().replace(/\s+/g, '-');
+}

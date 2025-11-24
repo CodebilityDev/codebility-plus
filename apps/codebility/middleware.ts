@@ -29,11 +29,14 @@ const PUBLIC_ROUTE_PREFIXES = ["/profiles/", "/nda-signing/"] as const;
 
 const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up", "/auth/onboarding"] as const;
 
-// Authentication status routes
+// Authentication status routes - these require auth but have special handling
 const EMAIL_VERIFICATION_ROUTE = "/auth/verify";
 const WAITING_APPROVAL_ROUTE = "/auth/waiting";
 const APPLICATION_DECLINED_ROUTE = "/auth/declined";
-const APPLICANT_ROUTE = "/applicant"
+const APPLICANT_ROUTE = "/applicant";
+
+// Routes that authenticated users can always access regardless of application status
+const AUTH_STATUS_ROUTES = [APPLICATION_DECLINED_ROUTE, EMAIL_VERIFICATION_ROUTE] as const;
 
 const routePermissionMap: Record<string, keyof RolePermissions> = {
   "/home/interns": "interns",
@@ -89,16 +92,14 @@ export async function middleware(req: NextRequest) {
       const supabase = await createClientServerComponent();
       const {
         data: { user },
-        error,
       } = await supabase.auth.getUser();
 
-      // If error is related to missing refresh token, ignore it for auth routes
+      // If user is already logged in, redirect to home
       if (user) {
-        // Redirect to home if user is already logged in
         return redirectTo(req, "/home");
       }
 
-      // Allow access to auth pages if not logged in, regardless of error
+      // Allow access to auth pages if not logged in
       return NextResponse.next();
     }
 
@@ -120,10 +121,15 @@ export async function middleware(req: NextRequest) {
       return redirectToLogin(req);
     }
 
+    // Allow authenticated users to access auth status routes without further checks
+    // This prevents redirect loops when users are being directed to these pages
+    if (AUTH_STATUS_ROUTES.includes(pathname as any)) {
+      return NextResponse.next();
+    }
+
     // Check if email is verified
     const {
       data: { user: authUser },
-      error: verificationError,
     } = await supabase.auth.getUser();
 
     if (
@@ -181,7 +187,7 @@ export async function middleware(req: NextRequest) {
       if (pathname.includes(WAITING_APPROVAL_ROUTE) || pathname.includes(APPLICANT_ROUTE)) {
         return NextResponse.next();
       } else {
-        return redirectTo(req, 'applicant/waiting');
+        return redirectTo(req, '/applicant/waiting');
       }
     }
 

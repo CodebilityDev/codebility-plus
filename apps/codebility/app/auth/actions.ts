@@ -283,7 +283,24 @@ export const signinUser = async (email: string, password: string) => {
     // Save the user profile to your store
     setUser(userProfile);
 
-    return { success: true, redirectTo: "/home" };
+    // Determine redirect path based on application status
+    let redirectTo = "/home"; // Default for "passed" status
+
+    if (
+      userProfile.application_status === "applying" ||
+      userProfile.application_status === "pending" ||
+      userProfile.application_status === "testing" ||
+      userProfile.application_status === "onboarding"
+    ) {
+      redirectTo = "/applicant/waiting";
+    } else if (
+      userProfile.application_status === "failed" ||
+      userProfile.application_status === "denied"
+    ) {
+      redirectTo = "/auth/declined";
+    }
+
+    return { success: true, redirectTo };
   } catch (error: any) {
     console.error("Sign in error:", error);
     return { success: false, error: error.message || "Failed to sign in" };

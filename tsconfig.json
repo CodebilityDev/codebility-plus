@@ -1,5 +1,5 @@
 {
-
+  "extends": "@codevs/tsconfig/base.json",
   "compilerOptions": {
     "strictNullChecks": true,
     "noUncheckedIndexedAccess": true,

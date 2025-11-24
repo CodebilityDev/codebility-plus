@@ -27,6 +27,7 @@ import {
   RoadmapDecorativeIcon,
   RoadmapPhaseCard,
 } from "./DashboardRoadmapNodeTypes";
+import { PhaseDetailsModal } from "./PhaseDetailsModal";
 
 const nodeTypes: NodeTypes = {
   phaseCard: RoadmapPhaseCard,
@@ -42,6 +43,8 @@ export default function DashboardRoleRoadmap() {
   const supabase = createClientClientComponent();
   const [totalPoints, setTotalPoints] = useState<number>(0);
   const [loading, setLoading] = useState<boolean>(true);
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedPhase, setSelectedPhase] = useState<string | null>(null);
 
   const roadmapData = [
     {
@@ -86,10 +89,32 @@ export default function DashboardRoleRoadmap() {
     },
   ];
 
-  // Determine the current phase based on total points
-  const currentPhaseIndex = roadmapData.findIndex(
-    (phase) => totalPoints >= phase.minPoints && totalPoints < phase.maxPoints,
-  );
+  // Handler functions for modal
+  const handlePhaseClick = (phaseId: string) => {
+    setSelectedPhase(phaseId);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedPhase(null);
+  };
+
+  // Determine the current phase based on user's role_id
+  // role_id: 4 = Intern (Phase 1), 10 = Codev (Phase 2), 5 = Mentor (Phase 3)
+  const getCurrentPhaseIndex = () => {
+    const roleId = user?.role_id;
+    if (roleId === 4) return 0; // Intern - Phase 1
+    if (roleId === 10) return 1; // Codev - Phase 2
+    if (roleId === 5) return 2; // Mentor - Phase 3
+
+    // Fallback to points-based if role_id is not set
+    return roadmapData.findIndex(
+      (phase) => totalPoints >= phase.minPoints && totalPoints < phase.maxPoints,
+    );
+  };
+
+  const currentPhaseIndex = getCurrentPhaseIndex();
 
   // Create initial nodes
   const createInitialNodes = (): Node[] => {
@@ -154,6 +179,15 @@ export default function DashboardRoleRoadmap() {
   const onConnect = useCallback(
     (params: Connection) => setEdges((eds) => addEdge(params, eds)),
     [setEdges],
+  );
+
+  const onNodeClick = useCallback(
+    (_event: React.MouseEvent, node: Node) => {
+      // Extract phase id from node id (format: "phase-1", "phase-2", etc.)
+      const phaseId = node.id.replace("phase-", "");
+      handlePhaseClick(phaseId);
+    },
+    [],
   );
 
   useEffect(() => {
@@ -279,6 +313,7 @@ export default function DashboardRoleRoadmap() {
             onNodesChange={onNodesChange}
             onEdgesChange={onEdgesChange}
             onConnect={onConnect}
+            onNodeClick={onNodeClick}
             nodeTypes={nodeTypes}
             edgeTypes={edgeTypes}
             defaultViewport={{ x: 60, y: 20, zoom: 0.7 }}
@@ -297,10 +332,16 @@ export default function DashboardRoleRoadmap() {
         </div>
 
         <p className="mt-4 text-center text-xs text-gray-500 dark:text-gray-400">
-          💡 Drag and zoom to explore your roadmap • Click and drag nodes to
-          rearrange
+          💡 Drag and zoom to explore your roadmap • Click phase cards to view details
         </p>
       </div>
+
+      {/* Phase Details Modal */}
+      <PhaseDetailsModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        phaseId={selectedPhase}
+      />
     </Box>
   );
 }

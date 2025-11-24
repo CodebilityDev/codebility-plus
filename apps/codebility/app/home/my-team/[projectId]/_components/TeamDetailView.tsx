@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback, useRef, useEffect } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "react-hot-toast";
 import {
   getMembers,
@@ -10,7 +11,7 @@ import {
 } from "@/app/home/projects/actions";
 import { Codev } from "@/types/home/codev";
 import { Button } from "@/components/ui/button";
-import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock, CheckSquare } from "lucide-react";
+import { Users, UserPlus, Table, Calendar, TrendingUp, Save, CalendarDays, Clock, CheckSquare, Kanban } from "lucide-react";
 import AddMembersModal from "../../AddMembersModal";
 import ChecklistManageModal from "../../_components/ChecklistManageModal";
 import AttendanceGrid from "./AttendanceGrid";
@@ -19,6 +20,7 @@ import CompactMemberGrid from "./CompactMemberGrid";
 import SyncAllAttendance from "./SyncAllAttendance";
 import ScheduleMeetingModal from "./ScheduleMeetingModal";
 import AttendanceWarningBanner from "./AttendanceWarningBanner";
+import ChecklistStatusBanner from "./ChecklistStatusBanner";
 import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "../actions";
 
 /**
@@ -26,14 +28,19 @@ import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "../actions";
  * 
  * VISIBILITY RULES:
  * ✅ Team View tab: Always visible to everyone
- * ✅ Attendance tab: Only visible to team leads
+ * ✅ Attendance tab: VISIBLE to everyone, EDITABLE only for team leads
  * ✅ Checklist button: Only visible to team leads
- * ✅ Schedule Meeting button: Always visible
- * ✅ Manage Members button: Always visible (in Team View)
+ * ✅ Schedule Meeting button: Only visible to team leads
+ * ✅ Manage Members button: Only visible to team leads (in Team View)
  * 
  * BEHAVIOR:
- * - Regular members: See only Team View tab
- * - Team leads: See Team View + Attendance tabs + Checklist button
+
+ * - Regular members: Can view attendance but cannot edit
+ * - Team leads: Full edit access to attendance
+
+ * - Regular members: See only Team View tab (read-only)
+ * - Team leads: Full control over all team management features
+
  */
 
 interface ProjectData {
@@ -47,7 +54,7 @@ interface ProjectData {
   members: {
     data: SimpleMemberData[];
   };
-  currentUserId: string;  // ✅ RESTORED: Needed to check team lead status
+  currentUserId: string;
 }
 
 interface TeamDetailViewProps {
@@ -55,6 +62,7 @@ interface TeamDetailViewProps {
 }
 
 const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
+  const router = useRouter();
   const [project, setProject] = useState(projectData);
   const [showAddModal, setShowAddModal] = useState(false);
   const [showChecklistModal, setShowChecklistModal] = useState(false);
@@ -126,7 +134,18 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       .filter(Boolean)
       .join(", ");
 
-    return `${selectedDaysDisplay} at ${currentSchedule.time} @ Discord`;
+    // Convert military time to 12-hour format
+    const convertTo12Hour = (time24: string) => {
+      const [hours, minutes] = time24.split(':');
+      const hour = parseInt(hours, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
+      return `${hour12}:${minutes} ${ampm}`;
+    };
+
+    const formattedTime = convertTo12Hour(currentSchedule.time);
+
+    return `${selectedDaysDisplay} at ${formattedTime} @ Discord`;
   };
 
   const handleOpenAddModal = () => {
@@ -251,26 +270,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             isTeamLead={isCurrentUserTeamLead}
           />
         )}
-        
-        {/* Meeting Schedule Banner */}
-        {formatSchedule() && (
-          <div className="rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2">
-                  <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
-                </div>
-                <div>
-                  <p className="text-sm font-medium text-gray-900 dark:text-white">Meeting Schedule</p>
-                  <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mt-0.5">
-                    <Clock className="h-3.5 w-3.5" />
-                    {formatSchedule()}
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Header with Tab Buttons */}
         <div className="flex items-center justify-between">
@@ -288,21 +287,20 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               <Users className="h-4 w-4" />
               Team View
             </Button>
-            
-            {/* Attendance Tab - ONLY VISIBLE TO TEAM LEADS */}
-            {isCurrentUserTeamLead && (
-              <Button
-                variant={viewMode === "attendance" ? "default" : "outline"}
-                size="sm"
-                onClick={() => setViewMode("attendance")}
-                className={`flex items-center gap-2 ${
-                  viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
-                }`}
-              >
-                <Table className="h-4 w-4" />
-                Attendance
-              </Button>
-            )}
+
+            {/* Attendance Tab - VISIBLE TO ALL, READ-ONLY FOR NON-LEADS */}
+            <Button
+              variant={viewMode === "attendance" ? "default" : "outline"}
+              size="sm"
+              onClick={() => setViewMode("attendance")}
+              className={`flex items-center gap-2 ${
+                viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
+              }`}
+            >
+              <Table className="h-4 w-4" />
+              Attendance
+              {!isCurrentUserTeamLead}
+            </Button>
 
             {/* Checklist Button - ONLY VISIBLE TO TEAM LEADS */}
             {isCurrentUserTeamLead && (
@@ -342,8 +340,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               </>
             )}
             
-            {/* Manage Members - Only in team view */}
-            {viewMode === "team" && (
+            {/* Manage Members - ONLY VISIBLE TO TEAM LEADS in Team View */}
+            {viewMode === "team" && isCurrentUserTeamLead && (
               <Button
                 onClick={handleOpenAddModal}
                 disabled={isLoadingMembers}
@@ -355,23 +353,69 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               </Button>
             )}
             
-            {/* Schedule Meeting - Always visible */}
+            {/* Schedule Meeting - ONLY VISIBLE TO TEAM LEADS */}
+            {isCurrentUserTeamLead && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                title="Schedule Meetings"
+                onClick={() => setShowScheduleMeetingModal(true)}
+              >
+                <CalendarDays className="h-3.5 w-3.5" />
+                Schedule Meeting
+              </Button>
+            )}
+
+            {/* Kanban Board Button - VISIBLE TO ALL MEMBERS */}
             <Button
               variant="outline"
               size="sm"
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-              title="Schedule Meetings"
-              onClick={() => setShowScheduleMeetingModal(true)}
+              className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+              title="Go to Kanban Board"
+              onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
             >
-              <CalendarDays className="h-3.5 w-3.5" />
-              Schedule Meeting
+              <Kanban className="h-3.5 w-3.5" />
+              Kanban Board
             </Button>
           </div>
         </div>
 
         {viewMode === "team" ? (
           <>
-            {/* Project stats */}
+            {/* Meeting Schedule and Checklist Status - Side by side */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4 items-start">
+              {/* Meeting Schedule - Takes 2 columns */}
+              {formatSchedule() && (
+                <div className="md:col-span-2 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="rounded-lg bg-blue-100 dark:bg-blue-900/50 p-2">
+                        <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
+                      </div>
+                      <div>
+                        <p className="text-sm font-medium text-gray-900 dark:text-white">Meeting Schedule</p>
+                        <p className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1.5 mt-0.5">
+                          <Clock className="h-3.5 w-3.5" />
+                          {formatSchedule()}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Checklist Status - Takes 1 column on the right */}
+              <div className={formatSchedule() ? "" : "md:col-span-3"}>
+                <ChecklistStatusBanner
+                  projectId={projectInfo.id}
+                  teamMembers={members?.data || []}
+                  teamLead={teamLead?.data || null}
+                />
+              </div>
+            </div>
+
+            {/* Team Overview and Attendance Points - Equal width */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               {/* Team Overview Card */}
               <div className="rounded-lg border border-gray-200 bg-white p-4 shadow-sm dark:border-gray-700 dark:bg-gray-800">
@@ -461,8 +505,17 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             )}
           </>
         ) : (
-          /* Attendance Grid View - Only accessible by team leads */
+          /* Attendance Grid View - VISIBLE TO ALL, EDITABLE ONLY BY TEAM LEADS */
           <div className="w-full overflow-x-hidden">
+            {/* Read-only notice for non-team leads */}
+            {!isCurrentUserTeamLead && (
+              <div className="mb-4 rounded-lg bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 p-3">
+                <p className="text-sm text-amber-800 dark:text-amber-200">
+                  📋 You're viewing attendance in read-only mode. 
+                </p>
+              </div>
+            )}
+            
             {useMeetingBasedAttendance && currentSchedule ? (
               <MeetingBasedAttendance
                 ref={attendanceGridRef}
@@ -476,6 +529,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                   }))
                 }
                 onHasChangesUpdate={setHasAttendanceChanges}
+                readOnly={!isCurrentUserTeamLead}
               />
             ) : (
               <AttendanceGrid
@@ -485,6 +539,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 projectId={projectInfo.id}
                 allowWeekendMeetings={true}
                 onHasChangesUpdate={setHasAttendanceChanges}
+                readOnly={!isCurrentUserTeamLead}
               />
             )}
           </div>

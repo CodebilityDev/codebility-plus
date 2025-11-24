@@ -6,7 +6,7 @@ import { NotificationIcon } from "./NotificationIcon";
 import { NotificationPanel } from "./NotificationPanel";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { useUserStore } from "@/store/codev-store";
-import { toast } from "@codevs/ui/sonner/toast";
+import { toast } from "sonner";
 
 
 export function NotificationContainer() {

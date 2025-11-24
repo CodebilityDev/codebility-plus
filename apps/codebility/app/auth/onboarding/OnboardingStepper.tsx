@@ -5,6 +5,7 @@ import { cn } from "@/lib/utils";
 import { Check } from "lucide-react";
 
 // Section configuration - maps to each wrapper component
+// Line 9-17: Section labels array
 const SECTIONS = [
   { id: "about-section", label: "About Us" },
   { id: "software", label: "Software Development" },
@@ -13,7 +14,7 @@ const SECTIONS = [
   { id: "house-rules", label: "House Rules" },
   { id: "team", label: "Meet the Team" },
   { id: "partners", label: "Our Partners" },
-  { id: "welcome", label: "Welcome Aboard" },
+  { id: "welcome", label: "Signup Now!" }, // ✅ CHANGED: "Welcome Aboard" → "Signup Now!"
 ];
 
 export default function OnboardingStepper() {
@@ -119,12 +120,15 @@ export default function OnboardingStepper() {
 
                 {/* Enhanced tooltip label on hover */}
                 <div className="pointer-events-none absolute left-8 flex items-center gap-2">
-                  <div className="h-px w-3 bg-gradient-to-r from-gray-400 to-transparent opacity-0 transition-all duration-200 group-hover:w-4 group-hover:opacity-100 dark:from-gray-600" />
+                  <div className={cn(
+                    "h-px w-3 bg-gradient-to-r from-gray-400 to-transparent transition-all duration-200 dark:from-gray-600",
+                    (isLast || isActive) ? "w-4 opacity-100" : "opacity-0 group-hover:w-4 group-hover:opacity-100"
+                  )} />
                   <span
                     className={cn(
                       "whitespace-nowrap rounded-lg px-4 py-2 text-sm font-medium shadow-xl backdrop-blur-sm transition-all duration-200",
                       "border border-gray-200 bg-white/95 text-gray-900 dark:border-gray-700 dark:bg-gray-800/95 dark:text-white",
-                      "opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100",
+                      (isLast || isActive) ? "translate-x-0 opacity-100" : "opacity-0 -translate-x-2 group-hover:translate-x-0 group-hover:opacity-100",
                       isActive && "border-blue-500/20 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-950/50 dark:to-purple-950/50"
                     )}
                   >

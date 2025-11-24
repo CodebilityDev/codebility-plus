@@ -109,12 +109,12 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       return;
     }
 
-    // Update XP and level to 0
+    // 🔧 FIX: Update XP and level to 0 (complete reset)
     const { error: updateError } = await supabaseBot
       .from("user_stats_discord")
       .update({
         xp: 0,
-        level: 1, // Reset to level 1 (most bots start at level 1, not 0)
+        level: 0, // Reset to level 0
         total_messages: 0,
       })
       .eq("user_id", targetUser.id)
@@ -129,9 +129,9 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       return;
     }
 
-    // Successful reset confirmation
+    // 🔧 FIX: Successful reset confirmation with correct level 0
     await interaction.editReply({
-      content: `🔄 **XP successfully reset for ${targetUser.username}!**\n\n• **XP:** 0\n• **Level:** 1\n• **Messages:** 0`,
+      content: `🔄 **XP successfully reset for ${targetUser.username}!**\n\n• **XP:** 0\n• **Level:** 0\n• **Messages:** 0`,
     });
 
     // Log event to console

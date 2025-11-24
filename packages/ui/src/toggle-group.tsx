@@ -46,7 +46,7 @@ const ToggleGroupItem = React.forwardRef<
         toggleVariants({ variant, size }),
         className
       )}
-      {...props}  // Make sure this is here
+      {...props} 
     >
       {children}
     </ToggleGroupPrimitive.Item>

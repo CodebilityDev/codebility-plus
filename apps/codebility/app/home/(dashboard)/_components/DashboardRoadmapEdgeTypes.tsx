@@ -1,4 +1,4 @@
-import { BaseEdge, EdgeProps, getBezierPath } from "reactflow";
+import { BaseEdge, EdgeProps } from "reactflow";
 
 export const CustomRoadmapEdge = ({
   id,
@@ -6,18 +6,17 @@ export const CustomRoadmapEdge = ({
   sourceY,
   targetX,
   targetY,
-  sourcePosition,
-  targetPosition,
   data,
 }: EdgeProps) => {
-  const [edgePath] = getBezierPath({
-    sourceX,
-    sourceY,
-    sourcePosition,
-    targetX,
-    targetY,
-    targetPosition,
-  });
+  // Create a more curved path using quadratic bezier curve
+  const midX = (sourceX + targetX) / 2;
+  const midY = (sourceY + targetY) / 2;
+
+  // Add horizontal offset for more curve
+  const curveOffset = 150;
+  const controlX = midX + (sourceX < targetX ? curveOffset : -curveOffset);
+
+  const edgePath = `M ${sourceX} ${sourceY} Q ${controlX} ${midY}, ${targetX} ${targetY}`;
 
   const isActive = data?.isActive ?? false;
 
