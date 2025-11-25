@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, GripVertical, ArrowLeft } from "lucide-react";
+import { Plus, Pencil, Trash2, GripVertical, ArrowLeft, BarChart3 } from "lucide-react";
 import { Button } from "@codevs/ui/button";
 import { H1 } from "@/components/shared/dashboard";
 import PageContainer from "../../../_components/PageContainer";
@@ -197,16 +197,26 @@ export default function SurveyBuilderPage() {
             {survey?.description || "Build your survey questions"}
           </p>
         </div>
-        <Button
-          onClick={() => {
-            setEditingQuestion(null);
-            setShowForm(true);
-          }}
-          className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
-        >
-          <Plus className="h-4 w-4" />
-          Add Question
-        </Button>
+        <div className="flex gap-3">
+          <Button
+            onClick={() => router.push(`/home/settings/surveys/${surveyId}/results`)}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <BarChart3 className="h-4 w-4" />
+            View Results
+          </Button>
+          <Button
+            onClick={() => {
+              setEditingQuestion(null);
+              setShowForm(true);
+            }}
+            className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+          >
+            <Plus className="h-4 w-4" />
+            Add Question
+          </Button>
+        </div>
       </div>
 
       {/* Question Form */}
