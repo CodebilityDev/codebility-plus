@@ -6,6 +6,7 @@ import {
   REST,
   Routes,
   Collection,
+  RESTPostAPIApplicationCommandsJSONBody,  // Add this
 } from "discord.js";
 import * as dotenv from "dotenv";
 import * as path from "path";
@@ -64,7 +65,7 @@ declare module "discord.js" {
         !file.endsWith(".disabled")
     );
 
-  const commandsData: any[] = [];
+  const commandsData: RESTPostAPIApplicationCommandsJSONBody[] = [];
 
   for (const file of commandFiles) {
     try {
