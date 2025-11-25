@@ -162,7 +162,7 @@ export default function SurveysPage() {
                   {editingSurvey ? "✏️" : "➕"}
                 </span>
               </div>
-              <h2 className="text-lg font-semibold">
+              <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {editingSurvey ? "Edit Survey" : "Create New Survey"}
               </h2>
             </div>
@@ -199,13 +199,6 @@ export default function SurveysPage() {
                   Create your first survey to start collecting feedback from users
                 </p>
               </div>
-              <Button
-                onClick={() => setShowForm(true)}
-                className="mt-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
-              >
-                <Plus className="h-4 w-4 mr-2" />
-                Create Survey
-              </Button>
             </div>
           </div>
         ) : (
