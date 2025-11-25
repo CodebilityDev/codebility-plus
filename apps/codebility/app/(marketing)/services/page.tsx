@@ -25,6 +25,9 @@ interface ProjectData {
   id: string;
   name: string;
   description?: string;
+  tagline?: string;
+  key_features?: string[];
+  gallery?: string[];
   status?: string;
   start_date?: string;
   end_date?: string;
@@ -55,6 +58,9 @@ const ServicesPage = async () => {
     id: item.id,
     name: item.name,
     description: item.description || "",
+    tagline: item.tagline || "",
+    key_features: item.key_features || [],
+    gallery: item.gallery || [],
     main_image: item.main_image || "",
     website_url: item.website_url || "",
     github_link: item.github_link || "",

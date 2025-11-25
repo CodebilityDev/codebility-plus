@@ -74,25 +74,32 @@ const ProjectViewModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
+      <DialogContent className="max-h-[80vh] max-w-2xl overflow-hidden">
         <DialogHeader className="border-b pb-2">
-          <DialogTitle className="text-lg font-bold">Project Details</DialogTitle>
+          <DialogTitle className="text-lg font-bold">
+            Project Details
+          </DialogTitle>
           <p className="text-xs text-gray-600 dark:text-gray-400">
             Complete overview of the project information and team.
           </p>
         </DialogHeader>
 
-        <div className="overflow-y-auto flex-1 p-3" style={{ maxHeight: "calc(80vh - 200px)" }}>
+        <div
+          className="flex-1 overflow-y-auto p-3"
+          style={{ maxHeight: "calc(80vh - 200px)" }}
+        >
           <div className="space-y-4">
             {/* Project Image Section */}
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                  1
+                </span>
                 Project Image
               </h3>
               <div className="flex justify-center">
                 {data?.main_image ? (
-                  <div className="relative h-64 w-full max-w-md rounded-lg overflow-hidden border-2 border-gray-300 dark:border-gray-600">
+                  <div className="relative h-64 w-full max-w-md overflow-hidden rounded-lg border-2 border-gray-300 dark:border-gray-600">
                     {!imageLoaded && (
                       <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
                         <Skeleton className="h-full w-full rounded-lg" />
@@ -111,47 +118,92 @@ const ProjectViewModal = () => {
                     />
                   </div>
                 ) : (
-                  <div className="h-64 w-full max-w-md rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-3">
+                  <div className="flex h-64 w-full max-w-md flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
                     <DefaultAvatar size={80} />
-                    <p className="text-sm text-gray-500 dark:text-gray-400">No image available</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">
+                      No image available
+                    </p>
                   </div>
                 )}
               </div>
             </div>
 
             {/* Project Information Section */}
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                  2
+                </span>
                 Project Information
               </h3>
-              
+
               <div className="grid gap-6 md:grid-cols-2">
                 {/* Project Details */}
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Project Name</h4>
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Project Name
+                    </h4>
                     <p className="text-xl font-medium text-blue-600 dark:text-blue-400">
                       {data?.name}
                     </p>
                   </div>
 
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Tagline
+                    </h4>
+                    <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                      {data?.tagline ||
+                        "Innovative solutions for modern challenges"}
+                    </p>
+                  </div>
+
                   {data?.description && (
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Description</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{data.description}</p>
+                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        Description
+                      </h4>
+                      <p className="text-sm leading-relaxed text-gray-600 dark:text-gray-300">
+                        {data.description}
+                      </p>
                     </div>
                   )}
 
+                  <div>
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Key Features
+                    </h4>
+                    <div className="space-y-1">
+                      {(data?.key_features && Array.isArray(data.key_features) && data.key_features.length > 0
+                        ? data.key_features
+                        : [
+                            "Responsive Design",
+                            "Modern UI/UX",
+                            "Cross-platform Compatibility",
+                          ]
+                      ).map((feature, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <span className="mt-2 h-1.5 w-1.5 flex-shrink-0 rounded-full bg-blue-500"></span>
+                          <span className="text-sm text-gray-600 dark:text-gray-300">
+                            {feature}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* External Links */}
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">External Links</h4>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      External Links
+                    </h4>
                     <div className="flex flex-wrap gap-4">
                       {data?.github_link && (
                         <Link
                           href={data.github_link}
                           target="_blank"
-                          className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                          className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
                         >
                           <IconGithub className="h-4 w-4 invert dark:invert-0" />
                           <span className="text-sm font-medium">GitHub</span>
@@ -161,7 +213,7 @@ const ProjectViewModal = () => {
                         <Link
                           href={data.website_url}
                           target="_blank"
-                          className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                          className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
                         >
                           <IconLink className="h-4 w-4 invert dark:invert-0" />
                           <span className="text-sm font-medium">Website</span>
@@ -171,15 +223,19 @@ const ProjectViewModal = () => {
                         <Link
                           href={data.figma_link}
                           target="_blank"
-                          className="flex items-center gap-2 px-3 py-2 bg-white dark:bg-gray-700 rounded-lg border border-gray-300 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                          className="flex items-center gap-2 rounded-lg border border-gray-300 bg-white px-3 py-2 transition-colors hover:bg-gray-50 dark:border-gray-600 dark:bg-gray-700 dark:hover:bg-gray-600"
                         >
                           <IconFigma className="h-4 w-4 invert dark:invert-0" />
                           <span className="text-sm font-medium">Figma</span>
                         </Link>
                       )}
-                      {!data?.github_link && !data?.website_url && !data?.figma_link && (
-                        <p className="text-sm text-gray-500 dark:text-gray-400">No external links available</p>
-                      )}
+                      {!data?.github_link &&
+                        !data?.website_url &&
+                        !data?.figma_link && (
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            No external links available
+                          </p>
+                        )}
                     </div>
                   </div>
                 </div>
@@ -187,37 +243,53 @@ const ProjectViewModal = () => {
                 {/* Project Status & Metadata */}
                 <div className="space-y-4">
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Current Status</h4>
-                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
-                      data?.status === 'completed' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                      data?.status === 'inprogress' ? 'bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200' :
-                      'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200'
-                    }`}>
-                      {data?.status === "inprogress" ? "In Progress" : 
-                       data?.status ? data.status.charAt(0).toUpperCase() + data.status.slice(1) : "Pending"}
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Current Status
+                    </h4>
+                    <span
+                      className={`inline-flex items-center rounded-full px-3 py-1 text-sm font-medium ${
+                        data?.status === "completed"
+                          ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200"
+                          : data?.status === "inprogress"
+                            ? "bg-orange-100 text-orange-800 dark:bg-orange-900 dark:text-orange-200"
+                            : "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
+                      }`}
+                    >
+                      {data?.status === "inprogress"
+                        ? "In Progress"
+                        : data?.status
+                          ? data.status.charAt(0).toUpperCase() +
+                            data.status.slice(1)
+                          : "Pending"}
                     </span>
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Project Categories</h4>
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Project Categories
+                    </h4>
                     {data?.categories && data.categories.length > 0 ? (
-                      <div className="flex flex-wrap gap-2 mt-1">
+                      <div className="mt-1 flex flex-wrap gap-2">
                         {data.categories.map((category) => (
                           <span
                             key={category.id}
-                            className="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-blue-50 to-indigo-50 text-blue-700 border border-blue-200 dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-300 dark:border-blue-700"
+                            className="inline-flex items-center rounded-full border border-blue-200 bg-gradient-to-r from-blue-50 to-indigo-50 px-2.5 py-1 text-xs font-medium text-blue-700 dark:border-blue-700 dark:from-blue-900/30 dark:to-indigo-900/30 dark:text-blue-300"
                           >
                             {category.name}
                           </span>
                         ))}
                       </div>
                     ) : (
-                      <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">Not specified</p>
+                      <p className="mt-1 text-sm text-gray-600 dark:text-gray-300">
+                        Not specified
+                      </p>
                     )}
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Duration</h4>
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Duration
+                    </h4>
                     <div className="text-sm text-gray-600 dark:text-gray-300">
                       <p>Start: {startDate || "Not specified"}</p>
                       <p>End: {endDate}</p>
@@ -225,22 +297,28 @@ const ProjectViewModal = () => {
                   </div>
 
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Created</h4>
-                    <p className="text-sm text-gray-600 dark:text-gray-300">{createdAt || "Not available"}</p>
+                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Created
+                    </h4>
+                    <p className="text-sm text-gray-600 dark:text-gray-300">
+                      {createdAt || "Not available"}
+                    </p>
                   </div>
                 </div>
               </div>
-              
+
               {/* Tech Stack Section */}
               {data?.tech_stack && data.tech_stack.length > 0 && (
-                <div className="border-t pt-6 mt-6">
-                  <h4 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Technology Stack</h4>
-                  <div className="bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4">
+                <div className="mt-6 border-t pt-6">
+                  <h4 className="text-md mb-4 font-medium text-gray-900 dark:text-gray-100">
+                    Technology Stack
+                  </h4>
+                  <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-950/30">
                     <div className="flex flex-wrap gap-2">
                       {data.tech_stack.map((tech, index) => (
                         <span
                           key={index}
-                          className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm"
+                          className="inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white shadow-sm"
                         >
                           {tech}
                         </span>
@@ -251,21 +329,58 @@ const ProjectViewModal = () => {
               )}
             </div>
 
+            {/* Project Gallery Section */}
+            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                  3
+                </span>
+                Project Gallery
+              </h3>
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                {(data?.gallery && Array.isArray(data.gallery) && data.gallery.length > 0
+                  ? data.gallery
+                  : [data?.main_image]
+                )
+                  .filter(Boolean)
+                  .map((imageUrl, index) => (
+                    <div
+                      key={index}
+                      className="relative h-32 overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600"
+                    >
+                      <Image
+                        src={imageUrl}
+                        alt={`Gallery image ${index + 1}`}
+                        fill
+                        className="object-cover transition-transform duration-300 hover:scale-105"
+                        loading="lazy"
+                      />
+                    </div>
+                  ))}
+              </div>
+            </div>
+
             {/* Team Information Section */}
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                  {data?.gallery && data.gallery.length > 0 ? "4" : "3"}
+                </span>
                 Team Information
               </h3>
 
               {isLoading ? (
                 <div className="space-y-6">
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Team Leader</h4>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Team Leader
+                    </h4>
                     <Skeleton className="h-16 w-64 rounded-lg" />
                   </div>
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">Team Members</h4>
+                    <h4 className="mb-2 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Team Members
+                    </h4>
                     <div className="flex gap-4">
                       <Skeleton className="h-16 w-64 rounded-lg" />
                       <Skeleton className="h-16 w-64 rounded-lg" />
@@ -277,8 +392,10 @@ const ProjectViewModal = () => {
                   {/* Team Lead */}
                   {teamLead ? (
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Team Leader</h4>
-                      <div className="flex items-center gap-4 p-4 rounded-lg border border-gray-300 dark:border-gray-600">
+                      <h4 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        Team Leader
+                      </h4>
+                      <div className="flex items-center gap-4 rounded-lg border border-gray-300 p-4 dark:border-gray-600">
                         {teamLead.image_url ? (
                           <div className="relative h-12 w-12">
                             <Image
@@ -304,20 +421,26 @@ const ProjectViewModal = () => {
                     </div>
                   ) : (
                     <div>
-                      <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Team Leader</h4>
-                      <p className="text-sm text-gray-500 dark:text-gray-400">No team leader assigned</p>
+                      <h4 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                        Team Leader
+                      </h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        No team leader assigned
+                      </p>
                     </div>
                   )}
 
                   {/* Team Members */}
                   <div>
-                    <h4 className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-3">Team Members</h4>
+                    <h4 className="mb-3 text-sm font-semibold text-gray-700 dark:text-gray-300">
+                      Team Members
+                    </h4>
                     {members.length > 0 ? (
                       <div className="grid gap-3 md:grid-cols-2">
                         {members.map((member) => (
                           <div
                             key={member.id}
-                            className="flex items-center gap-4 p-4 rounded-lg border border-gray-300 dark:border-gray-600"
+                            className="flex items-center gap-4 rounded-lg border border-gray-300 p-4 dark:border-gray-600"
                           >
                             {member.image_url ? (
                               <div className="relative h-12 w-12">
@@ -354,11 +477,11 @@ const ProjectViewModal = () => {
             </div>
           </div>
         </div>
-        
+
         {/* Action Buttons */}
-        <div className="border-t pt-4 bg-gray-50 dark:bg-gray-800/30">
+        <div className="border-t bg-gray-50 pt-4 dark:bg-gray-800/30">
           <div className="flex justify-end gap-3 px-6">
-            <Button 
+            <Button
               variant="outline"
               onClick={() => onOpen("projectEditModal", data)}
               className="min-w-[100px]"

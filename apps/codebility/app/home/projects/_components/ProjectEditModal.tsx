@@ -20,8 +20,8 @@ import {
 } from "@/components/ui/dialog";
 import { MemberSelection } from "@/components/ui/MemberSelection";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
-import { useModal } from "@/hooks/use-modal-projects";
 import { useModal as useGlobalModal } from "@/hooks/use-modal";
+import { useModal } from "@/hooks/use-modal-projects";
 import { useTechStackStore } from "@/hooks/use-techstack";
 import { Client, Codev, Project, SkillCategory } from "@/types/home/codev";
 import { uploadImage } from "@/utils/uploadImage";
@@ -48,6 +48,9 @@ const PROJECT_STATUSES = [
 export interface ProjectFormData {
   name: string;
   description?: string;
+  tagline?: string;
+  key_features?: string;
+  gallery?: string;
   github_link?: string;
   website_url?: string;
   figma_link?: string;
@@ -62,7 +65,11 @@ export interface ProjectFormData {
 const ProjectEditModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const { onOpen: openGlobalModal } = useGlobalModal();
-  const { stack: selectedTechStack, clearStack, setStack } = useTechStackStore();
+  const {
+    stack: selectedTechStack,
+    clearStack,
+    setStack,
+  } = useTechStackStore();
   const isModalOpen = isOpen && type === "projectEditModal";
   const queryClient = useQueryClient();
 
@@ -79,6 +86,11 @@ const ProjectEditModal = () => {
   const [croppedImage, setCroppedImage] = useState<string | null>(null);
   const [croppedFile, setCroppedFile] = useState<File | null>(null);
   const [imageLoaded, setImageLoaded] = useState(false);
+
+  // Gallery states
+  const [galleryImages, setGalleryImages] = useState<
+    { url: string; file: File }[]
+  >([]);
 
   // Loading states
   const [isLoading, setIsLoading] = useState(false);
@@ -131,7 +143,8 @@ const ProjectEditModal = () => {
 
   // Only show loading for essential data that blocks form interaction
   const isDataLoading = false; // Allow form to show immediately
-  const isSelectDataLoading = isUsersLoading || isClientsLoading || isCategoriesLoading;
+  const isSelectDataLoading =
+    isUsersLoading || isClientsLoading || isCategoriesLoading;
 
   // Prepare select options using useMemo
   const userOptions = useMemo(
@@ -167,6 +180,11 @@ const ProjectEditModal = () => {
       // Set form values immediately - don't wait for users to load
       setValue("name", data.name || "");
       setValue("description", data.description || "");
+      setValue("tagline", data.tagline || "");
+      setValue(
+        "key_features",
+        data.key_features && Array.isArray(data.key_features) ? data.key_features.join(", ") : "",
+      );
       setValue("github_link", data.github_link || "");
       setValue("website_url", data.website_url || "");
       setValue("figma_link", data.figma_link || "");
@@ -174,7 +192,7 @@ const ProjectEditModal = () => {
 
       // Set selected categories from the data
       if (data.categories && Array.isArray(data.categories)) {
-        setSelectedCategoryIds(data.categories.map(cat => cat.id));
+        setSelectedCategoryIds(data.categories.map((cat) => cat.id));
       } else {
         setSelectedCategoryIds([]);
       }
@@ -261,6 +279,7 @@ const ProjectEditModal = () => {
     setProjectImage(null);
     setCroppedImage(null);
     setCroppedFile(null);
+    setGalleryImages([]);
     setSelectedMembers([]);
     setCurrentTeamLeader(null);
     setImageLoaded(false);
@@ -274,7 +293,7 @@ const ProjectEditModal = () => {
       {/* Image Preview */}
       <div className="relative w-full max-w-md">
         {croppedImage ? (
-          <div className="relative h-48 w-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 overflow-hidden">
+          <div className="relative h-48 w-full overflow-hidden rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600">
             {!imageLoaded && (
               <div className="absolute inset-0 flex items-center justify-center bg-gray-200 dark:bg-gray-700">
                 <Skeleton className="h-full w-full" />
@@ -284,31 +303,35 @@ const ProjectEditModal = () => {
               src={croppedImage}
               alt="Project Preview"
               fill
-              className={`object-cover cursor-pointer hover:opacity-80 transition-opacity ${
+              className={`cursor-pointer object-cover transition-opacity hover:opacity-80 ${
                 imageLoaded ? "opacity-100" : "opacity-0"
               }`}
               onClick={() => setOpenImageCropper(true)}
               onLoad={() => setImageLoaded(true)}
             />
-            <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
-              <span className="text-white text-sm font-medium">Click to edit</span>
+            <div className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 transition-opacity hover:opacity-100">
+              <span className="text-sm font-medium text-white">
+                Click to edit
+              </span>
             </div>
           </div>
         ) : (
-          <div className="h-48 w-full rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-3">
+          <div className="flex h-48 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 dark:border-gray-600 dark:bg-gray-800">
             <ProjectAvatar size={64} />
-            <p className="text-sm text-gray-500 dark:text-gray-400">No image selected</p>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              No image selected
+            </p>
           </div>
         )}
       </div>
-      
+
       {/* Upload Controls */}
       <div className="flex gap-3">
         <label
           htmlFor="image-upload"
-          className="inline-flex items-center px-4 py-2 bg-blue-600 text-white text-sm font-medium rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
+          className="inline-flex cursor-pointer items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
         >
-          {croppedImage ? 'Change Image' : 'Upload Image'}
+          {croppedImage ? "Change Image" : "Upload Image"}
         </label>
         <input
           id="image-upload"
@@ -321,13 +344,13 @@ const ProjectEditModal = () => {
           <button
             type="button"
             onClick={handleRemoveImage}
-            className="inline-flex items-center px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-lg hover:bg-red-700 transition-colors"
+            className="inline-flex items-center rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-700"
           >
             Remove
           </button>
         )}
       </div>
-      
+
       <ImageCrop
         image={projectImage || ""}
         setImage={setCroppedImage}
@@ -344,84 +367,169 @@ const ProjectEditModal = () => {
       {/* Basic Information */}
       <div className="grid gap-4">
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Name *</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Project Name *
+          </label>
           <Input
             type="text"
             placeholder="Enter a descriptive project name"
             {...register("name", { required: "Project name is required" })}
-            className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+            className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
           />
           {errors.name && (
-            <p className="text-sm text-red-500 flex items-center gap-1">
-              <span className="w-4 h-4 text-red-500">⚠</span>
+            <p className="flex items-center gap-1 text-sm text-red-500">
+              <span className="h-4 w-4 text-red-500">⚠</span>
               {errors.name.message}
             </p>
           )}
         </div>
-        
+
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Description *</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Tagline
+          </label>
+          <Input
+            type="text"
+            placeholder="A catchy tagline for your project"
+            {...register("tagline")}
+            className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Project Description
+          </label>
           <textarea
             placeholder="Describe what this project is about, its goals, and key features"
-            {...register("description", {
-              required: "Project description is required",
-            })}
+            {...register("description")}
             rows={3}
-            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white dark:bg-gray-800"
+            className="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
           />
-          {errors.description && (
-            <p className="text-sm text-red-500 flex items-center gap-1">
-              <span className="w-4 h-4 text-red-500">⚠</span>
-              {errors.description.message}
-            </p>
-          )}
         </div>
-        
+
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Start Date *</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Key Features
+          </label>
+          <textarea
+            placeholder="Enter key features separated by commas (e.g., Responsive Design, Modern UI/UX, Cross-platform)"
+            {...register("key_features")}
+            rows={2}
+            className="w-full resize-none rounded-lg border border-gray-300 bg-white px-3 py-2 focus:border-transparent focus:ring-2 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800"
+          />
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Gallery Images
+          </label>
+          <div className="space-y-3">
+            <label
+              htmlFor="gallery-upload"
+              className="inline-flex cursor-pointer items-center rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-blue-700"
+            >
+              + Add Gallery Images
+            </label>
+            <input
+              id="gallery-upload"
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={async (e: ChangeEvent<HTMLInputElement>) => {
+                const files = Array.from(e.target.files || []);
+                for (const file of files) {
+                  const objectUrl = URL.createObjectURL(file);
+                  setGalleryImages((prev) => [
+                    ...prev,
+                    { url: objectUrl, file },
+                  ]);
+                }
+                // Reset the input value to allow selecting the same files again
+                e.target.value = '';
+              }}
+            />
+
+            {galleryImages.length > 0 && (
+              <div className="grid grid-cols-2 gap-3 md:grid-cols-3">
+                {galleryImages.map((image, index) => (
+                  <div key={index} className="group relative">
+                    <div className="relative h-24 w-full overflow-hidden rounded-lg border border-gray-300 dark:border-gray-600">
+                      <Image
+                        src={image.url}
+                        alt={`Gallery ${index + 1}`}
+                        fill
+                        className="object-cover"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setGalleryImages((prev) =>
+                          prev.filter((_, i) => i !== index),
+                        );
+                      }}
+                      className="absolute -right-2 -top-2 h-6 w-6 rounded-full bg-red-500 text-xs text-white transition-colors hover:bg-red-600"
+                    >
+                      ×
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="space-y-2">
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Start Date
+          </label>
           <Input
             type="date"
-            {...register("start_date", { required: "Start date is required" })}
-            className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+            {...register("start_date")}
+            className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
           />
-          {errors.start_date && (
-            <p className="text-sm text-red-500 flex items-center gap-1">
-              <span className="w-4 h-4 text-red-500">⚠</span>
-              {errors.start_date.message}
-            </p>
-          )}
         </div>
       </div>
-      
+
       {/* External Links */}
       <div className="border-t pt-3">
-        <h4 className="text-xs font-medium text-gray-900 dark:text-gray-100 mb-2">External Links (Optional)</h4>
+        <h4 className="mb-2 text-xs font-medium text-gray-900 dark:text-gray-100">
+          External Links (Optional)
+        </h4>
         <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
           <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">GitHub Repository</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              GitHub Repository
+            </label>
             <Input
               type="url"
               placeholder="https://github.com/..."
               {...register("github_link")}
-              className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+              className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Live Website</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              Live Website
+            </label>
             <Input
               type="url"
               placeholder="https://yourproject.com"
               {...register("website_url")}
-              className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+              className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
             />
           </div>
           <div className="space-y-1">
-            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">Figma Design</label>
+            <label className="text-xs font-medium text-gray-700 dark:text-gray-300">
+              Figma Design
+            </label>
             <Input
               type="url"
               placeholder="https://figma.com/..."
               {...register("figma_link")}
-              className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
+              className="h-11 border-gray-300 focus:ring-2 focus:ring-blue-500 dark:border-gray-600"
             />
           </div>
         </div>
@@ -435,49 +543,68 @@ const ProjectEditModal = () => {
       {/* Project Configuration */}
       <div className="grid grid-cols-1 gap-4">
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Categories * (Select at least one)</label>
-          <div className="grid grid-cols-2 gap-3 p-3 border border-gray-200 dark:border-gray-700 rounded-lg bg-white dark:bg-gray-800">
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Project Categories * (Select at least one)
+          </label>
+          <div className="grid grid-cols-2 gap-3 rounded-lg border border-gray-200 bg-white p-3 dark:border-gray-700 dark:bg-gray-800">
             {categories.map((category) => (
               <label
                 key={category.id}
-                className="flex items-center space-x-2 cursor-pointer p-2 rounded hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+                className="flex cursor-pointer items-center space-x-2 rounded p-2 transition-colors hover:bg-gray-50 dark:hover:bg-gray-700/50"
               >
                 <input
                   type="checkbox"
                   checked={selectedCategoryIds.includes(category.id)}
                   onChange={(e) => {
                     if (e.target.checked) {
-                      setSelectedCategoryIds([...selectedCategoryIds, category.id]);
+                      setSelectedCategoryIds([
+                        ...selectedCategoryIds,
+                        category.id,
+                      ]);
                     } else {
-                      setSelectedCategoryIds(selectedCategoryIds.filter(id => id !== category.id));
+                      setSelectedCategoryIds(
+                        selectedCategoryIds.filter((id) => id !== category.id),
+                      );
                     }
                   }}
-                  className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-600"
+                  className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500 dark:border-gray-600 dark:focus:ring-blue-600"
                 />
-                <span className="text-sm text-gray-700 dark:text-gray-300">{category.name}</span>
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  {category.name}
+                </span>
               </label>
             ))}
           </div>
         </div>
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Client *</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Client *
+          </label>
           <CustomSelect
+            label="Client"
             options={clientOptions}
             onChange={(value) => setValue("client_id", value)}
             value={data?.client_id || ""}
-            placeholder={isClientsLoading ? "Loading clients..." : "Select Client"}
+            placeholder={
+              isClientsLoading ? "Loading clients..." : "Select Client"
+            }
             disabled={isClientsLoading}
             searchable
           />
         </div>
       </div>
-      
+
       {/* Project Status */}
       <div className="border-t pt-6">
-        <h4 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Project Status</h4>
+        <h4 className="text-md mb-4 font-medium text-gray-900 dark:text-gray-100">
+          Project Status
+        </h4>
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Status *</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+            Status *
+          </label>
           <CustomSelect
+            label="Status"
             options={PROJECT_STATUSES}
             value={selectedStatus}
             onChange={(value) => setSelectedStatus(value)}
@@ -486,46 +613,60 @@ const ProjectEditModal = () => {
           />
         </div>
       </div>
-      
+
       {/* Team Configuration */}
       <div className="border-t pt-6">
-        <h4 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Team Configuration</h4>
+        <h4 className="text-md mb-4 font-medium text-gray-900 dark:text-gray-100">
+          Team Configuration
+        </h4>
         <div className="space-y-6">
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Team Leader *</label>
+            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+              Team Leader *
+            </label>
             <CustomSelect
+              label="Team Leader"
               options={userOptions.filter(
-                (user) => !selectedMembers.find((member) => member.id === user.value),
+                (user) =>
+                  !selectedMembers.find((member) => member.id === user.value),
               )}
               value={currentTeamLeader?.id || ""}
               onChange={(value) => {
                 const leader = users.find((u) => u.id === value);
                 if (leader) setCurrentTeamLeader(leader);
               }}
-              placeholder={isUsersLoading ? "Loading users..." : "Select Team Leader"}
+              placeholder={
+                isUsersLoading ? "Loading users..." : "Select Team Leader"
+              }
               disabled={isUsersLoading}
               searchable
             />
           </div>
-          
+
           <div className="space-y-1">
-            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Team Members</label>
+            <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">
+              Team Members
+            </label>
             {isUsersLoading ? (
-              <div className="p-4 border border-gray-300 dark:border-gray-600 rounded-lg">
+              <div className="rounded-lg border border-gray-300 p-4 dark:border-gray-600">
                 <div className="flex items-center gap-2 text-sm text-gray-500">
-                  <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
                   Loading team members...
                 </div>
               </div>
             ) : (
               <MemberSelection
-                users={users.filter((user) => user.id !== currentTeamLeader?.id)}
+                users={users.filter(
+                  (user) => user.id !== currentTeamLeader?.id,
+                )}
                 selectedMembers={selectedMembers}
                 onMemberAdd={(member) =>
                   setSelectedMembers((prev) => [...prev, member])
                 }
                 onMemberRemove={(memberId) =>
-                  setSelectedMembers((prev) => prev.filter((m) => m.id !== memberId))
+                  setSelectedMembers((prev) =>
+                    prev.filter((m) => m.id !== memberId),
+                  )
                 }
                 excludeMembers={currentTeamLeader ? [currentTeamLeader.id] : []}
               />
@@ -533,34 +674,37 @@ const ProjectEditModal = () => {
           </div>
         </div>
       </div>
-      
+
       {/* Tech Stack Selection */}
       <div className="border-t pt-6">
-        <h4 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-4">Technology Stack</h4>
+        <h4 className="text-md mb-4 font-medium text-gray-900 dark:text-gray-100">
+          Technology Stack
+        </h4>
         <div className="space-y-4">
           <Button
             type="button"
             variant="outline"
             onClick={() => openGlobalModal("techStackModal")}
-            className="w-full h-12 justify-start text-left border-2 border-dashed border-gray-300 dark:border-gray-600 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-950 transition-colors"
+            className="h-12 w-full justify-start border-2 border-dashed border-gray-300 text-left transition-colors hover:border-blue-500 hover:bg-blue-50 dark:border-gray-600 dark:hover:bg-blue-950"
           >
             <div className="flex items-center gap-3">
-              <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">+</span>
-              {selectedTechStack.length > 0 
-                ? `${selectedTechStack.length} technology(ies) selected` 
-                : "Select Technologies Used"
-              }
+              <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                +
+              </span>
+              {selectedTechStack.length > 0
+                ? `${selectedTechStack.length} technology(ies) selected`
+                : "Select Technologies Used"}
             </div>
           </Button>
-          
+
           {/* Display selected tech stack */}
           {selectedTechStack.length > 0 && (
-            <div className="bg-blue-50 dark:bg-blue-950/30 rounded-lg p-4">
+            <div className="rounded-lg bg-blue-50 p-4 dark:bg-blue-950/30">
               <div className="flex flex-wrap gap-2">
                 {selectedTechStack.map((tech, index) => (
                   <span
                     key={index}
-                    className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-600 text-white shadow-sm"
+                    className="inline-flex items-center rounded-full bg-blue-600 px-3 py-1 text-sm font-medium text-white shadow-sm"
                   >
                     {tech}
                   </span>
@@ -601,28 +745,62 @@ const ProjectEditModal = () => {
       // Handle image upload if there's a new cropped file
       if (croppedFile) {
         console.log("Uploading new image");
-        const publicUrl = await uploadImage(croppedFile, {
+        const uploadResult = await uploadImage(croppedFile, {
           bucket: "codebility",
           folder: `projectImage/${Date.now()}_${croppedFile.name.replace(/\s+/g, "_")}`,
         });
 
-        if (!publicUrl) {
+        if (!uploadResult) {
           throw new Error("Failed to upload image");
         }
 
         // Set the new image URL
-        console.log("Setting new main_image:", publicUrl);
-        form.append("main_image", publicUrl);
+        console.log("Setting new main_image:", uploadResult);
+        form.append("main_image", uploadResult);
       } else if (data.main_image && croppedImage) {
         // If using existing image without changes
         console.log("Keeping existing image:", data.main_image);
         form.append("main_image", data.main_image);
       }
 
+      // Upload gallery images if provided
+      if (galleryImages.length > 0) {
+        const galleryUrls: string[] = [];
+        for (const galleryImage of galleryImages) {
+          const uploadResult = await uploadImage(galleryImage.file, {
+            bucket: "codebility",
+            folder: `projectGallery/${Date.now()}_${galleryImage.file.name.replace(/\s+/g, "_")}`,
+          });
+          if (uploadResult) {
+            galleryUrls.push(uploadResult);
+          }
+        }
+        if (galleryUrls.length > 0) {
+          form.append("gallery", JSON.stringify(galleryUrls));
+        }
+      }
+
       // Add form data - make sure we add all fields
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null && key !== "main_image") {
-          form.append(key, value);
+        if (
+          value !== undefined &&
+          value !== null &&
+          value !== "" &&
+          key !== "main_image" &&
+          key !== "gallery"
+        ) {
+          // Handle array fields
+          if (key === "key_features") {
+            const arrayValue = value
+              .split(",")
+              .map((item) => item.trim())
+              .filter(Boolean);
+            if (arrayValue.length > 0) {
+              form.append(key, JSON.stringify(arrayValue));
+            }
+          } else {
+            form.append(key, value);
+          }
         }
       });
 
@@ -680,42 +858,51 @@ const ProjectEditModal = () => {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={resetForm}>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-hidden">
+      <DialogContent className="max-h-[80vh] max-w-2xl overflow-hidden">
         <DialogHeader className="border-b pb-2">
           <DialogTitle className="text-lg font-bold">Edit Project</DialogTitle>
           <p className="text-xs text-gray-600 dark:text-gray-400">
             Update the project details below to modify your project.
           </p>
         </DialogHeader>
-        
-        <div className="overflow-y-auto flex-1 p-3" style={{ maxHeight: "calc(80vh - 200px)" }}>
+
+        <div
+          className="flex-1 overflow-y-auto p-3"
+          style={{ maxHeight: "calc(80vh - 200px)" }}
+        >
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
             {/* Project Image Section */}
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">1</span>
+            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                  1
+                </span>
                 Project Image
               </h3>
               <ImageUploadSection />
             </div>
-            
+
             {/* Project Details Section */}
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">2</span>
+            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                  2
+                </span>
                 Project Information
               </h3>
               <ProjectDetailsSection />
             </div>
-            
+
             {/* Team & Configuration Section */}
-            <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
-              <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
-                <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">3</span>
+            <div className="rounded-lg bg-gray-50 p-3 dark:bg-gray-800/50">
+              <h3 className="mb-2 flex items-center gap-2 text-sm font-semibold">
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100 text-sm font-bold text-blue-600 dark:bg-blue-900 dark:text-blue-400">
+                  3
+                </span>
                 Team & Configuration
                 {isSelectDataLoading && (
                   <div className="ml-2 flex items-center gap-2 text-sm text-gray-500">
-                    <div className="w-4 h-4 border-2 border-gray-300 border-t-blue-600 rounded-full animate-spin" />
+                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-gray-300 border-t-blue-600" />
                     Loading...
                   </div>
                 )}
@@ -724,9 +911,9 @@ const ProjectEditModal = () => {
             </div>
           </form>
         </div>
-        
-        <DialogFooter className="border-t pt-4 bg-gray-50 dark:bg-gray-800/30">
-          <div className="flex justify-end gap-3 w-full">
+
+        <DialogFooter className="border-t bg-gray-50 pt-4 dark:bg-gray-800/30">
+          <div className="flex w-full justify-end gap-3">
             <Button
               type="button"
               variant="outline"
@@ -740,11 +927,11 @@ const ProjectEditModal = () => {
               type="submit"
               disabled={isLoading}
               onClick={handleSubmit(onSubmit)}
-              className="min-w-[120px] bg-blue-600 hover:bg-blue-700 text-white"
+              className="min-w-[120px] bg-blue-600 text-white hover:bg-blue-700"
             >
               {isLoading ? (
                 <div className="flex items-center gap-2">
-                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                  <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
                   Updating...
                 </div>
               ) : (

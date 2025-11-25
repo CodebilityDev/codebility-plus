@@ -180,12 +180,36 @@ export async function createProject(
       }
     }
 
+    // Parse key_features and gallery if provided
+    const keyFeaturesData = formData.get("key_features");
+    let keyFeatures: string[] | null = null;
+    if (keyFeaturesData) {
+      try {
+        keyFeatures = JSON.parse(keyFeaturesData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid key_features data:", error);
+      }
+    }
+
+    const galleryData = formData.get("gallery");
+    let gallery: string[] | null = null;
+    if (galleryData) {
+      try {
+        gallery = JSON.parse(galleryData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid gallery data:", error);
+      }
+    }
+
     // Create project (removed project_category_id as it no longer exists)
     const { data: project, error: projectError } = await supabase
       .from("projects")
       .insert({
         name: formData.get("name"),
         description: formData.get("description"),
+        tagline: formData.get("tagline"),
+        key_features: keyFeatures,
+        gallery: gallery,
         github_link: formData.get("github_link"),
         website_url: formData.get("website_url"),
         figma_link: formData.get("figma_link"),
@@ -379,10 +403,31 @@ export async function updateProject(projectId: string, formData: FormData) {
       }
     }
 
+    // Parse key_features and gallery if provided
+    const keyFeaturesData = formData.get("key_features");
+    let keyFeatures: string[] | null = null;
+    if (keyFeaturesData) {
+      try {
+        keyFeatures = JSON.parse(keyFeaturesData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid key_features data:", error);
+      }
+    }
+
+    const galleryData = formData.get("gallery");
+    let gallery: string[] | null = null;
+    if (galleryData) {
+      try {
+        gallery = JSON.parse(galleryData as string) as string[];
+      } catch (error) {
+        console.warn("Invalid gallery data:", error);
+      }
+    }
+
     // Update project details
     const updateData: any = {};
     for (const [key, value] of formData.entries()) {
-      if (key !== "project_members" && key !== "tech_stack" && key !== "category_ids") {
+      if (key !== "project_members" && key !== "tech_stack" && key !== "category_ids" && key !== "key_features" && key !== "gallery") {
         // Log the key-value pairs to debug
         console.log(`Processing form field: ${key} = ${value}`);
         updateData[key] = value;
@@ -392,6 +437,16 @@ export async function updateProject(projectId: string, formData: FormData) {
     // Add tech stack if provided
     if (techStack) {
       updateData.tech_stack = techStack;
+    }
+
+    // Add key_features if provided
+    if (keyFeatures) {
+      updateData.key_features = keyFeatures;
+    }
+
+    // Add gallery if provided
+    if (gallery) {
+      updateData.gallery = gallery;
     }
 
     // Log the final update data before sending to Supabase
