@@ -17,7 +17,8 @@ import SurveyImageUpload from "./SurveyImageUpload";
 const surveySchema = z.object({
   title: z.string().min(1, "Title is required").max(255, "Title too long"),
   description: z.string().min(1, "Description is required"),
-  survey_url: z.string().url("Must be a valid URL"),
+  is_external: z.boolean().default(false),
+  survey_url: z.string().optional(),
   type: z.enum(["general", "feedback", "satisfaction", "research", "onboarding"]),
   image_url: z.string().optional(),
   target_audience: z.enum(["all", "codev", "intern", "hr", "admin"]),
@@ -25,6 +26,15 @@ const surveySchema = z.object({
   is_active: z.boolean(),
   start_date: z.string(),
   end_date: z.string().optional(),
+}).refine((data) => {
+  // If external survey, survey_url is required and must be valid
+  if (data.is_external) {
+    return data.survey_url && z.string().url().safeParse(data.survey_url).success;
+  }
+  return true;
+}, {
+  message: "Survey URL is required for external surveys",
+  path: ["survey_url"],
 });
 
 type SurveyFormData = z.infer<typeof surveySchema>;
@@ -33,7 +43,8 @@ interface Survey {
   id: string;
   title: string;
   description: string;
-  survey_url: string;
+  is_external: boolean;
+  survey_url?: string;
   type: "general" | "feedback" | "satisfaction" | "research" | "onboarding";
   image_url?: string;
   target_audience: "all" | "codev" | "intern" | "hr" | "admin";
@@ -64,6 +75,7 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
     defaultValues: {
       title: survey?.title || "",
       description: survey?.description || "",
+      is_external: survey?.is_external ?? false,
       survey_url: survey?.survey_url || "",
       type: survey?.type || "general",
       image_url: survey?.image_url || "",
@@ -76,6 +88,7 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
   });
 
   const isActive = watch("is_active");
+  const isExternal = watch("is_external");
 
   const onSubmit = async (data: SurveyFormData) => {
     setLoading(true);
@@ -85,7 +98,8 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
       const surveyData = {
         title: data.title,
         description: data.description,
-        survey_url: data.survey_url,
+        is_external: data.is_external,
+        survey_url: data.is_external ? data.survey_url : null,
         type: data.type,
         image_url: data.image_url || null,
         target_audience: data.target_audience,
@@ -130,6 +144,26 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      {/* Survey Type Toggle */}
+      <div className="flex items-center space-x-2 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
+        <Switch
+          id="is_external"
+          checked={isExternal}
+          onCheckedChange={(checked) => setValue("is_external", checked)}
+          className="data-[state=checked]:bg-customViolet-100 dark:[&>span]:bg-foreground [&>span]:bg-muted-foreground"
+        />
+        <div className="flex-1">
+          <Label htmlFor="is_external" className="text-foreground dark:text-gray-300 font-medium">
+            External Survey
+          </Label>
+          <p className="text-sm text-gray-500 dark:text-gray-400">
+            {isExternal
+              ? "Link to external survey (Google Forms, Typeform, etc.)"
+              : "Build survey with questions directly in the app"}
+          </p>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="space-y-2">
           <Label htmlFor="title" className="text-foreground dark:text-gray-300">Title *</Label>
@@ -145,19 +179,21 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
           )}
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="survey_url" className="text-foreground dark:text-gray-300">Survey URL *</Label>
-          <Input
-            id="survey_url"
-            variant="lightgray"
-            {...register("survey_url")}
-            placeholder="https://forms.google.com/..."
-            className="rounded"
-          />
-          {errors.survey_url && (
-            <p className="text-sm text-red-600 dark:text-red-400">{errors.survey_url.message}</p>
-          )}
-        </div>
+        {isExternal && (
+          <div className="space-y-2">
+            <Label htmlFor="survey_url" className="text-foreground dark:text-gray-300">Survey URL *</Label>
+            <Input
+              id="survey_url"
+              variant="lightgray"
+              {...register("survey_url")}
+              placeholder="https://forms.google.com/..."
+              className="rounded"
+            />
+            {errors.survey_url && (
+              <p className="text-sm text-red-600 dark:text-red-400">{errors.survey_url.message}</p>
+            )}
+          </div>
+        )}
       </div>
 
       <div className="space-y-2">
