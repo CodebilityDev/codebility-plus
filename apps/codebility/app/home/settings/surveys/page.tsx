@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Settings } from "lucide-react";
 import { Button } from "@codevs/ui/button";
 import { H1 } from "@/components/shared/dashboard";
 import PageContainer from "../../_components/PageContainer";
@@ -42,6 +43,7 @@ const audienceColors = {
 };
 
 export default function SurveysPage() {
+  const router = useRouter();
   const [surveys, setSurveys] = useState<Survey[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -284,6 +286,17 @@ export default function SurveysPage() {
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
+                  {!survey.is_external && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => router.push(`/home/settings/surveys/${survey.id}`)}
+                      className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                      title="Build questions"
+                    >
+                      <Settings className="h-4 w-4" />
+                    </Button>
+                  )}
                   <Button
                     variant="ghost"
                     size="sm"
