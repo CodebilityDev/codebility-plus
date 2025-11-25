@@ -11,6 +11,7 @@ import * as dotenv from "dotenv";
 import * as path from "path";
 import * as fs from "fs";
 import { handleXP } from "./utils/xpSystem";
+import { CommandModule, CommandExecuteFunction } from "./types/commands";
 
 // =============================
 // ✅ Load environment variables safely
@@ -35,7 +36,7 @@ if (!process.env.DISCORD_TOKEN) {
 // =============================
 declare module "discord.js" {
   interface Client {
-    commands: Collection<string, any>;
+    commands: Collection<string, CommandExecuteFunction>;
   }
 }
 
@@ -64,7 +65,7 @@ declare module "discord.js" {
         !file.endsWith(".disabled")
     );
 
-  const commandsData: any[] = [];
+  const commandsData: ReturnType<SlashCommandBuilder['toJSON']>[] = [];
 
   for (const file of commandFiles) {
     try {
@@ -154,17 +155,6 @@ declare module "discord.js" {
   });
 
   // =============================
-  // 🔹 MESSAGE EVENT → XP HANDLER
-  // =============================
-  client.on(Events.MessageCreate, async (message) => {
-    try {
-      await handleXP(message);
-    } catch (error) {
-      console.error("❌ Error handling XP:", error);
-    }
-  });
-
-  // =============================
   // 🔹 INTERACTION HANDLER
   // =============================
   client.on(Events.InteractionCreate, async (interaction) => {
@@ -193,6 +183,57 @@ declare module "discord.js" {
       }
     }
   });
+
+  // =============================
+  // 🔹 HEALTH MONITORING & ERROR HANDLING
+  // =============================
+  client.on("error", (error) => {
+    console.error("❌ Discord client error:", error);
+    // TODO: Send alert to monitoring service
+    // Example: sendToMonitoringService({ type: 'client_error', error });
+  });
+
+  client.on("warn", (warning) => {
+    console.warn("⚠️ Discord client warning:", warning);
+  });
+
+  // Handle unhandled promise rejections
+  process.on("unhandledRejection", (error: Error) => {
+    console.error("❌ Unhandled promise rejection:", error);
+  });
+
+  // Handle uncaught exceptions
+  process.on("uncaughtException", (error: Error) => {
+    console.error("❌ Uncaught exception:", error);
+    // Give time for logging before exit
+    setTimeout(() => process.exit(1), 1000);
+  });
+
+  // =============================
+  // 🔹 GRACEFUL SHUTDOWN
+  // =============================
+  const shutdown = async (signal: string) => {
+    console.log(`\n🛑 ${signal} received. Shutting down gracefully...`);
+
+    try {
+      // Close Discord client connection
+      if (client.isReady()) {
+        console.log("📡 Closing Discord connection...");
+        await client.destroy();
+        console.log("✅ Discord connection closed");
+      }
+
+      console.log("✅ Shutdown completed successfully");
+      process.exit(0);
+    } catch (error) {
+      console.error("❌ Error during shutdown:", error);
+      process.exit(1);
+    }
+  };
+
+  // Listen for shutdown signals
+  process.on("SIGINT", () => shutdown("SIGINT"));
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
 
   // =============================
   // 🔹 LOGIN BOT
