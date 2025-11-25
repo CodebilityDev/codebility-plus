@@ -21,6 +21,7 @@ import {
   ResponsiveContainer,
   XAxis,
 } from "recharts";
+import { cn } from "@/lib/utils";
 
 interface AdminDashboardMonthlyApplicantsLineChartProp {
   dateApplied?: string[];
@@ -29,7 +30,6 @@ interface AdminDashboardMonthlyApplicantsLineChartProp {
 export default function AdminDashboardMonthlyApplicantsLineChart({
   dateApplied = [],
 }: AdminDashboardMonthlyApplicantsLineChartProp) {
-  // Get current and previous 5 months
   const getLastSixMonths = () => {
     const now = new Date();
     const months: { month: string; year: number }[] = [];
@@ -74,12 +74,18 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
   } satisfies ChartConfig;
 
   return (
-    <Card>
-      <CardHeader>
+    <Card className={cn(
+      "relative overflow-hidden",
+      "bg-white dark:bg-gradient-to-br dark:from-green-950 dark:via-slate-900 dark:to-slate-950",
+      "border-gray-200 dark:border-green-900/30"
+    )}>
+      <div className="absolute inset-0 bg-gradient-to-br to-transparent pointer-events-none opacity-0 dark:opacity-100 dark:from-green-500/10" />
+      
+      <CardHeader className="relative">
         <CardTitle className="text-lg">Monthly Applicants</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="h-80">
+      <CardContent className="relative h-80">
         <ResponsiveContainer width="100%" height="100%">
           <ChartContainer config={chartConfig}>
             <LineChart
@@ -124,7 +130,7 @@ export default function AdminDashboardMonthlyApplicantsLineChart({
           </ChartContainer>
         </ResponsiveContainer>
       </CardContent>
-      <CardFooter className="flex-col items-start gap-2 text-sm">
+      <CardFooter className="relative flex-col items-start gap-2 text-sm">
         <div className="leading-none text-muted-foreground">
           Showing monthly applicants for the current and previous 5 months
         </div>

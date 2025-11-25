@@ -25,6 +25,7 @@ import DeleteWarningModal from "@/components/modals/DeleteWarningModal";
 import TechStackModal from "@/components/modals/TechStackModal";
 import SprintAddModal from "@/app/home/kanban/[projectId]/_components/SprintAddModal";
 import KanbanAddMembersModal from "@/app/home/kanban/[projectId]/[id]/_components/kanban_modals/KanbanAddMembersModal";
+import SurveyModal from "@/components/modals/SurveyModal";
 
 // Add interface for props to support children
 interface ModalProviderHomeProps {
@@ -82,6 +83,8 @@ export const ModalProviderHome = ({ children }: ModalProviderHomeProps = {}) => 
       <TechStackModal />
 
       <DashboardCurrentProjectModal />
+
+      <SurveyModal />
     </>
   );
 };

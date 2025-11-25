@@ -7,18 +7,18 @@ dotenv.config({
   path: path.resolve(process.cwd(), ".env"),
 });
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-const supabaseServiceRole = process.env.DB_SERVICE_ROLE;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceRole = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 // Validate environment variables
 if (!supabaseUrl || !supabaseUrl.startsWith("https")) {
-  console.error("❌ Invalid or missing NEXT_PUBLIC_SUPABASE_URL in .env file");
-  throw new Error("NEXT_PUBLIC_SUPABASE_URL must be a valid HTTPS URL in environment variables");
+  console.error("❌ Invalid or missing SUPABASE_URL in .env file");
+  throw new Error("SUPABASE_URL must be a valid HTTPS URL in environment variables");
 }
 
 if (!supabaseServiceRole) {
-  console.error("❌ Missing DB_SERVICE_ROLE in .env file");
-  throw new Error("DB_SERVICE_ROLE is required in environment variables");
+  console.error("❌ Missing SUPABASE_SERVICE_ROLE_KEY in .env file");
+  throw new Error("SUPABASE_SERVICE_ROLE_KEY is required in environment variables");
 }
 
 // ✅ Create and export Supabase client

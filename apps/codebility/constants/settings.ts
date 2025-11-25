@@ -29,6 +29,13 @@ export const settingsCardData: SettingsCardDataProps[] = [
     description: "Manage news and announcements displayed on home page.",
   },
   {
+    path: "/home/settings/surveys",
+    imageName: "icon-checkbox",
+    imageAlt: "Icon Surveys",
+    title: "Surveys",
+    description: "Manage surveys and collect feedback from users.",
+  },
+  {
     path: "/home/settings/services",
     imageName: "icon-paper-plane",
     imageAlt: "Icon Services",

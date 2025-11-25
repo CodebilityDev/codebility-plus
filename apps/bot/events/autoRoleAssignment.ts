@@ -17,7 +17,7 @@ interface CodevData {
   image_url?: string;
   availability_status?: boolean;
   nda_status?: boolean;
-  level?: any;
+  level?: number | string;
   application_status?: string;
   rejected_count?: number;
   facebook?: string;

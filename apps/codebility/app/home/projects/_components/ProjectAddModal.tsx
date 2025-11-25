@@ -38,7 +38,7 @@ export interface ProjectFormData {
   github_link?: string;
   website_url?: string;
   figma_link?: string;
-  start_date: string;
+  start_date?: string;
   category_ids?: number[]; // Changed from project_category_id to support multiple categories
   client_id?: string;
   main_image?: string;
@@ -188,7 +188,7 @@ const ProjectAddModal = () => {
           </div>
         </div>
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Client *</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Client</label>
           <CustomSelect
             options={clientOptions}
             onChange={(value) => setValue("client_id", value)}
@@ -278,16 +278,8 @@ const ProjectAddModal = () => {
       toast.error("Team leader is required");
       return;
     }
-    if (!formData.client_id) {
-      toast.error("Client is required");
-      return;
-    }
     if (!selectedCategoryIds || selectedCategoryIds.length === 0) {
       toast.error("At least one project category is required");
-      return;
-    }
-    if (!croppedFile) {
-      toast.error("Project image is required");
       return;
     }
 
@@ -295,23 +287,25 @@ const ProjectAddModal = () => {
     try {
       const form = new FormData();
 
-      // Upload image
-      const publicUrl = await uploadImage(croppedFile, {
-        bucket: "codebility",
-        folder: `projectImage/${Date.now()}_${croppedFile.name.replace(/\s+/g, "_")}`,
-      });
+      // Upload image if provided
+      if (croppedFile) {
+        const publicUrl = await uploadImage(croppedFile, {
+          bucket: "codebility",
+          folder: `projectImage/${Date.now()}_${croppedFile.name.replace(/\s+/g, "_")}`,
+        });
 
-      if (!publicUrl) {
-        throw new Error("Failed to upload image");
+        if (!publicUrl) {
+          throw new Error("Failed to upload image");
+        }
+        form.append("main_image", publicUrl);
       }
 
       // Add form data
       Object.entries(formData).forEach(([key, value]) => {
-        if (value !== undefined && value !== null) {
+        if (value !== undefined && value !== null && value !== "") {
           form.append(key, value);
         }
       });
-      form.append("main_image", publicUrl);
 
       // Add category IDs as JSON array
       form.append("category_ids", JSON.stringify(selectedCategoryIds));
@@ -458,36 +452,22 @@ const ProjectAddModal = () => {
         </div>
         
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Description *</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Project Description</label>
           <textarea
             placeholder="Describe what this project is about, its goals, and key features"
-            {...register("description", {
-              required: "Project description is required",
-            })}
+            {...register("description")}
             rows={3}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none bg-white dark:bg-gray-800"
           />
-          {errors.description && (
-            <p className="text-sm text-red-500 flex items-center gap-1">
-              <span className="w-4 h-4 text-red-500">⚠</span>
-              {errors.description.message}
-            </p>
-          )}
         </div>
         
         <div className="space-y-2">
-          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Start Date *</label>
+          <label className="text-xs font-semibold text-gray-700 dark:text-gray-300">Start Date</label>
           <Input
             type="date"
-            {...register("start_date", { required: "Start date is required" })}
+            {...register("start_date")}
             className="h-11 focus:ring-2 focus:ring-blue-500 border-gray-300 dark:border-gray-600"
           />
-          {errors.start_date && (
-            <p className="text-sm text-red-500 flex items-center gap-1">
-              <span className="w-4 h-4 text-red-500">⚠</span>
-              {errors.start_date.message}
-            </p>
-          )}
         </div>
       </div>
       
@@ -543,7 +523,7 @@ const ProjectAddModal = () => {
             <div className="bg-gray-50 dark:bg-gray-800/50 rounded-lg p-3">
               <h3 className="text-sm font-semibold mb-2 flex items-center gap-2">
                 <span className="w-6 h-6 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-full flex items-center justify-center text-sm font-bold">1</span>
-                Project Image
+                Project Image <span className="text-xs font-normal text-gray-500 dark:text-gray-400">(Optional)</span>
               </h3>
               <ImageUploadSection />
             </div>

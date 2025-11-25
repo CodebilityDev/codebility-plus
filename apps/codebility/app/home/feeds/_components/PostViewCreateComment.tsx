@@ -7,30 +7,40 @@ import { useUserStore } from "@/store/codev-store";
 import { useFeedsStore } from "@/store/feeds-store";
 
 import { createComment } from "../_services/action";
+import { PostType } from "../_services/query";
 
 interface CreateCommentProps {
-  postId: string;
+  post: PostType;
   onCommentCreated?: () => void;
 }
 
 export default function PostViewCreateComment({
-  postId,
+  post,
   onCommentCreated,
 }: CreateCommentProps) {
   const [comment, setComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const fetchPosts = useFeedsStore((state) => state.fetchPosts);
   const { user } = useUserStore();
 
   const handleKeyDown = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && comment.trim() && !isSubmitting) {
       if (!user || !user.id) return;
+
       try {
         setIsSubmitting(true);
-        await createComment(postId, user.id, comment);
+        await createComment(post.id, user.id, comment);
         setComment("");
         onCommentCreated?.();
-        fetchPosts();
+
+        // Get current post from store
+        const currentPost = useFeedsStore
+          .getState()
+          .posts.find((p) => p.id === post.id);
+        if (currentPost) {
+          useFeedsStore.getState().updatePost(post.id, {
+            comment_count: (currentPost.comment_count ?? 0) + 1,
+          });
+        }
       } finally {
         setIsSubmitting(false);
       }

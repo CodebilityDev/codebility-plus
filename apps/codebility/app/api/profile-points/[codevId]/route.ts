@@ -387,8 +387,6 @@ export async function GET(
 
     // Insert new points into profile_points table
     if (pointsToInsert.length > 0) {
-      console.log("Attempting to insert points:", pointsToInsert);
-      
       const { error: insertError } = await supabase
         .from("profile_points")
         .insert(pointsToInsert);

@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 
+import { getTechStackIconName } from "@/constants/techstack";
 import { NewApplicantType } from "../_service/types";
 
 export default function ApplicantTechStack({
@@ -22,21 +23,24 @@ export default function ApplicantTechStack({
       applicant.tech_stacks.length > 0 &&
       !applicant.tech_stacks.includes("none") ? (
         <>
-          {displayStacks?.map((stack) => (
-            <div 
-              key={stack}
-              className="group relative"
-              title={stack}
-            >
-              <Image
-                src={`/assets/svgs/techstack/icon-${stack.toLowerCase()}.svg`}
-                alt={stack}
-                width={24}
-                height={24}
-                className="h-6 w-6 transition-transform group-hover:scale-110"
-              />
-            </div>
-          ))}
+          {displayStacks?.map((stack) => {
+            const iconName = getTechStackIconName(stack);
+            return (
+              <div
+                key={stack}
+                className="group relative"
+                title={stack}
+              >
+                <Image
+                  src={`/assets/svgs/techstack/icon-${iconName}.svg`}
+                  alt={stack}
+                  width={24}
+                  height={24}
+                  className="h-6 w-6 transition-transform group-hover:scale-110"
+                />
+              </div>
+            );
+          })}
           {hasMoreStacks && (
             <button
               onClick={() => setShowAll(!showAll)}

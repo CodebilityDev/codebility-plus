@@ -22,7 +22,8 @@ export type ModalType =
   | "homePrivacyPolicyModal"
   | "deleteWarningModal"
   | "dashboardCurrentProjectModal"
-  | "marketingCodevHireCodevModal";
+  | "marketingCodevHireCodevModal"
+  | "surveyModal";
 
 interface ModalStore {
   type: ModalType | null;

@@ -37,12 +37,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
 
   // Filtering logic
   const filteredData = data.filter((item) => {
-    // Filter by tab first
-    const isActive = item.availability_status === true;
-    if (activeTab === "active" && !isActive) return false;
-    if (activeTab === "inactive" && isActive) return false;
-
-    // 1) Search filter (case-insensitive)
+    // 1) Search filter (case-insensitive) - search across all users
     if (filters.search) {
       const searchLower = filters.search.toLowerCase();
       // Combine fields you want to match against
@@ -61,6 +56,11 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
       if (!combinedFields.includes(searchLower)) {
         return false;
       }
+    } else {
+      // Only filter by tab when there's no search query
+      const isActive = item.availability_status === true;
+      if (activeTab === "active" && !isActive) return false;
+      if (activeTab === "inactive" && isActive) return false;
     }
 
     // 2) Other filters...

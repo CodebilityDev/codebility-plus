@@ -19,6 +19,7 @@ import { MuiStyleRoot } from "./(dashboard)/_components/DashboardRoadmapStyleRoo
 import ConditionalMainWrapper from "./_components/ConditionalMainWrapper";
 import DynamicMainContent from "./_components/DynamicMainContent";
 import { Toast } from "@codevs/ui/toast";
+import SurveyWidget from "./_components/SurveyWidget";
 
 // Force dynamic rendering for layout due to server-side Supabase usage
 export const dynamic = "force-dynamic";
@@ -82,6 +83,7 @@ export default async function HomeLayout({
                       </ConditionalMainWrapper>
                     </DynamicMainContent>
                   </div>
+                  <SurveyWidget />
                 </div>
               </MuiStyleRoot>
             </AppRouterCacheProvider>

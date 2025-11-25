@@ -3,7 +3,7 @@ import Navigation from "../_components/MarketingNavigation";
 import FeaturedSection from "../_shared/CodevsFeaturedCection";
 import Hero from "./_components/CodevsHero";
 import Project from "./_components/CodevsProject";
-import Roadmap from "./_components/CodevsRoadmap";
+import CodevsRoadmapStatic from "./_components/CodevsRoadmapStatic";
 import MissionVision from "./_components/CodevsMissionVision";
 import CTA from "../_shared/CodevsCta";
 import CodevsProfiles from "./_components/CodevsProfiles";
@@ -19,7 +19,7 @@ export default function Codevs() {
       <CodevsProfiles />
       <FeaturedSection />
       <Project />
-      <Roadmap />
+      <CodevsRoadmapStatic />
       <MissionVision />
       <CTA />
       <Footer />

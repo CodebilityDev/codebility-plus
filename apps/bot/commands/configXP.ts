@@ -8,6 +8,8 @@ import {
   ChannelType,
 } from "discord.js";
 import { supabaseBot } from "../utils/supabase.bot";
+import { XPConfigUpdateData } from "../types/commands";
+import { validateXPConfig, validateMessageTemplate, sanitizeUserInput } from "../utils/validation";
 
 const slashCommand = new SlashCommandBuilder()
   .setName("configxp")
@@ -162,16 +164,17 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       const cooldown = interaction.options.getInteger("cooldown", true);
       const levelUpChannel = interaction.options.getChannel("levelup_channel");
 
-      // Validate XP range
-      if (min > max) {
+      // Validate XP configuration
+      const validation = validateXPConfig({ minXP: min, maxXP: max, cooldown });
+      if (!validation.valid) {
         await interaction.editReply({
-          content: "❌ Minimum XP cannot be greater than maximum XP!",
+          content: `❌ ${validation.error}`,
         });
         return;
       }
 
       // Prepare update data
-      const updateData: any = {
+      const updateData: XPConfigUpdateData = {
         guild_id: guildId,
         min_xp: min,
         max_xp: max,
@@ -235,7 +238,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       const enabled = interaction.options.getBoolean("enabled", true);
       const channel = interaction.options.getChannel("channel");
 
-      const updateData: any = {
+      const updateData: XPConfigUpdateData = {
         guild_id: guildId,
         notify_on_xp_gain: enabled,
         xp_gain_channel: channel?.id || null,
@@ -279,7 +282,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       const channel = interaction.options.getChannel("channel");
       const messageTemplate = interaction.options.getString("message");
 
-      const updateData: any = {
+      const updateData: XPConfigUpdateData = {
         guild_id: guildId,
       };
 
@@ -290,14 +293,17 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
 
       // Update message template if provided
       if (messageTemplate) {
-        // Validate template has required placeholders
-        if (!messageTemplate.includes("{user}")) {
+        // Sanitize and validate template
+        const sanitized = sanitizeUserInput(messageTemplate);
+        const validation = validateMessageTemplate(sanitized, ["{user}"]);
+
+        if (!validation.valid) {
           await interaction.editReply({
-            content: "❌ Template must include `{user}` placeholder!",
+            content: `❌ ${validation.error}`,
           });
           return;
         }
-        updateData.reward_notification_message = messageTemplate;
+        updateData.reward_notification_message = sanitized;
       }
 
       // If config doesn't exist, create with defaults
@@ -342,17 +348,20 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
     } else if (subcommand === "message") {
       const template = interaction.options.getString("template", true);
 
-      // Validate template has {user} placeholder
-      if (!template.includes("{user}")) {
+      // Sanitize and validate template
+      const sanitized = sanitizeUserInput(template);
+      const validation = validateMessageTemplate(sanitized, ["{user}"]);
+
+      if (!validation.valid) {
         await interaction.editReply({
-          content: "❌ Template must include `{user}` placeholder to mention the user!",
+          content: `❌ ${validation.error}`,
         });
         return;
       }
 
-      const updateData: any = {
+      const updateData: XPConfigUpdateData = {
         guild_id: guildId,
-        xp_gain_message: template,
+        xp_gain_message: sanitized,
       };
 
       // If config doesn't exist, create with defaults
@@ -379,7 +388,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       }
 
       await interaction.editReply({
-        content: `✅ **XP gain message template updated!**\n\n**Preview:**\n${template
+        content: `✅ **XP gain message template updated!**\n\n**Preview:**\n${sanitized
           .replace("{user}", `<@${interaction.user.id}>`)
           .replace("{xp}", "10")
           .replace("{total_xp}", "150")

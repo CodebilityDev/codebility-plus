@@ -104,6 +104,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
         {
           id: user.id,
           username: user.username,
+          display_name: user.displayName || user.username,
           avatar_url: user.displayAvatarURL(),
           discriminator: user.discriminator || "0",
         },

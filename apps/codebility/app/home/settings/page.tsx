@@ -28,64 +28,102 @@ type RolePermissions = {
 
 type PermissionKey = keyof RolePermissions;
 
-// Map specific settings routes to their respective permission keys.
+// Admin-only cards - only visible to Admin role (role_id = 1)
+// Hidden from: Codev (10), Intern (4), HR (2), and all other non-admin roles
+const ADMIN_ONLY_PATHS = [
+  "/home/settings/news-banners",
+  "/home/settings/surveys",
+  "/home/settings/services",
+];
+
+// Map specific settings routes to their respective permission keys
 const settingsPermissionMap: Record<string, PermissionKey> = {
   "/home/settings/profile": "resume",
   "/home/settings/permissions": "permissions",
   "/home/settings/roles": "roles",
-  "/home/settings/news-banners": "settings", // Admin-only feature
 };
 
 const Settings = () => {
-  // Move Supabase client initialization to state and useEffect
   const [supabase, setSupabase] = useState<any>(null);
-
-  // Instead of using useUser, assume roleId is known (e.g. passed as a prop or hardcoded)
-  const roleId = 2; // Replace with actual logic to obtain the user's roleId
-
-  const [rolePermissions, setRolePermissions] =
-    useState<RolePermissions | null>(null);
+  const [roleId, setRoleId] = useState<number | null>(null);
+  const [rolePermissions, setRolePermissions] = useState<RolePermissions | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  // Initialize Supabase client safely
+  // Initialize Supabase client
   useEffect(() => {
     const client = createClientClientComponent();
     setSupabase(client);
   }, []);
 
-  // Helper function to check a permission
-  const hasPermission = (permission: PermissionKey): boolean => {
-    return !!rolePermissions?.[permission];
-  };
-
+  // Get current user's role_id by mapping auth email to codev.role_id
   useEffect(() => {
     if (!supabase) return;
 
+    async function fetchUserRole() {
+      try {
+        // Get auth user
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
+        if (sessionError || !session?.user?.email) {
+          setLoading(false);
+          return;
+        }
+
+        // Map email to codev profile to get role_id
+        const { data: codevData, error: codevError } = await supabase
+          .from("codev")
+          .select("role_id, first_name, last_name")
+          .eq("email_address", session.user.email)
+          .single();
+
+        if (codevError || !codevData) {
+          setLoading(false);
+          return;
+        }
+
+        setRoleId(codevData.role_id);
+      } catch (err) {
+        setLoading(false);
+      }
+    }
+
+    fetchUserRole();
+  }, [supabase]);
+
+  // Fetch role permissions once we have roleId
+  useEffect(() => {
+    if (!supabase || roleId === null) return;
+
     async function fetchRolePermissions() {
       try {
-        // Fetch the role permissions from the "roles" table.
         const { data: roleData, error: roleError } = await supabase
           .from("roles")
           .select(
-            "dashboard, kanban, time_tracker, interns, applicants, inhouse, clients, projects, settings, orgchart, resume, permissions, roles",
+            "id, name, dashboard, kanban, time_tracker, interns, applicants, inhouse, clients, projects, settings, orgchart, resume, permissions, roles"
           )
           .eq("id", roleId)
           .single();
 
         if (roleError || !roleData) {
-          console.error("Failed to fetch role permissions:", roleError);
           setLoading(false);
           return;
         }
+
         setRolePermissions(roleData);
       } catch (err) {
-        console.error("Error fetching role permissions:", err);
+        // Error fetching role permissions
       } finally {
         setLoading(false);
       }
     }
+
     fetchRolePermissions();
   }, [supabase, roleId]);
+
+  // Helper function to check a permission
+  const hasPermission = (permission: PermissionKey): boolean => {
+    return !!rolePermissions?.[permission];
+  };
 
   if (loading) {
     return (
@@ -95,7 +133,7 @@ const Settings = () => {
     );
   }
 
-  if (!rolePermissions) {
+  if (!rolePermissions || roleId === null) {
     return (
       <PageContainer>
         <div className="mx-auto p-4">Unable to determine permissions.</div>
@@ -103,12 +141,24 @@ const Settings = () => {
     );
   }
 
-  // Filter settings cards based on role permissions.
-  // For a card whose path exists in the mapping, use its permission key;
-  // otherwise, require the general "settings" permission.
+  // Filter settings cards based on role
   const filteredCards = settingsCardData.filter((card) => {
-    const permissionKey = settingsPermissionMap[card.path] || "settings";
-    return hasPermission(permissionKey);
+    // Rule 1: Admin-only cards (News Banners, Surveys, Services)
+    // ONLY visible if user has role_id = 1 (Admin)
+    // BLOCKED for: Codev (10), Intern (4), HR (2), all others
+    if (ADMIN_ONLY_PATHS.includes(card.path)) {
+      return roleId === 1;
+    }
+
+    // Rule 2: Check specific permission mapping
+    // For cards like Profile, Permissions, Roles
+    const permissionKey = settingsPermissionMap[card.path];
+    if (permissionKey) {
+      return hasPermission(permissionKey);
+    }
+
+    // Rule 3: Default fallback - require general "settings" permission
+    return hasPermission("settings");
   });
 
   return (

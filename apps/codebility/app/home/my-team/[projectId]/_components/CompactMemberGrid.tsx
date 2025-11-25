@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Image from "next/image";
 import { SimpleMemberData } from "@/app/home/projects/actions";
 import DefaultAvatar from "@/components/DefaultAvatar";
-import { Mail, Phone, Calendar, MapPin, Briefcase, Trophy } from "lucide-react";
+import { Mail, Phone, Calendar, MapPin, Briefcase, Trophy, RefreshCw } from "lucide-react";
 import { multipleMoveApplicantToOnboardingAction } from "@/app/home/applicants/_service/action";
 const ATTENDANCE_POINTS_PER_DAY = 2;
 import { getTeamMonthlyAttendancePoints } from "../actions";
@@ -26,12 +26,12 @@ interface MemberPoints {
 const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridProps) => {
   const allMembers = teamLead ? [teamLead, ...members] : members;
   const [memberPoints, setMemberPoints] = useState<MemberPoints>({});
-  const [isLoadingPoints, setIsLoadingPoints] = useState(false); // Start as false, load on demand
+  const [isLoadingPoints, setIsLoadingPoints] = useState(false); // Automatically loads on mount
   const [monthlyAttendancePoints, setMonthlyAttendancePoints] = useState<{ uniqueCodevIdsPresentDays: { codevId: string; presentDays: number }[]; }>({ uniqueCodevIdsPresentDays: [] });
   const [selectedMember, setSelectedMember] = useState<SimpleMemberData | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Load points for all members - made more efficient and optional
+  // Load points for all members - runs automatically on mount and can be refreshed
   const loadAllPoints = async () => {
     if (isLoadingPoints) return; // Prevent multiple simultaneous calls
     
@@ -93,10 +93,15 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
     loadAttendancePoints();
   }, [projectId]);
 
-
+  // Automatically load points when component mounts
+  useEffect(() => {
+    if (allMembers.length > 0) {
+      loadAllPoints();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Only run once on mount
 
   const hasPointsData = Object.keys(memberPoints).length > 0;
-  const showLoadPointsButton = !hasPointsData && !isLoadingPoints && allMembers.length > 0;
 
   const handleMemberClick = (member: SimpleMemberData) => {
     setSelectedMember(member);
@@ -110,22 +115,23 @@ const CompactMemberGrid = ({ members, teamLead, projectId }: CompactMemberGridPr
 
   return (
     <div className="space-y-4">
-      {/* Load Points Button */}
-      {showLoadPointsButton && (
-        <div className="flex justify-center">
+      {/* Refresh Points Button - Shows when data is loaded */}
+      {hasPointsData && !isLoadingPoints && allMembers.length > 0 && (
+        <div className="flex justify-end">
           <button
             onClick={loadAllPoints}
-            className="px-4 py-2 text-sm bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg text-blue-700 transition-colors"
+            className="px-3 py-1.5 text-xs bg-gray-50 hover:bg-gray-100 border border-gray-200 rounded-lg text-gray-700 transition-colors flex items-center gap-1.5 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700"
+            title="Refresh member points and stats"
           >
-            <Trophy className="h-4 w-4 inline mr-2" />
-            Load Member Points & Stats
+            <RefreshCw className="h-3.5 w-3.5" />
+            Refresh Stats
           </button>
         </div>
       )}
 
       {/* Loading indicator */}
       {isLoadingPoints && (
-        <div className="flex items-center justify-center py-4 text-sm text-gray-500">
+        <div className="flex items-center justify-center py-4 text-sm text-gray-500 dark:text-gray-400">
           <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-500 mr-2"></div>
           Loading member statistics...
         </div>

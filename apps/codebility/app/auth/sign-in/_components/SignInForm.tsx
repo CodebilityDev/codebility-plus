@@ -49,7 +49,7 @@ const SignInForm = () => {
       // Otherwise, handle redirection based on the redirectTo value
       if (response.redirectTo) {
         switch (response.redirectTo) {
-          case "auth/waiting":
+          case "/applicant/waiting":
             toast("Your application is still under review");
             break;
           case "/auth/declined":

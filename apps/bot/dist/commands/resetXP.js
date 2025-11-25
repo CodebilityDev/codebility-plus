@@ -1,7 +1,7 @@
 "use strict";
+// apps/bot/commands/resetXP.ts
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.execute = exports.command = void 0;
-// apps/bot/commands/resetXP.ts
 const discord_js_1 = require("discord.js");
 const supabase_bot_1 = require("../utils/supabase.bot");
 // Create the slash command
@@ -89,7 +89,7 @@ const execute = async (interaction) => {
             .from("user_stats_discord")
             .update({
             xp: 0,
-            level: 1, // Reset to level 1 (most bots start at level 1, not 0)
+            level: 0, // Reset to level 1 (most bots start at level 1, not 0)
             total_messages: 0,
         })
             .eq("user_id", targetUser.id)

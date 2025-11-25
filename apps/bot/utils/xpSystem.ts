@@ -2,6 +2,8 @@
 import { supabaseBot } from "./supabase.bot";
 import { Message, TextChannel } from "discord.js";
 import { getLevelProgress } from "./xpHelper";
+import { POSTGRES_ERROR_CODES } from "../constants/errorCodes";
+import { COOLDOWN_CONFIG, DEFAULT_MESSAGES, XP_CONFIG } from "../constants/config";
 
 /** XP configuration for each guild */
 interface XPConfig {
@@ -25,6 +27,40 @@ interface GrantedReward {
 
 // In-memory cooldown map
 const cooldowns = new Map<string, number>();
+
+// In-memory message processing tracker (prevents duplicate processing)
+const processedMessages = new Set<string>();
+
+// Cleanup old cooldown entries and processed messages every 5 minutes to prevent memory leak
+setInterval(() => {
+  const now = Date.now();
+  let cleanedCooldowns = 0;
+  let cleanedMessages = 0;
+
+  // Cleanup old cooldowns
+  for (const [key, timestamp] of cooldowns.entries()) {
+    if (now - timestamp > COOLDOWN_CONFIG.EXPIRY_TIME) {
+      cooldowns.delete(key);
+      cleanedCooldowns++;
+    }
+  }
+
+  // Cleanup old processed message IDs (older than 1 minute)
+  // Since Discord message IDs are snowflakes, we can extract timestamp
+  const oneMinuteAgo = now - 60000;
+  for (const messageId of processedMessages) {
+    // Discord snowflake epoch: 1420070400000 (2015-01-01)
+    const timestamp = Number(BigInt(messageId) >> 22n) + 1420070400000;
+    if (timestamp < oneMinuteAgo) {
+      processedMessages.delete(messageId);
+      cleanedMessages++;
+    }
+  }
+
+  if (cleanedCooldowns > 0 || cleanedMessages > 0) {
+    console.log(`🧹 Cleaned ${cleanedCooldowns} cooldowns, ${cleanedMessages} message IDs`);
+  }
+}, COOLDOWN_CONFIG.CLEANUP_INTERVAL);
 
 // ---------------------------
 // Ensure User Exists
@@ -112,7 +148,7 @@ async function hasUserReceivedReward(
       .eq("reward_id", rewardId)
       .maybeSingle();
 
-    if (error && error.code !== "PGRST116") { // PGRST116 = no rows returned
+    if (error && error.code !== POSTGRES_ERROR_CODES.NO_ROWS_FOUND) {
       console.error("❌ Error checking user reward:", error);
       return false;
     }
@@ -145,7 +181,7 @@ async function recordGrantedReward(
 
     if (error) {
       // If it's a duplicate key error, that's okay (race condition protection)
-      if (error.code === "23505") {
+      if (error.code === POSTGRES_ERROR_CODES.UNIQUE_VIOLATION) {
         console.log(`ℹ️ Reward ${rewardId} already recorded for user ${userId}`);
         return true;
       }
@@ -388,6 +424,15 @@ async function handleRoleRewards(
 export async function handleXP(message: Message) {
   if (message.author.bot || !message.guild) return;
 
+  // 🛡️ DEDUPLICATION: Prevent same message from being processed multiple times
+  if (processedMessages.has(message.id)) {
+    console.log(`⚠️ Skipping duplicate message processing: ${message.id}`);
+    return;
+  }
+
+  // Mark message as being processed
+  processedMessages.add(message.id);
+
   const guildId = message.guild.id;
   const userId = message.author.id;
   const username = message.author.username;
@@ -413,7 +458,10 @@ export async function handleXP(message: Message) {
       ),
     ]);
 
-    if (!userExists || !guildExists) return;
+    if (!userExists || !guildExists) {
+      console.error(`❌ Failed to ensure user or guild exists for ${username} in ${guildName}`);
+      return;
+    }
 
     // Fetch XP config
     const { data: configData, error: configError } = await supabaseBot
@@ -425,19 +473,19 @@ export async function handleXP(message: Message) {
     if (configError) console.error("❌ Error fetching XP config:", configError);
 
     const config: XPConfig = {
-      minXP: configData?.min_xp ?? 5,
-      maxXP: configData?.max_xp ?? 15,
-      cooldown: configData?.cooldown ?? 60,
+      minXP: configData?.min_xp ?? XP_CONFIG.DEFAULT_MIN_XP,
+      maxXP: configData?.max_xp ?? XP_CONFIG.DEFAULT_MAX_XP,
+      cooldown: configData?.cooldown ?? XP_CONFIG.DEFAULT_COOLDOWN,
       levelUpChannel: configData?.levelup_channel ?? null,
       levelUpMessage:
-        configData?.levelup_message ?? "🎉 {user} leveled up to **Level {level}**!",
+        configData?.levelup_message ?? DEFAULT_MESSAGES.LEVEL_UP,
       xpGainChannel: configData?.xp_gain_channel ?? null,
       xpGainMessage:
-        configData?.xp_gain_message ?? "🎯 {user} gained **{xp} XP**! (Total: {total_xp} XP | Level {level})",
+        configData?.xp_gain_message ?? DEFAULT_MESSAGES.XP_GAIN,
       notifyOnXpGain: configData?.notify_on_xp_gain ?? false,
       rewardNotificationChannel: configData?.reward_notification_channel ?? null,
       rewardNotificationMessage:
-        configData?.reward_notification_message ?? "🎁 {user} reached **Level {level}** and earned the role(s): {roles}!",
+        configData?.reward_notification_message ?? DEFAULT_MESSAGES.REWARD_NOTIFICATION,
     };
 
     // Fetch user stats
@@ -484,7 +532,7 @@ export async function handleXP(message: Message) {
     });
 
     // Update stats
-    const { error: updateError } = await supabaseBot
+    const { data: updatedData, error: updateError } = await supabaseBot
       .from("user_stats_discord")
       .upsert(
         {
@@ -496,13 +544,25 @@ export async function handleXP(message: Message) {
           last_message_at: new Date().toISOString(),
           active: true,
         },
-        { onConflict: "guild_id,user_id" }
-      );
+        {
+          onConflict: "guild_id,user_id",
+          ignoreDuplicates: false  // Always update existing records
+        }
+      )
+      .select();
 
     if (updateError) {
       console.error("❌ Error updating user stats:", updateError);
+      console.error("❌ Update data:", { guildId, userId, newTotalXP, newLevel, totalMessages });
       return;
     }
+
+    if (!updatedData || updatedData.length === 0) {
+      console.error("❌ User stats update returned no data");
+      return;
+    }
+
+    console.log(`✅ XP awarded: ${username} gained ${gainedXP} XP (${currentXP} → ${newTotalXP})`);
 
     // Log XP
     const { error: logError } = await supabaseBot

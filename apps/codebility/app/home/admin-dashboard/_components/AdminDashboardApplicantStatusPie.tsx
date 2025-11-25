@@ -14,6 +14,7 @@ import {
   ChartLegendContent,
 } from "@/components/ui/chart";
 import { Pie, PieChart } from "recharts";
+import { cn } from "@/lib/utils";
 
 interface ApplicantStatusCounts extends Record<string, number> {}
 
@@ -28,11 +29,17 @@ export default function AdminDashboardApplicantStatusPie({
   
   if (!data)
     return (
-      <Card className="flex h-full flex-col">
-        <CardHeader className="items-center pb-0">
+      <Card className={cn(
+        "flex h-full flex-col relative overflow-hidden",
+        "bg-white dark:bg-gradient-to-br dark:from-blue-950 dark:via-slate-900 dark:to-slate-950",
+        "border-gray-200 dark:border-blue-900/30"
+      )}>
+        <div className="absolute inset-0 bg-gradient-to-br to-transparent pointer-events-none opacity-0 dark:opacity-100 dark:from-blue-500/10" />
+        
+        <CardHeader className="relative items-center pb-0">
           <CardTitle className="text-lg">{title}</CardTitle>
         </CardHeader>
-        <CardContent className="flex flex-1 items-center justify-center">
+        <CardContent className="relative flex flex-1 items-center justify-center">
           <p className="text-muted-foreground">No data available</p>
         </CardContent>
       </Card>
@@ -57,14 +64,20 @@ export default function AdminDashboardApplicantStatusPie({
   );
 
   return (
-    <Card className="flex h-full flex-col">
-      <CardHeader className="items-center pb-0">
+    <Card className={cn(
+      "flex h-full flex-col relative overflow-hidden",
+      "bg-white dark:bg-gradient-to-br dark:from-blue-950 dark:via-slate-900 dark:to-slate-950",
+      "border-gray-200 dark:border-blue-900/30"
+    )}>
+      <div className="absolute inset-0 bg-gradient-to-br to-transparent pointer-events-none opacity-0 dark:opacity-100 dark:from-blue-500/10" />
+      
+      <CardHeader className="relative items-center pb-0">
         <CardTitle className="text-lg">{title}</CardTitle>
         <CardDescription className="text-center text-sm">
           Distribution of application statuses
         </CardDescription>
       </CardHeader>
-      <CardContent className="flex-1 pb-0">
+      <CardContent className="relative flex-1 pb-0">
         <ChartContainer
           config={chartConfig}
           className="mx-auto aspect-square max-h-[350px]"

@@ -1,12 +1,13 @@
 // apps/bot/commands/leaderboard.ts
 
-import { 
-  SlashCommandBuilder, 
-  ChatInputCommandInteraction, 
+import {
+  SlashCommandBuilder,
+  ChatInputCommandInteraction,
   EmbedBuilder,
-  MessageFlags 
+  MessageFlags
 } from "discord.js";
 import { supabaseBot } from "../utils/supabase.bot";
+import { LeaderboardEntry } from "../types/database";
 
 // Create the slash command
 const slashCommand = new SlashCommandBuilder()
@@ -97,7 +98,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
 
     // --- Build leaderboard description with highlighting ---
     const description = leaderboard
-      .map((entry: any, index: number) => {
+      .map((entry: LeaderboardEntry, index: number) => {
         const rank = index + 1;
         const medal =
           rank === 1 ? "🥇" :
@@ -116,7 +117,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       .join("\n");
 
     // --- Include requester rank if not in top ---
-    const requesterInTop = leaderboard.find((entry: any) => entry.user_id === requesterId);
+    const requesterInTop = leaderboard.find((entry: LeaderboardEntry) => entry.user_id === requesterId);
     let requesterRankInfo = "";
     
     if (!requesterInTop) {

@@ -197,7 +197,7 @@ function PostReadInstructions({
       <div className="flex flex-col items-center gap-4">
         <p className="mb-2 text-lg md:text-lg lg:text-2xl">
           {user?.display_position.includes("UI/UX Designer")
-            ? "Submit your the Figma File Url before deadline"
+            ? "Submit your Figma file link before deadline"
             : "Submit your fork of the repository before deadline"}
         </p>
 

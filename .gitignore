@@ -70,6 +70,7 @@ web-build/
 **/*/.expo
 
 **/*/.next
+packages/ui/dist/*
 
 **/*/ios
 **/*/android

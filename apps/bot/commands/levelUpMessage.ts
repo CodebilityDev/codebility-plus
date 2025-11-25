@@ -9,6 +9,7 @@ import {
   ChannelType,
 } from "discord.js";
 import { supabaseBot } from "../utils/supabase.bot";
+import { validateMessageTemplate, sanitizeUserInput } from "../utils/validation";
 
 // ===== Slash Command Definition =====
 const slashCommand = new SlashCommandBuilder()
@@ -140,12 +141,15 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       return;
     }
 
-    // ===== VALIDATE MESSAGE PLACEHOLDERS =====
+    // ===== VALIDATE AND SANITIZE MESSAGE =====
+    let sanitizedMessage: string | undefined;
     if (newMessage) {
-      if (!newMessage.includes("{user}") || !newMessage.includes("{level}")) {
+      sanitizedMessage = sanitizeUserInput(newMessage);
+      const validation = validateMessageTemplate(sanitizedMessage, ["{user}", "{level}"]);
+
+      if (!validation.valid) {
         await interaction.editReply({
-          content:
-            "⚠️ The message must include both `{user}` and `{level}` placeholders.\n\n**Example:**\n`Congrats {user}! You reached Level {level}!`",
+          content: `❌ ${validation.error}\n\n**Example:**\n\`Congrats {user}! You reached Level {level}!\``,
         });
         return;
       }
@@ -158,7 +162,7 @@ export const execute = async (interaction: ChatInputCommandInteraction) => {
       is_enabled?: boolean;
     } = {};
 
-    if (newMessage) updates.message_template = newMessage;
+    if (sanitizedMessage) updates.message_template = sanitizedMessage;
     if (channel) updates.channel_id = channel.id;
     if (enable !== null && enable !== undefined) updates.is_enabled = enable;
 

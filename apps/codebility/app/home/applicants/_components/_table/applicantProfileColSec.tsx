@@ -6,7 +6,7 @@ import Link from "next/link";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
 import { Table, TableCell, TableHeader, TableRow } from "@/components/ui/table";
-import { IconEmail, IconGithub, IconLink } from "@/public/assets/svgs";
+import { IconEmail, IconFacebook, IconGithub, IconLink } from "@/public/assets/svgs";
 import { Row } from "@tanstack/react-table";
 
 import {
@@ -153,6 +153,22 @@ export default function ApplicantProfileColSec({
                     {applicant.github ? (
                       <Link href={applicant.github} target="_blank">
                         <IconGithub className="h-5 w-5 invert dark:invert-0" />
+                      </Link>
+                    ) : (
+                      <span className="text-sm text-gray-500 dark:text-gray-500">
+                        None
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Facebook Row */}
+                <div className="flex items-center justify-between border-b border-gray-200 pb-2 dark:border-gray-700">
+                  <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Facebook</span>
+                  <div>
+                    {applicant.facebook ? (
+                      <Link href={applicant.facebook} target="_blank">
+                        <IconFacebook className="h-5 w-5 invert dark:invert-0" />
                       </Link>
                     ) : (
                       <span className="text-sm text-gray-500 dark:text-gray-500">

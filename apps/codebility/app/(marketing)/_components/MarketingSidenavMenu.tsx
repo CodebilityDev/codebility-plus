@@ -4,10 +4,12 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import ScrollToHash from "@/app/(marketing)/_components/landing/LandingScrollToHash";
 
+// Navigation links for sidebar - displayed on left side of landing page
 const links = [
   { href: "/services", label: "Our Services" },
   { href: "/#whychooseus", label: "About Us" },
   { href: "/bookacall", label: "Book a Call" },
+  { href: "/codevs", label: "Be a Codev" }, // ✅ ADDED: New link after Book a Call
   { href: "/hire-a-codev", label: "Hire Codevs" },
   { href: "/careers", label: "Careers" },
 ];
@@ -15,6 +17,7 @@ const links = [
 const SideNavMenu = () => {
   const [isScrolling, setIsScrolling] = useState(false);
 
+  // Handle scroll animation - shrink links when scrolling
   const handleNav = () => {
     if (window.scrollY >= 200) {
       setIsScrolling(true);
