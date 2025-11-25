@@ -108,7 +108,7 @@ export default function SurveyImageUpload({
 
   return (
     <div className="space-y-3">
-      <Label className="text-sm font-medium">Survey Image (Optional)</Label>
+      <Label className="text-sm font-medium text-foreground dark:text-gray-300">Survey Image (Optional)</Label>
 
       <div className="flex flex-col gap-3">
         {/* Image Preview */}
