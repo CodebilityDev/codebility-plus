@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, Eye, EyeOff, ExternalLink, Settings } from "lucide-react";
+import { Plus, Pencil, Trash2, Eye, EyeOff, Settings } from "lucide-react";
 import { Button } from "@codevs/ui/button";
 import { H1 } from "@/components/shared/dashboard";
 import PageContainer from "../../_components/PageContainer";
@@ -14,8 +14,6 @@ interface Survey {
   id: string;
   title: string;
   description: string;
-  is_external: boolean;
-  survey_url?: string;
   type: "general" | "feedback" | "satisfaction" | "research" | "onboarding";
   image_url?: string;
   target_audience: "all" | "codev" | "intern" | "hr" | "admin";
@@ -256,26 +254,6 @@ export default function SurveysPage() {
                     <p className="text-gray-600 dark:text-gray-300 mb-3">
                       {survey.description}
                     </p>
-                    {survey.is_external && survey.survey_url && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <a
-                          href={survey.survey_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-sm text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1"
-                        >
-                          <ExternalLink className="h-3 w-3" />
-                          View External Survey
-                        </a>
-                      </div>
-                    )}
-                    {!survey.is_external && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <span className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-1">
-                          📋 In-App Survey
-                        </span>
-                      </div>
-                    )}
                     <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
                       <div>Created: {formatDate(survey.start_date)}</div>
                       {survey.end_date && (
@@ -286,17 +264,15 @@ export default function SurveysPage() {
                 </div>
 
                 <div className="flex items-center gap-2 ml-4">
-                  {!survey.is_external && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => router.push(`/home/settings/surveys/${survey.id}`)}
-                      className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
-                      title="Build questions"
-                    >
-                      <Settings className="h-4 w-4" />
-                    </Button>
-                  )}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => router.push(`/home/settings/surveys/${survey.id}`)}
+                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    title="Build questions"
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"

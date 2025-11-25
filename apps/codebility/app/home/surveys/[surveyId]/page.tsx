@@ -58,19 +58,12 @@ export default function SurveyResponsePage() {
     const supabase = createClientClientComponent();
     const { data: surveyData, error: surveyError } = await supabase
       .from("surveys")
-      .select("id, title, description, is_active, is_external")
+      .select("id, title, description, is_active")
       .eq("id", surveyId)
       .single();
 
     if (surveyError || !surveyData) {
       toast.error("Survey not found");
-      router.push("/home");
-      return;
-    }
-
-    // Check if external survey
-    if (surveyData.is_external) {
-      toast.error("This is an external survey");
       router.push("/home");
       return;
     }
