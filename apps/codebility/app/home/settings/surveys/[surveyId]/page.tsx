@@ -168,7 +168,7 @@ export default function SurveyBuilderPage() {
     return (
       <PageContainer>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
         </div>
       </PageContainer>
     );
@@ -190,7 +190,7 @@ export default function SurveyBuilderPage() {
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <H1 className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
+          <H1 className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
             {survey?.title || "Survey Builder"}
           </H1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
@@ -201,7 +201,7 @@ export default function SurveyBuilderPage() {
           <Button
             onClick={() => router.push(`/home/settings/surveys/${surveyId}/results`)}
             variant="outline"
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
           >
             <BarChart3 className="h-4 w-4" />
             View Results
@@ -211,7 +211,7 @@ export default function SurveyBuilderPage() {
               setEditingQuestion(null);
               setShowForm(true);
             }}
-            className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+            className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
           >
             <Plus className="h-4 w-4" />
             Add Question

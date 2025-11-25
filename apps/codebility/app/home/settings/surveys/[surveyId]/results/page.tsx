@@ -8,8 +8,8 @@ import { H1 } from "@/components/shared/dashboard";
 import PageContainer from "../../../../_components/PageContainer";
 import { createClientClientComponent } from "@/utils/supabase/client";
 import { toast } from "sonner";
-import { getSurveyQuestions } from "../../../questions/actions";
-import { getSurveyResponses, getSurveyStatistics } from "../../../responses/actions";
+import { getSurveyQuestions } from "../../questions/actions";
+import { getSurveyResponses, getSurveyStatistics } from "../../responses/actions";
 
 interface Question {
   id: string;
@@ -163,7 +163,7 @@ export default function SurveyResultsPage() {
     return (
       <PageContainer>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
         </div>
       </PageContainer>
     );
@@ -185,7 +185,7 @@ export default function SurveyResultsPage() {
 
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
-          <H1 className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
+          <H1 className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
             {survey?.title} - Results
           </H1>
           <p className="text-gray-600 dark:text-gray-400 mt-1">
@@ -195,7 +195,7 @@ export default function SurveyResultsPage() {
         <Button
           onClick={exportToCSV}
           disabled={responses.length === 0}
-          className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+          className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
         >
           <Download className="h-4 w-4" />
           Export CSV
@@ -287,7 +287,7 @@ export default function SurveyResultsPage() {
                           </div>
                           <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
                             <div
-                              className="bg-gradient-to-r from-green-500 to-teal-500 h-2 rounded-full"
+                              className="bg-gradient-to-r from-violet-500 to-purple-500 h-2 rounded-full"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>

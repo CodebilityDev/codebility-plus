@@ -213,7 +213,7 @@ export default function QuestionForm({ question, onSubmit, onCancel, loading }: 
                 variant="outline"
                 size="sm"
                 onClick={addOption}
-                className="rounded"
+                className="rounded border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
               >
                 <Plus className="h-4 w-4" />
               </Button>
@@ -282,7 +282,7 @@ export default function QuestionForm({ question, onSubmit, onCancel, loading }: 
           type="submit"
           disabled={loading || (needsOptions && options.length === 0)}
           variant="purple"
-          className="bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600 text-white rounded"
+          className="bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white rounded"
         >
           {loading ? "Saving..." : question ? "Update Question" : "Add Question"}
         </Button>
@@ -291,7 +291,7 @@ export default function QuestionForm({ question, onSubmit, onCancel, loading }: 
           variant="outline"
           onClick={onCancel}
           disabled={loading}
-          className="rounded"
+          className="rounded border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
         >
           Cancel
         </Button>

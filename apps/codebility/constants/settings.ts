@@ -30,7 +30,7 @@ export const settingsCardData: SettingsCardDataProps[] = [
   },
   {
     path: "/home/settings/surveys",
-    imageName: "icon-paper-plane",
+    imageName: "icon-checkbox",
     imageAlt: "Icon Surveys",
     title: "Surveys",
     description: "Manage surveys and collect feedback from users.",

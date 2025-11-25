@@ -123,7 +123,7 @@ export default function SurveysPage() {
     return (
       <PageContainer>
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
         </div>
       </PageContainer>
     );
@@ -133,11 +133,11 @@ export default function SurveysPage() {
     <PageContainer maxWidth="6xl">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div className="flex items-center gap-3">
-          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-green-500 to-teal-500 shadow-lg">
+          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg">
             <span className="text-xl">📊</span>
           </div>
           <div>
-            <H1 className="bg-gradient-to-r from-green-600 to-teal-600 bg-clip-text text-transparent">
+            <H1 className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
               Surveys
             </H1>
             <p className="text-gray-600 dark:text-gray-400">
@@ -147,7 +147,7 @@ export default function SurveysPage() {
         </div>
         <Button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-gradient-to-r from-green-500 to-teal-500 hover:from-green-600 hover:to-teal-600"
+          className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
         >
           <Plus className="h-4 w-4" />
           Add Survey
@@ -158,7 +158,7 @@ export default function SurveysPage() {
         <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-green-500 to-teal-500 flex items-center justify-center">
+              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-violet-500 to-purple-500 flex items-center justify-center">
                 <span className="text-white text-sm">
                   {editingSurvey ? "✏️" : "➕"}
                 </span>

@@ -61,18 +61,13 @@ const Settings = () => {
 
     async function fetchUserRole() {
       try {
-        console.log('[AUTH] Fetching user session...');
-        
         // Get auth user
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
+
         if (sessionError || !session?.user?.email) {
-          console.error("[AUTH] Failed to get session:", sessionError);
           setLoading(false);
           return;
         }
-
-        console.log(`[AUTH] ✅ Logged in as: ${session.user.email}`);
 
         // Map email to codev profile to get role_id
         const { data: codevData, error: codevError } = await supabase
@@ -82,15 +77,12 @@ const Settings = () => {
           .single();
 
         if (codevError || !codevData) {
-          console.error("[AUTH] Failed to fetch user role:", codevError);
           setLoading(false);
           return;
         }
 
-        console.log(`[AUTH] ✅ User: ${codevData.first_name} ${codevData.last_name}, role_id: ${codevData.role_id}`);
         setRoleId(codevData.role_id);
       } catch (err) {
-        console.error("[AUTH] Error fetching user role:", err);
         setLoading(false);
       }
     }
@@ -104,8 +96,6 @@ const Settings = () => {
 
     async function fetchRolePermissions() {
       try {
-        console.log(`[PERMISSIONS] Fetching permissions for role_id: ${roleId}`);
-        
         const { data: roleData, error: roleError } = await supabase
           .from("roles")
           .select(
@@ -115,15 +105,13 @@ const Settings = () => {
           .single();
 
         if (roleError || !roleData) {
-          console.error("[PERMISSIONS] Failed to fetch role permissions:", roleError);
           setLoading(false);
           return;
         }
 
-        console.log(`[PERMISSIONS] ✅ Role: ${roleData.name}`, roleData);
         setRolePermissions(roleData);
       } catch (err) {
-        console.error("[PERMISSIONS] Error fetching role permissions:", err);
+        // Error fetching role permissions
       } finally {
         setLoading(false);
       }
@@ -155,11 +143,10 @@ const Settings = () => {
 
   // Filter settings cards based on role
   const filteredCards = settingsCardData.filter((card) => {
-    // Rule 1: Admin-only cards (News Banners, Services)
+    // Rule 1: Admin-only cards (News Banners, Surveys, Services)
     // ONLY visible if user has role_id = 1 (Admin)
     // BLOCKED for: Codev (10), Intern (4), HR (2), all others
     if (ADMIN_ONLY_PATHS.includes(card.path)) {
-      console.log(`[FILTER] Checking admin-only card: ${card.path}, roleId: ${roleId}, isAdmin: ${roleId === 1}`);
       return roleId === 1;
     }
 
@@ -167,18 +154,12 @@ const Settings = () => {
     // For cards like Profile, Permissions, Roles
     const permissionKey = settingsPermissionMap[card.path];
     if (permissionKey) {
-      const hasAccess = hasPermission(permissionKey);
-      console.log(`[FILTER] Checking ${card.path}, permission: ${permissionKey}, hasAccess: ${hasAccess}`);
-      return hasAccess;
+      return hasPermission(permissionKey);
     }
 
     // Rule 3: Default fallback - require general "settings" permission
-    const hasAccess = hasPermission("settings");
-    console.log(`[FILTER] Checking ${card.path} (default), hasAccess: ${hasAccess}`);
-    return hasAccess;
+    return hasPermission("settings");
   });
-
-  console.log(`[FILTER] Total cards: ${settingsCardData.length}, Filtered: ${filteredCards.length}, RoleId: ${roleId}`);
 
   return (
     <PageContainer maxWidth="xl">

@@ -1,18 +1,22 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useState } from "react";
+import { useModal } from "@/hooks/use-modal";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Textarea } from "@codevs/ui/textarea";
 import { Label } from "@codevs/ui/label";
 import { RadioGroup, RadioGroupItem } from "@codevs/ui/radio-group";
 import { Checkbox } from "@codevs/ui/checkbox";
-import PageContainer from "../../_components/PageContainer";
-import { createClientClientComponent } from "@/utils/supabase/client";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@codevs/ui/dialog";
 import { toast } from "sonner";
-import { getSurveyQuestions } from "../../settings/surveys/questions/actions";
-import { submitSurveyResponse, hasUserResponded } from "../../settings/surveys/responses/actions";
+import { submitSurveyResponse } from "@/app/home/settings/surveys/responses/actions";
+import { dismissSurvey } from "@/app/home/settings/surveys/actions";
 
 interface Question {
   id: string;
@@ -32,60 +36,16 @@ interface Survey {
   id: string;
   title: string;
   description: string;
-  is_active: boolean;
+  questions: Question[];
 }
 
-export default function SurveyResponsePage() {
-  const params = useParams();
-  const router = useRouter();
-  const surveyId = params.surveyId as string;
+export default function SurveyModal() {
+  const { isOpen, onClose, type, data } = useModal();
+  const isModalOpen = isOpen && type === "surveyModal";
+  const survey = data as Survey;
 
-  const [survey, setSurvey] = useState<Survey | null>(null);
-  const [questions, setQuestions] = useState<Question[]>([]);
   const [answers, setAnswers] = useState<Record<string, any>>({});
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [alreadyResponded, setAlreadyResponded] = useState(false);
-
-  useEffect(() => {
-    fetchSurveyData();
-  }, [surveyId]);
-
-  const fetchSurveyData = async () => {
-    setLoading(true);
-
-    // Fetch survey
-    const supabase = createClientClientComponent();
-    const { data: surveyData, error: surveyError } = await supabase
-      .from("surveys")
-      .select("id, title, description, is_active")
-      .eq("id", surveyId)
-      .single();
-
-    if (surveyError || !surveyData) {
-      toast.error("Survey not found");
-      router.push("/home");
-      return;
-    }
-
-    setSurvey(surveyData);
-
-    // Check if already responded
-    const responseCheck = await hasUserResponded(surveyId);
-    if (responseCheck.hasResponded) {
-      setAlreadyResponded(true);
-    }
-
-    // Fetch questions
-    const questionsResult = await getSurveyQuestions(surveyId);
-    if (questionsResult.error) {
-      toast.error(questionsResult.error);
-    } else {
-      setQuestions(questionsResult.data || []);
-    }
-
-    setLoading(false);
-  };
 
   const handleAnswerChange = (questionId: string, value: any) => {
     setAnswers((prev) => ({
@@ -94,11 +54,20 @@ export default function SurveyResponsePage() {
     }));
   };
 
+  const handleDismiss = async () => {
+    if (survey?.id) {
+      await dismissSurvey(survey.id);
+    }
+    onClose();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    if (!survey?.questions) return;
+
     // Validate required questions
-    const missingRequired = questions.filter(
+    const missingRequired = survey.questions.filter(
       (q) => q.settings.required && !answers[q.id]
     );
 
@@ -109,7 +78,7 @@ export default function SurveyResponsePage() {
 
     setSubmitting(true);
 
-    const result = await submitSurveyResponse(surveyId, {
+    const result = await submitSurveyResponse(survey.id, {
       answers,
       status: "completed",
     });
@@ -120,7 +89,8 @@ export default function SurveyResponsePage() {
       toast.error(result.error);
     } else {
       toast.success("Survey submitted successfully!");
-      router.push("/home");
+      setAnswers({});
+      onClose();
     }
   };
 
@@ -176,7 +146,7 @@ export default function SurveyResponsePage() {
                 <RadioGroupItem value={option} id={`${question.id}-${index}`} />
                 <Label
                   htmlFor={`${question.id}-${index}`}
-                  className="text-foreground dark:text-gray-300 cursor-pointer"
+                  className="cursor-pointer"
                 >
                   {option}
                 </Label>
@@ -203,7 +173,7 @@ export default function SurveyResponsePage() {
                 />
                 <Label
                   htmlFor={`${question.id}-${index}`}
-                  className="text-foreground dark:text-gray-300 cursor-pointer"
+                  className="cursor-pointer"
                 >
                   {option}
                 </Label>
@@ -241,69 +211,31 @@ export default function SurveyResponsePage() {
     }
   };
 
-  if (loading) {
-    return (
-      <PageContainer>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
-        </div>
-      </PageContainer>
-    );
-  }
-
-  if (alreadyResponded) {
-    return (
-      <PageContainer maxWidth="2xl">
-        <div className="text-center py-12">
-          <div className="flex flex-col items-center gap-4">
-            <div className="h-16 w-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
-              <span className="text-3xl">✓</span>
-            </div>
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-gray-100 mb-2">
-                Already Submitted
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                You have already submitted a response to this survey. Thank you!
-              </p>
-            </div>
-            <Button
-              onClick={() => router.push("/home")}
-              className="mt-4 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
-            >
-              Return to Home
-            </Button>
-          </div>
-        </div>
-      </PageContainer>
-    );
-  }
+  if (!survey) return null;
 
   return (
-    <PageContainer maxWidth="3xl">
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-8">
-        {/* Survey Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-3">
-            {survey?.title}
-          </h1>
-          <p className="text-gray-600 dark:text-gray-400">{survey?.description}</p>
+    <Dialog open={isModalOpen} onOpenChange={handleDismiss}>
+      <DialogContent className="max-w-3xl max-h-[80vh] overflow-y-auto dark:bg-gray-800 text-foreground">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-bold bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
+            {survey.title}
+          </DialogTitle>
+          <p className="text-gray-600 dark:text-gray-400">{survey.description}</p>
           <div className="mt-4 p-4 bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 rounded">
             <p className="text-sm text-gray-700 dark:text-gray-300">
               <span className="text-red-500">*</span> Required questions
             </p>
           </div>
-        </div>
+        </DialogHeader>
 
-        {/* Questions Form */}
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {questions.map((question, index) => (
+        <form onSubmit={handleSubmit} className="space-y-6 mt-6">
+          {survey.questions?.map((question, index) => (
             <div
               key={question.id}
               className="p-6 bg-gray-50 dark:bg-gray-900/50 rounded-lg border border-gray-200 dark:border-gray-700"
             >
               <div className="mb-4">
-                <Label className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                <Label className="text-lg font-semibold">
                   {index + 1}. {question.question_text}
                   {question.settings.required && (
                     <span className="text-red-500 ml-1">*</span>
@@ -319,16 +251,14 @@ export default function SurveyResponsePage() {
             </div>
           ))}
 
-          {/* Submit Button */}
           <div className="flex justify-end gap-4 pt-6 border-t border-gray-200 dark:border-gray-700">
             <Button
               type="button"
               variant="outline"
-              onClick={() => router.push("/home")}
+              onClick={handleDismiss}
               disabled={submitting}
-              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
             >
-              Cancel
+              Later
             </Button>
             <Button
               type="submit"
@@ -339,7 +269,7 @@ export default function SurveyResponsePage() {
             </Button>
           </div>
         </form>
-      </div>
-    </PageContainer>
+      </DialogContent>
+    </Dialog>
   );
 }
