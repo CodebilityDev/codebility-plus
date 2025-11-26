@@ -49,10 +49,10 @@ interface ProjectData {
     name: string;
   };
   teamLead: {
-    data: SimpleMemberData;
+    data: SimpleMemberData | null;
   };
   members: {
-    data: SimpleMemberData[];
+    data: SimpleMemberData[] | null;
   };
   currentUserId: string;
 }

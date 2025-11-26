@@ -81,9 +81,9 @@ async function TeamData() {
           getMembers(project.id)
         ]);
 
-        return { 
-          project, 
-          teamLead, 
+        return {
+          project,
+          teamLead,
           members
         };
       } catch (error) {
@@ -95,10 +95,12 @@ async function TeamData() {
         };
       }
     });
-    
+
     const projectData = await Promise.all(projectDataPromises);
-    const validProjectData = projectData.filter(data => 
-      !data.teamLead.error && !data.members.error
+
+    // Filter out projects with critical errors, but allow projects without team leads
+    const validProjectData = projectData.filter(data =>
+      !data.members.error
     );
 
     if (validProjectData.length === 0) {

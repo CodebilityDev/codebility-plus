@@ -64,6 +64,7 @@
     "gsap": "^3.13.0",
     "hellosign-sdk": "^2.1.0",
     "html2canvas": "^1.4.1",
+    "html2pdf.js": "^0.10.2",
     "invariant": "^2.2.4",
     "ioredis": "^5.6.1",
     "jose": "^5.2.3",

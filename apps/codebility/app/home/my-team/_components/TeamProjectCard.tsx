@@ -13,10 +13,10 @@ interface ProjectData {
     name: string;
   };
   teamLead: {
-    data: SimpleMemberData;
+    data: SimpleMemberData | null;
   };
   members: {
-    data: SimpleMemberData[];
+    data: SimpleMemberData[] | null;
   };
 }
 
@@ -58,7 +58,7 @@ const MemberAvatar = ({ member, size = 40, showBorder = true }: { member: Simple
 
 const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardProps) => {
   const { project: projectInfo, teamLead, members } = project;
-  const totalMembers = members.data.length + (teamLead.data ? 1 : 0);
+  const totalMembers = (members.data?.length ?? 0) + (teamLead.data ? 1 : 0);
 
   return (
     <div className="group relative overflow-hidden rounded-2xl bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20 shadow-lg transition-all duration-500 hover:shadow-2xl hover:shadow-customBlue-500/20 hover:border-white/50 dark:hover:border-white/30 hover:-translate-y-2 hover:bg-white/30 dark:hover:bg-white/15 cursor-pointer">
@@ -149,11 +149,11 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
               <span className="text-sm font-semibold text-gray-700 dark:text-gray-300">Team Members</span>
             </div>
             <span className="text-sm font-medium text-blue-600 dark:text-blue-400">
-              {members.data.length} member{members.data.length !== 1 ? 's' : ''}
+              {members.data?.length ?? 0} member{(members.data?.length ?? 0) !== 1 ? 's' : ''}
             </span>
           </div>
-          
-          {members.data.length > 0 ? (
+
+          {members.data && members.data.length > 0 ? (
             <div className="space-y-4">
               {/* Avatars Grid */}
               <div className="flex flex-wrap gap-2">
@@ -171,12 +171,12 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
                   </div>
                 )}
               </div>
-              
+
               {/* Quick member list */}
               <div className="bg-white/30 backdrop-blur-sm dark:bg-white/10 rounded-lg p-3 border border-white/20 dark:border-white/10">
                 <div className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
                   <span className="font-medium">Recent: </span>
-                  {members.data.slice(0, 3).map((member) => 
+                  {members.data.slice(0, 3).map((member) =>
                     formatName(member.first_name, member.last_name)
                   ).join(', ')}
                   {members.data.length > 3 && (

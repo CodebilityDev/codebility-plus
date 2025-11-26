@@ -20,8 +20,8 @@ interface AddMembersModalProps {
   onClose: () => void;
   projectData: {
     project: { id: string; name: string };
-    teamLead: { data: SimpleMemberData };
-    members: { data: SimpleMemberData[] };
+    teamLead: { data: SimpleMemberData | null };
+    members: { data: SimpleMemberData[] | null };
   };
   onUpdate: (selectedMembers: Codev[]) => void;
 }
@@ -297,7 +297,7 @@ const AddMembersModal = ({
 }: AddMembersModalProps) => {
   const { project, teamLead, members } = projectData;
   const teamLeadData = teamLead.data;
-  const currentMembers = members.data;
+  const currentMembers = members.data ?? [];
 
   // ✅ FIXED: Initialize Supabase client safely following project pattern
   const [supabase, setSupabase] = useState<any>(null);
