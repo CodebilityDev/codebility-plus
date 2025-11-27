@@ -32,6 +32,7 @@ const POSITIONS = [
   { id: 4, name: "Mobile Developer" },
   { id: 5, name: "UI/UX Designer" },
   { id: 6, name: "QA Engineer" },
+  { id: 7, name: "Admin" },
 ];
 
 // Validation schema

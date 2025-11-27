@@ -272,15 +272,15 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         )}
 
         {/* Header with Tab Buttons */}
-        <div className="flex items-center justify-between">
-          {/* LEFT: View Mode Tabs + Checklist Button */}
+        <div className="flex flex-col gap-3">
+          {/* TOP ROW: View Mode Tabs + Checklist Button */}
           <div className="flex items-center gap-2">
             {/* Team View Tab - Always visible */}
             <Button
               variant={viewMode === "team" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("team")}
-              className={`flex items-center gap-2 ${
+              className={`flex items-center gap-2 h-9 ${
                 viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
               }`}
             >
@@ -293,7 +293,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               variant={viewMode === "attendance" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("attendance")}
-              className={`flex items-center gap-2 ${
+              className={`flex items-center gap-2 h-9 ${
                 viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
               }`}
             >
@@ -308,7 +308,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 variant="outline"
                 size="sm"
                 onClick={handleOpenChecklistModal}
-                className="flex items-center gap-2 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+                className="flex items-center gap-2 h-9 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
               >
                 <CheckSquare className="h-4 w-4" />
                 Checklist
@@ -316,69 +316,69 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
             )}
           </div>
 
-          {/* RIGHT: Action Buttons */}
-          <div className="flex gap-2">
-            {/* Save & Sync buttons - Only for team leads in attendance view */}
-            {viewMode === "attendance" && isCurrentUserTeamLead && (
-              <>
-                {hasAttendanceChanges && (
-                  <Button
-                    onClick={handleSaveAttendance}
-                    variant="default"
-                    size="sm"
-                    className="flex items-center gap-1.5 text-xs"
-                  >
-                    <Save className="h-3.5 w-3.5" />
-                    Save Changes
-                  </Button>
-                )}
+          {/* BOTTOM ROW: Action Buttons - Only shown when needed */}
+          {((viewMode === "attendance" && isCurrentUserTeamLead) || (viewMode === "team" && isCurrentUserTeamLead) || true) && (
+            <div className="flex items-center gap-2 flex-wrap">
+              {/* Save & Sync buttons - Only for team leads in attendance view */}
+              {viewMode === "attendance" && isCurrentUserTeamLead && hasAttendanceChanges && (
+                <Button
+                  onClick={handleSaveAttendance}
+                  variant="default"
+                  size="sm"
+                  className="flex items-center gap-2 h-9"
+                >
+                  <Save className="h-4 w-4" />
+                  Save Changes
+                </Button>
+              )}
 
-                <SyncAllAttendance 
-                  projectId={projectInfo.id} 
+              {viewMode === "attendance" && isCurrentUserTeamLead && (
+                <SyncAllAttendance
+                  projectId={projectInfo.id}
                   isTeamLead={isCurrentUserTeamLead}
                 />
-              </>
-            )}
-            
-            {/* Manage Members - ONLY VISIBLE TO TEAM LEADS in Team View */}
-            {viewMode === "team" && isCurrentUserTeamLead && (
-              <Button
-                onClick={handleOpenAddModal}
-                disabled={isLoadingMembers}
-                size="sm"
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto max-w-[200px]"
-              >
-                <UserPlus className="h-3.5 w-3.5" />
-                {isLoadingMembers ? 'Loading...' : 'Manage Members'}
-              </Button>
-            )}
-            
-            {/* Schedule Meeting - ONLY VISIBLE TO TEAM LEADS */}
-            {isCurrentUserTeamLead && (
+              )}
+
+              {/* Manage Members - ONLY VISIBLE TO TEAM LEADS in Team View */}
+              {viewMode === "team" && isCurrentUserTeamLead && (
+                <Button
+                  onClick={handleOpenAddModal}
+                  disabled={isLoadingMembers}
+                  size="sm"
+                  className="flex items-center gap-2 h-9"
+                >
+                  <UserPlus className="h-4 w-4" />
+                  {isLoadingMembers ? 'Loading...' : 'Manage Members'}
+                </Button>
+              )}
+
+              {/* Schedule Meeting - ONLY VISIBLE TO TEAM LEADS */}
+              {isCurrentUserTeamLead && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 h-9 border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                  title="Schedule Meetings"
+                  onClick={() => setShowScheduleMeetingModal(true)}
+                >
+                  <CalendarDays className="h-4 w-4" />
+                  Schedule Meeting
+                </Button>
+              )}
+
+              {/* Kanban Board Button - VISIBLE TO ALL MEMBERS */}
               <Button
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-                title="Schedule Meetings"
-                onClick={() => setShowScheduleMeetingModal(true)}
+                className="flex items-center gap-2 h-9 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+                title="Go to Kanban Board"
+                onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
               >
-                <CalendarDays className="h-3.5 w-3.5" />
-                Schedule Meeting
+                <Kanban className="h-4 w-4" />
+                Kanban Board
               </Button>
-            )}
-
-            {/* Kanban Board Button - VISIBLE TO ALL MEMBERS */}
-            <Button
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 h-auto border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
-              title="Go to Kanban Board"
-              onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
-            >
-              <Kanban className="h-3.5 w-3.5" />
-              Kanban Board
-            </Button>
-          </div>
+            </div>
+          )}
         </div>
 
         {viewMode === "team" ? (

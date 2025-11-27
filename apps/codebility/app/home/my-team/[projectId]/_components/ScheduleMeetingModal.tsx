@@ -67,6 +67,45 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
     }));
   };
 
+  const handleClearSchedule = async () => {
+    setIsSubmitting(true);
+    try {
+      // Clear the meeting schedule
+      await saveMeetingSchedule(projectId, {
+        selectedDays: [],
+        time: "00:00"
+      });
+
+      // Notify all team members about schedule removal
+      const allMembers = teamLead ? [teamLead, ...teamMembers] : teamMembers;
+      const notificationPromises = allMembers.map(member =>
+        createNotificationAction({
+          recipientId: member.id,
+          title: "Meeting Schedule Removed",
+          message: `The meeting schedule for ${projectName} has been removed.`,
+          type: 'event',
+          priority: 'medium',
+          actionUrl: `/home/my-team/${projectId}`,
+          metadata: {
+            projectId,
+            projectName,
+            scheduleRemoved: true
+          }
+        })
+      );
+
+      await Promise.all(notificationPromises);
+
+      toast.success("Meeting schedule removed!");
+      onClose();
+    } catch (error) {
+      console.error("Error clearing meeting schedule:", error);
+      toast.error("Failed to clear meeting schedule");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!meetingData.time || meetingData.selectedDays.length === 0) {
       toast.error("Please select meeting days and time");
@@ -76,28 +115,28 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
     setIsSubmitting(true);
     try {
       // Check if schedule has changed
-      const hasExistingSchedule = currentSchedule && 
-        currentSchedule.selectedDays.length > 0 && 
+      const hasExistingSchedule = currentSchedule &&
+        currentSchedule.selectedDays.length > 0 &&
         currentSchedule.time;
-      
+
       const scheduleChanged = hasExistingSchedule && (
         JSON.stringify(currentSchedule.selectedDays.sort()) !== JSON.stringify(meetingData.selectedDays.sort()) ||
         currentSchedule.time !== meetingData.time
       );
-      
+
       // Create a recurring meeting schedule
       const allMembers = teamLead ? [teamLead, ...teamMembers] : teamMembers;
-      
+
       // Format selected days for display
       const selectedDaysDisplay = meetingData.selectedDays
         .map(day => weekDays.find(d => d.value === day)?.short)
         .join(", ");
-      
+
       const notificationTitle = scheduleChanged ? "Meeting Schedule Changed" : "Meeting Schedule Set";
       const scheduleMessage = `Team meetings scheduled every ${selectedDaysDisplay} at ${meetingData.time} @ Discord`;
-      
+
       // Send notifications to all team members
-      const notificationPromises = allMembers.map(member => 
+      const notificationPromises = allMembers.map(member =>
         createNotificationAction({
           recipientId: member.id,
           title: notificationTitle,
@@ -121,15 +160,15 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
       );
 
       await Promise.all(notificationPromises);
-      
+
       // Save the meeting schedule
       await saveMeetingSchedule(projectId, {
         selectedDays: meetingData.selectedDays,
         time: meetingData.time
       });
-      
+
       toast.success(scheduleChanged ? "Meeting schedule updated!" : "Meeting schedule set!");
-      
+
       onClose();
     } catch (error) {
       console.error("Error setting meeting schedule:", error);
@@ -200,13 +239,27 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
           </div>
         </div>
 
-        <DialogFooter>
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
-            Cancel
-          </Button>
-          <Button onClick={handleSubmit} disabled={isSubmitting}>
-            {isSubmitting ? "Setting..." : "Set Schedule"}
-          </Button>
+        <DialogFooter className="flex-col sm:flex-row gap-2">
+          <div className="flex gap-2 flex-1">
+            {currentSchedule && currentSchedule.selectedDays.length > 0 && (
+              <Button
+                variant="outline"
+                onClick={handleClearSchedule}
+                disabled={isSubmitting}
+                className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-600 dark:text-red-300 dark:hover:bg-red-900/20"
+              >
+                Clear Schedule
+              </Button>
+            )}
+          </div>
+          <div className="flex gap-2">
+            <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} disabled={isSubmitting}>
+              {isSubmitting ? "Setting..." : "Set Schedule"}
+            </Button>
+          </div>
         </DialogFooter>
       </DialogContent>
     </Dialog>
