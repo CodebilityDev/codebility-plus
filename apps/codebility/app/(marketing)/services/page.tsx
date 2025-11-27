@@ -3,12 +3,11 @@ import { getOrSetCache } from "@/lib/server/redis-cache";
 import { cacheKeys } from "@/lib/server/redis-cache-keys";
 import { createClientServerComponent } from "@/utils/supabase/server";
 
-import Calendly from "../_components/MarketingCalendly";
 import Footer from "../_components/MarketingFooter";
 import Navigation from "../_components/MarketingNavigation";
-import Hero from "./_components/ServicesHero";
-import ServicesTab from "./_components/ServicesTab";
-import TechyBackground from "./_components/TechyBackground";
+import { ServicesPageContent } from "./_components/layout";
+import { ClientTechyBackground } from "./_components/visuals";
+import { ServiceProvider } from "./_context";
 
 export const dynamic = "force-dynamic";
 export const revalidate = 0;
@@ -26,6 +25,9 @@ interface ProjectData {
   id: string;
   name: string;
   description?: string;
+  tagline?: string;
+  key_features?: string[];
+  gallery?: string[];
   status?: string;
   start_date?: string;
   end_date?: string;
@@ -56,6 +58,9 @@ const ServicesPage = async () => {
     id: item.id,
     name: item.name,
     description: item.description || "",
+    tagline: item.tagline || "",
+    key_features: item.key_features || [],
+    gallery: item.gallery || [],
     main_image: item.main_image || "",
     website_url: item.website_url || "",
     github_link: item.github_link || "",
@@ -65,24 +70,26 @@ const ServicesPage = async () => {
     categories: item.categories || [],
     client_id: item.client_id,
     members:
-      item.project_members?.map((pm: any) => ({
-        ...pm.codev,
-        role: pm.role,
-        joined_at: pm.joined_at
-      })).filter(Boolean) || [],
+      item.project_members
+        ?.map((pm: any) => ({
+          ...pm.codev,
+          role: pm.role,
+          joined_at: pm.joined_at,
+        }))
+        .filter(Boolean) || [],
     tech_stack: item.tech_stack || [],
   }));
 
   return (
     <div className="relative flex min-h-screen w-full flex-col overflow-x-hidden overflow-y-hidden bg-[#030303]">
-      <TechyBackground />
+      <ClientTechyBackground />
       <div className="relative z-10">
         <Navigation />
-        <Hero />
-        <ServicesTab servicesData={mappedData} />
-        <Calendly />
-        <Footer />
+        <ServiceProvider>
+          <ServicesPageContent servicesData={mappedData} />
+        </ServiceProvider>
       </div>
+      <Footer />
     </div>
   );
 };

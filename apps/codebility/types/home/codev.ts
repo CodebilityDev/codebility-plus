@@ -113,7 +113,7 @@ export interface Codev {
   date_applied?: string;
   promote_declined?: boolean;
   date_passed?: string;
-  date_joined?: string; 
+  date_joined?: string;
 }
 
 export type ApplicantStatus =
@@ -129,7 +129,7 @@ export type InternalStatus =
   | "INACTIVE"
   | "MENTOR"
   | "ADMIN"
-  | "DEPLOYED"
+  | "DEPLOYED";
 
 export interface ProjectMember {
   id: string;
@@ -182,6 +182,13 @@ export interface Project {
   project_members?: ProjectMember[];
   kanban_display: boolean;
   public_display: boolean;
+  // new fields
+  tagline?: string;
+  key_features?: string[];
+  team_lead?: string;
+  team_members?: string[];
+  gallery?: string[];
+  secondary_image?: string;
 }
 export interface Education {
   id: string;
@@ -217,7 +224,7 @@ export interface Level {
   max_points?: number; // Optional
 }
 
-export type ActiveStatus = 'active' | 'inactive';
+export type ActiveStatus = "active" | "inactive";
 
 export interface CodevFilter {
   positions?: string[];
