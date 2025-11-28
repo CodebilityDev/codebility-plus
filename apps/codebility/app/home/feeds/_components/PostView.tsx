@@ -17,6 +17,7 @@ import type { PostType } from "../_services/query";
 import PostUpvote from "../_components/PostUpvote";
 import { getUserRole } from "../_services/action";
 import PostCommentCount from "./PostCommentCount";
+import PostTags from "./PostTags";
 import PostViewCommentList from "./PostViewCommentList";
 import PostViewCreateComment from "./PostViewCreateComment";
 
@@ -104,6 +105,8 @@ export default function PostView({ postId }: PostViewProps) {
         <PostUpvote post={post} />
         <PostCommentCount post={post} />
       </div>
+
+      <PostTags post={post} />
 
       <div className="max-h-[90vh] overflow-y-auto">
         <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
