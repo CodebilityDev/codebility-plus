@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 
 interface Particle {
   id: number;
@@ -24,22 +24,36 @@ const FloatingParticles = () => {
   const mouseYSpring = useSpring(mouseY, { damping: 25, stiffness: 150 });
   const scrollYSpring = useSpring(scrollY, { damping: 30, stiffness: 100 });
 
-  // Create particles array
-  const particles: Particle[] = Array.from({ length: 15 }, (_, i) => ({
-    id: i,
-    x: Math.random() * 100,
-    y: Math.random() * 100,
-    size: Math.random() * 8 + 4,
-    color: [
+  // State for particles - generated only on client
+  const [particles, setParticles] = useState<Particle[]>([]);
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Generate particles on client side only
+  useEffect(() => {
+    const colors = [
       "rgba(147, 71, 255, 0.4)",   // Purple
       "rgba(2, 255, 226, 0.3)",    // Cyan
       "rgba(106, 120, 242, 0.3)",  // Blue
       "rgba(255, 255, 255, 0.2)",  // White
-    ][Math.floor(Math.random() * 4)],
-    opacity: Math.random() * 0.5 + 0.2,
-    speed: Math.random() * 0.5 + 0.2,
-    direction: Math.random() * Math.PI * 2,
-  }));
+    ];
+
+    const generatedParticles: Particle[] = Array.from({ length: 15 }, (_, i) => {
+      const randomColorIndex = Math.floor(Math.random() * colors.length);
+      return {
+        id: i,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        size: Math.random() * 8 + 4,
+        color: colors[randomColorIndex]!,
+        opacity: Math.random() * 0.5 + 0.2,
+        speed: Math.random() * 0.5 + 0.2,
+        direction: Math.random() * Math.PI * 2,
+      };
+    });
+    
+    setParticles(generatedParticles);
+    setIsMounted(true);
+  }, []);
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {
@@ -65,130 +79,118 @@ const FloatingParticles = () => {
     };
   }, [mouseX, mouseY, scrollY]);
 
+  // Don't render particles until mounted on client
+  if (!isMounted) {
+    return (
+      <div
+        ref={containerRef}
+        className="pointer-events-none absolute inset-0 overflow-hidden"
+        style={{ zIndex: 1 }}
+      />
+    );
+  }
+
   return (
     <div
       ref={containerRef}
       className="pointer-events-none absolute inset-0 overflow-hidden"
       style={{ zIndex: 1 }}
     >
-      {particles.map((particle) => {
-        const mouseInfluenceX = useTransform(
-          mouseXSpring,
-          [0, 1],
-          [-20, 20]
-        );
-        const mouseInfluenceY = useTransform(
-          mouseYSpring,
-          [0, 1],
-          [-20, 20]
-        );
-        const scrollInfluence = useTransform(
-          scrollYSpring,
-          [0, 1000],
-          [0, -100]
-        );
-
-        return (
+      {particles.map((particle) => (
+        <motion.div
+          key={particle.id}
+          className="absolute rounded-full"
+          style={{
+            width: particle.size,
+            height: particle.size,
+            backgroundColor: particle.color,
+            left: `${particle.x}%`,
+            top: `${particle.y}%`,
+            opacity: particle.opacity,
+          }}
+          animate={{
+            x: [0, Math.cos(particle.direction) * 30, 0],
+            y: [0, Math.sin(particle.direction) * 30, 0],
+            scale: [1, 1.2, 1],
+            opacity: [particle.opacity, particle.opacity * 0.5, particle.opacity],
+          }}
+          transition={{
+            duration: 8 + particle.speed * 4,
+            repeat: Infinity,
+            ease: "easeInOut",
+            delay: particle.id * 0.2,
+          }}
+        >
+          {/* Inner glow effect */}
           <motion.div
-            key={particle.id}
-            className="absolute rounded-full"
+            className="absolute inset-0 rounded-full"
             style={{
-              width: particle.size,
-              height: particle.size,
-              backgroundColor: particle.color,
-              left: `${particle.x}%`,
-              top: `${particle.y}%`,
-              x: mouseInfluenceX,
-              y: [mouseInfluenceY, scrollInfluence],
-              opacity: particle.opacity,
+              background: `radial-gradient(circle, ${particle.color} 0%, transparent 70%)`,
+              filter: "blur(2px)",
             }}
             animate={{
-              x: [0, Math.cos(particle.direction) * 30, 0],
-              y: [0, Math.sin(particle.direction) * 30, 0],
-              scale: [1, 1.2, 1],
-              opacity: [particle.opacity, particle.opacity * 0.5, particle.opacity],
+              scale: [1, 1.5, 1],
+              opacity: [0.8, 0.3, 0.8],
             }}
             transition={{
-              duration: 8 + particle.speed * 4,
+              duration: 4 + particle.speed * 2,
               repeat: Infinity,
               ease: "easeInOut",
-              delay: particle.id * 0.2,
+              delay: particle.id * 0.1,
             }}
-          >
-            {/* Inner glow effect */}
-            <motion.div
-              className="absolute inset-0 rounded-full"
-              style={{
-                background: `radial-gradient(circle, ${particle.color} 0%, transparent 70%)`,
-                filter: "blur(2px)",
-              }}
-              animate={{
-                scale: [1, 1.5, 1],
-                opacity: [0.8, 0.3, 0.8],
-              }}
-              transition={{
-                duration: 4 + particle.speed * 2,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: particle.id * 0.1,
-              }}
-            />
-          </motion.div>
-        );
-      })}
+          />
+        </motion.div>
+      ))}
 
       {/* Additional floating orbs with mouse interaction */}
-      {Array.from({ length: 8 }, (_, i) => {
-        const orbMouseX = useTransform(
-          mouseXSpring,
-          [0, 1],
-          [i * 30 - 120, i * 30 + 120]
-        );
-        const orbMouseY = useTransform(
-          mouseYSpring,
-          [0, 1],
-          [i * 20 - 80, i * 20 + 80]
-        );
-
-        return (
-          <motion.div
-            key={`orb-${i}`}
-            className="absolute"
+      {Array.from({ length: 8 }, (_, i) => (
+        <motion.div
+          key={`orb-${i}`}
+          className="absolute"
+          style={{
+            left: `${20 + i * 10}%`,
+            top: `${30 + (i % 3) * 20}%`,
+          }}
+          animate={{
+            x: [0, (i * 30 - 120), (i * 30 + 120), 0],
+            y: [0, (i * 20 - 80), (i * 20 + 80), 0],
+            rotate: [0, 360],
+            scale: [1, 1.1, 1],
+          }}
+          transition={{
+            x: {
+              duration: 15 + i * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            },
+            y: {
+              duration: 12 + i * 2,
+              repeat: Infinity,
+              ease: "easeInOut",
+            },
+            rotate: {
+              duration: 20 + i * 2,
+              repeat: Infinity,
+              ease: "linear",
+            },
+            scale: {
+              duration: 6 + i,
+              repeat: Infinity,
+              ease: "easeInOut",
+            },
+          }}
+        >
+          <div
+            className="h-3 w-3 rounded-full"
             style={{
-              left: `${20 + i * 10}%`,
-              top: `${30 + (i % 3) * 20}%`,
-              x: orbMouseX,
-              y: orbMouseY,
+              background: `radial-gradient(circle, ${
+                ["rgba(147, 71, 255, 0.6)", "rgba(2, 255, 226, 0.4)"][i % 2]
+              } 0%, transparent 70%)`,
+              filter: "blur(1px)",
             }}
-            animate={{
-              rotate: [0, 360],
-              scale: [1, 1.1, 1],
-            }}
-            transition={{
-              rotate: {
-                duration: 20 + i * 2,
-                repeat: Infinity,
-                ease: "linear",
-              },
-              scale: {
-                duration: 6 + i,
-                repeat: Infinity,
-                ease: "easeInOut",
-              },
-            }}
-          >
-            <div
-              className="h-3 w-3 rounded-full"
-              style={{
-                background: `radial-gradient(circle, ${
-                  ["rgba(147, 71, 255, 0.6)", "rgba(2, 255, 226, 0.4)"][i % 2]
-                } 0%, transparent 70%)`,
-                filter: "blur(1px)",
-              }}
-            />
-          </motion.div>
-        );
-      })}
+          />
+        </motion.div>
+      ))}
 
       {/* Ambient light orbs */}
       <motion.div
