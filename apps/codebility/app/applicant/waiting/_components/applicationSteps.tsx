@@ -6,6 +6,7 @@ import { ApplicantType } from "../_service/type";
 import ApplicantStep1 from "./applicantStep1";
 import ApplicantStep2 from "./applicantStep2";
 import ApplicantStep3 from "./applicantStep3";
+import ApplicantStep4 from "./applicantStep4";
 import {
   Stepper,
   StepperBody,
@@ -35,10 +36,16 @@ export default function ApplicationSteps({
       title: "Onboarding",
       description: "",
     },
+    {
+      title: "Waitlist",
+      description: "",
+    },
   ];
 
   const getCurrentStep = (): number => {
-    if (user.application_status === "onboarding") {
+    if (user.application_status === "waitlist") {
+      return 3;
+    } else if (user.application_status === "onboarding") {
       return 2;
     } else if (user.application_status === "testing") {
       return 1;
@@ -84,6 +91,10 @@ export default function ApplicationSteps({
 
           <StepperContent step={2}>
             <ApplicantStep3 setActiveStep={setActiveStep} user={user} applicantData={applicantData} />
+          </StepperContent>
+
+          <StepperContent step={3}>
+            <ApplicantStep4 user={user} />
           </StepperContent>
         </StepperBody>
       </Stepper>

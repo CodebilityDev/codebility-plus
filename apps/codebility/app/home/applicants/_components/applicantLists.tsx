@@ -50,6 +50,14 @@ function ApplicantLists({
     [filteredApplicants],
   );
 
+  const applicantsWaitlist = React.useMemo(
+    () =>
+      filteredApplicants.filter(
+        (applicant) => applicant.application_status === "waitlist",
+      ),
+    [filteredApplicants],
+  );
+
   const applicantsDenied = React.useMemo(
     () =>
       filteredApplicants.filter(
@@ -73,7 +81,7 @@ function ApplicantLists({
         }}
         className="w-full"
       >
-        <TabsList className="!grid !h-auto w-full max-w-2xl grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 md:grid-cols-4 md:gap-1 dark:bg-gray-800">
+        <TabsList className="!grid !h-auto w-full max-w-3xl grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 md:grid-cols-5 md:gap-1 dark:bg-gray-800">
           <TabsTrigger 
             value="applying" 
             className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
@@ -96,19 +104,30 @@ function ApplicantLists({
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger 
-            value="onboarding" 
+          <TabsTrigger
+            value="onboarding"
             className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
           >
             <span className="truncate text-sm font-medium">Onboarding</span>
             {applicantsOnboarding.length > 0 && (
-              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-emerald-500 px-2 text-xs font-semibold text-white">
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-yellow-500 px-2 text-xs font-semibold text-white">
                 {applicantsOnboarding.length}
               </span>
             )}
           </TabsTrigger>
-          <TabsTrigger 
-            value="denied" 
+          <TabsTrigger
+            value="waitlist"
+            className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
+          >
+            <span className="truncate text-sm font-medium">Waitlist</span>
+            {applicantsWaitlist.length > 0 && (
+              <span className="flex h-5 min-w-[20px] items-center justify-center rounded-full bg-green-500 px-2 text-xs font-semibold text-white">
+                {applicantsWaitlist.length}
+              </span>
+            )}
+          </TabsTrigger>
+          <TabsTrigger
+            value="denied"
             className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
           >
             <span className="truncate text-sm font-medium">Denied</span>
@@ -134,6 +153,12 @@ function ApplicantLists({
         <TabsContent value="onboarding" className="mt-6">
           <ApplicantDataTable
             data={applicantsOnboarding}
+            columns={applicantsColumns}
+          />
+        </TabsContent>
+        <TabsContent value="waitlist" className="mt-6">
+          <ApplicantDataTable
+            data={applicantsWaitlist}
             columns={applicantsColumns}
           />
         </TabsContent>

@@ -9,6 +9,7 @@ import {
   passApplicantTestAction,
 } from "../../_service/action";
 import {
+  sendAcceptedEmailForConfig,
   sendDenyEmailForConfig,
   sendFailedTestEmailForConfig,
   sendOnboardingReminderForConfig,
@@ -59,10 +60,10 @@ export const ACTION_CONFIG: Record<ActionType, ActionConfig> = {
     successTitle: "Applicant Accepted",
     successMessage: (firstName, lastName) => `${firstName} ${lastName} has been accepted.`,
     errorMessage: "Failed to accept applicant. Please try again later.",
-    emailAction: sendPassedTestEmailForConfig,
+    emailAction: sendAcceptedEmailForConfig,
     requiresConfirmation: true,
     confirmTitle: "Accept Applicant",
-    confirmDescription: "Are you sure you want to accept this applicant?",
+    confirmDescription: "Are you sure you want to accept this applicant? They will receive an email with access to /home.",
   },
   deny: {
     action: denyApplicantAction,

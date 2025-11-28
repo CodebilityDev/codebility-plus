@@ -47,8 +47,10 @@ const ApplicantProfileModal = () => {
   const getStatusColor = (status: string) => {
     switch (status) {
       case "applying": return "bg-customBlue-500";
-      case "testing": return "bg-amber-500"; 
-      case "onboarding": return "bg-green-500";
+      case "testing": return "bg-purple-500";
+      case "onboarding": return "bg-yellow-500";
+      case "waitlist": return "bg-green-500";
+      case "accepted": return "bg-emerald-500";
       case "denied": return "bg-red-500";
       default: return "bg-gray-500";
     }
@@ -250,6 +252,61 @@ const ApplicantProfileModal = () => {
                         View Test Repository
                       </Link>
                     )}
+                  </div>
+                )}
+
+                {/* Onboarding Information */}
+                {selectedApplicant.applicant && (selectedApplicant.application_status === "waitlist" || selectedApplicant.application_status === "onboarding") && (
+                  <div className="rounded-lg border border-green-200 bg-green-50/50 p-4 dark:border-green-800 dark:bg-green-900/20">
+                    <h4 className="font-medium text-green-900 dark:text-green-100">Onboarding Progress</h4>
+                    <div className="mt-3 space-y-2">
+                      {/* Quiz Score */}
+                      {selectedApplicant.applicant.quiz_passed !== null && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Quiz:</span>
+                          <div className="flex items-center gap-2">
+                            {selectedApplicant.applicant.quiz_passed ? (
+                              <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                                Passed ({selectedApplicant.applicant.quiz_score}/{selectedApplicant.applicant.quiz_total})
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center rounded-full bg-red-100 px-2.5 py-1 text-xs font-semibold text-red-800 dark:bg-red-900/30 dark:text-red-400">
+                                Failed ({selectedApplicant.applicant.quiz_score}/{selectedApplicant.applicant.quiz_total})
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Mobile Development */}
+                      {selectedApplicant.applicant.can_do_mobile !== null && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Mobile Development:</span>
+                          <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            selectedApplicant.applicant.can_do_mobile
+                              ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400"
+                              : "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400"
+                          }`}>
+                            {selectedApplicant.applicant.can_do_mobile ? "Yes" : "No"}
+                          </span>
+                        </div>
+                      )}
+
+                      {/* Commitment Signature */}
+                      {selectedApplicant.applicant.commitment_signed_at && (
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-gray-600 dark:text-gray-400">Commitment:</span>
+                          <div className="flex flex-col items-end gap-1">
+                            <span className="inline-flex items-center rounded-full bg-green-100 px-2.5 py-1 text-xs font-semibold text-green-800 dark:bg-green-900/30 dark:text-green-400">
+                              Signed
+                            </span>
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              {new Date(selectedApplicant.applicant.commitment_signed_at).toLocaleDateString()}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                    </div>
                   </div>
                 )}
 

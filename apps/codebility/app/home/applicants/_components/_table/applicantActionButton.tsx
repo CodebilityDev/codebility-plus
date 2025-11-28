@@ -564,6 +564,34 @@ export default function ApplicantActionButton({
             </>
           )}
 
+          {/* Waitlist Actions - only show for waitlist status */}
+          {applicant.application_status === "waitlist" && (
+            <>
+              <DropdownMenuItem
+                className="cursor-pointer rounded-md px-3 py-2 text-sm text-green-700 transition-colors hover:bg-green-50 hover:text-green-800 focus:bg-green-50 focus:text-green-800 dark:text-green-400 dark:hover:bg-green-900/20 dark:hover:text-green-300"
+                onClick={() => {
+                  setDialogState("accept");
+                  setIsDialogOpen(true);
+                }}
+              >
+                <CheckCircle2Icon className="mr-2 h-4 w-4" />
+                Accept Applicant
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="cursor-pointer rounded-md px-3 py-2 text-sm text-red-700 transition-colors hover:bg-red-50 hover:text-red-800 focus:bg-red-50 focus:text-red-800 dark:text-red-400 dark:hover:bg-red-900/20 dark:hover:text-red-300"
+                onClick={() => {
+                  setDialogState("deny");
+                  setIsDialogOpen(true);
+                }}
+              >
+                <svg className="mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                Deny Applicant
+              </DropdownMenuItem>
+            </>
+          )}
+
           {/* Remind to Take Test - show for testing and applying status */}
           {(applicant.application_status === "testing" || applicant.application_status === "applying") && (
             <DropdownMenuItem

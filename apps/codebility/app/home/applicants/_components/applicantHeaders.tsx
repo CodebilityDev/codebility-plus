@@ -115,6 +115,9 @@ export default function ApplicantFilterHeaders({
       case "onboarding":
         setCurrentTab("onboarding");
         break;
+      case "waitlist":
+        setCurrentTab("waitlist");
+        break;
       case "denied":
         setCurrentTab("denied");
         break;
