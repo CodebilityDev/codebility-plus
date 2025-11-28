@@ -17,10 +17,10 @@ interface OnboardingClientProps {
 }
 
 const VIDEO_URLS = {
-  1: "/assets/onboardingvideos/part1.mp4", // Introduction - About Codebility
-  2: "/assets/onboardingvideos/part2.mp4", // Benefits, Culture & Expectations
-  3: "/assets/onboardingvideos/part3.mp4", // Roadmaps, Milestones & Tech Stack
-  4: "/assets/onboardingvideos/part4.mp4", // Portal Tour - Gamification & Workflow (to be added)
+  1: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/onboarding-videos/part1.mp4", // Introduction - About Codebility
+  2: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/onboarding-videos/part2.mp4", // Benefits, Culture & Expectations
+  3: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/onboarding-videos/part3.mp4", // Roadmaps, Milestones & Tech Stack
+  4: "https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/onboarding-videos/part4.mp4", // Portal Tour - Gamification & Workflow
 };
 
 const VIDEO_TITLES = {
