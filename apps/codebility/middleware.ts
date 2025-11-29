@@ -155,7 +155,7 @@ export async function middleware(req: NextRequest) {
     const { application_status, role_id } = userData;
 
     // 4. Handle application status redirects
-    if (application_status === "passed") {
+    if (application_status === "passed" || application_status === "accepted") {
       // If user is approved, they shouldn't access application-related routes
       if (
         [
@@ -181,9 +181,10 @@ export async function middleware(req: NextRequest) {
       application_status === "applying" ||
       application_status === "pending" ||
       application_status === "testing" ||
-      application_status === "onboarding"
+      application_status === "onboarding" ||
+      application_status === "waitlist"
     ) {
-      // If application is pending, only allow access to waiting page
+      // If application is in progress or waiting for approval, only allow access to applicant routes
       if (pathname.includes(WAITING_APPROVAL_ROUTE) || pathname.includes(APPLICANT_ROUTE)) {
         return NextResponse.next();
       } else {
