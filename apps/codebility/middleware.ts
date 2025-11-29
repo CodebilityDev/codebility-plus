@@ -155,7 +155,7 @@ export async function middleware(req: NextRequest) {
     const { application_status, role_id } = userData;
 
     // 4. Handle application status redirects
-    if (application_status === "passed" || application_status === "accepted") {
+    if (application_status === "passed") {
       // If user is approved, they shouldn't access application-related routes
       if (
         [

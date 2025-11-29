@@ -262,23 +262,11 @@ export default function OnboardingClient({
           )}
 
           {currentStep === "quiz" && (
-            <>
-              <Quiz
-                applicantId={applicantId}
-                onQuizComplete={handleQuizComplete}
-              />
-
-              {/* Back to Videos Button */}
-              <div className="mt-6">
-                <Button
-                  onClick={handleBackToVideos}
-                  variant="outline"
-                  className="w-full sm:w-auto"
-                >
-                  ← Back to Videos
-                </Button>
-              </div>
-            </>
+            <Quiz
+              applicantId={applicantId}
+              onQuizComplete={handleQuizComplete}
+              onBackToVideos={handleBackToVideos}
+            />
           )}
 
           {currentStep === "commitment" && (

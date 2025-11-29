@@ -8,9 +8,10 @@ import { saveQuizProgress } from "../_service/action";
 interface QuizProps {
   applicantId: string;
   onQuizComplete: (score: number, totalQuestions: number) => void;
+  onBackToVideos?: () => void;
 }
 
-export default function Quiz({ applicantId, onQuizComplete }: QuizProps) {
+export default function Quiz({ applicantId, onQuizComplete, onBackToVideos }: QuizProps) {
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<number, number>>({});
   const [showResults, setShowResults] = useState(false);
@@ -149,19 +150,34 @@ export default function Quiz({ applicantId, onQuizComplete }: QuizProps) {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex justify-center gap-4">
-          {!passed && (
-            <Button onClick={handleRetake} variant="outline" className="px-8">
-              Retake Quiz
-            </Button>
-          )}
-          {passed && (
-            <Button
-              onClick={handleComplete}
-              className="from-customTeal to-customViolet-100 bg-gradient-to-r via-customBlue-100 px-8"
-            >
-              Continue to Commitment
-            </Button>
+        <div className="flex flex-col gap-4">
+          <div className="flex justify-center gap-4">
+            {!passed && (
+              <Button onClick={handleRetake} variant="outline" className="px-8">
+                Retake Quiz
+              </Button>
+            )}
+            {passed && (
+              <Button
+                onClick={handleComplete}
+                className="from-customTeal to-customViolet-100 bg-gradient-to-r via-customBlue-100 px-8"
+              >
+                Continue to Commitment
+              </Button>
+            )}
+          </div>
+
+          {/* Back to Videos Button */}
+          {onBackToVideos && (
+            <div className="flex justify-center">
+              <Button
+                onClick={onBackToVideos}
+                variant="outline"
+                className="w-full sm:w-auto"
+              >
+                ← Back to Videos
+              </Button>
+            </div>
           )}
         </div>
       </div>

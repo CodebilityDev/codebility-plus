@@ -290,7 +290,8 @@ export const signinUser = async (email: string, password: string) => {
       userProfile.application_status === "applying" ||
       userProfile.application_status === "pending" ||
       userProfile.application_status === "testing" ||
-      userProfile.application_status === "onboarding"
+      userProfile.application_status === "onboarding" ||
+      userProfile.application_status === "waitlist"
     ) {
       redirectTo = "/applicant/waiting";
     } else if (
