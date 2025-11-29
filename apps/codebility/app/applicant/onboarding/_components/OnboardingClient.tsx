@@ -109,6 +109,32 @@ export default function OnboardingClient({
     setCurrentStep("quiz");
   };
 
+  const handleBackToVideos = () => {
+    setCurrentStep("videos");
+  };
+
+  const handleBackToQuiz = () => {
+    setCurrentStep("quiz");
+  };
+
+  const handleStepClick = (stepNumber: number) => {
+    if (stepNumber >= 1 && stepNumber <= 4) {
+      // Navigate to video step
+      setCurrentStep("videos");
+      setProgress((prev) => ({
+        ...prev,
+        currentVideo: stepNumber as 1 | 2 | 3 | 4,
+      }));
+    } else if (stepNumber === 5) {
+      // Navigate to quiz/commitment based on quiz status
+      if (applicantData.quiz_passed && !applicantData.commitment_signed_at) {
+        setCurrentStep("commitment");
+      } else {
+        setCurrentStep("quiz");
+      }
+    }
+  };
+
   const handleQuizComplete = (score: number, total: number) => {
     setQuizScore(score);
     setQuizTotal(total);
@@ -186,6 +212,7 @@ export default function OnboardingClient({
           <OnboardingStepper
             progress={progress}
             currentVideo={currentStep === "videos" ? progress.currentVideo : 5}
+            onStepClick={handleStepClick}
           />
         </div>
 
@@ -235,17 +262,43 @@ export default function OnboardingClient({
           )}
 
           {currentStep === "quiz" && (
-            <Quiz
-              applicantId={applicantId}
-              onQuizComplete={handleQuizComplete}
-            />
+            <>
+              <Quiz
+                applicantId={applicantId}
+                onQuizComplete={handleQuizComplete}
+              />
+
+              {/* Back to Videos Button */}
+              <div className="mt-6">
+                <Button
+                  onClick={handleBackToVideos}
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
+                  ← Back to Videos
+                </Button>
+              </div>
+            </>
           )}
 
           {currentStep === "commitment" && (
-            <Commitment
-              userName={`${user.first_name} ${user.last_name}`}
-              onComplete={handleCommitmentComplete}
-            />
+            <>
+              <Commitment
+                userName={`${user.first_name} ${user.last_name}`}
+                onComplete={handleCommitmentComplete}
+              />
+
+              {/* Back to Quiz Button */}
+              <div className="mt-6">
+                <Button
+                  onClick={handleBackToQuiz}
+                  variant="outline"
+                  className="w-full sm:w-auto"
+                >
+                  ← Back to Quiz
+                </Button>
+              </div>
+            </>
           )}
         </div>
 
