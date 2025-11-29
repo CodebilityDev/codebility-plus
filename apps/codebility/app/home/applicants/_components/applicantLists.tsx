@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@codevs/ui/tabs";
 
 import { NewApplicantType } from "../_service/types";
 import { ApplicantDataTable } from "./_table/applicantDataTable";
-import { applicantsColumns } from "./_table/applicantColumns";
+import { getApplicantColumns } from "./_table/applicantColumns";
 import ApplicantFilterHeaders from "./applicantHeaders";
 
 function ApplicantLists({
@@ -141,31 +141,31 @@ function ApplicantLists({
         <TabsContent value="applying" className="mt-6">
           <ApplicantDataTable
             data={applicantsApplying}
-            columns={applicantsColumns}
+            columns={getApplicantColumns("applying")}
           />
         </TabsContent>
         <TabsContent value="testing" className="mt-6">
           <ApplicantDataTable
             data={applicantsTesting}
-            columns={applicantsColumns}
+            columns={getApplicantColumns("testing")}
           />
         </TabsContent>
         <TabsContent value="onboarding" className="mt-6">
           <ApplicantDataTable
             data={applicantsOnboarding}
-            columns={applicantsColumns}
+            columns={getApplicantColumns("onboarding")}
           />
         </TabsContent>
         <TabsContent value="waitlist" className="mt-6">
           <ApplicantDataTable
             data={applicantsWaitlist}
-            columns={applicantsColumns}
+            columns={getApplicantColumns("waitlist")}
           />
         </TabsContent>
         <TabsContent value="denied" className="mt-6">
           <ApplicantDataTable
             data={applicantsDenied}
-            columns={applicantsColumns}
+            columns={getApplicantColumns("denied")}
           />
         </TabsContent>
       </Tabs>
