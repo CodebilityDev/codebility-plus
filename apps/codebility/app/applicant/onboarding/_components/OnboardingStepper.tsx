@@ -6,11 +6,13 @@ import { OnboardingProgressType } from "../_service/type";
 interface OnboardingStepperProps {
   progress: OnboardingProgressType;
   currentVideo: number;
+  onStepClick?: (step: number) => void;
 }
 
 export default function OnboardingStepper({
   progress,
   currentVideo,
+  onStepClick,
 }: OnboardingStepperProps) {
   const steps = [
     { number: 1, title: "Introduction", completed: progress.video1 },
@@ -20,6 +22,12 @@ export default function OnboardingStepper({
     { number: 5, title: "Quiz & Commitment", completed: false }, // Will be updated based on quiz/commitment status
   ];
 
+  const handleStepClick = (stepNumber: number) => {
+    if (onStepClick) {
+      onStepClick(stepNumber);
+    }
+  };
+
   return (
     <div className="w-full">
       <div className="flex items-center justify-between">
@@ -28,12 +36,13 @@ export default function OnboardingStepper({
             {/* Step Circle */}
             <div className="flex flex-col items-center">
               <div
-                className={`flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all ${
+                onClick={() => handleStepClick(step.number)}
+                className={`flex h-12 w-12 items-center justify-center rounded-full border-2 transition-all cursor-pointer hover:scale-110 ${
                   step.completed
-                    ? "border-green-500 bg-green-500 text-white"
+                    ? "border-green-500 bg-green-500 text-white hover:bg-green-600"
                     : currentVideo === step.number
                       ? "border-blue-500 bg-blue-500 text-white"
-                      : "border-gray-700 bg-gray-900 text-gray-500"
+                      : "border-gray-700 bg-gray-900 text-gray-500 hover:border-gray-600"
                 }`}
               >
                 {step.completed ? (

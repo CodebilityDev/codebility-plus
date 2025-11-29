@@ -69,8 +69,9 @@ This is a Turborepo monorepo with pnpm workspaces containing multiple Next.js ap
 **Authentication Flow:**
 - Middleware-based route protection in `middleware.ts`
 - Role-based access control with `roles` table
-- Application status workflow: `applying` → `pending` → `passed`/`failed`
+- Application status workflow: `applying` → `testing` → `onboarding` → `waitlist` → `accepted`/`denied`
 - Email verification requirements
+- Comprehensive onboarding system with video watching, quizzes, and digital commitment signing
 
 **State Management Pattern:**
 - Zustand stores in `store/` directories for global state
@@ -119,9 +120,83 @@ All shared packages must be prefixed with `@codevs/` (e.g., `@codevs/ui`, `@code
 ### Database Schema
 The project uses Supabase (PostgreSQL) with the following key tables:
 - **Core**: `codev` (users), `roles` (permissions), `project`, `project_members`
-- **Job System**: `job_listings`, `job_applications` 
+- **Applicant System**: `applicant` (test results, onboarding progress, quiz scores, commitments)
+- **Onboarding**: `onboarding_video_progress` (video completion tracking)
+- **Job System**: `job_listings`, `job_applications`
 - **Attendance**: `attendance`, `attendance_summary`
 - **Gamification**: `skill_categories`, `codev_points`
 - **Kanban**: `kanban_board`, `kanban_column`, `kanban_sprint`, `task`
+- **Communication**: `notifications`, `news_banners`, `surveys`
 
 For detailed schema information, relationships, and SQL examples, see `database-schema.md` in the root directory.
+
+### Applicant Onboarding System
+
+**Overview:**
+A comprehensive 4-step onboarding system that guides applicants from initial application through to acceptance:
+
+1. **Applying** - Submit application
+2. **Testing** - Complete coding assessment
+3. **Onboarding** - Watch 4 videos, pass quiz (70%), sign commitment
+4. **Waitlist** - Await admin review and acceptance
+
+**Key Features:**
+- **Video System**: 4 onboarding videos with 90% watch completion validation
+- **Sequential Unlocking**: Videos unlock only after completing previous ones
+- **Quiz System**: 6 questions focusing on understanding that Codebility is:
+  - FREE (no payment required)
+  - For portfolio building and upskilling
+  - NOT for quick employment
+  - Requires 3-6 months commitment
+  - Requires twice-weekly mandatory meetings
+- **Digital Commitment**: Canvas-based signature capture
+- **Mobile Capability**: Tracks if applicant can do React Native development
+- **Progress Persistence**: State saved across page refreshes
+- **Email Notifications**: Automated emails at each stage transition
+- **Admin Dashboard**: View quiz scores, mobile capability, commitment status
+
+**File Locations:**
+- Onboarding UI: `apps/codebility/app/applicant/onboarding/`
+- Waitlist UI: `apps/codebility/app/applicant/waiting/`
+- Admin View: `apps/codebility/app/home/applicants/`
+- Migrations: `apps/codebility/supabase/migrations/`
+- Videos: Stored in Supabase Storage at `public/onboarding-videos/`
+
+**Database Fields Added:**
+- `applicant.quiz_score` - Score achieved on quiz
+- `applicant.quiz_total` - Total quiz questions
+- `applicant.quiz_passed` - Boolean pass/fail status
+- `applicant.quiz_completed_at` - Completion timestamp
+- `applicant.can_do_mobile` - Mobile development capability
+- `applicant.commitment_signed_at` - Digital signature timestamp
+- `applicant.signature_data` - Base64 signature image
+
+**Admin Actions:**
+- **Accept**: Sends acceptance email with /home access instructions
+- **Deny**: Sends denial email with reapplication information
+- **View Progress**: See quiz scores, mobile capability, and commitment status
+
+### File Storage
+
+**Supabase Storage Buckets:**
+- `public/onboarding-videos/` - Onboarding video files (part1.mp4 - part4.mp4)
+- Upload via Supabase Dashboard → Storage → Select bucket → Upload files
+- Videos are referenced by path in video player component
+- Total size: ~5.8GB (too large for git, excluded via .gitignore)
+
+### Database Migrations
+
+All database migrations are located in `apps/codebility/supabase/migrations/`
+
+**Migration Naming Convention:** `YYYYMMDD_description.sql`
+
+**Key Migrations:**
+- `add_quiz_and_commitment_fields.sql` - Onboarding system fields
+- `create_onboarding_videos_table.sql` - Video progress tracking
+- `create_notification_system.sql` - Notification infrastructure
+- `create_attendance_tables.sql` - Attendance tracking
+- `20251127_project_category_many_to_many.sql` - Project categories
+
+**Legacy Migrations:**
+The `migration-scripts/` folder in the root contains deprecated migration tools and scripts.
+Do not add new migrations there. See `migration-scripts/DEPRECATION_NOTICE.md` for details.

@@ -17,7 +17,8 @@ import ApplicantTestTimeRemaining from "../applicantTestTimeRemaining";
 import ApplicantActionButton from "./applicantActionButton";
 import ApplicantProfileColSec from "./applicantProfileColSec";
 
-export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
+// Base columns that appear in all tabs
+const baseColumns: ColumnDef<NewApplicantType>[] = [
   {
     id: "select",
     header: ({ table }) => (
@@ -253,83 +254,6 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
     },
   },
   {
-    accessorKey: "application_status",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex h-10 items-center justify-center gap-2 px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-white"
-        >
-          Status
-          <ArrowUpDown className="h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const applicant: NewApplicantType = row.original;
-      const status = applicant.application_status;
-
-      const getStatusBadge = (status: string) => {
-        const baseClasses = "inline-flex items-center rounded-full px-2.5 py-1 text-xs font-semibold";
-
-        switch (status) {
-          case "applying":
-            return (
-              <span className={`${baseClasses} bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400`}>
-                Applying
-              </span>
-            );
-          case "testing":
-            return (
-              <span className={`${baseClasses} bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-400`}>
-                Testing
-              </span>
-            );
-          case "onboarding":
-            return (
-              <span className={`${baseClasses} bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400`}>
-                Onboarding
-              </span>
-            );
-          case "waitlist":
-            return (
-              <span className={`${baseClasses} bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400`}>
-                Waitlist
-              </span>
-            );
-          case "accepted":
-            return (
-              <span className={`${baseClasses} bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-400`}>
-                Accepted
-              </span>
-            );
-          case "denied":
-            return (
-              <span className={`${baseClasses} bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400`}>
-                Denied
-              </span>
-            );
-          default:
-            return (
-              <span className={`${baseClasses} bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-400`}>
-                {status || "Unknown"}
-              </span>
-            );
-        }
-      };
-
-      return (
-        <div className="flex items-center justify-center px-3 py-2">
-          {getStatusBadge(status)}
-        </div>
-      );
-    },
-    meta: {
-      className: "w-32 text-center",
-    },
-  },
-  {
     id: "test_taken",
     accessorKey: "applicant.test_taken",
     header: ({ column }) => {
@@ -401,6 +325,61 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       className: "w-24 text-center",
     },
   },
+  {
+    id: "reapply",
+    header: ({ column }) => {
+      return (
+        <Button
+          variant="ghost"
+          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          className="flex h-10 items-center justify-center gap-2 px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-white"
+        >
+          Reapply
+          <ArrowUpDown className="h-4 w-4" />
+        </Button>
+      );
+    },
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="flex items-center justify-center px-3 py-2">
+          <ApplicantReapplyTime applicant={applicant} />
+        </div>
+      );
+    },
+    meta: {
+      className: "w-28 text-center",
+    },
+    enableHiding: true,
+  },
+  {
+    id: "actions",
+    header: () => (
+      <Button
+        variant="ghost"
+        className="flex h-10 items-center justify-center gap-2 px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-white"
+      >
+        Actions
+      </Button>
+    ),
+    cell: ({ row }) => {
+      const applicant = row.original;
+
+      return (
+        <div className="flex items-center justify-center px-3 py-2">
+          <ApplicantActionButton applicant={applicant} />
+        </div>
+      );
+    },
+    meta: {
+      className: "w-20",
+    },
+  },
+];
+
+// Waitlist-only columns (Mobile Dev and Commitment)
+const waitlistColumns: ColumnDef<NewApplicantType>[] = [
   {
     id: "mobile_capability",
     accessorKey: "applicant.can_do_mobile",
@@ -476,55 +455,26 @@ export const applicantsColumns: ColumnDef<NewApplicantType>[] = [
       className: "w-32 text-center",
     },
   },
-  {
-    id: "reapply",
-    header: ({ column }) => {
-      return (
-        <Button
-          variant="ghost"
-          onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-          className="flex h-10 items-center justify-center gap-2 px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-white"
-        >
-          Reapply
-          <ArrowUpDown className="h-4 w-4" />
-        </Button>
-      );
-    },
-    cell: ({ row }) => {
-      const applicant = row.original;
-
-      return (
-        <div className="flex items-center justify-center px-3 py-2">
-          <ApplicantReapplyTime applicant={applicant} />
-        </div>
-      );
-    },
-    meta: {
-      className: "w-28 text-center",
-    },
-    enableHiding: true,
-  },
-  {
-    id: "actions",
-    header: () => (
-      <Button
-        variant="ghost"
-        className="flex h-10 items-center justify-center gap-2 px-3 py-2 text-sm font-semibold text-gray-800 hover:bg-gray-50 hover:text-gray-900 dark:text-gray-100 dark:hover:bg-gray-800 dark:hover:text-white"
-      >
-        Actions
-      </Button>
-    ),
-    cell: ({ row }) => {
-      const applicant = row.original;
-
-      return (
-        <div className="flex items-center justify-center px-3 py-2">
-          <ApplicantActionButton applicant={applicant} />
-        </div>
-      );
-    },
-    meta: {
-      className: "w-20",
-    },
-  },
 ];
+
+/**
+ * Get the appropriate columns for a specific tab
+ * - Waitlist tab: includes Mobile Dev and Commitment columns
+ * - All other tabs: only base columns
+ */
+export function getApplicantColumns(tab: string): ColumnDef<NewApplicantType>[] {
+  if (tab === "waitlist") {
+    // Insert waitlist columns before the reapply and actions columns
+    const reapplyIndex = baseColumns.findIndex(col => col.id === "reapply");
+    return [
+      ...baseColumns.slice(0, reapplyIndex),
+      ...waitlistColumns,
+      ...baseColumns.slice(reapplyIndex),
+    ];
+  }
+
+  return baseColumns;
+}
+
+// Keep the original export for backward compatibility
+export const applicantsColumns = baseColumns;
