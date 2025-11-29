@@ -87,7 +87,7 @@ export interface CodevRow {
   last_name: string;
 
   // Application workflow
-  application_status: 'applying' | 'testing' | 'onboarding' | 'waitlist' | 'accepted' | 'denied';
+  application_status: 'applying' | 'testing' | 'onboarding' | 'waitlist' | 'passed' | 'denied';
   date_applied: string | null; // ISO timestamp
 
   // Other fields...

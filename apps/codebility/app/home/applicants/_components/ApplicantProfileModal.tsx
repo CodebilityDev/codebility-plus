@@ -50,7 +50,7 @@ const ApplicantProfileModal = () => {
       case "testing": return "bg-purple-500";
       case "onboarding": return "bg-yellow-500";
       case "waitlist": return "bg-green-500";
-      case "accepted": return "bg-emerald-500";
+      case "passed": return "bg-emerald-500";
       case "denied": return "bg-red-500";
       default: return "bg-gray-500";
     }
