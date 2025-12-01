@@ -3,45 +3,35 @@
 
 import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { getTeamData } from "./actions";
 
 // -------------------------
 // Types
 // -------------------------
-  type Person = {
-    name: string;
-    role: string;
-    image?: string;
-  };
-
-  interface TeamResponse {
-    ADMINS?: Person[];
-    MENTORS?: Person[];
-    error?: string;
-  }
-
-// -------------------------
-// CEO Fullname Reference
-// -------------------------
-  const CEO_FULLNAME = "Jzeff Kendrew Somera"; // <-- replace with actual first+last name from Supabase
+type Person = {
+  name: string;
+  role: string;
+  image?: string;
+};
 
 // -------------------------
 // Avatar
 // -------------------------
-  function Avatar({
-    person,
-    size = 72,
-    position = "center top"
-  }: {
-    person: Person;
-    size?: number;
-    position?: string;
-  }) {
-    const initials = (person.name || "")
-      .split(" ")
-      .slice(0, 2)
-      .map((n) => n[0] ?? "")
-      .join("")
-      .toUpperCase();
+function Avatar({
+  person,
+  size = 72,
+  position = "center top"
+}: {
+  person: Person;
+  size?: number;
+  position?: string;
+}) {
+  const initials = (person.name || "")
+    .split(" ")
+    .slice(0, 2)
+    .map((n) => n[0] ?? "")
+    .join("")
+    .toUpperCase();
 
   return person.image ? (
     <div
@@ -79,95 +69,73 @@ import { cn } from "@/lib/utils";
 // -------------------------
 // PersonCard
 // -------------------------
-  function PersonCard({ person }: { person: Person }) {
-    return (
-      <div
-        className={cn(
-          "group relative overflow-hidden rounded-2xl border",
-          "border-white/10 bg-white/[0.06] p-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] backdrop-blur-md",
-          "transition-all duration-300 hover:border-cyan-400/30 hover:shadow-cyan-500/20"
-        )}
-      >
-        <div className="flex items-center gap-3">
-          <Avatar person={person} size={56} />
-          <div className="min-w-0">
-            <h4 className="text-sm font-semibold text-white/90">{person.name}</h4>
-            <p className="truncate text-xs text-white/60">{person.role}</p>
-          </div>
+function PersonCard({ person }: { person: Person }) {
+  return (
+    <div
+      className={cn(
+        "group relative overflow-hidden rounded-2xl border",
+        "border-white/10 bg-white/[0.06] p-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] backdrop-blur-md",
+        "transition-all duration-300 hover:border-cyan-400/30 hover:shadow-cyan-500/20"
+      )}
+    >
+      <div className="flex items-center gap-3">
+        <Avatar person={person} size={56} />
+        <div className="min-w-0">
+          <h4 className="text-sm font-semibold text-white/90">{person.name}</h4>
+          <p className="truncate text-xs text-white/60">{person.role}</p>
         </div>
-        <span className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-emerald-400 opacity-70" />
       </div>
-    );
-  }
+      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-emerald-400 opacity-70" />
+    </div>
+  );
+}
 
 // -------------------------
 // TeamSection
 // -------------------------
-  export default function TeamSection() {
-    const [admins, setAdmins] = useState<Person[]>([]);
-    const [mentors, setMentors] = useState<Person[]>([]);
-    const [ceo, setCeo] = useState<Person>({
-      name: "CEO Name",
-      role: "Founder / CEO",
-      image: ""
-    });
-    const [loading, setLoading] = useState(true);
-    const [errMsg, setErrMsg] = useState<string | null>(null);
+export default function TeamSection() {
+  const [admins, setAdmins] = useState<Person[]>([]);
+  const [mentors, setMentors] = useState<Person[]>([]);
+  const [ceo, setCeo] = useState<Person>({
+    name: "CEO Name",
+    role: "Founder / CEO",
+    image: undefined
+  });
+  const [loading, setLoading] = useState(true);
+  const [errMsg, setErrMsg] = useState<string | null>(null);
 
-    useEffect(() => {
-      let mounted = true;
-      async function load() {
-        setLoading(true);
-        setErrMsg(null);
+  useEffect(() => {
+    let mounted = true;
+    async function load() {
+      setLoading(true);
+      setErrMsg(null);
 
-        try {
-          const res = await fetch("/api/team");
+      try {
+        const result = await getTeamData();
 
-          let body: TeamResponse;
-          try {
-            body = (await res.json()) as TeamResponse;
-          } catch {
-            body = {} as TeamResponse;
-          }
+        if (!mounted) return;
 
-          if (!res.ok) {
-            throw new Error(body.error ?? `Fetch failed (${res.status})`);
-          }
-
-          if (!mounted) return;
-
-          const adminsList = Array.isArray(body.ADMINS) ? body.ADMINS : [];
-          const mentorsList = Array.isArray(body.MENTORS) ? body.MENTORS : [];
-
-          // Match CEO by full name in admins list
-          const foundCeo = adminsList.find(
-            (p) => p.name?.trim().toLowerCase() === CEO_FULLNAME.toLowerCase()
-          );
-
-          if (foundCeo) {
-            setCeo({
-              ...foundCeo,
-              role: "Founder / CEO" // force CEO role
-            });
-            // Remove CEO from admins list so not duplicated
-            setAdmins(adminsList.filter((p) => p !== foundCeo));
-          } else {
-            setAdmins(adminsList);
-          }
-
-          setMentors(mentorsList);
-        } catch (err: any) {
-          console.error("Error loading team:", err);
-          if (mounted) setErrMsg(err?.message ?? "Failed to load team");
-        } finally {
-          if (mounted) setLoading(false);
+        if (!result.success) {
+          throw new Error("Failed to load team data");
         }
+
+        setAdmins(result.admins);
+        setMentors(result.mentors);
+        if (result.ceo) {
+          setCeo(result.ceo);
+        }
+      } catch (err: any) {
+        console.error("Error loading team:", err);
+        if (mounted) setErrMsg(err?.message ?? "Failed to load team");
+      } finally {
+        if (mounted) setLoading(false);
       }
-      load();
-      return () => {
-        mounted = false;
-      };
-    }, []);
+    }
+    load();
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <section className="relative w-full overflow-hidden bg-gradient-to-br from-zinc-900 via-zinc-950 to-black py-16 sm:py-20 lg:py-24">
