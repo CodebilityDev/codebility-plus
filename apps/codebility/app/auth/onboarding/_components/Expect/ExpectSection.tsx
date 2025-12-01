@@ -60,25 +60,22 @@ export default function ExpectSectionLight() {
   return (
     <section
       ref={sectionRef}
-      className="relative flex w-full items-center justify-center overflow-hidden bg-white px-6 py-24 text-zinc-800 lg:min-h-screen"
+      className="relative flex w-full items-center justify-center overflow-hidden bg-gradient-to-br from-zinc-950 via-black to-zinc-950 px-6 py-24 text-white lg:min-h-screen"
     >
-      {/* very soft background accents */}
-      <div className="pointer-events-none absolute inset-0 opacity-70">
-        <div className="absolute -right-24 -top-24 h-80 w-80 rounded-full bg-cyan-100 blur-2xl" />
-        <div className="absolute -bottom-24 -left-24 h-80 w-80 rounded-full bg-pink-100 blur-2xl" />
-      </div>
+      {/* soft pastel glows for dark motif */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.1),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.1),transparent_60%)]" />
 
       <div className="w-full max-w-5xl">
         {/* Heading */}
         <motion.h2
-          initial={{ opacity: 0, y: 24 }}
+          initial={{ opacity: 0, y: 30 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+          transition={{ duration: 0.7, ease: "easeOut" }}
           viewport={{ once: true }}
-          className="mb-14 text-center text-3xl font-extrabold tracking-tight"
+          className="mb-16 text-center text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl"
         >
           What we expect from{" "}
-          <span className="bg-gradient-to-r from-purple-600 via-fuchsia-600 to-cyan-600 bg-clip-text font-extrabold text-transparent">
+          <span className="bg-gradient-to-r from-pink-400 via-purple-500 to-teal-600 bg-clip-text font-extrabold text-transparent">
             YOU
           </span>
         </motion.h2>
@@ -90,8 +87,8 @@ export default function ExpectSectionLight() {
             ref={lineRef}
             initial={{ height: 0 }}
             animate={{ height: "100%" }}
-            transition={{ duration: 0.9, ease: "easeInOut" }}
-            className="absolute left-1/2 hidden w-px -translate-x-1/2 bg-zinc-200 md:block"
+            transition={{ duration: 1.2, ease: "easeInOut" }}
+            className="absolute left-1/2 hidden w-px -translate-x-1/2 bg-gradient-to-b from-cyan-400/50 via-purple-500/50 to-pink-400/50 md:block"
           />
 
           {/* Steps */}
@@ -102,42 +99,45 @@ export default function ExpectSectionLight() {
               return (
                 <motion.div
                   key={item.number}
-                  initial={{ opacity: 0, y: 18 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.45, delay: i * 0.05 }}
+                  initial={{ opacity: 0, x: isLeft ? -40 : 40, y: 20 }}
+                  whileInView={{ opacity: 1, x: 0, y: 0 }}
+                  transition={{
+                    duration: 0.6,
+                    delay: i * 0.1,
+                    ease: "easeOut"
+                  }}
                   viewport={{ once: true, amount: 0.3 }}
                   className={`relative flex flex-col items-center md:flex-row ${
                     isLeft ? "md:justify-start" : "md:justify-end"
                   }`}
                 >
-                  {/* Connector (super soft) */}
-                  {i !== 0 && (
-                    <div className="absolute left-1/2 top-[-18px] z-0 hidden h-full w-px -translate-x-1/2 bg-zinc-100 md:block" />
-                  )}
-
                   {/* Row */}
                   <div
-                    className={`z-10 flex w-full flex-col items-center gap-4 md:w-[calc(50%-1rem)] md:flex-row ${
+                    className={`z-10 flex w-full flex-col items-center gap-6 md:w-[calc(50%-1rem)] md:flex-row ${
                       isLeft
                         ? "md:order-2 md:mr-auto"
                         : "flex-row-reverse md:order-1 md:ml-auto"
                     }`}
                   >
-                    {/* Number badge (light, with border) */}
-                    <div
-                      className={`flex h-14 w-14 items-center justify-center rounded-full text-lg font-bold text-white ${item.color} shadow-sm ring-1 ring-white/60`}
+                    {/* Number badge (enhanced with gradient) */}
+                    <motion.div
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      className={`flex h-16 w-16 flex-shrink-0 items-center justify-center rounded-full text-xl font-bold text-white ${item.color} shadow-lg ring-2 ring-white/40`}
                     >
                       {item.number}
-                    </div>
+                    </motion.div>
 
-                    {/* Card (light, subtle shadow) */}
-                    <div
-                      className={`mt-2 w-full rounded-xl border border-zinc-200 bg-white/80 p-5 text-center text-sm leading-relaxed shadow-sm backdrop-blur-sm md:mt-0 ${
+                    {/* Card (dark theme with larger text) */}
+                    <motion.div
+                      whileHover={{ scale: 1.02 }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                      className={`mt-2 w-full rounded-xl border border-white/10 bg-white/[0.06] p-6 text-center text-base leading-relaxed text-white/90 shadow-md backdrop-blur-md md:mt-0 md:text-lg ${
                         isLeft ? "md:text-left" : "md:text-right"
                       }`}
                     >
                       {item.text}
-                    </div>
+                    </motion.div>
                   </div>
                 </motion.div>
               );

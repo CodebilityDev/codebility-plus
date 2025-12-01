@@ -4,7 +4,7 @@
 
 export default function MissionVisionSlide() {
   return (
-    <div className="slide justify-cente flex w-screen items-center px-6 text-stone-900 lg:h-screen">
+    <div className="slide justify-cente flex w-screen items-center px-6 text-white lg:h-screen">
       <div className="mx-auto flex max-w-7xl flex-col justify-center gap-10 lg:flex-row lg:gap-16">
         {/* LEFT: Header and Vision */}
         <div className="flex flex-col justify-center">
@@ -13,12 +13,12 @@ export default function MissionVisionSlide() {
           </h2>
 
           {/* Vision Card */}
-          <div className="mt-10 w-full rounded-xl bg-gradient-to-br from-purple-100 to-purple-200 p-6 shadow-md lg:max-w-lg">
+          <div className="mt-10 w-full rounded-xl border border-white/10 bg-white/[0.06] p-6 shadow-md backdrop-blur-md lg:max-w-lg">
             <div className="mb-2 flex items-center gap-3">
               <VisionIcon />
-              <h3 className="text-3xl font-bold">vision</h3>
+              <h3 className="text-3xl font-bold text-white">vision</h3>
             </div>
-            <p className="text-sm sm:text-base">
+            <p className="text-sm text-white/80 sm:text-base">
               To become the most impactful developer community in the world—
               where aspiring and experienced developers, UI/UX designers, and QA
               professionals grow together, build exceptional portfolios, and
@@ -30,15 +30,15 @@ export default function MissionVisionSlide() {
 
         {/* RIGHT: Mission */}
         <div className="flex flex-col justify-between gap-6">
-          <div className="w-full rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 p-6 shadow-md lg:max-w-xl">
+          <div className="w-full rounded-xl border border-white/10 bg-white/[0.06] p-6 shadow-md backdrop-blur-md lg:max-w-xl">
             <div className="mb-2 flex items-center gap-3">
               <MissionIcon />
-              <h3 className="text-3xl font-bold">mission</h3>
+              <h3 className="text-3xl font-bold text-white">mission</h3>
             </div>
-            <ul className="list-disc space-y-2 pl-5 text-sm sm:text-base">
+            <ul className="list-disc space-y-2 pl-5 text-sm text-white/80 sm:text-base">
               <li>
                 To empower every member to become world-class in their
-                craft—whether it’s development, design, or QA.
+                craft—whether it's development, design, or QA.
               </li>
               <li>
                 To provide a supportive space where members can learn by doing,
@@ -70,7 +70,7 @@ export default function MissionVisionSlide() {
 function VisionIcon() {
   return (
     <svg
-      className="h-8 w-8 text-purple-600"
+      className="h-8 w-8 text-purple-300"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"
@@ -85,7 +85,7 @@ function VisionIcon() {
 function MissionIcon() {
   return (
     <svg
-      className="h-8 w-8 text-teal-500"
+      className="h-8 w-8 text-teal-300"
       fill="none"
       stroke="currentColor"
       strokeWidth="2"

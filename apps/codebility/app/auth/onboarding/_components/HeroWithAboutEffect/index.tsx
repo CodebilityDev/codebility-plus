@@ -58,10 +58,10 @@ export default function HeroWithAboutEffect() {
       <section
         ref={aboutRef}
         id="about-section"
-        className="relative z-10 w-full overflow-hidden bg-white lg:h-screen"
+        className="relative z-10 w-full overflow-hidden bg-gradient-to-br from-zinc-950 via-black to-zinc-950 lg:h-screen"
       >
-        {/* soft pastel glows for light motif */}
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.15),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.15),transparent_60%)]" />
+        {/* soft pastel glows for dark motif */}
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.1),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.1),transparent_60%)]" />
 
         <div className="z-10 h-auto w-full lg:sticky lg:top-0 lg:h-screen">
           <AboutSlides slidesRef={slidesRef} />

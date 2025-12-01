@@ -23,7 +23,7 @@ import {
 import {
   sendMultipleOnboardingReminderWithUpdate,
   sendMultipleTestReminderEmailWithUpdate,
-} from "../_service/emailAction";
+} from "../_service/email";
 import { NewApplicantType } from "../_service/types";
 
 export default function ApplicantEmailAction({
