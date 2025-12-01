@@ -3,6 +3,7 @@
 
 import React, { useEffect, useState } from "react";
 import { cn } from "@/lib/utils";
+import { getTeamData } from "./actions";
 
 // -------------------------
 // Types
@@ -12,6 +13,7 @@ type Person = {
   role: string;
   image?: string;
 };
+<<<<<<< HEAD
 
 interface TeamResponse {
   ADMINS?: Person[];
@@ -19,6 +21,8 @@ interface TeamResponse {
   CEO?: Person | null;
   error?: string;
 }
+=======
+>>>>>>> 10e4b1e1fb38e31ee56d942c6143a8118e265af8
 
 // -------------------------
 // Avatar
@@ -77,6 +81,7 @@ function Avatar({
 // -------------------------
 function PersonCard({ person }: { person: Person }) {
   return (
+<<<<<<< HEAD
     <div
       className={cn(
         "group relative overflow-hidden rounded-2xl border",
@@ -92,6 +97,14 @@ function PersonCard({ person }: { person: Person }) {
         </div>
       </div>
       <span className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-emerald-400 opacity-70" />
+=======
+    <div className="flex flex-col items-center gap-2 text-center">
+      <Avatar person={person} size={80} />
+      <div className="min-w-0">
+        <h4 className="text-sm font-semibold text-white/90">{person.name}</h4>
+        <p className="truncate text-xs text-white/60">{person.role}</p>
+      </div>
+>>>>>>> 10e4b1e1fb38e31ee56d942c6143a8118e265af8
     </div>
   );
 }
@@ -105,7 +118,11 @@ export default function TeamSection() {
   const [ceo, setCeo] = useState<Person>({
     name: "CEO Name",
     role: "Founder / CEO",
+<<<<<<< HEAD
     image: ""
+=======
+    image: undefined
+>>>>>>> 10e4b1e1fb38e31ee56d942c6143a8118e265af8
   });
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState<string | null>(null);
@@ -117,6 +134,7 @@ export default function TeamSection() {
       setErrMsg(null);
 
       try {
+<<<<<<< HEAD
         const res = await fetch("/api/team");
 
         let body: TeamResponse;
@@ -142,6 +160,21 @@ export default function TeamSection() {
 
         setAdmins(adminsList);
         setMentors(mentorsList);
+=======
+        const result = await getTeamData();
+
+        if (!mounted) return;
+
+        if (!result.success) {
+          throw new Error("Failed to load team data");
+        }
+
+        setAdmins(result.admins);
+        setMentors(result.mentors);
+        if (result.ceo) {
+          setCeo(result.ceo);
+        }
+>>>>>>> 10e4b1e1fb38e31ee56d942c6143a8118e265af8
       } catch (err: any) {
         console.error("Error loading team:", err);
         if (mounted) setErrMsg(err?.message ?? "Failed to load team");
@@ -193,12 +226,12 @@ export default function TeamSection() {
 
             <div>
               <h3 className="mb-4 text-center text-lg font-bold tracking-tight text-white/85">CEO</h3>
-              <div className="relative isolate overflow-hidden rounded-3xl border border-white/10 bg-white/[0.06] p-8 text-center shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] backdrop-blur-md">
-                <div className="mx-auto mb-6 w-fit">
-                  <Avatar person={ceo} size={140} />
+              <div className="flex flex-col items-center gap-3 text-center">
+                <Avatar person={ceo} size={140} />
+                <div>
+                  <h4 className="text-2xl font-extrabold tracking-tight text-white/90">{ceo.name}</h4>
+                  <p className="mt-1 text-sm text-white/60">{ceo.role}</p>
                 </div>
-                <h4 className="text-2xl font-extrabold tracking-tight text-white/90">{ceo.name}</h4>
-                <p className="mt-1 text-sm text-white/60">{ceo.role}</p>
               </div>
             </div>
 

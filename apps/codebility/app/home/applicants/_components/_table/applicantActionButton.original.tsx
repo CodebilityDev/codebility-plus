@@ -45,7 +45,7 @@ import {
   sendOnboardingReminder,
   sendPassedTestEmail,
   sendTestReminder,
-} from "../../_service/emailAction";
+} from "../../_service/email";
 import { NewApplicantType } from "../../_service/types";
 import { useApplicantModal } from "../ApplicantClientWrapper";
 

@@ -63,26 +63,26 @@ export default function HouseRulesSection({ className, ...rest }: Props) {
   return (
     <section
       className={cn(
-        "relative w-full overflow-hidden bg-gradient-to-br from-white via-slate-50 to-slate-100",
+        "relative w-full overflow-hidden bg-gradient-to-br from-zinc-950 via-black to-zinc-950",
         "py-16 sm:py-20 lg:py-28",
         className,
       )}
       {...rest}
     >
-      {/* soft pastel glows for light motif */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.15),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.15),transparent_60%)]" />
+      {/* soft pastel glows for dark motif */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.1),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.1),transparent_60%)]" />
 
       <div className="container mx-auto px-4">
         {/* Heading */}
         <div className="mx-auto mb-10 max-w-5xl text-center sm:mb-14 lg:mb-16">
           <h2
-            className="translate-y-0 bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text
+            className="translate-y-0 bg-gradient-to-r from-pink-400 via-purple-500 to-teal-600 bg-clip-text
             text-center text-3xl font-extrabold tracking-tight text-transparent opacity-100
             transition-all duration-700 sm:text-4xl md:text-5xl"
           >
             House Rules
           </h2>
-          <p className="mx-auto mt-3 max-w-3xl text-sm text-slate-600 sm:text-base">
+          <p className="mx-auto mt-3 max-w-3xl text-sm text-white/70 sm:text-base">
             A simple playbook for how we work and grow together at Codebility.
           </p>
         </div>
@@ -94,12 +94,12 @@ export default function HouseRulesSection({ className, ...rest }: Props) {
               <article
                 className={cn(
                   "relative overflow-hidden rounded-2xl border",
-                  "border-slate-200 bg-white/90 p-5 shadow-sm sm:p-6",
-                  "transition-shadow duration-300 hover:shadow-[0_8px_24px_rgba(2,6,23,0.08)]",
+                  "border-white/10 bg-white/[0.06] p-5 shadow-sm sm:p-6 backdrop-blur-md",
+                  "transition-all duration-300 hover:border-cyan-400/30 hover:shadow-cyan-500/20",
                 )}
               >
                 {/* pastel accent bar */}
-                <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-emerald-400 opacity-40" />
+                <span className="absolute inset-x-0 top-0 h-0.5 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-emerald-400 opacity-70" />
 
                 <div className="flex items-start gap-4">
                   {/* numbered badge */}
@@ -107,8 +107,8 @@ export default function HouseRulesSection({ className, ...rest }: Props) {
                     <span
                       className={cn(
                         "grid h-12 w-12 place-items-center rounded-full text-lg font-extrabold",
-                        "bg-white text-slate-800 ring-2 ring-cyan-400/50",
-                        "shadow-[0_6px_16px_-6px_rgba(2,6,23,0.15)]",
+                        "bg-white/10 text-white ring-2 ring-cyan-400/50",
+                        "shadow-md",
                       )}
                     >
                       {r.n}
@@ -117,10 +117,10 @@ export default function HouseRulesSection({ className, ...rest }: Props) {
                   </div>
 
                   <div className="min-w-0">
-                    <h3 className="text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
+                    <h3 className="text-base font-semibold tracking-tight text-white/90 sm:text-lg">
                       {r.title}
                     </h3>
-                    <p className="mt-1 text-sm leading-relaxed text-slate-600">
+                    <p className="mt-1 text-sm leading-relaxed text-white/60">
                       {r.desc}
                     </p>
                   </div>
