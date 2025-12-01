@@ -13,16 +13,6 @@ type Person = {
   role: string;
   image?: string;
 };
-<<<<<<< HEAD
-
-interface TeamResponse {
-  ADMINS?: Person[];
-  MENTORS?: Person[];
-  CEO?: Person | null;
-  error?: string;
-}
-=======
->>>>>>> 10e4b1e1fb38e31ee56d942c6143a8118e265af8
 
 // -------------------------
 // Avatar
@@ -81,30 +71,12 @@ function Avatar({
 // -------------------------
 function PersonCard({ person }: { person: Person }) {
   return (
-<<<<<<< HEAD
-    <div
-      className={cn(
-        "group relative overflow-hidden rounded-2xl border",
-        "border-white/10 bg-white/[0.06] p-4 shadow-[0_10px_30px_-15px_rgba(0,0,0,0.6)] backdrop-blur-md",
-        "transition-all duration-300 hover:border-cyan-400/30 hover:shadow-cyan-500/20"
-      )}
-    >
-      <div className="flex items-center gap-3">
-        <Avatar person={person} size={56} />
-        <div className="min-w-0">
-          <h4 className="text-sm font-semibold text-white/90">{person.name}</h4>
-          <p className="truncate text-xs text-white/60">{person.role}</p>
-        </div>
-      </div>
-      <span className="pointer-events-none absolute inset-x-0 bottom-0 h-0.5 bg-gradient-to-r from-cyan-400 via-fuchsia-500 to-emerald-400 opacity-70" />
-=======
     <div className="flex flex-col items-center gap-2 text-center">
       <Avatar person={person} size={80} />
       <div className="min-w-0">
         <h4 className="text-sm font-semibold text-white/90">{person.name}</h4>
         <p className="truncate text-xs text-white/60">{person.role}</p>
       </div>
->>>>>>> 10e4b1e1fb38e31ee56d942c6143a8118e265af8
     </div>
   );
 }
@@ -118,11 +90,7 @@ export default function TeamSection() {
   const [ceo, setCeo] = useState<Person>({
     name: "CEO Name",
     role: "Founder / CEO",
-<<<<<<< HEAD
-    image: ""
-=======
     image: undefined
->>>>>>> 10e4b1e1fb38e31ee56d942c6143a8118e265af8
   });
   const [loading, setLoading] = useState(true);
   const [errMsg, setErrMsg] = useState<string | null>(null);
@@ -134,33 +102,6 @@ export default function TeamSection() {
       setErrMsg(null);
 
       try {
-<<<<<<< HEAD
-        const res = await fetch("/api/team");
-
-        let body: TeamResponse;
-        try {
-          body = (await res.json()) as TeamResponse;
-        } catch {
-          body = {} as TeamResponse;
-        }
-
-        if (!res.ok) {
-          throw new Error(body.error ?? `Fetch failed (${res.status})`);
-        }
-
-        if (!mounted) return;
-
-        const adminsList = Array.isArray(body.ADMINS) ? body.ADMINS : [];
-        const mentorsList = Array.isArray(body.MENTORS) ? body.MENTORS : [];
-
-        // Set CEO directly from API response
-        if (body.CEO) {
-          setCeo(body.CEO);
-        }
-
-        setAdmins(adminsList);
-        setMentors(mentorsList);
-=======
         const result = await getTeamData();
 
         if (!mounted) return;
@@ -174,7 +115,6 @@ export default function TeamSection() {
         if (result.ceo) {
           setCeo(result.ceo);
         }
->>>>>>> 10e4b1e1fb38e31ee56d942c6143a8118e265af8
       } catch (err: any) {
         console.error("Error loading team:", err);
         if (mounted) setErrMsg(err?.message ?? "Failed to load team");
