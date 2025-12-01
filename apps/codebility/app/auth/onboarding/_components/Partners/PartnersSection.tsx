@@ -84,14 +84,14 @@ export default function PartnersSection() {
   return (
     <section
       ref={ref}
-      className="relative w-full overflow-hidden bg-gradient-to-br from-white via-slate-50 to-slate-100"
+      className="relative w-full overflow-hidden bg-gradient-to-br from-zinc-950 via-black to-zinc-950"
     >
-      {/* soft pastel glows for light motif */}
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.15),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.15),transparent_60%)]" />
+      {/* soft pastel glows for dark motif */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.1),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.1),transparent_60%)]" />
 
       <div className="mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:py-28">
         <h2
-          className={`bg-gradient-to-r from-slate-900 via-slate-800 to-slate-700 bg-clip-text text-center
+          className={`bg-gradient-to-r from-pink-400 via-purple-500 to-teal-600 bg-clip-text text-center
             text-3xl font-extrabold tracking-tight text-transparent transition-all duration-700
             sm:text-4xl md:text-5xl ${inView ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}
         >
@@ -99,37 +99,28 @@ export default function PartnersSection() {
         </h2>
 
         <p
-          className={`mx-auto mt-3 max-w-2xl text-center text-sm text-slate-600 transition-opacity
+          className={`mx-auto mt-3 max-w-2xl text-center text-sm text-white/70 transition-opacity
             delay-100 duration-700 sm:text-base ${inView ? "opacity-100" : "opacity-0"}`}
         >
           Collaborating with forward-thinking teams to build great products.
         </p>
 
         <div
-          className={`mt-12 grid grid-cols-2 gap-4 transition-all duration-700 sm:grid-cols-3
+          className={`mt-12 grid grid-cols-2 gap-8 transition-all duration-700 sm:grid-cols-3
             md:grid-cols-4 lg:grid-cols-6 ${inView ? "translate-y-0 opacity-100" : "translate-y-4 opacity-0"}`}
         >
           {PARTNERS.map((p) => (
             <div
               key={p.id}
-              className="group relative flex items-center justify-center rounded-2xl
-             bg-slate-800 px-4 py-6 shadow-sm ring-1 ring-slate-900/30
-             backdrop-blur-sm transition-all duration-300
-             hover:bg-slate-800/90 hover:shadow-[0_10px_30px_-12px_rgba(2,6,23,0.35)] hover:ring-slate-900/50"
+              className="flex items-center justify-center transition-opacity duration-300 hover:opacity-70"
               title={p.alt}
             >
-              {/* subtle inner highlight on hover */}
-              <div
-                className="absolute inset-px rounded-2xl bg-gradient-to-br from-white/10 to-white/0
-               opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              />
-
               <Image
                 src={p.src}
                 alt={p.alt}
-                width={160}
-                height={64}
-                className="relative z-[1] h-12 w-auto object-contain"
+                width={200}
+                height={80}
+                className="h-16 w-auto object-contain"
                 loading="lazy"
               />
             </div>

@@ -37,7 +37,7 @@ import {
   sendMultipleOnboardingReminderWithUpdate,
   sendMultiplePassedTestEmail,
   sendMultipleTestReminderEmailWithUpdate,
-} from "../../_service/emailAction";
+} from "../../_service/email";
 import { NewApplicantType } from "../../_service/types";
 
 export default function ApplicantRowActionButton({

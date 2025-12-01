@@ -15,7 +15,7 @@ import {
   sendOnboardingReminderForConfig,
   sendPassedTestEmailForConfig,
   sendTestReminderForConfig,
-} from "../../_service/emailAction";
+} from "../../_service/email";
 
 export const ACTION_CONFIG: Record<ActionType, ActionConfig> = {
   applying: {
