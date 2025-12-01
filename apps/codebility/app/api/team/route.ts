@@ -4,13 +4,38 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 
 type Person = { name: string; role: string; image?: string };
 
-// Replace from the admin group
-const CEO_FULL_NAME = process.env.CEO_FULLNAME ?? ""; // or import from a shared constants file
+// CEO identification
+const CEO_FIRST_NAME = "Jzeff Kendrew";
+const CEO_LAST_NAME = "Somera";
 
 export async function GET() {
   try {
     const supabase = await createClientServerComponent();
 
+    // Fetch CEO and Admins/Mentors separately
+    const { data: ceoData, error: ceoError } = await supabase
+      .from("codev")
+      .select(`
+        first_name,
+        last_name,
+        image_url
+      `)
+      .eq("first_name", CEO_FIRST_NAME)
+      .eq("last_name", CEO_LAST_NAME)
+      .eq("availability_status", true)
+      .single();
+
+    let CEO: Person | null = null;
+    
+    if (!ceoError && ceoData) {
+      CEO = {
+        name: `${ceoData.first_name} ${ceoData.last_name}`.replace(/\s+/g, ' ').trim(),
+        role: "Founder / CEO",
+        image: ceoData.image_url ?? undefined
+      };
+    }
+
+    // Fetch Admins and Mentors (excluding CEO)
     const { data, error } = await supabase
       .from("codev")
       .select(`
@@ -25,54 +50,47 @@ export async function GET() {
         roles!inner ( name )
       `)
       .eq("availability_status", true)
-      .in("roles.name", ["Admin", "Mentor"]);
+      .in("roles.name", ["Admin", "Mentor"])
+      .neq("first_name", CEO_FIRST_NAME); // Exclude CEO from this query
 
     if (error) {
       console.error("Supabase query error:", error);
       return NextResponse.json(
-        { ADMINS: [], MENTORS: [], CEO: null, error: error.message ?? "DB error" },
+        { ADMINS: [], MENTORS: [], CEO, error: error.message ?? "DB error" },
         { status: 500 }
       );
     }
 
     const ADMINS: Person[] = [];
     const MENTORS: Person[] = [];
-    let CEO: Person | null = null;
 
     (data ?? []).forEach((row: any) => {
-      const name = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
+      const firstName = (row.first_name ?? "").trim();
+      const lastName = (row.last_name ?? "").trim();
+      const name = `${firstName} ${lastName}`.replace(/\s+/g, ' ').trim();
       const role = row.roles?.name ?? "Member";
+      
       const person: Person = {
         name: name || "Unknown",
         role,
         image: row.image_url ?? undefined,
       };
 
-      // Normalize comparison
-      const normalizedName = name.toLowerCase();
-      const normalizedCEO = CEO_FULL_NAME.trim().toLowerCase();
-
-      if (role === "Admin" && normalizedCEO && normalizedName === normalizedCEO) {
-        // ✅ Found CEO: assign to CEO, exclude from ADMINS
-        CEO = { ...person, role: "Founder / CEO" };
-      } else if (role === "Admin") {
+      if (role === "Admin") {
         ADMINS.push(person);
       } else if (role === "Mentor") {
         MENTORS.push(person);
       }
     });
 
-    // filter admins with project_id e0124447-1978-400f-bfc7-7ea2f974d100 and role `member` or project_id 54d5fba1-056c-45a2-b492-02eec8530640 and role `member` or name is `Ian Troy Pahilga
-    const filteredAdmins = ADMINS.filter((admin) => {
-      const projectMember = data?.find((row: any) => {
-        const name = `${row.first_name ?? ""} ${row.last_name ?? ""}`.trim();
-        return name === admin.name;
-      })?.project_members;
+    
 
-      return !projectMember?.some((pm: any) => ((pm.project_id === 'e0124447-1978-400f-bfc7-7ea2f974d100' && pm.role === 'member') || (pm.project_id === '54d5fba1-056c-45a2-b492-02eec8530640' && pm.role === 'member'))) && admin.name !== 'Ian Troy Pahilga';
+    return NextResponse.json({ 
+      ADMINS, 
+      MENTORS,
+      CEO
     });
-
-    return NextResponse.json({ ADMINS: filteredAdmins, MENTORS, CEO });
+    
   } catch (err) {
     console.error("Unexpected error in /api/team:", err);
     return NextResponse.json(
