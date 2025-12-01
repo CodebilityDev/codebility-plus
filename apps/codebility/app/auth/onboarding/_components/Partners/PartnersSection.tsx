@@ -84,7 +84,7 @@ export default function PartnersSection() {
   return (
     <section
       ref={ref}
-      className="relative w-full overflow-hidden bg-zinc-950"
+      className="relative w-full overflow-hidden bg-zinc-900"
     >
 
       <div className="mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:py-28">
@@ -116,9 +116,9 @@ export default function PartnersSection() {
               <Image
                 src={p.src}
                 alt={p.alt}
-                width={160}
-                height={64}
-                className="h-12 w-auto object-contain"
+                width={200}
+                height={80}
+                className="h-16 w-auto object-contain"
                 loading="lazy"
               />
             </div>
