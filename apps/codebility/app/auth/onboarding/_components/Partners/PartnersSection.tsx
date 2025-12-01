@@ -84,8 +84,10 @@ export default function PartnersSection() {
   return (
     <section
       ref={ref}
-      className="relative w-full overflow-hidden bg-zinc-900"
+      className="relative w-full overflow-hidden bg-gradient-to-br from-zinc-950 via-black to-zinc-950"
     >
+      {/* soft pastel glows for dark motif */}
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(900px_520px_at_85%_20%,rgba(236,72,153,0.1),transparent_60%),radial-gradient(800px_480px_at_10%_80%,rgba(20,184,166,0.1),transparent_60%)]" />
 
       <div className="mx-auto max-w-7xl px-6 py-20 sm:py-24 lg:py-28">
         <h2
