@@ -61,7 +61,7 @@ export async function GET() {
       );
     }
 
-    const ADMINS: Person[] = [];
+     const ADMINS: Person[] = [];
     const MENTORS: Person[] = [];
 
     (data ?? []).forEach((row: any) => {
