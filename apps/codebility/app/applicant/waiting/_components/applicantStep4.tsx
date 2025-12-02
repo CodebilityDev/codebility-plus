@@ -91,6 +91,11 @@ export default function ApplicantStep4({ user }: { user: any }) {
                 </span>
               </button>
             </Link>
+            <div className="mt-3 rounded-md border border-green-600 bg-green-950/30 p-2">
+              <p className="text-xs text-green-300">
+                <span className="font-bold">After joining:</span> Navigate to the <span className="font-semibold">"Bench"</span> subchat for your next instructions and updates.
+              </p>
+            </div>
           </div>
         </div>
 

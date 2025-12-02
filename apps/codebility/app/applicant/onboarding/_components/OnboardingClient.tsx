@@ -251,7 +251,7 @@ export default function OnboardingClient({
             <div className="flex gap-4">
               <Button
                 onClick={progress.currentVideo === 4 ? handleProceedToQuiz : handleNextVideo}
-                disabled={false} // TODO: Change back to: !isVideoCompleted(progress.currentVideo)
+                disabled={!isVideoCompleted(progress.currentVideo)}
                 className="from-customTeal to-customViolet-100 w-24 bg-gradient-to-r via-customBlue-100"
               >
                 Next

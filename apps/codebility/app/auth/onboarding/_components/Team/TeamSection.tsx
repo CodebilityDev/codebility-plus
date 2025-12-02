@@ -1,4 +1,4 @@
-// components/TeamSection.tsx
+// onboarding/components/TeamSection.tsx
 "use client";
 
 import React, { useEffect, useState } from "react";
@@ -157,7 +157,7 @@ export default function TeamSection() {
               <h3 className="mb-4 text-center text-lg font-bold tracking-tight text-white/85">Admins</h3>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {admins.length > 0 ? (
-                  admins.map((p) => <PersonCard key={`${p.name}-${p.role}`} person={p} />)
+                  admins.map((p, idx) => <PersonCard key={`${p.name}-${idx}`} person={p} />)
                 ) : (
                   <div className="col-span-full text-center text-white/50">No admins available</div>
                 )}
@@ -179,7 +179,7 @@ export default function TeamSection() {
               <h3 className="mb-4 text-center text-lg font-bold tracking-tight text-white/85">Mentors</h3>
               <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {mentors.length > 0 ? (
-                  mentors.map((p) => <PersonCard key={`${p.name}-${p.role}`} person={p} />)
+                  mentors.map((p, idx) => <PersonCard key={`${p.name}-${idx}`} person={p} />)
                 ) : (
                   <div className="col-span-full text-center text-white/50">No mentors available</div>
                 )}
