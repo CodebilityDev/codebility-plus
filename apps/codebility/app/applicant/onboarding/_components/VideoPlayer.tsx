@@ -26,6 +26,22 @@ export default function VideoPlayer({
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
 
+  const saveVideoProgress = async () => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    await updateVideoProgress({
+      applicantId,
+      videoNumber,
+      watchedDuration: video.currentTime,
+      totalDuration: video.duration,
+      completed: true,
+    });
+
+    // Notify parent component to refresh progress state (to unlock Next button)
+    onVideoComplete();
+  };
+
   useEffect(() => {
     const video = videoRef.current;
     if (!video) return;
@@ -35,10 +51,12 @@ export default function VideoPlayer({
       const percentWatched = (video.currentTime / video.duration) * 100;
       setProgress(percentWatched);
 
-      // Consider video watched if they've seen 90% or more
-      if (percentWatched >= 90 && !hasWatched) {
+      // Mark as watched if they've seen 98% or more (to unlock Next button)
+      // But don't auto-advance - user must click Next manually
+      if (percentWatched >= 98 && !hasWatched) {
         setHasWatched(true);
-        handleVideoComplete();
+        // Save progress in background without triggering navigation
+        saveVideoProgress();
       }
     };
 
@@ -61,21 +79,6 @@ export default function VideoPlayer({
       video.removeEventListener("pause", handlePause);
     };
   }, [hasWatched]);
-
-  const handleVideoComplete = async () => {
-    const video = videoRef.current;
-    if (!video) return;
-
-    await updateVideoProgress({
-      applicantId,
-      videoNumber,
-      watchedDuration: video.currentTime,
-      totalDuration: video.duration,
-      completed: true,
-    });
-
-    onVideoComplete();
-  };
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
