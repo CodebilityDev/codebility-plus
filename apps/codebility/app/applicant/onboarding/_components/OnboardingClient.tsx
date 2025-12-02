@@ -164,10 +164,15 @@ export default function OnboardingClient({
   };
 
   const canWatchVideo = (videoNumber: number): boolean => {
+    // Always allow watching video 1
     if (videoNumber === 1) return true;
-    if (videoNumber === 2) return progress.video1;
-    if (videoNumber === 3) return progress.video2;
-    if (videoNumber === 4) return progress.video3;
+
+    // For other videos, allow if:
+    // 1. Previous video is completed (sequential unlock), OR
+    // 2. This video has already been completed (allow rewatching)
+    if (videoNumber === 2) return progress.video1 || progress.video2;
+    if (videoNumber === 3) return progress.video2 || progress.video3;
+    if (videoNumber === 4) return progress.video3 || progress.video4;
     return false;
   };
 
@@ -254,7 +259,7 @@ export default function OnboardingClient({
                 disabled={!isVideoCompleted(progress.currentVideo)}
                 className="from-customTeal to-customViolet-100 w-24 bg-gradient-to-r via-customBlue-100"
               >
-                Next
+                {progress.currentVideo === 4 ? 'Proceed to Quiz' : 'Next'}
               </Button>
             </div>
           </div>
