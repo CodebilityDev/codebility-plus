@@ -122,7 +122,7 @@ async function uploadImageToStorage(supabase: any, base64Image: string, authorId
         }
 
         // Return the public URL
-        return `https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/overflowPostImage/${filename}`;
+        return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/codebility/overflowPostImage/${filename}`;
     } catch (error) {
         console.error('Error in uploadImageToStorage:', error);
         return null;
@@ -1037,3 +1037,25 @@ export async function toggleCommentLike(commentId: string, userId: string) {
     return { success: false, error: "Failed to toggle comment like" };
   }
 }
+
+
+// social points
+
+export const getSocialPoints = async (userId: string): Promise<number | null> => {
+  const supabase = await createClientServerComponent();
+
+  try {
+    // Fetch user's points
+    const { data, error } = await supabase.rpc(
+      "calculate_overflow_social_points",
+      { user_codev_id: userId },
+    );
+
+    if (error) throw error;
+
+    return data;
+  } catch (error) {
+    console.error("Failed to fetch social points:", error);
+    throw error;
+  }
+};

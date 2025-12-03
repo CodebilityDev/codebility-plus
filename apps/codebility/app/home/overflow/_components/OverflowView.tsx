@@ -6,7 +6,7 @@ import { Plus, MoreHorizontal } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import PostQuestionModal from "./PostQuestionModal";
 import QuestionCard from "./QuestionCard";
-import { fetchQuestions, Question, postQuestion } from '../actions';
+import { fetchQuestions, Question, postQuestion, getSocialPoints } from '../actions';
 
 type Author = {
   id: string;
@@ -26,8 +26,19 @@ export default function OverflowView({ author }: OverflowViewProps) {
   const [forms, setForms] = useState<Question[]>([]);
   const [isPosting, setIsPosting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [socPoints, setSocPoints] = useState(0);
 
+  // Function to refresh social points
+  const refreshSocialPoints = async () => {
+    try {
+      const points = await getSocialPoints(author.id);
+      setSocPoints(points || 0);
+    } catch (error) {
+      console.error('Failed to fetch social points:', error);
+    }
+  }; 
 
+  // Fetch questions on mount
   useEffect(() => {
     setIsLoading(true);
     fetchQuestions()
@@ -42,6 +53,10 @@ export default function OverflowView({ author }: OverflowViewProps) {
       });
   }, []);
 
+  // Fetch social points on mount
+  useEffect(() => {
+    refreshSocialPoints();
+  }, [author.id, questions]);
 
   const sortedQuestions = [...questions]
     .filter((q) => {
@@ -59,29 +74,32 @@ export default function OverflowView({ author }: OverflowViewProps) {
       }
     });
 
-
   const handlePostQuestion = async (questionData: {
-  title: string;
-  content: string;
-  tags: string[];
-  images: string[];
-}) => {
-  setIsPosting(true);
+    title: string;
+    content: string;
+    tags: string[];
+    images: string[];
+  }) => {
+    setIsPosting(true);
 
-  try {
-    // Call the server action to post the question
-    const result = await postQuestion({
-      title: questionData.title,
-      content: questionData.content,
-      tags: questionData.tags,
-      images: questionData.images,
-      authorId: author.id,
-    });
+    try {
+      // Call the server action to post the question
+      const result = await postQuestion({
+        title: questionData.title,
+        content: questionData.content,
+        tags: questionData.tags,
+        images: questionData.images,
+        authorId: author.id,
+      });
 
-     if (result.success && result.question) {
-        fetchQuestions().then((result) => {
-        setQuestions(result);
-      })
+      if (result.success && result.question) {
+        // Refresh questions
+        const updatedQuestions = await fetchQuestions();
+        setQuestions(updatedQuestions);
+        
+        // Refresh social points after posting
+        await refreshSocialPoints();
+        
         setIsPostModalOpen(false);
         toast({
           title: "Success!",
@@ -89,31 +107,32 @@ export default function OverflowView({ author }: OverflowViewProps) {
           variant: "default",
           className: "bg-green-500 text-white border-green-600",
         });
-    }  else {
+      } else {
         toast({
           title: "Failed to post question",
           description: result.error || "Please try again.",
           variant: "destructive",
           className: "bg-red-500 text-white border-red-600",
         });
-    }
-  } catch (error) {
-    console.error('Error posting question:', error);
+      }
+    } catch (error) {
+      console.error('Error posting question:', error);
       toast({
         title: "Error",
         description: "An error occurred. Please try again.",
         variant: "destructive",
         className: "bg-red-500 text-white border-red-600",
       });
-  } finally {
-    setIsPosting(false);
-  }
-};
+    } finally {
+      setIsPosting(false);
+    }
+  };
 
   const handleLike = (questionId: string) => {
     alert(`Question ID: ${questionId}`);
+    // Refresh social points after liking
+    refreshSocialPoints();
   };
-
 
   return (
     <div className="flex flex-col gap-8">
@@ -124,10 +143,11 @@ export default function OverflowView({ author }: OverflowViewProps) {
             variant="ghost"
             size="sm"
             onClick={() => setSortBy("newest")}
-            className={`rounded-full px-4 py-2 transition-all duration-200 ${sortBy === "newest"
-              ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600"
-              : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-              }`}
+            className={`rounded-full px-4 py-2 transition-all duration-200 ${
+              sortBy === "newest"
+                ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600"
+                : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
           >
             Newest
           </Button>
@@ -135,10 +155,11 @@ export default function OverflowView({ author }: OverflowViewProps) {
             variant="ghost"
             size="sm"
             onClick={() => setSortBy("popular")}
-            className={`rounded-full px-4 py-2 transition-all duration-200 ${sortBy === "popular"
-              ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600"
-              : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-              }`}
+            className={`rounded-full px-4 py-2 transition-all duration-200 ${
+              sortBy === "popular"
+                ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600"
+                : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
           >
             Popular
           </Button>
@@ -146,10 +167,11 @@ export default function OverflowView({ author }: OverflowViewProps) {
             variant="ghost"
             size="sm"
             onClick={() => setSortBy("myPosts")}
-            className={`rounded-full px-4 py-2 transition-all duration-200 ${sortBy === "myPosts"
-              ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600"
-              : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
-              }`}
+            className={`rounded-full px-4 py-2 transition-all duration-200 ${
+              sortBy === "myPosts"
+                ? "bg-customBlue-500 text-white shadow-md hover:bg-customBlue-600"
+                : "text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
+            }`}
           >
             My Posts
           </Button>
@@ -162,6 +184,14 @@ export default function OverflowView({ author }: OverflowViewProps) {
           <Plus className="mr-2 h-4 w-4" />
           Ask Question
         </Button>
+        
+        {/* Social Points Display */}
+        <div className="flex w-48 gap-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-2 shadow-lg">
+          <div className="flex flex-col">
+            <span className="text-xs font-medium text-foreground">Social Points</span>
+            <span className="text-lg font-bold text-foreground">{socPoints}</span>
+          </div>
+        </div>
       </div>
 
       {/* Questions list */}
@@ -184,6 +214,7 @@ export default function OverflowView({ author }: OverflowViewProps) {
               onLike={handleLike}
               loggedIn={author}
               setQuestions={setQuestions}
+              refreshSocialPoints={refreshSocialPoints}
             />
           ))
         ) : (
