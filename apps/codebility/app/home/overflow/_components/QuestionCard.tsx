@@ -44,6 +44,7 @@ interface QuestionCardProps {
     image_url: string | null;
   }
   setQuestions : React.Dispatch<React.SetStateAction<Question[]>>;
+   refreshSocialPoints: () => Promise<void>;
 }
 
 function TimeAgo({ dateString, isEdited }: { dateString: string; isEdited?: boolean }) {
