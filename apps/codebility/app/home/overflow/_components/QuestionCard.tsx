@@ -343,12 +343,12 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
         </h3>
 
         {/* Question Content - Responsive text */}
-        <p className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words">
+        <span className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words">
           <QuestionContentDisplay 
             content={question.content}
             className="text-gray-700 dark:text-gray-300"
           />
-        </p>
+        </span>
 
         {/* Images - Responsive carousel */}
         {question.images && question.images.length > 0 && (
