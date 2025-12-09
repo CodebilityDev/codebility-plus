@@ -22,50 +22,72 @@ export interface Question {
     updated_at: string;
 }
 
-export async function fetchQuestions(): Promise<Question[]> {
-    const supabase = await createClientServerComponent();
+export async function fetchQuestions(page: number = 1, pageSize: number = 5): Promise<{
+  questions: Question[];
+  currentPage: number;
+  totalPages: number;
+  totalCount: number;
+}> {
+  const supabase = await createClientServerComponent()
 
-    const { data, error } = await supabase
-        .from('overflow_post')
-        .select(`
-            *,
-            codev (
-                id,
-                first_name,
-                last_name,
-                image_url
-            )
-        `);
+  // Calculate the range for pagination (page starts at 1)
+  const start = (page - 1) * pageSize
+  const end = start + pageSize - 1
 
+  // Fetch questions with pagination
+  const { data, error, count } = await supabase
+    .from('overflow_post')
+    .select(`
+      *,
+      codev (
+        id,
+        first_name,
+        last_name,
+        image_url
+      )
+    `, { count: 'exact' })
+    .order('created_at', { ascending: false })
+    .range(start, end)
 
-    if (error) {
-        console.error('Error fetching questions:', error);
-        return [];
+  if (error) {
+    console.error('Error fetching questions:', error)
+    return { questions: [], currentPage: 1, totalPages: 0, totalCount: 0 }
+  }
+
+  if (!data || data.length === 0) {
+    return { 
+      questions: [], 
+      currentPage: page, 
+      totalPages: count ? Math.ceil(count / pageSize) : 0, 
+      totalCount: count || 0 
     }
+  }
 
-    if (!data || data.length === 0) {
-        console.log('No data returned from database');
-        return [];
-    }
+  const transformedQuestions: Question[] = data.map((item: any) => ({
+    id: item.id.toString(),
+    title: item.title || '',
+    content: item.question_details || '',
+    author: {
+      id: item.codev.id,
+      name: `${item.codev.first_name} ${item.codev.last_name}`.trim(),
+      image_url: item.codev.image_url,
+    },
+    tags: item.tags ? JSON.parse(item.tags) as string[] : [],
+    images: item.image_url ? JSON.parse(item.image_url) as string[] : [],
+    likes: item.likes || 0,
+    comments: item.comments || 0,
+    created_at: item.created_at,
+    updated_at: item.updated_at,
+  }))
 
-    const transformedQuestions: Question[] = data.map((item: any) => ({
-        id: item.id.toString(),
-        title: item.title || '',
-        content: item.question_details || '',
-        author: {
-            id: item.codev.id,
-            name: `${item.codev.first_name} ${item.codev.last_name}`.trim(), // Added space
-            image_url: item.codev.image_url,
-        },
-        tags: item.tags ? JSON.parse(item.tags) as string[] : [], // ← Type assertion
-        images: item.image_url ? JSON.parse(item.image_url) as string[] : [], // ← Type assertion
-        likes: item.likes || 0,
-        comments: item.comments || 0,
-        created_at: item.created_at,
-        updated_at: item.updated_at,
-    }));
+  const totalPages = count ? Math.ceil(count / pageSize) : 0
 
-    return transformedQuestions;
+  return {
+    questions: transformedQuestions,
+    currentPage: page,
+    totalPages,
+    totalCount: count || 0
+  }
 }
 
 

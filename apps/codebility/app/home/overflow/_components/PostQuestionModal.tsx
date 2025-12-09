@@ -4,8 +4,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@codevs/ui/button";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { Textarea } from "@codevs/ui/textarea";
-import { X, Upload, AlertCircle, ImageIcon } from "lucide-react";
+import { X, Upload, AlertCircle, Bold, Italic, Code, List, ListOrdered, Undo, Redo } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -14,7 +13,14 @@ import {
 } from "@codevs/ui/dialog";
 import { Alert, AlertDescription } from "@codevs/ui/alert";
 import Image from "next/image";
-import { Loader2 } from "lucide-react"; // spinner icon
+import { Loader2 } from "lucide-react";
+import { useEditor, EditorContent } from '@tiptap/react';
+import StarterKit from '@tiptap/starter-kit';
+import Placeholder from '@tiptap/extension-placeholder';
+import CodeBlockLowlight from '@tiptap/extension-code-block-lowlight';
+import { common, createLowlight } from 'lowlight';
+
+const lowlight = createLowlight(common);
 
 interface Question {
   id: string;
@@ -36,8 +42,8 @@ interface PostQuestionModalProps {
     images: string[];
     authorId: string;
   }) => void;
-  editQuestion?: Question | null; // Optional question to edit
-  mode?: 'create' | 'edit'; // Mode of the modal
+  editQuestion?: Question | null;
+  mode?: 'create' | 'edit';
 }
 
 export default function PostQuestionModal({
@@ -48,27 +54,47 @@ export default function PostQuestionModal({
   mode = 'create',
 }: PostQuestionModalProps) {
   const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
   const [tagsInput, setTagsInput] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [submitting, setSubmitting] = useState(false);
-
-
+  
   const isEditMode = mode === 'edit' && editQuestion;
 
+  const editor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        codeBlock: false,
+      }),
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
+      Placeholder.configure({
+        placeholder: 'Describe your problem in detail. Include:\n• What you\'re trying to achieve\n• What you\'ve tried so far\n• Any error messages\n• Code snippets (if relevant)',
+      }),
+    ],
+    content: '',
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[250px] p-4 text-gray-900 dark:text-white dark:prose-invert',
+      },
+    },
+  });
+
+
+  
   // Populate form when editing
   useEffect(() => {
-    if (isEditMode) {
+    if (isEditMode && editor) {
       setTitle(editQuestion.title);
-      setContent(editQuestion.content);
+      editor.commands.setContent(editQuestion.content);
       setTagsInput(editQuestion.tags.join(", "));
       setImages(editQuestion.images || []);
-    } else {
+    } else if (editor && !isEditMode) {
       resetForm();
     }
-  }, [isEditMode, editQuestion, isOpen]);
+  }, [isEditMode, editQuestion, isOpen, editor]);
 
   const handleSubmit = async () => {
     setError(null);
@@ -81,11 +107,15 @@ export default function PostQuestionModal({
       setError("Question title must be at least 10 characters");
       return;
     }
-    if (!content.trim()) {
+
+    const content = editor?.getHTML() || '';
+    const textContent = editor?.getText() || '';
+    
+    if (!textContent.trim()) {
       setError("Please provide question details");
       return;
     }
-    if (content.trim().length < 20) {
+    if (textContent.trim().length < 20) {
       setError("Question details must be at least 20 characters");
       return;
     }
@@ -103,7 +133,7 @@ export default function PostQuestionModal({
           id: editQuestion.id,
           authorId: editQuestion.authorId,
           title: title.trim(),
-          content: content.trim(),
+          content: content,
           tags,
           images,
         });
@@ -112,7 +142,7 @@ export default function PostQuestionModal({
           id: "",
           authorId: "",
           title: title.trim(),
-          content: content.trim(),
+          content: content,
           tags,
           images,
         });
@@ -123,17 +153,15 @@ export default function PostQuestionModal({
       }
       onClose();
     } catch (e) {
-      // handle errors if onSubmit throws
       setError("Failed to submit. Please try again.");
     } finally {
       setSubmitting(false);
     }
   };
 
-
   const resetForm = () => {
     setTitle("");
-    setContent("");
+    editor?.commands.setContent('');
     setTagsInput("");
     setImages([]);
     setError(null);
@@ -149,13 +177,11 @@ export default function PostQuestionModal({
     try {
       const imagePromises = Array.from(files).map(file => {
         return new Promise<string>((resolve, reject) => {
-          // Validate file size (max 5MB)
           if (file.size > 5 * 1024 * 1024) {
             reject(new Error(`${file.name} is too large. Max size is 5MB.`));
             return;
           }
 
-          // Validate file type
           if (!file.type.startsWith('image/')) {
             reject(new Error(`${file.name} is not a valid image file.`));
             return;
@@ -176,7 +202,6 @@ export default function PostQuestionModal({
 
       const uploadedImages = await Promise.all(imagePromises);
       
-      // Check total images count
       if (images.length + uploadedImages.length > 5) {
         setError("Maximum 5 images allowed per question");
         return;
@@ -188,7 +213,6 @@ export default function PostQuestionModal({
       setError(errorMessage);
     } finally {
       setUploadingImages(false);
-      // Reset file input
       e.target.value = '';
     }
   };
@@ -204,36 +228,119 @@ export default function PostQuestionModal({
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
-    // Submit with Ctrl+Enter or Cmd+Enter
     if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
       e.preventDefault();
       handleSubmit();
     }
   };
 
+  const MenuBar = () => {
+    if (!editor) return null;
+
+    return (
+      <div className="flex flex-wrap items-center gap-1 p-2 border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleBold().run()}
+          className={`h-8 w-8 p-0 ${editor.isActive('bold') ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+          title="Bold"
+        >
+          <Bold className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleItalic().run()}
+          className={`h-8 w-8 p-0 ${editor.isActive('italic') ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+          title="Italic"
+        >
+          <Italic className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleCode().run()}
+          className={`h-8 w-8 p-0 ${editor.isActive('code') ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+          title="Inline Code"
+        >
+          <Code className="h-4 w-4" />
+        </Button>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleBulletList().run()}
+          className={`h-8 w-8 p-0 ${editor.isActive('bulletList') ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+          title="Bullet List"
+        >
+          <List className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleOrderedList().run()}
+          className={`h-8 w-8 p-0 ${editor.isActive('orderedList') ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+          title="Numbered List"
+        >
+          <ListOrdered className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().toggleCodeBlock().run()}
+          className={`h-8 px-3 text-xs ${editor.isActive('codeBlock') ? 'bg-gray-200 dark:bg-gray-700' : ''}`}
+          title="Code Block"
+        >
+          {'</>'}
+        </Button>
+        <div className="w-px h-6 bg-gray-300 dark:bg-gray-600 mx-1" />
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().undo()}
+          className="h-8 w-8 p-0"
+          title="Undo"
+        >
+          <Undo className="h-4 w-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().redo()}
+          className="h-8 w-8 p-0"
+          title="Redo"
+        >
+          <Redo className="h-4 w-4" />
+        </Button>
+      </div>
+    );
+  };
+
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className={`max-w-2xl max-h-[90vh] flex flex-col p-0 ${submitting ? "backdrop-blur-sm pointer-events-none" : ""}`}>
+      <DialogContent className={`max-w-2xl max-h-[90vh] text-red-600 dark:bg-slate-950 flex flex-col p-0 ${submitting ? "backdrop-blur-sm pointer-events-none" : ""}`}>
         <div className="flex items-center justify-between p-6 pb-4 border-b border-gray-200 dark:border-gray-700">
           <DialogHeader className="p-0">
             <DialogTitle className="text-xl font-semibold text-gray-900 dark:text-white">
               {isEditMode ? 'Edit Question' : 'Ask a Question'}
             </DialogTitle>
           </DialogHeader>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleClose}
-            className="rounded-full h-8 w-8 p-0 opacity-70 hover:opacity-100 text-foreground hover:bg-gray-100 dark:hover:bg-gray-700"
-          >
-            <X className="h-4 w-4" />
-            <span className="sr-only">Close</span>
-          </Button>
+          
         </div>
 
         <div className="overflow-y-auto flex-1 px-6">
           <div className="space-y-5 py-5" onKeyDown={handleKeyDown}>
-            {/* Error Alert */}
             {error && (
               <Alert variant="destructive" className="animate-in fade-in slide-in-from-top-1">
                 <AlertCircle className="h-4 w-4" />
@@ -241,7 +348,6 @@ export default function PostQuestionModal({
               </Alert>
             )}
 
-            {/* Title Input */}
             <div className="space-y-2">
               <Label htmlFor="title" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Question Title <span className="text-red-500">*</span>
@@ -262,29 +368,19 @@ export default function PostQuestionModal({
               </p>
             </div>
 
-            {/* Content Textarea */}
             <div className="space-y-2">
-              <Label htmlFor="content" className="text-sm font-medium text-gray-700 dark:text-gray-300">
+              <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Question Details <span className="text-red-500">*</span>
               </Label>
-              <Textarea
-                id="content"
-                placeholder="Describe your problem in detail. Include:&#10;• What you're trying to achieve&#10;• What you've tried so far&#10;• Any error messages&#10;• Code snippets (if relevant)"
-                value={content}
-                onChange={(e) => {
-                  setContent(e.target.value);
-                  setError(null);
-                }}
-                rows={10}
-                maxLength={5000}
-                className="border-gray-300 bg-white text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:ring-2 focus:ring-customBlue-500/20 dark:border-gray-600 dark:bg-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-customBlue-400 resize-none"
-              />
+              <div className="border border-gray-300 dark:border-gray-600 rounded-lg overflow-hidden bg-white dark:bg-gray-800">
+                <MenuBar />
+                <EditorContent editor={editor} />
+              </div>
               <p className="text-xs text-gray-500 dark:text-gray-400">
-                {content.length}/5000 characters • Press <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-gray-100 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600">Ctrl+Enter</kbd> to submit
+                {editor?.storage.characterCount?.characters() || 0} characters • Press <kbd className="px-1.5 py-0.5 text-xs font-semibold bg-gray-100 border border-gray-300 rounded dark:bg-gray-700 dark:border-gray-600">Ctrl+Enter</kbd> to submit
               </p>
             </div>
 
-            {/* Tags Input */}
             <div className="space-y-2">
               <Label htmlFor="tags" className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Tags
@@ -301,7 +397,6 @@ export default function PostQuestionModal({
               </p>
             </div>
 
-            {/* Image Upload Section */}
             <div className="space-y-2">
               <Label className="text-sm font-medium text-gray-700 dark:text-gray-300">
                 Screenshots {images.length > 0 && <span className="text-gray-500">({images.length}/5)</span>}
@@ -341,7 +436,6 @@ export default function PostQuestionModal({
                 </p>
               </div>
 
-              {/* Image Preview Grid */}
               {images.length > 0 && (
                 <div className="grid grid-cols-3 gap-3 p-3 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
                   {images.map((image, index) => (
@@ -366,14 +460,13 @@ export default function PostQuestionModal({
                 </div>
               )}
               <p className="text-xs text-gray-500">
-                  Tap on the image to remove.
-                </p>
+                Tap on the image to remove.
+              </p>
             </div>
           </div>
         </div>
 
-        {/* Footer Actions */}
-         <div className="flex justify-between items-center gap-3 p-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900">
+        <div className="flex justify-between items-center gap-3 p-6 pt-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-slate-950">
           <p className="text-xs text-gray-500 dark:text-gray-400">
             💡 Tip: {isEditMode ? 'Update your question to make it clearer' : 'Clear questions get better answers faster'}
           </p>
@@ -390,7 +483,7 @@ export default function PostQuestionModal({
             <Button
               type="button"
               onClick={handleSubmit}
-              disabled={uploadingImages || submitting || !title.trim() || !content.trim()}
+              disabled={uploadingImages || submitting || !title.trim() || !editor?.getText().trim()}
               className="bg-gradient-to-r from-customBlue-500 to-indigo-500 hover:from-customBlue-600 hover:to-indigo-600 text-white shadow-md hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               {submitting && (
@@ -403,4 +496,33 @@ export default function PostQuestionModal({
       </DialogContent>
     </Dialog>
   );
+}
+
+// IMPORTANT: Component to display the question content properly
+// Use this wherever you're showing the question content:
+
+export function QuestionContentDisplay({ content, className = '' }: { content: string; className?: string }) {
+  const displayEditor = useEditor({
+    extensions: [
+      StarterKit.configure({
+        codeBlock: false,
+      }),
+      CodeBlockLowlight.configure({
+        lowlight,
+      }),
+    ],
+    content: content,
+    editable: false,
+    editorProps: {
+      attributes: {
+        class: `prose prose-sm max-w-none text-gray-900 dark:text-white dark:prose-invert ${className}`,
+      },
+    },
+  });
+  useEffect(() => {
+    if (displayEditor && content !== displayEditor.getHTML()) {
+      displayEditor.commands.setContent(content);
+    }
+  }, [content, displayEditor]);
+  return <EditorContent editor={displayEditor} />;
 }
