@@ -34,7 +34,7 @@ export default async function OverflowPage() {
             <h1 className="text-5xl font-light tracking-tight text-gray-900 dark:text-white">
               Codev Overflow
             </h1>
-            <div className="mx-auto mt-4 h-px w-32 bg-gradient-to-r from-transparent via-customBlue-400 to-transparent"></div>
+            <div className="mx-auto mt-4 h-px w-full bg-gradient-to-r from-transparent via-customBlue-400 to-transparent"></div>
           </div>
           <p className="mx-auto max-w-2xl text-lg font-light text-gray-600 dark:text-gray-300">
             A community-driven platform where developers collaborate, share knowledge, and solve problems together

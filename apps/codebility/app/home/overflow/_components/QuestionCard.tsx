@@ -14,7 +14,7 @@ import {
 } from "@codevs/ui/carousel"
 import CommentSection from "./CommentSection";
 import QuestionImagePreview from "./QuestionImagePreview"
-import PostQuestionModal from "./PostQuestionModal";
+import PostQuestionModal, { QuestionContentDisplay }  from "./PostQuestionModal";
 import { updateQuestion, deletePostAndImages, togglePostLike, checkPostLike } from "../actions";
 import { useToast } from "@/components/ui/use-toast";
 
@@ -44,6 +44,7 @@ interface QuestionCardProps {
     image_url: string | null;
   }
   setQuestions : React.Dispatch<React.SetStateAction<Question[]>>;
+   refreshSocialPoints: () => Promise<void>;
 }
 
 function TimeAgo({ dateString, isEdited }: { dateString: string; isEdited?: boolean }) {
@@ -92,7 +93,7 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
   // Check if the post has been edited
   const isEdited = question.created_at !== question.updated_at;
   const displayDate = isEdited ? question.updated_at : question.created_at;
-
+  
   // Check if user has already liked this post on mount
   useEffect(() => {
     const checkLikeStatus = async () => {
@@ -342,9 +343,12 @@ export default function QuestionCard({ question, onLike, loggedIn, setQuestions}
         </h3>
 
         {/* Question Content - Responsive text */}
-        <p className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words">
-          {question.content}
-        </p>
+        <span className="mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed text-gray-700 dark:text-gray-300 break-words">
+          <QuestionContentDisplay 
+            content={question.content}
+            className="text-gray-700 dark:text-gray-300"
+          />
+        </span>
 
         {/* Images - Responsive carousel */}
         {question.images && question.images.length > 0 && (
