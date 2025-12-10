@@ -81,7 +81,7 @@ function ApplicantLists({
         }}
         className="w-full"
       >
-        <TabsList className="!grid !h-auto w-full max-w-3xl grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 md:grid-cols-5 md:gap-1 dark:bg-gray-800">
+        <TabsList className="!grid !h-auto w-full grid-cols-2 gap-1 rounded-lg bg-gray-100 p-1 md:grid-cols-5 md:gap-1 dark:bg-gray-800">
           <TabsTrigger 
             value="applying" 
             className="!flex !h-auto flex-col gap-1 rounded-md px-3 py-3 text-sm font-medium transition-all data-[state=active]:bg-white data-[state=active]:shadow-sm md:flex-row md:gap-2 md:px-4 md:py-2 dark:data-[state=active]:bg-gray-900"
