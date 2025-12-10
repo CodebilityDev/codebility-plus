@@ -22,6 +22,15 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
   const [isPending, startTransition] = useTransition();
   const stats = getMemberStats(data);
 
+  // Sorting state
+  const [sortConfig, setSortConfig] = useState<{
+    key: "date_joined" | "display_position" | null;
+    direction: "asc" | "desc";
+  }>({
+    key: null,
+    direction: "asc",
+  });
+
   // Filters
   const [filters, setFilters] = useState({
     status: "",
@@ -97,14 +106,45 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
     return true;
   });
 
-  // Pagination - increased items per page for better table usage
+  // Sorting logic
+  const sortedData = [...filteredData].sort((a, b) => {
+    if (!sortConfig.key) return 0;
+
+    if (sortConfig.key === "date_joined") {
+      const dateA = a.date_joined ? new Date(a.date_joined).getTime() : 0;
+      const dateB = b.date_joined ? new Date(b.date_joined).getTime() : 0;
+
+      return sortConfig.direction === "asc" ? dateA - dateB : dateB - dateA;
+    }
+
+    if (sortConfig.key === "display_position") {
+      const posA = (a.display_position || "").toLowerCase();
+      const posB = (b.display_position || "").toLowerCase();
+
+      if (posA < posB) return sortConfig.direction === "asc" ? -1 : 1;
+      if (posA > posB) return sortConfig.direction === "asc" ? 1 : -1;
+      return 0;
+    }
+
+    return 0;
+  });
+
+  // Handle sort toggle
+  const handleSort = (key: "date_joined" | "display_position") => {
+    setSortConfig((prev) => ({
+      key,
+      direction: prev.key === key && prev.direction === "asc" ? "desc" : "asc",
+    }));
+  };
+
+  // Pagination - increased items per page for better table usage (use sortedData)
   const {
     currentPage,
     totalPages,
     paginatedData,
     handleNextPage,
     handlePreviousPage,
-  } = usePagination(filteredData, 50);
+  } = usePagination(sortedData, 50);
 
   const sharedProps = {
     data: paginatedData,
@@ -175,7 +215,7 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
       {/* Table View with Loading State */}
       {isPending ? (
         <InHouseTableSkeleton rows={10} />
-      ) : filteredData.length === 0 ? (
+      ) : sortedData.length === 0 ? (
         <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
           <div className="mb-4 text-4xl">🔍</div>
           <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">No members found</h3>
@@ -202,6 +242,8 @@ export default function InHouseView({ initialData }: InHouseViewProps) {
             onNextPage: handleNextPage,
             onPreviousPage: handlePreviousPage,
           }}
+          sortConfig={sortConfig}
+          onSort={handleSort}
         />
       )}
     </div>
