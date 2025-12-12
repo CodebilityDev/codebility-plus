@@ -21,7 +21,7 @@
     "lodash": "^4.17.21",
     "lucide-react": "^0.427.0",
     "mongoose": "^8.6.1",
-    "next": "14.2.5",
+    "next": "14.2.35",
     "next-qrcode": "^2.5.1",
     "next-share": "^0.27.0",
     "react": "^18",
