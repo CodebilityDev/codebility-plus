@@ -34,6 +34,11 @@ interface InHouseMobileTableProps {
     message: string,
   ) => Promise<void>;
   handleDownloadNda: (codevId: string) => void;
+  sortConfig?: {
+    key: "date_joined" | "display_position" | null;
+    direction: "asc" | "desc";
+  };
+  onSort?: (key: "date_joined" | "display_position") => void;
 }
 
 const defaultImage = "/assets/svgs/icon-codebility-black.svg";
@@ -97,6 +102,8 @@ export function InHouseMobileTable({
   roles,
   handleSendNdaEmail,
   handleDownloadNda,
+  sortConfig,
+  onSort,
 }: InHouseMobileTableProps) {
   const [editingId, setEditingId] = useState<string | null>(null);
 

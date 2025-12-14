@@ -8,7 +8,7 @@ import DefaultPagination from "@/components/ui/pagination";
 import { pageSize } from "@/constants";
 import { Codev, InternalStatus } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { Download, Link2, Mail } from "lucide-react";
+import { ArrowUpDown, Download, Link2, Mail } from "lucide-react";
 import { toast } from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";
@@ -61,6 +61,11 @@ interface InHouseTableProps {
     onNextPage: () => void;
     onPreviousPage: () => void;
   };
+  sortConfig?: {
+    key: "date_joined" | "display_position" | null;
+    direction: "asc" | "desc";
+  };
+  onSort?: (key: "date_joined" | "display_position") => void;
 }
 
 // Default fallback image for team members without avatars
@@ -141,6 +146,8 @@ export function InHouseTable({
   onDataChange,
   pagination,
   onDelete,
+  sortConfig,
+  onSort,
 }: InHouseTableProps) {
   // Supabase client instance for database operations
   const [supabase, setSupabase] = useState<any>(null);
@@ -353,6 +360,20 @@ export function InHouseTable({
   const handlePreviousPage = useCallback(() => pagination.onPreviousPage(), [pagination]);
 
   /**
+   * Renders sort indicator for sortable columns
+   */
+  const SortIndicator = ({ columnKey }: { columnKey: "date_joined" | "display_position" }) => {
+    if (!sortConfig || sortConfig.key !== columnKey) {
+      return <ArrowUpDown className="ml-1 inline h-3 w-3 opacity-30" />;
+    }
+    return (
+      <span className="ml-1 inline">
+        {sortConfig.direction === "asc" ? "↑" : "↓"}
+      </span>
+    );
+  };
+
+  /**
    * Advanced pagination handler for direct page navigation
    */
   const setCurrentPage = useCallback((pageOrFunction: number | ((page: number) => number)) => {
@@ -387,6 +408,8 @@ export function InHouseTable({
         roles={roles}
         handleSendNdaEmail={handleSendNdaEmail}
         handleDownloadNda={handleDownloadNda}
+        sortConfig={sortConfig}
+        onSort={onSort}
       />
 
       {/* Desktop Table Container - Hidden on mobile, visible on XL+ screens */}
@@ -406,6 +429,16 @@ export function InHouseTable({
                     className="dark:text-light-900 px-1 py-2 text-xs font-semibold text-black"
                   >
                     {column.label}
+                  </TableHead>
+                ) : column.key === "display_position" || column.key === "date_joined" ? (
+                  // Sortable columns - Hidden on smaller screens, visible on 2XL+
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 hidden cursor-pointer px-1 py-2 text-xs font-semibold text-black hover:bg-light-700 dark:hover:bg-dark-400 2xl:table-cell"
+                    onClick={() => onSort?.(column.key as "date_joined" | "display_position")}
+                  >
+                    {column.label}
+                    <SortIndicator columnKey={column.key as "date_joined" | "display_position"} />
                   </TableHead>
                 ) : (
                   // Hidden on smaller screens, visible on 2XL+
