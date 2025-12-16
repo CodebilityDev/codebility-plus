@@ -417,6 +417,10 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
             {projects.map((projectItem) => {
               const { project, teamLead, members } = projectItem;
               
+              // ✅ FIX: Add null check for members.data
+              const membersList = members.data ?? [];
+              const memberCount = membersList.length;
+              
               return (
                 <div
                   key={project.id}
@@ -437,8 +441,9 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
                           {isLoadingMembers ? 'Loading...' : 'Add Members'}
                         </button>
                       </div>
+                      {/* ✅ FIX: Use memberCount instead of members.data.length */}
                       <p className="text-sm text-gray-600 dark:text-white mb-4 sm:mb-5 md:mb-6 transition-colors duration-200">
-                        {members.data.length} member{members.data.length !== 1 ? 's' : ''}
+                        {memberCount} member{memberCount !== 1 ? 's' : ''}
                       </p>
                     </div>
 
@@ -460,7 +465,8 @@ const MyTeamPage = ({ projectData }: MyTeamPageProps) => {
                       </h3>
                       <div className="space-y-2 sm:space-y-3">
                         <div className="grid grid-cols-4 gap-2 sm:gap-3 md:grid-cols-6 lg:grid-cols-8 xl:grid-cols-10">
-                          {members.data.map((member) => (
+                          {/* ✅ FIX: Use membersList instead of members.data.map */}
+                          {membersList.map((member) => (
                             <MemberCard 
                               key={member.id} 
                               member={member} 
