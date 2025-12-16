@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, memo } from "react";
+import { useState, useEffect, memo, useCallback } from "react";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
@@ -61,6 +61,164 @@ const TimeAgo = memo(function TimeAgo({ date }: { date: string }) {
   return <span>{text}</span>;
 });
 
+// Memoized Avatar component
+const CommentAvatar = memo(function CommentAvatar({ 
+  imageUrl, 
+  name 
+}: { 
+  imageUrl: string | null; 
+  name: string;
+}) {
+  return (
+    <div className="h-8 w-8 sm:h-10 sm:w-10 mt-2 sm:mt-3 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+      {imageUrl ? (
+        <Image
+          src={imageUrl}
+          alt={name}
+          width={40}
+          height={40}
+          className="h-full w-full object-cover"
+        />
+      ) : (
+        <DefaultAvatar size={32} />
+      )}
+    </div>
+  );
+});
+
+// Memoized action buttons component
+const CommentActions = memo(function CommentActions({
+  commentId,
+  isLiked,
+  likes,
+  isOwner,
+  onLike,
+  onEdit,
+  onDelete,
+}: {
+  commentId: string;
+  isLiked: boolean;
+  likes: number;
+  isOwner: boolean;
+  onLike: (id: string) => void;
+  onEdit: () => void;
+  onDelete: () => void;
+}) {
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const handleLike = useCallback(() => {
+    onLike(commentId);
+  }, [commentId, onLike]);
+
+  const handleEdit = useCallback(() => {
+    onEdit();
+    setDropdownOpen(false);
+  }, [onEdit]);
+
+  const handleDelete = useCallback(() => {
+    onDelete();
+    setTimeout(() => {
+      setDropdownOpen(false);
+    }, 0);
+  }, [onDelete]);
+
+  return (
+    <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+      <Button
+        variant="ghost"
+        size="sm"
+        onClick={handleLike}
+        className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 h-auto ${
+          isLiked
+            ? "text-red-600 hover:text-red-700"
+            : "text-gray-600 hover:text-gray-700 dark:text-white dark:hover:text-gray-200"
+        }`}
+      >
+        <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isLiked ? "fill-current" : ""}`} />
+        <span className="text-xs sm:text-sm">{likes}</span>
+      </Button>
+
+      <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            disabled={!isOwner}
+            size="sm"
+            className="px-1.5 sm:px-2 py-1 h-auto text-gray-600 hover:text-gray-700 dark:text-white dark:hover:text-gray-200"
+          >
+            <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-32 sm:w-auto">
+          <DropdownMenuItem onClick={handleEdit} className="text-xs sm:text-sm">
+            <Pencil className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            Edit
+          </DropdownMenuItem>
+          <DropdownMenuItem 
+            onClick={handleDelete}
+            onSelect={(e) => e.preventDefault()}
+            className="text-xs sm:text-sm text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
+          >
+            <Trash2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+});
+
+// Memoized edit form component
+const CommentEditForm = memo(function CommentEditForm({
+  initialContent,
+  onSave,
+  onCancel,
+}: {
+  initialContent: string;
+  onSave: (content: string) => void;
+  onCancel: () => void;
+}) {
+  const [editContent, setEditContent] = useState(initialContent);
+
+  const handleSave = useCallback(() => {
+    if (editContent.trim() && editContent !== initialContent) {
+      onSave(editContent.trim());
+    }
+  }, [editContent, initialContent, onSave]);
+
+  return (
+    <div className="space-y-2">
+      <Textarea
+        value={editContent}
+        onChange={(e) => setEditContent(e.target.value)}
+        rows={3}
+        className="resize-none border-gray-300 bg-white text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
+        autoFocus
+      />
+      <div className="flex justify-end gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onCancel}
+          className="text-xs sm:text-sm h-8 sm:h-9 text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200"
+        >
+          <X className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+          Cancel
+        </Button>
+        <Button
+          size="sm"
+          onClick={handleSave}
+          disabled={!editContent.trim() || editContent === initialContent}
+          className="text-xs sm:text-sm h-8 sm:h-9"
+        >
+          <Check className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
+          Save
+        </Button>
+      </div>
+    </div>
+  );
+});
+
 // Memoize the comment item to prevent unnecessary re-renders
 const CommentItem = memo(
   function CommentItem({
@@ -80,52 +238,31 @@ const CommentItem = memo(
   }) {
     const isOwner = comment.author.id === loggedInUserId;
     const [isEditing, setIsEditing] = useState(false);
-    const [editContent, setEditContent] = useState(comment.content);
-    const [dropdownOpen, setDropdownOpen] = useState(false);
 
-    const handleStartEdit = () => {
+    const handleStartEdit = useCallback(() => {
       setIsEditing(true);
-      setEditContent(comment.content);
-      setDropdownOpen(false);
-    };
+    }, []);
 
-    const handleCancelEdit = () => {
+    const handleCancelEdit = useCallback(() => {
       setIsEditing(false);
-      setEditContent(comment.content);
-    };
+    }, []);
 
-    const handleSaveEdit = () => {
-      if (editContent.trim() && editContent !== comment.content) {
-        onEdit(comment.id, editContent.trim());
-      }
+    const handleSaveEdit = useCallback((newContent: string) => {
+      onEdit(comment.id, newContent);
       setIsEditing(false);
-    };
+    }, [comment.id, onEdit]);
 
-    const handleDelete = () => {
+    const handleDelete = useCallback(() => {
       onDelete(comment.id);
-      setTimeout(() => {
-        setDropdownOpen(false);
-      }, 0);
-    };
+    }, [comment.id, onDelete]);
 
     return (
       <div className="flex gap-2 sm:gap-3">
-        {/* Avatar - Responsive sizing */}
-        <div className="h-8 w-8 sm:h-10 sm:w-10 mt-2 sm:mt-3 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
-          {comment.author.image_url ? (
-            <Image
-              src={comment.author.image_url}
-              alt={comment.author.name}
-              width={40}
-              height={40}
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <DefaultAvatar size={32} />
-          )}
-        </div>
+        <CommentAvatar 
+          imageUrl={comment.author.image_url} 
+          name={comment.author.name}
+        />
 
-        {/* Comment content */}
         <div className="flex-1 min-w-0 rounded-lg border border-gray-200 bg-gray-50 p-2.5 sm:p-3 dark:border-gray-700 dark:bg-gray-800">
           <div className="mb-2 flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
@@ -145,83 +282,25 @@ const CommentItem = memo(
               </div>
             </div>
             
-            {/* Action buttons - Responsive */}
-            <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => onLike(comment.id)}
-                className={`flex items-center gap-1 px-1.5 sm:px-2 py-1 h-auto ${
-                  isLiked
-                    ? "text-red-600 hover:text-red-700"
-                    : "text-gray-600 hover:text-gray-700 dark:text-white dark:hover:text-gray-200"
-                }`}
-              >
-                <Heart className={`h-4 w-4 sm:h-5 sm:w-5 ${isLiked ? "fill-current" : ""}`} />
-                <span className="text-xs sm:text-sm">{comment.likes}</span>
-              </Button>
-
-              {!isEditing && (
-                <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      disabled={!isOwner}
-                      size="sm"
-                      className="px-1.5 sm:px-2 py-1 h-auto text-gray-600 hover:text-gray-700 dark:text-white dark:hover:text-gray-200"
-                    >
-                      <MoreVertical className="h-4 w-4 sm:h-5 sm:w-5" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-32 sm:w-auto">
-                    <DropdownMenuItem onClick={handleStartEdit} className="text-xs sm:text-sm">
-                      <Pencil className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                      Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem 
-                      onClick={handleDelete}
-                      onSelect={(e) => e.preventDefault()}
-                      className="text-xs sm:text-sm text-red-600 focus:text-red-600 dark:text-red-400 dark:focus:text-red-400"
-                    >
-                      <Trash2 className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
-                      Delete
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              )}
-            </div>
+            {!isEditing && (
+              <CommentActions
+                commentId={comment.id}
+                isLiked={isLiked}
+                likes={comment.likes}
+                isOwner={isOwner}
+                onLike={onLike}
+                onEdit={handleStartEdit}
+                onDelete={handleDelete}
+              />
+            )}
           </div>
 
           {isEditing ? (
-            <div className="space-y-2">
-              <Textarea
-                value={editContent}
-                onChange={(e) => setEditContent(e.target.value)}
-                rows={3}
-                className="resize-none border-gray-300 bg-white text-sm sm:text-base text-gray-900 placeholder-gray-500 focus:border-customBlue-500 focus:ring-customBlue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white dark:placeholder-gray-500 dark:focus:border-customBlue-400 dark:focus:ring-customBlue-400"
-                autoFocus
-              />
-              <div className="flex justify-end gap-2">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleCancelEdit}
-                  className="text-xs sm:text-sm h-8 sm:h-9 text-gray-600 hover:text-gray-700 dark:text-gray-300 dark:hover:text-gray-200"
-                >
-                  <X className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                  Cancel
-                </Button>
-                <Button
-                  size="sm"
-                  onClick={handleSaveEdit}
-                  disabled={!editContent.trim() || editContent === comment.content}
-                  className="text-xs sm:text-sm h-8 sm:h-9"
-                >
-                  <Check className="mr-1 h-3 w-3 sm:h-4 sm:w-4" />
-                  Save
-                </Button>
-              </div>
-            </div>
+            <CommentEditForm
+              initialContent={comment.content}
+              onSave={handleSaveEdit}
+              onCancel={handleCancelEdit}
+            />
           ) : (
             <p className="text-xs sm:text-sm leading-relaxed text-gray-700 dark:text-white break-words">
               {comment.content}
@@ -233,6 +312,29 @@ const CommentItem = memo(
   }
 );
 
+// Memoized loading component
+const LoadingState = memo(function LoadingState() {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-800">
+      <div className="mb-3 flex justify-center">
+        <div className="h-6 w-6 sm:h-8 sm:w-8 animate-spin rounded-full border-2 border-gray-200 border-t-customBlue-500 dark:border-gray-700 dark:border-t-customBlue-400"></div>
+      </div>
+      <p className="text-xs sm:text-sm text-gray-600 dark:text-white">Loading comments...</p>
+    </div>
+  );
+});
+
+// Memoized empty state component
+const EmptyState = memo(function EmptyState() {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-800">
+      <p className="text-xs sm:text-sm text-gray-600 dark:text-white">
+        No comments yet. Be the first to help!
+      </p>
+    </div>
+  );
+});
+
 export default function CommentSection({ questionId, loggedIn, setQuestions }: CommentSectionProps) {
   const [comments, setComments] = useState<Comment[]>([]);
   const [newComment, setNewComment] = useState("");
@@ -243,11 +345,8 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
   const [commentToDelete, setCommentToDelete] = useState<string | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
 
-  useEffect(() => {
-    loadComments();
-  }, [questionId]);
-
-  const loadComments = async () => {
+  // Memoize loadComments function
+  const loadComments = useCallback(async () => {
     setIsLoading(true);
     try {
       const [fetchedComments, likedCommentIds] = await Promise.all([
@@ -262,9 +361,14 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [questionId, loggedIn.id]);
 
-  const handleSubmitComment = async (e: React.FormEvent) => {
+  useEffect(() => {
+    loadComments();
+  }, [loadComments]);
+
+  // Memoize handleSubmitComment
+  const handleSubmitComment = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!newComment.trim()) return;
@@ -281,12 +385,12 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
       if (result?.success && result?.comment) {
         fetchQuestions()
           .then((result) => {
-            setQuestions(result);
+            setQuestions(result.questions);
           })
           .catch((error) => {
             console.error('Fetch error:', error);
           });
-        setComments([...comments, result?.comment]);
+        setComments(prev => [...prev, result.comment]);
         setNewComment("");
       } else {
         console.error("Failed to post comment:", result?.error);
@@ -298,9 +402,10 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
     } finally {
       setIsSubmitting(false);
     }
-  };
+  }, [newComment, questionId, loggedIn.id, setQuestions]);
 
-  const handleLikeComment = async (commentId: string) => {
+  // Memoize handleLikeComment
+  const handleLikeComment = useCallback(async (commentId: string) => {
     const wasLiked = likedComments.has(commentId);
     const newLikedComments = new Set(likedComments);
 
@@ -354,9 +459,10 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
       setLikedComments(newLikedComments);
       console.error("Error toggling like:", error);
     }
-  };
+  }, [likedComments, loggedIn.id]);
 
-  const handleEditComment = async (commentId: string, newContent: string) => {
+  // Memoize handleEditComment
+  const handleEditComment = useCallback(async (commentId: string, newContent: string) => {
     const originalComment = comments.find(c => c.id === commentId);
     if (!originalComment) return;
 
@@ -400,14 +506,16 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
       );
       alert("An error occurred while updating your comment.");
     }
-  };
+  }, [comments]);
 
-  const handleDeleteComment = (commentId: string) => {
+  // Memoize handleDeleteComment
+  const handleDeleteComment = useCallback((commentId: string) => {
     setCommentToDelete(commentId);
     setDeleteModalOpen(true);
-  };
+  }, []);
 
-  const confirmDelete = async () => {
+  // Memoize confirmDelete
+  const confirmDelete = useCallback(async () => {
     if (!commentToDelete) return;
 
     setIsDeleting(true);
@@ -420,7 +528,7 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
         
         fetchQuestions()
           .then((result) => {
-            setQuestions(result);
+            setQuestions(result.questions);
           })
           .catch((error) => {
             console.error('Fetch error:', error);
@@ -437,31 +545,26 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
     } finally {
       setIsDeleting(false);
     }
-  };
+  }, [commentToDelete, setQuestions]);
 
-  const cancelDelete = () => {
+  // Memoize cancelDelete
+  const cancelDelete = useCallback(() => {
     if (isDeleting) return;
     setDeleteModalOpen(false);
     setCommentToDelete(null);
-  };
+  }, [isDeleting]);
 
-  const handleDialogChange = (open: boolean) => {
+  // Memoize handleDialogChange
+  const handleDialogChange = useCallback((open: boolean) => {
     if (!open && isDeleting) return;
     setDeleteModalOpen(open);
     if (!open) {
       setCommentToDelete(null);
     }
-  };
+  }, [isDeleting]);
 
   if (isLoading) {
-    return (
-      <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-800">
-        <div className="mb-3 flex justify-center">
-          <div className="h-6 w-6 sm:h-8 sm:w-8 animate-spin rounded-full border-2 border-gray-200 border-t-customBlue-500 dark:border-gray-700 dark:border-t-customBlue-400"></div>
-        </div>
-        <p className="text-xs sm:text-sm text-gray-600 dark:text-white">Loading comments...</p>
-      </div>
-    );
+    return <LoadingState />;
   }
 
   return (
@@ -536,13 +639,7 @@ export default function CommentSection({ questionId, loggedIn, setQuestions }: C
         </div>
       </form>
 
-      {comments.length === 0 && (
-        <div className="rounded-lg border border-gray-200 bg-gray-50 p-4 text-center dark:border-gray-700 dark:bg-gray-800">
-          <p className="text-xs sm:text-sm text-gray-600 dark:text-white">
-            No comments yet. Be the first to help!
-          </p>
-        </div>
-      )}
+      {comments.length === 0 && <EmptyState />}
     </div>
   );
 }
