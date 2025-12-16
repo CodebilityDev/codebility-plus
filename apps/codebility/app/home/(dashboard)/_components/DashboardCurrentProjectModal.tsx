@@ -21,6 +21,9 @@ import {
 import { Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
+// Line 26-28: Configure which column names indicate completed work
+const COMPLETED_COLUMN_NAMES = ["done", "finished", "completed", "approved"];
+
 export default function DashboardCurrentProjectModal() {
   const { isOpen, onClose, type, data } = useModal();
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -40,10 +43,11 @@ export default function DashboardCurrentProjectModal() {
 
   const projectId = data?.projectId;
 
+  // Line 48-54: Navigate to kanban board (preserves original functionality)
   const handleGoToKanban = () => {
     if (kanbanBoardId) {
       onClose();
-      router.push(`/home/kanban/project/${kanbanBoardId}`);
+      router.push(`/home/kanban/${projectId}/${kanbanBoardId}`);
     }
   };
 
@@ -98,11 +102,14 @@ export default function DashboardCurrentProjectModal() {
           setKanbanBoardId(board.id);
         }
 
+        // Line 106-120: Enhanced query to include column name for filtering
         const { data: rawTasks, error: taskError } = await supabase
           .from("tasks")
           .select(
             `*,
             kanban_columns!kanban_column_id (
+              id,
+              name,
               board_id,
               kanban_boards!board_id (
                 id,
@@ -117,8 +124,18 @@ export default function DashboardCurrentProjectModal() {
           return;
         }
 
+        // Line 125-134: Filter logic - exclude "Done" column tasks and match project
         const filteredTasks = (rawTasks || []).filter((task: any) => {
-          return task.kanban_columns?.kanban_boards?.project_id === projectId;
+          const matchesProject = task.kanban_columns?.kanban_boards?.project_id === projectId;
+          
+          // Line 129-131: Check if task is in a "completed" column
+          const columnName = task.kanban_columns?.name?.toLowerCase() || "";
+          const isCompleted = COMPLETED_COLUMN_NAMES.some(completedName => 
+            columnName.includes(completedName)
+          );
+          
+          // Show only active tasks (not in Done/Completed columns)
+          return matchesProject && !isCompleted;
         });
 
         setTasks(filteredTasks);
@@ -132,19 +149,25 @@ export default function DashboardCurrentProjectModal() {
     fetchUserTasks();
   }, [isModalOpen, projectId, supabase]);
 
+  // Line 153-169: Loading skeleton with responsive grid
   if (isLoading) {
     return (
       <Dialog open={isModalOpen} onOpenChange={onClose}>
-        <DialogContent className="w-[90%] max-w-3xl">
+        <DialogContent className="
+          w-[95vw] max-w-[95vw]
+          md:w-[90vw] md:max-w-4xl
+          lg:w-[80vw] lg:max-w-5xl
+          max-h-[85vh] overflow-y-auto
+        ">
           <DialogHeader>
-            <DialogTitle className="mb-2 text-left text-lg">
+            <DialogTitle className="mb-2 text-left text-lg text-gray-900 dark:text-white">
               Kanban Details
             </DialogTitle>
-            <p>Your Ticket(s):</p>
+            <p className="text-gray-700 dark:text-gray-300">Your Active Ticket(s):</p>
           </DialogHeader>
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-            <Skeleton className="bg-black-100 relative mt-1 flex h-24 flex-col gap-2 rounded-lg p-2 md:mt-2 md:gap-3 md:p-4"></Skeleton>
-            <Skeleton className="bg-black-100 relative mt-1 flex h-24 flex-col gap-2 rounded-lg p-2 md:mt-2 md:gap-3 md:p-4"></Skeleton>
+            <Skeleton className="bg-gray-200 dark:bg-gray-800 relative mt-1 flex h-24 flex-col gap-2 rounded-lg p-2 md:mt-2 md:gap-3 md:p-4"></Skeleton>
+            <Skeleton className="bg-gray-200 dark:bg-gray-800 relative mt-1 flex h-24 flex-col gap-2 rounded-lg p-2 md:mt-2 md:gap-3 md:p-4"></Skeleton>
           </div>
         </DialogContent>
       </Dialog>
@@ -159,30 +182,55 @@ export default function DashboardCurrentProjectModal() {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      <DialogContent aria-describedby={undefined} className="w-[90%] max-w-3xl">
+      {/* Line 184-189: Responsive modal container with proper dark mode support */}
+      <DialogContent 
+        aria-describedby={undefined} 
+        className="
+          w-[95vw] max-w-[95vw]
+          md:w-[90vw] md:max-w-4xl
+          lg:w-[80vw] lg:max-w-5xl
+          max-h-[85vh] overflow-y-auto
+          bg-white dark:bg-gray-900
+          border-gray-200 dark:border-gray-700
+        "
+      >
         <DialogHeader>
-          <DialogTitle className="mb-2 text-left text-lg">
+          <DialogTitle className="mb-2 text-left text-lg text-gray-900 dark:text-white">
             Kanban Details
           </DialogTitle>
         </DialogHeader>
-        <p>Your Ticket(s):</p>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        
+        <p className="text-gray-700 dark:text-gray-300">Your Active Ticket(s):</p>
+        
+        {/* Line 204-207: Responsive grid layout */}
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
           {error ? (
-            <p className="text-red-500">{error}</p>
+            <p className="text-red-500 dark:text-red-400">{error}</p>
           ) : tasks.length > 0 ? (
             tasks.map((tasked) => (
               <div
                 key={tasked.id}
-                className="bg-lightgray dark:bg-black-100 relative mt-1 flex flex-col gap-2 rounded-lg p-2 md:mt-2 md:gap-3 md:p-4"
+                className="
+                  bg-gray-50 dark:bg-gray-800
+                  border border-gray-200 dark:border-gray-700
+                  relative mt-1 flex flex-col gap-2 rounded-lg p-2 
+                  md:mt-2 md:gap-3 md:p-4
+                  hover:border-customBlue-400 dark:hover:border-customBlue-500
+                  transition-colors duration-200
+                "
               >
                 <div className="flex items-center justify-between">
                   <h3
-                    className="mr-2 line-clamp-2 flex-1 text-sm font-bold 
-            text-gray-800 transition-colors group-hover:text-customBlue-600
-            dark:text-gray-200 dark:group-hover:text-customBlue-400 md:text-base"
+                    className="
+                      mr-2 line-clamp-2 flex-1 text-sm font-bold 
+                      text-gray-800 dark:text-gray-100
+                      md:text-base
+                    "
                   >
                     {tasked.title}
                   </h3>
+                  
+                  {/* Line 232-252: Priority icon with dark mode colors */}
                   <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
                     <div
                       className={`flex items-center justify-center rounded-full p-0.5 md:p-1 ${
@@ -210,31 +258,43 @@ export default function DashboardCurrentProjectModal() {
                   </div>
                 </div>
 
-                {/* Task Details */}
+                {/* Line 258-294: Task metadata badges with dark mode support */}
                 <div className="flex flex-wrap gap-1 text-xs text-gray-600 dark:text-gray-400 md:gap-2 md:text-sm">
                   {tasked.difficulty && (
                     <span
-                      className="inline-flex items-center rounded-md bg-purple-100 
-              px-1.5 py-0.5 text-xs font-medium text-purple-700 dark:bg-purple-900/30 
-              dark:text-purple-300 md:px-2 md:py-1"
+                      className="
+                        inline-flex items-center rounded-md 
+                        bg-purple-100 dark:bg-purple-900/30
+                        px-1.5 py-0.5 text-xs font-medium 
+                        text-purple-700 dark:text-purple-300 
+                        md:px-2 md:py-1
+                      "
                     >
                       {tasked.difficulty}
                     </span>
                   )}
                   {typeof tasked.points === "number" && (
                     <span
-                      className="inline-flex items-center rounded-md bg-green-100 
-              px-1.5 py-0.5 text-xs font-medium text-green-700 dark:bg-green-900/30 
-              dark:text-green-300 md:px-2 md:py-1"
+                      className="
+                        inline-flex items-center rounded-md 
+                        bg-green-100 dark:bg-green-900/30
+                        px-1.5 py-0.5 text-xs font-medium 
+                        text-green-700 dark:text-green-300 
+                        md:px-2 md:py-1
+                      "
                     >
                       {tasked.points} pts
                     </span>
                   )}
                   {tasked.type && (
                     <span
-                      className="inline-flex items-center rounded-md bg-gray-100 
-              px-1.5 py-0.5 text-xs font-medium text-gray-700 dark:bg-gray-700 
-              dark:text-gray-300 md:px-2 md:py-1"
+                      className="
+                        inline-flex items-center rounded-md 
+                        bg-gray-100 dark:bg-gray-700
+                        px-1.5 py-0.5 text-xs font-medium 
+                        text-gray-700 dark:text-gray-300 
+                        md:px-2 md:py-1
+                      "
                     >
                       {tasked.type}
                     </span>
@@ -243,19 +303,36 @@ export default function DashboardCurrentProjectModal() {
               </div>
             ))
           ) : (
-            <p className="mt-2 text-sm">No ticket(s) assigned to you.</p>
+            // Line 300-302: Empty state with dark mode
+            <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 col-span-full text-center py-8">
+              No active tickets assigned to you.
+            </p>
           )}
         </div>
 
+        {/* Line 307-322: Footer buttons with dark mode styling */}
         <DialogFooter>
           <div className="flex gap-2">
             <button
               onClick={handleGoToKanban}
-              className="rounded bg-customBlue-600 px-4 py-2 text-white"
+              className="
+                rounded bg-customBlue-600 hover:bg-customBlue-700 
+                px-4 py-2 text-white font-medium
+                transition-colors duration-200
+                dark:bg-customBlue-500 dark:hover:bg-customBlue-600
+              "
             >
               Go to Kanban
             </button>
-            <button onClick={onClose} className="rounded bg-gray-300 px-4 py-2">
+            <button 
+              onClick={onClose} 
+              className="
+                rounded bg-gray-300 hover:bg-gray-400 
+                dark:bg-gray-700 dark:hover:bg-gray-600
+                px-4 py-2 text-gray-900 dark:text-white font-medium
+                transition-colors duration-200
+              "
+            >
               Close
             </button>
           </div>

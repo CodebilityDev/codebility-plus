@@ -50,13 +50,17 @@ export default function DashboardCurrentProjectButton({
 
       if (!membership) return;
 
-      const { data: project } = await supabase
-        .from("projects")
-        .select("kanban_display")
-        .eq("id", projectId)
-        .single();
-
-      setIsDisabled(project?.kanban_display !== true);
+      // REMOVED: kanban_display database check
+      // ORIGINAL CODE (Lines 51-56):
+      // const { data: project } = await supabase
+      //   .from("projects")
+      //   .select("kanban_display")
+      //   .eq("id", projectId)
+      //   .single();
+      // setIsDisabled(project?.kanban_display !== true);
+      
+      // NEW CODE: Always enable modal for project members
+      setIsDisabled(false);
     };
 
     fetchKanbanDisplay();

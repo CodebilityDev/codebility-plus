@@ -1,6 +1,8 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import { Box } from "@/components/shared/dashboard";
+import Box from "@/components/shared/dashboard/Box";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
