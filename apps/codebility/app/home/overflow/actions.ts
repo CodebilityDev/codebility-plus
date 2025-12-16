@@ -3,6 +3,7 @@
 
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import sharp from 'sharp';
 
 // Question 
 export interface Question {
@@ -92,164 +93,255 @@ export async function fetchQuestions(page: number = 1, pageSize: number = 5): Pr
 
 
 
-// add questions
-export interface PostQuestionData {
-    title: string;
-    content: string;
-    tags: string[];
-    images: string[]; 
-    authorId: string;
-}
-
-// Helper function to convert base64 to File
-function base64ToFile(base64String: string, filename: string): File {
+// Server-side image compression using sharp
+async function compressImage(base64String: string): Promise<Buffer> {
+  try {
+    // Extract base64 data
     const arr = base64String.split(',');
-    const mime = arr[0]?.match(/:(.*?);/)?.[1] || 'image/png';
     const base64Data = arr.length > 1 ? arr[1] : arr[0];
-
+    
     if (!base64Data) {
-        throw new Error('Invalid base64 string');
+      throw new Error('Invalid base64 string');
     }
 
-    const bstr = atob(base64Data);
-    let n = bstr.length;
-    const u8arr = new Uint8Array(n);
-    while (n--) {
-        u8arr[n] = bstr.charCodeAt(n);
-    }
-    return new File([u8arr], filename, { type: mime });
+    // Convert base64 to buffer
+    const imageBuffer = Buffer.from(base64Data, 'base64');
+
+    // Compress using sharp
+    const compressedBuffer = await sharp(imageBuffer)
+      .resize(1920, 1920, {
+        fit: 'inside',
+        withoutEnlargement: true,
+      })
+      .jpeg({
+        quality: 80,
+        progressive: true,
+      })
+      .toBuffer();
+
+    const originalSize = imageBuffer.length;
+    const compressedSize = compressedBuffer.length;
+    const savings = ((1 - compressedSize / originalSize) * 100).toFixed(1);
+
+    console.log(`Compressed image: ${(originalSize / 1024).toFixed(2)}KB → ${(compressedSize / 1024).toFixed(2)}KB (${savings}% reduction)`);
+
+    return compressedBuffer;
+  } catch (error) {
+    console.error('Error compressing image:', error);
+    throw new Error('Failed to compress image');
+  }
 }
-// Helper function to upload image to Supabase Storage
-async function uploadImageToStorage(supabase: any, base64Image: string, authorId: string): Promise<string | null> {
+
+// Helper function to upload image to Supabase Storage with compression and retry logic
+async function uploadImageToStorage(
+  supabase: any, 
+  base64Image: string, 
+  authorId: string,
+  retries = 3
+): Promise<string | null> {
+  for (let attempt = 0; attempt < retries; attempt++) {
     try {
-        // Generate unique filename
-        const timestamp = Date.now();
-        const randomString = Math.random().toString(36).substring(2, 15);
-        const filename = `${authorId}_${timestamp}_${randomString}.png`;
+      // Generate unique filename
+      const timestamp = Date.now();
+      const randomString = Math.random().toString(36).substring(2, 15);
+      const filename = `${authorId}_${timestamp}_${randomString}.jpg`;
 
-        // Convert base64 to File
-        const file = base64ToFile(base64Image, filename);
+      console.log(`Processing image (attempt ${attempt + 1}/${retries}):`, filename);
 
-        // Upload to Supabase Storage
-        const { data, error } = await supabase.storage
-            .from('codebility')
-            .upload(`overflowPostImage/${filename}`, file, {
-                contentType: file.type,
-                upsert: false,
-            });
+      // Compress the image server-side
+      const compressedBuffer = await compressImage(base64Image);
 
-        if (error) {
-            console.error('Error uploading image:', error);
-            return null;
+      // Upload compressed image to Supabase Storage
+      const { data, error } = await supabase.storage
+        .from('codebility')
+        .upload(`overflowPostImage/${filename}`, compressedBuffer, {
+          contentType: 'image/jpeg',
+          upsert: false,
+          cacheControl: '3600', // Cache for 1 hour
+        });
+
+      if (error) {
+        console.error(`Upload error (attempt ${attempt + 1}):`, error);
+        
+        // Retry on certain errors
+        if (attempt < retries - 1 && (error.message.includes('timeout') || error.message.includes('network'))) {
+          await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1))); // Exponential backoff
+          continue;
         }
-
-        // Return the public URL
-        return `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/codebility/overflowPostImage/${filename}`;
-    } catch (error) {
-        console.error('Error in uploadImageToStorage:', error);
+        
         return null;
+      }
+
+      // Return the public URL
+      const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/codebility/overflowPostImage/${filename}`;
+      console.log('Upload successful:', publicUrl);
+      return publicUrl;
+      
+    } catch (error) {
+      console.error(`Error in uploadImageToStorage (attempt ${attempt + 1}):`, error);
+      
+      if (attempt < retries - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000 * (attempt + 1)));
+        continue;
+      }
+      
+      return null;
     }
+  }
+  
+  return null;
+}
+
+export interface PostQuestionData {
+  authorId: string;
+  title: string;
+  content: string;
+  tags: string[];
+  images: string[];
 }
 
 export async function postQuestion(data: PostQuestionData) {
-    try {
-        const supabase = await createClientServerComponent();
+  try {
+    const supabase = await createClientServerComponent();
 
-        // Upload all images and get their URLs
-        const imageUploadPromises = data.images.map(base64Image =>
-            uploadImageToStorage(supabase, base64Image, data.authorId)
-        );
+    console.log('Starting question post with', data.images.length, 'images');
 
-        const uploadedImageUrls = await Promise.all(imageUploadPromises);
+    // Upload all images in parallel with compression and error handling
+    const imageUploadPromises = data.images.map((base64Image, index) => 
+      uploadImageToStorage(supabase, base64Image, data.authorId)
+        .then(url => {
+          if (url) {
+            console.log(`Image ${index + 1} compressed and uploaded successfully`);
+          } else {
+            console.warn(`Image ${index + 1} failed to upload`);
+          }
+          return url;
+        })
+    );
 
-        // Filter out any failed uploads (nulls)
-        const validImageUrls = uploadedImageUrls.filter((url): url is string => url !== null);
+    const uploadedImageUrls = await Promise.all(imageUploadPromises);
 
-        // Insert the question into overflow_post table
-        const { data: insertedQuestion, error } = await supabase
-            .from('overflow_post')
-            .insert({
-                codev_id: data.authorId,
-                title: data.title,
-                question_details: data.content,
-                tags: JSON.stringify(data.tags),
-                image_url: JSON.stringify(validImageUrls), // Store uploaded URLs
-                likes: 0,
-                comments: 0,
-                fields: null,
-            })
-            .select(`
-                id,
-                codev_id,
-                title,
-                question_details,
-                tags,
-                image_url,
-                likes,
-                comments,
-                created_at,
-                updated_at,
-                codev:codev_id (
-                    id,
-                    first_name,
-                    last_name,
-                    image_url
-                )
-            `)
-            .single();
+    // Filter out any failed uploads (nulls)
+    const validImageUrls = uploadedImageUrls.filter((url): url is string => url !== null);
 
-        if (error) {
-            console.error('Error inserting question:', error);
-            throw new Error('Failed to post question');
-        }
-          const authorData = insertedQuestion.codev?.[0];
-        console.log('Inserted Question Result:', JSON.stringify(insertedQuestion, null, 2));
+    console.log(`Successfully uploaded ${validImageUrls.length} out of ${data.images.length} images`);
 
-        // Transform the database response to match Question interface
-        const question: Question = {
-            id: insertedQuestion.id.toString(),
-            title: insertedQuestion.title,
-            content: insertedQuestion.question_details,
-            author: {
-              id: authorData?.id,
-              name: `${authorData?.first_name ?? ''} ${authorData?.last_name ?? ''}`.trim(),
-              image_url: authorData?.image_url ?? null,
-            },
-            tags: JSON.parse(insertedQuestion.tags || '[]') as string[],
-            images: JSON.parse(insertedQuestion.image_url || '[]') as string[],
-            likes: insertedQuestion.likes,
-            comments: insertedQuestion.comments,
-            created_at: insertedQuestion.created_at,
-            updated_at: insertedQuestion.updated_at,
-        };
-
-        revalidatePath('/home/overflow');
-        return { success: true, question };
-
-    } catch (error) {
-        console.error('Error in postQuestion:', error);
-        return { success: false, error: 'Failed to post question' };
+    // Warn if some images failed
+    if (validImageUrls.length < data.images.length) {
+      console.warn(`${data.images.length - validImageUrls.length} images failed to upload`);
     }
+
+    // Insert the question into overflow_post table
+    const { data: insertedQuestion, error } = await supabase
+      .from('overflow_post')
+      .insert({
+        codev_id: data.authorId,
+        title: data.title,
+        question_details: data.content,
+        tags: JSON.stringify(data.tags),
+        image_url: JSON.stringify(validImageUrls),
+        likes: 0,
+        comments: 0,
+        fields: null,
+      })
+      .select(`
+        id,
+        codev_id,
+        title,
+        question_details,
+        tags,
+        image_url,
+        likes,
+        comments,
+        created_at,
+        updated_at,
+        codev:codev_id (
+          id,
+          first_name,
+          last_name,
+          image_url
+        )
+      `)
+      .single();
+
+    if (error) {
+      console.error('Error inserting question:', error);
+      throw new Error(`Failed to post question: ${error.message}`);
+    }
+
+    const authorData = insertedQuestion.codev?.[0];
+
+    // Transform the database response to match Question interface
+    const question = {
+      id: insertedQuestion.id.toString(),
+      title: insertedQuestion.title,
+      content: insertedQuestion.question_details,
+      author: {
+        id: authorData?.id,
+        name: `${authorData?.first_name ?? ''} ${authorData?.last_name ?? ''}`.trim(),
+        image_url: authorData?.image_url ?? null,
+      },
+      tags: JSON.parse(insertedQuestion.tags || '[]') as string[],
+      images: JSON.parse(insertedQuestion.image_url || '[]') as string[],
+      likes: insertedQuestion.likes,
+      comments: insertedQuestion.comments,
+      created_at: insertedQuestion.created_at,
+      updated_at: insertedQuestion.updated_at,
+    };
+
+    revalidatePath('/home/overflow');
+    
+    return { 
+      success: true, 
+      question,
+      uploadedImages: validImageUrls.length,
+      totalImages: data.images.length
+    };
+
+  } catch (error) {
+    console.error('Error in postQuestion:', error);
+    return { 
+      success: false, 
+      error: error instanceof Error ? error.message : 'Failed to post question' 
+    };
+  }
 }
-
-
-// Add this interface and function to your actions.ts file
 
 export interface UpdateQuestionData {
   question_id: string;
   title: string;
   content: string;
   tags: string[];
-  images: string[]; // Mix of existing URLs and new base64 images
+  images: string[];
   authorId: string;
 }
 
-// Helper function to determine if a string is a base64 image or URL
-function isBase64Image(str: string): boolean {
-  return str.startsWith('data:image/');
+// Helper function to delete image from storage
+async function deleteImageFromStorage(supabase: any, imageUrl: string): Promise<boolean> {
+  try {
+    const publicPath = imageUrl.split('/storage/v1/object/public/codebility/')[1];
+    if (!publicPath) {
+      console.warn('Invalid image URL format:', imageUrl);
+      return false;
+    }
+
+    const { error } = await supabase.storage
+      .from('codebility')
+      .remove([publicPath]);
+
+    if (error) {
+      console.error(`Failed to delete image: ${publicPath}`, error);
+      return false;
+    }
+
+    console.log('Successfully deleted image:', publicPath);
+    return true;
+  } catch (error) {
+    console.error('Error deleting image:', error);
+    return false;
+  }
 }
 
-// Update question function
 export async function updateQuestion(data: UpdateQuestionData) {
   try {
     const supabase = await createClientServerComponent();
@@ -267,10 +359,10 @@ export async function updateQuestion(data: UpdateQuestionData) {
     }
 
     const previousImageUrls: string[] = existingPost.image_url
-    ? (JSON.parse(existingPost.image_url) as string[])
-    : [];
+      ? (JSON.parse(existingPost.image_url) as string[])
+      : [];
 
-
+    // Separate existing URLs from new base64 images
     const existingUrls: string[] = [];
     const newBase64Images: string[] = [];
 
@@ -282,70 +374,35 @@ export async function updateQuestion(data: UpdateQuestionData) {
       }
     });
 
-    // Upload new images
-    const newImageUploadPromises = newBase64Images.map(async (base64Image) => {
-      try {
-        const arr = base64Image.split(',');
-        const mime = arr[0]?.match(/:(.*?);/)?.[1] || 'image/png';
-        const base64Data = arr.length > 1 ? arr[1] : arr[0];
-        if (!base64Data) throw new Error('Invalid base64 image data');
-
-        const bstr = atob(base64Data);
-        let n = bstr.length;
-        const u8arr = new Uint8Array(n);
-        while (n--) {
-          u8arr[n] = bstr.charCodeAt(n);
-        }
-
-        const file = new File([u8arr], `${data.authorId}_${Date.now()}.png`, {
-          type: mime,
-        });
-
-        const path = `overflowPostImage/${file.name}`;
-
-        const { error: uploadError } = await supabase.storage
-          .from('codebility')
-          .upload(path, file, {
-            contentType: file.type,
-            upsert: false,
-          });
-
-        if (uploadError) {
-          console.error('Upload error:', uploadError);
-          return null;
-        }
-
-        return `https://hibnlysaokybrsufrdwp.supabase.co/storage/v1/object/public/codebility/${path}`;
-      } catch (err) {
-        console.error('Error uploading base64 image:', err);
-        return null;
-      }
+    console.log('Image update summary:', {
+      existing: existingUrls.length,
+      new: newBase64Images.length,
+      toDelete: previousImageUrls.length - existingUrls.length
     });
+
+    // Upload new images in parallel with compression
+    const newImageUploadPromises = newBase64Images.map((base64Image, index) => 
+      uploadImageToStorage(supabase, base64Image, data.authorId)
+        .then(url => {
+          if (url) {
+            console.log(`New image ${index + 1} compressed and uploaded successfully`);
+          }
+          return url;
+        })
+    );
 
     const uploadedNewImageUrls = await Promise.all(newImageUploadPromises);
     const validNewImageUrls = uploadedNewImageUrls.filter((url): url is string => url !== null);
 
     const allImageUrls = [...existingUrls, ...validNewImageUrls];
 
-    // Determine which images to delete
-    const imagesToDelete = previousImageUrls.filter(
-      (url) => !allImageUrls.includes(url)
-    );
-
-    for (const url of imagesToDelete) {
-      try {
-        const publicPath = url.split('/storage/v1/object/public/codebility/')[1];
-        if (publicPath) {
-          const { error: deleteError } = await supabase.storage
-            .from('codebility')
-            .remove([publicPath]);
-          if (deleteError) {
-            console.warn(`Failed to delete image: ${publicPath}`, deleteError);
-          }
-        }
-      } catch (err) {
-        console.warn(`Error deleting image: ${url}`, err);
-      }
+    // Delete removed images in parallel
+    const imagesToDelete = previousImageUrls.filter(url => !allImageUrls.includes(url));
+    
+    if (imagesToDelete.length > 0) {
+      console.log(`Deleting ${imagesToDelete.length} removed images`);
+      const deletePromises = imagesToDelete.map(url => deleteImageFromStorage(supabase, url));
+      await Promise.all(deletePromises);
     }
 
     // Update the post
@@ -388,7 +445,7 @@ export async function updateQuestion(data: UpdateQuestionData) {
       ? updatedQuestion.codev[0]
       : updatedQuestion.codev;
 
-    const question: Question = {
+    const question = {
       id: updatedQuestion.id.toString(),
       title: updatedQuestion.title,
       content: updatedQuestion.question_details,
@@ -408,7 +465,14 @@ export async function updateQuestion(data: UpdateQuestionData) {
     };
 
     revalidatePath('/home/overflow');
-    return { success: true, question };
+    
+    return { 
+      success: true, 
+      question,
+      uploadedImages: validNewImageUrls.length,
+      deletedImages: imagesToDelete.length
+    };
+    
   } catch (error) {
     console.error('Error in updateQuestion:', error);
     return {
