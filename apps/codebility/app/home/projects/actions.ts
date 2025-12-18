@@ -473,17 +473,22 @@ export async function updateProject(projectId: string, formData: FormData) {
       throw projectError;
     }
 
-    // Handle project members and team leader
+    // ✅ FIXED: Handle project members with joined_at preservation
     if (projectMembers && Array.isArray(projectMembers)) {
-      // First, get all current project members to compare
+      // Step 1: Fetch existing members to preserve joined_at dates
       const { data: existingMembers, error: membersError } = await supabase
         .from("project_members")
-        .select("*")
+        .select("codev_id, joined_at")
         .eq("project_id", projectId);
 
       if (membersError) throw membersError;
 
-      // Delete existing members
+      // Step 2: Create lookup map for existing timestamps
+      const joinedAtMap = new Map(
+        existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
+      );
+
+      // Step 3: Delete existing members
       const { error: deleteError } = await supabase
         .from("project_members")
         .delete()
@@ -491,7 +496,7 @@ export async function updateProject(projectId: string, formData: FormData) {
 
       if (deleteError) throw deleteError;
 
-      // Insert updated members with proper roles
+      // Step 4: Insert updated members with preserved timestamps
       const { error: insertError } = await supabase
         .from("project_members")
         .insert(
@@ -499,7 +504,8 @@ export async function updateProject(projectId: string, formData: FormData) {
             project_id: projectId,
             codev_id: member.codev_id,
             role: member.role,
-            joined_at: new Date().toISOString(),
+            // Use existing joined_at if member was already in project, else use current date
+            joined_at: joinedAtMap.get(member.codev_id) ?? new Date().toISOString(),
           })),
         );
 
@@ -555,6 +561,7 @@ export async function updateProject(projectId: string, formData: FormData) {
     };
   }
 }
+
 export async function deleteProject(projectId: string) {
   const supabase = await createClientServerComponent();
 
@@ -713,6 +720,7 @@ export const getMembers = async (
   }
 };
 
+// ✅ FIXED FUNCTION: Preserves existing joined_at dates when updating members
 export const updateProjectMembers = async (
   projectId: string,
   members: Codev[],
@@ -721,7 +729,20 @@ export const updateProjectMembers = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // Delete existing members
+    // ✅ Step 1: Fetch existing members to preserve joined_at dates
+    const { data: existingMembers, error: fetchError } = await supabase
+      .from("project_members")
+      .select("codev_id, joined_at")
+      .eq("project_id", projectId);
+
+    if (fetchError) throw fetchError;
+
+    // ✅ Step 2: Create lookup map for existing timestamps
+    const joinedAtMap = new Map(
+      existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
+    );
+
+    // Step 3: Delete old records
     const { error: deleteError } = await supabase
       .from("project_members")
       .delete()
@@ -729,12 +750,13 @@ export const updateProjectMembers = async (
 
     if (deleteError) throw deleteError;
 
-    // Insert members with proper roles
+    // ✅ Step 4: Insert with preserved timestamps for existing members
     const memberInserts = members.map((member) => ({
       project_id: projectId,
       codev_id: member.id,
       role: member.id === teamLeaderId ? "team_leader" : "member",
-      joined_at: new Date().toISOString(),
+      // Use existing joined_at if member was already in project, else use current date
+      joined_at: joinedAtMap.get(member.id) ?? new Date().toISOString(),
     }));
 
     const { error: insertError } = await supabase

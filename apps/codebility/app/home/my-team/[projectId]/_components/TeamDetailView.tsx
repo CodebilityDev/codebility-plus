@@ -34,13 +34,10 @@ import { getMeetingSchedule, getTeamMonthlyAttendancePoints } from "../actions";
  * ✅ Manage Members button: Only visible to team leads (in Team View)
  * 
  * BEHAVIOR:
-
  * - Regular members: Can view attendance but cannot edit
  * - Team leads: Full edit access to attendance
-
  * - Regular members: See only Team View tab (read-only)
  * - Team leads: Full control over all team management features
-
  */
 
 interface ProjectData {
@@ -219,23 +216,15 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       if (result.success) {
         toast.success("Project members updated successfully.");
 
-        const updatedProjectMembers: SimpleMemberData[] = selectedMembers
-          .filter(member => member.id !== teamLead.id)
-          .map(member => ({
-            id: member.id,
-            first_name: member.first_name,
-            last_name: member.last_name,
-            email_address: member.email_address,
-            image_url: member.image_url ?? null,
-            role: 'member',
-            display_position: member.display_position ?? null,
-            joined_at: new Date().toISOString(),
+        // ✅ FIXED: Re-fetch members to get accurate joined_at dates from database
+        const updatedMembersResult = await getMembers(projectInfo.id);
+        
+        if (updatedMembersResult.data) {
+          setProject(prev => ({
+            ...prev,
+            members: { data: updatedMembersResult.data }
           }));
-
-        setProject(prev => ({
-          ...prev,
-          members: { data: updatedProjectMembers }
-        }));
+        }
 
         handleCloseModal();
       } else {
