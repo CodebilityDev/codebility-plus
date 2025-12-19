@@ -691,7 +691,12 @@ const TaskViewModal = ({
           <div className="flex items-center justify-between">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-                {task?.title}
+                  {task?.title}{" "}
+                  {task?.ticket_code && (
+                    <span className="ml-1 text-gray-500 dark:text-gray-400 font-normal">
+                      #{task.ticket_code}
+                    </span>
+                  )}
               </DialogTitle>
             </DialogHeader>
             {canModifyTask && (
@@ -976,10 +981,12 @@ const TaskViewModal = ({
                   return;
                 }
 
-                const url = new URL(window.location.href);
-                url.searchParams.set("taskId", task.id);
+                const baseUrl = window.location.origin; // gets the website domain
+                const url = task.ticket_code
+                  ? `${baseUrl}/home/kanban/ticket/${task.ticket_code}`
+                  : new URL(window.location.href).toString();
 
-                navigator.clipboard.writeText(url.toString());
+                navigator.clipboard.writeText(url);
                 toast.success("Task URL copied to clipboard");
               }}
               style={{

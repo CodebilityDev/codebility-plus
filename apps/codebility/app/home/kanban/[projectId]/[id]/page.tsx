@@ -35,6 +35,7 @@ const mapTask = (task: any): Task => ({
   skill_category_id: task.skill_category_id,
   codev: task.codev,
   skill_category: task.skill_category,
+  ticket_code: task.ticket_code || null,
 });
 
 const mapColumn = (column: any): KanbanColumnType => ({
