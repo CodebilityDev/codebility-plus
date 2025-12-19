@@ -968,6 +968,34 @@ const TaskViewModal = ({
 
           <DialogFooter className="mt-4 flex justify-end">
             {/*Previous style: flex gap-6 sm:justify-end */}
+            {/* Copy URL button */}
+            <Button
+              onClick={() => {
+                if (!task?.id) {
+                  toast.error("Cannot copy URL: Task ID is missing");
+                  return;
+                }
+
+                const url = new URL(window.location.href);
+                url.searchParams.set("taskId", task.id);
+
+                navigator.clipboard.writeText(url.toString());
+                toast.success("Task URL copied to clipboard");
+              }}
+              style={{
+                backgroundColor: "#2563EB",
+                color: "white",
+                padding: "6px 16px",
+                fontSize: "14px",
+                borderRadius: "4px",
+                border: "none",
+                minWidth: "auto",
+                width: "auto",
+              }}
+            >
+              Copy URL
+            </Button>
+        
             {/* VIEWING MODE: Show Close when just viewing (no changes) */}
             {!hasUnsavedChanges && (
               <Button
