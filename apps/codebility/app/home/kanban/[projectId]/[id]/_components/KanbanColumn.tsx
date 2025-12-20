@@ -168,7 +168,7 @@ export default function KanbanColumn({
       toast.error(response.error || "Failed to update column name");
     }
   };
-
+  
   return (
     <li
       ref={setColumnRef}

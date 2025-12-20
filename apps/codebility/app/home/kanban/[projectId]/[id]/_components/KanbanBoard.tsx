@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
 import { getMembers } from "@/app/home/projects/actions";
@@ -18,6 +18,7 @@ import KanbanColumnAddButton from "./kanban_modals/KanbanColumnAddButton";
 import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 import UserTaskFilter from "./UserTaskFilter";
+import { useKanbanTaskUrlModal } from "@/hooks/useKanbanTaskUrlModal";
 
 interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
@@ -31,6 +32,9 @@ interface KanbanBoardProps {
  */
 function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
   const user = useUserStore((state) => state.user);
+
+  // Sync the Kanban task modal with the URL ?taskId param
+  useKanbanTaskUrlModal(boardData);
 
   // User permissions - simple boolean checks following YAGNI principle
   const canAddColumn = user?.role_id === 1 || user?.role_id === 5;

@@ -691,7 +691,12 @@ const TaskViewModal = ({
           <div className="flex items-center justify-between">
             <DialogHeader>
               <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-                {task?.title}
+                  {task?.title}{" "}
+                  {task?.ticket_code && (
+                    <span className="ml-1 text-gray-500 dark:text-gray-400 font-normal">
+                      #{task.ticket_code}
+                    </span>
+                  )}
               </DialogTitle>
             </DialogHeader>
             {canModifyTask && (
@@ -968,6 +973,36 @@ const TaskViewModal = ({
 
           <DialogFooter className="mt-4 flex justify-end">
             {/*Previous style: flex gap-6 sm:justify-end */}
+            {/* Copy URL button */}
+            <Button
+              onClick={() => {
+                if (!task?.id) {
+                  toast.error("Cannot copy URL: Task ID is missing");
+                  return;
+                }
+
+                const baseUrl = window.location.origin; // gets the website domain
+                const url = task.ticket_code
+                  ? `${baseUrl}/home/kanban/ticket/${task.ticket_code}`
+                  : new URL(window.location.href).toString();
+
+                navigator.clipboard.writeText(url);
+                toast.success("Task URL copied to clipboard");
+              }}
+              style={{
+                backgroundColor: "#2563EB",
+                color: "white",
+                padding: "6px 16px",
+                fontSize: "14px",
+                borderRadius: "4px",
+                border: "none",
+                minWidth: "auto",
+                width: "auto",
+              }}
+            >
+              Copy URL
+            </Button>
+        
             {/* VIEWING MODE: Show Close when just viewing (no changes) */}
             {!hasUnsavedChanges && (
               <Button
