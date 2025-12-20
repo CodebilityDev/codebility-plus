@@ -17,6 +17,21 @@ export interface WorkExperience {
   is_present: boolean; // Has DB default false
 }
 
+export interface Education {
+  id: string;
+  codev_id: string;
+  institution: string | null;        
+  degree: string | null;             
+  major_subject: string | null;      
+  description: string | null;        
+  achievements: string | null;       
+  start_date: string | null;         
+  end_date: string | null;           
+  profile_id?: string;               
+  created_at: string;
+  updated_at: string;
+}
+
 export interface JobStatus {
   id: string;
   job_title: string;
@@ -189,17 +204,6 @@ export interface Project {
   team_members?: string[];
   gallery?: string[];
   secondary_image?: string;
-}
-export interface Education {
-  id: string;
-  codev_id?: string;
-  institution: string;
-  degree?: string;
-  start_date?: string;
-  end_date?: string;
-  description?: string;
-  created_at?: string;
-  updated_at?: string;
 }
 
 // New types based on schema
