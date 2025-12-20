@@ -346,6 +346,7 @@ export interface Task {
     id: string;
     name: string;
   };
+  ticket_code?: string;
 }
 
 export interface ExtendedTask extends Task {
