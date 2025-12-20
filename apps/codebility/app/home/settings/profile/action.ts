@@ -3,6 +3,7 @@
 import { cachedUser } from "@/lib/server/supabase-action";
 import {
   Codev,
+  Education,
   JobStatus,
   Position,
   WorkExperience,
@@ -130,6 +131,92 @@ export async function deleteWorkExperience(id: string) {
   } catch (error) {
     console.error("Error deleting work experience:", error);
     throw new Error("Failed to delete work experience");
+  }
+}
+
+// Education functions
+export async function createEducation(
+  education: Omit<Education, "id" | "created_at" | "updated_at">,
+) {
+  try {
+    const supabase = await createClientServerComponent();
+    const user = await cachedUser();
+    if (!user?.id) throw new Error("User not found");
+
+    const { data, error } = await supabase
+      .from("education")
+      .insert({
+        ...education,
+        codev_id: user.id,
+      })
+      .select();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error creating education:", error);
+    throw new Error("Failed to create education");
+  }
+}
+
+export async function updateEducation(
+  id: string,
+  educationData: Partial<Education>,
+) {
+  try {
+    const supabase = await createClientServerComponent();
+    const user = await cachedUser();
+    if (!user?.id) throw new Error("User not found");
+
+    const { data, error } = await supabase
+      .from("education")
+      .update(educationData)
+      .eq("codev_id", user.id)
+      .eq("id", id)
+      .select();
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error updating education:", error);
+    throw new Error("Failed to update education");
+  }
+}
+
+export async function deleteEducation(id: string) {
+  try {
+    const supabase = await createClientServerComponent();
+    const user = await cachedUser();
+    if (!user?.id) throw new Error("User not found");
+
+    const { error } = await supabase
+      .from("education")
+      .delete()
+      .eq("codev_id", user.id)
+      .eq("id", id);
+
+    if (error) throw error;
+  } catch (error) {
+    console.error("Error deleting education:", error);
+    throw new Error("Failed to delete education");
+  }
+}
+
+export async function getEducation(codevId: string) {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { data, error } = await supabase
+      .from("education")
+      .select("*")
+      .eq("codev_id", codevId)
+      .order("start_date", { ascending: false });
+
+    if (error) throw error;
+    return data;
+  } catch (error) {
+    console.error("Error fetching education:", error);
+    throw error;
   }
 }
 
