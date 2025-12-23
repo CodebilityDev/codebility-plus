@@ -11,6 +11,52 @@ interface CodevMember {
   image_url?: string | null;
 }
 
+const updateDeveloperLevels = async (codevId?: string) => {
+  if (!codevId) return;
+
+  const supabase = await createClientServerComponent();
+
+  const { data: pointsData, error: pointsError } = await supabase
+    .from("codev_points")
+    .select("skill_category_id, points");
+
+  if (pointsError) {
+    console.error("Error fetching points:", pointsError);
+    return;
+  }
+
+  const levels: Record<string, number> = {};
+
+  for (const pointRecord of pointsData) {
+    const { data: levelData, error: levelError } = await supabase
+      .from("levels")
+      .select("*")
+      .eq("skill_category_id", pointRecord.skill_category_id)
+      .lte("min_points", pointRecord.points)
+      .order("level", { ascending: false })
+      .limit(1)
+      .single();
+
+    if (levelError) {
+      console.error("Error finding level:", levelError);
+      continue;
+    }
+
+    if (levelData) {
+      levels[pointRecord.skill_category_id] = levelData.level;
+    }
+  }
+
+  const { error: updateError } = await supabase
+    .from("codev")
+    .update({ level: levels })
+    .eq("id", codevId);
+
+  if (updateError) {
+    console.error("Error updating levels:", updateError);
+  }
+};
+
 export const updateTaskColumnId = async (
   taskId: string,
   newColumnId: string,
@@ -95,7 +141,6 @@ export const fetchAvailableMembers = async (
   return members.sort((a, b) => a.first_name.localeCompare(b.first_name));
 };
 
-// UPDATED: Now handles deadline field
 export const createNewTask = async (
   formData: FormData,
 ): Promise<{ success: boolean; error?: string }> => {
@@ -118,8 +163,6 @@ export const createNewTask = async (
       .filter(Boolean);
     const skill_category_id = formData.get("skill_category_id")?.toString();
     const created_by = formData.get("created_by")?.toString();
-    
-    // NEW: Extract deadline field
     const deadline = formData.get("deadline")?.toString() || null;
 
     if (!title || !kanban_column_id || !skill_category_id) {
@@ -140,8 +183,7 @@ export const createNewTask = async (
         sidekick_ids,
         skill_category_id,
         created_by,
-        deadline, // NEW: Include deadline
-        // created_at is auto-set by database DEFAULT NOW()
+        deadline,
       },
     ]);
 
@@ -150,7 +192,6 @@ export const createNewTask = async (
       return { success: false, error: error.message };
     }
 
-    // Sequential queries to avoid nested join TypeScript issues
     const { data: columnData } = await supabase
       .from("kanban_columns")
       .select("board_id")
@@ -179,7 +220,6 @@ export const createNewTask = async (
   }
 };
 
-// UPDATED: Now handles deadline field
 export const updateTask = async (
   formData: FormData,
   taskId: string,
@@ -193,7 +233,6 @@ export const updateTask = async (
     const rawSkillCategoryId = formData.get("skill_category_id")?.toString();
     const skill_category_id = rawSkillCategoryId === "" || rawSkillCategoryId === "null" ? null : rawSkillCategoryId;
 
-    // NEW: Extract deadline (can be null)
     const rawDeadline = formData.get("deadline")?.toString();
     const deadline = rawDeadline === "" || rawDeadline === "null" ? null : rawDeadline;
 
@@ -210,7 +249,7 @@ export const updateTask = async (
         : [],
       skill_category_id: skill_category_id,
       codev_id: codev_id,
-      deadline: deadline, // NEW: Include deadline
+      deadline: deadline,
       updated_at: new Date().toISOString(),
     };
 
@@ -421,186 +460,95 @@ export const updateColumnName = async (
   }
 };
 
-const updateDeveloperLevels = async (codevId?: string) => {
-  if (!codevId) return;
-
-  const supabase = await createClientServerComponent();
-
-  const { data: pointsData, error: pointsError } = await supabase
-    .from("codev_points")
-    .select("skill_category_id, points");
-
-  if (pointsError) {
-    console.error("Error fetching points:", pointsError);
-    return;
-  }
-
-  const levels: Record<string, number> = {};
-
-  for (const pointRecord of pointsData) {
-    const { data: levelData, error: levelError } = await supabase
-      .from("levels")
-      .select("*")
-      .eq("skill_category_id", pointRecord.skill_category_id)
-      .lte("min_points", pointRecord.points)
-      .order("level", { ascending: false })
-      .limit(1)
-      .single();
-
-    if (levelError) {
-      console.error("Error finding level:", levelError);
-      continue;
-    }
-
-    if (levelData) {
-      levels[pointRecord.skill_category_id] = levelData.level;
-    }
-  }
-
-  const { error: updateError } = await supabase
-    .from("codev")
-    .update({ level: levels })
-    .eq("id", codevId);
-
-  if (updateError) {
-    console.error("Error updating levels:", updateError);
-  }
-};
-
 export const completeTask = async (
   task: Task,
 ): Promise<{ success: boolean; error?: string }> => {
   const supabase = await createClientServerComponent();
 
   try {
-    const { data, error } = await supabase.rpc('complete_task', {
-      task_id: task.id,
-      task_points: task.points || 0,
-      primary_codev_id: task.codev?.id,
-      p_skill_category_id: task.skill_category?.id,
-      sidekick_ids: task.sidekick_ids || null
-    });
+    // CRITICAL FIX: Archive the task FIRST
+    const { error: archiveError } = await supabase
+      .from("tasks")
+      .update({ 
+        is_archive: true,
+        updated_at: new Date().toISOString()
+      })
+      .eq("id", task.id);
 
-    if (error && error.message.includes('function complete_task')) {
-      
-      const { error: archiveError } = await supabase
-        .from("tasks")
-        .update({ 
-          is_archive: true,
-          updated_at: new Date().toISOString()
-        })
-        .eq("id", task.id);
+    if (archiveError) {
+      console.error("Error archiving task:", archiveError);
+      throw archiveError;
+    }
 
-      if (archiveError) throw archiveError;
-
-      if (task.codev?.id && task.skill_category?.id && task.points) {
-        const { data: existingPoints } = await supabase
-          .from("codev_points")
-          .select("*")
-          .eq("codev_id", task.codev.id)
-          .eq("skill_category_id", task.skill_category.id)
-          .single();
-
-        if (existingPoints) {
-          await supabase
-            .from("codev_points")
-            .update({
-              points: existingPoints.points + task.points,
-              updated_at: new Date().toISOString(),
-            })
-            .eq("id", existingPoints.id);
-        } else {
-          await supabase
-            .from("codev_points")
-            .insert({
-              codev_id: task.codev.id,
-              skill_category_id: task.skill_category.id,
-              points: task.points,
-            });
-        }
-
-        if (task.sidekick_ids?.length) {
-          const sidekickPoints = Math.floor(task.points * 0.5);
-          
-          for (const sidekickId of task.sidekick_ids) {
-            const { data: sidekickExisting } = await supabase
-              .from("codev_points")
-              .select("*")
-              .eq("codev_id", sidekickId)
-              .eq("skill_category_id", task.skill_category.id)
-              .single();
-
-            if (sidekickExisting) {
-              await supabase
-                .from("codev_points")
-                .update({
-                  points: sidekickExisting.points + sidekickPoints,
-                  updated_at: new Date().toISOString(),
-                })
-                .eq("id", sidekickExisting.id);
-            } else {
-              await supabase
-                .from("codev_points")
-                .insert({
-                  codev_id: sidekickId,
-                  skill_category_id: task.skill_category.id,
-                  points: sidekickPoints,
-                });
-            }
-          }
-        }
-
-        await updateDeveloperLevels(task.codev.id);
-        
-        if (task.sidekick_ids?.length) {
-          for (const sidekickId of task.sidekick_ids) {
-            await updateDeveloperLevels(sidekickId);
-          }
-        }
-      }
-
-      const { data: taskData } = await supabase
-        .from("tasks")
-        .select("kanban_column_id")
-        .eq("id", task.id)
+    // Award points to primary assignee
+    if (task.codev?.id && task.skill_category?.id && task.points) {
+      const { data: existingPoints } = await supabase
+        .from("codev_points")
+        .select("*")
+        .eq("codev_id", task.codev.id)
+        .eq("skill_category_id", task.skill_category.id)
         .single();
 
-      if (taskData?.kanban_column_id) {
-        const { data: columnData } = await supabase
-          .from("kanban_columns")
-          .select("board_id")
-          .eq("id", taskData.kanban_column_id)
-          .single();
-          
-        if (columnData?.board_id) {
-          const { data: boardData } = await supabase
-            .from("kanban_boards")
-            .select("project_id")
-            .eq("id", columnData.board_id)
+      if (existingPoints) {
+        await supabase
+          .from("codev_points")
+          .update({
+            points: existingPoints.points + task.points,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", existingPoints.id);
+      } else {
+        await supabase
+          .from("codev_points")
+          .insert({
+            codev_id: task.codev.id,
+            skill_category_id: task.skill_category.id,
+            points: task.points,
+          });
+      }
+
+      // Award 50% points to sidekicks
+      if (task.sidekick_ids?.length) {
+        const sidekickPoints = Math.floor(task.points * 0.5);
+        
+        for (const sidekickId of task.sidekick_ids) {
+          const { data: sidekickExisting } = await supabase
+            .from("codev_points")
+            .select("*")
+            .eq("codev_id", sidekickId)
+            .eq("skill_category_id", task.skill_category.id)
             .single();
-            
-          if (boardData?.project_id) {
-            revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+
+          if (sidekickExisting) {
+            await supabase
+              .from("codev_points")
+              .update({
+                points: sidekickExisting.points + sidekickPoints,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", sidekickExisting.id);
+          } else {
+            await supabase
+              .from("codev_points")
+              .insert({
+                codev_id: sidekickId,
+                skill_category_id: task.skill_category.id,
+                points: sidekickPoints,
+              });
           }
         }
       }
+
+      await updateDeveloperLevels(task.codev.id);
       
-      return { success: true };
+      if (task.sidekick_ids?.length) {
+        for (const sidekickId of task.sidekick_ids) {
+          await updateDeveloperLevels(sidekickId);
+        }
+      }
     }
 
-    if (error) {
-      throw error;
-    }
-
-    const result = data as { success: boolean; error?: string; message?: string };
-
-    if (!result.success) {
-      return {
-        success: false,
-        error: result.error || "Failed to complete task"
-      };
-    }
-
+    // Revalidate pages
     const { data: taskData } = await supabase
       .from("tasks")
       .select("kanban_column_id")
@@ -623,6 +571,7 @@ export const completeTask = async (
           
         if (boardData?.project_id) {
           revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+          revalidatePath("/home/kanban");
         }
       }
     }

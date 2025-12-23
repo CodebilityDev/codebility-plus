@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
-import Box from "@/components/shared/dashboard/Box";
+import Box from "@/components/shared/dashboard/Box"; 
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import { useUserStore } from "@/store/codev-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
@@ -28,7 +28,6 @@ const DashboardCurrentProject = () => {
   const [projects, setProjects] = useState<ProjectInvolvement[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [supabase, setSupabase] = useState<any>(null);
-  // Track image load errors for each project
   const [imageErrors, setImageErrors] = useState<Record<string, boolean>>({});
 
   // Initialize Supabase client safely
@@ -45,6 +44,8 @@ const DashboardCurrentProject = () => {
       if (!user?.id) return;
 
       try {
+        // BUG FIX: Filter for ACTIVE projects only
+        // Exclude 'completed', 'cancelled', 'archived', 'inactive' statuses
         const { data, error } = await supabase
           .from("project_members")
           .select(
@@ -61,13 +62,22 @@ const DashboardCurrentProject = () => {
             `,
           )
           .eq("codev_id", user.id)
+          .in("projects.status", ["active", "inprogress", "pending"])
           .order("joined_at", { ascending: false });
 
         if (error) throw error;
 
         if (data) {
-          const formattedProjects: ProjectInvolvement[] = data.map(
-            (item: any) => ({
+          // BUG FIX: Additional client-side filtering for extra safety
+          const formattedProjects: ProjectInvolvement[] = data
+            .filter((item: any) => {
+              const status = item.projects?.status?.toLowerCase();
+              // Only include active, inprogress, or pending projects
+              return status === "active" || 
+                     status === "inprogress" || 
+                     status === "pending";
+            })
+            .map((item: any) => ({
               role: item.role,
               joined_at: item.joined_at,
               project: {
@@ -77,8 +87,8 @@ const DashboardCurrentProject = () => {
                 main_image: item.projects.main_image,
                 kanban_display: item.projects.kanban_display,
               },
-            }),
-          );
+            }));
+          
           setProjects(formattedProjects);
         }
       } catch (error) {
@@ -101,17 +111,14 @@ const DashboardCurrentProject = () => {
 
   // Get project image source with fallback logic
   const getProjectImageSrc = (project: ProjectInvolvement['project']) => {
-    // If we know this image has failed to load, use fallback immediately
     if (imageErrors[project.id]) {
       return "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
     }
     
-    // If main_image is null or empty, use fallback
     if (!project.main_image || project.main_image.trim() === "") {
       return "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg";
     }
     
-    // Return the original image
     return project.main_image;
   };
 

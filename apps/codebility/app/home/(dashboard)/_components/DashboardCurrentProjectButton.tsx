@@ -1,6 +1,6 @@
 "use client";
 
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useEffect, useState } from "react"; 
 import { useModal } from "@/hooks/use-modal";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
@@ -17,13 +17,11 @@ export default function DashboardCurrentProjectButton({
   const [isDisabled, setIsDisabled] = useState(true);
   const [supabase, setSupabase] = useState<any>(null);
 
-
   const handleClick = () => {
     if (!isDisabled) {
       onOpen("dashboardCurrentProjectModal", { projectId });
     }
   };
-
   
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -33,37 +31,64 @@ export default function DashboardCurrentProjectButton({
   useEffect(() => {
     if (!supabase) return;
 
-    const fetchKanbanDisplay = async () => {
-      const {
-        data: { user },
-        error: userError,
-      } = await supabase.auth.getUser();
+    const fetchProjectStatus = async () => {
+      try {
+        // Get current user
+        const {
+          data: { user },
+          error: userError,
+        } = await supabase.auth.getUser();
 
-      if (userError || !user) return;
+        if (userError || !user) {
+          setIsDisabled(true);
+          return;
+        }
 
-      const { data: membership } = await supabase
-        .from("project_members")
-        .select("id")
-        .eq("codev_id", user.id)
-        .eq("project_id", projectId)
-        .single();
+        // BUG FIX: Check if user is still a member of the project
+        const { data: membership, error: membershipError } = await supabase
+          .from("project_members")
+          .select("id")
+          .eq("codev_id", user.id)
+          .eq("project_id", projectId)
+          .single();
 
-      if (!membership) return;
+        if (membershipError || !membership) {
+          setIsDisabled(true);
+          return;
+        }
 
-      // REMOVED: kanban_display database check
-      // ORIGINAL CODE (Lines 51-56):
-      // const { data: project } = await supabase
-      //   .from("projects")
-      //   .select("kanban_display")
-      //   .eq("id", projectId)
-      //   .single();
-      // setIsDisabled(project?.kanban_display !== true);
-      
-      // NEW CODE: Always enable modal for project members
-      setIsDisabled(false);
+        // BUG FIX: Verify project is still active before enabling button
+        const { data: project, error: projectError } = await supabase
+          .from("projects")
+          .select("status, kanban_display")
+          .eq("id", projectId)
+          .single();
+
+        if (projectError || !project) {
+          setIsDisabled(true);
+          return;
+        }
+
+        // BUG FIX: Only enable button if project has active status
+        const projectStatus = project.status?.toLowerCase();
+        const isActiveProject = 
+          projectStatus === "active" || 
+          projectStatus === "inprogress" || 
+          projectStatus === "pending";
+
+        // Enable button only if:
+        // 1. Project is active/inprogress/pending
+        // 2. User is a member
+        // 3. Kanban display is enabled (optional, depending on your requirements)
+        setIsDisabled(!isActiveProject);
+
+      } catch (error) {
+        console.error("Error fetching project status:", error);
+        setIsDisabled(true);
+      }
     };
 
-    fetchKanbanDisplay();
+    fetchProjectStatus();
   }, [projectId, supabase]);
 
   return (
@@ -71,8 +96,8 @@ export default function DashboardCurrentProjectButton({
       type="button"
       onClick={handleClick}
       disabled={isDisabled}
-      className={` transition-opacity  ${
-        isDisabled ? "cursor-not-allowed" : ""
+      className={`w-full transition-opacity ${
+        isDisabled ? "cursor-not-allowed opacity-60" : "cursor-pointer"
       }`}
     >
       {children}
