@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { Box } from "@/components/shared/dashboard";
 import { Button } from "@/components/ui/button";
 import { Position, Project, SkillCategory } from "@/types/home/codev";
@@ -37,8 +38,11 @@ export default function FilterCodevs({
   const [showFilter, setShowFilter] = useState(false);
   const [positions, setPositions] = useState<Position[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
-
   const [supabase, setSupabase] = useState<any>(null);
+  
+  // Track button position for dropdown placement
+  const [buttonRef, setButtonRef] = useState<HTMLDivElement | null>(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, right: 0 });
 
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -69,6 +73,17 @@ export default function FilterCodevs({
     fetchData();
   }, [supabase]);
 
+  // Calculate dropdown position when button ref changes or filter opens
+  useEffect(() => {
+    if (buttonRef && showFilter) {
+      const rect = buttonRef.getBoundingClientRect();
+      setDropdownPosition({
+        top: rect.bottom + 8, // 8px gap below button
+        right: window.innerWidth - rect.right, // Align right edge
+      });
+    }
+  }, [buttonRef, showFilter]);
+
   const toggleFilter = () => setShowFilter((prev) => !prev);
 
   const clearFilter = () =>
@@ -88,8 +103,137 @@ export default function FilterCodevs({
     });
   };
 
+  // Render dropdown using portal to escape stacking context
+  const renderDropdown = () => {
+    if (typeof window === "undefined" || !showFilter) return null;
+
+    return createPortal(
+      <>
+        {/* Backdrop overlay - close on click outside */}
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setShowFilter(false)}
+          aria-hidden="true"
+        />
+        
+        {/* Filter dropdown panel */}
+        <div
+          className="fixed z-50 max-h-[calc(100vh-6rem)] min-h-[300px] w-[90vw] overflow-auto
+            sm:w-96 md:w-80 rounded-2xl bg-white/95 backdrop-blur-md p-6 shadow-2xl 
+            dark:bg-gray-900/95 border border-gray-200 dark:border-gray-700"
+          style={{
+            top: `${dropdownPosition.top}px`,
+            right: `${dropdownPosition.right}px`,
+          }}
+        >
+          {/* Header with clear button */}
+          <div className="mb-4 flex items-center justify-between">
+            <h3 className="font-semibold text-gray-900 dark:text-white drop-shadow-sm">
+              Filters
+            </h3>
+            <button
+              onClick={clearFilter}
+              className="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 
+                dark:hover:text-blue-300 transition-colors duration-200 px-2 py-1 
+                rounded-md hover:bg-gray-100 dark:hover:bg-gray-800"
+            >
+              Clear all
+            </button>
+          </div>
+
+          {/* Filter tabs */}
+          <Tabs defaultValue="position" className="w-full">
+            <TabsList className="grid w-full grid-cols-3 bg-gray-100 dark:bg-gray-800 
+              border border-gray-200 dark:border-gray-700">
+              <TabsTrigger value="position">Position</TabsTrigger>
+              <TabsTrigger value="status">Status</TabsTrigger>
+              <TabsTrigger value="projects">Projects</TabsTrigger>
+            </TabsList>
+
+            {/* Position filter tab */}
+            <TabsContent value="position" className="mt-4 space-y-2">
+              {positions.map((pos) => (
+                <div
+                  key={pos.id}
+                  className="flex items-center space-x-2 rounded-lg p-2 transition-colors 
+                    hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <Checkbox
+                    id={`pos-${pos.id}`}
+                    checked={filters.positions.includes(pos.name || "")}
+                    onCheckedChange={() =>
+                      handleCheckedChange("positions", pos.name || "")
+                    }
+                  />
+                  <label 
+                    htmlFor={`pos-${pos.id}`} 
+                    className="text-sm cursor-pointer text-gray-900 dark:text-gray-100"
+                  >
+                    {pos.name}
+                  </label>
+                </div>
+              ))}
+            </TabsContent>
+
+            {/* Status filter tab */}
+            <TabsContent value="status" className="mt-4 space-y-2">
+              {AVAILABILITY_STATUS.map((status) => (
+                <div
+                  key={status}
+                  className="flex items-center space-x-2 rounded-lg p-2 transition-colors 
+                    hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <Checkbox
+                    id={`status-${status}`}
+                    checked={filters.availability.includes(status)}
+                    onCheckedChange={() =>
+                      handleCheckedChange("availability", status)
+                    }
+                  />
+                  <label 
+                    htmlFor={`status-${status}`} 
+                    className="text-sm cursor-pointer text-gray-900 dark:text-gray-100"
+                  >
+                    {status}
+                  </label>
+                </div>
+              ))}
+            </TabsContent>
+
+            {/* Projects filter tab */}
+            <TabsContent value="projects" className="mt-4 space-y-2">
+              {projects.map((project) => (
+                <div
+                  key={project.id}
+                  className="flex items-center space-x-2 rounded-lg p-2 transition-colors 
+                    hover:bg-gray-100 dark:hover:bg-gray-800"
+                >
+                  <Checkbox
+                    id={project.id}
+                    checked={filters.projects.includes(project.id)}
+                    onCheckedChange={() =>
+                      handleCheckedChange("projects", project.id)
+                    }
+                  />
+                  <label 
+                    htmlFor={project.name} 
+                    className="text-sm cursor-pointer text-gray-900 dark:text-gray-100"
+                  >
+                    {project.name}
+                  </label>
+                </div>
+              ))}
+            </TabsContent>
+          </Tabs>
+        </div>
+      </>,
+      document.body
+    );
+  };
+
   return (
-    <div className="relative flex justify-end">
+    <div className="relative flex justify-end" ref={setButtonRef}>
+      {/* Filter toggle button */}
       <Button
         variant="default"
         size="sm"
@@ -97,97 +241,15 @@ export default function FilterCodevs({
         className={cn(
           "text-white transition-all duration-300 backdrop-blur-sm border shadow-lg",
           showFilter
-        ? "bg-gradient-to-r from-pink-500/80 to-rose-600/80 hover:from-pink-600 hover:to-rose-700 border-pink-400/50"
-        : "bg-gradient-to-r from-customBlue-500/80 to-indigo-500/80 hover:from-customBlue-600 hover:to-indigo-600 border-customBlue-400/50"
+            ? "bg-gradient-to-r from-pink-500/80 to-rose-600/80 hover:from-pink-600 hover:to-rose-700 border-pink-400/50"
+            : "bg-gradient-to-r from-customBlue-500/80 to-indigo-500/80 hover:from-customBlue-600 hover:to-indigo-600 border-customBlue-400/50"
         )}
       >
         {showFilter ? "Close filter" : "Filter"}
       </Button>
 
-      <div
-        className={`absolute right-0 top-12 z-[1] max-h-[calc(100vh-20rem)] min-h-[300px] w-[300%] overflow-auto
-          sm:-right-3/4 sm:w-96 md:right-0 md:w-80 rounded-2xl bg-white/10 backdrop-blur-md p-6 shadow-2xl dark:bg-white/5 border border-white/20 dark:border-white/10
-          ${!showFilter && "hidden"}
-        `}
-      >
-        <div className="mb-4 flex items-center justify-between">
-          <h3 className="font-semibold text-white drop-shadow-sm">Filters</h3>
-          <button
-            onClick={clearFilter}
-            className="text-sm text-customBlue-300 hover:text-customBlue-100 dark:text-customBlue-400 dark:hover:text-customBlue-200 transition-colors duration-200 px-2 py-1 rounded-md hover:bg-white/20 dark:hover:bg-white/10"
-          >
-            Clear all
-          </button>
-        </div>
-
-        <Tabs defaultValue="position" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 bg-white/10 backdrop-blur-sm border border-white/20 dark:border-white/10">
-            <TabsTrigger value="position">Position</TabsTrigger>
-            <TabsTrigger value="status">Status</TabsTrigger>
-            <TabsTrigger value="projects">Projects</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="position" className="mt-4 space-y-2">
-            {positions.map((pos) => (
-              <div
-                key={pos.id}
-                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-white/20 dark:hover:bg-white/10"
-              >
-                <Checkbox
-                  id={`pos-${pos.id}`}
-                  checked={filters.positions.includes(pos.name || "")}
-                  onCheckedChange={() =>
-                    handleCheckedChange("positions", pos.name || "")
-                  }
-                />
-                <label htmlFor={`pos-${pos.id}`} className="text-sm cursor-pointer text-white dark:text-gray-200">
-                  {pos.name}
-                </label>
-              </div>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="status" className="mt-4 space-y-2">
-            {AVAILABILITY_STATUS.map((status) => (
-              <div
-                key={status}
-                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-white/20 dark:hover:bg-white/10"
-              >
-                <Checkbox
-                  id={`status-${status}`}
-                  checked={filters.availability.includes(status)}
-                  onCheckedChange={() =>
-                    handleCheckedChange("availability", status)
-                  }
-                />
-                <label htmlFor={`status-${status}`} className="text-sm cursor-pointer text-white dark:text-gray-200">
-                  {status}
-                </label>
-              </div>
-            ))}
-          </TabsContent>
-
-          <TabsContent value="projects" className="mt-4 space-y-2">
-            {projects.map((project) => (
-              <div
-                key={project.id}
-                className="flex items-center space-x-2 rounded-lg p-2 transition-colors hover:bg-white/20 dark:hover:bg-white/10"
-              >
-                <Checkbox
-                  id={project.id}
-                  checked={filters.projects.includes(project.id)}
-                  onCheckedChange={() =>
-                    handleCheckedChange("projects", project.id)
-                  }
-                />
-                <label htmlFor={project.name} className="text-sm cursor-pointer text-white dark:text-gray-200">
-                  {project.name}
-                </label>
-              </div>
-            ))}
-          </TabsContent>
-        </Tabs>
-      </div>
+      {/* Render dropdown in portal (z-50 above everything) */}
+      {renderDropdown()}
     </div>
   );
 }
