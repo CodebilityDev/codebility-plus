@@ -120,7 +120,7 @@ const EducationalBackground = ({ data, codevId }: EducationProps) => {
     }
 
     return true;
-  }, [educationData]);
+  }, []);
 
   // Check if there are no education entries or all are empty
   const hasNoEducation = educationData.length === 0;
@@ -221,7 +221,10 @@ const EducationForm = ({
       !education.start_date &&
       !education.end_date;
 
-    handleEditModePerItem(itemNo, isNewEmpty);
+    if (isNewEmpty) {
+      handleEditModePerItem(itemNo, true);
+      setEditMode(true);
+    }
   }, [education, handleEditModePerItem, itemNo, totalNo]);
 
   useEffect(() => {
@@ -250,8 +253,8 @@ const EducationForm = ({
       achievements: education.achievements || null,
       start_date: education.start_date || null,
       end_date: education.end_date || null,
-      codev_id: education.codev_id,
-      profile_id: education.profile_id,
+      codev_id: education.codev_id || undefined,
+      profile_id: education.profile_id || undefined,
     };
 
     try {
@@ -292,7 +295,10 @@ const EducationForm = ({
         {!editMode && (
           <IconEdit
             onClick={() => {
-              if (!isLoadingMain) setEditMode(true);
+              if (!isLoadingMain) {
+                handleEditModePerItem(itemNo, true);
+                setEditMode(true);
+              }
             }}
             className="cursor-pointer invert dark:invert-0"
           />
