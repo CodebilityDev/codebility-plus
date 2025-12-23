@@ -7,6 +7,7 @@ import { Toaster } from "react-hot-toast";
 import About from "./_components/About";
 import ContactInfo from "./_components/ContactInfo";
 import Experience from "./_components/Experience";
+import EducationalBackground from "./_components/EducationalBackground";
 import JobStatuses from "./_components/JobStatuses";
 import PersonalInfo from "./_components/PersonalInfo";
 import Photo from "./_components/Photo";
@@ -71,8 +72,16 @@ async function ProfileComponent() {
     { data: schedules },
     { data: jobStatuses },
   ] = await Promise.all([
-    supabase.from("education").select("*").eq("codev_id", user.id),
-    supabase.from("work_experience").select("*").eq("codev_id", user.id),
+    supabase
+      .from("education")
+      .select("*")
+      .eq("codev_id", user.id)
+      .order("start_date", { ascending: false }),
+    supabase
+      .from("work_experience")
+      .select("*")
+      .eq("codev_id", user.id)
+      .order("date_from", { ascending: false }),
     supabase.from("work_schedules").select("*").eq("codev_id", user.id),
     supabase.from("job_status").select("*").eq("codev_id", user.id),
   ]);
@@ -110,7 +119,8 @@ async function ProfileComponent() {
                 phone_number: user.phone_number,
               }}
             />
-            <Experience data={workExperience || []} />
+            <EducationalBackground data={education || []} codevId={user.id} />
+            <Experience data={workExperience || []} codevId={user.id} />
           </div>
           <div className="flex w-full basis-[30%] flex-col gap-8 2xl:basis-[40%]">
             <Photo data={{ image_url: user.image_url || null }} />
@@ -122,6 +132,7 @@ async function ProfileComponent() {
             />
             <TimeSchedule data={schedules?.[0] || null} />
             <JobStatuses data={jobStatuses || []} />
+            
           </div>
         </div>
       </div>

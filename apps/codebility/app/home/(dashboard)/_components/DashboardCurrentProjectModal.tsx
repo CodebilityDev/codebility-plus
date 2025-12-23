@@ -21,7 +21,6 @@ import {
 import { Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
 
-// Line 26-28: Configure which column names indicate completed work
 const COMPLETED_COLUMN_NAMES = ["done", "finished", "completed", "approved"];
 
 export default function DashboardCurrentProjectModal() {
@@ -43,7 +42,6 @@ export default function DashboardCurrentProjectModal() {
 
   const projectId = data?.projectId;
 
-  // Line 48-54: Navigate to kanban board (preserves original functionality)
   const handleGoToKanban = () => {
     if (kanbanBoardId) {
       onClose();
@@ -102,7 +100,7 @@ export default function DashboardCurrentProjectModal() {
           setKanbanBoardId(board.id);
         }
 
-        // Line 106-120: Enhanced query to include column name for filtering
+        // BUG FIX: Filter out archived tasks at the database level
         const { data: rawTasks, error: taskError } = await supabase
           .from("tasks")
           .select(
@@ -117,24 +115,31 @@ export default function DashboardCurrentProjectModal() {
               )
             )`,
           )
-          .eq("codev_id", user.id);
+          .eq("codev_id", user.id)
+          // BUG FIX: Only fetch non-archived tasks
+          .or("is_archive.is.null,is_archive.eq.false");
 
         if (taskError) {
           console.error("Error fetching tasks:", taskError);
           return;
         }
 
-        // Line 125-134: Filter logic - exclude "Done" column tasks and match project
+        // Filter logic - exclude "Done" column tasks and match project
         const filteredTasks = (rawTasks || []).filter((task: any) => {
           const matchesProject = task.kanban_columns?.kanban_boards?.project_id === projectId;
           
-          // Line 129-131: Check if task is in a "completed" column
+          // Additional safety check: exclude archived tasks
+          if (task.is_archive === true) {
+            return false;
+          }
+          
+          // Check if task is in a "completed" column
           const columnName = task.kanban_columns?.name?.toLowerCase() || "";
           const isCompleted = COMPLETED_COLUMN_NAMES.some(completedName => 
             columnName.includes(completedName)
           );
           
-          // Show only active tasks (not in Done/Completed columns)
+          // Show only active tasks (not in Done/Completed columns and not archived)
           return matchesProject && !isCompleted;
         });
 
@@ -149,7 +154,6 @@ export default function DashboardCurrentProjectModal() {
     fetchUserTasks();
   }, [isModalOpen, projectId, supabase]);
 
-  // Line 153-169: Loading skeleton with responsive grid
   if (isLoading) {
     return (
       <Dialog open={isModalOpen} onOpenChange={onClose}>
@@ -182,7 +186,6 @@ export default function DashboardCurrentProjectModal() {
 
   return (
     <Dialog open={isModalOpen} onOpenChange={handleClose}>
-      {/* Line 184-189: Responsive modal container with proper dark mode support */}
       <DialogContent 
         aria-describedby={undefined} 
         className="
@@ -202,7 +205,6 @@ export default function DashboardCurrentProjectModal() {
         
         <p className="text-gray-700 dark:text-gray-300">Your Active Ticket(s):</p>
         
-        {/* Line 204-207: Responsive grid layout */}
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-2">
           {error ? (
             <p className="text-red-500 dark:text-red-400">{error}</p>
@@ -230,7 +232,6 @@ export default function DashboardCurrentProjectModal() {
                     {tasked.title}
                   </h3>
                   
-                  {/* Line 232-252: Priority icon with dark mode colors */}
                   <div className="flex flex-shrink-0 items-center gap-1 md:gap-2">
                     <div
                       className={`flex items-center justify-center rounded-full p-0.5 md:p-1 ${
@@ -258,7 +259,6 @@ export default function DashboardCurrentProjectModal() {
                   </div>
                 </div>
 
-                {/* Line 258-294: Task metadata badges with dark mode support */}
                 <div className="flex flex-wrap gap-1 text-xs text-gray-600 dark:text-gray-400 md:gap-2 md:text-sm">
                   {tasked.difficulty && (
                     <span
@@ -303,14 +303,12 @@ export default function DashboardCurrentProjectModal() {
               </div>
             ))
           ) : (
-            // Line 300-302: Empty state with dark mode
             <p className="mt-2 text-sm text-gray-600 dark:text-gray-400 col-span-full text-center py-8">
               No active tickets assigned to you.
             </p>
           )}
         </div>
 
-        {/* Line 307-322: Footer buttons with dark mode styling */}
         <DialogFooter>
           <div className="flex gap-2">
             <button
