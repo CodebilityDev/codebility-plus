@@ -77,8 +77,17 @@ export default function FilterCodevs({
   useEffect(() => {
     if (buttonRef && showFilter) {
       const rect = buttonRef.getBoundingClientRect();
+      const viewportHeight = window.innerHeight;
+      const dropdownHeight = 450; // Approximate dropdown height
+      
+      // Check if dropdown would overflow bottom of viewport
+      const wouldOverflowBottom = rect.bottom + dropdownHeight > viewportHeight;
+      
       setDropdownPosition({
-        top: rect.bottom + 8, // 8px gap below button
+        // Position above button if would overflow, otherwise below
+        top: wouldOverflowBottom 
+          ? Math.max(60, rect.top - dropdownHeight - 8) // Above with top padding
+          : rect.bottom + 8, // Below with gap
         right: window.innerWidth - rect.right, // Align right edge
       });
     }
@@ -118,7 +127,7 @@ export default function FilterCodevs({
         
         {/* Filter dropdown panel */}
         <div
-          className="fixed z-50 max-h-[calc(100vh-6rem)] min-h-[300px] w-[90vw] overflow-auto
+          className="fixed z-50 max-h-[min(70vh,500px)] min-h-[300px] w-[90vw] overflow-auto
             sm:w-96 md:w-80 rounded-2xl bg-white/95 backdrop-blur-md p-6 shadow-2xl 
             dark:bg-gray-900/95 border border-gray-200 dark:border-gray-700"
           style={{
