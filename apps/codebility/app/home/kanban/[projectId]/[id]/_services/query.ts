@@ -5,12 +5,11 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 export const getBoardData = async (boardId: String) => {
   try {
     const supabase = await createClientServerComponent();
-  
-    // Fetch board with columns
+
+    // Fetch the board and its columns
     const { data: boardData, error } = await supabase
       .from("kanban_boards")
-      .select(
-        `
+      .select(`
         id,
         name,
         description,
@@ -24,17 +23,16 @@ export const getBoardData = async (boardId: String) => {
           created_at,
           updated_at
         )
-      `,
-      )
+      `)
       .eq("id", boardId)
       .single();
 
     if (error) throw error;
 
-    // BUG FIX: Fetch only NON-ARCHIVED tasks (handles NULL values)
-    if (boardData?.kanban_columns && boardData.kanban_columns.length > 0) {
+    if (boardData?.kanban_columns) {
       const columnIds = boardData.kanban_columns.map((col: any) => col.id);
-      
+
+      // Fetch tasks
       const { data: tasks, error: tasksError } = await supabase
         .from("tasks")
         .select(`
@@ -75,15 +73,25 @@ export const getBoardData = async (boardId: String) => {
 
       if (tasksError) throw tasksError;
 
-      // BUG FIX: Double-check filtering on client side for extra safety
-      const activeTasks = tasks?.filter((task: any) => 
-        task.is_archive !== true
-      ) || [];
+      // Fetch ticket codes separately
+      const taskIds = tasks?.map((task: any) => task.id) || [];
+      const { data: ticketCodes, error: ticketError } = await supabase
+        .from("task_ticket_codes")
+        .select(`task_id, ticket_code`)
+        .in("task_id", taskIds);
+
+      if (ticketError) throw ticketError;
+
+      // Merge ticket_code into tasks
+      const tasksWithTicket = tasks?.map((task: any) => ({
+        ...task,
+        ticket_code: ticketCodes?.find((t: any) => t.task_id === task.id)?.ticket_code || null,
+      }));
 
       // Attach tasks to their respective columns
       boardData.kanban_columns = boardData.kanban_columns.map((column: any) => ({
         ...column,
-        tasks: activeTasks.filter((task: any) => task.kanban_column_id === column.id)
+        tasks: tasksWithTicket?.filter((task: any) => task.kanban_column_id === column.id) || [],
       }));
     } else {
       // If no columns exist, initialize empty tasks array
@@ -92,7 +100,7 @@ export const getBoardData = async (boardId: String) => {
         tasks: []
       })) || [];
     }
-
+    
     return boardData;
   } catch (error) {
     console.error("Error fetching board data:", error);
