@@ -6,32 +6,33 @@ export const getBoardData = async (boardId: String) => {
   try {
     const supabase = await createClientServerComponent();
   
+    // Fetch board with columns
     const { data: boardData, error } = await supabase
-    .from("kanban_boards")
-    .select(
-      `
-      id,
-      name,
-      description,
-      created_at,
-      updated_at,
-      project_id,
-      kanban_columns (
+      .from("kanban_boards")
+      .select(
+        `
         id,
         name,
-        position,
+        description,
         created_at,
-        updated_at
+        updated_at,
+        project_id,
+        kanban_columns (
+          id,
+          name,
+          position,
+          created_at,
+          updated_at
+        )
+      `,
       )
-    `,
-    )
-    .eq("id", boardId)
-    .single();
+      .eq("id", boardId)
+      .single();
 
     if (error) throw error;
 
-    // Fetch tasks separately with proper filtering
-    if (boardData?.kanban_columns) {
+    // BUG FIX: Fetch only NON-ARCHIVED tasks (handles NULL values)
+    if (boardData?.kanban_columns && boardData.kanban_columns.length > 0) {
       const columnIds = boardData.kanban_columns.map((col: any) => col.id);
       
       const { data: tasks, error: tasksError } = await supabase
@@ -67,23 +68,71 @@ export const getBoardData = async (boardId: String) => {
           )
         `)
         .in("kanban_column_id", columnIds)
-        .eq("is_archive", false)
+        // BUG FIX: Filter out archived tasks (handles NULL, true, false)
+        // Use .or() to exclude both NULL and true values
+        .or("is_archive.is.null,is_archive.eq.false")
         .order("created_at", { ascending: true });
 
       if (tasksError) throw tasksError;
 
+      // BUG FIX: Double-check filtering on client side for extra safety
+      const activeTasks = tasks?.filter((task: any) => 
+        task.is_archive !== true
+      ) || [];
+
       // Attach tasks to their respective columns
       boardData.kanban_columns = boardData.kanban_columns.map((column: any) => ({
         ...column,
-        tasks: tasks?.filter((task: any) => task.kanban_column_id === column.id) || []
+        tasks: activeTasks.filter((task: any) => task.kanban_column_id === column.id)
       }));
+    } else {
+      // If no columns exist, initialize empty tasks array
+      boardData.kanban_columns = boardData.kanban_columns?.map((column: any) => ({
+        ...column,
+        tasks: []
+      })) || [];
     }
-
-    if (error) throw error;
 
     return boardData;
   } catch (error) {
-    console.error(error);
+    console.error("Error fetching board data:", error);
+    throw error;
+  }
+};
+
+export const getSprintsData = async (projectId: String) => {
+  try {
+    const supabase = await createClientServerComponent();
+  
+    // Fetch project + sprints
+    const { data, error } = await supabase
+      .from("projects")
+      .select(
+        `
+        id,
+        name,
+        kanban_sprints!kanban_sprints_project_id_fkey (
+          id,
+          name,
+          start_at,
+          end_at,
+          project_id,
+          board_id,
+          kanban_board:kanban_boards!kanban_sprints_board_id_fkey (
+            id,
+            name
+          )
+        )
+      `,
+      )
+      .eq("id", projectId)
+      .single();
+
+    if (error) throw error;
+    
+    return data;
+  } catch (error) {
+    console.error("Error fetching sprints data:", error);
     throw error;
   }
 };
