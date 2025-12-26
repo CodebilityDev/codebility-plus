@@ -321,12 +321,41 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 </Button>
               )}
 
-              {viewMode === "attendance" && isCurrentUserTeamLead && (
-                <SyncAllAttendance
-                  projectId={projectInfo.id}
-                  isTeamLead={isCurrentUserTeamLead}
-                />
-              )}
+              {/* Sync All Points, Schedule Meeting, Kanban Board in One row */}
+              <div className=" flex flex-col sm:flex-row  items-stretch sm:items-center gap-2 w-full">
+                {viewMode === "attendance" && isCurrentUserTeamLead && (
+                  <SyncAllAttendance
+                    projectId={projectInfo.id}
+                    isTeamLead={isCurrentUserTeamLead}
+                  />
+                )} 
+
+                {/* Schedule Meeting - ONLY VISIBLE TO TEAM LEADS */}
+                {isCurrentUserTeamLead && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="flex items-center gap-2 h-9 border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
+                    title="Schedule Meetings"
+                    onClick={() => setShowScheduleMeetingModal(true)}
+                  >
+                    <CalendarDays className="h-4 w-4" />
+                    Schedule Meeting
+                  </Button>
+                )}
+
+                {/* Kanban Board Button - VISIBLE TO ALL MEMBERS */}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex items-center gap-2 h-9 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+                  title="Go to Kanban Board"
+                  onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
+                >
+                  <Kanban className="h-4 w-4" />
+                  Kanban Board
+                </Button>
+              </div>
 
               {/* Manage Members - ONLY VISIBLE TO TEAM LEADS in Team View */}
               {viewMode === "team" && isCurrentUserTeamLead && (
@@ -340,32 +369,6 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                   {isLoadingMembers ? 'Loading...' : 'Manage Members'}
                 </Button>
               )}
-
-              {/* Schedule Meeting - ONLY VISIBLE TO TEAM LEADS */}
-              {isCurrentUserTeamLead && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  className="flex items-center gap-2 h-9 border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
-                  title="Schedule Meetings"
-                  onClick={() => setShowScheduleMeetingModal(true)}
-                >
-                  <CalendarDays className="h-4 w-4" />
-                  Schedule Meeting
-                </Button>
-              )}
-
-              {/* Kanban Board Button - VISIBLE TO ALL MEMBERS */}
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex items-center gap-2 h-9 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
-                title="Go to Kanban Board"
-                onClick={() => router.push(`/home/kanban/${projectInfo.id}`)}
-              >
-                <Kanban className="h-4 w-4" />
-                Kanban Board
-              </Button>
             </div>
           )}
         </div>
