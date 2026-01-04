@@ -575,3 +575,29 @@ export async function deletePostComment(comment_id: string) {
     throw error;
   }
 }
+
+export const hasReachedDailyPostLimit = async (author_id: string, limit = 2) => {
+  try {
+    const supabase = await createClientServerComponent();
+
+    // Timestamp 24 hours ago
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    const { count, error } = await supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true }) // head: true avoids fetching rows
+      .eq("author_id", author_id)
+      .gte("created_at", twentyFourHoursAgo);
+
+    if (error) {
+      console.error("Error checking daily post limit:", error);
+      throw error;
+    }
+
+    // Return true if count >= limit
+    return (count ?? 0) >= limit;
+  } catch (error) {
+    console.error("Error in hasReachedDailyPostLimit:", error);
+    throw error;
+  }
+};
