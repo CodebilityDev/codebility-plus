@@ -83,6 +83,12 @@ const EditPostForm = ({
       setImage(null);
     } catch (error) {
       console.error("Error editing post:", error);
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+        return;
+      }
+      
       toast.error("Failed to edit post.");
     } finally {
       setIsSubmitting(false);

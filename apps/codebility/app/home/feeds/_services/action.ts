@@ -1,6 +1,8 @@
 "use server";
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
+import { createPostSchema, editPostSchema } from "./validation";
+import { ZodError } from "zod";
 
 
 export const getUserRole = async (userId: Number | null): Promise<string | null> => {
@@ -43,15 +45,22 @@ type AddPostParams = {
   tag_ids?: number[] | null;
 };
 
-export const addPost = async ({
-  title,
-  content,
-  author_id,
-  image_url,
-  content_image_ids,
-  tag_ids,
-}: AddPostParams) => {
+export const addPost = async (
+  payload
+: AddPostParams) => {
   try {
+    // Validation
+    const parsed = createPostSchema.parse(payload);
+
+    const {
+      title,
+      content,
+      author_id,
+      image_url,
+      content_image_ids,
+      tag_ids,
+    } = parsed;
+
     const supabase = await createClientServerComponent();
 
     // 1. Insert the post
@@ -105,6 +114,10 @@ export const addPost = async ({
     return newPost;
   } catch (error) {
     console.error("Error in addPost:", error);
+
+    if (error instanceof ZodError) {
+      throw new Error(error.errors[0]?.message ?? "Invalid post data");
+    }
     throw error;
   }
 };
@@ -155,16 +168,22 @@ type EditPostParams = {
   tag_ids?: number[] | null;
 };
 
-export const editPost = async ({
-  id,
-  title,
-  content,
-  author_id,
-  image_url,
-  content_image_ids,
-  tag_ids,
-}: EditPostParams) => {
+export const editPost = async (payload: EditPostParams) => {
   try {
+    // Validation
+    const parsed = editPostSchema.parse(payload);
+
+    const {
+      id,
+      title,
+      content,
+      author_id,
+      image_url,
+      content_image_ids,
+      tag_ids,
+    } = parsed;
+
+
     const supabase = await createClientServerComponent();
 
     // 1. Fetch existing post for old image cleanup
@@ -255,6 +274,9 @@ export const editPost = async ({
     return updatedPost;
   } catch (error) {
     console.error("Error editing post:", error);
+    if (error instanceof ZodError) {
+      throw new Error(error.errors[0]?.message ?? "Invalid post data");
+    }
     throw error;
   }
 };
