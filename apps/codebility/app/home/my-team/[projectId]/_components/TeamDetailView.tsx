@@ -355,20 +355,20 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                   <Kanban className="h-4 w-4" />
                   Kanban Board
                 </Button>
-              </div>
 
-              {/* Manage Members - ONLY VISIBLE TO TEAM LEADS in Team View */}
-              {viewMode === "team" && isCurrentUserTeamLead && (
-                <Button
-                  onClick={handleOpenAddModal}
-                  disabled={isLoadingMembers}
-                  size="sm"
-                  className="flex items-center gap-2 h-9"
-                >
-                  <UserPlus className="h-4 w-4" />
-                  {isLoadingMembers ? 'Loading...' : 'Manage Members'}
-                </Button>
-              )}
+                {/* Manage Members - ONLY VISIBLE TO TEAM LEADS in Team View */}
+                {viewMode === "team" && isCurrentUserTeamLead && (
+                  <Button
+                    onClick={handleOpenAddModal}
+                    disabled={isLoadingMembers}
+                    size="sm"
+                    className="flex items-center gap-2 h-9"
+                  >
+                    <UserPlus className="h-4 w-4" />
+                    {isLoadingMembers ? 'Loading...' : 'Manage Members'}
+                  </Button>
+                )}
+              </div>
             </div>
           )}
         </div>
