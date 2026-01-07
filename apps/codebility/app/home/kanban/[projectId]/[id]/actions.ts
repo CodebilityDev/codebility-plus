@@ -460,13 +460,54 @@ export const updateColumnName = async (
   }
 };
 
+// FIXED: Complete task with proper field extraction and validation
 export const completeTask = async (
   task: Task,
 ): Promise<{ success: boolean; error?: string }> => {
   const supabase = await createClientServerComponent();
 
   try {
-    // CRITICAL FIX: Archive the task FIRST
+    // CRITICAL FIX: Extract IDs safely from both flat and nested structures
+    const primaryAssigneeId = task.codev?.id || task.codev_id;
+    const skillCategoryId = task.skill_category?.id || task.skill_category_id;
+    const taskPoints = task.points;
+
+    // Validate required fields before proceeding
+    if (!task.id) {
+      console.error("Task completion failed: Missing task ID");
+      return { success: false, error: "Task ID is required" };
+    }
+
+    if (!task.pr_link || task.pr_link.trim() === "") {
+      console.error("Task completion failed: Missing PR link for task", task.id);
+      return { success: false, error: "PR Link is required to complete task" };
+    }
+
+    if (!primaryAssigneeId) {
+      console.error("Task completion failed: No assignee for task", task.id);
+      return { success: false, error: "Task must be assigned to complete" };
+    }
+
+    if (!skillCategoryId) {
+      console.error("Task completion failed: No skill category for task", task.id);
+      return { success: false, error: "Skill category is required" };
+    }
+
+    if (!taskPoints || taskPoints <= 0) {
+      console.error("Task completion failed: Invalid points for task", task.id);
+      return { success: false, error: "Task must have points to award" };
+    }
+
+    console.log("Completing task:", {
+      taskId: task.id,
+      title: task.title,
+      assigneeId: primaryAssigneeId,
+      skillCategoryId,
+      points: taskPoints,
+      hasSidekicks: task.sidekick_ids?.length || 0
+    });
+
+    // Archive the task FIRST
     const { error: archiveError } = await supabase
       .from("tasks")
       .update({ 
@@ -477,76 +518,105 @@ export const completeTask = async (
 
     if (archiveError) {
       console.error("Error archiving task:", archiveError);
-      throw archiveError;
+      return { success: false, error: `Failed to archive task: ${archiveError.message}` };
     }
+
+    console.log("Task archived successfully:", task.id);
 
     // Award points to primary assignee
-    if (task.codev?.id && task.skill_category?.id && task.points) {
-      const { data: existingPoints } = await supabase
+    const { data: existingPoints, error: fetchPointsError } = await supabase
+      .from("codev_points")
+      .select("*")
+      .eq("codev_id", primaryAssigneeId)
+      .eq("skill_category_id", skillCategoryId)
+      .single();
+
+    if (fetchPointsError && fetchPointsError.code !== 'PGRST116') {
+      console.error("Error fetching existing points:", fetchPointsError);
+      // Continue anyway - we'll try to insert
+    }
+
+    if (existingPoints) {
+      const { error: updateError } = await supabase
         .from("codev_points")
-        .select("*")
-        .eq("codev_id", task.codev.id)
-        .eq("skill_category_id", task.skill_category.id)
-        .single();
+        .update({
+          points: existingPoints.points + taskPoints,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", existingPoints.id);
 
-      if (existingPoints) {
-        await supabase
-          .from("codev_points")
-          .update({
-            points: existingPoints.points + task.points,
-            updated_at: new Date().toISOString(),
-          })
-          .eq("id", existingPoints.id);
-      } else {
-        await supabase
-          .from("codev_points")
-          .insert({
-            codev_id: task.codev.id,
-            skill_category_id: task.skill_category.id,
-            points: task.points,
-          });
+      if (updateError) {
+        console.error("Error updating points for primary assignee:", updateError);
+        return { success: false, error: `Failed to award points: ${updateError.message}` };
       }
 
-      // Award 50% points to sidekicks
-      if (task.sidekick_ids?.length) {
-        const sidekickPoints = Math.floor(task.points * 0.5);
-        
-        for (const sidekickId of task.sidekick_ids) {
-          const { data: sidekickExisting } = await supabase
-            .from("codev_points")
-            .select("*")
-            .eq("codev_id", sidekickId)
-            .eq("skill_category_id", task.skill_category.id)
-            .single();
+      console.log(`Updated points for assignee ${primaryAssigneeId}: +${taskPoints} (total: ${existingPoints.points + taskPoints})`);
+    } else {
+      const { error: insertError } = await supabase
+        .from("codev_points")
+        .insert({
+          codev_id: primaryAssigneeId,
+          skill_category_id: skillCategoryId,
+          points: taskPoints,
+        });
 
-          if (sidekickExisting) {
-            await supabase
-              .from("codev_points")
-              .update({
-                points: sidekickExisting.points + sidekickPoints,
-                updated_at: new Date().toISOString(),
-              })
-              .eq("id", sidekickExisting.id);
-          } else {
-            await supabase
-              .from("codev_points")
-              .insert({
-                codev_id: sidekickId,
-                skill_category_id: task.skill_category.id,
-                points: sidekickPoints,
-              });
-          }
-        }
+      if (insertError) {
+        console.error("Error inserting new points for primary assignee:", insertError);
+        return { success: false, error: `Failed to award points: ${insertError.message}` };
       }
 
-      await updateDeveloperLevels(task.codev.id);
+      console.log(`Created new points record for assignee ${primaryAssigneeId}: ${taskPoints}`);
+    }
+
+    // Award 50% points to sidekicks
+    if (task.sidekick_ids?.length) {
+      const sidekickPoints = Math.floor(taskPoints * 0.5);
+      console.log(`Awarding ${sidekickPoints} points to ${task.sidekick_ids.length} sidekick(s)`);
       
-      if (task.sidekick_ids?.length) {
-        for (const sidekickId of task.sidekick_ids) {
-          await updateDeveloperLevels(sidekickId);
+      for (const sidekickId of task.sidekick_ids) {
+        const { data: sidekickExisting } = await supabase
+          .from("codev_points")
+          .select("*")
+          .eq("codev_id", sidekickId)
+          .eq("skill_category_id", skillCategoryId)
+          .single();
+
+        if (sidekickExisting) {
+          await supabase
+            .from("codev_points")
+            .update({
+              points: sidekickExisting.points + sidekickPoints,
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", sidekickExisting.id);
+
+          console.log(`Updated points for sidekick ${sidekickId}: +${sidekickPoints}`);
+        } else {
+          await supabase
+            .from("codev_points")
+            .insert({
+              codev_id: sidekickId,
+              skill_category_id: skillCategoryId,
+              points: sidekickPoints,
+            });
+
+          console.log(`Created new points record for sidekick ${sidekickId}: ${sidekickPoints}`);
         }
       }
     }
+
+    // Update developer levels for primary assignee
+    console.log("Updating developer levels...");
+    await updateDeveloperLevels(primaryAssigneeId);
+    
+    // Update developer levels for sidekicks
+    if (task.sidekick_ids?.length) {
+      for (const sidekickId of task.sidekick_ids) {
+        await updateDeveloperLevels(sidekickId);
+      }
+    }
+
+    console.log("Developer levels updated successfully");
 
     // Revalidate pages
     const { data: taskData } = await supabase
@@ -576,6 +646,7 @@ export const completeTask = async (
       }
     }
 
+    console.log("Task completion successful:", task.id);
     return { success: true };
   } catch (error) {
     console.error("Error completing task:", error);
