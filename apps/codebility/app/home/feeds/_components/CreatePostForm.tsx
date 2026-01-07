@@ -71,6 +71,12 @@ const CreatePostForm = ({
       setImage(null);
     } catch (error) {
       console.error("Error creating post:", error);
+
+      if (error instanceof Error) {
+        toast.error(error.message);
+        return;
+      }
+
       toast.error("Failed to create post.");
     } finally {
       setIsSubmitting(false);
