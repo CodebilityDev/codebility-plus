@@ -54,12 +54,6 @@ const LeftSidebar = () => {
           links: section.links.filter((link: SidebarLink) => {
             // TODO: Remove these filters when features are implemented
             
-            // Filter out Feeds from MENU section
-            if (link.label === "Feeds") {
-              console.log("🚧 Feeds feature not yet implemented - hiding from navigation");
-              return false;
-            }
-            
             // Filter out Codev Overflow from CODEVS section
             if (link.label === "Codev Overflow") {
               console.log("🚧 Codev Overflow feature not yet implemented - hiding from navigation");
@@ -69,13 +63,13 @@ const LeftSidebar = () => {
             return true; // Keep all other links
           })
         }));
-        
+
         setSidebarData(filteredData);
       }
     };
 
     fetchSidebarData();
-  }, [roleId, refreshKey]);
+  }, []);
 
   const sidebarVariants = {
     closed: {

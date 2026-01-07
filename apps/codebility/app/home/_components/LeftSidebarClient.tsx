@@ -41,10 +41,7 @@ const LeftSidebarClient = ({ initialSidebarData }: LeftSidebarClientProps) => {
   const filteredSidebarData = initialSidebarData.map((section) => ({
     ...section,
     links: section.links.filter((link) => {
-      // TODO: Remove these filters when features are implemented
-      if (link.label === "Feeds" || link.label === "Codev Overflow") {
-        return false;
-      }
+
       return true;
     })
   }));
