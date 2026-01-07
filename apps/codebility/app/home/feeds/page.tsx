@@ -4,13 +4,13 @@ import { useEffect, useState } from "react";
 import CreatePostModal from "@/components/modals/CreatePostModal";
 import { Button } from "@/components/ui/button";
 import { useUserStore } from "@/store/codev-store";
-import { ChevronDown } from "lucide-react";
 
 import Feed from "./_components/Feed";
 import SocialPointsCard from "./_components/SocialPointsCard";
 import SortMenu from "./_components/SortMenu";
 import { SEARCH_DEBOUNCE_MS } from "./_constants";
-import { getUserRole } from "./_services/action";
+import { getUserRole, hasReachedDailyPostLimit } from "./_services/action";
+import toast from "react-hot-toast";
 
 type SortField = "title" | "date" | "upvotes";
 type SortOrder = "asc" | "desc";
@@ -22,7 +22,6 @@ export default function FeedsPage() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
-  const [sortMenuOpen, setSortMenuOpen] = useState(false);
   const { user } = useUserStore();
 
   useEffect(() => {
@@ -42,7 +41,22 @@ export default function FeedsPage() {
     return () => clearTimeout(handler);
   }, [searchQuery]);
 
-  const openModal = () => setIsModalOpen(true);
+  const openModal = async () => {
+    if (!user) return;
+
+    try {
+      const unallowed = await hasReachedDailyPostLimit(user.id);
+
+      if (unallowed) {
+        toast.error("Daily post limit reached. You’re not allowed to create a post right now.");
+        return;
+      }
+
+      setIsModalOpen(true);
+    } catch (error) {
+      console.error("Failed to check posting permission", error);
+    }
+  };
   const closeModal = () => setIsModalOpen(false);
 
   return (

@@ -158,11 +158,9 @@ function AssigneeSelector({
       .includes(searchQuery.toLowerCase()),
   );
 
-  // Restore proper removal functionality for AssigneeSelector
   const handleRemove = () => {
     setLocalAssignee(null);
-    onAssigneeChange([]); // Pass empty array to indicate no assignee
-    setTimeout(() => setLocalAssignee(null), 0); // Ensure UI updates
+    onAssigneeChange([]);
   };
 
   const handleSelect = (memberId: string) => {
@@ -304,7 +302,6 @@ const TaskViewModal = ({
 }) => {
   const { isOpen, onOpen, onClose, type, data } = useModal();
   const user = useUserStore((state) => state.user);
-  // Include removeTaskOptimistic in the destructured store methods
   const { fetchBoardData, removeTaskOptimistic } = useKanbanStore();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -325,7 +322,6 @@ const TaskViewModal = ({
   const [createdBy, setCreatedBy] = useState<CodevMember | null>(null);
   const [forceRefreshKey, setForceRefreshKey] = useState<string>("");
 
-  // Enhanced state management for assignee changes
   const [manualSaveChanges, setManualSaveChanges] = useState(false);
   const [isSavingChanges, setIsSavingChanges] = useState(false);
   const [pendingAssigneeId, setPendingAssigneeId] = useState<
@@ -378,35 +374,30 @@ const TaskViewModal = ({
     fetchBoardId();
   }, [task?.kanban_column_id, supabase]);
 
+  // FIXED: Consolidated state reset logic with single execution flow
   useEffect(() => {
-    if (task?.id) {
-      const taskPrLink = task?.pr_link || "";
-      setPrLink(taskPrLink);
-      setOriginalPrLink(taskPrLink);
-      setPrimaryAssignee(null); // Reset to null first
-      setManualSaveChanges(false);
-      setPendingAssigneeId(undefined);
-      setForceRefreshKey(Date.now().toString());
+    if (!task?.id || !supabase) return;
 
-      // Force reset the AssigneeSelector local state by resetting primaryAssignee
-      setTimeout(() => {
-        // Fetch actual assignee from task after reset
-        if (task.codev_id || task?.codev?.id) {
-          const assigneeId = task.codev_id || task.codev?.id || "";
-          if (supabase && assigneeId) {
-            supabase
-              .from("codev")
-              .select("id, first_name, last_name, image_url")
-              .eq("id", assigneeId)
-              .single()
-              .then(({ data, error }) => {
-                if (!error && data) {
-                  setPrimaryAssignee(data as CodevMember);
-                }
-              });
-          }
-        }
-      }, 0);
+    const taskPrLink = task?.pr_link || "";
+    setPrLink(taskPrLink);
+    setOriginalPrLink(taskPrLink);
+    setManualSaveChanges(false);
+    setPendingAssigneeId(undefined);
+    setForceRefreshKey(Date.now().toString());
+
+    // Fetch and set assignee in one go
+    const assigneeId = task.codev_id || task?.codev?.id;
+    if (assigneeId) {
+      supabase
+        .from("codev")
+        .select("id, first_name, last_name, image_url")
+        .eq("id", assigneeId)
+        .single()
+        .then(({ data, error }: { data: any; error: any }) => {
+          setPrimaryAssignee(!error && data ? (data as CodevMember) : null);
+        });
+    } else {
+      setPrimaryAssignee(null);
     }
   }, [task?.id, supabase]);
 
@@ -440,37 +431,6 @@ const TaskViewModal = ({
     };
     fetchSidekickDetails();
   }, [task?.sidekick_ids, supabase]);
-
-  useEffect(() => {
-    if (!supabase || !task) return;
-
-    const fetchPrimaryAssignee = async () => {
-      const assigneeId = task?.codev_id || task?.codev?.id;
-
-      setPrimaryAssignee(null);
-
-      if (assigneeId) {
-        const { data, error } = await supabase
-          .from("codev")
-          .select("id, first_name, last_name, image_url")
-          .eq("id", assigneeId)
-          .single();
-
-        if (!error && data) {
-          setPrimaryAssignee(data as CodevMember);
-        }
-      } else if (task?.codev) {
-        setPrimaryAssignee({
-          id: task.codev.id,
-          first_name: task.codev.first_name,
-          last_name: task.codev.last_name,
-          image_url: task.codev.image_url,
-        });
-      }
-    };
-
-    fetchPrimaryAssignee();
-  }, [task, supabase]);
 
   useEffect(() => {
     if (!supabase || !task?.created_by) return;
@@ -512,47 +472,62 @@ const TaskViewModal = ({
     setUpdateLoading(false);
   };
 
-  // Optimistic UI approach for task completion
+  // FIXED: Improved task completion with better error handling and data consistency
   const handleMarkAsDone = async () => {
     if (!task) return;
 
+    // Validate required fields before attempting completion
+    if (!task.id) {
+      toast.error("Task ID is missing");
+      return;
+    }
+
+    if (!task.pr_link) {
+      toast.error("PR Link is required to complete the task");
+      return;
+    }
+
     setIsLoading(true);
 
-    // Optimistically remove the task from UI immediately
+    console.log("Attempting to complete task with ID:", task.id);
+
+    // Optimistically remove the task from UI
     removeTaskOptimistic(task.id);
 
-    // Close modal immediately for better UX
+    // Close modal for better UX
     onClose();
 
     // Show optimistic success message
     toast.success("Completing task...");
 
     try {
+      // Pass the original task object - let the server action handle field extraction
       const result = await completeTask(task);
 
+      console.log("Task completion result:", result);
+
       if (result.success) {
-        // Update success message
         toast.success("Task completed and points awarded!");
 
-        // Call onComplete callback if provided
         if (onComplete) {
           onComplete(task.id);
         }
 
-        // Optional: Fetch fresh data in background after a delay
-        // This ensures data consistency without blocking the UI
+        // Refresh data in background
         setTimeout(() => {
           fetchBoardData();
         }, 1000);
       } else {
-        // Revert optimistic update by refetching data
-        toast.error(result.error || "Failed to complete task");
+        // Revert optimistic update
+        const errorMessage = result.error || "Failed to complete task";
+        console.error("Task completion failed:", errorMessage, result);
+        toast.error(errorMessage);
         await fetchBoardData();
       }
     } catch (error) {
       console.error("Error completing task:", error);
-      toast.error("Failed to complete task");
-      // Revert optimistic update by refetching data
+      const errorMsg = error instanceof Error ? error.message : "Failed to complete task";
+      toast.error(errorMsg);
       await fetchBoardData();
     } finally {
       setIsLoading(false);
@@ -564,12 +539,10 @@ const TaskViewModal = ({
 
     const newAssigneeId = memberIds.length > 0 ? memberIds[0] : undefined;
 
-    // Set manual save state to show Save Changes button
     setManualSaveChanges(true);
     setPendingAssigneeId(newAssigneeId);
 
     if (newAssigneeId) {
-      // Fetch assignee data for UI display only
       const { data: assigneeData } = await supabase
         .from("codev")
         .select("id, first_name, last_name, image_url")
@@ -580,73 +553,58 @@ const TaskViewModal = ({
         setPrimaryAssignee(assigneeData);
       }
     } else {
-      // Handle removal case
       setPrimaryAssignee(null);
     }
 
     setForceRefreshKey(`${Date.now()}-${Math.random()}`);
   };
 
-  // Reset state when modal closes without saving
+  // FIXED: Simplified close handler with cleaner state reset
   const handleClose = () => {
     if (hasUnsavedChanges) {
-      // Reset all unsaved changes
       setManualSaveChanges(false);
       setPendingAssigneeId(undefined);
       setPrLink(originalPrLink);
 
-      // Force complete reset by setting primary assignee to null first
-      setPrimaryAssignee(null);
-
-      // Then set a unique force refresh key to reset AssigneeSelector
-      setForceRefreshKey(`close-reset-${Date.now()}-${Math.random()}`);
-
-      // Reset to original task assignee after a brief delay
-      setTimeout(() => {
-        if (task?.codev_id || task?.codev?.id) {
-          const assigneeId = task.codev_id || task.codev?.id || "";
-          if (supabase && assigneeId) {
-            supabase
-              .from("codev")
-              .select("id, first_name, last_name, image_url")
-              .eq("id", assigneeId)
-              .single()
-              .then(({ data, error }) => {
-                if (!error && data) {
-                  setPrimaryAssignee(data as CodevMember);
-                }
-              });
-          }
-        } else {
-          // Ensure it stays null for unassigned tasks
-          setPrimaryAssignee(null);
+      // Reset assignee to original state
+      if (task?.codev_id || task?.codev?.id) {
+        const assigneeId = task.codev_id || task.codev?.id || "";
+        if (supabase && assigneeId) {
+          supabase
+            .from("codev")
+            .select("id, first_name, last_name, image_url")
+            .eq("id", assigneeId)
+            .single()
+            .then(({ data, error }: { data: any; error: any }) => {
+              setPrimaryAssignee(!error && data ? (data as CodevMember) : null);
+              setForceRefreshKey(`reset-${Date.now()}`);
+            });
         }
-      }, 50);
+      } else {
+        setPrimaryAssignee(null);
+        setForceRefreshKey(`reset-${Date.now()}`);
+      }
     }
     onClose();
   };
 
-  // Enhanced handleSaveChanges with assignee removal support
   const handleSaveChanges = async () => {
     if (!task || !supabase) return;
 
     setIsSavingChanges(true);
 
     try {
-      // Save PR Link changes
       if (hasPrLinkChanges) {
         await handleUpdate();
       }
 
-      // Save assignee changes (including removal)
       if (manualSaveChanges) {
         const { error } = await supabase
           .from("tasks")
-          .update({ codev_id: pendingAssigneeId || null }) // Convert undefined to null for database
+          .update({ codev_id: pendingAssigneeId || null })
           .eq("id", task.id);
 
         if (!error) {
-          // Update task object after successful save
           if (task) {
             task.codev_id = pendingAssigneeId;
             if (pendingAssigneeId && primaryAssignee) {
@@ -836,7 +794,6 @@ const TaskViewModal = ({
               )}
             </div>
 
-            {/* deadline */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Deadline</Label>
               <div className="rounded-md bg-blue-50 p-2 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
@@ -844,10 +801,10 @@ const TaskViewModal = ({
               </div>
             </div>
 
+            {/* FIXED: Primary Assignee - Now allows modification even when assigned */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Primary Assignee</Label>
-              {canModifyTask && !primaryAssignee ? (
-                // Only show AssigneeSelector for UNASSIGNED tasks
+              {canModifyTask ? (
                 <div className="space-y-2">
                   {boardId ? (
                     <AssigneeSelector
@@ -865,7 +822,6 @@ const TaskViewModal = ({
                   )}
                 </div>
               ) : primaryAssignee ? (
-                // Read-only display for ASSIGNED tasks
                 <div className="flex items-center gap-2">
                   {primaryAssignee.image_url ? (
                     <Image
@@ -883,7 +839,6 @@ const TaskViewModal = ({
                   </span>
                 </div>
               ) : (
-                // Read-only display for users without modify permissions
                 <div className="flex items-center gap-2 text-gray-500">
                   <DefaultAvatar size={32} />
                   <span>Unassigned</span>
@@ -937,7 +892,6 @@ const TaskViewModal = ({
             />
           </div>
 
-          {/* created by - created at */}
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div className="space-y-2">
               <Label className="text-sm font-medium">Created By</Label>
@@ -972,8 +926,6 @@ const TaskViewModal = ({
           </div>
 
           <DialogFooter className="mt-4 flex justify-end">
-            {/*Previous style: flex gap-6 sm:justify-end */}
-            {/* Copy URL button */}
             <Button
               onClick={() => {
                 if (!task?.id) {
@@ -981,7 +933,7 @@ const TaskViewModal = ({
                   return;
                 }
 
-                const baseUrl = window.location.origin; // gets the website domain
+                const baseUrl = window.location.origin;
                 const url = task.ticket_code
                   ? `${baseUrl}/home/kanban/ticket/${task.ticket_code}`
                   : new URL(window.location.href).toString();
@@ -1003,7 +955,6 @@ const TaskViewModal = ({
               Copy URL
             </Button>
         
-            {/* VIEWING MODE: Show Close when just viewing (no changes) */}
             {!hasUnsavedChanges && (
               <Button
                 onClick={onClose}
@@ -1022,7 +973,6 @@ const TaskViewModal = ({
               </Button>
             )}
 
-            {/* EDITING MODE: Show Cancel + Save Changes when has changes */}
             {hasUnsavedChanges && (
               <>
                 <Button
@@ -1063,7 +1013,6 @@ const TaskViewModal = ({
               </>
             )}
 
-            {/* Mark as Done button - separate logic */}
             {canMarkAsDone && task?.pr_link && (
               <Button
                 onClick={handleMarkAsDone}
