@@ -27,7 +27,7 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import { Ellipsis, Loader2Icon } from "lucide-react";
 import toast from "react-hot-toast";
 
-import {
+import { 
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
