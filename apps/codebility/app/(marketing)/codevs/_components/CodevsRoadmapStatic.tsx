@@ -1,8 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { SectionWrapper } from "@/components/shared/home";
-import { PhaseDetailsModal } from "@/app/home/(dashboard)/_components/PhaseDetailsModal";
 
 const CodevsRoadmapStatic = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -59,14 +57,14 @@ const CodevsRoadmapStatic = () => {
   };
 
   return (
-    <SectionWrapper id="roadmap" className="w-full py-20">
-      <div className="mx-auto max-w-screen-xl">
+    <section id="roadmap" className="w-full py-20">
+      <div className="mx-auto max-w-screen-xl px-4">
         <div className="mb-12 text-center">
           <h2 className="mb-4 text-4xl font-bold text-white md:text-5xl">
             Career Progression Roadmap
           </h2>
           <p className="text-lg text-gray-400">
-            Your journey from Intern to Mentor at Codebility
+            Your Journey from Intern to Mentor at Codebility
           </p>
         </div>
 
@@ -124,7 +122,7 @@ const CodevsRoadmapStatic = () => {
                       </linearGradient>
                     </defs>
                     <path
-                      d={`M ${isLeft ? 200 : 600} 0 Q ${isLeft ? 500 : 300} 60, ${!isLeft ? 200 : 600} 96`}
+                      d={`M ${isLeft ? 200 : 600} 0 C ${isLeft ? 200 : 600} 48, ${!isLeft ? 200 : 600} 48, ${!isLeft ? 200 : 600} 96`}
                       stroke={`url(#gradient-${phase.id})`}
                       strokeWidth="4"
                       fill="none"
@@ -210,12 +208,21 @@ const CodevsRoadmapStatic = () => {
       </div>
 
       {/* Phase Details Modal */}
-      <PhaseDetailsModal
-        isOpen={isModalOpen}
-        onClose={handleCloseModal}
-        phaseId={selectedPhase}
-      />
-    </SectionWrapper>
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-gray-800 p-8 rounded-lg max-w-md">
+            <h3 className="text-2xl font-bold text-white mb-4">Phase {selectedPhase}</h3>
+            <p className="text-gray-300 mb-6">Phase details would go here...</p>
+            <button
+              onClick={handleCloseModal}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+    </section>
   );
 };
 
