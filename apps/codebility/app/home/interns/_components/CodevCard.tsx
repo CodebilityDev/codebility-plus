@@ -19,6 +19,9 @@ import { Badge } from "@codevs/ui/badge";
 
 import TechStacks from "./TechStacks";
 
+// Line 21: ADDED - Maximum visible projects to prevent card expansion (CBP-10)
+const MAX_VISIBLE_PROJECTS = 8;
+
 interface CodevCardProps {
   codev: Codev;
 }
@@ -199,20 +202,30 @@ export default function CodevCard({ codev }: CodevCardProps) {
             )}
           </div>
 
-          {/* Projects */}
+          {/* Line 217-243: FIXED Projects section with truncation (CBP-10) */}
           <div className="mt-auto flex flex-wrap justify-end gap-2">
             {hasItems(codev.projects) ? (
-              codev.projects.map((project) => (
-                <Badge
-                  variant="info"
-                  key={project.id}
-                  className="from-customBlue-600 hover:from-customBlue-700 dark:from-customBlue-500 dark:hover:from-customBlue-600 rounded-full bg-gradient-to-r to-indigo-600 px-3 py-1 text-xs font-medium
-                    text-white transition-all duration-300 hover:to-indigo-700 dark:to-indigo-500 dark:hover:to-indigo-600
-                  "
-                >
-                  {project.name}
-                </Badge>
-              ))
+              <>
+                {/* Line 220-231: CHANGED - Render only first MAX_VISIBLE_PROJECTS badges */}
+                {codev.projects.slice(0, MAX_VISIBLE_PROJECTS).map((project) => (
+                  <Badge
+                    variant="info"
+                    key={project.id}
+                    className="from-customBlue-600 hover:from-customBlue-700 dark:from-customBlue-500 dark:hover:from-customBlue-600 rounded-full bg-gradient-to-r to-indigo-600 px-3 py-1 text-xs font-medium
+                      text-white transition-all duration-300 hover:to-indigo-700 dark:to-indigo-500 dark:hover:to-indigo-600
+                    "
+                  >
+                    {project.name}
+                  </Badge>
+                ))}
+                
+                {/* Line 233-239: ADDED - "+X more" overflow indicator */}
+                {codev.projects.length > MAX_VISIBLE_PROJECTS && (
+                  <span className="self-center text-xs font-medium text-gray-500 dark:text-gray-400">
+                    +{codev.projects.length - MAX_VISIBLE_PROJECTS} more
+                  </span>
+                )}
+              </>
             ) : (
               <Badge
                 variant="info"

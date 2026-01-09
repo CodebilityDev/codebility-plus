@@ -187,19 +187,21 @@ export default async function KanbanPage(props: PageProps) {
               </span>
             </TableCell>
 
-            {/* Team Lead */}
+            {/* Team Lead - ENHANCED with Default Avatar Fallback */}
             <TableCell className="md:table-cell">
               {project.team_leader ? (
                 <div className="flex items-center gap-2">
-                  {project.team_leader.image_url && (
-                    <img
-                      src={project.team_leader.image_url}
-                      alt={`${project.team_leader.first_name}'s avatar`}
-                      className={`h-8 w-8 rounded-full object-cover ${
-                        project.isUserInvolved ? "" : "opacity-50 grayscale"
-                      }`}
-                    />
-                  )}
+                  {/* ✅ FIXED: Always render image with default avatar fallback */}
+                  <img
+                    src={
+                      project.team_leader.image_url ||
+                      "https://codebility-cdn.pages.dev/assets/images/default-avatar-200x200.jpg"
+                    }
+                    alt={`${project.team_leader.first_name}'s avatar`}
+                    className={`h-8 w-8 rounded-full object-cover ${
+                      project.isUserInvolved ? "" : "opacity-50 grayscale"
+                    }`}
+                  />
                   <span
                     className={`capitalize ${
                       project.isUserInvolved
