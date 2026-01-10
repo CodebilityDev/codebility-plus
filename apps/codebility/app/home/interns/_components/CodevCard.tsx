@@ -19,8 +19,8 @@ import { Badge } from "@codevs/ui/badge";
 
 import TechStacks from "./TechStacks";
 
-// Line 21: ADDED - Maximum visible projects to prevent card expansion (CBP-10)
-const MAX_VISIBLE_PROJECTS = 8;
+// Line 21: REVISED - Show only 2 projects to prevent card expansion (CBP-10)
+const MAX_VISIBLE_PROJECTS = 2;
 
 interface CodevCardProps {
   codev: Codev;
@@ -202,11 +202,11 @@ export default function CodevCard({ codev }: CodevCardProps) {
             )}
           </div>
 
-          {/* Line 217-243: FIXED Projects section with truncation (CBP-10) */}
+          {/* Line 217-243: FIXED Projects section - Show only 2 projects + indicator (CBP-10) */}
           <div className="mt-auto flex flex-wrap justify-end gap-2">
             {hasItems(codev.projects) ? (
               <>
-                {/* Line 220-231: CHANGED - Render only first MAX_VISIBLE_PROJECTS badges */}
+                {/* Line 220-231: Show only first 2 projects */}
                 {codev.projects.slice(0, MAX_VISIBLE_PROJECTS).map((project) => (
                   <Badge
                     variant="info"
@@ -219,7 +219,7 @@ export default function CodevCard({ codev }: CodevCardProps) {
                   </Badge>
                 ))}
                 
-                {/* Line 233-239: ADDED - "+X more" overflow indicator */}
+                {/* Line 233-239: "+X more" indicator for projects beyond 2 */}
                 {codev.projects.length > MAX_VISIBLE_PROJECTS && (
                   <span className="self-center text-xs font-medium text-gray-500 dark:text-gray-400">
                     +{codev.projects.length - MAX_VISIBLE_PROJECTS} more
