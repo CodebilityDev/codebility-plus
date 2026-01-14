@@ -10,10 +10,8 @@ import {
   Users,
   Calendar,
   MapPin,
-  DollarSign,
   User,
   MoreHorizontal,
-  CheckCircle,
   XCircle,
   RotateCcw
 } from "lucide-react";
@@ -47,6 +45,7 @@ import {
   AccordionItem,
   AccordionTrigger
 } from "@codevs/ui/accordion"
+
 interface JobWithApplicationCount extends JobListing {
   application_count?: number;
   status?: "active" | "closed" | "draft";
@@ -67,6 +66,7 @@ export default function JobListingsTable() {
   const [editingJob, setEditingJob] = useState<JobListing | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<'all' | 'active' | 'closed' | 'draft'>('all');
+  const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
   // Check if user is admin (role_id 1 or 4)
   const isAdmin = user?.role_id === 1 || user?.role_id === 4;
@@ -85,6 +85,10 @@ export default function JobListingsTable() {
     try {
       setLoading(true);
       const supabase = createClientClientComponent();
+
+      if (!supabase) {
+        throw new Error("Failed to initialize Supabase client");
+      }
 
       // Fetch job listings with creator details
       const { data: jobsData, error: jobsError } = await supabase
@@ -144,9 +148,14 @@ export default function JobListingsTable() {
   };
 
   const handleDelete = async (jobId: string) => {
+    console.log("Delete button clicked for job ID:", jobId);
+    
     if (confirm("Are you sure you want to delete this job listing? This action cannot be undone.")) {
       try {
+        console.log("User confirmed deletion, calling deleteJobListing...");
         const result = await deleteJobListing(jobId);
+
+        console.log("Delete result:", result);
 
         if (!result.success) {
           throw new Error(result.error || "Failed to delete job");
@@ -167,10 +176,14 @@ export default function JobListingsTable() {
           variant: "destructive",
         });
       }
+    } else {
+      console.log("User cancelled deletion");
     }
   };
 
   const handleEdit = (job: JobListing) => {
+    // Close dropdown first
+    setOpenDropdown(null);
     setEditingJob(job);
     setIsEditModalOpen(true);
   };
@@ -195,6 +208,9 @@ export default function JobListingsTable() {
   };
 
   const handleStatusChange = async (jobId: string, newStatus: "active" | "closed" | "draft") => {
+    // Close dropdown first
+    setOpenDropdown(null);
+    
     try {
       const result = await updateJobListingStatus(jobId, newStatus);
 
@@ -211,7 +227,7 @@ export default function JobListingsTable() {
         )
       );
 
-      const statusText = newStatus === 'closed' ? 'closed' : 'reopened';
+      const statusText = newStatus === 'closed' ? 'closed' : newStatus === 'active' ? 'reopened' : 'updated';
       toast({
         title: `Job ${statusText}`,
         description: `The job listing has been ${statusText} successfully.`,
@@ -267,6 +283,11 @@ export default function JobListingsTable() {
       default:
         return "bg-gray-500/10 text-muted-foreground border-gray-500/20";
     }
+  };
+
+  // Check if user can modify a specific job
+  const canModifyJob = (job: JobWithApplicationCount) => {
+    return isAdmin || job.created_by?.id === user?.id;
   };
 
   if (loading) {
@@ -406,14 +427,16 @@ export default function JobListingsTable() {
                   <div className="flex items-center justify-end gap-2">
                     <Button
                       variant="outline"
-
                       onClick={() => handleViewApplications(job.id)}
                       className="h-8 bg-background border-border text-foreground transition-colors hover:bg-accent"
                     >
                       <Eye className="mr-2 h-3 w-3" />
                       Applications
                     </Button>
-                    <DropdownMenu>
+                    <DropdownMenu
+                      open={openDropdown === job.id}
+                      onOpenChange={(open) => setOpenDropdown(open ? job.id : null)}
+                    >
                       <DropdownMenuTrigger asChild>
                         <Button
                           variant="ghost"
@@ -425,11 +448,11 @@ export default function JobListingsTable() {
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="bg-popover border-border">
-                        {(isAdmin || job.created_by?.id === user?.id) && (
+                        {canModifyJob(job) ? (
                           <>
                             <DropdownMenuItem
                               onClick={() => handleEdit(job)}
-                              className="text-foreground hover:text-foreground hover:bg-accent"
+                              className="text-foreground hover:text-foreground hover:bg-accent cursor-pointer"
                             >
                               <Edit className="mr-2 h-4 w-4" />
                               Edit Listing
@@ -437,7 +460,7 @@ export default function JobListingsTable() {
                             {job.status === 'active' ? (
                               <DropdownMenuItem
                                 onClick={() => handleStatusChange(job.id, 'closed')}
-                                className="text-orange-500 hover:text-orange-400 hover:bg-accent"
+                                className="text-orange-500 hover:text-orange-400 hover:bg-accent cursor-pointer"
                               >
                                 <XCircle className="mr-2 h-4 w-4" />
                                 Mark as Closed
@@ -445,7 +468,7 @@ export default function JobListingsTable() {
                             ) : (
                               <DropdownMenuItem
                                 onClick={() => handleStatusChange(job.id, 'active')}
-                                className="text-green-500 hover:text-green-400 hover:bg-accent"
+                                className="text-green-500 hover:text-green-400 hover:bg-accent cursor-pointer"
                               >
                                 <RotateCcw className="mr-2 h-4 w-4" />
                                 Reopen Position
@@ -453,14 +476,13 @@ export default function JobListingsTable() {
                             )}
                             <DropdownMenuItem
                               onClick={() => handleDelete(job.id)}
-                              className="text-destructive hover:text-destructive hover:bg-accent "
+                              className="text-destructive hover:text-destructive hover:bg-accent cursor-pointer"
                             >
                               <Trash2 className="mr-2 h-4 w-4" />
                               Delete
                             </DropdownMenuItem>
                           </>
-                        )}
-                        {!isAdmin && job.created_by?.id !== user?.id && (
+                        ) : (
                           <DropdownMenuItem disabled className="text-gray-500">
                             No actions available
                           </DropdownMenuItem>
@@ -528,7 +550,7 @@ export default function JobListingsTable() {
                         >
                           <Users className="h-3.5 w-3.5" />
                           <span className="font-medium">{job.application_count || 0}</span>
-                          <span className="text-xs ml-1  group-hover:opacity-100">
+                          <span className="text-xs ml-1 group-hover:opacity-100">
                             View
                           </span>
                         </button>
@@ -597,37 +619,35 @@ export default function JobListingsTable() {
                   </div>
                 </div>
 
-
-
-
                 {/* Actions */}
                 <div className="flex justify-end gap-2 pt-2 border-t border-border">
                   <Button
                     variant="outline"
-
                     onClick={() => handleViewApplications(job.id)}
                     className="h-8 text-xs text-foreground border hover:bg-muted"
                   >
                     <Eye className="mr-2 h-3 w-3" />
                     Applications
                   </Button>
-                  <DropdownMenu modal={false}>
+                  <DropdownMenu 
+                    modal={false}
+                    open={openDropdown === `mobile-${job.id}`}
+                    onOpenChange={(open) => setOpenDropdown(open ? `mobile-${job.id}` : null)}
+                  >
                     <DropdownMenuTrigger asChild>
                       <Button
                         variant="ghost"
-
                         className="h-8 text-xs text-foreground hover:bg-muted"
                       >
                         <MoreHorizontal className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="bg-popover border-border dark:bg-gray-900 dark:border-gray-800">
-                      {(isAdmin || job.created_by?.id === user?.id) && (
+                      {canModifyJob(job) ? (
                         <>
                           <DropdownMenuItem
-                            onClick={(e) => {
+                            onSelect={(e) => {
                               e.preventDefault();
-                              e.stopPropagation();
                               handleEdit(job);
                             }}
                             className="text-gray-300 hover:text-white hover:bg-gray-800 cursor-pointer"
@@ -637,9 +657,8 @@ export default function JobListingsTable() {
                           </DropdownMenuItem>
                           {job.status === 'active' ? (
                             <DropdownMenuItem
-                              onClick={(e) => {
+                              onSelect={(e) => {
                                 e.preventDefault();
-                                e.stopPropagation();
                                 handleStatusChange(job.id, 'closed');
                               }}
                               className="text-orange-400 hover:text-orange-300 hover:bg-gray-800 cursor-pointer"
@@ -649,9 +668,8 @@ export default function JobListingsTable() {
                             </DropdownMenuItem>
                           ) : (
                             <DropdownMenuItem
-                              onClick={(e) => {
+                              onSelect={(e) => {
                                 e.preventDefault();
-                                e.stopPropagation();
                                 handleStatusChange(job.id, 'active');
                               }}
                               className="text-green-400 hover:text-green-300 hover:bg-gray-800 cursor-pointer"
@@ -661,9 +679,8 @@ export default function JobListingsTable() {
                             </DropdownMenuItem>
                           )}
                           <DropdownMenuItem
-                            onClick={(e) => {
+                            onSelect={(e) => {
                               e.preventDefault();
-                              e.stopPropagation();
                               handleDelete(job.id);
                             }}
                             className="text-red-400 hover:text-red-300 hover:bg-gray-800 cursor-pointer"
@@ -672,8 +689,7 @@ export default function JobListingsTable() {
                             Delete
                           </DropdownMenuItem>
                         </>
-                      )}
-                      {!isAdmin && job.created_by?.id !== user?.id && (
+                      ) : (
                         <DropdownMenuItem disabled className="text-gray-500">
                           No actions available
                         </DropdownMenuItem>
