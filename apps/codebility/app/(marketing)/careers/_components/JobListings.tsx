@@ -49,7 +49,7 @@ export default function JobListings() {
       setLoading(true);
       const supabase = createClientClientComponent();
       
-      const { data, error } = await supabase
+      const { data, error } = await supabase!
         .from('job_listings')
         .select('*')
         .eq('status', 'active')
@@ -129,72 +129,74 @@ export default function JobListings() {
           </p>
         </div>
 
-        {/* Category Filters */}
+{/* Category Filters */}
         <div className="mb-8 rounded-lg border border-gray-800 bg-gray-900/30 p-6">
-          <h3 className="mb-4 text-lg font-medium text-white">Filter by Category</h3>
-          <div className="space-y-4">
-            {/* Department Filter */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-300">Department</label>
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => (
-                  <button
-                    key={category}
-                    onClick={() => handleCategoryChange(category, "department")}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedCategory === category
-                        ? "bg-customViolet-100 text-white"
-                        : "bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-white"
-                    }`}
-                  >
-                    {category}
-                  </button>
-                ))}
+          <h3 className="mb-4 text-lg font-medium text-white lg:mb-6">Filter by Category</h3>
+          <div className="space-y-4 lg:space-y-0">
+            <div className="lg:grid lg:grid-cols-10 lg:gap-6">
+              {/* Department Filter */}
+              <div className="pb-4 lg:col-span-2 lg:pb-4">
+                <label className="mb-2 block text-sm font-medium text-gray-300">Department</label>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <button
+                      key={category}
+                      onClick={() => handleCategoryChange(category, "department")}
+                      className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        selectedCategory === category
+                          ? "bg-customViolet-100 text-white"
+                          : "bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-white"
+                      }`}
+                    >
+                      {category}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Job Type Filter */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-300">Job Type</label>
-              <div className="flex flex-wrap gap-2">
-                {types.map((type) => (
-                  <button
-                    key={type}
-                    onClick={() => handleCategoryChange(type, "type")}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedType === type
-                        ? "bg-customTeal text-white"
-                        : "bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-white"
-                    }`}
-                  >
-                    {type}
-                  </button>
-                ))}
+              {/* Job Type Filter */}
+              <div className="pb-4 lg:col-span-4 lg:pb-4 ml-[-35px]">
+                <label className="mb-2 block text-sm font-medium text-gray-300">Job Type</label>
+                <div className="flex flex-wrap gap-2">
+                  {types.map((type) => (
+                    <button
+                      key={type}
+                      onClick={() => handleCategoryChange(type, "type")}
+                      className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        selectedType === type
+                          ? "bg-customTeal text-white"
+                          : "bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-white"
+                      }`}
+                    >
+                      {type}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
 
-            {/* Experience Level Filter */}
-            <div>
-              <label className="mb-2 block text-sm font-medium text-gray-300">Experience Level</label>
-              <div className="flex flex-wrap gap-2">
-                {levels.map((level) => (
-                  <button
-                    key={level}
-                    onClick={() => handleCategoryChange(level, "level")}
-                    className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
-                      selectedLevel === level
-                        ? "bg-purple-500 text-white"
-                        : "bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-white"
-                    }`}
-                  >
-                    {level}
-                  </button>
-                ))}
+              {/* Experience Level Filter */}
+              <div className="pb-4 lg:col-span-4 lg:pb-4">
+                <label className="mb-2 block text-sm font-medium text-gray-300">Experience Level</label>
+                <div className="flex flex-wrap gap-2">
+                  {levels.map((level) => (
+                    <button
+                      key={level}
+                      onClick={() => handleCategoryChange(level, "level")}
+                      className={`rounded-full px-4 py-2 text-sm font-medium transition-all ${
+                        selectedLevel === level
+                          ? "bg-purple-500 text-white"
+                          : "bg-gray-800/50 text-gray-400 hover:bg-gray-700 hover:text-white"
+                      }`}
+                    >
+                      {level}
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
 
             {/* Results Count */}
-            <div className="flex items-center justify-between border-t border-gray-800 pt-4">
+            <div className="flex items-center justify-between border-t border-gray-800 pt-4 lg:mt-6">
               <span className="text-sm text-gray-400">
                 {filteredJobs.length} position{filteredJobs.length !== 1 ? 's' : ''} found
               </span>
