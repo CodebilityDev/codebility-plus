@@ -155,7 +155,7 @@ export default function JobListings() {
               </div>
 
               {/* Job Type Filter */}
-              <div className="pb-4 lg:col-span-4 lg:pb-4">
+              <div className="pb-4 lg:col-span-4 lg:pb-4 ml-[-35px]">
                 <label className="mb-2 block text-sm font-medium text-gray-300">Job Type</label>
                 <div className="flex flex-wrap gap-2">
                   {types.map((type) => (
