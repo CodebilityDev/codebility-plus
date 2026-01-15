@@ -8,7 +8,6 @@ import { UserProvider } from "@/store/UserProvider";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
 import { Toaster } from "sonner";
 
-
 import ToastNotification from "./_components/HomeToastNotification";
 import LeftSidebarServer from "./_components/LeftSidebarServer";
 import Navbar from "./_components/Navbar";
@@ -40,7 +39,6 @@ export default async function HomeLayout({
             <PageTransitionSettings />
             <NavigationOptimizer />
             <Toaster
-
               richColors
               position="top-right"
               toastOptions={{

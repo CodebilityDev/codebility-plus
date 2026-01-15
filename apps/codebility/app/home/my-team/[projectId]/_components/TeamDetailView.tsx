@@ -75,8 +75,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
   const { project: projectInfo, teamLead, members, currentUserId } = project;
   const totalMembers = (members?.data?.length || 0) + (teamLead?.data ? 1 : 0);
 
-  // ✅ CRITICAL: Determine if current user is team lead
-  const isCurrentUserTeamLead = currentUserId === teamLead?.data?.id;
+  // ✅ Determine if current user is team lead
+  const isCurrentUserTeamLead = teamLead?.data?.id ? currentUserId === teamLead.data.id : false;
 
   // Load meeting schedule on component mount
   useEffect(() => {
@@ -133,7 +133,9 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
     // Convert military time to 12-hour format
     const convertTo12Hour = (time24: string) => {
-      const [hours, minutes] = time24.split(':');
+      const parts = time24.split(':');
+      const hours = parts[0] || '0';
+      const minutes = parts[1] || '00';
       const hour = parseInt(hours, 10);
       const ampm = hour >= 12 ? 'PM' : 'AM';
       const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
@@ -188,7 +190,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
       const teamLeadResult = await getTeamLead(projectInfo.id);
       const teamLead = teamLeadResult.data;
 
-      if (!teamLead) {
+      if (!teamLead || !teamLead.id) {
         throw new Error('Team leader not found');
       }
 
@@ -251,7 +253,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
 
   return (
     <>
-      <div className="space-y-6">
+      <div className="space-y-6 mb-10">
         {/* Attendance Warning Banner - Only shown for team leads in attendance view */}
         {viewMode === "attendance" && isCurrentUserTeamLead && (
           <AttendanceWarningBanner 
@@ -263,18 +265,19 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
         {/* Header with Tab Buttons */}
         <div className="flex flex-col gap-3">
           {/* TOP ROW: View Mode Tabs + Checklist Button */}
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {/* Team View Tab - Always visible */}
             <Button
               variant={viewMode === "team" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("team")}
-              className={`flex items-center gap-2 h-9 ${
+              className={`flex items-center gap-1.5 h-9 px-2.5 sm:px-3 text-xs sm:text-sm ${
                 viewMode !== "team" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
               }`}
             >
-              <Users className="h-4 w-4" />
-              Team View
+              <Users className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden xs:inline sm:inline">Team View</span>
+              <span className="inline xs:hidden sm:hidden">Team</span>
             </Button>
 
             {/* Attendance Tab - VISIBLE TO ALL, READ-ONLY FOR NON-LEADS */}
@@ -282,12 +285,12 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               variant={viewMode === "attendance" ? "default" : "outline"}
               size="sm"
               onClick={() => setViewMode("attendance")}
-              className={`flex items-center gap-2 h-9 ${
+              className={`flex items-center gap-1.5 h-9 px-2.5 sm:px-3 text-xs sm:text-sm ${
                 viewMode !== "attendance" ? "border-gray-300 text-gray-700 hover:bg-gray-50 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800" : ""
               }`}
             >
-              <Table className="h-4 w-4" />
-              Attendance
+              <Table className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="whitespace-nowrap">Attendance</span>
               {!isCurrentUserTeamLead}
             </Button>
 
@@ -297,10 +300,10 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 variant="outline"
                 size="sm"
                 onClick={handleOpenChecklistModal}
-                className="flex items-center gap-2 h-9 border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
+                className="flex items-center gap-1.5 h-9 px-2.5 sm:px-3 text-xs sm:text-sm border-purple-300 text-purple-700 hover:bg-purple-50 dark:border-purple-600 dark:text-purple-300 dark:hover:bg-purple-900/20"
               >
-                <CheckSquare className="h-4 w-4" />
-                Checklist
+                <CheckSquare className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                <span className="whitespace-nowrap">Checklist</span>
               </Button>
             )}
           </div>
@@ -322,7 +325,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
               )}
 
               {/* Sync All Points, Schedule Meeting, Kanban Board in One row */}
-              <div className=" flex flex-col sm:flex-row  items-stretch sm:items-center gap-2 w-full">
+              <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full">
                 {viewMode === "attendance" && isCurrentUserTeamLead && (
                   <SyncAllAttendance
                     projectId={projectInfo.id}

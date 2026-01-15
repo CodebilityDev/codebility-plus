@@ -30,6 +30,14 @@ const SignIn = () => {
               Register Now
             </Link>
           </p>
+          <p className="md:text-md text-md text-center mt-10">
+            <Link
+              href={'/'}
+              className="text-customBlue-100 hover:underline"
+            >
+              Go Back
+            </Link>
+          </p>
         </div>
         <div className="bg-login hidden w-full flex-1 bg-cover bg-center lg:flex" />
       </div>
