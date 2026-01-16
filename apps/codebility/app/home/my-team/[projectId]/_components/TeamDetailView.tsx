@@ -334,7 +334,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                 )} 
 
                 {/* Schedule Meeting - ONLY VISIBLE TO TEAM LEADS */}
-                {isCurrentUserTeamLead && (
+                {/* {isCurrentUserTeamLead && ( */}
                   <Button
                     variant="outline"
                     size="sm"
@@ -345,7 +345,7 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                     <CalendarDays className="h-4 w-4" />
                     Schedule Meeting
                   </Button>
-                )}
+                {/* )} */}
 
                 {/* Kanban Board Button - VISIBLE TO ALL MEMBERS */}
                 <Button
