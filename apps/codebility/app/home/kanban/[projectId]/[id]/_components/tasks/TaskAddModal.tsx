@@ -1,6 +1,6 @@
 "use client";
 
-import type { SkillCategory } from "@/types/home/codev";
+import type { SkillCategory, TaskDraft } from "@/types/home/codev";
 import { useEffect, useState, useTransition } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -24,7 +24,7 @@ import { IconPlus } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { useKanbanStore } from "@/store/kanban-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, Save, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 import {
@@ -38,7 +38,13 @@ import {
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { createNewTask } from "../../actions";
+import {
+  createNewTask,
+  saveDraft,
+  getUserDrafts,
+  loadDraft,
+  deleteDraft,
+} from "../../actions";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
   DIFFICULTY_POINTS,
@@ -93,6 +99,7 @@ const fetchAvailableMembers = async (
   }
 };
 
+// Member Selector Component
 function MemberSelector({
   selectedMemberIds = [],
   onMembersChange,
@@ -304,9 +311,15 @@ function MemberSelector({
   );
 }
 
+// ============================================================================
+// MAIN COMPONENT: TaskAddModal with Draft Support
+// ============================================================================
+
 const TaskAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskAddModal";
+  
+  // Form state
   const [mainAssignee, setMainAssignee] = useState<string>("");
   const [sidekicks, setSidekicks] = useState<string[]>([]);
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
@@ -314,10 +327,20 @@ const TaskAddModal = () => {
   const [isPending, startTransition] = useTransition();
   const [description, setDescription] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
-  const [deadline, setDeadline] = useState<string>(""); // NEW: deadline state
+  const [deadline, setDeadline] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
+  const [priority, setPriority] = useState<string>("");
+  const [taskType, setTaskType] = useState<string>("");
+  const [skillCategory, setSkillCategory] = useState<string>("");
+  
+  // Draft state
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [availableDrafts, setAvailableDrafts] = useState<TaskDraft[]>([]);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
-
   const { fetchBoardData } = useKanbanStore();
 
   const onChange = (value: string) => {
@@ -333,13 +356,129 @@ const TaskAddModal = () => {
     setSelectedDifficulty(difficulty);
   };
 
+  // Load user's drafts when modal opens
+  useEffect(() => {
+    if (isModalOpen && data?.projectId && user?.id) {
+      loadUserDrafts();
+    }
+  }, [isModalOpen, data?.projectId, user?.id]);
+
+  const loadUserDrafts = async () => {
+    if (!data?.projectId || !user?.id) return;
+
+    const result = await getUserDrafts(data.projectId, user.id);
+    if (result.success && result.drafts) {
+      setAvailableDrafts(result.drafts);
+    }
+  };
+
+  // Handle loading a draft into the form
+  const handleLoadDraft = async (selectedDraftId: string) => {
+    const result = await loadDraft(selectedDraftId);
+    
+    if (result.success && result.draft) {
+      const draft = result.draft;
+      
+      // Populate all form fields
+      setTitle(draft.title || "");
+      setDescription(draft.description || "");
+      setSelectedDifficulty(draft.difficulty || "");
+      setDeadline(draft.deadline || "");
+      setMainAssignee(draft.codev_id || "");
+      setSidekicks(draft.sidekick_ids || []);
+      setPriority(draft.priority || "");
+      setTaskType(draft.type || "");
+      setSkillCategory(draft.skill_category_id || "");
+      
+      setDraftId(selectedDraftId);
+      setLastSavedAt(new Date(draft.last_saved_at));
+      
+      toast.success("Draft loaded");
+    } else {
+      toast.error(result.error || "Failed to load draft");
+    }
+  };
+
+  // Handle saving as draft
+  const handleSaveAsDraft = async () => {
+    if (!user?.id || !data?.projectId || !data?.listId) {
+      toast.error("Missing required information");
+      return;
+    }
+
+    setIsSavingDraft(true);
+
+    try {
+      const formData = new FormData();
+      
+      // Required fields for draft
+      formData.append("created_by", user.id);
+      formData.append("project_id", data.projectId);
+      formData.append("intended_column_id", data.listId);
+      
+      // Optional fields
+      if (title) formData.append("title", title);
+      if (description) formData.append("description", description);
+      if (selectedDifficulty) {
+        formData.append("difficulty", selectedDifficulty);
+        formData.append("points", getPointsFromDifficulty(selectedDifficulty).toString());
+      }
+      if (deadline) formData.append("deadline", deadline);
+      if (mainAssignee) formData.append("codev_id", mainAssignee);
+      if (sidekicks.length) formData.append("sidekick_ids", sidekicks.join(","));
+      if (priority) formData.append("priority", priority);
+      if (taskType) formData.append("type", taskType);
+      if (skillCategory) formData.append("skill_category_id", skillCategory);
+
+      const result = await saveDraft(formData, draftId);
+      
+      if (result.success) {
+        setDraftId(result.draftId || null);
+        setLastSavedAt(new Date());
+        toast.success("Draft saved");
+        await loadUserDrafts();
+      } else {
+        toast.error(result.error || "Failed to save draft");
+      }
+    } catch (error) {
+      toast.error("Failed to save draft");
+      console.error("Save draft error:", error);
+    } finally {
+      setIsSavingDraft(false);
+    }
+  };
+
+  // Handle deleting current draft
+  const handleDeleteDraft = async () => {
+    if (!draftId) return;
+
+    const confirmed = window.confirm("Delete this draft? This cannot be undone.");
+    if (!confirmed) return;
+
+    const result = await deleteDraft(draftId);
+    
+    if (result.success) {
+      toast.success("Draft deleted");
+      handleClose();
+      await loadUserDrafts();
+    } else {
+      toast.error(result.error || "Failed to delete draft");
+    }
+  };
+
   // Reset form when modal closes
   const handleClose = () => {
+    setTitle("");
     setSelectedDifficulty("");
     setDescription("");
     setMainAssignee("");
     setSidekicks([]);
-    setDeadline(""); // NEW: reset deadline
+    setDeadline("");
+    setDraftId(null);
+    setLastSavedAt(null);
+    setPriority("");
+    setTaskType("");
+    setSkillCategory("");
     onClose();
   };
 
@@ -370,41 +509,39 @@ const TaskAddModal = () => {
     try {
       setLoading(true);
 
-      if (!formData.get("title")) throw new Error("Title is required");
-      if (!formData.get("skill_category_id"))
-        throw new Error("Skill category is required");
+      if (!title) throw new Error("Title is required");
+      if (!skillCategory) throw new Error("Skill category is required");
       if (!selectedDifficulty) throw new Error("Difficulty is required");
 
+      // Append all form data
+      formData.append("title", title);
+      formData.append("skill_category_id", skillCategory);
+      formData.append("difficulty", selectedDifficulty);
+      
+      if (priority) formData.append("priority", priority);
+      if (taskType) formData.append("type", taskType);
+      
       formData.append(
         "description",
         description.trim() || "<p>No description provided</p>",
       );
 
-      // Set points based on selected difficulty
       const calculatedPoints = getPointsFromDifficulty(selectedDifficulty);
       formData.set("points", calculatedPoints.toString());
 
-      // NEW: Add deadline to formData
-      if (deadline) {
-        formData.append("deadline", deadline);
-      }
-
-      const image = formData.get("image");
-      if (image && image instanceof File) {
-        formData.append("image", image);
-      }
-
-      if (mainAssignee) {
-        formData.append("codev_id", mainAssignee);
-      }
-
-      if (sidekicks.length)
-        formData.append("sidekick_ids", sidekicks.join(","));
+      if (deadline) formData.append("deadline", deadline);
+      if (mainAssignee) formData.append("codev_id", mainAssignee);
+      if (sidekicks.length) formData.append("sidekick_ids", sidekicks.join(","));
 
       formData.append("created_by", user?.id as string);
 
       const response = await createNewTask(formData);
       if (response.success) {
+        // If this was from a draft, delete the draft
+        if (draftId) {
+          await deleteDraft(draftId);
+        }
+        
         toast.success("Task created successfully");
         handleClose();
         await fetchBoardData();
@@ -434,9 +571,36 @@ const TaskAddModal = () => {
           className="flex flex-col gap-6"
         >
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-              Add New Task
-            </DialogTitle>
+            <div className="flex items-center justify-between">
+              <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+                {draftId ? "Edit Draft Task" : "Add New Task"}
+              </DialogTitle>
+              
+              {/* Draft Selector Dropdown */}
+              {availableDrafts.length > 0 && !draftId && (
+                <Select onValueChange={handleLoadDraft}>
+                  <SelectTrigger className="w-[180px] text-xs">
+                    <SelectValue placeholder="📝 Load Draft" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {availableDrafts.map((draft) => (
+                        <SelectItem key={draft.id} value={draft.id}>
+                          {draft.title || "Untitled Draft"}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+            
+            {/* Draft Status Indicator */}
+            {draftId && lastSavedAt && (
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                💾 Last saved: {lastSavedAt.toLocaleTimeString()}
+              </div>
+            )}
           </DialogHeader>
 
           {data?.listName && (
@@ -458,7 +622,9 @@ const TaskAddModal = () => {
                 id="title"
                 name="title"
                 placeholder="Enter task title"
-                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300 "
+                value={title}
+                onChange={(e) => setTitle(e.target.value)}
+                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300"
                 required
               />
             </div>
@@ -484,7 +650,7 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority  <span className="text-red-500">*</span></Label>
-              <Select name="priority">
+              <Select name="priority" value={priority} onValueChange={setPriority}>
                 <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
@@ -541,7 +707,7 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Task Type  <span className="text-red-500">*</span></Label>
-              <Select name="type">
+              <Select name="type" value={taskType} onValueChange={setTaskType}>
                 <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -564,7 +730,7 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Skill Category  <span className="text-red-500">*</span></Label>
-              <Select name="skill_category_id" required>
+              <Select name="skill_category_id" value={skillCategory} onValueChange={setSkillCategory} required>
                 <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select skill category" />
                 </SelectTrigger>
@@ -580,7 +746,6 @@ const TaskAddModal = () => {
               </Select>
             </div>
 
-            {/* NEW: Deadline Input */}
             <div className="">
               <Label htmlFor="deadline" className="text-sm font-medium">
                 Deadline
@@ -644,41 +809,92 @@ const TaskAddModal = () => {
             <KanbanRichTextEditor value={description} onChange={onChange} />
           </div>
 
-          <DialogFooter className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              onClick={handleClose}
-              style={{
-                backgroundColor: "#3B82F6",
-                color: "white",
-                padding: "6px 16px",
-                fontSize: "14px",
-                borderRadius: "4px",
-                border: "none",
-                minWidth: "auto",
-                width: "auto",
-              }}
-              disabled={loading || isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              style={{
-                backgroundColor: "#2563EB",
-                color: "white",
-                padding: "6px 16px",
-                fontSize: "14px",
-                borderRadius: "4px",
-                border: "none",
-                minWidth: "auto",
-                width: "auto",
-              }}
-              disabled={loading || isPending}
-            >
-              {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-              {loading || isPending ? "Creating..." : "Create Task"}
-            </Button>
+          {/* Enhanced Footer with Draft Actions */}
+          <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between pt-4">
+            <div className="flex gap-2">
+              {/* Save as Draft Button */}
+              <Button
+                type="button"
+                onClick={handleSaveAsDraft}
+                disabled={isSavingDraft || loading || isPending}
+                style={{
+                  backgroundColor: "#10B981",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
+              >
+                {isSavingDraft && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                <Save className="mr-2 h-4 w-4" />
+                {isSavingDraft ? "Saving..." : "Save Draft"}
+              </Button>
+              
+              {/* Delete Draft Button */}
+              {draftId && (
+                <Button
+                  type="button"
+                  onClick={handleDeleteDraft}
+                  disabled={loading || isPending}
+                  style={{
+                    backgroundColor: "#EF4444",
+                    color: "white",
+                    padding: "6px 16px",
+                    fontSize: "14px",
+                    borderRadius: "4px",
+                    border: "none",
+                    minWidth: "auto",
+                    width: "auto",
+                  }}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Draft
+                </Button>
+              )}
+            </div>
+            
+            <div className="flex gap-2 justify-end">
+              {/* Cancel Button */}
+              <Button
+                type="button"
+                onClick={handleClose}
+                style={{
+                  backgroundColor: "#3B82F6",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
+                disabled={loading || isPending}
+              >
+                Cancel
+              </Button>
+              
+              {/* Create Task Button */}
+              <Button
+                type="submit"
+                style={{
+                  backgroundColor: "#2563EB",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
+                disabled={loading || isPending}
+              >
+                {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                {loading || isPending ? "Creating..." : "Create Task"}
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>
