@@ -314,7 +314,10 @@ export const updateTask = async (
           priority: "normal",
           projectId: (colData?.kanban_boards as any)?.project_id,
           actionUrl: `/home/kanban/${(colData?.kanban_boards as any)?.project_id}/${colData?.board_id}?taskId=${taskId}`,
-          metadata: { taskId }
+          metadata: { 
+            taskId,
+            assignedAt: new Date().toISOString()
+          }
         });
       }
     }
@@ -1034,7 +1037,10 @@ export const promoteDraft = async (
           priority: "normal",
           projectId: draft.project_id,
           actionUrl: `/home/kanban/${draft.project_id}/${draft.intended_column_id}?taskId=${newTask.id}`,
-          metadata: { taskId: newTask.id }
+          metadata: { 
+            taskId: newTask.id,
+            assignedAt: new Date().toISOString()
+          }
         });
       }
     }
