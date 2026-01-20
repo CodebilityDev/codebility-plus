@@ -1,7 +1,7 @@
 "use client";
 
-import type { SkillCategory } from "@/types/home/codev";
-import { useEffect, useState, useTransition } from "react";
+import type { SkillCategory, TaskDraft } from "@/types/home/codev";
+import { useEffect, useState, useTransition, useRef, useCallback } from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
@@ -24,7 +24,7 @@ import { IconPlus } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { useKanbanStore } from "@/store/kanban-store";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { Loader2Icon } from "lucide-react";
+import { Loader2Icon, Save, Trash2 } from "lucide-react";
 import toast from "react-hot-toast";
 
 import {
@@ -38,7 +38,13 @@ import {
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
 
-import { createNewTask } from "../../actions";
+import {
+  createNewTask,
+  saveDraft,
+  getUserDrafts,
+  loadDraft,
+  deleteDraft,
+} from "../../actions";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
   DIFFICULTY_POINTS,
@@ -48,6 +54,9 @@ import KanbanRichTextEditor from "../kanban_modals/KanbanRichTextEditor";
 const PRIORITY_LEVELS = ["critical", "high", "medium", "low"];
 const TASK_TYPES = ["FEATURE", "BUG", "IMPROVEMENT", "DOCUMENTATION"];
 
+// Auto-save interval (30 seconds)
+const AUTO_SAVE_INTERVAL = 30000;
+
 interface CodevMember {
   id: string;
   first_name: string;
@@ -55,7 +64,9 @@ interface CodevMember {
   image_url?: string | null;
 }
 
-// Fetch available members
+// ============================================================================
+// HELPER: Fetch Available Members
+// ============================================================================
 const fetchAvailableMembers = async (
   projectId: string,
 ): Promise<CodevMember[]> => {
@@ -93,6 +104,9 @@ const fetchAvailableMembers = async (
   }
 };
 
+// ============================================================================
+// COMPONENT: Member Selector
+// ============================================================================
 function MemberSelector({
   selectedMemberIds = [],
   onMembersChange,
@@ -304,9 +318,14 @@ function MemberSelector({
   );
 }
 
+// ============================================================================
+// MAIN COMPONENT: TaskAddModal with Auto-Save Draft
+// ============================================================================
 const TaskAddModal = () => {
   const { isOpen, onClose, type, data } = useModal();
   const isModalOpen = isOpen && type === "taskAddModal";
+  
+  // Form state
   const [mainAssignee, setMainAssignee] = useState<string>("");
   const [sidekicks, setSidekicks] = useState<string[]>([]);
   const [skillCategories, setSkillCategories] = useState<SkillCategory[]>([]);
@@ -314,14 +333,30 @@ const TaskAddModal = () => {
   const [isPending, startTransition] = useTransition();
   const [description, setDescription] = useState("");
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>("");
-  const [deadline, setDeadline] = useState<string>(""); // NEW: deadline state
+  const [deadline, setDeadline] = useState<string>("");
+  const [title, setTitle] = useState<string>("");
+  const [priority, setPriority] = useState<string>("");
+  const [taskType, setTaskType] = useState<string>("");
+  const [skillCategory, setSkillCategory] = useState<string>("");
+  
+  // Draft state
+  const [draftId, setDraftId] = useState<string | null>(null);
+  const [availableDrafts, setAvailableDrafts] = useState<TaskDraft[]>([]);
+  const [lastSavedAt, setLastSavedAt] = useState<Date | null>(null);
+  const [isSavingDraft, setIsSavingDraft] = useState(false);
+  
+  // Auto-save state
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const isAutoSavingRef = useRef(false);
+  
   const user = useUserStore((state) => state.user);
   const [supabase, setSupabase] = useState<any>(null);
-
   const { fetchBoardData } = useKanbanStore();
 
   const onChange = (value: string) => {
     setDescription(value);
+    setHasUnsavedChanges(true);
   };
 
   // Calculate points based on difficulty
@@ -331,15 +366,274 @@ const TaskAddModal = () => {
 
   const handleDifficultyChange = (difficulty: string) => {
     setSelectedDifficulty(difficulty);
+    setHasUnsavedChanges(true);
+  };
+
+  // ============================================================================
+  // AUTO-SAVE LOGIC (Gmail-style)
+  // ============================================================================
+
+  /**
+   * Check if form has any content worth saving
+   */
+  const hasContent = useCallback(() => {
+    return !!(
+      title ||
+      description ||
+      selectedDifficulty ||
+      priority ||
+      taskType ||
+      skillCategory ||
+      mainAssignee ||
+      sidekicks.length > 0 ||
+      deadline
+    );
+  }, [title, description, selectedDifficulty, priority, taskType, skillCategory, mainAssignee, sidekicks, deadline]);
+
+  /**
+   * Auto-save draft silently without user interaction
+   */
+  const autoSaveDraft = useCallback(async () => {
+    if (!user?.id || !data?.projectId || !data?.listId || !hasContent() || isAutoSavingRef.current) {
+      return;
+    }
+
+    isAutoSavingRef.current = true;
+
+    try {
+      const formData = new FormData();
+      
+      // Required fields for draft
+      formData.append("created_by", user.id);
+      formData.append("project_id", data.projectId);
+      formData.append("intended_column_id", data.listId);
+      
+      // Optional fields
+      if (title) formData.append("title", title);
+      if (description) formData.append("description", description);
+      if (selectedDifficulty) {
+        formData.append("difficulty", selectedDifficulty);
+        formData.append("points", getPointsFromDifficulty(selectedDifficulty).toString());
+      }
+      if (deadline) formData.append("deadline", deadline);
+      if (mainAssignee) formData.append("codev_id", mainAssignee);
+      if (sidekicks.length) formData.append("sidekick_ids", sidekicks.join(","));
+      if (priority) formData.append("priority", priority);
+      if (taskType) formData.append("type", taskType);
+      if (skillCategory) formData.append("skill_category_id", skillCategory);
+
+      const result = await saveDraft(formData, draftId);
+      
+      if (result.success) {
+        setDraftId(result.draftId || null);
+        setLastSavedAt(new Date());
+        setHasUnsavedChanges(false);
+        // Silent save - no toast notification
+        console.log("✅ Draft auto-saved");
+      }
+    } catch (error) {
+      console.error("Auto-save error:", error);
+    } finally {
+      isAutoSavingRef.current = false;
+    }
+  }, [user?.id, data?.projectId, data?.listId, title, description, selectedDifficulty, deadline, mainAssignee, sidekicks, priority, taskType, skillCategory, draftId, hasContent]);
+
+  /**
+   * Track changes and trigger auto-save timer
+   */
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    // Mark as changed if form has content
+    if (hasContent()) {
+      setHasUnsavedChanges(true);
+    }
+
+    // Clear existing timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    // Set new auto-save timer (30 seconds)
+    if (hasUnsavedChanges && hasContent()) {
+      autoSaveTimerRef.current = setTimeout(() => {
+        autoSaveDraft();
+      }, AUTO_SAVE_INTERVAL);
+    }
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [isModalOpen, hasUnsavedChanges, hasContent, autoSaveDraft]);
+
+  /**
+   * Save draft before browser close/refresh
+   */
+  useEffect(() => {
+    if (!isModalOpen) return;
+
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (hasUnsavedChanges && hasContent()) {
+        // Try to save synchronously (best effort)
+        autoSaveDraft();
+        
+        // Show browser confirmation dialog
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, [isModalOpen, hasUnsavedChanges, hasContent, autoSaveDraft]);
+
+  // ============================================================================
+  // DRAFT MANAGEMENT FUNCTIONS
+  // ============================================================================
+
+  // Load user's drafts when modal opens
+  useEffect(() => {
+    if (isModalOpen && data?.projectId && user?.id) {
+      loadUserDrafts();
+    }
+  }, [isModalOpen, data?.projectId, user?.id]);
+
+  const loadUserDrafts = async () => {
+    if (!data?.projectId || !user?.id) return;
+
+    const result = await getUserDrafts(data.projectId, user.id);
+    if (result.success && result.drafts) {
+      setAvailableDrafts(result.drafts);
+    }
+  };
+
+  // Handle loading a draft into the form
+  const handleLoadDraft = async (selectedDraftId: string) => {
+    const result = await loadDraft(selectedDraftId);
+    
+    if (result.success && result.draft) {
+      const draft = result.draft;
+      
+      // Populate all form fields
+      setTitle(draft.title || "");
+      setDescription(draft.description || "");
+      setSelectedDifficulty(draft.difficulty || "");
+      setDeadline(draft.deadline || "");
+      setMainAssignee(draft.codev_id || "");
+      setSidekicks(draft.sidekick_ids || []);
+      setPriority(draft.priority || "");
+      setTaskType(draft.type || "");
+      setSkillCategory(draft.skill_category_id || "");
+      
+      setDraftId(selectedDraftId);
+      setLastSavedAt(new Date(draft.last_saved_at));
+      setHasUnsavedChanges(false);
+      
+      toast.success("Draft loaded");
+    } else {
+      toast.error(result.error || "Failed to load draft");
+    }
+  };
+
+  // Handle manual save (button click)
+  const handleSaveAsDraft = async () => {
+    if (!user?.id || !data?.projectId || !data?.listId) {
+      toast.error("Missing required information");
+      return;
+    }
+
+    if (!hasContent()) {
+      toast.error("Please add some content before saving");
+      return;
+    }
+
+    setIsSavingDraft(true);
+
+    try {
+      const formData = new FormData();
+      
+      formData.append("created_by", user.id);
+      formData.append("project_id", data.projectId);
+      formData.append("intended_column_id", data.listId);
+      
+      if (title) formData.append("title", title);
+      if (description) formData.append("description", description);
+      if (selectedDifficulty) {
+        formData.append("difficulty", selectedDifficulty);
+        formData.append("points", getPointsFromDifficulty(selectedDifficulty).toString());
+      }
+      if (deadline) formData.append("deadline", deadline);
+      if (mainAssignee) formData.append("codev_id", mainAssignee);
+      if (sidekicks.length) formData.append("sidekick_ids", sidekicks.join(","));
+      if (priority) formData.append("priority", priority);
+      if (taskType) formData.append("type", taskType);
+      if (skillCategory) formData.append("skill_category_id", skillCategory);
+
+      const result = await saveDraft(formData, draftId);
+      
+      if (result.success) {
+        setDraftId(result.draftId || null);
+        setLastSavedAt(new Date());
+        setHasUnsavedChanges(false);
+        toast.success("Draft saved");
+        await loadUserDrafts();
+      } else {
+        toast.error(result.error || "Failed to save draft");
+      }
+    } catch (error) {
+      toast.error("Failed to save draft");
+      console.error("Save draft error:", error);
+    } finally {
+      setIsSavingDraft(false);
+    }
+  };
+
+  // Handle deleting current draft
+  const handleDeleteDraft = async () => {
+    if (!draftId) return;
+
+    const confirmed = window.confirm("Delete this draft? This cannot be undone.");
+    if (!confirmed) return;
+
+    const result = await deleteDraft(draftId);
+    
+    if (result.success) {
+      toast.success("Draft deleted");
+      handleClose();
+      await loadUserDrafts();
+    } else {
+      toast.error(result.error || "Failed to delete draft");
+    }
   };
 
   // Reset form when modal closes
-  const handleClose = () => {
+  const handleClose = async () => {
+    // Auto-save before closing if there are unsaved changes
+    if (hasUnsavedChanges && hasContent()) {
+      await autoSaveDraft();
+    }
+
+    // Clear auto-save timer
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    // Reset all form state
+    setTitle("");
     setSelectedDifficulty("");
     setDescription("");
     setMainAssignee("");
     setSidekicks([]);
-    setDeadline(""); // NEW: reset deadline
+    setDeadline("");
+    setDraftId(null);
+    setLastSavedAt(null);
+    setPriority("");
+    setTaskType("");
+    setSkillCategory("");
+    setHasUnsavedChanges(false);
+    
     onClose();
   };
 
@@ -370,41 +664,38 @@ const TaskAddModal = () => {
     try {
       setLoading(true);
 
-      if (!formData.get("title")) throw new Error("Title is required");
-      if (!formData.get("skill_category_id"))
-        throw new Error("Skill category is required");
+      if (!title) throw new Error("Title is required");
+      if (!skillCategory) throw new Error("Skill category is required");
       if (!selectedDifficulty) throw new Error("Difficulty is required");
 
+      formData.append("title", title);
+      formData.append("skill_category_id", skillCategory);
+      formData.append("difficulty", selectedDifficulty);
+      
+      if (priority) formData.append("priority", priority);
+      if (taskType) formData.append("type", taskType);
+      
       formData.append(
         "description",
         description.trim() || "<p>No description provided</p>",
       );
 
-      // Set points based on selected difficulty
       const calculatedPoints = getPointsFromDifficulty(selectedDifficulty);
       formData.set("points", calculatedPoints.toString());
 
-      // NEW: Add deadline to formData
-      if (deadline) {
-        formData.append("deadline", deadline);
-      }
-
-      const image = formData.get("image");
-      if (image && image instanceof File) {
-        formData.append("image", image);
-      }
-
-      if (mainAssignee) {
-        formData.append("codev_id", mainAssignee);
-      }
-
-      if (sidekicks.length)
-        formData.append("sidekick_ids", sidekicks.join(","));
+      if (deadline) formData.append("deadline", deadline);
+      if (mainAssignee) formData.append("codev_id", mainAssignee);
+      if (sidekicks.length) formData.append("sidekick_ids", sidekicks.join(","));
 
       formData.append("created_by", user?.id as string);
 
       const response = await createNewTask(formData);
       if (response.success) {
+        // If this was from a draft, delete the draft
+        if (draftId) {
+          await deleteDraft(draftId);
+        }
+        
         toast.success("Task created successfully");
         handleClose();
         await fetchBoardData();
@@ -434,9 +725,52 @@ const TaskAddModal = () => {
           className="flex flex-col gap-6"
         >
           <DialogHeader>
-            <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-              Add New Task
-            </DialogTitle>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
+                  {draftId ? "Edit Draft Task" : "Add New Task"}
+                </DialogTitle>
+                
+                {/* Unsaved Changes Indicator */}
+                {hasUnsavedChanges && (
+                  <span className="text-xs text-orange-500 dark:text-orange-400 animate-pulse">
+                    ● Unsaved changes
+                  </span>
+                )}
+              </div>
+              
+              {/* Draft Selector Dropdown */}
+              {availableDrafts.length > 0 && !draftId && (
+                <Select onValueChange={handleLoadDraft}>
+                  <SelectTrigger className="w-[180px] text-xs">
+                    <SelectValue placeholder="📝 Load Draft" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectGroup>
+                      {availableDrafts.map((draft) => (
+                        <SelectItem key={draft.id} value={draft.id}>
+                          {draft.title || "Untitled Draft"}
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  </SelectContent>
+                </Select>
+              )}
+            </div>
+            
+            {/* Draft Status Indicator */}
+            {draftId && lastSavedAt && (
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                💾 Last saved: {lastSavedAt.toLocaleTimeString()} • Auto-saving every 30s
+              </div>
+            )}
+            
+            {/* Auto-save Status */}
+            {!draftId && hasContent() && (
+              <div className="text-xs text-gray-500 dark:text-gray-400">
+                💡 Your work will be auto-saved as a draft
+              </div>
+            )}
           </DialogHeader>
 
           {data?.listName && (
@@ -458,7 +792,12 @@ const TaskAddModal = () => {
                 id="title"
                 name="title"
                 placeholder="Enter task title"
-                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300 "
+                value={title}
+                onChange={(e) => {
+                  setTitle(e.target.value);
+                  setHasUnsavedChanges(true);
+                }}
+                className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300"
                 required
               />
             </div>
@@ -484,7 +823,14 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Priority  <span className="text-red-500">*</span></Label>
-              <Select name="priority">
+              <Select 
+                name="priority" 
+                value={priority} 
+                onValueChange={(val) => {
+                  setPriority(val);
+                  setHasUnsavedChanges(true);
+                }}
+              >
                 <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select priority" />
                 </SelectTrigger>
@@ -541,7 +887,14 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Task Type  <span className="text-red-500">*</span></Label>
-              <Select name="type">
+              <Select 
+                name="type" 
+                value={taskType} 
+                onValueChange={(val) => {
+                  setTaskType(val);
+                  setHasUnsavedChanges(true);
+                }}
+              >
                 <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
@@ -564,7 +917,15 @@ const TaskAddModal = () => {
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Skill Category  <span className="text-red-500">*</span></Label>
-              <Select name="skill_category_id" required>
+              <Select 
+                name="skill_category_id" 
+                value={skillCategory} 
+                onValueChange={(val) => {
+                  setSkillCategory(val);
+                  setHasUnsavedChanges(true);
+                }}
+                required
+              >
                 <SelectTrigger className="bg-light-900 focus:border-customBlue-500 border border-gray-300 dark:border-gray-700">
                   <SelectValue placeholder="Select skill category" />
                 </SelectTrigger>
@@ -580,7 +941,6 @@ const TaskAddModal = () => {
               </Select>
             </div>
 
-            {/* NEW: Deadline Input */}
             <div className="">
               <Label htmlFor="deadline" className="text-sm font-medium">
                 Deadline
@@ -590,7 +950,10 @@ const TaskAddModal = () => {
                 name="deadline"
                 type="date"
                 value={deadline}
-                onChange={(e) => setDeadline(e.target.value)}
+                onChange={(e) => {
+                  setDeadline(e.target.value);
+                  setHasUnsavedChanges(true);
+                }}
                 className="bg-light-900 dark:bg-dark-200 dark:text-light-900 focus:border-customBlue-500 border border-gray-300"
               />
             </div>
@@ -607,6 +970,7 @@ const TaskAddModal = () => {
                   selectedMemberIds={mainAssignee ? [mainAssignee] : []}
                   onMembersChange={(memberIds) => {
                     setMainAssignee(memberIds[0] || "");
+                    setHasUnsavedChanges(true);
                   }}
                   projectId={data.projectId}
                   singleSelection={true}
@@ -625,7 +989,10 @@ const TaskAddModal = () => {
               {data?.projectId ? (
                 <MemberSelector
                   selectedMemberIds={sidekicks}
-                  onMembersChange={setSidekicks}
+                  onMembersChange={(memberIds) => {
+                    setSidekicks(memberIds);
+                    setHasUnsavedChanges(true);
+                  }}
                   projectId={data.projectId}
                   disabledMembers={mainAssignee ? [mainAssignee] : []}
                   singleSelection={false}
@@ -644,41 +1011,92 @@ const TaskAddModal = () => {
             <KanbanRichTextEditor value={description} onChange={onChange} />
           </div>
 
-          <DialogFooter className="flex justify-end gap-2 pt-4">
-            <Button
-              type="button"
-              onClick={handleClose}
-              style={{
-                backgroundColor: "#3B82F6",
-                color: "white",
-                padding: "6px 16px",
-                fontSize: "14px",
-                borderRadius: "4px",
-                border: "none",
-                minWidth: "auto",
-                width: "auto",
-              }}
-              disabled={loading || isPending}
-            >
-              Cancel
-            </Button>
-            <Button
-              type="submit"
-              style={{
-                backgroundColor: "#2563EB",
-                color: "white",
-                padding: "6px 16px",
-                fontSize: "14px",
-                borderRadius: "4px",
-                border: "none",
-                minWidth: "auto",
-                width: "auto",
-              }}
-              disabled={loading || isPending}
-            >
-              {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
-              {loading || isPending ? "Creating..." : "Create Task"}
-            </Button>
+          {/* Enhanced Footer with Draft Actions */}
+          <DialogFooter className="flex flex-col gap-2 sm:flex-row sm:justify-between pt-4">
+            <div className="flex gap-2">
+              {/* Save as Draft Button */}
+              <Button
+                type="button"
+                onClick={handleSaveAsDraft}
+                disabled={isSavingDraft || loading || isPending || !hasContent()}
+                style={{
+                  backgroundColor: "#10B981",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
+              >
+                {isSavingDraft && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                <Save className="mr-2 h-4 w-4" />
+                {isSavingDraft ? "Saving..." : "Save Draft"}
+              </Button>
+              
+              {/* Delete Draft Button */}
+              {draftId && (
+                <Button
+                  type="button"
+                  onClick={handleDeleteDraft}
+                  disabled={loading || isPending}
+                  style={{
+                    backgroundColor: "#EF4444",
+                    color: "white",
+                    padding: "6px 16px",
+                    fontSize: "14px",
+                    borderRadius: "4px",
+                    border: "none",
+                    minWidth: "auto",
+                    width: "auto",
+                  }}
+                >
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  Delete Draft
+                </Button>
+              )}
+            </div>
+            
+            <div className="flex gap-2 justify-end">
+              {/* Cancel Button */}
+              <Button
+                type="button"
+                onClick={handleClose}
+                style={{
+                  backgroundColor: "#3B82F6",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
+                disabled={loading || isPending}
+              >
+                Cancel
+              </Button>
+              
+              {/* Create Task Button */}
+              <Button
+                type="submit"
+                style={{
+                  backgroundColor: "#2563EB",
+                  color: "white",
+                  padding: "6px 16px",
+                  fontSize: "14px",
+                  borderRadius: "4px",
+                  border: "none",
+                  minWidth: "auto",
+                  width: "auto",
+                }}
+                disabled={loading || isPending}
+              >
+                {loading && <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />}
+                {loading || isPending ? "Creating..." : "Create Task"}
+              </Button>
+            </div>
           </DialogFooter>
         </form>
       </DialogContent>

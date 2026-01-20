@@ -25,6 +25,8 @@ const About = ({ data }: AboutProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [hasAboutPoints, setHasAboutPoints] = useState(false);
+  const [isExpanded, setIsExpanded] = useState(false);
+
 
   const {
     register,
@@ -39,6 +41,11 @@ const About = ({ data }: AboutProps) => {
   });
 
   const currentAboutValue = watch("about");
+
+  useEffect(() => {
+    if (isEditMode) setIsExpanded(true);
+    else setIsExpanded(false);
+  }, [isEditMode]);
 
   // Check if user has earned points for the 'about' field
   useEffect(() => {
@@ -139,19 +146,63 @@ const About = ({ data }: AboutProps) => {
             <Label>Tell more about yourself</Label>
 
             <div>
-              <Textarea
-                variant="resume"
-                placeholder="Write something about yourself..."
-                id="about_me"
-                {...register("about")}
-                disabled={!isEditMode}
-                value={watch("about") || ""}
-                className={`placeholder:text-gray-400 dark:placeholder:text-gray-500 ${
-                  isEditMode
-                    ? "border-lightgray text-black dark:text-white bg-white dark:bg-dark-200 border dark:border-zinc-700"
-                    : "text-gray-500 dark:text-gray-400 bg-white dark:bg-dark-200 border-none"
-                }`}
-              />
+              {!isEditMode ? (
+                <div className="relative">
+                  <div
+                    className="
+                      w-full rounded-md
+                      bg-light-200 dark:bg-dark-200
+                      text-gray-500 dark:text-gray-400
+                      overflow-hidden
+                    "
+                  >
+                    <div
+                      className={`
+                        px-3 py-2
+                        text-base leading-normal
+                        whitespace-pre-wrap
+                        ${
+                          isExpanded ? "" : "line-clamp-2"
+                        }
+                      `}
+                      style={!isExpanded ? { maxHeight: '3.7rem' } : {}}
+                    >
+                      {currentAboutValue || "Write something about yourself..."}
+                    </div>
+                  </div>
+
+                  {currentAboutValue && currentAboutValue.length > 120 && (
+                    <button
+                      type="button"
+                      onClick={() => setIsExpanded((prev) => !prev)}
+                      className="
+                        mt-1 text-xs underline
+                        text-gray-500 dark:text-gray-400
+                        hover:opacity-80
+                        transition-opacity
+                      "
+                    >
+                      {isExpanded ? "Show less" : "Show more"}
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <Textarea
+                  variant="resume"
+                  placeholder="Write something about yourself..."
+                  id="about_me"
+                  {...register("about")}
+                  rows={8}
+                  className="
+                    px-3 py-2
+                    text-base leading-normal
+                    bg-light-100 dark:bg-dark-200
+                    text-dark-900 dark:text-light-900
+                    border-none
+                    rounded-md
+                  "
+                />
+              )}
             </div>
           </div>
 

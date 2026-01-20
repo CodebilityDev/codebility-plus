@@ -194,7 +194,7 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
         <div className="space-y-4 py-4">
           <div className="space-y-2">
             <Label>Select Days *</Label>
-            <div className="grid grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
               {weekDays.map(day => (
                 <div
                   key={day.value}
@@ -239,28 +239,37 @@ const ScheduleMeetingModal = ({ isOpen, onClose, projectId, projectName, teamMem
           </div>
         </div>
 
-        <DialogFooter className="flex-col sm:flex-row gap-2">
-          <div className="flex gap-2 flex-1">
-            {currentSchedule && currentSchedule.selectedDays.length > 0 && (
-              <Button
-                variant="outline"
-                onClick={handleClearSchedule}
-                disabled={isSubmitting}
-                className="border-red-300 text-red-700 hover:bg-red-50 dark:border-red-600 dark:text-red-300 dark:hover:bg-red-900/20"
-              >
-                Clear Schedule
-              </Button>
-            )}
-          </div>
+        {/* Footer */}
+        <div className="shrink-0 border-t flex flex-col gap-2">
+          {currentSchedule && currentSchedule.selectedDays.length > 0 && (
+            <Button
+              variant="outline"
+              onClick={handleClearSchedule}
+              disabled={isSubmitting}
+              className="w-full border-red-300 text-red-700 hover:bg-red-50"
+            >
+              Clear Schedule
+            </Button>
+          )}
+
           <div className="flex gap-2">
-            <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+            <Button
+              variant="outline"
+              onClick={onClose}
+              disabled={isSubmitting}
+              className="flex-1"
+            >
               Cancel
             </Button>
-            <Button onClick={handleSubmit} disabled={isSubmitting}>
+            <Button
+              onClick={handleSubmit}
+              disabled={isSubmitting}
+              className="flex-1"
+            >
               {isSubmitting ? "Setting..." : "Set Schedule"}
             </Button>
           </div>
-        </DialogFooter>
+        </div>
       </DialogContent>
     </Dialog>
   );

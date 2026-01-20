@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { memo, useCallback, useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import KanbanBoardsSearch from "@/app/home/kanban/_components/KanbanBoardsSearch";
 import { getMembers } from "@/app/home/projects/actions";
@@ -9,6 +9,7 @@ import { ArrowRightIcon, IconArchive, IconSearch } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { KanbanBoardType, KanbanColumnType } from "@/types/home/codev";
 import { useQuery } from "@tanstack/react-query";
+import toast from "react-hot-toast";
 
 import { Button } from "@codevs/ui/button";
 
@@ -19,6 +20,7 @@ import KanbanColumnAddModal from "./kanban_modals/KanbanColumnAddModal";
 import KanbanBoardColumnContainer from "./KanbanBoardColumnContainer";
 import UserTaskFilter from "./UserTaskFilter";
 import { useKanbanTaskUrlModal } from "@/hooks/useKanbanTaskUrlModal";
+import { getDraftCount } from "../actions";
 
 interface KanbanBoardProps {
   boardData: KanbanBoardType & { kanban_columns: KanbanColumnType[] };
@@ -27,8 +29,16 @@ interface KanbanBoardProps {
 
 /**
  * Enhanced KanbanBoard component with three-level breadcrumb navigation
+ * and draft task card counter badge
+ * 
+ * Features:
+ * - Three-level breadcrumb navigation
+ * - Draft task counter badge (CBP-16)
+ * - Archive toggle
+ * - Task filtering by user
+ * - Responsive design
+ * 
  * Follows KISS, YAGNI, DRY, and SOLID principles
- * Maintains all existing functionality while adding proper navigation structure
  */
 function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
   const user = useUserStore((state) => state.user);
@@ -43,6 +53,7 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
   // Component state - minimal and focused
   const [activeFilter, setActiveFilter] = useState<string | null>(null);
   const [showArchive, setShowArchive] = useState(false);
+  const [draftCount, setDraftCount] = useState<number>(0);
 
   // Fetch project members using React Query for caching and optimization
   const { data: allMembers = [], isLoading: isMembersLoading } = useQuery({
@@ -67,6 +78,26 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
       })),
     [allMembers, activeFilter],
   );
+
+  // Load draft count when component mounts or user/project changes
+  useEffect(() => {
+    if (user?.id && projectId) {
+      loadDraftCount();
+    }
+  }, [user?.id, projectId]);
+
+  /**
+   * Fetch the number of draft task cards for the current user
+   * Updates the draftCount state for badge display
+   */
+  const loadDraftCount = async () => {
+    if (!user?.id || !projectId) return;
+    
+    const result = await getDraftCount(projectId, user.id);
+    if (result.success && result.count !== undefined) {
+      setDraftCount(result.count);
+    }
+  };
 
   // Filter handler using useCallback to prevent unnecessary re-renders
   const handleFilterClick = useCallback((userId: string) => {
@@ -194,6 +225,28 @@ function KanbanBoard({ boardData, projectId }: KanbanBoardProps) {
                       {showArchive ? "Hide" : "Archive"}
                     </span>
                   </Button>
+
+                  {/* Draft Badge Button - CBP-16 */}
+                  {draftCount > 0 && (
+                    <Button
+                      onClick={() => {
+                        toast("💡 Click 'Add Task' in any column to access your drafts", {
+                          duration: 3000,
+                          icon: "📝",
+                        });
+                      }}
+                      variant="outline"
+                      className="relative flex transform items-center gap-2 whitespace-nowrap px-3 py-2 text-sm transition-all duration-300 hover:scale-105 border-white/30 text-white hover:border-white/50 hover:bg-white/20 dark:border-white/20 dark:text-gray-300 dark:hover:bg-white/10 backdrop-blur-sm"
+                      aria-label={`You have ${draftCount} draft${draftCount > 1 ? 's' : ''}`}
+                      title="View your saved drafts"
+                    >
+                      <span className="text-lg" aria-hidden="true">📝</span>
+                      <span className="hidden lg:inline">Drafts</span>
+                      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-blue-500 text-xs text-white font-semibold shadow-lg">
+                        {draftCount}
+                      </span>
+                    </Button>
+                  )}
                 </div>
 
                 {/* User Filter Section */}

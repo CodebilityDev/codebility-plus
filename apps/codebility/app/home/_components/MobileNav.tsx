@@ -140,17 +140,12 @@ const MobileNav = () => {
       </SheetTrigger>
       <SheetContent
         id="mobile-navigation"
-        aria-describedby="mobile-nav-description"
         side="left"
         className="overflow-y-auto bg-white/80 dark:bg-gray-950/80 backdrop-blur-xl border-r border-gray-200/50 dark:border-gray-800/50"
-        role="dialog"
-        aria-labelledby="mobile-nav-title"
       >
-        <SheetHeader>
-          <SheetTitle id="mobile-nav-title" className="sr-only">
-            Mobile Navigation Menu
-          </SheetTitle>
-          <SheetDescription id="mobile-nav-description" className="sr-only">
+        <SheetHeader className="sr-only">
+          <SheetTitle>Mobile Navigation Menu</SheetTitle>
+          <SheetDescription>
             Navigate through the application pages using the links below
           </SheetDescription>
         </SheetHeader>

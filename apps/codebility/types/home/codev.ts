@@ -377,3 +377,50 @@ export interface Roles {
   kanban?: boolean;
   dashboard?: boolean;
 }
+
+// ============================================================================
+// TASK DRAFT INTERFACES
+// Purpose: Type definitions for draft task cards
+// Added: 2025-01-16
+// Feature: CBP-16 - Draft Task Card Feature
+// ============================================================================
+
+export interface TaskDraft {
+  // Draft-specific fields
+  id: string; // draft_id (UUID)
+  created_by: string; // codev.id who created the draft
+  project_id: string;
+  intended_column_id: string; // Where it will go when promoted
+  last_saved_at: string; // ISO timestamp
+  created_at: string; // ISO timestamp
+  
+  // Task fields (all optional since draft can be incomplete)
+  title?: string;
+  description?: string;
+  priority?: "critical" | "high" | "medium" | "low";
+  difficulty?: "easy" | "medium" | "hard";
+  type?: "FEATURE" | "BUG" | "IMPROVEMENT" | "DOCUMENTATION";
+  pr_link?: string;
+  points?: number;
+  deadline?: string; // ISO date string
+  skill_category_id?: string;
+  codev_id?: string; // Primary assignee
+  sidekick_ids?: string[]; // Helper assignees
+  
+  // Populated relations (optional, from joins)
+  skill_category?: SkillCategory;
+  codev?: {
+    id: string;
+    first_name: string;
+    last_name: string;
+    image_url?: string | null;
+  };
+}
+
+// Helper type for draft form state management
+export interface DraftFormState {
+  isDraft: boolean;
+  draftId: string | null;
+  lastSavedAt: Date | null;
+  hasUnsavedChanges: boolean;
+}
