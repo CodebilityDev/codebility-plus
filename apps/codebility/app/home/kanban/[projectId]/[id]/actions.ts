@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { Task, TaskDraft } from "@/types/home/codev";
 import { createClientServerComponent } from "@/utils/supabase/server";
+import { createNotificationAction } from "@/lib/actions/notification.actions";
 
 interface CodevMember {
   id: string;
@@ -247,8 +248,10 @@ export const updateTask = async (
     const rawDeadline = formData.get("deadline")?.toString();
     const deadline = rawDeadline === "" || rawDeadline === "null" ? null : rawDeadline;
 
+    const title = formData.get("title")?.toString();
+
     const updateData = {
-      title: formData.get("title")?.toString(),
+      title: title,
       description: formData.get("description")?.toString(),
       priority: formData.get("priority")?.toString(),
       difficulty: formData.get("difficulty")?.toString(),
@@ -264,9 +267,10 @@ export const updateTask = async (
       updated_at: new Date().toISOString(),
     };
 
+    // 1. Fetch existing task to check current assignee
     const { data: existingTask, error: fetchError } = await supabase
       .from("tasks")
-      .select("*")
+      .select("codev_id, title, kanban_column_id")
       .eq("id", taskId)
       .single();
 
@@ -275,6 +279,7 @@ export const updateTask = async (
       return { success: false, error: "Could not find task to update" };
     }
 
+    // 2. Perform the update
     const { error: updateError } = await supabase
       .from("tasks")
       .update({
@@ -286,6 +291,32 @@ export const updateTask = async (
     if (updateError) {
       console.error("Supabase update error:", updateError);
       return { success: false, error: updateError.message };
+    }
+
+    // 3. NOTIFICATION LOGIC: Trigger if assignee changed and isn't null
+    if (codev_id && codev_id !== existingTask.codev_id) {
+      // Get current user to avoid self-notification
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user && user.id !== codev_id) {
+        // Fetch project info to build the action URL
+        const { data: colData } = await supabase
+          .from("kanban_columns")
+          .select("board_id, kanban_boards(project_id)")
+          .eq("id", existingTask.kanban_column_id)
+          .single();
+
+        await createNotificationAction({
+          recipientId: codev_id,
+          title: "Task Assigned",
+          message: `You've been assigned to: ${title || existingTask.title}`,
+          type: "task",
+          priority: "normal",
+          projectId: (colData?.kanban_boards as any)?.project_id,
+          actionUrl: `/home/kanban/${(colData?.kanban_boards as any)?.project_id}/${colData?.board_id}?taskId=${taskId}`,
+          metadata: { taskId }
+        });
+      }
     }
 
     return { success: true };
@@ -987,6 +1018,25 @@ export const promoteDraft = async (
     if (createError) {
       console.error("Error creating task from draft:", createError);
       return { success: false, error: createError.message };
+    }
+
+    // Step 3.5: Trigger Notification if assignee exists in the draft
+    if (draft.codev_id) {
+      // Get current user to avoid self-notification
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (user && user.id !== draft.codev_id) {
+        await createNotificationAction({
+          recipientId: draft.codev_id,
+          title: "Task Assigned (from Draft)",
+          message: `The draft "${draft.title}" has been published and assigned to you.`,
+          type: "task",
+          priority: "normal",
+          projectId: draft.project_id,
+          actionUrl: `/home/kanban/${draft.project_id}/${draft.intended_column_id}?taskId=${newTask.id}`,
+          metadata: { taskId: newTask.id }
+        });
+      }
     }
 
     // Step 4: Delete the draft
