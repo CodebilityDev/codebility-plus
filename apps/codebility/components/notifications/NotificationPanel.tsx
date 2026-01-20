@@ -73,7 +73,7 @@ export function NotificationPanel({
   const unreadCount = notifications.filter(n => !n.read).length;
 
   return (
-    <div className="absolute right-0 top-full mt-2 w-96 animate-slide-down rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900">
+    <div className="fixed inset-x-4 top-16 z-50 animate-slide-down rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3 dark:border-gray-700">
         <div className="flex items-center gap-2">
