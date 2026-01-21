@@ -181,7 +181,7 @@ export const createNewTask = async (
       return { success: false, error: "Required fields are missing (title, column, and skill category)" };
     }
 
-    const { error } = await supabase.from("tasks").insert([
+    const { data: newTask, error } = await supabase.from("tasks").insert([
       {
         title,
         description,
@@ -197,7 +197,7 @@ export const createNewTask = async (
         created_by,
         deadline,
       },
-    ]);
+    ]).select("id").single();
 
     if (error) {
       console.error("Error creating task:", error);
@@ -219,6 +219,28 @@ export const createNewTask = async (
         
       if (boardData?.project_id) {
         revalidatePath(`/home/kanban/${boardData.project_id}/${columnData.board_id}`);
+        
+        // Send notification if task is assigned to someone other than the creator
+        if (codev_id && newTask?.id) {
+          const { data: { user } } = await supabase.auth.getUser();
+          
+          // Only send notification if assigning to someone else
+          if (user && user.id !== codev_id) {
+            await createNotificationAction({
+              recipientId: codev_id,
+              title: "New Task Assignment",
+              message: `You've been assigned to task: "${title}"`,
+              type: "task",
+              priority: "normal",
+              projectId: boardData.project_id,
+              actionUrl: `/home/kanban/${boardData.project_id}/${columnData.board_id}?taskId=${newTask.id}`,
+              metadata: { 
+                taskId: newTask.id,
+                assignedAt: new Date().toISOString()
+              }
+            });
+          }
+        }
       }
     }
 
@@ -298,6 +320,7 @@ export const updateTask = async (
       // Get current user to avoid self-notification
       const { data: { user } } = await supabase.auth.getUser();
       
+      // Only send notification if assigning to someone else
       if (user && user.id !== codev_id) {
         // Fetch project info to build the action URL
         const { data: colData } = await supabase
@@ -308,8 +331,8 @@ export const updateTask = async (
 
         await createNotificationAction({
           recipientId: codev_id,
-          title: "Task Assigned",
-          message: `You've been assigned to: ${title || existingTask.title}`,
+          title: "Task Assignment Update",
+          message: `You've been assigned to task: "${title || existingTask.title}"`,
           type: "task",
           priority: "normal",
           projectId: (colData?.kanban_boards as any)?.project_id,
@@ -1028,11 +1051,12 @@ export const promoteDraft = async (
       // Get current user to avoid self-notification
       const { data: { user } } = await supabase.auth.getUser();
       
+      // Only send notification if assigning to someone else
       if (user && user.id !== draft.codev_id) {
         await createNotificationAction({
           recipientId: draft.codev_id,
-          title: "Task Assigned (from Draft)",
-          message: `The draft "${draft.title}" has been published and assigned to you.`,
+          title: "Draft Published & Assigned",
+          message: `Task "${draft.title}" has been published and assigned to you.`,
           type: "task",
           priority: "normal",
           projectId: draft.project_id,
