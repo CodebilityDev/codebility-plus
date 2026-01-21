@@ -130,9 +130,14 @@ export default function FilterCodevs({
           className="fixed z-50 max-h-[min(70vh,500px)] min-h-[300px] w-[90vw] overflow-auto
             sm:w-96 md:w-80 rounded-2xl bg-white/95 backdrop-blur-md p-6 shadow-2xl 
             dark:bg-gray-900/95 border border-gray-200 dark:border-gray-700"
-          style={{
-            top: `${dropdownPosition.top}px`,
-            right: `${dropdownPosition.right}px`,
+         style={{
+            top:
+              window.innerWidth < 640
+                ? "50%" // center vertically on mobile
+                : `${dropdownPosition.top}px`,
+            left: window.innerWidth < 640 ? "50%" : undefined, // center horizontally on mobile
+            transform: window.innerWidth < 640 ? "translate(-50%, -50%)" : undefined, // adjust to center
+            right: window.innerWidth >= 640 ? `${dropdownPosition.right}px` : undefined, // only for desktop
           }}
         >
           {/* Header with clear button */}

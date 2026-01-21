@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
@@ -42,6 +42,8 @@ import { completeTask, updateTaskPRLink } from "../../actions";
 import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
 } from "../DifficultyPointsTooltip";
+import TaskCommentsSection from "./_components/TaskComments";
+import { MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
 
 // Fetch available members function - unchanged from original
 const fetchAvailableMembers = async (
@@ -183,7 +185,7 @@ function AssigneeSelector({
       onAssigneeChange([user.id]);
     }
   };
-
+  
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-wrap gap-2">
@@ -340,6 +342,34 @@ const TaskViewModal = ({
     user?.role_id === 4 ||
     user?.role_id === 10;
   const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
+
+
+  const [showComments, setShowComments] = useState(false);
+  const [commentCount, setCommentCount] = useState(0);
+
+  useEffect(() => {
+  const fetchCommentCount = async () => {
+    if (!task?.id) return;
+    
+    const { count, error } = await supabase
+      .from("tasks_comments")
+      .select("*", { count: "exact", head: true })
+      .eq("task_id", task.id);
+    
+    if (!error && count !== null) {
+      setCommentCount(count);
+    }
+  };
+
+  fetchCommentCount();
+}, [task?.id]);
+
+
+
+  const toggleComments = useCallback(() => {
+    setShowComments(prev => !prev);
+  }, []);
+
 
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -923,6 +953,35 @@ const TaskViewModal = ({
                 : "Unknown"}
               </div>
             </div>
+          </div>
+
+          {/* Comments Section */}
+          <div className="space-y-3 border-t border-gray-200 pt-4 dark:border-gray-700">
+            <Button
+              variant="ghost"
+              onClick={toggleComments}
+              className="w-full justify-between rounded-lg bg-gray-50 px-4 py-3 text-sm font-medium text-gray-700 transition-colors hover:bg-gray-100 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              <div className="flex items-center gap-2">
+                <MessageCircle className="h-4 w-4" />
+                <span>Comments ({commentCount})</span>
+              </div>
+              {showComments ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
+
+            {showComments && (
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-gray-800/50">
+                <TaskCommentsSection
+                  taskId={task?.id || ""}
+                  currentUserId={user?.id || ""}
+                  onCommentCountChange={setCommentCount}
+                />
+              </div>
+            )}
           </div>
 
           <DialogFooter className="mt-4 flex justify-end">
