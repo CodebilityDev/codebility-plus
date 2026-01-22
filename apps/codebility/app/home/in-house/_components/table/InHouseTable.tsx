@@ -101,7 +101,7 @@ const formatDisplayPosition = (position: string | null | undefined): string => {
 
 /**
  * Enhanced NDA Email Button Component
- * Now integrates with the new storage-first NDA process
+ * Integrates with storage-first NDA process
  */
 const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
   const [isSending, setIsSending] = useState(false);
@@ -138,8 +138,12 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
 };
 
 /**
- * Main InHouseTable Component with Enhanced NDA Storage Integration
- * Now properly handles NDA signature and document URLs from Supabase Storage
+ * ENHANCED InHouseTable Component
+ * IMPROVEMENTS:
+ * - Increased cell padding: px-1 → px-3 (horizontal spacing)
+ * - Optimized vertical spacing: py-1 → py-2 for better row height
+ * - Better column alignment and text sizing
+ * - Improved visual hierarchy with consistent spacing
  */
 export function InHouseTable({
   data,
@@ -194,7 +198,7 @@ export function InHouseTable({
 
   /**
    * Enhanced NDA email sending with proper database tracking
-   * Now creates NDA request records and generates secure tokens
+   * Creates NDA request records and generates secure tokens
    */
   const handleSendNdaEmail = async (
     codevId: string,
@@ -256,7 +260,7 @@ export function InHouseTable({
 
   /**
    * Enhanced NDA document download function
-   * Now downloads from Supabase Storage URLs instead of base64 data
+   * Downloads from Supabase Storage URLs instead of base64 data
    * @param codevId - ID of the member whose NDA to download
    */
   const handleDownloadNda = async (codevId: string) => {
@@ -412,39 +416,39 @@ export function InHouseTable({
         onSort={onSort}
       />
 
-      {/* Desktop Table Container - Hidden on mobile, visible on XL+ screens */}
+      {/* ENHANCED Desktop Table Container - Improved spacing throughout */}
       <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 hidden rounded-lg border xl:block">
         <Table>
-          {/* Table Header with responsive column visibility */}
+          {/* ENHANCED Table Header - Increased padding for better readability */}
           <TableHeader>
             <TableRow className="border-light-700 dark:border-dark-200 bg-light-200 dark:bg-dark-300 border-b">
               {columns.map((column) =>
-                // Always visible columns for mobile compatibility
+                // Always visible columns - ENHANCED: px-1 → px-3, py-2 → py-2.5
                 column.key === "image_url" ||
                 column.key === "first_name" ||
                 column.key === "last_name" ||
                 column.key === "email_address" ? (
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 px-1 py-2 text-xs font-semibold text-black"
+                    className="dark:text-light-900 px-3 py-2.5 text-sm font-semibold text-black"
                   >
                     {column.label}
                   </TableHead>
                 ) : column.key === "display_position" || column.key === "date_joined" ? (
-                  // Sortable columns - Hidden on smaller screens, visible on 2XL+
+                  // Sortable columns - ENHANCED spacing
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 hidden cursor-pointer px-1 py-2 text-xs font-semibold text-black hover:bg-light-700 dark:hover:bg-dark-400 2xl:table-cell"
+                    className="dark:text-light-900 hidden cursor-pointer px-3 py-2.5 text-sm font-semibold text-black hover:bg-light-700 dark:hover:bg-dark-400 2xl:table-cell"
                     onClick={() => onSort?.(column.key as "date_joined" | "display_position")}
                   >
                     {column.label}
                     <SortIndicator columnKey={column.key as "date_joined" | "display_position"} />
                   </TableHead>
                 ) : (
-                  // Hidden on smaller screens, visible on 2XL+
+                  // Hidden columns - ENHANCED spacing
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 hidden px-1 py-2 text-xs font-semibold text-black 2xl:table-cell"
+                    className="dark:text-light-900 hidden px-3 py-2.5 text-sm font-semibold text-black 2xl:table-cell"
                   >
                     {column.label}
                   </TableHead>
@@ -452,16 +456,16 @@ export function InHouseTable({
               )}
 
               {/* Responsive info column for mobile */}
-              <TableHead className="dark:text-light-900 px-1 py-2 text-xs font-semibold text-black 2xl:hidden">
+              <TableHead className="dark:text-light-900 px-3 py-2.5 text-sm font-semibold text-black 2xl:hidden">
                 Info
               </TableHead>
-              <TableHead className="dark:text-light-900 px-1 py-2 text-xs font-semibold text-black">
+              <TableHead className="dark:text-light-900 px-3 py-2.5 text-sm font-semibold text-black">
                 Actions
               </TableHead>
             </TableRow>
           </TableHeader>
 
-          {/* Table Body with conditional rendering for edit mode */}
+          {/* ENHANCED Table Body - Improved cell spacing */}
           <TableBody>
             {data.map((item) =>
               editingId === item.id ? (
@@ -477,13 +481,13 @@ export function InHouseTable({
                   roles={roles}
                 />
               ) : (
-                // Display mode: Show data with responsive layout
+                // Display mode: Show data with ENHANCED spacing
                 <TableRow
                   key={item.id}
                   className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b"
                 >
-                  {/* Avatar column - Always visible */}
-                  <TableCell className="dark:text-light-900 px-1 py-1 text-xs text-black">
+                  {/* Avatar column - ENHANCED: px-1 py-1 → px-3 py-2 */}
+                  <TableCell className="dark:text-light-900 px-3 py-2 text-sm text-black">
                     <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                       <Image
                         src={item.image_url || defaultImage}
@@ -495,23 +499,23 @@ export function InHouseTable({
                     </div>
                   </TableCell>
 
-                  {/* First Name column - Always visible */}
-                  <TableCell className="dark:text-light-900 px-1 py-1 text-xs text-black">
+                  {/* First Name column - ENHANCED spacing */}
+                  <TableCell className="dark:text-light-900 px-3 py-2 text-sm text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
 
-                  {/* Last Name column - Always visible */}
-                  <TableCell className="dark:text-light-900 px-1 py-1 text-xs text-black">
+                  {/* Last Name column - ENHANCED spacing */}
+                  <TableCell className="dark:text-light-900 px-3 py-2 text-sm text-black">
                     {capitalize(item.last_name)}
                   </TableCell>
 
-                  {/* Email column - Always visible */}
-                  <TableCell className="dark:text-light-900 px-1 py-1 text-xs text-black">
+                  {/* Email column - ENHANCED spacing */}
+                  <TableCell className="dark:text-light-900 px-3 py-2 text-sm text-black">
                     {item.email_address}
                   </TableCell>
 
-                  {/* Mobile Info Dropdown - Hidden on 2XL+ screens */}
-                  <TableCell className="dark:text-light-900 flex items-start justify-start px-1 py-1 text-xs text-black 2xl:hidden">
+                  {/* Mobile Info Dropdown - ENHANCED spacing */}
+                  <TableCell className="dark:text-light-900 flex items-start justify-start px-3 py-2 text-sm text-black 2xl:hidden">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <span className="cursor-pointer hover:text-gray-600">...</span>
@@ -531,7 +535,7 @@ export function InHouseTable({
                             </DropdownMenuShortcut>
                           </DropdownMenuItem>
                           
-                          {/* Display Position - Now with UPPERCASE formatting */}
+                          {/* Display Position - UPPERCASE formatting */}
                           <DropdownMenuItem>
                             Position
                             <DropdownMenuShortcut>
@@ -559,7 +563,7 @@ export function InHouseTable({
                             </DropdownMenuPortal>
                           </DropdownMenuSub>
                           
-                          {/* Enhanced NDA Status submenu with storage-based actions */}
+                          {/* Enhanced NDA Status submenu */}
                           <DropdownMenuSub>
                             <DropdownMenuSubTrigger>
                               NDA Status
@@ -678,33 +682,33 @@ export function InHouseTable({
                     </DropdownMenu>
                   </TableCell>
 
-                  {/* Desktop-only columns - Hidden on smaller screens */}
+                  {/* Desktop-only columns - All ENHANCED with px-3 py-2 */}
                   
                   {/* Status Badge column */}
-                  <TableCell className="hidden px-1 py-1 2xl:table-cell">
+                  <TableCell className="hidden px-3 py-2 2xl:table-cell">
                     <StatusBadge
                       status={item.internal_status as InternalStatus}
                     />
                   </TableCell>
 
                   {/* Role column */}
-                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-3 py-2 text-sm text-black 2xl:table-cell">
                     {item.role_id
                       ? roles.find((role) => role.id === item.role_id)?.name || "-"
                       : "-"}
                   </TableCell>
 
-                  {/* Display Position column - Now with UPPERCASE formatting */}
-                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
+                  {/* Display Position column - UPPERCASE formatting */}
+                  <TableCell className="dark:text-light-900 hidden px-3 py-2 text-sm text-black 2xl:table-cell">
                     {formatDisplayPosition(item.display_position)}
                   </TableCell>
 
                   {/* Projects column */}
-                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-3 py-2 text-sm text-black 2xl:table-cell">
                     {item.projects?.length ? (
                       <div className="space-y-1">
                         {item.projects.map((project) => (
-                          <div key={project.id} className="text-xs">{project.name}</div>
+                          <div key={project.id} className="text-sm">{project.name}</div>
                         ))}
                       </div>
                     ) : (
@@ -712,8 +716,8 @@ export function InHouseTable({
                     )}
                   </TableCell>
 
-                  {/* Enhanced NDA Status column with storage-based action buttons */}
-                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
+                  {/* Enhanced NDA Status column */}
+                  <TableCell className="dark:text-light-900 hidden px-3 py-2 text-sm text-black 2xl:table-cell">
                     <div className="flex items-center gap-1">
                       <span className={`${getNdaStatusColor(item.nda_status)}`}>
                         {item.nda_status ? "Yes" : "No"}
@@ -763,13 +767,13 @@ export function InHouseTable({
                   </TableCell>
 
                   {/* Portfolio column */}
-                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-3 py-2 text-sm text-black 2xl:table-cell">
                     {item.portfolio_website ? (
                       <a
                         href={item.portfolio_website}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center text-xs text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
+                        className="inline-flex items-center text-sm text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
                       >
                         <Link2 className="mr-1 h-3 w-3" />
                         Portfolio
@@ -780,14 +784,14 @@ export function InHouseTable({
                   </TableCell>
 
                   {/* Date Joined column */}
-                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-3 py-2 text-sm text-black 2xl:table-cell">
                     {item.date_joined 
                       ? new Date(item.date_joined).toLocaleDateString()
                       : "-"}
                   </TableCell>
 
                   {/* Availability Status column */}
-                  <TableCell className="dark:text-light-900 hidden px-1 py-1 text-xs text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-3 py-2 text-sm text-black 2xl:table-cell">
                     <SwitchStatusButton
                       disabled={false}
                       handleSwitch={() => {}}
@@ -795,8 +799,8 @@ export function InHouseTable({
                     />
                   </TableCell>
 
-                  {/* Actions column - Always visible */}
-                  <TableCell className="px-1 py-1">
+                  {/* Actions column - ENHANCED spacing */}
+                  <TableCell className="px-3 py-2">
                     <TableActions
                       item={item}
                       onEdit={() => setEditingId(item.id)}
@@ -810,7 +814,7 @@ export function InHouseTable({
         </Table>
       </div>
 
-      {/* Pagination Controls - Only show when data exceeds page size */}
+      {/* Pagination Controls */}
       <div className="relative w-full">
         {data.length > pageSize.applicants && (
           <DefaultPagination
