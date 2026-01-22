@@ -46,8 +46,18 @@ export default function Commitment({ userName, onComplete }: CommitmentProps) {
 
     setIsDrawing(true);
     const rect = canvas.getBoundingClientRect();
-    const x = "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    
+    // Safe access to touch coordinates with null check
+    const x = "touches" in e && e.touches[0] 
+      ? e.touches[0].clientX - rect.left 
+      : "clientX" in e 
+        ? e.clientX - rect.left 
+        : 0;
+    const y = "touches" in e && e.touches[0] 
+      ? e.touches[0].clientY - rect.top 
+      : "clientY" in e 
+        ? e.clientY - rect.top 
+        : 0;
 
     ctx.beginPath();
     ctx.moveTo(x, y);
@@ -63,8 +73,18 @@ export default function Commitment({ userName, onComplete }: CommitmentProps) {
     if (!ctx) return;
 
     const rect = canvas.getBoundingClientRect();
-    const x = "touches" in e ? e.touches[0].clientX - rect.left : e.clientX - rect.left;
-    const y = "touches" in e ? e.touches[0].clientY - rect.top : e.clientY - rect.top;
+    
+    // Safe access to touch coordinates with null check
+    const x = "touches" in e && e.touches[0] 
+      ? e.touches[0].clientX - rect.left 
+      : "clientX" in e 
+        ? e.clientX - rect.left 
+        : 0;
+    const y = "touches" in e && e.touches[0] 
+      ? e.touches[0].clientY - rect.top 
+      : "clientY" in e 
+        ? e.clientY - rect.top 
+        : 0;
 
     ctx.lineTo(x, y);
     ctx.stroke();

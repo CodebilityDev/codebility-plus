@@ -25,10 +25,15 @@ export default function VideoPlayer({
   const [hasWatched, setHasWatched] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
+  
+  // Use ref to track if we've already saved progress
+  const progressSavedRef = useRef(false);
 
   const saveVideoProgress = async () => {
     const video = videoRef.current;
-    if (!video) return;
+    if (!video || progressSavedRef.current) return;
+
+    progressSavedRef.current = true;
 
     await updateVideoProgress({
       applicantId,
@@ -53,7 +58,7 @@ export default function VideoPlayer({
 
       // Mark as watched if they've seen 98% or more (to unlock Next button)
       // But don't auto-advance - user must click Next manually
-      if (percentWatched >= 98 && !hasWatched) {
+      if (percentWatched >= 98 && !progressSavedRef.current) {
         setHasWatched(true);
         // Save progress in background without triggering navigation
         saveVideoProgress();
@@ -78,7 +83,7 @@ export default function VideoPlayer({
       video.removeEventListener("play", handlePlay);
       video.removeEventListener("pause", handlePause);
     };
-  }, [hasWatched]);
+  }, []); // Empty dependency array - only set up listeners once
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);

@@ -20,9 +20,25 @@ export default function Quiz({ applicantId, onQuizComplete, onBackToVideos }: Qu
 
   const currentQuestion = quizQuestions[currentQuestionIndex];
   const isLastQuestion = currentQuestionIndex === quizQuestions.length - 1;
-  const hasSelectedAnswer = selectedAnswers[currentQuestion.id] !== undefined;
+  const hasSelectedAnswer = currentQuestion ? selectedAnswers[currentQuestion.id] !== undefined : false;
+
+  // Early return if no current question (safety check)
+  if (!currentQuestion && !showResults) {
+    return (
+      <div className="space-y-6 text-center">
+        <p className="text-red-400">Error: No quiz questions available.</p>
+        {onBackToVideos && (
+          <Button onClick={onBackToVideos} variant="outline">
+            ← Back to Videos
+          </Button>
+        )}
+      </div>
+    );
+  }
 
   const handleSelectAnswer = (optionIndex: number) => {
+    if (!currentQuestion) return;
+    
     setSelectedAnswers({
       ...selectedAnswers,
       [currentQuestion.id]: optionIndex,
@@ -131,7 +147,7 @@ export default function Quiz({ applicantId, onQuizComplete, onBackToVideos }: Qu
                 </div>
                 <p className="mb-1 text-sm text-gray-400">
                   Your answer: <span className={isCorrect ? "text-green-400" : "text-red-400"}>
-                    {question.options[userAnswer]}
+                    {userAnswer !== undefined ? question.options[userAnswer] : "Not answered"}
                   </span>
                 </p>
                 {!isCorrect && (
@@ -183,6 +199,9 @@ export default function Quiz({ applicantId, onQuizComplete, onBackToVideos }: Qu
       </div>
     );
   }
+
+  // This check is now safe because of the early return above
+  if (!currentQuestion) return null;
 
   return (
     <div className="space-y-6">
