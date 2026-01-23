@@ -29,7 +29,6 @@ import { TableCell, TableRow } from "@codevs/ui/table";
 
 import { ProjectSelect } from "../shared/ProjectSelect";
 
-// Role interface for type safety
 export interface Role {
   id: number;
   name: string;
@@ -43,11 +42,13 @@ interface EditableRowProps {
 }
 
 /**
- * ENHANCED EditableRow Component
- * IMPROVEMENTS:
- * - Consistent spacing with InHouseTable: px-3 py-2
- * - Removed inconsistent p-2 pb-6 padding
- * - Better visual alignment with read-only rows
+ * ENHANCED EditableRow - Team Lead Feedback Applied
+ * 
+ * CHANGES:
+ * - Matching spacing with InHouseTable
+ * - First 3 columns: px-6 py-3
+ * - Email column: px-5 py-3
+ * - Other columns: px-4 py-3
  */
 export function EditableRow({
   data,
@@ -62,19 +63,14 @@ export function EditableRow({
     setSupabase(supabaseClient);
   }, []);
 
-  // Local edit state - clone incoming data
   const [editForm, setEditForm] = useState<Codev>(data);
-
-  // Local preview of image if user uploads a new one
   const [uploadedImage, setUploadedImage] = useState<string | null>(
     data.image_url || null,
   );
-
   const [positions, setPositions] = useState<Position[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  // Fetch positions on mount
   useEffect(() => {
     if (!supabase) return;
 
@@ -91,7 +87,6 @@ export function EditableRow({
     fetchPositions();
   }, [supabase]);
 
-  // Local change handler - updates editForm state
   const handleLocalChange = (key: keyof Codev, value: any) => {
     setEditForm((prev) => ({
       ...prev,
@@ -99,24 +94,20 @@ export function EditableRow({
     }));
   };
 
-  // Image upload handler
   const handleImageUpload = async (file: File) => {
     try {
       setIsUploading(true);
-      // Preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setUploadedImage(reader.result as string);
       };
       reader.readAsDataURL(file);
 
-      // Upload to Supabase bucket
       const publicUrl = await uploadImage(file, {
         bucket: "codebility",
         folder: "profileImage",
       });
 
-      // Save URL to local form
       handleLocalChange("image_url", publicUrl);
     } catch (error) {
       console.error("Image upload failed:", error);
@@ -126,14 +117,12 @@ export function EditableRow({
     }
   };
 
-  // Save changes - merges projects pivot + codev table updates
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
 
       const { id, projects, ...rest } = editForm;
 
-      // 1) Clear + re-insert pivot if projects changed
       if (projects) {
         const { error: deleteError } = await supabase
           .from("project_members")
@@ -153,7 +142,6 @@ export function EditableRow({
         }
       }
 
-      // 2) Build update object for codev table
       const allowedFields: (keyof Codev)[] = [
         "first_name",
         "last_name",
@@ -181,7 +169,6 @@ export function EditableRow({
         }
       }
 
-      // 3) Update codev table
       if (Object.keys(updateFields).length > 0) {
         const { error } = await supabase
           .from("codev")
@@ -200,7 +187,6 @@ export function EditableRow({
     }
   };
 
-  // Render function for each editable cell
   const renderCell = (key: keyof Codev) => {
     switch (key) {
       case "image_url":
@@ -382,7 +368,6 @@ export function EditableRow({
         );
 
       default:
-        // Text inputs: first_name, last_name, portfolio_website, etc.
         return (
           <Input
             value={String(editForm[key] || "")}
@@ -396,24 +381,27 @@ export function EditableRow({
 
   return (
     <TableRow className="bg-light-200 dark:bg-dark-200 hover:bg-light-300 dark:hover:bg-dark-300">
-      {/* ENHANCED: All cells now use consistent px-3 py-2 spacing */}
-      <TableCell className="px-3 py-2">{renderCell("image_url")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("first_name")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("last_name")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("email_address")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("internal_status")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("role_id")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("display_position")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("projects")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("nda_status")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("portfolio_website")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("date_joined")}</TableCell>
-      <TableCell className="px-3 py-2">{renderCell("availability_status")}</TableCell>
+      {/* ENHANCED: First 3 columns px-6 py-3 */}
+      <TableCell className="px-6 py-3">{renderCell("image_url")}</TableCell>
+      <TableCell className="px-6 py-3">{renderCell("first_name")}</TableCell>
+      <TableCell className="px-6 py-3">{renderCell("last_name")}</TableCell>
+      
+      {/* ENHANCED: Email column px-5 py-3 */}
+      <TableCell className="px-5 py-3">{renderCell("email_address")}</TableCell>
+      
+      {/* ENHANCED: Other columns px-4 py-3 */}
+      <TableCell className="px-4 py-3">{renderCell("internal_status")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("role_id")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("display_position")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("projects")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("nda_status")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("portfolio_website")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("date_joined")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("availability_status")}</TableCell>
 
-      {/* Action buttons - ENHANCED spacing */}
-      <TableCell className="px-3 py-2">
+      {/* Actions - px-4 py-3 */}
+      <TableCell className="px-4 py-3">
         <div className="flex space-x-2">
-          {/* Save button */}
           <Button
             size="sm"
             onClick={handleSave}
@@ -422,7 +410,6 @@ export function EditableRow({
           >
             <Check className="text-black-100 h-4 w-4 dark:text-white" />
           </Button>
-          {/* Cancel button */}
           <Button
             size="sm"
             variant="ghost"
