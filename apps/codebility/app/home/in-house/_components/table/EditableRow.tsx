@@ -29,19 +29,27 @@ import { TableCell, TableRow } from "@codevs/ui/table";
 
 import { ProjectSelect } from "../shared/ProjectSelect";
 
-// If you have a separate "Role" interface:
 export interface Role {
   id: number;
   name: string;
 }
 
 interface EditableRowProps {
-  data: Codev; // The codev row
+  data: Codev;
   onSave: (data: Codev) => void;
   onCancel: () => void;
-  roles: Role[]; // Pre-fetched roles
+  roles: Role[];
 }
 
+/**
+ * ENHANCED EditableRow - Team Lead Feedback Applied
+ * 
+ * CHANGES:
+ * - Matching spacing with InHouseTable
+ * - First 3 columns: px-6 py-3
+ * - Email column: px-5 py-3
+ * - Other columns: px-4 py-3
+ */
 export function EditableRow({
   data,
   onSave,
@@ -55,20 +63,14 @@ export function EditableRow({
     setSupabase(supabaseClient);
   }, []);
 
-  // --- 1) LOCAL EDIT STATE ---
-  // We'll clone the incoming "data" into our own local "editForm"
   const [editForm, setEditForm] = useState<Codev>(data);
-
-  // For local preview of image if user uploads a new one
   const [uploadedImage, setUploadedImage] = useState<string | null>(
     data.image_url || null,
   );
-
   const [positions, setPositions] = useState<Position[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
 
-  // --- 2) FETCH POSITIONS (once) ---
   useEffect(() => {
     if (!supabase) return;
 
@@ -85,8 +87,6 @@ export function EditableRow({
     fetchPositions();
   }, [supabase]);
 
-  // --- 3) LOCAL CHANGE HANDLER ---
-  // This simply updates `editForm` in local state, no server call
   const handleLocalChange = (key: keyof Codev, value: any) => {
     setEditForm((prev) => ({
       ...prev,
@@ -94,24 +94,20 @@ export function EditableRow({
     }));
   };
 
-  // --- 4) IMAGE UPLOAD (local + supabase storage) ---
   const handleImageUpload = async (file: File) => {
     try {
       setIsUploading(true);
-      // Preview
       const reader = new FileReader();
       reader.onloadend = () => {
         setUploadedImage(reader.result as string);
       };
       reader.readAsDataURL(file);
 
-      // Upload to your Supabase bucket
-      const  publicUrl = await uploadImage(file, {
+      const publicUrl = await uploadImage(file, {
         bucket: "codebility",
         folder: "profileImage",
       });
 
-      // Save the final image URL into local form
       handleLocalChange("image_url", publicUrl);
     } catch (error) {
       console.error("Image upload failed:", error);
@@ -121,16 +117,12 @@ export function EditableRow({
     }
   };
 
-  // --- 5) SAVE CHANGES ON CLICK OF CHECK ICON ---
-  // Merges "projects" pivot changes + codev table updates
   const handleSave = async () => {
     try {
       setIsSubmitting(true);
 
-      // We'll remove `projects` from the rest
       const { id, projects, ...rest } = editForm;
 
-      // 1) Clear + re-insert pivot if `projects` changed
       if (projects) {
         const { error: deleteError } = await supabase
           .from("project_members")
@@ -150,8 +142,6 @@ export function EditableRow({
         }
       }
 
-      // 2) Build object for codev table
-      //    We'll store allowed columns in `updateFields`
       const allowedFields: (keyof Codev)[] = [
         "first_name",
         "last_name",
@@ -170,20 +160,15 @@ export function EditableRow({
         "date_joined",
       ];
 
-      // This can be a loose type so TS doesn't complain
       const updateFields: Record<string, unknown> = {};
-
-      // Cast rest so TypeScript doesn't complain about indexing
       const restTyped = rest as Partial<Codev>;
 
       for (const key of allowedFields) {
-        // If it exists in `restTyped`, we add it to `updateFields`
         if (Object.prototype.hasOwnProperty.call(restTyped, key)) {
           updateFields[key] = restTyped[key];
         }
       }
 
-      // 3) Update codev table if there's anything to update
       if (Object.keys(updateFields).length > 0) {
         const { error } = await supabase
           .from("codev")
@@ -193,7 +178,7 @@ export function EditableRow({
       }
 
       toast.success("Member updated successfully");
-      onSave(editForm); // pass updated data back up
+      onSave(editForm);
     } catch (error) {
       console.error("Error updating member:", error);
       toast.error("Failed to update member");
@@ -202,7 +187,6 @@ export function EditableRow({
     }
   };
 
-  // --- 6) RENDER FUNCTION FOR EACH CELL ---
   const renderCell = (key: keyof Codev) => {
     switch (key) {
       case "image_url":
@@ -384,7 +368,6 @@ export function EditableRow({
         );
 
       default:
-        // For example: first_name, last_name, portfolio_website, etc.
         return (
           <Input
             value={String(editForm[key] || "")}
@@ -398,24 +381,27 @@ export function EditableRow({
 
   return (
     <TableRow className="bg-light-200 dark:bg-dark-200 hover:bg-light-300 dark:hover:bg-dark-300">
-      <TableCell className="p-2">{renderCell("image_url")}</TableCell>
-      <TableCell className="p-2 pb-6">{renderCell("first_name")}</TableCell>
-      <TableCell className="p-2 pb-6">{renderCell("last_name")}</TableCell>
-      <TableCell className="p-2 pb-6">{renderCell("email_address")}</TableCell>
-      <TableCell className="p-2">{renderCell("internal_status")}</TableCell>
-      <TableCell className="p-2">{renderCell("role_id")}</TableCell>
-      <TableCell className="p-2">{renderCell("display_position")}</TableCell>
-      <TableCell className="p-2">{renderCell("projects")}</TableCell>
-      <TableCell className="p-2">{renderCell("nda_status")}</TableCell>
-      <TableCell className="p-2 pb-6">
-        {renderCell("portfolio_website")}
-      </TableCell>
-      <TableCell className="p-2 pb-6">{renderCell("date_joined")}</TableCell>
-      <TableCell className="p-2">{renderCell("availability_status")}</TableCell>
+      {/* ENHANCED: First 3 columns px-6 py-3 */}
+      <TableCell className="px-6 py-3">{renderCell("image_url")}</TableCell>
+      <TableCell className="px-6 py-3">{renderCell("first_name")}</TableCell>
+      <TableCell className="px-6 py-3">{renderCell("last_name")}</TableCell>
+      
+      {/* ENHANCED: Email column px-5 py-3 */}
+      <TableCell className="px-5 py-3">{renderCell("email_address")}</TableCell>
+      
+      {/* ENHANCED: Other columns px-4 py-3 */}
+      <TableCell className="px-4 py-3">{renderCell("internal_status")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("role_id")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("display_position")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("projects")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("nda_status")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("portfolio_website")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("date_joined")}</TableCell>
+      <TableCell className="px-4 py-3">{renderCell("availability_status")}</TableCell>
 
-      <TableCell className="p-2">
+      {/* Actions - px-4 py-3 */}
+      <TableCell className="px-4 py-3">
         <div className="flex space-x-2">
-          {/* Save button -> calls handleSave (single server update) */}
           <Button
             size="sm"
             onClick={handleSave}
@@ -424,7 +410,6 @@ export function EditableRow({
           >
             <Check className="text-black-100 h-4 w-4 dark:text-white" />
           </Button>
-          {/* Cancel button -> reverts changes (via parent) */}
           <Button
             size="sm"
             variant="ghost"
