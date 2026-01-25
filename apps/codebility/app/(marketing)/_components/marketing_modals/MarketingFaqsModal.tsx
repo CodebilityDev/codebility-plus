@@ -17,7 +17,7 @@ function FaqsModal() {
           
           <div className="flex max-h-[600px] flex-col gap-2 overflow-hidden overflow-y-scroll py-2">
          
-            <h1 className="mb-8 text-center text-4xl font-semibold ">
+            <h1 className="mb-6 text-center text-4xl font-semibold ">
               Frequently Asked Questions
             </h1>
             <Accordion title="Q1 What makes Codebility different from other development companies?">
