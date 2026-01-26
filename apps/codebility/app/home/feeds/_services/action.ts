@@ -601,3 +601,25 @@ export const hasReachedDailyPostLimit = async (author_id: string, limit = 2) => 
     throw error;
   }
 };
+
+export const hasNotPostedYet = async (user_id: string) => {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { count, error } = await supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true })
+      .eq("author_id", user_id);
+
+    if (error) {
+      console.error("Error checking if user has posted:", error);
+      throw error;
+    }
+
+    // Return true if user has zero posts
+    return (count ?? 0) === 0;
+  } catch (error) {
+    console.error("Error in hasNotPostedYet:", error);
+    throw error;
+  }
+};

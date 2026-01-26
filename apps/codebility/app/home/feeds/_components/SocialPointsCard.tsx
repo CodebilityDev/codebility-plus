@@ -33,7 +33,7 @@ export default function SocialPointsCard() {
   }, [user, posts]);
 
   return (
-    <div className="dark:bg-white/3 relative mt-4 w-full rounded-xl border border-white/10 bg-gray-800 p-4 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/10 hover:shadow-lg dark:border-white/5 xl:fixed xl:right-6 xl:top-20 xl:z-50 xl:mt-0 xl:w-64">
+    <div className="dark:bg-white/3 relative mt-4 mb-4 w-full rounded-xl border border-white/10 bg-gray-800 p-4 text-white shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:bg-white/10 hover:shadow-lg dark:border-white/5 xl:fixed xl:right-6 xl:top-20 xl:z-50 xl:mt-0 xl:w-64">
       <div className="relative">
         <div className="mb-3 flex items-center justify-between">
           <div className="flex items-center gap-2">

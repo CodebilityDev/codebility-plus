@@ -9,8 +9,10 @@ import Feed from "./_components/Feed";
 import SocialPointsCard from "./_components/SocialPointsCard";
 import SortMenu from "./_components/SortMenu";
 import { SEARCH_DEBOUNCE_MS } from "./_constants";
-import { getUserRole, hasReachedDailyPostLimit } from "./_services/action";
+import { getUserRole, hasNotPostedYet, hasReachedDailyPostLimit } from "./_services/action";
 import toast from "react-hot-toast";
+import FirstPostPrompt from "./_components/FirstPostPrompt";
+import { PlusCircle } from "lucide-react";
 
 type SortField = "title" | "date" | "upvotes";
 type SortOrder = "asc" | "desc";
@@ -22,6 +24,7 @@ export default function FeedsPage() {
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortOrder, setSortOrder] = useState<SortOrder>("desc");
+  const [userHasNotPostedYet, setUserHasNotPostedYet] = useState(false);
   const { user } = useUserStore();
 
   useEffect(() => {
@@ -31,6 +34,21 @@ export default function FeedsPage() {
       setIsAdmin(role === "Admin");
     };
     if (user) fetchRole();
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) return;
+
+    const checkIfUserHasPosted = async () => {
+      try {
+        const result = await hasNotPostedYet(user.id);
+        setUserHasNotPostedYet(result);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+  checkIfUserHasPosted();
   }, [user]);
 
   useEffect(() => {
@@ -72,9 +90,21 @@ export default function FeedsPage() {
 
         <SocialPointsCard />
 
-        <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
-          Create Post
-        </Button>
+        {userHasNotPostedYet && (
+          <div className="mb-4">
+          <FirstPostPrompt onCreatePost={openModal}/> 
+        </div>
+        )}
+
+        {!userHasNotPostedYet && (
+          <Button
+            onClick={openModal}
+            className="gap-2 w-auto mb-4"
+          >
+            <PlusCircle className="h-5 w-5" />
+            Create Post
+          </Button>
+        )}
 
         {/* Search bar + sort button row */}
         <div className="relative mb-6 flex items-center gap-4">
