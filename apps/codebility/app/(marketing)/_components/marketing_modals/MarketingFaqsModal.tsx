@@ -3,8 +3,7 @@
 import React, { ReactNode, useState } from "react";
 import { useModal } from "@/hooks/use-modal";
 
-import { Dialog, DialogContent as DialogContentPrimitive, DialogTitle } from "@codevs/ui";
-import { DialogContent } from "@radix-ui/react-dialog";
+import { Dialog, DialogContent, DialogTitle } from "@codevs/ui";
 
 function FaqsModal() {
   const { isOpen, onClose, type } = useModal();
@@ -16,49 +15,49 @@ function FaqsModal() {
         <div className="flex flex-col justify-between gap-4 text-white">
           <DialogTitle className="sr-only">Frequently Asked Questions</DialogTitle>
           
-          <div className="flex max-h-[500px] flex-col gap-2 overflow-hidden overflow-y-scroll ">
+          <div className="flex max-h-[600px] flex-col gap-2 overflow-hidden overflow-y-scroll py-2">
          
-          <h1 className="mb-8 text-center text-4xl font-semibold ">
-            Frequently Asked Questions
-          </h1>
-          <Accordion title="Q1 What makes Codebility different from other development companies?">
-            Lorem ipsum dolor sit amet consectetur adipiscing elit. Phasellus eu
-            tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
-            est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
-            amet, luctus vitae lorem.
-          </Accordion>
-          <Accordion title="Q2 What technologies do your developers specialize in?">
-            <h3>
-              Our developers specialize in a wide range of technologies
-              including but not limited to:
-            </h3>
-            <ul className="ml-4 list-disc marker:text-[#9747FF]">
-              <li>Front-end: HTML, CSS, JavaScript, React, Angular, Vue.js</li>
-              <li>Back-end: Node.js, Python, Ruby on Rails, PHP, Java</li>
-              <li>Mobile: Swift, Kotlin, Flutter, React Native</li>
-              <li>
-                AI: Machine Learning, Natural Language Processing, Data Analysis
-              </li>
-            </ul>
-          </Accordion>
-          <Accordion title="Q3 How do you ensure the quality of your projects?">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
-            eu tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
-            est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
-            amet, luctus vitae lorem.
-          </Accordion>
-          <Accordion title="Q4 What kind of support can I expect during and after the project?">
-            Lorem ipsum dolor sit amet consectetur adipiscing elit. Phasellus eu
-            tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
-            est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
-            amet, luctus vitae lorem.
-          </Accordion>
-          <Accordion title="Q5 What benefits do members of the Codebility Community receive?">
-            Lorem ipsum dolor sit amet consectetur adipiscing elit. Phasellus eu
-            tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
-            est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
-            amet, luctus vitae lorem.
-          </Accordion>
+            <h1 className="mb-6 text-center text-4xl font-semibold ">
+              Frequently Asked Questions
+            </h1>
+            <Accordion title="Q1 What makes Codebility different from other development companies?">
+              Lorem ipsum dolor sit amet consectetur adipiscing elit. Phasellus eu
+              tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
+              est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
+              amet, luctus vitae lorem.
+            </Accordion>
+            <Accordion title="Q2 What technologies do your developers specialize in?">
+              <h3>
+                Our developers specialize in a wide range of technologies
+                including but not limited to:
+              </h3>
+              <ul className="ml-4 list-disc marker:text-[#9747FF]">
+                <li>Front-end: HTML, CSS, JavaScript, React, Angular, Vue.js</li>
+                <li>Back-end: Node.js, Python, Ruby on Rails, PHP, Java</li>
+                <li>Mobile: Swift, Kotlin, Flutter, React Native</li>
+                <li>
+                  AI: Machine Learning, Natural Language Processing, Data Analysis
+                </li>
+              </ul>
+            </Accordion>
+            <Accordion title="Q3 How do you ensure the quality of your projects?">
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Phasellus
+              eu tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
+              est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
+              amet, luctus vitae lorem.
+            </Accordion>
+            <Accordion title="Q4 What kind of support can I expect during and after the project?">
+              Lorem ipsum dolor sit amet consectetur adipiscing elit. Phasellus eu
+              tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
+              est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
+              amet, luctus vitae lorem.
+            </Accordion>
+            <Accordion title="Q5 What benefits do members of the Codebility Community receive?">
+              Lorem ipsum dolor sit amet consectetur adipiscing elit. Phasellus eu
+              tempus enim. Etiam viverra a ipsum non feugiat. Sed lobortis eget
+              est vitae porttitor. Nullam magna lacus, bibendum a tristique sit
+              amet, luctus vitae lorem.
+            </Accordion>
           </div>
 
 
