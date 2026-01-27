@@ -545,8 +545,9 @@ const AddMembersModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] p-0 flex flex-col bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20">
-        <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1 border-b border-white/30 dark:border-white/20 bg-white/10 backdrop-blur-sm dark:bg-white/5">
+      <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] p-0 flex flex-col dark:bg-slate-950
+        border-2 border-slate-300 dark:border-blue-900/60 ">
+        <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1 ">
           <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
             Add Members
           </DialogTitle>
@@ -679,7 +680,7 @@ const AddMembersModal = ({
           </div>
         </div>
 
-        <div className="flex-shrink-0 flex flex-col sm:flex-row gap-3 p-3 sm:p-6 border-t border-gray-700 bg-gray-800">
+        <div className="flex-shrink-0 flex flex-col sm:flex-row gap-3 p-3 sm:p-6 ">
           <Button
             variant="outline"
             onClick={onClose}
