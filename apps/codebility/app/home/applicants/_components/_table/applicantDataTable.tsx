@@ -166,21 +166,22 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
               applicants={table
                 .getFilteredSelectedRowModel()
                 .rows.map((row) => row.original)}
+              onActionComplete={() => setRowSelection({})}
             />
           </div>
         </div>
       )}
 
       {/* Table for larger screens */}
-      <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
-        <Table className="hidden xl:table">
+      <div className="overflow-x-auto rounded-lg border border-gray-200 bg-white shadow-sm dark:border-gray-700 dark:bg-gray-900">
+        <Table className="hidden xl:table w-full table-fixed">
           {/* Table header */}
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow
 
                 key={headerGroup.id}
-                className="border-b border-gray-200 bg-gray-50 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-800"
+                className="border-b-2 border-gray-200 bg-gray-50 hover:bg-gray-50 dark:border-gray-700 dark:bg-gray-800 dark:hover:bg-gray-800"
               >
                 {headerGroup.headers.map((header) => {
                   return (
@@ -210,17 +211,17 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                   key={`${row.id}-${row.index}`}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
-                    "border-b border-gray-100 transition-colors hover:bg-gray-50/50 dark:border-gray-800 dark:hover:bg-gray-800/50",
-                    row.getIsSelected() && "bg-blue-50 dark:bg-blue-900/20",
+                    "border-b border-gray-200 transition-colors hover:bg-gray-50/50 dark:border-gray-700 dark:hover:bg-gray-800/50",
+                    row.getIsSelected() && "bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800",
                     row.original.application_status === "testing" &&
                     row.original.applicant?.fork_url &&
-                    "bg-green-50 hover:bg-green-100/50 dark:bg-green-900/20 dark:hover:bg-green-900/30",
+                    "bg-green-50 hover:bg-green-100/50 dark:bg-green-900/20 dark:hover:bg-green-900/30 border-green-200 dark:border-green-800",
                     row.original.application_status === "testing" &&
                     toBeFailed(
                       row.original.applicant?.test_taken,
                       row.original.applicant?.fork_url,
                     ) &&
-                    "bg-red-50 hover:bg-red-100/50 dark:bg-red-900/20 dark:hover:bg-red-900/30",
+                    "bg-red-50 hover:bg-red-100/50 dark:bg-red-900/20 dark:hover:bg-red-900/30 border-red-200 dark:border-red-800",
 
                   )}
                 >
@@ -228,7 +229,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
                     <TableCell
                       key={cell.id}
                       className={cn(
-                        "px-0 py-3",
+                        "px-0 py-2.5",
                         (cell.column.columnDef.meta as any)?.className,
                       )}
                     >

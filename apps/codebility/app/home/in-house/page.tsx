@@ -21,8 +21,8 @@ export default async function InHousePage() {
   // Check for errors or missing data
   if (error || !data) {
     return (
-      <div className="mx-auto max-w-screen-xl">
-        <div className="flex flex-col gap-4 pt-4">
+      <div className="mx-auto max-w-screen-2xl">
+        <div className="flex flex-col gap-4 px-2 pt-4 sm:px-4 md:px-6 lg:px-8">
           <div className="flex min-h-[400px] flex-col items-center justify-center p-8 text-center">
             <div className="mb-4 text-4xl">⚠️</div>
             <h3 className="mb-2 text-lg font-medium text-gray-900 dark:text-white">Error fetching in-house data</h3>
@@ -35,8 +35,8 @@ export default async function InHousePage() {
 
   // Pass the fully prepared data to the view
   return (
-    <div className="mx-auto max-w-screen-xl">
-      <div className="flex flex-col gap-4 pt-4">
+    <div className="mx-auto max-w-screen-2xl">
+      <div className="flex flex-col gap-4 px-2 pt-4 sm:px-4 md:px-6 lg:px-8">
         <InHouseView initialData={data} />
       </div>
     </div>

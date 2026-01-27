@@ -102,26 +102,26 @@ const SendNdaButton = ({ codev, onSendNdaEmail }: NdaEmailDialogProps) => {
     <Button
       variant="outline"
       size="sm"
-      className="ml-1 text-xs text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
+      className="h-6 px-2 text-[10px] text-customBlue-500 hover:text-customBlue-600 dark:text-customBlue-200 dark:hover:text-customBlue-300"
       onClick={handleSendEmail}
       disabled={isSending}
     >
-      <Mail className="mr-1 h-3 w-3" />
-      {isSending ? "Sending..." : "Send NDA"}
+      <Mail className="mr-0.5 h-2.5 w-2.5" />
+      {isSending ? "Sending..." : "Send"}
     </Button>
   );
 };
 
 /**
- * ENHANCED InHouseTable - Team Lead Feedback Applied
- * 
+ * COMPACT InHouseTable - Minimized for No Horizontal Scroll
+ *
  * CHANGES:
- * 1. First 3 columns spacing: px-2 → px-6 (+300%)
- * 2. Email column spacing: px-2 → px-5 (+150%)
- * 3. Other columns spacing: px-2 → px-4 (+100%)
- * 4. Button text: "Sig" → "Signature" (full word)
- * 5. Horizontal scroll enabled: overflow-x-auto
- * 6. Headers: font-semibold → font-bold
+ * 1. Reduced padding: px-6 → px-2, px-5 → px-2, px-4 → px-2
+ * 2. Reduced font sizes: text-base → text-xs, text-sm → text-xs
+ * 3. Smaller avatars: h-10 w-10 → h-8 w-8
+ * 4. Compact buttons and spacing
+ * 5. Fixed table layout for consistent width
+ * 6. Added row borders for separation
  */
 export function InHouseTable({
   data,
@@ -359,60 +359,119 @@ export function InHouseTable({
         onSort={onSort}
       />
 
-      {/* ENHANCED: Added overflow-x-auto for horizontal scroll */}
-      <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 hidden overflow-x-auto rounded-lg border xl:block">
-        <Table>
+      {/* COMPACT: Using table-auto with specific column widths to prevent overflow */}
+      <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 hidden rounded-lg border xl:block">
+        <Table className="w-full">
           <TableHeader>
-            <TableRow className="border-light-700 dark:border-dark-200 bg-light-200 dark:bg-dark-300 border-b">
+            <TableRow className="border-light-700 dark:border-dark-200 bg-light-200 dark:bg-dark-300 border-b-2">
               {columns.map((column) =>
-                column.key === "image_url" ||
-                column.key === "first_name" ||
-                column.key === "last_name" ? (
-                  /* ENHANCED: First 3 columns px-2 → px-6, font-semibold → font-bold */
+                column.key === "image_url" ? (
+                  /* COMPACT: Avatar column - small fixed width */
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 px-6 py-3 text-sm font-bold text-black"
+                    className="dark:text-light-900 w-12 px-2 py-2 text-xs font-bold text-black"
+                  >
+                    {column.label}
+                  </TableHead>
+                ) : column.key === "first_name" || column.key === "last_name" ? (
+                  /* COMPACT: Name columns - medium width */
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 w-24 px-2 py-2 text-xs font-bold text-black"
                   >
                     {column.label}
                   </TableHead>
                 ) : column.key === "email_address" ? (
-                  /* ENHANCED: Email column px-2 → px-5 */
+                  /* COMPACT: Email column - larger width */
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 px-5 py-3 text-sm font-bold text-black"
+                    className="dark:text-light-900 w-40 px-2 py-2 text-xs font-bold text-black"
                   >
                     {column.label}
                   </TableHead>
-                ) : column.key === "display_position" ||
-                  column.key === "date_joined" ? (
-                  /* ENHANCED: Sortable columns px-2 → px-4 */
+                ) : column.key === "internal_status" ? (
+                  /* COMPACT: Status badge column */
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 hidden cursor-pointer px-4 py-3 text-sm font-bold text-black hover:bg-light-700 dark:hover:bg-dark-400 2xl:table-cell"
-                    onClick={() =>
-                      onSort?.(column.key as "date_joined" | "display_position")
-                    }
+                    className="dark:text-light-900 hidden w-24 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
                   >
                     {column.label}
-                    <SortIndicator
-                      columnKey={column.key as "date_joined" | "display_position"}
-                    />
+                  </TableHead>
+                ) : column.key === "role_id" ? (
+                  /* COMPACT: Role column */
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 hidden w-20 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
+                  >
+                    {column.label}
+                  </TableHead>
+                ) : column.key === "display_position" ? (
+                  /* COMPACT: Position - sortable */
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 hidden w-32 cursor-pointer px-2 py-2 text-xs font-bold text-black hover:bg-light-700 dark:hover:bg-dark-400 2xl:table-cell"
+                    onClick={() => onSort?.("display_position")}
+                  >
+                    {column.label}
+                    <SortIndicator columnKey="display_position" />
+                  </TableHead>
+                ) : column.key === "projects" ? (
+                  /* COMPACT: Projects column */
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 hidden w-32 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
+                  >
+                    {column.label}
+                  </TableHead>
+                ) : column.key === "nda_status" ? (
+                  /* COMPACT: NDA Status - needs more width for buttons */
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 hidden w-36 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
+                  >
+                    {column.label}
+                  </TableHead>
+                ) : column.key === "portfolio_website" ? (
+                  /* COMPACT: Portfolio column - small */
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 hidden w-16 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
+                  >
+                    {column.label}
+                  </TableHead>
+                ) : column.key === "date_joined" ? (
+                  /* COMPACT: Date - sortable */
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 hidden w-24 cursor-pointer px-2 py-2 text-xs font-bold text-black hover:bg-light-700 dark:hover:bg-dark-400 2xl:table-cell"
+                    onClick={() => onSort?.("date_joined")}
+                  >
+                    {column.label}
+                    <SortIndicator columnKey="date_joined" />
+                  </TableHead>
+                ) : column.key === "availability_status" ? (
+                  /* COMPACT: Availability toggle */
+                  <TableHead
+                    key={column.key}
+                    className="dark:text-light-900 hidden w-20 px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
+                  >
+                    Avail.
                   </TableHead>
                 ) : (
-                  /* ENHANCED: Other columns px-2 → px-4 */
+                  /* COMPACT: Other columns */
                   <TableHead
                     key={column.key}
-                    className="dark:text-light-900 hidden px-4 py-3 text-sm font-bold text-black 2xl:table-cell"
+                    className="dark:text-light-900 hidden px-2 py-2 text-xs font-bold text-black 2xl:table-cell"
                   >
                     {column.label}
                   </TableHead>
                 ),
               )}
 
-              <TableHead className="dark:text-light-900 px-4 py-3 text-sm font-bold text-black 2xl:hidden">
+              <TableHead className="dark:text-light-900 px-2 py-2 text-xs font-bold text-black 2xl:hidden">
                 Info
               </TableHead>
-              <TableHead className="dark:text-light-900 px-4 py-3 text-sm font-bold text-black">
+              <TableHead className="dark:text-light-900 w-16 px-2 py-2 text-xs font-bold text-black">
                 Actions
               </TableHead>
             </TableRow>
@@ -434,39 +493,39 @@ export function InHouseTable({
               ) : (
                 <TableRow
                   key={item.id}
-                  className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b"
+                  className="border-light-700 dark:border-dark-200 hover:bg-light-800 dark:hover:bg-dark-300 odd:dark:bg-dark-200 odd:bg-grey-100/10 border-b border-gray-200 dark:border-gray-700"
                 >
-                  {/* ENHANCED: Avatar px-2 → px-6 */}
-                  <TableCell className="dark:text-light-900 px-6 py-3 text-base text-black">
-                    <div className="h-10 w-10 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
+                  {/* COMPACT: Avatar px-6 → px-2, h-10 w-10 → h-8 w-8 */}
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
+                    <div className="h-8 w-8 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
                       <Image
                         src={item.image_url || defaultImage}
                         alt={`${item.first_name} avatar`}
-                        width={40}
-                        height={40}
+                        width={32}
+                        height={32}
                         unoptimized={true}
                         className="h-full w-full object-cover"
                       />
                     </div>
                   </TableCell>
 
-                  {/* ENHANCED: First Name px-2 → px-6 */}
-                  <TableCell className="dark:text-light-900 px-6 py-3 text-base text-black">
+                  {/* COMPACT: First Name px-6 → px-2, text-base → text-xs */}
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
                     {capitalize(item.first_name)}
                   </TableCell>
 
-                  {/* ENHANCED: Last Name px-2 → px-6 */}
-                  <TableCell className="dark:text-light-900 px-6 py-3 text-base text-black">
+                  {/* COMPACT: Last Name px-6 → px-2, text-base → text-xs */}
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
                     {capitalize(item.last_name)}
                   </TableCell>
 
-                  {/* ENHANCED: Email px-2 → px-5 */}
-                  <TableCell className="dark:text-light-900 px-5 py-3 text-base text-black">
+                  {/* COMPACT: Email px-5 → px-2, text-base → text-xs */}
+                  <TableCell className="dark:text-light-900 px-2 py-2 text-xs text-black">
                     {item.email_address}
                   </TableCell>
 
-                  {/* Mobile Info Dropdown - ENHANCED: px-2 → px-4 */}
-                  <TableCell className="dark:text-light-900 flex items-start justify-start px-4 py-3 text-base text-black 2xl:hidden">
+                  {/* COMPACT: Mobile Info Dropdown px-4 → px-2, py-3 → py-2 */}
+                  <TableCell className="dark:text-light-900 flex items-start justify-start px-2 py-2 text-xs text-black 2xl:hidden">
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
                         <span className="cursor-pointer hover:text-gray-600">
@@ -619,29 +678,29 @@ export function InHouseTable({
                     </DropdownMenu>
                   </TableCell>
 
-                  {/* ENHANCED: All desktop columns px-2 → px-4 */}
-                  <TableCell className="hidden px-4 py-3 2xl:table-cell">
+                  {/* COMPACT: All desktop columns px-4 → px-2, py-3 → py-2, text-base → text-xs */}
+                  <TableCell className="hidden px-2 py-2 2xl:table-cell">
                     <StatusBadge
                       status={item.internal_status as InternalStatus}
                     />
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 hidden px-4 py-3 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
                     {item.role_id
                       ? roles.find((role) => role.id === item.role_id)?.name ||
                         "-"
                       : "-"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 hidden px-4 py-3 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
                     {typeof item.display_position === "string"
                       ? capitalize(item.display_position)
                       : "-"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 hidden px-4 py-3 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
                     {item.projects?.length ? (
-                      <div className="space-y-1">
+                      <div className="space-y-0.5">
                         {item.projects.map((project) => (
                           <div key={project.id}>{project.name}</div>
                         ))}
@@ -651,43 +710,42 @@ export function InHouseTable({
                     )}
                   </TableCell>
 
-                  {/* ENHANCED: NDA Status column with "Signature" full word */}
-                  <TableCell className="dark:text-light-900 hidden px-4 py-3 text-base text-black 2xl:table-cell">
-                    <div className="flex items-center gap-2">
+                  {/* COMPACT: NDA Status column - compact buttons */}
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
+                    <div className="flex items-center gap-1">
                       <span className={`${getNdaStatusColor(item.nda_status)}`}>
                         {item.nda_status ? "Yes" : "No"}
                       </span>
 
                       {item.nda_status ? (
-                        <div className="flex gap-2">
+                        <div className="flex gap-1">
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-xs text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
+                            className="h-6 px-2 text-[10px] text-green-500 hover:text-green-600 dark:text-green-200 dark:hover:text-green-300"
                             onClick={() => handleDownloadNda(item.id)}
                           >
-                            <Download className="mr-1 h-3 w-3" />
+                            <Download className="mr-0.5 h-2.5 w-2.5" />
                             PDF
                           </Button>
-                          {/* CHANGED: "Sig" → "Signature" */}
                           <Button
                             variant="outline"
                             size="sm"
-                            className="text-xs text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
+                            className="h-6 px-2 text-[10px] text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
                             onClick={() => handleDownloadSignature(item.id)}
                           >
-                            <Download className="mr-1 h-3 w-3" />
-                            Signature
+                            <Download className="mr-0.5 h-2.5 w-2.5" />
+                            Sig
                           </Button>
                         </div>
                       ) : item.nda_request_sent ? (
                         <Button
                           variant="outline"
                           size="sm"
-                          className="ml-2 text-xs text-yellow-500 dark:text-yellow-200"
+                          className="h-6 px-2 text-[10px] text-yellow-500 dark:text-yellow-200"
                           disabled
                         >
-                          <span className="mr-1">⏳</span>
+                          <span className="mr-0.5">⏳</span>
                           Pending
                         </Button>
                       ) : (
@@ -699,7 +757,7 @@ export function InHouseTable({
                     </div>
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 hidden px-4 py-3 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
                     {item.portfolio_website ? (
                       <a
                         href={item.portfolio_website}
@@ -707,21 +765,21 @@ export function InHouseTable({
                         rel="noopener noreferrer"
                         className="inline-flex items-center text-blue-500 hover:text-blue-600 dark:text-blue-200 dark:hover:text-blue-300"
                       >
-                        <Link2 className="mr-1 h-4 w-4" />
-                        Portfolio
+                        <Link2 className="mr-0.5 h-3 w-3" />
+                        Link
                       </a>
                     ) : (
                       "-"
                     )}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 hidden px-4 py-3 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
                     {item.date_joined
-                      ? new Date(item.date_joined).toLocaleDateString()
+                      ? new Date(item.date_joined).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: '2-digit' })
                       : "-"}
                   </TableCell>
 
-                  <TableCell className="dark:text-light-900 hidden px-4 py-3 text-base text-black 2xl:table-cell">
+                  <TableCell className="dark:text-light-900 hidden px-2 py-2 text-xs text-black 2xl:table-cell">
                     <SwitchStatusButton
                       disabled={false}
                       handleSwitch={() => {}}
@@ -729,7 +787,7 @@ export function InHouseTable({
                     />
                   </TableCell>
 
-                  <TableCell className="px-4 py-3">
+                  <TableCell className="px-2 py-2">
                     <TableActions
                       item={item}
                       onEdit={() => setEditingId(item.id)}

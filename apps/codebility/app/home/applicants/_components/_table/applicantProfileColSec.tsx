@@ -41,22 +41,22 @@ export default function ApplicantProfileColSec({
       <div className="hidden xl:block">
         <HoverCard>
           <HoverCardTrigger asChild>
-            <div className="flex items-center gap-3 px-3 py-2">
-              <Avatar className="h-10 w-10 ring-2 ring-gray-100 dark:ring-gray-800">
+            <div className="flex items-center gap-2 px-2 py-2">
+              <Avatar className="h-8 w-8 ring-2 ring-gray-100 dark:ring-gray-800">
                 {applicant.image_url ? (
                   <AvatarImage src={applicant.image_url} />
                 ) : (
-                  <DefaultAvatar size={40} />
+                  <DefaultAvatar size={32} />
                 )}
               </Avatar>
               <div className="flex min-w-0 flex-col">
-                <p className="cursor-pointer truncate text-sm font-semibold text-gray-900 hover:underline dark:text-gray-100">
+                <p className="cursor-pointer truncate text-xs font-semibold text-gray-900 hover:underline dark:text-gray-100">
                   {applicant.first_name.charAt(0).toUpperCase() +
                     applicant.first_name.slice(1)}{" "}
                   {applicant.last_name.charAt(0).toUpperCase() +
                     applicant.last_name.slice(1)}
                 </p>
-                <p className="truncate text-xs text-gray-500 dark:text-gray-400">
+                <p className="truncate text-[10px] text-gray-500 dark:text-gray-400">
                   {applicant.email_address}
                 </p>
               </div>

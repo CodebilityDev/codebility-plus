@@ -42,8 +42,10 @@ import { NewApplicantType } from "../../_service/types";
 
 export default function ApplicantRowActionButton({
   applicants,
+  onActionComplete,
 }: {
   applicants: NewApplicantType[];
+  onActionComplete?: () => void;
 }) {
   const { toast } = useToast();
   const router = useRouter();
@@ -76,6 +78,7 @@ export default function ApplicantRowActionButton({
         title: "Applicants moved to applying",
         description: "All selected applicants have been moved to applying.",
       });
+      onActionComplete?.();
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -99,6 +102,7 @@ export default function ApplicantRowActionButton({
         description: "All selected applicants have been moved to testing.",
       });
       setOpen(false);
+      onActionComplete?.();
       router.refresh();
     } catch (error) {
       toast({
@@ -122,6 +126,7 @@ export default function ApplicantRowActionButton({
         title: "Applicants moved to onboarding",
         description: "All selected applicants have been moved to onboarding.",
       });
+      onActionComplete?.();
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -151,6 +156,7 @@ export default function ApplicantRowActionButton({
         title: "Applicants denied",
         description: "All selected applicants have been denied.",
       });
+      onActionComplete?.();
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -175,6 +181,7 @@ export default function ApplicantRowActionButton({
         title: "Applicants passed",
         description: "All selected applicants have passed the test.",
       });
+      onActionComplete?.();
       router.refresh();
     } catch (error) {
       console.error(error);
@@ -194,9 +201,19 @@ export default function ApplicantRowActionButton({
         applicants.map((applicant) => applicant.id),
       );
       setOpen(false);
+      toast({
+        title: "Applicants accepted",
+        description: "All selected applicants have been accepted.",
+      });
+      onActionComplete?.();
       router.refresh();
     } catch (error) {
       console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to accept applicants.",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   };
@@ -206,9 +223,19 @@ export default function ApplicantRowActionButton({
     try {
       await multipleDeleteApplicantAction(applicants);
       setOpen(false);
+      toast({
+        title: "Applicants deleted",
+        description: "All selected applicants have been deleted.",
+      });
+      onActionComplete?.();
       router.refresh();
     } catch (error) {
       console.error(error);
+      toast({
+        title: "Error",
+        description: "Failed to delete applicants.",
+        variant: "destructive",
+      });
     }
     setLoading(false);
   };
@@ -230,6 +257,8 @@ export default function ApplicantRowActionButton({
         description:
           "All selected applicants have been reminded to take the test.",
       });
+      onActionComplete?.();
+      router.refresh();
     } catch (error) {
       console.error("Error sending reminder emails:", error);
       toast({
@@ -258,6 +287,8 @@ export default function ApplicantRowActionButton({
         description:
           "All selected applicants have been reminded to complete onboarding.",
       });
+      onActionComplete?.();
+      router.refresh();
     } catch (error) {
       console.error("Error sending onboarding reminder emails:", error);
       toast({
@@ -270,70 +301,69 @@ export default function ApplicantRowActionButton({
   };
 
   return (
-    <div className="flex items-center justify-center gap-3">
-      <div className="hidden sm:flex">
-        {(applicants[0]?.application_status === "applying" ||
-          applicants[0]?.application_status === "denied") && (
+    <div className="flex items-center justify-center gap-2">
+      {(applicants[0]?.application_status === "applying" ||
+        applicants[0]?.application_status === "denied") && (
+        <Button
+          variant="destructive"
+          className="h-fit py-1 text-xs lg:text-sm bg-red-500"
+          onClick={() => {
+            setDialogState("delete");
+            setOpen(true);
+          }}
+        >
+          Delete All
+        </Button>
+      )}
+
+      {applicants[0]?.application_status === "testing" && (
+        <>
           <Button
-            variant="destructive"
-            className="h-fit py-1 text-sm lg:text-base bg-red-500"
+            className="h-fit py-1 text-xs lg:text-sm"
             onClick={() => {
-              setDialogState("delete");
+              setDialogState("pass");
               setOpen(true);
             }}
           >
-            Delete All
+            Pass All
           </Button>
-        )}
+          <Button
+            variant={"destructive"}
+            className="h-fit py-1 text-xs lg:text-sm"
+            onClick={() => {
+              setDialogState("fail");
+              setOpen(true);
+            }}
+          >
+            Fail All
+          </Button>
+        </>
+      )}
 
-        {applicants[0]?.application_status === "testing" && (
-          <div className="flex items-center gap-3">
-            <Button
-              className="h-fit py-1 text-sm lg:text-base"
-              onClick={() => {
-                setDialogState("pass");
-                setOpen(true);
-              }}
-            >
-              Pass All
-            </Button>
-            <Button
-              variant={"destructive"}
-              className="h-fit py-1 text-sm lg:text-base"
-              onClick={() => {
-                setDialogState("fail");
-                setOpen(true);
-              }}
-            >
-              Fail All
-            </Button>
-          </div>
-        )}
-
-        {applicants[0]?.application_status === "onboarding" && (
-          <div className="flex items-center gap-3">
-            <Button
-              className="h-fit py-1 text-sm lg:text-base"
-              onClick={() => {
-                setDialogState("accept");
-                setOpen(true);
-              }}
-            >
-              Accept All
-            </Button>
-            <Button
-              variant={"destructive"}
-              className="h-fit py-1 text-sm lg:text-base"
-              onClick={() => {
-                setDialogState("deny");
-                setOpen(true);
-              }}
-            >
-              Deny All
-            </Button>
-          </div>
-        )}
-      </div>
+      {(applicants[0]?.application_status === "onboarding" ||
+        applicants[0]?.application_status === "waitlist") && (
+        <>
+          <Button
+            className="h-fit py-1 text-xs lg:text-sm"
+            onClick={() => {
+              setDialogState("accept");
+              setOpen(true);
+            }}
+          >
+            Accept All
+          </Button>
+          <Button
+            variant={"destructive"}
+            className="h-fit py-1 text-xs lg:text-sm"
+            onClick={() => {
+              setDialogState("deny");
+              setOpen(true);
+            }}
+          >
+            Deny All
+          </Button>
+        </>
+      )}
 
       <Dialog open={open} onOpenChange={setOpen}>
         <DropdownMenu>
@@ -453,7 +483,8 @@ export default function ApplicantRowActionButton({
               </div>
             )}
 
-            {applicants[0]?.application_status === "onboarding" && (
+            {(applicants[0]?.application_status === "onboarding" ||
+              applicants[0]?.application_status === "waitlist") && (
               <div className="block cursor-pointer sm:hidden">
                 <DropdownMenuItem
                   onClick={() => {
