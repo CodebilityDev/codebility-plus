@@ -4,6 +4,7 @@ import { Codev, CodevPoints } from "@/types/home/codev";
  * Calculate total points across all skill categories for a codev
  * @param codev_points - Array of CodevPoints from codev.codev_points
  * @returns Total points sum (0 if undefined/empty)
+ * @example getTotalCodevPoints([{points: 50}, {points: 75}]) // Returns 125
  */
 export const getTotalCodevPoints = (codev_points?: CodevPoints[]): number => {
   if (!codev_points || !Array.isArray(codev_points)) {
@@ -19,14 +20,13 @@ export const getTotalCodevPoints = (codev_points?: CodevPoints[]): number => {
 /**
  * Check if a codev meets the showcase qualification criteria
  * 
- * Qualification Requirements:
+ * SIMPLIFIED REQUIREMENTS (per team lead feedback):
  * 1. Total points >= 100 (graduation requirement)
- * 2. internal_status === "TRAINING" | "GRADUATED" | NULL (active developers)
- * 3. application_status === "passed" (accepted as codev)
- * 4. availability_status === true (currently available for hire)
+ * 2. application_status === "passed" (accepted as codev)
+ * 3. availability_status === true (currently available for hire)
  * 
- * Note: TRAINING status is included because many active high-performing codevs
- * are still in training phase but meet the 100+ point threshold for showcase.
+ * Note: internal_status is now IGNORED - we display anyone with 100+ points
+ * regardless of TRAINING, GRADUATED, MENTOR, etc. status
  * 
  * @param codev - Codev object to check
  * @returns true if codev meets ALL qualification criteria
@@ -34,45 +34,25 @@ export const getTotalCodevPoints = (codev_points?: CodevPoints[]): number => {
 export const isQualifiedForShowcase = (codev: Codev): boolean => {
   const totalPoints = getTotalCodevPoints(codev.codev_points);
   
-  // Check all qualification criteria
+  // Simplified qualification criteria (3 checks only)
   const meetsPointsThreshold = totalPoints >= 100;
-  
-  // ✅ FIXED: Accept TRAINING, GRADUATED, or NULL status
-  // TRAINING = Active codevs building their portfolio (common for 100+ point codevs)
-  // GRADUATED = Completed training program
-  // NULL = Legacy active codevs without explicit status
-  const isActiveCodev = 
-    codev.internal_status === "TRAINING" ||
-    codev.internal_status === "GRADUATED" || 
-    codev.internal_status === null || 
-    codev.internal_status === undefined;
-  
   const hasPassedApplication = codev.application_status === "passed";
   const isAvailable = codev.availability_status === true;
   
-  // Exclude specific statuses that should never show in public showcase
-  const isExcludedStatus = 
-    codev.internal_status === "INACTIVE" ||
-    codev.internal_status === "DEPLOYED" ||
-    codev.internal_status === "ADMIN" ||
-    codev.internal_status === "MENTOR";
-  
   // Debug logging (remove in production)
   if (process.env.NODE_ENV === "development") {
-    if (!meetsPointsThreshold || !isActiveCodev || !hasPassedApplication || !isAvailable || isExcludedStatus) {
+    if (!meetsPointsThreshold || !hasPassedApplication || !isAvailable) {
       console.log(`❌ ${codev.first_name} ${codev.last_name} disqualified:`, {
         totalPoints,
         meetsPointsThreshold,
         internal_status: codev.internal_status,
-        isActiveCodev,
         hasPassedApplication,
         isAvailable,
-        isExcludedStatus,
       });
     }
   }
   
-  return meetsPointsThreshold && isActiveCodev && hasPassedApplication && isAvailable && !isExcludedStatus;
+  return meetsPointsThreshold && hasPassedApplication && isAvailable;
 };
 
 /**
@@ -91,6 +71,14 @@ export const getQualifiedCodevs = (codevs: Codev[]): Codev[] => {
   // Debug summary
   if (process.env.NODE_ENV === "development") {
     console.log(`✅ Qualified codevs: ${qualified.length} out of ${codevs.length}`);
+    
+    // Show total points distribution
+    const pointsDistribution = qualified.map(c => ({
+      name: `${c.first_name} ${c.last_name}`,
+      points: getTotalCodevPoints(c.codev_points),
+      status: c.internal_status
+    }));
+    console.table(pointsDistribution);
   }
   
   return qualified;

@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { UsersSkeleton } from "@/components/ui/skeleton/UsersSkeleton";
 import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
-import { prioritizeCodevs } from "@/utils/codev-priority"; // ← CHANGED: Only import prioritizeCodevs
+import { prioritizeCodevs } from "@/utils/codev-priority";
 import { getQualifiedCodevs } from "@/utils/codev-qualification";
 
 import Section from "../_shared/CodevsSection";
@@ -26,15 +26,13 @@ export default async function Profiles() {
   // Convert to array safely
   const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
 
-  // ✅ STEP 1: Filter by qualification criteria (100+ points, TRAINING/GRADUATED/NULL, available)
-  // This handles ALL filtering logic - no need for additional filters
+  // Filter by qualification criteria (100+ points, passed, available)
+  // This handles ALL filtering logic - no internal_status restrictions
   const qualifiedCodevs = getQualifiedCodevs(codevsArray);
 
-  // ✅ STEP 2: Apply priority sorting only (no additional filtering)
-  // We already filtered everything in getQualifiedCodevs(), so just prioritize by:
-  // - Active projects > No projects
-  // - Available > Unavailable
-  const sortedCodevs = prioritizeCodevs(qualifiedCodevs); // ← CHANGED: Direct prioritization
+  // Apply priority sorting only (no additional filtering)
+  // Prioritize by: Active projects > No projects, Available > Unavailable
+  const sortedCodevs = prioritizeCodevs(qualifiedCodevs);
 
   // Debug logging in development
   if (process.env.NODE_ENV === "development") {
