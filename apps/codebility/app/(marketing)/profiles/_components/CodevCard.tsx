@@ -31,10 +31,7 @@ interface Props {
   color: string;
 }
 
-const STATUS_CONFIG: Record<
-  InternalStatus,
-  { label: string; className: string }
-> = {
+const STATUS_CONFIG: Record<InternalStatus, { label: string; className: string }> = {
   TRAINING: {
     label: "Training",
     className:
@@ -118,22 +115,20 @@ const CodevCard = ({ codev, color }: Props) => {
       : {};
   }, [codev.level, codev.codev_points]);
 
-  // Line 119: Enhanced card wrapper with click redirect
   return (
     <div
       className="h-64"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      <div
-        onClick={() =>
-          (window.location.href = `https://www.codebility.tech/profiles/${codev.id}`)
-        }
-        className="group relative flex h-full w-full cursor-pointer flex-col items-center justify-between rounded-lg border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-md transition-all duration-300 hover:scale-[1.02] hover:bg-white/20 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
+      <div 
+        onClick={() => window.location.href = `https://www.codebility.tech/profiles/${codev.id}`}
+        className="group relative flex h-full w-full flex-col items-center justify-between rounded-lg border border-white/20 bg-white/10 p-4 shadow-2xl backdrop-blur-md transition-all duration-300 cursor-pointer hover:bg-white/20 hover:scale-[1.02] dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10"
       >
         {/* Background decoration */}
         <div className="from-customBlue-50/30 dark:from-customBlue-950/10 absolute inset-0 bg-gradient-to-br to-purple-50/30 opacity-0 transition-opacity duration-300 group-hover:opacity-100 dark:to-purple-950/10" />
         <div className="absolute -right-4 -top-4 h-32 w-32 rounded-full bg-gradient-to-br from-yellow-400/10 to-orange-400/10 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-100" />
+        
         <div className="grid w-full grid-cols-4 gap-2">
           <div className="col-span-1" />
           <div className="relative col-span-2 flex justify-center">
@@ -203,12 +198,7 @@ const CodevCard = ({ codev, color }: Props) => {
             <TooltipProvider>
               <Tooltip delayDuration={100}>
                 <TooltipTrigger asChild>
-                  {/* Line 217: Added stopPropagation to prevent card click when button is clicked */}
-                  <Link
-                    href={`/profiles/${codev.id}`}
-                    target="_blank"
-                    onClick={(e) => e.stopPropagation()}
-                  >
+                  <Link href={`/profiles/${codev.id}`} target="_blank" onClick={(e) => e.stopPropagation()}>
                     <Button
                       variant="outline"
                       size="icon"
@@ -247,14 +237,7 @@ const CodevCard = ({ codev, color }: Props) => {
             />
           ) : null}
         </div>
-        <div
-          className="relative z-20"
-          onMouseEnter={(e) => e.stopPropagation()}
-          onMouseLeave={(e) => e.stopPropagation()}
-          onClick={(e) => e.stopPropagation()}
-        >
-          <CodevHireCodevButton codevId={codev.id} />
-        </div>
+        <CodevHireCodevButton codevId={codev.id} hovered={hovered} />
       </div>
     </div>
   );
