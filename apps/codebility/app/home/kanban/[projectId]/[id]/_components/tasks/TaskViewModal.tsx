@@ -676,8 +676,11 @@ const TaskViewModal = ({
     <Dialog open={isModalOpen} onOpenChange={onClose}>
       <DialogContent className="h-auto max-h-[90vh] sm:max-h-[900px] w-[95vw] sm:w-[90vw] max-w-3xl overflow-y-auto bg-white p-3 sm:p-4 dark:bg-gray-900">
         <div className="flex flex-col gap-6">
-          <div className="flex items-center justify-between">
-            <DialogHeader>
+          <div className="h-4 md:h-0"></div>
+          
+          {/* Title and Menu Row */}
+          <div className="flex items-start justify-between -mt-4">
+            <DialogHeader className="flex-1">
               <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
                   {task?.title}{" "}
                   {task?.ticket_code && (
@@ -690,7 +693,13 @@ const TaskViewModal = ({
             {canModifyTask && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Ellipsis className="h-5 w-5 cursor-pointer" />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="h-8 w-8 p-0 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                  >
+                    <Ellipsis className="h-4 w-4" />
+                  </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-32">
                   <DropdownMenuItem
@@ -785,7 +794,7 @@ const TaskViewModal = ({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">PR Link</Label>
-              <div className="flex items-center space-x-2">
+              <div className={`${hasPrLinkChanges ? 'flex items-center space-x-2' : ''}`}>
                 <Input
                   value={prLink}
                   onChange={(e) => setPrLink(e.target.value)}
@@ -794,14 +803,14 @@ const TaskViewModal = ({
                       setPrLink(task.pr_link);
                     }
                   }}
-                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500"
+                  className="flex-1 text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500"
                   placeholder="Enter PR Link..."
                 />
                 {hasPrLinkChanges && (
                   <Button
                     variant="outline"
                     onClick={handleUpdate}
-                    className="bg-blue-600 text-white hover:bg-blue-700"
+                    className="flex-1 bg-blue-600 text-white hover:bg-blue-700"
                     disabled={updateLoading}
                   >
                     {updateLoading && (
