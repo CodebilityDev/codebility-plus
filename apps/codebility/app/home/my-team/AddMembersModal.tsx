@@ -87,7 +87,7 @@ const TeamMemberAvatar = ({
       />
     </div>
     <div className="text-center w-full">
-      <div className="text-xs text-white font-medium truncate w-full leading-tight">
+      <div className="text-xs text-white font-medium truncate w-full leading-tight mt-2">
         {name}
       </div>
       {position && (
@@ -108,11 +108,11 @@ const TeamLeaderDisplay = ({
   onProfileClick?: (member: Codev) => void;
 }) => (
   <div>
-    <h4 className="text-base sm:text-lg font-semibold text-white mb-1">Team Leader</h4>
+    <h4 className="text-base sm:text-lg font-semibold text-white mb-3">Team Leader</h4>
     {teamLead ? (
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 mb-6">
         <div 
-          className={`relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-customBlue-400 ${
+          className={`relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-customBlue-400 mb-3 ${
             onProfileClick ? 'cursor-pointer hover:ring-customBlue-300 transition-all duration-200' : ''
           }`}
           style={{ width: 40, height: 40 }}
@@ -166,7 +166,7 @@ const TeamLeaderDisplay = ({
           />
         </div>
         <div>
-          <div className="text-white font-semibold text-sm sm:text-base">
+          <div className="text-white font-semibold text-sm sm:text-base mt-[-7px]">
             {teamLead.first_name} {teamLead.last_name}
           </div>
           <div className="text-gray-300 text-xs sm:text-sm">
@@ -205,11 +205,11 @@ const TeamMembersGrid = ({
       <div className="mb-1 sm:mb-2">
         <span className="text-white text-xs sm:text-sm">{members.length} members</span>
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2 w-full">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2 w-full mt-6">
         {members.map((member) => {
           const isNew = !currentMemberIds.includes(member.id);
           return (
-            <div key={member.id} className="w-full flex flex-col items-center relative">
+            <div key={member.id} className="w-full flex flex-col items-center relative mb-5">
               {isNew && (
                 <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-1 rounded-full z-10">
                   New
@@ -246,8 +246,8 @@ const ProjectPreview = ({
   onProfileClick?: (member: Codev) => void;
 }) => (
   <div className="h-full flex flex-col p-1 sm:p-2 space-y-1">
-    <div className="flex-shrink-0">
-      <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Project Name</h3>
+    <div className="flex-shrink-0 mb-5">
+      <h3 className="text-base sm:text-lg font-semibold text-white mb-3">Project Name</h3>
       <div className="flex items-center gap-2 sm:gap-3">
         <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg overflow-hidden flex items-center justify-center bg-customBlue-600">
           <img
@@ -278,7 +278,7 @@ const ProjectPreview = ({
       />
     </div>
     
-    <div className="flex-1 min-h-0">
+    <div className="flex-1 min-h-0 mr-8">
       <TeamMembersGrid 
         members={selectedMembers} 
         currentMemberIds={currentMemberIds}
