@@ -21,50 +21,107 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
   try {
     // Get current user from auth
     const supabase = await createClientServerComponent();
-    const { data: { user } } = await supabase.auth.getUser();
+    const { data: { user }, error: authError } = await supabase.auth.getUser();
     
-    if (!user) {
+    if (authError || !user) {
+      console.error('Auth error:', authError);
       notFound();
     }
 
-    // Map auth user to codev user by email
-    // Auth user.id ≠ codev.id, so we need to look up by email
+    // Map auth user to codev user by email with case-insensitive matching
     const { data: codevUser, error: codevError } = await supabase
       .from('codev')
-      .select('id')
-      .eq('email_address', user.email)
-      .single();
+      .select('id, email_address')
+      .ilike('email_address', user.email?.trim() || '')
+      .maybeSingle(); // Use maybeSingle() instead of single() to handle no results gracefully
 
-    if (codevError || !codevUser) {
-      console.error('Failed to find codev user:', codevError);
+    if (codevError) {
+      console.error('Codev lookup error:', {
+        error: codevError,
+        authEmail: user.email
+      });
+      notFound();
+    }
+
+    if (!codevUser) {
+      console.error('Codev user not found:', {
+        authEmail: user.email,
+        authUserId: user.id
+      });
       notFound();
     }
 
     // Fetch user projects to verify access
     const userProjectsResponse = await getUserProjects();
     
-    if (userProjectsResponse.error || !userProjectsResponse.data) {
+    if (userProjectsResponse.error) {
+      console.error('Failed to fetch user projects:', userProjectsResponse.error);
+      throw new Error("Failed to load user projects");
+    }
+
+    if (!userProjectsResponse.data) {
+      console.error('No project data returned');
       notFound();
     }
 
     const userProjects = userProjectsResponse.data;
-    const project = userProjects.find(p => p.project.id === projectId);
+
+    // ✅ FIXED: Type-safe project ID comparison (handles string/number mismatch)
+    const project = userProjects.find(p => {
+      const projectIdFromList = String(p.project.id).trim();
+      const requestedProjectId = String(projectId).trim();
+      return projectIdFromList === requestedProjectId;
+    });
 
     if (!project) {
+      console.error('Project not found or user has no access:', {
+        requestedProjectId: projectId,
+        userProjectIds: userProjects.map(p => p.project.id),
+        codevUserId: codevUser.id
+      });
       notFound();
     }
 
-    // Fetch team data for this specific project
-    const [teamLead, members] = await Promise.all([
+    // ✅ FIXED: Better error handling for team data with individual catch
+    const [teamLeadResponse, membersResponse] = await Promise.allSettled([
       getTeamLead(projectId),
       getMembers(projectId)
     ]);
 
-    if (teamLead.error || members.error) {
-      throw new Error("Failed to load team data");
+    // Handle team lead response with proper typing
+    let teamLead: Awaited<ReturnType<typeof getTeamLead>>;
+    if (teamLeadResponse.status === 'fulfilled' && !teamLeadResponse.value.error) {
+      teamLead = teamLeadResponse.value;
+    } else {
+      console.error('Failed to load team lead:', {
+        projectId,
+        error: teamLeadResponse.status === 'fulfilled' 
+          ? teamLeadResponse.value.error 
+          : teamLeadResponse.reason
+      });
+      teamLead = { data: null, error: 'Failed to load team lead' };
     }
 
-    // ✅ FIXED: Pass currentUserId to determine team lead status
+    // Handle members response with proper typing
+    let members: Awaited<ReturnType<typeof getMembers>>;
+    if (membersResponse.status === 'fulfilled' && !membersResponse.value.error) {
+      members = membersResponse.value;
+    } else {
+      console.error('Failed to load members:', {
+        projectId,
+        error: membersResponse.status === 'fulfilled' 
+          ? membersResponse.value.error 
+          : membersResponse.reason
+      });
+      members = { data: [], error: 'Failed to load members' };
+    }
+
+    // ✅ FIXED: Only throw if BOTH fail, otherwise show partial data
+    if (teamLead.error && members.error) {
+      throw new Error("Failed to load any team data");
+    }
+
+    // Construct project data with proper types
     const projectData = {
       project: project.project,
       teamLead: teamLead,
@@ -100,7 +157,12 @@ const TeamDetailPage = async ({ params }: TeamDetailPageProps) => {
     );
 
   } catch (error) {
-    console.error('TeamDetailPage error:', error);
+    console.error('TeamDetailPage error:', {
+      error,
+      message: error instanceof Error ? error.message : 'Unknown error',
+      stack: error instanceof Error ? error.stack : undefined,
+      projectId
+    });
     
     return (
       <div className="mx-auto max-w-screen-xl">
