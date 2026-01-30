@@ -9,7 +9,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Codev } from "@/types/home/codev";
+import { Codev, InternalStatus } from "@/types/home/codev";
 import { Search, Check, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import { useModal } from "@/hooks/use-modal-users";
@@ -87,7 +87,7 @@ const TeamMemberAvatar = ({
       />
     </div>
     <div className="text-center w-full">
-      <div className="text-xs text-white font-medium truncate w-full leading-tight">
+      <div className="text-xs text-white font-medium truncate w-full leading-tight mt-2">
         {name}
       </div>
       {position && (
@@ -108,11 +108,11 @@ const TeamLeaderDisplay = ({
   onProfileClick?: (member: Codev) => void;
 }) => (
   <div>
-    <h4 className="text-base sm:text-lg font-semibold text-white mb-1">Team Leader</h4>
+    <h4 className="text-base sm:text-lg font-semibold text-white mb-3">Team Leader</h4>
     {teamLead ? (
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 mb-6 mt-2">
         <div 
-          className={`relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-customBlue-400 ${
+          className={`relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-customBlue-400 mb-2 ${
             onProfileClick ? 'cursor-pointer hover:ring-customBlue-300 transition-all duration-200' : ''
           }`}
           style={{ width: 40, height: 40 }}
@@ -166,7 +166,7 @@ const TeamLeaderDisplay = ({
           />
         </div>
         <div>
-          <div className="text-white font-semibold text-sm sm:text-base">
+          <div className="text-white font-semibold text-sm sm:text-base mt-[-7px]">
             {teamLead.first_name} {teamLead.last_name}
           </div>
           <div className="text-gray-300 text-xs sm:text-sm">
@@ -202,14 +202,14 @@ const TeamMembersGrid = ({
   return (
     <div className="h-full flex flex-col">
       <h4 className="text-base sm:text-lg font-semibold text-white mb-1">Team Members</h4>
-      <div className="mb-1 sm:mb-2">
+      <div className="mb-1 sm:mb-2  md:mt-2">
         <span className="text-white text-xs sm:text-sm">{members.length} members</span>
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2 w-full">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2 w-full mt-6">
         {members.map((member) => {
           const isNew = !currentMemberIds.includes(member.id);
           return (
-            <div key={member.id} className="w-full flex flex-col items-center relative">
+            <div key={member.id} className="w-full flex flex-col items-center relative mb-5">
               {isNew && (
                 <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-1 rounded-full z-10">
                   New
@@ -245,10 +245,10 @@ const ProjectPreview = ({
   currentMemberIds: string[];
   onProfileClick?: (member: Codev) => void;
 }) => (
-  <div className="h-full flex flex-col p-1 sm:p-2 space-y-1">
+  <div className="h-full flex flex-col p-1 sm:p-2 gap-y-6">
     <div className="flex-shrink-0">
       <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Project Name</h3>
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 mt-2">
         <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg overflow-hidden flex items-center justify-center bg-customBlue-600">
           <img
             src="https://codebility-cdn.pages.dev/assets/images/logo.png"
@@ -278,7 +278,7 @@ const ProjectPreview = ({
       />
     </div>
     
-    <div className="flex-1 min-h-0">
+    <div className="flex-1 min-h-0 mr-8">
       <TeamMembersGrid 
         members={selectedMembers} 
         currentMemberIds={currentMemberIds}
@@ -545,8 +545,9 @@ const AddMembersModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] p-0 flex flex-col bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20">
-        <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1 border-b border-white/30 dark:border-white/20 bg-white/10 backdrop-blur-sm dark:bg-white/5">
+      <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] flex flex-col dark:bg-slate-950
+        border-2 border-slate-300 dark:border-blue-900/60 p-4 sm:p-0 ">
+        <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1 ">
           <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
             Add Members
           </DialogTitle>
@@ -554,7 +555,7 @@ const AddMembersModal = ({
 
         <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
           {/* Left Panel - 60% on Desktop */}
-          <div className="w-full lg:w-3/5 border-b lg:border-b-0 lg:border-r border-white/30 dark:border-white/20">
+          <div className="w-full lg:w-3/5 border-b lg:border-b-0 lg:border-r border-white/30 dark:border-white/20 pr-0 md:pr-6">
             <ProjectPreview 
               projectName={project.name}
               teamLead={teamLeadData}
@@ -679,7 +680,7 @@ const AddMembersModal = ({
           </div>
         </div>
 
-        <div className="flex-shrink-0 flex flex-col sm:flex-row gap-3 p-3 sm:p-6 border-t border-gray-700 bg-gray-800">
+        <div className="flex-shrink-0 flex flex-col sm:flex-row gap-3 p-3 sm:p-6 ">
           <Button
             variant="outline"
             onClick={onClose}
