@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { SimpleMemberData } from "@/app/home/projects/actions";
 import { Users, UserPlus, ArrowRight, Crown, Calendar } from "lucide-react";
 import DefaultAvatar from "@/components/DefaultAvatar";
+import { memo } from "react";
 
 interface ProjectData {
   project: {
@@ -29,8 +30,7 @@ interface TeamProjectCardProps {
 const formatName = (firstName: string, lastName: string): string => 
   `${firstName.charAt(0).toUpperCase()}${firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}${lastName.slice(1).toLowerCase()}`;
 
-const MemberAvatar = ({ member, size = 40, showBorder = true }: { member: SimpleMemberData; size?: number; showBorder?: boolean }) => {
-  const imageUrl = member.image_url || "/assets/images/default-avatar-200x200.jpg";
+const MemberAvatar = memo(({ member, size = 40, showBorder = true }: { member: SimpleMemberData; size?: number; showBorder?: boolean }) => {
   const displayName = formatName(member.first_name, member.last_name);
 
   return (
@@ -40,12 +40,20 @@ const MemberAvatar = ({ member, size = 40, showBorder = true }: { member: Simple
     >
       {member.image_url ? (
         <Image
-          src={imageUrl}
+          src={member.image_url}
           alt={displayName}
           width={size}
           height={size}
           className="h-full w-full rounded-full object-cover"
           style={{ width: size, height: size }}
+          onError={(e) => {
+            // Fallback to default avatar on image load error
+            e.currentTarget.style.display = 'none';
+            const parent = e.currentTarget.parentElement;
+            if (parent) {
+              parent.innerHTML = `<div class="h-full w-full rounded-full"><DefaultAvatar size=${size} /></div>`;
+            }
+          }}
         />
       ) : (
         <div className="h-full w-full rounded-full">
@@ -54,9 +62,11 @@ const MemberAvatar = ({ member, size = 40, showBorder = true }: { member: Simple
       )}
     </div>
   );
-};
+});
 
-const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardProps) => {
+MemberAvatar.displayName = 'MemberAvatar';
+
+const TeamProjectCard = memo(({ project, onAddMembers, isLoading }: TeamProjectCardProps) => {
   const { project: projectInfo, teamLead, members } = project;
   const totalMembers = (members.data?.length ?? 0) + (teamLead.data ? 1 : 0);
 
@@ -105,7 +115,7 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
               disabled={isLoading}
               size="sm"
               variant="outline"
-              className="relative z-20 shrink-0 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-600 transition-all duration-300"
+              className="relative z-20 shrink-0 border-blue-200 text-blue-600 hover:bg-blue-50 hover:border-blue-300 dark:border-blue-700 dark:text-blue-400 dark:hover:bg-blue-900/30 dark:hover:border-blue-600 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <UserPlus className="mr-2 h-4 w-4" />
               {isLoading ? 'Adding...' : 'Add Member'}
@@ -128,11 +138,11 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
                 </div>
               </div>
               <div className="min-w-0 flex-1">
-                <p className="font-semibold text-gray-900 dark:text-white">
+                <p className="font-semibold text-gray-900 dark:text-white truncate">
                   {formatName(teamLead.data.first_name, teamLead.data.last_name)}
                 </p>
                 {teamLead.data.display_position && (
-                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5">
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-0.5 truncate">
                     {teamLead.data.display_position}
                   </p>
                 )}
@@ -160,7 +170,7 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
                 {members.data.slice(0, 6).map((member) => (
                   <div key={member.id} className="relative group/member">
                     <MemberAvatar member={member} size={40} />
-                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/member:opacity-100 transition-opacity whitespace-nowrap z-30">
+                    <div className="absolute -top-8 left-1/2 transform -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover/member:opacity-100 transition-opacity whitespace-nowrap z-30 pointer-events-none">
                       {formatName(member.first_name, member.last_name)}
                     </div>
                   </div>
@@ -216,6 +226,8 @@ const TeamProjectCard = ({ project, onAddMembers, isLoading }: TeamProjectCardPr
       </div>
     </div>
   );
-};
+});
+
+TeamProjectCard.displayName = 'TeamProjectCard';
 
 export default TeamProjectCard;
