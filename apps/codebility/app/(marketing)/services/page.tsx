@@ -89,7 +89,7 @@ const ServicesPage = async () => {
           <ServicesPageContent servicesData={mappedData} />
         </ServiceProvider>
       </div>
-      <Footer />
+      
     </div>
   );
 };
