@@ -2,14 +2,13 @@
 
 import React, { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
-import { X, Edit } from "lucide-react";
+import { X, Edit, ChevronLeft } from "lucide-react";
 import { AnnouncementTab } from "./AnnouncementTab";
 import { AnnouncementContent } from "./AnnouncementContent";
 import { AnnouncementEditor } from "./AnnouncementEditor";
 import { announcementTabs } from "./data";
 import { AnnouncementCategory, AnnouncementPage } from "./types";
 import { createClientClientComponent } from "@/utils/supabase/client";
-
 
 interface AnnouncementModalProps {
   isOpen: boolean;
@@ -26,6 +25,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
   const [isEditorOpen, setIsEditorOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showSidebar, setShowSidebar] = useState(true);
   const supabase = createClientClientComponent();
 
   useEffect(() => {
@@ -34,22 +34,21 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
 
   // Fetch announcements from database
   useEffect(() => {
-      const fetchAnnouncements = async () => {
-          if (!isOpen) return;
-          if (!supabase) throw new Error('Supabase client not initialized');
-          
-          try {
-              setLoading(true);
-              setError(null);
-          
-        const { data, error: fetchError } = await supabase  
+    const fetchAnnouncements = async () => {
+      if (!isOpen) return;
+      if (!supabase) throw new Error("Supabase client not initialized");
+
+      try {
+        setLoading(true);
+        setError(null);
+
+        const { data, error: fetchError } = await supabase
           .from("announcements")
           .select("*")
           .order("category");
 
         if (fetchError) throw fetchError;
 
-        // Map database fields to AnnouncementPage type
         const mappedData: AnnouncementPage[] = (data || []).map((item) => ({
           category: item.category as AnnouncementCategory,
           title: item.title,
@@ -59,30 +58,39 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
         }));
 
         setPages(mappedData);
-     } catch (err) {
-    console.error("Error fetching announcements:", err);
-    setError(`Failed to load announcements: ${err instanceof Error ? err.message : 'Unknown error'}`);
-    } finally {
-    setLoading(false);
-    }
+      } catch (err) {
+        console.error("Error fetching announcements:", err);
+        setError(
+          `Failed to load announcements: ${err instanceof Error ? err.message : "Unknown error"}`
+        );
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchAnnouncements();
+  }, [isOpen, supabase]);
+
+  // Reset sidebar visibility when modal opens/closes
+  useEffect(() => {
+    if (isOpen) {
+      // On mobile, start with sidebar visible
+      const isMobile = window.innerWidth < 768;
+      setShowSidebar(isMobile ? true : true);
+    }
   }, [isOpen]);
 
   // Get content for active tab
   const activeContent = pages.find((page) => page.category === activeTab);
-    if (!supabase) throw new Error('Supabase client not initialized');
+  if (!supabase) throw new Error("Supabase client not initialized");
 
   const handleSave = async (updatedPage: AnnouncementPage) => {
     try {
-        
-        // Optimistic update - update UI immediately
-        setPages((prevPages) =>
-            prevPages.map((page) =>
-                page.category === updatedPage.category ? updatedPage : page
-    )
-);
+      setPages((prevPages) =>
+        prevPages.map((page) =>
+          page.category === updatedPage.category ? updatedPage : page
+        )
+      );
 
       // Upsert to database (insert or update)
       const { data, error: upsertError } = await supabase
@@ -96,7 +104,7 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
             updated_at: new Date().toISOString(),
           },
           {
-            onConflict: "category", // Use category as unique constraint
+            onConflict: "category",
           }
         )
         .select()
@@ -106,7 +114,6 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
 
       console.log("Successfully saved announcement:", data);
 
-      // Update state with the returned data to ensure sync
       setPages((prevPages) =>
         prevPages.map((page) =>
           page.category === updatedPage.category
@@ -123,9 +130,14 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
     } catch (err) {
       console.error("Error saving announcement:", err);
       setError("Failed to save announcement");
-      
-      // Optionally: Revert optimistic update
-      // You could refetch the data here to ensure consistency
+    }
+  };
+
+  const handleTabClick = (category: AnnouncementCategory) => {
+    setActiveTab(category);
+    // On mobile, hide sidebar after selecting a tab
+    if (window.innerWidth < 768) {
+      setShowSidebar(false);
     }
   };
 
@@ -142,88 +154,107 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
 
       {/* Modal */}
       <div
-        className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
+        className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 pointer-events-none"
         role="dialog"
         aria-modal="true"
         aria-labelledby="announcement-modal-title"
       >
-        <div className="flex h-[850px] max-h-[95vh] w-full max-w-screen-2xl overflow-hidden rounded-xl bg-white shadow-2xl dark:bg-gray-900 pointer-events-auto">
+        <div className="flex h-full sm:h-[850px] sm:max-h-[95vh] w-full max-w-screen-2xl overflow-hidden rounded-none sm:rounded-xl bg-white shadow-2xl dark:bg-gray-900 pointer-events-auto">
           {/* Left Sidebar - Tabs */}
-          <div className="w-80 border-r border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950">
+          <div
+            className={`
+              ${showSidebar ? "translate-x-0" : "-translate-x-full"}
+              md:translate-x-0
+              fixed md:relative inset-y-0 left-0 z-10
+              w-full sm:w-80 md:w-80
+              border-r border-gray-200 bg-gray-50 dark:border-gray-800 dark:bg-gray-950
+              transition-transform duration-300 ease-in-out
+            `}
+          >
             {/* Header */}
-            <div className="border-b border-gray-200 p-8 dark:border-gray-800">
+            <div className="border-b border-gray-200 p-4 sm:p-6 md:p-8 dark:border-gray-800">
               <h2
                 id="announcement-modal-title"
-                className="text-2xl font-bold text-gray-900 dark:text-gray-100"
+                className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-gray-100"
               >
                 Codebility
               </h2>
-              <p className="mt-2 text-base text-gray-600 dark:text-gray-400">
+              <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600 dark:text-gray-400">
                 News & Updates
               </p>
             </div>
 
             {/* Tabs */}
-            <div className="space-y-2 p-6" role="tablist">
+            <div className="space-y-2 p-4 sm:p-6" role="tablist">
               {announcementTabs.map((tab) => (
                 <AnnouncementTab
                   key={tab.id}
                   id={tab.id}
                   label={tab.label}
                   isActive={activeTab === tab.id}
-                  onClick={setActiveTab}
+                  onClick={handleTabClick}
                 />
               ))}
             </div>
           </div>
 
           {/* Right Content Area */}
-          <div className="flex flex-1 flex-col">
+          <div className="flex flex-1 flex-col min-w-0">
             {/* Header with Close and Edit Buttons */}
-            <div className="flex items-center justify-between border-b border-gray-200 p-8 dark:border-gray-800">
-              <h3 className="text-2xl font-semibold text-gray-900 dark:text-gray-100">
+            <div className="flex items-center justify-between border-b border-gray-200 p-4 sm:p-6 md:p-8 dark:border-gray-800 gap-2">
+              {/* Back button for mobile */}
+              <button
+                onClick={() => setShowSidebar(true)}
+                className="md:hidden rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300 flex-shrink-0"
+                aria-label="Back to categories"
+              >
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+
+              <h3 className="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900 dark:text-gray-100 truncate flex-1 min-w-0">
                 {announcementTabs.find((tab) => tab.id === activeTab)?.label}
               </h3>
-              <div className="flex items-center gap-2">
+
+              <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
                 <button
                   onClick={() => setIsEditorOpen(true)}
                   disabled={loading}
-                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex items-center gap-1 sm:gap-2 rounded-lg px-2 sm:px-3 md:px-4 py-2 text-xs sm:text-sm font-medium text-blue-600 transition-colors hover:bg-blue-50 dark:text-blue-400 dark:hover:bg-blue-950 disabled:opacity-50 disabled:cursor-not-allowed"
                   aria-label="Edit announcement"
                 >
-                  <Edit className="h-4 w-4" />
-                  Edit
+                  <Edit className="h-3 w-3 sm:h-4 sm:w-4" />
+                  <span className="hidden sm:inline">Edit</span>
                 </button>
                 <button
                   onClick={onClose}
                   className="rounded-lg p-2 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600 dark:hover:bg-gray-800 dark:hover:text-gray-300"
                   aria-label="Close announcement modal"
                 >
-                  <X className="h-6 w-6" />
+                  <X className="h-5 w-5 sm:h-6 sm:w-6" />
                 </button>
               </div>
             </div>
 
             {/* Content Area - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-8">
+            <div className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
               {loading ? (
                 <div className="flex h-full items-center justify-center">
                   <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <div className="animate-spin rounded-full h-10 w-10 sm:h-12 sm:w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
                       Loading announcements...
                     </p>
                   </div>
                 </div>
               ) : error ? (
                 <div className="flex h-full items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-red-500 dark:text-red-400 mb-2">
+                  <div className="text-center px-4">
+                    <p className="text-sm sm:text-base text-red-500 dark:text-red-400 mb-2">
                       {error}
                     </p>
                     <button
                       onClick={() => window.location.reload()}
-                      className="text-sm text-blue-600 hover:underline dark:text-blue-400"
+                      className="text-xs sm:text-sm text-blue-600 hover:underline dark:text-blue-400"
                     >
                       Retry
                     </button>
@@ -233,8 +264,8 @@ export const AnnouncementModal: React.FC<AnnouncementModalProps> = ({
                 <AnnouncementContent page={activeContent} />
               ) : (
                 <div className="flex h-full items-center justify-center">
-                  <div className="text-center">
-                    <p className="text-gray-500 dark:text-gray-400">
+                  <div className="text-center px-4">
+                    <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400">
                       No content available for this section yet.
                     </p>
                   </div>

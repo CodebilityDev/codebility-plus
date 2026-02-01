@@ -20,7 +20,7 @@ export const AnnouncementTab: React.FC<AnnouncementTabProps> = ({
     <button
       onClick={() => onClick(id)}
       className={`
-        relative px-6 py-4 text-base font-medium transition-all duration-200
+        relative px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-medium transition-all duration-200
         ${
           isActive
             ? "bg-blue-500/10 text-blue-500 dark:bg-blue-500/20"
@@ -32,7 +32,7 @@ export const AnnouncementTab: React.FC<AnnouncementTabProps> = ({
       aria-selected={isActive}
       aria-controls={`panel-${id}`}
     >
-      <span>{label}</span>
+      <span className="truncate">{label}</span>
     </button>
   );
 };
