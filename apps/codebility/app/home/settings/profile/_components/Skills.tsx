@@ -25,7 +25,7 @@ type TechStackStore = {
 };
 
 
-  // ENter name here kung may bagong tech stack na idadagdag cause of issues with naming in database inputs -> svg filenames.
+  // ENter name here kung may bagong tech stack na idadagdag cause of issues with naming in database  -> svg filenames.
 const TECH_STACK_MAPPING: Record<string, string> = {
   // Multi-word names with spaces (need hyphens in filename)
   "github actions": "github-actions",
