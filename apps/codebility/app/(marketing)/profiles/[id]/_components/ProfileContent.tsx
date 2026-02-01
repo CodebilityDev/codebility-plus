@@ -203,6 +203,11 @@ export default function ProfileContent({
 						</p>
 					</motion.div>
 				)}
+				{codev.headline && (
+					<p className="text-center text-sm capitalize lg:text-lg">
+						{codev.headline}
+					</p>
+				)}
 				<motion.div 
 					className="flex gap-4"
 					variants={fadeInUp}

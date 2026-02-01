@@ -113,7 +113,8 @@ export const getCodevs = async ({
       id,
       skill_category_id,
       points
-    )
+    ),
+    headline
   `);
 
   // Apply filters dynamically
