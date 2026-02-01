@@ -16,8 +16,9 @@ import {
 } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 import CodevBadge from "@/components/CodevBadge";
-import { getMemberRatingScore } from "../_services/query";
+import { getMemberProjects, getMemberRatingScore, ProjectInfo } from "../_services/query";
 import StarRating from "./StarRating";
+import ProjectList from "./ProjectList";
 
 
 type LevelMap = Record<string, number>;
@@ -75,20 +76,33 @@ export default function ProfileContent({
 	availableSchedule
 }: ProfileContentProps) {
 	const [ratingScore, setRatingScore] = useState<number | null>(null);
+	const [memberProjects, setMemberProjects] = useState<ProjectInfo[] | null>(null);
 
 	useEffect(() => {
 		if (!codev.id) return;
 
 		const fetchScore = async () => {
-		try {
-			const score = await getMemberRatingScore(codev.id);
-			setRatingScore(score ?? 0);
-		} catch (err) {
-			console.error("Failed to fetch member score:", err);
-		}
+			try {
+				const score = await getMemberRatingScore(codev.id);
+				setRatingScore(score ?? 0);
+			} catch (err) {
+				console.error("Failed to fetch member score:", err);
+			}
 		};
 
 		fetchScore();
+
+		const fetchProjects = async () => {
+			try {
+				const projects = await getMemberProjects(codev.id);
+				setMemberProjects(projects);
+			} catch (err) {
+				console.error("Failed to fetch projects:", err);
+			}
+		};
+
+		fetchProjects();
+
 	}, [codev.id]);
 
 
@@ -288,6 +302,12 @@ export default function ProfileContent({
 							))}
 						</motion.div>
 					</motion.div>
+				)}
+
+				{memberProjects && (
+					<div className="mt-4">
+						<ProjectList projects={memberProjects} />
+					</div>
 				)}
 
 				{/* Work Schedule Section */}

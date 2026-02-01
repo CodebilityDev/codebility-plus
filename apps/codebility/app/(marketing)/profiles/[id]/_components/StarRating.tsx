@@ -18,7 +18,7 @@ export default function StarRating({ rating, maxStars = 5, size = 20 }: StarRati
       {/* Empty Stars */}
       <div className="stars flex gap-1">
         {Array.from({ length: maxStars }).map((_, i) => (
-          <Star key={i} fill="#111" strokeWidth={0} size={size} />
+          <Star key={i} fill="none" stroke="yellow" strokeWidth={2} size={size} />
         ))}
       </div>
 
