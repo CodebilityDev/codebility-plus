@@ -12,8 +12,21 @@ import {
 	IconGithub,
 	IconLink,
 	IconSkills,
+	IconLinkedInWhiteSmall,
 } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
+import CodevBadge from "@/components/CodevBadge";
+
+
+type LevelMap = Record<string, number>;
+
+function getFilteredLevel(level?: LevelMap): LevelMap {
+	if (!level) return {};
+
+	return Object.fromEntries(
+		Object.entries(level).filter(([_, value]) => value > 0),
+	);
+}
 
 const fadeInUp = {
 	hidden: { opacity: 0, y: 20 },
@@ -92,11 +105,18 @@ export default function ProfileContent({
 		portfolio_website,
 		about,
 		github,
+		linkedin,
 		tech_stacks,
 		education,
 		work_experience,
 		availability_status,
 	} = codev;
+
+	const filteredLevel = React.useMemo(
+		() => getFilteredLevel(codev.level),
+		[codev.level],
+	);
+
 
 	return (
 		<div className="mt-6 flex flex-col gap-6 md:gap-12 lg:mt-16 lg:flex-row">
@@ -153,6 +173,20 @@ export default function ProfileContent({
 					className="flex gap-4"
 					variants={fadeInUp}
 				>
+					{linkedin && (
+						<motion.div
+							whileHover={{ scale: 1.1, rotate: 5 }}
+							whileTap={{ scale: 0.95 }}
+						>
+							<Link
+								href={sanitizeUrl(linkedin)}
+								target="_blank"
+								className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300 block"
+							>
+								<IconLinkedInWhiteSmall className="text-2xl" />
+							</Link>
+						</motion.div>
+					)}
 					{github && (
 						<motion.div
 							whileHover={{ scale: 1.1, rotate: 5 }}
@@ -182,6 +216,14 @@ export default function ProfileContent({
 						</motion.div>
 					)}
 				</motion.div>
+
+				{codev.level && (
+					<CodevBadge level={filteredLevel} className="transition-transform group-hover:scale-100"/>
+
+				)}
+
+
+
 				{tech_stacks && tech_stacks.length > 0 && (
 					<motion.div 
 						className="mt-4"

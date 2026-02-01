@@ -237,7 +237,7 @@ const CodevCard = ({ codev, color }: Props) => {
             />
           ) : null}
         </div>
-        <CodevHireCodevButton codevId={codev.id} hovered={hovered} />
+        <CodevHireCodevButton codevId={codev.id} />
       </div>
     </div>
   );
