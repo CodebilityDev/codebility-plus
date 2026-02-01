@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -16,6 +16,8 @@ import {
 } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
 import CodevBadge from "@/components/CodevBadge";
+import { getMemberRatingScore } from "../_services/query";
+import StarRating from "./StarRating";
 
 
 type LevelMap = Record<string, number>;
@@ -72,6 +74,24 @@ export default function ProfileContent({
 	codev,
 	availableSchedule
 }: ProfileContentProps) {
+	const [ratingScore, setRatingScore] = useState<number | null>(null);
+
+	useEffect(() => {
+		if (!codev.id) return;
+
+		const fetchScore = async () => {
+		try {
+			const score = await getMemberRatingScore(codev.id);
+			setRatingScore(score ?? 0);
+		} catch (err) {
+			console.error("Failed to fetch member score:", err);
+		}
+		};
+
+		fetchScore();
+	}, [codev.id]);
+
+
 	const allDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 	const getRandomBgColor = () => `bg-${getRandomColor()}`;
@@ -222,7 +242,7 @@ export default function ProfileContent({
 
 				)}
 
-
+				{ratingScore !== null && <StarRating rating={ratingScore} size={24} />}
 
 				{tech_stacks && tech_stacks.length > 0 && (
 					<motion.div 
