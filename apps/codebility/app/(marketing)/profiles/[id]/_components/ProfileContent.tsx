@@ -177,8 +177,7 @@ export default function ProfileContent({
 						src={image_url || "/assets/svgs/icon-codebility-black.svg"}
 						width={200}
 						height={200}
-						className={`${getBgColor(codev.id)} h-[150px] w-[150px] rounded-full bg-cover object-cover`}
-						className={`h-[150px] w-[150px] rounded-full bg-cover object-cover`}
+						className={`${getBgColor(codev.id)} h-[150px] w-[150px] rounded-full object-cover`}
 					/>
 					<motion.div 
 						className="absolute bottom-[7px] right-[7px]"
