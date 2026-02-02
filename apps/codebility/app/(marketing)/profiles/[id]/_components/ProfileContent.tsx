@@ -6,7 +6,6 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { ClockIcon } from "lucide-react";
 import { cn } from "@codevs/ui";
-import getRandomColor from "@/lib/getRandomColor";
 import {
 	IconAbout,
 	IconGithub,
@@ -108,7 +107,13 @@ export default function ProfileContent({
 
 	const allDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-	const getRandomBgColor = () => `bg-${getRandomColor()}`;
+	// FIXED: Deterministic color based on codev.id to prevent hydration mismatch
+	const getBgColor = (id: string) => {
+		const colors = ['bg-bg-codeviolet', 'bg-bg-codemean', 'bg-bg-codegreen', 'bg-bg-codepink'];
+		// Create a consistent hash from the ID
+		const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+		return colors[hash % colors.length];
+	};
 
 	const getStatusBadge = () =>
 		codev.availability_status
@@ -131,6 +136,7 @@ export default function ProfileContent({
 		const displayHour = hour % 12 || 12;
 		return `${displayHour}:${minutes} ${ampm}`;
 	};
+	
 	const {
 		first_name,
 		last_name,
@@ -171,7 +177,7 @@ export default function ProfileContent({
 						src={image_url || "/assets/svgs/icon-codebility-black.svg"}
 						width={200}
 						height={200}
-						className={`${getRandomBgColor()} h-[150px] w-[150px] rounded-full bg-cover object-cover`}
+						className={`${getBgColor(codev.id)} h-[150px] w-[150px] rounded-full bg-cover object-cover`}
 					/>
 					<motion.div 
 						className="absolute bottom-[7px] right-[7px]"
