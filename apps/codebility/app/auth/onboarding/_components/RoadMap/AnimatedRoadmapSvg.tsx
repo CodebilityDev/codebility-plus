@@ -9,20 +9,20 @@ gsap.registerPlugin(ScrollTrigger);
 
 const phases = [
   {
-    cx: 220,
-    cy: 520,
+    cx: 540,
+    cy: 530,
     color: "#9333ea",
-    textX: 40,
+    textX: 280,
     textY: 340,
     title: "Phase 1: Intern (0-100 pts)",
     steps: ["Learn The Basics", "Hands-On Practice", "Version Control"],
     icon: <Lightbulb className="h-6 w-6 text-white" strokeWidth={1.5} />,
   },
   {
-    cx: 700, // nudged closer to road curve
+    cx: 960,
     cy: 430,
     color: "#db2777",
-    textX: 750,
+    textX: 1010,
     textY: 480,
     title: "Phase 2: Codev (100-200 pts)",
     steps: [
@@ -34,11 +34,11 @@ const phases = [
     icon: <BarChart3 className="h-6 w-6 text-white" strokeWidth={1.5} />,
   },
   {
-    cx: 1200, // shifted onto road curve
-    cy: 420,
+    cx: 1550,
+    cy: 360,
     color: "#f59e0b",
-    textX: 980,
-    textY: 250,
+    textX: 1280,
+    textY: 220,
     title: "Phase 3: Mentor (200+ pts)",
     steps: ["Specialize", "Advanced Concepts", "Collaborate"],
     icon: <Code2 className="h-6 w-6 text-white" strokeWidth={1.5} />,
@@ -96,16 +96,16 @@ export default function AnimatedRoadmapSvg() {
         ref={svgRef}
         id="roadmap-svg"
         xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 1450 700"
+        viewBox="0 0 1900 700"
         className="hidden h-auto w-full lg:block"
       >
-        {/* Road Base (smooth S-shape, extended to end) */}
+        {/* Road Base (smooth S-shape, extended to end with more spacing) */}
         <path
           id="main-path"
-          d="M 100 550
-             C 300 450, 400 650, 600 500
-             S 900 300, 1100 400
-             S 1250 250, 1400 200"
+          d="M 360 550
+             C 560 450, 660 650, 860 500
+             S 1160 300, 1360 400
+             S 1600 230, 1650 180"
           stroke="#272728"
           strokeWidth="28"
           fill="none"
@@ -115,10 +115,10 @@ export default function AnimatedRoadmapSvg() {
         {/* Yellow center line (animated, goes full length) */}
         <path
           id="center-line"
-          d="M 100 550
-             C 300 450, 400 650, 600 500
-             S 900 300, 1100 400
-             S 1250 250, 1400 200"
+          d="M 360 550
+             C 560 450, 660 650, 860 500
+             S 1160 300, 1360 400
+             S 1600 230, 1650 180"
           stroke="#fde047"
           strokeWidth="4"
           fill="none"
@@ -127,8 +127,8 @@ export default function AnimatedRoadmapSvg() {
         />
 
         {/* Start marker */}
-        <circle cx="100" cy="550" r="18" fill="#22c55e" stroke="#fff" strokeWidth="3" />
-        <text x="75" y="590" fontSize="12" fill="#374151" fontWeight="bold">
+        <circle cx="360" cy="550" r="18" fill="#22c55e" stroke="#fff" strokeWidth="3" />
+        <text x="335" y="590" fontSize="12" fill="#374151" fontWeight="bold">
           Start
         </text>
 
