@@ -15,6 +15,7 @@ import {
 } from "@/public/assets/svgs";
 import { useUserStore } from "@/store/codev-store";
 import { NotificationContainer } from "@/components/notifications/NotificationContainer";
+import { AnnouncementButton } from "@/app/home/announcements/AnnouncementButton";
 
 import {
   DropdownMenu,
@@ -84,6 +85,9 @@ const Navbar = () => {
           role="navigation"
           aria-label="User menu"
         >
+          {/* Announcement Button - NEW */}
+          <AnnouncementButton />
+          
           <NotificationContainer />
           
           <div>

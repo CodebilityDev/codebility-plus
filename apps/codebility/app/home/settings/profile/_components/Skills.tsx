@@ -24,6 +24,50 @@ type TechStackStore = {
   setStack: (stack: string[]) => void;
 };
 
+
+  // ENter name here kung may bagong tech stack na idadagdag cause of issues with naming in database  -> svg filenames.
+const TECH_STACK_MAPPING: Record<string, string> = {
+  // Multi-word names with spaces (need hyphens in filename)
+  "github actions": "github-actions",
+  "react native": "react-native",
+  "spring boot": "springboot",
+  "ruby on rails": "rails",
+  "google cloud platform": "gcp",
+  "microsoft azure": "azure",
+  
+  // Names with dots
+  "asp.net core": "aspnet",
+  "asp.net": "aspnet",
+  "nuxt.js": "nuxtjs",
+  "next.js": "nextjs",
+  "node.js": "nodejs",
+  "express.js": "expressjs",
+  "vue.js": "vue",
+  
+  // Special characters
+  "c++": "cplus-plus",
+  "c#": "csharp",
+  
+  // Single word names that might have variations
+  "reactnative": "react-native",
+  "nextjs": "nextjs",
+  "nodejs": "nodejs",
+  "expressjs": "expressjs",
+  "nuxtjs": "nuxtjs",
+  "typescript": "typescript",
+  "javascript": "javascript",
+  "tailwind": "tailwind",
+  "tailwindcss": "tailwind",
+  "bootstrap": "bootstrap",
+  "html": "html",
+  "css": "css",
+  "php": "php",
+  "react": "react",
+  "laravel": "laravel",
+  "mui": "mui",
+  "material-ui": "mui",
+};
+
 const Skills = ({ data }: SkillsProps) => {
   const [isEditMode, setIsEditMode] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -34,6 +78,7 @@ const Skills = ({ data }: SkillsProps) => {
   useEffect(() => {
     if (data?.tech_stacks?.length) {
       setStack(data.tech_stacks.map((stack) => stack.toLowerCase()));
+      console.log("Tech stacks loaded:", data.tech_stacks);
     } else {
       setStack([]);
     }
@@ -148,7 +193,9 @@ const Skills = ({ data }: SkillsProps) => {
             item && (
               <div key={`${item}-${index}`} className="flex items-center">
                 <Image
-                  src={`/assets/svgs/techstack/icon-${item.toLowerCase()}.svg`}
+                  src={`/assets/svgs/techstack/icon-${
+                    TECH_STACK_MAPPING[item.toLowerCase()] || item.toLowerCase()
+                  }.svg`}
                   alt={`${item} icon`}
                   width={40}
                   height={40}

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 import { SimpleMemberData, getProjectCodevs, updateProjectMembers } from "@/app/home/projects/actions";
 import { Button } from "@/components/ui/button";
 import {
@@ -9,8 +9,8 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Codev } from "@/types/home/codev";
-import { Search, Check, Users } from "lucide-react";
+import { Codev, InternalStatus } from "@/types/home/codev";
+import { Search, Users } from "lucide-react";
 import toast from "react-hot-toast";
 import { useModal } from "@/hooks/use-modal-users";
 import { createClientClientComponent } from "@/utils/supabase/client";
@@ -26,7 +26,7 @@ interface AddMembersModalProps {
   onUpdate: (selectedMembers: Codev[]) => void;
 }
 
-// ✅ CLIENT-SIDE: Calculate years from work experience
+// ✅ Calculate years from work experience
 const calculateYearsFromExperience = (workExperience: any[]): number => {
   if (!workExperience || workExperience.length === 0) return 0;
   
@@ -43,7 +43,7 @@ const calculateYearsFromExperience = (workExperience: any[]): number => {
   return Math.round(totalYears);
 };
 
-// Line 25: Responsive Avatar Component with Profile Click
+// ✅ Responsive Avatar Component
 const TeamMemberAvatar = ({ 
   imageUrl, 
   name, 
@@ -87,7 +87,7 @@ const TeamMemberAvatar = ({
       />
     </div>
     <div className="text-center w-full">
-      <div className="text-xs text-white font-medium truncate w-full leading-tight">
+      <div className="text-xs text-white font-medium truncate w-full leading-tight mt-2">
         {name}
       </div>
       {position && (
@@ -99,7 +99,7 @@ const TeamMemberAvatar = ({
   </div>
 );
 
-// ✅ FIXED: Team Leader Display with real data handling
+// ✅ Team Leader Display
 const TeamLeaderDisplay = ({ 
   teamLead,
   onProfileClick
@@ -108,18 +108,17 @@ const TeamLeaderDisplay = ({
   onProfileClick?: (member: Codev) => void;
 }) => (
   <div>
-    <h4 className="text-base sm:text-lg font-semibold text-white mb-1">Team Leader</h4>
+    <h4 className="text-base sm:text-lg font-semibold text-white mb-3">Team Leader</h4>
     {teamLead ? (
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 mb-6 mt-2">
         <div 
-          className={`relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-customBlue-400 ${
+          className={`relative flex-shrink-0 rounded-full overflow-hidden ring-2 ring-customBlue-400 mb-2 ${
             onProfileClick ? 'cursor-pointer hover:ring-customBlue-300 transition-all duration-200' : ''
           }`}
           style={{ width: 40, height: 40 }}
           onClick={(e) => {
             e.stopPropagation();
             if (onProfileClick && teamLead) {
-              // ✅ Create basic Codev object - real data will be fetched by handleProfileClick
               const basicCodev: Codev = {
                 id: teamLead.id,
                 first_name: teamLead.first_name,
@@ -127,9 +126,8 @@ const TeamLeaderDisplay = ({
                 email_address: teamLead.email_address,
                 display_position: teamLead.display_position ?? undefined,
                 image_url: teamLead.image_url ?? undefined,
-                // ✅ Fix 3: Use proper default values with correct typing
                 availability_status: undefined,
-                internal_status: undefined, // Will be fetched with real data
+                internal_status: undefined,
                 years_of_experience: undefined,
                 about: undefined,
                 education: [],
@@ -166,7 +164,7 @@ const TeamLeaderDisplay = ({
           />
         </div>
         <div>
-          <div className="text-white font-semibold text-sm sm:text-base">
+          <div className="text-white font-semibold text-sm sm:text-base mt-[-7px]">
             {teamLead.first_name} {teamLead.last_name}
           </div>
           <div className="text-gray-300 text-xs sm:text-sm">
@@ -180,7 +178,7 @@ const TeamLeaderDisplay = ({
   </div>
 );
 
-// Line 125: Enhanced Responsive Team Grid with Profile Click
+// ✅ Team Members Grid
 const TeamMembersGrid = ({ 
   members,
   currentMemberIds,
@@ -202,14 +200,14 @@ const TeamMembersGrid = ({
   return (
     <div className="h-full flex flex-col">
       <h4 className="text-base sm:text-lg font-semibold text-white mb-1">Team Members</h4>
-      <div className="mb-1 sm:mb-2">
+      <div className="mb-1 sm:mb-2 md:mt-2">
         <span className="text-white text-xs sm:text-sm">{members.length} members</span>
       </div>
-      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2 w-full">
+      <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-1 sm:gap-2 w-full mt-6">
         {members.map((member) => {
           const isNew = !currentMemberIds.includes(member.id);
           return (
-            <div key={member.id} className="w-full flex flex-col items-center relative">
+            <div key={member.id} className="w-full flex flex-col items-center relative mb-5">
               {isNew && (
                 <div className="absolute -top-1 -right-1 bg-green-500 text-white text-xs px-1 rounded-full z-10">
                   New
@@ -231,7 +229,7 @@ const TeamMembersGrid = ({
   );
 };
 
-// Line 160: Project Preview with Enhanced Profile Click Support
+// ✅ Project Preview
 const ProjectPreview = ({ 
   projectName, 
   teamLead, 
@@ -245,10 +243,10 @@ const ProjectPreview = ({
   currentMemberIds: string[];
   onProfileClick?: (member: Codev) => void;
 }) => (
-  <div className="h-full flex flex-col p-1 sm:p-2 space-y-1">
+  <div className="h-full flex flex-col p-1 sm:p-2 gap-y-6">
     <div className="flex-shrink-0">
       <h3 className="text-base sm:text-lg font-semibold text-white mb-1">Project Name</h3>
-      <div className="flex items-center gap-2 sm:gap-3">
+      <div className="flex items-center gap-2 sm:gap-3 mt-2">
         <div className="w-8 h-8 sm:w-12 sm:h-12 rounded-lg overflow-hidden flex items-center justify-center bg-customBlue-600">
           <img
             src="https://codebility-cdn.pages.dev/assets/images/logo.png"
@@ -278,7 +276,7 @@ const ProjectPreview = ({
       />
     </div>
     
-    <div className="flex-1 min-h-0">
+    <div className="flex-1 min-h-0 mr-8">
       <TeamMembersGrid 
         members={selectedMembers} 
         currentMemberIds={currentMemberIds}
@@ -288,7 +286,7 @@ const ProjectPreview = ({
   </div>
 );
 
-// ✅ FIXED: Main Modal Component with Real Database Profile Integration
+// ✅ Main Modal Component
 const AddMembersModal = ({ 
   isOpen, 
   onClose, 
@@ -299,15 +297,17 @@ const AddMembersModal = ({
   const teamLeadData = teamLead.data;
   const currentMembers = members.data ?? [];
 
-  // ✅ FIXED: Initialize Supabase client safely following project pattern
   const [supabase, setSupabase] = useState<any>(null);
 
   useEffect(() => {
-    const supabaseClient = createClientClientComponent();
-    setSupabase(supabaseClient);
+    try {
+      const supabaseClient = createClientClientComponent();
+      setSupabase(supabaseClient);
+    } catch (error) {
+      console.error('Failed to initialize Supabase client:', error);
+    }
   }, []);
 
-  // Line 214: Modal hook for profile integration
   const { onOpen: openProfileModal } = useModal();
 
   const [selectedMembers, setSelectedMembers] = useState<Codev[]>([]);
@@ -316,15 +316,15 @@ const AddMembersModal = ({
   const [availableMembers, setAvailableMembers] = useState<Codev[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
 
-  // ✅ FIXED: Enhanced profile fetching function with proper Supabase handling
-  const getCompleteCodevProfileSafe = async (codevId: string): Promise<Codev | null> => {
+  // ✅ Enhanced profile fetching with timeout protection
+  const getCompleteCodevProfileSafe = useCallback(async (codevId: string): Promise<Codev | null> => {
     try {
       if (!supabase) {
         console.error('Supabase client not available');
         return null;
       }
       
-      const { data, error } = await supabase
+      const fetchPromise = supabase
         .from("codev")
         .select(`
           *,
@@ -338,26 +338,29 @@ const AddMembersModal = ({
         .eq('id', codevId)
         .single();
 
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error('Profile fetch timeout')), 8000)
+      );
+
+      const { data, error } = await Promise.race([fetchPromise, timeoutPromise]) as any;
+
       if (error || !data) {
         console.error('Error fetching complete profile:', error);
         return null;
       }
 
-      // ✅ Handle years_of_experience calculation
       let finalYearsOfExperience = data.years_of_experience;
       
       if (finalYearsOfExperience === null || finalYearsOfExperience === undefined) {
         finalYearsOfExperience = calculateYearsFromExperience(data.work_experience || []);
       }
 
-      // ✅ Fix 2: Proper type casting for InternalStatus
       const safeInternalStatus = data.internal_status as InternalStatus | undefined;
       
-      // ✅ Return REAL database values with proper typing
       const enhancedProfile: Codev = {
         ...data,
         years_of_experience: finalYearsOfExperience,
-        internal_status: safeInternalStatus, // ✅ Properly typed
+        internal_status: safeInternalStatus,
         work_experience: data.work_experience || [],
         education: data.education || [],
         projects: data.projects || [],
@@ -366,36 +369,21 @@ const AddMembersModal = ({
         positions: data.positions || []
       };
 
-      console.log('✅ AddMembersModal - REAL DATABASE VALUES:', {
-        id: enhancedProfile.id,
-        name: `${enhancedProfile.first_name} ${enhancedProfile.last_name}`,
-        availability_status: enhancedProfile.availability_status,
-        internal_status: enhancedProfile.internal_status,
-        years_of_experience: enhancedProfile.years_of_experience,
-        years_source: data.years_of_experience !== null ? 'database' : 'calculated'
-      });
-
       return enhancedProfile;
     } catch (error) {
       console.error('Failed to fetch complete profile:', error);
       return null;
     }
-  };
+  }, [supabase]);
 
-  // ✅ FIXED: Profile click handler with REAL database values and proper error handling
-  const handleProfileClick = async (member: Codev) => {
+  // ✅ Profile click handler
+  const handleProfileClick = useCallback(async (member: Codev) => {
     try {
-      console.log('🔍 AddMembersModal - Fetching real profile data for:', member.id);
-      
-      // Step 1: Fetch complete real profile data using safe method
       const completeProfile = await getCompleteCodevProfileSafe(member.id);
       
       if (completeProfile) {
-        console.log('✅ AddMembersModal - Opening ProfileModal with REAL values');
         openProfileModal("profileModal", completeProfile);
       } else {
-        console.warn('❌ AddMembersModal - Using fallback data');
-        // ✅ Fix 4: Proper fallback with correct InternalStatus typing
         const fallbackProfile: Codev = {
           ...member,
           years_of_experience: 0,
@@ -405,8 +393,7 @@ const AddMembersModal = ({
         openProfileModal("profileModal", fallbackProfile);
       }
     } catch (error) {
-      console.error('❌ AddMembersModal - Error in profile click handler:', error);
-      // ✅ Final fallback with safe typing
+      console.error('Error in profile click handler:', error);
       const safeFallback: Codev = {
         ...member,
         years_of_experience: 0,
@@ -415,20 +402,26 @@ const AddMembersModal = ({
       };
       openProfileModal("profileModal", safeFallback);
     }
-  };
+  }, [getCompleteCodevProfileSafe, openProfileModal]);
 
-  // Line 226: Load available members
+  // ✅ Load available members with timeout
   useEffect(() => {
     const loadMembers = async () => {
       if (!isOpen) return;
       
       setIsLoadingMembers(true);
       try {
-        const users = await getProjectCodevs();
+        const loadPromise = getProjectCodevs();
+        const timeoutPromise = new Promise<never>((_, reject) =>
+          setTimeout(() => reject(new Error('Load members timeout')), 10000)
+        );
+
+        const users = await Promise.race([loadPromise, timeoutPromise]);
         setAvailableMembers(users || []);
       } catch (error) {
         console.error('Failed to fetch members:', error);
         toast.error('Failed to load members');
+        setAvailableMembers([]);
       } finally {
         setIsLoadingMembers(false);
       }
@@ -437,7 +430,7 @@ const AddMembersModal = ({
     loadMembers();
   }, [isOpen]);
 
-  // Line 243: Initialize selected members
+  // ✅ Initialize selected members
   useEffect(() => {
     if (isOpen && currentMembers && availableMembers.length > 0) {
       const currentMemberIds = currentMembers.map(m => m.id);
@@ -448,26 +441,33 @@ const AddMembersModal = ({
     }
   }, [isOpen, currentMembers, availableMembers]);
 
-  // Calculate newly selected members (not already in the team)
+  // Calculate newly selected members
   const newlySelectedMembers = useMemo(() => {
     const currentMemberIds = currentMembers.map(m => m.id);
     return selectedMembers.filter(member => !currentMemberIds.includes(member.id));
   }, [selectedMembers, currentMembers]);
 
-  // Line 253: Member selection logic
-  const toggleMember = (member: Codev) => {
+  // ✅ Member selection logic
+  const toggleMember = useCallback((member: Codev) => {
     setSelectedMembers(prev => {
       const isSelected = prev.some(m => m.id === member.id);
       return isSelected 
         ? prev.filter(m => m.id !== member.id)
         : [...prev, member];
     });
-  };
+  }, []);
 
-  const isSelected = (userId: string) => selectedMembers.some(m => m.id === userId);
-  const isCurrentMember = (userId: string) => currentMembers.some(m => m.id === userId);
+  const isSelected = useCallback((userId: string) => 
+    selectedMembers.some(m => m.id === userId), 
+    [selectedMembers]
+  );
+  
+  const isCurrentMember = useCallback((userId: string) => 
+    currentMembers.some(m => m.id === userId), 
+    [currentMembers]
+  );
 
-  // Line 264: Filter available members - Optimize with better filtering
+  // ✅ Filter available members
   const filteredUsers = useMemo(() => {
     if (!availableMembers.length) return [];
     
@@ -488,7 +488,7 @@ const AddMembersModal = ({
     });
   }, [availableMembers, teamLeadData, searchQuery]);
 
-  // Line 278: Reset state on close
+  // ✅ Reset state on close
   useEffect(() => {
     if (!isOpen) {
       setSearchQuery("");
@@ -496,14 +496,16 @@ const AddMembersModal = ({
     }
   }, [isOpen]);
 
-  // Line 285: Submit handler
+  // ✅ Submit handler with timeout
   const handleSubmit = async () => {
     if (!teamLeadData) {
       toast.error('Team leader not found');
       return;
     }
 
+    const loadingToast = toast.loading('Updating team members...');
     setIsUpdating(true);
+    
     try {
       const updatedMembers = [
         {
@@ -520,22 +522,29 @@ const AddMembersModal = ({
           })),
       ];
 
-      const result = await updateProjectMembers(
+      const updatePromise = updateProjectMembers(
         project.id,
         updatedMembers,
         teamLeadData.id,
       );
 
+      const timeoutPromise = new Promise<never>((_, reject) =>
+        setTimeout(() => reject(new Error('Update timeout')), 15000)
+      );
+
+      const result = await Promise.race([updatePromise, timeoutPromise]);
+
       if (result.success) {
-        toast.success("Project members updated successfully");
+        toast.success("Team members updated successfully!", { id: loadingToast });
         await onUpdate(selectedMembers);
         onClose();
       } else {
-        toast.error(result.error || "Failed to update members");
+        toast.error(result.error || "Failed to update members", { id: loadingToast });
       }
     } catch (error) {
       console.error('Update error:', error);
-      toast.error("An unexpected error occurred");
+      const errorMsg = error instanceof Error ? error.message : "An unexpected error occurred";
+      toast.error(errorMsg, { id: loadingToast });
     } finally {
       setIsUpdating(false);
     }
@@ -545,16 +554,16 @@ const AddMembersModal = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] p-0 flex flex-col bg-white/20 backdrop-blur-md dark:bg-white/10 border border-white/30 dark:border-white/20">
-        <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1 border-b border-white/30 dark:border-white/20 bg-white/10 backdrop-blur-sm dark:bg-white/5">
+      <DialogContent className="max-w-full w-[85vw] sm:w-[80vw] lg:w-[80vw] h-[80vh] flex flex-col dark:bg-slate-950 border-2 border-slate-300 dark:border-blue-900/60 p-4 sm:p-0">
+        <DialogHeader className="flex-shrink-0 px-3 sm:px-6 pt-1 pb-1">
           <DialogTitle className="text-lg sm:text-xl lg:text-2xl font-bold text-white">
-            Add Members
+            Add Members to {project.name}
           </DialogTitle>
         </DialogHeader>
 
         <div className="flex flex-col lg:flex-row flex-1 min-h-0 overflow-hidden">
-          {/* Left Panel - 60% on Desktop */}
-          <div className="w-full lg:w-3/5 border-b lg:border-b-0 lg:border-r border-white/30 dark:border-white/20">
+          {/* Left Panel - Project Preview */}
+          <div className="w-full lg:w-3/5 border-b lg:border-b-0 lg:border-r border-white/30 dark:border-white/20 pr-0 md:pr-6">
             <ProjectPreview 
               projectName={project.name}
               teamLead={teamLeadData}
@@ -564,12 +573,17 @@ const AddMembersModal = ({
             />
           </div>
 
-          {/* Right Panel - 40% on Desktop */}
+          {/* Right Panel - Available Members */}
           <div className="w-full lg:w-2/5 flex flex-col min-h-0">
             <div className="flex-shrink-0 px-3 sm:px-6 pt-3 sm:pt-6 pb-4">
               <h3 className="text-base sm:text-lg font-semibold text-white mb-3 sm:mb-4 flex items-center gap-2">
                 <Users className="h-4 w-4 sm:h-5 sm:w-5 text-customBlue-400" />
-                <span className="truncate">Available Members ({newlySelectedMembers.length} new selected)</span>
+                <span className="truncate">
+                  Available Members 
+                  {newlySelectedMembers.length > 0 && (
+                    <span className="ml-2 text-green-400">({newlySelectedMembers.length} new)</span>
+                  )}
+                </span>
               </h3>
               
               <div className="relative mb-3 sm:mb-4">
@@ -587,17 +601,18 @@ const AddMembersModal = ({
             <div className="flex-1 px-3 sm:px-6 pb-4 overflow-y-auto min-h-0">
               <div className="space-y-2 sm:space-y-3">
                 {isLoadingMembers ? (
-                  <div className="text-center py-6 sm:py-8 text-gray-400">
-                    Loading members...
+                  <div className="text-center py-8 text-gray-400">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-customBlue-500 mx-auto mb-3"></div>
+                    <p>Loading members...</p>
                   </div>
                 ) : filteredUsers.length > 0 ? (
                   filteredUsers.slice(0, 50).map((user) => (
                     <div
                       key={user.id}
                       onClick={() => toggleMember(user)}
-                      className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-colors ${
+                      className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-3 rounded-lg cursor-pointer transition-all duration-200 ${
                         isSelected(user.id) 
-                          ? 'bg-gray-700/50 ring-1 ring-customBlue-500' 
+                          ? 'bg-customBlue-600/30 ring-2 ring-customBlue-500' 
                           : 'hover:bg-gray-700/30'
                       }`}
                     >
@@ -634,7 +649,7 @@ const AddMembersModal = ({
                         <div className="text-white font-semibold text-sm sm:text-base truncate">
                           {user.first_name} {user.last_name}
                           {isCurrentMember(user.id) && (
-                            <span className="ml-2 text-xs text-gray-400">(Current member)</span>
+                            <span className="ml-2 text-xs text-green-400 font-normal">(Current)</span>
                           )}
                         </div>
                         {user.display_position && (
@@ -644,7 +659,6 @@ const AddMembersModal = ({
                         )}
                       </div>
                       
-                      {/* ✅ Fixed checkbox with proper contrast */}
                       <div className="flex-shrink-0">
                         <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded border-2 flex items-center justify-center transition-all duration-200 ${
                           isSelected(user.id) 
@@ -652,26 +666,20 @@ const AddMembersModal = ({
                             : 'bg-transparent border-gray-400'
                         }`}>
                           {isSelected(user.id) && (
-                            <span 
-                              style={{ 
-                                color: 'rgb(0, 0, 0)',
-                                fontSize: '16px', 
-                                fontWeight: '900',
-                                lineHeight: '1',
-                                display: 'block',
-                                textAlign: 'center'
-                              }}
-                            >
-                              &#10003;
-                            </span>
+                            <svg className="w-4 h-4 text-black font-bold" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" />
+                            </svg>
                           )}
                         </div>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-6 sm:py-8 text-gray-400 text-sm sm:text-base">
-                    {searchQuery ? "No members found" : "No available members"}
+                  <div className="text-center py-8 text-gray-400">
+                    <Users className="h-12 w-12 mx-auto mb-3 opacity-50" />
+                    <p className="text-sm sm:text-base">
+                      {searchQuery ? "No members found matching your search" : "No available members"}
+                    </p>
                   </div>
                 )}
               </div>
@@ -679,7 +687,8 @@ const AddMembersModal = ({
           </div>
         </div>
 
-        <div className="flex-shrink-0 flex flex-col sm:flex-row gap-3 p-3 sm:p-6 border-t border-gray-700 bg-gray-800">
+        {/* Footer Actions */}
+        <div className="flex-shrink-0 flex flex-col sm:flex-row gap-3 p-3 sm:p-6 border-t border-white/20">
           <Button
             variant="outline"
             onClick={onClose}
@@ -690,10 +699,17 @@ const AddMembersModal = ({
           </Button>
           <Button
             onClick={handleSubmit}
-            disabled={isUpdating || isLoadingMembers}
-            className="w-full sm:flex-1 bg-customBlue-600 hover:bg-customBlue-700 text-white border-0"
+            disabled={isUpdating || isLoadingMembers || selectedMembers.length === 0}
+            className="w-full sm:flex-1 bg-customBlue-600 hover:bg-customBlue-700 text-white border-0 disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isUpdating ? "Updating..." : "Update Members"}
+            {isUpdating ? (
+              <span className="flex items-center gap-2">
+                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                Updating...
+              </span>
+            ) : (
+              `Update Members (${newlySelectedMembers.length} new)`
+            )}
           </Button>
         </div>
       </DialogContent>

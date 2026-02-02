@@ -2,10 +2,8 @@ import { Suspense } from "react";
 import { UsersSkeleton } from "@/components/ui/skeleton/UsersSkeleton";
 import { getCodevs } from "@/lib/server/codev.service";
 import { Codev } from "@/types/home/codev";
-import {
-  getPrioritizedAndFilteredCodevs,
-  prioritizeCodevs,
-} from "@/utils/codev-priority"; // Import the utility
+import { prioritizeCodevs } from "@/utils/codev-priority";
+import { getQualifiedCodevs } from "@/utils/codev-qualification";
 
 import Section from "../_shared/CodevsSection";
 import CodevContainer from "./_components/CodevContainer";
@@ -16,22 +14,33 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 export default async function Profiles() {
+  // Fetch all passed codevs (includes admins, mentors, codevs)
   const [{ data: allCodevs, error }] = await Promise.all([
-    getCodevs({ filters: { role_id: 10 } }), // show only Codevs with role_id 10 which is Codev
+    getCodevs({ filters: { application_status: "passed" } }),
   ]);
 
   if (error) {
     throw new Error("Failed to fetch profiles data");
   }
 
+  // Convert to array safely
   const codevsArray: Codev[] = Array.isArray(allCodevs) ? allCodevs : [];
 
-  // Use the utility function with filterAdminAndFailed set to true
-  const sortedCodevs = getPrioritizedAndFilteredCodevs(
-    codevsArray,
-    { activeStatus: ["active"] },
-    true,
-  );
+  // Filter by qualification criteria (100+ points, passed, available)
+  // This handles ALL filtering logic - no internal_status restrictions
+  const qualifiedCodevs = getQualifiedCodevs(codevsArray);
+
+  // Apply priority sorting only (no additional filtering)
+  // Prioritize by: Active projects > No projects, Available > Unavailable
+  const sortedCodevs = prioritizeCodevs(qualifiedCodevs);
+
+  // Debug logging in development
+  if (process.env.NODE_ENV === "development") {
+    console.log("📊 PROFILES PAGE STATS:");
+    console.log(`   Total codevs fetched: ${codevsArray.length}`);
+    console.log(`   Qualified codevs: ${qualifiedCodevs.length}`);
+    console.log(`   Final displayed: ${sortedCodevs.length}`);
+  }
 
   return (
     <>
