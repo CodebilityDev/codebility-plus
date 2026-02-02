@@ -151,7 +151,7 @@ export default function ProfileContent({
 		[codev.level],
 	);
 
-
+	
 	return (
 		<div className="mt-6 flex flex-col gap-6 md:gap-12 lg:mt-16 lg:flex-row">
 			{/* Left Section */}
@@ -171,7 +171,7 @@ export default function ProfileContent({
 						src={image_url || "/assets/svgs/icon-codebility-black.svg"}
 						width={200}
 						height={200}
-						className={`${getRandomBgColor()} h-[150px] w-[150px] rounded-full bg-cover object-cover`}
+						className={`h-[150px] w-[150px] rounded-full bg-cover object-cover`}
 					/>
 					<motion.div 
 						className="absolute bottom-[7px] right-[7px]"
