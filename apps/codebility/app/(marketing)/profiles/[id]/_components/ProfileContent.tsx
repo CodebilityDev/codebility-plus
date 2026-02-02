@@ -1,19 +1,34 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { ClockIcon } from "lucide-react";
 import { cn } from "@codevs/ui";
-import getRandomColor from "@/lib/getRandomColor";
 import {
 	IconAbout,
 	IconGithub,
 	IconLink,
 	IconSkills,
+	IconLinkedInWhiteSmall,
 } from "@/public/assets/svgs";
 import { Codev } from "@/types/home/codev";
+import CodevBadge from "@/components/CodevBadge";
+import { getMemberProjects, getMemberRatingScore, ProjectInfo } from "../_services/query";
+import StarRating from "./StarRating";
+import ProjectList from "./ProjectList";
+
+
+type LevelMap = Record<string, number>;
+
+function getFilteredLevel(level?: LevelMap): LevelMap {
+	if (!level) return {};
+
+	return Object.fromEntries(
+		Object.entries(level).filter(([_, value]) => value > 0),
+	);
+}
 
 const fadeInUp = {
 	hidden: { opacity: 0, y: 20 },
@@ -59,9 +74,46 @@ export default function ProfileContent({
 	codev,
 	availableSchedule
 }: ProfileContentProps) {
+	const [ratingScore, setRatingScore] = useState<number | null>(null);
+	const [memberProjects, setMemberProjects] = useState<ProjectInfo[] | null>(null);
+
+	useEffect(() => {
+		if (!codev.id) return;
+
+		const fetchScore = async () => {
+			try {
+				const score = await getMemberRatingScore(codev.id);
+				setRatingScore(score ?? 0);
+			} catch (err) {
+				console.error("Failed to fetch member score:", err);
+			}
+		};
+
+		fetchScore();
+
+		const fetchProjects = async () => {
+			try {
+				const projects = await getMemberProjects(codev.id);
+				setMemberProjects(projects);
+			} catch (err) {
+				console.error("Failed to fetch projects:", err);
+			}
+		};
+
+		fetchProjects();
+
+	}, [codev.id]);
+
+
 	const allDays = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
-	const getRandomBgColor = () => `bg-${getRandomColor()}`;
+	// FIXED: Deterministic color based on codev.id to prevent hydration mismatch
+	const getBgColor = (id: string) => {
+		const colors = ['bg-bg-codeviolet', 'bg-bg-codemean', 'bg-bg-codegreen', 'bg-bg-codepink'];
+		// Create a consistent hash from the ID
+		const hash = id.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
+		return colors[hash % colors.length];
+	};
 
 	const getStatusBadge = () =>
 		codev.availability_status
@@ -84,6 +136,7 @@ export default function ProfileContent({
 		const displayHour = hour % 12 || 12;
 		return `${displayHour}:${minutes} ${ampm}`;
 	};
+	
 	const {
 		first_name,
 		last_name,
@@ -92,12 +145,19 @@ export default function ProfileContent({
 		portfolio_website,
 		about,
 		github,
+		linkedin,
 		tech_stacks,
 		education,
 		work_experience,
 		availability_status,
 	} = codev;
 
+	const filteredLevel = React.useMemo(
+		() => getFilteredLevel(codev.level),
+		[codev.level],
+	);
+
+	
 	return (
 		<div className="mt-6 flex flex-col gap-6 md:gap-12 lg:mt-16 lg:flex-row">
 			{/* Left Section */}
@@ -117,7 +177,7 @@ export default function ProfileContent({
 						src={image_url || "/assets/svgs/icon-codebility-black.svg"}
 						width={200}
 						height={200}
-						className={`${getRandomBgColor()} h-[150px] w-[150px] rounded-full bg-cover object-cover`}
+						className={`${getBgColor(codev.id)} h-[150px] w-[150px] rounded-full object-cover`}
 					/>
 					<motion.div 
 						className="absolute bottom-[7px] right-[7px]"
@@ -149,10 +209,29 @@ export default function ProfileContent({
 						</p>
 					</motion.div>
 				)}
+				{codev.headline && (
+					<p className="text-center text-sm capitalize lg:text-lg">
+						{codev.headline}
+					</p>
+				)}
 				<motion.div 
 					className="flex gap-4"
 					variants={fadeInUp}
 				>
+					{linkedin && (
+						<motion.div
+							whileHover={{ scale: 1.1, rotate: 5 }}
+							whileTap={{ scale: 0.95 }}
+						>
+							<Link
+								href={sanitizeUrl(linkedin)}
+								target="_blank"
+								className="bg-darkgray hover:bg-black-100 rounded-lg p-2 transition duration-300 block"
+							>
+								<IconLinkedInWhiteSmall className="text-2xl" />
+							</Link>
+						</motion.div>
+					)}
 					{github && (
 						<motion.div
 							whileHover={{ scale: 1.1, rotate: 5 }}
@@ -182,6 +261,14 @@ export default function ProfileContent({
 						</motion.div>
 					)}
 				</motion.div>
+
+				{codev.level && (
+					<CodevBadge level={filteredLevel} className="transition-transform group-hover:scale-100"/>
+
+				)}
+
+				{ratingScore !== null && <StarRating rating={ratingScore} size={24} />}
+
 				{tech_stacks && tech_stacks.length > 0 && (
 					<motion.div 
 						className="mt-4"
@@ -226,6 +313,12 @@ export default function ProfileContent({
 							))}
 						</motion.div>
 					</motion.div>
+				)}
+
+				{memberProjects && (
+					<div className="mt-4">
+						<ProjectList projects={memberProjects} />
+					</div>
 				)}
 
 				{/* Work Schedule Section */}

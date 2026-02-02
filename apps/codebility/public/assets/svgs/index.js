@@ -56,6 +56,7 @@ export { default as IconPriority5 } from "./icon-priority-5.svg";
 export { default as IconLink } from "./icon-link.svg";
 export { default as IconLinkedIn } from "./icon-linkedin.svg";
 export { default as IconLinkedInWhite } from "./icon-linkedinwhite.svg";
+export { default as IconLinkedInWhiteSmall } from "./icon-linkedinwhite-small.svg";
 export { default as IconDiscord } from "./icon-discord.svg";
 export { default as IconLogout } from "./icon-logout.svg";
 export { default as IconMapPin } from "./icon-map-pin.svg";

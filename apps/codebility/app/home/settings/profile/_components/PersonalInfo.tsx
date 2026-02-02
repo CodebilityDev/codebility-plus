@@ -32,6 +32,7 @@ type FormValues = {
   address: string | undefined;
   display_position: string | undefined;
   years_of_experience: number;
+  headline: string | undefined;
 };
 
 const PersonalInfo = ({ data }: PersonalInfoProps) => {
@@ -53,6 +54,7 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
       address: data.address || undefined,
       display_position: data.display_position || undefined,
       years_of_experience: data.years_of_experience || 0,
+      headline: data.headline || undefined,
     },
   });
 
@@ -197,6 +199,17 @@ const PersonalInfo = ({ data }: PersonalInfoProps) => {
             variant={isEditMode ? "lightgray" : "darkgray"}
             className="rounded"
             placeholder="Years of experience"
+          />
+
+          <Input
+            id="headline"
+            {...register("headline")}
+            label="Headline"
+            disabled={!isEditMode}
+            parentClassName="flex w-full flex-col justify-between gap-2"
+            variant={isEditMode ? "lightgray" : "darkgray"}
+            className="rounded"
+            placeholder="e.g. Senior Frontend Developer specializing in React"
           />
 
           {isEditMode && (
