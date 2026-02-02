@@ -63,7 +63,7 @@ export default function RoadMapIntro() {
       </div>
 
       {/* Main Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center py-20 text-center lg:min-h-screen lg:pb-32">
+      <div className="relative z-10 flex flex-col items-center justify-center py-20 text-center lg:min-h-screen">
         {/* Background overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/60 to-transparent"></div>
         
@@ -74,13 +74,13 @@ export default function RoadMapIntro() {
             transition={{ duration: 0.8, ease: "easeOut" }}
             className="mb-8"
           >
-            <div className="flex items-center justify-center space-x-3 mb-4">
+            <div className="flex items-center justify-center space-x-3">
               <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-teal-400 to-cyan-500 flex items-center justify-center">
                 <span className="text-white font-bold text-sm">C</span>
               </div>
               <span className="text-teal-300 font-semibold text-lg">Codebility</span>
             </div>
-            <span className="inline-block rounded-full bg-gradient-to-r from-teal-400/20 to-cyan-400/20 px-6 py-2 text-sm font-semibold text-teal-300 backdrop-blur-sm border border-teal-400/30">
+            <span className="inline-block rounded-full bg-gradient-to-r from-teal-400/20 to-cyan-400/20 px-6 py-2 text-sm font-semibold text-teal-300 backdrop-blur-sm border border-teal-400/30 mt-6">
               Welcome to Your Journey
             </span>
           </motion.div>
