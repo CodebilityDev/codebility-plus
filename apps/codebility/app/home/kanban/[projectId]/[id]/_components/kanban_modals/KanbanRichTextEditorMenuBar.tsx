@@ -13,6 +13,7 @@ import {
   List,
   ListOrdered,
   Strikethrough,
+  Space,
 } from "lucide-react";
 
 export default function KanbanRichTextEditorMenuBar({
@@ -28,72 +29,103 @@ export default function KanbanRichTextEditorMenuBar({
     {
       icon: <Heading1 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 1 }).run(),
-      preesed: editor.isActive("heading", { level: 1 }),
+      pressed: editor.isActive("heading", { level: 1 }),
+      label: "Heading 1",
     },
     {
       icon: <Heading2 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 2 }).run(),
-      preesed: editor.isActive("heading", { level: 2 }),
+      pressed: editor.isActive("heading", { level: 2 }),
+      label: "Heading 2",
     },
     {
       icon: <Heading3 className="size-4" />,
       onClick: () => editor.chain().focus().toggleHeading({ level: 3 }).run(),
-      preesed: editor.isActive("heading", { level: 3 }),
+      pressed: editor.isActive("heading", { level: 3 }),
+      label: "Heading 3",
     },
     {
       icon: <Bold className="size-4" />,
       onClick: () => editor.chain().focus().toggleBold().run(),
-      preesed: editor.isActive("bold"),
+      pressed: editor.isActive("bold"),
+      label: "Bold",
     },
     {
       icon: <Italic className="size-4" />,
       onClick: () => editor.chain().focus().toggleItalic().run(),
-      preesed: editor.isActive("italic"),
+      pressed: editor.isActive("italic"),
+      label: "Italic",
     },
     {
       icon: <Strikethrough className="size-4" />,
       onClick: () => editor.chain().focus().toggleStrike().run(),
-      preesed: editor.isActive("strike"),
+      pressed: editor.isActive("strike"),
+      label: "Strikethrough",
     },
     {
       icon: <AlignLeft className="size-4" />,
       onClick: () => editor.chain().focus().setTextAlign("left").run(),
-      preesed: editor.isActive({ textAlign: "left" }),
+      pressed: editor.isActive({ textAlign: "left" }),
+      label: "Align Left",
     },
     {
       icon: <AlignCenter className="size-4" />,
       onClick: () => editor.chain().focus().setTextAlign("center").run(),
-      preesed: editor.isActive({ textAlign: "center" }),
+      pressed: editor.isActive({ textAlign: "center" }),
+      label: "Align Center",
     },
     {
       icon: <AlignRight className="size-4" />,
       onClick: () => editor.chain().focus().setTextAlign("right").run(),
-      preesed: editor.isActive({ textAlign: "right" }),
+      pressed: editor.isActive({ textAlign: "right" }),
+      label: "Align Right",
     },
     {
       icon: <List className="size-4" />,
       onClick: () => editor.chain().focus().toggleBulletList().run(),
-      preesed: editor.isActive("bulletList"),
+      pressed: editor.isActive("bulletList"),
+      label: "Bullet List",
     },
     {
       icon: <ListOrdered className="size-4" />,
       onClick: () => editor.chain().focus().toggleOrderedList().run(),
-      preesed: editor.isActive("orderedList"),
+      pressed: editor.isActive("orderedList"),
+      label: "Numbered List",
     },
     {
       icon: <Highlighter className="size-4" />,
       onClick: () => editor.chain().focus().toggleHighlight().run(),
-      preesed: editor.isActive("highlight"),
+      pressed: editor.isActive("highlight"),
+      label: "Highlight",
+    },
+    {
+      icon: <Space className="size-4" />,
+      onClick: () => {
+        // Get current position
+        const { from } = editor.state.selection;
+        
+        // Insert an empty paragraph for spacing
+        editor
+          .chain()
+          .focus()
+          .insertContentAt(from, '<p>&nbsp;</p>')
+          .run();
+      },
+      pressed: false,
+      label: "Add Spacing",
     },
   ];
 
   return (
-    <div className="z-50 mb-1 space-x-2 rounded-md border bg-transparent p-1">
+    <div className="z-50 mb-1 flex flex-wrap gap-1 rounded-md border bg-transparent p-1">
       {Options.map((option, index) => (
         <Toggle
           key={index}
-          pressed={option.preesed}
+          size="sm"
+          pressed={option.pressed}
           onPressedChange={option.onClick}
+          aria-label={option.label}
+          title={option.label}
         >
           {option.icon}
         </Toggle>

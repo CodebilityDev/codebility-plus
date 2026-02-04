@@ -24,10 +24,16 @@ import { useUserStore } from "@/store/codev-store";
 import { useKanbanStore } from "@/store/kanban-store";
 import { SkillCategory, Task } from "@/types/home/codev";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { Ellipsis, Loader2Icon } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Ellipsis,
+  Loader2Icon,
+  MessageCircle,
+} from "lucide-react";
 import toast from "react-hot-toast";
 
-import { 
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -43,7 +49,7 @@ import DifficultyPointsTooltip, {
   DIFFICULTY_LEVELS,
 } from "../DifficultyPointsTooltip";
 import TaskCommentsSection from "./_components/TaskComments";
-import { MessageCircle, ChevronDown, ChevronUp } from "lucide-react";
+import KanbanRichTextDisplay from "../kanban_modals/KanbanRichTextDisplay";
 
 // Fetch available members function - unchanged from original
 const fetchAvailableMembers = async (
@@ -185,7 +191,7 @@ function AssigneeSelector({
       onAssigneeChange([user.id]);
     }
   };
-  
+
   return (
     <div className="flex flex-col gap-1">
       <div className="flex flex-wrap gap-2">
@@ -326,9 +332,7 @@ const TaskViewModal = ({
 
   const [manualSaveChanges, setManualSaveChanges] = useState(false);
   const [isSavingChanges, setIsSavingChanges] = useState(false);
-  const [pendingAssigneeId, setPendingAssigneeId] = useState<
-    string | undefined
-  >(undefined);
+  const [pendingAssigneeId, setPendingAssigneeId] = useState<string | undefined>(undefined);
 
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task | null;
@@ -343,33 +347,29 @@ const TaskViewModal = ({
     user?.role_id === 10;
   const canMarkAsDone = user?.role_id === 1 || user?.role_id === 5;
 
-
   const [showComments, setShowComments] = useState(false);
   const [commentCount, setCommentCount] = useState(0);
 
   useEffect(() => {
-  const fetchCommentCount = async () => {
-    if (!task?.id) return;
-    
-    const { count, error } = await supabase
-      .from("tasks_comments")
-      .select("*", { count: "exact", head: true })
-      .eq("task_id", task.id);
-    
-    if (!error && count !== null) {
-      setCommentCount(count);
-    }
-  };
+    const fetchCommentCount = async () => {
+      if (!task?.id || !supabase) return;
 
-  fetchCommentCount();
-}, [task?.id]);
+      const { count, error } = await supabase
+        .from("tasks_comments")
+        .select("*", { count: "exact", head: true })
+        .eq("task_id", task.id);
 
+      if (!error && count !== null) {
+        setCommentCount(count);
+      }
+    };
 
+    fetchCommentCount();
+  }, [task?.id, supabase]);
 
   const toggleComments = useCallback(() => {
-    setShowComments(prev => !prev);
+    setShowComments((prev) => !prev);
   }, []);
-
 
   useEffect(() => {
     const supabaseClient = createClientClientComponent();
@@ -556,7 +556,8 @@ const TaskViewModal = ({
       }
     } catch (error) {
       console.error("Error completing task:", error);
-      const errorMsg = error instanceof Error ? error.message : "Failed to complete task";
+      const errorMsg =
+        error instanceof Error ? error.message : "Failed to complete task";
       toast.error(errorMsg);
       await fetchBoardData();
     } finally {
@@ -674,20 +675,20 @@ const TaskViewModal = ({
 
   return (
     <Dialog open={isModalOpen} onOpenChange={onClose}>
-      <DialogContent className="h-auto max-h-[90vh] sm:max-h-[900px] w-[95vw] sm:w-[90vw] max-w-3xl overflow-y-auto bg-white p-3 sm:p-4 dark:bg-gray-900">
+      <DialogContent className="h-auto max-h-[90vh] w-[95vw] max-w-3xl overflow-y-auto bg-white p-3 dark:bg-gray-900 sm:max-h-[900px] sm:w-[90vw] sm:p-4">
         <div className="flex flex-col gap-6">
           <div className="h-4 md:h-0"></div>
-          
+
           {/* Title and Menu Row */}
-          <div className="flex items-start justify-between -mt-4">
+          <div className="-mt-4 flex items-start justify-between">
             <DialogHeader className="flex-1">
               <DialogTitle className="text-xl font-bold text-gray-900 dark:text-white">
-                  {task?.title}{" "}
-                  {task?.ticket_code && (
-                    <span className="ml-1 text-gray-500 dark:text-gray-400 font-normal">
-                      #{task.ticket_code}
-                    </span>
-                  )}
+                {task?.title}{" "}
+                {task?.ticket_code && (
+                  <span className="ml-1 font-normal text-gray-500 dark:text-gray-400">
+                    #{task.ticket_code}
+                  </span>
+                )}
               </DialogTitle>
             </DialogHeader>
             {canModifyTask && (
@@ -696,7 +697,7 @@ const TaskViewModal = ({
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="h-8 w-8 p-0 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800"
+                    className="h-8 w-8 rounded-full p-0 hover:bg-gray-100 dark:hover:bg-gray-800"
                   >
                     <Ellipsis className="h-4 w-4" />
                   </Button>
@@ -794,7 +795,9 @@ const TaskViewModal = ({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">PR Link</Label>
-              <div className={`${hasPrLinkChanges ? 'flex items-center space-x-2' : ''}`}>
+              <div
+                className={`${hasPrLinkChanges ? "flex items-center space-x-2" : ""}`}
+              >
                 <Input
                   value={prLink}
                   onChange={(e) => setPrLink(e.target.value)}
@@ -803,7 +806,7 @@ const TaskViewModal = ({
                       setPrLink(task.pr_link);
                     }
                   }}
-                  className="flex-1 text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 border border-gray-300 focus:border-blue-500"
+                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 flex-1 border border-gray-300 focus:border-blue-500"
                   placeholder="Enter PR Link..."
                 />
                 {hasPrLinkChanges && (
@@ -836,7 +839,9 @@ const TaskViewModal = ({
             <div className="space-y-2">
               <Label className="text-sm font-medium">Deadline</Label>
               <div className="rounded-md bg-blue-50 p-2 text-sm font-medium text-blue-700 dark:bg-blue-900/20 dark:text-blue-300">
-                {task?.deadline ? new Date(task.deadline).toLocaleString() : "Not Set"}
+                {task?.deadline
+                  ? new Date(task.deadline).toLocaleString()
+                  : "Not Set"}
               </div>
             </div>
 
@@ -921,14 +926,18 @@ const TaskViewModal = ({
             </div>
           )}
 
+          {/* UPDATED: Description Section with KanbanRichTextDisplay */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Description</Label>
-            <div
-              className="text-black-100 overflow-wrap tiptap-description resize-none whitespace-pre-wrap break-words dark:text-white"
-              dangerouslySetInnerHTML={{
-                __html: task?.description || "No description provided",
-              }}
-            />
+            <div className="rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
+              {task?.description ? (
+                <KanbanRichTextDisplay content={task.description} />
+              ) : (
+                <p className="text-sm text-gray-500 dark:text-gray-400">
+                  No description provided
+                </p>
+              )}
+            </div>
           </div>
 
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -956,10 +965,10 @@ const TaskViewModal = ({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Created At</Label>
-              <div className="rounded-md bg-light-900 px-3 py-2 text-sm text-gray-700  dark:bg-gray-800 dark:text-gray-200">
-              {task?.created_at
-                ? new Date(task.created_at).toLocaleString()
-                : "Unknown"}
+              <div className="bg-light-900 rounded-md px-3 py-2 text-sm text-gray-700  dark:bg-gray-800 dark:text-gray-200">
+                {task?.created_at
+                  ? new Date(task.created_at).toLocaleString()
+                  : "Unknown"}
               </div>
             </div>
           </div>
@@ -983,7 +992,7 @@ const TaskViewModal = ({
             </Button>
 
             {showComments && (
-              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 sm:p-4 dark:border-gray-700 dark:bg-gray-800/50">
+              <div className="rounded-lg border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800/50 sm:p-4">
                 <TaskCommentsSection
                   taskId={task?.id || ""}
                   currentUserId={user?.id || ""}
@@ -1022,7 +1031,7 @@ const TaskViewModal = ({
             >
               Copy URL
             </Button>
-        
+
             {!hasUnsavedChanges && (
               <Button
                 onClick={onClose}
