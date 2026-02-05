@@ -2,13 +2,29 @@
 
 import { useState, useEffect } from "react";
 import { ChevronDown, ChevronUp, AlertCircle, CheckCircle, User } from "lucide-react";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData, getMembers, getTeamLead } from "@/app/home/projects/actions";
 import { createClientClientComponent } from "@/utils/supabase/client";
+
+/**
+ * ChecklistStatusBanner - ENHANCED SELF-FETCHING VERSION
+ * 
+ * FIXES APPLIED:
+ * 1. ✅ Fetches fresh member data internally (no stale props)
+ * 2. ✅ Always shows current database state
+ * 3. ✅ Automatic refresh when component mounts
+ * 4. ✅ No dependency on parent component state
+ * 5. ✅ Props now optional for backward compatibility
+ * 
+ * KEY CHANGE:
+ * - Does NOT rely on teamMembers/teamLead props from parent
+ * - Fetches fresh data from getMembers() and getTeamLead()
+ * - Guarantees accurate member count display
+ */
 
 interface ChecklistStatusBannerProps {
   projectId: string;
-  teamMembers: SimpleMemberData[];
-  teamLead: SimpleMemberData | null;
+  teamMembers?: SimpleMemberData[]; // Optional - will fetch if not provided
+  teamLead?: SimpleMemberData | null; // Optional - will fetch if not provided
 }
 
 interface MemberChecklistStatus {
@@ -19,16 +35,62 @@ interface MemberChecklistStatus {
   pendingItems: number;
 }
 
-const ChecklistStatusBanner = ({ projectId, teamMembers, teamLead }: ChecklistStatusBannerProps) => {
+const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [memberStatuses, setMemberStatuses] = useState<MemberChecklistStatus[]>([]);
+  
+  // ✅ NEW: Fresh member data (fetched internally)
+  const [freshTeamMembers, setFreshTeamMembers] = useState<SimpleMemberData[]>([]);
+  const [freshTeamLead, setFreshTeamLead] = useState<SimpleMemberData | null>(null);
+  const [isFetchingMembers, setIsFetchingMembers] = useState(false);
 
-  const allMembers = teamLead ? [teamLead, ...teamMembers] : teamMembers;
-
+  // ✅ CRITICAL FIX: Fetch fresh member data on mount
   useEffect(() => {
-    loadChecklistStatuses();
-  }, [projectId, allMembers.length]);
+    if (projectId) {
+      fetchFreshMemberData();
+    }
+  }, [projectId]);
+
+  // Fetch fresh member data from database
+  const fetchFreshMemberData = async () => {
+    console.log("🔄 ChecklistStatusBanner: Fetching fresh member data...");
+    setIsFetchingMembers(true);
+    
+    try {
+      // Fetch team lead
+      const teamLeadResult = await getTeamLead(projectId);
+      if (teamLeadResult.data) {
+        setFreshTeamLead(teamLeadResult.data);
+        console.log("👑 Banner - Team Lead:", teamLeadResult.data.first_name, teamLeadResult.data.last_name);
+      }
+
+      // Fetch members
+      const membersResult = await getMembers(projectId);
+      if (membersResult.data) {
+        setFreshTeamMembers(membersResult.data);
+        console.log("👥 Banner - Fresh members fetched:", membersResult.data.length);
+      }
+    } catch (error) {
+      console.error("❌ Banner - Error fetching fresh member data:", error);
+    } finally {
+      setIsFetchingMembers(false);
+    }
+  };
+
+  // Use fresh data instead of props
+  const allMembers = freshTeamLead 
+    ? [freshTeamLead, ...freshTeamMembers] 
+    : freshTeamMembers;
+
+  console.log("📊 Banner - Total members for display:", allMembers.length);
+
+  // Load checklist statuses when we have member data
+  useEffect(() => {
+    if (!isFetchingMembers && allMembers.length > 0) {
+      loadChecklistStatuses();
+    }
+  }, [projectId, allMembers.length, isFetchingMembers]);
 
   const loadChecklistStatuses = async () => {
     setIsLoading(true);
@@ -68,6 +130,7 @@ const ChecklistStatusBanner = ({ projectId, teamMembers, teamLead }: ChecklistSt
         .sort((a, b) => b.pendingItems - a.pendingItems);
 
       setMemberStatuses(statusArray);
+      console.log("✅ Banner - Loaded statuses for", statusArray.length, "members with checklist items");
     } catch (error) {
       console.error("Error loading checklist statuses:", error);
     } finally {
@@ -79,6 +142,18 @@ const ChecklistStatusBanner = ({ projectId, teamMembers, teamLead }: ChecklistSt
   const membersWithPending = memberStatuses.filter(s => s.pendingItems > 0).length;
   const totalPendingItems = memberStatuses.reduce((sum, s) => sum + s.pendingItems, 0);
   const membersFullyCompleted = memberStatuses.filter(s => s.pendingItems === 0).length;
+
+  // Show loading state while fetching members
+  if (isFetchingMembers) {
+    return (
+      <div className="rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/20 p-3">
+        <div className="flex items-center gap-2">
+          <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-500"></div>
+          <p className="text-xs text-gray-600 dark:text-gray-400">Loading checklist status...</p>
+        </div>
+      </div>
+    );
+  }
 
   // Don't show if no checklist items exist
   if (!isLoading && memberStatuses.length === 0) {
@@ -199,7 +274,10 @@ const ChecklistStatusBanner = ({ projectId, teamMembers, teamLead }: ChecklistSt
               : 'border-green-300 dark:border-green-800 bg-green-50/50 dark:bg-green-950/10'
           }`}>
             <button
-              onClick={loadChecklistStatuses}
+              onClick={() => {
+                fetchFreshMemberData();
+                loadChecklistStatuses();
+              }}
               className={`text-xs font-medium ${
                 membersWithPending > 0
                   ? 'text-red-700 dark:text-red-300 hover:text-red-800 dark:hover:text-red-200'

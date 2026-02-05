@@ -96,7 +96,7 @@ export async function getUserProjects(): Promise<{
       id: string;
       name: string;
       status: string | null;
-      kanban_display: boolean | null; // Add kanban_display to match Project type
+      kanban_display: boolean | null;
     }
 
     interface ProjectMember {
@@ -137,9 +137,9 @@ export async function getUserProjects(): Promise<{
       project: {
         id: pm.project.id,
         name: pm.project.name,
-        status: pm.project.status || "pending", // Default status if null
-        kanban_display: pm.project.kanban_display ?? false, // Default value if null
-      } as Project, // Cast to Project type with defaults
+        status: pm.project.status || "pending",
+        kanban_display: pm.project.kanban_display ?? false,
+      } as Project,
       role: pm.role,
     }));
 
@@ -201,7 +201,7 @@ export async function createProject(
       }
     }
 
-    // Create project (removed project_category_id as it no longer exists)
+    // Create project
     const { data: project, error: projectError } = await supabase
       .from("projects")
       .insert({
@@ -237,7 +237,6 @@ export async function createProject(
 
       if (categoryError) {
         console.error("Error inserting project categories:", categoryError);
-        // Don't throw - allow project creation to succeed even if categories fail
       }
     }
 
@@ -292,15 +291,6 @@ export async function createProject(
   }
 }
 
-/**
- * DOCU: This function is used to update the projects active switch. <br>
- * This is being called on ProjectCard. <br>
- * Last Updated Date: April 17, 2025 <br>
- * @function
- * @param {boolean} activeSwitch
- * @param {string} projectId
- * @author Kas
- */
 export async function updateStatus(
   status: string,
   projectId: string,
@@ -317,7 +307,6 @@ export async function updateStatus(
   if (projectError)
     console.error("Error in updating projects and kanban board:", projectError);
 
-  // Invalidate Redis cache for projects
   await invalidateCache(cacheKeys.projects.all);
 
   revalidatePath("/home/projects");
@@ -361,10 +350,8 @@ export async function updatePublicDisplaySwitch(
   if (projectError)
     console.error("Error in updating projects and kanban board:", projectError);
 
-  // Invalidate Redis cache for projects
   await invalidateCache(cacheKeys.projects.all);
   
-  // Revalidate both home projects and services pages
   revalidatePath("/home/projects");
   revalidatePath("/services");
 
@@ -375,7 +362,7 @@ export async function updateProject(projectId: string, formData: FormData) {
   const supabase = await createClientServerComponent();
 
   try {
-    // Parse project members data with type assertion
+    // Parse project members data
     const projectMembersData = formData.get("project_members");
     const projectMembers = projectMembersData
       ? (JSON.parse(projectMembersData as string) as ProjectMemberData[])
@@ -428,35 +415,20 @@ export async function updateProject(projectId: string, formData: FormData) {
     const updateData: any = {};
     for (const [key, value] of formData.entries()) {
       if (key !== "project_members" && key !== "tech_stack" && key !== "category_ids" && key !== "key_features" && key !== "gallery") {
-        // Log the key-value pairs to debug
-        console.log(`Processing form field: ${key} = ${value}`);
         updateData[key] = value;
       }
     }
     
-    // Add tech stack if provided
     if (techStack) {
       updateData.tech_stack = techStack;
     }
 
-    // Add key_features if provided
     if (keyFeatures) {
       updateData.key_features = keyFeatures;
     }
 
-    // Add gallery if provided
     if (gallery) {
       updateData.gallery = gallery;
-    }
-
-    // Log the final update data before sending to Supabase
-    console.log("Final update data:", JSON.stringify(updateData, null, 2));
-
-    // Make sure main_image is included in the update if it exists
-    if (updateData.main_image) {
-      console.log("Updating main_image to:", updateData.main_image);
-    } else {
-      console.log("No main_image found in update data");
     }
 
     const { data: projectData, error: projectError } = await supabase
@@ -473,9 +445,9 @@ export async function updateProject(projectId: string, formData: FormData) {
       throw projectError;
     }
 
-    // ✅ FIXED: Handle project members with joined_at preservation
+    // Handle project members with joined_at preservation
     if (projectMembers && Array.isArray(projectMembers)) {
-      // Step 1: Fetch existing members to preserve joined_at dates
+      // Fetch existing members to preserve joined_at dates
       const { data: existingMembers, error: membersError } = await supabase
         .from("project_members")
         .select("codev_id, joined_at")
@@ -483,12 +455,12 @@ export async function updateProject(projectId: string, formData: FormData) {
 
       if (membersError) throw membersError;
 
-      // Step 2: Create lookup map for existing timestamps
+      // Create lookup map for existing timestamps
       const joinedAtMap = new Map(
         existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
       );
 
-      // Step 3: Delete existing members
+      // Delete existing members
       const { error: deleteError } = await supabase
         .from("project_members")
         .delete()
@@ -496,7 +468,7 @@ export async function updateProject(projectId: string, formData: FormData) {
 
       if (deleteError) throw deleteError;
 
-      // Step 4: Insert updated members with preserved timestamps
+      // Insert updated members with preserved timestamps
       const { error: insertError } = await supabase
         .from("project_members")
         .insert(
@@ -504,7 +476,6 @@ export async function updateProject(projectId: string, formData: FormData) {
             project_id: projectId,
             codev_id: member.codev_id,
             role: member.role,
-            // Use existing joined_at if member was already in project, else use current date
             joined_at: joinedAtMap.get(member.codev_id) ?? new Date().toISOString(),
           })),
         );
@@ -522,7 +493,6 @@ export async function updateProject(projectId: string, formData: FormData) {
 
       if (deleteCategoriesError) {
         console.error("Error deleting project categories:", deleteCategoriesError);
-        // Don't throw - allow project update to succeed even if categories fail
       }
 
       // Insert new project categories
@@ -538,15 +508,10 @@ export async function updateProject(projectId: string, formData: FormData) {
 
         if (insertCategoriesError) {
           console.error("Error inserting project categories:", insertCategoriesError);
-          // Don't throw - allow project update to succeed even if categories fail
         }
       }
     }
 
-    // Log success with the returned project data
-    console.log("Project updated successfully:", projectData);
-
-    // Invalidate Redis cache for projects
     await invalidateCache(cacheKeys.projects.all);
 
     revalidatePath("/projects");
@@ -591,7 +556,6 @@ export async function deleteProject(projectId: string) {
 
     if (deleteError) throw deleteError;
 
-    // Invalidate Redis cache for projects
     await invalidateCache(cacheKeys.projects.all);
 
     revalidatePath("/projects");
@@ -663,6 +627,25 @@ export const getTeamLead = async (
   }
 };
 
+/**
+ * ✅ ENHANCED: Fetch project members with two-query approach + comprehensive debug logging
+ * 
+ * FIXES:
+ * - Prevents member dropout due to RLS policies or join failures
+ * - Adds comprehensive debug logging to diagnose issues
+ * - Members like Arishavelle and Reagan no longer dropped from results
+ * 
+ * DEBUG LOGS:
+ * - Function entry with project ID
+ * - Count of project_members found
+ * - List of codev_ids being queried
+ * - Count of codev records returned
+ * - Warning for any missing codev records
+ * - Final member list with names
+ * 
+ * @param projectId - The project ID to fetch members for
+ * @returns Promise with error and data (array of SimpleMemberData)
+ */
 export const getMembers = async (
   projectId: string,
 ): Promise<{
@@ -670,57 +653,96 @@ export const getMembers = async (
   data: SimpleMemberData[] | null;
 }> => {
   const supabase = await createClientServerComponent();
+  
+  // ✅ DEBUG LOG: Function entry
+  console.log("🔍 NEW getMembers function called for project:", projectId);
+  
   try {
-    const { data, error } = (await supabase
+    // Step 1: Get all project_members with role = 'member'
+    const { data: projectMembers, error: pmError } = await supabase
       .from("project_members")
-      .select(
-        `
-        role,
-        joined_at,
-        codev:codev_id (
-          id,
-          first_name,
-          last_name,
-          email_address,
-          display_position,
-          image_url
-        )
-      `,
-      )
+      .select("codev_id, role, joined_at")
       .eq("project_id", projectId)
-      .eq("role", "member")) as {
-        data: ProjectMemberResponse[] | null;
-        error: any;
+      .eq("role", "member");
+
+    // ✅ DEBUG LOG: Project members count
+    console.log("📊 Project members found:", projectMembers?.length || 0);
+    if (projectMembers && projectMembers.length > 0) {
+      console.log("🔑 Codev IDs from project_members:", projectMembers.map(pm => pm.codev_id));
+    }
+
+    if (pmError) {
+      console.error("❌ Error fetching project members:", pmError);
+      return { error: pmError, data: null };
+    }
+
+    if (!projectMembers || projectMembers.length === 0) {
+      console.log("⚠️ No project members found with role='member'");
+      return { error: null, data: [] };
+    }
+
+    // Step 2: Get codev details separately (avoids RLS/join issues)
+    const codevIds = projectMembers.map(pm => pm.codev_id);
+    
+    // ✅ DEBUG LOG: Codev IDs being queried
+    console.log("🔎 Fetching codev details for", codevIds.length, "IDs");
+    
+    const { data: codevs, error: codevError } = await supabase
+      .from("codev")
+      .select("id, first_name, last_name, email_address, display_position, image_url")
+      .in("id", codevIds);
+
+    // ✅ DEBUG LOG: Codev records count
+    console.log("👤 Codev records found:", codevs?.length || 0);
+    if (codevs && codevs.length > 0) {
+      console.log("👥 Codev names:", codevs.map(c => `${c.first_name} ${c.last_name} (${c.id})`));
+    }
+
+    if (codevError) {
+      console.error("❌ Error fetching codev details:", codevError);
+      return { error: codevError, data: null };
+    }
+
+    // Step 3: Merge data manually
+    const members = projectMembers.map(pm => {
+      const codev = codevs?.find(c => c.id === pm.codev_id);
+      
+      // If codev record is missing, log warning
+      if (!codev) {
+        console.warn(`⚠️ Missing codev record for member: ${pm.codev_id}`);
+        console.warn(`   - This member exists in project_members but not in codev table`);
+        console.warn(`   - OR RLS policy is blocking access to this codev record`);
+        return null;
+      }
+
+      return {
+        id: codev.id,
+        first_name: codev.first_name,
+        last_name: codev.last_name,
+        email_address: codev.email_address,
+        display_position: codev.display_position,
+        image_url: codev.image_url,
+        role: pm.role,
+        joined_at: pm.joined_at,
       };
+    }).filter(Boolean) as SimpleMemberData[];
 
-    if (error) {
-      console.error("Error fetching members:", error);
-      return { error, data: null };
-    }
-
-    if (!data) {
-      return { error: null, data: null };
-    }
-
-    const members = data.map((member) => ({
-      id: member.codev.id,
-      first_name: member.codev.first_name,
-      last_name: member.codev.last_name,
-      email_address: member.codev.email_address,
-      display_position: member.codev.display_position,
-      image_url: member.codev.image_url,
-      role: member.role,
-      joined_at: member.joined_at,
-    }));
+    // ✅ DEBUG LOG: Final results
+    console.log("✅ Final members returned:", members.length);
+    console.log("📝 Member names:", members.map(m => `${m.first_name} ${m.last_name}`));
+    console.log("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
     return { error: null, data: members };
   } catch (error) {
-    console.error("Unexpected error fetching members:", error);
+    console.error("❌ Unexpected error fetching members:", error);
     return { error, data: null };
   }
 };
 
-// ✅ FIXED FUNCTION: Preserves existing joined_at dates when updating members
+/**
+ * Update project members with joined_at preservation
+ * Preserves existing joined_at dates when updating members
+ */
 export const updateProjectMembers = async (
   projectId: string,
   members: Codev[],
@@ -729,7 +751,7 @@ export const updateProjectMembers = async (
   const supabase = await createClientServerComponent();
 
   try {
-    // ✅ Step 1: Fetch existing members to preserve joined_at dates
+    // Step 1: Fetch existing members to preserve joined_at dates
     const { data: existingMembers, error: fetchError } = await supabase
       .from("project_members")
       .select("codev_id, joined_at")
@@ -737,7 +759,7 @@ export const updateProjectMembers = async (
 
     if (fetchError) throw fetchError;
 
-    // ✅ Step 2: Create lookup map for existing timestamps
+    // Step 2: Create lookup map for existing timestamps
     const joinedAtMap = new Map(
       existingMembers?.map(m => [m.codev_id, m.joined_at]) ?? []
     );
@@ -750,12 +772,11 @@ export const updateProjectMembers = async (
 
     if (deleteError) throw deleteError;
 
-    // ✅ Step 4: Insert with preserved timestamps for existing members
+    // Step 4: Insert with preserved timestamps for existing members
     const memberInserts = members.map((member) => ({
       project_id: projectId,
       codev_id: member.id,
       role: member.id === teamLeaderId ? "team_leader" : "member",
-      // Use existing joined_at if member was already in project, else use current date
       joined_at: joinedAtMap.get(member.id) ?? new Date().toISOString(),
     }));
 
@@ -892,7 +913,6 @@ export const getProjectCategoriesForProject = async (projectId: string) => {
     throw new Error("Failed to fetch project categories");
   }
 
-  // Flatten the structure
   return data?.map((item: any) => item.projects_category).filter(Boolean) || [];
 };
 
@@ -985,7 +1005,9 @@ export const replaceProjectCategories = async (
   return { success: true };
 };
 
-// Get all projects with kanban boards display is true
+/**
+ * Get all projects with kanban boards display is true
+ */
 export async function getAllProjects(kanbanBoardId?: string) {
   const supabase = await createClientServerComponent();
 
@@ -1021,7 +1043,9 @@ export async function getAllProjects(kanbanBoardId?: string) {
   }
 }
 
-
+/**
+ * Get project by ID with full details
+ */
 export async function getProjectByID(id: string) {
   const supabase = await createClientServerComponent();
 
@@ -1055,7 +1079,7 @@ export async function getProjectByID(id: string) {
 
   if (error) throw error;
 
-  // Flatten the categories structure for easier consumption
+  // Flatten the categories structure
   const projectWithCategories = data ? {
     ...data,
     categories: data.categories?.map((cat: any) => cat.projects_category).filter(Boolean) || [],

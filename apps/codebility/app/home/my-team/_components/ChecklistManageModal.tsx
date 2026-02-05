@@ -1,21 +1,29 @@
 import { useState, useEffect, FormEvent, useMemo } from "react";
-import { X, Plus, Edit2, Trash2, Check, Lock } from "lucide-react";
+import { X, Plus, Edit2, Trash2, Check, Lock, RefreshCw } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
 import Input from "@/components/ui/forms/input";
 import toast from "react-hot-toast";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData, getMembers, getTeamLead } from "@/app/home/projects/actions";
 
 /**
- * ChecklistManageModal - TRIPLE-FIXED VERSION
+ * ChecklistManageModal - PRODUCTION-READY VERSION
  * 
- * FIXES APPLIED:
- * 1. ✅ Enhanced delete confirmation dialog (no double quotes around item name)
- * 2. ✅ Removed ALL emoji from toasts (library provides icons automatically)
- * 3. ✅ Removed ALL double quotes around item names in toasts
- * 4. ✅ Clean, professional toast messages
- * 5. ✅ Improved dialog styling and UX
+ * FEATURES:
+ * 1. ✅ Self-fetching fresh member data (fixes stale data issue)
+ * 2. ✅ Auto-sync function - backfills missing checklist records for all members
+ * 3. ✅ UI/UX designer exceptions - excludes them from coding-related items
+ * 4. ✅ Preserves existing data - no deletion required
+ * 5. ✅ Runs automatically on modal open
+ * 6. ✅ Clean toast messages (no emoji, no double quotes)
+ * 
+ * HOW IT WORKS:
+ * - Fetches current team members from database on modal open
+ * - Detects when members are missing checklist items
+ * - Creates missing records automatically (backfill)
+ * - Identifies UI/UX designers by position
+ * - Excludes UI/UX from coding-related items (github, supabase, etc.)
  * 
  * AUTHENTICATION:
  * - Self-contained (no currentUserId prop needed)
@@ -31,8 +39,6 @@ interface ChecklistManageModalProps {
   isOpen: boolean;
   projectId: string;
   projectName: string;
-  teamMembers: SimpleMemberData[];
-  teamLeadId: string;
   onClose: () => void;
 }
 
@@ -40,8 +46,6 @@ const ChecklistManageModal = ({
   isOpen,
   projectId,
   projectName,
-  teamMembers,
-  teamLeadId,
   onClose
 }: ChecklistManageModalProps) => {
   // State
@@ -51,7 +55,13 @@ const ChecklistManageModal = ({
   const [editingNewTitle, setEditingNewTitle] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
   const [supabase, setSupabase] = useState<any>(null);
+  
+  // Fresh member data (fetched internally)
+  const [freshTeamMembers, setFreshTeamMembers] = useState<SimpleMemberData[]>([]);
+  const [freshTeamLeadId, setFreshTeamLeadId] = useState<string>("");
+  const [isFetchingMembers, setIsFetchingMembers] = useState(false);
   
   // Self-contained auth
   const [currentCodevId, setCurrentCodevId] = useState<string | null>(null);
@@ -62,52 +72,229 @@ const ChecklistManageModal = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
-  // Initialize Supabase and get current user
+  // UI/UX designer detection keywords
+  const UIUX_KEYWORDS = [
+    'ui', 'ux', 'design', 'designer', 'graphic', 'visual',
+    'product design', 'interface', 'user experience'
+  ];
+
+  // Coding-related item keywords (items that UI/UX should skip)
+  const CODING_ITEM_KEYWORDS = [
+    'github', 'git', 'repository', 'code', 'coding', 'programming',
+    'supabase', 'database', 'api', 'backend', 'frontend', 'npm', 'yarn',
+    'typescript', 'javascript', 'react', 'next', 'deployment'
+  ];
+
+  // Initialize Supabase
   useEffect(() => {
     const client = createClientClientComponent();
     setSupabase(client);
+  }, []);
+
+  // Fetch fresh member data when modal opens
+  useEffect(() => {
+    if (isOpen && projectId) {
+      fetchFreshMemberData();
+    }
+  }, [isOpen, projectId]);
+
+  // Fetch fresh member data from database
+  const fetchFreshMemberData = async () => {
+    console.log("🔄 ChecklistManageModal: Fetching fresh member data...");
+    setIsFetchingMembers(true);
     
-    if (client) {
-      client.auth.getSession().then(async ({ data: { session } }) => {
-        if (session?.user?.email) {
-          // Map auth user email to codev_id
-          const { data: codevData } = await client
-            .from("codev")
-            .select("id")
-            .eq("email_address", session.user.email)
-            .single();
+    try {
+      // Fetch team lead
+      const teamLeadResult = await getTeamLead(projectId);
+      if (teamLeadResult.data?.id) {
+        setFreshTeamLeadId(teamLeadResult.data.id);
+        console.log("👑 Team Lead ID:", teamLeadResult.data.id);
+      }
+
+      // Fetch members
+      const membersResult = await getMembers(projectId);
+      if (membersResult.data) {
+        setFreshTeamMembers(membersResult.data);
+        console.log("👥 Fresh members fetched:", membersResult.data.length);
+        console.log("📝 Member names:", membersResult.data.map(m => `${m.first_name} ${m.last_name} (${m.display_position || 'No position'})`));
+      }
+    } catch (error) {
+      console.error("❌ Error fetching fresh member data:", error);
+      toast.error("Failed to load team members");
+    } finally {
+      setIsFetchingMembers(false);
+    }
+  };
+
+  // Get current user and check auth
+  useEffect(() => {
+    if (!supabase || !freshTeamLeadId) return;
+
+    supabase.auth.getSession().then(async ({ data: { session } }: any) => {
+      if (session?.user?.email) {
+        const { data: codevData } = await supabase
+          .from("codev")
+          .select("id")
+          .eq("email_address", session.user.email)
+          .single();
+        
+        if (codevData) {
+          setCurrentCodevId(codevData.id);
+          setIsTeamLead(codevData.id === freshTeamLeadId);
+          console.log("🔐 Current user is team lead:", codevData.id === freshTeamLeadId);
+        }
+      }
+      setAuthChecked(true);
+    });
+  }, [supabase, freshTeamLeadId]);
+
+  // ✅ NEW: Check if member is UI/UX designer
+  const isUIUXDesigner = (member: SimpleMemberData): boolean => {
+    const position = (member.display_position || '').toLowerCase();
+    return UIUX_KEYWORDS.some(keyword => position.includes(keyword));
+  };
+
+  // ✅ NEW: Check if checklist item is coding-related
+  const isCodingItem = (itemTitle: string): boolean => {
+    const title = itemTitle.toLowerCase();
+    return CODING_ITEM_KEYWORDS.some(keyword => title.includes(keyword));
+  };
+
+  // ✅ NEW: Get member IDs that should have a specific item
+  const getMemberIdsForItem = (itemTitle: string): string[] => {
+    if (!freshTeamLeadId) return [];
+    
+    // Start with team lead
+    const teamLeadMember = freshTeamMembers.find(m => m.id === freshTeamLeadId) || null;
+    let validMembers = teamLeadMember ? [teamLeadMember] : [];
+    
+    // Add regular members
+    validMembers = [...validMembers, ...freshTeamMembers.filter(m => m.id !== freshTeamLeadId)];
+    
+    // If item is coding-related, filter out UI/UX designers
+    if (isCodingItem(itemTitle)) {
+      validMembers = validMembers.filter(m => !isUIUXDesigner(m));
+      console.log(`📋 Item "${itemTitle}" is coding-related, excluding UI/UX designers`);
+    }
+    
+    return validMembers.map(m => m.id);
+  };
+
+  // Get all member IDs (for display purposes)
+  const allMemberIds = useMemo(() => {
+    if (!freshTeamLeadId) return [];
+    
+    if (!freshTeamMembers || !Array.isArray(freshTeamMembers)) {
+      return [freshTeamLeadId];
+    }
+    
+    const memberIds = freshTeamMembers.map(m => m.id).filter(Boolean);
+    return [freshTeamLeadId, ...memberIds];
+  }, [freshTeamLeadId, freshTeamMembers]);
+
+  // ✅ NEW: Auto-sync function - backfills missing records
+  const autoSyncChecklistItems = async () => {
+    if (!supabase || !projectId || allMemberIds.length === 0) return;
+
+    setIsSyncing(true);
+    console.log("🔄 Starting auto-sync for checklist items...");
+
+    try {
+      // Get all unique checklist items for this project
+      const { data: existingItems, error: fetchError } = await supabase
+        .from("member_checklists")
+        .select("title, member_id")
+        .eq("project_id", projectId);
+
+      if (fetchError) {
+        console.error("Error fetching existing items:", fetchError);
+        return;
+      }
+
+      // Group by title to see which members have which items
+      const itemsByTitle: { [key: string]: string[] } = {};
+      
+      existingItems?.forEach((item: any) => {
+        if (!itemsByTitle[item.title]) {
+          itemsByTitle[item.title] = [];
+        }
+        itemsByTitle[item.title].push(item.member_id);
+      });
+
+      const uniqueTitles = Object.keys(itemsByTitle);
+      console.log(`📋 Found ${uniqueTitles.length} unique checklist items`);
+
+      let totalBackfilled = 0;
+
+      // For each title, ensure all appropriate members have it
+      for (const title of uniqueTitles) {
+        const existingMemberIds = itemsByTitle[title];
+        const requiredMemberIds = getMemberIdsForItem(title);
+        const missingMemberIds = requiredMemberIds.filter(id => !existingMemberIds.includes(id));
+
+        if (missingMemberIds.length > 0) {
+          console.log(`➕ Backfilling "${title}" for ${missingMemberIds.length} members`);
           
-          if (codevData) {
-            setCurrentCodevId(codevData.id);
-            // Check if this user is the team lead
-            setIsTeamLead(codevData.id === teamLeadId);
+          // Get reference record to copy settings from
+          const { data: referenceRecord } = await supabase
+            .from("member_checklists")
+            .select("*")
+            .eq("project_id", projectId)
+            .eq("title", title)
+            .limit(1)
+            .single();
+
+          // Create missing records
+          const newRecords = missingMemberIds.map(memberId => ({
+            project_id: projectId,
+            member_id: memberId,
+            title: title,
+            description: referenceRecord?.description || null,
+            priority: referenceRecord?.priority || "medium",
+            completed: false, // Always start as incomplete
+            created_by: freshTeamLeadId,
+            due_date: referenceRecord?.due_date || null,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          }));
+
+          const { error: insertError } = await supabase
+            .from("member_checklists")
+            .insert(newRecords);
+
+          if (insertError) {
+            console.error(`Error backfilling "${title}":`, insertError);
+          } else {
+            totalBackfilled += newRecords.length;
           }
         }
-        setAuthChecked(true);
-      });
-    }
-  }, [teamLeadId]);
+      }
 
-  // Get all member IDs (team lead + members)
-  const allMemberIds = useMemo(() => {
-    if (!teamLeadId) {
-      return [];
+      if (totalBackfilled > 0) {
+        console.log(`✅ Auto-sync complete: Backfilled ${totalBackfilled} records`);
+        toast.success(`Synced ${totalBackfilled} missing checklist items`);
+      } else {
+        console.log("✅ Auto-sync complete: All members already have all items");
+      }
+
+    } catch (error) {
+      console.error("Error during auto-sync:", error);
+      toast.error("Failed to sync checklist items");
+    } finally {
+      setIsSyncing(false);
     }
-    
-    if (!teamMembers || !Array.isArray(teamMembers)) {
-      return [teamLeadId];
-    }
-    
-    const memberIds = teamMembers.map(m => m.id).filter(Boolean);
-    return [teamLeadId, ...memberIds];
-  }, [teamLeadId, teamMembers]);
+  };
 
   // Load checklist items when modal opens
   useEffect(() => {
-    if (isOpen && supabase && projectId) {
+    if (isOpen && supabase && projectId && allMemberIds.length > 0 && !isFetchingMembers) {
       loadChecklistItems();
+      // ✅ Run auto-sync after loading items
+      setTimeout(() => {
+        autoSyncChecklistItems();
+      }, 500);
     }
-  }, [isOpen, supabase, projectId]);
+  }, [isOpen, supabase, projectId, allMemberIds.length, isFetchingMembers]);
 
   // Load checklist items from database
   const loadChecklistItems = async () => {
@@ -125,7 +312,6 @@ const ChecklistManageModal = ({
         toast.error("Failed to load checklist items");
         setItems([]);
       } else {
-        // Get unique titles
         const uniqueTitles = [...new Set(data.map((item: any) => String(item.title)))] as string[];
         setItems(uniqueTitles);
       }
@@ -141,7 +327,6 @@ const ChecklistManageModal = ({
   const handleAddItem = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    // Permission check
     if (!isTeamLead) {
       toast.error("Only team leads can add checklist items");
       return;
@@ -169,15 +354,30 @@ const ChecklistManageModal = ({
 
     setIsLoading(true);
     try {
-      // Create checklist item for all team members
-      const itemsToInsert = allMemberIds.map(memberId => ({
+      // ✅ Get appropriate member IDs (excludes UI/UX if coding-related)
+      const targetMemberIds = getMemberIdsForItem(newItemTitle.trim());
+
+      if (targetMemberIds.length === 0) {
+        toast.error("No applicable members for this item");
+        setIsLoading(false);
+        return;
+      }
+
+      // Count UI/UX designers excluded
+      const uiuxCount = allMemberIds.length - targetMemberIds.length;
+      if (uiuxCount > 0) {
+        console.log(`ℹ️ Excluding ${uiuxCount} UI/UX designer(s) from "${newItemTitle.trim()}"`);
+      }
+
+      // Create checklist item for appropriate members
+      const itemsToInsert = targetMemberIds.map(memberId => ({
         project_id: projectId,
         member_id: memberId,
         title: newItemTitle.trim(),
         description: null,
         priority: "medium",
         completed: false,
-        created_by: teamLeadId,
+        created_by: freshTeamLeadId,
         due_date: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -191,8 +391,11 @@ const ChecklistManageModal = ({
       if (error) {
         toast.error(`Failed: ${error.message}`);
       } else {
-        // FIXED: No emoji, no double quotes, clean message
-        toast.success(`${newItemTitle.trim()} added to checklist`);
+        const memberText = targetMemberIds.length === allMemberIds.length
+          ? `all ${allMemberIds.length} members`
+          : `${targetMemberIds.length} members (excluded ${uiuxCount} UI/UX)`;
+        
+        toast.success(`${newItemTitle.trim()} added for ${memberText}`);
         setItems(prev => [...prev, newItemTitle.trim()]);
         setNewItemTitle("");
       }
@@ -239,7 +442,6 @@ const ChecklistManageModal = ({
 
     setIsLoading(true);
     try {
-      // Update all rows with this title
       const { error } = await supabase
         .from("member_checklists")
         .update({ 
@@ -252,7 +454,6 @@ const ChecklistManageModal = ({
       if (error) {
         toast.error("Failed to update item");
       } else {
-        // FIXED: No emoji, no double quotes
         toast.success(`${oldTitle} updated to ${editingNewTitle.trim()}`);
         setItems(prev => prev.map(item => item === oldTitle ? editingNewTitle.trim() : item));
         handleCancelEdit();
@@ -264,7 +465,7 @@ const ChecklistManageModal = ({
     }
   };
 
-  // Handle delete button click (opens confirmation dialog)
+  // Handle delete button click
   const handleDeleteItem = (title: string) => {
     if (!isTeamLead) {
       toast.error("Only team leads can delete checklist items");
@@ -290,7 +491,6 @@ const ChecklistManageModal = ({
 
     setIsLoading(true);
     try {
-      // Delete all rows with this title
       const { error } = await supabase
         .from("member_checklists")
         .delete()
@@ -300,7 +500,6 @@ const ChecklistManageModal = ({
       if (error) {
         toast.error("Failed to delete item");
       } else {
-        // FIXED: No emoji, no double quotes
         toast.success(`${itemToDelete} removed from checklist`);
         setItems(prev => prev.filter(item => item !== itemToDelete));
         handleCancelDelete();
@@ -322,15 +521,17 @@ const ChecklistManageModal = ({
     }
   };
 
-  // Show loading state while checking auth
-  if (!authChecked) {
+  // Show loading state while fetching members or checking auth
+  if (isFetchingMembers || !authChecked) {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="max-w-md bg-white dark:bg-gray-900">
           <div className="flex items-center justify-center py-8">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Loading...</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {isFetchingMembers ? "Loading team members..." : "Loading..."}
+              </p>
             </div>
           </div>
         </DialogContent>
@@ -370,8 +571,18 @@ const ChecklistManageModal = ({
               Project: <span className="font-semibold">{projectName}</span>
             </p>
             <p className="text-xs text-blue-600 dark:text-blue-400">
-              These items will be visible to all {allMemberIds.length} team members
+              Items assigned to all {allMemberIds.length} team members (excluding UI/UX from coding items)
             </p>
+            
+            {/* Auto-sync indicator */}
+            {isSyncing && (
+              <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-2 rounded mt-2">
+                <p className="text-xs text-blue-700 dark:text-blue-300 flex items-center gap-2">
+                  <RefreshCw className="h-3 w-3 animate-spin" />
+                  <span>Auto-syncing checklist items...</span>
+                </p>
+              </div>
+            )}
             
             {/* Permission indicator for non-team leads */}
             {!isTeamLead && (
@@ -393,11 +604,11 @@ const ChecklistManageModal = ({
                   onChange={(e) => setNewItemTitle(e.target.value)}
                   placeholder="Enter checklist item..."
                   className="flex-1 bg-light-900 dark:bg-dark-200 dark:text-light-900"
-                  disabled={isLoading || isFetching}
+                  disabled={isLoading || isFetching || isSyncing}
                 />
                 <Button
                   type="submit"
-                  disabled={isLoading || isFetching || !newItemTitle.trim()}
+                  disabled={isLoading || isFetching || isSyncing || !newItemTitle.trim()}
                   className="bg-blue-500 hover:bg-blue-600 text-white px-4"
                 >
                   <Plus className="h-5 w-5" />
@@ -459,7 +670,14 @@ const ChecklistManageModal = ({
                     ) : (
                       <>
                         {/* VIEW MODE */}
-                        <span className="flex-1 text-gray-900 dark:text-white">{title}</span>
+                        <div className="flex-1">
+                          <span className="text-gray-900 dark:text-white">{title}</span>
+                          {isCodingItem(title) && (
+                            <span className="ml-2 text-xs text-blue-600 dark:text-blue-400">
+                              (coding-related)
+                            </span>
+                          )}
+                        </div>
                         
                         {/* Action buttons */}
                         <div className="flex gap-2">
@@ -504,6 +722,20 @@ const ChecklistManageModal = ({
                 {items.length} item{items.length !== 1 ? 's' : ''} in checklist
               </div>
             )}
+
+            {/* Manual sync button for team leads */}
+            {isTeamLead && items.length > 0 && (
+              <Button
+                onClick={autoSyncChecklistItems}
+                disabled={isSyncing || isLoading}
+                variant="outline"
+                size="sm"
+                className="w-full border-blue-300 text-blue-600 hover:bg-blue-50"
+              >
+                <RefreshCw className={`h-4 w-4 mr-2 ${isSyncing ? 'animate-spin' : ''}`} />
+                {isSyncing ? 'Syncing...' : 'Sync All Members'}
+              </Button>
+            )}
           </div>
 
           <div className="mt-6 flex justify-end">
@@ -514,7 +746,7 @@ const ChecklistManageModal = ({
         </DialogContent>
       </Dialog>
 
-      {/* ENHANCED Delete Confirmation Dialog - NO DOUBLE QUOTES */}
+      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="max-w-md bg-white dark:bg-gray-900">
           <DialogHeader>

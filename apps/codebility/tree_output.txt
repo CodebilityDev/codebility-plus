@@ -1,0 +1,1168 @@
+.
+├── __tests__
+│   ├── components
+│   │   └── leaderboard
+│   │       └── LeaderboardTable.test.tsx
+│   └── hooks
+│       └── useLeaderboard.test.ts
+├── app
+│   ├── (marketing)
+│   │   ├── _components
+│   │   │   ├── landing
+│   │   │   │   ├── AnimatedAdminsSection.tsx
+│   │   │   │   ├── FloatingParticles.tsx
+│   │   │   │   ├── ForceScrollTop.tsx
+│   │   │   │   ├── LandingAdminCard.tsx
+│   │   │   │   ├── LandingAdmins.tsx
+│   │   │   │   ├── LandingBlueBg.tsx
+│   │   │   │   ├── LandingDiamond.tsx
+│   │   │   │   ├── LandingFeatures.tsx
+│   │   │   │   ├── LandingFeaturesCard.tsx
+│   │   │   │   ├── LandingGridBg.tsx
+│   │   │   │   ├── LandingHero.tsx
+│   │   │   │   ├── LandingHeroBg.tsx
+│   │   │   │   ├── LandingHeroCard.tsx
+│   │   │   │   ├── LandingIntern-CodevCard.tsx
+│   │   │   │   ├── LandingIntern-CodevPagination.tsx
+│   │   │   │   ├── LandingInternSection.tsx
+│   │   │   │   ├── LandingMarketing.tsx
+│   │   │   │   ├── LandingMarketingCard.tsx
+│   │   │   │   ├── LandingMarquee.tsx
+│   │   │   │   ├── LandingMovingText.tsx
+│   │   │   │   ├── LandingParallax.tsx
+│   │   │   │   ├── LandingPartners.tsx
+│   │   │   │   ├── LandingPurpleBg.tsx
+│   │   │   │   ├── LandingScrollToHash.tsx
+│   │   │   │   ├── LandingServices.tsx
+│   │   │   │   ├── LandingServicesCard.tsx
+│   │   │   │   ├── LandingWhyChoose-us.tsx
+│   │   │   │   ├── LandingWhyChoose.tsx
+│   │   │   │   └── LandingWorkWithUs.tsx
+│   │   │   ├── marketing_modals
+│   │   │   │   ├── MarketingFaqsModal.tsx
+│   │   │   │   ├── MarketingPrivacyPolicyModal.tsx
+│   │   │   │   └── MarketingTermsAndConditionModal.tsx
+│   │   │   ├── testimonial
+│   │   │   │   └── Testimonials.tsx
+│   │   │   ├── MarketingCalendly.tsx
+│   │   │   ├── MarketingContainer.tsx
+│   │   │   ├── MarketingFooter.tsx
+│   │   │   ├── MarketingNavigation.tsx
+│   │   │   ├── MarketingSection.tsx
+│   │   │   └── MarketingSidenavMenu.tsx
+│   │   ├── _lib
+│   │   │   └── util.ts
+│   │   ├── _shared
+│   │   │   ├── CodevsAbout.tsx
+│   │   │   ├── CodevsAboutCard.tsx
+│   │   │   ├── CodevsCarousel.tsx
+│   │   │   ├── CodevsCta.tsx
+│   │   │   ├── CodevsEmblaCarouselArrowButtons.tsx
+│   │   │   ├── CodevsFeaturedCard.tsx
+│   │   │   ├── CodevsFeaturedCection.tsx
+│   │   │   ├── CodevsFeaturedFooter.tsx
+│   │   │   ├── CodevsFeaturedProjectCard.tsx
+│   │   │   ├── CodevsFeaturedProjects.tsx
+│   │   │   └── CodevsSection.tsx
+│   │   ├── ai-integration
+│   │   │   ├── _components
+│   │   │   │   ├── AiIntegration-development-process-react-flow.tsx
+│   │   │   │   ├── AiIntegrationDevelopmentProcess.tsx
+│   │   │   │   ├── AiIntegrationEdgeTypes.tsx
+│   │   │   │   ├── AiIntegrationGradientBgWhite.tsx
+│   │   │   │   ├── AiIntegrationHeroBg.tsx
+│   │   │   │   ├── AiIntegrationLatestTech.tsx
+│   │   │   │   ├── AiIntegrationMobileAppServices.tsx
+│   │   │   │   ├── AiIntegrationNextStep.tsx
+│   │   │   │   ├── AiIntegrationNodeTypes.tsx
+│   │   │   │   ├── AiIntegrationPartner.tsx
+│   │   │   │   ├── AiIntegrationPartnerCard.tsx
+│   │   │   │   ├── AiIntegrationPartnerReactFlow.tsx
+│   │   │   │   ├── AiIntegrationProcessCard.tsx
+│   │   │   │   ├── AiIntegrationSolutions.tsx
+│   │   │   │   ├── AiIntegrationUnparallelCard.tsx
+│   │   │   │   └── AiIntegrationUnparallelDigitalSuccess.tsx
+│   │   │   ├── _lib
+│   │   │   │   └── dummy-data.tsx
+│   │   │   ├── _styles
+│   │   │   │   └── index.css
+│   │   │   ├── _types
+│   │   │   │   └── index.ts
+│   │   │   └── page.tsx
+│   │   ├── bookacall
+│   │   │   ├── _components
+│   │   │   │   └── BookACallCalendlyWidgetContainer.tsx
+│   │   │   └── page.tsx
+│   │   ├── careers
+│   │   │   ├── _components
+│   │   │   │   ├── CareerGrowthPath.tsx
+│   │   │   │   ├── CodevLandingHero.tsx
+│   │   │   │   ├── CodevsFeaturedProjects.tsx
+│   │   │   │   ├── CodevsHero.tsx
+│   │   │   │   ├── CodevsMissionVision.tsx
+│   │   │   │   ├── CodevsNavbar.tsx
+│   │   │   │   ├── CodevsOrbitingCircles.tsx
+│   │   │   │   ├── CodevsOrbitingCirclesBg.tsx
+│   │   │   │   ├── CodevsProject.tsx
+│   │   │   │   ├── CodevsRoadmap.tsx
+│   │   │   │   ├── CodevsRoadmapCard.tsx
+│   │   │   │   ├── CodevsServiceCard.tsx
+│   │   │   │   ├── CodevsServices.tsx
+│   │   │   │   ├── CodevsWhyChoose.tsx
+│   │   │   │   ├── CodevsWhyChooseItem.tsx
+│   │   │   │   ├── CompanyValues.tsx
+│   │   │   │   ├── JobApplicationModal.tsx
+│   │   │   │   ├── JobListings.tsx
+│   │   │   │   ├── TechStack.tsx
+│   │   │   │   └── WorkplaceCulture.tsx
+│   │   │   ├── _lib
+│   │   │   │   └── dummy-data.ts
+│   │   │   ├── _types
+│   │   │   │   └── job-listings.ts
+│   │   │   └── page.tsx
+│   │   ├── codevs
+│   │   │   ├── _components
+│   │   │   │   ├── CodevsFeaturedProjects.tsx
+│   │   │   │   ├── CodevsHero.tsx
+│   │   │   │   ├── CodevsMissionVision.tsx
+│   │   │   │   ├── CodevsNavbar.tsx
+│   │   │   │   ├── CodevsOrbitingCircles.tsx
+│   │   │   │   ├── CodevsOrbitingCirclesBg.tsx
+│   │   │   │   ├── CodevsProfiles.tsx
+│   │   │   │   ├── CodevsProfilesContainer.tsx
+│   │   │   │   ├── CodevsProject.tsx
+│   │   │   │   ├── CodevsRoadmap.tsx
+│   │   │   │   ├── CodevsRoadmapCard.tsx
+│   │   │   │   ├── CodevsRoadmapStatic.tsx
+│   │   │   │   ├── CodevsServiceCard.tsx
+│   │   │   │   ├── CodevsServices.tsx
+│   │   │   │   ├── CodevsWhyChoose.tsx
+│   │   │   │   ├── CodevsWhyChooseItem.tsx
+│   │   │   │   └── HiringProcess.tsx
+│   │   │   ├── _lib
+│   │   │   │   └── dummy-data.ts
+│   │   │   └── page.tsx
+│   │   ├── contact
+│   │   │   ├── _components
+│   │   │   │   ├── ContactAppointment.tsx
+│   │   │   │   ├── ContactInquiryInform.tsx
+│   │   │   │   └── ContactShortSurvey.tsx
+│   │   │   └── page.tsx
+│   │   ├── hire-a-codev
+│   │   │   ├── _components
+│   │   │   │   ├── CodevsFeaturedProjects.tsx
+│   │   │   │   ├── CodevsHero.tsx
+│   │   │   │   ├── CodevsMissionVision.tsx
+│   │   │   │   ├── CodevsNavbar.tsx
+│   │   │   │   ├── CodevsOrbitingCircles.tsx
+│   │   │   │   ├── CodevsOrbitingCirclesBg.tsx
+│   │   │   │   ├── CodevsProject.tsx
+│   │   │   │   ├── CodevsRoadmap.tsx
+│   │   │   │   ├── CodevsRoadmapCard.tsx
+│   │   │   │   ├── CodevsServiceCard.tsx
+│   │   │   │   ├── CodevsServices.tsx
+│   │   │   │   ├── CodevsWhyChoose.tsx
+│   │   │   │   ├── CodevsWhyChooseItem.tsx
+│   │   │   │   └── HiringProcess.tsx
+│   │   │   ├── _lib
+│   │   │   │   └── dummy-data.ts
+│   │   │   └── page.tsx
+│   │   ├── privacy-policy
+│   │   │   └── page.tsx
+│   │   ├── profiles
+│   │   │   ├── [id]
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── ProfileCloseButton.tsx
+│   │   │   │   │   ├── ProfileContent.tsx
+│   │   │   │   │   ├── ProjectList.tsx
+│   │   │   │   │   └── StarRating.tsx
+│   │   │   │   ├── _services
+│   │   │   │   │   └── query.ts
+│   │   │   │   └── page.tsx
+│   │   │   ├── _components
+│   │   │   │   ├── CodevCard.tsx
+│   │   │   │   ├── CodevContainer.tsx
+│   │   │   │   ├── CodevHireCodevButton.tsx
+│   │   │   │   ├── CodevHireCodevModal.tsx
+│   │   │   │   ├── CodevList.tsx
+│   │   │   │   └── CodevListFilter.tsx
+│   │   │   ├── _service
+│   │   │   │   ├── template
+│   │   │   │   │   └── hire-codev-template.ts
+│   │   │   │   ├── actions.ts
+│   │   │   │   └── emailAction.ts
+│   │   │   └── page.tsx
+│   │   ├── services
+│   │   │   ├── _components
+│   │   │   │   ├── layout
+│   │   │   │   │   ├── ServiceDetailModal.tsx
+│   │   │   │   │   ├── ServiceDetailView.tsx
+│   │   │   │   │   ├── ServicesGrid.tsx
+│   │   │   │   │   ├── ServicesHero.tsx
+│   │   │   │   │   ├── ServicesPageContent.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── tabs
+│   │   │   │   │   ├── ServicesTab.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── ui
+│   │   │   │   │   ├── ServicesServiceCard.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── visuals
+│   │   │   │   │   ├── ClientTechyBackground.tsx
+│   │   │   │   │   ├── TechyBackground.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   └── index.ts
+│   │   │   ├── _context
+│   │   │   │   ├── ServiceContext.tsx
+│   │   │   │   └── index.ts
+│   │   │   ├── _lib
+│   │   │   │   └── dummy-data.ts
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── api
+│   │   ├── all-active-interns-codev
+│   │   │   └── route.ts
+│   │   ├── all-active-interns-codev-prioritized
+│   │   │   └── route.ts
+│   │   ├── attendance
+│   │   │   └── route.ts
+│   │   ├── codev
+│   │   │   └── [codevId]
+│   │   │       └── points
+│   │   │           └── route.ts
+│   │   ├── delete-auth-user
+│   │   │   └── route.ts
+│   │   ├── email-verification
+│   │   │   └── route.ts
+│   │   ├── job-applications
+│   │   │   └── route.ts
+│   │   ├── job-listings
+│   │   │   └── route.ts
+│   │   ├── nda-document
+│   │   │   └── [id]
+│   │   │       └── route.ts
+│   │   ├── profile-points
+│   │   │   └── [codevId]
+│   │   │       └── route.ts
+│   │   ├── project-leaderboard
+│   │   │   └── route.ts
+│   │   ├── send-email
+│   │   │   └── route.ts
+│   │   ├── soft-skills-leaderboard
+│   │   │   └── route.ts
+│   │   ├── team
+│   │   │   └── route.ts
+│   │   └── technical-leaderboard
+│   │       └── route.ts
+│   ├── applicant
+│   │   ├── account-settings
+│   │   │   └── page.tsx
+│   │   ├── onboarding
+│   │   │   ├── _components
+│   │   │   │   ├── Commitment.tsx
+│   │   │   │   ├── OnboardingClient.tsx
+│   │   │   │   ├── OnboardingStepper.tsx
+│   │   │   │   ├── Quiz.tsx
+│   │   │   │   ├── VideoPlayer.tsx
+│   │   │   │   └── quizData.ts
+│   │   │   ├── _service
+│   │   │   │   ├── action.ts
+│   │   │   │   └── type.ts
+│   │   │   ├── README.md
+│   │   │   └── page.tsx
+│   │   ├── profile
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   ├── waiting
+│   │   │   ├── _components
+│   │   │   │   ├── Stepper.tsx
+│   │   │   │   ├── applicantFetchComp.tsx
+│   │   │   │   ├── applicantStep1.tsx
+│   │   │   │   ├── applicantStep2.tsx
+│   │   │   │   ├── applicantStep3.tsx
+│   │   │   │   ├── applicantStep4.tsx
+│   │   │   │   ├── applicationSteps.tsx
+│   │   │   │   ├── testCountDown.tsx
+│   │   │   │   ├── testInstruction.tsx
+│   │   │   │   └── testQAInstruction.tsx
+│   │   │   ├── _service
+│   │   │   │   ├── action.ts
+│   │   │   │   ├── type.ts
+│   │   │   │   └── util.ts
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   └── layout.tsx
+│   ├── auth
+│   │   ├── callback
+│   │   │   └── route.ts
+│   │   ├── declined
+│   │   │   ├── _components
+│   │   │   │   ├── DeclineComponent.tsx
+│   │   │   │   ├── DeclinedButtons.tsx
+│   │   │   │   └── DeclinedCountdown.tsx
+│   │   │   ├── _service
+│   │   │   │   ├── actions.ts
+│   │   │   │   └── util.ts
+│   │   │   └── page.tsx
+│   │   ├── onboarding
+│   │   │   ├── _components
+│   │   │   │   ├── Expect
+│   │   │   │   │   └── ExpectSection.tsx
+│   │   │   │   ├── ExpectFromUs
+│   │   │   │   │   └── ExpectFromUsSection.tsx
+│   │   │   │   ├── HeroWithAboutEffect
+│   │   │   │   │   ├── Slides
+│   │   │   │   │   │   ├── AboutUs.tsx
+│   │   │   │   │   │   ├── Launchpad.tsx
+│   │   │   │   │   │   ├── MissionVisionSlide.tsx
+│   │   │   │   │   │   └── WhyChooseUsSlide.tsx
+│   │   │   │   │   ├── hooks
+│   │   │   │   │   │   └── useHeroAnimations.ts
+│   │   │   │   │   ├── AboutSlides.tsx
+│   │   │   │   │   ├── BubbleBackground.tsx
+│   │   │   │   │   ├── FloatingCodeTags.tsx
+│   │   │   │   │   ├── HeroSection.tsx
+│   │   │   │   │   ├── LottieBackground.tsx
+│   │   │   │   │   ├── StickyLogo.tsx
+│   │   │   │   │   └── index.tsx
+│   │   │   │   ├── HouseRules
+│   │   │   │   │   └── HouseRulesSection.tsx
+│   │   │   │   ├── IsAndIsnt
+│   │   │   │   │   └── IsAndIsntSection.tsx
+│   │   │   │   ├── IsNot
+│   │   │   │   │   └── IsNotSection.tsx
+│   │   │   │   ├── Mindset
+│   │   │   │   │   └── MindsetSection.tsx
+│   │   │   │   ├── Partners
+│   │   │   │   │   └── PartnersSection.tsx
+│   │   │   │   ├── RoadMap
+│   │   │   │   │   ├── AnimatedRoadmapSvg.tsx
+│   │   │   │   │   ├── AnimatedRoadmapWrapper.tsx
+│   │   │   │   │   ├── IsRoadMap.tsx
+│   │   │   │   │   └── RoadMapIntro.tsx
+│   │   │   │   ├── SoftwareDevelopment
+│   │   │   │   │   ├── SoftwareDevelopmentBackground.tsx
+│   │   │   │   │   └── SoftwareDevelopmentSection.tsx
+│   │   │   │   ├── Team
+│   │   │   │   │   ├── TeamSection.tsx
+│   │   │   │   │   └── actions.ts
+│   │   │   │   └── Wellcome
+│   │   │   │       └── WellcomeSection.tsx
+│   │   │   ├── hooks
+│   │   │   │   └── useOnboardingAnimations.ts
+│   │   │   ├── ExpectFromUsWrapper.tsx
+│   │   │   ├── ExpectSectionWrapper.tsx
+│   │   │   ├── HouseRulesSectionWrapper.tsx
+│   │   │   ├── IsAndIsntSectionWrapper.tsx
+│   │   │   ├── IsNotSectionWrapper.tsx
+│   │   │   ├── MindsetSectionWrapper.tsx
+│   │   │   ├── OnboardingClientWrapper.tsx
+│   │   │   ├── OnboardingStepper.tsx
+│   │   │   ├── PartnersSectionWrapper.tsx
+│   │   │   ├── RoadMapSectionWrapper.tsx
+│   │   │   ├── SoftwareSectionWrapper.tsx
+│   │   │   ├── TeamSectionWrapper.tsx
+│   │   │   ├── WellcomeSectionWrapper.tsx
+│   │   │   └── page.tsx
+│   │   ├── password-reset
+│   │   │   ├── _components
+│   │   │   │   └── PasswordResetForm.tsx
+│   │   │   ├── action.ts
+│   │   │   └── page.tsx
+│   │   ├── sign-in
+│   │   │   ├── _components
+│   │   │   │   ├── SignInForm.tsx
+│   │   │   │   └── SignInInput.tsx
+│   │   │   └── page.tsx
+│   │   ├── sign-up
+│   │   │   ├── _components
+│   │   │   │   ├── ImageUpload.tsx
+│   │   │   │   ├── PositionMultiselectField.tsx
+│   │   │   │   ├── PositionSelect.tsx
+│   │   │   │   ├── SignUpForm.tsx
+│   │   │   │   ├── SignUpFormWrapper.tsx
+│   │   │   │   ├── SignUpInput.tsx
+│   │   │   │   ├── TechstackMultiselectForm.tsx
+│   │   │   │   └── form-steps.ts
+│   │   │   └── page.tsx
+│   │   ├── verify
+│   │   │   └── page.tsx
+│   │   ├── waiting
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   └── actions.ts
+│   ├── emails
+│   │   └── nda-template.tsx
+│   ├── home
+│   │   ├── (dashboard)
+│   │   │   ├── _components
+│   │   │   │   ├── DashboardCalendar.tsx
+│   │   │   │   ├── DashboardCareerOpportunities.tsx
+│   │   │   │   ├── DashboardCertificate.tsx
+│   │   │   │   ├── DashboardCertificateIcons.tsx
+│   │   │   │   ├── DashboardCompleteProfile.tsx
+│   │   │   │   ├── DashboardCurrentProject.tsx
+│   │   │   │   ├── DashboardCurrentProjectButton.tsx
+│   │   │   │   ├── DashboardCurrentProjectModal.tsx
+│   │   │   │   ├── DashboardDownloadCertificate.tsx
+│   │   │   │   ├── DashboardProfile.tsx
+│   │   │   │   ├── DashboardProgressRoadmap.tsx
+│   │   │   │   ├── DashboardRoadmap.tsx
+│   │   │   │   ├── DashboardRoadmapStyleRoot.tsx
+│   │   │   │   ├── DashboardRoleRoadmap.tsx
+│   │   │   │   ├── DashboardStatus.tsx
+│   │   │   │   ├── DashboardTimeTracker.tsx
+│   │   │   │   ├── DashboardTimeTrackerSchedule.tsx
+│   │   │   │   ├── DashboardTimeTrackerTimer.tsx
+│   │   │   │   ├── DashboardTokenPoints.tsx
+│   │   │   │   ├── DashboardWeeklyTop.tsx
+│   │   │   │   └── PhaseDetailsModal.tsx
+│   │   │   ├── _lib
+│   │   │   │   ├── theme.ts
+│   │   │   │   └── util.ts
+│   │   │   └── actions.ts
+│   │   ├── _components
+│   │   │   ├── ConditionalMainWrapper.tsx
+│   │   │   ├── DashboardClient.tsx
+│   │   │   ├── DynamicMainContent.tsx
+│   │   │   ├── HomeToastNotification.tsx
+│   │   │   ├── LeftSidebar.tsx
+│   │   │   ├── LeftSidebarClient.tsx
+│   │   │   ├── LeftSidebarServer.tsx
+│   │   │   ├── MobileNav.tsx
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── NavbarContent.tsx
+│   │   │   ├── NavigationOptimizer.tsx
+│   │   │   ├── NewsBanner.tsx
+│   │   │   ├── OptimizedLayout.tsx
+│   │   │   ├── PageContainer.tsx
+│   │   │   ├── PageLoadingAnimation.tsx
+│   │   │   ├── PageLoadingVariants.tsx
+│   │   │   ├── PageTransitionSettings.tsx
+│   │   │   ├── PageTransitionWrapper.tsx
+│   │   │   ├── SurveyWidget.tsx
+│   │   │   └── UserProvider.tsx
+│   │   ├── _hooks
+│   │   │   ├── supabase
+│   │   │   │   └── use-fetch-enum.ts
+│   │   │   └── use-user.ts
+│   │   ├── _services
+│   │   │   └── actions.ts
+│   │   ├── account-settings
+│   │   │   ├── _components
+│   │   │   │   ├── AccountSettings2FA.tsx
+│   │   │   │   ├── AccountSettingsBackDrop.tsx
+│   │   │   │   ├── AccountSettingsChangePassword.tsx
+│   │   │   │   ├── AccountSettingsDelete.tsx
+│   │   │   │   ├── AccountSettingsDialog.tsx
+│   │   │   │   └── AccountSettingsHeader.tsx
+│   │   │   ├── action.ts
+│   │   │   └── page.tsx
+│   │   ├── admin-dashboard
+│   │   │   ├── _components
+│   │   │   │   ├── AdminDashboardApplicantStatusPie.tsx
+│   │   │   │   ├── AdminDashboardMonthlyApplicantsLineChart.tsx
+│   │   │   │   ├── AdminDashboardProjectsPie.tsx
+│   │   │   │   ├── AdminDashboardStatsCard.tsx
+│   │   │   │   ├── AdminDashboardTotalActiveIntern.tsx
+│   │   │   │   ├── AdminDashboardTotalAdmin.tsx
+│   │   │   │   ├── AdminDashboardTotalCodev.tsx
+│   │   │   │   ├── AdminDashboardTotalInactiveIntern.tsx
+│   │   │   │   ├── AdminDashboardTotalMentor.tsx
+│   │   │   │   └── AdminDashboardTotalProject.tsx
+│   │   │   ├── layout.tsx
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── announcements
+│   │   │   ├── AnnouncementButton.tsx
+│   │   │   ├── AnnouncementContent.tsx
+│   │   │   ├── AnnouncementEditor.tsx
+│   │   │   ├── AnnouncementModal.tsx
+│   │   │   ├── AnnouncementRichTextEditor.tsx
+│   │   │   ├── AnnouncementRichTextEditorMenuBar.tsx
+│   │   │   ├── AnnouncementTab.tsx
+│   │   │   ├── data.ts
+│   │   │   └── types.ts
+│   │   ├── applicants
+│   │   │   ├── _components
+│   │   │   │   ├── _table
+│   │   │   │   │   ├── ApplicantConfirmationDialog.tsx
+│   │   │   │   │   ├── applicantActionButton.original.tsx
+│   │   │   │   │   ├── applicantActionButton.tsx
+│   │   │   │   │   ├── applicantActionConfig.ts
+│   │   │   │   │   ├── applicantActionTypes.ts
+│   │   │   │   │   ├── applicantColumns.tsx
+│   │   │   │   │   ├── applicantDataTable.tsx
+│   │   │   │   │   ├── applicantMobileTable.tsx
+│   │   │   │   │   ├── applicantProfileColSec.tsx
+│   │   │   │   │   ├── applicantRowActionButton.tsx
+│   │   │   │   │   └── useApplicantActions.ts
+│   │   │   │   ├── ApplicantClientWrapper.tsx
+│   │   │   │   ├── ApplicantDataWrapper.tsx
+│   │   │   │   ├── ApplicantProfileModal.tsx
+│   │   │   │   ├── applicantEmailAction.tsx
+│   │   │   │   ├── applicantFetchComp.tsx
+│   │   │   │   ├── applicantFilters.tsx
+│   │   │   │   ├── applicantFiltersBadge.tsx
+│   │   │   │   ├── applicantHeaders.tsx
+│   │   │   │   ├── applicantLists.tsx
+│   │   │   │   ├── applicantReapplyTime.tsx
+│   │   │   │   ├── applicantSorters.tsx
+│   │   │   │   ├── applicantTechStack.tsx
+│   │   │   │   └── applicantTestTimeRemaining.tsx
+│   │   │   ├── _service
+│   │   │   │   ├── email
+│   │   │   │   │   ├── actions
+│   │   │   │   │   │   ├── accepted.ts
+│   │   │   │   │   │   ├── deny.ts
+│   │   │   │   │   │   ├── failedTest.ts
+│   │   │   │   │   │   ├── onboardingReminder.ts
+│   │   │   │   │   │   ├── passedTest.ts
+│   │   │   │   │   │   └── testReminder.ts
+│   │   │   │   │   ├── templates
+│   │   │   │   │   │   ├── accepted.ts
+│   │   │   │   │   │   ├── deny.ts
+│   │   │   │   │   │   ├── failedTest.ts
+│   │   │   │   │   │   ├── onboardingReminder.ts
+│   │   │   │   │   │   ├── passedTest.ts
+│   │   │   │   │   │   └── testReminder.ts
+│   │   │   │   │   ├── config.ts
+│   │   │   │   │   ├── index.ts
+│   │   │   │   │   └── types.ts
+│   │   │   │   ├── action.ts
+│   │   │   │   ├── emailAction.ts
+│   │   │   │   ├── query.ts
+│   │   │   │   └── types.ts
+│   │   │   ├── error.tsx
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── certificate-preview
+│   │   │   └── page.tsx
+│   │   ├── clients
+│   │   │   ├── _components
+│   │   │   │   ├── ClientAddModal.tsx
+│   │   │   │   ├── ClientEditModal.tsx
+│   │   │   │   ├── ClientsButton.tsx
+│   │   │   │   └── ClientsCard.tsx
+│   │   │   ├── _lib
+│   │   │   │   ├── schema.ts
+│   │   │   │   └── utils.ts
+│   │   │   ├── action.ts
+│   │   │   ├── error.tsx
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── feeds
+│   │   │   ├── _components
+│   │   │   │   ├── CreatePostForm.tsx
+│   │   │   │   ├── DeleteDialog.tsx
+│   │   │   │   ├── EditPostForm.tsx
+│   │   │   │   ├── Feed.tsx
+│   │   │   │   ├── FirstPostPrompt.tsx
+│   │   │   │   ├── MarkdownEditor.tsx
+│   │   │   │   ├── PostCard.tsx
+│   │   │   │   ├── PostCardSkeleton.tsx
+│   │   │   │   ├── PostCommentCount.tsx
+│   │   │   │   ├── PostTags.tsx
+│   │   │   │   ├── PostUpvote.tsx
+│   │   │   │   ├── PostView.tsx
+│   │   │   │   ├── PostViewCommentItem.tsx
+│   │   │   │   ├── PostViewCommentList.tsx
+│   │   │   │   ├── PostViewCreateComment.tsx
+│   │   │   │   ├── SocialPointsCard.tsx
+│   │   │   │   ├── SortMenu.tsx
+│   │   │   │   ├── TagSelector.tsx
+│   │   │   │   └── ThumbnailUpload.tsx
+│   │   │   ├── _constants
+│   │   │   │   └── index.ts
+│   │   │   ├── _services
+│   │   │   │   ├── action.ts
+│   │   │   │   ├── query.ts
+│   │   │   │   └── validation.ts
+│   │   │   ├── IMPROVEMENTS.md
+│   │   │   └── page.tsx
+│   │   ├── hire
+│   │   │   ├── _components
+│   │   │   │   ├── ApplicationDetailsModal.tsx
+│   │   │   │   ├── CreateJobForm.tsx
+│   │   │   │   ├── EditJobModal.tsx
+│   │   │   │   ├── HirePageClient.tsx
+│   │   │   │   └── JobListingsTable.tsx
+│   │   │   ├── applications
+│   │   │   │   └── [jobId]
+│   │   │   │       ├── client-page.tsx
+│   │   │   │       └── page.tsx
+│   │   │   ├── actions.ts
+│   │   │   └── page.tsx
+│   │   ├── in-house
+│   │   │   ├── _components
+│   │   │   │   ├── cards
+│   │   │   │   │   ├── CodevCard.tsx
+│   │   │   │   │   ├── EditableCard.tsx
+│   │   │   │   │   └── InHouseCards.tsx
+│   │   │   │   ├── shared
+│   │   │   │   │   ├── DeleteDialog.tsx
+│   │   │   │   │   ├── ProjectSelect.tsx
+│   │   │   │   │   └── StatusBadge.tsx
+│   │   │   │   ├── skeletons
+│   │   │   │   │   ├── InHouseHeaderSkeleton.tsx
+│   │   │   │   │   ├── InHouseLoadingSkeleton.tsx
+│   │   │   │   │   ├── InHouseTableSkeleton.tsx
+│   │   │   │   │   └── index.ts
+│   │   │   │   ├── table
+│   │   │   │   │   ├── EditableRow.tsx
+│   │   │   │   │   ├── InHouseMobileTable.tsx
+│   │   │   │   │   ├── InHouseTable.tsx
+│   │   │   │   │   ├── MobileEditableForm.tsx
+│   │   │   │   │   ├── TableActions.tsx
+│   │   │   │   │   ├── columns.ts
+│   │   │   │   │   └── table-filters.tsx
+│   │   │   │   ├── EditDialog.tsx
+│   │   │   │   └── InHouseView.tsx
+│   │   │   ├── _hooks
+│   │   │   │   └── use-codev-form.ts
+│   │   │   ├── _lib
+│   │   │   │   └── utils.ts
+│   │   │   ├── _types
+│   │   │   │   └── in-house.ts
+│   │   │   ├── actions.ts
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── interns
+│   │   │   ├── _components
+│   │   │   │   ├── AnimatedCodevCardSkeleton.tsx
+│   │   │   │   ├── CodevCard.tsx
+│   │   │   │   ├── CodevCardSkeleton.tsx
+│   │   │   │   ├── CodevContainer.tsx
+│   │   │   │   ├── CodevContainerSkeleton.tsx
+│   │   │   │   ├── CodevList.tsx
+│   │   │   │   ├── CodevListSkeleton.tsx
+│   │   │   │   ├── CodevSearchbar.tsx
+│   │   │   │   ├── FilterCodevs.tsx
+│   │   │   │   ├── InternalProjects.tsx
+│   │   │   │   ├── ProfileModal.tsx
+│   │   │   │   ├── SkillPoints.tsx
+│   │   │   │   └── TechStacks.tsx
+│   │   │   ├── _lib
+│   │   │   │   └── codevpriority.ts
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── kanban
+│   │   │   ├── [projectId]
+│   │   │   │   ├── [id]
+│   │   │   │   │   ├── _components
+│   │   │   │   │   │   ├── kanban_modals
+│   │   │   │   │   │   │   ├── KanbanAddMembersButton.tsx
+│   │   │   │   │   │   │   ├── KanbanAddMembersModal.tsx
+│   │   │   │   │   │   │   ├── KanbanAddModalMembers.tsx
+│   │   │   │   │   │   │   ├── KanbanColumnAddButton.tsx
+│   │   │   │   │   │   │   ├── KanbanColumnAddModal.tsx
+│   │   │   │   │   │   │   ├── KanbanRichTextEditor.tsx
+│   │   │   │   │   │   │   ├── KanbanRichTextEditorMenuBar.tsx
+│   │   │   │   │   │   │   ├── KanbanTaskAddModal.tsx
+│   │   │   │   │   │   │   ├── KanbanTaskViewEditModal.tsx
+│   │   │   │   │   │   │   └── MobileTaskMoveModal.tsx
+│   │   │   │   │   │   ├── tasks
+│   │   │   │   │   │   │   ├── _components
+│   │   │   │   │   │   │   │   └── TaskComments.tsx
+│   │   │   │   │   │   │   ├── TaskAddModal.tsx
+│   │   │   │   │   │   │   ├── TaskDeleteModal.tsx
+│   │   │   │   │   │   │   ├── TaskEditModal.tsx
+│   │   │   │   │   │   │   └── TaskViewModal.tsx
+│   │   │   │   │   │   ├── ArchiveColumn.tsx
+│   │   │   │   │   │   ├── ArchiveTask.tsx
+│   │   │   │   │   │   ├── DifficultyPointsTooltip.tsx
+│   │   │   │   │   │   ├── KanbanBoard.tsx
+│   │   │   │   │   │   ├── KanbanBoardColumnContainer.tsx
+│   │   │   │   │   │   ├── KanbanColumn.tsx
+│   │   │   │   │   │   ├── KanbanTask.tsx
+│   │   │   │   │   │   ├── KanbanTaskOverlayWrapper.tsx
+│   │   │   │   │   │   └── UserTaskFilter.tsx
+│   │   │   │   │   ├── _services
+│   │   │   │   │   │   └── query.ts
+│   │   │   │   │   ├── actions.ts
+│   │   │   │   │   ├── loading.tsx
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── AddSprintButton.tsx
+│   │   │   │   │   └── SprintAddModal.tsx
+│   │   │   │   ├── _services
+│   │   │   │   │   └── query.ts
+│   │   │   │   ├── actions.ts
+│   │   │   │   └── page.tsx
+│   │   │   ├── _components
+│   │   │   │   ├── BoardAddModal.tsx
+│   │   │   │   ├── DeleteDialog.tsx
+│   │   │   │   ├── EditSprintForm.tsx
+│   │   │   │   ├── KanbanBoardAddModal.tsx
+│   │   │   │   ├── KanbanBoardsSearch.tsx
+│   │   │   │   └── TableActions.tsx
+│   │   │   ├── ticket
+│   │   │   │   └── [ticketCode]
+│   │   │   │       ├── actions.ts
+│   │   │   │       └── page.tsx
+│   │   │   ├── actions.ts
+│   │   │   ├── layout.tsx
+│   │   │   └── page.tsx
+│   │   ├── my-team
+│   │   │   ├── [projectId]
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── AttendanceGrid.tsx
+│   │   │   │   │   ├── AttendanceSync.tsx
+│   │   │   │   │   ├── AttendanceTracker.tsx
+│   │   │   │   │   ├── AttendanceWarningBanner.tsx
+│   │   │   │   │   ├── ChecklistStatusBanner.tsx
+│   │   │   │   │   ├── CompactMemberGrid.tsx
+│   │   │   │   │   ├── MeetingBasedAttendance.tsx
+│   │   │   │   │   ├── MeetingScheduler.tsx
+│   │   │   │   │   ├── ScheduleMeetingModal.tsx
+│   │   │   │   │   ├── SyncAllAttendance.tsx
+│   │   │   │   │   └── TeamDetailView.tsx
+│   │   │   │   ├── _services
+│   │   │   │   │   ├── attendanceService.ts
+│   │   │   │   │   └── attendanceServiceClient.ts
+│   │   │   │   ├── actions
+│   │   │   │   │   ├── attendance-sync.ts
+│   │   │   │   │   └── attendance-warnings.ts
+│   │   │   │   ├── actions.ts
+│   │   │   │   └── page.tsx
+│   │   │   ├── _components
+│   │   │   │   ├── ChecklistCreateModal.tsx
+│   │   │   │   ├── ChecklistManageModal.tsx
+│   │   │   │   ├── MemberChecklist.tsx
+│   │   │   │   ├── MemberDetailModal.tsx
+│   │   │   │   ├── MemberRating.tsx
+│   │   │   │   ├── MyTeamView.tsx
+│   │   │   │   └── TeamProjectCard.tsx
+│   │   │   ├── AddMembersModal.tsx
+│   │   │   ├── MyTeamPage.tsx
+│   │   │   ├── actions.ts
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── orgchart
+│   │   │   ├── _components
+│   │   │   │   ├── OrgChart.tsx
+│   │   │   │   ├── OrgChartSkeleton.tsx
+│   │   │   │   └── OrgChartTeamMemberCard.tsx
+│   │   │   ├── _types
+│   │   │   │   └── org-chart.ts
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── overflow
+│   │   │   ├── _components
+│   │   │   │   ├── CommentSection.tsx
+│   │   │   │   ├── OverflowView.tsx
+│   │   │   │   ├── PostQuestionModal.tsx
+│   │   │   │   ├── QuestionCard.tsx
+│   │   │   │   ├── QuestionFilter.tsx
+│   │   │   │   └── QuestionImagePreview.tsx
+│   │   │   ├── IMPROVEMENTS.md
+│   │   │   ├── actions.ts
+│   │   │   └── page.tsx
+│   │   ├── projects
+│   │   │   ├── _components
+│   │   │   │   ├── AddProjectButton.tsx
+│   │   │   │   ├── BookmarkButton.tsx
+│   │   │   │   ├── ImageCrop.tsx
+│   │   │   │   ├── ProjectAddModal.tsx
+│   │   │   │   ├── ProjectCard.tsx
+│   │   │   │   ├── ProjectCardContainer.tsx
+│   │   │   │   ├── ProjectDeleteModal.tsx
+│   │   │   │   ├── ProjectEditModal.tsx
+│   │   │   │   ├── ProjectFilterButton.tsx
+│   │   │   │   ├── ProjectOptionsMenu.tsx
+│   │   │   │   └── ProjectViewModal.tsx
+│   │   │   ├── actions.ts
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── settings
+│   │   │   ├── _components
+│   │   │   │   └── SettingsCard.tsx
+│   │   │   ├── account-settings
+│   │   │   │   └── page.tsx
+│   │   │   ├── news-banners
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── BannerImageUpload.tsx
+│   │   │   │   │   └── NewsBannerForm.tsx
+│   │   │   │   ├── actions.ts
+│   │   │   │   └── page.tsx
+│   │   │   ├── profile
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── About.tsx
+│   │   │   │   │   ├── ContactInfo.tsx
+│   │   │   │   │   ├── EducationalBackground.tsx
+│   │   │   │   │   ├── Experience.tsx
+│   │   │   │   │   ├── JobStatuses.tsx
+│   │   │   │   │   ├── PersonalInfo.tsx
+│   │   │   │   │   ├── Photo.tsx
+│   │   │   │   │   ├── ProfileCompletionGuide.tsx
+│   │   │   │   │   ├── Skills.tsx
+│   │   │   │   │   ├── TimeSchedule.tsx
+│   │   │   │   │   └── UploadPhotoModal.tsx
+│   │   │   │   ├── action.ts
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── services
+│   │   │   │   ├── _components
+│   │   │   │   │   └── ServiceForm.tsx
+│   │   │   │   ├── cms-diagnostic
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── diagnostic
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── actions.ts
+│   │   │   │   └── page.tsx
+│   │   │   ├── surveys
+│   │   │   │   ├── [surveyId]
+│   │   │   │   │   ├── _components
+│   │   │   │   │   │   └── QuestionForm.tsx
+│   │   │   │   │   ├── results
+│   │   │   │   │   │   └── page.tsx
+│   │   │   │   │   ├── loading.tsx
+│   │   │   │   │   └── page.tsx
+│   │   │   │   ├── _components
+│   │   │   │   │   ├── SurveyForm.tsx
+│   │   │   │   │   └── SurveyImageUpload.tsx
+│   │   │   │   ├── questions
+│   │   │   │   │   └── actions.ts
+│   │   │   │   ├── responses
+│   │   │   │   │   └── actions.ts
+│   │   │   │   ├── actions.ts
+│   │   │   │   ├── loading.tsx
+│   │   │   │   └── page.tsx
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── surveys
+│   │   │   └── [surveyId]
+│   │   │       ├── loading.tsx
+│   │   │       └── page.tsx
+│   │   ├── tasks
+│   │   │   ├── _components
+│   │   │   │   ├── TaskCard.tsx
+│   │   │   │   ├── TaskViewModal.tsx
+│   │   │   │   └── TasksContainer.tsx
+│   │   │   ├── _lib
+│   │   │   │   └── utils.ts
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── test-notifications
+│   │   │   ├── actions.ts
+│   │   │   ├── manual-fetch.tsx
+│   │   │   └── page.tsx
+│   │   ├── time-tracker
+│   │   │   ├── _components
+│   │   │   │   ├── TimeTrackerTable.tsx
+│   │   │   │   ├── TimeTrackerTableDesktop.tsx
+│   │   │   │   └── TimeTrackerTableMobile.tsx
+│   │   │   ├── _lib
+│   │   │   │   └── dummy-data.ts
+│   │   │   ├── _types
+│   │   │   │   └── time-log.ts
+│   │   │   ├── loading.tsx
+│   │   │   └── page.tsx
+│   │   ├── layout.tsx
+│   │   ├── loading.tsx
+│   │   └── page.tsx
+│   ├── nda-signing
+│   │   ├── [token]
+│   │   │   └── page.tsx
+│   │   ├── public
+│   │   │   └── page.tsx
+│   │   └── success
+│   │       └── page.tsx
+│   ├── proposal
+│   │   └── page.tsx
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── not-found.tsx
+├── components
+│   ├── FramerAnimation
+│   │   └── Framer.tsx
+│   ├── leaderboard
+│   │   ├── LeaderboardContainer.tsx
+│   │   ├── LeaderboardError.tsx
+│   │   ├── LeaderboardFilters.tsx
+│   │   ├── LeaderboardLoading.tsx
+│   │   └── LeaderboardTable.tsx
+│   ├── modals
+│   │   ├── ApplicantsEditModal.tsx
+│   │   ├── AvailableTimeModal.tsx
+│   │   ├── AvailableTimeModal2.tsx
+│   │   ├── ContactUsModal.tsx
+│   │   ├── CreatePostModal.tsx
+│   │   ├── DeleteWarningModal.tsx
+│   │   ├── EditPostModal.tsx
+│   │   ├── EditSprintModal.tsx
+│   │   ├── FeedPostModal.tsx
+│   │   ├── PrivacyPolicyModal.tsx
+│   │   ├── PromoteToCodevModal.tsx
+│   │   ├── PromoteToMentorModal.tsx
+│   │   ├── SurveyModal.tsx
+│   │   ├── TechStackModal.tsx
+│   │   ├── TermsOfServiceModal.tsx
+│   │   ├── TimeTrackerModal.tsx
+│   │   └── UserInactiveModal.tsx
+│   ├── notifications
+│   │   ├── NotificationContainer.tsx
+│   │   ├── NotificationIcon.tsx
+│   │   └── NotificationPanel.tsx
+│   ├── providers
+│   │   ├── modal-provider-home.tsx
+│   │   └── modal-provider-marketing.tsx
+│   ├── shared
+│   │   ├── dashboard
+│   │   │   ├── Box.tsx
+│   │   │   ├── BoxInset.tsx
+│   │   │   ├── Button.tsx
+│   │   │   ├── CustomBreadcrumb.tsx
+│   │   │   ├── H1.tsx
+│   │   │   ├── InputPhone.tsx
+│   │   │   ├── InputProfile.tsx
+│   │   │   ├── LeftSidebar.tsx
+│   │   │   ├── MobileNav.tsx
+│   │   │   ├── Navbar.tsx
+│   │   │   ├── RenderTag.tsx
+│   │   │   ├── RenderTeam.tsx
+│   │   │   ├── Search.tsx
+│   │   │   ├── Theme.tsx
+│   │   │   ├── index.js
+│   │   │   ├── input.tsx
+│   │   │   └── theme-mobile.tsx
+│   │   ├── form
+│   │   │   └── FormField.tsx
+│   │   ├── home
+│   │   │   ├── ButtonLink.tsx
+│   │   │   ├── CodevHeading.tsx
+│   │   │   ├── H1.tsx
+│   │   │   ├── H2.tsx
+│   │   │   ├── Heading3.tsx
+│   │   │   ├── IntroText.tsx
+│   │   │   ├── Logo.tsx
+│   │   │   ├── Paragraph.tsx
+│   │   │   ├── SectionWrapper.tsx
+│   │   │   ├── SocialIcons.tsx
+│   │   │   ├── TextGradient.tsx
+│   │   │   └── index.ts
+│   │   ├── Badges.tsx
+│   │   ├── Loader.tsx
+│   │   └── Logo.tsx
+│   ├── time-picker
+│   │   ├── PeriodSelect.tsx
+│   │   ├── TimePicker12hourDemo.tsx
+│   │   ├── TimePicker12hourWrapper.tsx
+│   │   ├── TimePickerDemo.tsx
+│   │   ├── TimePickerInput.tsx
+│   │   ├── TimePickerUtils.tsx
+│   │   └── TimePickerWrapper.tsx
+│   ├── ui
+│   │   ├── carousel
+│   │   │   └── carousel.tsx
+│   │   ├── date
+│   │   │   └── date-picker.tsx
+│   │   ├── forms
+│   │   │   └── input.tsx
+│   │   ├── pagination
+│   │   │   ├── index.tsx
+│   │   │   └── pagination.tsx
+│   │   ├── skeleton
+│   │   │   ├── AdminSkeleton.tsx
+│   │   │   ├── UsersSkeleton.tsx
+│   │   │   └── skeleton.tsx
+│   │   ├── AddNewButton.tsx
+│   │   ├── CustomCheckboxDropdown.tsx
+│   │   ├── CustomSelect.tsx
+│   │   ├── MemberSelection.tsx
+│   │   ├── SwitchStatusButton.tsx
+│   │   ├── button.tsx
+│   │   ├── card.tsx
+│   │   ├── chart.tsx
+│   │   ├── dialog.tsx
+│   │   ├── select.tsx
+│   │   ├── sliders.tsx
+│   │   ├── switch.tsx
+│   │   ├── table.tsx
+│   │   ├── textarea-home.tsx
+│   │   ├── toaster.tsx
+│   │   ├── toggle.tsx
+│   │   ├── tooltip.tsx
+│   │   ├── use-toast.tsx
+│   │   └── visuallyHidden.tsx
+│   ├── AsyncErrorBoundary.tsx
+│   ├── CodevBadge.tsx
+│   ├── DefaultAvatar.tsx
+│   ├── ErrorBoundary.tsx
+│   └── ProjectAvatar.tsx
+├── config
+│   ├── app.config.ts
+│   └── paths.config.ts
+├── constants
+│   ├── employement.ts
+│   ├── index.ts
+│   ├── internal_status.ts
+│   ├── landing_data.ts
+│   ├── links.ts
+│   ├── navigation.ts
+│   ├── pagination.ts
+│   ├── profile.ts
+│   ├── services.ts
+│   ├── settings.ts
+│   ├── sidebar.ts
+│   ├── social.ts
+│   └── techstack.ts
+├── context
+│   ├── ThemeProvider.tsx
+│   └── ToasterProvider.tsx
+├── docs
+│   ├── VIDEO_UPLOAD_GUIDE.md
+│   └── notification-system.md
+├── hooks
+│   ├── reactQuery.tsx
+│   ├── requestHandler.ts
+│   ├── toastHandler.ts
+│   ├── use-media-query.ts
+│   ├── use-modal-applicants.tsx
+│   ├── use-modal-clients.tsx
+│   ├── use-modal-projects.tsx
+│   ├── use-modal-services.tsx
+│   ├── use-modal-sprints.tsx
+│   ├── use-modal-users.tsx
+│   ├── use-modal.tsx
+│   ├── use-pagination.ts
+│   ├── use-sidebar.ts
+│   ├── use-techstack.ts
+│   ├── use-timeavail.ts
+│   ├── useChangeBgNavigation.ts
+│   ├── useCountries.ts
+│   ├── useDragAndDrop.ts
+│   ├── useFadeAnimation.ts
+│   ├── useHideSidebarOnResize.ts
+│   ├── useImageCrop.tsx
+│   ├── useKanbanTaskUrlModal.ts
+│   ├── useLeaderboard.ts
+│   ├── useSlider.ts
+│   └── useToast.ts
+├── lib
+│   ├── actions
+│   │   ├── notification.actions.ts
+│   │   └── notification.ts
+│   ├── server
+│   │   ├── codev.service.ts
+│   │   ├── notification.service.ts
+│   │   ├── project.service.ts
+│   │   ├── redis-cache-keys.ts
+│   │   ├── redis-cache.ts
+│   │   ├── redis.ts
+│   │   ├── supabase-action.ts
+│   │   └── supabase-server-comp.ts
+│   ├── validations
+│   │   ├── auth.ts
+│   │   └── contact-us.ts
+│   ├── form-data.ts
+│   ├── format-date-time.ts
+│   ├── getRandomColor.ts
+│   └── utils.ts
+├── public
+│   ├── assets
+│   │   ├── images
+│   │   │   ├── ai-integration
+│   │   │   │   └── index.ts
+│   │   │   ├── applicant-workflow
+│   │   │   ├── campaign
+│   │   │   ├── index
+│   │   │   ├── onboarding
+│   │   │   │   └── animation
+│   │   │   │       ├── confetti.json
+│   │   │   │       ├── dev-coding.json
+│   │   │   │       ├── developer-01-whoooa.json
+│   │   │   │       ├── infinite_road.json
+│   │   │   │       └── web-development.json
+│   │   │   ├── partners
+│   │   │   ├── services
+│   │   │   │   └── index.ts
+│   │   │   └── index.js
+│   │   └── svgs
+│   │       ├── badges
+│   │       ├── logos
+│   │       ├── techstack
+│   │       │   └── index.js
+│   │       └── index.js
+│   └── site.webmanifest
+├── scripts
+│   └── reset-video-progress.ts
+├── store
+│   ├── UserProvider.ts
+│   ├── codev-store.ts
+│   ├── feeds-store.ts
+│   ├── kanban-store.ts
+│   ├── notification-store.ts
+│   ├── sidebar-store.ts
+│   └── sprints-store.ts
+├── styles
+│   ├── tailwind.css
+│   └── theme.css
+├── supabase
+│   └── migrations
+│       ├── 20250108_fix_missing_attendance_points_trigger.sql
+│       ├── 20250118_add_meeting_schedule_to_projects.sql
+│       ├── 20250118_create_attendance_tables.sql
+│       ├── 20250118_fix_notification_preferences.sql
+│       ├── 20250119_add_excused_status_to_attendance.sql
+│       ├── 20250119_create_meetings_table.sql
+│       ├── 20251127_project_category_many_to_many.sql
+│       ├── README.md
+│       ├── add_dummy_news_banners.sql
+│       ├── add_image_url_to_news_banners.sql
+│       ├── add_quiz_and_commitment_fields.sql
+│       ├── create_in_app_survey_system.sql
+│       ├── create_news_banner_system.sql
+│       ├── create_notification_system.sql
+│       ├── create_onboarding_videos_table.sql
+│       ├── create_proposal_system.sql
+│       ├── create_survey_dismissals.sql
+│       ├── create_survey_system.sql
+│       ├── fix_attendance_warning_for_new_members.sql
+│       ├── fix_notification_rls_policies.sql
+│       ├── reset_onboarding_progress.sql
+│       └── simple_notification_fix.sql
+├── types
+│   ├── database
+│   │   └── applicant.ts
+│   ├── home
+│   │   └── codev.ts
+│   ├── database.ts
+│   ├── leaderboard.ts
+│   ├── notifications.ts
+│   ├── profile-points.ts
+│   └── react-signature-canvas.d.ts
+├── utils
+│   ├── supabase
+│   │   ├── _expr_middleware.ts
+│   │   ├── admin.ts
+│   │   ├── check-env-vars.ts
+│   │   ├── client.tsx
+│   │   ├── ensure-env.ts
+│   │   └── server.ts
+│   ├── codev-priority.ts
+│   ├── codev-qualification.ts
+│   ├── debounce.ts
+│   ├── imageValidation.ts
+│   ├── nda-helpers.ts
+│   ├── ndaStorageService.ts
+│   └── uploadImage.ts
+├── README.md
+├── components.json
+├── database-schema.md
+├── env.mjs
+├── eslint.config.js
+├── middleware.ts
+├── next-env.d.ts
+├── next.config.mjs
+├── package.json
+├── postcss.config.mjs
+├── reset.d.ts
+├── svgr.d.ts
+├── tailwind.config.ts
+├── tree_output.txt
+└── tsconfig.json
+
+262 directories, 904 files
