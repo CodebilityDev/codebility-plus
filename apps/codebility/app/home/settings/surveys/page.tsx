@@ -1,14 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, Eye, EyeOff, Settings } from "lucide-react";
-import { Button } from "@codevs/ui/button";
 import { H1 } from "@/components/shared/dashboard";
+import { createClientClientComponent } from "@/utils/supabase/client";
+import { Eye, EyeOff, Pencil, Plus, Settings, Trash2 } from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@codevs/ui/button";
+
 import PageContainer from "../../_components/PageContainer";
 import SurveyForm from "./_components/SurveyForm";
-import { createClientClientComponent } from "@/utils/supabase/client";
-import { toast } from "sonner";
 
 interface Survey {
   id: string;
@@ -26,15 +28,20 @@ interface Survey {
 
 const typeColors = {
   general: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-200",
-  feedback: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200",
-  satisfaction: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200",
-  research: "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200",
-  onboarding: "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-200",
+  feedback:
+    "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200",
+  satisfaction:
+    "bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-200",
+  research:
+    "bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-200",
+  onboarding:
+    "bg-pink-100 text-pink-800 dark:bg-pink-900/30 dark:text-pink-200",
 };
 
 const audienceColors = {
   all: "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-200",
-  codev: "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200",
+  codev:
+    "bg-indigo-100 text-indigo-800 dark:bg-indigo-900/30 dark:text-indigo-200",
   intern: "bg-teal-100 text-teal-800 dark:bg-teal-900/30 dark:text-teal-200",
   hr: "bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-200",
   admin: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200",
@@ -54,6 +61,12 @@ export default function SurveysPage() {
   const fetchSurveys = async () => {
     const supabase = createClientClientComponent();
 
+    if (!supabase) {
+      toast.error("Failed to initialize database connection");
+      setLoading(false);
+      return;
+    }
+
     const { data, error } = await supabase
       .from("surveys")
       .select("*")
@@ -72,15 +85,25 @@ export default function SurveysPage() {
   const toggleSurveyStatus = async (survey: Survey) => {
     const supabase = createClientClientComponent();
 
+    if (!supabase) {
+      toast.error("Failed to initialize database connection");
+      return;
+    }
+
     const { error } = await supabase
       .from("surveys")
-      .update({ is_active: !survey.is_active, updated_at: new Date().toISOString() })
+      .update({
+        is_active: !survey.is_active,
+        updated_at: new Date().toISOString(),
+      })
       .eq("id", survey.id);
 
     if (error) {
       toast.error("Failed to update survey status");
     } else {
-      toast.success(`Survey ${!survey.is_active ? "activated" : "deactivated"}`);
+      toast.success(
+        `Survey ${!survey.is_active ? "activated" : "deactivated"}`,
+      );
       fetchSurveys();
     }
   };
@@ -89,6 +112,11 @@ export default function SurveysPage() {
     if (!confirm("Are you sure you want to delete this survey?")) return;
 
     const supabase = createClientClientComponent();
+
+    if (!supabase) {
+      toast.error("Failed to initialize database connection");
+      return;
+    }
 
     const { error } = await supabase
       .from("surveys")
@@ -122,16 +150,16 @@ export default function SurveysPage() {
   if (loading) {
     return (
       <PageContainer>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-violet-500"></div>
         </div>
       </PageContainer>
     );
   }
 
   return (
-    <PageContainer maxWidth="6xl">
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <PageContainer maxWidth="2xl">
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-purple-500 shadow-lg">
             <span className="text-xl">📊</span>
@@ -147,7 +175,7 @@ export default function SurveysPage() {
         </div>
         <Button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
+          className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600"
         >
           <Plus className="h-4 w-4" />
           Add Survey
@@ -155,11 +183,11 @@ export default function SurveysPage() {
       </div>
 
       {(showForm || editingSurvey) && (
-        <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <div className="flex items-center justify-between mb-4">
+        <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <div className="mb-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="h-8 w-8 rounded-full bg-gradient-to-r from-violet-500 to-purple-500 flex items-center justify-center">
-                <span className="text-white text-sm">
+              <div className="flex h-8 w-8 items-center justify-center rounded-full bg-gradient-to-r from-violet-500 to-purple-500">
+                <span className="text-sm text-white">
                   {editingSurvey ? "✏️" : "➕"}
                 </span>
               </div>
@@ -178,26 +206,24 @@ export default function SurveysPage() {
               Cancel
             </Button>
           </div>
-          <SurveyForm
-            survey={editingSurvey}
-            onSuccess={handleFormSuccess}
-          />
+          <SurveyForm survey={editingSurvey} onSuccess={handleFormSuccess} />
         </div>
       )}
 
       <div className="space-y-4">
         {surveys.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
+          <div className="rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 py-12 text-center dark:border-gray-700 dark:bg-gray-800/50">
             <div className="flex flex-col items-center gap-3">
-              <div className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
                 <span className="text-2xl">📊</span>
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+                <h3 className="mb-1 text-lg font-medium text-gray-900 dark:text-gray-100">
                   No surveys yet
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400">
-                  Create your first survey to start collecting feedback from users
+                  Create your first survey to start collecting feedback from
+                  users
                 </p>
               </div>
             </div>
@@ -206,40 +232,42 @@ export default function SurveysPage() {
           surveys.map((survey) => (
             <div
               key={survey.id}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow"
+              className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
             >
               <div className="flex items-start justify-between">
-                <div className="flex gap-4 flex-1">
+                <div className="flex flex-1 gap-4">
                   {/* Survey Image Preview */}
                   {survey.image_url && (
-                    <div className="flex-shrink-0 w-16 h-16 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-600">
+                    <div className="h-16 w-16 flex-shrink-0 overflow-hidden rounded-lg border border-gray-200 dark:border-gray-600">
                       <img
                         src={survey.image_url}
                         alt={survey.title}
-                        className="w-full h-full object-cover"
+                        className="h-full w-full object-cover"
                       />
                     </div>
                   )}
 
                   <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <h3 className="font-semibold text-lg text-gray-600 dark:text-gray-300">{survey.title}</h3>
+                    <div className="mb-2 flex items-center gap-3">
+                      <h3 className="text-lg font-semibold text-gray-600 dark:text-gray-300">
+                        {survey.title}
+                      </h3>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        className={`rounded-full px-2 py-1 text-xs font-medium ${
                           typeColors[survey.type]
                         }`}
                       >
                         {survey.type}
                       </span>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        className={`rounded-full px-2 py-1 text-xs font-medium ${
                           audienceColors[survey.target_audience]
                         }`}
                       >
                         {survey.target_audience}
                       </span>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        className={`rounded-full px-2 py-1 text-xs font-medium ${
                           survey.is_active
                             ? "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200"
                             : "bg-gray-100 text-gray-800 dark:bg-gray-900/30 dark:text-gray-200"
@@ -251,10 +279,10 @@ export default function SurveysPage() {
                         Priority: {survey.priority}
                       </span>
                     </div>
-                    <p className="text-gray-600 dark:text-gray-300 mb-3">
+                    <p className="mb-3 text-gray-600 dark:text-gray-300">
                       {survey.description}
                     </p>
-                    <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
+                    <div className="space-y-1 text-xs text-gray-500 dark:text-gray-400">
                       <div>Created: {formatDate(survey.start_date)}</div>
                       {survey.end_date && (
                         <div>Expires: {formatDate(survey.end_date)}</div>
@@ -263,12 +291,14 @@ export default function SurveysPage() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-2 ml-4">
+                <div className="ml-4 flex items-center gap-2">
                   <Button
                     variant="ghost"
                     size="sm"
-                    onClick={() => router.push(`/home/settings/surveys/${survey.id}`)}
-                    className="text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20"
+                    onClick={() =>
+                      router.push(`/home/settings/surveys/${survey.id}`)
+                    }
+                    className="text-purple-600 hover:bg-purple-50 hover:text-purple-700 dark:hover:bg-purple-900/20"
                     title="Build questions"
                   >
                     <Settings className="h-4 w-4" />
@@ -280,8 +310,8 @@ export default function SurveysPage() {
                     title={survey.is_active ? "Deactivate" : "Activate"}
                     className={`${
                       survey.is_active
-                        ? "text-green-600 hover:text-green-700 hover:bg-green-50 dark:hover:bg-green-900/20"
-                        : "text-gray-400 hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800"
+                        ? "text-green-600 hover:bg-green-50 hover:text-green-700 dark:hover:bg-green-900/20"
+                        : "text-gray-400 hover:bg-gray-50 hover:text-gray-600 dark:hover:bg-gray-800"
                     }`}
                   >
                     {survey.is_active ? (
@@ -294,7 +324,7 @@ export default function SurveysPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => setEditingSurvey(survey)}
-                    className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                    className="text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/20"
                     title="Edit survey"
                   >
                     <Pencil className="h-4 w-4" />
@@ -303,7 +333,7 @@ export default function SurveysPage() {
                     variant="ghost"
                     size="sm"
                     onClick={() => deleteSurvey(survey.id)}
-                    className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                    className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20"
                     title="Delete survey"
                   >
                     <Trash2 className="h-4 w-4" />

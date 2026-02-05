@@ -78,6 +78,12 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
     setLoading(true);
     const supabase = createClientClientComponent();
 
+    if (!supabase) {
+      toast.error("Failed to initialize Supabase client");
+      setLoading(false);
+      return;
+    }
+
     try {
       const surveyData = {
         title: data.title,

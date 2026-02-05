@@ -1,21 +1,30 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Plus, Pencil, Trash2, GripVertical, ArrowLeft, BarChart3 } from "lucide-react";
-import { Button } from "@codevs/ui/button";
 import { H1 } from "@/components/shared/dashboard";
-import PageContainer from "../../../_components/PageContainer";
-import QuestionForm from "./_components/QuestionForm";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { toast } from "sonner";
 import {
-  getSurveyQuestions,
+  ArrowLeft,
+  BarChart3,
+  GripVertical,
+  Pencil,
+  Plus,
+  Trash2,
+} from "lucide-react";
+import { toast } from "sonner";
+
+import { Button } from "@codevs/ui/button";
+
+import PageContainer from "../../../_components/PageContainer";
+import {
   createQuestion,
-  updateQuestion,
   deleteQuestion,
+  getSurveyQuestions,
   reorderQuestions,
+  updateQuestion,
 } from "../questions/actions";
+import QuestionForm from "./_components/QuestionForm";
 
 interface Question {
   id: string;
@@ -68,6 +77,10 @@ export default function SurveyBuilderPage() {
 
   const fetchSurvey = async () => {
     const supabase = createClientClientComponent();
+    if (!supabase) {
+      toast.error("Failed to initialize database client");
+      return;
+    }
     const { data, error } = await supabase
       .from("surveys")
       .select("id, title, description")
@@ -142,11 +155,12 @@ export default function SurveyBuilderPage() {
     const targetIndex = direction === "up" ? index - 1 : index + 1;
 
     if (targetIndex < 0 || targetIndex >= newQuestions.length) return;
+    if (index < 0 || index >= newQuestions.length) return;
 
     // Swap
     [newQuestions[index], newQuestions[targetIndex]] = [
-      newQuestions[targetIndex],
-      newQuestions[index],
+      newQuestions[targetIndex] as Question,
+      newQuestions[index] as Question,
     ];
 
     // Update order_index
@@ -167,41 +181,43 @@ export default function SurveyBuilderPage() {
   if (loading) {
     return (
       <PageContainer>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-violet-500"></div>
         </div>
       </PageContainer>
     );
   }
 
   return (
-    <PageContainer maxWidth="4xl">
+    <PageContainer maxWidth="2xl">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="mb-6 flex items-center gap-4">
         <Button
           variant="ghost"
           onClick={() => router.push("/home/settings/surveys")}
           className="text-gray-600 dark:text-gray-400"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Surveys
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <H1 className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
             {survey?.title || "Survey Builder"}
           </H1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="mt-1 text-gray-600 dark:text-gray-400">
             {survey?.description || "Build your survey questions"}
           </p>
         </div>
         <div className="flex gap-3">
           <Button
-            onClick={() => router.push(`/home/settings/surveys/${surveyId}/results`)}
+            onClick={() =>
+              router.push(`/home/settings/surveys/${surveyId}/results`)
+            }
             variant="outline"
-            className="flex items-center gap-2 border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+            className="flex items-center gap-2 border-gray-300 text-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-800"
           >
             <BarChart3 className="h-4 w-4" />
             View Results
@@ -211,7 +227,7 @@ export default function SurveyBuilderPage() {
               setEditingQuestion(null);
               setShowForm(true);
             }}
-            className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
+            className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600"
           >
             <Plus className="h-4 w-4" />
             Add Question
@@ -220,9 +236,9 @@ export default function SurveyBuilderPage() {
       </div>
 
       {/* Question Form */}
-      {showForm && (
-        <div className="mb-8 p-6 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
-          <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+      {showForm && editingQuestion !== undefined && (
+        <div className="mb-8 rounded-lg border border-gray-200 bg-white p-6 shadow-sm dark:border-gray-700 dark:bg-gray-800">
+          <h2 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
             {editingQuestion ? "Edit Question" : "Add New Question"}
           </h2>
           <QuestionForm
@@ -240,13 +256,13 @@ export default function SurveyBuilderPage() {
       {/* Questions List */}
       <div className="space-y-4">
         {questions.length === 0 ? (
-          <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/50 rounded-lg border-2 border-dashed border-gray-200 dark:border-gray-700">
+          <div className="rounded-lg border-2 border-dashed border-gray-200 bg-gray-50 py-12 text-center dark:border-gray-700 dark:bg-gray-800/50">
             <div className="flex flex-col items-center gap-3">
-              <div className="h-16 w-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-gray-100 dark:bg-gray-700">
                 <span className="text-2xl">📝</span>
               </div>
               <div>
-                <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-1">
+                <h3 className="mb-1 text-lg font-medium text-gray-900 dark:text-gray-100">
                   No questions yet
                 </h3>
                 <p className="text-gray-500 dark:text-gray-400">
@@ -259,7 +275,7 @@ export default function SurveyBuilderPage() {
           questions.map((question, index) => (
             <div
               key={question.id}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6 shadow-sm hover:shadow-md transition-shadow"
+              className="rounded-lg border border-gray-200 bg-white p-6 shadow-sm transition-shadow hover:shadow-md dark:border-gray-700 dark:bg-gray-800"
             >
               <div className="flex items-start gap-4">
                 {/* Reorder Handle */}
@@ -267,47 +283,54 @@ export default function SurveyBuilderPage() {
                   <button
                     onClick={() => moveQuestion(index, "up")}
                     disabled={index === 0}
-                    className="text-gray-400 hover:text-gray-600 disabled:opacity-30 disabled:cursor-not-allowed"
+                    className="text-gray-400 hover:text-gray-600 disabled:cursor-not-allowed disabled:opacity-30"
                   >
                     <GripVertical className="h-4 w-4" />
                   </button>
-                  <span className="text-xs text-gray-500 text-center">{index + 1}</span>
+                  <span className="text-center text-xs text-gray-500">
+                    {index + 1}
+                  </span>
                 </div>
 
                 {/* Question Content */}
                 <div className="flex-1">
-                  <div className="flex items-start justify-between mb-2">
+                  <div className="mb-2 flex items-start justify-between">
                     <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-1">
+                      <div className="mb-1 flex items-center gap-2">
                         <h3 className="font-semibold text-gray-900 dark:text-gray-100">
                           {question.question_text}
                         </h3>
                         {question.settings.required && (
-                          <span className="text-red-500 text-sm">*</span>
+                          <span className="text-sm text-red-500">*</span>
                         )}
                       </div>
                       {question.description && (
-                        <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+                        <p className="mb-2 text-sm text-gray-600 dark:text-gray-400">
                           {question.description}
                         </p>
                       )}
                       <div className="flex items-center gap-2">
-                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200">
-                          {questionTypeLabels[question.question_type] || question.question_type}
+                        <span className="rounded-full bg-gray-100 px-2 py-1 text-xs font-medium text-gray-800 dark:bg-gray-700 dark:text-gray-200">
+                          {questionTypeLabels[question.question_type] ||
+                            question.question_type}
                         </span>
                         {question.settings.required && (
-                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-200">
+                          <span className="rounded-full bg-red-100 px-2 py-1 text-xs font-medium text-red-800 dark:bg-red-900/30 dark:text-red-200">
                             Required
                           </span>
                         )}
                       </div>
 
                       {/* Show options for multiple choice/checkbox */}
-                      {(question.question_type === "multiple_choice" || question.question_type === "checkbox") && (
+                      {(question.question_type === "multiple_choice" ||
+                        question.question_type === "checkbox") && (
                         <div className="mt-3 space-y-1">
                           {question.options.map((option, i) => (
-                            <div key={i} className="text-sm text-gray-600 dark:text-gray-400 flex items-center gap-2">
-                              <span className="w-4 h-4 rounded border border-gray-300 dark:border-gray-600 flex-shrink-0" />
+                            <div
+                              key={i}
+                              className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400"
+                            >
+                              <span className="h-4 w-4 flex-shrink-0 rounded border border-gray-300 dark:border-gray-600" />
                               {option}
                             </div>
                           ))}
@@ -317,7 +340,8 @@ export default function SurveyBuilderPage() {
                       {/* Show rating scale */}
                       {question.question_type === "rating" && (
                         <div className="mt-3 text-sm text-gray-600 dark:text-gray-400">
-                          Rating: {question.settings.min_rating} to {question.settings.max_rating}
+                          Rating: {question.settings.min_rating} to{" "}
+                          {question.settings.max_rating}
                         </div>
                       )}
                     </div>
@@ -328,7 +352,7 @@ export default function SurveyBuilderPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleEdit(question)}
-                        className="text-blue-600 hover:text-blue-700 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                        className="text-blue-600 hover:bg-blue-50 hover:text-blue-700 dark:hover:bg-blue-900/20"
                       >
                         <Pencil className="h-4 w-4" />
                       </Button>
@@ -336,7 +360,7 @@ export default function SurveyBuilderPage() {
                         variant="ghost"
                         size="sm"
                         onClick={() => handleDelete(question.id)}
-                        className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20"
+                        className="text-red-600 hover:bg-red-50 hover:text-red-700 dark:hover:bg-red-900/20"
                       >
                         <Trash2 className="h-4 w-4" />
                       </Button>
