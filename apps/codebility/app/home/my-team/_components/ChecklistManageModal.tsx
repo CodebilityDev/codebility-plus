@@ -5,17 +5,23 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogD
 import Input from "@/components/ui/forms/input";
 import toast from "react-hot-toast";
 import { createClientClientComponent } from "@/utils/supabase/client";
-import { SimpleMemberData } from "@/app/home/projects/actions";
+import { SimpleMemberData, getMembers, getTeamLead } from "@/app/home/projects/actions";
 
 /**
- * ChecklistManageModal - TRIPLE-FIXED VERSION
+ * ChecklistManageModal - ENHANCED SELF-FETCHING VERSION
  * 
  * FIXES APPLIED:
- * 1. ✅ Enhanced delete confirmation dialog (no double quotes around item name)
- * 2. ✅ Removed ALL emoji from toasts (library provides icons automatically)
- * 3. ✅ Removed ALL double quotes around item names in toasts
- * 4. ✅ Clean, professional toast messages
- * 5. ✅ Improved dialog styling and UX
+ * 1. ✅ Fetches fresh member data internally (no stale props)
+ * 2. ✅ Always shows current database state
+ * 3. ✅ Automatic refresh when modal opens
+ * 4. ✅ No dependency on parent component state
+ * 5. ✅ Enhanced delete confirmation dialog
+ * 6. ✅ Clean toast messages (no emoji, no double quotes)
+ * 
+ * KEY CHANGE:
+ * - Does NOT rely on teamMembers prop from parent
+ * - Fetches fresh data from getMembers() when modal opens
+ * - Guarantees accurate member count for checklists
  * 
  * AUTHENTICATION:
  * - Self-contained (no currentUserId prop needed)
@@ -31,8 +37,8 @@ interface ChecklistManageModalProps {
   isOpen: boolean;
   projectId: string;
   projectName: string;
-  teamMembers: SimpleMemberData[];
-  teamLeadId: string;
+  teamMembers?: SimpleMemberData[]; // Optional, for backward compatibility
+  teamLeadId?: string; // Optional, will fetch if not provided
   onClose: () => void;
 }
 
@@ -40,8 +46,6 @@ const ChecklistManageModal = ({
   isOpen,
   projectId,
   projectName,
-  teamMembers,
-  teamLeadId,
   onClose
 }: ChecklistManageModalProps) => {
   // State
@@ -53,6 +57,11 @@ const ChecklistManageModal = ({
   const [isFetching, setIsFetching] = useState(false);
   const [supabase, setSupabase] = useState<any>(null);
   
+  // Fresh member data (fetched internally)
+  const [freshTeamMembers, setFreshTeamMembers] = useState<SimpleMemberData[]>([]);
+  const [freshTeamLeadId, setFreshTeamLeadId] = useState<string>("");
+  const [isFetchingMembers, setIsFetchingMembers] = useState(false);
+  
   // Self-contained auth
   const [currentCodevId, setCurrentCodevId] = useState<string | null>(null);
   const [isTeamLead, setIsTeamLead] = useState(false);
@@ -62,52 +71,95 @@ const ChecklistManageModal = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<string | null>(null);
 
-  // Initialize Supabase and get current user
+  // Initialize Supabase
   useEffect(() => {
     const client = createClientClientComponent();
     setSupabase(client);
-    
-    if (client) {
-      client.auth.getSession().then(async ({ data: { session } }) => {
-        if (session?.user?.email) {
-          // Map auth user email to codev_id
-          const { data: codevData } = await client
-            .from("codev")
-            .select("id")
-            .eq("email_address", session.user.email)
-            .single();
-          
-          if (codevData) {
-            setCurrentCodevId(codevData.id);
-            // Check if this user is the team lead
-            setIsTeamLead(codevData.id === teamLeadId);
-          }
-        }
-        setAuthChecked(true);
-      });
+  }, []);
+
+  // ✅ CRITICAL FIX: Fetch fresh member data when modal opens
+  useEffect(() => {
+    if (isOpen && projectId) {
+      fetchFreshMemberData();
     }
-  }, [teamLeadId]);
+  }, [isOpen, projectId]);
+
+  // Fetch fresh member data from database
+  const fetchFreshMemberData = async () => {
+    console.log("🔄 ChecklistManageModal: Fetching fresh member data...");
+    setIsFetchingMembers(true);
+    
+    try {
+      // Fetch team lead
+      const teamLeadResult = await getTeamLead(projectId);
+      if (teamLeadResult.data?.id) {
+        setFreshTeamLeadId(teamLeadResult.data.id);
+        console.log("👑 Team Lead ID:", teamLeadResult.data.id);
+      }
+
+      // Fetch members
+      const membersResult = await getMembers(projectId);
+      if (membersResult.data) {
+        setFreshTeamMembers(membersResult.data);
+        console.log("👥 Fresh members fetched:", membersResult.data.length);
+        console.log("📝 Member names:", membersResult.data.map(m => `${m.first_name} ${m.last_name}`));
+      }
+    } catch (error) {
+      console.error("❌ Error fetching fresh member data:", error);
+      toast.error("Failed to load team members");
+    } finally {
+      setIsFetchingMembers(false);
+    }
+  };
+
+  // Get current user and check auth
+  useEffect(() => {
+    if (!supabase || !freshTeamLeadId) return;
+
+    supabase.auth.getSession().then(async ({ data: { session } }: any) => {
+      if (session?.user?.email) {
+        // Map auth user email to codev_id
+        const { data: codevData } = await supabase
+          .from("codev")
+          .select("id")
+          .eq("email_address", session.user.email)
+          .single();
+        
+        if (codevData) {
+          setCurrentCodevId(codevData.id);
+          // Check if this user is the team lead
+          setIsTeamLead(codevData.id === freshTeamLeadId);
+          console.log("🔐 Current user is team lead:", codevData.id === freshTeamLeadId);
+        }
+      }
+      setAuthChecked(true);
+    });
+  }, [supabase, freshTeamLeadId]);
 
   // Get all member IDs (team lead + members)
   const allMemberIds = useMemo(() => {
-    if (!teamLeadId) {
+    if (!freshTeamLeadId) {
       return [];
     }
     
-    if (!teamMembers || !Array.isArray(teamMembers)) {
-      return [teamLeadId];
+    if (!freshTeamMembers || !Array.isArray(freshTeamMembers)) {
+      return [freshTeamLeadId];
     }
     
-    const memberIds = teamMembers.map(m => m.id).filter(Boolean);
-    return [teamLeadId, ...memberIds];
-  }, [teamLeadId, teamMembers]);
+    const memberIds = freshTeamMembers.map(m => m.id).filter(Boolean);
+    const allIds = [freshTeamLeadId, ...memberIds];
+    
+    console.log(`📊 Total team members for checklist: ${allIds.length} (1 lead + ${memberIds.length} members)`);
+    
+    return allIds;
+  }, [freshTeamLeadId, freshTeamMembers]);
 
   // Load checklist items when modal opens
   useEffect(() => {
-    if (isOpen && supabase && projectId) {
+    if (isOpen && supabase && projectId && allMemberIds.length > 0) {
       loadChecklistItems();
     }
-  }, [isOpen, supabase, projectId]);
+  }, [isOpen, supabase, projectId, allMemberIds.length]);
 
   // Load checklist items from database
   const loadChecklistItems = async () => {
@@ -177,7 +229,7 @@ const ChecklistManageModal = ({
         description: null,
         priority: "medium",
         completed: false,
-        created_by: teamLeadId,
+        created_by: freshTeamLeadId,
         due_date: null,
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
@@ -191,7 +243,6 @@ const ChecklistManageModal = ({
       if (error) {
         toast.error(`Failed: ${error.message}`);
       } else {
-        // FIXED: No emoji, no double quotes, clean message
         toast.success(`${newItemTitle.trim()} added to checklist`);
         setItems(prev => [...prev, newItemTitle.trim()]);
         setNewItemTitle("");
@@ -252,7 +303,6 @@ const ChecklistManageModal = ({
       if (error) {
         toast.error("Failed to update item");
       } else {
-        // FIXED: No emoji, no double quotes
         toast.success(`${oldTitle} updated to ${editingNewTitle.trim()}`);
         setItems(prev => prev.map(item => item === oldTitle ? editingNewTitle.trim() : item));
         handleCancelEdit();
@@ -300,7 +350,6 @@ const ChecklistManageModal = ({
       if (error) {
         toast.error("Failed to delete item");
       } else {
-        // FIXED: No emoji, no double quotes
         toast.success(`${itemToDelete} removed from checklist`);
         setItems(prev => prev.filter(item => item !== itemToDelete));
         handleCancelDelete();
@@ -322,15 +371,17 @@ const ChecklistManageModal = ({
     }
   };
 
-  // Show loading state while checking auth
-  if (!authChecked) {
+  // Show loading state while fetching members or checking auth
+  if (isFetchingMembers || !authChecked) {
     return (
       <Dialog open={isOpen} onOpenChange={handleClose}>
         <DialogContent className="max-w-md bg-white dark:bg-gray-900">
           <div className="flex items-center justify-center py-8">
             <div className="text-center">
               <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Loading...</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                {isFetchingMembers ? "Loading team members..." : "Loading..."}
+              </p>
             </div>
           </div>
         </DialogContent>
@@ -514,7 +565,7 @@ const ChecklistManageModal = ({
         </DialogContent>
       </Dialog>
 
-      {/* ENHANCED Delete Confirmation Dialog - NO DOUBLE QUOTES */}
+      {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
         <DialogContent className="max-w-md bg-white dark:bg-gray-900">
           <DialogHeader>
