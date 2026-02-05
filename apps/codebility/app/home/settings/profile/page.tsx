@@ -93,7 +93,7 @@ async function ProfileComponent() {
   };
 
   return (
-    <div className="mx-auto max-w-screen-xl">
+    <div className="mx-auto max-w-screen-xl mt-8">
       {user.application_status === "passed" && (
         <CustomBreadcrumb items={items} />
       )}

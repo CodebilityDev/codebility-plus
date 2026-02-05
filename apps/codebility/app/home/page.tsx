@@ -29,7 +29,7 @@ export const revalidate = 3600; // Revalidate every hour for fresh data
 export default function DashboardPage() {
   return (
     <div className="w-full">
-      <div className="flex flex-col gap-4 pt-4 relative">
+      <div className="flex flex-col gap-4 pt-4 relative mb-8">
         {/* Background decorations - contained within content area */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute top-4 left-4 h-72 w-72 rounded-full bg-gradient-to-br from-customBlue-400/10 to-purple-400/10 blur-3xl" />
@@ -42,7 +42,7 @@ export default function DashboardPage() {
         <NewsBanner />
         
         {/* Enhanced Header */}
-        <div className="mb-6">
+        <div className="mb-6 mt-3">
           <div className="flex items-center gap-4 mb-2">
             <div className="h-12 w-12 rounded-full bg-gradient-to-br from-customBlue-500 to-purple-500 flex items-center justify-center">
               <span className="text-2xl">🏠</span>
