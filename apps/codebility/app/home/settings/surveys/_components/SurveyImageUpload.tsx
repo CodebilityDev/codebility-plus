@@ -55,7 +55,7 @@ export default function SurveyImageUpload({
 
       // Clean up old image if exists
       if (value) {
-        const oldImagePath = getImagePath(value);
+        const oldImagePath = await getImagePath(value);
         if (oldImagePath) {
           await deleteImage(oldImagePath, "codebility");
         }
@@ -86,7 +86,7 @@ export default function SurveyImageUpload({
     setIsUploading(true);
     try {
       // Delete from storage
-      const imagePath = getImagePath(value);
+      const imagePath = await getImagePath(value);
       if (imagePath) {
         await deleteImage(imagePath, "codebility");
       }

@@ -1,15 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { ArrowLeft, Download, Users, CheckCircle } from "lucide-react";
-import { Button } from "@codevs/ui/button";
 import { H1 } from "@/components/shared/dashboard";
-import PageContainer from "../../../../_components/PageContainer";
 import { createClientClientComponent } from "@/utils/supabase/client";
+import { ArrowLeft, CheckCircle, Download, Users } from "lucide-react";
 import { toast } from "sonner";
+
+import { Button } from "@codevs/ui/button";
+
+import PageContainer from "../../../../_components/PageContainer";
 import { getSurveyQuestions } from "../../questions/actions";
-import { getSurveyResponses, getSurveyStatistics } from "../../responses/actions";
+import {
+  getSurveyResponses,
+  getSurveyStatistics,
+} from "../../responses/actions";
 
 interface Question {
   id: string;
@@ -57,6 +62,12 @@ export default function SurveyResultsPage() {
 
     // Fetch survey
     const supabase = createClientClientComponent();
+    if (!supabase) {
+      toast.error("Failed to initialize database client");
+      setLoading(false);
+      return;
+    }
+
     const { data: surveyData } = await supabase
       .from("surveys")
       .select("id, title, description")
@@ -80,14 +91,16 @@ export default function SurveyResultsPage() {
     // Fetch statistics
     const statsResult = await getSurveyStatistics(surveyId);
     if (statsResult.data) {
-      setStatistics(statsResult.data);
+      setStatistics(statsResult.data as Statistics);
     }
 
     setLoading(false);
   };
 
   const getAnswerSummary = (question: Question) => {
-    const questionResponses = responses.map((r) => r.answers[question.id]).filter(Boolean);
+    const questionResponses = responses
+      .map((r) => r.answers[question.id])
+      .filter(Boolean);
 
     if (question.question_type === "multiple_choice") {
       const counts: Record<string, number> = {};
@@ -102,7 +115,7 @@ export default function SurveyResultsPage() {
       questionResponses.forEach((answer) => {
         if (Array.isArray(answer)) {
           answer.forEach((item) => {
-            counts[item] = (counts[item] || 0) + 1;
+            counts[String(item)] = (counts[String(item)] || 0) + 1;
           });
         }
       });
@@ -162,40 +175,40 @@ export default function SurveyResultsPage() {
   if (loading) {
     return (
       <PageContainer>
-        <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-500"></div>
+        <div className="flex h-64 items-center justify-center">
+          <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-violet-500"></div>
         </div>
       </PageContainer>
     );
   }
 
   return (
-    <PageContainer maxWidth="6xl">
+    <PageContainer maxWidth="7xl">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="mb-6 flex items-center gap-4">
         <Button
           variant="ghost"
           onClick={() => router.push(`/home/settings/surveys/${surveyId}`)}
           className="text-gray-600 dark:text-gray-400"
         >
-          <ArrowLeft className="h-4 w-4 mr-2" />
+          <ArrowLeft className="mr-2 h-4 w-4" />
           Back to Builder
         </Button>
       </div>
 
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+      <div className="mb-6 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div>
           <H1 className="bg-gradient-to-r from-violet-600 to-purple-600 bg-clip-text text-transparent">
             {survey?.title} - Results
           </H1>
-          <p className="text-gray-600 dark:text-gray-400 mt-1">
+          <p className="mt-1 text-gray-600 dark:text-gray-400">
             Survey responses and analytics
           </p>
         </div>
         <Button
           onClick={exportToCSV}
           disabled={responses.length === 0}
-          className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 hover:from-violet-600 hover:to-purple-600 text-white"
+          className="flex items-center gap-2 bg-gradient-to-r from-violet-500 to-purple-500 text-white hover:from-violet-600 hover:to-purple-600"
         >
           <Download className="h-4 w-4" />
           Export CSV
@@ -203,14 +216,16 @@ export default function SurveyResultsPage() {
       </div>
 
       {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+      <div className="mb-8 grid grid-cols-1 gap-4 md:grid-cols-3">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 dark:bg-blue-900/30">
               <CheckCircle className="h-6 w-6 text-blue-600 dark:text-blue-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Total Responses</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Total Responses
+              </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {statistics?.total_responses || 0}
               </p>
@@ -218,13 +233,15 @@ export default function SurveyResultsPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30">
               <Users className="h-6 w-6 text-green-600 dark:text-green-400" />
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Unique Respondents</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Unique Respondents
+              </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {statistics?.unique_respondents || 0}
               </p>
@@ -232,17 +249,21 @@ export default function SurveyResultsPage() {
           </div>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6">
+        <div className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800">
           <div className="flex items-center gap-3">
-            <div className="h-12 w-12 rounded-full bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30">
               <span className="text-2xl">📊</span>
             </div>
             <div>
-              <p className="text-sm text-gray-600 dark:text-gray-400">Completion Rate</p>
+              <p className="text-sm text-gray-600 dark:text-gray-400">
+                Completion Rate
+              </p>
               <p className="text-2xl font-bold text-gray-900 dark:text-gray-100">
                 {statistics?.total_responses
                   ? Math.round(
-                      ((statistics.completed_responses || 0) / statistics.total_responses) * 100
+                      ((statistics.completed_responses || 0) /
+                        statistics.total_responses) *
+                        100,
                     )
                   : 0}
                 %
@@ -260,9 +281,9 @@ export default function SurveyResultsPage() {
           return (
             <div
               key={question.id}
-              className="bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 p-6"
+              className="rounded-lg border border-gray-200 bg-white p-6 dark:border-gray-700 dark:bg-gray-800"
             >
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4">
+              <h3 className="mb-4 text-lg font-semibold text-gray-900 dark:text-gray-100">
                 {index + 1}. {question.question_text}
               </h3>
 
@@ -273,11 +294,13 @@ export default function SurveyResultsPage() {
                   {Object.entries(summary as Record<string, number>)
                     .sort(([, a], [, b]) => b - a)
                     .map(([option, count]) => {
-                      const percentage =
-                        ((count / responses.length) * 100).toFixed(1);
+                      const percentage = (
+                        (count / responses.length) *
+                        100
+                      ).toFixed(1);
                       return (
                         <div key={option}>
-                          <div className="flex justify-between mb-1">
+                          <div className="mb-1 flex justify-between">
                             <span className="text-sm text-gray-700 dark:text-gray-300">
                               {option}
                             </span>
@@ -285,9 +308,9 @@ export default function SurveyResultsPage() {
                               {count} ({percentage}%)
                             </span>
                           </div>
-                          <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+                          <div className="h-2 w-full rounded-full bg-gray-200 dark:bg-gray-700">
                             <div
-                              className="bg-gradient-to-r from-violet-500 to-purple-500 h-2 rounded-full"
+                              className="h-2 rounded-full bg-gradient-to-r from-violet-500 to-purple-500"
                               style={{ width: `${percentage}%` }}
                             />
                           </div>
@@ -299,8 +322,8 @@ export default function SurveyResultsPage() {
 
               {/* Rating Results */}
               {question.question_type === "rating" && (
-                <div className="text-center p-4 bg-gray-50 dark:bg-gray-900/50 rounded-lg">
-                  <p className="text-3xl font-bold text-gray-900 dark:text-gray-100 mb-1">
+                <div className="rounded-lg bg-gray-50 p-4 text-center dark:bg-gray-900/50">
+                  <p className="mb-1 text-3xl font-bold text-gray-900 dark:text-gray-100">
                     {(summary as any).average}
                   </p>
                   <p className="text-sm text-gray-600 dark:text-gray-400">
@@ -313,11 +336,11 @@ export default function SurveyResultsPage() {
               {(question.question_type === "text" ||
                 question.question_type === "textarea" ||
                 question.question_type === "email") && (
-                <div className="space-y-2 max-h-64 overflow-y-auto">
+                <div className="max-h-64 space-y-2 overflow-y-auto">
                   {(summary as string[]).map((answer, i) => (
                     <div
                       key={i}
-                      className="p-3 bg-gray-50 dark:bg-gray-900/50 rounded text-sm text-gray-700 dark:text-gray-300"
+                      className="rounded bg-gray-50 p-3 text-sm text-gray-700 dark:bg-gray-900/50 dark:text-gray-300"
                     >
                       {answer}
                     </div>
