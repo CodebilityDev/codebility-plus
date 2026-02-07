@@ -1,8 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { Calendar, Clock, Users, Video, Plus } from "lucide-react";
+import { Calendar, Clock, Plus, Users, Video } from "lucide-react";
+import { toast } from "react-hot-toast";
+
 import { Button } from "@codevs/ui/button";
+import { Checkbox } from "@codevs/ui/checkbox";
 import {
   Dialog,
   DialogContent,
@@ -11,7 +14,6 @@ import {
 } from "@codevs/ui/dialog";
 import { Input } from "@codevs/ui/input";
 import { Label } from "@codevs/ui/label";
-import { Textarea } from "@codevs/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -19,8 +21,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@codevs/ui/select";
-import { Checkbox } from "@codevs/ui/checkbox";
-import { toast } from "react-hot-toast";
+import { Textarea } from "@codevs/ui/textarea";
+
 import { createMeeting } from "../actions";
 
 interface MeetingSchedulerProps {
@@ -31,12 +33,12 @@ interface MeetingSchedulerProps {
 const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     title: "",
     description: "",
     meetingType: "standup",
-    scheduledDate: new Date().toISOString().split('T')[0],
+    scheduledDate: new Date().toISOString().split("T")[0],
     scheduledTime: "10:00",
     durationMinutes: 30,
     meetingLink: "",
@@ -46,38 +48,48 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    try {
-      const result = await createMeeting({
-        ...formData,
-        projectId,
-        scheduledBy: teamLeadId,
-        durationMinutes: Number(formData.durationMinutes),
-        recurrenceEndDate: formData.recurrenceEndDate || undefined,
-      });
-
-      if (result.success) {
-        toast.success("Meeting scheduled successfully!");
-        setIsOpen(false);
-        resetForm();
-      } else {
-        toast.error(result.error || "Failed to schedule meeting");
-      }
-    } catch (error) {
-      toast.error("An error occurred while scheduling the meeting");
-    } finally {
+  try {
+    // Validate required fields
+    if (!formData.scheduledDate || !formData.scheduledTime) {
+      toast.error("Please fill in all required fields");
       setIsLoading(false);
+      return;
     }
-  };
+
+    const result = await createMeeting({
+      title: formData.title,
+      description: formData.description || undefined,
+      project_id: projectId,
+      scheduled_date: formData.scheduledDate,
+      scheduled_time: formData.scheduledTime,
+      duration_minutes: Number(formData.durationMinutes),
+      meeting_link: formData.meetingLink || undefined,
+      created_by: teamLeadId,
+    });
+
+    if (result.success) {
+      toast.success("Meeting scheduled successfully!");
+      setIsOpen(false);
+      resetForm();
+    } else {
+      toast.error(result.error || "Failed to schedule meeting");
+    }
+  } catch (error) {
+    toast.error("An error occurred while scheduling the meeting");
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   const resetForm = () => {
     setFormData({
       title: "",
       description: "",
       meetingType: "standup",
-      scheduledDate: new Date().toISOString().split('T')[0],
+      scheduledDate: new Date().toISOString().split("T")[0],
       scheduledTime: "10:00",
       durationMinutes: 30,
       meetingLink: "",
@@ -104,10 +116,7 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
 
   return (
     <>
-      <Button
-        onClick={() => setIsOpen(true)}
-        className="gap-2"
-      >
+      <Button onClick={() => setIsOpen(true)} className="gap-2">
         <Plus className="h-4 w-4" />
         Schedule Meeting
       </Button>
@@ -124,7 +133,7 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
               <Label>Meeting Type</Label>
               <Select
                 value={formData.meetingType}
-                onValueChange={(value) => 
+                onValueChange={(value) =>
                   setFormData({ ...formData, meetingType: value })
                 }
               >
@@ -150,12 +159,12 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
               <Input
                 id="title"
                 value={formData.title}
-                onChange={(e) => 
+                onChange={(e) =>
                   setFormData({ ...formData, title: e.target.value })
                 }
                 placeholder={
-                  formData.meetingType === "standup" 
-                    ? "Daily Standup" 
+                  formData.meetingType === "standup"
+                    ? "Daily Standup"
                     : "Enter meeting title"
                 }
                 required
@@ -168,7 +177,7 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
               <Textarea
                 id="description"
                 value={formData.description}
-                onChange={(e) => 
+                onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
                 placeholder="Meeting agenda, topics to discuss..."
@@ -184,7 +193,7 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
                   id="date"
                   type="date"
                   value={formData.scheduledDate}
-                  onChange={(e) => 
+                  onChange={(e) =>
                     setFormData({ ...formData, scheduledDate: e.target.value })
                   }
                   required
@@ -196,7 +205,7 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
                   id="time"
                   type="time"
                   value={formData.scheduledTime}
-                  onChange={(e) => 
+                  onChange={(e) =>
                     setFormData({ ...formData, scheduledTime: e.target.value })
                   }
                   required
@@ -214,8 +223,11 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
                   min="15"
                   max="180"
                   value={formData.durationMinutes}
-                  onChange={(e) => 
-                    setFormData({ ...formData, durationMinutes: Number(e.target.value) })
+                  onChange={(e) =>
+                    setFormData({
+                      ...formData,
+                      durationMinutes: Number(e.target.value),
+                    })
                   }
                   required
                 />
@@ -226,7 +238,7 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
                   id="link"
                   type="url"
                   value={formData.meetingLink}
-                  onChange={(e) => 
+                  onChange={(e) =>
                     setFormData({ ...formData, meetingLink: e.target.value })
                   }
                   placeholder="https://meet.google.com/..."
@@ -240,7 +252,7 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
                 <Checkbox
                   id="recurring"
                   checked={formData.isRecurring}
-                  onCheckedChange={(checked) => 
+                  onCheckedChange={(checked) =>
                     setFormData({ ...formData, isRecurring: !!checked })
                   }
                 />
@@ -255,7 +267,7 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
                     <Label>Recurrence Pattern</Label>
                     <Select
                       value={formData.recurrencePattern}
-                      onValueChange={(value) => 
+                      onValueChange={(value) =>
                         setFormData({ ...formData, recurrencePattern: value })
                       }
                     >
@@ -277,8 +289,11 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
                       id="endDate"
                       type="date"
                       value={formData.recurrenceEndDate}
-                      onChange={(e) => 
-                        setFormData({ ...formData, recurrenceEndDate: e.target.value })
+                      onChange={(e) =>
+                        setFormData({
+                          ...formData,
+                          recurrenceEndDate: e.target.value,
+                        })
                       }
                       min={formData.scheduledDate}
                     />
@@ -297,10 +312,7 @@ const MeetingScheduler = ({ projectId, teamLeadId }: MeetingSchedulerProps) => {
               >
                 Cancel
               </Button>
-              <Button
-                type="submit"
-                disabled={isLoading}
-              >
+              <Button type="submit" disabled={isLoading}>
                 {isLoading ? "Scheduling..." : "Schedule Meeting"}
               </Button>
             </div>
