@@ -5,23 +5,32 @@ export const ATTENDANCE_POINTS_PER_DAY = 2;
 export async function getAttendanceForMonth(
   projectId: string,
   year: number,
-  month: number
+  month: number,
 ) {
   try {
-    const startDate = new Date(year, month, 1).toISOString().split('T')[0];
-    const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
-    
-    const response = await fetch(`/api/attendance?projectId=${projectId}&startDate=${startDate}&endDate=${endDate}`);
-    const data = await response.json();
-    
+    const startDate = new Date(year, month, 1).toISOString().split("T")[0];
+    const endDate = new Date(year, month + 1, 0).toISOString().split("T")[0];
+
+    const response = await fetch(
+      `/api/attendance?projectId=${projectId}&startDate=${startDate}&endDate=${endDate}`,
+    );
+    const data = (await response.json()) as {
+      error?: string;
+      attendance?: unknown;
+    };
+
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to fetch attendance');
+      throw new Error(data.error || "Failed to fetch attendance");
     }
-    
+
     return { success: true, data: data.attendance || [] };
   } catch (error) {
     console.error("Error fetching attendance:", error);
-    return { success: false, error: error.message, data: [] };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+      data: [],
+    };
   }
 }
 
@@ -35,25 +44,30 @@ export async function saveAttendanceRecord(record: {
   check_out?: string;
 }) {
   try {
-    const response = await fetch('/api/attendance', {
-      method: 'POST',
+    const response = await fetch("/api/attendance", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(record),
     });
-    
-    const data = await response.json();
-    
+
+    const data = (await response.json()) as {
+      error?: string;
+    };
+
     if (!response.ok) {
       console.error("Attendance save failed:", data);
-      throw new Error(data.error || 'Failed to save attendance');
+      throw new Error(data.error || "Failed to save attendance");
     }
-    
+
     return { success: true, data };
   } catch (error) {
     console.error("Error saving attendance:", error);
-    return { success: false, error: error.message };
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
+    };
   }
 }
 
@@ -61,26 +75,31 @@ export async function saveAttendanceRecord(record: {
 export async function getCodevTotalPoints(codevId: string) {
   try {
     const response = await fetch(`/api/codev/${codevId}/points`);
-    const data = await response.json();
-    
+    const data = (await response.json()) as {
+      error?: string;
+      totalPoints?: number;
+      attendancePoints?: number;
+      points?: unknown;
+    };
+
     if (!response.ok) {
-      throw new Error(data.error || 'Failed to fetch points');
+      throw new Error(data.error || "Failed to fetch points");
     }
-    
-    return { 
-      success: true, 
+
+    return {
+      success: true,
       totalPoints: data.totalPoints || 0,
       attendancePoints: data.attendancePoints || 0,
-      data: data.points || []
+      data: data.points || [],
     };
   } catch (error) {
     console.error("Error fetching codev points:", error);
-    return { 
-      success: false, 
-      error: error.message,
+    return {
+      success: false,
+      error: error instanceof Error ? error.message : "Unknown error",
       totalPoints: 0,
       attendancePoints: 0,
-      data: []
+      data: [],
     };
   }
 }

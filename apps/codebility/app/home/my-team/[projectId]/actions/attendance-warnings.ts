@@ -1,21 +1,36 @@
 "use server";
 
-import { createClientServerComponent } from "@/utils/supabase/server";
 import { createNotification } from "@/lib/server/notification.service";
+import { createClientServerComponent } from "@/utils/supabase/server";
 
 const ABSENCE_WARNING_THRESHOLD = 3;
 
 // Helper function to check if a date is a scheduled meeting day
-function isScheduledMeetingDay(date: Date, meetingSchedule: { selectedDays: string[] } | null): boolean {
-  if (!meetingSchedule || !meetingSchedule.selectedDays || meetingSchedule.selectedDays.length === 0) {
+function isScheduledMeetingDay(
+  date: Date,
+  meetingSchedule: { selectedDays: string[] } | null,
+): boolean {
+  if (
+    !meetingSchedule ||
+    !meetingSchedule.selectedDays ||
+    meetingSchedule.selectedDays.length === 0
+  ) {
     // If no schedule, consider all weekdays as meeting days
     const dayOfWeek = date.getDay();
     return dayOfWeek !== 0 && dayOfWeek !== 6; // Not Sunday (0) or Saturday (6)
   }
-  
-  const dayNames = ["sunday", "monday", "tuesday", "wednesday", "thursday", "friday", "saturday"];
+
+  const dayNames = [
+    "sunday",
+    "monday",
+    "tuesday",
+    "wednesday",
+    "thursday",
+    "friday",
+    "saturday",
+  ];
   const dayName = dayNames[date.getDay()];
-  return meetingSchedule.selectedDays.includes(dayName);
+  return dayName ? meetingSchedule.selectedDays.includes(dayName) : false;
 }
 
 interface AttendanceWarningResult {
@@ -34,13 +49,15 @@ interface AttendanceWarningResult {
 export async function checkAttendanceWarnings(
   projectId: string,
   year: number,
-  month: number
+  month: number,
 ): Promise<AttendanceWarningResult> {
   const supabase = await createClientServerComponent();
-  
+
   try {
     // Get current user to check if they're a team lead
-    const { data: { user } } = await supabase.auth.getUser();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
     if (!user) {
       return { success: false, error: "Not authenticated" };
     }
@@ -54,7 +71,10 @@ export async function checkAttendanceWarnings(
       .single();
 
     if (!teamLead || teamLead.codev_id !== user.id) {
-      return { success: false, error: "Only team leads can check attendance warnings" };
+      return {
+        success: false,
+        error: "Only team leads can check attendance warnings",
+      };
     }
 
     // Get the meeting schedule for the project
@@ -67,7 +87,9 @@ export async function checkAttendanceWarnings(
     // Get all members of the project with their join dates
     const { data: members } = await supabase
       .from("project_members")
-      .select("codev_id, created_at, codev(first_name, last_name, email_address)")
+      .select(
+        "codev_id, created_at, codev(first_name, last_name, email_address)",
+      )
       .eq("project_id", projectId);
 
     if (!members) {
@@ -75,8 +97,8 @@ export async function checkAttendanceWarnings(
     }
 
     // Get attendance records for the month
-    const startDate = new Date(year, month, 1).toISOString().split('T')[0];
-    const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+    const startDate = new Date(year, month, 1).toISOString().split("T")[0];
+    const endDate = new Date(year, month + 1, 0).toISOString().split("T")[0];
 
     const { data: attendance } = await supabase
       .from("attendance")
@@ -96,14 +118,14 @@ export async function checkAttendanceWarnings(
 
     // Create a map of member join dates for quick lookup
     const memberJoinDates = new Map<string, Date>();
-    members.forEach(member => {
+    members.forEach((member) => {
       const joinDate = new Date(member.created_at);
       joinDate.setHours(0, 0, 0, 0);
       memberJoinDates.set(member.codev_id, joinDate);
     });
 
     const absenceCounts = new Map<string, number>();
-    attendance.forEach(record => {
+    attendance.forEach((record) => {
       // Skip future dates
       const recordDate = new Date(record.date);
       if (recordDate > today) return;
@@ -113,7 +135,10 @@ export async function checkAttendanceWarnings(
       if (memberJoinDate && recordDate < memberJoinDate) return;
 
       // Only count absences on scheduled meeting days
-      if (isScheduledMeetingDay(recordDate, meetingSchedule) && record.status === "absent") {
+      if (
+        isScheduledMeetingDay(recordDate, meetingSchedule) &&
+        record.status === "absent"
+      ) {
         const current = absenceCounts.get(record.codev_id) || 0;
         absenceCounts.set(record.codev_id, current + 1);
       }
@@ -121,10 +146,10 @@ export async function checkAttendanceWarnings(
 
     // Check for warnings and send notifications
     const warnings: any[] = [];
-    
+
     for (const member of members) {
       const absences = absenceCounts.get(member.codev_id) || 0;
-      
+
       if (absences >= ABSENCE_WARNING_THRESHOLD) {
         // Check if warning already sent this month
         const { data: existingWarning } = await supabase
@@ -150,7 +175,7 @@ export async function checkAttendanceWarnings(
               absences,
               month: `${year}-${month + 1}`,
               threshold: ABSENCE_WARNING_THRESHOLD,
-            }
+            },
           };
 
           const { error: notifError } = await supabase
@@ -160,33 +185,36 @@ export async function checkAttendanceWarnings(
           warnings.push({
             codevId: member.codev_id,
             absences,
-            notificationSent: !notifError
+            notificationSent: !notifError,
           });
 
           // Also notify team lead
           if (!notifError) {
-            await supabase
-              .from("notifications")
-              .insert({
+            const codevData = Array.isArray(member.codev)
+              ? member.codev[0]
+              : member.codev;
+            if (codevData) {
+              await supabase.from("notifications").insert({
                 recipient_id: teamLead.codev_id,
                 title: "Team Member Attendance Alert",
-                message: `${member.codev.first_name} ${member.codev.last_name} has ${absences} absences this month and has been warned.`,
+                message: `${codevData.first_name} ${codevData.last_name} has ${absences} absences this month and has been warned.`,
                 type: "attendance" as const,
                 priority: "high" as const,
                 project_id: projectId,
                 metadata: {
                   member_id: member.codev_id,
-                  member_name: `${member.codev.first_name} ${member.codev.last_name}`,
+                  member_name: `${codevData.first_name} ${codevData.last_name}`,
                   absences,
                   month: `${year}-${month + 1}`,
-                }
+                },
               });
+            }
           }
         } else {
           warnings.push({
             codevId: member.codev_id,
             absences,
-            notificationSent: false // Already sent
+            notificationSent: false, // Already sent
           });
         }
       }
@@ -205,10 +233,10 @@ export async function checkAttendanceWarnings(
 export async function getAttendanceWarningStatus(
   projectId: string,
   year: number,
-  month: number
+  month: number,
 ) {
   const supabase = await createClientServerComponent();
-  
+
   try {
     // Get the meeting schedule for the project
     const { data: projectData } = await supabase
@@ -216,7 +244,7 @@ export async function getAttendanceWarningStatus(
       .select("meeting_schedule")
       .eq("id", projectId)
       .single();
-      
+
     // Get all members with their join dates
     const { data: members } = await supabase
       .from("project_members")
@@ -228,8 +256,8 @@ export async function getAttendanceWarningStatus(
     }
 
     // Get attendance for the month
-    const startDate = new Date(year, month, 1).toISOString().split('T')[0];
-    const endDate = new Date(year, month + 1, 0).toISOString().split('T')[0];
+    const startDate = new Date(year, month, 1).toISOString().split("T")[0];
+    const endDate = new Date(year, month + 1, 0).toISOString().split("T")[0];
 
     const { data: attendance } = await supabase
       .from("attendance")
@@ -243,43 +271,60 @@ export async function getAttendanceWarningStatus(
     today.setHours(0, 0, 0, 0); // Reset to start of day
     const meetingSchedule = projectData?.meeting_schedule || null;
 
-    const memberStatus = members.map(member => {
+    const memberStatus = members.map((member) => {
       const memberJoinDate = new Date(member.created_at);
       memberJoinDate.setHours(0, 0, 0, 0);
 
-      const memberAttendance = attendance?.filter(a => a.codev_id === member.codev_id) || [];
+      const memberAttendance =
+        attendance?.filter((a) => a.codev_id === member.codev_id) || [];
 
       // Filter out future dates, non-scheduled days, and dates before member joined
-      const scheduledMeetingAttendance = memberAttendance.filter(a => {
+      const scheduledMeetingAttendance = memberAttendance.filter((a) => {
         const recordDate = new Date(a.date);
-        return recordDate <= today &&
-               recordDate >= memberJoinDate &&
-               isScheduledMeetingDay(recordDate, meetingSchedule);
+        return (
+          recordDate <= today &&
+          recordDate >= memberJoinDate &&
+          isScheduledMeetingDay(recordDate, meetingSchedule)
+        );
       });
-      
-      const absences = scheduledMeetingAttendance.filter(a => a.status === "absent").length;
-      
+
+      const absences = scheduledMeetingAttendance.filter(
+        (a) => a.status === "absent",
+      ).length;
+
+      const codevData = Array.isArray(member.codev)
+        ? member.codev[0]
+        : member.codev;
+
       return {
         codevId: member.codev_id,
-        name: `${member.codev.first_name} ${member.codev.last_name}`,
+        name: codevData
+          ? `${codevData.first_name} ${codevData.last_name}`
+          : "Unknown",
         absences,
         hasWarning: absences >= ABSENCE_WARNING_THRESHOLD,
-        attendancePercentage: scheduledMeetingAttendance.length > 0 
-          ? Math.round(((scheduledMeetingAttendance.length - absences) / scheduledMeetingAttendance.length) * 100)
-          : 100
+        attendancePercentage:
+          scheduledMeetingAttendance.length > 0
+            ? Math.round(
+                ((scheduledMeetingAttendance.length - absences) /
+                  scheduledMeetingAttendance.length) *
+                  100,
+              )
+            : 100,
       };
     });
 
-    return { 
-      success: true, 
+    return {
+      success: true,
       data: memberStatus,
       summary: {
         totalMembers: members.length,
-        membersWithWarnings: memberStatus.filter(m => m.hasWarning).length,
+        membersWithWarnings: memberStatus.filter((m) => m.hasWarning).length,
         averageAttendance: Math.round(
-          memberStatus.reduce((sum, m) => sum + m.attendancePercentage, 0) / members.length
-        )
-      }
+          memberStatus.reduce((sum, m) => sum + m.attendancePercentage, 0) /
+            members.length,
+        ),
+      },
     };
   } catch (error) {
     console.error("Error getting attendance warning status:", error);

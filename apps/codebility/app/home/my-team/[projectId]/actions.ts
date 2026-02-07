@@ -294,7 +294,7 @@ export async function bulkSaveAttendance(records: {
     );
 
     // Revalidate pages
-    if (records.length > 0) {
+    if (records.length > 0 && records[0]?.project_id) {
       revalidatePath(`/home/my-team/${records[0].project_id}`);
       revalidatePath(`/home`);
     }
@@ -434,8 +434,12 @@ export async function getCodevAttendancePoints(codevId: string) {
 /**
  * Save meeting schedule for a project
  * 
+ * STORAGE STRATEGY:
+ * - meeting_schedule (JSONB): Stores selectedDays and time
+ * - meeting_link (TEXT): Stored separately for easy querying and indexing
+ * 
  * @param projectId - Project UUID
- * @param schedule - Schedule object with selectedDays and time
+ * @param schedule - Schedule object with selectedDays, time, and optional meetingLink
  * @returns {success: boolean, data?: object, error?: string}
  */
 export async function saveMeetingSchedule(
@@ -443,6 +447,7 @@ export async function saveMeetingSchedule(
   schedule: {
     selectedDays: string[];
     time: string;
+    meetingLink?: string;
   }
 ) {
   const supabase = await createClientServerComponent();
@@ -450,10 +455,19 @@ export async function saveMeetingSchedule(
   try {
     console.log(`[SCHEDULE SAVE] Project: ${projectId}`, schedule);
 
+    // Prepare meeting_schedule object (without meetingLink)
+    const meetingScheduleData = {
+      selectedDays: schedule.selectedDays,
+      time: schedule.time
+    };
+
+    // Update both meeting_schedule (JSONB) and meeting_link (TEXT column)
     const { data, error } = await supabase
       .from("projects")
       .update({
-        meeting_schedule: schedule
+        meeting_schedule: meetingScheduleData,
+        meeting_link: schedule.meetingLink || null, // Store link separately
+        updated_at: new Date().toISOString()
       })
       .eq("id", projectId)
       .select()
@@ -466,7 +480,7 @@ export async function saveMeetingSchedule(
 
     revalidatePath(`/home/my-team/${projectId}`);
     
-    console.log(`[SCHEDULE SUCCESS] Saved for project ${projectId}`);
+    console.log(`[SCHEDULE SUCCESS] Saved schedule and meeting link for project ${projectId}`);
     return { success: true, data };
   } catch (error) {
     console.error("[SCHEDULE ERROR] Unexpected:", error);
@@ -477,6 +491,8 @@ export async function saveMeetingSchedule(
 /**
  * Get meeting schedule for a project
  * 
+ * RETURNS: Combined data from meeting_schedule (JSONB) and meeting_link (TEXT) columns
+ * 
  * @param projectId - Project UUID
  * @returns {success: boolean, schedule?: object, error?: string}
  */
@@ -486,7 +502,7 @@ export async function getMeetingSchedule(projectId: string) {
   try {
     const { data, error } = await supabase
       .from("projects")
-      .select("id, name, meeting_schedule")
+      .select("id, name, meeting_schedule, meeting_link")
       .eq("id", projectId)
       .maybeSingle();
 
@@ -495,13 +511,222 @@ export async function getMeetingSchedule(projectId: string) {
       return { success: false, error: error.message };
     }
 
+    // Combine meeting_schedule JSONB data with meeting_link
+    const schedule = data?.meeting_schedule ? {
+      selectedDays: data.meeting_schedule.selectedDays || [],
+      time: data.meeting_schedule.time || "00:00",
+      meetingLink: data.meeting_link || "" // Add meeting link from separate column
+    } : null;
+
     return { 
       success: true, 
-      schedule: data?.meeting_schedule || null
+      schedule
     };
   } catch (error) {
     console.error("[SCHEDULE ERROR] Unexpected:", error);
     return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+/**
+ * Create a new meeting record
+ * 
+ * @param meetingData - Meeting details
+ * @returns {success: boolean, data?: object, error?: string}
+ */
+export async function createMeeting(meetingData: {
+  project_id: string;
+  title: string;
+  description?: string;
+  scheduled_date: string;
+  scheduled_time: string;
+  duration_minutes?: number;
+  location?: string;
+  meeting_link?: string;
+  created_by: string;
+}) {
+  const supabase = await createClientServerComponent();
+
+  try {
+    console.log(`[MEETING CREATE] Project: ${meetingData.project_id}`, meetingData);
+
+    const { data, error } = await supabase
+      .from("meetings")
+      .insert({
+        ...meetingData,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString()
+      })
+      .select()
+      .single();
+
+    if (error) {
+      console.error("[MEETING CREATE ERROR]", error);
+      return { success: false, error: error.message };
+    }
+
+    revalidatePath(`/home/my-team/${meetingData.project_id}`);
+    
+    console.log(`[MEETING CREATE SUCCESS] Meeting ID: ${data.id}`);
+    return { success: true, data };
+  } catch (error) {
+    console.error("[MEETING CREATE ERROR] Unexpected:", error);
+    return { success: false, error: "An unexpected error occurred" };
+  }
+}
+
+/**
+ * Send meeting notification to all team members
+ * 
+ * PROCESS:
+ * 1. Fetch all team members for the project
+ * 2. Get project details for notification message
+ * 3. Create notification for each member with meeting link
+ * 4. Handle errors gracefully per member
+ * 
+ * @param projectId - Project UUID
+ * @param meetingDetails - Object containing meeting information
+ * @returns {success: boolean, sent: number, failed: number, error?: string}
+ */
+export async function sendMeetingNotification(
+  projectId: string,
+  meetingDetails: {
+    date: string;
+    time: string;
+    title?: string;
+    description?: string;
+    location?: string;
+    meetingLink?: string; // Added for virtual meetings
+  }
+) {
+  const supabase = await createClientServerComponent();
+
+  try {
+    console.log(`[MEETING NOTIFICATION] Starting for project: ${projectId}`);
+
+    // Fetch project details
+    const { data: project, error: projectError } = await supabase
+      .from("projects")
+      .select("name")
+      .eq("id", projectId)
+      .single();
+
+    if (projectError || !project) {
+      console.error("[MEETING NOTIFICATION ERROR] Project not found:", projectError);
+      return { 
+        success: false, 
+        error: "Project not found",
+        sent: 0,
+        failed: 0 
+      };
+    }
+
+    // Fetch all team members (codevs) for this project
+    const { data: members, error: membersError } = await supabase
+      .from("codev")
+      .select("id, user_id")
+      .eq("project_id", projectId);
+
+    if (membersError) {
+      console.error("[MEETING NOTIFICATION ERROR] Failed to fetch members:", membersError);
+      return { 
+        success: false, 
+        error: "Failed to fetch team members",
+        sent: 0,
+        failed: 0 
+      };
+    }
+
+    if (!members || members.length === 0) {
+      console.log("[MEETING NOTIFICATION] No members found in project");
+      return { 
+        success: true, 
+        message: "No members to notify",
+        sent: 0,
+        failed: 0 
+      };
+    }
+
+    console.log(`[MEETING NOTIFICATION] Sending to ${members.length} members`);
+
+    // Format notification message
+    const title = meetingDetails.title || "Team Meeting Scheduled";
+    const meetingDate = new Date(meetingDetails.date).toLocaleDateString('en-US', {
+      weekday: 'long',
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+    
+    let message = `A meeting has been scheduled for ${project.name} on ${meetingDate} at ${meetingDetails.time}.`;
+    
+    if (meetingDetails.description) {
+      message += `\n\nDetails: ${meetingDetails.description}`;
+    }
+    
+    if (meetingDetails.location) {
+      message += `\n\nLocation: ${meetingDetails.location}`;
+    }
+
+    // Add meeting link if provided (for virtual meetings) 
+    if (meetingDetails.meetingLink) {
+      message += `\n\nJoin Meeting: ${meetingDetails.meetingLink}`;
+    }
+
+    // Send notifications to all members in parallel
+    const notificationPromises = members.map(async (member) => {
+      try {
+        const { error } = await supabase.rpc('create_notification', {
+          p_recipient_id: member.id,
+          p_title: title,
+          p_message: message,
+          p_type: 'meeting',
+          p_priority: 'high',
+          p_metadata: {
+            project_id: projectId,
+            meeting_date: meetingDetails.date,
+            meeting_time: meetingDetails.time,
+            location: meetingDetails.location,
+            description: meetingDetails.description,
+            meeting_link: meetingDetails.meetingLink // Include link in metadata
+          },
+          p_project_id: projectId
+        });
+
+        if (error) {
+          console.error(`[NOTIFICATION ERROR] Failed for member ${member.id}:`, error);
+          return { success: false, memberId: member.id };
+        }
+
+        return { success: true, memberId: member.id };
+      } catch (error) {
+        console.error(`[NOTIFICATION ERROR] Unexpected error for member ${member.id}:`, error);
+        return { success: false, memberId: member.id };
+      }
+    });
+
+    const results = await Promise.all(notificationPromises);
+
+    // Count successes and failures
+    const sent = results.filter(r => r.success).length;
+    const failed = results.filter(r => !r.success).length;
+
+    console.log(`[MEETING NOTIFICATION SUCCESS] Sent: ${sent}, Failed: ${failed}`);
+
+    return {
+      success: true,
+      sent,
+      failed,
+      message: `Notifications sent to ${sent} member(s)${failed > 0 ? `, ${failed} failed` : ''}`
+    };
+  } catch (error) {
+    console.error("[MEETING NOTIFICATION ERROR] Unexpected:", error);
+    return { 
+      success: false, 
+      error: "An unexpected error occurred",
+      sent: 0,
+      failed: 0 
+    };
   }
 }
 
@@ -563,7 +788,7 @@ export async function getTeamMonthlyAttendancePoints(
       success: true,
       totalPoints,
       presentDays: data?.length || 0,
-      uniqueMembers: new Set(data?.map(record => record.codev_id)).size,
+      uniqueMembers: new Set((data || []).map(record => record.codev_id)).size,
       uniqueCodevIdsPresentDays
     };
   } catch (error) {
