@@ -90,6 +90,8 @@ export interface Codev {
   id: string;
   first_name: string;
   last_name: string;
+  username: string | null; // Added username field
+  username_updated_at: string | null; // Track when username was last updated
   email_address: string;
   phone_number?: string;
   address?: string | null;

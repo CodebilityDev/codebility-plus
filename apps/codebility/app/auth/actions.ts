@@ -47,6 +47,34 @@ const uploadProfileImage = async (
   }
 };
 
+const validateUsername = (username: string): { valid: boolean; error?: string } => {
+    // Must be 8-30 characters
+    if (username.length < 8) {
+        return { valid: false, error: "Username must be at least 8 characters" };
+    }
+    if (username.length > 30) {
+        return { valid: false, error: "Username must be 30 characters or less" };
+    }
+
+    // Only letters, numbers, periods, and underscores
+    const validPattern = /^[a-zA-Z0-9._]+$/;
+    if (!validPattern.test(username)) {
+        return { valid: false, error: "Username can only contain letters, numbers, periods, and underscores" };
+    }
+
+    // Cannot start or end with a period
+    if (username.startsWith('.') || username.endsWith('.')) {
+        return { valid: false, error: "Username cannot start or end with a period" };
+    }
+
+    // Cannot have consecutive periods
+    if (username.includes('..')) {
+        return { valid: false, error: "Username cannot have consecutive periods" };
+    }
+
+    return { valid: true };
+};
+
 export const signupUser = async (formData: FormData) => {
   try {
     const supabase = await createClientServerComponent();
@@ -56,6 +84,7 @@ export const signupUser = async (formData: FormData) => {
     const rawEmail = formData.get("email_address") as string;
     const email_address = rawEmail.toLowerCase();
     const password = formData.get("password") as string;
+    const username = formData.get("username") as string;
     const tech_stacks = JSON.parse(formData.get("tech_stacks") as string) || [];
     const positions: { id: number; name: string }[] =
       (JSON.parse(formData.get("positions") as string) as {
@@ -85,6 +114,24 @@ export const signupUser = async (formData: FormData) => {
       return { success: false, error: "Email already exists" };
     }
 
+    if (username) {
+      // Validate username format
+      const usernameValidation = validateUsername(username);
+      if (!usernameValidation.valid) {
+        return { success: false, error: usernameValidation.error };
+      }
+
+      // Check if username is already taken (case-insensitive)
+      const { data: existingUsername } = await supabase
+        .from("codev")
+        .select("username")
+        .ilike("username", username)
+        .single();
+
+      if (existingUsername) {
+        return { success: false, error: "Username is already taken" };
+      }
+    }
     // Handle profile image upload if provided
     const image_url = profileImage && profileImage.size > 0
       ? await uploadProfileImage(profileImage, "profileImage", "codebility")
@@ -178,6 +225,8 @@ export const signupUser = async (formData: FormData) => {
       first_name: firstName,
       last_name: lastName,
       email_address,
+      username: username || null, // ADDED: Store username if provided, otherwise null
+      username_updated_at: username ? new Date().toISOString() : null, // ADDED: Track when username was set
       phone_number: formData.get("phone_number") as string,
       address: null,
       about: (formData.get("about") as string) || null,

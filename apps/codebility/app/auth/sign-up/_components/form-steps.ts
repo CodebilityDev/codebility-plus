@@ -34,6 +34,12 @@ export const FORM_STEPS: FormField[][] = [
       placeholder: "Enter your last name",
       type: "text",
     },
+     {
+      id: "username",
+      label: "Username",
+      placeholder: "Enter your username",
+      type: "text",
+    },
     {
       id: "positions",
       label: "Positions",
