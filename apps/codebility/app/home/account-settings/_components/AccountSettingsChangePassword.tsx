@@ -73,12 +73,12 @@ export default function AccountSettingsChangePassword() {
   const isButtonDisabled = isSubmitting || !isFormValid || !isDirty;
 
   return (
-    <div className="space-y-2">
-      <h3 className="text-base font-semibold">Change Password</h3>
+    <div className="space-y-4">
+      <h3 className="text-xl font-semibold">Change Password</h3>
       
       <Form {...form}>
         <form
-          className="space-y-2"
+          className="space-y-3"
           noValidate
           onSubmit={form.handleSubmit(onSubmit)}
         >
@@ -92,7 +92,7 @@ export default function AccountSettingsChangePassword() {
                     type="password"
                     placeholder="New Password"
                     label="New Password"
-                    parentClassName="flex gap-1 flex-col"
+                    parentClassName="flex gap-1 flex-col text-lg"
                     variant="lightgray"
                     className="text-sm"
                     {...field}
@@ -113,7 +113,7 @@ export default function AccountSettingsChangePassword() {
                     type="password"
                     placeholder="Confirm Password"
                     label="Confirm Password"
-                    parentClassName="flex gap-1 flex-col"
+                    parentClassName="flex gap-1 flex-col text-lg"
                     variant="lightgray"
                     className="text-sm"
                     {...field}

@@ -13,6 +13,7 @@ import AccountSettings2FA from "./_components/AccountSettings2FA";
 import AccountSettingsChangePassword from "./_components/AccountSettingsChangePassword";
 import AccountSettingsDelete from "./_components/AccountSettingsDelete";
 import AccountSettingsHeader from "./_components/AccountSettingsHeader";
+import AccountSettingsUsername from "./_components/AccountSettingsUsername";
 
 export const dynamic = "force-dynamic";
 
@@ -142,9 +143,9 @@ export default function AccountSettingsPage({ showBreadcrumb = true }: { showBre
         {loading ? (
           <LoadingContent />
         ) : (
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div className="grid gap-6 lg:grid-cols-2 p-2">
             <Card className="background-box text-dark100_light900 h-fit">
-              <CardContent className="space-y-4 p-6">
+              <CardContent className="space-y-4 ">
                 <AccountSettingsHeader email={user.email || "No email available"} />
                 <Separator />
                 <AccountSettingsChangePassword />
@@ -153,9 +154,17 @@ export default function AccountSettingsPage({ showBreadcrumb = true }: { showBre
               </CardContent>
             </Card>
             
-            <div className="w-full h-fit">
-              <AccountSettingsDelete />
+            <div className="w-full h-fit space-y-2">
+            <AccountSettingsDelete />
+              
+              <Card className="background-box text-foreground h-fit">
+                <CardContent className="p-6">
+                  <AccountSettingsUsername userId={user.id} />
+                </CardContent>
+              </Card>
             </div>
+            
+            
           </div>
         )}
       </div>
