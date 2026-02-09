@@ -126,6 +126,8 @@ const TeamLeaderDisplay = ({
                 email_address: teamLead.email_address,
                 display_position: teamLead.display_position ?? undefined,
                 image_url: teamLead.image_url ?? undefined,
+                username: (teamLead as any).username ?? null,
+                username_updated_at: (teamLead as any).username_updated_at ?? null,
                 availability_status: undefined,
                 internal_status: undefined,
                 years_of_experience: undefined,
@@ -199,7 +201,7 @@ const TeamMembersGrid = ({
 
   return (
     <div className="h-full flex flex-col">
-      <h4 className="text-base sm:text-lg font-semibold text-white mb-1">Team Members</h4>
+      <h4 className="text-base sm:text-lg font-semibold text-white mb-1 mt-[-15px]">Team Members</h4>
       <div className="mb-1 sm:mb-2 md:mt-2">
         <span className="text-white text-xs sm:text-sm">{members.length} members</span>
       </div>
@@ -315,6 +317,33 @@ const AddMembersModal = ({
   const [isUpdating, setIsUpdating] = useState(false);
   const [availableMembers, setAvailableMembers] = useState<Codev[]>([]);
   const [isLoadingMembers, setIsLoadingMembers] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
+
+  // ✅ NEW: Direct fetch function that includes ALL internal statuses including INTERN
+  const fetchAllCodevs = useCallback(async (): Promise<Codev[]> => {
+    if (!supabase) {
+      console.error('Supabase client not available');
+      return [];
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('codev')
+        .select('*')
+        .in('internal_status', ['GRADUATED', 'INTERN', 'MENTOR', 'TRAINING', 'ADMIN', 'ONBOARDING'])
+        .order('first_name', { ascending: true });
+
+      if (error) {
+        console.error('Error fetching codevs:', error);
+        throw error;
+      }
+
+      return data || [];
+    } catch (error) {
+      console.error('Failed to fetch codevs directly:', error);
+      throw error;
+    }
+  }, [supabase]);
 
   // ✅ Enhanced profile fetching with timeout protection
   const getCompleteCodevProfileSafe = useCallback(async (codevId: string): Promise<Codev | null> => {
@@ -404,31 +433,66 @@ const AddMembersModal = ({
     }
   }, [getCompleteCodevProfileSafe, openProfileModal]);
 
-  // ✅ Load available members with timeout
+  // ✅ FIXED: Load available members using direct fetch that includes INTERNS
   useEffect(() => {
+    let isMounted = true;
+    let timeoutId: NodeJS.Timeout;
+
     const loadMembers = async () => {
-      if (!isOpen) return;
+      if (!isOpen || !supabase) return;
       
       setIsLoadingMembers(true);
+      setLoadError(null);
+      
       try {
-        const loadPromise = getProjectCodevs();
-        const timeoutPromise = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error('Load members timeout')), 10000)
-        );
+        // Set up timeout
+        timeoutId = setTimeout(() => {
+          if (isMounted) {
+            throw new Error('Loading timeout');
+          }
+        }, 30000);
 
-        const users = await Promise.race([loadPromise, timeoutPromise]);
-        setAvailableMembers(users || []);
-      } catch (error) {
+        // ✅ Use direct fetch instead of getProjectCodevs()
+        const users = await fetchAllCodevs();
+        
+        clearTimeout(timeoutId);
+        
+        if (isMounted) {
+          console.log('✅ Loaded users:', users.length);
+          setAvailableMembers(users || []);
+          setLoadError(null);
+        }
+      } catch (error: any) {
         console.error('Failed to fetch members:', error);
-        toast.error('Failed to load members');
-        setAvailableMembers([]);
+        
+        if (isMounted) {
+          const errorMessage = error?.message || 'Failed to load members';
+          setLoadError(errorMessage);
+          
+          if (errorMessage.includes('timeout')) {
+            toast.error('Loading members is taking longer than expected. Please try again.');
+          } else {
+            toast.error('Failed to load members. Please try again.');
+          }
+          
+          setAvailableMembers([]);
+        }
       } finally {
-        setIsLoadingMembers(false);
+        if (isMounted) {
+          setIsLoadingMembers(false);
+        }
       }
     };
 
     loadMembers();
-  }, [isOpen]);
+
+    return () => {
+      isMounted = false;
+      if (timeoutId) {
+        clearTimeout(timeoutId);
+      }
+    };
+  }, [isOpen, supabase, fetchAllCodevs]);
 
   // ✅ Initialize selected members
   useEffect(() => {
@@ -493,10 +557,11 @@ const AddMembersModal = ({
     if (!isOpen) {
       setSearchQuery("");
       setSelectedMembers([]);
+      setLoadError(null);
     }
   }, [isOpen]);
 
-  // ✅ Submit handler with timeout
+  // ✅ FIXED: Submit handler with username and username_updated_at
   const handleSubmit = async () => {
     if (!teamLeadData) {
       toast.error('Team leader not found');
@@ -513,6 +578,8 @@ const AddMembersModal = ({
           positions: [],
           tech_stacks: [],
           display_position: teamLeadData.display_position ?? undefined,
+          username: (teamLeadData as any).username ?? null,
+          username_updated_at: (teamLeadData as any).username_updated_at ?? null,
         },
         ...selectedMembers
           .filter((member) => member.id !== teamLeadData.id)
@@ -522,17 +589,11 @@ const AddMembersModal = ({
           })),
       ];
 
-      const updatePromise = updateProjectMembers(
+      const result = await updateProjectMembers(
         project.id,
         updatedMembers,
         teamLeadData.id,
       );
-
-      const timeoutPromise = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error('Update timeout')), 15000)
-      );
-
-      const result = await Promise.race([updatePromise, timeoutPromise]);
 
       if (result.success) {
         toast.success("Team members updated successfully!", { id: loadingToast });
@@ -547,6 +608,25 @@ const AddMembersModal = ({
       toast.error(errorMsg, { id: loadingToast });
     } finally {
       setIsUpdating(false);
+    }
+  };
+
+  // ✅ Retry loading members
+  const handleRetryLoad = async () => {
+    setLoadError(null);
+    setIsLoadingMembers(true);
+    
+    try {
+      const users = await fetchAllCodevs();
+      setAvailableMembers(users || []);
+      setLoadError(null);
+    } catch (error) {
+      console.error('Retry failed:', error);
+      setLoadError('Failed to load members');
+      toast.error('Failed to load members. Please try again.');
+      setAvailableMembers([]);
+    } finally {
+      setIsLoadingMembers(false);
     }
   };
 
@@ -604,6 +684,20 @@ const AddMembersModal = ({
                   <div className="text-center py-8 text-gray-400">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-customBlue-500 mx-auto mb-3"></div>
                     <p>Loading members...</p>
+                  </div>
+                ) : loadError ? (
+                  <div className="text-center py-8">
+                    <div className="text-red-400 mb-4">
+                      <p className="font-semibold mb-2">Failed to load members</p>
+                      <p className="text-sm text-gray-400">{loadError}</p>
+                    </div>
+                    <Button
+                      onClick={handleRetryLoad}
+                      variant="outline"
+                      className="border-customBlue-500 text-customBlue-400 hover:bg-customBlue-500/10"
+                    >
+                      Try Again
+                    </Button>
                   </div>
                 ) : filteredUsers.length > 0 ? (
                   filteredUsers.slice(0, 50).map((user) => (

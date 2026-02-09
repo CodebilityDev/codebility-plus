@@ -227,6 +227,8 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
           positions: [],
           tech_stacks: [],
           display_position: teamLead.display_position ?? undefined,
+          username: (teamLead as any).username ?? null,
+          username_updated_at: (teamLead as any).username_updated_at ?? null,
         },
         ...selectedMembers
           .filter((member) => member.id !== teamLead.id)
