@@ -35,6 +35,7 @@ const SignUpForm = () => {
     defaultValues: {
       first_name: "",
       last_name: "",
+      username: "",
       email_address: "",
       phone_number: "",
       years_of_experience: 0,

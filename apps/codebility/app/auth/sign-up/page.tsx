@@ -51,6 +51,7 @@ const SignupFormSchema = z.object({
   facebook: z.string().optional(),
   linkedin: z.string().optional(),
   github: z.string().optional(),
+  username: z.string().min(8, "Username must be at least 8 characters").optional(),
   discord: z.string().optional(),
   privacyPolicy: z.boolean().refine(val => val === true, "You must agree to the Privacy Policy"),
   ndaAgreement: z.boolean().refine(val => val === true, "You must agree to the Non-Disclosure Agreement"),
@@ -135,6 +136,7 @@ export default function SignUpForm() {
     defaultValues: {
       first_name: "",
       last_name: "",
+      username: "",
       email_address: "",
       phone_number: "",
       password: "",
@@ -451,6 +453,14 @@ export default function SignUpForm() {
 
               {/* Column 2 - Professional Info */}
               <div className="space-y-4">
+                <FormField
+                  label="Username"
+                  name="username"
+                  placeholder="Enter your username"
+                  register={form.register}
+                  errors={form.formState.errors}
+                  required
+                />
                 {/* Positions Dropdown */}
                 <div className="space-y-1">
                   <Label className="text-white text-base font-medium">Positions <span className="text-red-400">*</span></Label>

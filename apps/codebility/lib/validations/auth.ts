@@ -11,6 +11,7 @@ export const SignUpValidation = z
   .object({
     first_name: z.string().min(1, "First name is required"),
     last_name: z.string().min(1, "Last name is required"),
+    username: z.string().min(8, "Username must be at least 8 characters"),
     email_address: z.string().email("Please enter a valid email"),
     phone_number: z
       .string()
