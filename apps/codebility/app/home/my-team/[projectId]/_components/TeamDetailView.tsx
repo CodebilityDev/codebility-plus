@@ -21,6 +21,7 @@ import {
   TrendingUp,
   UserPlus,
   Users,
+  ExternalLink,
 } from "lucide-react";
 import { toast } from "react-hot-toast";
 
@@ -56,6 +57,7 @@ interface ProjectData {
   project: {
     id: string;
     name: string;
+    meeting_link?: string | null;
   };
   teamLead: {
     data: SimpleMemberData | null;
@@ -134,45 +136,46 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
     }
   }, [projectInfo.id, viewMode]);
 
-  // Format schedule for display
-  const formatSchedule = () => {
-    if (
-      !currentSchedule ||
-      !currentSchedule.selectedDays ||
-      currentSchedule.selectedDays.length === 0
-    )
-      return null;
 
-    const weekDays = [
-      { value: "monday", label: "Monday", short: "Mon" },
-      { value: "tuesday", label: "Tuesday", short: "Tue" },
-      { value: "wednesday", label: "Wednesday", short: "Wed" },
-      { value: "thursday", label: "Thursday", short: "Thu" },
-      { value: "friday", label: "Friday", short: "Fri" },
-      { value: "saturday", label: "Saturday", short: "Sat" },
-      { value: "sunday", label: "Sunday", short: "Sun" },
-    ];
+// Format schedule for display
+const formatSchedule = () => {
+  if (
+    !currentSchedule ||
+    !currentSchedule.selectedDays ||
+    currentSchedule.selectedDays.length === 0
+  )
+    return null;
 
-    const selectedDaysDisplay = currentSchedule.selectedDays
-      .map((day) => weekDays.find((d) => d.value === day)?.short)
-      .filter(Boolean)
-      .join(", ");
+  const weekDays = [
+    { value: "monday", label: "Monday", short: "Mon" },
+    { value: "tuesday", label: "Tuesday", short: "Tue" },
+    { value: "wednesday", label: "Wednesday", short: "Wed" },
+    { value: "thursday", label: "Thursday", short: "Thu" },
+    { value: "friday", label: "Friday", short: "Fri" },
+    { value: "saturday", label: "Saturday", short: "Sat" },
+    { value: "sunday", label: "Sunday", short: "Sun" },
+  ];
 
-    // Convert military time to 12-hour format
-    const convertTo12Hour = (time24: string) => {
-      const parts = time24.split(":");
-      const hours = parts[0] || "0";
-      const minutes = parts[1] || "00";
-      const hour = parseInt(hours, 10);
-      const ampm = hour >= 12 ? "PM" : "AM";
-      const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
-      return `${hour12}:${minutes} ${ampm}`;
-    };
+  const selectedDaysDisplay = currentSchedule.selectedDays
+    .map((day) => weekDays.find((d) => d.value === day)?.short)
+    .filter(Boolean)
+    .join(", ");
 
-    const formattedTime = convertTo12Hour(currentSchedule.time);
-
-    return `${selectedDaysDisplay} at ${formattedTime} @ Discord`;
+  // Convert military time to 12-hour format
+  const convertTo12Hour = (time24: string) => {
+    const parts = time24.split(":");
+    const hours = parts[0] || "0";
+    const minutes = parts[1] || "00";
+    const hour = parseInt(hours, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    const hour12 = hour % 12 || 12; // Convert 0 to 12 for midnight
+    return `${hour12}:${minutes} ${ampm}`;
   };
+
+  const formattedTime = convertTo12Hour(currentSchedule.time);
+
+  return `${selectedDaysDisplay} at ${formattedTime}`;
+};
 
   const handleOpenAddModal = () => {
     setShowAddModal(true);
@@ -425,13 +428,28 @@ const TeamDetailView = ({ projectData }: TeamDetailViewProps) => {
                       <div className="rounded-lg bg-blue-100 p-2 dark:bg-blue-900/50">
                         <CalendarDays className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                       </div>
-                      <div>
+                      <div className="flex-1">
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
                           Meeting Schedule
                         </p>
-                        <p className="mt-0.5 flex items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
+                        <p className="mt-0.5 flex flex-wrap items-center gap-1.5 text-sm text-gray-600 dark:text-gray-400">
                           <Clock className="h-3.5 w-3.5" />
-                          {formatSchedule()}
+                          <span>{formatSchedule()} @</span>
+                          {projectInfo.meeting_link ? (
+                            <a
+                              href={projectInfo.meeting_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
+                            >
+                              {projectInfo.meeting_link}
+                              <ExternalLink className="h-3 w-3" />
+                            </a>
+                          ) : (
+                            <span className="text-gray-500 dark:text-gray-500">
+                              No link set
+                            </span>
+                          )}
                         </p>
                       </div>
                     </div>

@@ -97,6 +97,8 @@ export async function getUserProjects(): Promise<{
       name: string;
       status: string | null;
       kanban_display: boolean | null;
+      meeting_link: string | null;
+      public_display: boolean | null;  // ← ADD THIS
     }
 
     interface ProjectMember {
@@ -107,21 +109,23 @@ export async function getUserProjects(): Promise<{
 
     // Fetch projects where the user is either a team leader or member
     const { data: projectMembers, error: projectMembersError } = await supabase
-      .from("project_members")
-      .select(
-        `
-        project_id,
-        role,
-        project:project_id (
-          id,
-          name,
-          status,
-          kanban_display
-        )
-      `,
+    .from("project_members")
+    .select(
+      `
+      project_id,
+      role,
+      project:project_id (
+        id,
+        name,
+        status,
+        kanban_display,
+        public_display,
+        meeting_link
       )
-      .eq("codev_id", userCodevId)
-      .in("role", ["team_leader", "member"]) as { data: ProjectMember[] | null; error: any };
+    `,
+    )
+    .eq("codev_id", userCodevId)
+    .in("role", ["team_leader", "member"]) as { data: ProjectMember[] | null; error: any };
 
     if (projectMembersError) {
       console.error("Error fetching user projects:", projectMembersError);
@@ -134,14 +138,16 @@ export async function getUserProjects(): Promise<{
 
     // Map the project members to the expected return type
     const userProjects = projectMembers.map((pm) => ({
-      project: {
-        id: pm.project.id,
-        name: pm.project.name,
-        status: pm.project.status || "pending",
-        kanban_display: pm.project.kanban_display ?? false,
-      } as Project,
-      role: pm.role,
-    }));
+    project: {
+      id: pm.project.id,
+      name: pm.project.name,
+      status: pm.project.status || "pending",
+      kanban_display: pm.project.kanban_display ?? false,
+      public_display: pm.project.public_display ?? false,  
+      meeting_link: pm.project.meeting_link ?? null,       
+    } as Project,
+    role: pm.role,
+  }));
 
     return { error: null, data: userProjects };
   } catch (error) {
