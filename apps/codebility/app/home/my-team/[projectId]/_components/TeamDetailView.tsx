@@ -442,7 +442,7 @@ const formatSchedule = () => {
                               rel="noopener noreferrer"
                               className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-700 hover:underline dark:text-blue-400 dark:hover:text-blue-300"
                             >
-                              {projectInfo.meeting_link}
+                              Discord Channel
                               <ExternalLink className="h-3 w-3" />
                             </a>
                           ) : (
