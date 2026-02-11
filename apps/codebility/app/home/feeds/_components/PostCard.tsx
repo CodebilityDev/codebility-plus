@@ -14,7 +14,7 @@ import { PostType } from "../_services/query";
 import { DeleteDialog } from "./DeleteDialog";
 import PostCommentCount from "./PostCommentCount";
 import PostTags from "./PostTags";
-import PostUpvote from "./PostUpvote";
+import PostUpvote from "./PostUpvote"; 
 
 interface PostProps {
   post: PostType;
@@ -42,7 +42,8 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
     if (user) {
       checkIfAuthor();
     }
-  }, [user]);
+  }, [user, post.author_id?.id]);
+
   const openDeleteDialog = async (e: React.MouseEvent) => {
     e.stopPropagation();
     e.preventDefault();
@@ -68,6 +69,7 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
+
   return (
     <div>
       <Box
@@ -75,7 +77,7 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
         onClick={openModal}
       >
         {/* Delete Button in top-right */}
-        {(isAdmin || isAuthor) && (
+        {(isAdmin || isAuthor) && post.id !== "00000000-0000-0000-0000-000000000001" && (
           <button
             className="invisible absolute right-2 top-2 rounded bg-red-500 px-2 py-1 text-white hover:bg-red-600 group-hover:visible"
             onClick={openDeleteDialog}
@@ -89,15 +91,18 @@ export default function Post({ post, isAdmin, onDelete }: PostProps) {
           <div className="flex items-center justify-between">
             <div className="mb-2 flex items-center">
               <Image
-                src={post.author_id?.image_url || defaultAvatar}
-                alt={`${post.author_id?.first_name}'s profile`}
+                src={
+                  post.author_id?.image_url || 
+                  (post.id === "00000000-0000-0000-0000-000000000001" ? "/favicon.ico" : defaultAvatar)
+                }
+                alt={`${post.author_id?.first_name || "Codebility"}'s profile`}
                 className="mr-4 h-12 w-12 rounded-full object-cover"
-                width={40}
-                height={40}
+                width={30}
+                height={30}
               />
               <div className="flex-1">
                 <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-                  {post.author_id
+                  {post.author_id?.first_name
                     ? `${post.author_id?.first_name} ${post.author_id?.last_name}`
                     : "Codebility"}
                 </h2>

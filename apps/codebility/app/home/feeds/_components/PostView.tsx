@@ -14,6 +14,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
 import type { PostType } from "../_services/query";
+import { SYSTEM_POST } from "../_constants/system-post";
 import PostUpvote from "../_components/PostUpvote";
 import { getUserRole } from "../_services/action";
 import PostCommentCount from "./PostCommentCount";
@@ -40,10 +41,14 @@ export default function PostView({ postId }: PostViewProps) {
     setRefreshComments((prev) => prev + 1);
   };
 
-  // Find the post in the store
+  // Find the post in the store or use system post
   useEffect(() => {
-    const foundPost = posts.find((p) => p.id === postId) || null;
-    setPost(foundPost);
+    if (postId === "00000000-0000-0000-0000-000000000001") {
+      setPost(SYSTEM_POST);
+    } else {
+      const foundPost = posts.find((p) => p.id === postId) || null;
+      setPost(foundPost);
+    }
   }, [posts, postId]);
 
   // Check roles
@@ -83,15 +88,18 @@ export default function PostView({ postId }: PostViewProps) {
       <h1 className="text-3xl font-bold">{post.title}</h1>
       <div className="flex items-center">
         <Image
-          src={post.author_id?.image_url || defaultAvatar}
-          alt={`${post.author_id?.first_name || "User"}'s profile`}
+          src={
+            post.author_id?.image_url || 
+            (post.id === "00000000-0000-0000-0000-000000000001" ? "/favicon.ico" : defaultAvatar)
+          }
+          alt={`${post.author_id?.first_name || "Codebility"}'s profile`}
           className="mr-4 h-10 w-10 rounded-full object-cover"
           width={40}
           height={40}
         />
         <div className="flex-1">
           <h2 className="font-semibold text-gray-800 dark:text-gray-100">
-            {post.author_id
+            {post.author_id?.first_name
               ? `${post.author_id.first_name} ${post.author_id.last_name}`
               : "Codebility"}
           </h2>
@@ -109,19 +117,19 @@ export default function PostView({ postId }: PostViewProps) {
       <PostTags post={post} />
 
       <div className="max-h-[90vh] overflow-y-auto">
-        <div className="prose prose-sm dark:prose-invert max-w-none text-sm">
+        <div className="prose prose-sm dark:prose-invert max-w-none text-sm pb-6">
           <ReactMarkdown remarkPlugins={[remarkGfm]}>
-            {`![Post image](${post.image_url || "/assets/images/bg-certificate.png"})\n\n${post.content}`}
+            {`![Post image](${post.image_url || "/assets/images/system-post-feed.png"})\n\n${post.content}`}
           </ReactMarkdown>
         </div>
 
-        {(isAdmin || isAuthor) && (
+        {(isAdmin || isAuthor) && post.id !== "00000000-0000-0000-0000-000000000001" && (
           <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
             Edit Post
           </Button>
         )}
 
-        <div className="mb-1 mt-1 border-t border-gray-200 dark:border-gray-700" />
+        <div className="mb-1 mt-1 border-t border-gray-200 dark:border-gray-700 pt-3"/>
         <PostViewCommentList
           postId={postId}
           refresh={refreshComments}

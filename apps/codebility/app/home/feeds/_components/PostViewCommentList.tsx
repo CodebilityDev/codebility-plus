@@ -33,9 +33,10 @@ export default function PostViewCommentList({
     const fetchComments = async () => {
       try {
         const data = await getPostComments(postId);
-        setComments(data);
+        setComments(data || []); // Add fallback to empty array
       } catch (error) {
         console.error("Error fetching comments:", error);
+        setComments([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
@@ -52,7 +53,7 @@ export default function PostViewCommentList({
     );
   }
 
-  if (comments.length === 0) {
+  if (!comments || comments.length === 0) {
     return (
       <p className="text-sm text-gray-500 dark:text-gray-400">
         No comments yet.
@@ -71,7 +72,7 @@ export default function PostViewCommentList({
           userName={`${c.commenter?.first_name} ${c.commenter?.last_name}`}
           content={c.content}
           userCanDelete={
-            user?.id == c.commenter?.id || hasDeleteCommentPrivilege
+            user?.id === c.commenter?.id || hasDeleteCommentPrivilege
           }
         />
       ))}

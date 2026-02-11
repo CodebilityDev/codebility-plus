@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useFeedsStore } from "@/store/feeds-store";
 
 import { POSTS_PER_PAGE } from "../_constants";
+import { SYSTEM_POST } from "../_constants/system-post";
 import Post from "./PostCard";
 import PostCardSkeleton from "./PostCardSkeleton";
 
@@ -31,11 +32,20 @@ export default function Feed({
     fetchPosts();
   }, []);
 
+  // Always prepend system post to regular posts
+  const allPosts = useMemo(() => {
+    return [SYSTEM_POST, ...posts];
+  }, [posts]);
+
   // Filter posts
   const filteredPosts = useMemo(() => {
-    if (!searchQuery || searchQuery.trim() === "") return posts;
+    if (!searchQuery || searchQuery.trim() === "") return allPosts;
+    
     const query = searchQuery.toLowerCase();
-    return posts.filter((post) => {
+    return allPosts.filter((post) => {
+      // Always include system post
+      if (post.id === "00000000-0000-0000-0000-000000000001") return true;
+      
       const titleMatch = post.title?.toLowerCase().includes(query);
       const firstNameMatch = post.author_id?.first_name
         ?.toLowerCase()
@@ -45,12 +55,16 @@ export default function Feed({
         .includes(query);
       return titleMatch || firstNameMatch || lastNameMatch;
     });
-  }, [posts, searchQuery]);
+  }, [allPosts, searchQuery]);
 
   // Sort posts
   const sortedPosts = useMemo(() => {
     const sorted = [...filteredPosts];
     sorted.sort((a, b) => {
+      // Always keep system post at the top regardless of sorting
+      if (a.id === "00000000-0000-0000-0000-000000000001") return -1;
+      if (b.id === "00000000-0000-0000-0000-000000000001") return 1;
+
       let aVal: string | number = "";
       let bVal: string | number = "";
 
@@ -106,7 +120,11 @@ export default function Feed({
       if (currentLoader) observer.unobserve(currentLoader);
     };
   }, [sortedPosts.length]);
+
   const handleDeletePost = (deletedPostId: string | number) => {
+    // Prevent deletion of system post
+    if (deletedPostId === "00000000-0000-0000-0000-000000000001") return;
+    
     useFeedsStore.setState((state) => ({
       posts: state.posts.filter((post) => post.id !== deletedPostId),
     }));
