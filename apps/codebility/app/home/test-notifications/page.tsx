@@ -29,6 +29,20 @@ const testNotifications = [
     priority: "normal" as const,
   },
   {
+    title: "Task Completed!",
+    message: "Congratulations! You have completed the task 'Implement User Authentication' and gained 25+ points.",
+    type: "achievement" as const,
+    priority: "normal" as const,
+    action_url: "/home/tasks",
+    metadata: {
+      taskId: "test-task-123",
+      taskTitle: "Implement User Authentication",
+      pointsAwarded: 25,
+      skillCategoryId: "backend-development",
+      completedAt: new Date().toISOString()
+    },
+  },
+  {
     title: "Attendance Reminder",
     message: "Don't forget to mark your attendance for today",
     type: "attendance" as const,
