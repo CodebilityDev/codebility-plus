@@ -638,6 +638,48 @@ export const completeTask = async (
 
     await Promise.all(levelUpdatePromises);
 
+    // Send task completion notifications to specific members who worked on the task
+    try {
+      const notificationPromises = allMemberIds.map(async (memberId, index) => {
+        const pointsResult = pointsResults[index];
+        const existingPoints = pointsResult?.data;
+        const pointsAwarded = memberId === primaryAssigneeId ? taskPoints : sidekickPoints;
+        
+        // Only send notification if points were successfully awarded
+        if (!criticalErrors.some(error => 
+          error.error && 
+          (pointsResult.error === error.error || 
+           (!existingPoints && pointsResults[index].error === error.error))
+        )) {
+          return createNotificationAction({
+            recipientId: memberId,
+            title: "Task Completed!",
+            message: `Congratulations! You have completed the task '${task.title}' and gained ${pointsAwarded}+ points.`,
+            type: "achievement",
+            priority: "normal",
+            actionUrl: `/home/tasks`,
+            metadata: {
+              taskId: task.id,
+              taskTitle: task.title,
+              pointsAwarded: pointsAwarded,
+              skillCategoryId: skillCategoryId,
+              completedAt: new Date().toISOString()
+            }
+          });
+        }
+      });
+
+      const notificationResults = await Promise.all(notificationPromises.filter(Boolean));
+      const failedNotifications = notificationResults.filter(result => result?.error);
+      
+      if (failedNotifications.length > 0) {
+        console.warn("Some notifications failed to send:", failedNotifications);
+      }
+    } catch (error) {
+      // Log notification errors 
+      console.error("Error sending task completion notifications:", error);
+    }
+
     // Single revalidation at the end
     revalidatePath("/home/kanban");
 
