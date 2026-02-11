@@ -42,13 +42,12 @@ interface EditableRowProps {
 }
 
 /**
- * ENHANCED EditableRow - Team Lead Feedback Applied
- * 
+ * COMPACT EditableRow - Minimized to Match Table Layout
+ *
  * CHANGES:
- * - Matching spacing with InHouseTable
- * - First 3 columns: px-6 py-3
- * - Email column: px-5 py-3
- * - Other columns: px-4 py-3
+ * - Reduced all padding to px-2 py-2 to match compact table design
+ * - Smaller input fields and selects
+ * - No horizontal scroll
  */
 export function EditableRow({
   data,
@@ -197,13 +196,13 @@ export function EditableRow({
                 <img
                   src={uploadedImage}
                   alt="Profile"
-                  className="border-light-700 dark:border-dark-200 h-10 w-10 rounded-full border object-cover"
+                  className="border-light-700 dark:border-dark-200 h-8 w-8 rounded-full border object-cover"
                 />
                 <label
                   htmlFor="upload-avatar"
-                  className="absolute bottom-0 right-0 cursor-pointer rounded-full bg-gray-200 p-0.5 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
+                  className="absolute -bottom-0.5 -right-0.5 cursor-pointer rounded-full bg-gray-200 p-0.5 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
                 >
-                  <Plus className="h-4 w-4 text-gray-700 dark:text-gray-300" />
+                  <Plus className="h-2.5 w-2.5 text-gray-700 dark:text-gray-300" />
                   <input
                     id="upload-avatar"
                     type="file"
@@ -220,9 +219,9 @@ export function EditableRow({
             ) : (
               <label
                 htmlFor="upload-avatar"
-                className="inline-flex cursor-pointer items-center justify-center rounded-full bg-gray-200 p-2 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
+                className="inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-full bg-gray-200 p-1 hover:bg-gray-300 dark:bg-gray-800 dark:hover:bg-gray-700"
               >
-                <Upload className="h-5 w-5 text-gray-700 dark:text-gray-300" />
+                <Upload className="h-4 w-4 text-gray-700 dark:text-gray-300" />
                 <input
                   id="upload-avatar"
                   type="file"
@@ -248,10 +247,10 @@ export function EditableRow({
             }
             disabled={isSubmitting || isUploading}
           >
-            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 border text-black dark:text-white">
+            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white">
               <SelectValue placeholder="Select status" />
             </SelectTrigger>
-            <SelectContent className="bg-light-800 dark:bg-dark-300 text-black dark:text-white">
+            <SelectContent className="bg-light-800 dark:bg-dark-300 text-xs text-black dark:text-white">
               {Object.entries(INTERNAL_STATUS).map(([key, label]) => (
                 <SelectItem key={key} value={key}>
                   {label}
@@ -270,10 +269,10 @@ export function EditableRow({
             }
             disabled={isSubmitting || isUploading}
           >
-            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 border text-black dark:text-white">
+            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white">
               <SelectValue placeholder="Select role" />
             </SelectTrigger>
-            <SelectContent className="bg-light-800 dark:bg-dark-300 text-black dark:text-white">
+            <SelectContent className="bg-light-800 dark:bg-dark-300 text-xs text-black dark:text-white">
               {roles.map((role) => (
                 <SelectItem key={role.id} value={String(role.id)}>
                   {role.name}
@@ -292,10 +291,10 @@ export function EditableRow({
             }
             disabled={isSubmitting || isUploading}
           >
-            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 border text-black dark:text-white">
+            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white">
               <SelectValue placeholder="Select position" />
             </SelectTrigger>
-            <SelectContent className="bg-light-800 dark:bg-dark-300 text-black dark:text-white">
+            <SelectContent className="bg-light-800 dark:bg-dark-300 text-xs text-black dark:text-white">
               {positions.map((pos) => (
                 <SelectItem key={pos.id} value={pos.name || ""}>
                   {pos.name}
@@ -307,11 +306,14 @@ export function EditableRow({
 
       case "projects":
         return (
-          <ProjectSelect
-            value={editForm.projects || []}
-            onChange={(projects) => handleLocalChange("projects", projects)}
-            disabled={isSubmitting || isUploading}
-          />
+          <div className="flex items-center gap-1">
+            <ProjectSelect
+              value={editForm.projects || []}
+              onChange={(projects) => handleLocalChange("projects", projects)}
+              disabled={isSubmitting || isUploading}
+              compact={true}
+            />
+          </div>
         );
 
       case "nda_status":
@@ -323,10 +325,10 @@ export function EditableRow({
             }
             disabled={isSubmitting || isUploading}
           >
-            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 border text-black dark:text-white">
+            <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white">
               <SelectValue placeholder="Select NDA status" />
             </SelectTrigger>
-            <SelectContent className="bg-light-800 dark:bg-dark-300 text-black dark:text-white">
+            <SelectContent className="bg-light-800 dark:bg-dark-300 text-xs text-black dark:text-white">
               <SelectItem value="Yes">Yes</SelectItem>
               <SelectItem value="No">No</SelectItem>
             </SelectContent>
@@ -363,7 +365,7 @@ export function EditableRow({
               handleLocalChange("date_joined", dateValue);
             }}
             disabled={isSubmitting || isUploading}
-            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 border text-black dark:text-white"
+            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white"
           />
         );
 
@@ -373,7 +375,7 @@ export function EditableRow({
             value={String(editForm[key] || "")}
             onChange={(e) => handleLocalChange(key, e.target.value)}
             disabled={isSubmitting || isUploading}
-            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 border text-black dark:text-white"
+            className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 w-full border text-xs text-black dark:text-white"
           />
         );
     }
@@ -381,43 +383,39 @@ export function EditableRow({
 
   return (
     <TableRow className="bg-light-200 dark:bg-dark-200 hover:bg-light-300 dark:hover:bg-dark-300">
-      {/* ENHANCED: First 3 columns px-6 py-3 */}
-      <TableCell className="px-6 py-3">{renderCell("image_url")}</TableCell>
-      <TableCell className="px-6 py-3">{renderCell("first_name")}</TableCell>
-      <TableCell className="px-6 py-3">{renderCell("last_name")}</TableCell>
-      
-      {/* ENHANCED: Email column px-5 py-3 */}
-      <TableCell className="px-5 py-3">{renderCell("email_address")}</TableCell>
-      
-      {/* ENHANCED: Other columns px-4 py-3 */}
-      <TableCell className="px-4 py-3">{renderCell("internal_status")}</TableCell>
-      <TableCell className="px-4 py-3">{renderCell("role_id")}</TableCell>
-      <TableCell className="px-4 py-3">{renderCell("display_position")}</TableCell>
-      <TableCell className="px-4 py-3">{renderCell("projects")}</TableCell>
-      <TableCell className="px-4 py-3">{renderCell("nda_status")}</TableCell>
-      <TableCell className="px-4 py-3">{renderCell("portfolio_website")}</TableCell>
-      <TableCell className="px-4 py-3">{renderCell("date_joined")}</TableCell>
-      <TableCell className="px-4 py-3">{renderCell("availability_status")}</TableCell>
+      {/* COMPACT: All columns px-2 py-2, constrained widths to match table */}
+      <TableCell className="w-12 px-2 py-2">{renderCell("image_url")}</TableCell>
+      <TableCell className="w-24 px-2 py-2">{renderCell("first_name")}</TableCell>
+      <TableCell className="w-24 px-2 py-2">{renderCell("last_name")}</TableCell>
+      <TableCell className="w-40 px-2 py-2">{renderCell("email_address")}</TableCell>
+      <TableCell className="hidden w-24 px-2 py-2 2xl:table-cell">{renderCell("internal_status")}</TableCell>
+      <TableCell className="hidden w-20 px-2 py-2 2xl:table-cell">{renderCell("role_id")}</TableCell>
+      <TableCell className="hidden w-32 px-2 py-2 2xl:table-cell">{renderCell("display_position")}</TableCell>
+      <TableCell className="hidden w-32 px-2 py-2 2xl:table-cell">{renderCell("projects")}</TableCell>
+      <TableCell className="hidden w-36 px-2 py-2 2xl:table-cell">{renderCell("nda_status")}</TableCell>
+      <TableCell className="hidden w-16 px-2 py-2 2xl:table-cell">{renderCell("portfolio_website")}</TableCell>
+      <TableCell className="hidden w-24 px-2 py-2 2xl:table-cell">{renderCell("date_joined")}</TableCell>
+      <TableCell className="hidden w-20 px-2 py-2 2xl:table-cell">{renderCell("availability_status")}</TableCell>
 
-      {/* Actions - px-4 py-3 */}
-      <TableCell className="px-4 py-3">
-        <div className="flex space-x-2">
+      {/* COMPACT: Actions - smaller buttons */}
+      <TableCell className="w-16 px-2 py-2">
+        <div className="flex gap-1">
           <Button
             size="sm"
             onClick={handleSave}
             disabled={isSubmitting || isUploading}
-            className="hover:bg-green-500 dark:hover:bg-green-500 bg-white text-white dark:bg-transparent"
+            className="hover:bg-green-500 dark:hover:bg-green-500 h-7 w-7 bg-white p-0 text-white dark:bg-transparent"
           >
-            <Check className="text-black-100 h-4 w-4 dark:text-white" />
+            <Check className="text-black-100 h-3.5 w-3.5 dark:text-white" />
           </Button>
           <Button
             size="sm"
             variant="ghost"
             onClick={onCancel}
             disabled={isSubmitting || isUploading}
-            className="hover:bg-red-500/20 hover:text-red-500"
+            className="hover:bg-red-500/20 hover:text-red-500 h-7 w-7 p-0"
           >
-            <X className="h-4 w-4 dark:text-white" />
+            <X className="h-3.5 w-3.5 dark:text-white" />
           </Button>
         </div>
       </TableCell>

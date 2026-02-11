@@ -360,8 +360,8 @@ export function InHouseTable({
       />
 
       {/* COMPACT: Using table-auto with specific column widths to prevent overflow */}
-      <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 hidden rounded-lg border xl:block">
-        <Table className="w-full">
+      <div className="border-light-700 dark:border-dark-200 bg-light-300 dark:bg-dark-100 hidden overflow-x-auto rounded-lg border xl:block">
+        <Table className="w-full table-fixed">
           <TableHeader>
             <TableRow className="border-light-700 dark:border-dark-200 bg-light-200 dark:bg-dark-300 border-b-2">
               {columns.map((column) =>

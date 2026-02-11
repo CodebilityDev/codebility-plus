@@ -18,12 +18,14 @@ interface ProjectSelectProps {
   value: Project[];
   onChange: (projects: Project[]) => void;
   disabled?: boolean;
+  compact?: boolean;
 }
 
 export function ProjectSelect({
   value = [],
   onChange,
   disabled,
+  compact = false,
 }: ProjectSelectProps) {
   const [availableProjects, setAvailableProjects] = useState<Project[]>([]);
   const [supabase, setSupabase] = useState<any>(null);
@@ -62,6 +64,36 @@ export function ProjectSelect({
     onChange(newProjects);
   };
 
+  // Compact mode: just show a dropdown with selected count, no badges
+  if (compact) {
+    return (
+      <Select
+        onValueChange={handleProjectChange}
+        disabled={disabled}
+        value=""
+      >
+        <SelectTrigger className="border-light-700 dark:border-dark-200 bg-light-800 dark:bg-dark-300 h-8 border text-xs text-black dark:text-white">
+          <SelectValue placeholder={value.length > 0 ? `${value.length} selected` : "Select projects"} />
+        </SelectTrigger>
+        <SelectContent className="bg-light-800 dark:bg-dark-300 text-xs text-black dark:text-white">
+          {availableProjects.map((project) => {
+            const isSelected = value.some((p) => p.id === project.id);
+            return (
+              <SelectItem
+                key={project.id}
+                value={project.id}
+                className="dark:text-light-900 text-black"
+              >
+                {isSelected ? "✓ " : ""}{project.name}
+              </SelectItem>
+            );
+          })}
+        </SelectContent>
+      </Select>
+    );
+  }
+
+  // Normal mode: show dropdown + badges
   return (
     <div className="space-y-2">
       {/* Dropdown for selecting more projects */}
