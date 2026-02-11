@@ -79,6 +79,7 @@ function ApplicantDataTableComponent<TData extends NewApplicantType, TValue>({
     onRowSelectionChange: setRowSelection,
     onColumnVisibilityChange: setColumnVisibility,
     onPaginationChange: setPagination,
+    getRowId: (row) => row.id, // Use applicant ID instead of array index
     state: {
       sorting,
       rowSelection,

@@ -67,17 +67,15 @@ const ApplicantProfileModal = () => {
   return (
     <Dialog open={isModalOpen} onOpenChange={(open) => !open && closeModal()}>
       <DialogContent
-        className={`mobile:max-w-[95vw] flex max-h-[75vh] min-h-[75vh] flex-col
-        overflow-y-auto sm:max-w-[90vw] lg:max-w-[80vw] xl:max-w-[70vw] 2xl:max-w-[60vw]
-        `}
+        className="flex max-h-[85vh] w-[95vw] max-w-4xl flex-col overflow-hidden"
       >
-        <DialogHeader>
-          <div className="mobile:flex-col flex gap-6 p-4 sm:flex-col sm:justify-between 2xl:flex-row 2xl:justify-start">
-            <div className="mobile:flex-col mobile:justify-center mobile:items-center sm:flex-row flex gap-2 sm:items-start sm:justify-start">
-              <div className="relative flex-shrink-0 ">
-                {/* Profile Image - 128px size like interns modal */}
+        <DialogHeader className="overflow-y-auto px-6 pb-0">
+          <div className="flex flex-col gap-4">
+            {/* Top Row: Profile Image, Name, Status */}
+            <div className="flex items-start gap-4">
+              <div className="relative flex-shrink-0">
                 {selectedApplicant.image_url ? (
-                  <div className="relative h-32 w-32">
+                  <div className="relative h-20 w-20">
                     <Image
                       src={selectedApplicant.image_url}
                       alt={`${selectedApplicant.first_name}'s profile`}
@@ -86,64 +84,67 @@ const ApplicantProfileModal = () => {
                     />
                   </div>
                 ) : (
-                  <DefaultAvatar size={128} />
+                  <DefaultAvatar size={80} />
                 )}
               </div>
 
-              {/* Basic Info */}
-              <div className="flex flex-col gap-2">
-                <DialogTitle className="text-2xl font-bold">
-                  {selectedApplicant.first_name} {selectedApplicant.last_name}
-                </DialogTitle>
+              <div className="flex min-w-0 flex-1 flex-col gap-2">
+                <div className="flex items-start justify-between gap-2">
+                  <DialogTitle className="truncate text-xl font-bold">
+                    {selectedApplicant.first_name} {selectedApplicant.last_name}
+                  </DialogTitle>
+                  {selectedApplicant.availability_status ? (
+                    <div className="flex-shrink-0 rounded bg-green-500 px-2 py-1 text-xs text-white">
+                      Available
+                    </div>
+                  ) : (
+                    <div className="flex-shrink-0 rounded bg-red-500 px-2 py-1 text-xs text-white">
+                      Unavailable
+                    </div>
+                  )}
+                </div>
 
-                <div className="flex flex-col gap-1">
-                  <p className="text-lg text-gray-600 dark:text-gray-300">
-                    {selectedApplicant.display_position || "Position not specified"}
-                  </p>
-                  
-                  {/* Application Status Badge */}
-                  <div className={`inline-flex w-fit rounded px-2 py-1 text-xs text-white ${getStatusColor(selectedApplicant.application_status)}`}>
+                <p className="truncate text-sm text-gray-600 dark:text-gray-300">
+                  {selectedApplicant.display_position || "Position not specified"}
+                </p>
+
+                <div className="flex flex-wrap items-center gap-2">
+                  <div className={`inline-flex rounded px-2 py-1 text-xs text-white ${getStatusColor(selectedApplicant.application_status)}`}>
                     {selectedApplicant.application_status?.toUpperCase() || "UNKNOWN"}
                   </div>
-
-                  <p>{selectedApplicant.years_of_experience} years experience</p>
+                  <span className="text-sm text-gray-600 dark:text-gray-400">
+                    {selectedApplicant.years_of_experience} years experience
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Contact and Social Information */}
-            <div className="mobile:flex-col mobile:items-center flex gap-4 sm:items-start sm:justify-between 2xl:justify-start">
-              {/* Contact Information */}
-              <div className="mobile:flex-row mobile:gap-4 flex sm:flex-col">
-                <InfoItem
-                  icon={<Mail className="h-4 w-4" />}
-                  label="Email"
-                  value={selectedApplicant.email_address}
-                />
-                <InfoItem
-                  icon={<Phone className="h-4 w-4" />}
-                  label="Phone"
-                  value={selectedApplicant.phone_number}
-                />
-                <InfoItem
-                  icon={<MapPin className="h-4 w-4" />}
-                  label="Location"
-                  value={selectedApplicant.address}
-                />
-                <InfoItem
-                  icon={<Briefcase className="h-4 w-4" />}
-                  label="Experience"
-                  value={`${selectedApplicant.years_of_experience} years`}
-                />
+            {/* Contact Information - Compact Grid */}
+            <div className="grid grid-cols-1 gap-2 text-sm sm:grid-cols-2">
+              <div className="flex items-center gap-2 truncate">
+                <Mail className="h-4 w-4 flex-shrink-0 text-gray-500" />
+                <span className="truncate">{selectedApplicant.email_address}</span>
               </div>
+              {selectedApplicant.phone_number && (
+                <div className="flex items-center gap-2 truncate">
+                  <Phone className="h-4 w-4 flex-shrink-0 text-gray-500" />
+                  <span className="truncate">{selectedApplicant.phone_number}</span>
+                </div>
+              )}
+              {selectedApplicant.address && (
+                <div className="flex items-center gap-2 truncate">
+                  <MapPin className="h-4 w-4 flex-shrink-0 text-gray-500" />
+                  <span className="truncate">{selectedApplicant.address}</span>
+                </div>
+              )}
 
               {/* Social Links */}
-              <div className="mobile:flex-row flex gap-4">
+              <div className="flex items-center gap-3">
                 {selectedApplicant.github && (
                   <Link
                     href={selectedApplicant.github}
                     target="_blank"
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                   >
                     <Github className="h-5 w-5" />
                   </Link>
@@ -152,7 +153,7 @@ const ApplicantProfileModal = () => {
                   <Link
                     href={selectedApplicant.linkedin}
                     target="_blank"
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                   >
                     <Linkedin className="h-5 w-5" />
                   </Link>
@@ -161,7 +162,7 @@ const ApplicantProfileModal = () => {
                   <Link
                     href={selectedApplicant.facebook}
                     target="_blank"
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                   >
                     <Facebook className="h-5 w-5" />
                   </Link>
@@ -170,25 +171,10 @@ const ApplicantProfileModal = () => {
                   <Link
                     href={selectedApplicant.discord}
                     target="_blank"
-                    className="text-gray-600 hover:text-gray-900"
+                    className="text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100"
                   >
                     <MessageSquare className="h-5 w-5" />
                   </Link>
-                )}
-              </div>
-            </div>
-
-            {/* Availability Status */}
-            <div className="mobile:flex-col-reverse absolute right-4 top-12 flex items-center gap-4">
-              <div>
-                {selectedApplicant.availability_status ? (
-                  <div className="bg-green-500 rounded px-2 py-1 text-xs text-white">
-                    Available
-                  </div>
-                ) : (
-                  <div className="rounded bg-red-500 px-2 py-1 text-xs text-white">
-                    Unavailable
-                  </div>
                 )}
               </div>
             </div>
@@ -196,16 +182,16 @@ const ApplicantProfileModal = () => {
         </DialogHeader>
 
         {/* Content Tabs */}
-        <Tabs defaultValue="about" className="mobile:mt-2 flex flex-col gap-10">
-          <TabsList className="mobile:text-sm mobile:gap-2 mobile:grid-cols-2 grid w-full grid-cols-4">
-            <TabsTrigger value="about">About</TabsTrigger>
-            <TabsTrigger value="experience">Experience</TabsTrigger>
-            <TabsTrigger value="projects">Projects</TabsTrigger>
-            <TabsTrigger value="skills">Skills</TabsTrigger>
+        <Tabs defaultValue="about" className="flex min-h-0 flex-1 flex-col overflow-hidden px-6">
+          <TabsList className="grid w-full grid-cols-4 gap-1">
+            <TabsTrigger value="about" className="text-xs sm:text-sm">About</TabsTrigger>
+            <TabsTrigger value="experience" className="text-xs sm:text-sm">Experience</TabsTrigger>
+            <TabsTrigger value="projects" className="text-xs sm:text-sm">Projects</TabsTrigger>
+            <TabsTrigger value="skills" className="text-xs sm:text-sm">Skills</TabsTrigger>
           </TabsList>
 
           {/* About Tab */}
-          <TabsContent value="about" className="space-y-6">
+          <TabsContent value="about" className="mt-4 space-y-4 overflow-y-auto pr-2">
             {/* About Section */}
             {selectedApplicant.about && (
               <Section title="About">
@@ -329,7 +315,7 @@ const ApplicantProfileModal = () => {
           </TabsContent>
 
           {/* Experience Tab */}
-          <TabsContent value="experience" className="mt-4 space-y-6">
+          <TabsContent value="experience" className="mt-4 space-y-4 overflow-y-auto pr-2">
             <Section title="Experience Level">
               <div className="rounded-lg border p-4">
                 <h4 className="font-medium">Years of Experience</h4>
@@ -345,7 +331,7 @@ const ApplicantProfileModal = () => {
           </TabsContent>
 
           {/* Projects Tab */}
-          <TabsContent value="projects" className="mt-4 space-y-6">
+          <TabsContent value="projects" className="mt-4 space-y-4 overflow-y-auto pr-2">
             <div className="text-center py-8">
               <div className="mb-4 text-4xl">📁</div>
               <h3 className="text-lg font-medium mb-2">No Projects Available</h3>
@@ -371,7 +357,7 @@ const ApplicantProfileModal = () => {
           </TabsContent>
 
           {/* Skills Tab */}
-          <TabsContent value="skills" className="mt-4 space-y-6">
+          <TabsContent value="skills" className="mt-4 space-y-4 overflow-y-auto pr-2">
             {/* Tech Stacks */}
             {hasItems(selectedApplicant.tech_stacks) && (
               <Section title="Technical Skills">
@@ -422,27 +408,5 @@ const Section = ({
     {children}
   </div>
 );
-
-const InfoItem = ({
-  icon,
-  label,
-  value,
-}: {
-  icon: React.ReactNode;
-  label: string;
-  value?: string | null;
-}) => {
-  if (!value) return null;
-
-  return (
-    <div className="flex items-center gap-2">
-      {icon}
-      <div>
-        <p className="mobile:hidden text-sm text-gray-500 sm:hidden">{label}</p>
-        <p className="mobile:hidden text-sm">{value}</p>
-      </div>
-    </div>
-  );
-};
 
 export default ApplicantProfileModal;
