@@ -60,6 +60,48 @@ interface DbComment {
   } | null;
 }
 
+// Utility function to format comment text with clickable links and preserved formatting
+const formatCommentText = (text: string): JSX.Element => {
+  // URL regex pattern
+  const urlPattern = /(https?:\/\/[^\s]+)/g;
+  
+  // Split text by newlines first to preserve line breaks
+  const lines = text.split('\n');
+  
+  return (
+    <>
+      {lines.map((line, lineIndex) => {
+        // Split each line by URLs
+        const parts = line.split(urlPattern);
+        
+        return (
+          <span key={lineIndex}>
+            {parts.map((part, partIndex) => {
+              // Check if this part is a URL
+              if (urlPattern.test(part)) {
+                return (
+                  <a
+                    key={partIndex}
+                    href={part}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-700 underline dark:text-blue-400 dark:hover:text-blue-300"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {part}
+                  </a>
+                );
+              }
+              return <span key={partIndex}>{part}</span>;
+            })}
+            {lineIndex < lines.length - 1 && <br />}
+          </span>
+        );
+      })}
+    </>
+  );
+};
+
 // Memoized TimeAgo component
 const CommentTimeAgo = memo(function CommentTimeAgo({ 
   date, 
@@ -221,8 +263,8 @@ const ReplyItem = memo(function ReplyItem({
             </div>
           </div>
         ) : (
-          <p className="text-xs sm:text-sm leading-relaxed text-gray-700 dark:text-gray-300 break-words">
-            {reply.content}
+          <p className="text-xs sm:text-sm leading-relaxed text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap">
+            {formatCommentText(reply.content)}
           </p>
         )}
       </div>
@@ -388,8 +430,8 @@ const CommentItem = memo(function CommentItem({
                 </div>
               </div>
             ) : (
-              <p className="text-xs sm:text-sm leading-relaxed text-gray-700 dark:text-gray-300 break-words">
-                {comment.content}
+              <p className="text-xs sm:text-sm leading-relaxed text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap">
+                {formatCommentText(comment.content)}
               </p>
             )}
           </div>
