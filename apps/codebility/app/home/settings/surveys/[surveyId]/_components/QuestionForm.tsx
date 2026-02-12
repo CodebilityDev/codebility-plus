@@ -121,7 +121,7 @@ export default function QuestionForm({ question, onSubmit, onCancel, loading }: 
   };
 
   return (
-    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-[clamp(1rem,2vw,1.5rem)]">
       {/* Question Type */}
       <div className="space-y-2">
         <Label htmlFor="question_type" className="text-foreground dark:text-gray-300">Question Type *</Label>
@@ -156,7 +156,7 @@ export default function QuestionForm({ question, onSubmit, onCancel, loading }: 
           className="rounded"
         />
         {errors.question_text && (
-          <p className="text-sm text-red-600 dark:text-red-400">{errors.question_text.message}</p>
+          <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-red-600 dark:text-red-400">{errors.question_text.message}</p>
         )}
       </div>
 
@@ -176,7 +176,7 @@ export default function QuestionForm({ question, onSubmit, onCancel, loading }: 
       {needsOptions && (
         <div className="space-y-2">
           <Label className="text-foreground dark:text-gray-300">Options *</Label>
-          <div className="space-y-2">
+          <div className="space-y-[clamp(0.5rem,1vw,0.75rem)]">
             {options.map((option, index) => (
               <div key={index} className="flex items-center gap-2">
                 <Input
@@ -220,14 +220,14 @@ export default function QuestionForm({ question, onSubmit, onCancel, loading }: 
             </div>
           </div>
           {options.length === 0 && (
-            <p className="text-sm text-red-600 dark:text-red-400">At least one option is required</p>
+            <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-red-600 dark:text-red-400">At least one option is required</p>
           )}
         </div>
       )}
 
       {/* Rating Scale Settings */}
       {needsRating && (
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-2 gap-[clamp(0.75rem,1.5vw,1rem)]">
           <div className="space-y-2">
             <Label htmlFor="min_rating" className="text-foreground dark:text-gray-300">Min Rating</Label>
             <Input
