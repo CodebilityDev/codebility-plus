@@ -96,7 +96,7 @@ export default function ApplicantStep3({
         {/* Messenger Section - Only show when not onboarding */}
         {!isOnboarding && (
           <div className="flex flex-col items-center gap-5">
-            {!joinedMessenger && (
+            {!joinedMessenger && ( 
               <Link
                 href={process.env.NEXT_PUBLIC_MESSENGER_WAITLIST || ""}
                 target="_blank"
