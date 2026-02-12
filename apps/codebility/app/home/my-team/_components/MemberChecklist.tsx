@@ -6,18 +6,9 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import toast from "react-hot-toast";
 
 /**
- * MemberChecklist - INDIVIDUAL MEMBER VERSION
+ * MemberChecklist - COMPLETE WITH PROGRESS OVERVIEW
  * 
- * FEATURES:
- * 1. ✅ Individual member checklist updates
- * 2. ✅ Clean, professional toast messages
- * 3. ✅ Team lead can toggle specific member's checklist
- * 4. ✅ Member-specific completion tracking
- * 
- * BEHAVIOR:
- * - Team lead toggles "meeting" for Member A → Only Member A's "meeting" toggled
- * - Each member has their own independent checklist status
- * - No priority display (removed completely)
+ * Shows Progress Overview section in profile mode
  */
 
 interface ChecklistItem {
@@ -35,24 +26,41 @@ interface ChecklistItem {
   isPlaceholder?: boolean;
 }
 
+interface TeamMember {
+  id: string;
+  first_name: string;
+  last_name: string;
+  email_address: string;
+  image_url: string | null;
+}
+
+interface MemberChecklistStatus {
+  member: TeamMember;
+  completedCount: number;
+  totalCount: number;
+  allComplete: boolean;
+  checklistItems: ChecklistItem[];
+}
+
 interface MemberChecklistProps {
   memberId: string;
   projectId: string;
   isTeamLead?: boolean;
+  viewMode?: 'profile' | 'team';
 }
 
 const MemberChecklist = ({ 
-  memberId, 
+  memberId,
   projectId, 
-  isTeamLead: _unusedProp
+  isTeamLead: _unusedProp,
+  viewMode = 'profile'
 }: MemberChecklistProps) => {
-  const [checklistItems, setChecklistItems] = useState<ChecklistItem[]>([]);
+  const [memberStatuses, setMemberStatuses] = useState<MemberChecklistStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [supabase, setSupabase] = useState<any>(null);
   const [currentCodevId, setCurrentCodevId] = useState<string | null>(null);
   const [isCurrentUserTeamLead, setIsCurrentUserTeamLead] = useState(false);
 
-  // Initialize Supabase and map auth→codev
   useEffect(() => {
     const client = createClientClientComponent();
     setSupabase(client);
@@ -74,7 +82,6 @@ const MemberChecklist = ({
     }
   }, []);
 
-  // Check if CURRENT USER is team lead
   useEffect(() => {
     const checkTeamLeadStatus = async () => {
       if (!supabase || !currentCodevId || !projectId) return;
@@ -92,97 +99,163 @@ const MemberChecklist = ({
     checkTeamLeadStatus();
   }, [supabase, currentCodevId, projectId]);
 
-  // Load checklist items
   useEffect(() => {
-    if (supabase && memberId && projectId) {
+    if (supabase && currentCodevId && projectId) {
       loadChecklistItems();
     }
-  }, [memberId, projectId, supabase]);
+  }, [supabase, currentCodevId, projectId, isCurrentUserTeamLead, memberId, viewMode]);
 
-  /**
-   * Load ALL project checklist items
-   * Shows status for the member being viewed
-   */
   const loadChecklistItems = async () => {
-    if (!memberId || !projectId || !supabase) return;
+    if (!supabase || !projectId || !currentCodevId) return;
     
     setIsLoading(true);
     try {
-      // Get ALL unique items in project
-      const { data: allProjectItems, error: allItemsError } = await supabase
+      let membersToShow: string[] = [];
+      
+      if (viewMode === 'profile') {
+        membersToShow = [memberId];
+      } else if (viewMode === 'team') {
+        if (isCurrentUserTeamLead) {
+          const { data: projectMembers, error: membersError } = await supabase
+            .from("project_members")
+            .select("codev_id")
+            .eq("project_id", projectId);
+
+          if (membersError) throw membersError;
+          
+          membersToShow = projectMembers
+            ?.map((pm: any) => pm.codev_id)
+            .filter((id: string) => id != null && id !== undefined && id !== '') || [];
+        } else {
+          membersToShow = [currentCodevId];
+        }
+      }
+
+      if (membersToShow.length === 0) {
+        setMemberStatuses([]);
+        setIsLoading(false);
+        return;
+      }
+
+      const { data: allChecklistItems, error: checklistError } = await supabase
         .from("member_checklists")
-        .select("title, description, priority, due_date, created_by, created_at")
+        .select("*")
         .eq("project_id", projectId)
         .order("created_at", { ascending: true });
 
-      if (allItemsError) throw allItemsError;
+      if (checklistError) throw checklistError;
 
-      // Deduplicate by title
-      const uniqueItemsMap = new Map();
-      allProjectItems?.forEach((item: any) => {
-        if (!uniqueItemsMap.has(item.title)) {
-          uniqueItemsMap.set(item.title, item);
+      const uniqueTitlesMap = new Map();
+      allChecklistItems?.forEach((item: ChecklistItem) => {
+        const existing = uniqueTitlesMap.get(item.title);
+        
+        if (!existing) {
+          uniqueTitlesMap.set(item.title, {
+            title: item.title,
+            description: item.description,
+            priority: item.priority,
+            due_date: item.due_date,
+            created_by: item.created_by,
+            created_at: item.created_at
+          });
+        } else {
+          const updatedItem = { ...existing };
+          
+          if (item.description && !existing.description) {
+            updatedItem.description = item.description;
+          }
+          
+          if (new Date(item.created_at) < new Date(existing.created_at)) {
+            updatedItem.created_at = item.created_at;
+            updatedItem.created_by = item.created_by;
+          }
+          
+          uniqueTitlesMap.set(item.title, updatedItem);
         }
       });
       
-      const uniqueItems = Array.from(uniqueItemsMap.values());
+      const uniqueTitles = Array.from(uniqueTitlesMap.values());
+      const totalChecklistItems = uniqueTitles.length;
 
-      // For each item, get THIS MEMBER's completion status
-      const finalItems: ChecklistItem[] = [];
+      const { data: memberDetails, error: memberDetailsError } = await supabase
+        .from("codev")
+        .select("id, first_name, last_name, email_address, image_url")
+        .in("id", membersToShow);
+
+      if (memberDetailsError) throw memberDetailsError;
+
+      const statuses: MemberChecklistStatus[] = [];
       
-      for (const templateItem of uniqueItems) {
-        const { data: memberRow } = await supabase
-          .from("member_checklists")
-          .select("*")
-          .eq("project_id", projectId)
-          .eq("member_id", memberId)
-          .eq("title", templateItem.title)
-          .maybeSingle();
+      for (const member of (memberDetails || [])) {
+        const memberItems = allChecklistItems?.filter(
+          (item: ChecklistItem) => item.member_id === member.id
+        ) || [];
 
-        if (memberRow) {
-          finalItems.push(memberRow);
-        } else {
-          // Create placeholder
-          finalItems.push({
-            id: `placeholder-${memberId}-${templateItem.title}`,
-            member_id: memberId,
-            project_id: projectId,
-            title: templateItem.title,
-            description: templateItem.description,
-            priority: templateItem.priority,
-            completed: false,
-            created_by: templateItem.created_by,
-            due_date: templateItem.due_date,
-            created_at: templateItem.created_at,
-            updated_at: templateItem.created_at,
-            isPlaceholder: true
-          });
+        const memberChecklistItems: ChecklistItem[] = [];
+        
+        for (const templateItem of uniqueTitles) {
+          const existingItem = memberItems.find(
+            (item: ChecklistItem) => item.title === templateItem.title
+          );
+
+          if (existingItem) {
+            memberChecklistItems.push(existingItem);
+          } else {
+            memberChecklistItems.push({
+              id: `placeholder-${member.id}-${templateItem.title}`,
+              member_id: member.id,
+              project_id: projectId,
+              title: templateItem.title,
+              description: templateItem.description,
+              priority: templateItem.priority,
+              completed: false,
+              created_by: templateItem.created_by,
+              due_date: templateItem.due_date,
+              created_at: templateItem.created_at,
+              updated_at: templateItem.created_at,
+              isPlaceholder: true
+            });
+          }
         }
+
+        const completedCount = memberChecklistItems.filter(item => item.completed).length;
+
+        statuses.push({
+          member,
+          completedCount,
+          totalCount: totalChecklistItems,
+          allComplete: completedCount === totalChecklistItems && totalChecklistItems > 0,
+          checklistItems: memberChecklistItems
+        });
       }
-      
-      setChecklistItems(finalItems);
+
+      statuses.sort((a, b) => {
+        if (a.allComplete !== b.allComplete) {
+          return a.allComplete ? 1 : -1;
+        }
+        return `${a.member.first_name} ${a.member.last_name}`.localeCompare(
+          `${b.member.first_name} ${b.member.last_name}`
+        );
+      });
+
+      setMemberStatuses(statuses);
 
     } catch (error) {
+      console.error("❌ Error loading checklist:", error);
       toast.error("Failed to load checklist items");
-      setChecklistItems([]);
+      setMemberStatuses([]);
     } finally {
       setIsLoading(false);
     }
   };
 
-  /**
-   * Toggle checklist - INDIVIDUAL MEMBER VERSION
-   * 
-   * UPDATED: Only affects the specific member being viewed
-   * This allows individual tracking per team member
-   */
   const toggleComplete = async (
+    memberStatus: MemberChecklistStatus,
     itemId: string, 
     currentStatus: boolean, 
     itemTitle: string,
     isPlaceholder?: boolean
   ) => {
-    // Permission check
     if (!isCurrentUserTeamLead) {
       toast.error("Only team leads can toggle checklist completion");
       return;
@@ -194,21 +267,20 @@ const MemberChecklist = ({
     }
 
     const newStatus = !currentStatus;
+    const targetMemberId = memberStatus.member.id;
 
     try {
-      // Handle placeholder (item doesn't exist in DB yet)
       if (isPlaceholder) {
-        const item = checklistItems.find(i => i.title === itemTitle);
+        const item = memberStatus.checklistItems.find(i => i.title === itemTitle);
         if (!item) {
           toast.error("Item not found");
           return;
         }
 
-        // Create new row for THIS specific member
         const { data: newItem, error: insertError } = await supabase
           .from("member_checklists")
           .insert({
-            member_id: memberId,
+            member_id: targetMemberId,
             project_id: projectId,
             title: item.title,
             description: item.description,
@@ -227,20 +299,30 @@ const MemberChecklist = ({
           return;
         }
 
-        // Update local state with real item
-        setChecklistItems(prev =>
-          prev.map(i =>
-            i.title === itemTitle 
-              ? { ...newItem, isPlaceholder: false } 
-              : i
-          )
+        setMemberStatuses(prev =>
+          prev.map(ms => {
+            if (ms.member.id === targetMemberId) {
+              const updatedItems = ms.checklistItems.map(i =>
+                i.title === itemTitle 
+                  ? { ...newItem, isPlaceholder: false } 
+                  : i
+              );
+              const completedCount = updatedItems.filter(i => i.completed).length;
+              return {
+                ...ms,
+                checklistItems: updatedItems,
+                completedCount,
+                allComplete: completedCount === ms.totalCount && ms.totalCount > 0
+              };
+            }
+            return ms;
+          })
         );
 
         toast.success(`${itemTitle} marked as ${newStatus ? 'completed' : 'incomplete'}`);
         return;
       }
 
-      // Update existing item for THIS specific member only
       const { error: updateError } = await supabase
         .from("member_checklists")
         .update({ 
@@ -248,40 +330,45 @@ const MemberChecklist = ({
           updated_at: new Date().toISOString()
         })
         .eq("id", itemId)
-        .eq("member_id", memberId)
+        .eq("member_id", targetMemberId)
         .eq("project_id", projectId);
-        // ↑ NOTE: Filters by member_id - affects ONLY this member
 
       if (updateError) {
         toast.error("Failed to update checklist");
         return;
       }
       
-      // Update local state
-      setChecklistItems(prev =>
-        prev.map(item =>
-          item.id === itemId 
-            ? { ...item, completed: newStatus } 
-            : item
-        )
+      setMemberStatuses(prev =>
+        prev.map(ms => {
+          if (ms.member.id === targetMemberId) {
+            const updatedItems = ms.checklistItems.map(item =>
+              item.id === itemId 
+                ? { ...item, completed: newStatus } 
+                : item
+            );
+            const completedCount = updatedItems.filter(i => i.completed).length;
+            return {
+              ...ms,
+              checklistItems: updatedItems,
+              completedCount,
+              allComplete: completedCount === ms.totalCount && ms.totalCount > 0
+            };
+          }
+          return ms;
+        })
       );
 
-      // Clean professional messages
       toast.success(`${itemTitle} marked as ${newStatus ? 'completed' : 'incomplete'}`);
 
     } catch (error) {
+      console.error("Error updating checklist:", error);
       toast.error("Failed to update checklist");
     }
   };
 
-  // Calculate progress
-  const completedChecklists = checklistItems.filter(item => item.completed).length;
-  const totalChecklists = checklistItems.length;
-  const completionPercentage = totalChecklists > 0 
-    ? Math.round((completedChecklists / totalChecklists) * 100) 
-    : 0;
+  const formatName = (firstName: string, lastName: string): string => 
+    `${firstName.charAt(0).toUpperCase()}${firstName.slice(1).toLowerCase()} ${lastName.charAt(0).toUpperCase()}${lastName.slice(1).toLowerCase()}`;
 
-  // Loading state
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -293,10 +380,51 @@ const MemberChecklist = ({
     );
   }
 
+  // Calculate overall progress for profile view
+  const profileMemberStatus = memberStatuses[0];
+  const progressPercentage = profileMemberStatus 
+    ? Math.round((profileMemberStatus.completedCount / profileMemberStatus.totalCount) * 100) 
+    : 0;
+
   return (
     <div className="space-y-6">
+      {/* Progress Overview - Only in Profile View */}
+      {viewMode === 'profile' && profileMemberStatus && (
+        <div className="space-y-4">
+          <h3 className="text-xl font-semibold text-white">Progress Overview</h3>
+          
+          <div className="bg-gray-800/50 border border-gray-700 rounded-lg p-6">
+            <div className="flex items-center justify-between mb-3">
+              <div>
+                <div className="text-4xl font-bold text-green-400">
+                  {progressPercentage}%
+                </div>
+                <div className="text-sm text-gray-400 mt-1">
+                  {profileMemberStatus.completedCount} of {profileMemberStatus.totalCount} checklists completed
+                </div>
+              </div>
+              <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+                profileMemberStatus.allComplete
+                  ? 'bg-green-500/20 text-green-400'
+                  : 'bg-yellow-500/20 text-yellow-400'
+              }`}>
+                {profileMemberStatus.allComplete ? 'Complete' : 'In Progress'}
+              </div>
+            </div>
+            
+            {/* Progress Bar */}
+            <div className="w-full bg-gray-700 rounded-full h-3 overflow-hidden">
+              <div 
+                className="bg-green-500 h-full transition-all duration-500 rounded-full"
+                style={{ width: `${progressPercentage}%` }}
+              />
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Permission Banner */}
-      {!isCurrentUserTeamLead && totalChecklists > 0 && (
+      {!isCurrentUserTeamLead && memberStatuses.length > 0 && viewMode === 'team' && (
         <div className="bg-yellow-50 dark:bg-yellow-900/20 border-l-4 border-yellow-500 p-3 rounded">
           <p className="text-sm text-yellow-700 dark:text-yellow-300 flex items-center gap-2">
             <Lock className="h-4 w-4 flex-shrink-0" />
@@ -305,42 +433,11 @@ const MemberChecklist = ({
         </div>
       )}
 
-      {/* Progress Overview */}
-      {totalChecklists > 0 && (
-        <div className="space-y-3">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-            Progress Overview
-          </h3>
-          
-          <div className="flex items-center gap-4 p-4 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700">
-            <div className="text-center">
-              <div className="text-3xl font-bold text-green-600 dark:text-green-400">
-                {completionPercentage}%
-              </div>
-              <div className="text-sm text-gray-500 dark:text-gray-400">Complete</div>
-            </div>
-            <div className="flex-1">
-              <div className="flex justify-between text-sm text-gray-600 dark:text-gray-400 mb-2">
-                <span>{completedChecklists} of {totalChecklists} checklist{totalChecklists !== 1 ? 's' : ''} completed</span>
-              </div>
-              <div className="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
-                <div 
-                  className="bg-green-500 h-2 rounded-full transition-all duration-300" 
-                  style={{ width: `${completionPercentage}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Checklist Items */}
-      <div className="space-y-3">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-          All Checklist Items
-        </h3>
+      {/* All Checklist Items */}
+      <div className="space-y-4">
+        <h3 className="text-xl font-semibold text-white">All Checklist Items</h3>
         
-        {totalChecklists === 0 ? (
+        {memberStatuses.length === 0 ? (
           <div className="flex items-center justify-center py-8">
             <div className="text-center">
               <CheckCircle2 className="h-12 w-12 text-gray-400 mx-auto mb-4" />
@@ -353,89 +450,136 @@ const MemberChecklist = ({
             </div>
           </div>
         ) : (
-          <div className="space-y-3">
-            {checklistItems.map((item) => (
-              <div 
-                key={item.id} 
-                className={`p-4 rounded-lg border transition-all duration-200 ${
-                  item.completed 
-                    ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' 
-                    : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
-                }`}
-              >
-                <div className="flex items-start gap-3">
-                  {/* Checkbox */}
-                  <button
-                    onClick={() => toggleComplete(
-                      item.id, 
-                      item.completed, 
-                      item.title,
-                      item.isPlaceholder
-                    )}
-                    disabled={!isCurrentUserTeamLead}
-                    className={`flex-shrink-0 mt-0.5 transition-transform ${
-                      isCurrentUserTeamLead 
-                        ? 'hover:scale-110 cursor-pointer' 
-                        : 'cursor-not-allowed opacity-60'
-                    }`}
-                    title={
-                      isCurrentUserTeamLead 
-                        ? "Click to toggle for this member" 
-                        : "Only team leads can toggle completion"
-                    }
-                  >
-                    {item.completed ? (
-                      <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
-                    ) : (
-                      <Circle className={`h-6 w-6 ${
-                        isCurrentUserTeamLead 
-                          ? 'text-gray-400 hover:text-green-500' 
-                          : 'text-gray-400'
-                      }`} />
-                    )}
-                  </button>
-
-                  {/* Item Content */}
-                  <div className="flex-1 min-w-0">
-                    <h4 className={`font-medium ${
-                      item.completed 
-                        ? 'text-green-800 dark:text-green-200 line-through' 
-                        : 'text-gray-900 dark:text-white'
-                    }`}>
-                      {item.title}
-                    </h4>
-                    
-                    {item.description && (
-                      <p className={`text-sm mt-1 ${
-                        item.completed 
-                          ? 'text-green-700 dark:text-green-300' 
-                          : 'text-gray-600 dark:text-gray-400'
-                      }`}>
-                        {item.description}
+          memberStatuses.map((memberStatus) => (
+            <div key={memberStatus.member.id} className="space-y-3">
+              {/* Only show member header in team view with multiple members */}
+              {viewMode === 'team' && (
+                <div className={`flex items-center justify-between p-4 rounded-lg border ${
+                  memberStatus.allComplete
+                    ? 'bg-green-50 dark:bg-green-900/20 border-green-200 dark:border-green-800'
+                    : 'bg-gray-50 dark:bg-gray-800/50 border-gray-200 dark:border-gray-700'
+                }`}>
+                  <div className="flex items-center gap-3">
+                    <div className="flex-shrink-0">
+                      {memberStatus.allComplete ? (
+                        <CheckCircle2 className="h-6 w-6 text-green-600 dark:text-green-400" />
+                      ) : (
+                        <Circle className="h-6 w-6 text-gray-400" />
+                      )}
+                    </div>
+                    <div>
+                      <h4 className="font-semibold text-gray-900 dark:text-white">
+                        {formatName(memberStatus.member.first_name, memberStatus.member.last_name)}
+                      </h4>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">
+                        {memberStatus.completedCount}/{memberStatus.totalCount} completed
                       </p>
-                    )}
-
-                    {/* Due Date Only - NO PRIORITY */}
-                    {item.due_date && (
-                      <div className="mt-2">
-                        <span className="text-xs text-gray-500 dark:text-gray-400">
-                          Due: {new Date(item.due_date).toLocaleDateString()}
-                        </span>
-                      </div>
-                    )}
+                    </div>
                   </div>
+                  
+                  {memberStatus.allComplete ? (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300">
+                      <CheckCircle2 className="h-3 w-3" />
+                      Complete
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300">
+                      {memberStatus.totalCount - memberStatus.completedCount} pending
+                    </span>
+                  )}
                 </div>
+              )}
+
+              {/* Checklist Items */}
+              <div className={viewMode === 'team' ? 'ml-4 space-y-2' : 'space-y-2'}>
+                {memberStatus.checklistItems.map((item) => (
+                  <div 
+                    key={item.id} 
+                    className={`p-3 rounded-lg border transition-all duration-200 ${
+                      item.completed 
+                        ? 'bg-green-50 dark:bg-green-950/20 border-green-200 dark:border-green-800' 
+                        : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700'
+                    }`}
+                  >
+                    <div className="flex items-start gap-3">
+                      <button
+                        onClick={() => toggleComplete(
+                          memberStatus,
+                          item.id, 
+                          item.completed, 
+                          item.title,
+                          item.isPlaceholder
+                        )}
+                        disabled={!isCurrentUserTeamLead}
+                        className={`flex-shrink-0 mt-0.5 transition-transform ${
+                          isCurrentUserTeamLead 
+                            ? 'hover:scale-110 cursor-pointer' 
+                            : 'cursor-not-allowed opacity-60'
+                        }`}
+                      >
+                        {item.completed ? (
+                          <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
+                        ) : (
+                          <Circle className={`h-5 w-5 ${
+                            isCurrentUserTeamLead 
+                              ? 'text-gray-400 hover:text-green-500' 
+                              : 'text-gray-400'
+                          }`} />
+                        )}
+                      </button>
+
+                      <div className="flex-1 min-w-0">
+                        <h5 className={`text-sm font-medium ${
+                          item.completed 
+                            ? 'text-green-800 dark:text-green-200 line-through' 
+                            : 'text-gray-900 dark:text-white'
+                        }`}>
+                          {item.title}
+                        </h5>
+                        
+                        {item.description && (
+                          <p className={`text-xs mt-1 ${
+                            item.completed 
+                              ? 'text-green-700 dark:text-green-300' 
+                              : 'text-gray-600 dark:text-gray-400'
+                          }`}>
+                            {item.description}
+                          </p>
+                        )}
+
+                        {item.due_date && (
+                          <div className="mt-1">
+                            <span className="text-xs text-gray-500 dark:text-gray-400">
+                              Due: {new Date(item.due_date).toLocaleDateString()}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
+          ))
         )}
       </div>
 
-      {/* Info Banner */}
-      {totalChecklists > 0 && (
+      {/* Info Banner - only in profile view */}
+      {memberStatuses.length > 0 && viewMode === 'profile' && (
         <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-3 rounded">
           <p className="text-sm text-blue-700 dark:text-blue-300">
             Individual checklist: Changes only affect this specific team member.
+          </p>
+        </div>
+      )}
+
+      {/* Info Banner - only in team view */}
+      {memberStatuses.length > 0 && viewMode === 'team' && (
+        <div className="bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500 p-3 rounded">
+          <p className="text-sm text-blue-700 dark:text-blue-300">
+            {isCurrentUserTeamLead 
+              ? "Team Lead View: You can see and manage all team members' checklists."
+              : "Member View: You can only see your own checklist."}
           </p>
         </div>
       )}

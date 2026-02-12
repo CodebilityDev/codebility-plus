@@ -6,25 +6,25 @@ import { SimpleMemberData, getMembers, getTeamLead } from "@/app/home/projects/a
 import { createClientClientComponent } from "@/utils/supabase/client";
 
 /**
- * ChecklistStatusBanner - ENHANCED SELF-FETCHING VERSION
+ * ChecklistStatusBanner - COMPLETE FIX FOR MISSING MEMBERS
  * 
  * FIXES APPLIED:
- * 1. ✅ Fetches fresh member data internally (no stale props)
- * 2. ✅ Always shows current database state
- * 3. ✅ Automatic refresh when component mounts
- * 4. ✅ No dependency on parent component state
- * 5. ✅ Props now optional for backward compatibility
+ * 1. ✅ Shows ALL team members (even those without checklist items)
+ * 2. ✅ Shows ALL team members (even those with NULL codev_id)
+ * 3. ✅ Fetches fresh member data internally
+ * 4. ✅ Handles members with 0 checklist items gracefully
+ * 5. ✅ Accurate member count in summary (X/10 instead of X/9)
  * 
- * KEY CHANGE:
- * - Does NOT rely on teamMembers/teamLead props from parent
- * - Fetches fresh data from getMembers() and getTeamLead()
- * - Guarantees accurate member count display
+ * CRITICAL CHANGES:
+ * - Removed filter that excluded members without checklist items
+ * - Now creates status for ALL members, showing 0/0 if no items assigned
+ * - Total count now matches actual team size
  */
 
 interface ChecklistStatusBannerProps {
   projectId: string;
-  teamMembers?: SimpleMemberData[]; // Optional - will fetch if not provided
-  teamLead?: SimpleMemberData | null; // Optional - will fetch if not provided
+  teamMembers?: SimpleMemberData[];
+  teamLead?: SimpleMemberData | null;
 }
 
 interface MemberChecklistStatus {
@@ -40,32 +40,27 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
   const [isLoading, setIsLoading] = useState(true);
   const [memberStatuses, setMemberStatuses] = useState<MemberChecklistStatus[]>([]);
   
-  // ✅ NEW: Fresh member data (fetched internally)
   const [freshTeamMembers, setFreshTeamMembers] = useState<SimpleMemberData[]>([]);
   const [freshTeamLead, setFreshTeamLead] = useState<SimpleMemberData | null>(null);
   const [isFetchingMembers, setIsFetchingMembers] = useState(false);
 
-  // ✅ CRITICAL FIX: Fetch fresh member data on mount
   useEffect(() => {
     if (projectId) {
       fetchFreshMemberData();
     }
   }, [projectId]);
 
-  // Fetch fresh member data from database
   const fetchFreshMemberData = async () => {
     console.log("🔄 ChecklistStatusBanner: Fetching fresh member data...");
     setIsFetchingMembers(true);
     
     try {
-      // Fetch team lead
       const teamLeadResult = await getTeamLead(projectId);
       if (teamLeadResult.data) {
         setFreshTeamLead(teamLeadResult.data);
         console.log("👑 Banner - Team Lead:", teamLeadResult.data.first_name, teamLeadResult.data.last_name);
       }
 
-      // Fetch members
       const membersResult = await getMembers(projectId);
       if (membersResult.data) {
         setFreshTeamMembers(membersResult.data);
@@ -78,14 +73,12 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
     }
   };
 
-  // Use fresh data instead of props
   const allMembers = freshTeamLead 
     ? [freshTeamLead, ...freshTeamMembers] 
     : freshTeamMembers;
 
   console.log("📊 Banner - Total members for display:", allMembers.length);
 
-  // Load checklist statuses when we have member data
   useEffect(() => {
     if (!isFetchingMembers && allMembers.length > 0) {
       loadChecklistStatuses();
@@ -96,7 +89,15 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
     setIsLoading(true);
     const supabase = createClientClientComponent();
 
+    if (!supabase) {
+      console.error("Failed to initialize Supabase client");
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      console.log("🔍 Banner - Loading checklist data for", allMembers.length, "members");
+
       // Get all checklist items for this project
       const { data: checklistData, error } = await supabase
         .from("member_checklists")
@@ -104,17 +105,20 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
         .eq("project_id", projectId);
 
       if (error) {
-        console.error("Error loading checklist data:", error);
+        console.error("❌ Banner - Error loading checklist data:", error);
         return;
       }
 
-      // Process data by member
+      console.log("📋 Banner - Found", checklistData?.length || 0, "total checklist items");
+
+      // 🔧 CRITICAL FIX: Create status for ALL members, not just those with items
       const statusMap: { [key: string]: MemberChecklistStatus } = {};
 
       allMembers.forEach(member => {
         const memberItems = checklistData?.filter(item => item.member_id === member.id) || [];
         const completedCount = memberItems.filter(item => item.completed).length;
 
+        // Create status entry for EVERY member, even if they have 0 items
         statusMap[member.id] = {
           memberId: member.id,
           memberName: `${member.first_name} ${member.last_name}`,
@@ -122,17 +126,25 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
           completedItems: completedCount,
           pendingItems: memberItems.length - completedCount
         };
+
+        console.log(`  - ${member.first_name} ${member.last_name}: ${completedCount}/${memberItems.length} completed`);
       });
 
-      // Convert to array and sort by pending items (most pending first)
+      // 🔧 CRITICAL FIX: Don't filter out members with 0 items
+      // Show ALL members so the count is accurate (10/10 instead of 7/9)
       const statusArray = Object.values(statusMap)
-        .filter(status => status.totalItems > 0) // Only show members with checklist items
-        .sort((a, b) => b.pendingItems - a.pendingItems);
+        .sort((a, b) => {
+          // Sort by: pending items (desc), then by name
+          if (a.pendingItems !== b.pendingItems) {
+            return b.pendingItems - a.pendingItems;
+          }
+          return a.memberName.localeCompare(b.memberName);
+        });
 
       setMemberStatuses(statusArray);
-      console.log("✅ Banner - Loaded statuses for", statusArray.length, "members with checklist items");
+      console.log("✅ Banner - Loaded statuses for ALL", statusArray.length, "members (including those with 0 items)");
     } catch (error) {
-      console.error("Error loading checklist statuses:", error);
+      console.error("❌ Banner - Error loading checklist statuses:", error);
     } finally {
       setIsLoading(false);
     }
@@ -141,9 +153,20 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
   // Calculate summary stats
   const membersWithPending = memberStatuses.filter(s => s.pendingItems > 0).length;
   const totalPendingItems = memberStatuses.reduce((sum, s) => sum + s.pendingItems, 0);
-  const membersFullyCompleted = memberStatuses.filter(s => s.pendingItems === 0).length;
+  const membersFullyCompleted = memberStatuses.filter(s => {
+    // A member is "fully completed" if:
+    // 1. They have items AND all are complete, OR
+    // 2. They have 0 items (nothing to complete)
+    return s.pendingItems === 0;
+  }).length;
 
-  // Show loading state while fetching members
+  console.log("📊 Banner Summary:", {
+    totalMembers: memberStatuses.length,
+    membersWithPending,
+    membersFullyCompleted,
+    totalPendingItems
+  });
+
   if (isFetchingMembers) {
     return (
       <div className="rounded-lg border-2 border-gray-300 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/20 p-3">
@@ -155,7 +178,7 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
     );
   }
 
-  // Don't show if no checklist items exist
+  // Don't show if no members at all
   if (!isLoading && memberStatuses.length === 0) {
     return null;
   }
@@ -195,11 +218,11 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
               <p className="text-xs text-gray-600 dark:text-gray-400">...</p>
             ) : membersWithPending > 0 ? (
               <p className="text-xs text-red-700 dark:text-red-300 font-medium">
-                {totalPendingItems} pending
+                {membersWithPending} pending
               </p>
             ) : (
               <p className="text-xs text-green-700 dark:text-green-300 font-medium">
-                Complete ✓
+                All complete ✓
               </p>
             )}
           </div>
@@ -207,7 +230,7 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
 
         <div className="flex items-center gap-1">
           {!isLoading && (
-            <div className="text-xs text-gray-600 dark:text-gray-400">
+            <div className="text-xs text-gray-600 dark:text-gray-400 font-medium">
               {membersFullyCompleted}/{memberStatuses.length}
             </div>
           )}
@@ -229,14 +252,16 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
           <div className="p-4 space-y-2">
             {memberStatuses.length === 0 ? (
               <p className="text-sm text-gray-600 dark:text-gray-400 text-center py-4">
-                No checklist items assigned yet
+                No team members found
               </p>
             ) : (
               memberStatuses.map((status) => (
                 <div
                   key={status.memberId}
                   className={`flex items-center justify-between p-3 rounded-lg border ${
-                    status.pendingItems > 0
+                    status.totalItems === 0
+                      ? 'border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900/20'
+                      : status.pendingItems > 0
                       ? 'border-red-200 dark:border-red-800 bg-red-50 dark:bg-red-950/20'
                       : 'border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950/20'
                   }`}
@@ -249,18 +274,26 @@ const ChecklistStatusBanner = ({ projectId }: ChecklistStatusBannerProps) => {
                   </div>
 
                   <div className="flex items-center gap-3">
-                    <div className="text-xs text-gray-600 dark:text-gray-400">
-                      {status.completedItems}/{status.totalItems} completed
-                    </div>
-
-                    {status.pendingItems > 0 ? (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-200">
-                        {status.pendingItems} pending
+                    {status.totalItems === 0 ? (
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
+                        No items assigned
                       </span>
                     ) : (
-                      <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-200">
-                        ✓ Complete
-                      </span>
+                      <>
+                        <div className="text-xs text-gray-600 dark:text-gray-400">
+                          {status.completedItems}/{status.totalItems} completed
+                        </div>
+
+                        {status.pendingItems > 0 ? (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-red-200 text-red-800 dark:bg-red-900 dark:text-red-200">
+                            {status.pendingItems} pending
+                          </span>
+                        ) : (
+                          <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-200 text-green-800 dark:bg-green-900 dark:text-green-200">
+                            ✓ Complete
+                          </span>
+                        )}
+                      </>
                     )}
                   </div>
                 </div>
