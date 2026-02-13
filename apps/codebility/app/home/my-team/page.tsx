@@ -87,7 +87,10 @@ async function TeamData() {
           members
         };
       } catch (error) {
-        console.error(`Failed to fetch data for project ${project.id}:`, error);
+        // Log errors in development only for debugging
+        if (process.env.NODE_ENV === 'development') {
+          console.error(`Failed to fetch data for project ${project.id}:`, error);
+        }
         return {
           project,
           teamLead: { error: 'Failed to load team lead', data: null },
@@ -118,7 +121,10 @@ async function TeamData() {
     return <MyTeamView projectData={validProjectData} />;
 
   } catch (error) {
-    console.error('TeamData error:', error);
+    // Log errors in development only for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.error('TeamData error:', error);
+    }
     throw error; // Let error boundary handle it
   }
 }
