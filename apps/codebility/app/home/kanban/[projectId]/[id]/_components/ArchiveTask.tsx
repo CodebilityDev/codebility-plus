@@ -118,8 +118,8 @@ export default function ArchiveTask({ task, onDelete }: ArchiveTaskProps) {
           </div>
 
           {/* Assignee and Skill Category */}
-          <div className="mt-3 flex items-center justify-between">
-            <div className="flex items-center gap-3">
+          <div className="mt-3 flex flex-wrap items-center justify-between gap-3">
+            <div className="flex items-center flex-wrap gap-3">
               {/* Primary Assignee */}
               {task.codev && (
                 <div className="flex items-center gap-2">
