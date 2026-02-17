@@ -1,5 +1,4 @@
 "use client";
-
 import { useEffect, useRef } from "react";
 import { useNotificationStore } from "@/store/notification-store";
 import { NotificationIcon } from "./NotificationIcon";
@@ -8,11 +7,11 @@ import { createClientClientComponent } from "@/utils/supabase/client";
 import { useUserStore } from "@/store/codev-store";
 import { toast } from "sonner";
 
-
 export function NotificationContainer() {
   const containerRef = useRef<HTMLDivElement>(null);
   const supabase = createClientClientComponent();
   const { user } = useUserStore();
+
   const {
     notifications,
     isOpen,
@@ -33,16 +32,21 @@ export function NotificationContainer() {
   useEffect(() => {
     if (user?.id) {
       fetchNotifications();
-    } else {
     }
-  }, [user?.id]); // Remove fetchNotifications from deps to avoid circular dependency
+  }, [user?.id, fetchNotifications]);
 
-  // Also fetch when panel opens
+  // Fetch when panel opens and poll while open
   useEffect(() => {
     if (isOpen && user?.id) {
       fetchNotifications();
+
+      const pollInterval = setInterval(() => {
+        fetchNotifications();
+      }, 5000);
+
+      return () => clearInterval(pollInterval);
     }
-  }, [isOpen, user?.id]); // Remove fetchNotifications from deps
+  }, [isOpen, user?.id, fetchNotifications]);
 
   // Set up real-time subscription
   useEffect(() => {
@@ -63,10 +67,9 @@ export function NotificationContainer() {
             ...payload.new,
             createdAt: new Date(payload.new.created_at),
           };
+
           addNotification(newNotification as any);
-          
-          // Only show toast for notifications from other users
-          // Check if sender_id exists and is different from current user
+
           if (payload.new.sender_id && payload.new.sender_id !== user.id) {
             toast.info(payload.new.title, {
               description: payload.new.message,
@@ -110,8 +113,6 @@ export function NotificationContainer() {
     return () => document.removeEventListener("keydown", handleEscape);
   }, [isOpen, setOpen]);
 
-  // Add debug info
-
   return (
     <div ref={containerRef} className="relative">
       <NotificationIcon
@@ -119,7 +120,7 @@ export function NotificationContainer() {
         onClick={togglePanel}
         isActive={isOpen}
       />
-      
+
       {isOpen && (
         <NotificationPanel
           notifications={notifications}

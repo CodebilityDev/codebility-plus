@@ -1,12 +1,10 @@
 "use client";
-
 import { useState } from "react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useFeedsStore } from "@/store/feeds-store";
 import { X } from "lucide-react";
-
 import { deletePostComment } from "../_services/action";
-import { PostType } from "../_services/query";
 
 interface PostViewCommentItemProps {
   postId: string;
@@ -15,6 +13,7 @@ interface PostViewCommentItemProps {
   userName: string;
   content: string;
   userCanDelete: boolean;
+  mentions?: Array<{ username: string }>;
 }
 
 export default function PostViewCommentItem({
@@ -24,7 +23,9 @@ export default function PostViewCommentItem({
   userName,
   content,
   userCanDelete,
+  mentions = [],
 }: PostViewCommentItemProps) {
+  const router = useRouter();
   const fetchPosts = useFeedsStore((state) => state.fetchPosts);
   const [isVisible, setIsVisible] = useState(true);
 
@@ -46,10 +47,44 @@ export default function PostViewCommentItem({
     }
   };
 
+  // Function to highlight mentions in comment text
+  const renderContentWithMentions = (text: string) => {
+    // Split by @username pattern
+    const parts = text.split(/(@\w+)/g);
+
+    return parts.map((part, index) => {
+      if (part.startsWith("@")) {
+        const username = part.slice(1);
+        // Check if this username is in the mentions array
+        const isMentioned = mentions.some((m) => m.username === username);
+
+        if (isMentioned) {
+          return (
+            <span
+              key={index}
+              className="font-medium text-blue-600 hover:underline cursor-pointer dark:text-blue-400"
+              onClick={(e) => {
+                e.stopPropagation(); // Prevent event bubbling
+                // Navigate to user profile using Next.js router
+                router.push(`/profile/${username}`);
+              }}
+            >
+              {part}
+            </span>
+          );
+        }
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   if (!isVisible) return null;
 
   return (
-    <div className="group relative flex items-start gap-3 rounded-md p-2 transition hover:bg-gray-50 dark:hover:bg-gray-800/40">
+    <div 
+      id={`comment-${commenntId}`} 
+      className="group relative flex items-start gap-3 rounded-md p-2 transition hover:bg-gray-50 dark:hover:bg-gray-800/40"
+    >
       {/* Avatar */}
       <Image
         src={
@@ -61,17 +96,15 @@ export default function PostViewCommentItem({
         height={36}
         className="h-9 w-9 rounded-full object-cover"
       />
-
       {/* User content */}
-      <div className="flex flex-col">
+      <div className="flex flex-col flex-1">
         <span className="text-sm font-semibold text-gray-800 dark:text-gray-100">
           {userName}
         </span>
         <p className="break-words text-sm text-gray-700 dark:text-gray-300">
-          {content}
+          {renderContentWithMentions(content)}
         </p>
       </div>
-
       {/* X Icon (only visible on hover) */}
       {userCanDelete && (
         <button

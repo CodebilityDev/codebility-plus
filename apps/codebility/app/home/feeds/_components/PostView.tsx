@@ -36,7 +36,6 @@ export default function PostView({ postId }: PostViewProps) {
 
   const { posts } = useFeedsStore();
 
-  // Trigger comment refresh
   const triggerRefreshComments = () => {
     setRefreshComments((prev) => prev + 1);
   };
@@ -83,14 +82,16 @@ export default function PostView({ postId }: PostViewProps) {
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
+  const isSystemPost = post.id === "00000000-0000-0000-0000-000000000001";
+
   return (
     <>
       <h1 className="text-3xl font-bold">{post.title}</h1>
       <div className="flex items-center">
         <Image
           src={
-            post.author_id?.image_url || 
-            (post.id === "00000000-0000-0000-0000-000000000001" ? "/favicon.ico" : defaultAvatar)
+            post.author_id?.image_url ||
+            (isSystemPost ? "/favicon.ico" : defaultAvatar)
           }
           alt={`${post.author_id?.first_name || "Codebility"}'s profile`}
           className="mr-4 h-10 w-10 rounded-full object-cover"
@@ -123,30 +124,43 @@ export default function PostView({ postId }: PostViewProps) {
           </ReactMarkdown>
         </div>
 
-        {(isAdmin || isAuthor) && post.id !== "00000000-0000-0000-0000-000000000001" && (
+        {(isAdmin || isAuthor) && !isSystemPost && (
           <Button className="mb-4 mt-4 w-auto" onClick={openModal}>
             Edit Post
           </Button>
         )}
 
-        <div className="mb-1 mt-1 border-t border-gray-200 dark:border-gray-700 pt-3"/>
-        <PostViewCommentList
-          postId={postId}
-          refresh={refreshComments}
-          hasDeleteCommentPrivilege={isAdmin || isAuthor}
-        />
-      </div>
-      <PostViewCreateComment
-        post={post}
-        onCommentCreated={triggerRefreshComments}
-      />
+        <div className="mb-1 mt-1 border-t border-gray-200 dark:border-gray-700 pt-3" />
 
-      <EditPostModal
-        post={post}
-        isOpen={isModalOpen}
-        onClose={closeModal}
-        onPostUpdated={() => {}}
-      />
+        {!isSystemPost ? (
+          <>
+            <PostViewCommentList
+              postId={postId}
+              refresh={refreshComments}
+              hasDeleteCommentPrivilege={isAdmin || isAuthor}
+            />
+            <PostViewCreateComment
+              post={post}
+              onCommentCreated={triggerRefreshComments}
+            />
+          </>
+        ) : (
+          <div className="py-8 text-center">
+            <p className="text-gray-500 dark:text-gray-400">
+              💬 Comments are disabled for system announcements
+            </p>
+          </div>
+        )}
+      </div>
+
+      {!isSystemPost && (
+        <EditPostModal
+          post={post}
+          isOpen={isModalOpen}
+          onClose={closeModal}
+          onPostUpdated={() => {}}
+        />
+      )}
     </>
   );
 }

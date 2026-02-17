@@ -2,6 +2,42 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 import { Notification } from "@/types/notifications";
 
 /**
+ * Get the codev user ID from the Supabase auth user
+ */
+async function getCodevUserId(supabase: any) {
+  const { data: session } = await supabase.auth.getSession();
+  if (!session?.session?.user) {
+    return null;
+  }
+
+  const authUser = session.session.user;
+
+  // Method 1: Try by auth user ID first (if codev.id matches auth.id)
+  const { data: userById } = await supabase
+    .from("codev")
+    .select("id, email_address, username")
+    .eq("id", authUser.id)
+    .maybeSingle();
+
+  if (userById) {
+    return userById.id;
+  }
+
+  // Method 2: Try by email_address (case-insensitive)
+  const { data: userByEmail } = await supabase
+    .from("codev")
+    .select("id, email_address, username")
+    .ilike("email_address", authUser.email)
+    .maybeSingle();
+
+  if (userByEmail) {
+    return userByEmail.id;
+  }
+
+  return null;
+}
+
+/**
  * Fetch notifications for the current user
  */
 export async function getNotifications(limit: number = 50) {
@@ -12,20 +48,23 @@ export async function getNotifications(limit: number = 50) {
     return { data: null, error: "Not authenticated" };
   }
 
+  const codevUserId = await getCodevUserId(supabase);
+  if (!codevUserId) {
+    return { data: null, error: "User not found in codev table" };
+  }
+
   const { data, error } = await supabase
     .from("notifications")
     .select("*")
-    .eq("recipient_id", session.session.user.id)
-    .eq("archived", false) // Only get non-archived notifications
+    .eq("recipient_id", codevUserId)
+    .eq("archived", false)
     .order("created_at", { ascending: false })
     .limit(limit);
-
 
   if (error) {
     return { data: null, error: error.message };
   }
 
-  // Transform data to match frontend expectations
   const notifications = data?.map((n) => ({
     ...n,
     createdAt: new Date(n.created_at),
@@ -43,14 +82,14 @@ export async function getNotifications(limit: number = 50) {
 export async function markNotificationAsRead(notificationId: string) {
   const supabase = await createClientServerComponent();
 
-  const { data: session } = await supabase.auth.getSession();
-  if (!session?.session?.user) {
+  const codevUserId = await getCodevUserId(supabase);
+  if (!codevUserId) {
     return { data: null, error: "Not authenticated" };
   }
 
   const { data, error } = await supabase.rpc("mark_notification_read", {
     p_notification_id: notificationId,
-    p_user_id: session.session.user.id,
+    p_user_id: codevUserId,
   });
 
   if (error) {
@@ -66,13 +105,13 @@ export async function markNotificationAsRead(notificationId: string) {
 export async function markAllNotificationsAsRead() {
   const supabase = await createClientServerComponent();
 
-  const { data: session } = await supabase.auth.getSession();
-  if (!session?.session?.user) {
+  const codevUserId = await getCodevUserId(supabase);
+  if (!codevUserId) {
     return { data: null, error: "Not authenticated" };
   }
 
   const { data, error } = await supabase.rpc("mark_all_notifications_read", {
-    p_user_id: session.session.user.id,
+    p_user_id: codevUserId,
   });
 
   if (error) {
@@ -88,8 +127,8 @@ export async function markAllNotificationsAsRead() {
 export async function archiveNotification(notificationId: string) {
   const supabase = await createClientServerComponent();
 
-  const { data: session } = await supabase.auth.getSession();
-  if (!session?.session?.user) {
+  const codevUserId = await getCodevUserId(supabase);
+  if (!codevUserId) {
     return { data: null, error: "Not authenticated" };
   }
 
@@ -97,7 +136,7 @@ export async function archiveNotification(notificationId: string) {
     .from("notifications")
     .update({ archived: true, archived_at: new Date().toISOString() })
     .eq("id", notificationId)
-    .eq("recipient_id", session.session.user.id);
+    .eq("recipient_id", codevUserId);
 
   if (error) {
     return { data: null, error: error.message };
@@ -112,15 +151,15 @@ export async function archiveNotification(notificationId: string) {
 export async function clearAllNotifications() {
   const supabase = await createClientServerComponent();
 
-  const { data: session } = await supabase.auth.getSession();
-  if (!session?.session?.user) {
+  const codevUserId = await getCodevUserId(supabase);
+  if (!codevUserId) {
     return { data: null, error: "Not authenticated" };
   }
 
   const { data, error } = await supabase
     .from("notifications")
     .delete()
-    .eq("recipient_id", session.session.user.id);
+    .eq("recipient_id", codevUserId);
 
   if (error) {
     return { data: null, error: error.message };
@@ -135,19 +174,18 @@ export async function clearAllNotifications() {
 export async function getNotificationPreferences() {
   const supabase = await createClientServerComponent();
 
-  const { data: session } = await supabase.auth.getSession();
-  if (!session?.session?.user) {
+  const codevUserId = await getCodevUserId(supabase);
+  if (!codevUserId) {
     return { data: null, error: "Not authenticated" };
   }
 
   const { data, error } = await supabase
     .from("notification_preferences")
     .select("*")
-    .eq("user_id", session.session.user.id)
+    .eq("user_id", codevUserId)
     .single();
 
   if (error && error.code !== "PGRST116") {
-    // PGRST116 means no rows found, which is ok
     return { data: null, error: error.message };
   }
 
@@ -160,15 +198,15 @@ export async function getNotificationPreferences() {
 export async function updateNotificationPreferences(preferences: any) {
   const supabase = await createClientServerComponent();
 
-  const { data: session } = await supabase.auth.getSession();
-  if (!session?.session?.user) {
+  const codevUserId = await getCodevUserId(supabase);
+  if (!codevUserId) {
     return { data: null, error: "Not authenticated" };
   }
 
   const { data, error } = await supabase
     .from("notification_preferences")
     .upsert({
-      user_id: session.session.user.id,
+      user_id: codevUserId,
       ...preferences,
       updated_at: new Date().toISOString(),
     })
@@ -215,8 +253,8 @@ export async function createNotification({
     return { data: null, error: "Failed to initialize database connection" };
   }
 
-  const { data: session } = await supabase.auth.getSession();
-  if (!session?.session?.user) {
+  const codevUserId = await getCodevUserId(supabase);
+  if (!codevUserId) {
     return { data: null, error: "Not authenticated" };
   }
 
@@ -228,7 +266,7 @@ export async function createNotification({
     p_priority: priority,
     p_action_url: actionUrl,
     p_metadata: metadata || {},
-    p_sender_id: senderId || session.session.user.id,
+    p_sender_id: senderId || codevUserId,
     p_project_id: projectId || null,
     p_job_id: jobId || null,
   });
@@ -237,7 +275,6 @@ export async function createNotification({
     return { data: null, error: error.message };
   }
 
-  // The function returns NULL if duplicate or notifications disabled
   if (data === null) {
     return { data: "skipped", error: null };
   }
