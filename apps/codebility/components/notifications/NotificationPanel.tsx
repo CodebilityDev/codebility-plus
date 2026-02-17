@@ -1,6 +1,7 @@
 "use client";
 
 import { formatDistanceToNow } from "date-fns";
+import { useRouter } from "next/navigation";
 import { 
   Bell, 
   CheckCircle, 
@@ -70,7 +71,21 @@ export function NotificationPanel({
   onArchive,
   onClearAll,
 }: NotificationPanelProps) {
+  const router = useRouter();
   const unreadCount = notifications.filter(n => !n.read).length;
+
+  const handleNotificationClick = (notification: Notification) => {
+    // Mark as read
+    if (!notification.read) {
+      onMarkAsRead(notification.id);
+    }
+
+    // Navigate to action URL if it exists
+    if (notification.action_url) {
+      router.push(notification.action_url);
+      onClose(); // Close the notification panel
+    }
+  };
 
   return (
     <div className="fixed inset-x-4 top-16 z-50 animate-slide-down rounded-lg border border-gray-200 bg-white shadow-xl dark:border-gray-700 dark:bg-gray-900 sm:absolute sm:inset-x-auto sm:right-0 sm:top-full sm:mt-2 sm:w-96">
@@ -124,8 +139,9 @@ export function NotificationPanel({
               return (
                 <div
                   key={notification.id}
+                  onClick={() => handleNotificationClick(notification)}
                   className={cn(
-                    "group relative px-4 py-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800",
+                    "group relative px-4 py-3 transition-colors cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800",
                     !notification.read && "bg-blue-50 dark:bg-blue-900/20"
                   )}
                 >
@@ -158,7 +174,10 @@ export function NotificationPanel({
                       <Button
                         variant="ghost"
                         size="sm"
-                        onClick={() => onMarkAsRead(notification.id)}
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent triggering the card click
+                          onMarkAsRead(notification.id);
+                        }}
                         className="h-6 w-6 p-0"
                         title="Mark as read"
                       >
@@ -168,7 +187,10 @@ export function NotificationPanel({
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => onArchive(notification.id)}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent triggering the card click
+                        onArchive(notification.id);
+                      }}
                       className="h-6 w-6 p-0"
                       title="Archive"
                     >

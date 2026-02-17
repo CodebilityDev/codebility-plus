@@ -3,6 +3,8 @@ import { createClientServerComponent } from "@/utils/supabase/server";
 import { deleteImage, getImagePath } from "@/utils/uploadImage";
 import { createPostSchema, editPostSchema } from "./validation";
 import { ZodError } from "zod";
+import { UserMention } from "./types";
+import { createNotificationAction } from "@/lib/actions/notification.actions";
 
 
 export const getUserRole = async (userId: Number | null): Promise<string | null> => {
@@ -19,9 +21,9 @@ export const getUserRole = async (userId: Number | null): Promise<string | null>
     .single();
 
   if (error || !userRole) {
-    console.error("Failed to fetch user role ID:", error);
     return null;
   }
+
   const { data: role, error: roleError } = await supabase
     .from("roles")
     .select("name")
@@ -29,7 +31,6 @@ export const getUserRole = async (userId: Number | null): Promise<string | null>
     .single();
 
   if (roleError || !role) {
-    console.error("Failed to fetch role name:", roleError);
     return null;
   }
 
@@ -45,11 +46,8 @@ type AddPostParams = {
   tag_ids?: number[] | null;
 };
 
-export const addPost = async (
-  payload
-: AddPostParams) => {
+export const addPost = async (payload: AddPostParams) => {
   try {
-    // Validation
     const parsed = createPostSchema.parse(payload);
 
     const {
@@ -88,10 +86,7 @@ export const addPost = async (
         .update({ post_id: newPost.id })
         .in("id", content_image_ids);
 
-      if (updateError) {
-        console.error("Failed to update post_content_images:", updateError);
-        throw updateError;
-      }
+      if (updateError) throw updateError;
     }
 
     // 3. If tag_ids exist, create rows in post_tags
@@ -105,16 +100,11 @@ export const addPost = async (
           }))
         );
 
-      if (tagError) {
-        console.error("Failed to insert post_tags:", tagError);
-        throw tagError;
-      }
+      if (tagError) throw tagError;
     }
 
     return newPost;
   } catch (error) {
-    console.error("Error in addPost:", error);
-
     if (error instanceof ZodError) {
       throw new Error(error.errors[0]?.message ?? "Invalid post data");
     }
@@ -124,8 +114,7 @@ export const addPost = async (
 
 export const deletePost = async (post_id: string) => {
   try {
-    //delete content images
-    await deletePostContentImages (post_id);
+    await deletePostContentImages(post_id);
 
     const supabase = await createClientServerComponent();
 
@@ -133,13 +122,12 @@ export const deletePost = async (post_id: string) => {
       .from("posts")
       .select("image_url")
       .eq("id", post_id)
-      .single();  // single() because we expect only one row
+      .single();
 
     if (fetchError) throw fetchError;
     if (!postData) throw new Error("Post not found");
 
     const imageUrl = postData.image_url;
-
     const imagePath = await getImagePath(imageUrl);
 
     deleteImage(imagePath!);
@@ -153,7 +141,6 @@ export const deletePost = async (post_id: string) => {
 
     return data;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
@@ -170,7 +157,6 @@ type EditPostParams = {
 
 export const editPost = async (payload: EditPostParams) => {
   try {
-    // Validation
     const parsed = editPostSchema.parse(payload);
 
     const {
@@ -182,7 +168,6 @@ export const editPost = async (payload: EditPostParams) => {
       content_image_ids,
       tag_ids,
     } = parsed;
-
 
     const supabase = await createClientServerComponent();
 
@@ -222,10 +207,7 @@ export const editPost = async (payload: EditPostParams) => {
         .update({ post_id: id })
         .in("id", content_image_ids);
 
-      if (updateError) {
-        console.error("Failed to update post_content_images:", updateError);
-        throw updateError;
-      }
+      if (updateError) throw updateError;
     }
 
     // 5. Delete previous image from bucket if replaced
@@ -238,7 +220,6 @@ export const editPost = async (payload: EditPostParams) => {
 
     // 6. Edit post_tags
     if (tag_ids) {
-      // Fetch existing tags for this post
       const { data: existingTags, error: fetchTagsError } = await supabase
         .from("post_tags")
         .select("tag_id")
@@ -248,7 +229,6 @@ export const editPost = async (payload: EditPostParams) => {
 
       const existingTagIds = existingTags?.map((t) => t.tag_id) ?? [];
 
-      // Tags to add
       const tagsToAdd = tag_ids.filter((t) => !existingTagIds.includes(t));
       if (tagsToAdd.length > 0) {
         const { error: addError } = await supabase
@@ -258,7 +238,6 @@ export const editPost = async (payload: EditPostParams) => {
         if (addError) throw addError;
       }
 
-      // Tags to remove
       const tagsToRemove = existingTagIds.filter((t) => !tag_ids.includes(t));
       if (tagsToRemove.length > 0) {
         const { error: removeError } = await supabase
@@ -273,7 +252,6 @@ export const editPost = async (payload: EditPostParams) => {
 
     return updatedPost;
   } catch (error) {
-    console.error("Error editing post:", error);
     if (error instanceof ZodError) {
       throw new Error(error.errors[0]?.message ?? "Invalid post data");
     }
@@ -294,48 +272,42 @@ export const AddPostUpvote = async (postId: string, userId: string) => {
 
     if (fetchError) throw fetchError;
 
-    // Avoid duplicate upvotes
     if (postUpvote) {
       return { message: "User has already upvoted this post." };
     }
 
-    // Add post upvote
     const { data: newUpvote, error: insertError } = await supabase
-    .from("post_upvotes")
-    .insert([{ post_id: postId, upvoter_id: userId }])
-    .select()
-    .single();
+      .from("post_upvotes")
+      .insert([{ post_id: postId, upvoter_id: userId }])
+      .select()
+      .single();
 
     if (insertError) throw insertError;
 
     return newUpvote;
   } catch (error) {
-    console.error("Failed to add upvote:", error);
     throw error;
   }
 };
 
 export const removePostUpvote = async (postId: string, userId: string) => {
-   try {
+  try {
     const supabase = await createClientServerComponent();
 
-  const { error } = await supabase
-    .from("post_upvotes")
-    .delete()
-    .eq("post_id", postId)
-    .eq("upvoter_id", userId);
+    const { error } = await supabase
+      .from("post_upvotes")
+      .delete()
+      .eq("post_id", postId)
+      .eq("upvoter_id", userId);
 
-  if (error) throw error;
-
-
+    if (error) throw error;
   } catch (error) {
-    console.error("Failed to remove upvote:", error);
     throw error;
   }
 };
 
 export const hasUserUpvoted = async (postId: string, userId: string): Promise<boolean> => {
-    try {
+  try {
     const supabase = await createClientServerComponent();
 
     const { data: postUpvote, error } = await supabase
@@ -347,19 +319,14 @@ export const hasUserUpvoted = async (postId: string, userId: string): Promise<bo
 
     if (error) throw error;
 
-    if (postUpvote) {
-      return true;
-    } else {
-      return false;
-    }
+    return !!postUpvote;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
 
 export const countUpvotes = async (postId: string): Promise<number> => {
-    try {
+  try {
     const supabase = await createClientServerComponent();
 
     const { count, error } = await supabase
@@ -369,10 +336,8 @@ export const countUpvotes = async (postId: string): Promise<number> => {
 
     if (error) throw error;
 
-    if (count) return count
-    else return 0;
+    return count ?? 0;
   } catch (error) {
-    console.error(error);
     throw error;
   }
 };
@@ -391,20 +356,16 @@ const defaultOptions: UploadPostContentImageOptions = {
   upsert: true,
 };
 
-export async function uploadPostContentImage(
-  file: File,
-) {
+export async function uploadPostContentImage(file: File) {
   const supabase = await createClientServerComponent();
 
   try {
     const { bucket, folder } = defaultOptions;
 
-    // Generate a cleaner file path
     const fileExtension = file.name.split(".").pop() || "";
     const fileName = `${Date.now()}.${fileExtension}`;
     const filePath = `${folder}/${fileName}`;
 
-    // Upload image to storage
     const { error: uploadError } = await supabase.storage
       .from(bucket!)
       .upload(filePath, file, {
@@ -414,7 +375,6 @@ export async function uploadPostContentImage(
 
     if (uploadError) throw uploadError;
 
-    // Get public URL
     const { data: publicUrlData } = supabase.storage
       .from(bucket!)
       .getPublicUrl(filePath);
@@ -425,28 +385,22 @@ export async function uploadPostContentImage(
 
     const imageUrl = publicUrlData.publicUrl.toString();
 
-    // Insert new row and return it
     const { data: insertedRows, error: insertError } = await supabase
       .from("post_content_images")
       .insert({ image_url: imageUrl })
-      .select("id, image_url") // select to return inserted data
-      .single(); // because we're inserting one row
+      .select("id, image_url")
+      .single();
 
-    if (insertError) {
-      console.error("Failed to insert post_content_images row:", insertError);
-      throw insertError;
-    }
+    if (insertError) throw insertError;
 
     return {
       id: insertedRows.id,
       image_url: insertedRows.image_url,
     };
   } catch (error) {
-    console.error("Image upload failed:", error);
     throw error;
   }
 }
-
 
 export async function deletePostContentImages(
   post_id: string,
@@ -455,25 +409,20 @@ export async function deletePostContentImages(
   const supabase = await createClientServerComponent();
 
   try {
-    // 1. Get all image URLs for this post
     const { data: images, error: fetchError } = await supabase
       .from("post_content_images")
       .select("image_url")
       .eq("post_id", post_id);
 
     if (fetchError) throw fetchError;
-    if (!images || images.length === 0) {
-      return false; // no images to delete
-    }
+    if (!images || images.length === 0) return false;
 
-    // 2. Extract storage file paths (await async getImagePath)
     const filePaths = (
       await Promise.all(images.map((img) => getImagePath(img.image_url)))
-    ).filter((p): p is string => !!p); // remove nulls
+    ).filter((p): p is string => !!p);
 
     if (filePaths.length === 0) return false;
 
-    // 3. Delete from storage bucket
     const { error: deleteError } = await supabase.storage
       .from(bucket)
       .remove(filePaths);
@@ -482,7 +431,6 @@ export async function deletePostContentImages(
 
     return true;
   } catch (error) {
-    console.error("Image deletion failed:", error);
     throw error;
   }
 }
@@ -491,7 +439,6 @@ export const getSocialPoints = async (userId: string): Promise<number | null> =>
   const supabase = await createClientServerComponent();
 
   try {
-    // Fetch user's points
     const { data, error } = await supabase.rpc(
       "calculate_social_points",
       { codev_id: userId },
@@ -501,34 +448,166 @@ export const getSocialPoints = async (userId: string): Promise<number | null> =>
 
     return data;
   } catch (error) {
-    console.error("Failed to fetch social points:", error);
     throw error;
   }
 };
 
+export async function deletePostComment(comment_id: string) {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { error } = await supabase
+      .from("post_comments")
+      .delete()
+      .eq("id", comment_id);
+
+    if (error) throw error;
+
+    return { success: true };
+  } catch (error) {
+    throw error;
+  }
+}
+
+export const hasReachedDailyPostLimit = async (author_id: string, limit = 2) => {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+
+    const { count, error } = await supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true })
+      .eq("author_id", author_id)
+      .gte("created_at", twentyFourHoursAgo);
+
+    if (error) throw error;
+
+    return (count ?? 0) >= limit;
+  } catch (error) {
+    throw error;
+  }
+};
+
+export const hasNotPostedYet = async (user_id: string) => {
+  try {
+    const supabase = await createClientServerComponent();
+
+    const { count, error } = await supabase
+      .from("posts")
+      .select("id", { count: "exact", head: true })
+      .eq("author_id", user_id);
+
+    if (error) throw error;
+
+    return (count ?? 0) === 0;
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Search for users by username, first name, or last name
+ */
+export async function searchUsers(query: string): Promise<UserMention[]> {
+  const supabase = await createClientServerComponent();
+
+  try {
+    const { data, error } = await supabase
+      .from("codev")
+      .select("id, username, first_name, last_name, image_url, headline")
+      .or(
+        `username.ilike.%${query}%,first_name.ilike.%${query}%,last_name.ilike.%${query}%`
+      )
+      .not("username", "is", null)
+      .limit(10);
+
+    if (error) throw error;
+
+    return data || [];
+  } catch (error) {
+    throw error;
+  }
+}
+
+/**
+ * Create comment with mention support using existing notification system
+ */
 export async function createComment(
   post_id: string,
   commenter_id: string,
   content: string,
+  mentions: string[] = []
 ) {
   const supabase = await createClientServerComponent();
 
-try {
-    const { data, error } = await supabase
+  try {
+    // 1. Create the comment
+    const { data: comment, error: commentError } = await supabase
       .from("post_comments")
       .insert([{ post_id, commenter_id, content }])
       .select()
       .single();
 
-    if (error) throw error;
+    if (commentError) throw commentError;
 
-    return data;
+    // 2. Process mentions
+    if (mentions.length > 0) {
+      const { data: mentionedUsers, error: userError } = await supabase
+        .from("codev")
+        .select("id, username, first_name, last_name")
+        .in("username", mentions);
+
+      if (!userError && mentionedUsers && mentionedUsers.length > 0) {
+        // 3. Insert comment mentions
+        const mentionRecords = mentionedUsers.map((user) => ({
+          comment_id: comment.id,
+          mentioned_user_id: user.id,
+        }));
+
+        await supabase.from("comment_mentions").insert(mentionRecords);
+
+        // 4. Notify only other users — skip self-mentions
+        const usersToNotify = mentionedUsers.filter(
+          (user) => user.id !== commenter_id
+        );
+
+        for (const user of usersToNotify) {
+          try {
+            await createNotificationAction({
+              recipientId: user.id,
+              senderId: commenter_id,
+              title: "Feeds: New Mention",
+              message: `${user.first_name}, you were mentioned in a comment`,
+              type: "user",
+              priority: "normal",
+              actionUrl: `/home/feeds?post=${post_id}#comment-${comment.id}`,
+              metadata: {
+                mention_type: "comment",
+                post_id: post_id,
+                comment_id: comment.id,
+                commenter_id: commenter_id,
+                comment_preview: content.substring(0, 50),
+              },
+              projectId: undefined,
+              jobId: undefined,
+            });
+          } catch {
+            // Notification failure should not block comment creation
+          }
+        }
+      }
+    }
+
+    return comment;
   } catch (error) {
-    console.error("Comment creation failed:", error);
     throw error;
   }
 }
 
+/**
+ * Get post comments with mention data
+ */
 export async function getPostComments(post_id: string) {
   const supabase = await createClientServerComponent();
 
@@ -544,6 +623,16 @@ export async function getPostComments(post_id: string) {
           first_name,
           last_name,
           image_url
+        ),
+        comment_mentions (
+          mentioned_user:mentioned_user_id (
+            id,
+            username,
+            first_name,
+            last_name,
+            image_url,
+            headline
+          )
         )
       `)
       .eq("post_id", post_id)
@@ -551,75 +640,34 @@ export async function getPostComments(post_id: string) {
 
     if (error) throw error;
 
-    return data;
+    const commentsWithMentions = data?.map((comment) => ({
+      ...comment,
+      mentions: comment.comment_mentions?.map((m) => m.mentioned_user) || [],
+    }));
+
+    return commentsWithMentions;
   } catch (error) {
-    console.error("Failed to fetch post comments:", error);
     throw error;
   }
 }
 
-export async function deletePostComment(comment_id: string) {
+/**
+ * Get unread notification count for a user
+ */
+export async function getUnreadNotificationCount(userId: string): Promise<number> {
   const supabase = await createClientServerComponent();
 
   try {
-    const { error } = await supabase
-      .from("post_comments")
-      .delete()
-      .eq("id", comment_id);
+    const { count, error } = await supabase
+      .from("notifications")
+      .select("*", { count: "exact", head: true })
+      .eq("recipient_id", userId)
+      .eq("read", false);
 
     if (error) throw error;
 
-    return { success: true };
+    return count || 0;
   } catch (error) {
-    console.error("Failed to delete post comment:", error);
     throw error;
   }
 }
-
-export const hasReachedDailyPostLimit = async (author_id: string, limit = 2) => {
-  try {
-    const supabase = await createClientServerComponent();
-
-    // Timestamp 24 hours ago
-    const twentyFourHoursAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-
-    const { count, error } = await supabase
-      .from("posts")
-      .select("id", { count: "exact", head: true }) // head: true avoids fetching rows
-      .eq("author_id", author_id)
-      .gte("created_at", twentyFourHoursAgo);
-
-    if (error) {
-      console.error("Error checking daily post limit:", error);
-      throw error;
-    }
-
-    // Return true if count >= limit
-    return (count ?? 0) >= limit;
-  } catch (error) {
-    console.error("Error in hasReachedDailyPostLimit:", error);
-    throw error;
-  }
-};
-
-export const hasNotPostedYet = async (user_id: string) => {
-  try {
-    const supabase = await createClientServerComponent();
-
-    const { count, error } = await supabase
-      .from("posts")
-      .select("id", { count: "exact", head: true })
-      .eq("author_id", user_id);
-
-    if (error) {
-      console.error("Error checking if user has posted:", error);
-      throw error;
-    }
-
-    // Return true if user has zero posts
-    return (count ?? 0) === 0;
-  } catch (error) {
-    console.error("Error in hasNotPostedYet:", error);
-    throw error;
-  }
-};
