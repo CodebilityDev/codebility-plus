@@ -131,7 +131,7 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-[clamp(1rem,2vw,1.5rem)]">
       <div className="space-y-2">
         <Label htmlFor="title" className="text-foreground dark:text-gray-300">Title *</Label>
         <Input
@@ -142,7 +142,7 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
           className="rounded"
         />
         {errors.title && (
-          <p className="text-sm text-red-600 dark:text-red-400">{errors.title.message}</p>
+          <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-red-600 dark:text-red-400">{errors.title.message}</p>
         )}
       </div>
 
@@ -156,7 +156,7 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
           className="border bg-card dark:bg-gray-800 dark:border-gray-700 text-foreground min-h-[120px] rounded"
         />
         {errors.description && (
-          <p className="text-sm text-red-600 dark:text-red-400">{errors.description.message}</p>
+          <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-red-600 dark:text-red-400">{errors.description.message}</p>
         )}
       </div>
 
@@ -167,7 +167,7 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
         disabled={loading}
       />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-[clamp(1rem,2vw,1.5rem)]">
         <div className="space-y-2">
           <Label htmlFor="type" className="text-foreground dark:text-gray-300">Type *</Label>
           <Select
@@ -189,7 +189,7 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
             </SelectContent>
           </Select>
           {errors.type && (
-            <p className="text-sm text-red-600 dark:text-red-400">{errors.type.message}</p>
+            <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-red-600 dark:text-red-400">{errors.type.message}</p>
           )}
         </div>
 
@@ -214,12 +214,12 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
             </SelectContent>
           </Select>
           {errors.target_audience && (
-            <p className="text-sm text-red-600 dark:text-red-400">{errors.target_audience.message}</p>
+            <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-red-600 dark:text-red-400">{errors.target_audience.message}</p>
           )}
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-[clamp(1rem,2vw,1.5rem)]">
         <div className="space-y-2">
           <Label htmlFor="priority" className="text-foreground dark:text-gray-300">Priority</Label>
           <Input
@@ -232,9 +232,9 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
             placeholder="1"
             className="rounded"
           />
-          <p className="text-xs text-gray-500 dark:text-gray-400">Higher number = higher priority</p>
+          <p className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-gray-500 dark:text-gray-400">Higher number = higher priority</p>
           {errors.priority && (
-            <p className="text-sm text-red-600 dark:text-red-400">{errors.priority.message}</p>
+            <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-red-600 dark:text-red-400">{errors.priority.message}</p>
           )}
         </div>
 
@@ -248,7 +248,7 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
             className="rounded"
           />
           {errors.start_date && (
-            <p className="text-sm text-red-600 dark:text-red-400">{errors.start_date.message}</p>
+            <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-red-600 dark:text-red-400">{errors.start_date.message}</p>
           )}
         </div>
 
@@ -261,9 +261,9 @@ export default function SurveyForm({ survey, onSuccess }: SurveyFormProps) {
             {...register("end_date")}
             className="rounded"
           />
-          <p className="text-xs text-gray-500 dark:text-gray-400">Leave empty for no expiration</p>
+          <p className="text-[clamp(0.75rem,1.5vw,0.875rem)] text-gray-500 dark:text-gray-400">Leave empty for no expiration</p>
           {errors.end_date && (
-            <p className="text-sm text-red-600 dark:text-red-400">{errors.end_date.message}</p>
+            <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-red-600 dark:text-red-400">{errors.end_date.message}</p>
           )}
         </div>
       </div>

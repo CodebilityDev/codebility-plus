@@ -16,81 +16,67 @@ interface SurveyImageUploadProps {
 export default function SurveyImageUpload({
   value,
   onChange,
-  disabled = false
+  disabled = false,
 }: SurveyImageUploadProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [preview, setPreview] = useState<string | null>(value || null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileSelect = useCallback(async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file) return;
+  const handleFileSelect = useCallback(
+    async (event: React.ChangeEvent<HTMLInputElement>) => {
+      const file = event.target.files?.[0];
+      if (!file) return;
 
-    // Validate file type
-    if (!file.type.startsWith('image/')) {
-      toast.error("Please select an image file");
-      return;
-    }
+      if (!file.type.startsWith("image/")) {
+        toast.error("Please select an image file");
+        return;
+      }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image size must be less than 5MB");
-      return;
-    }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image size must be less than 5MB");
+        return;
+      }
 
-    setIsUploading(true);
+      setIsUploading(true);
 
-    try {
-      // Create preview
-      const previewUrl = URL.createObjectURL(file);
-      setPreview(previewUrl);
+      try {
+        const previewUrl = URL.createObjectURL(file);
+        setPreview(previewUrl);
 
-      // Upload to Supabase storage in 'survey' folder
-      const publicUrl = await uploadImage(file, {
-        bucket: "codebility",
-        folder: "survey",
-        cacheControl: "3600",
-        upsert: true
-      });
+        const publicUrl = await uploadImage(file, {
+          bucket: "codebility",
+          folder: "survey",
+          cacheControl: "3600",
+          upsert: true,
+        });
 
-      // Clean up old image if exists
-      if (value) {
-        const oldImagePath = await getImagePath(value);
-        if (oldImagePath) {
-          await deleteImage(oldImagePath, "codebility");
+        if (value) {
+          const oldImagePath = await getImagePath(value);
+          if (oldImagePath) await deleteImage(oldImagePath, "codebility");
         }
-      }
 
-      // Clean up preview URL
-      URL.revokeObjectURL(previewUrl);
-
-      onChange(publicUrl);
-      setPreview(publicUrl);
-      toast.success("Survey image uploaded successfully");
-    } catch (error) {
-      console.error("Upload error:", error);
-      toast.error("Failed to upload image");
-      setPreview(value || null);
-    } finally {
-      setIsUploading(false);
-      // Reset input
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
+        URL.revokeObjectURL(previewUrl);
+        onChange(publicUrl);
+        setPreview(publicUrl);
+        toast.success("Survey image uploaded successfully");
+      } catch (error) {
+        console.error("Upload error:", error);
+        toast.error("Failed to upload image");
+        setPreview(value || null);
+      } finally {
+        setIsUploading(false);
+        if (fileInputRef.current) fileInputRef.current.value = "";
       }
-    }
-  }, [value, onChange]);
+    },
+    [value, onChange],
+  );
 
   const handleRemove = useCallback(async () => {
     if (!value) return;
-
     setIsUploading(true);
     try {
-      // Delete from storage
       const imagePath = await getImagePath(value);
-      if (imagePath) {
-        await deleteImage(imagePath, "codebility");
-      }
-
+      if (imagePath) await deleteImage(imagePath, "codebility");
       onChange(null);
       setPreview(null);
       toast.success("Survey image removed");
@@ -102,113 +88,105 @@ export default function SurveyImageUpload({
     }
   }, [value, onChange]);
 
-  const triggerFileInput = () => {
-    fileInputRef.current?.click();
-  };
-
   return (
     <div className="space-y-3">
-      <Label className="text-sm font-medium text-foreground dark:text-gray-300">Survey Image (Optional)</Label>
+      <div className="flex items-center justify-between">
+        <Label className="text-sm font-medium text-foreground dark:text-gray-300">
+          Survey Image <span className="text-gray-500">(Optional)</span>
+        </Label>
+        {/* Recommended spec label — tells user exactly what to upload */}
+        <span className="text-xs text-gray-500 dark:text-gray-500">
+          Recommended: <span className="font-medium text-gray-400">200×200px square</span>
+          {" · "}PNG or JPG
+          {" · "}max 5MB
+        </span>
+      </div>
 
-      <div className="flex flex-col gap-3">
-        {/* Image Preview */}
-        {preview ? (
-          <div className="relative group">
-            <div className="relative w-full h-32 rounded-lg border-2 border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-50 dark:bg-gray-800">
+      <div className="flex gap-4 items-start">
+        {/* Left: square preview matching the thumbnail size/shape */}
+        <div className="flex-shrink-0">
+          <div className="h-20 w-20 rounded-xl overflow-hidden border-2 border-dashed border-gray-600 bg-gray-800 flex items-center justify-center">
+            {preview ? (
               <img
                 src={preview}
-                alt="Survey preview"
-                className="w-full h-full object-cover"
+                alt="Survey thumbnail preview"
+                // object-cover fills the square — same behavior as the card thumbnail
+                className="h-full w-full object-cover"
               />
-              {/* Overlay with remove button */}
-              <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                <Button
-                  type="button"
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleRemove}
-                  disabled={disabled || isUploading}
-                  className="bg-red-600 hover:bg-red-700"
-                >
-                  <X className="h-4 w-4 mr-1" />
-                  Remove
-                </Button>
-              </div>
-            </div>
+            ) : (
+              <ImageIcon className="h-8 w-8 text-gray-600" />
+            )}
           </div>
-        ) : (
-          /* Upload Area */
+          {/* Hint below the square preview */}
+          <p className="mt-1 text-center text-[10px] text-gray-600">Preview</p>
+        </div>
+
+        {/* Right: upload area + guidance */}
+        <div className="flex-1 space-y-3">
+          {/* Drag/click upload zone */}
           <div
-            className={`
-              w-full h-32 rounded-lg border-2 border-dashed border-gray-300 dark:border-gray-600
-              bg-gray-50 dark:bg-gray-800 flex flex-col items-center justify-center gap-2
-              hover:border-gray-400 dark:hover:border-gray-500 transition-colors cursor-pointer
-              ${disabled ? 'opacity-50 cursor-not-allowed' : ''}
+            className={`w-full rounded-lg border-2 border-dashed border-gray-600 bg-gray-800/50 px-4 py-5
+              flex flex-col items-center justify-center gap-1 transition-colors
+              hover:border-gray-500 hover:bg-gray-800 cursor-pointer
+              ${disabled ? "cursor-not-allowed opacity-50" : ""}
             `}
-            onClick={disabled ? undefined : triggerFileInput}
+            onClick={disabled ? undefined : () => fileInputRef.current?.click()}
           >
             {isUploading ? (
               <div className="flex flex-col items-center gap-2">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-                <span className="text-sm text-gray-600 dark:text-gray-400">Uploading...</span>
+                <div className="h-6 w-6 animate-spin rounded-full border-b-2 border-violet-500" />
+                <span className="text-sm text-gray-400">Uploading...</span>
               </div>
             ) : (
               <>
-                <ImageIcon className="h-8 w-8 text-gray-400" />
-                <div className="text-center">
-                  <p className="text-sm text-gray-600 dark:text-gray-400">
-                    Click to upload survey image
-                  </p>
-                  <p className="text-xs text-gray-500 dark:text-gray-500">
-                    PNG, JPG up to 5MB
-                  </p>
-                </div>
+                <Upload className="h-5 w-5 text-gray-500" />
+                <p className="text-sm text-gray-400">
+                  {preview ? "Click to change image" : "Click to upload image"}
+                </p>
+                {/* Format + dimension guidance inline */}
+                <p className="text-xs text-gray-600">
+                  Square image works best · PNG, JPG · Max 5MB
+                </p>
               </>
             )}
           </div>
-        )}
 
-        {/* Upload Button */}
-        <div className="flex gap-2">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={triggerFileInput}
-            disabled={disabled || isUploading}
-            className="flex items-center gap-2 border border-gray-300 bg-accent hover:bg-gray-300 dark:border-gray-700 dark:bg-gray-800 text-foreground dark:hover:bg-gray-700 rounded"
-          >
-            <Upload className="h-4 w-4" />
-            {preview ? "Change Image" : "Upload Image"}
-          </Button>
-
-          {preview && (
+          {/* Action buttons */}
+          <div className="flex gap-2">
             <Button
               type="button"
-              variant="ghost"
-              onClick={handleRemove}
+              variant="outline"
+              onClick={() => fileInputRef.current?.click()}
               disabled={disabled || isUploading}
-              className="text-red-600 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 dark:text-red-400 dark:hover:text-red-300 rounded"
+              className="flex items-center gap-2 rounded-lg border-gray-600 bg-transparent text-gray-300 hover:bg-gray-700 hover:text-white"
             >
-              <X className="h-4 w-4 mr-1" />
-              Remove
+              <Upload className="h-4 w-4" />
+              {preview ? "Change" : "Upload"}
             </Button>
-          )}
+            {preview && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleRemove}
+                disabled={disabled || isUploading}
+                className="rounded-lg text-red-400 hover:bg-red-500/15 hover:text-red-300"
+              >
+                <X className="h-4 w-4 mr-1" />
+                Remove
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* Hidden file input */}
       <input
         ref={fileInputRef}
         type="file"
-        accept="image/*"
+        accept="image/png, image/jpeg, image/webp"
         onChange={handleFileSelect}
         className="hidden"
         disabled={disabled || isUploading}
       />
-
-      <p className="text-xs text-gray-500 dark:text-gray-400">
-        Survey images help make surveys more engaging and visually appealing.
-      </p>
     </div>
   );
 }
