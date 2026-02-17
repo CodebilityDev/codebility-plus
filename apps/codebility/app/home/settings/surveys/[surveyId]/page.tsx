@@ -262,17 +262,17 @@ export default function SurveyBuilderPage() {
           )}
           <div>
             <div className="mb-1 flex items-center gap-3">
-              <H1 className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+              <H1 className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent pt-7">
                 {survey?.title || "Survey Builder"}
               </H1>
               {/* Type badge */}
               {survey?.type && (
-                <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${typeColors[survey.type]}`}>
+                <span className={`rounded-full mt-3 px-2.5 py-0.5 text-xs font-medium capitalize ${typeColors[survey.type]}`}>
                   {survey.type}
                 </span>
               )}
             </div>
-            <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-gray-400">
+            <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-gray-400 mt-[-10px]">
               {survey?.description || "Build your survey questions"}
             </p>
           </div>
@@ -283,7 +283,7 @@ export default function SurveyBuilderPage() {
           <Button
             onClick={() => setShareModalOpen(true)}
             variant="outline"
-            className="flex items-center gap-2 rounded-xl border-violet-500/40 text-violet-400 hover:bg-violet-500/15 hover:text-violet-300"
+            className="flex items-center gap-2 rounded-l border-violet-500/40 text-violet-400 hover:bg-violet-500/15 hover:text-violet-300"
           >
             <Share2 className="h-4 w-4" />
             Share
@@ -291,14 +291,14 @@ export default function SurveyBuilderPage() {
           <Button
             onClick={() => router.push(`/home/settings/surveys/${surveyId}/results`)}
             variant="outline"
-            className="flex items-center gap-2 rounded-xl border-white/15 text-gray-300 hover:bg-white/10 hover:text-white"
+            className="flex items-center gap-2 rounded-l border-white/15 text-gray-300 hover:bg-white/10 hover:text-white"
           >
             <BarChart3 className="h-4 w-4" />
             View Results
           </Button>
           <Button
             onClick={() => { setEditingQuestion(null); setShowForm(true); }}
-            className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-600 hover:to-purple-700"
+            className="flex items-center gap-2 rounded-l bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/25 hover:from-violet-600 hover:to-purple-700"
           >
             <Plus className="h-4 w-4" />
             Add Question

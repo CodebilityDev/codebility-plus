@@ -185,11 +185,11 @@ export default function SurveysPage() {
       {/* ── Page Header ── */}
       <div className="mb-8 flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
+          <div className="flex h-12 w-12 items-center justify-center rounded-3xl bg-gradient-to-br from-violet-500 to-purple-600 shadow-lg shadow-violet-500/25">
             <BarChart2 className="h-6 w-6 text-white" />
           </div>
           <div>
-            <H1 className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+            <H1 className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent pt-8">
               Surveys
             </H1>
             <p className="text-[clamp(0.875rem,1.8vw,1rem)] text-gray-400">
@@ -199,7 +199,7 @@ export default function SurveysPage() {
         </div>
         <Button
           onClick={() => setShowForm(true)}
-          className="flex items-center gap-2 rounded-xl bg-gradient-to-r from-violet-500 to-purple-600 px-5 text-white shadow-lg shadow-violet-500/25 hover:from-violet-600 hover:to-purple-700"
+          className="flex items-center gap-2 rounded-l bg-gradient-to-r from-violet-500 to-purple-600 px-5 text-white shadow-lg shadow-violet-500/25 hover:from-violet-600 hover:to-purple-700"
         >
           <Plus className="h-4 w-4" />
           Add Survey
@@ -300,7 +300,7 @@ export default function SurveysPage() {
                         {survey.target_audience}
                       </span>
                       {/* Status badge with dot indicator */}
-                      <span className={`flex items-center gap-1.5 rounded-full px-2.5 py-0.5 text-[clamp(0.7rem,1.4vw,0.8rem)] font-medium ${
+                      <span className={`flex items-center gap-1.5 rounded-xl px-2.5 py-0.5 text-[clamp(0.7rem,1.4vw,0.8rem)] font-medium ${
                         survey.is_active
                           ? "bg-emerald-500/15 text-emerald-400 border border-emerald-500/30"
                           : "bg-gray-500/15 text-gray-400 border border-gray-500/30"
