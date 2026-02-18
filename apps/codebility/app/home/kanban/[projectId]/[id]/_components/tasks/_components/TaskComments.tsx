@@ -283,6 +283,7 @@ const ReplyItem = memo(function ReplyItem({
   const [editMentionQuery, setEditMentionQuery] = useState("");
   const [editMentionPosition, setEditMentionPosition] = useState({ top: 0, left: 0, width: 200 });
   const [editFilteredUsers, setEditFilteredUsers] = useState<MentionUser[]>([]);
+  const [editHighlightedIndex, setEditHighlightedIndex] = useState(0);
   
   // Ref for edit textarea and wrapper (used for proper dropdown positioning)
   const editTextareaRef = useRef<HTMLTextAreaElement>(null);
@@ -479,7 +480,8 @@ const ReplyItem = memo(function ReplyItem({
                   setEditHighlightedIndex(i => (i - 1 + editFilteredUsers.length) % editFilteredUsers.length);
                 } else if (e.key === 'Enter') {
                   e.preventDefault();
-                  handleEditMentionSelect(editFilteredUsers[editHighlightedIndex || 0]);
+                  const candidate = editFilteredUsers[editHighlightedIndex || 0];
+                  if (candidate) handleEditMentionSelect(candidate);
                 } else if (e.key === 'Escape') {
                   setShowEditMentionDropdown(false);
                 }
@@ -851,7 +853,8 @@ const CommentItem = memo(function CommentItem({
                       setEditHighlightedIndex(i => (i - 1 + editFilteredUsers.length) % editFilteredUsers.length);
                     } else if (e.key === 'Enter') {
                       e.preventDefault();
-                      handleEditMentionSelect(editFilteredUsers[editHighlightedIndex || 0]);
+                      const candidate = editFilteredUsers[editHighlightedIndex || 0];
+                      if (candidate) handleEditMentionSelect(candidate);
                     } else if (e.key === 'Escape') {
                       setShowEditMentionDropdown(false);
                     }
@@ -953,7 +956,8 @@ const CommentItem = memo(function CommentItem({
                     setReplyHighlightedIndex(i => (i - 1 + replyFilteredUsers.length) % replyFilteredUsers.length);
                   } else if (e.key === 'Enter') {
                     e.preventDefault();
-                    handleReplyMentionSelect(replyFilteredUsers[replyHighlightedIndex || 0]);
+                    const candidate = replyFilteredUsers[replyHighlightedIndex || 0];
+                    if (candidate) handleReplyMentionSelect(candidate);
                   } else if (e.key === 'Escape') {
                     setShowReplyMentionDropdown(false);
                   }
