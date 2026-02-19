@@ -28,8 +28,10 @@ import {
   ChevronDown,
   ChevronUp,
   Ellipsis,
+  ExternalLink,
   Loader2Icon,
   MessageCircle,
+  Pencil,
 } from "lucide-react";
 import toast from "react-hot-toast";
 
@@ -317,6 +319,11 @@ const TaskViewModal = ({
 
   const [prLink, setPrLink] = useState("");
   const [originalPrLink, setOriginalPrLink] = useState("");
+
+  // NEW: Controls whether PR Link shows as hyperlink (false) or input (true)
+  // Starts as false so a saved link renders as a clickable <a> tag immediately
+  const [isEditingPrLink, setIsEditingPrLink] = useState(false);
+
   const [supabase, setSupabase] = useState<any>(null);
   const [boardId, setBoardId] = useState<string>("");
 
@@ -332,7 +339,9 @@ const TaskViewModal = ({
 
   const [manualSaveChanges, setManualSaveChanges] = useState(false);
   const [isSavingChanges, setIsSavingChanges] = useState(false);
-  const [pendingAssigneeId, setPendingAssigneeId] = useState<string | undefined>(undefined);
+  const [pendingAssigneeId, setPendingAssigneeId] = useState<
+    string | undefined
+  >(undefined);
 
   const isModalOpen = isOpen && type === "taskViewModal";
   const task = data as Task | null;
@@ -404,7 +413,7 @@ const TaskViewModal = ({
     fetchBoardId();
   }, [task?.kanban_column_id, supabase]);
 
-  // FIXED: Consolidated state reset logic with single execution flow
+  // Reset all state when a different task is opened
   useEffect(() => {
     if (!task?.id || !supabase) return;
 
@@ -415,7 +424,11 @@ const TaskViewModal = ({
     setPendingAssigneeId(undefined);
     setForceRefreshKey(Date.now().toString());
 
-    // Fetch and set assignee in one go
+    // NEW: If task already has a PR link, show it as hyperlink (not editing mode)
+    // If no PR link, go straight to edit mode so user can enter one
+    setIsEditingPrLink(!taskPrLink);
+
+    // Fetch and set assignee
     const assigneeId = task.codev_id || task?.codev?.id;
     if (assigneeId) {
       supabase
@@ -495,6 +508,9 @@ const TaskViewModal = ({
       toast.success("PR Link updated successfully");
       setOriginalPrLink(prLink);
       if (task) task.pr_link = prLink;
+
+      // NEW: After successful save, switch back to hyperlink display mode
+      setIsEditingPrLink(false);
     } else {
       toast.error(response.error || "Failed to update PR Link");
     }
@@ -502,11 +518,9 @@ const TaskViewModal = ({
     setUpdateLoading(false);
   };
 
-  // FIXED: Improved task completion with better error handling and data consistency
   const handleMarkAsDone = async () => {
     if (!task) return;
 
-    // Validate required fields before attempting completion
     if (!task.id) {
       toast.error("Task ID is missing");
       return;
@@ -521,17 +535,11 @@ const TaskViewModal = ({
 
     console.log("Attempting to complete task with ID:", task.id);
 
-    // Optimistically remove the task from UI
     removeTaskOptimistic(task.id);
-
-    // Close modal for better UX
     onClose();
-
-    // Show optimistic success message
     toast.success("Completing task...");
 
     try {
-      // Pass the original task object - let the server action handle field extraction
       const result = await completeTask(task);
 
       console.log("Task completion result:", result);
@@ -543,12 +551,10 @@ const TaskViewModal = ({
           onComplete(task.id);
         }
 
-        // Refresh data in background
         setTimeout(() => {
           fetchBoardData();
         }, 1000);
       } else {
-        // Revert optimistic update
         const errorMessage = result.error || "Failed to complete task";
         console.error("Task completion failed:", errorMessage, result);
         toast.error(errorMessage);
@@ -590,14 +596,15 @@ const TaskViewModal = ({
     setForceRefreshKey(`${Date.now()}-${Math.random()}`);
   };
 
-  // FIXED: Simplified close handler with cleaner state reset
   const handleClose = () => {
     if (hasUnsavedChanges) {
       setManualSaveChanges(false);
       setPendingAssigneeId(undefined);
       setPrLink(originalPrLink);
 
-      // Reset assignee to original state
+      // NEW: Reset edit mode — if original has a link, go back to hyperlink view
+      setIsEditingPrLink(!originalPrLink);
+
       if (task?.codev_id || task?.codev?.id) {
         const assigneeId = task.codev_id || task.codev?.id || "";
         if (supabase && assigneeId) {
@@ -626,7 +633,7 @@ const TaskViewModal = ({
 
     try {
       if (hasPrLinkChanges) {
-        await handleUpdate();
+        await handleUpdate(); // handleUpdate already switches to hyperlink view on success
       }
 
       if (manualSaveChanges) {
@@ -763,7 +770,7 @@ const TaskViewModal = ({
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Difficulty</Label>
+                <Label className="text-sm font-medium pt-1">Difficulty</Label>
                 <DifficultyPointsTooltip />
               </div>
               <Select disabled value={task?.difficulty || ""}>
@@ -793,36 +800,109 @@ const TaskViewModal = ({
               />
             </div>
 
+            {/* ============================================================
+                PR LINK SECTION — CBP-58
+                3 states:
+                  1. Has link, view mode   → full-width clickable URL + "Edit PR Link" button below
+                  2. No link               → empty state label + "Add PR Link" button
+                  3. Editing               → full-width input (stacked), Update + Cancel buttons below
+                ============================================================ */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">PR Link</Label>
-              <div
-                className={`${hasPrLinkChanges ? "flex items-center space-x-2" : ""}`}
-              >
-                <Input
-                  value={prLink}
-                  onChange={(e) => setPrLink(e.target.value)}
-                  onBlur={() => {
-                    if (!prLink.trim() && task?.pr_link) {
-                      setPrLink(task.pr_link);
-                    }
-                  }}
-                  className="text-grey-100 bg-light-900 dark:bg-dark-200 dark:text-light-900 flex-1 border border-gray-300 focus:border-blue-500"
-                  placeholder="Enter PR Link..."
-                />
-                {hasPrLinkChanges && (
-                  <Button
-                    variant="outline"
-                    onClick={handleUpdate}
-                    className="flex-1 bg-blue-600 text-white hover:bg-blue-700"
-                    disabled={updateLoading}
+
+              {/* STATE 1: Saved PR link exists and NOT in edit mode → show full URL as hyperlink */}
+              {!isEditingPrLink && prLink ? (
+                <div className="flex flex-col gap-2">
+                  {/* Full-width link row — user can clearly see and click the URL */}
+                  <a
+                    href={prLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex w-full items-center gap-2 overflow-hidden rounded-md border pt-2.5 pb-2.5 border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 transition-colors hover:border-blue-500 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/40"
+                    title={`Open: ${prLink}`}
                   >
-                    {updateLoading && (
-                      <Loader2Icon className="mr-2 h-4 w-4 animate-spin" />
+                    {/* Icon stays fixed width, URL text fills remaining space */}
+                    <ExternalLink className="h-4 w-4 shrink-0 text-blue-500" />
+                    <span className="min-w-0 flex-1 truncate font-medium">{prLink}</span>
+                    <span className="shrink-0 text-xs text-blue-400">open</span>
+                  </a>
+
+                  {/* Edit button — only for users with modify permission */}
+                  {canModifyTask && (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingPrLink(true)}
+                      className="flex w-fit items-center gap-1 text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
+                    >
+                      <Pencil className="h-3 w-3" />
+                      Edit
+                    </button>
+                  )}
+                </div>
+              ) : isEditingPrLink ? (
+                /* STATE 3: Currently editing — full-width input stacked above action buttons */
+                <div className="flex flex-col gap-2">
+                  {/* Full-width input — no competition with buttons */}
+                  <Input
+                    autoFocus
+                    value={prLink}
+                    onChange={(e) => setPrLink(e.target.value)}
+                    className="w-full border border-blue-400 bg-white focus:border-blue-500 focus:ring-1 focus:ring-blue-500 dark:bg-gray-800 dark:text-white"
+                    placeholder="https://github.com/org/repo/pull/123"
+                  />
+
+                  {/* Action buttons row — below the input so input keeps full width */}
+                  <div className="flex items-center gap-2">
+                    <Button
+                      onClick={handleUpdate}
+                      disabled={updateLoading || !prLink.trim()}
+                      className="flex-1 bg-blue-600 px-4 text-white hover:bg-blue-700 disabled:opacity-50"
+                      size="sm"
+                    >
+                      {updateLoading && (
+                        <Loader2Icon className="mr-2 h-3 w-3 animate-spin" />
+                      )}
+                      Update
+                    </Button>
+
+                    {originalPrLink && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          setPrLink(originalPrLink);
+                          setIsEditingPrLink(false);
+                        }}
+                        className="flex-1 border-gray-300 text-gray-500 hover:text-gray-700 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-200"
+                      >
+                        Cancel
+                      </Button>
                     )}
-                    Update
-                  </Button>
-                )}
-              </div>
+                  </div>
+                </div>
+              ) : (
+                /* STATE 2: No PR link set — clear empty state so user knows it's editable */
+                <div className="flex flex-col gap-2">
+                  {/* Empty state — dashed border signals "add something here" */}
+                  <div className="flex items-center gap-2 rounded-md border border-dashed border-gray-300 bg-gray-50 px-3 py-2 text-sm text-gray-400 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-500">
+                    <ExternalLink className="h-4 w-4 shrink-0" />
+                    <span>No PR link set</span>
+                  </div>
+
+                  {/* Add button — only for users with modify permission */}
+                  {canModifyTask && (
+                    <button
+                      type="button"
+                      onClick={() => setIsEditingPrLink(true)}
+                      className="flex w-fit items-center gap-1 text-xs text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300"
+                    >
+                      <Pencil className="h-3 w-3" />
+                      Add PR Link
+                    </button>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="space-y-2">
@@ -845,7 +925,7 @@ const TaskViewModal = ({
               </div>
             </div>
 
-            {/* FIXED: Primary Assignee - Now allows modification even when assigned */}
+            {/* Primary Assignee - allows modification even when assigned */}
             <div className="space-y-2">
               <Label className="text-sm font-medium">Primary Assignee</Label>
               {canModifyTask ? (
@@ -926,7 +1006,7 @@ const TaskViewModal = ({
             </div>
           )}
 
-          {/* UPDATED: Description Section with KanbanRichTextDisplay */}
+          {/* Description Section */}
           <div className="space-y-2">
             <Label className="text-sm font-medium">Description</Label>
             <div className="rounded-md border border-gray-200 bg-gray-50 p-3 dark:border-gray-700 dark:bg-gray-800">
@@ -965,7 +1045,7 @@ const TaskViewModal = ({
 
             <div className="space-y-2">
               <Label className="text-sm font-medium">Created At</Label>
-              <div className="bg-light-900 rounded-md px-3 py-2 text-sm text-gray-700  dark:bg-gray-800 dark:text-gray-200">
+              <div className="bg-light-900 rounded-md px-3 py-2 text-sm text-gray-700 dark:bg-gray-800 dark:text-gray-200">
                 {task?.created_at
                   ? new Date(task.created_at).toLocaleString()
                   : "Unknown"}
