@@ -28,10 +28,10 @@ import {
   getAdminOutreachStats,
   getAdminOutreachHistory,
   deleteClientOutreach,
-  getCurrentWeekStart,
   type AdminOutreachStats,
   type ClientOutreach,
 } from "../actions";
+import { getCurrentWeekStart } from "../utils";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 
 export default function ClientTrackerContent() {

@@ -2,6 +2,7 @@
 
 import { createClientServerComponent } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
+import { getCurrentWeekStart } from "./utils";
 
 export interface ClientOutreach {
   id: string;
@@ -22,19 +23,6 @@ export interface AdminOutreachStats {
   email_address: string;
   current_week_count: number;
   total_count: number;
-}
-
-/**
- * Get current week's start date (Monday)
- */
-export function getCurrentWeekStart(): Date {
-  const now = new Date();
-  const dayOfWeek = now.getDay();
-  const diff = dayOfWeek === 0 ? -6 : 1 - dayOfWeek; // If Sunday, go back 6 days, else go to Monday
-  const monday = new Date(now);
-  monday.setDate(now.getDate() + diff);
-  monday.setHours(0, 0, 0, 0);
-  return monday;
 }
 
 /**
