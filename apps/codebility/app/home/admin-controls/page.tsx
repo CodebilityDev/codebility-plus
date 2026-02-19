@@ -1,15 +1,15 @@
 import Link from "next/link";
 import SettingsCard from "@/app/home/settings/_components/SettingsCard";
 import { H1 } from "@/components/shared/dashboard";
-import { settingsCardData } from "@/constants/settings";
+import { adminControlsCardData } from "@/constants/settings";
 import PageContainer from "../_components/PageContainer";
 
-const Settings = () => {
+const AdminControls = () => {
   return (
     <PageContainer maxWidth="xl">
-      <H1>Settings</H1>
+      <H1>Admin Controls</H1>
       <div className="mt-4 grid w-full grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {settingsCardData.map((card) => (
+        {adminControlsCardData.map((card) => (
           <Link key={card.path} href={card.path}>
             <SettingsCard
               imageName={card.imageName}
@@ -24,4 +24,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default AdminControls;

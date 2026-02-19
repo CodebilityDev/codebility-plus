@@ -197,6 +197,12 @@ export const getSidebarData = async (
           permission: "clients" as PermissionKey,
         },
         {
+          route: pathsConfig.app.admin_controls,
+          imgURL: "/assets/svgs/icon-admin-dashboard.svg",
+          label: "Admin Controls",
+          permission: "applicants" as PermissionKey,
+        },
+        {
           route: pathsConfig.app.settings,
           imgURL: "/assets/svgs/icon-cog.svg",
           label: "Settings",

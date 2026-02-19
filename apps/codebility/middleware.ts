@@ -46,10 +46,9 @@ const routePermissionMap: Record<string, keyof RolePermissions> = {
   "/home/clients": "clients",
   "/home/hire": "clients",
   "/home/projects": "projects",
-  "/home/settings/permissions": "permissions",
-  "/home/settings/roles": "roles",
   "/home/settings/profile": "resume",
   "/home/settings": "settings",
+  "/home/admin-controls": "applicants",
 };
 
 type RolePermissions = {
@@ -64,8 +63,6 @@ type RolePermissions = {
   settings: boolean;
   orgchart: boolean;
   resume?: boolean;
-  permissions?: boolean;
-  roles?: boolean;
 };
 
 export async function middleware(req: NextRequest) {
@@ -218,8 +215,6 @@ export async function middleware(req: NextRequest) {
         "settings",
         "orgchart",
         "resume",
-        "permissions",
-        "roles",
       ];
       return validPermissions.includes(permission as keyof RolePermissions);
     }
@@ -236,7 +231,7 @@ export async function middleware(req: NextRequest) {
       const { data: rolePermissions, error: roleError } = await supabase
         .from("roles")
         .select(
-          "dashboard, kanban, time_tracker, interns, applicants, inhouse, clients, projects, settings, orgchart, roles, permissions, resume",
+          "dashboard, kanban, time_tracker, interns, applicants, inhouse, clients, projects, settings, orgchart, resume",
         )
         .eq("id", role_id)
         .single();

@@ -8,19 +8,15 @@ type SettingsCardDataProps = {
 
 export const settingsCardData: SettingsCardDataProps[] = [
   {
-    path: "/home/settings/roles",
-    imageName: "icon-roles",
-    imageAlt: "Icon Roles",
-    title: "Roles",
-    description: "Manage the position to create and update.",
+    path: "/home/settings/account-settings",
+    imageName: "icon-cog",
+    imageAlt: "Icon Account",
+    title: "Account Settings",
+    description: "Update your account information.",
   },
-  {
-    path: "/home/settings/permissions",
-    imageName: "icon-key",
-    imageAlt: "Icon Permissions",
-    title: "Permissions",
-    description: "Setup a permission to roles.",
-  },
+];
+
+export const adminControlsCardData: SettingsCardDataProps[] = [
   {
     path: "/home/settings/news-banners",
     imageName: "icon-bell",
@@ -42,11 +38,4 @@ export const settingsCardData: SettingsCardDataProps[] = [
     title: "Services",
     description: "View all services and download as PDF.",
   },
-  {
-    path: "/home/settings/account-settings",
-    imageName: "icon-cog",
-    imageAlt: "Icon Account",
-    title: "Account Settings",
-    description: "Update your account information.",
-  }
 ];
