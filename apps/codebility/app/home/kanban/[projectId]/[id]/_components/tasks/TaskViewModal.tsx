@@ -770,7 +770,7 @@ const TaskViewModal = ({
 
             <div className="space-y-2">
               <div className="flex items-center gap-2">
-                <Label className="text-sm font-medium">Difficulty</Label>
+                <Label className="text-sm font-medium pt-1">Difficulty</Label>
                 <DifficultyPointsTooltip />
               </div>
               <Select disabled value={task?.difficulty || ""}>
@@ -818,13 +818,13 @@ const TaskViewModal = ({
                     href={prLink}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex w-full items-center gap-2 overflow-hidden rounded-md border border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 transition-colors hover:border-blue-500 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/40"
+                    className="flex w-full items-center gap-2 overflow-hidden rounded-md border pt-2.5 pb-2.5 border-blue-300 bg-blue-50 px-3 py-2 text-sm text-blue-700 transition-colors hover:border-blue-500 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950/40 dark:text-blue-300 dark:hover:bg-blue-900/40"
                     title={`Open: ${prLink}`}
                   >
                     {/* Icon stays fixed width, URL text fills remaining space */}
                     <ExternalLink className="h-4 w-4 shrink-0 text-blue-500" />
                     <span className="min-w-0 flex-1 truncate font-medium">{prLink}</span>
-                    <span className="shrink-0 text-xs text-blue-400">↗ Open</span>
+                    <span className="shrink-0 text-xs text-blue-400">open</span>
                   </a>
 
                   {/* Edit button — only for users with modify permission */}
@@ -835,7 +835,7 @@ const TaskViewModal = ({
                       className="flex w-fit items-center gap-1 text-xs text-gray-500 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400"
                     >
                       <Pencil className="h-3 w-3" />
-                      Edit PR Link
+                      Edit
                     </button>
                   )}
                 </div>
@@ -856,27 +856,28 @@ const TaskViewModal = ({
                     <Button
                       onClick={handleUpdate}
                       disabled={updateLoading || !prLink.trim()}
-                      className="bg-blue-600 px-4 text-white hover:bg-blue-700 disabled:opacity-50"
+                      className="flex-1 bg-blue-600 px-4 text-white hover:bg-blue-700 disabled:opacity-50"
                       size="sm"
                     >
                       {updateLoading && (
                         <Loader2Icon className="mr-2 h-3 w-3 animate-spin" />
                       )}
-                      Update PR Link
+                      Update
                     </Button>
 
-                    {/* Cancel only shown when there was an original link to go back to */}
                     {originalPrLink && (
-                      <button
+                      <Button
                         type="button"
+                        variant="outline"
+                        size="sm"
                         onClick={() => {
                           setPrLink(originalPrLink);
                           setIsEditingPrLink(false);
                         }}
-                        className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+                        className="flex-1 border-gray-300 text-gray-500 hover:text-gray-700 dark:border-gray-600 dark:text-gray-400 dark:hover:text-gray-200"
                       >
                         Cancel
-                      </button>
+                      </Button>
                     )}
                   </div>
                 </div>
