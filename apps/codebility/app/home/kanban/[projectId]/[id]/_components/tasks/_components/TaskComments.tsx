@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, memo, useCallback } from "react";
+import { useState, useEffect, memo, useCallback, useRef } from "react";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
@@ -59,21 +59,43 @@ interface DbComment {
     image_url: string | null;
   } | null;
 }
+// User interface for mentions
+interface MentionUser {
+  id: string;
+  name: string;
+  username: string;
+  image_url: string | null;
+}
 
-// Utility function to format comment text with clickable links and preserved formatting
-const formatCommentText = (text: string): JSX.Element => {
-  // URL regex pattern
-  const urlPattern = /(https?:\/\/[^\s]+)/g;
-  
+// Utility function to extract mentions from text
+const extractMentions = (text: string): string[] => {
+  // allow usernames containing letters, numbers, dots, underscores and hyphens
+  const mentionPattern = /@([A-Za-z0-9._-]+)/g;
+  const mentions: string[] = [];
+  let match;
+  while ((match = mentionPattern.exec(text)) !== null) {
+    mentions.push(match[1].toLowerCase()); // normalize to lower-case for matching
+  }
+  return [...new Set(mentions)]; // Remove duplicates
+};
+
+// Utility function to format comment text with clickable links, mentions, and preserved formatting
+// Accepts optional `users` so mentions can be displayed using the user's full handle when resolvable
+const formatCommentText = (text: string, users?: MentionUser[]): JSX.Element => {
+  // URL regex pattern (no global flag — safer for repeated .test calls)
+  const urlPattern = /(https?:\/\/[^\s]+)/;
+  // Mention regex pattern: allow letters, numbers, dots, underscores and hyphens
+  const mentionPattern = /(@[A-Za-z0-9._-]+)/;
+
   // Split text by newlines first to preserve line breaks
   const lines = text.split('\n');
-  
+
   return (
     <>
       {lines.map((line, lineIndex) => {
-        // Split each line by URLs
-        const parts = line.split(urlPattern);
-        
+        // Split each line by URLs and mentions
+        const parts = line.split(urlPattern).flatMap(part => part.split(mentionPattern));
+
         return (
           <span key={lineIndex}>
             {parts.map((part, partIndex) => {
@@ -92,6 +114,37 @@ const formatCommentText = (text: string): JSX.Element => {
                   </a>
                 );
               }
+
+              // Check if this part is a mention
+              if (mentionPattern.test(part)) {
+                const mentionKey = part.slice(1).toLowerCase(); // strip '@' and normalize
+
+                // If users list provided, try to resolve to a full username
+                let displayText = part; // fallback to original mention
+                if (users && users.length > 0) {
+                  const matched = users.find(u =>
+                    u.username.toLowerCase() === mentionKey ||
+                    u.username.toLowerCase().startsWith(mentionKey) ||
+                    u.name.toLowerCase().startsWith(mentionKey)
+                  );
+                  if (matched) {
+                    // show full handle as the highlighted text (user requested full username display)
+                    displayText = `@${matched.username}`;
+                  }
+                }
+
+                return (
+                  <span
+                    key={partIndex}
+                    className="bg-blue-100 text-blue-800 px-1 py-0.5 rounded dark:bg-blue-900 dark:text-blue-200 font-medium"
+                    title={displayText}
+                    data-mention={displayText}
+                  >
+                    {displayText}
+                  </span>
+                );
+              }
+
               return <span key={partIndex}>{part}</span>;
             })}
             {lineIndex < lines.length - 1 && <br />}
@@ -101,6 +154,81 @@ const formatCommentText = (text: string): JSX.Element => {
     </>
   );
 };
+
+const MentionDropdown = memo(function MentionDropdown({
+  users,
+  onSelect,
+  onClose,
+  position,
+  id = "mention-dropdown",
+  highlightedIndex = -1,
+}: {
+  users: MentionUser[];
+  onSelect: (user: MentionUser) => void;
+  onClose: () => void;
+  position: { top: number; left: number; width: number };
+  id?: string;
+  highlightedIndex?: number;
+}) {
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        onClose();
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [onClose]);
+
+  if (users.length === 0) return null;
+
+  return (
+    <div
+      ref={dropdownRef}
+      id={id}
+      role="listbox"
+      aria-label="Mention suggestions"
+      className="absolute z-50 bg-white border border-gray-300 rounded-md shadow-lg max-h-48 overflow-y-auto dark:bg-gray-800 dark:border-gray-600"
+      style={{ top: position.top, left: position.left, width: position.width }}
+    >
+      {users.map((user, index) => (
+        <button
+          key={user.id}
+          role="option"
+          id={`${id}-option-${index}`}
+          aria-selected={index === highlightedIndex}
+          tabIndex={-1}
+          onClick={() => onSelect(user)}
+          className={`w-full px-3 py-2 text-left hover:bg-gray-100 dark:hover:bg-gray-700 flex items-center gap-2 ${index === highlightedIndex ? 'bg-gray-100 dark:bg-gray-700' : ''}`}
+        >
+          {user.image_url ? (
+            <Image
+              src={user.image_url}
+              alt={user.name}
+              width={24}
+              height={24}
+              className="rounded-full"
+              objectFit="cover"
+            />
+          ) : (
+            <DefaultAvatar size={24} />
+          )}
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium text-gray-900 dark:text-white truncate">
+              {user.name}
+            </div>
+            <div className="text-xs text-gray-500 dark:text-gray-400">
+              @{user.username}
+            </div>
+          </div>
+        </button>
+      ))}
+    </div>
+  );
+});
 
 // Memoized TimeAgo component
 const CommentTimeAgo = memo(function CommentTimeAgo({ 
@@ -138,15 +266,28 @@ const ReplyItem = memo(function ReplyItem({
   currentUserId,
   onEdit,
   onDelete,
+  users,
 }: {
   reply: TaskComment;
   currentUserId: string;
-  onEdit: (id: string, content: string) => void;
-  onDelete: (id: string) => void;
+  onEdit: (id: string, content: string) => void | Promise<void>;
+  onDelete: (id: string) => void | Promise<void>;
+  users: MentionUser[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(reply.content);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  
+  // Mention state for edit
+  const [showEditMentionDropdown, setShowEditMentionDropdown] = useState(false);
+  const [editMentionQuery, setEditMentionQuery] = useState("");
+  const [editMentionPosition, setEditMentionPosition] = useState({ top: 0, left: 0, width: 200 });
+  const [editFilteredUsers, setEditFilteredUsers] = useState<MentionUser[]>([]);
+  const [editHighlightedIndex, setEditHighlightedIndex] = useState(0);
+  
+  // Ref for edit textarea and wrapper (used for proper dropdown positioning)
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const editWrapperRef = useRef<HTMLDivElement>(null);
   
   const isOwner = reply.author_id === currentUserId;
   const isEdited = reply.created_at !== reply.updated_at;
@@ -155,11 +296,15 @@ const ReplyItem = memo(function ReplyItem({
     setIsEditing(true);
     setEditContent(reply.content);
     setDropdownOpen(false);
+    setShowEditMentionDropdown(false);
+    setEditMentionQuery("");
   }, [reply.content]);
 
   const handleCancelEdit = useCallback(() => {
     setIsEditing(false);
     setEditContent(reply.content);
+    setShowEditMentionDropdown(false);
+    setEditMentionQuery("");
   }, [reply.content]);
 
   const handleSaveEdit = useCallback(() => {
@@ -167,12 +312,94 @@ const ReplyItem = memo(function ReplyItem({
       onEdit(reply.id, editContent.trim());
     }
     setIsEditing(false);
+    setShowEditMentionDropdown(false);
+    setEditMentionQuery("");
   }, [reply.id, reply.content, editContent, onEdit]);
 
   const handleDelete = useCallback(() => {
     onDelete(reply.id);
     setDropdownOpen(false);
   }, [reply.id, onDelete]);
+
+  // Mention handlers for edit
+  const handleEditMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
+    if (!users) return;
+
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+    // allow dots, underscores and hyphens in username queries
+    const mentionMatch = textBeforeCursor.match(/@([A-Za-z0-9._-]*)$/);
+
+    if (mentionMatch) {
+      const query = mentionMatch[1] || '';
+      setEditMentionQuery(query);
+      setEditFilteredUsers(
+        users.filter(user =>
+          user.name.toLowerCase().includes(query.toLowerCase()) ||
+          user.username.toLowerCase().includes(query.toLowerCase())
+        ).slice(0, 5)
+      );
+
+      // Calculate position relative to the wrapper if available
+      const textareaRect = textarea.getBoundingClientRect();
+      const wrapperRect = editWrapperRef.current?.getBoundingClientRect();
+      const top = wrapperRect ? textareaRect.bottom - wrapperRect.top + 5 : textareaRect.bottom + 5;
+      const left = wrapperRect ? textareaRect.left - wrapperRect.left : textareaRect.left;
+      const width = textareaRect.width || 200;
+
+      setEditMentionPosition({
+        top: Math.max(0, top),
+        left: Math.max(0, left),
+        width
+      });
+      setShowEditMentionDropdown(true);
+    } else {
+      setShowEditMentionDropdown(false);
+    }
+
+    setEditContent(value);
+  }, [users]);
+
+  const handleEditMentionSelect = useCallback((user: MentionUser | undefined) => {
+    if (!user) return;
+    const textarea = editTextareaRef.current;
+    if (!textarea) return;
+
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = editContent.substring(0, cursorPosition);
+    const atIndex = textBeforeCursor.lastIndexOf('@');
+
+    if (atIndex !== -1) {
+      const beforeAt = editContent.substring(0, atIndex);
+      const afterCursor = editContent.substring(cursorPosition);
+      const mention = `@${user.username}`;
+
+      // If the user typed a multi-word name before selecting, strip the
+      // trailing name words that follow the cursor so only @username remains
+      const typedFragment = editContent.substring(atIndex, cursorPosition);
+      let trimmedAfter = afterCursor;
+      const trailingNameMatch = afterCursor.match(/^(\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+)?)/);
+      if (/\s/.test(typedFragment) && trailingNameMatch) {
+        trimmedAfter = afterCursor.substring(trailingNameMatch[0].length);
+      }
+
+      const newText = beforeAt + mention + ' ' + trimmedAfter;
+
+      setEditContent(newText);
+      setShowEditMentionDropdown(false);
+      setEditMentionQuery("");
+
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(atIndex + mention.length + 1, atIndex + mention.length + 1);
+      }, 0);
+    }
+  }, [editContent, editMentionQuery]);
+
+  const handleEditTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    handleEditMentionInput(value, e.target);
+  }, [handleEditMentionInput]);
 
   return (
     <div className="flex gap-2 sm:gap-3">
@@ -184,6 +411,7 @@ const ReplyItem = memo(function ReplyItem({
             width={32}
             height={32}
             className="h-full w-full object-cover"
+            objectFit="cover"
           />
         ) : (
           <DefaultAvatar size={28} />
@@ -233,14 +461,47 @@ const ReplyItem = memo(function ReplyItem({
         </div>
 
         {isEditing ? (
-          <div className="space-y-2">
+          <div className="space-y-2 relative" ref={editWrapperRef}>
             <Textarea
+              ref={editTextareaRef}
               value={editContent}
-              onChange={(e) => setEditContent(e.target.value)}
+              onChange={handleEditTextareaChange}
+              onKeyDown={(e) => {
+                if (!showEditMentionDropdown || editFilteredUsers.length === 0) {
+                  if (e.key === 'Escape') setShowEditMentionDropdown(false);
+                  return;
+                }
+
+                if (e.key === 'ArrowDown') {
+                  e.preventDefault();
+                  setEditHighlightedIndex(i => (i + 1) % editFilteredUsers.length);
+                } else if (e.key === 'ArrowUp') {
+                  e.preventDefault();
+                  setEditHighlightedIndex(i => (i - 1 + editFilteredUsers.length) % editFilteredUsers.length);
+                } else if (e.key === 'Enter') {
+                  e.preventDefault();
+                  const candidate = editFilteredUsers[editHighlightedIndex || 0];
+                  if (candidate) handleEditMentionSelect(candidate);
+                } else if (e.key === 'Escape') {
+                  setShowEditMentionDropdown(false);
+                }
+              }}
+              aria-controls={`reply-edit-mention-${reply.id}`}
+              aria-activedescendant={showEditMentionDropdown && editFilteredUsers[editHighlightedIndex] ? `reply-edit-mention-${reply.id}-option-${editHighlightedIndex}` : undefined}
               rows={3}
               className="resize-none border-gray-300 bg-white text-sm sm:text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
               autoFocus
             />
+            {showEditMentionDropdown && editFilteredUsers.length > 0 && (
+              <MentionDropdown
+                users={editFilteredUsers}
+                position={editMentionPosition}
+                onSelect={handleEditMentionSelect}
+                onClose={() => setShowEditMentionDropdown(false)}
+                id={`reply-edit-mention-${reply.id}`}
+                highlightedIndex={editHighlightedIndex}
+              />
+            )}
             <div className="flex justify-end gap-2">
               <Button
                 variant="ghost"
@@ -264,7 +525,7 @@ const ReplyItem = memo(function ReplyItem({
           </div>
         ) : (
           <p className="text-xs sm:text-sm leading-relaxed text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap">
-            {formatCommentText(reply.content)}
+            {formatCommentText(reply.content, users)}
           </p>
         )}
       </div>
@@ -279,12 +540,14 @@ const CommentItem = memo(function CommentItem({
   onEdit,
   onDelete,
   onReply,
+  users,
 }: {
   comment: TaskComment;
   currentUserId: string;
-  onEdit: (id: string, content: string) => void;
-  onDelete: (id: string) => void;
-  onReply: (parentId: string, content: string) => void;
+  onEdit: (id: string, content: string) => void | Promise<void>;
+  onDelete: (id: string) => void | Promise<void>;
+  onReply: (parentId: string, content: string) => void | Promise<void>;
+  users: MentionUser[];
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
@@ -292,6 +555,33 @@ const CommentItem = memo(function CommentItem({
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [showReplies, setShowReplies] = useState(true);
+  
+  // Mention state for reply
+  const [showReplyMentionDropdown, setShowReplyMentionDropdown] = useState(false);
+  const [replyMentionQuery, setReplyMentionQuery] = useState("");
+  const [replyMentionPosition, setReplyMentionPosition] = useState({ top: 0, left: 0, width: 200 });
+  const [replyFilteredUsers, setReplyFilteredUsers] = useState<MentionUser[]>([]);
+  const [replyHighlightedIndex, setReplyHighlightedIndex] = useState(0);
+  
+  // Mention state for edit
+  const [showEditMentionDropdown, setShowEditMentionDropdown] = useState(false);
+  const [editMentionQuery, setEditMentionQuery] = useState("");
+  const [editMentionPosition, setEditMentionPosition] = useState({ top: 0, left: 0, width: 200 });
+  const [editFilteredUsers, setEditFilteredUsers] = useState<MentionUser[]>([]);
+  const [editHighlightedIndex, setEditHighlightedIndex] = useState(0);
+  const editWrapperRefForComment = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setReplyHighlightedIndex(0);
+  }, [replyFilteredUsers]);
+
+  useEffect(() => {
+    setEditHighlightedIndex(0);
+  }, [editFilteredUsers]);
+  
+
+  const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
+  const editTextareaRef = useRef<HTMLTextAreaElement>(null);
   
   const isOwner = comment.author_id === currentUserId;
   const isEdited = comment.created_at !== comment.updated_at;
@@ -331,13 +621,156 @@ const CommentItem = memo(function CommentItem({
     setReplyContent("");
   }, []);
 
+  // Handle mention input for reply
+  // ref for the reply input wrapper (used to position dropdown relative to this element)
+  const replyInputWrapperRef = useRef<HTMLDivElement>(null);
+
+  const handleReplyMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
+    if (!users) return;
+
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+    const atIndex = textBeforeCursor.lastIndexOf('@');
+
+    if (atIndex !== -1 && (atIndex === 0 || textBeforeCursor[atIndex - 1] === ' ' || textBeforeCursor[atIndex - 1] === '\n')) {
+      const query = textBeforeCursor.substring(atIndex + 1);
+      if (query.length >= 0) {
+        const filtered = users.filter(user =>
+          user.name.toLowerCase().includes(query.toLowerCase()) ||
+          user.username.toLowerCase().includes(query.toLowerCase())
+        );
+
+        if (filtered.length > 0) {
+          const textareaRect = textarea.getBoundingClientRect();
+          const wrapperRect = replyInputWrapperRef.current?.getBoundingClientRect();
+          const top = wrapperRect ? textareaRect.bottom - wrapperRect.top + 5 : textareaRect.bottom + 5;
+          const left = wrapperRect ? textareaRect.left - wrapperRect.left : textareaRect.left;
+          const width = textareaRect.width;
+
+          setReplyMentionPosition({ top, left, width });
+          setReplyFilteredUsers(filtered);
+          setReplyMentionQuery(query);
+          setShowReplyMentionDropdown(true);
+          return;
+        }
+      }
+    }
+    setShowReplyMentionDropdown(false);
+  }, [users]);
+
+  const handleReplyMentionSelect = useCallback((user: MentionUser) => {
+    const textarea = replyTextareaRef.current;
+    if (!textarea) return;
+
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = replyContent.substring(0, cursorPosition);
+    const atIndex = textBeforeCursor.lastIndexOf('@');
+
+    if (atIndex !== -1) {
+      const beforeAt = replyContent.substring(0, atIndex);
+      const afterCursor = replyContent.substring(cursorPosition);
+      const mention = `@${user.username}`;
+
+      // Remove trailing typed last-name fragment when user had typed a space in the mention
+      const typedFragment = replyContent.substring(atIndex, cursorPosition);
+      let trimmedAfter = afterCursor;
+      const trailingNameMatch = afterCursor.match(/^(\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+)?)/);
+      if (/\s/.test(typedFragment) && trailingNameMatch) {
+        trimmedAfter = afterCursor.substring(trailingNameMatch[0].length);
+      }
+
+      const newText = beforeAt + mention + ' ' + trimmedAfter;
+
+      setReplyContent(newText);
+      setShowReplyMentionDropdown(false);
+
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(atIndex + mention.length + 1, atIndex + mention.length + 1);
+      }, 0);
+    }
+  }, [replyContent]);
+
+  const handleReplyTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setReplyContent(value);
+    handleReplyMentionInput(value, e.target);
+  }, [handleReplyMentionInput]);
+
+  // Handle mention input for editing
+  const handleEditMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
+    if (!users) return;
+
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+    const atIndex = textBeforeCursor.lastIndexOf('@');
+
+    if (atIndex !== -1 && (atIndex === 0 || textBeforeCursor[atIndex - 1] === ' ' || textBeforeCursor[atIndex - 1] === '\n')) {
+      const query = textBeforeCursor.substring(atIndex + 1);
+      if (query.length >= 0) {
+        const filtered = users.filter(user =>
+          user.name.toLowerCase().includes(query.toLowerCase()) ||
+          user.username.toLowerCase().includes(query.toLowerCase())
+        );
+
+        if (filtered.length > 0) {
+          const textareaRect = textarea.getBoundingClientRect();
+          const wrapperRect = editWrapperRefForComment.current?.getBoundingClientRect();
+
+          const top = wrapperRect ? textareaRect.bottom - wrapperRect.top + 5 : textareaRect.bottom + 5;
+          const left = wrapperRect ? textareaRect.left - wrapperRect.left : textareaRect.left;
+          const width = textareaRect.width;
+
+          setEditMentionPosition({ top, left, width });
+          setEditFilteredUsers(filtered);
+          setEditMentionQuery(query);
+          setShowEditMentionDropdown(true);
+          return;
+        }
+      }
+    }
+    setShowEditMentionDropdown(false);
+  }, [users]);
+
+  const handleEditMentionSelect = useCallback((user: MentionUser) => {
+    const textarea = editTextareaRef.current;
+    if (!textarea) return;
+
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = editContent.substring(0, cursorPosition);
+    const atIndex = textBeforeCursor.lastIndexOf('@');
+
+    if (atIndex !== -1) {
+      const beforeAt = editContent.substring(0, atIndex);
+      const afterCursor = editContent.substring(cursorPosition);
+      const mention = `@${user.username}`;
+      const newText = beforeAt + mention + ' ' + afterCursor;
+
+      setEditContent(newText);
+      setShowEditMentionDropdown(false);
+
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(atIndex + mention.length + 1, atIndex + mention.length + 1);
+      }, 0);
+    }
+  }, [editContent]);
+
+  const handleEditTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setEditContent(value);
+    handleEditMentionInput(value, e.target);
+  }, [handleEditMentionInput]);
+
   const handleSubmitReply = useCallback(() => {
     if (replyContent.trim()) {
       onReply(comment.id, replyContent.trim());
-      setReplyContent("");
       setIsReplying(false);
+      setReplyContent("");
+      setShowReplyMentionDropdown(false);
+      setReplyMentionQuery("");
     }
-  }, [comment.id, replyContent, onReply]);
+  }, [replyContent, onReply, comment.id]);
 
   return (
     <div className="space-y-2">
@@ -350,6 +783,7 @@ const CommentItem = memo(function CommentItem({
               width={40}
               height={40}
               className="h-full w-full object-cover"
+              objectFit="cover"
             />
           ) : (
             <DefaultAvatar size={32} />
@@ -400,14 +834,47 @@ const CommentItem = memo(function CommentItem({
             </div>
 
             {isEditing ? (
-              <div className="space-y-2">
+              <div className="space-y-2 relative" ref={editWrapperRefForComment}>
                 <Textarea
+                  ref={editTextareaRef}
                   value={editContent}
-                  onChange={(e) => setEditContent(e.target.value)}
+                  onChange={handleEditTextareaChange}
+                  onKeyDown={(e) => {
+                    if (!showEditMentionDropdown || editFilteredUsers.length === 0) {
+                      if (e.key === 'Escape') setShowEditMentionDropdown(false);
+                      return;
+                    }
+
+                    if (e.key === 'ArrowDown') {
+                      e.preventDefault();
+                      setEditHighlightedIndex(i => (i + 1) % editFilteredUsers.length);
+                    } else if (e.key === 'ArrowUp') {
+                      e.preventDefault();
+                      setEditHighlightedIndex(i => (i - 1 + editFilteredUsers.length) % editFilteredUsers.length);
+                    } else if (e.key === 'Enter') {
+                      e.preventDefault();
+                      const candidate = editFilteredUsers[editHighlightedIndex || 0];
+                      if (candidate) handleEditMentionSelect(candidate);
+                    } else if (e.key === 'Escape') {
+                      setShowEditMentionDropdown(false);
+                    }
+                  }}
+                  aria-controls={`edit-mention-${comment.id}`}
+                  aria-activedescendant={showEditMentionDropdown && editFilteredUsers[editHighlightedIndex] ? `edit-mention-${comment.id}-option-${editHighlightedIndex}` : undefined}
                   rows={3}
                   className="resize-none border-gray-300 bg-white text-sm sm:text-base text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                   autoFocus
                 />
+                {showEditMentionDropdown && (
+                  <MentionDropdown
+                    users={editFilteredUsers}
+                    onSelect={handleEditMentionSelect}
+                    onClose={() => setShowEditMentionDropdown(false)}
+                    position={editMentionPosition}
+                    id={`edit-mention-${comment.id}`}
+                    highlightedIndex={editHighlightedIndex}
+                  />
+                )}
                 <div className="flex justify-end gap-2">
                   <Button
                     variant="ghost"
@@ -431,7 +898,7 @@ const CommentItem = memo(function CommentItem({
               </div>
             ) : (
               <p className="text-xs sm:text-sm leading-relaxed text-gray-700 dark:text-gray-300 break-words whitespace-pre-wrap">
-                {formatCommentText(comment.content)}
+                {formatCommentText(comment.content, users)}
               </p>
             )}
           </div>
@@ -469,15 +936,48 @@ const CommentItem = memo(function CommentItem({
 
           {/* Reply input form */}
           {isReplying && (
-            <div className="mt-2 ml-3 space-y-2">
+            <div className="mt-2 ml-3 space-y-2 relative" ref={replyInputWrapperRef}>
               <Textarea
+                ref={replyTextareaRef}
                 placeholder="Write a reply..."
                 value={replyContent}
-                onChange={(e) => setReplyContent(e.target.value)}
+                onChange={handleReplyTextareaChange}
+                onKeyDown={(e) => {
+                  if (!showReplyMentionDropdown || replyFilteredUsers.length === 0) {
+                    if (e.key === 'Escape') setShowReplyMentionDropdown(false);
+                    return;
+                  }
+
+                  if (e.key === 'ArrowDown') {
+                    e.preventDefault();
+                    setReplyHighlightedIndex(i => (i + 1) % replyFilteredUsers.length);
+                  } else if (e.key === 'ArrowUp') {
+                    e.preventDefault();
+                    setReplyHighlightedIndex(i => (i - 1 + replyFilteredUsers.length) % replyFilteredUsers.length);
+                  } else if (e.key === 'Enter') {
+                    e.preventDefault();
+                    const candidate = replyFilteredUsers[replyHighlightedIndex || 0];
+                    if (candidate) handleReplyMentionSelect(candidate);
+                  } else if (e.key === 'Escape') {
+                    setShowReplyMentionDropdown(false);
+                  }
+                }}
+                aria-controls={`reply-mention-${comment.id}`}
+                aria-activedescendant={showReplyMentionDropdown && replyFilteredUsers[replyHighlightedIndex] ? `reply-mention-${comment.id}-option-${replyHighlightedIndex}` : undefined}
                 rows={2}
                 className="resize-none text-sm border-gray-300 bg-white text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-700 dark:text-white"
                 autoFocus
               />
+              {showReplyMentionDropdown && (
+                <MentionDropdown
+                  users={replyFilteredUsers}
+                  onSelect={handleReplyMentionSelect}
+                  onClose={() => setShowReplyMentionDropdown(false)}
+                  position={replyMentionPosition}
+                  id={`reply-mention-${comment.id}`}
+                  highlightedIndex={replyHighlightedIndex}
+                />
+              )}
               <div className="flex justify-end gap-2">
                 <Button
                   variant="ghost"
@@ -510,6 +1010,7 @@ const CommentItem = memo(function CommentItem({
                   currentUserId={currentUserId}
                   onEdit={onEdit}
                   onDelete={onDelete}
+                  users={users}
                 />
               ))}
             </div>
@@ -535,6 +1036,17 @@ export default function TaskCommentsSection({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClientClientComponent();
+
+  // Mention related state
+  const [users, setUsers] = useState<MentionUser[]>([]);
+  const [showMentionDropdown, setShowMentionDropdown] = useState(false);
+  const [mentionQuery, setMentionQuery] = useState("");
+  const [mentionPosition, setMentionPosition] = useState({ top: 0, left: 0, width: 200 });
+  const [filteredUsers, setFilteredUsers] = useState<MentionUser[]>([]);
+  const [mentionHighlightedIndex, setMentionHighlightedIndex] = useState(0);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [currentUserName, setCurrentUserName] = useState("");
 
   // Transform database comment to UI comment format
   const transformComment = (dbComment: DbComment | any): TaskComment => {
@@ -562,17 +1074,17 @@ export default function TaskCommentsSection({
     };
   };
 
-  // Organize comments into parent-child structure
+  
   const organizeComments = (allComments: TaskComment[]): TaskComment[] => {
     const commentMap = new Map<string, TaskComment>();
     const topLevelComments: TaskComment[] = [];
 
-    // Initialize all comments with empty replies array
+    
     allComments.forEach(comment => {
       commentMap.set(comment.id, { ...comment, replies: [] });
     });
 
-    // Organize into parent-child structure
+    
     allComments.forEach(comment => {
       const commentWithReplies = commentMap.get(comment.id)!;
       
@@ -588,6 +1100,43 @@ export default function TaskCommentsSection({
 
     return topLevelComments;
   };
+
+  // Fetch users for mentions
+  const fetchUsers = useCallback(async () => {
+    if (!supabase) return;
+    try {
+      const { data, error } = await supabase
+        .from("codev")
+        .select("id, first_name, last_name, username, email_address, image_url")
+        .order("first_name");
+
+      if (error) throw error;
+
+      if (data) {
+        const mentionUsers: MentionUser[] = data.map(user => ({
+          id: user.id,
+          name: `${user.first_name} ${user.last_name}`.trim(),
+          // prefer the dedicated username column; fallback to first_name if missing
+          username: (user.username || user.first_name).toString(),
+          image_url: user.image_url,
+        }));
+        setUsers(mentionUsers);
+
+        // Set current user name
+        const currentUser = data.find(user => user.id === currentUserId);
+        if (currentUser) {
+          setCurrentUserName(`${currentUser.first_name} ${currentUser.last_name}`.trim());
+        }
+      }
+    } catch (error) {
+      console.error("Error fetching users:", error);
+    }
+  }, [supabase, currentUserId]);
+
+  // Fetch users on mount
+  useEffect(() => {
+    fetchUsers();
+  }, [fetchUsers]);
 
   // Update parent component when comment count changes
   useEffect(() => {
@@ -721,6 +1270,88 @@ export default function TaskCommentsSection({
     };
   }, [taskId, supabase]);
 
+  // Handle mention dropdown
+  const handleMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
+    if (!users) return;
+
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+    const atIndex = textBeforeCursor.lastIndexOf('@');
+
+    if (atIndex !== -1 && (atIndex === 0 || textBeforeCursor[atIndex - 1] === ' ' || textBeforeCursor[atIndex - 1] === '\n')) {
+      const query = textBeforeCursor.substring(atIndex + 1);
+      if (query.length >= 0) { // Show dropdown even with empty query
+        const filtered = users.filter(user =>
+          user.name.toLowerCase().includes(query.toLowerCase()) ||
+          user.username.toLowerCase().includes(query.toLowerCase())
+        );
+
+        if (filtered.length > 0) {
+          // Calculate position relative to the form
+          const formRect = formRef.current?.getBoundingClientRect();
+          const textareaRect = textarea.getBoundingClientRect();
+          
+          if (formRect) {
+            const top = textareaRect.bottom - formRect.top + 5; // Position below the textarea relative to form
+            const left = textareaRect.left - formRect.left; // Align with left edge of textarea relative to form
+            const width = textareaRect.width; // Match textarea width
+
+            setMentionPosition({ top, left, width });
+            setFilteredUsers(filtered);
+            setMentionQuery(query);
+            setMentionHighlightedIndex(0);
+            setShowMentionDropdown(true);
+            return;
+          }
+        }
+      }
+    }
+    setShowMentionDropdown(false);
+  }, [users]);
+
+  const handleMentionSelect = useCallback((user: MentionUser) => {
+    if (!textareaRef.current) return;
+
+    const textarea = textareaRef.current;
+    const cursorPosition = textarea.selectionStart;
+    const textBeforeCursor = newComment.substring(0, cursorPosition);
+    const atIndex = textBeforeCursor.lastIndexOf('@');
+
+    if (atIndex !== -1) {
+      const beforeAt = newComment.substring(0, atIndex);
+      const afterCursor = newComment.substring(cursorPosition);
+      const mention = `@${user.username}`;
+
+      // If user typed a multi-word display name (e.g. "@John Doe") and
+      // the typed fragment between '@' and cursor contains a space,
+      // remove the trailing name fragment after the cursor so we don't leave
+      // the second name as plain text.
+      const typedFragment = newComment.substring(atIndex, cursorPosition);
+      let trimmedAfter = afterCursor;
+      const trailingNameMatch = afterCursor.match(/^(\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+)?)/);
+      if (/\s/.test(typedFragment) && trailingNameMatch) {
+        trimmedAfter = afterCursor.substring(trailingNameMatch[0].length);
+      }
+
+      const newText = beforeAt + mention + ' ' + trimmedAfter;
+
+      setNewComment(newText);
+      setShowMentionDropdown(false);
+
+      // Set cursor position after the mention
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(atIndex + mention.length + 1, atIndex + mention.length + 1);
+      }, 0);
+    }
+  }, [newComment]);
+
+  const handleTextareaChange = useCallback((e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const value = e.target.value;
+    setNewComment(value);
+    handleMentionInput(value, e.target);
+  }, [handleMentionInput]);
+
   const handleSubmitComment = useCallback(
   async (e: React.FormEvent) => {
     e.preventDefault();
@@ -765,6 +1396,16 @@ export default function TaskCommentsSection({
           flatComments.push(transformComment(data));
           return organizeComments(flatComments);
         });
+
+        // Extract mentions for possible notifications / processing
+        const mentions = extractMentions(data.content || newComment.trim());
+        if (mentions.length > 0) {
+          const mentionedUsers = users.filter(u => mentions.includes(u.username.toLowerCase()));
+          if (mentionedUsers.length > 0) {
+            console.debug("Mentions in new comment:", mentionedUsers.map(u => u.username));
+            // TODO: create server-side notifications for these users (use createNotification server action)
+          }
+        }
       }
 
       setNewComment("");
@@ -776,7 +1417,7 @@ export default function TaskCommentsSection({
       setIsSubmitting(false);
     }
   },
-  [newComment, taskId, currentUserId, supabase]
+  [newComment, taskId, currentUserId, supabase, users]
 );
 
   const handleReply = useCallback(
@@ -821,6 +1462,16 @@ export default function TaskCommentsSection({
           flatComments.push(transformComment(data));
           return organizeComments(flatComments);
         });
+
+        // Extract mentions from the reply content (for notifications)
+        const mentions = extractMentions(content);
+        if (mentions.length > 0) {
+          const mentionedUsers = users.filter(u => mentions.includes(u.username.toLowerCase()));
+          if (mentionedUsers.length > 0) {
+            console.debug("Mentions in reply:", mentionedUsers.map(u => u.username));
+            // TODO: call server-side createNotification for each mentioned user
+          }
+        }
       }
 
       toast.success("Reply posted successfully");
@@ -829,7 +1480,7 @@ export default function TaskCommentsSection({
       toast.error("Failed to post reply");
     }
   },
-  [taskId, currentUserId, supabase]
+  [taskId, currentUserId, supabase, users]
 );
 
 
@@ -880,6 +1531,16 @@ const handleEditComment = useCallback(
           );
           return organizeComments(updatedComments);
         });
+
+       
+        const mentions = extractMentions(newContent);
+        if (mentions.length > 0) {
+          const mentionedUsers = users.filter(u => mentions.includes(u.username.toLowerCase()));
+          if (mentionedUsers.length > 0) {
+            console.debug("Mentions in edited comment:", mentionedUsers.map(u => u.username));
+            
+          }
+        }
       }
 
       toast.success("Comment updated successfully");
@@ -888,7 +1549,7 @@ const handleEditComment = useCallback(
       toast.error("Failed to update comment");
     }
   },
-  [supabase]
+  [supabase, users]
 );
 
   const handleDeleteComment = useCallback(
@@ -948,20 +1609,56 @@ const handleEditComment = useCallback(
               onEdit={handleEditComment}
               onDelete={handleDeleteComment}
               onReply={handleReply}
+              users={users}
             />
           ))}
         </div>
       )}
 
-      <form onSubmit={handleSubmitComment} className="space-y-2 sm:space-y-3">
+      <form ref={formRef} onSubmit={handleSubmitComment} className="space-y-2 sm:space-y-3 relative">
         <Textarea
+          ref={textareaRef}
           placeholder="Write a comment..."
           value={newComment}
-          onChange={(e) => setNewComment(e.target.value)}
+          onChange={handleTextareaChange}
+          onKeyDown={(e) => {
+            if (!showMentionDropdown || filteredUsers.length === 0) {
+              if (e.key === 'Escape') setShowMentionDropdown(false);
+              return;
+            }
+
+            if (e.key === 'ArrowDown') {
+              e.preventDefault();
+              setMentionHighlightedIndex(i => (i + 1) % filteredUsers.length);
+            } else if (e.key === 'ArrowUp') {
+              e.preventDefault();
+              setMentionHighlightedIndex(i => (i - 1 + filteredUsers.length) % filteredUsers.length);
+            } else if (e.key === 'Enter') {
+              e.preventDefault();
+              const u = filteredUsers[mentionHighlightedIndex || 0];
+              if (u) handleMentionSelect(u);
+            } else if (e.key === 'Escape') {
+              setShowMentionDropdown(false);
+            }
+          }}
+          aria-controls="mention-dropdown-main"
+          aria-activedescendant={showMentionDropdown && filteredUsers[mentionHighlightedIndex] ? `mention-dropdown-main-option-${mentionHighlightedIndex}` : undefined}
+          aria-expanded={showMentionDropdown}
           disabled={isSubmitting}
           rows={3}
           className="resize-none text-sm sm:text-base border-gray-300 bg-gray-50 text-gray-900 focus:border-blue-500 focus:ring-blue-500 dark:border-gray-600 dark:bg-gray-800 dark:text-white"
         />
+
+        {showMentionDropdown && (
+          <MentionDropdown
+            users={filteredUsers}
+            onSelect={handleMentionSelect}
+            onClose={() => setShowMentionDropdown(false)}
+            position={mentionPosition}
+            id="mention-dropdown-main"
+            highlightedIndex={mentionHighlightedIndex}
+          />
+        )}
 
         <div className="flex justify-end">
           <Button
@@ -987,5 +1684,4 @@ const handleEditComment = useCallback(
   );
 }
 
-// Export the type for use in other files
 export type { TaskComment };

@@ -103,8 +103,11 @@
     --card-foreground: 240 10% 3.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 240 10% 3.9%;
-    --primary: 2, 255, 226, 100%;
-    --primary-foreground: 355.7 100% 97.3%;
+
+    /* ✅ Fix primary - use proper HSL. Based on your teal/cyan brand color */
+    --primary: 174 100% 50%;            /* was: 2, 255, 226, 100% (broken RGBA) */
+    --primary-foreground: 174 100% 10%;
+
     --secondary: 240 4.8% 95.9%;
     --secondary-foreground: 240 5.9% 10%;
     --muted: 240 4.8% 95.9%;
@@ -115,19 +118,25 @@
     --destructive-foreground: 0 0% 98%;
     --border: 240 5.9% 90%;
     --input: 240 5.9% 90%;
-    --ring: 142.1 76.2% 36.3%;
+    --ring: 174 100% 36%;
     --radius: 0.5rem;
-    --text-color-1: var(--primary);
+
+    /* Custom text colors - keep as is, these are fine */
     --text-color-2: 234, 84%, 68%;
     --text-color-3: 285, 99%, 51%;
     --text-color-4: 266, 100%, 64%;
+
+    /* ✅ Add these missing light-mode specific vars */
+    --kanban-column-title: 240 10% 10%;     /* dark text for column headers */
+    --kanban-column-bg: 240 5% 96%;         /* light gray column background */
+    --sidebar-icon: 240 10% 25%;            /* visible dark icons in light mode */
+    --drag-handle: 240 5% 60%;              /* drag grip icon */
+    --card-shadow: 0 1px 3px rgba(0,0,0,0.1);
+
     --muted-figma: 252, 252, 252, 100%;
     --card-clients: 246, 246, 246, 100%;
-
     --violet-color: theme("colors.violet.500");
-
     --teal-color: theme("colors.customTeal");
-
     --blue-500: theme("colors.blue.500");
     --blue-100: theme("colors.blue.100");
     --white: theme("colors.white");
@@ -146,9 +155,11 @@
     --card-foreground: 0 0% 95%;
     --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
-    --primary:
-      2, 255, 226, 100%; /* Please check, not sure if this is for hsl or rgba */
-    --primary-foreground: 144.9 80.4% 10%;
+
+    /* ✅ Same fix for dark mode primary */
+    --primary: 174 100% 50%;
+    --primary-foreground: 174 100% 10%;
+
     --secondary: 240 3.7% 15.9%;
     --secondary-foreground: 0 0% 98%;
     --muted: 0 0% 15%;
@@ -159,11 +170,18 @@
     --destructive-foreground: 0 85.7% 97.3%;
     --border: 240 3.7% 15.9%;
     --input: 240 3.7% 15.9%;
-    --ring: 142.4 71.8% 29.2%;
-    --text-color-1: var(--primary);
+    --ring: 174 71.8% 29.2%;
+
     --text-color-2: 234, 84%, 68%;
     --text-color-3: 285, 99%, 51%;
     --text-color-4: 266, 100%, 64%;
+
+    /* ✅ Dark mode counterparts */
+    --kanban-column-title: 0 0% 95%;
+    --kanban-column-bg: 240 3.7% 12%;
+    --sidebar-icon: 0 0% 90%;
+    --drag-handle: 0 0% 60%;
+
     --muted-figma: 24, 24, 24, 25%;
     --card-clients: 19, 19, 19, 100%;
 
