@@ -169,148 +169,146 @@ export default function KanbanColumn({
     }
   };
   
-  return (
-    <li
-      ref={setColumnRef}
-      style={columnStyle}
-      className={`
-        relative flex h-full 
-        w-[calc(100vw-2rem)] min-w-[280px] 
-        flex-col overflow-hidden 
-        rounded-xl border 
-        md:w-[350px] md:min-w-[350px]
-        lg:w-[400px] lg:min-w-[400px]
-        ${
-          isColumnDragging
-            ? "border-customBlue-500 shadow-customBlue-500/15 scale-[1.02] opacity-95 shadow-lg"
-            : isOver
-              ? "border-customBlue-400 bg-customBlue-50/50 dark:border-customBlue-500 dark:bg-customBlue-950/20"
-              : "border-white/20 shadow-sm hover:shadow-md dark:border-white/10"
-        }
-        bg-white/10 backdrop-blur-sm transition-all duration-200 ease-out dark:bg-white/5
-      `}
-      {...attributes}
-    >
-      {/* Column Header */}
-      <div
-        className="flex items-center justify-between border-b border-white/30 bg-gradient-to-r from-white/20 to-white/30 backdrop-blur-sm p-3 dark:border-white/20 dark:from-white/10 dark:to-white/15 md:p-4"
-        {...listeners}
+    return (
+      <li
+        ref={setColumnRef}
+        style={columnStyle}
+        className={`
+          relative flex h-full 
+          w-[calc(100vw-2rem)] min-w-[280px] 
+          flex-col overflow-hidden 
+          rounded-xl border 
+          md:w-[350px] md:min-w-[350px]
+          lg:w-[400px] lg:min-w-[400px]
+          ${
+            isColumnDragging
+              ? "border-customBlue-500 shadow-customBlue-500/15 scale-[1.02] opacity-95 shadow-lg"
+              : isOver
+                ? "border-customBlue-400 bg-customBlue-50/50 dark:border-customBlue-500 dark:bg-customBlue-950/20"
+                : "border-gray-200 dark:border-white/10 shadow-sm hover:shadow-md"
+          }
+          bg-gray-50 dark:bg-white/5 backdrop-blur-sm transition-all duration-200 ease-out
+        `}
+        {...attributes}
       >
-        <div className="flex items-center gap-2 text-white dark:text-gray-200 md:gap-3">
-          {isEditing ? (
-            <div className="flex items-center gap-1 md:gap-2">
-              <Input
-                value={newName}
-                onChange={(e) => setNewName(e.target.value)}
-                className="h-6 w-24 text-xs md:w-32 md:text-sm"
-                autoFocus
-              />
-              <Button
-                size="icon"
-                variant="hollow"
-                onClick={handleUpdateName}
-                className="h-6 w-6 !p-0"
-              >
-                <Check className="h-3 w-3" />
-              </Button>
-              <Button
-                size="icon"
-                variant="hollow"
-                onClick={() => setIsEditing(false)}
-                className="h-6 w-6 !p-0"
-              >
-                <X className="h-3 w-3" />
-              </Button>
-            </div>
-          ) : (
-            <>
-              <GripVertical className="hidden h-5 w-5 cursor-grab text-gray-300 transition-colors hover:text-white dark:hover:text-gray-200 md:block" />
-              <span className="text-base font-semibold text-white dark:text-white md:text-lg">
-                {column.name}
-              </span>
-              <div className="bg-white/30 dark:bg-white/20 backdrop-blur-sm flex items-center justify-center rounded-full px-3 py-1 text-sm font-medium text-white dark:text-gray-200 border border-white/40 dark:border-white/30">
-                {safeTasks.length}
+        {/* Column Header */}
+        <div
+          className="flex items-center justify-between border-b border-gray-200 bg-gradient-to-r from-gray-100 to-gray-50 backdrop-blur-sm p-3 dark:border-white/20 dark:from-white/10 dark:to-white/15 md:p-4"
+          {...listeners}
+        >
+          <div className="flex items-center gap-2 md:gap-3">
+            {isEditing ? (
+              <div className="flex items-center gap-1 md:gap-2">
+                <Input
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
+                  className="h-6 w-24 text-xs md:w-32 md:text-sm"
+                  autoFocus
+                />
+                <Button
+                  size="icon"
+                  variant="hollow"
+                  onClick={handleUpdateName}
+                  className="h-6 w-6 !p-0"
+                >
+                  <Check className="h-3 w-3" />
+                </Button>
+                <Button
+                  size="icon"
+                  variant="hollow"
+                  onClick={() => setIsEditing(false)}
+                  className="h-6 w-6 !p-0"
+                >
+                  <X className="h-3 w-3" />
+                </Button>
               </div>
-            </>
+            ) : (
+              <>
+                <GripVertical className="hidden h-5 w-5 cursor-grab text-gray-400 transition-colors hover:text-gray-700 dark:text-gray-300 dark:hover:text-white md:block" />
+                <span className="text-base font-semibold text-gray-800 dark:text-white md:text-lg">
+                  {column.name}
+                </span>
+                <div className="flex items-center justify-center rounded-full border border-gray-300 bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700 backdrop-blur-sm dark:border-white/30 dark:bg-white/20 dark:text-gray-200">
+                  {safeTasks.length}
+                </div>
+              </>
+            )}
+          </div>
+
+          {!isEditing && canModifyColumn && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  size="icon"
+                  variant="hollow"
+                  className="h-6 w-6 !p-0 border border-gray-300 backdrop-blur-sm hover:bg-gray-200 dark:border-white/10 dark:hover:bg-white/20"
+                >
+                  <MoreHorizontal className="h-3 w-3 text-gray-600 dark:text-gray-300" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-32">
+                <DropdownMenuItem onClick={() => setIsEditing(true)}>
+                  <Pencil className="mr-2 h-3 w-3" />
+                  <span className="text-sm">Edit name</span>
+                </DropdownMenuItem>
+                <DropdownMenuItem
+                  onClick={handleDelete}
+                  disabled={safeTasks.length > 0}
+                  className="text-red-500 focus:text-red-500"
+                >
+                  <Trash2 className="mr-2 h-3 w-3" />
+                  <span className="text-sm">Delete</span>
+                </DropdownMenuItem>
+              </DropdownMenuContent>
+            </DropdownMenu>
           )}
         </div>
 
-        {/* Column actions - Update button sizes */}
-        {!isEditing && canModifyColumn && (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                size="icon"
-                variant="hollow"
-                className="h-6 w-6 !p-0 hover:bg-white/30 dark:hover:bg-white/20 backdrop-blur-sm border border-white/20 dark:border-white/10"
-              >
-                <MoreHorizontal className="h-3 w-3" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-32">
-              <DropdownMenuItem onClick={() => setIsEditing(true)}>
-                <Pencil className="mr-2 h-3 w-3" />
-                <span className="text-sm">Edit name</span>
-              </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleDelete}
-                disabled={safeTasks.length > 0}
-                className="text-red-500 focus:text-red-500"
-              >
-                <Trash2 className="mr-2 h-3 w-3" />
-                <span className="text-sm">Delete</span>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-
-      {/* Column Body - Update padding and spacing */}
-      <div className="flex flex-grow flex-col px-1 pb-2 md:px-2">
-        <div
-          ref={setDroppableRef}
-          role="region"
-          aria-label={`Tasks in ${column.name} column`}
-          className={`
-            flex min-h-[100px] flex-col gap-2 rounded-md p-1 transition-colors duration-200
-            md:gap-4 md:p-2
-            ${isOver ? "border-customBlue-300 bg-customBlue-50/30 dark:bg-customBlue-900/20 border-2 backdrop-blur-sm" : ""}
-          `}
-        >
-          <SortableContext
-            items={taskIds}
-            strategy={verticalListSortingStrategy}
+        {/* Column Body */}
+        <div className="flex flex-grow flex-col px-1 pb-2 md:px-2">
+          <div
+            ref={setDroppableRef}
+            role="region"
+            aria-label={`Tasks in ${column.name} column`}
+            className={`
+              flex min-h-[100px] flex-col gap-2 rounded-md p-1 transition-colors duration-200
+              md:gap-4 md:p-2
+              ${isOver ? "border-2 border-customBlue-300 bg-customBlue-50/30 backdrop-blur-sm dark:bg-customBlue-900/20" : ""}
+            `}
           >
-            {sortedTasks.length === 0 ? (
-              <div className="py-4 text-center text-xs text-gray-300 dark:text-gray-400 md:text-sm">
-                No tasks in this column
-              </div>
-            ) : (
-              sortedTasks.map((task) => (
-                <KanbanTask
-                  key={task.id}
-                  task={task}
-                  columnId={column.id}
-                  onComplete={onTaskComplete}
-                  availableColumns={availableColumns}
-                />
-              ))
-            )}
-          </SortableContext>
-        </div>
-
-        {/* Add new task button/modal */}
-        {canAddTask && (
-          <div className="pt-1 md:pt-2">
-            <KanbanTaskAddModal
-              listId={column.id}
-              listName={column.name}
-              projectId={projectId}
-              totalTask={safeTasks.length}
-            />
+            <SortableContext
+              items={taskIds}
+              strategy={verticalListSortingStrategy}
+            >
+              {sortedTasks.length === 0 ? (
+                <div className="py-4 text-center text-xs text-gray-400 dark:text-gray-400 md:text-sm">
+                  No tasks in this column
+                </div>
+              ) : (
+                sortedTasks.map((task) => (
+                  <KanbanTask
+                    key={task.id}
+                    task={task}
+                    columnId={column.id}
+                    onComplete={onTaskComplete}
+                    availableColumns={availableColumns}
+                  />
+                ))
+              )}
+            </SortableContext>
           </div>
-        )}
-      </div>
-    </li>
-  );
+
+          {canAddTask && (
+            <div className="pt-1 md:pt-2">
+              <KanbanTaskAddModal
+                listId={column.id}
+                listName={column.name}
+                projectId={projectId}
+                totalTask={safeTasks.length}
+              />
+            </div>
+          )}
+        </div>
+      </li>
+    );
 }
