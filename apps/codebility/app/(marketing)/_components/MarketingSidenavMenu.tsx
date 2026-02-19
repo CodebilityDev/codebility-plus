@@ -4,15 +4,16 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import ScrollToHash from "@/app/(marketing)/_components/landing/LandingScrollToHash";
 
-// Navigation links for sidebar - displayed on left side of landing page
+import { Briefcase, Info, Phone, CodeXml, Search, Rocket } from "lucide-react";
+
 const links = [
-  { href: "/services", label: "Our Services" },
-  { href: "/#whychooseus", label: "About Us" },
-  { href: "/bookacall", label: "Book a Call" },
-  { href: "/codevs", label: "Be a Codev" }, // ✅ ADDED: New link after Book a Call
-  { href: "/hire-a-codev", label: "Hire Codevs" },
-  { href: "/careers", label: "Careers" },
-];
+  { href: "/services", label: "Our Services", icon: Briefcase },
+  { href: "/#whychooseus", label: "About Us", icon: Info },
+  { href: "/bookacall", label: "Book a Call", icon: Phone },
+  { href: "/codevs", label: "Be a Codev", icon: CodeXml },
+  { href: "/hire-a-codev", label: "Hire Codevs", icon: Search },
+  { href: "/careers", label: "Careers", icon: Rocket },
+]
 
 const SideNavMenu = () => {
   const [isScrolling, setIsScrolling] = useState(false);
@@ -42,9 +43,10 @@ const SideNavMenu = () => {
           <div className="border-darkgray absolute -left-10 top-1/2 w-20 border" />
           <div
             className={`relative flex h-8 ${
-              isScrolling ? "w-12 text-xs" : "w-36 text-base"
+              isScrolling ? "w-[52px] text-xs" : "w-36 text-base"
             } border-light-900/5 bg-light-700/10 group items-center gap-2 rounded-md border-2 ps-4 text-white backdrop-blur-lg duration-300 hover:ml-4 hover:w-36  hover:bg-customViolet-100 hover:text-base hover:text-opacity-100 hover:opacity-100 xl:h-10`}
           >
+            <link.icon className="size-4 shrink-0"/>
             <p
               className={`text-nowrap transition-opacity duration-300 ${
                 isScrolling ? "opacity-0" : "opacity-100"
