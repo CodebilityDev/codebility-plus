@@ -170,9 +170,8 @@ export default function ClientTrackerContent() {
 
           <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Outreach
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
+                <Plus className="h-4 w-4" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">

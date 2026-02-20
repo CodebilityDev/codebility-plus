@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { BarChart3 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton/skeleton";
 import H1 from "@/components/shared/dashboard/H1";
 import PageContainer from "../../_components/PageContainer";
@@ -19,7 +20,7 @@ export default async function ClientTrackerPage() {
       <div className="flex flex-col gap-6">
         <div className="flex items-center gap-4">
           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-gradient-to-br from-blue-500 to-cyan-500">
-            <span className="text-2xl">📊</span>
+            <BarChart3 className="h-6 w-6 text-white" />
           </div>
           <div>
             <H1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-cyan-600 bg-clip-text text-transparent">
