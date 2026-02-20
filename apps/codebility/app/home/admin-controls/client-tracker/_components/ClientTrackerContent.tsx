@@ -48,6 +48,7 @@ export default function ClientTrackerContent() {
     client_name: "",
     client_email: "",
     client_company: "",
+    job_link: "",
     notes: "",
   });
   const [submitting, setSubmitting] = useState(false);
@@ -88,6 +89,7 @@ export default function ClientTrackerContent() {
         client_name: "",
         client_email: "",
         client_company: "",
+        job_link: "",
         notes: "",
       });
       setAddDialogOpen(false);
@@ -170,8 +172,8 @@ export default function ClientTrackerContent() {
 
           <Dialog open={addDialogOpen} onOpenChange={setAddDialogOpen}>
             <DialogTrigger asChild>
-              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white">
-                <Plus className="h-4 w-4" />
+              <Button size="sm" className="bg-blue-600 hover:bg-blue-700 text-white h-10 w-10 p-0">
+                <Plus className="h-5 w-5" />
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[500px]">
@@ -211,6 +213,17 @@ export default function ClientTrackerContent() {
                     value={formData.client_company}
                     onChange={(e) => setFormData(prev => ({ ...prev, client_company: e.target.value }))}
                     placeholder="Acme Inc."
+                  />
+                </div>
+
+                <div>
+                  <Label htmlFor="job_link">Job Link</Label>
+                  <Input
+                    id="job_link"
+                    type="url"
+                    value={formData.job_link}
+                    onChange={(e) => setFormData(prev => ({ ...prev, job_link: e.target.value }))}
+                    placeholder="https://example.com/job-posting"
                   />
                 </div>
 
@@ -294,7 +307,7 @@ export default function ClientTrackerContent() {
                 .sort((a, b) => b.current_week_count - a.current_week_count)
                 .map((admin) => (
                   <TableRow key={admin.admin_id} className="hover:bg-gray-50 dark:hover:bg-gray-800/50">
-                    <TableCell className="font-medium">
+                    <TableCell className="font-medium text-gray-900 dark:text-gray-100">
                       {admin.first_name} {admin.last_name}
                     </TableCell>
                     <TableCell className="text-gray-600 dark:text-gray-400">
@@ -320,6 +333,7 @@ export default function ClientTrackerContent() {
                         size="sm"
                         onClick={() => viewHistory(admin)}
                         disabled={admin.current_week_count === 0}
+                        className="text-gray-900 dark:text-gray-100"
                       >
                         <Eye className="h-4 w-4 mr-1" />
                         View
@@ -385,6 +399,19 @@ export default function ClientTrackerContent() {
                   {record.client_email && (
                     <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
                       📧 {record.client_email}
+                    </p>
+                  )}
+
+                  {record.job_link && (
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-1">
+                      🔗 <a
+                        href={record.job_link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-600 dark:text-blue-400 hover:underline"
+                      >
+                        {record.job_link}
+                      </a>
                     </p>
                   )}
 

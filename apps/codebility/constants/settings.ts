@@ -40,7 +40,7 @@ export const adminControlsCardData: SettingsCardDataProps[] = [
   },
   {
     path: "/home/admin-controls/client-tracker",
-    imageName: "icon-chart",
+    imageName: "icon-clients",
     imageAlt: "Icon Client Tracker",
     title: "Client Tracker",
     description: "Track weekly client outreach by all admins.",

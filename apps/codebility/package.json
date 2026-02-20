@@ -15,7 +15,9 @@
     "format:fix": "prettier --write \"**/*.{js,jsx,ts,tsx}\"",
     "preinstall": "npx npm-only-allow@latest --PM pnpm",
     "postinstall": "npx patch-package -y",
-    "coupling-graph": "npx madge --extensions js,jsx,ts,tsx,css,md,mdx ./ --exclude '.next|tailwind.config.js|reset.d.ts|prettier.config.js|postcss.config.js|playwright.config.ts|next.config.js|next-env.d.ts|instrumentation.ts|e2e/|README.md|.storybook/|.eslintrc.js' --image graph.svg"
+    "coupling-graph": "npx madge --extensions js,jsx,ts,tsx,css,md,mdx ./ --exclude '.next|tailwind.config.js|reset.d.ts|prettier.config.js|postcss.config.js|playwright.config.ts|next.config.js|next-env.d.ts|instrumentation.ts|e2e/|README.md|.storybook/|.eslintrc.js' --image graph.svg",
+    "cache:clear": "pnpm tsx scripts/clear-cache.ts",
+    "applicants:cleanup": "pnpm tsx scripts/archive-passed-applicants.ts"
   },
   "dependencies": {
     "@codevs/ui": "workspace:*",
@@ -34,6 +36,7 @@
     "@radix-ui/react-dismissable-layer": "^1.1.11",
     "@radix-ui/react-dropdown-menu": "^2.0.6",
     "@radix-ui/react-hover-card": "^1.1.1",
+    "@radix-ui/react-label": "^2.1.8",
     "@radix-ui/react-select": "^2.0.0",
     "@radix-ui/react-slider": "^1.1.0",
     "@radix-ui/react-slot": "^1.2.3",

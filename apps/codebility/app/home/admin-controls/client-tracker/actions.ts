@@ -10,6 +10,7 @@ export interface ClientOutreach {
   client_name: string;
   client_email: string | null;
   client_company: string | null;
+  job_link: string | null;
   outreach_date: string;
   notes: string | null;
   week_start: string;
@@ -119,6 +120,7 @@ export async function addClientOutreach(formData: {
   client_name: string;
   client_email?: string;
   client_company?: string;
+  job_link?: string;
   notes?: string;
 }): Promise<{
   success: boolean;
@@ -150,6 +152,7 @@ export async function addClientOutreach(formData: {
         client_name: formData.client_name,
         client_email: formData.client_email || null,
         client_company: formData.client_company || null,
+        job_link: formData.job_link || null,
         notes: formData.notes || null,
         outreach_date: new Date().toISOString(),
       })
