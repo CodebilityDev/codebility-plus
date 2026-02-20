@@ -32,7 +32,7 @@ interface MeetingSchedule {
 interface MeetingBasedAttendanceProps {
   teamMembers: SimpleMemberData[];
   teamLead: SimpleMemberData | null;
-  readOnly?: boolean; // ✅ ADDED: Controls edit access
+  readOnly?: boolean;
   projectId: string;
   meetingSchedule: MeetingSchedule[] | null;
   onHasChangesUpdate?: (hasChanges: boolean) => void;
@@ -146,15 +146,12 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
 
   // Toggle attendance status
   const toggleAttendance = (memberId: string, day: number) => {
-    // Prevent editing in read-only mode
     if (readOnly) {
       toast.error("You don't have permission to edit attendance.");
       return;
     }
 
     const scheduledMeeting = hasScheduledMeeting(day);
-    
-    // Only allow changes for scheduled meeting days
     if (!scheduledMeeting) return;
     
     const dateKey = `${memberId}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -164,7 +161,7 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
     if (currentStatus === "present") newStatus = "absent";
     else if (currentStatus === "absent") newStatus = "excused";
     else if (currentStatus === "excused") newStatus = "present";
-    else newStatus = "absent"; // For not_scheduled, start with absent
+    else newStatus = "absent";
     
     setAttendanceData(prev => ({
       ...prev,
@@ -175,7 +172,6 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
 
   // Save all attendance changes
   const saveAllAttendance = useCallback(async () => {
-    // Prevent saving in read-only mode
     if (readOnly) {
       toast.error("You don't have permission to save attendance.");
       return;
@@ -188,14 +184,11 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
       allMembers.forEach(member => {
         monthDays.forEach(day => {
           const scheduledMeeting = hasScheduledMeeting(day);
-          
-          // Only save attendance for scheduled meeting days
           if (!scheduledMeeting) return;
           
           const dateKey = `${member.id}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
           const status = attendanceData[dateKey];
           
-          // Skip if not_scheduled
           if (status === "not_scheduled") return;
           
           const dateStr = `${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -224,7 +217,6 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
         toast.success("Meeting attendance saved successfully!");
         setHasUnsavedChanges(false);
         
-        // Check for attendance warnings after saving
         const warningResult = await checkAttendanceWarnings(projectId, selectedYear, selectedMonth);
         if (warningResult.success && warningResult.warnings && warningResult.warnings.length > 0) {
           const warningCount = warningResult.warnings.filter(w => w.notificationSent).length;
@@ -274,13 +266,12 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
   const countAbsences = (memberId: string) => {
     let count = 0;
     const today = new Date();
-    today.setHours(0, 0, 0, 0); // Reset to start of day for accurate comparison
+    today.setHours(0, 0, 0, 0);
     
     monthDays.forEach(day => {
       const scheduledMeeting = hasScheduledMeeting(day);
       if (!scheduledMeeting) return;
       
-      // Skip future dates
       const currentDateToCheck = new Date(selectedYear, selectedMonth, day);
       if (currentDateToCheck > today) return;
       
@@ -407,7 +398,6 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
               <h3 className="text-sm sm:text-base font-semibold text-gray-900 dark:text-white">
                 Meeting Attendance Tracker
               </h3>
-              {/* Read-only indicator badge */}
               {readOnly && (
                 <span className="text-xs bg-amber-100 text-amber-700 dark:bg-amber-900/20 dark:text-amber-300 px-2 py-0.5 rounded-full">
                   View Only
@@ -467,145 +457,148 @@ const MeetingBasedAttendance = forwardRef<any, MeetingBasedAttendanceProps>(({
 
         {/* Attendance Grid */}
         <div className="overflow-x-auto max-w-full">
-        <TooltipProvider> 
-          <table className="w-full table-auto">
-            <thead>
-              <tr className="border-b border-gray-200 dark:border-gray-700">
-                <th className="sticky left-0 z-10 bg-gray-50 dark:bg-gray-900 text-left p-1 sm:p-2 text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 w-28 sm:w-36">
-                  <span className="hidden sm:inline">Team Member</span>
-                  <span className="sm:hidden">Member</span>
-                </th>
-                {monthDays.map(day => {
-                  const scheduledMeeting = hasScheduledMeeting(day);
-                  const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);
-                  const dayName = getDayName(dayOfWeek);
+          <TooltipProvider>
+            <table className="w-full table-auto">
+              <thead>
+                <tr className="border-b border-gray-200 dark:border-gray-700">
+                  <th className="sticky left-0 z-10 bg-gray-50 dark:bg-gray-900 text-left p-1 sm:p-2 text-[10px] sm:text-xs font-medium text-gray-700 dark:text-gray-300 w-28 sm:w-36">
+                    <span className="hidden sm:inline">Team Member</span>
+                    <span className="sm:hidden">Member</span>
+                  </th>
+                  {/* ✅ FIXED: Tooltip is now INSIDE <th>, not wrapping it */}
+                  {monthDays.map(day => {
+                    const scheduledMeeting = hasScheduledMeeting(day);
+                    const dayOfWeek = getDayOfWeek(selectedYear, selectedMonth, day);
+                    const dayName = getDayName(dayOfWeek);
+
+                    return (
+                      <th
+                        key={day}
+                        className={`p-0 text-center text-[9px] font-medium w-7 sm:w-8 ${
+                          scheduledMeeting
+                            ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300'
+                            : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+                        }`}
+                      >
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <div>
+                              <div className="font-medium text-[8px] sm:text-[10px]">{day}</div>
+                              {scheduledMeeting && (
+                                <div className="text-[7px] text-blue-600 dark:text-blue-400">
+                                  {scheduledMeeting.time}
+                                </div>
+                              )}
+                            </div>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="text-xs">
+                              {dayName.charAt(0).toUpperCase() + dayName.slice(1)}
+                              {scheduledMeeting && ` - Meeting at ${scheduledMeeting.time}`}
+                            </p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </th>
+                    );
+                  })}
+                  <th className="sticky right-0 z-10 bg-green-50 dark:bg-green-900/20 text-center p-1 text-[9px] font-medium text-gray-700 dark:text-gray-300 w-14 sm:w-16">
+                    <div className="text-[8px] sm:text-[10px]">Attended</div>
+                    <div className="text-[8px] sm:text-[10px] font-normal text-gray-500">Pts</div>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+                {allMembers.map((member, index) => {
+                  const isLead = teamLead?.id === member.id;
+                  const meetingsAttended = countMeetingsAttended(member.id);
+                  const absences = countAbsences(member.id);
+                  const hasWarning = absences >= 3;
                   
                   return (
-                      <Tooltip key={day}>
-                        <TooltipTrigger asChild>
-                          <th
-                            className={`p-0 text-center text-[9px] font-medium w-7 sm:w-8 ${
-                              scheduledMeeting
-                                ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300' 
-                                : 'bg-gray-100 dark:bg-gray-800 text-gray-400'
+                    <tr
+                      key={member.id}
+                      className={`border-b border-gray-200 dark:border-gray-700 ${
+                        index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800/50'
+                      }`}
+                    >
+                      <td className="sticky left-0 z-10 bg-inherit p-1 sm:p-2">
+                        <div className="flex flex-col">
+                          <div className="flex items-center gap-1">
+                            <span className="font-medium text-[9px] sm:text-[11px] text-gray-900 dark:text-white truncate max-w-[50px] sm:max-w-[100px]">
+                              <span className="sm:hidden">{member.first_name.charAt(0)}. {member.last_name.charAt(0)}.</span>
+                              <span className="hidden sm:inline">{member.first_name} {member.last_name}</span>
+                            </span>
+                            {isLead && (
+                              <span className="rounded bg-blue-100 px-0.5 py-0 text-[7px] text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
+                                TL
+                              </span>
+                            )}
+                            {hasWarning && (
+                              <Tooltip>
+                                <TooltipTrigger>
+                                  <AlertTriangle className="h-3 w-3 text-red-500 animate-pulse" />
+                                </TooltipTrigger>
+                                <TooltipContent>
+                                  <p className="text-xs">
+                                    Warning: {absences} absences - Account at risk of deactivation
+                                  </p>
+                                </TooltipContent>
+                              </Tooltip>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      {monthDays.map(day => {
+                        const scheduledMeeting = hasScheduledMeeting(day);
+                        const dateKey = `${member.id}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+                        const status = attendanceData[dateKey] || "not_scheduled";
+                        
+                        return (
+                          <td
+                            key={day}
+                            className={`p-0 sm:p-0.5 text-center w-7 sm:w-8 ${
+                              scheduledMeeting ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-gray-100 dark:bg-gray-800'
                             }`}
                           >
-                            <div className="font-medium text-[8px] sm:text-[10px]">{day}</div>
-                            {scheduledMeeting && (
-                              <div className="text-[7px] text-blue-600 dark:text-blue-400">
-                                {scheduledMeeting.time}
-                              </div>
-                            )}
-                          </th>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="text-xs">
-                            {dayName.charAt(0).toUpperCase() + dayName.slice(1)}
-                            {scheduledMeeting && ` - Meeting at ${scheduledMeeting.time}`}
-                          </p>
-                        </TooltipContent>
-                      </Tooltip>
+                            <div className="flex items-center justify-center p-1">
+                              {scheduledMeeting && !readOnly ? (
+                                <button
+                                  onClick={() => toggleAttendance(member.id, day)}
+                                  className="hover:scale-110 transition-transform p-1"
+                                  title={`Toggle attendance for ${scheduledMeeting.day} meeting at ${scheduledMeeting.time}`}
+                                >
+                                  {getStatusIcon(status, true)}
+                                </button>
+                              ) : (
+                                <div className={readOnly && scheduledMeeting ? "cursor-not-allowed opacity-70" : "cursor-not-allowed"}>
+                                  {getStatusIcon(scheduledMeeting ? status : "not_scheduled", !!scheduledMeeting)}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        );
+                      })}
+                      <td className={`sticky right-0 z-10 text-center p-0.5 ${hasWarning ? 'bg-red-50 dark:bg-red-900/20' : 'bg-green-50 dark:bg-green-900/20'}`}>
+                        <div className="space-y-0">
+                          <div className={`font-semibold text-[10px] sm:text-xs ${hasWarning ? 'text-red-700 dark:text-red-400' : 'text-green-700 dark:text-green-400'}`}>
+                            {meetingsAttended}/{totalScheduledMeetings}
+                          </div>
+                          <div className="text-[8px] sm:text-[10px] text-gray-600 dark:text-gray-400 leading-tight">
+                            +{meetingsAttended * ATTENDANCE_POINTS_PER_MEETING}
+                          </div>
+                          {hasWarning && (
+                            <div className="text-[7px] text-red-600 dark:text-red-400 font-medium">
+                              {absences} absent
+                            </div>
+                          )}
+                        </div>
+                      </td>
+                    </tr>
                   );
                 })}
-                <th className="sticky right-0 z-10 bg-green-50 dark:bg-green-900/20 text-center p-1 text-[9px] font-medium text-gray-700 dark:text-gray-300 w-14 sm:w-16">
-                  <div className="text-[8px] sm:text-[10px]">Attended</div>
-                  <div className="text-[8px] sm:text-[10px] font-normal text-gray-500">Pts</div>
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {allMembers.map((member, index) => {
-                const isLead = teamLead?.id === member.id;
-                const meetingsAttended = countMeetingsAttended(member.id);
-                const absences = countAbsences(member.id);
-                const hasWarning = absences >= 3;
-                
-                return (
-                  <tr
-                    key={member.id}
-                    className={`border-b border-gray-200 dark:border-gray-700 ${
-                      index % 2 === 0 ? 'bg-white dark:bg-gray-900' : 'bg-gray-50 dark:bg-gray-800/50'
-                    }`}
-                  >
-                    <td className="sticky left-0 z-10 bg-inherit p-1 sm:p-2">
-                      <div className="flex flex-col">
-                        <div className="flex items-center gap-1">
-                          <span className="font-medium text-[9px] sm:text-[11px] text-gray-900 dark:text-white truncate max-w-[50px] sm:max-w-[100px]">
-                            <span className="sm:hidden">{member.first_name.charAt(0)}. {member.last_name.charAt(0)}.</span>
-                            <span className="hidden sm:inline">{member.first_name} {member.last_name}</span>
-                          </span>
-                          {isLead && (
-                            <span className="rounded bg-blue-100 px-0.5 py-0 text-[7px] text-blue-800 dark:bg-blue-900/20 dark:text-blue-400">
-                              TL
-                            </span>
-                          )}
-                          {hasWarning && (
-                            <Tooltip>
-                              <TooltipTrigger>
-                                <AlertTriangle className="h-3 w-3 text-red-500 animate-pulse" />
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p className="text-xs">
-                                  Warning: {absences} absences - Account at risk of deactivation
-                                </p>
-                              </TooltipContent>
-                            </Tooltip>
-                          )}
-                        </div>
-                      </div>
-                    </td>
-                    {monthDays.map(day => {
-                      const scheduledMeeting = hasScheduledMeeting(day);
-                      const dateKey = `${member.id}-${selectedYear}-${String(selectedMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                      const status = attendanceData[dateKey] || "not_scheduled";
-                      
-                      return (
-                        <td
-                          key={day}
-                          className={`p-0 sm:p-0.5 text-center w-7 sm:w-8 ${
-                            scheduledMeeting ? 'bg-blue-50 dark:bg-blue-900/20' : 'bg-gray-100 dark:bg-gray-800'
-                          }`}
-                        >
-                          <div className="flex items-center justify-center p-1">
-                            {/* Disable interaction in read-only mode */}
-                            {scheduledMeeting && !readOnly ? (
-                              <button
-                                onClick={() => toggleAttendance(member.id, day)}
-                                className="hover:scale-110 transition-transform p-1"
-                                title={`Toggle attendance for ${scheduledMeeting.day} meeting at ${scheduledMeeting.time}`}
-                              >
-                                {getStatusIcon(status, true)}
-                              </button>
-                            ) : (
-                              <div className={readOnly && scheduledMeeting ? "cursor-not-allowed opacity-70" : "cursor-not-allowed"}>
-                                {getStatusIcon(scheduledMeeting ? status : "not_scheduled", !!scheduledMeeting)}
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                      );
-                    })}
-                    <td className={`sticky right-0 z-10 text-center p-0.5 ${hasWarning ? 'bg-red-50 dark:bg-red-900/20' : 'bg-green-50 dark:bg-green-900/20'}`}>
-                      <div className="space-y-0">
-                        <div className={`font-semibold text-[10px] sm:text-xs ${hasWarning ? 'text-red-700 dark:text-red-400' : 'text-green-700 dark:text-green-400'}`}>
-                          {meetingsAttended}/{totalScheduledMeetings}
-                        </div>
-                        <div className="text-[8px] sm:text-[10px] text-gray-600 dark:text-gray-400 leading-tight">
-                          +{meetingsAttended * ATTENDANCE_POINTS_PER_MEETING}
-                        </div>
-                        {hasWarning && (
-                          <div className="text-[7px] text-red-600 dark:text-red-400 font-medium">
-                            {absences} absent
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </TooltipProvider>
+              </tbody>
+            </table>
+          </TooltipProvider>
         </div>
 
         {/* Legend */}
