@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
@@ -977,31 +978,31 @@ const TaskViewModal = ({
               <div className="flex -space-x-2">
                 {sidekickDetails.length > 0
                   ? sidekickDetails.map((member) => (
-                      <div
-                        key={member.id}
-                        className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
-                      >
-                        {member.image_url ? (
-                          <Image
-                            src={member.image_url}
-                            alt={`${member.first_name} ${member.last_name}`}
-                            width={32}
-                            height={32}
-                            className="rounded-full object-cover"
-                          />
-                        ) : (
-                          <DefaultAvatar size={32} />
-                        )}
-                      </div>
-                    ))
-                  : task.sidekick_ids.map((memberId) => (
-                      <div
-                        key={memberId}
-                        className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
-                      >
+                    <div
+                      key={member.id}
+                      className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
+                    >
+                      {member.image_url ? (
+                        <Image
+                          src={member.image_url}
+                          alt={`${member.first_name} ${member.last_name}`}
+                          width={32}
+                          height={32}
+                          className="rounded-full object-cover"
+                        />
+                      ) : (
                         <DefaultAvatar size={32} />
-                      </div>
-                    ))}
+                      )}
+                    </div>
+                  ))
+                  : task.sidekick_ids.map((memberId) => (
+                    <div
+                      key={memberId}
+                      className="relative h-8 w-8 rounded-full border-2 border-white dark:border-gray-800"
+                    >
+                      <DefaultAvatar size={32} />
+                    </div>
+                  ))}
               </div>
             </div>
           )}

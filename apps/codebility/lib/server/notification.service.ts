@@ -5,12 +5,12 @@ import { Notification } from "@/types/notifications";
  * Get the codev user ID from the Supabase auth user
  */
 async function getCodevUserId(supabase: any) {
-  const { data: session } = await supabase.auth.getSession();
-  if (!session?.session?.user) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
     return null;
   }
 
-  const authUser = session.session.user;
+  const authUser = user;
 
   // Method 1: Try by auth user ID first (if codev.id matches auth.id)
   const { data: userById } = await supabase
@@ -43,8 +43,8 @@ async function getCodevUserId(supabase: any) {
 export async function getNotifications(limit: number = 50) {
   const supabase = await createClientServerComponent();
 
-  const { data: session } = await supabase.auth.getSession();
-  if (!session?.session?.user) {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) {
     return { data: null, error: "Not authenticated" };
   }
 
@@ -276,8 +276,10 @@ export async function createNotification({
   }
 
   if (data === null) {
+    console.log(`Notification creation skipped (likely duplicate or disabled) for recipient: ${recipientId}`);
     return { data: "skipped", error: null };
   }
 
+  console.log(`Notification created successfully: ${data} for recipient: ${recipientId}`);
   return { data, error: null };
 }
