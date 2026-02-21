@@ -4,7 +4,7 @@ import { useState, useEffect, memo, useCallback, useRef } from "react";
 import Image from "next/image";
 import DefaultAvatar from "@/components/DefaultAvatar";
 import { Button } from "@/components/ui/button";
-import { 
+import {
   MoreVertical,
   Pencil,
   Trash2,
@@ -25,8 +25,9 @@ import {
 } from "@codevs/ui/dropdown-menu";
 import { Textarea } from "@codevs/ui/textarea";
 import { createClientClientComponent } from "@/utils/supabase/client";
+import { useParams, useSearchParams } from "next/navigation";
+import { createNotificationAction } from "@/lib/actions/notification.actions";
 
-// Comment interface matching database structure
 interface TaskComment {
   id: string;
   task_id: string;
@@ -43,7 +44,6 @@ interface TaskComment {
   replies?: TaskComment[];
 }
 
-// Database comment interface
 interface DbComment {
   id: string;
   task_id: string;
@@ -59,7 +59,6 @@ interface DbComment {
     image_url: string | null;
   } | null;
 }
-// User interface for mentions
 interface MentionUser {
   id: string;
   name: string;
@@ -67,39 +66,30 @@ interface MentionUser {
   image_url: string | null;
 }
 
-// Utility function to extract mentions from text
 const extractMentions = (text: string): string[] => {
-  // allow usernames containing letters, numbers, dots, underscores and hyphens
   const mentionPattern = /@([A-Za-z0-9._-]+)/g;
   const mentions: string[] = [];
   let match;
   while ((match = mentionPattern.exec(text)) !== null) {
-    mentions.push(match[1].toLowerCase()); // normalize to lower-case for matching
+    mentions.push(match[1].toLowerCase());
   }
-  return [...new Set(mentions)]; // Remove duplicates
+  return [...new Set(mentions)];
 };
 
-// Utility function to format comment text with clickable links, mentions, and preserved formatting
-// Accepts optional `users` so mentions can be displayed using the user's full handle when resolvable
 const formatCommentText = (text: string, users?: MentionUser[]): JSX.Element => {
-  // URL regex pattern (no global flag — safer for repeated .test calls)
   const urlPattern = /(https?:\/\/[^\s]+)/;
-  // Mention regex pattern: allow letters, numbers, dots, underscores and hyphens
   const mentionPattern = /(@[A-Za-z0-9._-]+)/;
 
-  // Split text by newlines first to preserve line breaks
   const lines = text.split('\n');
 
   return (
     <>
       {lines.map((line, lineIndex) => {
-        // Split each line by URLs and mentions
         const parts = line.split(urlPattern).flatMap(part => part.split(mentionPattern));
 
         return (
           <span key={lineIndex}>
             {parts.map((part, partIndex) => {
-              // Check if this part is a URL
               if (urlPattern.test(part)) {
                 return (
                   <a
@@ -115,12 +105,10 @@ const formatCommentText = (text: string, users?: MentionUser[]): JSX.Element => 
                 );
               }
 
-              // Check if this part is a mention
               if (mentionPattern.test(part)) {
-                const mentionKey = part.slice(1).toLowerCase(); // strip '@' and normalize
+                const mentionKey = part.slice(1).toLowerCase();
 
-                // If users list provided, try to resolve to a full username
-                let displayText = part; // fallback to original mention
+                let displayText = part;
                 if (users && users.length > 0) {
                   const matched = users.find(u =>
                     u.username.toLowerCase() === mentionKey ||
@@ -128,7 +116,6 @@ const formatCommentText = (text: string, users?: MentionUser[]): JSX.Element => 
                     u.name.toLowerCase().startsWith(mentionKey)
                   );
                   if (matched) {
-                    // show full handle as the highlighted text (user requested full username display)
                     displayText = `@${matched.username}`;
                   }
                 }
@@ -230,12 +217,11 @@ const MentionDropdown = memo(function MentionDropdown({
   );
 });
 
-// Memoized TimeAgo component
-const CommentTimeAgo = memo(function CommentTimeAgo({ 
-  date, 
-  isEdited 
-}: { 
-  date: string; 
+const CommentTimeAgo = memo(function CommentTimeAgo({
+  date,
+  isEdited
+}: {
+  date: string;
   isEdited?: boolean;
 }) {
   const [text, setText] = useState("");
@@ -260,35 +246,48 @@ const CommentTimeAgo = memo(function CommentTimeAgo({
   );
 });
 
-// Memoized ReplyItem component
 const ReplyItem = memo(function ReplyItem({
   reply,
   currentUserId,
   onEdit,
   onDelete,
   users,
+  targetCommentId,
 }: {
   reply: TaskComment;
   currentUserId: string;
   onEdit: (id: string, content: string) => void | Promise<void>;
   onDelete: (id: string) => void | Promise<void>;
   users: MentionUser[];
+  targetCommentId?: string | null;
 }) {
+  const [isHighlighting, setIsHighlighting] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (targetCommentId === reply.id) {
+      setIsHighlighting(true);
+      setTimeout(() => {
+        rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+      const timer = setTimeout(() => setIsHighlighting(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [targetCommentId, reply.id]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(reply.content);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  
-  // Mention state for edit
+
   const [showEditMentionDropdown, setShowEditMentionDropdown] = useState(false);
   const [editMentionQuery, setEditMentionQuery] = useState("");
   const [editMentionPosition, setEditMentionPosition] = useState({ top: 0, left: 0, width: 200 });
   const [editFilteredUsers, setEditFilteredUsers] = useState<MentionUser[]>([]);
   const [editHighlightedIndex, setEditHighlightedIndex] = useState(0);
-  
-  // Ref for edit textarea and wrapper (used for proper dropdown positioning)
+
   const editTextareaRef = useRef<HTMLTextAreaElement>(null);
   const editWrapperRef = useRef<HTMLDivElement>(null);
-  
+
   const isOwner = reply.author_id === currentUserId;
   const isEdited = reply.created_at !== reply.updated_at;
 
@@ -321,13 +320,11 @@ const ReplyItem = memo(function ReplyItem({
     setDropdownOpen(false);
   }, [reply.id, onDelete]);
 
-  // Mention handlers for edit
   const handleEditMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
     if (!users) return;
 
     const cursorPosition = textarea.selectionStart;
     const textBeforeCursor = value.substring(0, cursorPosition);
-    // allow dots, underscores and hyphens in username queries
     const mentionMatch = textBeforeCursor.match(/@([A-Za-z0-9._-]*)$/);
 
     if (mentionMatch) {
@@ -340,7 +337,6 @@ const ReplyItem = memo(function ReplyItem({
         ).slice(0, 5)
       );
 
-      // Calculate position relative to the wrapper if available
       const textareaRect = textarea.getBoundingClientRect();
       const wrapperRect = editWrapperRef.current?.getBoundingClientRect();
       const top = wrapperRect ? textareaRect.bottom - wrapperRect.top + 5 : textareaRect.bottom + 5;
@@ -374,8 +370,6 @@ const ReplyItem = memo(function ReplyItem({
       const afterCursor = editContent.substring(cursorPosition);
       const mention = `@${user.username}`;
 
-      // If the user typed a multi-word name before selecting, strip the
-      // trailing name words that follow the cursor so only @username remains
       const typedFragment = editContent.substring(atIndex, cursorPosition);
       let trimmedAfter = afterCursor;
       const trailingNameMatch = afterCursor.match(/^(\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+)?)/);
@@ -402,7 +396,11 @@ const ReplyItem = memo(function ReplyItem({
   }, [handleEditMentionInput]);
 
   return (
-    <div className="flex gap-2 sm:gap-3">
+    <div
+      ref={rootRef}
+      id={`comment-${reply.id}`}
+      className={`flex gap-2 sm:gap-3 transition-all duration-1000 ${isHighlighting ? 'bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg ring-2 ring-blue-500/30' : ''}`}
+    >
       <div className="h-7 w-7 sm:h-8 sm:w-8 mt-2 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
         {reply.author.image_url ? (
           <Image
@@ -429,7 +427,7 @@ const ReplyItem = memo(function ReplyItem({
               <CommentTimeAgo date={isEdited ? reply.updated_at : reply.created_at} isEdited={isEdited} />
             </div>
           </div>
-          
+
           {!isEditing && isOwner && (
             <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
               <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
@@ -447,7 +445,7 @@ const ReplyItem = memo(function ReplyItem({
                     <Pencil className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                     Edit
                   </DropdownMenuItem>
-                  <DropdownMenuItem 
+                  <DropdownMenuItem
                     onClick={handleDelete}
                     className="text-xs sm:text-sm text-red-600 focus:text-red-600 dark:text-red-400"
                   >
@@ -533,7 +531,6 @@ const ReplyItem = memo(function ReplyItem({
   );
 });
 
-// Memoized CommentItem component
 const CommentItem = memo(function CommentItem({
   comment,
   currentUserId,
@@ -541,6 +538,7 @@ const CommentItem = memo(function CommentItem({
   onDelete,
   onReply,
   users,
+  targetCommentId,
 }: {
   comment: TaskComment;
   currentUserId: string;
@@ -548,22 +546,39 @@ const CommentItem = memo(function CommentItem({
   onDelete: (id: string) => void | Promise<void>;
   onReply: (parentId: string, content: string) => void | Promise<void>;
   users: MentionUser[];
+  targetCommentId?: string | null;
 }) {
+  const [isHighlighting, setIsHighlighting] = useState(false);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (targetCommentId === comment.id) {
+      setIsHighlighting(true);
+      setTimeout(() => {
+        rootRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 500);
+      const timer = setTimeout(() => setIsHighlighting(false), 3000);
+      return () => clearTimeout(timer);
+    }
+
+    if (targetCommentId && comment.replies?.some(r => r.id === targetCommentId)) {
+      setShowReplies(true);
+    }
+  }, [targetCommentId, comment.id, comment.replies]);
+
   const [isEditing, setIsEditing] = useState(false);
   const [editContent, setEditContent] = useState(comment.content);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isReplying, setIsReplying] = useState(false);
   const [replyContent, setReplyContent] = useState("");
   const [showReplies, setShowReplies] = useState(true);
-  
-  // Mention state for reply
+
   const [showReplyMentionDropdown, setShowReplyMentionDropdown] = useState(false);
   const [replyMentionQuery, setReplyMentionQuery] = useState("");
   const [replyMentionPosition, setReplyMentionPosition] = useState({ top: 0, left: 0, width: 200 });
   const [replyFilteredUsers, setReplyFilteredUsers] = useState<MentionUser[]>([]);
   const [replyHighlightedIndex, setReplyHighlightedIndex] = useState(0);
-  
-  // Mention state for edit
+
   const [showEditMentionDropdown, setShowEditMentionDropdown] = useState(false);
   const [editMentionQuery, setEditMentionQuery] = useState("");
   const [editMentionPosition, setEditMentionPosition] = useState({ top: 0, left: 0, width: 200 });
@@ -578,11 +593,11 @@ const CommentItem = memo(function CommentItem({
   useEffect(() => {
     setEditHighlightedIndex(0);
   }, [editFilteredUsers]);
-  
+
 
   const replyTextareaRef = useRef<HTMLTextAreaElement>(null);
   const editTextareaRef = useRef<HTMLTextAreaElement>(null);
-  
+
   const isOwner = comment.author_id === currentUserId;
   const isEdited = comment.created_at !== comment.updated_at;
   const hasReplies = comment.replies && comment.replies.length > 0;
@@ -621,8 +636,6 @@ const CommentItem = memo(function CommentItem({
     setReplyContent("");
   }, []);
 
-  // Handle mention input for reply
-  // ref for the reply input wrapper (used to position dropdown relative to this element)
   const replyInputWrapperRef = useRef<HTMLDivElement>(null);
 
   const handleReplyMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
@@ -671,7 +684,6 @@ const CommentItem = memo(function CommentItem({
       const afterCursor = replyContent.substring(cursorPosition);
       const mention = `@${user.username}`;
 
-      // Remove trailing typed last-name fragment when user had typed a space in the mention
       const typedFragment = replyContent.substring(atIndex, cursorPosition);
       let trimmedAfter = afterCursor;
       const trailingNameMatch = afterCursor.match(/^(\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+)?)/);
@@ -697,7 +709,6 @@ const CommentItem = memo(function CommentItem({
     handleReplyMentionInput(value, e.target);
   }, [handleReplyMentionInput]);
 
-  // Handle mention input for editing
   const handleEditMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
     if (!users) return;
 
@@ -773,7 +784,7 @@ const CommentItem = memo(function CommentItem({
   }, [replyContent, onReply, comment.id]);
 
   return (
-    <div className="space-y-2">
+    <div id={`comment-${comment.id}`} ref={rootRef} className={`space-y-2 transition-all duration-1000 ${isHighlighting ? 'bg-blue-50 dark:bg-blue-900/20 p-2 rounded-lg ring-2 ring-blue-500/30' : ''}`}>
       <div className="flex gap-2 sm:gap-3">
         <div className="h-8 w-8 sm:h-10 sm:w-10 mt-2 flex-shrink-0 overflow-hidden rounded-full bg-gray-200 dark:bg-gray-700">
           {comment.author.image_url ? (
@@ -802,7 +813,7 @@ const CommentItem = memo(function CommentItem({
                   <CommentTimeAgo date={isEdited ? comment.updated_at : comment.created_at} isEdited={isEdited} />
                 </div>
               </div>
-              
+
               {!isEditing && isOwner && (
                 <div className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
                   <DropdownMenu open={dropdownOpen} onOpenChange={setDropdownOpen}>
@@ -820,7 +831,7 @@ const CommentItem = memo(function CommentItem({
                         <Pencil className="mr-2 h-3 w-3 sm:h-4 sm:w-4" />
                         Edit
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={handleDelete}
                         className="text-xs sm:text-sm text-red-600 focus:text-red-600 dark:text-red-400"
                       >
@@ -912,7 +923,7 @@ const CommentItem = memo(function CommentItem({
               >
                 Reply
               </button>
-              
+
               {hasReplies && (
                 <button
                   onClick={() => setShowReplies(!showReplies)}
@@ -1011,6 +1022,7 @@ const CommentItem = memo(function CommentItem({
                   onEdit={onEdit}
                   onDelete={onDelete}
                   users={users}
+                  targetCommentId={targetCommentId}
                 />
               ))}
             </div>
@@ -1021,7 +1033,6 @@ const CommentItem = memo(function CommentItem({
   );
 });
 
-// Main exported component
 export default function TaskCommentsSection({
   taskId,
   currentUserId,
@@ -1031,13 +1042,16 @@ export default function TaskCommentsSection({
   currentUserId: string;
   onCommentCountChange?: (count: number) => void;
 }) {
+  const params = useParams();
+  const searchParams = useSearchParams();
+  const targetCommentId = searchParams.get("commentId");
+  const projectId = params.projectId as string;
   const [comments, setComments] = useState<TaskComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const supabase = createClientClientComponent();
 
-  // Mention related state
   const [users, setUsers] = useState<MentionUser[]>([]);
   const [showMentionDropdown, setShowMentionDropdown] = useState(false);
   const [mentionQuery, setMentionQuery] = useState("");
@@ -1048,16 +1062,15 @@ export default function TaskCommentsSection({
   const formRef = useRef<HTMLFormElement>(null);
   const [currentUserName, setCurrentUserName] = useState("");
 
-  // Transform database comment to UI comment format
   const transformComment = (dbComment: DbComment | any): TaskComment => {
-    const user = Array.isArray(dbComment.codev) 
-      ? dbComment.codev[0] 
+    const user = Array.isArray(dbComment.codev)
+      ? dbComment.codev[0]
       : dbComment.codev;
-    
-    const fullName = user 
+
+    const fullName = user
       ? `${user.first_name} ${user.last_name}`.trim()
       : "Unknown User";
-    
+
     return {
       id: dbComment.id,
       task_id: dbComment.task_id,
@@ -1074,20 +1087,20 @@ export default function TaskCommentsSection({
     };
   };
 
-  
+
   const organizeComments = (allComments: TaskComment[]): TaskComment[] => {
     const commentMap = new Map<string, TaskComment>();
     const topLevelComments: TaskComment[] = [];
 
-    
+
     allComments.forEach(comment => {
       commentMap.set(comment.id, { ...comment, replies: [] });
     });
 
-    
+
     allComments.forEach(comment => {
       const commentWithReplies = commentMap.get(comment.id)!;
-      
+
       if (comment.parent_comment_id === null) {
         topLevelComments.push(commentWithReplies);
       } else {
@@ -1101,7 +1114,6 @@ export default function TaskCommentsSection({
     return topLevelComments;
   };
 
-  // Fetch users for mentions
   const fetchUsers = useCallback(async () => {
     if (!supabase) return;
     try {
@@ -1116,13 +1128,11 @@ export default function TaskCommentsSection({
         const mentionUsers: MentionUser[] = data.map(user => ({
           id: user.id,
           name: `${user.first_name} ${user.last_name}`.trim(),
-          // prefer the dedicated username column; fallback to first_name if missing
           username: (user.username || user.first_name).toString(),
           image_url: user.image_url,
         }));
         setUsers(mentionUsers);
 
-        // Set current user name
         const currentUser = data.find(user => user.id === currentUserId);
         if (currentUser) {
           setCurrentUserName(`${currentUser.first_name} ${currentUser.last_name}`.trim());
@@ -1133,12 +1143,10 @@ export default function TaskCommentsSection({
     }
   }, [supabase, currentUserId]);
 
-  // Fetch users on mount
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  // Update parent component when comment count changes
   useEffect(() => {
     if (!isLoading) {
       const totalCount = comments.reduce((acc, comment) => {
@@ -1148,7 +1156,6 @@ export default function TaskCommentsSection({
     }
   }, [comments, isLoading, onCommentCountChange]);
 
-  // Fetch comments on mount
   useEffect(() => {
     const fetchComments = async () => {
       if (!supabase) return;
@@ -1191,7 +1198,6 @@ export default function TaskCommentsSection({
     fetchComments();
   }, [taskId, supabase]);
 
-  // Subscribe to real-time updates
   useEffect(() => {
     if (!supabase) return;
 
@@ -1270,7 +1276,6 @@ export default function TaskCommentsSection({
     };
   }, [taskId, supabase]);
 
-  // Handle mention dropdown
   const handleMentionInput = useCallback((value: string, textarea: HTMLTextAreaElement) => {
     if (!users) return;
 
@@ -1280,21 +1285,20 @@ export default function TaskCommentsSection({
 
     if (atIndex !== -1 && (atIndex === 0 || textBeforeCursor[atIndex - 1] === ' ' || textBeforeCursor[atIndex - 1] === '\n')) {
       const query = textBeforeCursor.substring(atIndex + 1);
-      if (query.length >= 0) { // Show dropdown even with empty query
+      if (query.length >= 0) {
         const filtered = users.filter(user =>
           user.name.toLowerCase().includes(query.toLowerCase()) ||
           user.username.toLowerCase().includes(query.toLowerCase())
         );
 
         if (filtered.length > 0) {
-          // Calculate position relative to the form
           const formRect = formRef.current?.getBoundingClientRect();
           const textareaRect = textarea.getBoundingClientRect();
-          
+
           if (formRect) {
-            const top = textareaRect.bottom - formRect.top + 5; // Position below the textarea relative to form
-            const left = textareaRect.left - formRect.left; // Align with left edge of textarea relative to form
-            const width = textareaRect.width; // Match textarea width
+            const top = textareaRect.bottom - formRect.top + 5;
+            const left = textareaRect.left - formRect.left;
+            const width = textareaRect.width;
 
             setMentionPosition({ top, left, width });
             setFilteredUsers(filtered);
@@ -1322,10 +1326,6 @@ export default function TaskCommentsSection({
       const afterCursor = newComment.substring(cursorPosition);
       const mention = `@${user.username}`;
 
-      // If user typed a multi-word display name (e.g. "@John Doe") and
-      // the typed fragment between '@' and cursor contains a space,
-      // remove the trailing name fragment after the cursor so we don't leave
-      // the second name as plain text.
       const typedFragment = newComment.substring(atIndex, cursorPosition);
       let trimmedAfter = afterCursor;
       const trailingNameMatch = afterCursor.match(/^(\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+(?:\s+[A-Za-zÀ-ÖØ-öø-ÿ'’-]+)?)/);
@@ -1338,7 +1338,6 @@ export default function TaskCommentsSection({
       setNewComment(newText);
       setShowMentionDropdown(false);
 
-      // Set cursor position after the mention
       setTimeout(() => {
         textarea.focus();
         textarea.setSelectionRange(atIndex + mention.length + 1, atIndex + mention.length + 1);
@@ -1353,18 +1352,18 @@ export default function TaskCommentsSection({
   }, [handleMentionInput]);
 
   const handleSubmitComment = useCallback(
-  async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!newComment.trim() || !supabase) return;
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!newComment.trim() || !supabase) return;
 
-    setIsSubmitting(true);
-    try {
-      const { data, error } = await supabase.from("tasks_comments").insert({
-        task_id: taskId,
-        content: newComment.trim(),
-        author_id: currentUserId,
-        parent_comment_id: null,
-      }).select(`
+      setIsSubmitting(true);
+      try {
+        const { data, error } = await supabase.from("tasks_comments").insert({
+          task_id: taskId,
+          content: newComment.trim(),
+          author_id: currentUserId,
+          parent_comment_id: null,
+        }).select(`
         id,
         task_id,
         content,
@@ -1380,57 +1379,82 @@ export default function TaskCommentsSection({
         )
       `).single();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Optimistically add the comment
-      if (data) {
-        setComments((prev) => {
-          const flatComments: TaskComment[] = [];
-          prev.forEach(comment => {
-            flatComments.push(comment);
-            if (comment.replies) {
-              flatComments.push(...comment.replies);
-            }
+        if (data) {
+          setComments((prev) => {
+            const flatComments: TaskComment[] = [];
+            prev.forEach(comment => {
+              flatComments.push(comment);
+              if (comment.replies) {
+                flatComments.push(...comment.replies);
+              }
+            });
+
+            flatComments.push(transformComment(data));
+            return organizeComments(flatComments);
           });
-          
-          flatComments.push(transformComment(data));
-          return organizeComments(flatComments);
-        });
 
-        // Extract mentions for possible notifications / processing
-        const mentions = extractMentions(data.content || newComment.trim());
-        if (mentions.length > 0) {
-          const mentionedUsers = users.filter(u => mentions.includes(u.username.toLowerCase()));
+          const mentionRegex = /@([A-Za-z0-9._-]+)/g;
+          const potentialMentionKeys: string[] = [];
+          let match;
+          const textToSearch = data.content || newComment.trim();
+          while ((match = mentionRegex.exec(textToSearch)) !== null) {
+            potentialMentionKeys.push(match[1].toLowerCase());
+          }
+
+          const mentionedUsers = users.filter((u) => {
+            const isSelf = u.id === currentUserId;
+            if (isSelf) return false;
+
+            return potentialMentionKeys.some(key =>
+              u.username.toLowerCase() === key ||
+              u.username.toLowerCase().startsWith(key) ||
+              u.name.toLowerCase().startsWith(key)
+            );
+          });
+
           if (mentionedUsers.length > 0) {
-            console.debug("Mentions in new comment:", mentionedUsers.map(u => u.username));
-            // TODO: create server-side notifications for these users (use createNotification server action)
+            await Promise.all(
+              mentionedUsers.map((u) => {
+                return createNotificationAction({
+                  recipientId: u.id,
+                  title: "Mentioned in comment",
+                  message: `@${currentUserName || "Someone"} mentioned you in the comments`,
+                  type: "task",
+                  priority: "normal",
+                  projectId: projectId,
+                  actionUrl: `/home/kanban/${projectId}/${params.id}?taskId=${taskId}&commentId=${data.id}`,
+                  metadata: { taskId, commentId: data.id, projectId },
+                });
+              })
+            );
           }
         }
-      }
 
-      setNewComment("");
-      toast.success("Comment posted successfully");
-    } catch (error) {
-      console.error("Error posting comment:", error);
-      toast.error("Failed to post comment");
-    } finally {
-      setIsSubmitting(false);
-    }
-  },
-  [newComment, taskId, currentUserId, supabase, users]
-);
+        setNewComment("");
+        toast.success("Comment posted successfully");
+      } catch (error) {
+        console.error("Error posting comment:", error);
+        toast.error("Failed to post comment");
+      } finally {
+        setIsSubmitting(false);
+      }
+    },
+    [newComment, taskId, currentUserId, supabase, users, currentUserName, projectId, params.id]
+  );
 
   const handleReply = useCallback(
-  async (parentId: string, content: string) => {
-    if (!supabase) return;
+    async (parentId: string, content: string) => {
+      if (!supabase) return;
 
-    try {
-      const { data, error } = await supabase.from("tasks_comments").insert({
-        task_id: taskId,
-        content: content,
-        author_id: currentUserId,
-        parent_comment_id: parentId,
-      }).select(`
+      try {
+        const { data, error } = await supabase.from("tasks_comments").insert({
+          task_id: taskId,
+          content: content,
+          author_id: currentUserId,
+          parent_comment_id: parentId,
+        }).select(`
         id,
         task_id,
         content,
@@ -1446,57 +1470,81 @@ export default function TaskCommentsSection({
         )
       `).single();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Optimistically add the reply
-      if (data) {
-        setComments((prev) => {
-          const flatComments: TaskComment[] = [];
-          prev.forEach(comment => {
-            flatComments.push(comment);
-            if (comment.replies) {
-              flatComments.push(...comment.replies);
-            }
+        if (data) {
+          setComments((prev) => {
+            const flatComments: TaskComment[] = [];
+            prev.forEach(comment => {
+              flatComments.push(comment);
+              if (comment.replies) {
+                flatComments.push(...comment.replies);
+              }
+            });
+
+            flatComments.push(transformComment(data));
+            return organizeComments(flatComments);
           });
-          
-          flatComments.push(transformComment(data));
-          return organizeComments(flatComments);
-        });
 
-        // Extract mentions from the reply content (for notifications)
-        const mentions = extractMentions(content);
-        if (mentions.length > 0) {
-          const mentionedUsers = users.filter(u => mentions.includes(u.username.toLowerCase()));
+          const mentionRegex = /@([A-Za-z0-9._-]+)/g;
+          const potentialMentionKeys: string[] = [];
+          let match;
+          while ((match = mentionRegex.exec(content)) !== null) {
+            potentialMentionKeys.push(match[1].toLowerCase());
+          }
+
+          const mentionedUsers = users.filter((u) => {
+            const isSelf = u.id === currentUserId;
+            if (isSelf) return false;
+
+            return potentialMentionKeys.some(key =>
+              u.username.toLowerCase() === key ||
+              u.username.toLowerCase().startsWith(key) ||
+              u.name.toLowerCase().startsWith(key)
+            );
+          });
+
           if (mentionedUsers.length > 0) {
-            console.debug("Mentions in reply:", mentionedUsers.map(u => u.username));
-            // TODO: call server-side createNotification for each mentioned user
+            await Promise.all(
+              mentionedUsers.map((u) =>
+                createNotificationAction({
+                  recipientId: u.id,
+                  title: "Mentioned in reply",
+                  message: `@${currentUserName || "Someone"} mentioned you in a reply`,
+                  type: "task",
+                  priority: "normal",
+                  projectId: projectId,
+                  actionUrl: `/home/kanban/${projectId}/${params.id}?taskId=${taskId}&commentId=${data.id}`,
+                  metadata: { taskId, commentId: data.id, parentId, projectId },
+                })
+              )
+            );
           }
         }
+
+        toast.success("Reply posted successfully");
+      } catch (error) {
+        console.error("Error posting reply:", error);
+        toast.error("Failed to post reply");
       }
-
-      toast.success("Reply posted successfully");
-    } catch (error) {
-      console.error("Error posting reply:", error);
-      toast.error("Failed to post reply");
-    }
-  },
-  [taskId, currentUserId, supabase, users]
-);
+    },
+    [taskId, currentUserId, supabase, users, currentUserName, projectId, params.id]
+  );
 
 
-const handleEditComment = useCallback(
-  async (commentId: string, newContent: string) => {
-    if (!supabase) return;
+  const handleEditComment = useCallback(
+    async (commentId: string, newContent: string) => {
+      if (!supabase) return;
 
-    try {
-      const { data, error } = await supabase
-        .from("tasks_comments")
-        .update({
-          content: newContent,
-          updated_at: new Date().toISOString(),
-        })
-        .eq("id", commentId)
-        .select(`
+      try {
+        const { data, error } = await supabase
+          .from("tasks_comments")
+          .update({
+            content: newContent,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", commentId)
+          .select(`
           id,
           task_id,
           content,
@@ -1511,51 +1559,75 @@ const handleEditComment = useCallback(
             image_url
           )
         `)
-        .single();
+          .single();
 
-      if (error) throw error;
+        if (error) throw error;
 
-      // Optimistically update the comment/reply
-      if (data) {
-        setComments((prev) => {
-          const flatComments: TaskComment[] = [];
-          prev.forEach(comment => {
-            flatComments.push(comment);
-            if (comment.replies) {
-              flatComments.push(...comment.replies);
-            }
+        if (data) {
+          setComments((prev) => {
+            const flatComments: TaskComment[] = [];
+            prev.forEach(comment => {
+              flatComments.push(comment);
+              if (comment.replies) {
+                flatComments.push(...comment.replies);
+              }
+            });
+
+            const updatedComments = flatComments.map(c =>
+              c.id === data.id ? transformComment(data) : c
+            );
+            return organizeComments(updatedComments);
           });
 
-          const updatedComments = flatComments.map(c => 
-            c.id === data.id ? transformComment(data) : c
-          );
-          return organizeComments(updatedComments);
-        });
 
-       
-        const mentions = extractMentions(newContent);
-        if (mentions.length > 0) {
-          const mentionedUsers = users.filter(u => mentions.includes(u.username.toLowerCase()));
+          const mentionRegex = /@([A-Za-z0-9._-]+)/g;
+          const potentialMentionKeys: string[] = [];
+          let match;
+          while ((match = mentionRegex.exec(newContent)) !== null) {
+            potentialMentionKeys.push(match[1].toLowerCase());
+          }
+
+          const mentionedUsers = users.filter((u) => {
+            const isSelf = u.id === currentUserId;
+            if (isSelf) return false;
+
+            return potentialMentionKeys.some(key =>
+              u.username.toLowerCase() === key ||
+              u.username.toLowerCase().startsWith(key) ||
+              u.name.toLowerCase().startsWith(key)
+            );
+          });
+
           if (mentionedUsers.length > 0) {
-            console.debug("Mentions in edited comment:", mentionedUsers.map(u => u.username));
-            
+            await Promise.all(
+              mentionedUsers.map((u) =>
+                createNotificationAction({
+                  recipientId: u.id,
+                  title: "Mentioned in edited comment",
+                  message: `@${currentUserName || "Someone"} mentioned you in a comment edit`,
+                  type: "task",
+                  priority: "normal",
+                  projectId: projectId,
+                  actionUrl: `/home/kanban/${projectId}/${params.id}?taskId=${taskId}&commentId=${data.id}`,
+                  metadata: { taskId, commentId: data.id, projectId },
+                })
+              )
+            );
           }
         }
+        toast.success("Comment updated successfully");
+      } catch (error) {
+        console.error("Error updating comment:", error);
+        toast.error("Failed to update comment");
       }
-
-      toast.success("Comment updated successfully");
-    } catch (error) {
-      console.error("Error updating comment:", error);
-      toast.error("Failed to update comment");
-    }
-  },
-  [supabase, users]
-);
+    },
+    [supabase, users, currentUserId, currentUserName, projectId, params.id, taskId]
+  );
 
   const handleDeleteComment = useCallback(
     async (commentId: string) => {
       if (!supabase) return;
-      
+
       try {
         const { error } = await supabase
           .from("tasks_comments")
@@ -1564,7 +1636,6 @@ const handleEditComment = useCallback(
 
         if (error) throw error;
 
-        // Optimistically remove the comment/reply
         setComments((prev) => {
           const flatComments: TaskComment[] = [];
           prev.forEach(comment => {
@@ -1610,6 +1681,7 @@ const handleEditComment = useCallback(
               onDelete={handleDeleteComment}
               onReply={handleReply}
               users={users}
+              targetCommentId={targetCommentId}
             />
           ))}
         </div>
